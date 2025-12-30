@@ -23,6 +23,8 @@ import {
   ChevronRight,
   CheckCircle,
   DollarSign,
+  Loader2,
+  AlertTriangle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -56,104 +58,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 import { formatDate, formatCurrency } from '@/lib/utils';
-
-// Mock data
-const mockCampaigns = [
-  {
-    id: '1',
-    name: 'Yılbaşı Premium Kampanyası',
-    type: 'multi_channel',
-    status: 'active',
-    channels: ['push', 'email', 'in_app'],
-    segment: 'free_users',
-    start_date: '2024-12-15T00:00:00Z',
-    end_date: '2024-12-31T23:59:59Z',
-    goal: 'Conversion',
-    budget: 5000,
-    spent: 2340,
-    stats: {
-      reach: 45000,
-      impressions: 128000,
-      clicks: 8900,
-      conversions: 456,
-      revenue: 68400,
-    },
-  },
-  {
-    id: '2',
-    name: 'Haftalık Moment Hatırlatma',
-    type: 'recurring',
-    status: 'active',
-    channels: ['push'],
-    segment: 'inactive_creators',
-    start_date: '2024-12-01T00:00:00Z',
-    end_date: null,
-    goal: 'Engagement',
-    budget: null,
-    spent: 0,
-    stats: {
-      reach: 8500,
-      impressions: 24000,
-      clicks: 2100,
-      conversions: 890,
-      revenue: 0,
-    },
-  },
-  {
-    id: '3',
-    name: 'Yeni Kullanıcı Onboarding',
-    type: 'automated',
-    status: 'active',
-    channels: ['email', 'in_app'],
-    segment: 'new_users',
-    start_date: '2024-11-01T00:00:00Z',
-    end_date: null,
-    goal: 'Activation',
-    budget: null,
-    spent: 0,
-    stats: {
-      reach: 12400,
-      impressions: 37200,
-      clicks: 5600,
-      conversions: 3200,
-      revenue: 0,
-    },
-  },
-  {
-    id: '4',
-    name: 'Kış Seyahati Kampanyası',
-    type: 'one_time',
-    status: 'scheduled',
-    channels: ['push', 'email'],
-    segment: 'all_users',
-    start_date: '2024-12-20T10:00:00Z',
-    end_date: '2024-12-25T23:59:59Z',
-    goal: 'Awareness',
-    budget: 3000,
-    spent: 0,
-    stats: null,
-  },
-  {
-    id: '5',
-    name: 'Black Friday Promosyonu',
-    type: 'one_time',
-    status: 'completed',
-    channels: ['push', 'email', 'in_app'],
-    segment: 'all_users',
-    start_date: '2024-11-24T00:00:00Z',
-    end_date: '2024-11-27T23:59:59Z',
-    goal: 'Conversion',
-    budget: 10000,
-    spent: 8750,
-    stats: {
-      reach: 125000,
-      impressions: 450000,
-      clicks: 32000,
-      conversions: 2800,
-      revenue: 420000,
-    },
-  },
-];
+import { useCampaigns, useCreateCampaign, useUpdateCampaign } from '@/hooks/use-campaigns';
 
 const campaignTypes = [
   { id: 'one_time', name: 'Tek Seferlik', description: 'Belirli tarihler arasında çalışır' },
@@ -162,17 +67,32 @@ const campaignTypes = [
   { id: 'multi_channel', name: 'Çok Kanallı', description: 'Birden fazla kanal kombinasyonu' },
 ];
 
-const overallStats = {
-  totalCampaigns: 12,
-  activeCampaigns: 3,
-  totalReach: 245000,
-  totalConversions: 7346,
-  totalRevenue: 488400,
-  avgConversionRate: 3.2,
-};
-
 export default function CampaignsPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('all');
+  const [newCampaignName, setNewCampaignName] = useState('');
+  const [newCampaignType, setNewCampaignType] = useState('email');
+
+  // Use real API data
+  const { data, isLoading, error } = useCampaigns({
+    status: activeTab === 'all' ? undefined : activeTab,
+  });
+  const createCampaign = useCreateCampaign();
+  const updateCampaign = useUpdateCampaign();
+
+  const campaigns = data?.campaigns || [];
+
+  // Calculate stats from real data
+  const overallStats = {
+    totalCampaigns: data?.total || campaigns.length,
+    activeCampaigns: campaigns.filter(c => c.status === 'active').length,
+    totalReach: campaigns.reduce((sum, c) => sum + (c.impressions || 0), 0),
+    totalConversions: campaigns.reduce((sum, c) => sum + (c.conversions || 0), 0),
+    totalRevenue: campaigns.reduce((sum, c) => sum + ((c.budget || 0) - (c.spent || 0)), 0),
+    avgConversionRate: campaigns.length > 0
+      ? (campaigns.reduce((sum, c) => sum + (c.impressions > 0 ? (c.clicks / c.impressions) * 100 : 0), 0) / campaigns.length).toFixed(1)
+      : 0,
+  };
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant: 'default' | 'secondary' | 'outline' | 'destructive'; label: string }> = {
@@ -181,6 +101,7 @@ export default function CampaignsPage() {
       paused: { variant: 'outline', label: 'Duraklatıldı' },
       completed: { variant: 'outline', label: 'Tamamlandı' },
       draft: { variant: 'outline', label: 'Taslak' },
+      cancelled: { variant: 'destructive', label: 'İptal' },
     };
     const { variant, label } = variants[status] || { variant: 'outline', label: status };
     return <Badge variant={variant}>{label}</Badge>;
@@ -191,8 +112,10 @@ export default function CampaignsPage() {
       push: <Bell className="h-4 w-4" />,
       email: <Mail className="h-4 w-4" />,
       in_app: <MessageSquare className="h-4 w-4" />,
+      social: <Users className="h-4 w-4" />,
+      display: <Eye className="h-4 w-4" />,
     };
-    return icons[channel];
+    return icons[channel] || <Megaphone className="h-4 w-4" />;
   };
 
   const getCampaignTypeLabel = (type: string) => {
@@ -201,9 +124,78 @@ export default function CampaignsPage() {
       recurring: 'Tekrarlayan',
       automated: 'Otomatik',
       multi_channel: 'Çok Kanallı',
+      email: 'E-posta',
+      push: 'Push',
+      social: 'Sosyal',
+      display: 'Display',
     };
     return labels[type] || type;
   };
+
+  const handleCreateCampaign = () => {
+    if (!newCampaignName) {
+      toast.error('Kampanya adı gerekli');
+      return;
+    }
+
+    createCampaign.mutate(
+      {
+        name: newCampaignName,
+        type: newCampaignType as 'email' | 'push' | 'social' | 'display',
+        status: 'draft',
+      },
+      {
+        onSuccess: () => {
+          toast.success('Kampanya oluşturuldu');
+          setIsCreateOpen(false);
+          setNewCampaignName('');
+        },
+        onError: (error) => {
+          toast.error(error.message || 'Kampanya oluşturulamadı');
+        },
+      }
+    );
+  };
+
+  const handlePauseCampaign = (campaignId: string) => {
+    updateCampaign.mutate(
+      { id: campaignId, status: 'paused' },
+      {
+        onSuccess: () => {
+          toast.success('Kampanya duraklatıldı');
+        },
+        onError: (error) => {
+          toast.error(error.message || 'İşlem başarısız');
+        },
+      }
+    );
+  };
+
+  const handleResumeCampaign = (campaignId: string) => {
+    updateCampaign.mutate(
+      { id: campaignId, status: 'active' },
+      {
+        onSuccess: () => {
+          toast.success('Kampanya devam etti');
+        },
+        onError: (error) => {
+          toast.error(error.message || 'İşlem başarısız');
+        },
+      }
+    );
+  };
+
+  if (error) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <div className="text-center">
+          <AlertTriangle className="mx-auto h-12 w-12 text-destructive" />
+          <h2 className="mt-4 text-lg font-semibold">Bir hata oluştu</h2>
+          <p className="text-muted-foreground">Kampanyalar yüklenemedi. Lütfen tekrar deneyin.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -231,50 +223,31 @@ export default function CampaignsPage() {
             </DialogHeader>
 
             <div className="space-y-6">
-              {/* Campaign Type Selection */}
-              <div className="space-y-2">
-                <Label>Kampanya Tipi</Label>
-                <div className="grid gap-4 md:grid-cols-2">
-                  {campaignTypes.map((type) => (
-                    <div
-                      key={type.id}
-                      className="flex cursor-pointer items-start gap-3 rounded-lg border p-4 hover:border-primary hover:bg-accent/50 transition-colors"
-                    >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                        <Megaphone className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-medium">{type.name}</p>
-                        <p className="text-sm text-muted-foreground">{type.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
               {/* Campaign Name */}
               <div className="space-y-2">
                 <Label htmlFor="name">Kampanya Adı</Label>
-                <Input id="name" placeholder="Kampanya adını girin..." />
+                <Input
+                  id="name"
+                  placeholder="Kampanya adını girin..."
+                  value={newCampaignName}
+                  onChange={(e) => setNewCampaignName(e.target.value)}
+                />
               </div>
 
-              {/* Channels */}
+              {/* Campaign Type Selection */}
               <div className="space-y-2">
-                <Label>Kanallar</Label>
-                <div className="flex flex-wrap gap-2">
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <Bell className="h-4 w-4" />
-                    Push Bildirim
-                  </Button>
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <Mail className="h-4 w-4" />
-                    E-posta
-                  </Button>
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <MessageSquare className="h-4 w-4" />
-                    In-App Mesaj
-                  </Button>
-                </div>
+                <Label>Kampanya Tipi</Label>
+                <Select value={newCampaignType} onValueChange={setNewCampaignType}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="email">E-posta</SelectItem>
+                    <SelectItem value="push">Push Bildirim</SelectItem>
+                    <SelectItem value="social">Sosyal Medya</SelectItem>
+                    <SelectItem value="display">Display</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Target Segment */}
@@ -317,9 +290,10 @@ export default function CampaignsPage() {
               <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
                 İptal
               </Button>
-              <Button onClick={() => { toast.success('Kampanya oluşturuldu'); setIsCreateOpen(false); }}>
+              <Button onClick={handleCreateCampaign} disabled={createCampaign.isPending}>
+                {createCampaign.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 <ChevronRight className="mr-2 h-4 w-4" />
-                Sonraki Adım
+                Oluştur
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -331,7 +305,9 @@ export default function CampaignsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
-              <p className="text-2xl font-bold">{overallStats.totalCampaigns}</p>
+              <p className="text-2xl font-bold">
+                {isLoading ? <Loader2 className="mx-auto h-6 w-6 animate-spin" /> : overallStats.totalCampaigns}
+              </p>
               <p className="text-sm text-muted-foreground">Toplam Kampanya</p>
             </div>
           </CardContent>
@@ -339,7 +315,9 @@ export default function CampaignsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
-              <p className="text-2xl font-bold text-green-600">{overallStats.activeCampaigns}</p>
+              <p className="text-2xl font-bold text-green-600">
+                {isLoading ? <Loader2 className="mx-auto h-6 w-6 animate-spin" /> : overallStats.activeCampaigns}
+              </p>
               <p className="text-sm text-muted-foreground">Aktif</p>
             </div>
           </CardContent>
@@ -348,7 +326,7 @@ export default function CampaignsPage() {
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-2xl font-bold">
-                {(overallStats.totalReach / 1000).toFixed(0)}K
+                {isLoading ? <Loader2 className="mx-auto h-6 w-6 animate-spin" /> : `${(overallStats.totalReach / 1000).toFixed(0)}K`}
               </p>
               <p className="text-sm text-muted-foreground">Toplam Erişim</p>
             </div>
@@ -358,7 +336,7 @@ export default function CampaignsPage() {
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-2xl font-bold">
-                {overallStats.totalConversions.toLocaleString('tr-TR')}
+                {isLoading ? <Loader2 className="mx-auto h-6 w-6 animate-spin" /> : overallStats.totalConversions.toLocaleString('tr-TR')}
               </p>
               <p className="text-sm text-muted-foreground">Dönüşüm</p>
             </div>
@@ -376,245 +354,148 @@ export default function CampaignsPage() {
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-2xl font-bold text-green-600">
-                {formatCurrency(overallStats.totalRevenue, 'TRY')}
+                {isLoading ? <Loader2 className="mx-auto h-6 w-6 animate-spin" /> : formatCurrency(campaigns.reduce((sum, c) => sum + (c.spent || 0), 0), 'TRY')}
               </p>
-              <p className="text-sm text-muted-foreground">Toplam Gelir</p>
+              <p className="text-sm text-muted-foreground">Harcama</p>
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Campaigns List */}
-      <Tabs defaultValue="all" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="all">Tümü</TabsTrigger>
           <TabsTrigger value="active">Aktif</TabsTrigger>
-          <TabsTrigger value="scheduled">Zamanlandı</TabsTrigger>
+          <TabsTrigger value="draft">Taslak</TabsTrigger>
+          <TabsTrigger value="paused">Duraklatıldı</TabsTrigger>
           <TabsTrigger value="completed">Tamamlandı</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="all" className="space-y-4">
-          {mockCampaigns.map((campaign) => (
-            <Card key={campaign.id}>
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                      <Megaphone className="h-6 w-6 text-primary" />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold">{campaign.name}</h3>
-                        {getStatusBadge(campaign.status)}
-                        <Badge variant="outline">{getCampaignTypeLabel(campaign.type)}</Badge>
-                      </div>
-
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Target className="h-4 w-4" />
-                          {campaign.goal}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-4 w-4" />
-                          {formatDate(campaign.start_date)}
-                          {campaign.end_date && ` - ${formatDate(campaign.end_date)}`}
-                        </span>
-                      </div>
-
-                      {/* Channels */}
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">Kanallar:</span>
-                        {campaign.channels.map((channel) => (
-                          <Badge key={channel} variant="secondary" className="gap-1">
-                            {getChannelIcon(channel)}
-                            {channel === 'push' && 'Push'}
-                            {channel === 'email' && 'E-posta'}
-                            {channel === 'in_app' && 'In-App'}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      {/* Budget Progress */}
-                      {campaign.budget && (
-                        <div className="space-y-1">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Bütçe</span>
-                            <span>
-                              {formatCurrency(campaign.spent, 'TRY')} / {formatCurrency(campaign.budget, 'TRY')}
-                            </span>
-                          </div>
-                          <Progress value={(campaign.spent / campaign.budget) * 100} className="h-2" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    {/* Stats */}
-                    {campaign.stats && (
-                      <div className="flex items-center gap-6 text-sm">
-                        <div className="text-center">
-                          <p className="font-semibold">
-                            {(campaign.stats.reach / 1000).toFixed(1)}K
-                          </p>
-                          <p className="text-xs text-muted-foreground">Erişim</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="font-semibold">
-                            {((campaign.stats.clicks / campaign.stats.impressions) * 100).toFixed(1)}%
-                          </p>
-                          <p className="text-xs text-muted-foreground">CTR</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="font-semibold">
-                            {campaign.stats.conversions.toLocaleString('tr-TR')}
-                          </p>
-                          <p className="text-xs text-muted-foreground">Dönüşüm</p>
-                        </div>
-                        {campaign.stats.revenue > 0 && (
-                          <div className="text-center">
-                            <p className="font-semibold text-green-600">
-                              {formatCurrency(campaign.stats.revenue, 'TRY')}
-                            </p>
-                            <p className="text-xs text-muted-foreground">Gelir</p>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Actions */}
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Eye className="mr-2 h-4 w-4" />
-                          Detayları Gör
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <BarChart3 className="mr-2 h-4 w-4" />
-                          Analiz
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Düzenle
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Copy className="mr-2 h-4 w-4" />
-                          Kopyala
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        {campaign.status === 'active' && (
-                          <DropdownMenuItem>
-                            <Pause className="mr-2 h-4 w-4" />
-                            Duraklat
-                          </DropdownMenuItem>
-                        )}
-                        {campaign.status === 'paused' && (
-                          <DropdownMenuItem>
-                            <Play className="mr-2 h-4 w-4" />
-                            Devam Et
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem className="text-destructive">
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Sil
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </TabsContent>
-
-        <TabsContent value="active">
-          {mockCampaigns
-            .filter((c) => c.status === 'active')
-            .map((campaign) => (
+        <TabsContent value={activeTab} className="space-y-4">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : campaigns.length === 0 ? (
+            <div className="py-12 text-center">
+              <Megaphone className="mx-auto h-12 w-12 text-muted-foreground" />
+              <h3 className="mt-4 text-lg font-semibold">Kampanya bulunamadı</h3>
+              <p className="text-muted-foreground">Yeni bir kampanya oluşturarak başlayın</p>
+            </div>
+          ) : (
+            campaigns.map((campaign) => (
               <Card key={campaign.id}>
                 <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
-                        <CheckCircle className="h-5 w-5 text-green-600" />
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-4">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                        <Megaphone className="h-6 w-6 text-primary" />
                       </div>
-                      <div>
-                        <h3 className="font-semibold">{campaign.name}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {getCampaignTypeLabel(campaign.type)}
-                        </p>
-                      </div>
-                    </div>
-                    {getStatusBadge(campaign.status)}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-        </TabsContent>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold">{campaign.name}</h3>
+                          {getStatusBadge(campaign.status)}
+                          <Badge variant="outline">{getCampaignTypeLabel(campaign.type)}</Badge>
+                        </div>
 
-        <TabsContent value="scheduled">
-          {mockCampaigns
-            .filter((c) => c.status === 'scheduled')
-            .map((campaign) => (
-              <Card key={campaign.id}>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-                        <Clock className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold">{campaign.name}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Başlangıç: {formatDate(campaign.start_date)}
-                        </p>
-                      </div>
-                    </div>
-                    {getStatusBadge(campaign.status)}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-        </TabsContent>
-
-        <TabsContent value="completed">
-          {mockCampaigns
-            .filter((c) => c.status === 'completed')
-            .map((campaign) => (
-              <Card key={campaign.id}>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100">
-                        <CheckCircle className="h-5 w-5 text-gray-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold">{campaign.name}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {formatDate(campaign.start_date)} - {formatDate(campaign.end_date!)}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      {campaign.stats && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <DollarSign className="h-4 w-4 text-green-600" />
-                          <span className="font-semibold text-green-600">
-                            {formatCurrency(campaign.stats.revenue, 'TRY')}
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="h-4 w-4" />
+                            {formatDate(campaign.start_date)}
+                            {campaign.end_date && ` - ${formatDate(campaign.end_date)}`}
                           </span>
                         </div>
+
+                        {/* Budget Progress */}
+                        {campaign.budget && campaign.budget > 0 && (
+                          <div className="space-y-1 max-w-xs">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">Bütçe</span>
+                              <span>
+                                {formatCurrency(campaign.spent || 0, 'TRY')} / {formatCurrency(campaign.budget, 'TRY')}
+                              </span>
+                            </div>
+                            <Progress value={((campaign.spent || 0) / campaign.budget) * 100} className="h-2" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      {/* Stats */}
+                      {campaign.impressions > 0 && (
+                        <div className="flex items-center gap-6 text-sm">
+                          <div className="text-center">
+                            <p className="font-semibold">
+                              {(campaign.impressions / 1000).toFixed(1)}K
+                            </p>
+                            <p className="text-xs text-muted-foreground">Görüntüleme</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="font-semibold">
+                              {((campaign.clicks / campaign.impressions) * 100).toFixed(1)}%
+                            </p>
+                            <p className="text-xs text-muted-foreground">CTR</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="font-semibold">
+                              {campaign.conversions.toLocaleString('tr-TR')}
+                            </p>
+                            <p className="text-xs text-muted-foreground">Dönüşüm</p>
+                          </div>
+                        </div>
                       )}
-                      {getStatusBadge(campaign.status)}
+
+                      {/* Actions */}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>
+                            <Eye className="mr-2 h-4 w-4" />
+                            Detayları Gör
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <BarChart3 className="mr-2 h-4 w-4" />
+                            Analiz
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Düzenle
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Copy className="mr-2 h-4 w-4" />
+                            Kopyala
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          {campaign.status === 'active' && (
+                            <DropdownMenuItem onClick={() => handlePauseCampaign(campaign.id)}>
+                              <Pause className="mr-2 h-4 w-4" />
+                              Duraklat
+                            </DropdownMenuItem>
+                          )}
+                          {campaign.status === 'paused' && (
+                            <DropdownMenuItem onClick={() => handleResumeCampaign(campaign.id)}>
+                              <Play className="mr-2 h-4 w-4" />
+                              Devam Et
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem className="text-destructive">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Sil
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </div>
                 </CardContent>
               </Card>
-            ))}
+            ))
+          )}
         </TabsContent>
       </Tabs>
     </div>
