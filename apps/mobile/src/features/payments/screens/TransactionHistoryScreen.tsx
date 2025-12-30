@@ -1,3 +1,12 @@
+/**
+ * TransactionHistoryScreen - Transaction History with 60-30-10 Color Rule
+ *
+ * Implements UX best practices:
+ * - Color-coded amounts (green for income, red for expense)
+ * - Clean filter pills
+ * - Minimalist card design
+ */
+
 import React, { useState } from 'react';
 import {
   View,
@@ -9,14 +18,14 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { COLORS } from '@/constants/colors';
+import { COLORS, primitives } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
-type FilterType = 'All' | 'Sent' | 'Received' | 'Withdrawals';
+type FilterType = 'Tümü' | 'Gönderilen' | 'Alınan' | 'Çekimler';
 
 interface Transaction {
   id: string;
@@ -24,79 +33,88 @@ interface Transaction {
   title: string;
   date: string;
   amount: number;
-  status: 'Completed' | 'Verified' | 'Pending' | 'Failed';
+  status: 'Tamamlandı' | 'Doğrulandı' | 'Beklemede' | 'Başarısız';
   icon: IconName;
   iconBgColor: string;
 }
 
 export const TransactionHistoryScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const [filter, setFilter] = useState<FilterType>('All');
+  const [filter, setFilter] = useState<FilterType>('Tümü');
 
   const transactions: Transaction[] = [
     {
       id: '1',
       type: 'received',
-      title: 'Gift from Alex Johnson',
-      date: 'Oct 26, 2023',
-      amount: 50.0,
-      status: 'Completed',
-      icon: 'inbox-arrow-down',
-      iconBgColor: COLORS.successTransparent33,
+      title: 'Ayşe\'den Hediye',
+      date: '26 Ara 2024',
+      amount: 250.0,
+      status: 'Tamamlandı',
+      icon: 'gift-outline',
+      iconBgColor: primitives.emerald[50],
     },
     {
       id: '2',
       type: 'sent',
-      title: "Gift for Maria's trip",
-      date: 'Oct 24, 2023',
-      amount: -25.0,
-      status: 'Verified',
-      icon: 'inbox-arrow-up',
-      iconBgColor: `${COLORS.brand.primary}33`,
+      title: 'Mehmet\'e Hediye',
+      date: '24 Ara 2024',
+      amount: -125.0,
+      status: 'Doğrulandı',
+      icon: 'gift',
+      iconBgColor: primitives.stone[100],
     },
     {
       id: '3',
       type: 'withdrawal',
-      title: 'Withdrawal to Bank Account',
-      date: 'Oct 20, 2023',
-      amount: -150.0,
-      status: 'Pending',
-      icon: 'bank',
-      iconBgColor: `${COLORS.border.default}80`,
+      title: 'Banka Hesabına Transfer',
+      date: '20 Ara 2024',
+      amount: -500.0,
+      status: 'Beklemede',
+      icon: 'bank-transfer-out',
+      iconBgColor: primitives.amber[50],
     },
     {
       id: '4',
       type: 'received',
-      title: 'Gift from Samantha Bee',
-      date: 'Oct 19, 2023',
-      amount: 75.0,
-      status: 'Failed',
-      icon: 'inbox-arrow-down',
-      iconBgColor: `${COLORS.border.default}80`,
+      title: 'Zeynep\'den Hediye',
+      date: '19 Ara 2024',
+      amount: 175.0,
+      status: 'Başarısız',
+      icon: 'gift-outline',
+      iconBgColor: primitives.red[50],
     },
   ];
 
   const filteredTransactions = transactions.filter((transaction) => {
-    if (filter === 'All') return true;
-    if (filter === 'Sent') return transaction.type === 'sent';
-    if (filter === 'Received') return transaction.type === 'received';
-    if (filter === 'Withdrawals') return transaction.type === 'withdrawal';
+    if (filter === 'Tümü') return true;
+    if (filter === 'Gönderilen') return transaction.type === 'sent';
+    if (filter === 'Alınan') return transaction.type === 'received';
+    if (filter === 'Çekimler') return transaction.type === 'withdrawal';
     return true;
   });
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Completed':
-        return { bg: COLORS.successTransparent33, text: COLORS.feedback.success };
-      case 'Verified':
-        return { bg: COLORS.infoTransparent33, text: COLORS.brand.primary };
-      case 'Pending':
-        return { bg: COLORS.warningTransparent33, text: COLORS.feedback.warning };
-      case 'Failed':
-        return { bg: `${COLORS.brand.primary}33`, text: COLORS.brand.primary };
+      case 'Tamamlandı':
+        return { bg: primitives.emerald[50], text: primitives.emerald[600] };
+      case 'Doğrulandı':
+        return { bg: primitives.blue[50], text: primitives.blue[600] };
+      case 'Beklemede':
+        return { bg: primitives.amber[50], text: primitives.amber[600] };
+      case 'Başarısız':
+        return { bg: primitives.red[50], text: primitives.red[600] };
       default:
-        return { bg: COLORS.border.default, text: COLORS.text.secondary };
+        return { bg: primitives.stone[100], text: COLORS.text.secondary };
     }
+  };
+
+  // Format currency in Turkish Lira
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('tr-TR', {
+      style: 'currency',
+      currency: 'TRY',
+      minimumFractionDigits: 2,
+    }).format(Math.abs(amount));
   };
 
   const handleBack = () => {
@@ -118,7 +136,7 @@ export const TransactionHistoryScreen: React.FC = () => {
             color={COLORS.text.primary}
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Transaction History</Text>
+        <Text style={styles.headerTitle}>İşlem Geçmişi</Text>
         <View style={styles.headerSpacer} />
       </View>
 
@@ -126,7 +144,7 @@ export const TransactionHistoryScreen: React.FC = () => {
         {/* Filter Buttons */}
         <View style={styles.filterContainer}>
           <View style={styles.filterButtonGroup}>
-            {(['All', 'Sent', 'Received', 'Withdrawals'] as FilterType[]).map(
+            {(['Tümü', 'Gönderilen', 'Alınan', 'Çekimler'] as FilterType[]).map(
               (filterOption) => (
                 <TouchableOpacity
                   key={filterOption}
@@ -179,10 +197,10 @@ export const TransactionHistoryScreen: React.FC = () => {
                       size={24}
                       color={
                         transaction.type === 'received'
-                          ? COLORS.feedback.success
+                          ? primitives.emerald[500]
                           : transaction.type === 'sent'
-                          ? COLORS.brand.primary
-                          : COLORS.text.secondary
+                          ? primitives.stone[600]
+                          : primitives.amber[600]
                       }
                     />
                   </View>
@@ -205,13 +223,13 @@ export const TransactionHistoryScreen: React.FC = () => {
                         {
                           color:
                             transaction.amount > 0
-                              ? COLORS.feedback.success
-                              : COLORS.text.primary,
+                              ? primitives.emerald[500]
+                              : primitives.red[500],
                         },
                       ]}
                     >
-                      {transaction.amount > 0 ? '+' : ''}$
-                      {Math.abs(transaction.amount).toFixed(2)}
+                      {transaction.amount > 0 ? '+' : '-'}
+                      {formatCurrency(transaction.amount)}
                     </Text>
                     <View
                       style={[
@@ -243,10 +261,9 @@ export const TransactionHistoryScreen: React.FC = () => {
                 color={COLORS.text.secondary}
               />
             </View>
-            <Text style={styles.emptyStateTitle}>Your History Awaits</Text>
+            <Text style={styles.emptyStateTitle}>Henüz İşlem Yok</Text>
             <Text style={styles.emptyStateText}>
-              Once you send or receive a gift, all your transactions will appear
-              here.
+              Hediye gönderdiğinizde veya aldığınızda tüm işlemleriniz burada görünecek.
             </Text>
           </View>
         )}
@@ -295,8 +312,8 @@ const styles = StyleSheet.create({
   },
   filterButtonGroup: {
     flexDirection: 'row',
-    backgroundColor: `${COLORS.border.default}40`,
-    borderRadius: 24,
+    backgroundColor: primitives.stone[100],
+    borderRadius: 12,
     padding: 4,
     gap: 4,
   },
@@ -305,7 +322,7 @@ const styles = StyleSheet.create({
     height: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 20,
+    borderRadius: 10,
   },
   filterButtonActive: {
     backgroundColor: COLORS.utility.white,
