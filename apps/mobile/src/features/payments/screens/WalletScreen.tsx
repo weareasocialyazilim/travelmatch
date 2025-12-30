@@ -170,6 +170,10 @@ const WalletScreen = () => {
           })
         }
         activeOpacity={0.7}
+        accessible={true}
+        accessibilityLabel={`${transaction.title}, ${transaction.isPositive ? 'gelen' : 'giden'} ${formatCurrency(Math.abs(transaction.amount))}`}
+        accessibilityRole="button"
+        accessibilityHint="İşlem detaylarını görüntüler"
       >
         {/* Icon */}
         <View
@@ -253,6 +257,10 @@ const WalletScreen = () => {
           style={styles.headerButton}
           onPress={() => navigation.goBack()}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          accessible={true}
+          accessibilityLabel="Geri dön"
+          accessibilityRole="button"
+          accessibilityHint="Önceki ekrana döner"
         >
           <MaterialCommunityIcons
             name="arrow-left"
@@ -265,6 +273,10 @@ const WalletScreen = () => {
           style={styles.headerButton}
           onPress={() => navigation.navigate('PaymentMethods' as never)}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          accessible={true}
+          accessibilityLabel="Ödeme yöntemleri ayarları"
+          accessibilityRole="button"
+          accessibilityHint="Ödeme yöntemleri ayarlarını açar"
         >
           <MaterialCommunityIcons
             name="cog-outline"
@@ -292,7 +304,7 @@ const WalletScreen = () => {
           style={styles.cardContainer}
         >
           <LinearGradient
-            colors={['#1C1917', '#292524', '#1C1917']}
+            colors={[primitives.stone[900], primitives.stone[800], primitives.stone[900]]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.walletCard}
@@ -353,6 +365,9 @@ const WalletScreen = () => {
               style={styles.quickActionButton}
               onPress={action.onPress}
               activeOpacity={0.7}
+              accessible={true}
+              accessibilityLabel={action.label}
+              accessibilityRole="button"
             >
               <View
                 style={[
@@ -528,7 +543,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   cardBrand: {
-    fontSize: 16,
+    ...TYPOGRAPHY.button,
     fontWeight: '700',
     color: COLORS.white,
     letterSpacing: 1,
@@ -538,18 +553,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   balanceLabel: {
-    fontSize: 13,
+    ...TYPOGRAPHY.bodySmall,
     color: 'rgba(255, 255, 255, 0.6)',
     marginBottom: 4,
   },
   balanceAmount: {
-    fontSize: 32,
+    ...TYPOGRAPHY.h1,
     fontWeight: '800',
     color: COLORS.white,
     letterSpacing: -1,
   },
   pendingBalance: {
-    fontSize: 13,
+    ...TYPOGRAPHY.bodySmall,
     color: primitives.amber[400],
     marginTop: 4,
   },
@@ -566,7 +581,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cardDotsText: {
-    fontSize: 16,
+    ...TYPOGRAPHY.button,
     color: 'rgba(255, 255, 255, 0.5)',
     letterSpacing: 2,
   },
@@ -599,7 +614,7 @@ const styles = StyleSheet.create({
     backgroundColor: primitives.stone[800],
   },
   quickActionLabel: {
-    fontSize: 13,
+    ...TYPOGRAPHY.bodySmall,
     fontWeight: '500',
     color: COLORS.text.secondary,
   },
@@ -626,12 +641,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 17,
+    ...TYPOGRAPHY.h4,
     fontWeight: '700',
     color: COLORS.text.primary,
   },
   seeAllLink: {
-    fontSize: 14,
+    ...TYPOGRAPHY.bodySmall,
     fontWeight: '600',
     color: COLORS.primary,
   },
@@ -709,7 +724,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   transactionAmount: {
-    fontSize: 15,
+    ...TYPOGRAPHY.bodySmall,
     fontWeight: '700',
   },
   proofLoopBadge: {
@@ -719,7 +734,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   proofLoopText: {
-    fontSize: 11,
+    ...TYPOGRAPHY.captionSmall,
     fontWeight: '600',
     color: primitives.amber[700],
   },
@@ -741,7 +756,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   emptyTitle: {
-    fontSize: 17,
+    ...TYPOGRAPHY.h4,
     fontWeight: '700',
     color: COLORS.text.primary,
     marginBottom: 8,
