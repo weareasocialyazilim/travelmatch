@@ -2,14 +2,16 @@
  * TrustScoreCircle Component
  *
  * Premium circular trust score visualization
- * Inspired by modern health/cycle tracking apps
+ * Inspired by modern health/cycle tracking apps (like Image 9)
  *
  * Features:
  * - Animated circular progress ring
  * - Color-coded segments for trust factors
- * - Central score display
- * - Stats cards below
+ * - Central score display with level icon
+ * - Info cards with key metrics
  * - Premium "jewelry" aesthetic
+ *
+ * UX Best Practice: Dashboard visualization shows key metrics at a glance
  */
 
 import React, { useEffect, useMemo } from 'react';
@@ -51,16 +53,24 @@ export interface TrustScoreCircleProps {
   strokeWidth?: number;
   /** Show animation on mount */
   animated?: boolean;
+  /** Show dashboard info cards below */
+  showDashboard?: boolean;
+  /** Additional dashboard data */
+  dashboardData?: {
+    averageScore?: number;
+    completedProofs?: number;
+    regularity?: number;
+    nextMilestone?: { name: string; daysLeft: number };
+  };
 }
 
 // Default trust factors if none provided
-// Using hardcoded colors for test compatibility (match primitives values)
 const DEFAULT_FACTORS: TrustFactor[] = [
-  { id: '1', name: 'Kimlik', value: 0, maxValue: 30, color: '#10B981', icon: 'shield-check' }, // emerald[500]
-  { id: '2', name: 'Sosyal', value: 0, maxValue: 15, color: '#3B82F6', icon: 'link-variant' }, // blue[500]
-  { id: '3', name: 'Deneyim', value: 0, maxValue: 30, color: '#EC4899', icon: 'check-circle' }, // magenta[500]
-  { id: '4', name: 'Yanıt', value: 0, maxValue: 15, color: '#F59E0B', icon: 'message-reply' }, // amber[500]
-  { id: '5', name: 'Puan', value: 0, maxValue: 10, color: '#8B5CF6', icon: 'star' }, // purple[500]
+  { id: '1', name: 'Kimlik', value: 0, maxValue: 30, color: '#10B981', icon: 'shield-check' },
+  { id: '2', name: 'Sosyal', value: 0, maxValue: 15, color: '#3B82F6', icon: 'link-variant' },
+  { id: '3', name: 'Deneyim', value: 0, maxValue: 30, color: '#EC4899', icon: 'check-circle' },
+  { id: '4', name: 'Yanıt', value: 0, maxValue: 15, color: '#F59E0B', icon: 'message-reply' },
+  { id: '5', name: 'Puan', value: 0, maxValue: 10, color: '#8B5CF6', icon: 'star' },
 ];
 
 export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({
@@ -70,6 +80,8 @@ export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({
   size = SCREEN_WIDTH * 0.65,
   strokeWidth = 14,
   animated = true,
+  showDashboard = true,
+  dashboardData,
 }) => {
   const progress = useSharedValue(0);
   const radius = (size - strokeWidth) / 2;
@@ -93,10 +105,10 @@ export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({
 
   // Get level color based on score
   const levelColor = useMemo(() => {
-    if (score >= 90) return primitives.purple[500]; // Flourishing
-    if (score >= 70) return primitives.emerald[500]; // Blooming
-    if (score >= 40) return primitives.amber[500]; // Growing
-    return primitives.magenta[500]; // Sprout
+    if (score >= 90) return primitives.purple[500];
+    if (score >= 70) return primitives.emerald[500];
+    if (score >= 40) return primitives.amber[500];
+    return primitives.magenta[500];
   }, [score]);
 
   // Animated props for main progress circle
@@ -106,7 +118,7 @@ export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({
 
   // Calculate factor segments
   const factorSegments = useMemo(() => {
-    let startAngle = -90; // Start from top
+    let startAngle = -90;
     return factors.map((factor) => {
       const percentage = (factor.maxValue / 100) * 360;
       const fillPercentage = factor.value / factor.maxValue;
@@ -157,7 +169,7 @@ export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({
               const segmentRadius = radius + strokeWidth / 2 + 4;
               const segmentCircumference = 2 * Math.PI * segmentRadius;
               const segmentLength = (segment.endAngle - segment.startAngle) / 360;
-              const gapSize = 0.008; // Small gap between segments
+              const gapSize = 0.008;
 
               return (
                 <Circle
@@ -208,37 +220,137 @@ export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({
         </View>
       </View>
 
-      {/* Factor Stats Cards */}
-      <View style={styles.statsContainer}>
-        {factors.slice(0, 3).map((factor) => (
-          <View key={factor.id} style={styles.statCard}>
-            <View style={[styles.statIcon, { backgroundColor: `${factor.color}15` }]}>
-              <MaterialCommunityIcons
-                name={factor.icon}
-                size={18}
-                color={factor.color}
-              />
+      {/* Dashboard Info Cards */}
+      {showDashboard && (
+        <>
+          {/* Quick Info Row */}
+          <View style={styles.quickInfoRow}>
+            <View style={styles.quickInfoCard}>
+              <View style={[styles.quickInfoIcon, { backgroundColor: `${primitives.emerald[500]}15` }]}>
+                <MaterialCommunityIcons
+                  name="trending-up"
+                  size={18}
+                  color={primitives.emerald[500]}
+                />
+              </View>
+              <View>
+                <Text style={styles.quickInfoLabel}>Gelişim</Text>
+                <Text style={[styles.quickInfoValue, { color: primitives.emerald[500] }]}>
+                  +{dashboardData?.averageScore || 5} puan
+                </Text>
+              </View>
             </View>
-            <Text style={styles.statValue}>
-              {factor.id === '5' ? factor.value.toFixed(1) : factor.value}
-            </Text>
-            <Text style={styles.statLabel}>{factor.name}</Text>
-          </View>
-        ))}
-      </View>
 
-      {/* Additional Stats Row */}
-      <View style={styles.additionalStats}>
-        {factors.slice(3).map((factor) => (
-          <View key={factor.id} style={styles.additionalStatItem}>
-            <View style={[styles.additionalStatDot, { backgroundColor: factor.color }]} />
-            <Text style={styles.additionalStatLabel}>{factor.name}</Text>
-            <Text style={styles.additionalStatValue}>
-              {factor.value}/{factor.maxValue}
-            </Text>
+            <View style={styles.quickInfoCard}>
+              <View style={[styles.quickInfoIcon, { backgroundColor: `${primitives.magenta[500]}15` }]}>
+                <MaterialCommunityIcons
+                  name="calendar-check"
+                  size={18}
+                  color={primitives.magenta[500]}
+                />
+              </View>
+              <View>
+                <Text style={styles.quickInfoLabel}>Sonraki Hedef</Text>
+                <Text style={[styles.quickInfoValue, { color: primitives.magenta[500] }]}>
+                  {dashboardData?.nextMilestone?.daysLeft || 7} gün
+                </Text>
+              </View>
+            </View>
           </View>
-        ))}
-      </View>
+
+          {/* Factor Stats Cards */}
+          <View style={styles.statsContainer}>
+            {factors.slice(0, 3).map((factor) => (
+              <View key={factor.id} style={styles.statCard}>
+                <View style={[styles.statIcon, { backgroundColor: `${factor.color}15` }]}>
+                  <MaterialCommunityIcons
+                    name={factor.icon}
+                    size={18}
+                    color={factor.color}
+                  />
+                </View>
+                <Text style={styles.statValue}>
+                  {factor.id === '5' ? factor.value.toFixed(1) : factor.value}
+                </Text>
+                <Text style={styles.statLabel}>{factor.name}</Text>
+              </View>
+            ))}
+          </View>
+
+          {/* Additional Stats Row */}
+          <View style={styles.additionalStats}>
+            {factors.slice(3).map((factor) => (
+              <View key={factor.id} style={styles.additionalStatItem}>
+                <View style={[styles.additionalStatDot, { backgroundColor: factor.color }]} />
+                <Text style={styles.additionalStatLabel}>{factor.name}</Text>
+                <Text style={styles.additionalStatValue}>
+                  {factor.value}/{factor.maxValue}
+                </Text>
+              </View>
+            ))}
+          </View>
+
+          {/* Bottom metrics row */}
+          <View style={styles.metricsRow}>
+            <View style={styles.metricItem}>
+              <View style={[styles.metricIcon, { backgroundColor: primitives.blue[50] }]}>
+                <MaterialCommunityIcons name="chart-line" size={16} color={primitives.blue[500]} />
+              </View>
+              <Text style={styles.metricValue}>{dashboardData?.averageScore || 28}</Text>
+              <Text style={styles.metricLabel}>Ort. Skor</Text>
+            </View>
+            <View style={styles.metricItem}>
+              <View style={[styles.metricIcon, { backgroundColor: primitives.magenta[50] }]}>
+                <MaterialCommunityIcons name="check-decagram" size={16} color={primitives.magenta[500]} />
+              </View>
+              <Text style={styles.metricValue}>{dashboardData?.completedProofs || 5}</Text>
+              <Text style={styles.metricLabel}>Kanıt</Text>
+            </View>
+            <View style={styles.metricItem}>
+              <View style={[styles.metricIcon, { backgroundColor: primitives.amber[50] }]}>
+                <MaterialCommunityIcons name="percent" size={16} color={primitives.amber[500]} />
+              </View>
+              <Text style={styles.metricValue}>{dashboardData?.regularity || 92}%</Text>
+              <Text style={styles.metricLabel}>Düzenlilik</Text>
+            </View>
+          </View>
+        </>
+      )}
+
+      {/* Legacy support - simple stats when dashboard is off */}
+      {!showDashboard && (
+        <>
+          <View style={styles.statsContainer}>
+            {factors.slice(0, 3).map((factor) => (
+              <View key={factor.id} style={styles.statCard}>
+                <View style={[styles.statIcon, { backgroundColor: `${factor.color}15` }]}>
+                  <MaterialCommunityIcons
+                    name={factor.icon}
+                    size={18}
+                    color={factor.color}
+                  />
+                </View>
+                <Text style={styles.statValue}>
+                  {factor.id === '5' ? factor.value.toFixed(1) : factor.value}
+                </Text>
+                <Text style={styles.statLabel}>{factor.name}</Text>
+              </View>
+            ))}
+          </View>
+
+          <View style={styles.additionalStats}>
+            {factors.slice(3).map((factor) => (
+              <View key={factor.id} style={styles.additionalStatItem}>
+                <View style={[styles.additionalStatDot, { backgroundColor: factor.color }]} />
+                <Text style={styles.additionalStatLabel}>{factor.name}</Text>
+                <Text style={styles.additionalStatValue}>
+                  {factor.value}/{factor.maxValue}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </>
+      )}
     </View>
   );
 };
@@ -355,6 +467,48 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
+
+  // Quick Info Row - Dashboard style
+  quickInfoRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 12,
+    marginBottom: 16,
+    paddingHorizontal: 16,
+  },
+  quickInfoCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    gap: 10,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
+    minWidth: 140,
+  },
+  quickInfoIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quickInfoLabel: {
+    fontSize: 11,
+    color: COLORS.text.secondary,
+    marginBottom: 2,
+  },
+  quickInfoValue: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+
+  // Stats Container
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -394,10 +548,13 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: COLORS.text.secondary,
   },
+
+  // Additional Stats
   additionalStats: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 24,
+    marginBottom: 20,
   },
   additionalStatItem: {
     flexDirection: 'row',
@@ -417,6 +574,44 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: COLORS.text.primary,
+  },
+
+  // Metrics Row - Dashboard bottom stats
+  metricsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    marginHorizontal: 16,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  metricItem: {
+    alignItems: 'center',
+    gap: 6,
+  },
+  metricIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  metricValue: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: COLORS.text.primary,
+  },
+  metricLabel: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: COLORS.text.secondary,
   },
 });
 

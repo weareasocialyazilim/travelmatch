@@ -2,6 +2,12 @@
  * Input Component
  * A feature-rich text input with label, error handling,
  * icons, password visibility toggle, and validation states.
+ *
+ * UX Best Practices Implemented:
+ * 1. USE CLEAR ERROR STATES - Specific, actionable error messages
+ * 2. APPROPRIATE INPUT TYPES - Configurable keyboard types
+ * 3. REAL-TIME VALIDATION - Success states when valid
+ * 4. ADD CLEAR OPTION - Quick delete to spare manual removal
  */
 
 import React, { useState, memo, useCallback, useMemo } from 'react';
@@ -13,6 +19,12 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  withSequence,
+  withTiming,
+  useSharedValue,
+} from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, primitives } from '../../constants/colors';
 
@@ -35,39 +47,12 @@ interface InputProps extends TextInputProps {
   required?: boolean;
   /** Show success checkmark (for validation) */
   showSuccess?: boolean;
+  /** Show clear button when there's text (UX best practice: quick delete option) */
+  showClearButton?: boolean;
+  /** Callback when clear button is pressed */
+  onClear?: () => void;
 }
 
-/**
- * Input - Text input with full feature set
- *
- * Features:
- * - Floating label
- * - Error/hint messages
- * - Left/right icons
- * - Password visibility toggle
- * - Focus state styling
- *
- * @example
- * ```tsx
- * // Basic input
- * <Input label="Email" placeholder="Enter email" />
- *
- * // With validation error
- * <Input
- *   label="Password"
- *   secureTextEntry
- *   error="Password too weak"
- * />
- *
- * // With icons
- * <Input
- *   label="Search"
- *   leftIcon="magnify"
- *   rightIcon="close"
- *   onRightIconPress={handleClear}
- * />
- * ```
- */
 export const Input: React.FC<InputProps> = memo(
   ({
     label,
@@ -79,6 +64,9 @@ export const Input: React.FC<InputProps> = memo(
     containerStyle,
     secureTextEntry,
     showSuccess,
+    showClearButton,
+    onClear,
+    value,
     onFocus: onFocusProp,
     onBlur: onBlurProp,
     ...rest
@@ -86,7 +74,28 @@ export const Input: React.FC<InputProps> = memo(
     const [isFocused, setIsFocused] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
+    // Shake animation for error state
+    const shakeValue = useSharedValue(0);
+
     const isPassword = secureTextEntry !== undefined;
+    const hasValue = value && value.length > 0;
+
+    // Trigger shake animation when error appears
+    React.useEffect(() => {
+      if (error) {
+        shakeValue.value = withSequence(
+          withTiming(-8, { duration: 50 }),
+          withTiming(8, { duration: 50 }),
+          withTiming(-6, { duration: 50 }),
+          withTiming(6, { duration: 50 }),
+          withTiming(0, { duration: 50 })
+        );
+      }
+    }, [error, shakeValue]);
+
+    const shakeAnimatedStyle = useAnimatedStyle(() => ({
+      transform: [{ translateX: shakeValue.value }],
+    }));
 
     // Memoize border color calculation
     const borderColor = useMemo((): string => {
@@ -116,8 +125,13 @@ export const Input: React.FC<InputProps> = memo(
       [],
     );
 
+    // Handle clear button press
+    const handleClear = useCallback(() => {
+      onClear?.();
+    }, [onClear]);
+
     return (
-      <View style={[styles.container, containerStyle]}>
+      <Animated.View style={[styles.container, containerStyle, shakeAnimatedStyle]}>
         {label && (
           <Text style={styles.label}>
             {label}
@@ -145,10 +159,11 @@ export const Input: React.FC<InputProps> = memo(
 
           <TextInput
             {...rest}
+            value={value}
             style={[
               styles.input,
               leftIcon && styles.inputWithLeftIcon,
-              (rightIcon || isPassword) && styles.inputWithRightIcon,
+              (rightIcon || isPassword || (showClearButton && hasValue)) && styles.inputWithRightIcon,
             ]}
             placeholderTextColor={primitives.stone[400]}
             onFocus={handleFocus}
@@ -158,6 +173,25 @@ export const Input: React.FC<InputProps> = memo(
             accessibilityHint={hint}
             accessibilityRole="none"
           />
+
+          {/* Clear button - UX best practice: quick delete option */}
+          {showClearButton && hasValue && !isPassword && !showSuccess && !rightIcon && (
+            <TouchableOpacity
+              onPress={handleClear}
+              style={styles.clearButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              accessibilityLabel="Clear input"
+              accessibilityRole="button"
+            >
+              <View style={styles.clearButtonInner}>
+                <MaterialCommunityIcons
+                  name="close"
+                  size={14}
+                  color={primitives.stone[0]}
+                />
+              </View>
+            </TouchableOpacity>
+          )}
 
           {isPassword && (
             <TouchableOpacity
@@ -205,7 +239,7 @@ export const Input: React.FC<InputProps> = memo(
 
         {error && <Text style={styles.error}>{error}</Text>}
         {hint && !error && <Text style={styles.hint}>{hint}</Text>}
-      </View>
+      </Animated.View>
     );
   },
 );
@@ -236,9 +270,11 @@ const styles = StyleSheet.create({
   },
   inputError: {
     borderColor: COLORS.feedback.error,
+    backgroundColor: `${COLORS.feedback.error}08`,
   },
   inputSuccess: {
     borderColor: COLORS.feedback.success,
+    backgroundColor: `${COLORS.feedback.success}05`,
   },
   input: {
     flex: 1,
@@ -263,10 +299,24 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     padding: 4,
   },
+  // Clear button - UX best practice for quick data removal
+  clearButton: {
+    marginLeft: 8,
+    padding: 2,
+  },
+  clearButtonInner: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: primitives.stone[400],
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   error: {
     fontSize: 12,
     color: COLORS.feedback.error,
-    marginTop: 4,
+    marginTop: 6,
+    marginLeft: 4,
   },
   hint: {
     fontSize: 12,
