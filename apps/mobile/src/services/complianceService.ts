@@ -69,10 +69,12 @@ export interface ComplianceCheckResult {
  * Check user limits before a transaction
  * @param category - 'send', 'receive', 'withdraw', 'moment_create', 'gift_per_moment'
  * @param amount - Transaction amount (optional for count-only checks)
- * @param _currency - Currency code (default: TRY) - unused until RPC is available
+ * @param currency - Currency code (default: TRY)
  *
- * Note: This is a placeholder implementation until the RPC function is created.
- * The actual check_user_limits function needs to be created in the database.
+ * Calls the check_user_limits RPC function in the database which checks:
+ * - Plan-based limits (passport/first_class/concierge)
+ * - User type limits (new/standard/verified)
+ * - KYC thresholds
  */
 export const checkUserLimits = async (
   category:
@@ -82,78 +84,196 @@ export const checkUserLimits = async (
     | 'moment_create'
     | 'gift_per_moment',
   amount?: number,
-  _currency: CurrencyCode = 'TRY',
+  currency: CurrencyCode = 'TRY',
 ): Promise<LimitCheckResult> => {
-  // Placeholder: Return allowed with no warnings until RPC is implemented
-  // TODO: Implement check_user_limits RPC function in database
-  logger.debug('check_user_limits RPC not yet implemented, allowing all');
+  const userId = (await supabase.auth.getUser()).data.user?.id;
+  if (!userId) {
+    return {
+      allowed: false,
+      plan_id: 'passport',
+      user_type: 'new',
+      kyc_status: 'none',
+      kyc_required: false,
+      kyc_reason: null,
+      block_reason: 'User not authenticated',
+      warnings: [],
+      upgrade_available: false,
+    };
+  }
 
-  // Basic client-side checks as fallback
-  const defaultLimits: Record<typeof category, number> = {
-    send: 50000,
-    receive: 100000,
-    withdraw: 25000,
-    moment_create: 10,
-    gift_per_moment: 5000,
-  };
+  try {
+    const { data, error } = await supabase.rpc('check_user_limits', {
+      p_user_id: userId,
+      p_category: category,
+      p_amount: amount ?? null,
+      p_currency: currency,
+    });
 
-  const limit = defaultLimits[category];
-  const effectiveAmount = amount ?? 0;
+    if (error) {
+      logger.error('check_user_limits RPC error', error);
+      // Return permissive fallback on error to not block transactions
+      return {
+        allowed: true,
+        plan_id: 'passport',
+        user_type: 'standard',
+        kyc_status: 'none',
+        kyc_required: false,
+        kyc_reason: null,
+        block_reason: null,
+        warnings: [{ type: 'rpc_error', message: 'Could not verify limits' }],
+        upgrade_available: true,
+      };
+    }
 
-  return {
-    allowed: effectiveAmount <= limit,
-    plan_id: 'free',
-    user_type: 'standard',
-    kyc_status: 'none',
-    kyc_required: false,
-    kyc_reason: null,
-    block_reason: null,
-    warnings:
-      effectiveAmount > limit * 0.8
-        ? [{ type: 'limit_warning', message: `Approaching ${category} limit` }]
-        : [],
-    upgrade_available: true,
-  };
+    return {
+      allowed: data.allowed ?? true,
+      plan_id: data.plan_id ?? 'passport',
+      user_type: data.user_type ?? 'standard',
+      kyc_status: data.kyc_status ?? 'none',
+      kyc_required: data.kyc_required ?? false,
+      kyc_reason: data.kyc_reason ?? null,
+      block_reason: data.block_reason ?? null,
+      warnings: data.warnings ?? [],
+      upgrade_available: data.upgrade_available ?? true,
+    };
+  } catch (err) {
+    logger.error('check_user_limits unexpected error', err);
+    return {
+      allowed: true,
+      plan_id: 'passport',
+      user_type: 'standard',
+      kyc_status: 'none',
+      kyc_required: false,
+      kyc_reason: null,
+      block_reason: null,
+      warnings: [],
+      upgrade_available: true,
+    };
+  }
 };
 
 /**
  * Check contribution limit for a specific moment
  * @param momentId - The moment UUID
  * @param amount - Contribution amount
+ *
+ * Calls check_moment_contribution_limit RPC function which checks:
+ * - Per-user contribution count to this moment
+ * - Per-user total contribution amount to this moment
+ * - Plan-based limits (passport/first_class/concierge)
  */
 export const checkMomentContributionLimit = async (
-  _momentId: string,
+  momentId: string,
   amount: number,
 ): Promise<ContributionLimitResult> => {
-  // TODO: Implement actual contribution limit check when RPC is available
-  // For now, return a placeholder that allows contributions up to 50,000 TRY
-  const limit = 50000;
-  return {
-    allowed: amount <= limit,
-    current_count: 0,
-    current_total: 0,
-    max_count: 10,
-    max_total: limit,
-    remaining_count: 10,
-    remaining_amount: limit,
-  };
+  const userId = (await supabase.auth.getUser()).data.user?.id;
+  if (!userId) {
+    return {
+      allowed: false,
+      reason: 'User not authenticated',
+      current_count: 0,
+      current_total: 0,
+    };
+  }
+
+  try {
+    const { data, error } = await supabase.rpc('check_moment_contribution_limit', {
+      p_moment_id: momentId,
+      p_user_id: userId,
+      p_amount: amount,
+    });
+
+    if (error) {
+      logger.error('check_moment_contribution_limit RPC error', error);
+      // Allow on error to not block transactions
+      return {
+        allowed: true,
+        current_count: 0,
+        current_total: 0,
+      };
+    }
+
+    return {
+      allowed: data.allowed ?? true,
+      reason: data.reason,
+      current_count: data.current_count ?? 0,
+      current_total: data.current_total ?? 0,
+      max_count: data.max_count,
+      max_total: data.max_total,
+      remaining_count: data.remaining_count,
+      remaining_amount: data.remaining ?? data.remaining_amount,
+    };
+  } catch (err) {
+    logger.error('check_moment_contribution_limit unexpected error', err);
+    return {
+      allowed: true,
+      current_count: 0,
+      current_total: 0,
+    };
+  }
 };
 
 /**
  * Check if user can create a new moment
+ *
+ * Calls check_moment_creation_limit RPC function which checks:
+ * - Daily moment creation count
+ * - Monthly moment creation count
+ * - Plan-based limits (passport: 3/month, first_class: 15/month, concierge: unlimited)
  */
 export const checkMomentCreationLimit =
   async (): Promise<MomentCreationLimitResult> => {
-    // TODO: Implement actual moment creation limit check when RPC is available
-    // For now, allow users to create moments
-    return {
-      allowed: true,
-      daily_count: 0,
-      daily_limit: 10,
-      monthly_count: 0,
-      monthly_limit: 100,
-      plan_id: 'free',
-    };
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) {
+      return {
+        allowed: false,
+        reason: 'User not authenticated',
+        daily_count: 0,
+        daily_limit: 0,
+        monthly_count: 0,
+        monthly_limit: 0,
+        plan_id: 'passport',
+      };
+    }
+
+    try {
+      const { data, error } = await supabase.rpc('check_moment_creation_limit', {
+        p_user_id: userId,
+      });
+
+      if (error) {
+        logger.error('check_moment_creation_limit RPC error', error);
+        // Allow on error to not block moment creation
+        return {
+          allowed: true,
+          daily_count: 0,
+          daily_limit: 10,
+          monthly_count: 0,
+          monthly_limit: 100,
+          plan_id: 'passport',
+        };
+      }
+
+      return {
+        allowed: data.allowed ?? true,
+        reason: data.reason,
+        daily_count: data.daily_count ?? 0,
+        daily_limit: data.daily_limit,
+        monthly_count: data.monthly_count ?? 0,
+        monthly_limit: data.monthly_limit,
+        plan_id: data.plan_id ?? 'passport',
+      };
+    } catch (err) {
+      logger.error('check_moment_creation_limit unexpected error', err);
+      return {
+        allowed: true,
+        daily_count: 0,
+        daily_limit: 10,
+        monthly_count: 0,
+        monthly_limit: 100,
+        plan_id: 'passport',
+      };
+    }
   };
 
 // ============================================
@@ -163,25 +283,60 @@ export const checkMomentCreationLimit =
 /**
  * Full compliance check for a transaction (AML + Fraud + Limits)
  * Should be called before processing any payment
+ *
+ * Combines:
+ * - User limit checks via check_user_limits RPC
+ * - User risk profile check
+ * - KYC status verification
  */
 export const checkTransactionCompliance = async (
-  _amount: number,
-  _currency: CurrencyCode,
-  _transactionType: 'send' | 'receive' | 'withdraw',
+  amount: number,
+  currency: CurrencyCode,
+  transactionType: 'send' | 'receive' | 'withdraw',
   _recipientId?: string,
 ): Promise<ComplianceCheckResult> => {
-  // TODO: Implement actual transaction compliance check when RPC is available
-  // For now, return a placeholder that allows transactions
+  // Check user limits first
+  const limitsResult = await checkUserLimits(transactionType, amount, currency);
+
+  // Get user risk profile
+  const riskProfile = await getUserRiskProfile();
+
+  // Combine results
+  const blockReasons: string[] = [];
+  const warnings: string[] = [];
+
+  if (!limitsResult.allowed && limitsResult.block_reason) {
+    blockReasons.push(limitsResult.block_reason);
+  }
+
+  if (riskProfile?.is_blocked && riskProfile.block_reason) {
+    blockReasons.push(riskProfile.block_reason);
+  }
+
+  // Add warnings from limit check
+  for (const warning of limitsResult.warnings) {
+    warnings.push(warning.message);
+  }
+
+  // Determine overall risk level
+  let riskLevel: 'low' | 'medium' | 'high' | 'critical' = 'low';
+  if (riskProfile) {
+    riskLevel = riskProfile.risk_level;
+  }
+  if (limitsResult.kyc_required && !limitsResult.allowed) {
+    riskLevel = riskLevel === 'low' ? 'medium' : riskLevel;
+  }
+
   return {
-    allowed: true,
-    user_plan: 'free',
-    kyc_status: 'none',
-    risk_score: 0,
-    risk_level: 'low',
-    requires_kyc: false,
-    requires_review: false,
-    block_reasons: [],
-    warnings: [],
+    allowed: limitsResult.allowed && !riskProfile?.is_blocked,
+    user_plan: limitsResult.plan_id,
+    kyc_status: limitsResult.kyc_status,
+    risk_score: riskProfile?.risk_score ?? 0,
+    risk_level: riskLevel,
+    requires_kyc: limitsResult.kyc_required,
+    requires_review: riskLevel === 'high' || riskLevel === 'critical',
+    block_reasons: blockReasons,
+    warnings: warnings,
   };
 };
 
