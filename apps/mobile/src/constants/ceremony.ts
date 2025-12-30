@@ -44,6 +44,7 @@ export const CEREMONY_COLORS = {
   passport: {
     cover: '#1E3A5F', // Koyu mavi pasaport kapağı
     coverAccent: '#2563EB', // Accent çizgiler
+    coverGold: '#D4AF37', // Altın page indicator
     pages: '#FEF3C7', // Krem sayfa rengi
     pageLines: 'rgba(0, 0, 0, 0.1)', // Sayfa çizgileri
     binding: '#1E293B', // Cilt kenarı
