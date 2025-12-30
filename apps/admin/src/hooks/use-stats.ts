@@ -3,16 +3,31 @@
 import { useQuery } from '@tanstack/react-query';
 
 interface DashboardStats {
+  // Main KPIs
+  totalUsers: number;
+  userGrowth: number;
+  activeUsers: number;
+  activeGrowth: number;
+  totalRevenue: number;
+  revenueGrowth: number;
+  totalMoments: number;
+  momentGrowth: number;
+
+  // Today's summary
+  todayRegistrations: number;
+  activeSessions: number;
+  todayRevenue: number;
+  todayMoments: number;
+
+  // Legacy fields for backward compatibility
   total_users: number;
   active_users_24h: number;
   total_moments: number;
-  total_matches: number;
-  pending_disputes: number;
   pending_tasks: number;
   today_revenue: number;
 }
 
-async function fetchStats(): Promise<{ stats: DashboardStats }> {
+async function fetchStats(): Promise<DashboardStats> {
   const response = await fetch('/api/stats');
   if (!response.ok) {
     throw new Error('İstatistikler yüklenemedi');
