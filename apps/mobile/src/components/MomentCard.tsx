@@ -17,7 +17,6 @@ import {
   StyleSheet,
   Pressable,
   Share,
-  Dimensions,
   Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';

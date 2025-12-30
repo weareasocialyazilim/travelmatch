@@ -16,7 +16,6 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   withTiming,
-  Easing,
 } from 'react-native-reanimated';
 import { COLORS, primitives } from '@/constants/colors';
 
@@ -291,7 +290,7 @@ export const CircularProgress = memo<CircularProgressProps>(
     max = 100,
     size = 60,
     strokeWidth = 6,
-    color = primitives.emerald[500],
+    color: _color = primitives.emerald[500], // TODO: Use color for SVG progress fill
     backgroundColor = primitives.stone[100],
     showLabel = true,
     labelFormat = 'percentage',

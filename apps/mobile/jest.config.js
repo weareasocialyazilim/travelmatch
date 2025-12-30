@@ -2,7 +2,7 @@ const jestExpoPreset = require('jest-expo/jest-preset');
 
 module.exports = {
   ...jestExpoPreset,
-  testEnvironment: 'node',
+  // Removed explicit testEnvironment to use jest-expo preset default
   // Increase timeout for async operations (Phase 3 fix)
   testTimeout: 10000, // Increased from default 5000ms
   // Override setupFiles to avoid React Native's setup.js with Flow types
