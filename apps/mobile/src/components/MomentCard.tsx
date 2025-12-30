@@ -6,11 +6,13 @@
  * - Gradient price badge
  * - Smooth scale animations
  * - Trust indicators
+ * - Badge system (Hot Choice, Top Rated, Featured)
+ * - Clear font hierarchy (24px headline, 16px subheadline, 14px body)
  *
  * Designed for Awwwards Best UI nomination
  */
 
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -43,6 +45,64 @@ import { useToast } from '@/context/ToastContext';
 import type { Moment } from '../types';
 
 // ============================================
+// BADGE TYPES & CONFIG
+// ============================================
+type BadgeType = 'hot' | 'featured' | 'top_rated' | 'new' | 'trending' | 'verified';
+
+interface BadgeConfig {
+  label: string;
+  icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  backgroundColor: string;
+  textColor: string;
+  borderColor?: string;
+}
+
+const BADGE_CONFIGS: Record<BadgeType, BadgeConfig> = {
+  hot: {
+    label: 'Popüler',
+    icon: 'fire',
+    backgroundColor: COLORS.secondaryMuted,
+    textColor: COLORS.secondary,
+    borderColor: COLORS.secondaryLight,
+  },
+  featured: {
+    label: 'Öne Çıkan',
+    icon: 'star',
+    backgroundColor: COLORS.primaryMuted,
+    textColor: COLORS.primary,
+    borderColor: COLORS.primaryLight,
+  },
+  top_rated: {
+    label: 'En Beğenilen',
+    icon: 'heart',
+    backgroundColor: COLORS.trustMuted,
+    textColor: COLORS.trust.primary,
+    borderColor: COLORS.trustLight,
+  },
+  new: {
+    label: 'Yeni',
+    icon: 'new-box',
+    backgroundColor: COLORS.accentMuted,
+    textColor: COLORS.accent,
+    borderColor: COLORS.accentLight,
+  },
+  trending: {
+    label: 'Trend',
+    icon: 'trending-up',
+    backgroundColor: 'rgba(139, 92, 246, 0.12)',
+    textColor: '#8B5CF6',
+    borderColor: '#A78BFA',
+  },
+  verified: {
+    label: 'Onaylı',
+    icon: 'check-decagram',
+    backgroundColor: COLORS.trustMuted,
+    textColor: COLORS.trust.primary,
+    borderColor: COLORS.trustLight,
+  },
+};
+
+// ============================================
 // TYPES
 // ============================================
 interface MomentCardProps {
@@ -50,13 +110,39 @@ interface MomentCardProps {
   onPress: () => void;
   onGiftPress: (moment: Moment) => void;
   onSharePress?: (moment: Moment) => void;
+  /** Badge to display (hot, featured, top_rated, new, trending, verified) */
+  badge?: BadgeType;
+  /** Compact mode for grid layouts */
+  compact?: boolean;
 }
+
+// ============================================
+// BADGE COMPONENT
+// ============================================
+const MomentBadge: React.FC<{ type: BadgeType }> = memo(({ type }) => {
+  const config = BADGE_CONFIGS[type];
+
+  return (
+    <View style={[styles.badge, { backgroundColor: config.backgroundColor }]}>
+      <MaterialCommunityIcons
+        name={config.icon}
+        size={12}
+        color={config.textColor}
+      />
+      <Text style={[styles.badgeText, { color: config.textColor }]}>
+        {config.label}
+      </Text>
+    </View>
+  );
+});
+
+MomentBadge.displayName = 'MomentBadge';
 
 // ============================================
 // MAIN COMPONENT
 // ============================================
 const MomentCard: React.FC<MomentCardProps> = memo(
-  ({ moment, onPress, onGiftPress, onSharePress }) => {
+  ({ moment, onPress, onGiftPress, onSharePress, badge, compact = false }) => {
     const { showToast } = useToast();
     const scale = useSharedValue(1);
 
@@ -126,6 +212,15 @@ const MomentCard: React.FC<MomentCardProps> = memo(
       onPress();
     }, [onPress]);
 
+    // Memoize computed badge type from moment data if not provided
+    const computedBadge = useMemo(() => {
+      if (badge) return badge;
+      // Auto-detect badge based on moment properties
+      if (moment.user?.isVerified) return 'verified';
+      // Add more auto-detection logic as needed
+      return undefined;
+    }, [badge, moment.user?.isVerified]);
+
     return (
       <Pressable
         onPress={handleCardPress}
@@ -136,9 +231,13 @@ const MomentCard: React.FC<MomentCardProps> = memo(
         }`}
         accessibilityRole="button"
       >
-        <Reanimated.View style={[styles.card, animatedStyle]}>
+        <Reanimated.View style={[
+          styles.card,
+          compact && styles.cardCompact,
+          animatedStyle
+        ]}>
           {/* Image Container */}
-          <View style={styles.imageContainer}>
+          <View style={[styles.imageContainer, compact && styles.imageContainerCompact]}>
             <OptimizedImage
               {...getMomentImageProps(
                 moment,
@@ -157,7 +256,14 @@ const MomentCard: React.FC<MomentCardProps> = memo(
               style={styles.imageOverlay}
             />
 
-            {/* Share Button */}
+            {/* Badge - Top Left */}
+            {computedBadge && (
+              <View style={styles.badgeContainer}>
+                <MomentBadge type={computedBadge} />
+              </View>
+            )}
+
+            {/* Share Button - Top Right */}
             <Pressable
               style={styles.shareButton}
               onPress={handleSharePress}
@@ -191,10 +297,7 @@ const MomentCard: React.FC<MomentCardProps> = memo(
                     IMAGE_VARIANTS_BY_CONTEXT.AVATAR_SMALL,
                     'https://via.placeholder.com/150',
                   )}
-                  contentFit="cover"
                   style={styles.userAvatar}
-                  transition={150}
-                  priority="normal"
                   accessibilityLabel={`${moment.user?.name || 'User'}'s avatar`}
                 />
                 <View style={styles.userInfo}>
@@ -211,28 +314,35 @@ const MomentCard: React.FC<MomentCardProps> = memo(
               </BlurView>
             </View>
 
-            {/* Price Badge */}
+            {/* Price Badge - Bottom Right */}
             <View style={styles.priceBadgeContainer}>
               <LinearGradient
-                colors={GRADIENTS.gift}
+                colors={GRADIENTS.primary}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.priceBadge}
               >
-                <Text style={styles.priceText}>${moment.price}</Text>
+                <Text style={styles.priceText}>
+                  ₺{moment.price?.toLocaleString('tr-TR') || '0'}
+                </Text>
               </LinearGradient>
             </View>
           </View>
 
-          {/* Content Section */}
-          <View style={styles.cardContent}>
-            <Text style={styles.cardTitle} numberOfLines={2}>
+          {/* Card Content */}
+          <View style={[styles.cardContent, compact && styles.cardContentCompact]}>
+            {/* Title - Headline (18-20px for mobile) */}
+            <Text
+              style={[styles.cardTitle, compact && styles.cardTitleCompact]}
+              numberOfLines={compact ? 1 : 2}
+            >
               {moment.title}
             </Text>
 
+            {/* Location Row */}
             <View style={styles.locationRow}>
               <MaterialCommunityIcons
-                name="map-marker-outline"
+                name="map-marker"
                 size={14}
                 color={COLORS.text.secondary}
               />
@@ -241,21 +351,36 @@ const MomentCard: React.FC<MomentCardProps> = memo(
               </Text>
             </View>
 
-            <View style={styles.detailsRow}>
-              <View style={styles.detailItem}>
-                <MaterialCommunityIcons
-                  name="clock-outline"
-                  size={14}
-                  color={COLORS.text.muted}
-                />
-                <Text style={styles.detailText}>
-                  {moment.availability || 'Flexible'}
-                </Text>
+            {/* Details Row - Only in non-compact mode */}
+            {!compact && (
+              <View style={styles.detailsRow}>
+                <View style={styles.detailItem}>
+                  <MaterialCommunityIcons
+                    name="clock-outline"
+                    size={14}
+                    color={COLORS.text.muted}
+                  />
+                  <Text style={styles.detailText}>
+                    {moment.availability || 'Flexible'}
+                  </Text>
+                </View>
+                {moment.user?.trustScore && (
+                  <View style={styles.detailItem}>
+                    <MaterialCommunityIcons
+                      name="shield-check"
+                      size={14}
+                      color={COLORS.trust.primary}
+                    />
+                    <Text style={[styles.detailText, { color: COLORS.trust.primary }]}>
+                      {moment.user.trustScore}%
+                    </Text>
+                  </View>
+                )}
               </View>
-            </View>
+            )}
 
-            {/* Action Buttons */}
-            <View style={styles.cardActions}>
+            {/* Action Buttons - 16px Button text */}
+            <View style={[styles.cardActions, compact && styles.cardActionsCompact]}>
               <Pressable
                 style={styles.primaryButton}
                 onPress={handleGiftPress}
@@ -264,14 +389,22 @@ const MomentCard: React.FC<MomentCardProps> = memo(
                   colors={GRADIENTS.gift}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  style={styles.primaryButtonGradient}
+                  style={[
+                    styles.primaryButtonGradient,
+                    compact && styles.primaryButtonGradientCompact
+                  ]}
                 >
                   <MaterialCommunityIcons
                     name="gift-outline"
-                    size={18}
+                    size={compact ? 16 : 18}
                     color={PALETTE.white}
                   />
-                  <Text style={styles.primaryButtonText}>Hediye et</Text>
+                  <Text style={[
+                    styles.primaryButtonText,
+                    compact && styles.primaryButtonTextCompact
+                  ]}>
+                    Hediye et
+                  </Text>
                 </LinearGradient>
               </Pressable>
             </View>
@@ -283,23 +416,34 @@ const MomentCard: React.FC<MomentCardProps> = memo(
 );
 
 // ============================================
-// STYLES
+// STYLES - Following design reference:
+// Headline: 20px (mobile scale of 24px)
+// Subheadline: 14px (mobile scale of 16px)
+// Body: 12px-14px
+// Button: 14px-16px
 // ============================================
 const styles = StyleSheet.create({
   card: {
     backgroundColor: COLORS.bg.primary,
-    borderRadius: 24,
+    borderRadius: 20, // Consistent rounded corners
     marginBottom: 16,
     overflow: 'hidden',
-    shadowColor: '#000000', // black
-    shadowOffset: { width: 0, height: 8 },
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
-    shadowRadius: 24,
-    elevation: 8,
+    shadowRadius: 16,
+    elevation: 6,
+  },
+  cardCompact: {
+    borderRadius: 16,
+    marginBottom: 12,
   },
   imageContainer: {
     position: 'relative',
     height: 220,
+  },
+  imageContainerCompact: {
+    height: 160,
   },
   cardImage: {
     height: '100%',
@@ -308,6 +452,28 @@ const styles = StyleSheet.create({
   imageOverlay: {
     ...StyleSheet.absoluteFillObject,
   },
+
+  // Badge styles - Top Left positioning like reference images
+  badgeContainer: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+  },
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 20,
+    gap: 4,
+  },
+  badgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 0.2,
+  },
+
+  // Share button - Top Right
   shareButton: {
     position: 'absolute',
     top: 12,
@@ -323,6 +489,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.15)',
   },
+
+  // User badge - Bottom Left
   userBadgeContainer: {
     position: 'absolute',
     bottom: 12,
@@ -349,19 +517,21 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   userName: {
-    ...TYPE_SCALE.label.small,
-    color: PALETTE.white,
+    fontSize: 13, // Subheadline scale
     fontWeight: '600',
+    color: PALETTE.white,
   },
   verifiedBadge: {
     color: COLORS.trust.primary,
     fontSize: 12,
   },
   userRole: {
-    ...TYPE_SCALE.body.caption,
+    fontSize: 11, // Caption
     color: 'rgba(255,255,255,0.7)',
     marginTop: 1,
   },
+
+  // Price badge - Bottom Right
   priceBadgeContainer: {
     position: 'absolute',
     bottom: 12,
@@ -374,18 +544,36 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   priceText: {
-    ...TYPE_SCALE.mono.priceSmall,
-    color: PALETTE.white,
+    fontSize: 15, // Price emphasis
     fontWeight: '700',
+    color: PALETTE.white,
+    fontVariant: ['tabular-nums'],
   },
+
+  // Content Section
   cardContent: {
     padding: 16,
   },
+  cardContentCompact: {
+    padding: 12,
+  },
+
+  // Title - Headline (20px for mobile, equivalent to 24px desktop)
   cardTitle: {
-    ...TYPE_SCALE.display.h3,
+    fontSize: 18, // Mobile headline
+    fontWeight: '600',
     color: COLORS.text.primary,
     marginBottom: 6,
+    lineHeight: 24,
+    letterSpacing: -0.2,
   },
+  cardTitleCompact: {
+    fontSize: 15,
+    lineHeight: 20,
+    marginBottom: 4,
+  },
+
+  // Location - Body text (14px)
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -393,10 +581,13 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   cardLocation: {
-    ...TYPE_SCALE.body.small,
+    fontSize: 13, // Body small
     color: COLORS.text.secondary,
     flex: 1,
+    lineHeight: 18,
   },
+
+  // Details row
   detailsRow: {
     flexDirection: 'row',
     gap: 16,
@@ -410,14 +601,22 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   detailText: {
-    ...TYPE_SCALE.body.caption,
+    fontSize: 12, // Caption
     color: COLORS.text.muted,
+    lineHeight: 16,
   },
+
+  // Actions
   cardActions: {
     marginTop: 16,
   },
+  cardActionsCompact: {
+    marginTop: 12,
+  },
+
+  // Primary Button - 16px button text
   primaryButton: {
-    borderRadius: 26,
+    borderRadius: 24, // Pill shape
     overflow: 'hidden',
   },
   primaryButtonGradient: {
@@ -427,13 +626,23 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     gap: 8,
   },
+  primaryButtonGradientCompact: {
+    paddingVertical: 10,
+    gap: 6,
+  },
   primaryButtonText: {
-    ...TYPE_SCALE.label.large,
-    color: PALETTE.white,
+    fontSize: 15, // Button text
     fontWeight: '600',
+    color: PALETTE.white,
+    letterSpacing: 0.3,
+  },
+  primaryButtonTextCompact: {
+    fontSize: 13,
   },
 });
 
 MomentCard.displayName = 'MomentCard';
 
 export default MomentCard;
+export { MomentBadge, BADGE_CONFIGS };
+export type { BadgeType, MomentCardProps };
