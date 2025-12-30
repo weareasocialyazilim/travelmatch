@@ -25,6 +25,8 @@ import { canSubmitForm } from '@/utils/forms/helpers';
 import type { MinimalFormState } from '@/utils/forms/helpers';
 import { useToast } from '@/context/ToastContext';
 import { COLORS } from '@/constants/colors';
+import { TYPE_SCALE } from '@/constants/typography';
+import { RADIUS } from '@/constants/spacing';
 
 export const LoginScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -167,6 +169,10 @@ export const LoginScreen: React.FC = () => {
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => navigation.goBack()}
+            accessible={true}
+            accessibilityLabel="Geri dön"
+            accessibilityRole="button"
+            accessibilityHint="Önceki ekrana döner"
           >
             <MaterialCommunityIcons
               name="arrow-left"
@@ -272,6 +278,10 @@ export const LoginScreen: React.FC = () => {
             <TouchableOpacity
               style={styles.forgotPasswordContainer}
               onPress={() => navigation.navigate('ForgotPassword')}
+              accessible={true}
+              accessibilityLabel="Şifremi unuttum"
+              accessibilityRole="link"
+              accessibilityHint="Şifre sıfırlama sayfasına yönlendirir"
             >
               <Text style={styles.forgotPasswordText}>Şifremi Unuttum</Text>
             </TouchableOpacity>
@@ -349,7 +359,13 @@ export const LoginScreen: React.FC = () => {
             {/* Sign Up Link */}
             <View style={styles.signUpContainer}>
               <Text style={styles.signUpText}>Hesabın yok mu? </Text>
-              <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Register')}
+                accessible={true}
+                accessibilityLabel="Kayıt ol"
+                accessibilityRole="link"
+                accessibilityHint="Yeni hesap oluşturma sayfasına yönlendirir"
+              >
                 <Text style={styles.signUpLink}>Kayıt Ol</Text>
               </TouchableOpacity>
             </View>
@@ -378,8 +394,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   headerTitle: {
-    fontSize: 17,
-    fontWeight: '600',
+    ...TYPE_SCALE.display.h4,
     color: COLORS.text.primary,
   },
   placeholder: {
@@ -396,13 +411,12 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    ...TYPE_SCALE.display.h1,
     marginBottom: 10,
     color: COLORS.text.primary,
   },
   subtitle: {
-    fontSize: 16,
+    ...TYPE_SCALE.body.base,
     color: COLORS.text.secondary,
     marginBottom: 30,
   },
@@ -415,9 +429,9 @@ const styles = StyleSheet.create({
     height: 50,
     borderWidth: 1,
     borderColor: COLORS.border.default,
-    borderRadius: 8,
+    borderRadius: RADIUS.sm,
     paddingHorizontal: 16,
-    fontSize: 16,
+    ...TYPE_SCALE.body.base,
     color: COLORS.text.primary,
     backgroundColor: COLORS.surface.base,
   },
@@ -425,8 +439,8 @@ const styles = StyleSheet.create({
     borderColor: COLORS.feedback.error,
   },
   errorText: {
+    ...TYPE_SCALE.body.caption,
     color: COLORS.feedback.error,
-    fontSize: 12,
     marginTop: 4,
     marginLeft: 4,
   },
@@ -434,7 +448,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 50,
     backgroundColor: COLORS.brand.primary,
-    borderRadius: 8,
+    borderRadius: RADIUS.sm,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 8,
@@ -443,9 +457,8 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   buttonText: {
+    ...TYPE_SCALE.button.base,
     color: COLORS.utility.white,
-    fontSize: 16,
-    fontWeight: '600',
   },
   divider: {
     flexDirection: 'row',
@@ -459,8 +472,8 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.border.default,
   },
   dividerText: {
+    ...TYPE_SCALE.body.small,
     marginHorizontal: 16,
-    fontSize: 14,
     color: COLORS.text.secondary,
   },
   biometricButton: {
@@ -468,16 +481,15 @@ const styles = StyleSheet.create({
     height: 60,
     borderWidth: 1.5,
     borderColor: COLORS.brand.primary,
-    borderRadius: 8,
+    borderRadius: RADIUS.sm,
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
     gap: 12,
   },
   biometricButtonText: {
+    ...TYPE_SCALE.button.base,
     color: COLORS.brand.primary,
-    fontSize: 16,
-    fontWeight: '600',
   },
   forgotPasswordContainer: {
     alignSelf: 'flex-end',
@@ -485,8 +497,8 @@ const styles = StyleSheet.create({
     marginTop: -8,
   },
   forgotPasswordText: {
+    ...TYPE_SCALE.body.small,
     color: COLORS.brand.primary,
-    fontSize: 14,
     fontWeight: '500',
   },
   signUpContainer: {
@@ -495,12 +507,12 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   signUpText: {
+    ...TYPE_SCALE.body.small,
     color: COLORS.text.secondary,
-    fontSize: 14,
   },
   signUpLink: {
+    ...TYPE_SCALE.body.small,
     color: COLORS.brand.primary,
-    fontSize: 14,
     fontWeight: '600',
   },
 });
