@@ -1,6 +1,4 @@
-/**
- * Web Ceremony Components Export
- */
-
 export { CeremonyShowcase } from './CeremonyShowcase';
-export { TrustBadgeDisplay, TrustBadgeRow } from './TrustBadgeDisplay';
+export { FeatureCard } from './FeatureCard';
+export { InteractiveDemo } from './InteractiveDemo';
+export { TrustBadgeDisplay } from './TrustBadgeDisplay';
