@@ -3,11 +3,19 @@
  * "Cinematic Travel + Trust Jewelry" Design System
  *
  * Motto: "Give a moment. See it happen."
+ *
+ * Sections: Hero, Features, How It Works, Trust, CTA, Footer
+ * (Testimonials removed per design decision)
  */
 
 import Link from "next/link";
+import { Navbar } from "@/components/shared/Navbar";
+import { TrustRing } from "@/components/ui/TrustRing";
 
-// Icons
+// ═══════════════════════════════════════════════════════════════════
+// ICONS
+// ═══════════════════════════════════════════════════════════════════
+
 const GiftIcon = () => (
   <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a4 4 0 00-4-4H6a4 4 0 00-4 4v2h10zm0 0V6a4 4 0 014-4h2a4 4 0 014 4v2H12zM4 8h16v13a1 1 0 01-1 1H5a1 1 0 01-1-1V8z" />
@@ -39,8 +47,23 @@ const MapPinIcon = () => (
   </svg>
 );
 
-// Trust Ring Component
-function TrustRing({ score, size = 44 }: { score: number; size?: number }) {
+const AppleIcon = () => (
+  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+  </svg>
+);
+
+const PlayStoreIcon = () => (
+  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.5,12.92 20.16,13.19L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
+  </svg>
+);
+
+// ═══════════════════════════════════════════════════════════════════
+// SMALL TRUST RING (for social proof)
+// ═══════════════════════════════════════════════════════════════════
+
+function SmallTrustRing({ score, size = 40 }: { score: number; size?: number }) {
   const radius = (size - 4) / 2;
   const circumference = 2 * Math.PI * radius;
   const progress = (score / 100) * circumference;
@@ -62,7 +85,7 @@ function TrustRing({ score, size = 44 }: { score: number; size?: number }) {
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="url(#trustGrad)"
+          stroke="url(#trustGradSmall)"
           strokeWidth={3}
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -70,28 +93,35 @@ function TrustRing({ score, size = 44 }: { score: number; size?: number }) {
           className="transition-all duration-1000"
         />
         <defs>
-          <linearGradient id="trustGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient id="trustGradSmall" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#34D399" />
             <stop offset="100%" stopColor="#10B981" />
           </linearGradient>
         </defs>
       </svg>
-      <div
-        className="absolute inset-1 rounded-full bg-gradient-to-br from-stone-100 to-stone-200 dark:from-stone-700 dark:to-stone-800"
-      />
+      <div className="absolute inset-1 rounded-full bg-gradient-to-br from-stone-100 to-stone-200 dark:from-stone-700 dark:to-stone-800" />
     </div>
   );
 }
 
+// ═══════════════════════════════════════════════════════════════════
+// MAIN PAGE
+// ═══════════════════════════════════════════════════════════════════
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-cream dark:bg-stone-950">
-      {/* HERO SECTION */}
-      <section className="relative min-h-screen flex items-center overflow-hidden">
+      {/* NAVBAR */}
+      <Navbar />
+
+      {/* ═══════════════════════════════════════════════════════════
+          HERO SECTION
+          ═══════════════════════════════════════════════════════════ */}
+      <section className="relative min-h-screen flex items-center overflow-hidden pt-20">
         {/* Background Effects */}
         <div className="absolute inset-0 bg-gradient-radial-glow opacity-50" />
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse-soft" />
-        <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-secondary/10 rounded-full blur-3xl animate-pulse-soft" style={{ animationDelay: '1s' }} />
+        <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-secondary/10 rounded-full blur-3xl animate-pulse-soft animation-delay-500" />
 
         <div className="section-container relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -108,41 +138,37 @@ export default function Home() {
               </div>
 
               {/* Headline */}
-              <h1 className="heading-hero animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+              <h1 className="heading-hero animate-fade-in-up animation-delay-100">
                 <span className="gradient-text">Give a moment.</span>
                 <br />
                 <span className="text-stone-900 dark:text-white">See it happen.</span>
               </h1>
 
               {/* Subtitle */}
-              <p className="text-xl text-stone-600 dark:text-stone-400 max-w-lg mx-auto lg:mx-0 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+              <p className="text-xl text-stone-600 dark:text-stone-400 max-w-lg mx-auto lg:mx-0 animate-fade-in-up animation-delay-200">
                 The first platform where you can gift real travel experiences
                 and see the proof when they happen. Build trust. Meet better.
               </p>
 
               {/* CTAs */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-fade-in-up animation-delay-300">
                 <Link href="https://apps.apple.com" className="btn-primary">
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
-                  </svg>
+                  <AppleIcon />
                   Download for iOS
                 </Link>
                 <Link href="https://play.google.com" className="btn-outline">
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.5,12.92 20.16,13.19L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
-                  </svg>
+                  <PlayStoreIcon />
                   Get on Android
                 </Link>
               </div>
 
               {/* Social Proof */}
-              <div className="flex items-center gap-4 justify-center lg:justify-start pt-4 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+              <div className="flex items-center gap-4 justify-center lg:justify-start pt-4 animate-fade-in-up animation-delay-400">
                 <div className="flex -space-x-2">
-                  <TrustRing score={92} size={40} />
-                  <TrustRing score={87} size={40} />
-                  <TrustRing score={95} size={40} />
-                  <TrustRing score={89} size={40} />
+                  <SmallTrustRing score={92} size={40} />
+                  <SmallTrustRing score={87} size={40} />
+                  <SmallTrustRing score={95} size={40} />
+                  <SmallTrustRing score={89} size={40} />
                 </div>
                 <p className="text-sm text-stone-500 dark:text-stone-400">
                   <span className="font-semibold text-stone-900 dark:text-white">10,000+</span>
@@ -152,7 +178,7 @@ export default function Home() {
             </div>
 
             {/* Phone Mockup */}
-            <div className="relative hidden lg:flex justify-center animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+            <div className="relative hidden lg:flex justify-center animate-fade-in-up animation-delay-500">
               <div className="relative animate-float">
                 {/* Phone Frame */}
                 <div className="w-[320px] h-[650px] bg-stone-900 rounded-[3rem] p-3 shadow-2xl border border-stone-700">
@@ -203,15 +229,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* VALUE PILLARS */}
-      <section className="section-padding bg-white dark:bg-stone-900">
+      {/* ═══════════════════════════════════════════════════════════
+          FEATURES SECTION
+          ═══════════════════════════════════════════════════════════ */}
+      <section id="features" className="section-padding bg-white dark:bg-stone-900">
         <div className="section-container">
           <div className="text-center mb-16">
             <h2 className="heading-display mb-4">
               Why <span className="gradient-text">TravelMatch</span>?
             </h2>
             <p className="text-lg text-stone-600 dark:text-stone-400 max-w-2xl mx-auto">
-              We are reinventing how people connect through gifted experiences.
+              The only platform designed for meaningful travel connections through verified experiences.
             </p>
           </div>
 
@@ -221,10 +249,9 @@ export default function Home() {
               <div className="w-16 h-16 mx-auto mb-6 bg-gradient-hero rounded-2xl flex items-center justify-center text-white shadow-button group-hover:scale-110 transition-transform duration-300">
                 <GiftIcon />
               </div>
-              <h3 className="text-xl font-bold mb-3 text-stone-900 dark:text-white">Gift Moments</h3>
+              <h3 className="text-xl font-bold mb-3 text-stone-900 dark:text-white">Gift Experiences</h3>
               <p className="text-stone-600 dark:text-stone-400">
-                Send coffee, tickets, or experiences to travelers you connect with.
-                Make their journey special.
+                Send coffee, dinner, or unique local experiences to travelers anywhere in the world.
               </p>
             </div>
 
@@ -233,10 +260,9 @@ export default function Home() {
               <div className="w-16 h-16 mx-auto mb-6 bg-gradient-trust rounded-2xl flex items-center justify-center text-white trust-glow group-hover:scale-110 transition-transform duration-300">
                 <CheckBadgeIcon />
               </div>
-              <h3 className="text-xl font-bold mb-3 text-stone-900 dark:text-white">Proof System</h3>
+              <h3 className="text-xl font-bold mb-3 text-stone-900 dark:text-white">See the Proof</h3>
               <p className="text-stone-600 dark:text-stone-400">
-                See photo/video proof when your gift is used.
-                Real moments, verified and authentic.
+                Receive verified photos and videos when your gift is experienced. No more wondering.
               </p>
             </div>
 
@@ -245,32 +271,35 @@ export default function Home() {
               <div className="w-16 h-16 mx-auto mb-6 bg-gradient-discover rounded-2xl flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300">
                 <ShieldCheckIcon />
               </div>
-              <h3 className="text-xl font-bold mb-3 text-stone-900 dark:text-white">Trust Score</h3>
+              <h3 className="text-xl font-bold mb-3 text-stone-900 dark:text-white">Build Trust</h3>
               <p className="text-stone-600 dark:text-stone-400">
-                Build your reputation through verified interactions.
-                Connect with confidence.
+                Our Trust Score system helps you connect with verified, reliable travelers.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
-      <section className="section-padding">
+      {/* ═══════════════════════════════════════════════════════════
+          HOW IT WORKS SECTION
+          ═══════════════════════════════════════════════════════════ */}
+      <section id="how-it-works" className="section-padding">
         <div className="section-container">
           <div className="text-center mb-16">
             <h2 className="heading-display mb-4">
               How It <span className="gradient-text">Works</span>
             </h2>
-            <div className="w-24 h-1 bg-gradient-hero mx-auto rounded-full" />
+            <p className="text-lg text-stone-600 dark:text-stone-400">
+              Four simple steps to gift meaningful travel experiences.
+            </p>
           </div>
 
           <div className="max-w-3xl mx-auto space-y-8">
             {[
-              { step: '01', title: 'Create a Moment', desc: 'Share an experience you want to receive as a gift', color: 'text-primary' },
-              { step: '02', title: 'Get Discovered', desc: 'Travelers find your moment and connect with you', color: 'text-secondary' },
-              { step: '03', title: 'Receive a Gift', desc: 'Someone gifts you the experience through our secure escrow', color: 'text-accent' },
-              { step: '04', title: 'Upload Proof', desc: 'Share proof when you enjoy the moment, release the funds', color: 'text-trust' },
+              { step: '01', title: 'Discover', desc: 'Browse unique local experiences created by travelers around the world.', color: 'text-primary' },
+              { step: '02', title: 'Gift', desc: 'Choose an experience and send it as a gift. Payment is held securely.', color: 'text-secondary' },
+              { step: '03', title: 'Experience', desc: 'The recipient enjoys the experience you gifted.', color: 'text-accent' },
+              { step: '04', title: 'Prove', desc: 'They submit proof, you see it happen, and payment is released.', color: 'text-trust' },
             ].map((item) => (
               <div
                 key={item.step}
@@ -289,21 +318,44 @@ export default function Home() {
         </div>
       </section>
 
-      {/* TRUST SYSTEM PREVIEW */}
+      {/* ═══════════════════════════════════════════════════════════
+          TRUST SECTION
+          ═══════════════════════════════════════════════════════════ */}
       <section className="section-padding bg-gradient-to-br from-stone-900 to-stone-950 text-white">
         <div className="section-container">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <span className="badge bg-trust/20 text-trust">Trust System</span>
               <h2 className="text-4xl md:text-5xl font-bold">
-                Build Trust.<br />
-                <span className="bg-clip-text text-transparent bg-gradient-trust">Meet Better.</span>
+                Trust is our<br />
+                <span className="bg-clip-text text-transparent bg-gradient-trust">currency</span>
               </h2>
               <p className="text-lg text-stone-400">
-                Every gift sent, every proof uploaded, every positive interaction builds your Trust Score.
-                It is your passport to meaningful connections.
+                Every user builds a Trust Score through verified experiences.
+                Higher scores unlock more features and build credibility in our community.
               </p>
-              <div className="flex flex-wrap gap-4">
+
+              <div className="space-y-4">
+                {[
+                  { label: 'Verified identity', desc: 'KYC verification for added security' },
+                  { label: 'AI proof verification', desc: 'Smart detection ensures authentic experiences' },
+                  { label: 'Community ratings', desc: 'Build reputation through completed gifts' },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-4">
+                    <div className="w-6 h-6 rounded-full bg-trust flex items-center justify-center flex-shrink-0 mt-1">
+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="font-semibold">{item.label}</div>
+                      <div className="text-sm text-stone-400">{item.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap gap-4 pt-4">
                 <div className="glass-dark px-4 py-3 rounded-xl">
                   <span className="text-2xl font-bold text-trust tabular-nums">92</span>
                   <span className="text-stone-400 ml-2">Platinum Traveler</span>
@@ -319,72 +371,68 @@ export default function Home() {
             <div className="flex justify-center">
               <div className="relative">
                 <div className="w-64 h-64 rounded-full bg-gradient-trust opacity-20 blur-3xl absolute inset-0" />
-                <div className="relative w-48 h-48">
-                  <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="6" className="text-stone-800" />
-                    <circle
-                      cx="50" cy="50" r="45" fill="none" stroke="url(#trustGradLg)" strokeWidth="6"
-                      strokeLinecap="round" strokeDasharray={2 * Math.PI * 45} strokeDashoffset={2 * Math.PI * 45 * 0.08}
-                      className="animate-pulse-soft"
-                    />
-                    <defs>
-                      <linearGradient id="trustGradLg" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#34D399" />
-                        <stop offset="100%" stopColor="#10B981" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-5xl font-bold tabular-nums">92</span>
-                    <span className="text-stone-400 text-sm">Trust Score</span>
-                  </div>
-                </div>
+                <TrustRing score={92} size={200} />
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA SECTION */}
-      <section className="section-padding bg-gradient-hero text-white">
-        <div className="section-container text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Start gifting moments today
-          </h2>
-          <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-            Join thousands of travelers who are creating meaningful connections
-            through gifted experiences.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="https://apps.apple.com"
-              className="inline-flex items-center gap-3 bg-white text-stone-900 px-8 py-4 rounded-2xl font-semibold hover:bg-white/90 transition-colors"
-            >
-              <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
-              </svg>
-              <div className="text-left">
-                <div className="text-xs text-stone-500">Download on the</div>
-                <div className="text-lg font-bold">App Store</div>
+      {/* ═══════════════════════════════════════════════════════════
+          APP DOWNLOAD CTA SECTION
+          ═══════════════════════════════════════════════════════════ */}
+      <section id="download" className="section-padding bg-gradient-hero text-white overflow-hidden">
+        <div className="section-container">
+          <div className="relative">
+            {/* Background decoration */}
+            <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
+            <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
+
+            <div className="relative text-center max-w-3xl mx-auto">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                Start gifting moments today
+              </h2>
+              <p className="text-xl text-white/80 mb-10">
+                Download TravelMatch and join thousands of travelers creating
+                meaningful connections through gifted experiences.
+              </p>
+
+              {/* App Store Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  href="https://apps.apple.com"
+                  className="inline-flex items-center gap-4 bg-white text-stone-900 px-8 py-4 rounded-2xl font-semibold hover:bg-white/90 transition-colors"
+                >
+                  <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                  </svg>
+                  <div className="text-left">
+                    <div className="text-xs text-stone-500">Download on the</div>
+                    <div className="text-lg font-bold">App Store</div>
+                  </div>
+                </Link>
+
+                <Link
+                  href="https://play.google.com"
+                  className="inline-flex items-center gap-4 bg-white/10 backdrop-blur border border-white/20 px-8 py-4 rounded-2xl font-semibold hover:bg-white/20 transition-colors"
+                >
+                  <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.5,12.92 20.16,13.19L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
+                  </svg>
+                  <div className="text-left">
+                    <div className="text-xs text-white/60">GET IT ON</div>
+                    <div className="text-lg font-bold">Google Play</div>
+                  </div>
+                </Link>
               </div>
-            </Link>
-            <Link
-              href="https://play.google.com"
-              className="inline-flex items-center gap-3 bg-white/10 backdrop-blur border border-white/20 px-8 py-4 rounded-2xl font-semibold hover:bg-white/20 transition-colors"
-            >
-              <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.5,12.92 20.16,13.19L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
-              </svg>
-              <div className="text-left">
-                <div className="text-xs text-white/60">GET IT ON</div>
-                <div className="text-lg font-bold">Google Play</div>
-              </div>
-            </Link>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* PARTNER CTA */}
+      {/* ═══════════════════════════════════════════════════════════
+          PARTNER CTA
+          ═══════════════════════════════════════════════════════════ */}
       <section className="py-12 bg-secondary/5">
         <div className="section-container">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
@@ -404,7 +452,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FOOTER */}
+      {/* ═══════════════════════════════════════════════════════════
+          FOOTER
+          ═══════════════════════════════════════════════════════════ */}
       <footer className="py-12 bg-stone-900 text-white">
         <div className="section-container">
           {/* Logo & Social */}
@@ -439,8 +489,7 @@ export default function Home() {
             <Link href="/terms" className="text-stone-400 hover:text-white transition-colors">Terms</Link>
             <Link href="/privacy" className="text-stone-400 hover:text-white transition-colors">Privacy</Link>
             <Link href="/safety" className="text-stone-400 hover:text-white transition-colors">Safety</Link>
-            <Link href="/community" className="text-stone-400 hover:text-white transition-colors">Community</Link>
-            <Link href="/contact" className="text-stone-400 hover:text-white transition-colors">Contact</Link>
+            <Link href="mailto:hello@travelmatch.app" className="text-stone-400 hover:text-white transition-colors">Contact</Link>
           </div>
 
           {/* Copyright */}
