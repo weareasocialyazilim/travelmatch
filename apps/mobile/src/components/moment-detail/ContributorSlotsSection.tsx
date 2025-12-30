@@ -65,9 +65,7 @@ export const ContributorSlotsSection: React.FC<ContributorSlotsSectionProps> =
                   ) : (
                     <Image
                       source={{
-                        uri:
-                          slot.contributor.avatar ||
-                          'https://via.placeholder.com/48',
+                        uri: slot.contributor.avatar || '',
                       }}
                       style={styles.contributorAvatar}
                     />

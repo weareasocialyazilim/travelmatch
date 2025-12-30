@@ -162,7 +162,7 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
       otherUser: {
         id: escrowId,
         name: receiverName,
-        avatar: receiverAvatar || 'https://via.placeholder.com/100',
+        avatar: receiverAvatar || '',
         isVerified: true,
         type: 'local',
         role: 'Local',
@@ -177,7 +177,7 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
       otherUser: {
         id: escrowId,
         name: receiverName,
-        avatar: receiverAvatar || 'https://via.placeholder.com/100',
+        avatar: receiverAvatar || '',
         isVerified: true,
         type: 'local',
         role: 'Local',
@@ -215,7 +215,7 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
           <View style={styles.receiverInfo}>
             <Image
               source={{
-                uri: receiverAvatar || 'https://via.placeholder.com/100',
+                uri: receiverAvatar || '',
               }}
               style={styles.receiverAvatar}
             />

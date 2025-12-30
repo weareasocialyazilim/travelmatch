@@ -241,9 +241,7 @@ export const ReceiverApprovalScreen: React.FC<ReceiverApprovalScreenProps> = ({
                   <View style={styles.giverInfo}>
                     <Image
                       source={{
-                        uri:
-                          slot.giver.avatar ||
-                          'https://via.placeholder.com/150',
+                        uri: slot.giver.avatar || '',
                       }}
                       style={styles.giverAvatar}
                     />

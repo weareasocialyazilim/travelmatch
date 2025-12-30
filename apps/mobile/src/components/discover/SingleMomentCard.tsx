@@ -36,7 +36,7 @@ export const SingleMomentCard: React.FC<MomentCardProps> = memo(
           <View style={styles.creatorRow}>
             <OptimizedImage
               source={{
-                uri: item.user?.avatar || 'https://via.placeholder.com/40',
+                uri: item.user?.avatar || '',
               }}
               style={styles.creatorAvatar}
               contentFit="cover"

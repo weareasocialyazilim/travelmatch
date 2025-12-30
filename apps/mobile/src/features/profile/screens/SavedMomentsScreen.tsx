@@ -207,8 +207,7 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
                 <View style={styles.momentContent}>
                   <Image
                     source={{
-                      uri:
-                        moment.images?.[0] || 'https://via.placeholder.com/70',
+                      uri: moment.images?.[0] || '',
                     }}
                     style={styles.momentImage}
                   />
