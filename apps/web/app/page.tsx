@@ -69,7 +69,10 @@ const Toast = ({ message, onClose }: ToastProps) => {
   }, [onClose]);
 
   return (
-    <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[10001] animate-[toast-in_0.3s_cubic-bezier(0.175,0.885,0.32,1.275)_forwards]">
+    <div
+      className="fixed bottom-10 left-1/2 z-[10002] animate-[toast-in_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)_forwards] origin-center"
+      style={{ transform: 'translateX(-50%)' }}
+    >
       <div className="bg-[#CCFF00] border-4 border-black px-8 py-4 shadow-[8px_8px_0px_0px_#000] flex items-center gap-4 min-w-[300px] justify-center text-center">
         <span className="text-2xl animate-pulse">⚡️</span>
         <span className="font-mono font-bold text-black uppercase tracking-wide text-sm md:text-base">
@@ -165,8 +168,8 @@ interface GiftPopupProps {
 }
 
 const GiftPopup = ({ item, onClose, onConfirm }: GiftPopupProps) => (
-  <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 backdrop-blur-xl p-4 isolate">
-    <div className="relative bg-[#050505] border-4 border-white w-full max-w-md p-8 shadow-[15px_15px_0px_0px_#CCFF00] animate-[popup-in_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)_forwards]">
+  <div className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/95 backdrop-blur-xl p-4">
+    <div className="relative bg-[#050505] border-4 border-white w-full max-w-md max-h-[90vh] overflow-y-auto p-8 shadow-[15px_15px_0px_0px_#CCFF00] animate-[popup-in_0.3s_ease-out_forwards]">
       <div className="absolute top-0 left-0 w-full h-4 bg-[#CCFF00]"></div>
       <button
         onClick={onClose}
