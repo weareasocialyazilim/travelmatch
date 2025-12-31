@@ -14,8 +14,7 @@ describe('Divider Component', () => {
 
   describe('Basic Rendering', () => {
     it('renders without props', () => {
-      const { UNSAFE_root } = render(<Divider />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Divider />);
     });
 
     it('renders as a simple line by default', () => {
@@ -24,8 +23,7 @@ describe('Divider Component', () => {
     });
 
     it('renders with default medium spacing', () => {
-      const { UNSAFE_root } = render(<Divider />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Divider />);
     });
   });
 
@@ -73,18 +71,15 @@ describe('Divider Component', () => {
 
   describe('Spacing', () => {
     it('renders with small spacing', () => {
-      const { UNSAFE_root } = render(<Divider spacing="sm" />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Divider spacing="sm" />);
     });
 
     it('renders with medium spacing', () => {
-      const { UNSAFE_root } = render(<Divider spacing="md" />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Divider spacing="md" />);
     });
 
     it('renders with large spacing', () => {
-      const { UNSAFE_root } = render(<Divider spacing="lg" />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Divider spacing="lg" />);
     });
 
     it('applies small spacing with text', () => {
@@ -103,8 +98,7 @@ describe('Divider Component', () => {
     });
 
     it('uses medium as default spacing', () => {
-      const { UNSAFE_root } = render(<Divider />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Divider />);
     });
   });
 
@@ -114,20 +108,15 @@ describe('Divider Component', () => {
 
   describe('Custom Styles', () => {
     it('accepts custom style prop', () => {
-      const { UNSAFE_root } = render(<Divider style={{ marginTop: 20 }} />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Divider style={{ marginTop: 20 }} />);
     });
 
     it('renders with multiple custom styles', () => {
-      const { UNSAFE_root } = render(
-        <Divider style={{ marginTop: 10, marginBottom: 10 }} />,
-      );
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Divider style={{ marginTop: 10, marginBottom: 10 }} />);
     });
 
     it('handles undefined style gracefully', () => {
-      const { UNSAFE_root } = render(<Divider style={undefined} />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Divider style={undefined} />);
     });
 
     it('applies custom styles with text', () => {
@@ -156,10 +145,7 @@ describe('Divider Component', () => {
     });
 
     it('combines large spacing with custom style', () => {
-      const { UNSAFE_root } = render(
-        <Divider spacing="lg" style={{ backgroundColor: '#000' }} />,
-      );
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Divider spacing="lg" style={{ backgroundColor: '#000' }} />);
     });
 
     it('renders multiple dividers independently', () => {
@@ -183,9 +169,8 @@ describe('Divider Component', () => {
 
   describe('Edge Cases', () => {
     it('handles empty string text', () => {
-      const { UNSAFE_root } = render(<Divider text="" />);
+      render(<Divider text="" />);
       // Empty text should still render the container
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('handles whitespace-only text', () => {
@@ -210,8 +195,7 @@ describe('Divider Component', () => {
     });
 
     it('handles null style gracefully', () => {
-      const { UNSAFE_root } = render(<Divider style={null} />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Divider style={null} />);
     });
   });
 
@@ -247,21 +231,15 @@ describe('Divider Component', () => {
     });
 
     it('updates spacing dynamically', () => {
-      const { rerender, UNSAFE_root } = render(<Divider spacing="sm" />);
-      expect(UNSAFE_root).toBeTruthy();
+      const { rerender } = render(<Divider spacing="sm" />);
 
       rerender(<Divider spacing="lg" />);
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('updates style dynamically', () => {
-      const { rerender, UNSAFE_root } = render(
-        <Divider style={{ marginTop: 10 }} />,
-      );
-      expect(UNSAFE_root).toBeTruthy();
+      const { rerender } = render(<Divider style={{ marginTop: 10 }} />);
 
       rerender(<Divider style={{ marginTop: 20 }} />);
-      expect(UNSAFE_root).toBeTruthy();
     });
   });
 
@@ -271,14 +249,12 @@ describe('Divider Component', () => {
 
   describe('Layout', () => {
     it('renders as horizontal separator', () => {
-      const { UNSAFE_root } = render(<Divider />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Divider />);
     });
 
     it('renders text-based divider with proper structure', () => {
-      const { getByText, UNSAFE_root } = render(<Divider text="OR" />);
+      const { getByText } = render(<Divider text="OR" />);
       expect(getByText('OR')).toBeTruthy();
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('renders in vertical stack', () => {
@@ -307,8 +283,7 @@ describe('Divider Component', () => {
     });
 
     it('renders as section separator', () => {
-      const { UNSAFE_root } = render(<Divider spacing="md" />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Divider spacing="md" />);
     });
 
     it('renders as content divider with text', () => {
@@ -317,17 +292,11 @@ describe('Divider Component', () => {
     });
 
     it('renders with custom margin for tight layouts', () => {
-      const { UNSAFE_root } = render(
-        <Divider spacing="sm" style={{ marginVertical: 4 }} />,
-      );
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Divider spacing="sm" style={{ marginVertical: 4 }} />);
     });
 
     it('renders with custom margin for spacious layouts', () => {
-      const { UNSAFE_root } = render(
-        <Divider spacing="lg" style={{ marginVertical: 32 }} />,
-      );
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Divider spacing="lg" style={{ marginVertical: 32 }} />);
     });
   });
 
@@ -349,7 +318,7 @@ describe('Divider Component', () => {
     });
 
     it('handles rapid prop changes', () => {
-      const { rerender, UNSAFE_root } = render(<Divider />);
+      const { rerender } = render(<Divider />);
 
       for (let i = 0; i < 5; i++) {
         rerender(
@@ -359,8 +328,6 @@ describe('Divider Component', () => {
           />,
         );
       }
-
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('renders in complex layouts', () => {
