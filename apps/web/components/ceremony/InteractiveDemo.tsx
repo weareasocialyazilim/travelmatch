@@ -10,10 +10,26 @@ export function InteractiveDemo() {
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
   const steps: { id: DemoStep; title: string; description: string }[] = [
-    { id: 'gift', title: 'Hediye Gönder', description: 'Sevdiklerinize deneyim hediye edin' },
-    { id: 'experience', title: 'Deneyimle', description: 'Alıcı deneyimi yaşar' },
-    { id: 'proof', title: 'Anı Paylaş', description: 'Proof Ceremony ile belgele' },
-    { id: 'celebrate', title: 'Kutla', description: 'Para aktarılır, anılar kalır' },
+    {
+      id: 'gift',
+      title: 'Hediye Gönder',
+      description: 'Sevdiklerinize deneyim hediye edin',
+    },
+    {
+      id: 'experience',
+      title: 'Deneyimle',
+      description: 'Alıcı deneyimi yaşar',
+    },
+    {
+      id: 'proof',
+      title: 'Anı Paylaş',
+      description: 'Proof Ceremony ile belgele',
+    },
+    {
+      id: 'celebrate',
+      title: 'Kutla',
+      description: 'Para aktarılır, anılar kalır',
+    },
   ];
 
   // Auto-advance demo
@@ -21,10 +37,11 @@ export function InteractiveDemo() {
     if (!isAutoPlaying) return;
 
     const timer = setInterval(() => {
-      setActiveStep(prev => {
-        const currentIndex = steps.findIndex(s => s.id === prev);
+      setActiveStep((prev) => {
+        const currentIndex = steps.findIndex((s) => s.id === prev);
         const nextIndex = (currentIndex + 1) % steps.length;
-        return steps[nextIndex].id;
+        const nextStep = steps[nextIndex];
+        return nextStep ? nextStep.id : 'gift';
       });
     }, 3000);
 
@@ -82,8 +99,12 @@ export function InteractiveDemo() {
                           <span className="text-6xl">🎈</span>
                         </div>
                         <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur rounded-xl p-3">
-                          <p className="font-medium text-sm">Ayşe deneyimi yaşıyor! 🎈</p>
-                          <p className="text-xs text-gray-500 mt-1">Kapadokya, Türkiye</p>
+                          <p className="font-medium text-sm">
+                            Ayşe deneyimi yaşıyor! 🎈
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Kapadokya, Türkiye
+                          </p>
                         </div>
                       </div>
                     </DemoScreen>
@@ -102,7 +123,9 @@ export function InteractiveDemo() {
                           <div className="w-12 h-12 mx-auto bg-amber-100 rounded-full flex items-center justify-center text-2xl mb-2">
                             📸
                           </div>
-                          <p className="text-sm text-gray-600">Anınızı yakalayın</p>
+                          <p className="text-sm text-gray-600">
+                            Anınızı yakalayın
+                          </p>
                         </div>
 
                         {/* AI analyzing */}
@@ -121,15 +144,21 @@ export function InteractiveDemo() {
                           ✨
                         </div>
                         <h4 className="font-bold text-lg">Harika! 🎉</h4>
-                        <p className="text-gray-500 text-sm mt-1">Deneyim onaylandı</p>
+                        <p className="text-gray-500 text-sm mt-1">
+                          Deneyim onaylandı
+                        </p>
 
                         <div className="mt-4 bg-emerald-50 text-emerald-700 py-2 px-4 rounded-lg text-sm">
                           💰 ₺2,500 hesaba aktarılıyor
                         </div>
 
                         <div className="mt-4 border rounded-lg p-3">
-                          <p className="text-xs text-gray-500">Teşekkür Kartı</p>
-                          <p className="text-sm font-medium mt-1">&quot;Harika bir hediyeydi! 💝&quot;</p>
+                          <p className="text-xs text-gray-500">
+                            Teşekkür Kartı
+                          </p>
+                          <p className="text-sm font-medium mt-1">
+                            &quot;Harika bir hediyeydi! 💝&quot;
+                          </p>
                         </div>
                       </div>
                     </DemoScreen>
@@ -158,16 +187,20 @@ export function InteractiveDemo() {
                   : 'hover:bg-gray-50 border-2 border-transparent'
               }`}
             >
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold ${
-                activeStep === step.id
-                  ? 'bg-amber-500 text-white'
-                  : 'bg-gray-100 text-gray-400'
-              }`}>
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold ${
+                  activeStep === step.id
+                    ? 'bg-amber-500 text-white'
+                    : 'bg-gray-100 text-gray-400'
+                }`}
+              >
                 {index + 1}
               </div>
-              <span className={`text-sm font-medium ${
-                activeStep === step.id ? 'text-amber-700' : 'text-gray-500'
-              }`}>
+              <span
+                className={`text-sm font-medium ${
+                  activeStep === step.id ? 'text-amber-700' : 'text-gray-500'
+                }`}
+              >
                 {step.title}
               </span>
             </button>
@@ -176,7 +209,7 @@ export function InteractiveDemo() {
 
         {/* Current step description */}
         <p className="text-center text-gray-600 mt-4">
-          {steps.find(s => s.id === activeStep)?.description}
+          {steps.find((s) => s.id === activeStep)?.description}
         </p>
       </div>
     </motion.div>
