@@ -450,8 +450,12 @@ describe('security', () => {
 
   describe('isValidUrl', () => {
     describe('valid URLs', () => {
-      it('should accept standard HTTP URL', () => {
-        expect(isValidUrl('http://example.com')).toBe(true);
+      it('should reject HTTP URL by default (requireHttps=true)', () => {
+        expect(isValidUrl('http://example.com')).toBe(false);
+      });
+
+      it('should accept HTTP URL when requireHttps=false', () => {
+        expect(isValidUrl('http://example.com', false)).toBe(true);
       });
 
       it('should accept standard HTTPS URL', () => {
@@ -492,14 +496,13 @@ describe('security', () => {
         expect(isValidUrl('')).toBe(false);
       });
 
-      it('should accept FTP protocol (URL constructor allows it)', () => {
-        expect(isValidUrl('ftp://example.com')).toBe(true); // URL constructor accepts ftp
+      it('should reject FTP protocol for security', () => {
+        expect(isValidUrl('ftp://example.com')).toBe(false); // FTP not allowed
       });
 
-      it('should accept javascript: protocol (URL constructor allows it, filter on usage)', () => {
-        // Note: isValidUrl uses URL constructor which accepts javascript: as valid
-        // Application should filter dangerous protocols at usage time, not validation
-        expect(isValidUrl('javascript:alert(1)')).toBe(true);
+      it('should reject javascript: protocol for security', () => {
+        // isValidUrl rejects dangerous protocols like javascript:
+        expect(isValidUrl('javascript:alert(1)')).toBe(false);
       });
     });
   });

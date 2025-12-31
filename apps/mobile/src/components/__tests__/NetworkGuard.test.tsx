@@ -66,7 +66,7 @@ describe('NetworkGuard', () => {
         refresh: jest.fn(),
       });
 
-      const { queryByText, UNSAFE_root } = render(
+      const { queryByText } = render(
         <NetworkGuard>
           <TestChild />
         </NetworkGuard>,
@@ -76,7 +76,6 @@ describe('NetworkGuard', () => {
       expect(queryByText('Protected Content')).toBeNull();
 
       // OfflineState should be rendered
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('should render custom offline message', () => {
@@ -102,13 +101,12 @@ describe('NetworkGuard', () => {
         refresh: mockRefresh,
       });
 
-      const { UNSAFE_root } = render(
+      render(
         <NetworkGuard>
           <TestChild />
         </NetworkGuard>,
       );
 
-      expect(UNSAFE_root).toBeTruthy();
       // OfflineState should receive refresh as onRetry
     });
 
@@ -121,13 +119,12 @@ describe('NetworkGuard', () => {
         refresh: mockRefresh,
       });
 
-      const { UNSAFE_root } = render(
+      render(
         <NetworkGuard onRetry={mockCustomRetry}>
           <TestChild />
         </NetworkGuard>,
       );
 
-      expect(UNSAFE_root).toBeTruthy();
       // OfflineState should receive custom retry
     });
   });
@@ -139,13 +136,11 @@ describe('NetworkGuard', () => {
         refresh: jest.fn(),
       });
 
-      const { UNSAFE_root } = render(
+      render(
         <NetworkGuard compact>
           <TestChild />
         </NetworkGuard>,
       );
-
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('should render full OfflineState when compact is false', () => {
@@ -154,13 +149,11 @@ describe('NetworkGuard', () => {
         refresh: jest.fn(),
       });
 
-      const { UNSAFE_root } = render(
+      render(
         <NetworkGuard compact={false}>
           <TestChild />
         </NetworkGuard>,
       );
-
-      expect(UNSAFE_root).toBeTruthy();
     });
   });
 

@@ -1,6 +1,6 @@
 /**
  * CachedImage Component Tests
- * 
+ *
  * Simplified tests focused on core functionality
  */
 
@@ -19,7 +19,7 @@ jest.mock('../../services/imageCacheManager', () => {
     clearCache: jest.fn(),
     getCacheSize: jest.fn(),
   };
-  
+
   return {
     __esModule: true,
     default: mockManager,
@@ -28,7 +28,9 @@ jest.mock('../../services/imageCacheManager', () => {
 
 // Import after mock
 import imageCacheManager from '../../services/imageCacheManager';
-const mockImageCacheManager = imageCacheManager as jest.Mocked<typeof imageCacheManager>;
+const mockImageCacheManager = imageCacheManager as jest.Mocked<
+  typeof imageCacheManager
+>;
 
 describe('CachedImage', () => {
   const mockImageUri = 'https://example.com/image.jpg';
@@ -43,10 +45,7 @@ describe('CachedImage', () => {
   describe('Basic Rendering', () => {
     it('should render successfully with uri source', async () => {
       const { getByTestId } = render(
-        <CachedImage
-          source={{ uri: mockImageUri }}
-          testID="cached-image"
-        />
+        <CachedImage source={{ uri: mockImageUri }} testID="cached-image" />,
       );
 
       await waitFor(() => {
@@ -57,11 +56,7 @@ describe('CachedImage', () => {
     it('should render with local image source', () => {
       const localImage = 1; // require('./image.png')
 
-      const { UNSAFE_root } = render(
-        <CachedImage source={localImage} />
-      );
-
-      expect(UNSAFE_root).toBeTruthy();
+      render(<CachedImage source={localImage} />);
     });
 
     it('should apply custom styles', async () => {
@@ -72,7 +67,7 @@ describe('CachedImage', () => {
           source={{ uri: mockImageUri }}
           style={customStyle}
           testID="styled-image"
-        />
+        />,
       );
 
       await waitFor(() => {
@@ -81,27 +76,18 @@ describe('CachedImage', () => {
     });
 
     it('should pass through resizeMode prop', () => {
-      const { UNSAFE_root } = render(
-        <CachedImage
-          source={{ uri: mockImageUri }}
-          resizeMode="cover"
-        />
-      );
-
-      expect(UNSAFE_root).toBeTruthy();
+      render(<CachedImage source={{ uri: mockImageUri }} resizeMode="cover" />);
     });
   });
 
   describe('Image Loading', () => {
     it('should call getImage with correct uri', async () => {
-      render(
-        <CachedImage source={{ uri: mockImageUri }} />
-      );
+      render(<CachedImage source={{ uri: mockImageUri }} />);
 
       await waitFor(() => {
         expect(mockImageCacheManager.getImage).toHaveBeenCalledWith(
           mockImageUri,
-          expect.any(Object)
+          expect.any(Object),
         );
       });
     });
@@ -114,7 +100,7 @@ describe('CachedImage', () => {
           source={{ uri: mockImageUri }}
           cloudflareId={cloudflareId}
           variant="medium"
-        />
+        />,
       );
 
       await waitFor(() => {
@@ -123,7 +109,7 @@ describe('CachedImage', () => {
           expect.objectContaining({
             cloudflareId,
             variant: 'medium',
-          })
+          }),
         );
       });
     });
@@ -132,10 +118,7 @@ describe('CachedImage', () => {
       const onLoadEnd = jest.fn() as jest.Mock;
 
       render(
-        <CachedImage
-          source={{ uri: mockImageUri }}
-          onLoadEnd={onLoadEnd}
-        />
+        <CachedImage source={{ uri: mockImageUri }} onLoadEnd={onLoadEnd} />,
       );
 
       await waitFor(() => {
@@ -147,14 +130,11 @@ describe('CachedImage', () => {
   describe('Error Handling', () => {
     it('should handle image load error', async () => {
       const onError = jest.fn() as jest.Mock;
-      mockImageCacheManager.getImage.mockRejectedValue(new Error('Load failed'));
-
-      render(
-        <CachedImage
-          source={{ uri: mockImageUri }}
-          onError={onError}
-        />
+      mockImageCacheManager.getImage.mockRejectedValue(
+        new Error('Load failed'),
       );
+
+      render(<CachedImage source={{ uri: mockImageUri }} onError={onError} />);
 
       await waitFor(() => {
         expect(onError).toHaveBeenCalledWith(expect.any(Error));
@@ -162,29 +142,26 @@ describe('CachedImage', () => {
     });
 
     it('should show error state on failure', async () => {
-      mockImageCacheManager.getImage.mockRejectedValue(new Error('Load failed'));
-
-      const { UNSAFE_root } = render(
-        <CachedImage
-          source={{ uri: mockImageUri }}
-          showError={true}
-        />
+      mockImageCacheManager.getImage.mockRejectedValue(
+        new Error('Load failed'),
       );
 
-      await waitFor(() => {
-        expect(UNSAFE_root).toBeTruthy();
-      });
+      render(<CachedImage source={{ uri: mockImageUri }} showError={true} />);
+
+      await waitFor(() => {});
     });
 
     it('should use fallback source on error', async () => {
       const fallbackUri = 'https://example.com/fallback.jpg';
-      mockImageCacheManager.getImage.mockRejectedValueOnce(new Error('Load failed'));
+      mockImageCacheManager.getImage.mockRejectedValueOnce(
+        new Error('Load failed'),
+      );
 
       render(
         <CachedImage
           source={{ uri: mockImageUri }}
           fallbackSource={{ uri: fallbackUri }}
-        />
+        />,
       );
 
       await waitFor(() => {
@@ -199,29 +176,29 @@ describe('CachedImage', () => {
         .mockRejectedValueOnce(new Error('First fail'))
         .mockResolvedValueOnce(mockCachedUri);
 
-      const { UNSAFE_root } = render(
+      render(
         <CachedImage
           source={{ uri: mockImageUri }}
           enableRetry={true}
           maxRetries={3}
-        />
+        />,
       );
 
-      await waitFor(() => {
-        expect(UNSAFE_root).toBeTruthy();
-      });
+      await waitFor(() => {});
     });
 
     it('should call onRetry callback', async () => {
       const onRetry = jest.fn() as jest.Mock;
-      mockImageCacheManager.getImage.mockRejectedValue(new Error('Load failed'));
+      mockImageCacheManager.getImage.mockRejectedValue(
+        new Error('Load failed'),
+      );
 
       render(
         <CachedImage
           source={{ uri: mockImageUri }}
           enableRetry={true}
           onRetry={onRetry}
-        />
+        />,
       );
 
       await waitFor(() => {
@@ -232,14 +209,7 @@ describe('CachedImage', () => {
 
   describe('Loading State', () => {
     it('should show loading indicator', async () => {
-      const { UNSAFE_root } = render(
-        <CachedImage
-          source={{ uri: mockImageUri }}
-          showLoading={true}
-        />
-      );
-
-      expect(UNSAFE_root).toBeTruthy();
+      render(<CachedImage source={{ uri: mockImageUri }} showLoading={true} />);
     });
 
     it('should call onLoadStart', async () => {
@@ -249,7 +219,7 @@ describe('CachedImage', () => {
         <CachedImage
           source={{ uri: mockImageUri }}
           onLoadStart={onLoadStart}
-        />
+        />,
       );
 
       await waitFor(() => {
@@ -260,39 +230,21 @@ describe('CachedImage', () => {
 
   describe('Image Types', () => {
     it('should render avatar type', async () => {
-      const { UNSAFE_root } = render(
-        <CachedImage
-          source={{ uri: mockImageUri }}
-          type="avatar"
-        />
-      );
+      render(<CachedImage source={{ uri: mockImageUri }} type="avatar" />);
 
-      await waitFor(() => {
-        expect(UNSAFE_root).toBeTruthy();
-      });
+      await waitFor(() => {});
     });
 
     it('should render moment type', async () => {
-      const { UNSAFE_root } = render(
-        <CachedImage
-          source={{ uri: mockImageUri }}
-          type="moment"
-        />
-      );
+      render(<CachedImage source={{ uri: mockImageUri }} type="moment" />);
 
-      await waitFor(() => {
-        expect(UNSAFE_root).toBeTruthy();
-      });
+      await waitFor(() => {});
     });
 
     it('should render with default type', async () => {
-      const { UNSAFE_root } = render(
-        <CachedImage source={{ uri: mockImageUri }} />
-      );
+      render(<CachedImage source={{ uri: mockImageUri }} />);
 
-      await waitFor(() => {
-        expect(UNSAFE_root).toBeTruthy();
-      });
+      await waitFor(() => {});
     });
   });
 });
@@ -312,7 +264,7 @@ describe('ResponsiveCachedImage', () => {
         source={{ uri: mockImageUri }}
         testID="responsive-image"
         sizes={{ small: 100, medium: 200, large: 400 }}
-      />
+      />,
     );
 
     await waitFor(() => {
@@ -327,7 +279,7 @@ describe('ResponsiveCachedImage', () => {
         cloudflareId="cf-123"
         sizes={{ small: 100, medium: 200, large: 400 }}
         prefetch={true}
-      />
+      />,
     );
 
     await waitFor(() => {
@@ -336,15 +288,13 @@ describe('ResponsiveCachedImage', () => {
   });
 
   it('should handle different screen sizes', async () => {
-    const { UNSAFE_root } = render(
+    render(
       <ResponsiveCachedImage
         source={{ uri: mockImageUri }}
         sizes={{ small: 100, medium: 200, large: 400 }}
-      />
+      />,
     );
 
-    await waitFor(() => {
-      expect(UNSAFE_root).toBeTruthy();
-    });
+    await waitFor(() => {});
   });
 });
