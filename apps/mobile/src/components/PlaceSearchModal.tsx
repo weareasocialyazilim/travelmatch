@@ -136,8 +136,12 @@ export const PlaceSearchModal: React.FC<PlaceSearchModalProps> = ({
 
     // Use fallback search if Mapbox token is not configured
     if (!MAPBOX_ACCESS_TOKEN) {
-      logger.warn(
-        'PlaceSearchModal: Mapbox token not configured, using fallback places',
+      // NOTE: Using fallback places. To enable real geocoding:
+      // 1. Get a Mapbox token from https://account.mapbox.com
+      // 2. Add EXPO_PUBLIC_MAPBOX_TOKEN=pk.xxx to .env file
+      // 3. Restart Metro bundler
+      logger.debug(
+        'PlaceSearchModal: Using fallback places (Mapbox token not configured)',
       );
       const filtered = FALLBACK_PLACES.filter(
         (place) =>

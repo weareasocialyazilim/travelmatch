@@ -25,7 +25,10 @@ export const HostSection: React.FC<HostSectionProps> = React.memo(
         accessibilityLabel={`View ${user.name}'s profile`}
         accessibilityRole="button"
       >
-        <Image source={{ uri: user.avatar }} style={styles.userAvatar} />
+        <Image
+          source={{ uri: user.avatar || undefined }}
+          style={styles.userAvatar}
+        />
         <View style={styles.userInfo}>
           <View style={styles.userNameRow}>
             <Text style={styles.userName}>{user.name}</Text>

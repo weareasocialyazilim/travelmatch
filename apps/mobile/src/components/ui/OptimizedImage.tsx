@@ -89,6 +89,22 @@ export const OptimizedImage = memo<OptimizedImageProps>(
     // Normalize source to ImageSourcePropType ({ uri } or number)
     const imageSource = typeof source === 'string' ? { uri: source } : source;
 
+    // Validate source - show error for empty/invalid URLs
+    const isValidSource = (() => {
+      if (typeof source === 'number') return true; // Local asset
+      if (typeof source === 'string') {
+        return source.trim().length > 0 && !source.includes('undefined');
+      }
+      if (source && typeof source === 'object' && 'uri' in source) {
+        return !!(
+          source.uri &&
+          source.uri.trim().length > 0 &&
+          !source.uri.includes('undefined')
+        );
+      }
+      return false;
+    })();
+
     const handleLoadStart = () => {
       loadStartTime.current = Date.now();
       setIsLoading(true);
@@ -121,8 +137,8 @@ export const OptimizedImage = memo<OptimizedImageProps>(
       }
     };
 
-    // Show error state
-    if (hasError) {
+    // Show error state for invalid sources or load errors
+    if (!isValidSource || hasError) {
       if (errorComponent) {
         return (
           <View style={[styles.container, containerStyle]}>

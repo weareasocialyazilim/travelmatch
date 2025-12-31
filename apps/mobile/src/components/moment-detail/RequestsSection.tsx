@@ -40,7 +40,7 @@ export const RequestsSection: React.FC<RequestsSectionProps> = React.memo(
         {requests.map((request) => (
           <View key={request.id} style={styles.requestCard}>
             <Image
-              source={{ uri: request.avatar }}
+              source={{ uri: request.avatar || undefined }}
               style={styles.requestAvatar}
             />
             <View style={styles.requestInfo}>

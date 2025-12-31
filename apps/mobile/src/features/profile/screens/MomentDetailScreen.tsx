@@ -150,11 +150,12 @@ const MomentDetailScreen: React.FC = () => {
 
       try {
         // This RPC function is expected to be created via migrations
-        // For now, we use a workaround with direct query
+        // Note: escrow_transactions has multiple foreign keys to users table
+        // We need to specify which relationship to use
         const { data, error } = await supabase
-          .from('escrow_contributions')
+          .from('escrow_transactions')
           .select(
-            'user_id, amount, is_anonymous, users:user_id(name, avatar_url)',
+            'user_id, amount, users!escrow_transactions_sender_id_fkey(full_name, avatar_url)',
           )
           .eq('moment_id', moment.id)
           .eq('status', 'completed');

@@ -47,7 +47,13 @@ import type { Moment } from '../types';
 // ============================================
 // BADGE TYPES & CONFIG
 // ============================================
-type BadgeType = 'hot' | 'featured' | 'top_rated' | 'new' | 'trending' | 'verified';
+type BadgeType =
+  | 'hot'
+  | 'featured'
+  | 'top_rated'
+  | 'new'
+  | 'trending'
+  | 'verified';
 
 interface BadgeConfig {
   label: string;
@@ -90,8 +96,8 @@ const BADGE_CONFIGS: Record<BadgeType, BadgeConfig> = {
     label: 'Trend',
     icon: 'trending-up',
     backgroundColor: COLORS.purpleTransparent,
-    textColor: primitives.purple[500],
-    borderColor: primitives.purple[400],
+    textColor: COLORS.brand.primary,
+    borderColor: COLORS.brand.primary,
   },
   verified: {
     label: 'Onaylı',
@@ -231,13 +237,16 @@ const MomentCard: React.FC<MomentCardProps> = memo(
         }`}
         accessibilityRole="button"
       >
-        <Reanimated.View style={[
-          styles.card,
-          compact && styles.cardCompact,
-          animatedStyle
-        ]}>
+        <Reanimated.View
+          style={[styles.card, compact && styles.cardCompact, animatedStyle]}
+        >
           {/* Image Container */}
-          <View style={[styles.imageContainer, compact && styles.imageContainerCompact]}>
+          <View
+            style={[
+              styles.imageContainer,
+              compact && styles.imageContainerCompact,
+            ]}
+          >
             <OptimizedImage
               {...getMomentImageProps(
                 moment,
@@ -330,7 +339,9 @@ const MomentCard: React.FC<MomentCardProps> = memo(
           </View>
 
           {/* Card Content */}
-          <View style={[styles.cardContent, compact && styles.cardContentCompact]}>
+          <View
+            style={[styles.cardContent, compact && styles.cardContentCompact]}
+          >
             {/* Title - Headline (18-20px for mobile) */}
             <Text
               style={[styles.cardTitle, compact && styles.cardTitleCompact]}
@@ -371,7 +382,12 @@ const MomentCard: React.FC<MomentCardProps> = memo(
                       size={14}
                       color={COLORS.trust.primary}
                     />
-                    <Text style={[styles.detailText, { color: COLORS.trust.primary }]}>
+                    <Text
+                      style={[
+                        styles.detailText,
+                        { color: COLORS.trust.primary },
+                      ]}
+                    >
                       {moment.user.trustScore}%
                     </Text>
                   </View>
@@ -380,18 +396,17 @@ const MomentCard: React.FC<MomentCardProps> = memo(
             )}
 
             {/* Action Buttons - 16px Button text */}
-            <View style={[styles.cardActions, compact && styles.cardActionsCompact]}>
-              <Pressable
-                style={styles.primaryButton}
-                onPress={handleGiftPress}
-              >
+            <View
+              style={[styles.cardActions, compact && styles.cardActionsCompact]}
+            >
+              <Pressable style={styles.primaryButton} onPress={handleGiftPress}>
                 <LinearGradient
                   colors={GRADIENTS.gift}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={[
                     styles.primaryButtonGradient,
-                    compact && styles.primaryButtonGradientCompact
+                    compact && styles.primaryButtonGradientCompact,
                   ]}
                 >
                   <MaterialCommunityIcons
@@ -399,10 +414,12 @@ const MomentCard: React.FC<MomentCardProps> = memo(
                     size={compact ? 16 : 18}
                     color={PALETTE.white}
                   />
-                  <Text style={[
-                    styles.primaryButtonText,
-                    compact && styles.primaryButtonTextCompact
-                  ]}>
+                  <Text
+                    style={[
+                      styles.primaryButtonText,
+                      compact && styles.primaryButtonTextCompact,
+                    ]}
+                  >
                     Hediye et
                   </Text>
                 </LinearGradient>

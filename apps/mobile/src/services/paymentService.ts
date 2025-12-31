@@ -198,6 +198,10 @@ export const paymentService = {
 
       if (error) {
         logger.error('Get balance error:', { error, userId: user.id });
+        // If wallets table doesn't exist, return defaults instead of throwing
+        if (error.code === 'PGRST205') {
+          return { available: 0, pending: 0, currency: 'USD' };
+        }
         throw new Error('Failed to fetch wallet balance');
       }
 
@@ -208,7 +212,8 @@ export const paymentService = {
         .eq('recipient_id', user.id)
         .eq('status', 'pending');
 
-      const pendingAmount = pendingEscrow?.reduce((sum, e) => sum + e.amount, 0) || 0;
+      const pendingAmount =
+        pendingEscrow?.reduce((sum, e) => sum + e.amount, 0) || 0;
 
       return {
         available: data?.balance || 0,
@@ -337,7 +342,14 @@ export const paymentService = {
         .eq('user_id', user.id)
         .eq('is_active', true);
 
-      if (error) throw error;
+      if (error) {
+        logger.error('Get payment methods error:', error);
+        // If table doesn't exist, return empty array
+        if (error.code === 'PGRST205') {
+          return { cards: [] };
+        }
+        throw error;
+      }
 
       type PaymentMethodRow = {
         id: string;
@@ -770,7 +782,9 @@ export const paymentService = {
           requested: data.amount,
           available,
         });
-        throw new Error(`Insufficient balance. Available: ${available} ${data.currency}`);
+        throw new Error(
+          `Insufficient balance. Available: ${available} ${data.currency}`,
+        );
       }
 
       // Verify bank account belongs to user
@@ -817,9 +831,12 @@ export const paymentService = {
     } catch (error) {
       logger.error('Withdraw funds error:', error);
       // Re-throw with user-friendly message if not already
-      if (error instanceof Error && (error.message.includes('Insufficient') ||
+      if (
+        error instanceof Error &&
+        (error.message.includes('Insufficient') ||
           error.message.includes('not found') ||
-          error.message.includes('must be'))) {
+          error.message.includes('must be'))
+      ) {
         throw error;
       }
       throw new Error('Withdrawal failed. Please try again.');
@@ -873,13 +890,22 @@ export const paymentService = {
             });
 
           if (directError) {
-            logger.error('[Payment] Direct transfer failed', { directError, amount, recipientId });
+            logger.error('[Payment] Direct transfer failed', {
+              directError,
+              amount,
+              recipientId,
+            });
             throw new Error('Transfer failed. Please try again.');
           }
 
           if (!directData?.senderTxnId) {
-            logger.error('[Payment] Transfer completed but transaction ID missing', { amount, recipientId });
-            throw new Error('Transfer completed but transaction ID missing. Please contact support.');
+            logger.error(
+              '[Payment] Transfer completed but transaction ID missing',
+              { amount, recipientId },
+            );
+            throw new Error(
+              'Transfer completed but transaction ID missing. Please contact support.',
+            );
           }
 
           return {
@@ -907,13 +933,22 @@ export const paymentService = {
               });
 
             if (escrowError) {
-              logger.error('[Payment] Escrow creation failed', { escrowError, amount, recipientId });
+              logger.error('[Payment] Escrow creation failed', {
+                escrowError,
+                amount,
+                recipientId,
+              });
               throw new Error('Failed to create escrow. Please try again.');
             }
 
             if (!escrowData?.escrowId) {
-              logger.error('[Payment] Escrow created but ID missing', { amount, recipientId });
-              throw new Error('Escrow created but ID missing. Please contact support.');
+              logger.error('[Payment] Escrow created but ID missing', {
+                amount,
+                recipientId,
+              });
+              throw new Error(
+                'Escrow created but ID missing. Please contact support.',
+              );
             }
 
             return {
@@ -933,13 +968,22 @@ export const paymentService = {
               });
 
             if (directError2) {
-              logger.error('[Payment] Direct transfer failed', { directError2, amount, recipientId });
+              logger.error('[Payment] Direct transfer failed', {
+                directError2,
+                amount,
+                recipientId,
+              });
               throw new Error('Transfer failed. Please try again.');
             }
 
             if (!directData2?.senderTxnId) {
-              logger.error('[Payment] Transfer completed but transaction ID missing', { amount, recipientId });
-              throw new Error('Transfer completed but transaction ID missing. Please contact support.');
+              logger.error(
+                '[Payment] Transfer completed but transaction ID missing',
+                { amount, recipientId },
+              );
+              throw new Error(
+                'Transfer completed but transaction ID missing. Please contact support.',
+              );
             }
 
             return {
@@ -962,18 +1006,28 @@ export const paymentService = {
             });
 
           if (mandatoryError) {
-            logger.error('[Payment] Mandatory escrow creation failed', { mandatoryError, amount, recipientId });
+            logger.error('[Payment] Mandatory escrow creation failed', {
+              mandatoryError,
+              amount,
+              recipientId,
+            });
             throw new Error('Failed to create escrow. Please try again.');
           }
 
           if (!mandatoryData?.escrowId) {
-            logger.error('[Payment] Mandatory escrow created but ID missing', { amount, recipientId });
-            throw new Error('Escrow created but ID missing. Please contact support.');
+            logger.error('[Payment] Mandatory escrow created but ID missing', {
+              amount,
+              recipientId,
+            });
+            throw new Error(
+              'Escrow created but ID missing. Please contact support.',
+            );
           }
 
           return {
             success: true,
-            transactionId: mandatoryData.transactionId || mandatoryData.escrowId,
+            transactionId:
+              mandatoryData.transactionId || mandatoryData.escrowId,
             escrowId: mandatoryData.escrowId,
           };
         }

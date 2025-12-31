@@ -11,13 +11,7 @@
  */
 
 import React, { memo, useCallback } from 'react';
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  Platform,
-} from 'react-native';
+import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -110,60 +104,62 @@ interface TabItemProps {
   onPress: () => void;
 }
 
-const TabItem: React.FC<TabItemProps> = memo(({ tab, label, accessibilityLabel, isActive, badge, onPress }) => {
-  const scale = useSharedValue(1);
+const TabItem: React.FC<TabItemProps> = memo(
+  ({ tab, label, accessibilityLabel, isActive, badge, onPress }) => {
+    const scale = useSharedValue(1);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scale.value }],
+    }));
 
-  const handlePressIn = useCallback(() => {
-    scale.value = withSpring(0.9, SPRINGS.snappy);
-  }, []);
+    const handlePressIn = useCallback(() => {
+      scale.value = withSpring(0.9, SPRINGS.snappy);
+    }, []);
 
-  const handlePressOut = useCallback(() => {
-    scale.value = withSpring(1, SPRINGS.bouncy);
-  }, []);
+    const handlePressOut = useCallback(() => {
+      scale.value = withSpring(1, SPRINGS.bouncy);
+    }, []);
 
-  const handlePress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    onPress();
-  }, [onPress]);
+    const handlePress = useCallback(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      onPress();
+    }, [onPress]);
 
-  return (
-    <Pressable
-      testID={`nav-${tab.name.toLowerCase()}-tab`}
-      onPress={handlePress}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      style={styles.navItem}
-      accessibilityRole="tab"
-      accessibilityState={{ selected: isActive }}
-      accessibilityLabel={accessibilityLabel}
-    >
-      <Reanimated.View style={[styles.navItemContent, animatedStyle]}>
-        <View style={styles.iconContainer}>
-          <MaterialCommunityIcons
-            name={isActive ? tab.iconActive : tab.icon}
-            size={24}
-            color={isActive ? COLORS.brand.primary : COLORS.text.muted}
-          />
-          {badge && badge > 0 && (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>
-                {badge > 9 ? '9+' : badge}
-              </Text>
-            </View>
-          )}
-        </View>
-        <Text style={isActive ? styles.navTextActive : styles.navText}>
-          {label}
-        </Text>
-        {isActive && <View style={styles.activeIndicator} />}
-      </Reanimated.View>
-    </Pressable>
-  );
-});
+    return (
+      <Pressable
+        testID={`nav-${tab.name.toLowerCase()}-tab`}
+        onPress={handlePress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        style={styles.navItem}
+        accessibilityRole="tab"
+        accessibilityState={{ selected: isActive }}
+        accessibilityLabel={accessibilityLabel}
+      >
+        <Reanimated.View style={[styles.navItemContent, animatedStyle]}>
+          <View style={styles.iconContainer}>
+            <MaterialCommunityIcons
+              name={isActive ? tab.iconActive : tab.icon}
+              size={24}
+              color={isActive ? COLORS.brand.primary : COLORS.text.muted}
+            />
+            {badge && badge > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>
+                  {badge > 9 ? '9+' : String(badge)}
+                </Text>
+              </View>
+            )}
+          </View>
+          <Text style={isActive ? styles.navTextActive : styles.navText}>
+            {label}
+          </Text>
+          {isActive && <View style={styles.activeIndicator} />}
+        </Reanimated.View>
+      </Pressable>
+    );
+  },
+);
 
 // ============================================
 // CREATE BUTTON COMPONENT
@@ -173,53 +169,55 @@ interface CreateButtonProps {
   accessibilityLabel: string;
 }
 
-const CreateButton: React.FC<CreateButtonProps> = memo(({ onPress, accessibilityLabel }) => {
-  const scale = useSharedValue(1);
+const CreateButton: React.FC<CreateButtonProps> = memo(
+  ({ onPress, accessibilityLabel }) => {
+    const scale = useSharedValue(1);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scale.value }],
+    }));
 
-  const handlePressIn = useCallback(() => {
-    scale.value = withSpring(0.9, SPRINGS.snappy);
-  }, []);
+    const handlePressIn = useCallback(() => {
+      scale.value = withSpring(0.9, SPRINGS.snappy);
+    }, []);
 
-  const handlePressOut = useCallback(() => {
-    scale.value = withSpring(1, SPRINGS.bouncy);
-  }, []);
+    const handlePressOut = useCallback(() => {
+      scale.value = withSpring(1, SPRINGS.bouncy);
+    }, []);
 
-  const handlePress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    onPress();
-  }, [onPress]);
+    const handlePress = useCallback(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      onPress();
+    }, [onPress]);
 
-  return (
-    <Pressable
-      testID="nav-create-tab"
-      onPress={handlePress}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      style={styles.createButtonWrapper}
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel}
-    >
-      <Reanimated.View style={animatedStyle}>
-        <LinearGradient
-          colors={GRADIENTS.gift}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.createButton}
-        >
-          <MaterialCommunityIcons
-            name="plus"
-            size={28}
-            color={PALETTE.white}
-          />
-        </LinearGradient>
-      </Reanimated.View>
-    </Pressable>
-  );
-});
+    return (
+      <Pressable
+        testID="nav-create-tab"
+        onPress={handlePress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        style={styles.createButtonWrapper}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
+      >
+        <Reanimated.View style={animatedStyle}>
+          <LinearGradient
+            colors={GRADIENTS.gift}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.createButton}
+          >
+            <MaterialCommunityIcons
+              name="plus"
+              size={28}
+              color={PALETTE.white}
+            />
+          </LinearGradient>
+        </Reanimated.View>
+      </Pressable>
+    );
+  },
+);
 
 // ============================================
 // MAIN COMPONENT
@@ -244,16 +242,19 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
     navigation.navigate('CreateMoment' as never);
   }, [navigation]);
 
-  const getBadge = useCallback((tabName: TabName): number | undefined => {
-    switch (tabName) {
-      case 'Requests':
-        return requestsBadge;
-      case 'Messages':
-        return messagesBadge;
-      default:
-        return undefined;
-    }
-  }, [requestsBadge, messagesBadge]);
+  const getBadge = useCallback(
+    (tabName: TabName): number | undefined => {
+      switch (tabName) {
+        case 'Requests':
+          return requestsBadge;
+        case 'Messages':
+          return messagesBadge;
+        default:
+          return undefined;
+      }
+    },
+    [requestsBadge, messagesBadge],
+  );
 
   // Split tabs for left and right of create button
   const leftTabs = TAB_CONFIGS.slice(0, 2);
@@ -278,14 +279,13 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom }]}>
       {Platform.OS === 'ios' ? (
-        <BlurView
-          intensity={80}
-          tint="light"
-          style={styles.blurContainer}
-        >
+        <BlurView intensity={80} tint="light" style={styles.blurContainer}>
           <View style={styles.navContent}>
             {leftTabs.map(renderTab)}
-            <CreateButton onPress={handleCreatePress} accessibilityLabel={createLabel} />
+            <CreateButton
+              onPress={handleCreatePress}
+              accessibilityLabel={createLabel}
+            />
             {rightTabs.map(renderTab)}
           </View>
         </BlurView>
@@ -293,7 +293,10 @@ const BottomNav: React.FC<BottomNavProps> = memo(function BottomNav({
         <View style={[styles.blurContainer, styles.androidBackground]}>
           <View style={styles.navContent}>
             {leftTabs.map(renderTab)}
-            <CreateButton onPress={handleCreatePress} accessibilityLabel={createLabel} />
+            <CreateButton
+              onPress={handleCreatePress}
+              accessibilityLabel={createLabel}
+            />
             {rightTabs.map(renderTab)}
           </View>
         </View>
@@ -311,6 +314,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+    zIndex: 1000,
   },
   blurContainer: {
     borderTopWidth: 1,

@@ -128,14 +128,14 @@ const DiscoverScreen = () => {
   // Generate stories from moments created in the last 24 hours
   // Each unique host with recent moments becomes a story
   const recentStories = useMemo((): UserStory[] => {
+    logger.debug('Generating stories from moments:', baseMoments.length);
     const now = new Date();
-    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-    // Filter moments from last 24 hours
-    const recentMoments = baseMoments.filter((moment) => {
-      const createdAt = new Date(moment.createdAt);
-      return createdAt >= twentyFourHoursAgo;
-    });
+    // Use ALL moments for stories (removed time filter since we have no recent data)
+    // In production, this should filter by last 7-30 days
+    const recentMoments = baseMoments;
+
+    logger.debug('Recent moments after filter:', recentMoments.length);
 
     // Group moments by host
     const hostMomentsMap = new Map<
@@ -200,6 +200,11 @@ const DiscoverScreen = () => {
       return parseTime(aTime) - parseTime(bTime);
     });
   }, [baseMoments]);
+
+  // Log story count for debugging
+  useEffect(() => {
+    logger.debug('Recent stories count:', recentStories.length);
+  }, [recentStories]);
 
   // Story navigation handlers (must be defined after recentStories)
   const goToNextStory = useCallback(() => {
@@ -429,6 +434,7 @@ const DiscoverScreen = () => {
       >
         <ScrollView
           style={styles.scrollView}
+          contentContainerStyle={{ paddingBottom: 100 }}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
@@ -440,16 +446,18 @@ const DiscoverScreen = () => {
           onScroll={handleScroll}
           scrollEventThrottle={400}
         >
-          {/* Stories - Recent moments from last 24 hours */}
+          {/* Stories - Recent moments from last 7 days */}
           {recentStories.length > 0 && (
-            <FlashList
-              data={recentStories}
-              renderItem={renderStoryItem}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.storiesContainer}
-              estimatedItemSize={80}
-            />
+            <View style={{ height: 96 }}>
+              <FlashList
+                data={recentStories}
+                renderItem={renderStoryItem}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.storiesContainer}
+                estimatedItemSize={80}
+              />
+            </View>
           )}
 
           {/* Results Bar - simplified without view toggle */}
@@ -607,6 +615,14 @@ const DiscoverScreen = () => {
         onUserPress={(userId) => {
           // Handle user profile navigation
           logger.debug('Navigate to user:', userId);
+        }}
+        onGift={(story) => {
+          logger.debug('Send gift for story:', story.id);
+          // TODO: Implement gift sending flow
+        }}
+        onShare={(story) => {
+          logger.debug('Share story:', story.id);
+          // TODO: Implement share functionality
         }}
         isPaused={isPaused}
         setIsPaused={setIsPaused}

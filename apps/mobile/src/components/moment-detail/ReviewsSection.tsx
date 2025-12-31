@@ -21,7 +21,7 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = React.memo(
           <View key={review.id} style={styles.reviewCard}>
             <View style={styles.reviewHeader}>
               <Image
-                source={{ uri: review.avatar }}
+                source={{ uri: review.avatar || undefined }}
                 style={styles.reviewAvatar}
               />
               <View style={styles.reviewInfo}>
@@ -32,7 +32,11 @@ export const ReviewsSection: React.FC<ReviewsSectionProps> = React.memo(
                       key={i}
                       name="star"
                       size={14}
-                      color={i < review.rating ? COLORS.feedback.warning : COLORS.border.default}
+                      color={
+                        i < review.rating
+                          ? COLORS.feedback.warning
+                          : COLORS.border.default
+                      }
                     />
                   ))}
                 </View>
