@@ -70,17 +70,14 @@ describe('Badge Component', () => {
     });
 
     it('renders all variants correctly', () => {
-      const variants: Array<'default' | 'success' | 'warning' | 'error' | 'info' | 'primary'> = [
-        'default',
-        'success',
-        'warning',
-        'error',
-        'info',
-        'primary',
-      ];
+      const variants: Array<
+        'default' | 'success' | 'warning' | 'error' | 'info' | 'primary'
+      > = ['default', 'success', 'warning', 'error', 'info', 'primary'];
 
       variants.forEach((variant) => {
-        const { getByText } = render(<Badge label={variant} variant={variant} />);
+        const { getByText } = render(
+          <Badge label={variant} variant={variant} />,
+        );
         expect(getByText(variant)).toBeTruthy();
       });
     });
@@ -122,11 +119,8 @@ describe('Badge Component', () => {
 
   describe('Icons', () => {
     it('renders with icon', () => {
-      const { getByText, UNSAFE_root } = render(
-        <Badge label="Icon Badge" icon="check" />
-      );
+      const { getByText } = render(<Badge label="Icon Badge" icon="check" />);
       expect(getByText('Icon Badge')).toBeTruthy();
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('renders without icon when not provided', () => {
@@ -149,12 +143,16 @@ describe('Badge Component', () => {
     });
 
     it('renders icon with small size', () => {
-      const { getByText } = render(<Badge label="Small Icon" size="sm" icon="check" />);
+      const { getByText } = render(
+        <Badge label="Small Icon" size="sm" icon="check" />,
+      );
       expect(getByText('Small Icon')).toBeTruthy();
     });
 
     it('renders icon with large size', () => {
-      const { getByText } = render(<Badge label="Large Icon" size="lg" icon="check" />);
+      const { getByText } = render(
+        <Badge label="Large Icon" size="lg" icon="check" />,
+      );
       expect(getByText('Large Icon')).toBeTruthy();
     });
   });
@@ -175,16 +173,24 @@ describe('Badge Component', () => {
     });
 
     it('renders dot with different variants', () => {
-      const variants: Array<'success' | 'warning' | 'error'> = ['success', 'warning', 'error'];
+      const variants: Array<'success' | 'warning' | 'error'> = [
+        'success',
+        'warning',
+        'error',
+      ];
 
       variants.forEach((variant) => {
-        const { getByText } = render(<Badge label="Dot" variant={variant} dot={true} />);
+        const { getByText } = render(
+          <Badge label="Dot" variant={variant} dot={true} />,
+        );
         expect(getByText('Dot')).toBeTruthy();
       });
     });
 
     it('renders both dot and icon', () => {
-      const { getByText } = render(<Badge label="Both" dot={true} icon="check" />);
+      const { getByText } = render(
+        <Badge label="Both" dot={true} icon="check" />,
+      );
       expect(getByText('Both')).toBeTruthy();
     });
   });
@@ -203,28 +209,28 @@ describe('Badge Component', () => {
           icon="check"
           dot={true}
           style={{ marginTop: 10 }}
-        />
+        />,
       );
       expect(getByText('Full Badge')).toBeTruthy();
     });
 
     it('combines variant and size', () => {
       const { getByText } = render(
-        <Badge label="Combo" variant="primary" size="sm" />
+        <Badge label="Combo" variant="primary" size="sm" />,
       );
       expect(getByText('Combo')).toBeTruthy();
     });
 
     it('combines icon and size', () => {
       const { getByText } = render(
-        <Badge label="Icon Size" icon="star" size="lg" />
+        <Badge label="Icon Size" icon="star" size="lg" />,
       );
       expect(getByText('Icon Size')).toBeTruthy();
     });
 
     it('combines dot and variant', () => {
       const { getByText } = render(
-        <Badge label="Dot Variant" dot={true} variant="error" />
+        <Badge label="Dot Variant" dot={true} variant="error" />,
       );
       expect(getByText('Dot Variant')).toBeTruthy();
     });
@@ -235,7 +241,7 @@ describe('Badge Component', () => {
           <Badge label="Badge 1" variant="success" />
           <Badge label="Badge 2" variant="error" />
           <Badge label="Badge 3" variant="info" />
-        </>
+        </>,
       );
 
       expect(getByText('Badge 1')).toBeTruthy();
@@ -251,14 +257,14 @@ describe('Badge Component', () => {
   describe('Custom Styles', () => {
     it('accepts custom style prop', () => {
       const { getByText } = render(
-        <Badge label="Styled" style={{ marginTop: 20 }} />
+        <Badge label="Styled" style={{ marginTop: 20 }} />,
       );
       expect(getByText('Styled')).toBeTruthy();
     });
 
     it('renders with multiple custom styles', () => {
       const { getByText } = render(
-        <Badge label="Multi Style" style={{ margin: 10, opacity: 0.8 }} />
+        <Badge label="Multi Style" style={{ margin: 10, opacity: 0.8 }} />,
       );
       expect(getByText('Multi Style')).toBeTruthy();
     });
@@ -275,7 +281,8 @@ describe('Badge Component', () => {
     });
 
     it('renders with very long label', () => {
-      const longLabel = 'This is a very long badge label that might wrap or truncate';
+      const longLabel =
+        'This is a very long badge label that might wrap or truncate';
       const { getByText } = render(<Badge label={longLabel} />);
       expect(getByText(longLabel)).toBeTruthy();
     });
@@ -291,7 +298,9 @@ describe('Badge Component', () => {
     });
 
     it('handles undefined style gracefully', () => {
-      const { getByText } = render(<Badge label="No Style" style={undefined} />);
+      const { getByText } = render(
+        <Badge label="No Style" style={undefined} />,
+      );
       expect(getByText('No Style')).toBeTruthy();
     });
   });
@@ -364,7 +373,7 @@ describe('NotificationBadge Component', () => {
   describe('Custom Styles', () => {
     it('accepts custom style prop', () => {
       const { getByText } = render(
-        <NotificationBadge count={3} style={{ top: 5, right: 5 }} />
+        <NotificationBadge count={3} style={{ top: 5, right: 5 }} />,
       );
       expect(getByText('3')).toBeTruthy();
     });
@@ -377,7 +386,9 @@ describe('NotificationBadge Component', () => {
 
   describe('Edge Cases', () => {
     it('handles very large counts', () => {
-      const { getByText } = render(<NotificationBadge count={9999} max={999} />);
+      const { getByText } = render(
+        <NotificationBadge count={9999} max={999} />,
+      );
       expect(getByText('999+')).toBeTruthy();
     });
 
@@ -392,9 +403,8 @@ describe('NotificationBadge Component', () => {
     });
 
     it('does not render for zero count', () => {
-      const { UNSAFE_root } = render(<NotificationBadge count={0} />);
+      render(<NotificationBadge count={0} />);
       // Component returns null, so root should be minimal
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('handles multiple notification badges', () => {
@@ -403,7 +413,7 @@ describe('NotificationBadge Component', () => {
           <NotificationBadge count={3} />
           <NotificationBadge count={10} />
           <NotificationBadge count={150} />
-        </>
+        </>,
       );
 
       expect(getByText('3')).toBeTruthy();

@@ -211,6 +211,118 @@ try {
   // ignore if not available
 }
 
+// Polyfill UNSAFE_* APIs for @testing-library/react-native v14+ compatibility
+// v14 removed these APIs but many tests still use them
+try {
+  const rtl = require('@testing-library/react-native');
+  const originalRender = rtl.render;
+
+  // Helper function to recursively find elements by type in the tree
+  const findByType = (element, type, results = [], all = false) => {
+    if (!element) return results;
+
+    // Check if current element matches
+    const elementType = element.type;
+    const typeMatches =
+      elementType === type ||
+      (typeof elementType === 'function' && elementType.name === type?.name) ||
+      (typeof elementType === 'function' &&
+        elementType.displayName === type?.displayName) ||
+      (typeof type === 'string' && elementType === type);
+
+    if (typeMatches) {
+      results.push(element);
+      if (!all) return results;
+    }
+
+    // Recursively check children
+    const children = element.props?.children;
+    if (children) {
+      if (Array.isArray(children)) {
+        for (const child of children) {
+          if (child && typeof child === 'object') {
+            findByType(child, type, results, all);
+            if (!all && results.length > 0) return results;
+          }
+        }
+      } else if (typeof children === 'object') {
+        findByType(children, type, results, all);
+      }
+    }
+
+    return results;
+  };
+
+  rtl.render = function patchedRender(...args) {
+    const result = originalRender.apply(this, args);
+
+    // Add UNSAFE_root
+    if (!result.UNSAFE_root) {
+      Object.defineProperty(result, 'UNSAFE_root', {
+        get() {
+          return result.container || { children: true };
+        },
+        enumerable: true,
+        configurable: true,
+      });
+    }
+
+    // Add UNSAFE_getByType
+    if (!result.UNSAFE_getByType) {
+      result.UNSAFE_getByType = function (type) {
+        const json = result.toJSON();
+        const found = findByType(json, type);
+        if (found.length === 0) {
+          throw new Error(
+            `Unable to find element with type: ${type?.name || type}`,
+          );
+        }
+        return found[0];
+      };
+    }
+
+    // Add UNSAFE_queryByType
+    if (!result.UNSAFE_queryByType) {
+      result.UNSAFE_queryByType = function (type) {
+        try {
+          return result.UNSAFE_getByType(type);
+        } catch {
+          return null;
+        }
+      };
+    }
+
+    // Add UNSAFE_getAllByType
+    if (!result.UNSAFE_getAllByType) {
+      result.UNSAFE_getAllByType = function (type) {
+        const json = result.toJSON();
+        const found = findByType(json, type, [], true);
+        if (found.length === 0) {
+          throw new Error(
+            `Unable to find elements with type: ${type?.name || type}`,
+          );
+        }
+        return found;
+      };
+    }
+
+    // Add UNSAFE_queryAllByType
+    if (!result.UNSAFE_queryAllByType) {
+      result.UNSAFE_queryAllByType = function (type) {
+        try {
+          return result.UNSAFE_getAllByType(type);
+        } catch {
+          return [];
+        }
+      };
+    }
+
+    return result;
+  };
+} catch (e) {
+  // ignore if testing library not available
+}
+
 // Set environment variables for tests
 process.env.EXPO_PUBLIC_SUPABASE_URL = 'https://example.supabase.co';
 process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
@@ -1342,6 +1454,22 @@ jest.mock('react-native-reanimated', () => {
     useAnimatedScrollHandler: () => ({}),
     useAnimatedRef: () => ({ current: null }),
     createAnimatedComponent: (Component) => Component,
+    // Layout animations with chainable methods
+    FadeIn: { duration: () => ({ delay: () => ({}) }) },
+    FadeOut: { duration: () => ({ delay: () => ({}) }) },
+    FadeInUp: { duration: () => ({ delay: () => ({}) }) },
+    FadeOutDown: { duration: () => ({ delay: () => ({}) }) },
+    SlideInRight: { duration: () => ({ delay: () => ({}) }) },
+    SlideOutLeft: { duration: () => ({ delay: () => ({}) }) },
+    SlideInLeft: { duration: () => ({ delay: () => ({}) }) },
+    SlideOutRight: { duration: () => ({ delay: () => ({}) }) },
+    SlideInUp: { duration: () => ({ delay: () => ({}) }) },
+    SlideOutUp: { duration: () => ({ delay: () => ({}) }) },
+    SlideInDown: { duration: () => ({ delay: () => ({}) }) },
+    SlideOutDown: { duration: () => ({ delay: () => ({}) }) },
+    ZoomIn: { duration: () => ({ delay: () => ({}) }) },
+    ZoomOut: { duration: () => ({ delay: () => ({}) }) },
+    Layout: { duration: () => ({ delay: () => ({}) }) },
   };
 });
 

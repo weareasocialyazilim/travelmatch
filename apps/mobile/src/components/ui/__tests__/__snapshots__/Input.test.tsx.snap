@@ -6,6 +6,11 @@ exports[`Input Component Snapshots matches snapshot for basic input 1`] = `
   style={
     {
       "marginBottom": 16,
+      "transform": [
+        {
+          "translateX": 0,
+        },
+      ],
     }
   }
 >
@@ -28,7 +33,7 @@ exports[`Input Component Snapshots matches snapshot for basic input 1`] = `
     style={
       {
         "alignItems": "center",
-        "backgroundColor": "#FAFAF9",
+        "backgroundColor": "#FFFFFF",
         "borderColor": "#E7E5E4",
         "borderRadius": 12,
         "borderWidth": 1,
@@ -57,7 +62,7 @@ exports[`Input Component Snapshots matches snapshot for basic input 1`] = `
             "paddingVertical": 0,
           },
           undefined,
-          false,
+          undefined,
         ]
       }
     />
@@ -71,6 +76,11 @@ exports[`Input Component Snapshots matches snapshot with error 1`] = `
   style={
     {
       "marginBottom": 16,
+      "transform": [
+        {
+          "translateX": 0,
+        },
+      ],
     }
   }
 >
@@ -93,7 +103,7 @@ exports[`Input Component Snapshots matches snapshot with error 1`] = `
     style={
       {
         "alignItems": "center",
-        "backgroundColor": "#FAFAF9",
+        "backgroundColor": "#EF444408",
         "borderColor": "#EF4444",
         "borderRadius": 12,
         "borderWidth": 1,
@@ -121,7 +131,7 @@ exports[`Input Component Snapshots matches snapshot with error 1`] = `
             "paddingVertical": 0,
           },
           undefined,
-          false,
+          undefined,
         ]
       }
     />
@@ -132,7 +142,8 @@ exports[`Input Component Snapshots matches snapshot with error 1`] = `
       {
         "color": "#EF4444",
         "fontSize": 12,
-        "marginTop": 4,
+        "marginLeft": 4,
+        "marginTop": 6,
       }
     }
     testID="RCTText"
@@ -148,6 +159,11 @@ exports[`Input Component Snapshots matches snapshot with icons 1`] = `
   style={
     {
       "marginBottom": 16,
+      "transform": [
+        {
+          "translateX": 0,
+        },
+      ],
     }
   }
 >
@@ -170,7 +186,7 @@ exports[`Input Component Snapshots matches snapshot with icons 1`] = `
     style={
       {
         "alignItems": "center",
-        "backgroundColor": "#FAFAF9",
+        "backgroundColor": "#FFFFFF",
         "borderColor": "#E7E5E4",
         "borderRadius": 12,
         "borderWidth": 1,

@@ -247,9 +247,7 @@ describe('SortSelector Component', () => {
   describe('Modal Behavior', () => {
     it('calls onClose when overlay pressed', () => {
       const onClose = jest.fn() as jest.Mock;
-      const { UNSAFE_root } = render(
-        <SortSelector visible={true} onClose={onClose} />,
-      );
+      render(<SortSelector visible={true} onClose={onClose} />);
 
       // Find overlay TouchableOpacity
       const touchables = UNSAFE_root.findAllByType(
@@ -264,9 +262,7 @@ describe('SortSelector Component', () => {
 
     it('calls onClose on modal request close', () => {
       const onClose = jest.fn() as jest.Mock;
-      const { UNSAFE_root } = render(
-        <SortSelector visible={true} onClose={onClose} />,
-      );
+      render(<SortSelector visible={true} onClose={onClose} />);
 
       const modal = UNSAFE_root.findByType(require('react-native').Modal);
 
@@ -279,9 +275,7 @@ describe('SortSelector Component', () => {
 
     it('renders with transparent background', () => {
       const onClose = jest.fn() as jest.Mock;
-      const { UNSAFE_root } = render(
-        <SortSelector visible={true} onClose={onClose} />,
-      );
+      render(<SortSelector visible={true} onClose={onClose} />);
 
       const modal = UNSAFE_root.findByType(require('react-native').Modal);
       expect(modal.props.transparent).toBe(true);
@@ -289,9 +283,7 @@ describe('SortSelector Component', () => {
 
     it('uses fade animation', () => {
       const onClose = jest.fn() as jest.Mock;
-      const { UNSAFE_root } = render(
-        <SortSelector visible={true} onClose={onClose} />,
-      );
+      render(<SortSelector visible={true} onClose={onClose} />);
 
       const modal = UNSAFE_root.findByType(require('react-native').Modal);
       expect(modal.props.animationType).toBe('fade');
@@ -425,9 +417,7 @@ describe('SortSelector Component', () => {
 
     it('renders icons for all options', () => {
       const onClose = jest.fn() as jest.Mock;
-      const { UNSAFE_root } = render(
-        <SortSelector visible={true} onClose={onClose} />,
-      );
+      render(<SortSelector visible={true} onClose={onClose} />);
 
       const icons = UNSAFE_root.findAllByType(
         require('@expo/vector-icons').MaterialCommunityIcons,
@@ -595,9 +585,7 @@ describe('SortSelector Component', () => {
 
     it('closes on overlay tap (dismissal)', () => {
       const onClose = jest.fn() as jest.Mock;
-      const { UNSAFE_root } = render(
-        <SortSelector visible={true} onClose={onClose} />,
-      );
+      render(<SortSelector visible={true} onClose={onClose} />);
 
       const touchables = UNSAFE_root.findAllByType(
         require('react-native').TouchableOpacity,

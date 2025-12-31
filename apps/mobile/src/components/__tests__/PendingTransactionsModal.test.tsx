@@ -63,14 +63,14 @@ describe('PendingTransactionsModal', () => {
   describe('Rendering', () => {
     it('should render when visible is true with pending items', () => {
       const { getByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       expect(getByText('Incomplete Actions')).toBeTruthy();
     });
 
     it('should not render when visible is false', () => {
       const { UNSAFE_getByType } = render(
-        <PendingTransactionsModal {...defaultProps} visible={false} />
+        <PendingTransactionsModal {...defaultProps} visible={false} />,
       );
       const modal = UNSAFE_getByType(require('react-native').Modal);
       expect(modal.props.visible).toBe(false);
@@ -82,50 +82,50 @@ describe('PendingTransactionsModal', () => {
           {...defaultProps}
           payments={[]}
           uploads={[]}
-        />
+        />,
       );
       // Component returns null, so it won't render anything
-      expect(result.UNSAFE_root).toBeTruthy();
+      expect(result.toJSON()).toBeTruthy();
     });
 
     it('should render header with icon', () => {
       const { getByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       expect(getByText('Incomplete Actions')).toBeTruthy();
     });
 
     it('should render subtitle', () => {
       const { getByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       expect(
         getByText(
-          "We found some actions that didn't complete. Would you like to continue?"
-        )
+          "We found some actions that didn't complete. Would you like to continue?",
+        ),
       ).toBeTruthy();
     });
 
     it('should render pending payments section', () => {
       const { getByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       expect(getByText('Pending Payments (1)')).toBeTruthy();
     });
 
     it('should render pending uploads section', () => {
       const { getByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       expect(getByText('Pending Uploads (1)')).toBeTruthy();
     });
 
     it('should render close button', () => {
       const { UNSAFE_getAllByType } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       const touchables = UNSAFE_getAllByType(
-        require('react-native').TouchableOpacity
+        require('react-native').TouchableOpacity,
       );
       expect(touchables.length).toBeGreaterThan(0);
     });
@@ -134,7 +134,7 @@ describe('PendingTransactionsModal', () => {
   describe('Payment Display', () => {
     it('should display gift payment type correctly', () => {
       const { getByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       expect(getByText('Gift Payment')).toBeTruthy();
     });
@@ -148,7 +148,7 @@ describe('PendingTransactionsModal', () => {
         <PendingTransactionsModal
           {...defaultProps}
           payments={[withdrawalPayment]}
-        />
+        />,
       );
       expect(getByText('Withdrawal')).toBeTruthy();
     });
@@ -162,28 +162,28 @@ describe('PendingTransactionsModal', () => {
         <PendingTransactionsModal
           {...defaultProps}
           payments={[momentPayment]}
-        />
+        />,
       );
       expect(getByText('Moment Purchase')).toBeTruthy();
     });
 
     it('should format payment amount correctly', () => {
       const { getByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       expect(getByText('$50.00')).toBeTruthy();
     });
 
     it('should display payment note when provided', () => {
       const { getByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       expect(getByText('Test payment')).toBeTruthy();
     });
 
     it('should display relative time for payments', () => {
       const { getByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       // Should show "1m ago" or similar
       expect(getByText(/1m ago/)).toBeTruthy();
@@ -191,7 +191,7 @@ describe('PendingTransactionsModal', () => {
 
     it('should render Resume button for payments', () => {
       const { getAllByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       const resumeButtons = getAllByText('Resume');
       expect(resumeButtons.length).toBeGreaterThan(0);
@@ -199,7 +199,7 @@ describe('PendingTransactionsModal', () => {
 
     it('should render Dismiss button for payments', () => {
       const { getAllByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       const dismissButtons = getAllByText('Dismiss');
       expect(dismissButtons.length).toBeGreaterThan(0);
@@ -209,7 +209,7 @@ describe('PendingTransactionsModal', () => {
   describe('Upload Display', () => {
     it('should display proof upload type correctly', () => {
       const { getByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       expect(getByText('Proof Upload')).toBeTruthy();
     });
@@ -220,10 +220,7 @@ describe('PendingTransactionsModal', () => {
         type: 'moment',
       };
       const { getByText } = render(
-        <PendingTransactionsModal
-          {...defaultProps}
-          uploads={[momentUpload]}
-        />
+        <PendingTransactionsModal {...defaultProps} uploads={[momentUpload]} />,
       );
       expect(getByText('Moment Image')).toBeTruthy();
     });
@@ -234,10 +231,7 @@ describe('PendingTransactionsModal', () => {
         type: 'avatar',
       };
       const { getByText } = render(
-        <PendingTransactionsModal
-          {...defaultProps}
-          uploads={[avatarUpload]}
-        />
+        <PendingTransactionsModal {...defaultProps} uploads={[avatarUpload]} />,
       );
       expect(getByText('Profile Picture')).toBeTruthy();
     });
@@ -251,21 +245,21 @@ describe('PendingTransactionsModal', () => {
         <PendingTransactionsModal
           {...defaultProps}
           uploads={[messageUpload]}
-        />
+        />,
       );
       expect(getByText('Message Attachment')).toBeTruthy();
     });
 
     it('should display file name', () => {
       const { getByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       expect(getByText('proof.jpg')).toBeTruthy();
     });
 
     it('should display progress bar for partial uploads', () => {
       const { getByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       expect(getByText('50%')).toBeTruthy();
     });
@@ -279,7 +273,7 @@ describe('PendingTransactionsModal', () => {
         <PendingTransactionsModal
           {...defaultProps}
           uploads={[completedUpload]}
-        />
+        />,
       );
       expect(queryByText('100%')).toBeNull();
     });
@@ -290,17 +284,14 @@ describe('PendingTransactionsModal', () => {
         progress: 0,
       };
       const { queryByText } = render(
-        <PendingTransactionsModal
-          {...defaultProps}
-          uploads={[zeroUpload]}
-        />
+        <PendingTransactionsModal {...defaultProps} uploads={[zeroUpload]} />,
       );
       expect(queryByText('0%')).toBeNull();
     });
 
     it('should display retry count when > 0', () => {
       const { getByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       expect(getByText('Failed 1 time')).toBeTruthy();
     });
@@ -311,17 +302,14 @@ describe('PendingTransactionsModal', () => {
         retryCount: 3,
       };
       const { getByText } = render(
-        <PendingTransactionsModal
-          {...defaultProps}
-          uploads={[failedUpload]}
-        />
+        <PendingTransactionsModal {...defaultProps} uploads={[failedUpload]} />,
       );
       expect(getByText('Failed 3 times')).toBeTruthy();
     });
 
     it('should render Retry button for uploads', () => {
       const { getByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       expect(getByText('Retry')).toBeTruthy();
     });
@@ -330,10 +318,10 @@ describe('PendingTransactionsModal', () => {
   describe('User Interactions', () => {
     it('should call onClose when close button is pressed', () => {
       const { UNSAFE_getAllByType } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       const touchables = UNSAFE_getAllByType(
-        require('react-native').TouchableOpacity
+        require('react-native').TouchableOpacity,
       );
       // First touchable should be close button
       fireEvent.press(touchables[0]);
@@ -342,7 +330,7 @@ describe('PendingTransactionsModal', () => {
 
     it('should call onResumePayment when Resume is pressed for payment', () => {
       const { getAllByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       const resumeButtons = getAllByText('Resume');
       // First Resume button is for payment
@@ -352,7 +340,7 @@ describe('PendingTransactionsModal', () => {
 
     it('should call onDismissPayment when Dismiss is pressed for payment', () => {
       const { getAllByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       const dismissButtons = getAllByText('Dismiss');
       // First Dismiss button is for payment
@@ -362,7 +350,7 @@ describe('PendingTransactionsModal', () => {
 
     it('should call onResumeUpload when Retry is pressed for upload', () => {
       const { getByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       const retryButton = getByText('Retry');
       fireEvent.press(retryButton);
@@ -371,7 +359,7 @@ describe('PendingTransactionsModal', () => {
 
     it('should call onDismissUpload when Dismiss is pressed for upload', () => {
       const { getAllByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       const dismissButtons = getAllByText('Dismiss');
       // Second Dismiss button is for upload
@@ -381,7 +369,7 @@ describe('PendingTransactionsModal', () => {
 
     it('should call onClose when "I\'ll handle this later" is pressed', () => {
       const { getByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       const laterButton = getByText("I'll handle this later");
       fireEvent.press(laterButton);
@@ -392,7 +380,7 @@ describe('PendingTransactionsModal', () => {
   describe('Modal Properties', () => {
     it('should use transparent mode', () => {
       const { UNSAFE_getByType } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       const modal = UNSAFE_getByType(require('react-native').Modal);
       expect(modal.props.transparent).toBe(true);
@@ -400,7 +388,7 @@ describe('PendingTransactionsModal', () => {
 
     it('should use slide animation', () => {
       const { UNSAFE_getByType } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       const modal = UNSAFE_getByType(require('react-native').Modal);
       expect(modal.props.animationType).toBe('slide');
@@ -408,7 +396,7 @@ describe('PendingTransactionsModal', () => {
 
     it('should respect visible prop', () => {
       const { UNSAFE_getByType } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       const modal = UNSAFE_getByType(require('react-native').Modal);
       expect(modal.props.visible).toBe(true);
@@ -416,7 +404,7 @@ describe('PendingTransactionsModal', () => {
 
     it('should call onClose on modal request close', () => {
       const { UNSAFE_getByType } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       const modal = UNSAFE_getByType(require('react-native').Modal);
       modal.props.onRequestClose();
@@ -435,7 +423,7 @@ describe('PendingTransactionsModal', () => {
         <PendingTransactionsModal
           {...defaultProps}
           payments={[samplePayment, payment2]}
-        />
+        />,
       );
       expect(getByText('Pending Payments (2)')).toBeTruthy();
       expect(getByText('$50.00')).toBeTruthy();
@@ -452,7 +440,7 @@ describe('PendingTransactionsModal', () => {
         <PendingTransactionsModal
           {...defaultProps}
           uploads={[sampleUpload, upload2]}
-        />
+        />,
       );
       expect(getByText('Pending Uploads (2)')).toBeTruthy();
       expect(getByText('proof.jpg')).toBeTruthy();
@@ -461,14 +449,14 @@ describe('PendingTransactionsModal', () => {
 
     it('should not render payments section when empty', () => {
       const { queryByText } = render(
-        <PendingTransactionsModal {...defaultProps} payments={[]} />
+        <PendingTransactionsModal {...defaultProps} payments={[]} />,
       );
       expect(queryByText('Pending Payments')).toBeNull();
     });
 
     it('should not render uploads section when empty', () => {
       const { queryByText } = render(
-        <PendingTransactionsModal {...defaultProps} uploads={[]} />
+        <PendingTransactionsModal {...defaultProps} uploads={[]} />,
       );
       expect(queryByText('Pending Uploads')).toBeNull();
     });
@@ -484,7 +472,7 @@ describe('PendingTransactionsModal', () => {
         <PendingTransactionsModal
           {...defaultProps}
           payments={[paymentWithoutNote]}
-        />
+        />,
       );
       expect(queryByText('Test payment')).toBeNull();
     });
@@ -498,7 +486,7 @@ describe('PendingTransactionsModal', () => {
         <PendingTransactionsModal
           {...defaultProps}
           uploads={[uploadNoRetry]}
-        />
+        />,
       );
       expect(queryByText(/Failed/)).toBeNull();
     });
@@ -509,10 +497,7 @@ describe('PendingTransactionsModal', () => {
         currency: 'EUR',
       };
       const { getByText } = render(
-        <PendingTransactionsModal
-          {...defaultProps}
-          payments={[eurPayment]}
-        />
+        <PendingTransactionsModal {...defaultProps} payments={[eurPayment]} />,
       );
       expect(getByText('EUR50.00')).toBeTruthy();
     });
@@ -526,7 +511,7 @@ describe('PendingTransactionsModal', () => {
         <PendingTransactionsModal
           {...defaultProps}
           payments={[recentPayment]}
-        />
+        />,
       );
       expect(getByText('Just now')).toBeTruthy();
     });
@@ -537,10 +522,7 @@ describe('PendingTransactionsModal', () => {
         createdAt: Date.now() - 172800000, // 2 days ago
       };
       const { getByText } = render(
-        <PendingTransactionsModal
-          {...defaultProps}
-          payments={[oldPayment]}
-        />
+        <PendingTransactionsModal {...defaultProps} payments={[oldPayment]} />,
       );
       // Should show date - the component formats it with toLocaleDateString
       expect(getByText('$50.00')).toBeTruthy();
@@ -548,7 +530,7 @@ describe('PendingTransactionsModal', () => {
 
     it('should handle rapid button presses', () => {
       const { getAllByText } = render(
-        <PendingTransactionsModal {...defaultProps} />
+        <PendingTransactionsModal {...defaultProps} />,
       );
       const resumeButtons = getAllByText('Resume');
       fireEvent.press(resumeButtons[0]);

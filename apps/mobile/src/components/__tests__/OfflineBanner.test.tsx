@@ -26,7 +26,7 @@ describe('OfflineBanner', () => {
       });
 
       const { getByText } = render(<OfflineBanner />);
-      
+
       expect(getByText("You're offline")).toBeTruthy();
     });
 
@@ -38,7 +38,7 @@ describe('OfflineBanner', () => {
       });
 
       const { queryByText } = render(<OfflineBanner />);
-      
+
       expect(queryByText("You're offline")).toBeNull();
     });
 
@@ -51,7 +51,7 @@ describe('OfflineBanner', () => {
 
       const customMessage = 'No internet connection';
       const { getByText } = render(<OfflineBanner message={customMessage} />);
-      
+
       expect(getByText(customMessage)).toBeTruthy();
     });
   });
@@ -65,7 +65,7 @@ describe('OfflineBanner', () => {
       });
 
       const { getByText } = render(<OfflineBanner showRetry={true} />);
-      
+
       expect(getByText('Retry')).toBeTruthy();
     });
 
@@ -77,14 +77,14 @@ describe('OfflineBanner', () => {
       });
 
       const { queryByText } = render(<OfflineBanner showRetry={false} />);
-      
+
       expect(queryByText('Retry')).toBeNull();
     });
 
     it('should call onRetry when retry button pressed and connection restored', async () => {
       const mockCheckConnection = jest.fn().mockResolvedValue(true);
       const mockOnRetry = jest.fn() as jest.Mock;
-      
+
       mockUseNetwork.mockReturnValue({
         isOffline: true,
         isOnline: false,
@@ -92,14 +92,14 @@ describe('OfflineBanner', () => {
       });
 
       const { getByText } = render(
-        <OfflineBanner showRetry={true} onRetry={mockOnRetry} />
+        <OfflineBanner showRetry={true} onRetry={mockOnRetry} />,
       );
-      
+
       const retryButton = getByText('Retry');
       fireEvent.press(retryButton);
 
       // Wait for async operations
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(mockCheckConnection).toHaveBeenCalled();
       expect(mockOnRetry).toHaveBeenCalled();
@@ -108,7 +108,7 @@ describe('OfflineBanner', () => {
     it('should not call onRetry when connection check fails', async () => {
       const mockCheckConnection = jest.fn().mockResolvedValue(false);
       const mockOnRetry = jest.fn() as jest.Mock;
-      
+
       mockUseNetwork.mockReturnValue({
         isOffline: true,
         isOnline: false,
@@ -116,14 +116,14 @@ describe('OfflineBanner', () => {
       });
 
       const { getByText } = render(
-        <OfflineBanner showRetry={true} onRetry={mockOnRetry} />
+        <OfflineBanner showRetry={true} onRetry={mockOnRetry} />,
       );
-      
+
       const retryButton = getByText('Retry');
       fireEvent.press(retryButton);
 
       // Wait for async operations
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(mockCheckConnection).toHaveBeenCalled();
       expect(mockOnRetry).not.toHaveBeenCalled();
@@ -138,10 +138,9 @@ describe('OfflineBanner', () => {
         checkConnection: jest.fn(),
       });
 
-      const { UNSAFE_root } = render(<OfflineBanner />);
-      
+      render(<OfflineBanner />);
+
       // Component renders, icon should be present
-      expect(UNSAFE_root).toBeTruthy();
     });
   });
 });

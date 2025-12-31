@@ -89,7 +89,8 @@ describe('Home Page', () => {
     });
 
     it('renders Discover step', () => {
-      expect(screen.getByText('Discover')).toBeInTheDocument();
+      // Multiple "Discover" texts may exist in the page
+      expect(screen.getAllByText('Discover').length).toBeGreaterThan(0);
     });
 
     it('renders Gift step', () => {

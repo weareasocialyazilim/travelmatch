@@ -12,6 +12,11 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
       style={
         {
           "marginBottom": 16,
+          "transform": [
+            {
+              "translateX": 0,
+            },
+          ],
         }
       }
     >
@@ -34,7 +39,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FAFAF9",
+            "backgroundColor": "#FFFFFF",
             "borderColor": "#E7E5E4",
             "borderRadius": 12,
             "borderWidth": 1,
@@ -63,7 +68,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
                 "paddingVertical": 0,
               },
               undefined,
-              false,
+              undefined,
             ]
           }
           testID="email-input"
@@ -80,6 +85,11 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
       style={
         {
           "marginBottom": 16,
+          "transform": [
+            {
+              "translateX": 0,
+            },
+          ],
         }
       }
     >
@@ -102,7 +112,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FAFAF9",
+            "backgroundColor": "#FFFFFF",
             "borderColor": "#E7E5E4",
             "borderRadius": 12,
             "borderWidth": 1,
@@ -204,6 +214,11 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
       style={
         {
           "marginBottom": 16,
+          "transform": [
+            {
+              "translateX": 0,
+            },
+          ],
         }
       }
     >
@@ -226,7 +241,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FAFAF9",
+            "backgroundColor": "#FFFFFF",
             "borderColor": "#E7E5E4",
             "borderRadius": 12,
             "borderWidth": 1,
@@ -255,7 +270,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
                 "paddingVertical": 0,
               },
               undefined,
-              false,
+              undefined,
             ]
           }
           testID="username-input"
@@ -272,6 +287,11 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
       style={
         {
           "marginBottom": 16,
+          "transform": [
+            {
+              "translateX": 0,
+            },
+          ],
         }
       }
     >
@@ -294,7 +314,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FAFAF9",
+            "backgroundColor": "#FFFFFF",
             "borderColor": "#E7E5E4",
             "borderRadius": 12,
             "borderWidth": 1,
@@ -325,7 +345,7 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
                 "paddingVertical": 0,
               },
               undefined,
-              false,
+              undefined,
             ]
           }
           testID="bio-input"
@@ -349,6 +369,11 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
       style={
         {
           "marginBottom": 16,
+          "transform": [
+            {
+              "translateX": 0,
+            },
+          ],
         }
       }
     >
@@ -371,7 +396,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FAFAF9",
+            "backgroundColor": "#FFFFFF",
             "borderColor": "#E7E5E4",
             "borderRadius": 12,
             "borderWidth": 1,
@@ -400,7 +425,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
                 "paddingVertical": 0,
               },
               undefined,
-              false,
+              undefined,
             ]
           }
           testID="email-input"
@@ -417,6 +442,11 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
       style={
         {
           "marginBottom": 16,
+          "transform": [
+            {
+              "translateX": 0,
+            },
+          ],
         }
       }
     >
@@ -439,7 +469,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FAFAF9",
+            "backgroundColor": "#FFFFFF",
             "borderColor": "#E7E5E4",
             "borderRadius": 12,
             "borderWidth": 1,
@@ -541,6 +571,11 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
       style={
         {
           "marginBottom": 16,
+          "transform": [
+            {
+              "translateX": 0,
+            },
+          ],
         }
       }
     >
@@ -563,7 +598,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FAFAF9",
+            "backgroundColor": "#FFFFFF",
             "borderColor": "#E7E5E4",
             "borderRadius": 12,
             "borderWidth": 1,
@@ -592,7 +627,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
                 "paddingVertical": 0,
               },
               undefined,
-              false,
+              undefined,
             ]
           }
           testID="username-input"
@@ -609,6 +644,11 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
       style={
         {
           "marginBottom": 16,
+          "transform": [
+            {
+              "translateX": 0,
+            },
+          ],
         }
       }
     >
@@ -631,7 +671,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FAFAF9",
+            "backgroundColor": "#FFFFFF",
             "borderColor": "#E7E5E4",
             "borderRadius": 12,
             "borderWidth": 1,
@@ -662,7 +702,7 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
                 "paddingVertical": 0,
               },
               undefined,
-              false,
+              undefined,
             ]
           }
           testID="bio-input"

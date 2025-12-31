@@ -42,7 +42,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <AnimatedButton onPress={() => {}}>
           <Text>Click Me</Text>
-        </AnimatedButton>
+        </AnimatedButton>,
       );
 
       expect(getByText('Click Me')).toBeTruthy();
@@ -53,7 +53,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <AnimatedButton onPress={onPress}>
           <Text>Press</Text>
-        </AnimatedButton>
+        </AnimatedButton>,
       );
 
       fireEvent.press(getByText('Press'));
@@ -64,18 +64,20 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <AnimatedButton onPress={() => {}}>
           <Text>Haptic</Text>
-        </AnimatedButton>
+        </AnimatedButton>,
       );
 
       fireEvent.press(getByText('Haptic'));
-      expect(Haptics.impactAsync).toHaveBeenCalledWith(Haptics.ImpactFeedbackStyle.Light);
+      expect(Haptics.impactAsync).toHaveBeenCalledWith(
+        Haptics.ImpactFeedbackStyle.Light,
+      );
     });
 
     it('does not trigger haptic when disabled', () => {
       const { getByText } = render(
         <AnimatedButton onPress={() => {}} haptic={false}>
           <Text>No Haptic</Text>
-        </AnimatedButton>
+        </AnimatedButton>,
       );
 
       fireEvent.press(getByText('No Haptic'));
@@ -87,7 +89,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <AnimatedButton onPress={onPress} disabled>
           <Text>Disabled</Text>
-        </AnimatedButton>
+        </AnimatedButton>,
       );
 
       // Note: React Native Pressable still fires onPress even when disabled
@@ -101,7 +103,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <AnimatedButton onPress={() => {}} style={customStyle}>
           <Text>Styled</Text>
-        </AnimatedButton>
+        </AnimatedButton>,
       );
 
       const button = getByText('Styled').parent?.parent;
@@ -112,7 +114,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <AnimatedButton onPress={() => {}}>
           <Text>Press Events</Text>
-        </AnimatedButton>
+        </AnimatedButton>,
       );
 
       const button = getByText('Press Events').parent?.parent;
@@ -129,7 +131,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <FadeInView>
           <Text>Fade In</Text>
-        </FadeInView>
+        </FadeInView>,
       );
 
       expect(getByText('Fade In')).toBeTruthy();
@@ -139,7 +141,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <FadeInView>
           <Text>Default Fade</Text>
-        </FadeInView>
+        </FadeInView>,
       );
 
       expect(getByText('Default Fade')).toBeTruthy();
@@ -149,7 +151,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <FadeInView delay={500}>
           <Text>Delayed Fade</Text>
-        </FadeInView>
+        </FadeInView>,
       );
 
       expect(getByText('Delayed Fade')).toBeTruthy();
@@ -159,7 +161,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <FadeInView duration={1000}>
           <Text>Long Fade</Text>
-        </FadeInView>
+        </FadeInView>,
       );
 
       expect(getByText('Long Fade')).toBeTruthy();
@@ -170,7 +172,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <FadeInView style={customStyle}>
           <Text>Styled Fade</Text>
-        </FadeInView>
+        </FadeInView>,
       );
 
       expect(getByText('Styled Fade')).toBeTruthy();
@@ -181,7 +183,7 @@ describe('AnimatedComponents', () => {
         <FadeInView>
           <Text>Child 1</Text>
           <Text>Child 2</Text>
-        </FadeInView>
+        </FadeInView>,
       );
 
       expect(getByText('Child 1')).toBeTruthy();
@@ -192,7 +194,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <FadeInView delay={0}>
           <Text>No Delay</Text>
-        </FadeInView>
+        </FadeInView>,
       );
 
       expect(getByText('No Delay')).toBeTruthy();
@@ -202,7 +204,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <FadeInView duration={50}>
           <Text>Quick Fade</Text>
-        </FadeInView>
+        </FadeInView>,
       );
 
       expect(getByText('Quick Fade')).toBeTruthy();
@@ -218,7 +220,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <SlideInView>
           <Text>Slide In</Text>
-        </SlideInView>
+        </SlideInView>,
       );
 
       expect(getByText('Slide In')).toBeTruthy();
@@ -228,7 +230,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <SlideInView>
           <Text>Slide Up</Text>
-        </SlideInView>
+        </SlideInView>,
       );
 
       expect(getByText('Slide Up')).toBeTruthy();
@@ -238,7 +240,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <SlideInView direction="down">
           <Text>Slide Down</Text>
-        </SlideInView>
+        </SlideInView>,
       );
 
       expect(getByText('Slide Down')).toBeTruthy();
@@ -248,7 +250,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <SlideInView direction="left">
           <Text>Slide Left</Text>
-        </SlideInView>
+        </SlideInView>,
       );
 
       expect(getByText('Slide Left')).toBeTruthy();
@@ -258,7 +260,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <SlideInView direction="right">
           <Text>Slide Right</Text>
-        </SlideInView>
+        </SlideInView>,
       );
 
       expect(getByText('Slide Right')).toBeTruthy();
@@ -268,7 +270,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <SlideInView delay={300}>
           <Text>Delayed Slide</Text>
-        </SlideInView>
+        </SlideInView>,
       );
 
       expect(getByText('Delayed Slide')).toBeTruthy();
@@ -278,7 +280,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <SlideInView duration={500}>
           <Text>Long Slide</Text>
-        </SlideInView>
+        </SlideInView>,
       );
 
       expect(getByText('Long Slide')).toBeTruthy();
@@ -289,20 +291,25 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <SlideInView style={customStyle}>
           <Text>Styled Slide</Text>
-        </SlideInView>
+        </SlideInView>,
       );
 
       expect(getByText('Styled Slide')).toBeTruthy();
     });
 
     it('handles all direction values', () => {
-      const directions: Array<'left' | 'right' | 'up' | 'down'> = ['left', 'right', 'up', 'down'];
-      
+      const directions: Array<'left' | 'right' | 'up' | 'down'> = [
+        'left',
+        'right',
+        'up',
+        'down',
+      ];
+
       directions.forEach((direction) => {
         const { getByText } = render(
           <SlideInView direction={direction}>
             <Text>{`Slide ${direction}`}</Text>
-          </SlideInView>
+          </SlideInView>,
         );
 
         expect(getByText(`Slide ${direction}`)).toBeTruthy();
@@ -319,7 +326,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <ScaleOnPress>
           <Text>Scale Press</Text>
-        </ScaleOnPress>
+        </ScaleOnPress>,
       );
 
       expect(getByText('Scale Press')).toBeTruthy();
@@ -330,7 +337,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <ScaleOnPress onPress={onPress}>
           <Text>Press Me</Text>
-        </ScaleOnPress>
+        </ScaleOnPress>,
       );
 
       fireEvent.press(getByText('Press Me'));
@@ -341,17 +348,19 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <ScaleOnPress>
           <Text>No Press Handler</Text>
-        </ScaleOnPress>
+        </ScaleOnPress>,
       );
 
-      expect(() => fireEvent.press(getByText('No Press Handler'))).not.toThrow();
+      expect(() =>
+        fireEvent.press(getByText('No Press Handler')),
+      ).not.toThrow();
     });
 
     it('triggers haptic feedback by default', () => {
       const { getByText } = render(
         <ScaleOnPress onPress={() => {}}>
           <Text>Haptic Scale</Text>
-        </ScaleOnPress>
+        </ScaleOnPress>,
       );
 
       fireEvent.press(getByText('Haptic Scale'));
@@ -362,7 +371,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <ScaleOnPress onPress={() => {}} haptic={false}>
           <Text>No Haptic Scale</Text>
-        </ScaleOnPress>
+        </ScaleOnPress>,
       );
 
       fireEvent.press(getByText('No Haptic Scale'));
@@ -373,7 +382,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <ScaleOnPress scale={0.9}>
           <Text>Custom Scale</Text>
-        </ScaleOnPress>
+        </ScaleOnPress>,
       );
 
       expect(getByText('Custom Scale')).toBeTruthy();
@@ -384,7 +393,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <ScaleOnPress style={customStyle}>
           <Text>Styled Scale</Text>
-        </ScaleOnPress>
+        </ScaleOnPress>,
       );
 
       expect(getByText('Styled Scale')).toBeTruthy();
@@ -394,7 +403,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <ScaleOnPress>
           <Text>Default Scale</Text>
-        </ScaleOnPress>
+        </ScaleOnPress>,
       );
 
       expect(getByText('Default Scale')).toBeTruthy();
@@ -410,7 +419,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <PulseView>
           <Text>Pulse</Text>
-        </PulseView>
+        </PulseView>,
       );
 
       expect(getByText('Pulse')).toBeTruthy();
@@ -420,7 +429,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <PulseView>
           <Text>Default Pulse</Text>
-        </PulseView>
+        </PulseView>,
       );
 
       expect(getByText('Default Pulse')).toBeTruthy();
@@ -430,7 +439,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <PulseView pulseScale={1.2}>
           <Text>Custom Pulse</Text>
-        </PulseView>
+        </PulseView>,
       );
 
       expect(getByText('Custom Pulse')).toBeTruthy();
@@ -441,7 +450,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <PulseView style={customStyle}>
           <Text>Styled Pulse</Text>
-        </PulseView>
+        </PulseView>,
       );
 
       expect(getByText('Styled Pulse')).toBeTruthy();
@@ -451,7 +460,7 @@ describe('AnimatedComponents', () => {
       const { unmount, getByText } = render(
         <PulseView>
           <Text>Unmount Test</Text>
-        </PulseView>
+        </PulseView>,
       );
 
       expect(getByText('Unmount Test')).toBeTruthy();
@@ -462,7 +471,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <PulseView pulseScale={2.0}>
           <Text>Large Pulse</Text>
-        </PulseView>
+        </PulseView>,
       );
 
       expect(getByText('Large Pulse')).toBeTruthy();
@@ -472,7 +481,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <PulseView pulseScale={1.01}>
           <Text>Small Pulse</Text>
-        </PulseView>
+        </PulseView>,
       );
 
       expect(getByText('Small Pulse')).toBeTruthy();
@@ -492,7 +501,7 @@ describe('AnimatedComponents', () => {
             <Text key="2">Item 2</Text>,
             <Text key="3">Item 3</Text>,
           ]}
-        </StaggeredList>
+        </StaggeredList>,
       );
 
       expect(getByText('Item 1')).toBeTruthy();
@@ -503,11 +512,8 @@ describe('AnimatedComponents', () => {
     it('applies default stagger delay', () => {
       const { getByText } = render(
         <StaggeredList>
-          {[
-            <Text key="1">A</Text>,
-            <Text key="2">B</Text>,
-          ]}
-        </StaggeredList>
+          {[<Text key="1">A</Text>, <Text key="2">B</Text>]}
+        </StaggeredList>,
       );
 
       expect(getByText('A')).toBeTruthy();
@@ -517,11 +523,8 @@ describe('AnimatedComponents', () => {
     it('applies custom stagger delay', () => {
       const { getByText } = render(
         <StaggeredList staggerDelay={100}>
-          {[
-            <Text key="1">X</Text>,
-            <Text key="2">Y</Text>,
-          ]}
-        </StaggeredList>
+          {[<Text key="1">X</Text>, <Text key="2">Y</Text>]}
+        </StaggeredList>,
       );
 
       expect(getByText('X')).toBeTruthy();
@@ -530,9 +533,7 @@ describe('AnimatedComponents', () => {
 
     it('handles single child', () => {
       const { getByText } = render(
-        <StaggeredList>
-          {[<Text key="1">Single</Text>]}
-        </StaggeredList>
+        <StaggeredList>{[<Text key="1">Single</Text>]}</StaggeredList>,
       );
 
       expect(getByText('Single')).toBeTruthy();
@@ -543,9 +544,7 @@ describe('AnimatedComponents', () => {
         <Text key={i}>Item {i}</Text>
       ));
 
-      const { getByText } = render(
-        <StaggeredList>{items}</StaggeredList>
-      );
+      const { getByText } = render(<StaggeredList>{items}</StaggeredList>);
 
       expect(getByText('Item 0')).toBeTruthy();
       expect(getByText('Item 9')).toBeTruthy();
@@ -554,11 +553,8 @@ describe('AnimatedComponents', () => {
     it('handles zero stagger delay', () => {
       const { getByText } = render(
         <StaggeredList staggerDelay={0}>
-          {[
-            <Text key="1">Zero 1</Text>,
-            <Text key="2">Zero 2</Text>,
-          ]}
-        </StaggeredList>
+          {[<Text key="1">Zero 1</Text>, <Text key="2">Zero 2</Text>]}
+        </StaggeredList>,
       );
 
       expect(getByText('Zero 1')).toBeTruthy();
@@ -591,7 +587,7 @@ describe('AnimatedComponents', () => {
     it('can trigger shake animation', () => {
       const { getByTestId } = render(<TestComponent />);
       const trigger = getByTestId('shake-trigger');
-      
+
       expect(() => fireEvent.press(trigger)).not.toThrow();
     });
   });
@@ -602,8 +598,7 @@ describe('AnimatedComponents', () => {
 
   describe('SuccessAnimation', () => {
     it('renders when visible', () => {
-      const { UNSAFE_root } = render(<SuccessAnimation visible={true} />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<SuccessAnimation visible={true} />);
     });
 
     it('does not render when not visible', () => {
@@ -615,37 +610,35 @@ describe('AnimatedComponents', () => {
       const onComplete = jest.fn() as jest.Mock;
       render(<SuccessAnimation visible={true} onComplete={onComplete} />);
 
-      await waitFor(() => {
-        expect(onComplete).toHaveBeenCalled();
-      }, { timeout: 1000 });
+      await waitFor(
+        () => {
+          expect(onComplete).toHaveBeenCalled();
+        },
+        { timeout: 1000 },
+      );
     });
 
     it('does not call onComplete when not visible', () => {
       const onComplete = jest.fn() as jest.Mock;
       render(<SuccessAnimation visible={false} onComplete={onComplete} />);
-      
+
       expect(onComplete).not.toHaveBeenCalled();
     });
 
     it('resets when visibility changes', () => {
-      const { rerender, UNSAFE_root } = render(<SuccessAnimation visible={true} />);
-      expect(UNSAFE_root).toBeTruthy();
+      const { rerender } = render(<SuccessAnimation visible={true} />);
 
       rerender(<SuccessAnimation visible={false} />);
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('shows animation when becoming visible', () => {
-      const { rerender, UNSAFE_root } = render(<SuccessAnimation visible={false} />);
-      expect(UNSAFE_root).toBeTruthy();
+      const { rerender } = render(<SuccessAnimation visible={false} />);
 
       rerender(<SuccessAnimation visible={true} />);
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('works without onComplete callback', () => {
-      const { UNSAFE_root } = render(<SuccessAnimation visible={true} />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<SuccessAnimation visible={true} />);
     });
   });
 
@@ -659,7 +652,7 @@ describe('AnimatedComponents', () => {
       const { getByText } = render(
         <AnimatedButton onPress={onPress}>
           <Text>Rapid</Text>
-        </AnimatedButton>
+        </AnimatedButton>,
       );
 
       const button = getByText('Rapid');
@@ -676,7 +669,7 @@ describe('AnimatedComponents', () => {
           <SlideInView>
             <Text>Nested</Text>
           </SlideInView>
-        </FadeInView>
+        </FadeInView>,
       );
 
       expect(getByText('Nested')).toBeTruthy();
@@ -689,7 +682,7 @@ describe('AnimatedComponents', () => {
             <Text>Complex</Text>
             <Text>Children</Text>
           </View>
-        </ScaleOnPress>
+        </ScaleOnPress>,
       );
 
       expect(getByText('Complex')).toBeTruthy();
@@ -697,24 +690,17 @@ describe('AnimatedComponents', () => {
     });
 
     it('StaggeredList handles empty array', () => {
-      const { UNSAFE_root } = render(
-        <StaggeredList>{[]}</StaggeredList>
-      );
-
-      expect(UNSAFE_root).toBeTruthy();
+      render(<StaggeredList>{[]}</StaggeredList>);
     });
 
     it('SuccessAnimation handles multiple show/hide cycles', () => {
-      const { rerender, UNSAFE_root } = render(<SuccessAnimation visible={false} />);
-      
+      const { rerender } = render(<SuccessAnimation visible={false} />);
+
       rerender(<SuccessAnimation visible={true} />);
-      expect(UNSAFE_root).toBeTruthy();
-      
+
       rerender(<SuccessAnimation visible={false} />);
-      expect(UNSAFE_root).toBeTruthy();
-      
+
       rerender(<SuccessAnimation visible={true} />);
-      expect(UNSAFE_root).toBeTruthy();
     });
   });
 });

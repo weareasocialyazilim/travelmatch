@@ -14,13 +14,11 @@ describe('Avatar Component', () => {
 
   describe('Basic Rendering', () => {
     it('renders without props', () => {
-      const { UNSAFE_root } = render(<Avatar />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar />);
     });
 
     it('renders with default size', () => {
-      const { UNSAFE_root } = render(<Avatar />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar />);
     });
 
     it('renders with placeholder when no source provided', () => {
@@ -45,13 +43,12 @@ describe('Avatar Component', () => {
 
   describe('Image Source', () => {
     it('renders with image source', () => {
-      const { UNSAFE_root } = render(<Avatar source="https://example.com/avatar.jpg" />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar source="https://example.com/avatar.jpg" />);
     });
 
     it('renders image when source is provided', () => {
       const { queryByText } = render(
-        <Avatar source="https://example.com/avatar.jpg" name="John Doe" />
+        <Avatar source="https://example.com/avatar.jpg" name="John Doe" />,
       );
       // When source is provided, initials should not be shown
       expect(queryByText('JD')).toBeNull();
@@ -65,8 +62,7 @@ describe('Avatar Component', () => {
       ];
 
       urls.forEach((url) => {
-        const { UNSAFE_root } = render(<Avatar source={url} />);
-        expect(UNSAFE_root).toBeTruthy();
+        render(<Avatar source={url} />);
       });
     });
   });
@@ -112,7 +108,9 @@ describe('Avatar Component', () => {
     });
 
     it('handles very long names', () => {
-      const { getByText } = render(<Avatar name="Alexander Benjamin Christopher" />);
+      const { getByText } = render(
+        <Avatar name="Alexander Benjamin Christopher" />,
+      );
       expect(getByText('AB')).toBeTruthy();
     });
   });
@@ -123,42 +121,41 @@ describe('Avatar Component', () => {
 
   describe('Sizes', () => {
     it('renders extra small size', () => {
-      const { UNSAFE_root } = render(<Avatar size="xs" />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar size="xs" />);
     });
 
     it('renders small size', () => {
-      const { UNSAFE_root } = render(<Avatar size="sm" />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar size="sm" />);
     });
 
     it('renders medium size', () => {
-      const { UNSAFE_root } = render(<Avatar size="md" />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar size="md" />);
     });
 
     it('renders large size', () => {
-      const { UNSAFE_root } = render(<Avatar size="lg" />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar size="lg" />);
     });
 
     it('renders extra large size', () => {
-      const { UNSAFE_root } = render(<Avatar size="xl" />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar size="xl" />);
     });
 
     it('renders all sizes correctly', () => {
-      const sizes: Array<'xs' | 'sm' | 'md' | 'lg' | 'xl'> = ['xs', 'sm', 'md', 'lg', 'xl'];
+      const sizes: Array<'xs' | 'sm' | 'md' | 'lg' | 'xl'> = [
+        'xs',
+        'sm',
+        'md',
+        'lg',
+        'xl',
+      ];
 
       sizes.forEach((size) => {
-        const { UNSAFE_root } = render(<Avatar size={size} name="Test" />);
-        expect(UNSAFE_root).toBeTruthy();
+        render(<Avatar size={size} name="Test" />);
       });
     });
 
     it('uses medium as default size', () => {
-      const { UNSAFE_root } = render(<Avatar />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar />);
     });
   });
 
@@ -168,40 +165,40 @@ describe('Avatar Component', () => {
 
   describe('Badge Indicator', () => {
     it('renders with badge', () => {
-      const { UNSAFE_root } = render(<Avatar showBadge={true} />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar showBadge={true} />);
     });
 
     it('does not render badge by default', () => {
-      const { UNSAFE_root } = render(<Avatar />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar />);
     });
 
     it('renders badge with default color', () => {
-      const { UNSAFE_root } = render(<Avatar showBadge={true} />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar showBadge={true} />);
     });
 
     it('renders badge with custom color', () => {
-      const { UNSAFE_root } = render(<Avatar showBadge={true} badgeColor="#FF0000" />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar showBadge={true} badgeColor="#FF0000" />);
     });
 
     it('renders badge with different colors', () => {
       const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00'];
 
       colors.forEach((color) => {
-        const { UNSAFE_root } = render(<Avatar showBadge={true} badgeColor={color} />);
-        expect(UNSAFE_root).toBeTruthy();
+        render(<Avatar showBadge={true} badgeColor={color} />);
       });
     });
 
     it('renders badge with all sizes', () => {
-      const sizes: Array<'xs' | 'sm' | 'md' | 'lg' | 'xl'> = ['xs', 'sm', 'md', 'lg', 'xl'];
+      const sizes: Array<'xs' | 'sm' | 'md' | 'lg' | 'xl'> = [
+        'xs',
+        'sm',
+        'md',
+        'lg',
+        'xl',
+      ];
 
       sizes.forEach((size) => {
-        const { UNSAFE_root } = render(<Avatar size={size} showBadge={true} />);
-        expect(UNSAFE_root).toBeTruthy();
+        render(<Avatar size={size} showBadge={true} />);
       });
     });
   });
@@ -212,33 +209,37 @@ describe('Avatar Component', () => {
 
   describe('Verified Indicator', () => {
     it('renders with verified checkmark', () => {
-      const { UNSAFE_root } = render(<Avatar showVerified={true} />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar showVerified={true} />);
     });
 
     it('does not render verified by default', () => {
-      const { UNSAFE_root } = render(<Avatar />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar />);
     });
 
     it('renders verified with all sizes', () => {
-      const sizes: Array<'xs' | 'sm' | 'md' | 'lg' | 'xl'> = ['xs', 'sm', 'md', 'lg', 'xl'];
+      const sizes: Array<'xs' | 'sm' | 'md' | 'lg' | 'xl'> = [
+        'xs',
+        'sm',
+        'md',
+        'lg',
+        'xl',
+      ];
 
       sizes.forEach((size) => {
-        const { UNSAFE_root } = render(<Avatar size={size} showVerified={true} />);
-        expect(UNSAFE_root).toBeTruthy();
+        render(<Avatar size={size} showVerified={true} />);
       });
     });
 
     it('renders verified with image', () => {
-      const { UNSAFE_root } = render(
-        <Avatar source="https://example.com/avatar.jpg" showVerified={true} />
+      render(
+        <Avatar source="https://example.com/avatar.jpg" showVerified={true} />,
       );
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('renders verified with initials', () => {
-      const { getByText } = render(<Avatar name="John Doe" showVerified={true} />);
+      const { getByText } = render(
+        <Avatar name="John Doe" showVerified={true} />,
+      );
       expect(getByText('JD')).toBeTruthy();
     });
   });
@@ -249,7 +250,7 @@ describe('Avatar Component', () => {
 
   describe('Combinations', () => {
     it('renders with all props', () => {
-      const { UNSAFE_root } = render(
+      render(
         <Avatar
           source="https://example.com/avatar.jpg"
           name="John Doe"
@@ -258,41 +259,33 @@ describe('Avatar Component', () => {
           badgeColor="#00FF00"
           showVerified={true}
           style={{ margin: 10 }}
-        />
+        />,
       );
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('renders badge and verified together', () => {
-      const { UNSAFE_root } = render(
-        <Avatar showBadge={true} showVerified={true} />
-      );
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar showBadge={true} showVerified={true} />);
     });
 
     it('renders image with badge and verified', () => {
-      const { UNSAFE_root } = render(
+      render(
         <Avatar
           source="https://example.com/avatar.jpg"
           showBadge={true}
           showVerified={true}
-        />
+        />,
       );
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('renders initials with badge and verified', () => {
       const { getByText } = render(
-        <Avatar name="Jane Smith" showBadge={true} showVerified={true} />
+        <Avatar name="Jane Smith" showBadge={true} showVerified={true} />,
       );
       expect(getByText('JS')).toBeTruthy();
     });
 
     it('combines size, badge, and verified', () => {
-      const { UNSAFE_root } = render(
-        <Avatar size="xl" showBadge={true} showVerified={true} />
-      );
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar size="xl" showBadge={true} showVerified={true} />);
     });
 
     it('renders multiple avatars independently', () => {
@@ -301,7 +294,7 @@ describe('Avatar Component', () => {
           <Avatar name="Alice" />
           <Avatar name="Bob" size="sm" />
           <Avatar name="Charlie" showBadge={true} />
-        </>
+        </>,
       );
 
       expect(getByText('A')).toBeTruthy();
@@ -316,20 +309,15 @@ describe('Avatar Component', () => {
 
   describe('Custom Styles', () => {
     it('accepts custom style prop', () => {
-      const { UNSAFE_root } = render(<Avatar style={{ marginTop: 20 }} />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar style={{ marginTop: 20 }} />);
     });
 
     it('renders with multiple custom styles', () => {
-      const { UNSAFE_root } = render(
-        <Avatar style={{ margin: 10, opacity: 0.8 }} />
-      );
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar style={{ margin: 10, opacity: 0.8 }} />);
     });
 
     it('handles undefined style gracefully', () => {
-      const { UNSAFE_root } = render(<Avatar style={undefined} />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar style={undefined} />);
     });
   });
 
@@ -359,27 +347,22 @@ describe('Avatar Component', () => {
     });
 
     it('renders with very small badge color', () => {
-      const { UNSAFE_root } = render(
-        <Avatar size="xs" showBadge={true} badgeColor="#000000" />
-      );
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar size="xs" showBadge={true} badgeColor="#000000" />);
     });
 
     it('renders with very large size and all features', () => {
-      const { UNSAFE_root } = render(
+      render(
         <Avatar
           size="xl"
           name="John Doe"
           showBadge={true}
           showVerified={true}
-        />
+        />,
       );
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('handles invalid image URL gracefully', () => {
-      const { UNSAFE_root } = render(<Avatar source="invalid-url" />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<Avatar source="invalid-url" />);
     });
   });
 
@@ -392,32 +375,28 @@ describe('Avatar Component', () => {
       const { rerender, queryByText } = render(<Avatar name="John Doe" />);
       expect(queryByText('JD')).toBeTruthy();
 
-      rerender(<Avatar source="https://example.com/avatar.jpg" name="John Doe" />);
+      rerender(
+        <Avatar source="https://example.com/avatar.jpg" name="John Doe" />,
+      );
       expect(queryByText('JD')).toBeNull();
     });
 
     it('updates size dynamically', () => {
-      const { rerender, UNSAFE_root } = render(<Avatar size="sm" />);
-      expect(UNSAFE_root).toBeTruthy();
+      const { rerender } = render(<Avatar size="sm" />);
 
       rerender(<Avatar size="xl" />);
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('toggles badge visibility', () => {
-      const { rerender, UNSAFE_root } = render(<Avatar showBadge={false} />);
-      expect(UNSAFE_root).toBeTruthy();
+      const { rerender } = render(<Avatar showBadge={false} />);
 
       rerender(<Avatar showBadge={true} />);
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('toggles verified status', () => {
-      const { rerender, UNSAFE_root } = render(<Avatar showVerified={false} />);
-      expect(UNSAFE_root).toBeTruthy();
+      const { rerender } = render(<Avatar showVerified={false} />);
 
       rerender(<Avatar showVerified={true} />);
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('updates name and initials', () => {
@@ -446,18 +425,14 @@ describe('Avatar Component', () => {
 
     it('maintains accessibility with image', () => {
       const { getByLabelText } = render(
-        <Avatar source="https://example.com/avatar.jpg" name="John Doe" />
+        <Avatar source="https://example.com/avatar.jpg" name="John Doe" />,
       );
       expect(getByLabelText('Avatar of John Doe')).toBeTruthy();
     });
 
     it('maintains accessibility with all features', () => {
       const { getByLabelText } = render(
-        <Avatar
-          name="Jane Smith"
-          showBadge={true}
-          showVerified={true}
-        />
+        <Avatar name="Jane Smith" showBadge={true} showVerified={true} />,
       );
       expect(getByLabelText('Avatar of Jane Smith')).toBeTruthy();
     });
@@ -480,14 +455,14 @@ describe('Avatar Component', () => {
           {users.map((user, index) => (
             <Avatar key={index} name={user.name} source={user.source} />
           ))}
-        </>
+        </>,
       );
 
       expect(getByText('B')).toBeTruthy(); // Bob has no source, shows initials
     });
 
     it('handles rapid prop changes', () => {
-      const { rerender, UNSAFE_root } = render(<Avatar />);
+      const { rerender } = render(<Avatar />);
 
       for (let i = 0; i < 5; i++) {
         rerender(
@@ -495,11 +470,9 @@ describe('Avatar Component', () => {
             size={i % 2 === 0 ? 'sm' : 'lg'}
             showBadge={i % 2 === 0}
             showVerified={i % 3 === 0}
-          />
+          />,
         );
       }
-
-      expect(UNSAFE_root).toBeTruthy();
     });
   });
 });

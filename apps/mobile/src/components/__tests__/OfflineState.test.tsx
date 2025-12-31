@@ -10,26 +10,26 @@ describe('OfflineState', () => {
   describe('Rendering', () => {
     it('should render with default props', () => {
       const { getByText } = render(<OfflineState />);
-      
+
       expect(getByText('Bağlantı Yok')).toBeTruthy();
     });
 
     it('should render custom message', () => {
       const customMessage = 'İnternet bağlantınız yok';
       const { getByText } = render(<OfflineState message={customMessage} />);
-      
+
       expect(getByText(customMessage)).toBeTruthy();
     });
 
     it('should render with default testID', () => {
       const { getByTestId } = render(<OfflineState />);
-      
+
       expect(getByTestId('offline-state')).toBeTruthy();
     });
 
     it('should render with custom testID', () => {
       const { getByTestId } = render(<OfflineState testID="custom-offline" />);
-      
+
       expect(getByTestId('custom-offline')).toBeTruthy();
     });
   });
@@ -37,22 +37,22 @@ describe('OfflineState', () => {
   describe('Retry Functionality', () => {
     it('should render retry button when onRetry is provided', () => {
       const { getByText } = render(<OfflineState onRetry={jest.fn()} />);
-      
+
       expect(getByText('Tekrar Dene')).toBeTruthy();
     });
 
     it('should render custom retry text', () => {
       const customRetryText = 'Yeniden Bağlan';
       const { getByText } = render(
-        <OfflineState onRetry={jest.fn()} retryText={customRetryText} />
+        <OfflineState onRetry={jest.fn()} retryText={customRetryText} />,
       );
-      
+
       expect(getByText(customRetryText)).toBeTruthy();
     });
 
     it('should not render retry button when onRetry is not provided', () => {
       const { queryByText } = render(<OfflineState />);
-      
+
       expect(queryByText('Tekrar Dene')).toBeNull();
     });
 
@@ -72,7 +72,7 @@ describe('OfflineState', () => {
 
     it('should show loading indicator while retrying', async () => {
       const mockOnRetry = jest.fn().mockResolvedValue(undefined);
-      const { getByText, UNSAFE_root } = render(<OfflineState onRetry={mockOnRetry} />);
+      const { getByText } = render(<OfflineState onRetry={mockOnRetry} />);
 
       await act(async () => {
         const retryButton = getByText('Tekrar Dene');
@@ -80,7 +80,6 @@ describe('OfflineState', () => {
       });
 
       // Loading indicator should be visible
-      expect(UNSAFE_root).toBeTruthy();
 
       // Wait for async operations to complete
       await waitFor(() => {
@@ -104,7 +103,7 @@ describe('OfflineState', () => {
 
     it('should disable retry button while retrying', async () => {
       const mockOnRetry = jest.fn().mockResolvedValue(undefined);
-      const { getByText, UNSAFE_root } = render(<OfflineState onRetry={mockOnRetry} />);
+      const { getByText } = render(<OfflineState onRetry={mockOnRetry} />);
 
       await act(async () => {
         const retryButton = getByText('Tekrar Dene');
@@ -112,7 +111,6 @@ describe('OfflineState', () => {
       });
 
       // Button should be disabled (showing loading)
-      expect(UNSAFE_root).toBeTruthy();
 
       // Wait for async operations to complete
       await waitFor(() => {
@@ -123,52 +121,43 @@ describe('OfflineState', () => {
 
   describe('Compact Mode', () => {
     it('should render in full screen mode by default', () => {
-      const { UNSAFE_root } = render(<OfflineState />);
-      
-      expect(UNSAFE_root).toBeTruthy();
+      render(<OfflineState />);
     });
 
     it('should render in compact mode when compact is true', () => {
-      const { UNSAFE_root } = render(<OfflineState compact />);
-      
-      expect(UNSAFE_root).toBeTruthy();
+      render(<OfflineState compact />);
     });
 
     it('should render in full screen mode when compact is false', () => {
-      const { UNSAFE_root } = render(<OfflineState compact={false} />);
-      
-      expect(UNSAFE_root).toBeTruthy();
+      render(<OfflineState compact={false} />);
     });
   });
 
   describe('Custom Styling', () => {
     it('should apply custom style', () => {
       const customStyle = { backgroundColor: '#f0f0f0', padding: 20 };
-      const { UNSAFE_root } = render(<OfflineState style={customStyle} />);
-      
-      expect(UNSAFE_root).toBeTruthy();
+      render(<OfflineState style={customStyle} />);
     });
   });
 
   describe('Icon Rendering', () => {
     it('should render offline icon', () => {
-      const { UNSAFE_root } = render(<OfflineState />);
-      
-      expect(UNSAFE_root).toBeTruthy();
+      render(<OfflineState />);
     });
   });
 
   describe('Edge Cases', () => {
     it('should handle empty message', () => {
       const { getByTestId } = render(<OfflineState message="" />);
-      
+
       expect(getByTestId('offline-state')).toBeTruthy();
     });
 
     it('should handle long message', () => {
-      const longMessage = 'İnternet bağlantınız kesildi. Lütfen bağlantınızı kontrol edip tekrar deneyin. Bu mesaj çok uzun olabilir ve birden fazla satıra yayılabilir.';
+      const longMessage =
+        'İnternet bağlantınız kesildi. Lütfen bağlantınızı kontrol edip tekrar deneyin. Bu mesaj çok uzun olabilir ve birden fazla satıra yayılabilir.';
       const { getByText } = render(<OfflineState message={longMessage} />);
-      
+
       expect(getByText(longMessage)).toBeTruthy();
     });
 

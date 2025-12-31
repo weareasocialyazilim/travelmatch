@@ -81,7 +81,7 @@ describe('ShareProofModal', () => {
     });
 
     it('renders modal component', () => {
-      const { UNSAFE_root } = render(
+      render(
         <ShareProofModal
           visible={true}
           onClose={mockOnClose}
@@ -89,8 +89,6 @@ describe('ShareProofModal', () => {
           proofUrl={mockProofUrl}
         />,
       );
-
-      expect(UNSAFE_root).toBeTruthy();
     });
   });
 
@@ -238,7 +236,7 @@ describe('ShareProofModal', () => {
     });
 
     it('maintains component when toggling visibility', () => {
-      const { rerender, UNSAFE_root } = render(
+      const { rerender } = render(
         <ShareProofModal
           visible={true}
           onClose={mockOnClose}
@@ -246,8 +244,6 @@ describe('ShareProofModal', () => {
           proofUrl={mockProofUrl}
         />,
       );
-
-      expect(UNSAFE_root).toBeTruthy();
 
       rerender(
         <ShareProofModal
@@ -258,8 +254,6 @@ describe('ShareProofModal', () => {
         />,
       );
 
-      expect(UNSAFE_root).toBeTruthy();
-
       rerender(
         <ShareProofModal
           visible={true}
@@ -268,8 +262,6 @@ describe('ShareProofModal', () => {
           proofUrl={mockProofUrl}
         />,
       );
-
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('renders with different URL formats', () => {
@@ -299,7 +291,7 @@ describe('ShareProofModal', () => {
       const error = new Error('Clipboard error');
       mockWriteText.mockRejectedValue(error);
 
-      const { UNSAFE_root } = render(
+      render(
         <ShareProofModal
           visible={true}
           onClose={mockOnClose}
@@ -307,8 +299,6 @@ describe('ShareProofModal', () => {
           proofUrl={mockProofUrl}
         />,
       );
-
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('renders modal on different platforms', () => {
@@ -348,7 +338,7 @@ describe('ShareProofModal', () => {
     });
 
     it('renders with visible=false', () => {
-      const { UNSAFE_root } = render(
+      render(
         <ShareProofModal
           visible={false}
           onClose={mockOnClose}
@@ -356,8 +346,6 @@ describe('ShareProofModal', () => {
           proofUrl={mockProofUrl}
         />,
       );
-
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('works with different callback functions', () => {
