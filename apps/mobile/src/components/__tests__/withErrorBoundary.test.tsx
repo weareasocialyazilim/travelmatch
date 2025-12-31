@@ -287,10 +287,7 @@ describe('withErrorBoundary HOC', () => {
       );
       const WrappedComponent = withErrorBoundary(ManyPropsComponent);
 
-      const { UNSAFE_root } = render(
-        <WrappedComponent prop1="a" prop2="b" prop3="c" prop4="d" />,
-      );
-      expect(UNSAFE_root).toBeTruthy();
+      render(<WrappedComponent prop1="a" prop2="b" prop3="c" prop4="d" />);
     });
 
     it('works with class components', () => {

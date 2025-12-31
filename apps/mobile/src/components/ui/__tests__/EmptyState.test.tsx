@@ -26,7 +26,17 @@ jest.mock('../Button', () => {
   const React = require('react');
   const RN = require('react-native');
   return {
-    Button: ({ title, onPress, variant, testID }: { title?: string; onPress?: () => void; variant?: string; testID?: string }) =>
+    Button: ({
+      title,
+      onPress,
+      variant,
+      testID,
+    }: {
+      title?: string;
+      onPress?: () => void;
+      variant?: string;
+      testID?: string;
+    }) =>
       React.createElement(
         RN.TouchableOpacity,
         { onPress, testID },
@@ -80,8 +90,7 @@ describe('EmptyState Component', () => {
     });
 
     it('renders with default icon', () => {
-      const { UNSAFE_root } = render(<EmptyState title="Empty" />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<EmptyState title="Empty" />);
     });
   });
 
@@ -91,10 +100,7 @@ describe('EmptyState Component', () => {
 
   describe('Icons', () => {
     it('renders with custom icon', () => {
-      const { UNSAFE_root } = render(
-        <EmptyState title="No messages" icon="message-outline" />,
-      );
-      expect(UNSAFE_root).toBeTruthy();
+      render(<EmptyState title="No messages" icon="message-outline" />);
     });
 
     it('renders with different icons', () => {
@@ -106,8 +112,7 @@ describe('EmptyState Component', () => {
       ];
 
       icons.forEach((icon) => {
-        const { UNSAFE_root } = render(<EmptyState title="Test" icon={icon} />);
-        expect(UNSAFE_root).toBeTruthy();
+        render(<EmptyState title="Test" icon={icon} />);
       });
     });
   });
@@ -205,10 +210,7 @@ describe('EmptyState Component', () => {
 
     it('does not render action button without actionLabel', () => {
       const onAction = jest.fn() as jest.Mock;
-      const { UNSAFE_root } = render(
-        <EmptyState title="Empty" onAction={onAction} />,
-      );
-      expect(UNSAFE_root).toBeTruthy();
+      render(<EmptyState title="Empty" onAction={onAction} />);
     });
 
     it('renders primary button with primary variant', () => {
@@ -316,27 +318,20 @@ describe('EmptyState Component', () => {
 
   describe('Custom Styles', () => {
     it('accepts custom style prop', () => {
-      const { UNSAFE_root } = render(
-        <EmptyState title="Empty" style={{ padding: 20 }} />,
-      );
-      expect(UNSAFE_root).toBeTruthy();
+      render(<EmptyState title="Empty" style={{ padding: 20 }} />);
     });
 
     it('renders with multiple custom styles', () => {
-      const { UNSAFE_root } = render(
+      render(
         <EmptyState
           title="Empty"
           style={{ padding: 20, backgroundColor: '#fff' }}
         />,
       );
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('handles undefined style gracefully', () => {
-      const { UNSAFE_root } = render(
-        <EmptyState title="Empty" style={undefined} />,
-      );
-      expect(UNSAFE_root).toBeTruthy();
+      render(<EmptyState title="Empty" style={undefined} />);
     });
   });
 
@@ -416,14 +411,13 @@ describe('EmptyState Component', () => {
     });
 
     it('handles both description and subtitle as undefined', () => {
-      const { UNSAFE_root } = render(
+      render(
         <EmptyState
           title="Title"
           description={undefined}
           subtitle={undefined}
         />,
       );
-      expect(UNSAFE_root).toBeTruthy();
     });
 
     it('handles special characters in title', () => {
@@ -439,8 +433,7 @@ describe('EmptyState Component', () => {
     });
 
     it('handles null style prop', () => {
-      const { UNSAFE_root } = render(<EmptyState title="Empty" style={null} />);
-      expect(UNSAFE_root).toBeTruthy();
+      render(<EmptyState title="Empty" style={null} />);
     });
   });
 
@@ -557,7 +550,7 @@ describe('EmptyState Component', () => {
     });
 
     it('handles rapid prop changes', () => {
-      const { rerender, UNSAFE_root } = render(<EmptyState title="Test" />);
+      const { rerender } = render(<EmptyState title="Test" />);
 
       for (let i = 0; i < 5; i++) {
         rerender(
@@ -568,8 +561,6 @@ describe('EmptyState Component', () => {
           />,
         );
       }
-
-      expect(UNSAFE_root).toBeTruthy();
     });
   });
 
