@@ -72,9 +72,9 @@ export interface MomentData {
   badge?: MomentBadgeType; // Featured/Popular/New/Premium badge
   metadata?: {
     // Additional metadata (like property cards)
-    duration?: string;    // "20 dk"
-    servings?: string;    // "4 kişi"
-    difficulty?: string;  // "Orta"
+    duration?: string; // "20 dk"
+    servings?: string; // "4 kişi"
+    difficulty?: string; // "Orta"
     beds?: number;
     baths?: number;
     sqft?: number;
@@ -169,7 +169,7 @@ export const TMCard: React.FC<TMCardProps> = ({
             />
             <Text style={styles.locationText}>
               {moment.location.city}
-              {moment.distance && ` • ${moment.distance}`}
+              {moment.distance ? ` • ${moment.distance}` : ''}
             </Text>
           </BlurView>
 
@@ -316,10 +316,7 @@ export const TMCard: React.FC<TMCardProps> = ({
                 </Pressable>
 
                 {onGiftPress && (
-                  <Pressable
-                    style={styles.primaryButton}
-                    onPress={onGiftPress}
-                  >
+                  <Pressable style={styles.primaryButton} onPress={onGiftPress}>
                     <LinearGradient
                       colors={GRADIENTS.gift}
                       start={{ x: 0, y: 0 }}
@@ -331,7 +328,9 @@ export const TMCard: React.FC<TMCardProps> = ({
                         size={16}
                         color={COLORS.white}
                       />
-                      <Text style={styles.primaryButtonText}>Hediye Gönder</Text>
+                      <Text style={styles.primaryButtonText}>
+                        Hediye Gönder
+                      </Text>
                     </LinearGradient>
                   </Pressable>
                 )}

@@ -71,7 +71,6 @@ export const fetchRemoteConfig = async (): Promise<Partial<FeatureFlags>> => {
       throw new Error(`HTTP ${response.status}`);
     }
 
-     
     const data: RemoteConfigResponse = await response.json();
 
     // Cache the response
@@ -84,7 +83,11 @@ export const fetchRemoteConfig = async (): Promise<Partial<FeatureFlags>> => {
     );
     return data.flags;
   } catch (error) {
-    logger.warn('⚠️ [RemoteConfig] Fetch failed, using local defaults:', error);
+    // Network failures are expected in development without a remote config server
+    logger.debug(
+      '⚠️ [RemoteConfig] Fetch failed, using local defaults:',
+      error,
+    );
     return {};
   }
 };

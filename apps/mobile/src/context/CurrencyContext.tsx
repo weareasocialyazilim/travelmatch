@@ -63,6 +63,16 @@ const STORAGE_KEY = '@travelmatch/user_currency';
 const RATES_CACHE_KEY = '@travelmatch/exchange_rates';
 const RATES_CACHE_TTL = 60 * 60 * 1000; // 1 hour
 
+// Fallback exchange rates if DB is unavailable
+const FALLBACK_EXCHANGE_RATES: ExchangeRates = {
+  USD_TRY: 34.5,
+  EUR_TRY: 37.45,
+  GBP_TRY: 43.2,
+  TRY_USD: 0.029,
+  TRY_EUR: 0.027,
+  TRY_GBP: 0.023,
+};
+
 // ============================================
 // Context
 // ============================================
@@ -163,6 +173,16 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({
         .order('rate_date', { ascending: false });
 
       if (error) {
+        // If table doesn't exist, use fallback rates (expected in development)
+        if (error.code === 'PGRST205') {
+          logger.info(
+            '[Currency] exchange_rates table not found, using fallback rates',
+          );
+          setExchangeRates(FALLBACK_EXCHANGE_RATES);
+          setIsLoading(false);
+          return;
+        }
+        logger.error('[Currency] Failed to load exchange rates:', error);
         // Try getting latest available rates
         const { data: latestData, error: latestError } = await supabase
           .from('exchange_rates')

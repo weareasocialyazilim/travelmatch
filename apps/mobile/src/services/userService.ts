@@ -127,7 +127,6 @@ type DBUserRowLike = Partial<{
   created_at: string | null;
   last_seen_at: string | null;
   updated_at: string | null;
-  public_key: string | null;
 }>;
 
 // User Service
@@ -148,14 +147,9 @@ export const userService = {
       // 2. Check remote key
       const { data: profile } = await dbUsersService.getById(user.id);
 
-      // Upload public key if not already set
-      const typedProfile = profile as DBUserRowLike | null;
-      if (typedProfile && !typedProfile.public_key) {
-        logger.info('[User] Uploading public key');
-        await dbUsersService.update(user.id, {
-          public_key: keys.publicKey,
-        } as Database['public']['Tables']['users']['Update']);
-      }
+      // TODO: Upload public key when column is added to database
+      // Currently skipping public_key sync as column doesn't exist
+      logger.debug('[User] Skipping public_key sync (column not in database)');
     } catch (error) {
       logger.error('[User] Failed to sync keys', error);
     }
@@ -188,13 +182,8 @@ export const userService = {
         verified,
         rating,
         review_count,
-        joined_at,
         languages,
         interests,
-        instagram,
-        twitter,
-        website,
-        public_key,
         notification_preferences,
         created_at,
         updated_at
@@ -229,12 +218,8 @@ export const userService = {
         verified,
         rating,
         review_count,
-        joined_at,
         languages,
-        interests,
-        instagram,
-        twitter,
-        website
+        interests
       `,
       )
       .eq('id', userId)
@@ -268,12 +253,8 @@ export const userService = {
         verified,
         rating,
         review_count,
-        joined_at,
         languages,
-        interests,
-        instagram,
-        twitter,
-        website
+        interests
       `,
       )
       .eq('username', username)

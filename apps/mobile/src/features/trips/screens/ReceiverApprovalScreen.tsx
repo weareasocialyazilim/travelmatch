@@ -181,7 +181,11 @@ export const ReceiverApprovalScreen: React.FC<ReceiverApprovalScreenProps> = ({
 
         {selectedTotalAmount >= totalAmount && (
           <View style={styles.successBanner}>
-            <Icon name="check-circle" size={20} color={COLORS.feedback.success} />
+            <Icon
+              name="check-circle"
+              size={20}
+              color={COLORS.feedback.success}
+            />
             <Text style={styles.successText}>Amount fulfilled!</Text>
           </View>
         )}
@@ -299,7 +303,7 @@ export const ReceiverApprovalScreen: React.FC<ReceiverApprovalScreenProps> = ({
               <Icon name="check" size={20} color={COLORS.utility.white} />
               <Text style={styles.approveButtonText}>
                 Approve{' '}
-                {selectedSlots.length > 0 && `(${selectedSlots.length})`}
+                {selectedSlots.length > 0 ? `(${selectedSlots.length})` : ''}
               </Text>
             </>
           </LinearGradient>

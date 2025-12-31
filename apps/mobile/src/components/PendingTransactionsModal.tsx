@@ -1,6 +1,6 @@
 /**
  * Pending Transactions Modal
- * 
+ *
  * Shows when app starts with incomplete payments or uploads.
  * Allows user to resume or dismiss pending transactions.
  */
@@ -17,7 +17,10 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
 import { TYPOGRAPHY } from '../theme/typography';
-import type { PendingPayment, PendingUpload } from '../services/pendingTransactionsService';
+import type {
+  PendingPayment,
+  PendingUpload,
+} from '../services/pendingTransactionsService';
 
 interface PendingTransactionsModalProps {
   visible: boolean;
@@ -30,7 +33,9 @@ interface PendingTransactionsModalProps {
   onClose: () => void;
 }
 
-export const PendingTransactionsModal: React.FC<PendingTransactionsModalProps> = ({
+export const PendingTransactionsModal: React.FC<
+  PendingTransactionsModalProps
+> = ({
   visible,
   payments,
   uploads,
@@ -55,7 +60,7 @@ export const PendingTransactionsModal: React.FC<PendingTransactionsModalProps> =
     const date = new Date(timestamp);
     const now = Date.now();
     const diff = now - timestamp;
-    
+
     if (diff < 60000) return 'Just now';
     if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
     if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
@@ -80,21 +85,35 @@ export const PendingTransactionsModal: React.FC<PendingTransactionsModalProps> =
             />
             <Text style={styles.title}>Incomplete Actions</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <MaterialCommunityIcons name="close" size={24} color={COLORS.text.secondary} />
+              <MaterialCommunityIcons
+                name="close"
+                size={24}
+                color={COLORS.text.secondary}
+              />
             </TouchableOpacity>
           </View>
 
           <Text style={styles.subtitle}>
-            We found some actions that didn't complete. Would you like to continue?
+            We found some actions that didn't complete. Would you like to
+            continue?
           </Text>
 
-          <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          <ScrollView
+            style={styles.scrollView}
+            showsVerticalScrollIndicator={false}
+          >
             {/* Pending Payments */}
             {hasPayments && (
               <View style={styles.section}>
                 <View style={styles.sectionHeader}>
-                  <MaterialCommunityIcons name="credit-card-outline" size={20} color={COLORS.text.primary} />
-                  <Text style={styles.sectionTitle}>Pending Payments ({payments.length})</Text>
+                  <MaterialCommunityIcons
+                    name="credit-card-outline"
+                    size={20}
+                    color={COLORS.text.primary}
+                  />
+                  <Text style={styles.sectionTitle}>
+                    Pending Payments ({payments.length})
+                  </Text>
                 </View>
 
                 {payments.map((payment) => (
@@ -102,19 +121,27 @@ export const PendingTransactionsModal: React.FC<PendingTransactionsModalProps> =
                     <View style={styles.cardHeader}>
                       <View>
                         <Text style={styles.cardTitle}>
-                          {payment.type === 'gift' && 'Gift Payment'}
-                          {payment.type === 'withdraw' && 'Withdrawal'}
-                          {payment.type === 'moment_purchase' && 'Moment Purchase'}
+                          {payment.type === 'gift'
+                            ? 'Gift Payment'
+                            : payment.type === 'withdraw'
+                              ? 'Withdrawal'
+                              : payment.type === 'moment_purchase'
+                                ? 'Moment Purchase'
+                                : 'Payment'}
                         </Text>
                         <Text style={styles.cardAmount}>
                           {formatAmount(payment.amount, payment.currency)}
                         </Text>
                       </View>
-                      <Text style={styles.cardTime}>{formatTime(payment.createdAt)}</Text>
+                      <Text style={styles.cardTime}>
+                        {formatTime(payment.createdAt)}
+                      </Text>
                     </View>
 
                     {payment.metadata?.note && (
-                      <Text style={styles.cardNote}>{payment.metadata.note}</Text>
+                      <Text style={styles.cardNote}>
+                        {payment.metadata.note}
+                      </Text>
                     )}
 
                     <View style={styles.cardActions}>
@@ -140,8 +167,14 @@ export const PendingTransactionsModal: React.FC<PendingTransactionsModalProps> =
             {hasUploads && (
               <View style={styles.section}>
                 <View style={styles.sectionHeader}>
-                  <MaterialCommunityIcons name="cloud-upload-outline" size={20} color={COLORS.text.primary} />
-                  <Text style={styles.sectionTitle}>Pending Uploads ({uploads.length})</Text>
+                  <MaterialCommunityIcons
+                    name="cloud-upload-outline"
+                    size={20}
+                    color={COLORS.text.primary}
+                  />
+                  <Text style={styles.sectionTitle}>
+                    Pending Uploads ({uploads.length})
+                  </Text>
                 </View>
 
                 {uploads.map((upload) => (
@@ -149,29 +182,46 @@ export const PendingTransactionsModal: React.FC<PendingTransactionsModalProps> =
                     <View style={styles.cardHeader}>
                       <View>
                         <Text style={styles.cardTitle}>
-                          {upload.type === 'proof' && 'Proof Upload'}
-                          {upload.type === 'moment' && 'Moment Image'}
-                          {upload.type === 'avatar' && 'Profile Picture'}
-                          {upload.type === 'message' && 'Message Attachment'}
+                          {upload.type === 'proof'
+                            ? 'Proof Upload'
+                            : upload.type === 'moment'
+                              ? 'Moment Image'
+                              : upload.type === 'avatar'
+                                ? 'Profile Picture'
+                                : upload.type === 'message'
+                                  ? 'Message Attachment'
+                                  : 'Upload'}
                         </Text>
-                        <Text style={styles.cardSubtitle}>{upload.fileName}</Text>
+                        <Text style={styles.cardSubtitle}>
+                          {upload.fileName}
+                        </Text>
                       </View>
-                      <Text style={styles.cardTime}>{formatTime(upload.createdAt)}</Text>
+                      <Text style={styles.cardTime}>
+                        {formatTime(upload.createdAt)}
+                      </Text>
                     </View>
 
                     {/* Progress bar */}
                     {upload.progress > 0 && upload.progress < 100 && (
                       <View style={styles.progressContainer}>
                         <View style={styles.progressBar}>
-                          <View style={[styles.progressFill, { width: `${upload.progress}%` }]} />
+                          <View
+                            style={[
+                              styles.progressFill,
+                              { width: `${upload.progress}%` },
+                            ]}
+                          />
                         </View>
-                        <Text style={styles.progressText}>{upload.progress}%</Text>
+                        <Text style={styles.progressText}>
+                          {upload.progress}%
+                        </Text>
                       </View>
                     )}
 
                     {upload.retryCount > 0 && (
                       <Text style={styles.retryText}>
-                        Failed {upload.retryCount} time{upload.retryCount > 1 ? 's' : ''}
+                        Failed {upload.retryCount} time
+                        {upload.retryCount > 1 ? 's' : ''}
                       </Text>
                     )}
 
@@ -186,7 +236,11 @@ export const PendingTransactionsModal: React.FC<PendingTransactionsModalProps> =
                         style={[styles.actionButton, styles.resumeButton]}
                         onPress={() => onResumeUpload(upload)}
                       >
-                        <MaterialCommunityIcons name="refresh" size={16} color={COLORS.utility.white} />
+                        <MaterialCommunityIcons
+                          name="refresh"
+                          size={16}
+                          color={COLORS.utility.white}
+                        />
                         <Text style={styles.resumeButtonText}>Retry</Text>
                       </TouchableOpacity>
                     </View>

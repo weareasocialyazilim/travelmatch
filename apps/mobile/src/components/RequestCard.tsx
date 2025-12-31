@@ -91,7 +91,7 @@ export const RequestCard: React.FC<RequestCardProps> = memo(
       >
         <View style={styles.header}>
           <Image
-            source={{ uri: userAvatar || '' }}
+            source={{ uri: userAvatar || undefined }}
             style={styles.avatar}
           />
           <View style={styles.headerInfo}>
