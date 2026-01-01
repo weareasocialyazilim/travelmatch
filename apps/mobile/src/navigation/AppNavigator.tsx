@@ -543,6 +543,7 @@ const AppNavigator = () => {
 
             {/* Wallet & Settings */}
             <Stack.Screen name="Wallet" component={WalletScreen} />
+            <Stack.Screen name="PromoCode" component={PromoCodeScreen} />
             <Stack.Screen name="Settings" component={AppSettingsScreen} />
             <Stack.Screen
               name="NotificationDetail"
