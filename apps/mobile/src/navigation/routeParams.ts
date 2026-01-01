@@ -260,4 +260,7 @@ export type RootStackParamList = {
   // Data Privacy & Deleted Moments
   DataPrivacy: undefined;
   DeletedMoments: undefined;
+
+  // Leaderboard
+  Leaderboard: undefined;
 };

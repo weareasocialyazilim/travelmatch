@@ -23,6 +23,7 @@ export { ShareMomentScreen } from './screens/ShareMomentScreen';
 export { ReportMomentScreen } from './screens/ReportMomentScreen';
 export { SavedMomentsScreen } from './screens/SavedMomentsScreen';
 export { DeletedMomentsScreen } from './screens/DeletedMomentsScreen';
+export { LeaderboardScreen } from './screens/LeaderboardScreen';
 
 // Hooks
 export { 
