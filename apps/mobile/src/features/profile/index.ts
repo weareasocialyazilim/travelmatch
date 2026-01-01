@@ -20,6 +20,7 @@ export { ReviewScreen } from './screens/ReviewScreen';
 
 // Moments
 export { default as MyMomentsScreen } from './screens/MyMomentsScreen';
+export { MyHostedMomentsScreen } from './screens/MyHostedMomentsScreen';
 export { default as CreateMomentScreen } from './screens/CreateMomentScreen';
 export { EditMomentScreen } from './screens/EditMomentScreen';
 export { default as MomentDetailScreen } from './screens/MomentDetailScreen';

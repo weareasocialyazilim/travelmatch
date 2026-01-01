@@ -242,6 +242,7 @@ export type RootStackParamList = {
 
   // New Profile sub-screens
   MyMoments: undefined;
+  MyHostedMoments: undefined;
   Security: undefined;
   AppSettings: undefined;
   ConnectedAccounts: undefined;
