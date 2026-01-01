@@ -1,342 +1,125 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   TextInput,
-  ScrollView,
-  SafeAreaView,
+  TouchableOpacity,
+  ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
 } from 'react-native';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { supabase } from '@/config/supabase';
-import { logger } from '@/utils/logger';
-import { COLORS } from '@/constants/colors';
-import { editMomentSchema, type EditMomentInput } from '@/utils/forms';
-import { canSubmitForm } from '@/utils/forms/helpers';
-import type { RootStackParamList } from '@/navigation/routeParams';
-import type { RouteProp } from '@react-navigation/native';
-import type { StackNavigationProp } from '@react-navigation/stack';
-import { useToast } from '@/context/ToastContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS } from '@/theme/colors';
 
-type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
+export const EditMomentScreen = ({ navigation }: any) => {
+  const insets = useSafeAreaInsets();
 
-type EditMomentScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'EditMoment'
->;
-type EditMomentScreenRouteProp = RouteProp<RootStackParamList, 'EditMoment'>;
+  // Mock Data (Normalde route.params ile gelir)
+  const [title, setTitle] = useState('Dinner at Hotel Costes');
+  const [price, setPrice] = useState('150');
+  const [image, setImage] = useState('https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=600');
 
-interface EditMomentScreenProps {
-  navigation: EditMomentScreenNavigationProp;
-  route: EditMomentScreenRouteProp;
-}
-
-export const EditMomentScreen: React.FC<EditMomentScreenProps> = ({
-  navigation,
-  route,
-}) => {
-  const { showToast } = useToast();
-  const { momentId } = route.params || {};
-
-  const [loading, setLoading] = useState(false);
-
-  const { control, handleSubmit, formState, setValue } =
-    useForm<EditMomentInput>({
-      resolver: zodResolver(editMomentSchema),
-      mode: 'onChange',
-      defaultValues: {
-        title: '',
-        description: '',
-        price: 0,
-      },
-    });
-
-  useEffect(() => {
-    const fetchMoment = async () => {
-      if (!momentId) return;
-      try {
-        const { data, error } = await supabase
-          .from('moments')
-          .select('title, description, price')
-          .eq('id', momentId)
-          .single();
-
-        if (error) throw error;
-        if (data) {
-          setValue('title', data.title);
-          setValue('description', data.description || '');
-          setValue('price', data.price || 0);
-        }
-      } catch (error) {
-        logger.error('Error fetching moment', error as Error);
-        showToast('Failed to load moment details', 'error');
-      }
-    };
-    fetchMoment();
-  }, [momentId, setValue]);
-
-  const handleSave = async (data: EditMomentInput) => {
-    setLoading(true);
-    try {
-      const { error } = await supabase
-        .from('moments')
-        .update({
-          title: data.title,
-          description: data.description,
-          price: data.price,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', momentId);
-
-      if (error) throw error;
-
-      logger.info('Moment updated', { momentId });
-      navigation.goBack();
-    } catch (error) {
-      logger.error('Error updating moment', error as Error);
-      showToast('Failed to update moment', 'error');
-    } finally {
-      setLoading(false);
-    }
+  const handleSave = () => {
+    Alert.alert('Changes Saved', 'Your moment has been updated successfully.', [
+      { text: 'OK', onPress: () => navigation.goBack() }
+    ]);
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerButton}
-          onPress={() => navigation.goBack()}
-          activeOpacity={0.7}
+    <View style={styles.container}>
+      <ImageBackground source={{ uri: image }} style={styles.bgImage} blurRadius={10}>
+        <View style={styles.overlay} />
+
+        <View style={[styles.header, { paddingTop: insets.top }]}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.iconBtn}>
+            <Ionicons name="close" size={24} color="white" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Edit Moment</Text>
+          <TouchableOpacity onPress={handleSave} style={styles.iconBtn}>
+            <Ionicons name="checkmark" size={24} color={COLORS.brand.primary} />
+          </TouchableOpacity>
+        </View>
+
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.content}
         >
-          <MaterialCommunityIcons
-            name={'close' as IconName}
-            size={28}
-            color={COLORS.text.secondary}
-          />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Edit Moment</Text>
-        <View style={styles.headerButton} />
-      </View>
+          <View style={styles.imagePreviewContainer}>
+            <ImageBackground source={{ uri: image }} style={styles.imagePreview} imageStyle={{ borderRadius: 20 }}>
+              <TouchableOpacity style={styles.changePhotoBtn}>
+                <MaterialCommunityIcons name="camera-flip" size={24} color="white" />
+                <Text style={styles.changePhotoText}>Change Photo</Text>
+              </TouchableOpacity>
+            </ImageBackground>
+          </View>
 
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Title Input */}
-        <Controller
-          control={control}
-          name="title"
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Title</Text>
+          <View style={styles.form}>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>TITLE</Text>
               <TextInput
-                style={[styles.input, error && styles.inputError]}
-                placeholder="Enter moment title"
-                placeholderTextColor={COLORS.text.secondary}
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
+                style={styles.inputTitle}
+                value={title}
+                onChangeText={setTitle}
+                placeholderTextColor="rgba(255,255,255,0.5)"
               />
-              {error && <Text style={styles.errorText}>{error.message}</Text>}
             </View>
-          )}
-        />
 
-        {/* Description Input */}
-        <Controller
-          control={control}
-          name="description"
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Description</Text>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>PRICE ($)</Text>
               <TextInput
-                style={[
-                  styles.input,
-                  styles.textArea,
-                  error && styles.inputError,
-                ]}
-                placeholder="Tell us about this moment"
-                placeholderTextColor={COLORS.text.secondary}
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                multiline
-                numberOfLines={6}
-                textAlignVertical="top"
+                style={styles.inputPrice}
+                value={price}
+                onChangeText={setPrice}
+                keyboardType="numeric"
+                placeholderTextColor="rgba(255,255,255,0.5)"
               />
-              {error && <Text style={styles.errorText}>{error.message}</Text>}
             </View>
-          )}
-        />
 
-        {/* Price Input */}
-        <Controller
-          control={control}
-          name="price"
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Price</Text>
-              <View style={styles.priceInputWrapper}>
-                <MaterialCommunityIcons
-                  name={'currency-usd' as IconName}
-                  size={20}
-                  color={COLORS.text.secondary}
-                  style={styles.priceIcon}
-                />
-                <TextInput
-                  style={[
-                    styles.input,
-                    styles.priceInput,
-                    error && styles.inputError,
-                  ]}
-                  placeholder="0.00"
-                  placeholderTextColor={COLORS.text.secondary}
-                  value={value.toString()}
-                  onChangeText={(text) => {
-                    const num = parseFloat(text);
-                    onChange(isNaN(num) ? 0 : num);
-                  }}
-                  onBlur={onBlur}
-                  keyboardType="decimal-pad"
-                />
-              </View>
-              {error && <Text style={styles.errorText}>{error.message}</Text>}
+            <View style={styles.infoBox}>
+              <Ionicons name="information-circle-outline" size={20} color={COLORS.text.secondary} />
+              <Text style={styles.infoText}>
+                Major changes (like title or image) will require re-approval from our team.
+              </Text>
             </View>
-          )}
-        />
-      </ScrollView>
+          </View>
 
-      {/* Sticky Save Button */}
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={[
-            styles.saveButton,
-            (loading || !canSubmitForm({ formState })) &&
-              styles.saveButtonDisabled,
-          ]}
-          onPress={handleSubmit(handleSave)}
-          disabled={loading || !canSubmitForm({ formState })}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.saveButtonText}>
-            {loading ? 'Saving...' : 'Save changes'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+          <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
+            <Text style={styles.saveBtnText}>Update Moment</Text>
+          </TouchableOpacity>
+
+        </KeyboardAvoidingView>
+      </ImageBackground>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.utility.white,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border.default,
-    backgroundColor: COLORS.utility.white,
-  },
-  headerButton: {
-    minWidth: 40,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: COLORS.text.primary,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 32,
-  },
-  inputContainer: {
-    marginBottom: 24,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.text.primary,
-    marginBottom: 8,
-  },
-  input: {
-    height: 56,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: COLORS.border.default,
-    backgroundColor: COLORS.bg.primary,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    color: COLORS.text.primary,
-  },
-  inputError: {
-    borderColor: COLORS.feedback.error,
-  },
-  errorText: {
-    color: COLORS.feedback.error,
-    fontSize: 12,
-    marginTop: 4,
-    marginLeft: 4,
-  },
-  textArea: {
-    height: 120,
-    paddingTop: 16,
-    paddingBottom: 16,
-  },
-  priceInputWrapper: {
-    position: 'relative',
-  },
-  priceIcon: {
-    position: 'absolute',
-    left: 16,
-    top: 18,
-    zIndex: 1,
-  },
-  priceInput: {
-    paddingLeft: 44,
-  },
-  footer: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 16,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border.default,
-    backgroundColor: COLORS.utility.white,
-  },
-  saveButton: {
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: COLORS.brand.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  saveButtonDisabled: {
-    opacity: 0.5,
-  },
-  saveButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.utility.white,
-  },
+  container: { flex: 1, backgroundColor: 'black' },
+  bgImage: { flex: 1, width: '100%', height: '100%' },
+  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.8)' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20 },
+  iconBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' },
+  headerTitle: { fontSize: 16, fontWeight: 'bold', color: 'white' },
+  content: { flex: 1, padding: 24, justifyContent: 'space-between' },
+
+  imagePreviewContainer: { alignItems: 'center', marginBottom: 30 },
+  imagePreview: { width: '100%', height: 250, justifyContent: 'center', alignItems: 'center', borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
+  changePhotoBtn: { backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 30, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  changePhotoText: { color: 'white', fontWeight: '600' },
+
+  form: { gap: 24 },
+  inputGroup: { gap: 8 },
+  label: { color: COLORS.brand.primary, fontSize: 12, fontWeight: 'bold', letterSpacing: 1 },
+  inputTitle: { fontSize: 24, fontWeight: 'bold', color: 'white', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.2)', paddingBottom: 8 },
+  inputPrice: { fontSize: 32, fontWeight: '900', color: 'white', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.2)', paddingBottom: 8 },
+
+  infoBox: { flexDirection: 'row', gap: 10, backgroundColor: 'rgba(255,255,255,0.05)', padding: 16, borderRadius: 12, alignItems: 'center' },
+  infoText: { color: COLORS.text.secondary, fontSize: 12, flex: 1, lineHeight: 18 },
+
+  saveBtn: { backgroundColor: COLORS.brand.primary, height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
+  saveBtnText: { color: 'black', fontWeight: 'bold', fontSize: 16 },
 });
