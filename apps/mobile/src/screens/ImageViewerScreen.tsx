@@ -1,31 +1,52 @@
 import React from 'react';
-import { View, StyleSheet, Image, TouchableOpacity, Dimensions, StatusBar } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet, TouchableOpacity, Dimensions, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import Animated, { FadeIn } from 'react-native-reanimated';
 
 const { width, height } = Dimensions.get('window');
 
-export const ImageViewerScreen = ({ navigation, route }: any) => {
-  const { imageUrl } = route.params || { imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de' }; // Fallback for dev
+export const ImageViewerScreen = ({ route, navigation }: any) => {
+  const { imageUrl } = route.params;
   const insets = useSafeAreaInsets();
 
   return (
     <View style={styles.container}>
-      <StatusBar hidden />
-      <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="contain" />
-
+      {/* Close Button */}
       <TouchableOpacity
-        style={[styles.closeBtn, { top: insets.top + 20 }]}
+        style={[styles.closeBtn, { top: insets.top + 10 }]}
         onPress={() => navigation.goBack()}
       >
-        <Ionicons name="close" size={30} color="white" />
+        <Ionicons name="close" size={28} color="white" />
       </TouchableOpacity>
+
+      {/* Image */}
+      <Animated.View entering={FadeIn.duration(300)} style={styles.imageContainer}>
+        <Image
+          source={{ uri: imageUrl }}
+          style={styles.image}
+          resizeMode="contain"
+        />
+      </Animated.View>
+
+      {/* Actions (Optional - Save/Share) */}
+      <View style={[styles.actionBar, { bottom: insets.bottom + 20 }]}>
+        <TouchableOpacity style={styles.actionBtn}>
+          <Ionicons name="share-outline" size={24} color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionBtn}>
+          <Ionicons name="download-outline" size={24} color="white" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'black' },
-  image: { width, height },
-  closeBtn: { position: 'absolute', right: 20, width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center' },
+  closeBtn: { position: 'absolute', right: 20, zIndex: 10, padding: 10, backgroundColor: 'rgba(50,50,50,0.5)', borderRadius: 20 },
+  imageContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  image: { width: width, height: height },
+  actionBar: { position: 'absolute', flexDirection: 'row', gap: 20, alignSelf: 'center' },
+  actionBtn: { width: 50, height: 50, borderRadius: 25, backgroundColor: 'rgba(50,50,50,0.5)', alignItems: 'center', justifyContent: 'center' }
 });
