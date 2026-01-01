@@ -371,7 +371,10 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
               suspensionEndsAt: newData.suspension_ends_at,
             } as UserAccountStatusEvent);
           } else if (!newData.is_suspended && oldData.is_suspended) {
-            logger.info('RealtimeContext', 'User has been REINSTATED from suspension');
+            logger.info(
+              'RealtimeContext',
+              'User has been REINSTATED from suspension',
+            );
             emit('user:reinstated', {
               userId: newData.id,
               status: 'active',
@@ -402,17 +405,6 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
   }, [user, emit]);
 
   /**
-   * Unsubscribe from user status changes
-   */
-  const unsubscribeFromUserStatus = useCallback(() => {
-    if (userStatusChannelRef.current) {
-      logger.info('RealtimeContext', 'Unsubscribing from user status');
-      supabase.removeChannel(userStatusChannelRef.current);
-      userStatusChannelRef.current = null;
-    }
-  }, []);
-
-  /**
    * Connect to Supabase Realtime
    */
   const connect = useCallback(async () => {
@@ -440,7 +432,13 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
       logger.error('RealtimeContext', 'Failed to connect:', error);
       setConnectionState('disconnected');
     }
-  }, [isAuthenticated, user, setupPresence, subscribeToNotifications, subscribeToUserStatus]);
+  }, [
+    isAuthenticated,
+    user,
+    setupPresence,
+    subscribeToNotifications,
+    subscribeToUserStatus,
+  ]);
 
   /**
    * Disconnect from Supabase Realtime

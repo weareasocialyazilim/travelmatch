@@ -20,7 +20,6 @@ import {
   Pressable,
   TextInputProps,
   ViewStyle,
-  LayoutAnimation,
   Platform,
   UIManager,
 } from 'react-native';
@@ -31,7 +30,6 @@ import Animated, {
   withSequence,
   withTiming,
   interpolate,
-  runOnJS,
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, primitives } from '@/constants/colors';
@@ -40,7 +38,10 @@ import { RADIUS, SPACING, SIZES } from '@/constants/spacing';
 import { SPRING, HAPTIC } from '@/utils/motion';
 
 // Enable LayoutAnimation on Android
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+if (
+  Platform.OS === 'android' &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
@@ -108,7 +109,7 @@ export const TMInput: React.FC<TMInputProps> = ({
         withTiming(8, { duration: 50 }),
         withTiming(-6, { duration: 50 }),
         withTiming(6, { duration: 50 }),
-        withTiming(0, { duration: 50 })
+        withTiming(0, { duration: 50 }),
       );
       HAPTIC.error();
     }
@@ -116,7 +117,10 @@ export const TMInput: React.FC<TMInputProps> = ({
 
   // Label animation
   useEffect(() => {
-    labelPosition.value = withSpring(isFocused || hasValue ? 1 : 0, SPRING.default);
+    labelPosition.value = withSpring(
+      isFocused || hasValue ? 1 : 0,
+      SPRING.default,
+    );
   }, [isFocused, hasValue]);
 
   const handleFocus = useCallback(() => {
@@ -235,7 +239,8 @@ export const TMInput: React.FC<TMInputProps> = ({
           style={[
             styles.input,
             leftIcon && styles.inputWithLeftIcon,
-            (rightIcon || isPassword || (showClear && hasValue)) && styles.inputWithRightIcon,
+            (rightIcon || isPassword || (showClear && hasValue)) &&
+              styles.inputWithRightIcon,
             multiline && styles.inputTextMultiline,
           ]}
           accessibilityLabel={label}
@@ -267,7 +272,9 @@ export const TMInput: React.FC<TMInputProps> = ({
             onPress={togglePassword}
             style={styles.rightIconButton}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+            accessibilityLabel={
+              showPassword ? 'Hide password' : 'Show password'
+            }
           >
             <MaterialCommunityIcons
               name={showPassword ? 'eye-off' : 'eye'}

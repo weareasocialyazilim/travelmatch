@@ -83,7 +83,10 @@ interface PassportBookProps {
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const PASSPORT_WIDTH = Math.min(CEREMONY_SIZES.passport.width, SCREEN_WIDTH - 40);
+const PASSPORT_WIDTH = Math.min(
+  CEREMONY_SIZES.passport.width,
+  SCREEN_WIDTH - 40,
+);
 const PASSPORT_HEIGHT = PASSPORT_WIDTH * 1.4;
 
 const PAGES: PageType[] = ['cover', 'photo', 'stamps', 'history'];
@@ -129,10 +132,10 @@ export const PassportBook: React.FC<PassportBookProps> = ({
             flipProgress.value = 0;
             runOnJS(setIsFlipping)(false);
           }
-        }
+        },
       );
     },
-    [currentPage, isFlipping, onPageChange]
+    [currentPage, isFlipping, onPageChange],
   );
 
   // Animated styles for 3D flip effect
@@ -159,7 +162,7 @@ export const PassportBook: React.FC<PassportBookProps> = ({
     zIndex: flipProgress.value > 0 ? 1 : 0,
   }));
 
-  const renderPage = (pageType: PageType, isBack = false) => {
+  const renderPage = (pageType: PageType, _isBack = false) => {
     switch (pageType) {
       case 'cover':
         return <CoverPage userName={user.name} />;
@@ -219,7 +222,10 @@ export const PassportBook: React.FC<PassportBookProps> = ({
             backPageStyle,
           ]}
         >
-          {renderPage(flipProgress.value > 0 ? nextPageType : prevPageType, true)}
+          {renderPage(
+            flipProgress.value > 0 ? nextPageType : prevPageType,
+            true,
+          )}
         </Animated.View>
       </View>
 
@@ -236,14 +242,17 @@ export const PassportBook: React.FC<PassportBookProps> = ({
       {/* Navigation buttons */}
       <View style={styles.navigation}>
         <TouchableOpacity
-          style={[styles.navButton, currentPage === 0 && styles.navButtonDisabled]}
+          style={[
+            styles.navButton,
+            currentPage === 0 && styles.navButtonDisabled,
+          ]}
           onPress={() => handleFlipPage('prev')}
           disabled={currentPage === 0 || isFlipping}
         >
           <MaterialCommunityIcons
             name="chevron-left"
             size={24}
-            color={currentPage === 0 ? COLORS.textMuted : COLORS.text}
+            color={currentPage === 0 ? COLORS.textMuted : COLORS.textPrimary}
           />
         </TouchableOpacity>
 
@@ -263,7 +272,9 @@ export const PassportBook: React.FC<PassportBookProps> = ({
             name="chevron-right"
             size={24}
             color={
-              currentPage === PAGES.length - 1 ? COLORS.textMuted : COLORS.text
+              currentPage === PAGES.length - 1
+                ? COLORS.textMuted
+                : COLORS.textPrimary
             }
           />
         </TouchableOpacity>
@@ -412,13 +423,13 @@ const StampComponent: React.FC<{
           withSpring(1, {
             damping: 8,
             stiffness: 100,
-          })
-        )
+          }),
+        ),
       );
 
       stampRotation.value = withSequence(
         withTiming(-15, { duration: 0 }),
-        withDelay(300, withSpring(0, { damping: 10 }))
+        withDelay(300, withSpring(0, { damping: 10 })),
       );
     }
   }, [isNew, stamp.verified]);
@@ -456,7 +467,7 @@ const StampComponent: React.FC<{
           styles.stamp,
           stamp.verified
             ? { borderColor: stampColor }
-            : { borderColor: COLORS.border, opacity: 0.4 },
+            : { borderColor: COLORS.borderDefault, opacity: 0.4 },
           stampAnimatedStyle,
         ]}
       >
@@ -495,7 +506,9 @@ const StampComponent: React.FC<{
 };
 
 // History Page Component
-const HistoryPage: React.FC<{ experiences: Experience[] }> = ({ experiences }) => (
+const HistoryPage: React.FC<{ experiences: Experience[] }> = ({
+  experiences,
+}) => (
   <View style={styles.historyPage}>
     <View style={styles.photoPageHeader}>
       <Text style={styles.pageTitle}>TRAVEL HISTORY</Text>
@@ -579,7 +592,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.borderDefault,
   },
   dotActive: {
     backgroundColor: CEREMONY_COLORS.passport.coverGold,
@@ -689,7 +702,7 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontSize: 12,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.textPrimary,
     letterSpacing: 2,
   },
   photoSection: {
@@ -700,7 +713,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 100,
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: COLORS.borderDefault,
     borderRadius: 4,
     overflow: 'hidden',
   },
@@ -726,7 +739,7 @@ const styles = StyleSheet.create({
   infoValue: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.textPrimary,
   },
   trustStars: {
     flexDirection: 'row',
@@ -802,7 +815,7 @@ const styles = StyleSheet.create({
   experienceTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.textPrimary,
   },
   experienceDetails: {
     fontSize: 10,
