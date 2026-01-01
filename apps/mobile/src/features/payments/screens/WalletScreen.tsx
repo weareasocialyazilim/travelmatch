@@ -1,12 +1,12 @@
 /**
- * WalletScreen - Premium Wallet Management
+ * WalletScreen - Premium Dark Wallet with Glass Morphism
  *
  * Implements UX best practices:
+ * - Dark theme with glass morphism balance card
  * - 60-30-10 color rule (Background 60%, Text 30%, Accent 10%)
- * - Premium dark card design (inspired by banking apps)
+ * - Premium blur effects and smooth animations
  * - Color-coded transactions (green income, red expense)
- * - Quick action buttons
- * - Clean minimalist layout
+ * - Quick action buttons with gradient
  */
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
@@ -18,45 +18,53 @@ import {
   TouchableOpacity,
   RefreshControl,
   Dimensions,
+  StatusBar,
+  FlatList,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { FlashList } from '@shopify/flash-list';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import Animated, {
   FadeInDown,
   FadeInUp,
+  FadeInRight,
 } from 'react-native-reanimated';
 import BottomNav from '@/components/BottomNav';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
 import { NetworkGuard } from '@/components/NetworkGuard';
 import { useToast } from '@/context/ToastContext';
-import { COLORS, primitives } from '@/constants/colors';
+import { COLORS, primitives, GRADIENTS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { usePayments } from '@/hooks/usePayments';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CARD_WIDTH = SCREEN_WIDTH - 40;
-const CARD_HEIGHT = CARD_WIDTH * 0.58;
 
-type FilterType = 'all' | 'incoming' | 'outgoing';
+type FilterType = 'all' | 'incoming' | 'outgoing' | 'gifts';
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
-interface QuickAction {
-  id: string;
-  label: string;
-  icon: IconName;
-  onPress: () => void;
-  variant?: 'default' | 'active';
-}
+// Dark theme colors
+const DARK_THEME = {
+  background: '#0C0A09',
+  backgroundSecondary: '#1a1a1a',
+  cardBackground: 'rgba(20,20,20,0.6)',
+  cardBorder: 'rgba(255,255,255,0.1)',
+  textPrimary: '#FFFFFF',
+  textSecondary: 'rgba(255,255,255,0.6)',
+  accent: '#CCFF00', // Neon lime for primary actions
+  accentPink: '#FF0099', // Neon pink for expenses
+  filterActive: primitives.magenta[500],
+  filterInactive: 'rgba(255,255,255,0.05)',
+};
 
 const WalletScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
+  const insets = useSafeAreaInsets();
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const toast = useToast();
 
   // Use payments hook
@@ -77,29 +85,31 @@ const WalletScreen = () => {
     loadTransactions();
   }, [refreshBalance, loadTransactions]);
 
-  // Use API transactions
+  // Use API transactions - adapt to display format
   const displayTransactions = useMemo(() => {
     return transactions.map((t) => ({
       id: t.id,
       type: t.type as 'gift_received' | 'withdrawal' | 'gift_sent' | 'deposit',
       title: t.description || t.type,
-      subtitle: t.status || '',
+      date: t.status || '',
       amount: t.amount,
       isPositive: t.type !== 'withdrawal' && t.type !== 'gift_sent',
-      hasProofLoop: t.type === 'gift_received' && t.status === 'pending',
-      status: t.status,
+      category: t.type === 'gift_received' || t.type === 'gift_sent' ? 'gift' :
+                t.type === 'deposit' ? 'topup' : 'refund',
     }));
   }, [transactions]);
 
   // Filter transactions
   const filteredTransactions = useMemo(() => {
-    if (selectedFilter === 'all') return displayTransactions;
-    if (selectedFilter === 'incoming')
+    if (activeFilter === 'all') return displayTransactions;
+    if (activeFilter === 'incoming')
       return displayTransactions.filter((t) => t.isPositive);
+    if (activeFilter === 'gifts')
+      return displayTransactions.filter((t) => t.category === 'gift');
     return displayTransactions.filter((t) => !t.isPositive);
-  }, [displayTransactions, selectedFilter]);
+  }, [displayTransactions, activeFilter]);
 
-  const onRefresh = async () => {
+  const onRefresh = useCallback(async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try {
       await refreshBalance();
@@ -109,125 +119,91 @@ const WalletScreen = () => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       toast.error('Cüzdan bilgileri yüklenemedi. Lütfen tekrar deneyin.');
     }
-  };
-
-  // Quick actions
-  const quickActions: QuickAction[] = [
-    {
-      id: 'add',
-      label: 'Yükle',
-      icon: 'plus-circle-outline',
-      onPress: () => navigation.navigate('AddMoney' as never),
-    },
-    {
-      id: 'withdraw',
-      label: 'Çek',
-      icon: 'bank-transfer-out',
-      onPress: () => navigation.navigate('Withdraw'),
-    },
-    {
-      id: 'history',
-      label: 'Geçmiş',
-      icon: 'history',
-      onPress: () => navigation.navigate('TransactionHistory'),
-      variant: 'active',
-    },
-  ];
+  }, [refreshBalance, loadTransactions, toast]);
 
   // Format currency
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = useCallback((amount: number) => {
     return new Intl.NumberFormat('tr-TR', {
       style: 'currency',
       currency: 'TRY',
       minimumFractionDigits: 2,
     }).format(amount);
-  };
+  }, []);
 
-  const getTransactionIcon = (
-    type: 'gift_received' | 'withdrawal' | 'gift_sent' | 'deposit',
-  ): IconName => {
-    switch (type) {
-      case 'gift_received':
+  const getTransactionIcon = useCallback((category: string): IconName => {
+    switch (category) {
+      case 'gift':
         return 'gift-outline';
-      case 'withdrawal':
-        return 'bank-transfer-out';
-      case 'gift_sent':
-        return 'gift';
-      case 'deposit':
-        return 'credit-card-plus-outline';
+      case 'topup':
+        return 'wallet-plus';
+      case 'refund':
+        return 'refresh';
       default:
         return 'cash';
     }
-  };
+  }, []);
 
-  // Memoized render function for transaction items
-  const renderTransactionItem = useCallback(
-    ({ item: transaction }: { item: (typeof filteredTransactions)[0] }) => (
-      <TouchableOpacity
-        style={styles.transactionItem}
-        onPress={() =>
-          navigation.navigate('TransactionDetail', {
-            transactionId: transaction.id,
-          })
-        }
-        activeOpacity={0.7}
-        accessible={true}
-        accessibilityLabel={`${transaction.title}, ${transaction.isPositive ? 'gelen' : 'giden'} ${formatCurrency(Math.abs(transaction.amount))}`}
-        accessibilityRole="button"
-        accessibilityHint="İşlem detaylarını görüntüler"
-      >
-        {/* Icon */}
-        <View
-          style={[
-            styles.transactionIcon,
-            {
-              backgroundColor: transaction.isPositive
-                ? primitives.emerald[50]
-                : primitives.stone[100],
-            },
-          ]}
+  // Render transaction item
+  const renderTransaction = useCallback(
+    ({ item, index }: { item: (typeof displayTransactions)[0]; index: number }) => {
+      const isCredit = item.isPositive;
+
+      return (
+        <Animated.View
+          entering={FadeInUp.delay(index * 100)}
+          style={styles.txItem}
         >
-          <MaterialCommunityIcons
-            name={getTransactionIcon(transaction.type)}
-            size={22}
-            color={
-              transaction.isPositive
-                ? primitives.emerald[500]
-                : primitives.stone[500]
+          <TouchableOpacity
+            style={styles.txItemContent}
+            onPress={() =>
+              navigation.navigate('TransactionDetail', {
+                transactionId: item.id,
+              })
             }
-          />
-        </View>
-
-        {/* Content */}
-        <View style={styles.transactionInfo}>
-          <Text style={styles.transactionTitle}>{transaction.title}</Text>
-          <Text style={styles.transactionSubtitle}>{transaction.subtitle}</Text>
-        </View>
-
-        {/* Amount */}
-        <View style={styles.transactionRight}>
-          <Text
-            style={[
-              styles.transactionAmount,
-              {
-                color: transaction.isPositive
-                  ? primitives.emerald[500]
-                  : primitives.red[500],
-              },
-            ]}
+            activeOpacity={0.7}
+            accessible={true}
+            accessibilityLabel={`${item.title}, ${isCredit ? 'gelen' : 'giden'} ${formatCurrency(Math.abs(item.amount))}`}
+            accessibilityRole="button"
+            accessibilityHint="İşlem detaylarını görüntüler"
           >
-            {transaction.isPositive ? '+' : '-'}
-            {formatCurrency(Math.abs(transaction.amount))}
-          </Text>
-          {transaction.hasProofLoop && (
-            <View style={styles.proofLoopBadge}>
-              <Text style={styles.proofLoopText}>Beklemede</Text>
+            <View style={styles.txIconContainer}>
+              <View
+                style={[
+                  styles.txIconBg,
+                  {
+                    backgroundColor: isCredit
+                      ? 'rgba(204, 255, 0, 0.1)'
+                      : 'rgba(255, 0, 153, 0.1)',
+                  },
+                ]}
+              >
+                <MaterialCommunityIcons
+                  name={getTransactionIcon(item.category)}
+                  size={24}
+                  color={isCredit ? DARK_THEME.accent : DARK_THEME.accentPink}
+                />
+              </View>
             </View>
-          )}
-        </View>
-      </TouchableOpacity>
-    ),
-    [navigation],
+
+            <View style={styles.txInfo}>
+              <Text style={styles.txTitle}>{item.title}</Text>
+              <Text style={styles.txDate}>{item.date}</Text>
+            </View>
+
+            <Text
+              style={[
+                styles.txAmount,
+                { color: isCredit ? DARK_THEME.accent : DARK_THEME.textPrimary },
+              ]}
+            >
+              {isCredit ? '+' : '-'}
+              {formatCurrency(Math.abs(item.amount))}
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
+      );
+    },
+    [navigation, formatCurrency, getTransactionIcon],
   );
 
   // Empty state component
@@ -238,544 +214,409 @@ const WalletScreen = () => {
           <MaterialCommunityIcons
             name="receipt"
             size={48}
-            color={COLORS.text.secondary}
+            color={DARK_THEME.textSecondary}
           />
         </View>
         <Text style={styles.emptyTitle}>Henüz işlem yok</Text>
         <Text style={styles.emptyText}>
-          Hediye gönderdiğinizde veya aldığınızda tüm işlemleriniz burada görünecek.
+          Hediye gönderdiğinizde veya aldığınızda tüm işlemleriniz burada
+          görünecek.
         </Text>
       </View>
     ),
     [],
   );
 
+  const filters: { key: FilterType; label: string }[] = [
+    { key: 'all', label: 'Tümü' },
+    { key: 'incoming', label: 'Gelen' },
+    { key: 'outgoing', label: 'Giden' },
+    { key: 'gifts', label: 'Hediyeler' },
+  ];
+
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" />
       <NetworkGuard
         offlineMessage="Cüzdan bilgilerinizi görmek için internet bağlantısı gerekli."
         onRetry={onRefresh}
       >
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerButton}
-          onPress={() => navigation.goBack()}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          accessible={true}
-          accessibilityLabel="Geri dön"
-          accessibilityRole="button"
-          accessibilityHint="Önceki ekrana döner"
-        >
-          <MaterialCommunityIcons
-            name="arrow-left"
-            size={24}
-            color={COLORS.text.primary}
-          />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Cüzdan</Text>
-        <TouchableOpacity
-          style={styles.headerButton}
-          onPress={() => navigation.navigate('PaymentMethods' as never)}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          accessible={true}
-          accessibilityLabel="Ödeme yöntemleri ayarları"
-          accessibilityRole="button"
-          accessibilityHint="Ödeme yöntemleri ayarlarını açar"
-        >
-          <MaterialCommunityIcons
-            name="cog-outline"
-            size={24}
-            color={COLORS.text.primary}
-          />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={isLoading}
-            onRefresh={onRefresh}
-            tintColor={COLORS.primary}
-          />
-        }
-      >
-        {/* Premium Wallet Card */}
-        <Animated.View
-          entering={FadeInDown.duration(600).springify()}
-          style={styles.cardContainer}
-        >
+        {/* 1. HEADER & BALANCE CARD */}
+        <View style={styles.headerSection}>
           <LinearGradient
-            colors={[primitives.stone[900], primitives.stone[800], primitives.stone[900]]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.walletCard}
+            colors={[DARK_THEME.backgroundSecondary, DARK_THEME.background]}
+            style={[styles.headerGradient, { paddingTop: insets.top + 10 }]}
           >
-            {/* Card Pattern Overlay */}
-            <View style={styles.cardPattern}>
-              <View style={styles.cardPatternCircle1} />
-              <View style={styles.cardPatternCircle2} />
+            <View style={styles.topBar}>
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={styles.backButton}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                accessible={true}
+                accessibilityLabel="Geri dön"
+                accessibilityRole="button"
+              >
+                <Ionicons name="arrow-back" size={24} color="white" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Cüzdan</Text>
+              <TouchableOpacity
+                style={styles.historyButton}
+                onPress={() => navigation.navigate('TransactionHistory')}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                accessible={true}
+                accessibilityLabel="İşlem geçmişi"
+                accessibilityRole="button"
+              >
+                <MaterialCommunityIcons name="history" size={24} color="white" />
+              </TouchableOpacity>
             </View>
 
-            {/* Card Header */}
-            <View style={styles.cardHeader}>
-              <Text style={styles.cardBrand}>TravelMatch</Text>
-              <MaterialCommunityIcons
-                name="contactless-payment"
-                size={28}
-                color="rgba(255, 255, 255, 0.6)"
-              />
-            </View>
+            {/* GLASS BALANCE CARD */}
+            <Animated.View
+              entering={FadeInDown.delay(200).duration(600).springify()}
+              style={styles.balanceCardContainer}
+            >
+              <BlurView
+                intensity={40}
+                tint="dark"
+                style={styles.balanceCard}
+              >
+                <LinearGradient
+                  colors={['rgba(255,255,255,0.05)', 'transparent']}
+                  style={StyleSheet.absoluteFill}
+                />
+                <View style={styles.cardTop}>
+                  <Text style={styles.balanceLabel}>Toplam Bakiye</Text>
+                  <View style={styles.currencyBadge}>
+                    <Text style={styles.currencyText}>TRY</Text>
+                  </View>
+                </View>
 
-            {/* Balance Section */}
-            <View style={styles.balanceSection}>
-              <Text style={styles.balanceLabel}>Bakiye</Text>
-              <Text style={styles.balanceAmount}>
-                {formatCurrency(balance?.available || 0)}
-              </Text>
-              {(balance?.pending || 0) > 0 && (
-                <Text style={styles.pendingBalance}>
-                  +{formatCurrency(balance?.pending || 0)} beklemede
+                <Text style={styles.balanceValue}>
+                  {formatCurrency(balance?.available || 0)}
                 </Text>
-              )}
-            </View>
 
-            {/* Card Footer */}
-            <View style={styles.cardFooter}>
-              <View style={styles.cardChip}>
-                <MaterialCommunityIcons
-                  name="integrated-circuit-chip"
-                  size={32}
-                  color="rgba(255, 215, 0, 0.8)"
-                />
-              </View>
-              <View style={styles.cardDots}>
-                <Text style={styles.cardDotsText}>•••• •••• ••••</Text>
-              </View>
-            </View>
-          </LinearGradient>
-        </Animated.View>
-
-        {/* Quick Actions */}
-        <Animated.View
-          entering={FadeInUp.delay(200).duration(500)}
-          style={styles.quickActionsContainer}
-        >
-          {quickActions.map((action) => (
-            <TouchableOpacity
-              key={action.id}
-              style={styles.quickActionButton}
-              onPress={action.onPress}
-              activeOpacity={0.7}
-              accessible={true}
-              accessibilityLabel={action.label}
-              accessibilityRole="button"
-            >
-              <View
-                style={[
-                  styles.quickActionIcon,
-                  action.variant === 'active' && styles.quickActionIconActive,
-                ]}
-              >
-                <MaterialCommunityIcons
-                  name={action.icon}
-                  size={22}
-                  color={
-                    action.variant === 'active'
-                      ? COLORS.white
-                      : COLORS.text.primary
-                  }
-                />
-              </View>
-              <Text
-                style={[
-                  styles.quickActionLabel,
-                  action.variant === 'active' && styles.quickActionLabelActive,
-                ]}
-              >
-                {action.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </Animated.View>
-
-        {/* Transactions Section */}
-        <Animated.View
-          entering={FadeInUp.delay(400).duration(500)}
-          style={styles.transactionsSection}
-        >
-          {/* Section Header */}
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>İşlemler</Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('TransactionHistory')}
-            >
-              <Text style={styles.seeAllLink}>Tümü</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Segmented Filter */}
-          <View style={styles.filterContainer}>
-            <View style={styles.segmentedControl}>
-              {[
-                { key: 'all', label: 'Tümü' },
-                { key: 'incoming', label: 'Gelen' },
-                { key: 'outgoing', label: 'Giden' },
-              ].map((filter) => (
-                <TouchableOpacity
-                  key={filter.key}
-                  style={[
-                    styles.filterButton,
-                    selectedFilter === filter.key && styles.filterButtonActive,
-                  ]}
-                  onPress={() => setSelectedFilter(filter.key as FilterType)}
-                >
-                  <Text
-                    style={[
-                      styles.filterButtonText,
-                      selectedFilter === filter.key &&
-                        styles.filterButtonTextActive,
-                    ]}
-                  >
-                    {filter.label}
+                {(balance?.pending || 0) > 0 && (
+                  <Text style={styles.pendingBalance}>
+                    +{formatCurrency(balance?.pending || 0)} beklemede
                   </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
+                )}
 
-          {/* Transaction List */}
-          <View style={styles.transactionListContainer}>
-            <FlashList
-              data={filteredTransactions}
-              renderItem={renderTransactionItem}
-              ListEmptyComponent={renderEmptyState}
-              scrollEnabled={false}
-              estimatedItemSize={72}
-            />
-          </View>
-        </Animated.View>
+                <View style={styles.cardActions}>
+                  <TouchableOpacity
+                    style={styles.actionBtnPrimary}
+                    onPress={() => navigation.navigate('AddMoney' as never)}
+                    accessible={true}
+                    accessibilityLabel="Para yükle"
+                    accessibilityRole="button"
+                  >
+                    <Text style={styles.actionBtnTextPrimary}>+ Yükle</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.actionBtnSecondary}
+                    onPress={() => navigation.navigate('Withdraw')}
+                    accessible={true}
+                    accessibilityLabel="Para çek"
+                    accessibilityRole="button"
+                  >
+                    <Text style={styles.actionBtnTextSecondary}>Çek</Text>
+                  </TouchableOpacity>
+                </View>
+              </BlurView>
+            </Animated.View>
+          </LinearGradient>
+        </View>
 
-        <View style={styles.bottomSpacer} />
-      </ScrollView>
+        {/* 2. TRANSACTIONS */}
+        <View style={styles.contentSection}>
+          <Text style={styles.sectionTitle}>Son İşlemler</Text>
 
-      {/* Bottom Navigation */}
-      <BottomNav activeTab="Profile" />
+          {/* Filter Pills */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.filterScroll}
+            contentContainerStyle={styles.filterScrollContent}
+          >
+            {filters.map((filter, index) => (
+              <TouchableOpacity
+                key={filter.key}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setActiveFilter(filter.key);
+                }}
+                style={[
+                  styles.filterPill,
+                  activeFilter === filter.key && styles.filterPillActive,
+                  index === 0 && { marginLeft: 24 },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.filterText,
+                    activeFilter === filter.key && styles.filterTextActive,
+                  ]}
+                >
+                  {filter.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+
+          <FlatList
+            data={filteredTransactions}
+            renderItem={renderTransaction}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+            ListEmptyComponent={renderEmptyState}
+            refreshControl={
+              <RefreshControl
+                refreshing={isLoading}
+                onRefresh={onRefresh}
+                tintColor={DARK_THEME.accent}
+              />
+            }
+          />
+        </View>
+
+        {/* Bottom Navigation */}
+        <BottomNav activeTab="Profile" />
       </NetworkGuard>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.bg.primary,
+    backgroundColor: DARK_THEME.background,
   },
-  header: {
+  headerSection: {
+    paddingBottom: 20,
+  },
+  headerGradient: {
+    paddingBottom: 20,
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+    overflow: 'hidden',
+  },
+  topBar: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border.default,
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    marginBottom: 24,
   },
-  headerButton: {
-    width: 44,
-    height: 44,
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.1)',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 22,
-    backgroundColor: COLORS.surface.base,
   },
   headerTitle: {
-    ...TYPOGRAPHY.h4,
-    fontWeight: '700',
-    color: COLORS.text.primary,
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'white',
   },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingTop: 20,
-    paddingHorizontal: 20,
+  historyButton: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
-  // Premium Wallet Card
-  cardContainer: {
-    alignItems: 'center',
-    marginBottom: 24,
+  // Balance Card
+  balanceCardContainer: {
+    marginHorizontal: 24,
+    borderRadius: 24,
+    shadowColor: DARK_THEME.accent,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 10,
   },
-  walletCard: {
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
-    borderRadius: 20,
+  balanceCard: {
+    borderRadius: 24,
     padding: 24,
     overflow: 'hidden',
-    position: 'relative',
+    backgroundColor: DARK_THEME.cardBackground,
+    borderWidth: 1,
+    borderColor: DARK_THEME.cardBorder,
   },
-  cardPattern: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  cardPatternCircle1: {
-    position: 'absolute',
-    top: -50,
-    right: -50,
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-  },
-  cardPatternCircle2: {
-    position: 'absolute',
-    bottom: -80,
-    left: -40,
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: 'rgba(255, 255, 255, 0.02)',
-  },
-  cardHeader: {
+  cardTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  cardBrand: {
-    ...TYPOGRAPHY.button,
-    fontWeight: '700',
-    color: COLORS.white,
-    letterSpacing: 1,
-  },
-  balanceSection: {
-    flex: 1,
-    justifyContent: 'center',
+    marginBottom: 8,
   },
   balanceLabel: {
-    ...TYPOGRAPHY.bodySmall,
-    color: 'rgba(255, 255, 255, 0.6)',
-    marginBottom: 4,
-  },
-  balanceAmount: {
-    ...TYPOGRAPHY.h1,
-    fontWeight: '800',
-    color: COLORS.white,
-    letterSpacing: -1,
-  },
-  pendingBalance: {
-    ...TYPOGRAPHY.bodySmall,
-    color: primitives.amber[400],
-    marginTop: 4,
-  },
-  cardFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  cardChip: {
-    opacity: 0.8,
-  },
-  cardDots: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cardDotsText: {
-    ...TYPOGRAPHY.button,
-    color: 'rgba(255, 255, 255, 0.5)',
-    letterSpacing: 2,
-  },
-
-  // Quick Actions
-  quickActionsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 16,
-    marginBottom: 24,
-  },
-  quickActionButton: {
-    alignItems: 'center',
-    gap: 8,
-  },
-  quickActionIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
-    backgroundColor: COLORS.surface.base,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  quickActionIconActive: {
-    backgroundColor: primitives.stone[800],
-  },
-  quickActionLabel: {
-    ...TYPOGRAPHY.bodySmall,
-    fontWeight: '500',
-    color: COLORS.text.secondary,
-  },
-  quickActionLabelActive: {
-    color: COLORS.text.primary,
+    color: DARK_THEME.textSecondary,
+    fontSize: 14,
     fontWeight: '600',
   },
-
-  // Transactions Section
-  transactionsSection: {
-    backgroundColor: COLORS.surface.base,
-    borderRadius: 20,
-    padding: 20,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    elevation: 2,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    ...TYPOGRAPHY.h4,
-    fontWeight: '700',
-    color: COLORS.text.primary,
-  },
-  seeAllLink: {
-    ...TYPOGRAPHY.bodySmall,
-    fontWeight: '600',
-    color: COLORS.primary,
-  },
-
-  // Filter
-  filterContainer: {
-    marginBottom: 16,
-  },
-  segmentedControl: {
-    flexDirection: 'row',
-    backgroundColor: primitives.stone[100],
-    borderRadius: 12,
-    padding: 4,
-    gap: 4,
-  },
-  filterButton: {
-    flex: 1,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 10,
-  },
-  filterButtonActive: {
-    backgroundColor: COLORS.white,
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  filterButtonText: {
-    ...TYPOGRAPHY.bodySmall,
-    fontWeight: '500',
-    color: COLORS.text.secondary,
-  },
-  filterButtonTextActive: {
-    color: COLORS.text.primary,
-    fontWeight: '600',
-  },
-
-  // Transaction List
-  transactionListContainer: {
-    minHeight: 200,
-  },
-  transactionItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: primitives.stone[100],
-  },
-  transactionIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  transactionInfo: {
-    flex: 1,
-  },
-  transactionTitle: {
-    ...TYPOGRAPHY.bodyLarge,
-    fontWeight: '600',
-    color: COLORS.text.primary,
-    marginBottom: 2,
-  },
-  transactionSubtitle: {
-    ...TYPOGRAPHY.bodySmall,
-    color: COLORS.text.secondary,
-  },
-  transactionRight: {
-    alignItems: 'flex-end',
-    gap: 4,
-  },
-  transactionAmount: {
-    ...TYPOGRAPHY.bodySmall,
-    fontWeight: '700',
-  },
-  proofLoopBadge: {
+  currencyBadge: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
     paddingHorizontal: 8,
-    paddingVertical: 2,
-    backgroundColor: primitives.amber[100],
+    paddingVertical: 4,
     borderRadius: 8,
   },
-  proofLoopText: {
-    ...TYPOGRAPHY.captionSmall,
+  currencyText: {
+    color: 'white',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  balanceValue: {
+    fontSize: 36,
+    fontWeight: '900',
+    color: 'white',
+    marginBottom: 8,
+  },
+  pendingBalance: {
+    fontSize: 14,
+    color: primitives.amber[400],
+    marginBottom: 16,
+  },
+  cardActions: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 8,
+  },
+  actionBtnPrimary: {
+    flex: 1,
+    backgroundColor: DARK_THEME.accent,
+    paddingVertical: 14,
+    borderRadius: 16,
+    alignItems: 'center',
+  },
+  actionBtnTextPrimary: {
+    color: 'black',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  actionBtnSecondary: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    paddingVertical: 14,
+    borderRadius: 16,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  actionBtnTextSecondary: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+
+  // Transactions
+  contentSection: {
+    flex: 1,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'white',
+    marginLeft: 24,
+    marginBottom: 16,
+  },
+  filterScroll: {
+    paddingBottom: 16,
+    marginBottom: 8,
+  },
+  filterScrollContent: {
+    paddingRight: 24,
+  },
+  filterPill: {
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: DARK_THEME.filterInactive,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
+  },
+  filterPillActive: {
+    backgroundColor: DARK_THEME.filterActive,
+    borderColor: DARK_THEME.filterActive,
+  },
+  filterText: {
+    color: DARK_THEME.textSecondary,
     fontWeight: '600',
-    color: primitives.amber[700],
+  },
+  filterTextActive: {
+    color: 'white',
+  },
+  listContent: {
+    paddingHorizontal: 24,
+    paddingBottom: 120, // Space for bottom nav
+  },
+  txItem: {
+    marginBottom: 12,
+  },
+  txItemContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.02)',
+    padding: 12,
+    borderRadius: 16,
+  },
+  txIconContainer: {
+    marginRight: 16,
+  },
+  txIconBg: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  txInfo: {
+    flex: 1,
+  },
+  txTitle: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  txDate: {
+    color: DARK_THEME.textSecondary,
+    fontSize: 12,
+  },
+  txAmount: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 
   // Empty State
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 40,
-    paddingHorizontal: 20,
+    paddingVertical: 60,
+    paddingHorizontal: 40,
   },
   emptyIconContainer: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: primitives.stone[100],
+    backgroundColor: 'rgba(255,255,255,0.05)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
   },
   emptyTitle: {
-    ...TYPOGRAPHY.h4,
+    fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text.primary,
+    color: 'white',
     marginBottom: 8,
   },
   emptyText: {
-    ...TYPOGRAPHY.bodySmall,
-    color: COLORS.text.secondary,
+    fontSize: 14,
+    color: DARK_THEME.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
-  },
-
-  bottomSpacer: {
-    height: 100,
   },
 });
 
