@@ -18,5 +18,6 @@ export { default as InviteFriendsScreen } from './screens/InviteFriendsScreen';
 export { ReportUserScreen } from './screens/ReportUserScreen';
 export { MaintenanceScreen } from './screens/MaintenanceScreen';
 export { default as DataPrivacyScreen } from './screens/DataPrivacyScreen';
+export { LanguageCurrencyScreen } from './screens/LanguageCurrencyScreen';
 
 // TODO: Add settings hooks, components, and services exports
