@@ -177,6 +177,7 @@ import {
   GiftInboxDetailScreen,
   UnifiedGiftFlowScreen,
   MyGiftsScreen,
+  GiftCardMarketScreen,
   RefundRequestScreen,
   SuccessScreen,
   SuccessConfirmationScreen,
@@ -459,6 +460,10 @@ const AppNavigator = () => {
             />
             <Stack.Screen name="Review" component={ReviewScreen} />
             <Stack.Screen name="MyGifts" component={MyGiftsScreen} />
+            <Stack.Screen
+              name="GiftCardMarket"
+              component={GiftCardMarketScreen}
+            />
             <Stack.Screen name="TrustNotes" component={TrustNotesScreen} />
             <Stack.Screen
               name="MomentGallery"
