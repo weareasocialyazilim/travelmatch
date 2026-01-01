@@ -12,6 +12,7 @@ export { HowEscrowWorksScreen } from './screens/HowEscrowWorksScreen';
 export { default as MatchConfirmationScreen } from './screens/MatchConfirmationScreen';
 export { ReceiverApprovalScreen } from './screens/ReceiverApprovalScreen';
 export { DisputeFlowScreen } from './screens/DisputeFlowScreen';
+export { TripDetailsScreen } from './screens/TripDetailsScreen';
 export { default as RequestsScreen } from './screens/RequestsScreen';
 export { default as RequestManagerScreen } from './screens/RequestManagerScreen';
 export { MyTripsScreen } from './screens/MyTripsScreen';
