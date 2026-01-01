@@ -60,6 +60,7 @@ import {
   ReceiverApprovalScreen,
   DisputeFlowScreen,
   RequestsScreen,
+  RequestManagerScreen,
 } from '../features/trips';
 
 // ===================================
@@ -375,6 +376,7 @@ const AppNavigator = () => {
             {/* Main App - New consolidated screens */}
             <Stack.Screen name="Discover" component={DiscoverScreen} />
             <Stack.Screen name="Requests" component={RequestsScreen} />
+            <Stack.Screen name="RequestManager" component={RequestManagerScreen} />
             <Stack.Screen name="Messages" component={MessagesScreen} />
 
             <Stack.Screen name="CreateMoment" component={CreateMomentScreen} />
