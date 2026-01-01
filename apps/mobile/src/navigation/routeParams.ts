@@ -210,6 +210,9 @@ export type RootStackParamList = {
   // Reputation
   Reputation: undefined;
 
+  // Achievements
+  Achievements: undefined;
+
   // Legal & Policy
   TermsOfService: undefined;
   PrivacyPolicy: undefined;

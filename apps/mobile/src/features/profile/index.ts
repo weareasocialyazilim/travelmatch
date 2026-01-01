@@ -18,6 +18,9 @@ export { ProofHistoryScreen } from './screens/ProofHistoryScreen';
 // Review
 export { ReviewScreen } from './screens/ReviewScreen';
 
+// Achievements
+export { AchievementsScreen } from './screens/AchievementsScreen';
+
 // Moments
 export { default as MyMomentsScreen } from './screens/MyMomentsScreen';
 export { default as CreateMomentScreen } from './screens/CreateMomentScreen';
