@@ -1,535 +1,140 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedScrollHandler,
-} from 'react-native-reanimated';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { GiftMomentBottomSheet } from '@/components/GiftMomentBottomSheet';
-import { GiftSuccessModal } from '@/components/GiftSuccessModal';
-import {
-  MomentHeader,
-  MomentGallery as _MomentGallery,
-  MomentInfo,
-  HostSection,
-  RequestsSection,
-  ReviewsSection,
-  SummarySection,
-  ActionBar,
-  ContributorSlotsSection,
-} from '@/components/moment-detail';
-import type { Contributor } from '@/components/moment-detail';
-import { ReportBlockBottomSheet } from '@/components/ReportBlockBottomSheet';
-import { COLORS } from '@/constants/colors';
-import { VALUES } from '@/constants/values';
-import { useMoments } from '../hooks';
-import { supabase } from '@/config/supabase';
-import { useAnalytics } from '@/hooks/useAnalytics';
-import { requestService } from '@/services/requestService';
-import { reviewService } from '@/services/reviewService';
-import type {
-  MomentUser,
-  PendingRequest,
-  Review,
-  ActionLoadingState,
-} from '@/components/moment-detail';
-import type { RootStackParamList } from '@/navigation/routeParams';
-import type { MomentData } from '../types';
-import type { RouteProp, NavigationProp } from '@react-navigation/native';
-import { useToast } from '@/context/ToastContext';
-import { logger } from '@/utils/production-logger';
+import React from 'react';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { COLORS } from '@/theme/colors';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BlurView } from 'expo-blur';
 
-type MomentDetailRouteProp = RouteProp<RootStackParamList, 'MomentDetail'>;
+const { width, height } = Dimensions.get('window');
 
-const MomentDetailScreen: React.FC = () => {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const route = useRoute<MomentDetailRouteProp>();
-  const { showToast } = useToast();
-  const {
-    moment,
-    isOwner = false,
-    pendingRequests: _pendingRequests = 0,
-  } = route.params;
-
-  // Hooks
-  const { saveMoment, deleteMoment } = useMoments();
-  const { trackEvent } = useAnalytics();
-
-  const trackMount = useCallback(() => {
-    trackEvent('moment_detail_view', { momentId: moment.id });
-  }, [moment.id, trackEvent]);
-
-  const trackInteraction = useCallback(
-    (action: string) => {
-      trackEvent(action, { momentId: moment.id });
-    },
-    [moment.id, trackEvent],
-  );
-
-  // User data - coerce to MomentUser type
-  const userSource = moment.user || moment.creator;
-  const momentUser: MomentUser = {
-    id: userSource?.id,
-    name: userSource?.name || 'Anonymous',
-    avatar:
-      userSource?.avatar ||
-      (userSource as { photoUrl?: string })?.photoUrl ||
-      '',
-    type: userSource?.type || 'traveler',
-    isVerified: userSource?.isVerified || false,
-    location: userSource?.location || 'Unknown',
-    travelDays: userSource?.travelDays || 0,
-  };
-
-  // State
-  const [showGiftSheet, setShowGiftSheet] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [showReportSheet, setShowReportSheet] = useState(false);
-  const [giftAmount, setGiftAmount] = useState(0);
-  const [isSaved, setIsSaved] = useState(false);
-  const [actionLoading, setActionLoading] = useState<ActionLoadingState>(null);
-
-  const [pendingRequestsList, setPendingRequestsList] = useState<
-    PendingRequest[]
-  >([]);
-
-  const [reviews, setReviews] = useState<Review[]>([]);
-
-  // Contributor slots state
-  const [contributors, setContributors] = useState<Contributor[]>([]);
-  const [contributorCount, setContributorCount] = useState(0);
-  const [maxContributors, setMaxContributors] = useState<number | null>(null);
-
-  // Helper to check if ID is a valid UUID (not mock story ID like 's2-1')
-  const isValidUUID = useCallback((id: string) => {
-    const uuidRegex =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    return uuidRegex.test(id);
-  }, []);
-
-  // Fetch data - only if moment ID is a valid UUID (not mock story data)
-  useEffect(() => {
-    const fetchReviews = async () => {
-      // Skip API call for mock story IDs (like 's2-1', 's3-1')
-      if (!isValidUUID(moment.id)) {
-        return;
-      }
-      try {
-        const { reviews: apiReviews } = await reviewService.getReviews({
-          momentId: moment.id,
-        });
-        const mappedReviews = apiReviews.map((r) => ({
-          id: r.id,
-          name: r.reviewerName,
-          avatar: r.reviewerAvatar,
-          rating: r.rating,
-          text: r.comment,
-        }));
-        setReviews(mappedReviews);
-      } catch {
-        // Silent fail
-      }
-    };
-
-    fetchReviews();
-  }, [moment.id, isValidUUID]);
-
-  // Fetch contributors for 100+ TL moments
-  useEffect(() => {
-    const fetchContributors = async () => {
-      if (moment.price < 100) {
-        setMaxContributors(null);
-        return;
-      }
-
-      // Skip if not a valid UUID (mock data)
-      if (!isValidUUID(moment.id)) {
-        return;
-      }
-
-      try {
-        // This RPC function is expected to be created via migrations
-        // Note: escrow_transactions has multiple foreign keys to users table
-        // We need to specify which relationship to use
-        const { data, error } = await supabase
-          .from('escrow_transactions')
-          .select(
-            'user_id, amount, users!escrow_transactions_sender_id_fkey(full_name, avatar_url)',
-          )
-          .eq('moment_id', moment.id)
-          .eq('status', 'completed');
-
-        if (error) {
-          logger.error('Failed to fetch contributors', error);
-          return;
-        }
-
-        if (data) {
-          // Calculate max contributors based on moment price
-          const calculatedMax =
-            moment.price >= 500 ? 10 : moment.price >= 200 ? 5 : 3;
-          setMaxContributors(calculatedMax);
-          setContributorCount(data.length || 0);
-          setContributors(
-            (
-              (data || []) as unknown as {
-                user_id: string;
-                is_anonymous?: boolean;
-                users?: { name?: string; avatar_url?: string } | null;
-              }[]
-            ).map((c) => ({
-              userId: c.user_id,
-              name: c.users?.name || 'Anonymous',
-              avatar: c.users?.avatar_url,
-              isAnonymous: c.is_anonymous,
-            })),
-          );
-        }
-      } catch {
-        // Silent fail
-      }
-    };
-
-    fetchContributors();
-  }, [moment.id, moment.price, isValidUUID]);
-
-  useEffect(() => {
-    // Skip API call for mock story IDs
-    if (isOwner && isValidUUID(moment.id)) {
-      const fetchRequests = async () => {
-        try {
-          const { requests } = await requestService.getReceivedRequests({
-            momentId: moment.id,
-            status: 'pending',
-          });
-          const mappedRequests = requests.map((r) => ({
-            id: r.id,
-            name: r.requesterName,
-            avatar: r.requesterAvatar,
-            message: r.message || '',
-          }));
-          setPendingRequestsList(mappedRequests);
-        } catch {
-          // Silent fail
-        }
-      };
-      fetchRequests();
-    }
-  }, [isOwner, moment.id, isValidUUID]);
-
-  // Animation - using Reanimated for native-driven scroll
-  const scrollY = useSharedValue(0);
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollY.value = event.contentOffset.y;
-    },
-  });
-
-  // Effects
-  useEffect(() => {
-    trackMount();
-  }, [trackMount]);
-
-  // Handlers
-  const handleSave = useCallback(async () => {
-    if (actionLoading) return;
-    setActionLoading('save');
-
-    try {
-      const success = await saveMoment(moment.id);
-      if (success) {
-        setIsSaved((prev) => !prev);
-        trackInteraction('save');
-        Alert.alert(
-          isSaved ? 'Removed from Saved' : 'Saved!',
-          isSaved
-            ? 'This moment has been removed from your saved list.'
-            : 'This moment has been added to your saved list.',
-        );
-      }
-    } catch {
-      showToast('Could not save moment. Please try again.', 'error');
-    } finally {
-      setActionLoading(null);
-    }
-  }, [actionLoading, saveMoment, moment.id, isSaved, trackInteraction]);
-
-  const handleDelete = useCallback(() => {
-    Alert.alert(
-      'Delete Moment',
-      'Are you sure you want to delete this moment? This action cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            setActionLoading('delete');
-            try {
-              const success = await deleteMoment(moment.id);
-              if (success) {
-                navigation.goBack();
-                showToast('Your moment has been deleted.', 'info');
-              }
-            } catch {
-              Alert.alert(
-                'Error',
-                'Could not delete moment. Please try again.',
-              );
-            } finally {
-              setActionLoading(null);
-            }
-          },
-        },
-      ],
-    );
-  }, [deleteMoment, moment.id, navigation, showToast]);
-
-  const handleAcceptRequest = useCallback(
-    (requestId: string) => {
-      showToast('The guest has been notified!', 'info');
-      setPendingRequestsList((prev) => prev.filter((r) => r.id !== requestId));
-    },
-    [showToast],
-  );
-
-  const handleDeclineRequest = useCallback(
-    (requestId: string) => {
-      showToast('The guest has been notified.', 'info');
-      setPendingRequestsList((prev) => prev.filter((r) => r.id !== requestId));
-    },
-    [showToast],
-  );
-
-  const handleGiftOption = useCallback(() => {
-    trackInteraction('gift_selected');
-    setShowGiftSheet(false);
-    setGiftAmount(moment.price);
-
-    setTimeout(() => {
-      setShowSuccessModal(true);
-    }, VALUES.ANIMATION_DURATION);
-  }, [moment.price, trackInteraction]);
-
-  const handleViewApprovals = useCallback(() => {
-    setShowSuccessModal(false);
-    navigation.navigate('ReceiverApproval', {
-      momentTitle: moment.title,
-      totalAmount: moment.price,
-      momentId: moment.id,
-    });
-  }, [moment.price, moment.title, moment.id, navigation]);
-
-  const handleEdit = useCallback(() => {
-    navigation.navigate('EditMoment', { momentId: moment.id });
-  }, [moment.id, navigation]);
-
-  const handleShare = useCallback(() => {
-    navigation.navigate('ShareMoment', { momentId: moment.id });
-  }, [moment.id, navigation]);
-
-  const handleCreateSimilar = useCallback(() => {
-    navigation.navigate('CreateMoment' as never);
-  }, [navigation]);
-
-  const handleReport = useCallback(() => {
-    setShowReportSheet(true);
-  }, []);
-
-  const handleReportSubmit = useCallback(
-    (_action: string, _reason?: string, _details?: string) => {
-      // In a real app, this would call an API
-      setShowReportSheet(false);
-      Alert.alert(
-        'Report Submitted',
-        'Thank you for keeping our community safe.',
-      );
-    },
-    [],
-  );
-
-  // Gift sheet moment data
-  const giftSheetMoment: MomentData | null = showGiftSheet
-    ? {
-        id: moment.id,
-        title: moment.title,
-        imageUrl: moment.imageUrl,
-        category: moment.category || {
-          id: 'other',
-          label: 'Other',
-          emoji: '🎁',
-        },
-        user: {
-          name: momentUser.name,
-          avatar: momentUser.avatar || '',
-          type: (momentUser.type as 'traveler' | 'local') || 'traveler',
-          location:
-            typeof momentUser.location === 'string'
-              ? momentUser.location
-              : momentUser.location
-                ? `${momentUser.location.city || ''}, ${
-                    momentUser.location.country || ''
-                  }`
-                : undefined,
-          travelDays: momentUser.travelDays,
-          isVerified: momentUser.isVerified,
-        },
-        location: {
-          name: moment.location?.name || 'Unknown Location',
-          city: moment.location?.city || 'Unknown City',
-          country: moment.location?.country || 'Unknown Country',
-        },
-        story: moment.story,
-        dateRange: moment.dateRange || { start: new Date(), end: new Date() },
-        price: moment.price,
-        availability: moment.availability || 'Available',
-      }
-    : null;
-
-  const isCompleted = moment.status === 'completed';
+export const MomentDetailScreen = ({ navigation, route }: any) => {
+  const insets = useSafeAreaInsets();
+  // route.params'dan data gelir
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <View style={styles.container}>
-        <MomentHeader
-          navigation={navigation}
-          isOwner={isOwner}
-          isSaved={isSaved}
-          actionLoading={actionLoading}
-          momentId={moment.id}
-          momentStatus={moment.status}
-          onSave={handleSave}
-          onDelete={handleDelete}
-          onShare={handleShare}
-          onEdit={handleEdit}
-          onReport={handleReport}
-        />
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
 
-        {/* Scrollable Content */}
-        <Animated.ScrollView
-          style={styles.scrollView}
-          showsVerticalScrollIndicator={false}
-          scrollEventThrottle={16}
-          onScroll={scrollHandler}
-          contentContainerStyle={styles.scrollViewContent}
-        >
-          <View style={styles.content}>
-            {/* Host Info */}
-            <HostSection user={momentUser} navigation={navigation} />
+        {/* Hero Image */}
+        <View style={styles.imageContainer}>
+          <Image
+            source={{ uri: 'https://images.unsplash.com/photo-1514362545857-3bc16549766b?q=80&w=800' }}
+            style={styles.image}
+          />
+          <LinearGradient colors={['transparent', COLORS.background.primary]} style={styles.gradient} />
 
-            {/* Contributor Slots (100+ TL moments only) */}
-            {!isOwner && moment.price >= 100 && (
-              <ContributorSlotsSection
-                price={moment.price}
-                contributors={contributors}
-                currentCount={contributorCount}
-                maxContributors={maxContributors}
-              />
-            )}
+          <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { top: insets.top + 10 }]}>
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
 
-            {/* Moment Info */}
-            <MomentInfo
-              title={moment.title}
-              category={moment.category}
-              location={moment.location}
-              availability={moment.availability}
-              date={moment.date}
-              story={moment.story}
-            />
+          <TouchableOpacity style={[styles.shareBtn, { top: insets.top + 10 }]}>
+            <Ionicons name="share-outline" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
 
-            {/* Owner Active: Pending Requests */}
-            {isOwner && !isCompleted && (
-              <RequestsSection
-                requests={pendingRequestsList}
-                onAccept={handleAcceptRequest}
-                onDecline={handleDeclineRequest}
-              />
-            )}
-
-            {/* Owner Completed: Summary */}
-            {isOwner && isCompleted && (
-              <SummarySection
-                totalEarned={moment.price * 3}
-                guestCount={3}
-                rating={4.8}
-              />
-            )}
-
-            {/* Owner Completed: Reviews */}
-            {isOwner && isCompleted && <ReviewsSection reviews={reviews} />}
-
-            <View style={styles.bottomSpacer} />
+        <View style={styles.content}>
+          {/* Host Info */}
+          <View style={styles.hostRow}>
+            <Image source={{ uri: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100' }} style={styles.avatar} />
+            <View>
+              <Text style={styles.hostName}>Hosted by Selin Y.</Text>
+              <View style={styles.ratingRow}>
+                <Ionicons name="star" size={12} color="#FFD700" />
+                <Text style={styles.ratingText}>4.9 (45)</Text>
+                <View style={styles.dot} />
+                <Text style={styles.verified}>Verified Host</Text>
+              </View>
+            </View>
           </View>
-        </Animated.ScrollView>
 
-        {/* Bottom Action Bar */}
-        <ActionBar
-          isOwner={isOwner}
-          isCompleted={isCompleted}
-          price={moment.price}
-          onGift={() => setShowGiftSheet(true)}
-          onCreateSimilar={handleCreateSimilar}
-        />
+          <Text style={styles.title}>Sunset Dinner at Hotel Costes</Text>
 
-        {/* Gift Bottom Sheet */}
-        <GiftMomentBottomSheet
-          visible={showGiftSheet}
-          moment={giftSheetMoment}
-          onClose={() => setShowGiftSheet(false)}
-          onGift={handleGiftOption}
-        />
+          <View style={styles.tags}>
+            <View style={styles.tag}><Text style={styles.tagText}>Dining 🍽️</Text></View>
+            <View style={styles.tag}><Text style={styles.tagText}>Paris 🇫🇷</Text></View>
+            <View style={styles.tag}><Text style={styles.tagText}>$$$</Text></View>
+          </View>
 
-        {/* Success Modal */}
-        <GiftSuccessModal
-          visible={showSuccessModal}
-          amount={giftAmount}
-          momentTitle={moment.title}
-          onViewApprovals={handleViewApprovals}
-          onClose={() => {
-            setShowSuccessModal(false);
-            navigation.goBack();
-          }}
-        />
+          <Text style={styles.desc}>
+            Join me for an unforgettable dinner at the iconic Hotel Costes.
+            Great vibes, amazing music, and the best spicy pasta in town.
+            Looking for good company to share stories.
+          </Text>
 
-        {/* Report/Block Sheet */}
-        <ReportBlockBottomSheet
-          visible={showReportSheet}
-          onClose={() => setShowReportSheet(false)}
-          onSubmit={handleReportSubmit}
-          targetType="moment"
-        />
-      </View>
-    </SafeAreaView>
+          <View style={styles.mapPreview}>
+            <MaterialCommunityIcons name="map-marker-radius" size={24} color={COLORS.brand.primary} />
+            <Text style={styles.locationText}>239 Rue Saint-Honoré, Paris</Text>
+            <Ionicons name="chevron-forward" size={20} color="#666" style={{ marginLeft: 'auto' }} />
+          </View>
+
+          <Text style={styles.sectionTitle}>What to expect</Text>
+          <View style={styles.expectRow}>
+            <View style={styles.expectItem}>
+              <MaterialCommunityIcons name="clock-outline" size={24} color="white" />
+              <Text style={styles.expectLabel}>2 Hours</Text>
+            </View>
+            <View style={styles.expectItem}>
+              <MaterialCommunityIcons name="account-group" size={24} color="white" />
+              <Text style={styles.expectLabel}>Up to 2 Guests</Text>
+            </View>
+            <View style={styles.expectItem}>
+              <MaterialCommunityIcons name="glass-cocktail" size={24} color="white" />
+              <Text style={styles.expectLabel}>Drinks Incl.</Text>
+            </View>
+          </View>
+        </View>
+      </ScrollView>
+
+      {/* Floating Action Bar */}
+      <BlurView intensity={90} tint="dark" style={[styles.fab, { paddingBottom: insets.bottom + 20 }]}>
+        <View>
+          <Text style={styles.priceLabel}>Total Price</Text>
+          <Text style={styles.price}>$150<Text style={styles.perPerson}> / person</Text></Text>
+        </View>
+        <TouchableOpacity
+          style={styles.bookBtn}
+          onPress={() => navigation.navigate('ChatDetail', { chatId: 'new' })}
+        >
+          <Text style={styles.bookText}>Request to Join</Text>
+        </TouchableOpacity>
+      </BlurView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: COLORS.utility.white,
-  },
-  container: {
-    backgroundColor: COLORS.utility.white,
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollViewContent: {
-    paddingTop: 400,
-  },
-  content: {
-    backgroundColor: COLORS.bg.primary,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    marginTop: -24,
-    paddingHorizontal: 20,
-    paddingTop: 24,
-  },
-  bottomSpacer: {
-    height: 120,
-  },
+  container: { flex: 1, backgroundColor: COLORS.background.primary },
+  imageContainer: { height: height * 0.45, width: '100%' },
+  image: { width: '100%', height: '100%' },
+  gradient: { position: 'absolute', bottom: 0, width: '100%', height: 150 },
+  backBtn: { position: 'absolute', left: 20, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.3)', alignItems: 'center', justifyContent: 'center' },
+  shareBtn: { position: 'absolute', right: 20, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.3)', alignItems: 'center', justifyContent: 'center' },
+  content: { padding: 24, marginTop: -40 },
+  hostRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
+  avatar: { width: 40, height: 40, borderRadius: 20, marginRight: 12, borderWidth: 2, borderColor: COLORS.brand.primary },
+  hostName: { color: 'white', fontWeight: 'bold', fontSize: 14 },
+  ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  ratingText: { color: 'white', fontSize: 12, fontWeight: '600' },
+  dot: { width: 3, height: 3, borderRadius: 1.5, backgroundColor: '#666' },
+  verified: { color: COLORS.brand.primary, fontSize: 12, fontWeight: 'bold' },
+  title: { fontSize: 32, fontWeight: '900', color: 'white', marginBottom: 12, lineHeight: 36 },
+  tags: { flexDirection: 'row', gap: 8, marginBottom: 20 },
+  tag: { backgroundColor: 'rgba(255,255,255,0.1)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
+  tagText: { color: 'white', fontSize: 12, fontWeight: '600' },
+  desc: { color: '#ccc', fontSize: 16, lineHeight: 24, marginBottom: 24 },
+  mapPreview: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.05)', padding: 16, borderRadius: 16, marginBottom: 30 },
+  locationText: { color: 'white', fontWeight: '600', marginLeft: 10, fontSize: 14 },
+  sectionTitle: { color: 'white', fontSize: 18, fontWeight: 'bold', marginBottom: 16 },
+  expectRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  expectItem: { alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.05)', padding: 16, borderRadius: 16, width: '30%' },
+  expectLabel: { color: '#ccc', fontSize: 12, marginTop: 8, fontWeight: '600' },
+  fab: { position: 'absolute', bottom: 0, width: '100%', padding: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)' },
+  priceLabel: { color: '#888', fontSize: 12 },
+  price: { color: 'white', fontSize: 24, fontWeight: 'bold' },
+  perPerson: { fontSize: 14, fontWeight: 'normal', color: '#888' },
+  bookBtn: { backgroundColor: COLORS.brand.primary, paddingHorizontal: 24, paddingVertical: 14, borderRadius: 16 },
+  bookText: { color: 'black', fontWeight: 'bold', fontSize: 16 },
 });
 
 export default MomentDetailScreen;
