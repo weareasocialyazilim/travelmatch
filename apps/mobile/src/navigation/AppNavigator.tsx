@@ -233,6 +233,11 @@ import {
 } from '../features/settings/screens/legal';
 
 // ===================================
+// CALENDAR FEATURE SCREENS
+// ===================================
+import { MyCalendarScreen } from '../features/calendar';
+
+// ===================================
 // TYPE IMPORTS
 // ===================================
 // RootStackParamList is defined in routeParams.ts to avoid circular dependencies
@@ -659,6 +664,9 @@ const AppNavigator = () => {
               name="DeletedMoments"
               component={DeletedMomentsScreen}
             />
+
+            {/* Calendar */}
+            <Stack.Screen name="MyCalendar" component={MyCalendarScreen} />
           </Stack.Navigator>
         </Suspense>
       </NavigationContainer>
