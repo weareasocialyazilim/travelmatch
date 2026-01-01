@@ -45,8 +45,9 @@ import {
 } from '../features/auth';
 import SessionExpiredScreen from '../screens/SessionExpiredScreen';
 import LinkNotFoundScreen from '../screens/LinkNotFoundScreen';
-import LinkExpiredScreen from '../screens/LinkExpiredScreen';
+import { LinkExpiredScreen } from '../screens/LinkExpiredScreen';
 import LinkInvalidScreen from '../screens/LinkInvalidScreen';
+import { ImageViewerScreen } from '../screens/ImageViewerScreen';
 
 // ===================================
 // TRIPS FEATURE SCREENS
@@ -652,6 +653,17 @@ const AppNavigator = () => {
 
             {/* Calendar */}
             <Stack.Screen name="MyCalendar" component={MyCalendarScreen} />
+
+            {/* Image Viewer */}
+            <Stack.Screen
+              name="ImageViewer"
+              component={ImageViewerScreen}
+              options={{
+                presentation: 'fullScreenModal',
+                animation: 'fade',
+                headerShown: false,
+              }}
+            />
           </Stack.Navigator>
         </Suspense>
       </NavigationContainer>
