@@ -107,3 +107,9 @@ export type {
 // Filter Modals
 // ═══════════════════════════════════════════════════════════════════
 export { BlurFilterModal } from './BlurFilterModal';
+
+// ═══════════════════════════════════════════════════════════════════
+// Glass Modals
+// ═══════════════════════════════════════════════════════════════════
+export { GlassModal } from './GlassModal';
+export type { GlassModalProps } from './GlassModal';
