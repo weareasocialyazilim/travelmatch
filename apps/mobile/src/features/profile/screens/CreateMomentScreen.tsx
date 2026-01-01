@@ -1,499 +1,574 @@
 /**
- * CreateMomentScreen
- * Refactored - uses modular sub-components
+ * CreateMomentScreen - Phase 3: The Drop
+ *
+ * Story Mode UI: Instagram-like immersive moment creation
+ * - No boring forms, just layered experience on top of selected photo
+ * - Neon & Glass aesthetic with brand colors
+ * - Step-by-step: Media → Details → Price → Review → Drop
+ *
+ * Design Principles:
+ * - "Sürükleyici Deneyim" - Form değil, story atar gibi kolay
+ * - Her adım fotoğrafın üzerine "Layer" olarak geliyor
+ * - Neon Lime & Glass Black yoğun kullanım
  */
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  ImageBackground,
   TouchableOpacity,
-  TouchableWithoutFeedback,
-  Platform,
+  TextInput,
+  Dimensions,
   KeyboardAvoidingView,
-  ActivityIndicator,
-  Modal,
+  Platform,
   Alert,
-  Keyboard,
 } from 'react-native';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  createMomentSchema,
-  type CreateMomentInput,
-} from '../../../utils/forms/schemas';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import Animated, {
+  FadeIn,
+  SlideInDown,
+  SlideOutDown,
+} from 'react-native-reanimated';
+import * as ImagePicker from 'expo-image-picker';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  PhotoSection,
-  TitleInput,
-  CategorySelector,
-  DetailsSection,
-  StorySection,
-  MomentPreview,
-  CATEGORIES,
-  getCategoryEmoji,
-  type Place,
-} from '@/components/createMoment';
-import { PlaceSearchModal } from '@/components/PlaceSearchModal';
-import { COLORS } from '@/constants/colors';
-import { LAYOUT } from '@/constants/layout';
-import { STRINGS as _STRINGS } from '../constants/strings';
-import { VALUES } from '@/constants/values';
-import { useMoments } from '../hooks';
-import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
-import { useToast } from '@/context/ToastContext';
+import type { RootStackParamList } from '@/navigation/routeParams';
+import { COLORS, GRADIENTS } from '@/constants/colors';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
+import { useMoments } from '../hooks';
+import { useToast } from '@/context/ToastContext';
 
-// Import sub-components
+const { width: _width, height: _height } = Dimensions.get('window');
+
+// Step-by-step flow
+type Step = 'media' | 'details' | 'price' | 'review';
+
+// Category options with Material Community Icons
+const CATEGORIES = [
+  { id: 'dining', label: 'Fine Dining', icon: 'silverware-fork-knife' as const },
+  { id: 'nightlife', label: 'Nightlife', icon: 'glass-cocktail' as const },
+  { id: 'culture', label: 'Art & Culture', icon: 'palette' as const },
+  { id: 'adventure', label: 'Adventure', icon: 'compass' as const },
+] as const;
+
+type CategoryId = (typeof CATEGORIES)[number]['id'];
 
 const CreateMomentScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const insets = useSafeAreaInsets();
   const { createMoment } = useMoments();
   const { showToast } = useToast();
 
-  // UI-specific state (not in form)
-  const [photo, setPhoto] = useState<string>(''); // Managed by PhotoSection
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showPlaceSearch, setShowPlaceSearch] = useState(false);
+  // Step state
+  const [step, setStep] = useState<Step>('media');
+
+  // Form data
+  const [imageUri, setImageUri] = useState<string | null>(null);
+  const [title, setTitle] = useState('');
+  const [price, setPrice] = useState('50');
+  const [selectedCategory, setSelectedCategory] = useState<CategoryId | null>(
+    null,
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors, isValid },
-  } = useForm<CreateMomentInput>({
-    resolver: zodResolver(createMomentSchema),
-    mode: 'onChange',
-    defaultValues: {
-      title: '',
-      category: '',
-      amount: 0,
-      date: new Date(),
-      story: '',
-      photo: '',
-      place: null,
-    },
-  });
+  // 1. Media Selection - Story format (9:16)
+  const pickImage = useCallback(async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [9, 16], // Story format
+      quality: 1,
+    });
 
-  const title = watch('title');
-  const selectedCategory = watch('category');
-  const amount = watch('amount');
-  const selectedDate = watch('date');
-  const story = watch('story');
-  const place = watch('place');
-
-  // Payment hint text
-  const paymentHint = useMemo(() => {
-    const amountNum = amount || 0;
-    if (amountNum <= 0) return 'Enter amount to see payment terms';
-    if (amountNum <= VALUES.ESCROW_DIRECT_MAX)
-      return 'Direct payment • Instant transfer';
-    if (amountNum <= VALUES.ESCROW_OPTIONAL_MAX)
-      return 'Your supporter decides payment method';
-    return 'Escrow protected • Proof required';
-  }, [amount]);
-
-  // Dismiss keyboard when tapping outside inputs
-  const dismissKeyboard = useCallback(() => {
-    Keyboard.dismiss();
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+      setStep('details');
+    }
   }, []);
 
-  // Handle publish
-  const onPublish = useCallback(
-    async (data: CreateMomentInput) => {
-      Keyboard.dismiss();
-      setIsSubmitting(true);
+  // 2. Drop Action (Submit to API)
+  const handleDrop = useCallback(async () => {
+    if (!title || !selectedCategory || !imageUri) {
+      Alert.alert(
+        'Eksik Bilgi',
+        'Lütfen tüm alanları doldur, vibe yarım kalmasın. ✨',
+      );
+      return;
+    }
 
-      try {
-        const categoryObj = CATEGORIES.find((c) => c.id === data.category);
+    setIsSubmitting(true);
 
-        const momentData = {
-          title: data.title.trim(),
-          story: data.story?.trim() || undefined,
-          price: data.amount,
-          category: {
-            id: data.category,
-            label: categoryObj?.label || data.category,
-            emoji: getCategoryEmoji(data.category),
-          },
-          location: data.place
-            ? {
-                name: data.place.name,
-                city:
-                  data.place.address?.split(',')[0]?.trim() || data.place.name,
-                country: data.place.address?.split(',')[1]?.trim() || '',
-              }
-            : undefined,
-          date: data.date.toISOString(),
-          imageUrl: photo || undefined,
-          availability: 'Available',
-        };
+    try {
+      const categoryObj = CATEGORIES.find((c) => c.id === selectedCategory);
 
-        // Convert to CreateMomentData format
-        const createMomentInput = {
-          title: momentData.title,
-          description: momentData.story || '',
-          category: momentData.category.id,
-          location: {
-            city: momentData.location?.city || '',
-            country: momentData.location?.country || '',
-          },
-          images: momentData.imageUrl ? [momentData.imageUrl] : [],
-          pricePerGuest: momentData.price,
-          currency: 'USD',
-          maxGuests: 4,
-          duration: '2 hours',
-          availability: [momentData.date],
-        };
+      const momentData = {
+        title: title.trim(),
+        description: '',
+        category: selectedCategory,
+        location: {
+          city: '',
+          country: '',
+        },
+        images: [imageUri],
+        pricePerGuest: parseFloat(price) || 0,
+        currency: 'USD',
+        maxGuests: 4,
+        duration: '2 hours',
+        availability: [new Date().toISOString()],
+      };
 
-        const createdMoment = await createMoment(createMomentInput);
+      const createdMoment = await createMoment(momentData);
 
-        if (createdMoment) {
-          Alert.alert('Success!', 'Your moment has been published', [
-            { text: 'OK', onPress: () => navigation.goBack() },
-          ]);
-        } else {
-          showToast('Could not create moment. Please try again.', 'error');
-        }
-      } catch {
-        showToast('Something went wrong. Please try again.', 'error');
-      } finally {
-        setIsSubmitting(false);
+      if (createdMoment) {
+        Alert.alert(
+          'Boom! 💥',
+          'Moment başarıyla drop edildi. Şimdi eşleşmeleri bekle!',
+          [{ text: 'Lets Go', onPress: () => navigation.navigate('Discover') }],
+        );
+      } else {
+        showToast('Could not create moment. Please try again.', 'error');
       }
-    },
-    [createMoment, navigation],
+    } catch (error) {
+      showToast('Something went wrong. Please try again.', 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [title, selectedCategory, imageUri, price, createMoment, navigation, showToast]);
+
+  // Navigate back to media step
+  const handleBack = useCallback(() => {
+    if (step === 'details') {
+      setStep('media');
+    } else if (step === 'price') {
+      setStep('details');
+    } else if (step === 'review') {
+      setStep('price');
+    }
+  }, [step]);
+
+  const handleClose = useCallback(() => {
+    navigation.goBack();
+  }, [navigation]);
+
+  // --- Render Steps ---
+
+  // Step 1: Media Selection - Clean upload UI
+  const renderMediaStep = () => (
+    <Animated.View entering={FadeIn} style={styles.centerContent}>
+      <TouchableOpacity onPress={pickImage} style={styles.uploadButton}>
+        <LinearGradient
+          colors={GRADIENTS.primary}
+          style={styles.gradientBorder}
+        >
+          <View style={styles.uploadInner}>
+            <MaterialCommunityIcons name="camera-plus" size={40} color="white" />
+            <Text style={styles.uploadText}>Upload Visual</Text>
+          </View>
+        </LinearGradient>
+      </TouchableOpacity>
+      <Text style={styles.stepHint}>
+        Yüksek kaliteli, dikey bir fotoğraf seç.{'\n'}Bu senin vitrinin.
+      </Text>
+    </Animated.View>
   );
 
-  // Handlers
-  const handleDatePress = useCallback(() => setShowDatePicker(true), []);
-  const handleNavigateToPlaceSearch = useCallback(() => {
-    setShowPlaceSearch(true);
-  }, []);
-  const handlePlaceSelect = useCallback(
-    (selectedPlace: Place) => {
-      setValue('place', selectedPlace);
-    },
-    [setValue],
-  );
+  // Steps 2-4: Overlay controls on top of selected image
+  const renderControls = () => {
+    if (step === 'media') return null;
 
-  return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    return (
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}
+        style={styles.overlayContainer}
       >
-        {/* Header */}
-        <View style={styles.header}>
+        {/* Top Controls: Back & Close */}
+        <View style={[styles.topBar, { marginTop: insets.top }]}>
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.headerButton}
+            onPress={handleBack}
+            style={styles.iconButton}
+            accessibilityLabel="Geri"
             accessibilityRole="button"
-            accessibilityLabel="Close"
           >
-            <MaterialCommunityIcons
-              name="close"
-              size={24}
-              color={COLORS.text.primary}
-            />
+            <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Share a Moment</Text>
-          <View style={styles.headerButton} />
+          <TouchableOpacity
+            onPress={handleClose}
+            style={styles.iconButton}
+            accessibilityLabel="Kapat"
+            accessibilityRole="button"
+          >
+            <Ionicons name="close" size={24} color="white" />
+          </TouchableOpacity>
         </View>
 
-        <ScrollView
-          style={styles.scrollView}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          onScrollBeginDrag={dismissKeyboard}
-        >
-          {/* Photo Section */}
-          <PhotoSection
-            photo={photo}
-            onPhotoSelected={(uri) => {
-              setPhoto(uri);
-              setValue('photo', uri);
-            }}
-          />
+        {/* Content Layer */}
+        <View style={styles.contentLayer}>
+          {/* STEP: DETAILS (Title & Category) */}
+          {step === 'details' && (
+            <Animated.View entering={SlideInDown} exiting={SlideOutDown}>
+              <Text style={styles.label}>SET THE VIBE</Text>
 
-          {/* Title Input */}
-          <Controller
-            control={control}
-            name="title"
-            render={({ field: { onChange, value } }) => (
-              <TitleInput title={value} onTitleChange={onChange} />
-            )}
-          />
-          {errors.title && (
-            <Text style={styles.errorText}>{errors.title.message}</Text>
-          )}
-
-          {/* Category Selector */}
-          <CategorySelector
-            selectedCategory={selectedCategory}
-            onSelectCategory={(category) => setValue('category', category)}
-          />
-          {errors.category && (
-            <Text style={styles.errorText}>{errors.category.message}</Text>
-          )}
-
-          {/* Details Section */}
-          <DetailsSection
-            place={place ?? null}
-            selectedDate={selectedDate}
-            amount={String(amount || '')}
-            onPlaceChange={(p) => setValue('place', p)}
-            onDatePress={handleDatePress}
-            onAmountChange={(a) => setValue('amount', parseFloat(a) || 0)}
-            onNavigateToPlaceSearch={handleNavigateToPlaceSearch}
-          />
-          {errors.amount && (
-            <Text style={styles.errorText}>{errors.amount.message}</Text>
-          )}
-          {errors.date && (
-            <Text style={styles.errorText}>{errors.date.message}</Text>
-          )}
-
-          {/* Story Section */}
-          <StorySection
-            story={story || ''}
-            onStoryChange={(s) => setValue('story', s)}
-          />
-
-          {/* Live Preview */}
-          <MomentPreview
-            photo={photo}
-            title={title}
-            story={story || ''}
-            place={place ?? null}
-            selectedDate={selectedDate}
-            amount={String(amount || '')}
-          />
-
-          {/* Bottom Spacing */}
-          <View style={styles.bottomSpacing} />
-        </ScrollView>
-
-        {/* Sticky Publish Button */}
-        <TouchableWithoutFeedback onPress={dismissKeyboard}>
-          <View style={styles.publishSection}>
-            {/* Show validation errors if form is incomplete */}
-            {!isValid && (
-              <View style={styles.validationHint}>
-                {errors.title && (
-                  <Text style={styles.validationError}>• Başlık en az 5 karakter olmalı</Text>
-                )}
-                {errors.category && (
-                  <Text style={styles.validationError}>• Kategori seçin</Text>
-                )}
-                {errors.amount && (
-                  <Text style={styles.validationError}>• Tutar girin (0'dan büyük)</Text>
-                )}
-              </View>
-            )}
-            <Text style={styles.publishHint}>{paymentHint}</Text>
-            <TouchableOpacity
-              testID="create-moment-button"
-              style={[
-                styles.publishButton,
-                (!isValid || isSubmitting) && styles.publishButtonDisabled,
-              ]}
-              onPress={handleSubmit(onPublish)}
-              activeOpacity={0.8}
-              disabled={!isValid || isSubmitting}
-              accessibilityRole="button"
-              accessibilityLabel="Publish moment"
-              accessibilityState={{ disabled: !isValid || isSubmitting }}
-            >
-              {isSubmitting ? (
-                <ActivityIndicator size="small" color={COLORS.text.primary} />
-              ) : (
-                <>
-                  <MaterialCommunityIcons
-                    name="check"
-                    size={20}
-                    color={COLORS.text.primary}
-                  />
-                  <Text style={styles.publishButtonText}>Publish Moment</Text>
-                </>
-              )}
-            </TouchableOpacity>
-          </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-
-      {/* Date Picker Modal */}
-      {showDatePicker &&
-        (Platform.OS === 'ios' ? (
-          <Modal
-            transparent={true}
-            animationType="slide"
-            visible={showDatePicker}
-            onRequestClose={() => setShowDatePicker(false)}
-          >
-            <View style={styles.datePickerModalContainer}>
-              <TouchableOpacity
-                style={styles.datePickerBackdrop}
-                activeOpacity={1}
-                onPress={() => setShowDatePicker(false)}
+              <TextInput
+                style={styles.titleInput}
+                placeholder="Dinner at Hotel Costes..."
+                placeholderTextColor="rgba(255,255,255,0.5)"
+                value={title}
+                onChangeText={setTitle}
+                maxLength={40}
+                autoFocus
+                accessibilityLabel="Moment başlığı"
               />
-              <View style={styles.datePickerContent}>
-                <View style={styles.datePickerHeader}>
-                  <TouchableOpacity onPress={() => setShowDatePicker(false)}>
-                    <Text style={styles.datePickerDoneText}>Done</Text>
+
+              <View style={styles.categoryGrid}>
+                {CATEGORIES.map((cat) => (
+                  <TouchableOpacity
+                    key={cat.id}
+                    style={[
+                      styles.categoryPill,
+                      selectedCategory === cat.id && styles.categoryPillActive,
+                    ]}
+                    onPress={() => setSelectedCategory(cat.id)}
+                    accessibilityLabel={cat.label}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: selectedCategory === cat.id }}
+                  >
+                    <MaterialCommunityIcons
+                      name={cat.icon}
+                      size={18}
+                      color={selectedCategory === cat.id ? 'black' : 'white'}
+                    />
+                    <Text
+                      style={[
+                        styles.categoryText,
+                        selectedCategory === cat.id && styles.categoryTextActive,
+                      ]}
+                    >
+                      {cat.label}
+                    </Text>
                   </TouchableOpacity>
-                </View>
-                <DateTimePicker
-                  value={selectedDate}
-                  mode="date"
-                  display="spinner"
-                  minimumDate={new Date()}
-                  maximumDate={new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)}
-                  onChange={(_event, date) => {
-                    if (date) setValue('date', date);
-                  }}
-                  textColor={COLORS.text.primary}
+                ))}
+              </View>
+
+              <TouchableOpacity
+                style={[
+                  styles.nextButton,
+                  (!title || !selectedCategory) && styles.nextButtonDisabled,
+                ]}
+                onPress={() => setStep('price')}
+                disabled={!title || !selectedCategory}
+                accessibilityLabel="Sonraki: Fiyat Belirle"
+                accessibilityRole="button"
+              >
+                <Text style={styles.nextButtonText}>Next: Set Price</Text>
+                <Ionicons name="arrow-forward" size={20} color="black" />
+              </TouchableOpacity>
+            </Animated.View>
+          )}
+
+          {/* STEP: PRICE */}
+          {step === 'price' && (
+            <Animated.View
+              entering={SlideInDown}
+              exiting={SlideOutDown}
+              style={styles.priceStep}
+            >
+              <Text style={styles.label}>ESTIMATED COST</Text>
+
+              <View style={styles.priceContainer}>
+                <Text style={styles.currency}>$</Text>
+                <TextInput
+                  style={styles.priceInput}
+                  value={price}
+                  onChangeText={setPrice}
+                  keyboardType="number-pad"
+                  maxLength={4}
+                  accessibilityLabel="Fiyat"
                 />
               </View>
-            </View>
-          </Modal>
-        ) : (
-          <DateTimePicker
-            value={selectedDate}
-            mode="date"
-            display="default"
-            minimumDate={new Date()}
-            maximumDate={new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)}
-            onChange={(_event, date) => {
-              setShowDatePicker(false);
-              if (date) setValue('date', date);
-            }}
-          />
-        ))}
+              <Text style={styles.priceHint}>
+                Bu tutarı eşleştiğin kişi ödeyecek (veya paylaşacaksınız).
+              </Text>
 
-      {/* Place Search Modal (Mapbox) */}
-      <PlaceSearchModal
-        visible={showPlaceSearch}
-        onClose={() => setShowPlaceSearch(false)}
-        onSelect={handlePlaceSelect}
-      />
-    </SafeAreaView>
+              <TouchableOpacity
+                style={styles.nextButton}
+                onPress={() => setStep('review')}
+                accessibilityLabel="Drop'u Gözden Geçir"
+                accessibilityRole="button"
+              >
+                <Text style={styles.nextButtonText}>Review Drop</Text>
+                <Ionicons name="eye-outline" size={20} color="black" />
+              </TouchableOpacity>
+            </Animated.View>
+          )}
+
+          {/* STEP: REVIEW (Final Look) */}
+          {step === 'review' && (
+            <Animated.View entering={SlideInDown} style={styles.reviewStep}>
+              <BlurView intensity={30} style={styles.reviewCard}>
+                <Text style={styles.reviewTitle}>{title}</Text>
+                <Text style={styles.reviewMeta}>
+                  {CATEGORIES.find((c) => c.id === selectedCategory)?.label} • $
+                  {price}
+                </Text>
+              </BlurView>
+
+              <TouchableOpacity
+                style={[
+                  styles.nextButton,
+                  styles.dropButton,
+                  isSubmitting && styles.nextButtonDisabled,
+                ]}
+                onPress={handleDrop}
+                disabled={isSubmitting}
+                accessibilityLabel="Moment'ı Drop Et"
+                accessibilityRole="button"
+              >
+                <Text style={[styles.nextButtonText, styles.dropButtonText]}>
+                  {isSubmitting ? 'DROPPING...' : 'DROP MOMENT 🔥'}
+                </Text>
+              </TouchableOpacity>
+            </Animated.View>
+          )}
+        </View>
+      </KeyboardAvoidingView>
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      {/* Background Image or Gradient Placeholder */}
+      <ImageBackground
+        source={imageUri ? { uri: imageUri } : undefined}
+        style={styles.background}
+        resizeMode="cover"
+      >
+        {!imageUri && (
+          <LinearGradient
+            colors={[COLORS.backgroundDark, '#1a1a1a']}
+            style={StyleSheet.absoluteFill}
+          />
+        )}
+
+        {/* Dark Overlay for Text Readability */}
+        {imageUri && (
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.8)']}
+            style={StyleSheet.absoluteFill}
+          />
+        )}
+
+        {step === 'media' ? renderMediaStep() : renderControls()}
+      </ImageBackground>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: COLORS.bg.primary,
     flex: 1,
+    backgroundColor: COLORS.backgroundDark,
   },
-  header: {
+  background: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  centerContent: {
     alignItems: 'center',
-    backgroundColor: COLORS.utility.white,
-    borderBottomColor: COLORS.border.default,
-    borderBottomWidth: 1,
+    gap: 20,
+  },
+
+  // Upload Button - Gradient border effect
+  uploadButton: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+  },
+  gradientBorder: {
+    flex: 1,
+    borderRadius: 60,
+    padding: 3, // Creates border effect
+  },
+  uploadInner: {
+    flex: 1,
+    backgroundColor: COLORS.backgroundDark,
+    borderRadius: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  uploadText: {
+    color: 'white',
+    marginTop: 8,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  stepHint: {
+    color: COLORS.text.secondary,
+    textAlign: 'center',
+    fontSize: 14,
+    lineHeight: 20,
+  },
+
+  // Overlay Controls
+  overlayContainer: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  topBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingVertical: 16,
   },
-  headerButton: {
+  iconButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(0,0,0,0.3)',
     alignItems: 'center',
-    height: 40,
     justifyContent: 'center',
-    width: 40,
   },
-  headerTitle: {
-    color: COLORS.text.primary,
-    fontSize: 17,
-    fontWeight: '600',
+  contentLayer: {
+    paddingHorizontal: 24,
+    paddingBottom: 40,
+    gap: 24,
   },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 20,
-  },
-  publishSection: {
-    backgroundColor: COLORS.utility.white,
-    borderTopColor: COLORS.border.default,
-    borderTopWidth: 1,
-    gap: 12,
-    padding: 20,
-  },
-  publishHint: {
-    color: COLORS.text.secondary,
+
+  // Labels & Inputs
+  label: {
+    color: COLORS.brand.primary,
+    fontWeight: '800',
     fontSize: 12,
+    marginBottom: 10,
+    letterSpacing: 1,
+  },
+  titleInput: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: 'white',
+    marginBottom: 20,
+  },
+
+  // Category Grid - Pills layout
+  categoryGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginBottom: 30,
+  },
+  categoryPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+    gap: 8,
+  },
+  categoryPillActive: {
+    backgroundColor: COLORS.brand.primary,
+    borderColor: COLORS.brand.primary,
+  },
+  categoryText: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  categoryTextActive: {
+    color: 'black',
+  },
+
+  // Price Step
+  priceStep: {
+    alignItems: 'center',
+  },
+  priceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  currency: {
+    fontSize: 40,
+    color: COLORS.brand.primary,
+    fontWeight: 'bold',
+    marginRight: 4,
+  },
+  priceInput: {
+    fontSize: 64,
+    fontWeight: '900',
+    color: 'white',
+    minWidth: 100,
     textAlign: 'center',
   },
-  publishButton: {
-    alignItems: 'center',
-    backgroundColor: COLORS.brand.primary,
-    borderRadius: LAYOUT.borderRadius.full,
-    flexDirection: 'row',
-    gap: 8,
-    justifyContent: 'center',
-    paddingVertical: 16,
-  },
-  publishButtonDisabled: {
-    backgroundColor: COLORS.border.default,
-  },
-  publishButtonText: {
-    color: COLORS.text.primary,
-    fontSize: 17,
-    fontWeight: '600',
-  },
-  bottomSpacing: {
-    height: 40,
-  },
-  datePickerModalContainer: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  datePickerBackdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  datePickerContent: {
-    backgroundColor: COLORS.utility.white,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingBottom: 20,
-  },
-  datePickerHeader: {
-    alignItems: 'flex-end',
-    borderBottomColor: COLORS.border.default,
-    borderBottomWidth: 1,
-    padding: 16,
-  },
-  datePickerDoneText: {
-    color: COLORS.brand.primary,
-    fontSize: 17,
-    fontWeight: '600',
-  },
-  errorText: {
-    color: COLORS.feedback.error,
-    fontSize: 12,
-    marginTop: 4,
-    marginHorizontal: LAYOUT.padding,
-  },
-  validationHint: {
-    backgroundColor: COLORS.feedback.errorBg || '#FEF2F2',
-    borderRadius: 8,
-    marginBottom: 12,
-    padding: 12,
-  },
-  validationError: {
-    color: COLORS.feedback.error,
-    fontSize: 13,
+  priceHint: {
+    color: 'rgba(255,255,255,0.6)',
+    marginBottom: 30,
+    textAlign: 'center',
+    fontSize: 14,
     lineHeight: 20,
+  },
+
+  // Review Step
+  reviewStep: {
+    alignItems: 'center',
+    width: '100%',
+  },
+  reviewCard: {
+    width: '100%',
+    padding: 24,
+    borderRadius: 24,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    marginBottom: 24,
+    alignItems: 'center',
+  },
+  reviewTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'white',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  reviewMeta: {
+    fontSize: 16,
+    color: COLORS.brand.primary,
+    fontWeight: '600',
+  },
+
+  // Buttons
+  nextButton: {
+    backgroundColor: COLORS.brand.primary,
+    height: 56,
+    borderRadius: 28,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    width: '100%',
+    shadowColor: COLORS.brand.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 6,
+  },
+  nextButtonText: {
+    color: 'black',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  nextButtonDisabled: {
+    opacity: 0.5,
+  },
+  dropButton: {
+    backgroundColor: COLORS.secondary, // Hot Pink for Drop
+  },
+  dropButtonText: {
+    color: 'white',
   },
 });
 
