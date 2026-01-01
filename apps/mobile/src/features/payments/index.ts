@@ -32,6 +32,7 @@ export { MyGiftsScreen } from './screens/MyGiftsScreen';
 export { GiftCardMarketScreen } from './screens/GiftCardMarketScreen';
 export { ProofReviewScreen } from './screens/ProofReviewScreen';
 export { PayTRWebViewScreen } from './screens/PayTRWebViewScreen';
+export { PayoutSettingsScreen } from './screens/PayoutSettingsScreen';
 
 // KYC Screens
 export { default as KYCIntroScreen } from './kyc/KYCIntroScreen';
