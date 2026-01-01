@@ -203,6 +203,7 @@ import {
   AboutScreen,
   FAQScreen,
   SupportScreen,
+  HelpCenterScreen,
   SafetyScreen,
   EmergencyScreen,
   PrivacyPolicyScreen,
@@ -456,6 +457,7 @@ const AppNavigator = () => {
             <Stack.Screen name="Subscription" component={SubscriptionScreen} />
             <Stack.Screen name="Support" component={SupportScreen} />
             <Stack.Screen name="FAQ" component={FAQScreen} />
+            <Stack.Screen name="HelpCenter" component={HelpCenterScreen} />
             <Stack.Screen
               name="DeleteAccount"
               component={DeleteAccountScreen}
