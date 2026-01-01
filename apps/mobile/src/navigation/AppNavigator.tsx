@@ -1,6 +1,6 @@
 // Note: import/order disabled because lazyLoad imports are grouped by feature, not alphabetically
-import React, { Suspense, useState, useEffect, useCallback } from 'react';
-import { View, ActivityIndicator, Linking } from 'react-native';
+import React, { Suspense, useState, useEffect } from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -10,8 +10,6 @@ import { lazyLoad } from '../utils/lazyLoad';
 import { navigationRef } from '../services/navigationService';
 import { apiClient } from '../services/apiV1Service';
 import { deepLinkHandler } from '../services/deepLinkHandler';
-import { useAuth } from '../context/AuthContext';
-import { logger } from '../utils/logger';
 
 // Loading fallback for lazy-loaded screens
 const loadingStyle = {
@@ -49,10 +47,6 @@ import SessionExpiredScreen from '../screens/SessionExpiredScreen';
 import LinkNotFoundScreen from '../screens/LinkNotFoundScreen';
 import LinkExpiredScreen from '../screens/LinkExpiredScreen';
 import LinkInvalidScreen from '../screens/LinkInvalidScreen';
-import SearchMapScreen from '../screens/SearchMapScreen';
-
-// Dev Menu (development only)
-import { DevMenuScreen } from '../screens/dev/DevMenuScreen';
 
 // ===================================
 // TRIPS FEATURE SCREENS
@@ -66,7 +60,7 @@ import {
   ReceiverApprovalScreen,
   DisputeFlowScreen,
   RequestsScreen,
-  RequestManagerScreen,
+  TicketScreen,
 } from '../features/trips';
 
 // ===================================
@@ -77,11 +71,6 @@ import {
   ChatScreen,
   ArchivedChatsScreen,
 } from '../features/messages';
-
-// ===================================
-// INBOX / VIBE ROOM FEATURE SCREENS
-// ===================================
-import { InboxScreen } from '../features/inbox';
 
 // ===================================
 // PROFILE FEATURE SCREENS
@@ -100,17 +89,7 @@ const TrustGardenDetailScreen = lazyLoad(() =>
     default: m.TrustGardenDetailScreen,
   })),
 );
-import {
-  TrustNotesScreen,
-  ProfileDetailScreen,
-  VerificationScreen,
-  AchievementsScreen,
-} from '../features/profile';
-
-// Review Screen
-const ReviewScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({ default: m.ReviewScreen })),
-);
+import { TrustNotesScreen, ProfileDetailScreen } from '../features/profile';
 
 // Proof system screens
 const ProofHistoryScreen = lazyLoad(() =>
@@ -181,14 +160,12 @@ import {
   GiftInboxDetailScreen,
   UnifiedGiftFlowScreen,
   MyGiftsScreen,
-  GiftCardMarketScreen,
   RefundRequestScreen,
   SuccessScreen,
   SuccessConfirmationScreen,
   PaymentFailedScreen,
   ProofReviewScreen,
   PayTRWebViewScreen,
-  CheckoutScreen,
   // KYC Screens
   KYCIntroScreen,
   KYCDocumentTypeScreen,
@@ -204,7 +181,6 @@ import {
 import {
   NotificationDetailScreen,
   GestureReceivedScreen,
-  NotificationsScreen,
 } from '../features/notifications';
 
 // ===================================
@@ -229,7 +205,6 @@ import {
   ReportUserScreen,
   MaintenanceScreen,
   DataPrivacyScreen,
-  CommunityGuidelinesScreen,
 } from '../features/settings';
 
 // Legal screens - Turkish compliance
@@ -256,55 +231,6 @@ const AppNavigator = () => {
   const [initialRoute, setInitialRoute] = useState<
     'Splash' | 'Onboarding' | 'Welcome' | null
   >(null);
-
-  // Get OAuth callback handler from AuthContext
-  const { handleOAuthCallback, isAuthenticated } = useAuth();
-
-  // Handle OAuth callback from deep link
-  const processOAuthCallback = useCallback(
-    async (url: string) => {
-      if (url.includes('/auth/callback')) {
-        logger.info('[AppNavigator] Processing OAuth callback:', url);
-        try {
-          await handleOAuthCallback(url);
-          logger.info('[AppNavigator] OAuth callback processed successfully');
-          // Navigate to main app after successful OAuth
-          if (navigationRef.isReady()) {
-            (navigationRef.navigate as (name: string) => void)('Discover');
-          }
-        } catch (error) {
-          logger.error('[AppNavigator] OAuth callback error:', error);
-        }
-      }
-    },
-    [handleOAuthCallback],
-  );
-
-  // Listen for OAuth callbacks via deep links
-  useEffect(() => {
-    // Handle initial URL (app opened from OAuth callback)
-    const handleInitialURL = async () => {
-      const url = await Linking.getInitialURL();
-      if (url && url.includes('/auth/callback')) {
-        logger.info('[AppNavigator] Initial URL is OAuth callback');
-        await processOAuthCallback(url);
-      }
-    };
-
-    void handleInitialURL();
-
-    // Listen for deep links while app is running
-    const subscription = Linking.addEventListener('url', ({ url }) => {
-      if (url.includes('/auth/callback')) {
-        logger.info('[AppNavigator] Received OAuth callback deep link');
-        void processOAuthCallback(url);
-      }
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, [processOAuthCallback]);
 
   useEffect(() => {
     const checkOnboarding = async () => {
@@ -447,13 +373,7 @@ const AppNavigator = () => {
             {/* Main App - New consolidated screens */}
             <Stack.Screen name="Discover" component={DiscoverScreen} />
             <Stack.Screen name="Requests" component={RequestsScreen} />
-            <Stack.Screen
-              name="RequestManager"
-              component={RequestManagerScreen}
-            />
             <Stack.Screen name="Messages" component={MessagesScreen} />
-            <Stack.Screen name="SearchMap" component={SearchMapScreen} />
-            <Stack.Screen name="Inbox" component={InboxScreen} />
 
             <Stack.Screen name="CreateMoment" component={CreateMomentScreen} />
             <Stack.Screen name="EditMoment" component={EditMomentScreen} />
@@ -463,12 +383,7 @@ const AppNavigator = () => {
               name="ProfileDetail"
               component={ProfileDetailScreen}
             />
-            <Stack.Screen name="Review" component={ReviewScreen} />
             <Stack.Screen name="MyGifts" component={MyGiftsScreen} />
-            <Stack.Screen
-              name="GiftCardMarket"
-              component={GiftCardMarketScreen}
-            />
             <Stack.Screen name="TrustNotes" component={TrustNotesScreen} />
             <Stack.Screen
               name="MomentGallery"
@@ -550,7 +465,6 @@ const AppNavigator = () => {
               name="IdentityVerification"
               component={KYCIntroScreen}
             />
-            <Stack.Screen name="GetVerified" component={VerificationScreen} />
             <Stack.Screen
               name="KYCDocumentType"
               component={KYCDocumentTypeScreen}
@@ -571,9 +485,6 @@ const AppNavigator = () => {
 
             {/* Reputation */}
             <Stack.Screen name="Reputation" component={ReputationScreen} />
-
-            {/* Achievements */}
-            <Stack.Screen name="Achievements" component={AchievementsScreen} />
 
             {/* Legal & Policy */}
             <Stack.Screen
@@ -613,16 +524,9 @@ const AppNavigator = () => {
               component={PaymentMethodsScreen}
             />
 
-            {/* Checkout */}
-            <Stack.Screen name="Checkout" component={CheckoutScreen} />
-
             {/* Wallet & Settings */}
             <Stack.Screen name="Wallet" component={WalletScreen} />
             <Stack.Screen name="Settings" component={AppSettingsScreen} />
-            <Stack.Screen
-              name="Notifications"
-              component={NotificationsScreen}
-            />
             <Stack.Screen
               name="NotificationDetail"
               component={NotificationDetailScreen}
@@ -654,6 +558,7 @@ const AppNavigator = () => {
               name="BookingDetail"
               component={BookingDetailScreen}
             />
+            <Stack.Screen name="Ticket" component={TicketScreen} />
             <Stack.Screen name="ShareMoment" component={ShareMomentScreen} />
             <Stack.Screen
               name="UnifiedGiftFlow"
@@ -665,7 +570,6 @@ const AppNavigator = () => {
             {/* <Stack.Screen name="Contact" component={ContactScreen} />
             <Stack.Screen name="Help" component={HelpScreen} /> */}
             <Stack.Screen name="Safety" component={SafetyScreen} />
-            <Stack.Screen name="CommunityGuidelines" component={CommunityGuidelinesScreen} />
 
             {/* Data Privacy & Deleted Content */}
             <Stack.Screen name="DataPrivacy" component={DataPrivacyScreen} />
@@ -673,9 +577,6 @@ const AppNavigator = () => {
               name="DeletedMoments"
               component={DeletedMomentsScreen}
             />
-
-            {/* Dev Menu (development only) */}
-            <Stack.Screen name="DevMenu" component={DevMenuScreen} />
           </Stack.Navigator>
         </Suspense>
       </NavigationContainer>

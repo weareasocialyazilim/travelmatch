@@ -1,6 +1,6 @@
 /**
  * Trips Feature - Barrel Exports
- * 
+ *
  * Seyahat discovery, booking, escrow yönetimi
  */
 
@@ -16,13 +16,26 @@ export { TripDetailsScreen } from './screens/TripDetailsScreen';
 export { default as RequestsScreen } from './screens/RequestsScreen';
 export { default as RequestManagerScreen } from './screens/RequestManagerScreen';
 export { MyTripsScreen } from './screens/MyTripsScreen';
+export { default as TicketScreen } from './screens/TicketScreen';
 
 // Hooks
-export { useTrips, useTrip, useCreateTrip, useUpdateTrip, useDeleteTrip, useMyTrips, useBooking } from './hooks/useTrips';
+export {
+  useTrips,
+  useTrip,
+  useCreateTrip,
+  useUpdateTrip,
+  useDeleteTrip,
+  useMyTrips,
+  useBooking,
+} from './hooks/useTrips';
 
 // Services
 export { tripsApi } from './services/tripsApi';
-export type { TripFilters, CreateTripDto, UpdateTripDto } from './services/tripsApi';
+export type {
+  TripFilters,
+  CreateTripDto,
+  UpdateTripDto,
+} from './services/tripsApi';
 
 // Types
 export type {
