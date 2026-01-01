@@ -173,6 +173,7 @@ export type RootStackParamList = {
   Subscription: undefined;
   Support: undefined;
   FAQ: undefined;
+  HelpCenter: undefined;
   DeleteAccount: undefined;
   NotificationSettings: undefined;
   HowEscrowWorks: undefined;
