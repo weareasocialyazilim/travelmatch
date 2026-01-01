@@ -1,7 +1,12 @@
 /**
  * Moments Feature - Public API
- * TODO: Add screens, components and hooks when implemented
+ *
+ * Phase 3: The Drop - Story Mode Moment Creation
  */
 
 // Types
 export * from './types/moments.types';
+
+// Screens - Re-exported from profile feature for navigation compatibility
+// The CreateMomentScreen uses an immersive "Story Mode" UI
+export { default as CreateMomentScreen } from '../profile/screens/CreateMomentScreen';
