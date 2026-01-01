@@ -221,6 +221,7 @@ import {
   TermsOfServiceScreen,
   RefundPolicyScreen,
   InviteFriendsScreen,
+  InviteContactsScreen,
   ReportUserScreen,
   MaintenanceScreen,
   DataPrivacyScreen,
@@ -557,6 +558,10 @@ const AppNavigator = () => {
             <Stack.Screen
               name="InviteFriends"
               component={InviteFriendsScreen}
+            />
+            <Stack.Screen
+              name="InviteContacts"
+              component={InviteContactsScreen}
             />
 
             {/* Reputation */}
