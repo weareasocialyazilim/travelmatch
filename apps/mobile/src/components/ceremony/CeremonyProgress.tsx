@@ -15,14 +15,10 @@ import { View, StyleSheet } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   withSpring,
-  interpolateColor,
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import {
-  CEREMONY_STEP_ORDER,
-  type CeremonyStep,
-} from '@/constants/ceremony';
-import { COLORS, GRADIENTS } from '@/constants/colors';
+import { CEREMONY_STEP_ORDER, type CeremonyStep } from '@/constants/ceremony';
+import { COLORS } from '@/constants/colors';
 import { SPACING } from '@/constants/spacing';
 
 interface CeremonyProgressProps {
@@ -100,18 +96,10 @@ const ProgressDot: React.FC<ProgressDotProps> = ({
 
   return (
     <Animated.View
-      style={[
-        styles.dot,
-        animatedStyle,
-        isCurrent && styles.dotCurrent,
-      ]}
+      style={[styles.dot, animatedStyle, isCurrent && styles.dotCurrent]}
     >
       {isCompleted && (
-        <MaterialCommunityIcons
-          name="check"
-          size={12}
-          color={COLORS.white}
-        />
+        <MaterialCommunityIcons name="check" size={12} color={COLORS.white} />
       )}
     </Animated.View>
   );
