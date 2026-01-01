@@ -244,6 +244,7 @@ export type RootStackParamList = {
   MyMoments: undefined;
   Security: undefined;
   AppSettings: undefined;
+  DataSettings: undefined;
   ConnectedAccounts: undefined;
   TrustGardenDetail: undefined;
   ChangePassword: undefined;
