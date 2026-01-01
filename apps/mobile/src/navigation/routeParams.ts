@@ -210,6 +210,14 @@ export type RootStackParamList = {
   // Payment Methods
   PaymentMethods: undefined;
 
+  // Checkout
+  Checkout: {
+    title?: string;
+    price?: number;
+    fee?: number;
+    momentId?: string;
+  } | undefined;
+
   // Wallet & Settings
   Wallet: undefined;
   TransactionHistory: undefined;

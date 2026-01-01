@@ -22,6 +22,7 @@ export { default as GiftInboxDetailScreen } from './screens/GiftInboxDetailScree
 export { default as PaymentsKYCScreen } from './screens/PaymentsKYCScreen';
 
 // Screens - named exports
+export { CheckoutScreen } from './screens/CheckoutScreen';
 export { PaymentFailedScreen } from './screens/PaymentFailedScreen';
 export { TransactionHistoryScreen } from './screens/TransactionHistoryScreen';
 export { SubscriptionScreen } from './screens/SubscriptionScreen';
