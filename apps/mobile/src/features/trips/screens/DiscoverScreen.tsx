@@ -1,723 +1,380 @@
-import React, {
-  useState,
-  useCallback,
-  useMemo,
-  useEffect,
-  useRef,
-} from 'react';
+/**
+ * DiscoverScreen - TravelMatch: The Rebirth
+ *
+ * TikTok-style immersive vertical feed with:
+ * - Full-screen moment cards
+ * - Snap-to-page scrolling
+ * - Anti-Cheapskate counter-offer logic
+ * - FloatingDock navigation
+ */
+
+import React, { useRef, useCallback, useMemo } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
-  ScrollView,
-  RefreshControl,
+  Dimensions,
+  FlatList,
+  Alert,
   StatusBar,
   ActivityIndicator,
-  TouchableOpacity,
-  type NativeSyntheticEvent,
-  type NativeScrollEvent,
+  Text,
 } from 'react-native';
-import * as Haptics from 'expo-haptics';
-import { FlashList } from '@shopify/flash-list';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { EmptyState } from '../../../components/ui/EmptyState';
-import BottomNav from '@/components/BottomNav';
-import {
-  StoryViewer,
-  FilterModal,
-  LocationModal,
-  DiscoverHeader,
-  StoryItem,
-  POPULAR_CITIES,
-} from '@/components/discover';
-import MomentSingleCard from '@/components/discover/cards/MomentSingleCard';
-import { SkeletonList } from '../../../components/ui/SkeletonList';
-import { COLORS } from '@/constants/colors';
-import { useMoments } from '@/hooks/useMoments';
-import { useAccessibility } from '@/hooks/useAccessibility';
-import { logger } from '@/utils/logger';
+import { useNavigation } from '@react-navigation/native';
+import * as Haptics from 'expo-haptics';
+import { ImmersiveMomentCard } from '@/components/discover/ImmersiveMomentCard';
+import { FloatingDock } from '@/components/layout/FloatingDock';
+import { useMoments, type Moment } from '@/hooks/useMoments';
+import { COLORS } from '@/theme/colors';
 import { withErrorBoundary } from '../../../components/withErrorBoundary';
-import { useNetworkStatus } from '../../../context/NetworkContext';
-import { OfflineState } from '../../../components/OfflineState';
-import { NetworkGuard } from '../../../components/NetworkGuard';
-
-// Import modular components
-import type { UserStory, PriceRange } from '@/components/discover/types';
-import type { RootStackParamList } from '@/navigation/routeParams';
-import type { Moment } from '@/hooks/useMoments';
-import type { Moment as DomainMoment } from '@/types';
 import type { NavigationProp } from '@react-navigation/native';
+import type { RootStackParamList } from '@/navigation/routeParams';
+
+const { height, width } = Dimensions.get('window');
+
+// Tier system for counter-offer validation
+interface PlaceTier {
+  category: string;
+  tier: number; // 1 = budget, 2 = mid, 3 = premium, 4 = luxury
+  price: number;
+}
+
+// Anti-Cheapskate Logic: Validate counter-offer tier
+const validateCounterOffer = (
+  proposedPlace: PlaceTier,
+  originalMoment: PlaceTier,
+): { valid: boolean; message?: string } => {
+  // Same category check
+  if (proposedPlace.category !== originalMoment.category) {
+    return {
+      valid: false,
+      message: 'Please suggest a place in the same category.',
+    };
+  }
+
+  // Tier check - proposed place must be at least the same tier
+  if (proposedPlace.tier < originalMoment.tier) {
+    return {
+      valid: false,
+      message:
+        "This suggestion doesn't match the moment's standards. TravelMatch maintains quality - please suggest something in a similar or higher tier!",
+    };
+  }
+
+  return { valid: true };
+};
+
+// Get tier from price (simplified logic)
+const getTierFromPrice = (price: number, category: string): number => {
+  // Food category tiers
+  if (category === 'food' || category === 'restaurant') {
+    if (price < 20) return 1; // Budget
+    if (price < 50) return 2; // Mid
+    if (price < 150) return 3; // Premium
+    return 4; // Luxury
+  }
+
+  // Default tiers for other categories
+  if (price < 50) return 1;
+  if (price < 150) return 2;
+  if (price < 500) return 3;
+  return 4;
+};
 
 const DiscoverScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const { isConnected, refresh: refreshNetwork } = useNetworkStatus();
-  const { props: a11y, announce: _announce } = useAccessibility();
+  const flatListRef = useRef<FlatList>(null);
+  const { moments, loading, error, refresh, loadMore, hasMore } = useMoments();
 
-  // Use moments hook for data fetching
-  const {
-    moments: apiMoments,
-    loading,
-    error,
-    refresh: refreshMoments,
-    loadMore,
-    hasMore,
-    setFilters,
-  } = useMoments();
-
-  // UI States
-  const [refreshing, setRefreshing] = useState(false);
-  const [showFilterModal, setShowFilterModal] = useState(false);
-  const [showLocationModal, setShowLocationModal] = useState(false);
-  const [showStoryViewer, setShowStoryViewer] = useState(false);
-  const [selectedStoryUser, setSelectedStoryUser] = useState<UserStory | null>(
-    null,
+  // Filter only active moments
+  const activeMoments = useMemo(
+    () => moments.filter((m) => m.status === 'active'),
+    [moments],
   );
 
-  // Story viewer states
-  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
-  const [currentUserIndex, setCurrentUserIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
+  // Handle Counter-Offer with Anti-Cheapskate Logic
+  const handleCounterOffer = useCallback((moment: Moment) => {
+    // In a real implementation, this would open a BottomSheet
+    // where the user selects an alternative place.
+    // For now, we simulate the validation logic.
 
-  // Filter states
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sortBy, setSortBy] = useState('nearest');
-  const [maxDistance, setMaxDistance] = useState(50);
-  const [priceRange, setPriceRange] = useState<PriceRange>({
-    min: 0,
-    max: 500,
-  });
-  const [selectedGender, setSelectedGender] = useState('all');
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-  // Location state
-  const [selectedLocation, setSelectedLocation] = useState('San Francisco, CA');
-  const [recentLocations, setRecentLocations] = useState([
-    'New York, NY',
-    'Los Angeles, CA',
-    'Chicago, IL',
-  ]);
+    // Get the original moment's tier info
+    const originalCategory =
+      typeof moment.category === 'string'
+        ? moment.category
+        : moment.category?.id || 'experience';
+    const originalPrice = moment.price || moment.pricePerGuest || 0;
+    const originalTier = getTierFromPrice(originalPrice, originalCategory);
 
-  // Refresh handler with haptic feedback
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    try {
-      await refreshMoments();
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-    } finally {
-      setRefreshing(false);
+    // Simulated proposed place (in real app, this comes from user selection)
+    // Simulating a "cheapskate" attempt for demo
+    const proposedPlace: PlaceTier = {
+      category: originalCategory,
+      tier: originalTier - 1, // Trying to downgrade
+      price: originalPrice * 0.3, // 70% cheaper
+    };
+
+    const validation = validateCounterOffer(proposedPlace, {
+      category: originalCategory,
+      tier: originalTier,
+      price: originalPrice,
+    });
+
+    if (!validation.valid) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      Alert.alert(
+        "Whoops! 📉",
+        validation.message ||
+          "This doesn't match the moment's standards. Suggest something similar or better!",
+        [{ text: 'Got it, I\'ll upgrade', style: 'default' }],
+      );
+      return;
     }
-  }, [refreshMoments]);
 
-  const closeStoryViewer = useCallback(() => {
-    setShowStoryViewer(false);
-    setSelectedStoryUser(null);
-    setCurrentStoryIndex(0);
-    setCurrentUserIndex(0);
-    setIsPaused(false);
+    // If valid, proceed with counter-offer flow
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    Alert.alert(
+      'Offer Sent! 🚀',
+      'Great alternative suggestion! The host will review it.',
+      [{ text: 'Awesome', style: 'default' }],
+    );
   }, []);
 
-  // Use API moments
-  const baseMoments = useMemo(() => {
-    return apiMoments;
-  }, [apiMoments]);
+  // Handle Gift Press
+  const handleGiftPress = useCallback(
+    (moment: Moment) => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      // Navigate to gift flow
+      navigation.navigate('UnifiedGiftFlow' as never, {
+        moment: moment as any,
+      } as never);
+    },
+    [navigation],
+  );
 
-  // Generate stories from moments created in the last 24 hours
-  // Each unique host with recent moments becomes a story
-  const recentStories = useMemo((): UserStory[] => {
-    logger.debug('Generating stories from moments:', baseMoments.length);
-    const now = new Date();
+  // Handle Like Press
+  const handleLikePress = useCallback(
+    (moment: Moment) => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      // TODO: Implement save/unsave logic
+    },
+    [],
+  );
 
-    // Use ALL moments for stories (removed time filter since we have no recent data)
-    // In production, this should filter by last 7-30 days
-    const recentMoments = baseMoments;
+  // Handle User Press
+  const handleUserPress = useCallback(
+    (moment: Moment) => {
+      navigation.navigate('Profile' as never, {
+        userId: moment.hostId,
+      } as never);
+    },
+    [navigation],
+  );
 
-    logger.debug('Recent moments after filter:', recentMoments.length);
+  // Handle Share Press
+  const handleSharePress = useCallback((moment: Moment) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    // TODO: Implement share logic
+  }, []);
 
-    // Group moments by host
-    const hostMomentsMap = new Map<
-      string,
-      { host: (typeof recentMoments)[0]; moments: typeof recentMoments }
-    >();
+  // Render each moment card
+  const renderItem = useCallback(
+    ({ item }: { item: Moment }) => (
+      <ImmersiveMomentCard
+        item={item}
+        onGiftPress={() => handleGiftPress(item)}
+        onCounterOfferPress={() => handleCounterOffer(item)}
+        onLikePress={() => handleLikePress(item)}
+        onUserPress={() => handleUserPress(item)}
+        onSharePress={() => handleSharePress(item)}
+      />
+    ),
+    [
+      handleGiftPress,
+      handleCounterOffer,
+      handleLikePress,
+      handleUserPress,
+      handleSharePress,
+    ],
+  );
 
-    recentMoments.forEach((moment) => {
-      const hostId = moment.hostId;
-      if (!hostMomentsMap.has(hostId)) {
-        hostMomentsMap.set(hostId, { host: moment, moments: [] });
-      }
-      hostMomentsMap.get(hostId)!.moments.push(moment);
-    });
+  // Handle refresh
+  const handleRefresh = useCallback(async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    await refresh();
+  }, [refresh]);
 
-    // Convert to UserStory format
-    const stories: UserStory[] = [];
-    hostMomentsMap.forEach(({ host, moments }) => {
-      // Calculate time ago for the most recent moment
-      const mostRecentMoment = moments.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      )[0];
-      const timeDiff =
-        now.getTime() - new Date(mostRecentMoment.createdAt).getTime();
-      const hoursAgo = Math.floor(timeDiff / (1000 * 60 * 60));
-      const minsAgo = Math.floor(timeDiff / (1000 * 60));
-      const timeAgo = hoursAgo > 0 ? `${hoursAgo}h ago` : `${minsAgo}m ago`;
-
-      stories.push({
-        id: host.hostId,
-        name: host.hostName || 'Unknown',
-        avatar: host.hostAvatar || '',
-        hasStory: true,
-        isNew: hoursAgo < 6, // Mark as new if less than 6 hours old
-        stories: moments.map((m) => ({
-          id: m.id,
-          imageUrl: m.image || m.images?.[0] || '',
-          title: m.title,
-          description: m.description || '',
-          location:
-            typeof m.location === 'string'
-              ? m.location
-              : m.location?.city || 'Unknown',
-          distance: m.distance || '0 km',
-          price: m.price || m.pricePerGuest || 0,
-          time: timeAgo,
-        })),
-      });
-    });
-
-    // Sort by most recent first
-    return stories.sort((a, b) => {
-      const aTime = a.stories[0]?.time || '24h ago';
-      const bTime = b.stories[0]?.time || '24h ago';
-      const parseTime = (t: string) => {
-        const match = t.match(/(\d+)(m|h)/);
-        if (!match) return 999;
-        const [, num, unit] = match;
-        return unit === 'm' ? parseInt(num) : parseInt(num) * 60;
-      };
-      return parseTime(aTime) - parseTime(bTime);
-    });
-  }, [baseMoments]);
-
-  // Log story count for debugging
-  useEffect(() => {
-    logger.debug('Recent stories count:', recentStories.length);
-  }, [recentStories]);
-
-  // Story navigation handlers (must be defined after recentStories)
-  const goToNextStory = useCallback(() => {
-    if (!selectedStoryUser) return;
-
-    const currentUserStories = selectedStoryUser.stories;
-
-    if (currentStoryIndex < currentUserStories.length - 1) {
-      setCurrentStoryIndex((prev) => prev + 1);
-    } else {
-      const nextUserIndex = currentUserIndex + 1;
-      if (nextUserIndex < recentStories.length) {
-        setCurrentUserIndex(nextUserIndex);
-        setSelectedStoryUser(recentStories[nextUserIndex]);
-        setCurrentStoryIndex(0);
-      } else {
-        closeStoryViewer();
-      }
-    }
-  }, [
-    selectedStoryUser,
-    currentStoryIndex,
-    currentUserIndex,
-    recentStories,
-    closeStoryViewer,
-  ]);
-
-  const goToPreviousStory = useCallback(() => {
-    if (!selectedStoryUser) return;
-
-    if (currentStoryIndex > 0) {
-      setCurrentStoryIndex((prev) => prev - 1);
-    } else {
-      const prevUserIndex = currentUserIndex - 1;
-      if (prevUserIndex >= 0) {
-        const prevUser = recentStories[prevUserIndex];
-        setCurrentUserIndex(prevUserIndex);
-        setSelectedStoryUser(prevUser);
-        setCurrentStoryIndex(prevUser.stories.length - 1);
-      }
-    }
-  }, [selectedStoryUser, currentStoryIndex, currentUserIndex, recentStories]);
-
-  // Filter and sort moments
-  const filteredMoments = useMemo(() => {
-    let moments = [...baseMoments];
-
-    if (selectedCategory !== 'all') {
-      moments = moments.filter((m) => {
-        const categoryId =
-          typeof m.category === 'string' ? m.category : m.category?.id;
-        return categoryId?.toLowerCase() === selectedCategory;
-      });
-    }
-
-    moments = moments.filter((m) => {
-      const price = m.price || m.pricePerGuest || 0;
-      return price >= priceRange.min && price <= priceRange.max;
-    });
-
-    switch (sortBy) {
-      case 'nearest':
-        moments.sort(
-          (a, b) =>
-            parseFloat(a.distance || '999') - parseFloat(b.distance || '999'),
-        );
-        break;
-      case 'newest':
-        moments.sort(
-          (a, b) =>
-            new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime(),
-        );
-        break;
-      case 'price_low':
-        moments.sort((a, b) => (a.price || 0) - (b.price || 0));
-        break;
-      case 'price_high':
-        moments.sort((a, b) => (b.price || 0) - (a.price || 0));
-        break;
-    }
-
-    return moments;
-  }, [baseMoments, selectedCategory, sortBy, priceRange]);
-
-  // Handle load more for infinite scroll
-  const handleLoadMore = useCallback(() => {
+  // Handle load more
+  const handleEndReached = useCallback(() => {
     if (hasMore && !loading) {
       loadMore();
     }
   }, [hasMore, loading, loadMore]);
 
-  // Ref to track if we're already loading more to prevent duplicate calls
-  const isLoadingMoreRef = useRef(false);
+  // Key extractor
+  const keyExtractor = useCallback((item: Moment) => item.id, []);
 
-  // Memoized scroll handler to prevent re-creation on every render
-  const handleScroll = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const { layoutMeasurement, contentOffset, contentSize } =
-        event.nativeEvent;
-      const paddingToBottom = 50;
-      const isCloseToBottom =
-        layoutMeasurement.height + contentOffset.y >=
-        contentSize.height - paddingToBottom;
-
-      if (isCloseToBottom && !isLoadingMoreRef.current) {
-        isLoadingMoreRef.current = true;
-        handleLoadMore();
-        // Reset after a short delay to prevent rapid firing
-        setTimeout(() => {
-          isLoadingMoreRef.current = false;
-        }, 500);
-      }
-    },
-    [handleLoadMore],
+  // Get item layout for performance optimization
+  const getItemLayout = useCallback(
+    (_: any, index: number) => ({
+      length: height,
+      offset: height * index,
+      index,
+    }),
+    [],
   );
 
-  // Apply filters to hook when category changes
-  useEffect(() => {
-    if (selectedCategory !== 'all') {
-      setFilters({ category: selectedCategory });
-    }
-  }, [selectedCategory, setFilters]);
+  // Loading state
+  if (loading && activeMoments.length === 0) {
+    return (
+      <View style={styles.loadingContainer}>
+        <StatusBar barStyle="light-content" backgroundColor="black" />
+        <ActivityIndicator size="large" color={COLORS.brand.primary} />
+        <Text style={styles.loadingText}>Discovering moments...</Text>
+      </View>
+    );
+  }
 
-  const handleMomentPress = useCallback(
-    (moment: Moment) => {
-      // Cast to any to bridge hook Moment and domain Moment types
-      navigation.navigate('MomentDetail', {
-        moment: moment as unknown as import('@/types').Moment,
-      });
-    },
-    [navigation],
-  );
+  // Error state
+  if (error && activeMoments.length === 0) {
+    return (
+      <View style={styles.errorContainer}>
+        <StatusBar barStyle="light-content" backgroundColor="black" />
+        <Text style={styles.errorText}>{error}</Text>
+        <Text style={styles.retryText} onPress={handleRefresh}>
+          Tap to retry
+        </Text>
+      </View>
+    );
+  }
 
-  const handleStoryPress = useCallback(
-    (user: UserStory) => {
-      const userIndex = recentStories.findIndex((u) => u.id === user.id);
-      setCurrentUserIndex(userIndex >= 0 ? userIndex : 0);
-      setSelectedStoryUser(user);
-      setCurrentStoryIndex(0);
-      setShowStoryViewer(true);
-    },
-    [recentStories],
-  );
-
-  const handleLocationSelect = useCallback(
-    (location: string) => {
-      if (
-        selectedLocation !== location &&
-        !recentLocations.includes(selectedLocation)
-      ) {
-        setRecentLocations((prev) => [selectedLocation, ...prev.slice(0, 2)]);
-      }
-      setSelectedLocation(location);
-      setShowLocationModal(false);
-    },
-    [selectedLocation, recentLocations],
-  );
-
-  // Active filter count
-  const activeFilterCount = useMemo(() => {
-    let count = 0;
-    if (selectedCategory !== 'all') count++;
-    if (sortBy !== 'nearest') count++;
-    if (maxDistance !== 50) count++;
-    if (priceRange.min !== 0 || priceRange.max !== 500) count++;
-    return count;
-  }, [selectedCategory, sortBy, maxDistance, priceRange, selectedGender]);
-
-  // Clear all filters
-  const clearFilters = useCallback(() => {
-    setSelectedCategory('all');
-    setSortBy('nearest');
-    setMaxDistance(50);
-    setPriceRange({ min: 0, max: 500 });
-    setSelectedGender('all');
-  }, []);
-
-  // Memoized modal handlers to prevent unnecessary re-renders
-  const openLocationModal = useCallback(() => setShowLocationModal(true), []);
-  const closeLocationModal = useCallback(() => setShowLocationModal(false), []);
-  const openFilterModal = useCallback(() => setShowFilterModal(true), []);
-  const closeFilterModal = useCallback(() => setShowFilterModal(false), []);
-
-  // Memoized render functions
-  const renderStoryItem = useCallback(
-    ({ item }: { item: UserStory }) => (
-      <StoryItem item={item} onPress={handleStoryPress} />
-    ),
-    [handleStoryPress],
-  );
-
-  const renderMomentCard = useCallback(
-    ({ item, index: _index }: { item: Moment; index: number }) => {
-      return <MomentSingleCard moment={item} onPress={handleMomentPress} />;
-    },
-    [handleMomentPress],
-  );
+  // Empty state
+  if (!loading && activeMoments.length === 0) {
+    return (
+      <View style={styles.emptyContainer}>
+        <StatusBar barStyle="light-content" backgroundColor="black" />
+        <Text style={styles.emptyTitle}>No moments yet</Text>
+        <Text style={styles.emptySubtitle}>
+          Be the first to create a moment!
+        </Text>
+        <FloatingDock />
+      </View>
+    );
+  }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.bg.primary} />
+    <View style={styles.container}>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
 
-      {/* Offline Banner at top */}
-      {!isConnected && (
-        <OfflineState
-          compact
-          onRetry={refreshNetwork}
-          message="İnternet bağlantısı yok"
-        />
+      {/* Immersive Vertical Feed */}
+      <FlatList
+        ref={flatListRef}
+        data={activeMoments}
+        renderItem={renderItem}
+        keyExtractor={keyExtractor}
+        pagingEnabled
+        decelerationRate="fast"
+        snapToInterval={height}
+        snapToAlignment="start"
+        showsVerticalScrollIndicator={false}
+        onRefresh={handleRefresh}
+        refreshing={loading}
+        onEndReached={handleEndReached}
+        onEndReachedThreshold={0.5}
+        getItemLayout={getItemLayout}
+        removeClippedSubviews
+        maxToRenderPerBatch={3}
+        windowSize={5}
+        initialNumToRender={2}
+      />
+
+      {/* Loading more indicator */}
+      {loading && activeMoments.length > 0 && (
+        <View style={styles.loadMoreIndicator}>
+          <ActivityIndicator size="small" color={COLORS.brand.primary} />
+        </View>
       )}
 
-      {/* Header */}
-      <DiscoverHeader
-        location={selectedLocation}
-        activeFiltersCount={activeFilterCount}
-        onLocationPress={openLocationModal}
-        onFilterPress={openFilterModal}
-      />
-
-      <NetworkGuard
-        offlineMessage={
-          apiMoments.length > 0
-            ? "Son yüklenen moment'ları gösteriyorsunuz"
-            : "Moment'ları yüklemek için internet bağlantısı gerekli"
-        }
-        onRetry={onRefresh}
-      >
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={{ paddingBottom: 100 }}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing || loading}
-              onRefresh={onRefresh}
-              tintColor={COLORS.mint}
-            />
-          }
-          onScroll={handleScroll}
-          scrollEventThrottle={400}
-        >
-          {/* Stories - Recent moments from last 7 days */}
-          {recentStories.length > 0 && (
-            <View style={{ height: 96 }}>
-              <FlashList
-                data={recentStories}
-                renderItem={renderStoryItem}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.storiesContainer}
-                estimatedItemSize={80}
-              />
-            </View>
-          )}
-
-          {/* Results Bar - simplified without view toggle */}
-          <View style={styles.resultsBar}>
-            <Text style={styles.resultsText}>
-              {loading
-                ? 'Loading...'
-                : `${filteredMoments.length} moments nearby`}
-            </Text>
-          </View>
-
-          {/* Error State */}
-          {error && !loading && (
-            <View style={styles.errorContainer}>
-              <MaterialCommunityIcons
-                name="alert-circle-outline"
-                size={48}
-                color={COLORS.feedback.error}
-                accessible={false}
-              />
-              <Text style={styles.errorText} {...a11y.alert(error)}>
-                {error}
-              </Text>
-              <TouchableOpacity
-                style={styles.retryButton}
-                onPress={onRefresh}
-                {...a11y.button('Try Again', 'Reload moments')}
-              >
-                <Text style={styles.retryButtonText}>Try Again</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {/* Loading Skeleton */}
-          {loading && filteredMoments.length === 0 && !error && (
-            <SkeletonList
-              type="moment"
-              count={4}
-              show={loading}
-              minDisplayTime={400}
-            />
-          )}
-
-          {/* Moments List */}
-          {!error && filteredMoments.length > 0 && (
-            <View style={styles.momentsListContainer}>
-              <FlashList
-                data={filteredMoments}
-                renderItem={renderMomentCard}
-                numColumns={1}
-                contentContainerStyle={styles.singleListContainer}
-                onEndReached={handleLoadMore}
-                onEndReachedThreshold={0.5}
-                scrollEnabled={false}
-                estimatedItemSize={350}
-              />
-            </View>
-          )}
-
-          {/* Empty State */}
-          {!loading && !error && filteredMoments.length === 0 && (
-            <EmptyState
-              icon="compass-off-outline"
-              title="No moments found"
-              description="Try adjusting your filters or location"
-              actionLabel="Clear Filters"
-              onAction={clearFilters}
-            />
-          )}
-
-          {/* Load More Indicator */}
-          {loading && filteredMoments.length > 0 && (
-            <View style={styles.loadMoreContainer}>
-              <ActivityIndicator size="small" color={COLORS.brand.primary} />
-              <Text style={styles.loadMoreText}>Loading more...</Text>
-            </View>
-          )}
-
-          {/* Bottom Padding */}
-          <View style={styles.bottomPadding} />
-        </ScrollView>
-      </NetworkGuard>
-
-      {/* Modals - Using extracted components */}
-      <LocationModal
-        visible={showLocationModal}
-        onClose={closeLocationModal}
-        onLocationSelect={handleLocationSelect}
-        selectedLocation={selectedLocation}
-        recentLocations={recentLocations}
-        popularCities={POPULAR_CITIES}
-        currentLocationName="San Francisco, CA"
-      />
-
-      <FilterModal
-        visible={showFilterModal}
-        onClose={closeFilterModal}
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-        sortBy={sortBy}
-        setSortBy={setSortBy}
-        maxDistance={maxDistance}
-        setMaxDistance={setMaxDistance}
-        priceRange={priceRange}
-        setPriceRange={setPriceRange}
-        selectedGender={selectedGender}
-        setSelectedGender={setSelectedGender}
-      />
-
-      <StoryViewer
-        visible={showStoryViewer}
-        user={selectedStoryUser}
-        currentStoryIndex={currentStoryIndex}
-        onClose={closeStoryViewer}
-        onNextStory={goToNextStory}
-        onPreviousStory={goToPreviousStory}
-        onViewMoment={(story) => {
-          closeStoryViewer();
-          // Convert story to moment format for navigation
-          const domainMoment: DomainMoment = {
-            id: story.id,
-            title: story.title,
-            imageUrl: story.imageUrl,
-            image: story.imageUrl,
-            price: story.price,
-            story: story.description,
-            location: { city: story.location, country: '' },
-            category: { id: 'experience', label: 'Experience', emoji: '✨' },
-            user: selectedStoryUser
-              ? {
-                  id: selectedStoryUser.id || '',
-                  name: selectedStoryUser.name,
-                  avatar: selectedStoryUser.avatar,
-                  isVerified: false,
-                  location: '',
-                  type: 'traveler',
-                  travelDays: 0,
-                }
-              : {
-                  id: '',
-                  name: 'Unknown',
-                  avatar: '',
-                  isVerified: false,
-                  location: '',
-                  type: 'traveler',
-                  travelDays: 0,
-                },
-            availability: 'Available',
-            giftCount: 0,
-          };
-          navigation.navigate('MomentDetail', {
-            moment: domainMoment,
-          });
-        }}
-        onUserPress={(userId) => {
-          // Handle user profile navigation
-          logger.debug('Navigate to user:', userId);
-        }}
-        onGift={(story) => {
-          logger.debug('Send gift for story:', story.id);
-          // TODO: Implement gift sending flow
-        }}
-        onShare={(story) => {
-          logger.debug('Share story:', story.id);
-          // TODO: Implement share functionality
-        }}
-        isPaused={isPaused}
-        setIsPaused={setIsPaused}
-      />
-
-      {/* Bottom Navigation */}
-      <BottomNav activeTab="Discover" />
-    </SafeAreaView>
+      {/* Floating Navigation Dock */}
+      <FloatingDock />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.bg.primary,
+    backgroundColor: COLORS.background.primary,
   },
-  scrollView: {
+
+  // Loading State
+  loadingContainer: {
     flex: 1,
-  },
-
-  // Results Bar
-  resultsBar: {
-    flexDirection: 'row',
+    backgroundColor: COLORS.background.primary,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    justifyContent: 'center',
   },
-  resultsText: {
-    fontSize: 14,
+  loadingText: {
     color: COLORS.text.secondary,
-  },
-
-  // Single List Container
-  singleListContainer: {
-    paddingHorizontal: 16,
+    fontSize: 16,
+    marginTop: 16,
   },
 
   // Error State
   errorContainer: {
     flex: 1,
+    backgroundColor: COLORS.background.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 40,
+    padding: 20,
   },
   errorText: {
+    color: COLORS.feedback.error,
     fontSize: 16,
-    color: COLORS.text.secondary,
     textAlign: 'center',
-    marginTop: 16,
+    marginBottom: 16,
   },
-  retryButton: {
-    marginTop: 20,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    backgroundColor: COLORS.brand.primary,
-    borderRadius: 8,
-  },
-  retryButtonText: {
-    color: COLORS.utility.white,
+  retryText: {
+    color: COLORS.brand.primary,
+    fontSize: 16,
     fontWeight: '600',
   },
 
-  // Load More
-  loadMoreContainer: {
-    flexDirection: 'row',
+  // Empty State
+  emptyContainer: {
+    flex: 1,
+    backgroundColor: COLORS.background.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 20,
+    padding: 20,
   },
-  loadMoreText: {
-    marginLeft: 8,
-    fontSize: 14,
+  emptyTitle: {
+    color: COLORS.text.primary,
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  emptySubtitle: {
     color: COLORS.text.secondary,
+    fontSize: 16,
+    textAlign: 'center',
   },
 
-  // Stories Container
-  storiesContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    gap: 16,
-  },
-
-  // Moments List Container - for FlashList
-  momentsListContainer: {
-    minHeight: 400,
-  },
-
-  // Bottom Padding
-  bottomPadding: {
-    height: 100,
+  // Load More
+  loadMoreIndicator: {
+    position: 'absolute',
+    bottom: 100,
+    alignSelf: 'center',
   },
 });
 
-// Wrap with ErrorBoundary for critical home screen
+// Wrap with ErrorBoundary
 export default withErrorBoundary(DiscoverScreen, {
   fallbackType: 'generic',
   displayName: 'DiscoverScreen',
