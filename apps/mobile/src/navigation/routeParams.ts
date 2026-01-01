@@ -61,7 +61,10 @@ export type RootStackParamList = {
     details?: SuccessDetails;
   };
 
-  // Main App - Tab Screens
+  // Main App - Tab Navigator
+  MainTabs: undefined;
+
+  // Individual Tab Screens (for deep linking)
   Discover: undefined;
   Search: undefined;
   Inbox: undefined;
