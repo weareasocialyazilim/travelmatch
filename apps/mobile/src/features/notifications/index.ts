@@ -3,6 +3,7 @@
 // Screens
 export { default as GestureReceivedScreen } from './screens/GestureReceivedScreen';
 export { NotificationDetailScreen } from './screens/NotificationDetailScreen';
+export { default as NotificationsScreen } from './screens/NotificationsScreen';
 
 // Hooks
 export { useNotifications } from '@/hooks/useNotifications';
