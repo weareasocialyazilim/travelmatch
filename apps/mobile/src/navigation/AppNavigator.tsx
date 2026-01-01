@@ -151,6 +151,7 @@ import {
   WalletScreen,
   WithdrawScreen,
   PaymentMethodsScreen,
+  AddCardScreen,
   TransactionDetailScreen,
   TransactionHistoryScreen,
   PaymentsKYCScreen,
@@ -525,6 +526,7 @@ const AppNavigator = () => {
               name="PaymentMethods"
               component={PaymentMethodsScreen}
             />
+            <Stack.Screen name="AddCard" component={AddCardScreen} />
 
             {/* Wallet & Settings */}
             <Stack.Screen name="Wallet" component={WalletScreen} />

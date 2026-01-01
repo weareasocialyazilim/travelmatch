@@ -209,6 +209,7 @@ export type RootStackParamList = {
 
   // Payment Methods
   PaymentMethods: undefined;
+  AddCard: undefined;
 
   // Wallet & Settings
   Wallet: undefined;
