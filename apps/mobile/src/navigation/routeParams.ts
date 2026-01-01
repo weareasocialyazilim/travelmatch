@@ -259,6 +259,7 @@ export type RootStackParamList = {
 
   // Footer pages
   Safety: undefined;
+  Emergency: undefined;
 
   // Deep Link Error Screens
   LinkInvalid: { message?: string };

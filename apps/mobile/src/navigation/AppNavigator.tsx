@@ -217,6 +217,7 @@ import {
   FAQScreen,
   SupportScreen,
   SafetyScreen,
+  EmergencyScreen,
   PrivacyPolicyScreen,
   TermsOfServiceScreen,
   RefundPolicyScreen,
@@ -652,6 +653,7 @@ const AppNavigator = () => {
             {/* <Stack.Screen name="Contact" component={ContactScreen} />
             <Stack.Screen name="Help" component={HelpScreen} /> */}
             <Stack.Screen name="Safety" component={SafetyScreen} />
+            <Stack.Screen name="Emergency" component={EmergencyScreen} />
 
             {/* Data Privacy & Deleted Content */}
             <Stack.Screen name="DataPrivacy" component={DataPrivacyScreen} />
