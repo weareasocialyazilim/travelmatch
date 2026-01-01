@@ -120,7 +120,7 @@ export const EmailAuthScreen: React.FC = () => {
               <TextInput
                 style={styles.input}
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={(text) => setEmail(text.toLowerCase())}
                 placeholder="you@example.com"
                 placeholderTextColor={COLORS.text.secondary}
                 keyboardType="email-address"
