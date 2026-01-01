@@ -48,25 +48,24 @@ export const PhoneAuthScreen: React.FC = () => {
   const formatPhoneNumber = (text: string) => {
     // Remove non-numeric characters
     const cleaned = text.replace(/\D/g, '');
-    // Format as (XXX) XXX-XXXX
+    // Format as XXX XXX XX XX (Turkish format)
     if (cleaned.length <= 3) return cleaned;
     if (cleaned.length <= 6)
-      return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3)}`;
-    return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(
-      6,
-      10,
-    )}`;
+      return `${cleaned.slice(0, 3)} ${cleaned.slice(3)}`;
+    if (cleaned.length <= 8)
+      return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6)}`;
+    return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6, 8)} ${cleaned.slice(8, 10)}`;
   };
 
   const getE164Phone = () => {
     const cleaned = phoneNumber.replace(/\D/g, '');
-    return `+1${cleaned}`; // Assuming US numbers, adjust as needed
+    return `+90${cleaned}`; // Turkish phone numbers
   };
 
   const handleSendOtp = async () => {
     const cleaned = phoneNumber.replace(/\D/g, '');
     if (cleaned.length !== 10) {
-      showToast('Please enter a valid 10-digit phone number', 'error');
+      showToast('Lütfen geçerli bir 10 haneli telefon numarası girin', 'error');
       return;
     }
 
@@ -74,14 +73,14 @@ export const PhoneAuthScreen: React.FC = () => {
     try {
       const { error } = await signInWithPhone(getE164Phone());
       if (error) {
-        showToast(error.message || 'Failed to send verification code', 'error');
+        showToast(error.message || 'Doğrulama kodu gönderilemedi', 'error');
       } else {
         setStep('otp');
         setCountdown(60);
-        showToast('Verification code sent!', 'success');
+        showToast('Doğrulama kodu gönderildi!', 'success');
       }
     } catch {
-      showToast('An error occurred. Please try again.', 'error');
+      showToast('Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -121,7 +120,7 @@ export const PhoneAuthScreen: React.FC = () => {
   const handleVerifyOtp = async () => {
     const code = otpCode.join('');
     if (code.length !== 6) {
-      showToast('Please enter the 6-digit code', 'error');
+      showToast('Lütfen 6 haneli kodu girin', 'error');
       return;
     }
 
@@ -129,13 +128,13 @@ export const PhoneAuthScreen: React.FC = () => {
     try {
       const { error } = await verifyPhoneOtp(getE164Phone(), code);
       if (error) {
-        showToast(error.message || 'Invalid verification code', 'error');
+        showToast(error.message || 'Geçersiz doğrulama kodu', 'error');
       } else {
-        showToast('Phone verified successfully!', 'success');
+        showToast('Telefon başarıyla doğrulandı!', 'success');
         // Navigation handled by auth state change
       }
     } catch {
-      showToast('An error occurred. Please try again.', 'error');
+      showToast('Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -177,33 +176,33 @@ export const PhoneAuthScreen: React.FC = () => {
             />
             <Text style={styles.title}>
               {step === 'phone'
-                ? 'Phone Authentication'
-                : 'Enter Verification Code'}
+                ? 'Telefon ile Giriş'
+                : 'Doğrulama Kodunu Girin'}
             </Text>
             <Text style={styles.subtitle}>
               {step === 'phone'
-                ? "We'll send you a verification code"
-                : `Code sent to ${phoneNumber}`}
+                ? 'Size bir doğrulama kodu göndereceğiz'
+                : `Kod gönderildi: ${phoneNumber}`}
             </Text>
           </View>
 
           {step === 'phone' ? (
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Phone Number</Text>
+              <Text style={styles.label}>Telefon Numarası</Text>
               <View style={styles.phoneInputWrapper}>
-                <Text style={styles.countryCode}>+1</Text>
+                <Text style={styles.countryCode}>+90</Text>
                 <TextInput
                   style={styles.phoneInput}
                   value={phoneNumber}
                   onChangeText={(text) =>
                     setPhoneNumber(formatPhoneNumber(text))
                   }
-                  placeholder="(555) 123-4567"
+                  placeholder="5XX XXX XX XX"
                   placeholderTextColor={COLORS.text.secondary}
                   keyboardType="phone-pad"
-                  maxLength={14}
+                  maxLength={13}
                   editable={!isLoading}
-                  {...a11y.textInput('Phone number input')}
+                  {...a11y.textInput('Telefon numarası girişi')}
                 />
               </View>
 
@@ -211,18 +210,18 @@ export const PhoneAuthScreen: React.FC = () => {
                 style={[styles.button, isLoading && styles.buttonDisabled]}
                 onPress={handleSendOtp}
                 disabled={isLoading}
-                {...a11y.button('Send verification code', undefined, isLoading)}
+                {...a11y.button('Doğrulama kodu gönder', undefined, isLoading)}
               >
                 {isLoading ? (
                   <ActivityIndicator color="#FFF" />
                 ) : (
-                  <Text style={styles.buttonText}>Send Code</Text>
+                  <Text style={styles.buttonText}>Kod Gönder</Text>
                 )}
               </TouchableOpacity>
             </View>
           ) : (
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Verification Code</Text>
+              <Text style={styles.label}>Doğrulama Kodu</Text>
               <View style={styles.otpContainer}>
                 {otpCode.map((digit, index) => (
                   <TextInput
@@ -250,12 +249,12 @@ export const PhoneAuthScreen: React.FC = () => {
                 style={[styles.button, isLoading && styles.buttonDisabled]}
                 onPress={handleVerifyOtp}
                 disabled={isLoading}
-                {...a11y.button('Verify code', undefined, isLoading)}
+                {...a11y.button('Kodu doğrula', undefined, isLoading)}
               >
                 {isLoading ? (
                   <ActivityIndicator color="#FFF" />
                 ) : (
-                  <Text style={styles.buttonText}>Verify</Text>
+                  <Text style={styles.buttonText}>Doğrula</Text>
                 )}
               </TouchableOpacity>
 
@@ -265,8 +264,8 @@ export const PhoneAuthScreen: React.FC = () => {
                 disabled={countdown > 0}
                 {...a11y.button(
                   countdown > 0
-                    ? `Resend code in ${countdown} seconds`
-                    : 'Resend code',
+                    ? `${countdown} saniye sonra tekrar gönder`
+                    : 'Tekrar gönder',
                   undefined,
                   countdown > 0,
                 )}
@@ -278,8 +277,8 @@ export const PhoneAuthScreen: React.FC = () => {
                   ]}
                 >
                   {countdown > 0
-                    ? `Resend code in ${countdown}s`
-                    : 'Resend Code'}
+                    ? `${countdown} saniye bekleyin`
+                    : 'Tekrar Gönder'}
                 </Text>
               </TouchableOpacity>
 
@@ -289,9 +288,9 @@ export const PhoneAuthScreen: React.FC = () => {
                   setStep('phone');
                   setOtpCode(['', '', '', '', '', '']);
                 }}
-                {...a11y.button('Change phone number')}
+                {...a11y.button('Telefon numarasını değiştir')}
               >
-                <Text style={styles.changePhoneText}>Change Phone Number</Text>
+                <Text style={styles.changePhoneText}>Numarayı Değiştir</Text>
               </TouchableOpacity>
             </View>
           )}
