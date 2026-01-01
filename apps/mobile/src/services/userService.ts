@@ -142,10 +142,10 @@ export const userService = {
       if (!user) return;
 
       // 1. Ensure local keys exist
-      const keys = await encryptionService.initializeKeys();
+      await encryptionService.initializeKeys();
 
       // 2. Check remote key
-      const { data: profile } = await dbUsersService.getById(user.id);
+      const { data: _profile } = await dbUsersService.getById(user.id);
 
       // TODO: Upload public key when column is added to database
       // Currently skipping public_key sync as column doesn't exist

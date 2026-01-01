@@ -14,18 +14,11 @@
  */
 
 import React, { memo, useMemo, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  Image,
-  Platform
-} from 'react-native';
+import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { COLORS, GRADIENTS, PALETTE } from '@/constants/colors';
+import { COLORS, GRADIENTS } from '@/constants/colors';
 
 // ============================================
 // NOTIFICATION TYPES & PRIORITY
@@ -64,91 +57,91 @@ const typeConfig: Record<NotificationType, TypeConfigItem> = {
     icon: 'gift',
     color: COLORS.secondary,
     bgColor: COLORS.secondaryMuted,
-    priority: 'high'
+    priority: 'high',
   },
   gift_sent: {
     icon: 'gift-outline',
     color: COLORS.primary,
     bgColor: COLORS.primaryMuted,
-    priority: 'normal'
+    priority: 'normal',
   },
   request_accepted: {
     icon: 'check-circle',
     color: COLORS.success,
     bgColor: COLORS.successMuted,
-    priority: 'high'
+    priority: 'high',
   },
   request_rejected: {
     icon: 'close-circle',
     color: COLORS.error,
     bgColor: 'rgba(239, 68, 68, 0.12)',
-    priority: 'normal'
+    priority: 'normal',
   },
   request_pending: {
     icon: 'clock-outline',
     color: COLORS.warning,
     bgColor: COLORS.primaryMuted,
-    priority: 'normal'
+    priority: 'normal',
   },
   new_message: {
     icon: 'message-text',
     color: COLORS.accent,
     bgColor: COLORS.accentMuted,
-    priority: 'high'
+    priority: 'high',
   },
   new_review: {
     icon: 'star',
     color: COLORS.primary,
     bgColor: COLORS.primaryMuted,
-    priority: 'normal'
+    priority: 'normal',
   },
   proof_required: {
     icon: 'camera',
     color: COLORS.warning,
     bgColor: COLORS.primaryMuted,
-    priority: 'urgent'
+    priority: 'urgent',
   },
   proof_verified: {
     icon: 'check-decagram',
     color: COLORS.trust.primary,
     bgColor: COLORS.trustMuted,
-    priority: 'high'
+    priority: 'high',
   },
   proof_rejected: {
     icon: 'alert-circle',
     color: COLORS.error,
     bgColor: 'rgba(239, 68, 68, 0.12)',
-    priority: 'high'
+    priority: 'high',
   },
   payment_received: {
     icon: 'cash-plus',
     color: COLORS.success,
     bgColor: COLORS.successMuted,
-    priority: 'high'
+    priority: 'high',
   },
   payment_sent: {
     icon: 'cash-minus',
     color: COLORS.text.secondary,
     bgColor: COLORS.surfaceMuted,
-    priority: 'normal'
+    priority: 'normal',
   },
   trust_update: {
     icon: 'shield-check',
     color: COLORS.trust.primary,
     bgColor: COLORS.trustMuted,
-    priority: 'normal'
+    priority: 'normal',
   },
   system: {
     icon: 'bell',
     color: COLORS.text.secondary,
     bgColor: COLORS.surfaceMuted,
-    priority: 'low'
+    priority: 'low',
   },
   promotional: {
     icon: 'tag',
     color: COLORS.secondary,
     bgColor: COLORS.secondaryMuted,
-    priority: 'low'
+    priority: 'low',
   },
 };
 
@@ -182,10 +175,9 @@ const PriorityIndicator: React.FC<{ priority: NotificationPriority }> = memo(
     const isUrgent = priority === 'urgent';
 
     return (
-      <View style={[
-        styles.priorityIndicator,
-        isUrgent && styles.priorityUrgent
-      ]}>
+      <View
+        style={[styles.priorityIndicator, isUrgent && styles.priorityUrgent]}
+      >
         {isUrgent ? (
           <LinearGradient
             colors={GRADIENTS.gift}
@@ -194,11 +186,13 @@ const PriorityIndicator: React.FC<{ priority: NotificationPriority }> = memo(
             style={styles.priorityGradient}
           />
         ) : (
-          <View style={[styles.priorityDot, { backgroundColor: COLORS.primary }]} />
+          <View
+            style={[styles.priorityDot, { backgroundColor: COLORS.primary }]}
+          />
         )}
       </View>
     );
-  }
+  },
 );
 
 PriorityIndicator.displayName = 'PriorityIndicator';
@@ -227,7 +221,7 @@ export const NotificationCard: React.FC<NotificationCardProps> = memo(
       () => [
         styles.card,
         !read && styles.unread,
-        config.priority === 'urgent' && styles.cardUrgent
+        config.priority === 'urgent' && styles.cardUrgent,
       ],
       [read, config.priority],
     );

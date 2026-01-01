@@ -245,7 +245,9 @@ export const paymentsApi = {
           // Validate file type for security
           const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
           if (!allowedTypes.includes(file.type)) {
-            throw new Error(`Invalid file type for ${key}. Allowed: JPEG, PNG, WebP`);
+            throw new Error(
+              `Invalid file type for ${key}. Allowed: JPEG, PNG, WebP`,
+            );
           }
 
           // Validate file size (max 10MB)
@@ -275,16 +277,20 @@ export const paymentsApi = {
       }
 
       // Create KYC record with paths (not URLs)
+      // Note: Using type assertion as table schema may not be fully typed
+      const insertData = {
+        user_id: user.id,
+        provider: 'manual',
+        document_type: documents.get('documentType') as string,
+        document_paths: documentPaths, // Store paths, not public URLs
+        status: 'pending',
+        verification_type: 'document',
+        submitted_at: new Date().toISOString(),
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await supabase
         .from('kyc_verifications')
-        .insert({
-          user_id: user.id,
-          document_type: documents.get('documentType') as string,
-          document_paths: documentPaths, // Store paths, not public URLs
-          status: 'pending',
-          verification_type: 'document',
-          submitted_at: new Date().toISOString(),
-        })
+        .insert(insertData as any)
         .select()
         .single();
 
@@ -292,8 +298,8 @@ export const paymentsApi = {
         // Cleanup uploaded files if database insert fails
         await Promise.all(
           uploadedPaths.map((path) =>
-            supabase.storage.from('kyc-documents').remove([path])
-          )
+            supabase.storage.from('kyc-documents').remove([path]),
+          ),
         );
         throw error;
       }
@@ -304,10 +310,13 @@ export const paymentsApi = {
       if (uploadedPaths.length > 0) {
         await Promise.all(
           uploadedPaths.map((path) =>
-            supabase.storage.from('kyc-documents').remove([path]).catch(() => {
-              // Ignore cleanup errors, log for investigation
-            })
-          )
+            supabase.storage
+              .from('kyc-documents')
+              .remove([path])
+              .catch(() => {
+                // Ignore cleanup errors, log for investigation
+              }),
+          ),
         );
       }
       throw error;

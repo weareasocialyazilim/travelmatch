@@ -1,7 +1,8 @@
-import { COLORS } from './colors';
-import type { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-export type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
+export type IconName = React.ComponentProps<
+  typeof MaterialCommunityIcons
+>['name'];
 
 /**
  * TravelMatch Subscription Plans

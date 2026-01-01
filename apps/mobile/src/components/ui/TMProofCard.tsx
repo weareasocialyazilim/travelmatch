@@ -23,7 +23,6 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
-  runOnJS,
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, SHADOWS, primitives } from '@/constants/colors';
@@ -60,7 +59,9 @@ export interface TMProofCardProps {
 /**
  * Get status configuration
  */
-const getStatusConfig = (status: ProofStatus): {
+const getStatusConfig = (
+  status: ProofStatus,
+): {
   label: string;
   color: string;
   bgColor: string;
@@ -156,7 +157,7 @@ export const TMProofCard: React.FC<TMProofCardProps> = ({
         <View style={styles.header}>
           <View style={styles.headerContent}>
             <MaterialCommunityIcons
-              name="camera-check"
+              name="camera-marker-outline"
               size={20}
               color={COLORS.trust.primary}
             />

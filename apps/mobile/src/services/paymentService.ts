@@ -215,10 +215,11 @@ export const paymentService = {
       const pendingAmount =
         pendingEscrow?.reduce((sum, e) => sum + e.amount, 0) || 0;
 
+      const walletData = data as { balance?: number; currency?: string } | null;
       return {
-        available: data?.balance || 0,
+        available: walletData?.balance || 0,
         pending: pendingAmount,
-        currency: data?.currency || 'USD',
+        currency: walletData?.currency || 'USD',
       };
     } catch (error) {
       logger.error('Get balance error:', error);
@@ -346,7 +347,7 @@ export const paymentService = {
         logger.error('Get payment methods error:', error);
         // If table doesn't exist, return empty array
         if (error.code === 'PGRST205') {
-          return { cards: [] };
+          return { cards: [], bankAccounts: [] };
         }
         throw error;
       }
@@ -799,7 +800,7 @@ export const paymentService = {
         throw new Error('Bank account not found or does not belong to you');
       }
 
-      if (!bankAccount.is_verified) {
+      if (!(bankAccount as { is_verified?: boolean }).is_verified) {
         throw new Error('Bank account must be verified before withdrawal');
       }
 

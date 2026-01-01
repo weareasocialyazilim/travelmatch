@@ -15,7 +15,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, ViewStyle } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, primitives } from '@/constants/colors';
-import { SIZES, SPACING } from '@/constants/spacing';
+import { SIZES } from '@/constants/spacing';
 
 export type AvatarSize =
   | 'xxs'
@@ -32,11 +32,11 @@ export type AvatarStatus = 'online' | 'offline' | 'away';
 // Size configuration matching the guide
 const SIZE_CONFIG: Record<AvatarSize, number> = {
   xxs: SIZES.avatarXXS, // 24
-  xs: SIZES.avatarXS,   // 28
-  sm: SIZES.avatarSM,   // 36
-  md: SIZES.avatarMD,   // 48
-  lg: SIZES.avatarLG,   // 64
-  xl: SIZES.avatarXL,   // 80
+  xs: SIZES.avatarXS, // 28
+  sm: SIZES.avatarSM, // 36
+  md: SIZES.avatarMD, // 48
+  lg: SIZES.avatarLG, // 64
+  xl: SIZES.avatarXL, // 80
   hero: SIZES.avatarHero, // 100
   profile: SIZES.avatar2XL, // 120
 };
@@ -185,15 +185,14 @@ export const TMAvatar: React.FC<TMAvatarProps> = ({
               width: avatarSize - (showBorder ? 4 : 0),
               height: avatarSize - (showBorder ? 4 : 0),
               borderRadius: (avatarSize - (showBorder ? 4 : 0)) / 2,
-              backgroundColor: name ? getBackgroundColor(name) : primitives.stone[300],
+              backgroundColor: name
+                ? getBackgroundColor(name)
+                : primitives.stone[300],
             },
           ]}
         >
           <Text
-            style={[
-              styles.initials,
-              { fontSize: INITIAL_FONT_SIZE[size] },
-            ]}
+            style={[styles.initials, { fontSize: INITIAL_FONT_SIZE[size] }]}
           >
             {name ? getInitials(name) : '?'}
           </Text>
