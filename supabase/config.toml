@@ -53,7 +53,9 @@ enable_signup = true
 [auth.email]
 enable_signup = true
 double_confirm_changes = true
-enable_confirmations = true
+# Email confirmation disabled - phone verification is used instead
+# Users verify their phone number after registration via Twilio
+enable_confirmations = false
 # SendGrid SMTP configuration (production)
 # Configure in Supabase Dashboard > Authentication > Email Templates
 # SMTP Settings:
