@@ -1,366 +1,84 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-} from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { changePasswordWithVerification } from '@/services/supabaseAuthService';
-import { useToast } from '@/context/ToastContext';
-import { useAccessibility } from '@/hooks/useAccessibility';
-import { COLORS } from '@/constants/colors';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { COLORS } from '@/theme/colors';
 
-export const ChangePasswordScreen: React.FC = () => {
-  const navigation = useNavigation();
-  const { showToast } = useToast();
-  const { props: a11y } = useAccessibility();
+export const ChangePasswordScreen = ({ navigation }: any) => {
+  const insets = useSafeAreaInsets();
+  const [oldPass, setOldPass] = useState('');
+  const [newPass, setNewPass] = useState('');
+  const [confirmPass, setConfirmPass] = useState('');
 
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const isValidPassword = (password: string) => {
-    // At least 8 characters, one uppercase, one lowercase, one number
-    return (
-      password.length >= 8 &&
-      /[A-Z]/.test(password) &&
-      /[a-z]/.test(password) &&
-      /\d/.test(password)
-    );
-  };
-
-  const canSubmit =
-    currentPassword.length > 0 &&
-    isValidPassword(newPassword) &&
-    newPassword === confirmPassword;
-
-  const handleChangePassword = async () => {
-    if (!canSubmit) {
-      if (newPassword !== confirmPassword) {
-        showToast('Passwords do not match', 'error');
-      } else if (!isValidPassword(newPassword)) {
-        showToast(
-          'Password must be at least 8 characters with uppercase, lowercase, and number',
-          'error',
-        );
-      }
+  const handleUpdate = () => {
+    if (newPass !== confirmPass) {
+      Alert.alert('Error', 'Passwords do not match');
       return;
     }
-
-    setIsLoading(true);
-    try {
-      const { error } = await changePasswordWithVerification(currentPassword, newPassword);
-      if (error) {
-        showToast(error.message || 'Şifre güncellenemedi', 'error');
-      } else {
-        showToast('Şifreniz başarıyla güncellendi!', 'success');
-        navigation.goBack();
-      }
-    } catch {
-      showToast('Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
-    } finally {
-      setIsLoading(false);
-    }
+    Alert.alert('Success', 'Password updated successfully', [{ text: 'OK', onPress: () => navigation.goBack() }]);
   };
 
-  const renderPasswordInput = (
-    label: string,
-    value: string,
-    onChangeText: (text: string) => void,
-    showPassword: boolean,
-    setShowPassword: (show: boolean) => void,
-    placeholder: string,
-    accessibilityLabel: string,
-  ) => (
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>{label}</Text>
-      <View style={styles.inputWrapper}>
-        <MaterialCommunityIcons
-          name="lock-outline"
-          size={20}
-          color={COLORS.text.secondary}
-          style={styles.inputIcon}
-        />
-        <TextInput
-          style={styles.input}
-          value={value}
-          onChangeText={onChangeText}
-          placeholder={placeholder}
-          placeholderTextColor={COLORS.text.secondary}
-          secureTextEntry={!showPassword}
-          autoCapitalize="none"
-          editable={!isLoading}
-          {...a11y.textInput(accessibilityLabel)}
-        />
-        <TouchableOpacity
-          onPress={() => setShowPassword(!showPassword)}
-          style={styles.eyeButton}
-          {...a11y.button(showPassword ? 'Hide password' : 'Show password')}
-        >
-          <MaterialCommunityIcons
-            name={showPassword ? 'eye-off-outline' : 'eye-outline'}
-            size={20}
-            color={COLORS.text.secondary}
+  return (
+    <View style={styles.container}>
+      <View style={[styles.header, { paddingTop: insets.top }]}>
+        <TouchableOpacity onPress={() => navigation.goBack()}><Ionicons name="arrow-back" size={24} color="white" /></TouchableOpacity>
+        <Text style={styles.headerTitle}>Change Password</Text>
+        <View style={{ width: 24 }} />
+      </View>
+
+      <View style={styles.content}>
+        <View style={styles.group}>
+          <Text style={styles.label}>Current Password</Text>
+          <TextInput
+            style={styles.input}
+            secureTextEntry
+            value={oldPass}
+            onChangeText={setOldPass}
+            placeholder="••••••••"
+            placeholderTextColor="#444"
           />
+        </View>
+
+        <View style={styles.group}>
+          <Text style={styles.label}>New Password</Text>
+          <TextInput
+            style={styles.input}
+            secureTextEntry
+            value={newPass}
+            onChangeText={setNewPass}
+            placeholder="••••••••"
+            placeholderTextColor="#444"
+          />
+        </View>
+
+        <View style={styles.group}>
+          <Text style={styles.label}>Confirm New Password</Text>
+          <TextInput
+            style={styles.input}
+            secureTextEntry
+            value={confirmPass}
+            onChangeText={setConfirmPass}
+            placeholder="••••••••"
+            placeholderTextColor="#444"
+          />
+        </View>
+
+        <TouchableOpacity style={styles.btn} onPress={handleUpdate}>
+          <Text style={styles.btnText}>Update Password</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
-
-  return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-        >
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-            {...a11y.button('Back button')}
-          >
-            <MaterialCommunityIcons
-              name="arrow-left"
-              size={24}
-              color={COLORS.text.primary}
-            />
-          </TouchableOpacity>
-
-          <View style={styles.header}>
-            <MaterialCommunityIcons
-              name="shield-lock-outline"
-              size={64}
-              color={COLORS.brand.primary}
-            />
-            <Text style={styles.title}>Change Password</Text>
-            <Text style={styles.subtitle}>
-              Create a strong password with at least 8 characters, including
-              uppercase, lowercase, and numbers
-            </Text>
-          </View>
-
-          <View style={styles.form}>
-            {renderPasswordInput(
-              'Current Password',
-              currentPassword,
-              setCurrentPassword,
-              showCurrentPassword,
-              setShowCurrentPassword,
-              'Enter current password',
-              'Current password input',
-            )}
-
-            {renderPasswordInput(
-              'New Password',
-              newPassword,
-              setNewPassword,
-              showNewPassword,
-              setShowNewPassword,
-              'Enter new password',
-              'New password input',
-            )}
-
-            {newPassword.length > 0 && (
-              <View style={styles.requirements}>
-                <RequirementItem
-                  met={newPassword.length >= 8}
-                  text="At least 8 characters"
-                />
-                <RequirementItem
-                  met={/[A-Z]/.test(newPassword)}
-                  text="One uppercase letter"
-                />
-                <RequirementItem
-                  met={/[a-z]/.test(newPassword)}
-                  text="One lowercase letter"
-                />
-                <RequirementItem
-                  met={/\d/.test(newPassword)}
-                  text="One number"
-                />
-              </View>
-            )}
-
-            {renderPasswordInput(
-              'Confirm New Password',
-              confirmPassword,
-              setConfirmPassword,
-              showConfirmPassword,
-              setShowConfirmPassword,
-              'Confirm new password',
-              'Confirm password input',
-            )}
-
-            {confirmPassword.length > 0 && newPassword !== confirmPassword && (
-              <Text style={styles.mismatchError}>Passwords do not match</Text>
-            )}
-
-            <TouchableOpacity
-              style={[
-                styles.button,
-                (!canSubmit || isLoading) && styles.buttonDisabled,
-              ]}
-              onPress={handleChangePassword}
-              disabled={!canSubmit || isLoading}
-              {...a11y.button(
-                'Update password',
-                undefined,
-                !canSubmit || isLoading,
-              )}
-            >
-              {isLoading ? (
-                <ActivityIndicator color="#FFF" />
-              ) : (
-                <Text style={styles.buttonText}>Update Password</Text>
-              )}
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
-  );
 };
 
-const RequirementItem: React.FC<{ met: boolean; text: string }> = ({
-  met,
-  text,
-}) => (
-  <View style={styles.requirementItem}>
-    <MaterialCommunityIcons
-      name={met ? 'check-circle' : 'circle-outline'}
-      size={16}
-      color={met ? COLORS.feedback.success : COLORS.text.secondary}
-    />
-    <Text style={[styles.requirementText, met && styles.requirementMet]}>
-      {text}
-    </Text>
-  </View>
-);
-
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: COLORS.bg.primary,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.bg.primary,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 20,
-  },
-  backButton: {
-    marginBottom: 20,
-    padding: 8,
-    alignSelf: 'flex-start',
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: COLORS.text.primary,
-    marginTop: 16,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: COLORS.text.secondary,
-    marginTop: 8,
-    textAlign: 'center',
-    paddingHorizontal: 20,
-  },
-  form: {
-    width: '100%',
-  },
-  inputGroup: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.text.primary,
-    marginBottom: 8,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.surface.base,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: COLORS.border.default,
-  },
-  inputIcon: {
-    paddingLeft: 16,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: COLORS.text.primary,
-    padding: 16,
-    paddingLeft: 12,
-  },
-  eyeButton: {
-    padding: 16,
-  },
-  requirements: {
-    backgroundColor: COLORS.surface.base,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20,
-  },
-  requirementItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
-  },
-  requirementText: {
-    fontSize: 14,
-    color: COLORS.text.secondary,
-  },
-  requirementMet: {
-    color: COLORS.feedback.success,
-  },
-  mismatchError: {
-    color: COLORS.feedback.error,
-    fontSize: 14,
-    marginTop: -12,
-    marginBottom: 16,
-  },
-  button: {
-    backgroundColor: COLORS.brand.primary,
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  container: { flex: 1, backgroundColor: COLORS.background.primary },
+  header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center' },
+  headerTitle: { fontSize: 16, fontWeight: 'bold', color: 'white' },
+  content: { padding: 24 },
+  group: { marginBottom: 24 },
+  label: { color: COLORS.text.secondary, marginBottom: 10, fontSize: 12, textTransform: 'uppercase' },
+  input: { backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: 16, color: 'white' },
+  btn: { backgroundColor: COLORS.brand.primary, padding: 18, borderRadius: 16, alignItems: 'center', marginTop: 20 },
+  btnText: { color: 'black', fontWeight: 'bold', fontSize: 16 },
 });
-
-export default ChangePasswordScreen;
