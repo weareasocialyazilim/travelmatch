@@ -208,6 +208,7 @@ export type RootStackParamList = {
 
   // Social & Invite
   InviteFriends: undefined;
+  InviteContacts: undefined;
 
   // Reputation
   Reputation: undefined;
