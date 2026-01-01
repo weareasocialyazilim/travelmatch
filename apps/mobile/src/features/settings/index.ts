@@ -1,5 +1,6 @@
 // Settings Feature Exports
 export { default as AppSettingsScreen } from './screens/AppSettingsScreen';
+export { SettingsScreen } from './screens/SettingsScreen';
 export { NotificationSettingsScreen } from './screens/NotificationSettingsScreen';
 export { default as SecurityScreen } from './screens/SecurityScreen';
 export { default as ConnectedAccountsScreen } from './screens/ConnectedAccountsScreen';
