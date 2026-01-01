@@ -14,6 +14,7 @@ export { default as PrivacyPolicyScreen } from './screens/PrivacyPolicyScreen';
 export { default as TermsOfServiceScreen } from './screens/TermsOfServiceScreen';
 export { RefundPolicyScreen } from './screens/RefundPolicyScreen';
 export { default as InviteFriendsScreen } from './screens/InviteFriendsScreen';
+export { default as ReferralScreen } from './screens/ReferralScreen';
 export { ReportUserScreen } from './screens/ReportUserScreen';
 export { MaintenanceScreen } from './screens/MaintenanceScreen';
 export { default as DataPrivacyScreen } from './screens/DataPrivacyScreen';
