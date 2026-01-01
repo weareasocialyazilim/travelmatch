@@ -1,305 +1,59 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Switch,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { COLORS } from '@/constants/colors';
-import { TYPOGRAPHY } from '@/theme/typography';
-import { logger } from '@/utils/logger';
-import type { RootStackParamList } from '@/navigation/routeParams';
-import type { StackNavigationProp } from '@react-navigation/stack';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Switch, TouchableOpacity } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { COLORS } from '@/theme/colors';
 
-type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
+const TOGGLES = [
+  { id: 'requests', label: 'New Requests', desc: 'When someone wants to join your moment' },
+  { id: 'messages', label: 'Chat Messages', desc: 'Direct messages from other travelers' },
+  { id: 'marketing', label: 'Offers & Updates', desc: 'News about TravelMatch features' },
+  { id: 'reminders', label: 'Reminders', desc: 'Upcoming moment alerts' },
+];
 
-type NotificationSettingsScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'NotificationSettings'
->;
+export const NotificationSettingsScreen = ({ navigation }: any) => {
+  const insets = useSafeAreaInsets();
+  const [settings, setSettings] = useState({ requests: true, messages: true, marketing: false, reminders: true });
 
-interface NotificationSettingsScreenProps {
-  navigation: NotificationSettingsScreenNavigationProp;
-}
-
-interface NotificationSetting {
-  id: string;
-  icon: IconName;
-  label: string;
-  value: boolean;
-}
-
-interface NotificationSection {
-  title: string;
-  settings: NotificationSetting[];
-}
-
-export const NotificationSettingsScreen: React.FC<
-  NotificationSettingsScreenProps
-> = ({ navigation }) => {
-  const [sections, setSections] = useState<NotificationSection[]>([
-    {
-      title: 'GIFTS & PROOFS',
-      settings: [
-        {
-          id: 'gift_received',
-          icon: 'gift',
-          label: 'When someone gifts my moment',
-          value: true,
-        },
-        {
-          id: 'proof_status',
-          icon: 'check-decagram',
-          label: 'When a proof is approved or rejected',
-          value: true,
-        },
-      ],
-    },
-    {
-      title: 'MESSAGES',
-      settings: [
-        {
-          id: 'new_messages',
-          icon: 'message-text',
-          label: 'New chat messages',
-          value: false,
-        },
-        {
-          id: 'message_requests',
-          icon: 'email',
-          label: 'Message requests',
-          value: true,
-        },
-      ],
-    },
-    {
-      title: 'DISCOVERY',
-      settings: [
-        {
-          id: 'nearby_moments',
-          icon: 'map-marker',
-          label: 'Moments near me',
-          value: false,
-        },
-        {
-          id: 'trip_reminders',
-          icon: 'airplane-takeoff',
-          label: 'Trip reminders & travel tips',
-          value: true,
-        },
-      ],
-    },
-    {
-      title: 'APP UPDATES',
-      settings: [
-        {
-          id: 'announcements',
-          icon: 'bullhorn',
-          label: 'New features & announcements',
-          value: true,
-        },
-      ],
-    },
-  ]);
-
-  const STORAGE_KEY = '@notification_settings';
-
-  // Load settings on mount
-  useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        const saved = await AsyncStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          const savedValues = JSON.parse(saved) as Record<string, boolean>;
-          setSections((prev) =>
-            prev.map((section) => ({
-              ...section,
-              settings: section.settings.map((setting) => ({
-                ...setting,
-                value: savedValues[setting.id] ?? setting.value,
-              })),
-            })),
-          );
-        }
-      } catch {
-        logger.debug('Failed to load notification settings');
-      }
-    };
-    void loadSettings();
-  }, []);
-
-  const toggleSetting = async (sectionIndex: number, settingId: string) => {
-    const newSections = [...sections];
-    const setting = newSections[sectionIndex].settings.find(
-      (s) => s.id === settingId,
-    );
-    if (setting) {
-      setting.value = !setting.value;
-      setSections(newSections);
-
-      // Save to AsyncStorage
-      const allSettings: Record<string, boolean> = {};
-      newSections.forEach((section) => {
-        section.settings.forEach((s) => {
-          allSettings[s.id] = s.value;
-        });
-      });
-      try {
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(allSettings));
-      } catch {
-        logger.debug('Failed to save notification settings');
-      }
-    }
+  const toggle = (id: string) => {
+    setSettings(prev => ({ ...prev, [id]: !prev[id as keyof typeof prev] }));
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerButton}
-          onPress={() => navigation.goBack()}
-          activeOpacity={0.7}
-        >
-          <MaterialCommunityIcons
-            name={'arrow-left' as IconName}
-            size={24}
-            color={COLORS.text.primary}
-          />
-        </TouchableOpacity>
+    <View style={styles.container}>
+      <View style={[styles.header, { paddingTop: insets.top }]}>
+        <TouchableOpacity onPress={() => navigation.goBack()}><Ionicons name="arrow-back" size={24} color="white" /></TouchableOpacity>
         <Text style={styles.headerTitle}>Notifications</Text>
-        <View style={styles.headerButton} />
+        <View style={{ width: 24 }} />
       </View>
 
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
-        {sections.map((section, sectionIndex) => (
-          <View key={section.title} style={styles.section}>
-            <Text style={styles.sectionTitle}>{section.title}</Text>
-            <View style={styles.settingsContainer}>
-              {section.settings.map((setting, settingIndex) => (
-                <View
-                  key={setting.id}
-                  style={[
-                    styles.settingRow,
-                    settingIndex < section.settings.length - 1 &&
-                      styles.settingRowBorder,
-                  ]}
-                >
-                  <View style={styles.settingContent}>
-                    <View style={styles.settingIconContainer}>
-                      <MaterialCommunityIcons
-                        name={setting.icon}
-                        size={20}
-                        color={COLORS.brand.primary}
-                      />
-                    </View>
-                    <Text style={styles.settingLabel}>{setting.label}</Text>
-                  </View>
-                  <Switch
-                    value={setting.value}
-                    onValueChange={() =>
-                      toggleSetting(sectionIndex, setting.id)
-                    }
-                    trackColor={{
-                      false: COLORS.border.default,
-                      true: COLORS.brand.primary,
-                    }}
-                    thumbColor={COLORS.utility.white}
-                  />
-                </View>
-              ))}
+      <View style={styles.content}>
+        {TOGGLES.map((item) => (
+          <View key={item.id} style={styles.row}>
+            <View style={styles.textCol}>
+              <Text style={styles.label}>{item.label}</Text>
+              <Text style={styles.desc}>{item.desc}</Text>
             </View>
+            <Switch
+              trackColor={{ false: "#3e3e3e", true: COLORS.brand.primary }}
+              thumbColor={settings[item.id as keyof typeof settings] ? "#000" : "#f4f3f4"}
+              onValueChange={() => toggle(item.id)}
+              value={settings[item.id as keyof typeof settings]}
+            />
           </View>
         ))}
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.bg.primary,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border.default,
-  },
-  headerButton: {
-    width: 48,
-    height: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    ...TYPOGRAPHY.h4,
-    fontWeight: '700',
-    color: COLORS.text.primary,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  section: {
-    paddingTop: 16,
-    paddingBottom: 8,
-  },
-  sectionTitle: {
-    ...TYPOGRAPHY.caption,
-    fontWeight: '700',
-    color: COLORS.text.secondary,
-    paddingHorizontal: 16,
-    paddingBottom: 8,
-    letterSpacing: 0.5,
-  },
-  settingsContainer: {
-    backgroundColor: COLORS.utility.white,
-    marginHorizontal: 16,
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  settingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    minHeight: 56,
-    paddingHorizontal: 16,
-    gap: 16,
-  },
-  settingRowBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: `${COLORS.border.default}40`,
-  },
-  settingContent: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-  },
-  settingIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    backgroundColor: `${COLORS.brand.primary}20`,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  settingLabel: {
-    flex: 1,
-    ...TYPOGRAPHY.bodyLarge,
-    color: COLORS.text.primary,
-    lineHeight: 20,
-  },
+  container: { flex: 1, backgroundColor: COLORS.background.primary },
+  header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center' },
+  headerTitle: { fontSize: 16, fontWeight: 'bold', color: 'white' },
+  content: { padding: 20 },
+  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 20, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' },
+  textCol: { flex: 1, marginRight: 20 },
+  label: { color: 'white', fontSize: 16, fontWeight: 'bold', marginBottom: 4 },
+  desc: { color: '#666', fontSize: 13, lineHeight: 18 },
 });
