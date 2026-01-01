@@ -212,6 +212,7 @@ import {
   ReportUserScreen,
   MaintenanceScreen,
   DataPrivacyScreen,
+  DietaryPreferencesScreen,
 } from '../features/settings';
 
 // Legal screens - Turkish compliance
