@@ -2,17 +2,38 @@ import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
+import { OfferBubble } from './OfferBubble';
 import type { Message } from '../hooks/useChatScreen';
+import type { OfferStatus } from '@/types/message.types';
 
 interface MessageBubbleProps {
   item: Message;
   proofStatus?: 'pending' | 'verified' | 'rejected' | 'disputed';
+  onAcceptOffer?: (messageId: string) => void;
+  onDeclineOffer?: (messageId: string) => void;
 }
 
 export const MessageBubble: React.FC<MessageBubbleProps> = ({
   item,
   proofStatus = 'verified',
+  onAcceptOffer,
+  onDeclineOffer,
 }) => {
+  // Offer message
+  if (item.type === 'offer') {
+    return (
+      <OfferBubble
+        amount={item.amount || 0}
+        currency={item.currency}
+        status={(item.offerStatus as OfferStatus) || 'pending'}
+        momentTitle={item.momentTitle}
+        isOwn={item.user === 'me'}
+        onAccept={() => onAcceptOffer?.(item.id)}
+        onDecline={() => onDeclineOffer?.(item.id)}
+      />
+    );
+  }
+
   // System message
   if (item.type === 'system') {
     return (

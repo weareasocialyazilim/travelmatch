@@ -1,9 +1,9 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChatHeader } from '../components/ChatHeader';
+import { ChatHeader, type LinkedMoment } from '../components/ChatHeader';
 import { MessageBubble } from '../components/MessageBubble';
 import { ChatInputBar } from '../components/ChatInputBar';
 import { ChatAttachmentBottomSheet } from '@/components/ChatAttachmentBottomSheet';
@@ -48,6 +48,8 @@ const ChatScreen: React.FC = () => {
     handlePhotoVideo,
     handleGift,
     handleChatAction,
+    handleAcceptOffer,
+    handleDeclineOffer,
   } = useChatScreen({
     conversationId,
     otherUserId: otherUser.id,
@@ -58,22 +60,56 @@ const ChatScreen: React.FC = () => {
 
   const renderMessage = useCallback(
     ({ item }: { item: Message }) => (
-      <MessageBubble item={item} proofStatus={proofStatus} />
+      <MessageBubble
+        item={item}
+        proofStatus={proofStatus}
+        onAcceptOffer={handleAcceptOffer}
+        onDeclineOffer={handleDeclineOffer}
+      />
     ),
-    [proofStatus]
+    [proofStatus, handleAcceptOffer, handleDeclineOffer]
   );
 
-  const handleMomentPress = () => {
+  // Get linked moment from messages (if there's an offer) or conversation context
+  // In production, this would come from the conversation data or API
+  const linkedMoment = useMemo((): LinkedMoment | undefined => {
+    // Find any offer message to get moment context
+    const offerMessage = messages.find((msg) => msg.type === 'offer');
+    if (offerMessage && offerMessage.momentId) {
+      return {
+        id: offerMessage.momentId,
+        title: offerMessage.momentTitle || 'Moment',
+        price: offerMessage.amount,
+        currency: offerMessage.currency,
+        status: offerMessage.offerStatus === 'accepted' ? 'accepted' : 'negotiating',
+        isGiftedByMe: offerMessage.user === 'me',
+      };
+    }
+
+    // Default mock moment for demo - would be fetched from conversation in production
+    return {
+      id: 'moment-123',
+      title: 'Coffee at a Parisian Café',
+      image: 'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=200',
+      price: 15,
+      status: 'negotiating',
+      isGiftedByMe: isSender,
+    };
+  }, [messages, isSender]);
+
+  const handleMomentPress = useCallback(() => {
+    if (!linkedMoment) return;
+
     logger.debug('Moment card pressed - navigating to MomentDetail');
     navigation.navigate('MomentDetail', {
       moment: {
-        id: 'moment-123',
-        title: 'Coffee at a Parisian Café',
+        id: linkedMoment.id,
+        title: linkedMoment.title,
         story:
           'Enjoy coffee with a view of the Eiffel Tower. Experience authentic Parisian café culture while enjoying breathtaking views of the iconic Eiffel Tower.',
         imageUrl:
-          'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=800',
-        price: 15,
+          linkedMoment.image || 'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=800',
+        price: linkedMoment.price || 15,
         availability: 'Dec 5-10',
         category: {
           id: 'food',
@@ -95,13 +131,14 @@ const ChatScreen: React.FC = () => {
         },
       },
     });
-  };
+  }, [linkedMoment, navigation, otherUser]);
 
   return (
     <NetworkGuard>
       <SafeAreaView style={styles.container} edges={['top']}>
         <ChatHeader
           otherUser={otherUser}
+          linkedMoment={linkedMoment}
           onBack={() => navigation.goBack()}
           onUserPress={() =>
             navigation.navigate('ProfileDetail', { userId: otherUser.id })

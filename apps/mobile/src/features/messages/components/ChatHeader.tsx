@@ -3,6 +3,16 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 
+export interface LinkedMoment {
+  id: string;
+  title: string;
+  image?: string;
+  price?: number;
+  currency?: string;
+  status?: 'negotiating' | 'accepted' | 'paid' | 'completed';
+  isGiftedByMe?: boolean;
+}
+
 interface ChatHeaderProps {
   otherUser: {
     id: string;
@@ -11,6 +21,7 @@ interface ChatHeaderProps {
     type?: string;
     isVerified?: boolean | null;
   };
+  linkedMoment?: LinkedMoment;
   onBack: () => void;
   onUserPress: () => void;
   onMomentPress: () => void;
@@ -19,11 +30,24 @@ interface ChatHeaderProps {
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
   otherUser,
+  linkedMoment,
   onBack,
   onUserPress,
   onMomentPress,
   onMorePress,
 }) => {
+  const getMomentSubtitle = () => {
+    if (!linkedMoment) return '';
+    if (linkedMoment.status === 'paid' || linkedMoment.status === 'completed') {
+      return linkedMoment.isGiftedByMe ? 'Gifted by you' : 'Gift received';
+    }
+    if (linkedMoment.status === 'accepted') {
+      return 'Offer accepted';
+    }
+    const currencySymbol = linkedMoment.currency === 'TRY' ? '₺' : linkedMoment.currency === 'EUR' ? '€' : '$';
+    return linkedMoment.price ? `${currencySymbol}${linkedMoment.price}` : 'Negotiating';
+  };
+
   return (
     <View style={styles.header}>
       <View style={styles.headerTop}>
@@ -93,28 +117,32 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
       </View>
 
       {/* Linked Moment Card */}
-      <TouchableOpacity
-        style={styles.linkedMomentCard}
-        onPress={onMomentPress}
-        activeOpacity={0.7}
-        accessibilityLabel="View linked moment: Coffee at a Parisian Café"
-        accessibilityRole="button"
-        accessibilityHint="Opens the moment details"
-      >
-        <Image
-          source={{
-            uri: 'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=200',
-          }}
-          style={styles.momentThumbnail}
-        />
-        <View style={styles.momentInfo}>
-          <Text style={styles.momentTitle}>Coffee at a Parisian Café</Text>
-          <Text style={styles.momentSubtitle}>Gifted by you</Text>
-        </View>
-        <View style={styles.viewButton}>
-          <Text style={styles.viewButtonText}>View</Text>
-        </View>
-      </TouchableOpacity>
+      {linkedMoment && (
+        <TouchableOpacity
+          style={styles.linkedMomentCard}
+          onPress={onMomentPress}
+          activeOpacity={0.7}
+          accessibilityLabel={`View linked moment: ${linkedMoment.title}`}
+          accessibilityRole="button"
+          accessibilityHint="Opens the moment details"
+        >
+          <Image
+            source={{
+              uri: linkedMoment.image || 'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=200',
+            }}
+            style={styles.momentThumbnail}
+          />
+          <View style={styles.momentInfo}>
+            <Text style={styles.momentTitle} numberOfLines={1}>
+              {linkedMoment.title}
+            </Text>
+            <Text style={styles.momentSubtitle}>{getMomentSubtitle()}</Text>
+          </View>
+          <View style={styles.viewButton}>
+            <Text style={styles.viewButtonText}>View</Text>
+          </View>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
