@@ -14,6 +14,7 @@ export { ReceiverApprovalScreen } from './screens/ReceiverApprovalScreen';
 export { DisputeFlowScreen } from './screens/DisputeFlowScreen';
 export { default as RequestsScreen } from './screens/RequestsScreen';
 export { default as RequestManagerScreen } from './screens/RequestManagerScreen';
+export { MyTripsScreen } from './screens/MyTripsScreen';
 
 // Hooks
 export { useTrips, useTrip, useCreateTrip, useUpdateTrip, useDeleteTrip, useMyTrips, useBooking } from './hooks/useTrips';
