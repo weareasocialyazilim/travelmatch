@@ -56,7 +56,7 @@ export { EmptyState } from './ui/EmptyState';
 export { Spinner } from './ui/Spinner';
 
 // Loading States & Skeletons
-export { Skeleton } from './ui/Skeleton';
+export { Skeleton, SkeletonLoader, FeedSkeleton } from './ui/Skeleton';
 export { SkeletonList } from './ui/SkeletonList';
 export type { SkeletonItemType } from './ui/SkeletonList';
 
