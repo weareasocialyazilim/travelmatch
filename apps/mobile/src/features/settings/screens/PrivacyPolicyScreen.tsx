@@ -1,191 +1,46 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '@/constants/colors';
-import { TYPOGRAPHY } from '@/theme/typography';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { COLORS } from '@/theme/colors';
 
-interface Section {
-  id: string;
-  title: string;
-  content: string;
-}
+export const PrivacyPolicyScreen = ({ navigation }: any) => {
+  const insets = useSafeAreaInsets();
 
-const SECTIONS: Section[] = [
-  {
-    id: '1',
-    title: 'Data We Collect',
-    content:
-      'We collect information you provide directly to us, such as when you create an account, create or share content, and communicate with us. This may include your name, email address, phone number, and payment information. We also collect device information and usage data automatically.',
-  },
-  {
-    id: '2',
-    title: 'Location Use',
-    content:
-      "To verify your travel moments, we require access to your device's location data. This information is used solely for the purpose of confirming that you are at the location you claim to be, which is essential for the proof-based nature of our platform. We do not track your location in the background or share this data with third parties for marketing purposes.",
-  },
-  {
-    id: '3',
-    title: 'Photos & Proof Data',
-    content:
-      'When you upload photos or other media as proof of a travel moment, we store this data securely. This content is used to validate your experience and is shared with your designated supporters. We do not use your photos for any purpose other than the core functionality of the app without your explicit consent.',
-  },
-  {
-    id: '4',
-    title: 'Payments & Security',
-    content:
-      'We use a secure third-party payment processor to handle all transactions. Your payment information is encrypted and transmitted directly to the processor; we do not store your full credit card details on our servers. All funds are held in a secure escrow system until the travel moment is successfully verified.',
-  },
-  {
-    id: '5',
-    title: 'Data Retention',
-    content:
-      'We retain your personal data for as long as your account is active or as needed to provide you services. We will also retain and use your information as necessary to comply with our legal obligations, resolve disputes, and enforce our agreements.',
-  },
-  {
-    id: '6',
-    title: 'User Rights',
-    content:
-      'You have the right to access, correct, or update your personal information at any time through your account settings. You may also request a copy of your data or ask for its deletion, subject to legal and contractual restrictions.',
-  },
-  {
-    id: '7',
-    title: 'Deleting Your Data',
-    content:
-      'You can request the deletion of your account and associated personal data by contacting our support team. Upon receiving a request, we will delete your information from our active databases, although some data may be retained in our backups for a limited period before being permanently erased.',
-  },
-  {
-    id: '8',
-    title: 'Contact Us',
-    content:
-      'If you have any questions or concerns about this Privacy Policy, please contact us at privacy@travelmatch.app.',
-  },
-];
-
-import type { RootStackParamList } from '@/navigation/routeParams';
-import type { StackScreenProps } from '@react-navigation/stack';
-
-type PrivacyPolicyScreenProps = StackScreenProps<
-  RootStackParamList,
-  'PrivacyPolicy'
->;
-
-export default function PrivacyPolicyScreen({
-  navigation,
-}: PrivacyPolicyScreenProps) {
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <MaterialCommunityIcons
-            name="arrow-left"
-            size={24}
-            color={COLORS.text.primary}
-          />
-        </TouchableOpacity>
+    <View style={styles.container}>
+      <View style={[styles.header, { paddingTop: insets.top }]}>
+        <TouchableOpacity onPress={() => navigation.goBack()}><Ionicons name="arrow-back" size={24} color="white" /></TouchableOpacity>
         <Text style={styles.headerTitle}>Privacy Policy</Text>
-        <View style={styles.backButton} />
+        <View style={{ width: 24 }} />
       </View>
 
-      {/* Content */}
-      <ScrollView
-        style={styles.content}
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Last Updated */}
-        <Text style={styles.lastUpdated}>Last Updated: December 26, 2024</Text>
+      <ScrollView contentContainerStyle={styles.content}>
+        <Text style={styles.section}>1. Data Collection</Text>
+        <Text style={styles.para}>We collect information you provide directly to us, such as when you create or modify your account, request on-demand services, contact customer support, or otherwise communicate with us.</Text>
 
-        {/* Introduction */}
-        <Text style={styles.introduction}>
-          Welcome to our proof-based social gifting platform. This Privacy
-          Policy explains how we collect, use, disclose, and safeguard your
-          information when you use our mobile application. Please read this
-          privacy policy carefully. If you do not agree with the terms of this
-          privacy policy, please do not access the application.
-        </Text>
+        <Text style={styles.section}>2. Location Information</Text>
+        <Text style={styles.para}>When you use the Services for transportation or delivery, we collect precise location data about the trip from the TravelMatch app used by the Host.</Text>
 
-        {/* Sections */}
-        {SECTIONS.map((section) => (
-          <View key={section.id} style={styles.section}>
-            <Text style={styles.sectionTitle}>{section.title}</Text>
-            <Text style={styles.sectionContent}>{section.content}</Text>
-          </View>
-        ))}
+        <Text style={styles.section}>3. Use of Information</Text>
+        <Text style={styles.para}>We may use the information we collect about you to provide, maintain, and improve our Services, such as processing payments and facilitating payments.</Text>
+
+        <Text style={styles.section}>4. Sharing of Information</Text>
+        <Text style={styles.para}>We may share the information we collect about you as described in this Statement or as described at the time of collection or sharing.</Text>
+
+        <View style={{ height: 40 }} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.bg.primary,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    backgroundColor: COLORS.utility.white,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border.default,
-  },
-  backButton: {
-    width: 48,
-    height: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    flex: 1,
-    ...TYPOGRAPHY.h4,
-    fontWeight: '700',
-    color: COLORS.text.primary,
-    textAlign: 'center',
-  },
-  content: {
-    flex: 1,
-  },
-  contentContainer: {
-    paddingHorizontal: 16,
-    paddingBottom: 48,
-  },
-  lastUpdated: {
-    ...TYPOGRAPHY.bodySmall,
-    color: COLORS.text.secondary,
-    paddingTop: 16,
-    marginBottom: 24,
-  },
-  introduction: {
-    ...TYPOGRAPHY.bodyLarge,
-    lineHeight: 26,
-    color: COLORS.text.primary,
-    marginBottom: 32,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: COLORS.text.primary,
-    marginBottom: 8,
-    lineHeight: 28,
-  },
-  sectionContent: {
-    ...TYPOGRAPHY.bodyLarge,
-    lineHeight: 26,
-    color: COLORS.text.secondary,
-  },
+  container: { flex: 1, backgroundColor: COLORS.background.primary },
+  header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#222' },
+  headerTitle: { fontSize: 16, fontWeight: 'bold', color: 'white' },
+  content: { padding: 24 },
+  section: { color: 'white', fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 10 },
+  para: { color: COLORS.text.secondary, fontSize: 15, lineHeight: 24 },
 });
+
+export default PrivacyPolicyScreen;
