@@ -193,6 +193,7 @@ export type RootStackParamList = {
 
   // Social & Invite
   InviteFriends: undefined;
+  Referral: undefined;
 
   // Reputation
   Reputation: undefined;
