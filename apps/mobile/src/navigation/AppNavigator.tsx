@@ -51,6 +51,9 @@ import LinkExpiredScreen from '../screens/LinkExpiredScreen';
 import LinkInvalidScreen from '../screens/LinkInvalidScreen';
 import SearchMapScreen from '../screens/SearchMapScreen';
 
+// Dev Menu (development only)
+import { DevMenuScreen } from '../screens/dev/DevMenuScreen';
+
 // ===================================
 // TRIPS FEATURE SCREENS
 // ===================================
@@ -659,6 +662,9 @@ const AppNavigator = () => {
               name="DeletedMoments"
               component={DeletedMomentsScreen}
             />
+
+            {/* Dev Menu (development only) */}
+            <Stack.Screen name="DevMenu" component={DevMenuScreen} />
           </Stack.Navigator>
         </Suspense>
       </NavigationContainer>
