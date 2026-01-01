@@ -143,6 +143,11 @@ const DeletedMomentsScreen = lazyLoad(() =>
     default: m.DeletedMomentsScreen,
   })),
 );
+const MomentCommentsScreen = lazyLoad(() =>
+  import('../features/profile').then((m) => ({
+    default: m.MomentCommentsScreen,
+  })),
+);
 
 // ===================================
 // PAYMENTS FEATURE SCREENS
@@ -380,6 +385,10 @@ const AppNavigator = () => {
             <Stack.Screen name="CreateMoment" component={CreateMomentScreen} />
             <Stack.Screen name="EditMoment" component={EditMomentScreen} />
             <Stack.Screen name="MomentDetail" component={MomentDetailScreen} />
+            <Stack.Screen
+              name="MomentComments"
+              component={MomentCommentsScreen}
+            />
             <Stack.Screen name="Profile" component={ProfileScreen} />
             <Stack.Screen
               name="ProfileDetail"
