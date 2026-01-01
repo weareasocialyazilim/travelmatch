@@ -143,6 +143,11 @@ const DeletedMomentsScreen = lazyLoad(() =>
     default: m.DeletedMomentsScreen,
   })),
 );
+const LeaderboardScreen = lazyLoad(() =>
+  import('../features/profile').then((m) => ({
+    default: m.LeaderboardScreen,
+  })),
+);
 
 // ===================================
 // PAYMENTS FEATURE SCREENS
@@ -581,6 +586,9 @@ const AppNavigator = () => {
               name="DeletedMoments"
               component={DeletedMomentsScreen}
             />
+
+            {/* Leaderboard */}
+            <Stack.Screen name="Leaderboard" component={LeaderboardScreen} />
           </Stack.Navigator>
         </Suspense>
       </NavigationContainer>
