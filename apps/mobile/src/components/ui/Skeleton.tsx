@@ -29,6 +29,8 @@ interface SkeletonLoaderProps {
   style?: ViewStyle;
   /** Enable shimmer animation (default: true) */
   shimmer?: boolean;
+  /** Shape variant: 'rect' for rectangle, 'circle' for circular */
+  variant?: 'rect' | 'circle';
 }
 
 export const Skeleton = memo<SkeletonLoaderProps>(function Skeleton({
@@ -37,7 +39,10 @@ export const Skeleton = memo<SkeletonLoaderProps>(function Skeleton({
   borderRadius = 8,
   style,
   shimmer = true,
+  variant = 'rect',
 }) {
+  // Calculate borderRadius based on variant
+  const computedBorderRadius = variant === 'circle' ? (typeof height === 'number' ? height / 2 : 8) : borderRadius;
   const opacity = useSharedValue(0.4);
   const translateX = useSharedValue(-SCREEN_WIDTH);
 
@@ -86,7 +91,7 @@ export const Skeleton = memo<SkeletonLoaderProps>(function Skeleton({
         {
           width: width as number,
           height,
-          borderRadius,
+          borderRadius: computedBorderRadius,
         },
         style,
       ]}
@@ -238,6 +243,25 @@ export const SkeletonMessage: React.FC<{
   </View>
 );
 
+/**
+ * FeedSkeleton - Skeleton for feed/discover card layout
+ * Pre-built layout showing 2 cards with image, title, and metadata
+ */
+export const FeedSkeleton: React.FC<{ style?: ViewStyle }> = ({ style }) => (
+  <View style={[styles.feedContainer, style]}>
+    {[1, 2].map(i => (
+      <View key={i} style={styles.feedCard}>
+        <Skeleton height={350} borderRadius={20} />
+        <View style={styles.feedCardFooter}>
+          <Skeleton width={150} height={24} />
+          <Skeleton width={60} height={24} />
+        </View>
+        <Skeleton width={100} height={16} style={styles.marginTopSm} />
+      </View>
+    ))}
+  </View>
+);
+
 const styles = StyleSheet.create({
   lineSpacing: {
     marginTop: 8,
@@ -334,6 +358,22 @@ const styles = StyleSheet.create({
   messageBubbleOwn: {
     backgroundColor: COLORS.primaryMuted,
   },
+  // Feed skeleton styles
+  feedContainer: {
+    padding: 20,
+    gap: 20,
+  },
+  feedCard: {
+    gap: 10,
+  },
+  feedCardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
 });
+
+// Alias for SkeletonLoader API compatibility
+export const SkeletonLoader = Skeleton;
 
 export default Skeleton;
