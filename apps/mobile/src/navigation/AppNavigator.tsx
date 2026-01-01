@@ -72,6 +72,11 @@ import {
 } from '../features/messages';
 
 // ===================================
+// INBOX / VIBE ROOM FEATURE SCREENS
+// ===================================
+import { InboxScreen } from '../features/inbox';
+
+// ===================================
 // PROFILE FEATURE SCREENS
 // ===================================
 const ProfileScreen = lazyLoad(() =>
@@ -376,6 +381,7 @@ const AppNavigator = () => {
             <Stack.Screen name="Discover" component={DiscoverScreen} />
             <Stack.Screen name="Requests" component={RequestsScreen} />
             <Stack.Screen name="Messages" component={MessagesScreen} />
+            <Stack.Screen name="Inbox" component={InboxScreen} />
 
             <Stack.Screen name="CreateMoment" component={CreateMomentScreen} />
             <Stack.Screen name="EditMoment" component={EditMomentScreen} />
