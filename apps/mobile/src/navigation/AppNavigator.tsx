@@ -224,6 +224,7 @@ import {
   ReportUserScreen,
   MaintenanceScreen,
   DataPrivacyScreen,
+  CommunityGuidelinesScreen,
 } from '../features/settings';
 
 // Legal screens - Turkish compliance
@@ -652,6 +653,7 @@ const AppNavigator = () => {
             {/* <Stack.Screen name="Contact" component={ContactScreen} />
             <Stack.Screen name="Help" component={HelpScreen} /> */}
             <Stack.Screen name="Safety" component={SafetyScreen} />
+            <Stack.Screen name="CommunityGuidelines" component={CommunityGuidelinesScreen} />
 
             {/* Data Privacy & Deleted Content */}
             <Stack.Screen name="DataPrivacy" component={DataPrivacyScreen} />
