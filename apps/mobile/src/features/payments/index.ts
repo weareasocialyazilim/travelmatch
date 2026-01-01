@@ -14,6 +14,7 @@
 export { default as WalletScreen } from './screens/WalletScreen';
 export { default as WithdrawScreen } from './screens/WithdrawScreen';
 export { default as PaymentMethodsScreen } from './screens/PaymentMethodsScreen';
+export { default as AddCardScreen } from './screens/AddCardScreen';
 export { default as TransactionDetailScreen } from './screens/TransactionDetailScreen';
 export { default as RefundRequestScreen } from './screens/RefundRequestScreen';
 export { default as SuccessScreen } from './screens/SuccessScreen';

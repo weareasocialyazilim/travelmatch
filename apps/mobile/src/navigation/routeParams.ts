@@ -226,6 +226,7 @@ export type RootStackParamList = {
 
   // Payment Methods
   PaymentMethods: undefined;
+  AddCard: undefined;
 
   // Checkout
   Checkout:
