@@ -555,6 +555,10 @@ const AppNavigator = () => {
 
             {/* Profile Sub-screens */}
             <Stack.Screen name="MyMoments" component={MyMomentsScreen} />
+            <Stack.Screen
+              name="MyHostedMoments"
+              component={MyHostedMomentsScreen}
+            />
             <Stack.Screen name="Security" component={SecurityScreen} />
             <Stack.Screen
               name="ChangePassword"
