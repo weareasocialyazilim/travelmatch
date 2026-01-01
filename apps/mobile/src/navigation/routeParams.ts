@@ -79,6 +79,7 @@ export type RootStackParamList = {
     userName: string;
     userAvatar: string;
   };
+  UserProfile: { userId?: string } | undefined;
   MyGifts: undefined;
   TrustNotes: undefined;
   MomentGallery: { momentId: string };
