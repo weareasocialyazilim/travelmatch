@@ -6,6 +6,7 @@ import { useMessages } from '@/hooks/useMessages';
 import { useScreenPerformance } from '@/hooks/useScreenPerformance';
 import { logger } from '@/utils/logger';
 import { useToast } from '@/context/ToastContext';
+import { giftOfferService } from '@/services/giftOfferService';
 
 export interface Message {
   id: string;
@@ -15,6 +16,7 @@ export interface Message {
   user: 'me' | 'other' | 'system';
   timestamp?: string | null;
   // Offer-specific fields
+  giftId?: string; // Links to gifts table
   amount?: number;
   currency?: string;
   offerStatus?: 'pending' | 'accepted' | 'declined' | 'expired';
@@ -271,8 +273,18 @@ export const useChatScreen = ({
   // Handle accepting an offer
   const handleAcceptOffer = useCallback(
     async (messageId: string) => {
+      // Find the message to get the giftId
+      const offerMessage = messages.find((msg) => msg.id === messageId);
+      const giftId = offerMessage?.giftId;
+
+      if (!giftId) {
+        logger.warn('No giftId found for message:', messageId);
+        showToast('Unable to process offer. Please try again.', 'error');
+        return;
+      }
+
       try {
-        trackInteraction('offer_accepted', { messageId, otherUser: otherUserName });
+        trackInteraction('offer_accepted', { messageId, giftId, otherUser: otherUserName });
 
         // Update message status optimistically
         setMessages((prev) =>
@@ -281,20 +293,24 @@ export const useChatScreen = ({
           )
         );
 
+        // Call API to accept offer
+        const result = await giftOfferService.acceptOffer(giftId);
+
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to accept offer');
+        }
+
         // Add system message
         const systemMessage: Message = {
           id: `system-${Date.now()}`,
           type: 'system',
-          text: 'Offer accepted! Waiting for payment...',
+          text: 'Offer accepted! Payment has been processed.',
           user: 'system',
           timestamp: new Date().toISOString(),
         };
         setMessages((prev) => [...prev, systemMessage]);
 
-        showToast('Offer accepted! Waiting for payment.', 'success');
-
-        // TODO: Call API to accept offer
-        // await giftService.acceptOffer(messageId);
+        showToast('Offer accepted! Payment processed.', 'success');
       } catch (error) {
         logger.error('Failed to accept offer', error as Error);
         showToast('Failed to accept offer. Please try again.', 'error');
@@ -307,14 +323,24 @@ export const useChatScreen = ({
         );
       }
     },
-    [otherUserName, trackInteraction, showToast]
+    [messages, otherUserName, trackInteraction, showToast]
   );
 
   // Handle declining an offer
   const handleDeclineOffer = useCallback(
     async (messageId: string) => {
+      // Find the message to get the giftId
+      const offerMessage = messages.find((msg) => msg.id === messageId);
+      const giftId = offerMessage?.giftId;
+
+      if (!giftId) {
+        logger.warn('No giftId found for message:', messageId);
+        showToast('Unable to process offer. Please try again.', 'error');
+        return;
+      }
+
       try {
-        trackInteraction('offer_declined', { messageId, otherUser: otherUserName });
+        trackInteraction('offer_declined', { messageId, giftId, otherUser: otherUserName });
 
         // Update message status optimistically
         setMessages((prev) =>
@@ -322,6 +348,13 @@ export const useChatScreen = ({
             msg.id === messageId ? { ...msg, offerStatus: 'declined' as const } : msg
           )
         );
+
+        // Call API to decline offer
+        const result = await giftOfferService.declineOffer(giftId);
+
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to decline offer');
+        }
 
         // Add system message
         const systemMessage: Message = {
@@ -334,9 +367,6 @@ export const useChatScreen = ({
         setMessages((prev) => [...prev, systemMessage]);
 
         showToast('Offer declined.', 'info');
-
-        // TODO: Call API to decline offer
-        // await giftService.declineOffer(messageId);
       } catch (error) {
         logger.error('Failed to decline offer', error as Error);
         showToast('Failed to decline offer. Please try again.', 'error');
@@ -349,7 +379,7 @@ export const useChatScreen = ({
         );
       }
     },
-    [otherUserName, trackInteraction, showToast]
+    [messages, otherUserName, trackInteraction, showToast]
   );
 
   return {
