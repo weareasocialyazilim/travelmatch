@@ -38,8 +38,7 @@ import {
   getAvatarImageProps,
   IMAGE_VARIANTS_BY_CONTEXT,
 } from '../utils/cloudflareImageHelpers';
-import { COLORS, GRADIENTS, PALETTE, primitives } from '../constants/colors';
-import { TYPE_SCALE } from '../theme/typography';
+import { COLORS, GRADIENTS, PALETTE } from '../constants/colors';
 import { SPRINGS } from '../hooks/useAnimations';
 import { useToast } from '@/context/ToastContext';
 import type { Moment } from '../types';
@@ -375,23 +374,30 @@ const MomentCard: React.FC<MomentCardProps> = memo(
                     {moment.availability || 'Flexible'}
                   </Text>
                 </View>
-                {moment.user?.trustScore && (
-                  <View style={styles.detailItem}>
-                    <MaterialCommunityIcons
-                      name="shield-check"
-                      size={14}
-                      color={COLORS.trust.primary}
-                    />
-                    <Text
-                      style={[
-                        styles.detailText,
-                        { color: COLORS.trust.primary },
-                      ]}
-                    >
-                      {moment.user.trustScore}%
-                    </Text>
-                  </View>
-                )}
+                {(() => {
+                  const user = moment.user as
+                    | { trustScore?: number; trust_score?: number }
+                    | undefined;
+                  const score = user?.trustScore ?? user?.trust_score;
+                  if (!score) return null;
+                  return (
+                    <View style={styles.detailItem}>
+                      <MaterialCommunityIcons
+                        name="shield-check"
+                        size={14}
+                        color={COLORS.trust.primary}
+                      />
+                      <Text
+                        style={[
+                          styles.detailText,
+                          { color: COLORS.trust.primary },
+                        ]}
+                      >
+                        {score}%
+                      </Text>
+                    </View>
+                  );
+                })()}
               </View>
             )}
 

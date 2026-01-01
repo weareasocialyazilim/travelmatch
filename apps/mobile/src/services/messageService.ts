@@ -368,9 +368,17 @@ export const messageService = {
           .select('id, public_key')
           .in('id', senderIds);
 
-        if (senders) {
+        if (senders && Array.isArray(senders) && senders.length > 0) {
+          // Note: public_key column may not exist in schema yet
+          const typedSenders = senders as unknown as Array<{
+            id: string;
+            public_key?: string;
+          }>;
           senderMap = new Map(
-            senders.map((s) => [s.id, { id: s.id, public_key: s.public_key } as UserWithEncryption]),
+            typedSenders.map((s) => [
+              s.id,
+              { id: s.id, public_key: s.public_key } as UserWithEncryption,
+            ]),
           );
         }
       }

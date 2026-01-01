@@ -717,7 +717,9 @@ export function normalizeUserFromAPI(apiUser: ApiUser): User {
     bio: apiUser.bio,
     role: apiUser.role ?? (apiUser.type === 'traveler' ? 'Traveler' : 'Local'),
     type: apiUser.type,
-    kycStatus: apiUser.kyc_status ?? apiUser.kyc ?? 'Unverified',
+    kycStatus: (apiUser.kyc_status ??
+      apiUser.kyc ??
+      'not_started') as KYCStatus,
     isVerified:
       apiUser.is_verified ??
       (apiUser.kyc_status === 'Verified' || apiUser.kyc === 'Verified'),

@@ -377,6 +377,7 @@ export const COLORS = {
     dark: '#2D4A3A',
   },
   // Flat border aliases for backwards compatibility
+  borderDefault: primitives.stone[200],
   borderLight: primitives.stone[100],
   borderStrong: primitives.stone[300],
   borderFocus: primitives.amber[500],

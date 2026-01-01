@@ -14,15 +14,10 @@ import type {
   LegacyKYCStatus,
   MomentLifecycleStatus,
   MomentModerationStatus,
-  TransactionType,
   TransactionStatus,
   ProofType,
-  ProofStatus,
 } from '../types/enums';
-import {
-  mapLegacyKYCStatus,
-  mapKYCStatusToLegacy,
-} from '../types/enums';
+import { mapLegacyKYCStatus, mapKYCStatusToLegacy } from '../types/enums';
 
 // ============================================
 // USER TYPE ADAPTERS
@@ -108,14 +103,23 @@ export function adminUserToMobileUser(adminUser: AdminUser): MobileUser {
 /**
  * Convert mobile user to admin user format
  */
-export function mobileUserToAdminUser(mobileUser: MobileUser, defaults?: Partial<AdminUser>): AdminUser {
+export function mobileUserToAdminUser(
+  mobileUser: MobileUser,
+  defaults?: Partial<AdminUser>,
+): AdminUser {
   return {
     id: mobileUser.id,
     email: mobileUser.email || '',
     full_name: mobileUser.name,
     display_name: null,
     avatar_url: mobileUser.avatar || null,
-    status: mobileUser.status || (mobileUser.isBanned ? 'banned' : mobileUser.isSuspended ? 'suspended' : 'active'),
+    status:
+      mobileUser.status ||
+      (mobileUser.isBanned
+        ? 'banned'
+        : mobileUser.isSuspended
+          ? 'suspended'
+          : 'active'),
     kyc_status: mobileUser.kycStatus || mapLegacyKYCStatus(mobileUser.kyc),
     balance: defaults?.balance || 0,
     total_trips: defaults?.total_trips || 0,
@@ -204,7 +208,9 @@ export interface MobileMoment {
 /**
  * Convert admin moment to mobile format
  */
-export function adminMomentToMobileMoment(adminMoment: AdminMoment): MobileMoment {
+export function adminMomentToMobileMoment(
+  adminMoment: AdminMoment,
+): MobileMoment {
   return {
     id: adminMoment.id,
     userId: adminMoment.user_id,
@@ -222,7 +228,7 @@ export function adminMomentToMobileMoment(adminMoment: AdminMoment): MobileMomen
  */
 export function getMomentDisplayStatus(
   lifecycleStatus: MomentLifecycleStatus,
-  moderationStatus: MomentModerationStatus
+  moderationStatus: MomentModerationStatus,
 ): string {
   // If not approved, show moderation status
   if (moderationStatus === 'rejected') {
@@ -273,13 +279,13 @@ export interface MobileTransaction {
  * Map admin transaction type to mobile type
  */
 export function mapAdminToMobileTransactionType(
-  adminType: AdminTransaction['type']
+  adminType: AdminTransaction['type'],
 ): MobileTransaction['type'] {
   const mapping: Record<AdminTransaction['type'], MobileTransaction['type']> = {
-    'payment': 'gift',
-    'payout': 'withdrawal',
-    'refund': 'refund',
-    'fee': 'deposit', // Fee doesn't have a direct mapping, default to deposit
+    payment: 'gift',
+    payout: 'withdrawal',
+    refund: 'refund',
+    fee: 'deposit', // Fee doesn't have a direct mapping, default to deposit
   };
   return mapping[adminType];
 }
@@ -288,13 +294,13 @@ export function mapAdminToMobileTransactionType(
  * Map mobile transaction type to admin type
  */
 export function mapMobileToAdminTransactionType(
-  mobileType: MobileTransaction['type']
+  mobileType: MobileTransaction['type'],
 ): AdminTransaction['type'] {
   const mapping: Record<MobileTransaction['type'], AdminTransaction['type']> = {
-    'gift': 'payment',
-    'withdrawal': 'payout',
-    'refund': 'refund',
-    'deposit': 'payment',
+    gift: 'payment',
+    withdrawal: 'payout',
+    refund: 'refund',
+    deposit: 'payment',
   };
   return mapping[mobileType];
 }
@@ -303,7 +309,7 @@ export function mapMobileToAdminTransactionType(
  * Convert admin transaction to mobile format
  */
 export function adminTransactionToMobileTransaction(
-  adminTx: AdminTransaction
+  adminTx: AdminTransaction,
 ): MobileTransaction {
   return {
     id: adminTx.id,
@@ -322,22 +328,20 @@ export function adminTransactionToMobileTransaction(
 /**
  * Map extended mobile proof types to shared proof types
  */
-export function mapMobileToSharedProofType(
-  mobileType: string
-): ProofType {
+export function mapMobileToSharedProofType(mobileType: string): ProofType {
   // Mobile-specific types map to generic types
   const mapping: Record<string, ProofType> = {
-    'photo': 'photo',
-    'receipt': 'receipt',
-    'geo': 'custom',
-    'ticket_qr': 'custom',
-    'delivery': 'custom',
-    'experience': 'verified-experience',
+    photo: 'photo',
+    receipt: 'receipt',
+    geo: 'custom',
+    ticket_qr: 'custom',
+    delivery: 'custom',
+    experience: 'verified-experience',
     'micro-kindness': 'micro-kindness',
     'verified-experience': 'verified-experience',
     'community-proof': 'community-proof',
-    'milestone': 'milestone',
-    'custom': 'custom',
+    milestone: 'milestone',
+    custom: 'custom',
   };
   return mapping[mobileType] || 'custom';
 }
@@ -353,10 +357,17 @@ export { mapLegacyKYCStatus, mapKYCStatusToLegacy };
 // ============================================
 
 /**
+ * Type guard to check if user is MobileUser
+ */
+function isMobileUser(user: MobileUser | DbUserRow): user is MobileUser {
+  return 'isBanned' in user || 'name' in user;
+}
+
+/**
  * Check if a user is restricted (banned or suspended)
  */
 export function isUserRestricted(user: MobileUser | DbUserRow): boolean {
-  if ('isBanned' in user) {
+  if (isMobileUser(user)) {
     return user.isBanned === true || user.isSuspended === true;
   }
   return user.is_banned === true || user.is_suspended === true;
@@ -365,8 +376,10 @@ export function isUserRestricted(user: MobileUser | DbUserRow): boolean {
 /**
  * Get restriction reason for a user
  */
-export function getRestrictionReason(user: MobileUser | DbUserRow): string | undefined {
-  if ('isBanned' in user) {
+export function getRestrictionReason(
+  user: MobileUser | DbUserRow,
+): string | undefined {
+  if (isMobileUser(user)) {
     if (user.isBanned) return user.banReason;
     if (user.isSuspended) return user.suspensionReason;
     return undefined;
@@ -379,8 +392,10 @@ export function getRestrictionReason(user: MobileUser | DbUserRow): string | und
 /**
  * Get restriction end date (for suspensions)
  */
-export function getRestrictionEndDate(user: MobileUser | DbUserRow): string | undefined {
-  if ('isSuspended' in user) {
+export function getRestrictionEndDate(
+  user: MobileUser | DbUserRow,
+): string | undefined {
+  if (isMobileUser(user)) {
     return user.isSuspended ? user.suspensionEndsAt : undefined;
   }
   return user.is_suspended ? user.suspension_ends_at || undefined : undefined;

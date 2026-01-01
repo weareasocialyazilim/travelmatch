@@ -18,21 +18,12 @@
  */
 
 import React, { useEffect, useState, useCallback, memo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Platform,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  withSequence,
   interpolate,
-  FadeIn,
-  FadeOut,
   ZoomIn,
 } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
@@ -70,148 +61,152 @@ interface SacredMomentsProps {
   testID?: string;
 }
 
-export const SacredMoments = memo<SacredMomentsProps>(({
-  children,
-  enabled = true,
-  onScreenshotAttempt,
-  showShareOption = false,
-  onShare,
-  vaultMode = false,
-  protectionMessage = 'Bu an sadece ikinize ait 💝',
-  testID,
-}) => {
-  const [isBlurred, setIsBlurred] = useState(false);
-  const [screenshotCount, setScreenshotCount] = useState(0);
-  const blurIntensity = useSharedValue(0);
+export const SacredMoments = memo<SacredMomentsProps>(
+  ({
+    children,
+    enabled = true,
+    onScreenshotAttempt,
+    showShareOption = false,
+    onShare,
+    vaultMode = false,
+    protectionMessage = 'Bu an sadece ikinize ait 💝',
+    testID,
+  }) => {
+    const [isBlurred, setIsBlurred] = useState(false);
+    const [screenshotCount, setScreenshotCount] = useState(0);
+    const blurIntensity = useSharedValue(0);
 
-  // Prevent screen capture in vault mode
-  usePreventScreenCapture(vaultMode && enabled);
+    // Prevent screen capture in vault mode
+    usePreventScreenCapture(
+      vaultMode && enabled ? 'sacred-moments' : undefined,
+    );
 
-  // Screenshot listener
-  useEffect(() => {
-    if (!enabled) return;
+    // Screenshot listener
+    useEffect(() => {
+      if (!enabled) return;
 
-    const subscription = addScreenshotListener(() => {
-      // Screenshot detected
-      handleScreenshotAttempt();
-    });
+      const subscription = addScreenshotListener(() => {
+        // Screenshot detected
+        handleScreenshotAttempt();
+      });
 
-    return () => subscription.remove();
-  }, [enabled]);
+      return () => subscription.remove();
+    }, [enabled]);
 
-  const handleScreenshotAttempt = useCallback(() => {
-    setIsBlurred(true);
-    setScreenshotCount((prev) => prev + 1);
-    onScreenshotAttempt?.();
+    const handleScreenshotAttempt = useCallback(() => {
+      setIsBlurred(true);
+      setScreenshotCount((prev) => prev + 1);
+      onScreenshotAttempt?.();
 
-    // Haptic warning
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      // Haptic warning
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
 
-    // Animate blur in
-    blurIntensity.value = withTiming(95, { duration: CEREMONY_TIMING.blurTransition });
+      // Animate blur in
+      blurIntensity.value = withTiming(95, {
+        duration: CEREMONY_TIMING.blurTransition,
+      });
 
-    // Auto-unblur after delay
-    const timer = setTimeout(() => {
-      blurIntensity.value = withTiming(0, { duration: CEREMONY_TIMING.blurTransition });
-      setIsBlurred(false);
-    }, CEREMONY_TIMING.unblurDelay);
+      // Auto-unblur after delay
+      const timer = setTimeout(() => {
+        blurIntensity.value = withTiming(0, {
+          duration: CEREMONY_TIMING.blurTransition,
+        });
+        setIsBlurred(false);
+      }, CEREMONY_TIMING.unblurDelay);
 
-    // Return cleanup function for use by caller if needed
-    return () => clearTimeout(timer);
-  }, [onScreenshotAttempt, blurIntensity]);
+      // Return cleanup function for use by caller if needed
+      return () => clearTimeout(timer);
+    }, [onScreenshotAttempt, blurIntensity]);
 
-  const blurAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(blurIntensity.value, [0, 95], [0, 1]),
-  }));
+    const blurAnimatedStyle = useAnimatedStyle(() => ({
+      opacity: interpolate(blurIntensity.value, [0, 95], [0, 1]),
+    }));
 
-  return (
-    <View
-      style={styles.container}
-      testID={testID}
-      accessible
-      accessibilityLabel={CEREMONY_A11Y.labels.sacredMoments}
-    >
-      {/* Content */}
-      <View style={styles.content}>{children}</View>
-
-      {/* Blur overlay */}
-      <Animated.View
-        style={[StyleSheet.absoluteFill, blurAnimatedStyle]}
-        pointerEvents={isBlurred ? 'auto' : 'none'}
+    return (
+      <View
+        style={styles.container}
+        testID={testID}
+        accessible
+        accessibilityLabel={CEREMONY_A11Y.labels.sacredMoments}
       >
-        <BlurView
-          intensity={95}
-          tint="dark"
-          style={StyleSheet.absoluteFill}
+        {/* Content */}
+        <View style={styles.content}>{children}</View>
+
+        {/* Blur overlay */}
+        <Animated.View
+          style={[StyleSheet.absoluteFill, blurAnimatedStyle]}
+          pointerEvents={isBlurred ? 'auto' : 'none'}
         >
-          <View style={styles.messageContainer}>
-            <Animated.View
-              entering={ZoomIn.springify()}
-              style={styles.lockIconContainer}
+          <BlurView intensity={95} tint="dark" style={StyleSheet.absoluteFill}>
+            <View style={styles.messageContainer}>
+              <Animated.View
+                entering={ZoomIn.springify()}
+                style={styles.lockIconContainer}
+              >
+                <MaterialCommunityIcons
+                  name="shield-lock"
+                  size={56}
+                  color={CEREMONY_COLORS.sacred.lockIcon}
+                />
+              </Animated.View>
+              <Text style={styles.protectionMessage}>{protectionMessage}</Text>
+              <Text style={styles.protectionHint}>
+                Screenshot'lar korunan içeriği yakalayamaz
+              </Text>
+              {screenshotCount > 1 && (
+                <Text style={styles.warningText}>
+                  Ekran görüntüsü almak engellenmiştir
+                </Text>
+              )}
+            </View>
+          </BlurView>
+        </Animated.View>
+
+        {/* Share button with gradient */}
+        {showShareOption && !isBlurred && (
+          <TouchableOpacity
+            style={styles.shareButton}
+            onPress={onShare}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={GRADIENTS.gift}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.shareGradient}
             >
               <MaterialCommunityIcons
-                name="lock-heart"
-                size={56}
-                color={CEREMONY_COLORS.sacred.lockIcon}
+                name="share-variant"
+                size={18}
+                color={COLORS.white}
               />
-            </Animated.View>
-            <Text style={styles.protectionMessage}>{protectionMessage}</Text>
-            <Text style={styles.protectionHint}>
-              Screenshot'lar korunan içeriği yakalayamaz
-            </Text>
-            {screenshotCount > 1 && (
-              <Text style={styles.warningText}>
-                Ekran görüntüsü almak engellenmiştir
-              </Text>
-            )}
+              <Text style={styles.shareText}>Dünyayla Paylaş</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        )}
+
+        {/* Subtle watermark for shared content */}
+        {showShareOption && (
+          <View style={styles.watermark} pointerEvents="none">
+            <Text style={styles.watermarkText}>TravelMatch</Text>
           </View>
-        </BlurView>
-      </Animated.View>
+        )}
 
-      {/* Share button with gradient */}
-      {showShareOption && !isBlurred && (
-        <TouchableOpacity
-          style={styles.shareButton}
-          onPress={onShare}
-          activeOpacity={0.8}
-        >
-          <LinearGradient
-            colors={GRADIENTS.gift as unknown as string[]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.shareGradient}
-          >
+        {/* Vault indicator */}
+        {vaultMode && (
+          <View style={styles.vaultIndicator}>
             <MaterialCommunityIcons
-              name="share-variant"
-              size={18}
-              color={COLORS.white}
+              name="shield-lock"
+              size={14}
+              color={CEREMONY_COLORS.sacred.lockIcon}
             />
-            <Text style={styles.shareText}>Dünyayla Paylaş</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      )}
-
-      {/* Subtle watermark for shared content */}
-      {showShareOption && (
-        <View style={styles.watermark} pointerEvents="none">
-          <Text style={styles.watermarkText}>TravelMatch</Text>
-        </View>
-      )}
-
-      {/* Vault indicator */}
-      {vaultMode && (
-        <View style={styles.vaultIndicator}>
-          <MaterialCommunityIcons
-            name="shield-lock"
-            size={14}
-            color={CEREMONY_COLORS.sacred.lockIcon}
-          />
-          <Text style={styles.vaultText}>Korumalı</Text>
-        </View>
-      )}
-    </View>
-  );
-});
+            <Text style={styles.vaultText}>Korumalı</Text>
+          </View>
+        )}
+      </View>
+    );
+  },
+);
 
 SacredMoments.displayName = 'SacredMoments';
 

@@ -39,9 +39,10 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ViewShot, { captureRef } from 'react-native-view-shot';
 import * as MediaLibrary from 'expo-media-library';
 import * as Haptics from 'expo-haptics';
-import { CEREMONY_COLORS, CEREMONY_SIZES } from '@/constants/ceremony';
+import { CEREMONY_SIZES } from '@/constants/ceremony';
 import { COLORS, GRADIENTS } from '@/constants/colors';
 import { SPACING } from '@/constants/spacing';
+import { logger } from '@/utils/logger';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = Math.min(CEREMONY_SIZES.memoryCard.width, SCREEN_WIDTH - 40);
@@ -91,15 +92,17 @@ export const MemoryCard: React.FC<MemoryCardProps> = ({
     shimmerPosition.value = withRepeat(
       withSequence(
         withTiming(1, { duration: 2000 }),
-        withTiming(0, { duration: 0 })
+        withTiming(0, { duration: 0 }),
       ),
       -1,
-      false
+      false,
     );
   }, []);
 
   const shimmerStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: (shimmerPosition.value * CARD_WIDTH) - CARD_WIDTH }],
+    transform: [
+      { translateX: shimmerPosition.value * CARD_WIDTH - CARD_WIDTH },
+    ],
   }));
 
   const captureCard = useCallback(async (): Promise<string | null> => {
@@ -112,7 +115,7 @@ export const MemoryCard: React.FC<MemoryCardProps> = ({
       });
       return uri;
     } catch (error) {
-      console.error('Error capturing card:', error);
+      logger.error('Error capturing card:', error);
       return null;
     }
   }, []);
@@ -129,7 +132,7 @@ export const MemoryCard: React.FC<MemoryCardProps> = ({
         });
         onShare?.(uri);
       } catch (error) {
-        console.error('Share error:', error);
+        logger.error('Share error:', error);
       }
     }
   };
@@ -147,7 +150,7 @@ export const MemoryCard: React.FC<MemoryCardProps> = ({
           onSave?.(uri);
         }
       } catch (error) {
-        console.error('Save error:', error);
+        logger.error('Save error:', error);
       }
     }
   };
@@ -210,7 +213,9 @@ export const MemoryCard: React.FC<MemoryCardProps> = ({
             {/* Additional photos indicator */}
             {proofPhotos.length > 1 && (
               <View style={styles.morePhotos}>
-                <Text style={styles.morePhotosText}>+{proofPhotos.length - 1}</Text>
+                <Text style={styles.morePhotosText}>
+                  +{proofPhotos.length - 1}
+                </Text>
               </View>
             )}
           </View>
@@ -290,7 +295,7 @@ export const MemoryCard: React.FC<MemoryCardProps> = ({
           <MaterialCommunityIcons
             name="download"
             size={22}
-            color={COLORS.text}
+            color={COLORS.textPrimary}
           />
           <Text style={styles.actionText}>Kaydet</Text>
         </TouchableOpacity>
@@ -492,7 +497,7 @@ const styles = StyleSheet.create({
   actionText: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.textPrimary,
   },
   shareButton: {
     borderRadius: 25,

@@ -6,8 +6,9 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/config/supabase';
 import * as Haptics from 'expo-haptics';
+import { logger } from '@/utils/logger';
 import {
   type CeremonyStep,
   type SunsetPhase,
@@ -50,7 +51,13 @@ interface CeremonyState {
   sunsetPhase: SunsetPhase;
   milestones: TrustMilestone[];
   thankYouCardSent: boolean;
-  verificationStatus: 'pending' | 'analyzing' | 'verified' | 'rejected' | 'needs_review' | null;
+  verificationStatus:
+    | 'pending'
+    | 'analyzing'
+    | 'verified'
+    | 'rejected'
+    | 'needs_review'
+    | null;
 }
 
 interface UseCeremonyReturn {
@@ -92,7 +99,9 @@ const formatTimeRemaining = (deadline: Date): string => {
   if (remaining <= 0) return 'Süre doldu';
 
   const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const hours = Math.floor(
+    (remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+  );
   const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
 
   if (days > 0) return `${days}g ${hours}s`;
@@ -152,43 +161,57 @@ export function useCeremony(): UseCeremonyReturn {
           .eq('id', session.session.user.id)
           .single();
 
-        if (profile) {
+        if (profile && typeof profile === 'object' && 'id' in profile) {
+          // Cast profile to the expected shape
+          const p = profile as {
+            email_verified?: boolean;
+            email_verified_at?: string;
+            phone_verified?: boolean;
+            phone_verified_at?: string;
+            kyc_verified?: boolean;
+            kyc_verified_at?: string;
+            bank_connected?: boolean;
+            bank_connected_at?: string;
+          };
           // Map profile data to milestones
           const updatedMilestones = DEFAULT_MILESTONES.map((m) => {
             switch (m.type) {
               case 'email':
                 return {
                   ...m,
-                  verified: !!profile.email_verified,
-                  verifiedAt: profile.email_verified_at,
+                  verified: !!p.email_verified,
+                  verifiedAt: p.email_verified_at,
                 };
               case 'phone':
                 return {
                   ...m,
-                  verified: !!profile.phone_verified,
-                  verifiedAt: profile.phone_verified_at,
+                  verified: !!p.phone_verified,
+                  verifiedAt: p.phone_verified_at,
                 };
               case 'id':
                 return {
                   ...m,
-                  verified: !!profile.kyc_verified,
-                  verifiedAt: profile.kyc_verified_at,
+                  verified: !!p.kyc_verified,
+                  verifiedAt: p.kyc_verified_at,
                 };
               case 'bank':
                 return {
                   ...m,
-                  verified: !!profile.bank_connected,
-                  verifiedAt: profile.bank_connected_at,
+                  verified: !!p.bank_connected,
+                  verifiedAt: p.bank_connected_at,
                 };
               default:
                 return m;
             }
           });
 
-          setState((prev) => ({ ...prev, milestones: updatedMilestones }));
+          setState((prev) => ({
+            ...prev,
+            milestones: updatedMilestones as TrustMilestone[],
+          }));
         }
       } catch (error) {
-        console.error('Error fetching milestones:', error);
+        logger.error('Error fetching milestones:', error);
       }
     };
 
@@ -299,11 +322,11 @@ export function useCeremony(): UseCeremonyReturn {
         setState((prev) => ({ ...prev, thankYouCardSent: true }));
         return true;
       } catch (error) {
-        console.error('Error sending thank you card:', error);
+        logger.error('Error sending thank you card:', error);
         return false;
       }
     },
-    [state.gift]
+    [state.gift],
   );
 
   const resetCeremony = useCallback(() => {

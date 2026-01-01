@@ -39,16 +39,19 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ViewShot, { captureRef } from 'react-native-view-shot';
 import * as Haptics from 'expo-haptics';
 import {
-  CEREMONY_COLORS,
   CEREMONY_SIZES,
   CARD_TEMPLATES,
   type CardTemplate,
 } from '@/constants/ceremony';
 import { COLORS } from '@/constants/colors';
 import { SPACING } from '@/constants/spacing';
+import { logger } from '@/utils/logger';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CARD_WIDTH = Math.min(CEREMONY_SIZES.thankYouCard.width, SCREEN_WIDTH - 40);
+const CARD_WIDTH = Math.min(
+  CEREMONY_SIZES.thankYouCard.width,
+  SCREEN_WIDTH - 40,
+);
 const CARD_HEIGHT = CARD_WIDTH * 0.625;
 
 interface ThankYouCardCreatorProps {
@@ -75,10 +78,10 @@ export const ThankYouCardCreator: React.FC<ThankYouCardCreatorProps> = ({
   testID,
 }) => {
   const [selectedTemplate, setSelectedTemplate] = useState<CardTemplate>(
-    CARD_TEMPLATES[0]
+    CARD_TEMPLATES[0],
   );
   const [message, setMessage] = useState(
-    `${recipientName}, bu harika deneyim için teşekkürler! 💝`
+    `${recipientName}, bu harika deneyim için teşekkürler! 💝`,
   );
   const [selectedPhoto, setSelectedPhoto] = useState(proofPhotos[0]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -116,7 +119,7 @@ export const ThankYouCardCreator: React.FC<ThankYouCardCreatorProps> = ({
       // For now, just return the local URI
       onComplete(uri);
     } catch (error) {
-      console.error('Error generating card:', error);
+      logger.error('Error generating card:', error);
       setIsGenerating(false);
     }
   }, [onComplete]);
@@ -149,11 +152,12 @@ export const ThankYouCardCreator: React.FC<ThankYouCardCreatorProps> = ({
               onPress={() => handleTemplateSelect(template)}
               style={[
                 styles.templateButton,
-                selectedTemplate.id === template.id && styles.templateButtonSelected,
+                selectedTemplate.id === template.id &&
+                  styles.templateButtonSelected,
               ]}
             >
               <LinearGradient
-                colors={template.gradient as unknown as string[]}
+                colors={[...template.gradient] as [string, string, ...string[]]}
                 style={styles.templatePreview}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -161,7 +165,8 @@ export const ThankYouCardCreator: React.FC<ThankYouCardCreatorProps> = ({
               <Text
                 style={[
                   styles.templateName,
-                  selectedTemplate.id === template.id && styles.templateNameSelected,
+                  selectedTemplate.id === template.id &&
+                    styles.templateNameSelected,
                 ]}
               >
                 {template.name}
@@ -207,7 +212,9 @@ export const ThankYouCardCreator: React.FC<ThankYouCardCreatorProps> = ({
           style={styles.cardPreview}
         >
           <LinearGradient
-            colors={selectedTemplate.gradient as unknown as string[]}
+            colors={
+              [...selectedTemplate.gradient] as [string, string, ...string[]]
+            }
             style={styles.card}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -224,11 +231,19 @@ export const ThankYouCardCreator: React.FC<ThankYouCardCreatorProps> = ({
 
             {/* Content */}
             <View style={styles.cardContent}>
-              <Text style={[styles.cardTitle, { color: selectedTemplate.textColor }]}>
+              <Text
+                style={[
+                  styles.cardTitle,
+                  { color: selectedTemplate.textColor },
+                ]}
+              >
                 {momentTitle}
               </Text>
               <Text
-                style={[styles.cardMessage, { color: selectedTemplate.textColor }]}
+                style={[
+                  styles.cardMessage,
+                  { color: selectedTemplate.textColor },
+                ]}
                 numberOfLines={3}
               >
                 {message}
@@ -244,7 +259,10 @@ export const ThankYouCardCreator: React.FC<ThankYouCardCreatorProps> = ({
                   color={selectedTemplate.accentColor}
                 />
                 <Text
-                  style={[styles.brandText, { color: selectedTemplate.accentColor }]}
+                  style={[
+                    styles.brandText,
+                    { color: selectedTemplate.accentColor },
+                  ]}
                 >
                   TravelMatch
                 </Text>
@@ -320,7 +338,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.textPrimary,
   },
   subtitle: {
     fontSize: 14,
@@ -450,7 +468,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: SPACING.md,
     fontSize: 14,
-    color: COLORS.text,
+    color: COLORS.textPrimary,
     minHeight: 80,
     textAlignVertical: 'top',
   },

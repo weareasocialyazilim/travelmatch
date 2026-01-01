@@ -17,8 +17,15 @@
  * ```
  */
 
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  type ViewStyle,
+  type DimensionValue,
+} from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -26,7 +33,6 @@ import Animated, {
   withRepeat,
   withSequence,
   interpolate,
-  interpolateColor,
   Easing,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -37,7 +43,6 @@ import {
   CEREMONY_TIMING,
   CEREMONY_SIZES,
   CEREMONY_A11Y,
-  SUNSET_PHASE_THRESHOLDS,
   SUNSET_PHASE_MESSAGES,
   type SunsetPhase,
 } from '@/constants/ceremony';
@@ -101,7 +106,7 @@ const formatTimeRemaining = (deadline: Date): string => {
 
   const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
   const hours = Math.floor(
-    (remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+    (remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
   );
   const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
 
@@ -116,7 +121,7 @@ const formatTimeRemaining = (deadline: Date): string => {
 
 // Get gradient colors for phase
 const getGradientColors = (
-  phase: SunsetPhase
+  phase: SunsetPhase,
 ): readonly [string, string, string] => {
   return CEREMONY_COLORS.sky[phase] as readonly [string, string, string];
 };
@@ -134,7 +139,9 @@ export const SunsetClock: React.FC<SunsetClockProps> = ({
   const containerSize = CEREMONY_SIZES.sunsetClock[size];
   const isCompact = size === 'compact';
 
-  const [phase, setPhase] = useState<SunsetPhase>(() => calculatePhase(deadline));
+  const [phase, setPhase] = useState<SunsetPhase>(() =>
+    calculatePhase(deadline),
+  );
   const [timeText, setTimeText] = useState(() => formatTimeRemaining(deadline));
   const previousPhase = React.useRef(phase);
 
@@ -200,27 +207,29 @@ export const SunsetClock: React.FC<SunsetClockProps> = ({
     sunGlow.value = withRepeat(
       withSequence(
         withTiming(0.8, { duration: 1500 }),
-        withTiming(0.5, { duration: 1500 })
+        withTiming(0.5, { duration: 1500 }),
       ),
       -1,
-      true
+      true,
     );
 
     // Wave animation
     waveOffset.value = withRepeat(
       withTiming(1, { duration: 3000, easing: Easing.linear }),
       -1,
-      false
+      false,
     );
   }, []);
 
   // Sun animated style
   const sunAnimatedStyle = useAnimatedStyle(() => {
-    const containerHeight = isCompact ? containerSize * 0.7 : containerSize * 0.6;
+    const containerHeight = isCompact
+      ? containerSize * 0.7
+      : containerSize * 0.6;
     const sunY = interpolate(
       sunPosition.value,
       [0, 1],
-      [containerHeight - 10, 0]
+      [containerHeight - 10, 0],
     );
 
     return {
@@ -245,7 +254,10 @@ export const SunsetClock: React.FC<SunsetClockProps> = ({
     <View
       style={[
         styles.container,
-        { width: containerSize, height: isCompact ? containerSize : containerSize * 0.8 },
+        {
+          width: containerSize,
+          height: isCompact ? containerSize : containerSize * 0.8,
+        },
       ]}
       testID={testID}
       accessible
@@ -336,7 +348,8 @@ export const SunsetClock: React.FC<SunsetClockProps> = ({
             style={[
               styles.timeText,
               isCompact && styles.timeTextCompact,
-              (phase === 'twilight' || phase === 'expired') && styles.timeTextLight,
+              (phase === 'twilight' || phase === 'expired') &&
+                styles.timeTextLight,
             ]}
           >
             {timeText}
@@ -345,7 +358,8 @@ export const SunsetClock: React.FC<SunsetClockProps> = ({
             <Text
               style={[
                 styles.phaseText,
-                (phase === 'urgent' || phase === 'twilight') && styles.phaseTextUrgent,
+                (phase === 'urgent' || phase === 'twilight') &&
+                  styles.phaseTextUrgent,
               ]}
             >
               {phaseMessage}
@@ -381,10 +395,10 @@ const Star: React.FC<{ index: number; size: number }> = ({ index, size }) => {
     twinkle.value = withRepeat(
       withSequence(
         withTiming(1, { duration: 800 + index * 200 }),
-        withTiming(0.3, { duration: 800 + index * 200 })
+        withTiming(0.3, { duration: 800 + index * 200 }),
       ),
       -1,
-      true
+      true,
     );
   }, [index]);
 
@@ -406,19 +420,18 @@ const Star: React.FC<{ index: number; size: number }> = ({ index, size }) => {
 
   const pos = positions[index % positions.length];
 
+  // Cast position for Reanimated style compatibility
+  const positionStyle: ViewStyle = {
+    width: size,
+    height: size,
+    borderRadius: size / 2,
+    top: pos.top,
+    ...(pos.left !== undefined ? { left: pos.left as DimensionValue } : {}),
+    ...(pos.right !== undefined ? { right: pos.right as DimensionValue } : {}),
+  };
+
   return (
-    <Animated.View
-      style={[
-        styles.star,
-        {
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          ...pos,
-        },
-        twinkleStyle,
-      ]}
-    />
+    <Animated.View style={[styles.star, positionStyle as any, twinkleStyle]} />
   );
 };
 
@@ -433,12 +446,14 @@ const WaveEffect: React.FC<{ phase: SunsetPhase; isCompact: boolean }> = ({
     waveOffset.value = withRepeat(
       withTiming(1, { duration: 2000, easing: Easing.linear }),
       -1,
-      false
+      false,
     );
   }, []);
 
   const waveStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: interpolate(waveOffset.value, [0, 1], [0, -20]) }],
+    transform: [
+      { translateX: interpolate(waveOffset.value, [0, 1], [0, -20]) },
+    ],
   }));
 
   const waveColor =
@@ -518,7 +533,7 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.textPrimary,
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,

@@ -173,7 +173,7 @@ const MomentDetailScreen: React.FC = () => {
           setContributorCount(data.length || 0);
           setContributors(
             (
-              (data || []) as {
+              (data || []) as unknown as {
                 user_id: string;
                 is_anonymous?: boolean;
                 users?: { name?: string; avatar_url?: string } | null;

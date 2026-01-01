@@ -17,13 +17,7 @@
  */
 
 import React, { useEffect, useMemo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  AccessibilityInfo,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -34,17 +28,10 @@ import Animated, {
   withSequence,
   Easing,
   interpolate,
-  FadeIn,
   FadeInUp,
+  type SharedValue,
 } from 'react-native-reanimated';
-import Svg, {
-  Circle,
-  Line,
-  Defs,
-  RadialGradient,
-  Stop,
-  G,
-} from 'react-native-svg';
+import Svg, { Line, Defs, RadialGradient, Stop, G } from 'react-native-svg';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import {
@@ -52,15 +39,12 @@ import {
   CEREMONY_TIMING,
   CEREMONY_SIZES,
   CEREMONY_A11Y,
-  CEREMONY_HAPTICS,
   DEFAULT_MILESTONES,
   type TrustMilestone,
 } from '@/constants/ceremony';
 import { COLORS } from '@/constants/colors';
-import { TYPOGRAPHY } from '@/theme/typography';
 import { SPACING } from '@/constants/spacing';
 
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const AnimatedLine = Animated.createAnimatedComponent(Line);
 
 type ConstellationSize = 'sm' | 'md' | 'lg';
@@ -90,7 +74,7 @@ const getSizeValue = (size: ConstellationSize): number => {
 
 export const TrustConstellation: React.FC<TrustConstellationProps> = ({
   milestones = DEFAULT_MILESTONES,
-  score = 0,
+  score: _score = 0,
   size = 'md',
   animated = true,
   onMilestonePress,
@@ -105,7 +89,7 @@ export const TrustConstellation: React.FC<TrustConstellationProps> = ({
   // Calculate verified count for badge
   const verifiedCount = useMemo(
     () => milestones.filter((m) => m.verified).length,
-    [milestones]
+    [milestones],
   );
   const totalCount = milestones.length;
   const allVerified = verifiedCount === totalCount;
@@ -123,17 +107,17 @@ export const TrustConstellation: React.FC<TrustConstellationProps> = ({
         withTiming(1, {
           duration: CEREMONY_TIMING.constellationDraw,
           easing: Easing.out(Easing.cubic),
-        })
+        }),
       );
 
       // Glow animation for verified stars
       glowOpacity.value = withRepeat(
         withSequence(
           withTiming(0.8, { duration: 1000 }),
-          withTiming(0.3, { duration: 1000 })
+          withTiming(0.3, { duration: 1000 }),
         ),
         -1,
-        true
+        true,
       );
 
       // Badge animation
@@ -142,8 +126,8 @@ export const TrustConstellation: React.FC<TrustConstellationProps> = ({
           CEREMONY_TIMING.constellationDraw + 500,
           withSequence(
             withTiming(1.2, { duration: 200 }),
-            withTiming(1, { duration: 150 })
-          )
+            withTiming(1, { duration: 150 }),
+          ),
         );
       }
     } else {
@@ -163,7 +147,7 @@ export const TrustConstellation: React.FC<TrustConstellationProps> = ({
 
   // Render connections between milestones
   const renderConnections = () => {
-    const connections: JSX.Element[] = [];
+    const connections: React.ReactElement[] = [];
     const renderedPairs = new Set<string>();
 
     milestones.forEach((milestone) => {
@@ -191,7 +175,7 @@ export const TrustConstellation: React.FC<TrustConstellationProps> = ({
             verified={bothVerified}
             progress={drawProgress}
             delay={connections.length * 100}
-          />
+          />,
         );
       });
     });
@@ -209,7 +193,10 @@ export const TrustConstellation: React.FC<TrustConstellationProps> = ({
 
   return (
     <View
-      style={[styles.container, { width: containerSize, height: containerSize }]}
+      style={[
+        styles.container,
+        { width: containerSize, height: containerSize },
+      ]}
       testID={testID}
       accessible
       accessibilityLabel={`${CEREMONY_A11Y.labels.trustConstellation}. ${verifiedCount} / ${totalCount} doğrulandı`}
@@ -286,8 +273,8 @@ interface StarNodeProps {
   containerSize: number;
   starRadius: number;
   iconSize: number;
-  progress: Animated.SharedValue<number>;
-  glowOpacity: Animated.SharedValue<number>;
+  progress: SharedValue<number>;
+  glowOpacity: SharedValue<number>;
   delay: number;
   animated: boolean;
   isDark: boolean;
@@ -299,7 +286,7 @@ const StarNode: React.FC<StarNodeProps> = ({
   containerSize,
   starRadius,
   iconSize,
-  progress,
+  progress: _progress,
   glowOpacity,
   delay,
   animated,
@@ -316,8 +303,8 @@ const StarNode: React.FC<StarNodeProps> = ({
         delay + 300,
         withSequence(
           withTiming(1.3, { duration: 150 }),
-          withTiming(1, { duration: 100 })
-        )
+          withTiming(1, { duration: 100 }),
+        ),
       );
     } else {
       starScale.value = 1;
@@ -421,7 +408,7 @@ interface ConnectionLineProps {
   x2: number;
   y2: number;
   verified: boolean;
-  progress: Animated.SharedValue<number>;
+  progress: SharedValue<number>;
   delay: number;
 }
 
@@ -432,7 +419,7 @@ const ConnectionLine: React.FC<ConnectionLineProps> = ({
   y2,
   verified,
   progress,
-  delay,
+  delay: _delay,
 }) => {
   const lineLength = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 
@@ -499,7 +486,7 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 11,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.textPrimary,
   },
   badgeTextDark: {
     color: COLORS.textInverse,

@@ -12,19 +12,12 @@
  */
 
 import React, { useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  ViewStyle,
-} from 'react-native';
+import { View, Text, StyleSheet, Pressable, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
-  runOnJS,
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, GRADIENTS, SHADOWS, primitives } from '@/constants/colors';
@@ -78,7 +71,9 @@ const formatCurrency = (amount: number, currency: string): string => {
 /**
  * Get status configuration
  */
-const getStatusConfig = (status: GiftStatus): {
+const getStatusConfig = (
+  status: GiftStatus,
+): {
   label: string;
   color: string;
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
@@ -89,7 +84,11 @@ const getStatusConfig = (status: GiftStatus): {
     case 'declined':
       return { label: 'Declined', color: COLORS.error, icon: 'close-circle' };
     case 'expired':
-      return { label: 'Expired', color: primitives.stone[400], icon: 'clock-alert' };
+      return {
+        label: 'Expired',
+        color: primitives.stone[400],
+        icon: 'clock-alert',
+      };
     case 'pending':
     default:
       return { label: 'Pending', color: COLORS.warning, icon: 'clock-outline' };
@@ -207,11 +206,7 @@ export const TMGiftCard: React.FC<TMGiftCardProps> = ({
         <View style={styles.content}>
           {/* Sender Info */}
           <View style={styles.senderRow}>
-            <TMAvatar
-              source={senderAvatar}
-              name={senderName}
-              size="sm"
-            />
+            <TMAvatar source={senderAvatar} name={senderName} size="sm" />
             <View style={styles.senderInfo}>
               <Text style={styles.senderLabel}>From</Text>
               <Text style={styles.senderName}>{senderName}</Text>
