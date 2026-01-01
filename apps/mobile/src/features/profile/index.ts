@@ -13,6 +13,9 @@ export { ProofFlowScreen } from './screens/ProofFlowScreen';
 export { ProofDetailScreen } from './screens/ProofDetailScreen';
 export { ProofHistoryScreen } from './screens/ProofHistoryScreen';
 
+// Review
+export { ReviewScreen } from './screens/ReviewScreen';
+
 // Moments
 export { default as MyMomentsScreen } from './screens/MyMomentsScreen';
 export { default as CreateMomentScreen } from './screens/CreateMomentScreen';

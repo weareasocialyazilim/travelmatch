@@ -90,6 +90,11 @@ const TrustGardenDetailScreen = lazyLoad(() =>
 );
 import { TrustNotesScreen, ProfileDetailScreen } from '../features/profile';
 
+// Review Screen
+const ReviewScreen = lazyLoad(() =>
+  import('../features/profile').then((m) => ({ default: m.ReviewScreen })),
+);
+
 // Proof system screens
 const ProofHistoryScreen = lazyLoad(() =>
   import('../features/profile').then((m) => ({
@@ -385,6 +390,7 @@ const AppNavigator = () => {
               name="ProfileDetail"
               component={ProfileDetailScreen}
             />
+            <Stack.Screen name="Review" component={ReviewScreen} />
             <Stack.Screen name="MyGifts" component={MyGiftsScreen} />
             <Stack.Screen name="TrustNotes" component={TrustNotesScreen} />
             <Stack.Screen

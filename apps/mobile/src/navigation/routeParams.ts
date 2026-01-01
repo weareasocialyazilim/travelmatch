@@ -71,6 +71,11 @@ export type RootStackParamList = {
   MomentDetail: { moment: Moment; isOwner?: boolean; pendingRequests?: number };
   Profile: undefined;
   ProfileDetail: { userId: string };
+  Review: {
+    userId: string;
+    userName: string;
+    userAvatar: string;
+  };
   MyGifts: undefined;
   TrustNotes: undefined;
   MomentGallery: { momentId: string };
