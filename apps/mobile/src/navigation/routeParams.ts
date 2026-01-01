@@ -283,4 +283,7 @@ export type RootStackParamList = {
   // Data Privacy & Deleted Moments
   DataPrivacy: undefined;
   DeletedMoments: undefined;
+
+  // Dev Menu (development only)
+  DevMenu: undefined;
 };
