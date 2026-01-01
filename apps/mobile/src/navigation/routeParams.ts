@@ -81,6 +81,7 @@ export type RootStackParamList = {
   };
   UserProfile: { userId?: string } | undefined;
   MyGifts: undefined;
+  GiftCardMarket: undefined;
   TrustNotes: undefined;
   MomentGallery: { momentId: string };
   ProofHistory: { momentId: string };
