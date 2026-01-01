@@ -254,6 +254,7 @@ export type RootStackParamList = {
 
   // Missing routes
   BookingDetail: { bookingId: string };
+  Ticket: { bookingId: string };
   UnifiedGiftFlow: {
     recipientId: string;
     recipientName: string;
