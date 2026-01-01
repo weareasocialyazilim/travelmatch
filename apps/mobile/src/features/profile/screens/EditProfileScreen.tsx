@@ -29,6 +29,15 @@ import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 import { useToast } from '@/context/ToastContext';
 
+// Helper to mask phone number for privacy display
+const maskPhone = (phone: string): string => {
+  if (!phone || phone.length < 6) return phone;
+  const visibleStart = phone.slice(0, 4);
+  const visibleEnd = phone.slice(-2);
+  const maskedMiddle = '*'.repeat(Math.max(0, phone.length - 6));
+  return `${visibleStart}${maskedMiddle}${visibleEnd}`;
+};
+
 const EditProfileScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user, refreshUser } = useAuth();
@@ -506,6 +515,43 @@ const EditProfileScreen = () => {
             </View>
           </View>
 
+          {/* Private Information Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>PRIVATE INFORMATION</Text>
+
+            <View style={styles.inputCard}>
+              {/* Email */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Email</Text>
+                <TextInput
+                  style={[styles.textInput, styles.disabledInput]}
+                  value={user?.email || ''}
+                  editable={false}
+                  placeholder="No email set"
+                  placeholderTextColor={COLORS.text.tertiary}
+                />
+              </View>
+
+              <View style={styles.inputDivider} />
+
+              {/* Phone */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Phone</Text>
+                <TextInput
+                  style={[styles.textInput, styles.disabledInput]}
+                  value={user?.phone ? maskPhone(user.phone) : ''}
+                  editable={false}
+                  placeholder="No phone set"
+                  placeholderTextColor={COLORS.text.tertiary}
+                />
+              </View>
+            </View>
+
+            <Text style={styles.privateInfoNote}>
+              This information is private and only visible to you.
+            </Text>
+          </View>
+
           <View style={styles.bottomSpacer} />
         </ScrollView>
       </KeyboardAvoidingView>
@@ -679,6 +725,17 @@ const styles = StyleSheet.create({
 
   bottomSpacer: {
     height: 40,
+  },
+
+  // Private Information
+  disabledInput: {
+    color: COLORS.text.tertiary,
+  },
+  privateInfoNote: {
+    fontSize: 12,
+    color: COLORS.text.tertiary,
+    marginTop: 10,
+    paddingHorizontal: 4,
   },
 });
 
