@@ -20,7 +20,7 @@ export const AboutScreen = ({ navigation }: any) => {
           <MaterialCommunityIcons name="compass-rose" size={60} color="black" />
         </View>
         <Text style={styles.appName}>TravelMatch</Text>
-        <Text style={styles.version}>Version 2.0.1 (Build 2026)</Text>
+        <Text style={styles.version}>Version 1.0.0</Text>
 
         <View style={styles.menu}>
           <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('Terms')}>
@@ -29,10 +29,6 @@ export const AboutScreen = ({ navigation }: any) => {
           </TouchableOpacity>
           <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('PrivacyPolicy')}>
             <Text style={styles.itemText}>Privacy Policy</Text>
-            <Ionicons name="chevron-forward" size={20} color="#666" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.item}>
-            <Text style={styles.itemText}>Open Source Licenses</Text>
             <Ionicons name="chevron-forward" size={20} color="#666" />
           </TouchableOpacity>
         </View>
