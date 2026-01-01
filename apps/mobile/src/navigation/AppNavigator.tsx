@@ -104,6 +104,7 @@ import {
   TrustNotesScreen,
   ProfileDetailScreen,
   VerificationScreen,
+  AchievementsScreen,
 } from '../features/profile';
 
 // Review Screen
@@ -570,6 +571,9 @@ const AppNavigator = () => {
 
             {/* Reputation */}
             <Stack.Screen name="Reputation" component={ReputationScreen} />
+
+            {/* Achievements */}
+            <Stack.Screen name="Achievements" component={AchievementsScreen} />
 
             {/* Legal & Policy */}
             <Stack.Screen
