@@ -322,4 +322,7 @@ export type RootStackParamList = {
 
   // Dev Menu (development only)
   DevMenu: undefined;
+
+  // Image Viewer (fullscreen modal)
+  ImageViewer: { imageUrl: string };
 };
