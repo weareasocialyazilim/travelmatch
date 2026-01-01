@@ -102,3 +102,8 @@ export type {
   SelectionOption,
   BottomSheetHeight,
 } from './GenericBottomSheet';
+
+// ═══════════════════════════════════════════════════════════════════
+// Filter Modals
+// ═══════════════════════════════════════════════════════════════════
+export { BlurFilterModal } from './BlurFilterModal';
