@@ -1,175 +1,48 @@
-/**
- * Session Expired Screen
- * 
- * Shown when user's session has expired and cannot be refreshed
- * - Clear message about session expiry
- * - Login button to re-authenticate
- * - Prevents further app usage until re-login
- */
-
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { COLORS } from '../constants/colors';
-import { TYPOGRAPHY } from '@/theme/typography';
-import { sessionManager } from '../services/sessionManager';
-import { logger } from '../utils/logger';
+import { COLORS } from '@/theme/colors';
+import { LinearGradient } from 'expo-linear-gradient';
 
-const SessionExpiredScreen: React.FC = () => {
-  const navigation = useNavigation();
-
-  const handleLogin = async () => {
-    try {
-      // Clear session completely
-      await sessionManager.clearSession();
-      
-      logger.info('[SessionExpired] Navigating to login');
-      
-      // Navigate to login screen
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Login' as never }],
-      });
-    } catch (error) {
-      logger.error('[SessionExpired] Clear session failed:', error);
-      
-      // Force navigation anyway
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Login' as never }],
-      });
-    }
+export const SessionExpiredScreen = ({ navigation }: any) => {
+  const handleLogin = () => {
+    // Reset navigation to Auth stack
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Login' }],
+    });
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <View style={styles.content}>
-        {/* Icon */}
-        <View style={styles.iconContainer}>
-          <MaterialCommunityIcons
-            name="clock-alert-outline"
-            size={80}
-            color={COLORS.feedback.warning}
-          />
-        </View>
-
-        {/* Title */}
-        <Text style={styles.title}>Oturumunuz Sona Erdi</Text>
-
-        {/* Message */}
-        <Text style={styles.message}>
-          Güvenliğiniz için oturumunuz sonlandırıldı. Devam etmek için lütfen tekrar giriş yapın.
-        </Text>
-
-        {/* Login Button */}
-        <TouchableOpacity
-          style={styles.loginButton}
-          onPress={handleLogin}
-          activeOpacity={0.8}
-        >
-          <MaterialCommunityIcons
-            name="login"
-            size={20}
-            color={COLORS.utility.white}
-            style={styles.buttonIcon}
-          />
-          <Text style={styles.loginButtonText}>Tekrar Giriş Yap</Text>
-        </TouchableOpacity>
-
-        {/* Info */}
-        <View style={styles.infoContainer}>
-          <MaterialCommunityIcons
-            name="information-outline"
-            size={16}
-            color={COLORS.text.secondary}
-          />
-          <Text style={styles.infoText}>
-            Verileriniz güvende. Giriş yaptıktan sonra kaldığınız yerden devam edebilirsiniz.
-          </Text>
-        </View>
+    <View style={styles.container}>
+      <View style={styles.iconCircle}>
+        <MaterialCommunityIcons name="timer-off-outline" size={60} color="black" />
       </View>
-    </SafeAreaView>
+
+      <Text style={styles.title}>Session Timed Out</Text>
+      <Text style={styles.desc}>
+        For your security, we've logged you out due to inactivity.
+        Please sign in again to continue your journey.
+      </Text>
+
+      <TouchableOpacity onPress={handleLogin} style={{ width: '100%' }}>
+        <LinearGradient
+          colors={[COLORS.brand.primary, COLORS.brand.secondary]}
+          start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+          style={styles.btn}
+        >
+          <Text style={styles.btnText}>Sign In Again</Text>
+        </LinearGradient>
+      </TouchableOpacity>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.bg.primary,
-  },
-  content: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 32,
-  },
-  iconContainer: {
-    marginBottom: 24,
-    padding: 20,
-    borderRadius: 60,
-    backgroundColor: COLORS.warningLight || `${COLORS.feedback.warning}15`,
-  },
-  title: {
-    ...TYPOGRAPHY.h2,
-    color: COLORS.text.primary,
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  message: {
-    ...TYPOGRAPHY.body,
-    color: COLORS.text.secondary,
-    textAlign: 'center',
-    marginBottom: 32,
-    lineHeight: 22,
-    maxWidth: 320,
-  },
-  loginButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.brand.primary,
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-    minWidth: 200,
-    shadowColor: COLORS.brand.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  buttonIcon: {
-    marginRight: 8,
-  },
-  loginButtonText: {
-    ...TYPOGRAPHY.button,
-    color: COLORS.utility.white,
-    fontSize: 16,
-  },
-  infoContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginTop: 32,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: COLORS.bg.secondary || `${COLORS.text.secondary}08`,
-    borderRadius: 8,
-    maxWidth: 320,
-  },
-  infoText: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.text.secondary,
-    marginLeft: 8,
-    flex: 1,
-    lineHeight: 18,
-  },
+  container: { flex: 1, backgroundColor: COLORS.background.primary, alignItems: 'center', justifyContent: 'center', padding: 30 },
+  iconCircle: { width: 120, height: 120, borderRadius: 60, backgroundColor: COLORS.brand.primary, alignItems: 'center', justifyContent: 'center', marginBottom: 30 },
+  title: { fontSize: 28, fontWeight: '900', color: 'white', marginBottom: 12 },
+  desc: { color: COLORS.text.secondary, textAlign: 'center', fontSize: 16, lineHeight: 24, marginBottom: 50 },
+  btn: { width: '100%', paddingVertical: 18, borderRadius: 16, alignItems: 'center' },
+  btnText: { color: 'black', fontWeight: 'bold', fontSize: 16 },
 });
-
-export default SessionExpiredScreen;
