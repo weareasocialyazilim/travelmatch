@@ -3,7 +3,7 @@
  * Discriminated Union Pattern for type-safe message handling
  */
 
-export type MessageType = 'text' | 'image' | 'location' | 'system';
+export type MessageType = 'text' | 'image' | 'location' | 'system' | 'offer';
 
 export type MessageStatus = 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
 
@@ -53,10 +53,22 @@ export interface SystemMessage extends BaseMessage {
   metadata?: Record<string, unknown>;
 }
 
+export type OfferStatus = 'pending' | 'accepted' | 'declined' | 'expired';
+
+export interface OfferMessage extends BaseMessage {
+  type: 'offer';
+  amount: number;
+  currency?: string;
+  offer_status: OfferStatus;
+  moment_id?: string;
+  moment_title?: string;
+  expires_at?: string;
+}
+
 /**
  * Discriminated Union - TypeScript will narrow the type based on 'type' field
  */
-export type Message = TextMessage | ImageMessage | LocationMessage | SystemMessage;
+export type Message = TextMessage | ImageMessage | LocationMessage | SystemMessage | OfferMessage;
 
 /**
  * Type Guards for runtime type checking
@@ -75,6 +87,10 @@ export function isLocationMessage(msg: Message): msg is LocationMessage {
 
 export function isSystemMessage(msg: Message): msg is SystemMessage {
   return msg.type === 'system';
+}
+
+export function isOfferMessage(msg: Message): msg is OfferMessage {
+  return msg.type === 'offer';
 }
 
 /**
