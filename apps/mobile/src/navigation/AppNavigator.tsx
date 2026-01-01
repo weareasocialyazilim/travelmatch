@@ -184,6 +184,7 @@ import {
   ProofReviewScreen,
   PayTRWebViewScreen,
   CheckoutScreen,
+  PromoCodeScreen,
   // KYC Screens
   KYCIntroScreen,
   KYCDocumentTypeScreen,
@@ -605,6 +606,7 @@ const AppNavigator = () => {
 
             {/* Wallet & Settings */}
             <Stack.Screen name="Wallet" component={WalletScreen} />
+            <Stack.Screen name="PromoCode" component={PromoCodeScreen} />
             <Stack.Screen name="Settings" component={AppSettingsScreen} />
             <Stack.Screen
               name="Notifications"
