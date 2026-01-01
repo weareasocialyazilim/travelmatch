@@ -66,6 +66,7 @@ export type RootStackParamList = {
   Requests: { initialTab?: 'pending' | 'notifications' } | undefined;
   RequestManager: { momentId?: string } | undefined;
   Messages: undefined;
+  SearchMap: undefined;
 
   CreateMoment: undefined;
   EditMoment: { momentId: string };
