@@ -1,211 +1,67 @@
 /**
- * TravelMatch Awwwards Design System 2026 - Onboarding Screen
+ * TravelMatch Onboarding Screen
  *
- * Immersive storytelling onboarding with:
- * - 3D parallax floating elements
- * - Smooth gradient transitions
- * - Animated emoji interactions
- * - Story-based narrative
- *
- * Designed for Awwwards Best UI/UX nomination
+ * Immersive image-based onboarding with:
+ * - Full-screen background images
+ * - Smooth gradient overlays
+ * - Horizontal swipe navigation
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
+  FlatList,
   Dimensions,
-  Pressable,
-  Platform,
+  TouchableOpacity,
+  ImageBackground,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
+import { Ionicons } from '@expo/vector-icons';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Reanimated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withSequence,
-  withDelay,
-  withTiming,
-  withRepeat,
-  interpolate,
-  Extrapolation,
-  Easing,
-  SharedValue,
-} from 'react-native-reanimated';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import type {
-  StackNavigationProp,
-  StackScreenProps,
-} from '@react-navigation/stack';
+import type { StackScreenProps } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
 
-import { PALETTE, COLORS, primitives } from '../../../constants/colors';
-import { TYPE_SCALE } from '../../../theme/typography';
-import { SPRINGS, TIMINGS } from '../../../hooks/useAnimations';
+import { COLORS } from '@/theme/colors';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useOnboarding } from '@/hooks/useOnboarding';
-import { useTranslation } from '@/hooks/useTranslation';
 import { logger } from '../../../utils/logger';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 // ============================================
-// TYPES
+// SLIDE DATA
 // ============================================
-interface OnboardingSlideData {
-  id: string;
-  emoji: string;
-  emojiSize: number;
-  gradientColors: readonly [string, string, string];
-  floatingElements: Array<{
-    emoji: string;
-    position: { top: number; left: number };
-    scale: number;
-    rotation: number;
-  }>;
-}
-
-type OnboardingScreenProps = StackScreenProps<RootStackParamList, 'Onboarding'>;
-
-// ============================================
-// SLIDE DATA (text comes from translations)
-// ============================================
-const SLIDES: OnboardingSlideData[] = [
+const SLIDES = [
   {
     id: '1',
-    emoji: '\u2615', // Coffee emoji
-    emojiSize: 120,
-    gradientColors: [COLORS.orange, COLORS.orangeBright, primitives.stone[950]] as const,
-    floatingElements: [
-      { emoji: '\u2728', position: { top: 15, left: 10 }, scale: 1.2, rotation: -15 },
-      { emoji: '\u{1F9E1}', position: { top: 25, left: 80 }, scale: 0.8, rotation: 10 },
-      { emoji: '\u2615', position: { top: 60, left: 85 }, scale: 0.6, rotation: -5 },
-    ],
+    image: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=1200',
+    title: 'Discover Local Vibes',
+    desc: 'Find exclusive moments curated by locals. From hidden bars to sunset dinners.',
   },
   {
     id: '2',
-    emoji: '\u{1F31F}', // Star emoji
-    emojiSize: 100,
-    gradientColors: [primitives.purple[500], primitives.purple[400], primitives.stone[950]] as const,
-    floatingElements: [
-      { emoji: '\u{1F4AB}', position: { top: 20, left: 15 }, scale: 1, rotation: 20 },
-      { emoji: '\u2B50', position: { top: 35, left: 75 }, scale: 1.1, rotation: -10 },
-      { emoji: '\u{1F319}', position: { top: 55, left: 10 }, scale: 0.7, rotation: 5 },
-    ],
+    image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1200',
+    title: 'Connect & Experience',
+    desc: "Don't just travel. Meet people who share your taste and gift them a moment.",
   },
   {
     id: '3',
-    emoji: '\u{1F381}', // Gift emoji
-    emojiSize: 110,
-    gradientColors: [primitives.magenta[500], primitives.magenta[400], primitives.stone[950]] as const,
-    floatingElements: [
-      { emoji: '\u{1F49D}', position: { top: 18, left: 20 }, scale: 0.9, rotation: -12 },
-      { emoji: '\u{1F389}', position: { top: 40, left: 78 }, scale: 1, rotation: 15 },
-      { emoji: '\u2728', position: { top: 58, left: 25 }, scale: 0.8, rotation: -8 },
-    ],
-  },
-  {
-    id: '4',
-    emoji: '\u{1F510}', // Lock emoji
-    emojiSize: 100,
-    gradientColors: [primitives.emerald[500], primitives.emerald[400], primitives.stone[950]] as const,
-    floatingElements: [
-      { emoji: '\u{1F6E1}', position: { top: 22, left: 12 }, scale: 1.1, rotation: 8 },
-      { emoji: '\u2713', position: { top: 38, left: 82 }, scale: 0.9, rotation: -5 },
-      { emoji: '\u{1F48E}', position: { top: 55, left: 70 }, scale: 0.7, rotation: 12 },
-    ],
-  },
-  {
-    id: '5',
-    emoji: '\u{1F680}', // Rocket emoji
-    emojiSize: 120,
-    gradientColors: [primitives.blue[500], primitives.blue[400], primitives.stone[950]] as const,
-    floatingElements: [
-      { emoji: '\u{1F30D}', position: { top: 20, left: 15 }, scale: 1.2, rotation: -10 },
-      { emoji: '\u2764', position: { top: 45, left: 80 }, scale: 1, rotation: 15 },
-      { emoji: '\u{1F3AF}', position: { top: 60, left: 20 }, scale: 0.8, rotation: 5 },
-    ],
+    image: 'https://images.unsplash.com/photo-1551632436-cbf8dd354ca8?q=80&w=1200',
+    title: 'Secure & Cashless',
+    desc: 'Pay safely via the app. No cash, no awkward moments. Just pure vibes.',
   },
 ];
 
 // ============================================
-// FLOATING ELEMENT COMPONENT
+// TYPES
 // ============================================
-interface FloatingElementProps {
-  emoji: string;
-  position: { top: number; left: number };
-  scale: number;
-  rotation: number;
-  slideProgress: SharedValue<number>;
-  index: number;
-}
-
-const FloatingElement: React.FC<FloatingElementProps> = ({
-  emoji,
-  position,
-  scale,
-  rotation,
-  slideProgress,
-  index,
-}) => {
-  const floatY = useSharedValue(0);
-
-  useEffect(() => {
-    // Floating animation
-    floatY.value = withRepeat(
-      withSequence(
-        withTiming(-8, { duration: 2000 + index * 200, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0, { duration: 2000 + index * 200, easing: Easing.inOut(Easing.ease) })
-      ),
-      -1,
-      false
-    );
-  }, [index]);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    const parallaxOffset = interpolate(
-      slideProgress.value,
-      [0, 1],
-      [0, -30 * (index + 1)],
-      Extrapolation.CLAMP
-    );
-
-    return {
-      transform: [
-        { translateY: parallaxOffset + floatY.value },
-        { scale: scale },
-        { rotate: `${rotation}deg` },
-      ],
-      opacity: interpolate(
-        slideProgress.value,
-        [0, 0.3, 0.7, 1],
-        [0, 1, 1, 0],
-        Extrapolation.CLAMP
-      ),
-    };
-  });
-
-  return (
-    <Reanimated.Text
-      style={[
-        styles.floatingEmoji,
-        {
-          top: `${position.top}%`,
-          left: `${position.left}%`,
-          fontSize: 40,
-        },
-        animatedStyle,
-      ]}
-    >
-      {emoji}
-    </Reanimated.Text>
-  );
-};
+type OnboardingScreenProps = StackScreenProps<RootStackParamList, 'Onboarding'>;
 
 // ============================================
 // MAIN COMPONENT
@@ -213,62 +69,25 @@ const FloatingElement: React.FC<FloatingElementProps> = ({
 export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   navigation: navProp,
 }) => {
-  const defaultNavigation =
-    useNavigation<StackNavigationProp<RootStackParamList>>();
+  const defaultNavigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const navigation = navProp || defaultNavigation;
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const flatListRef = useRef<FlatList>(null);
   const insets = useSafeAreaInsets();
   const analytics = useAnalytics();
   const { completeOnboarding } = useOnboarding();
-  const { t } = useTranslation();
-
-  const slideProgress = useSharedValue(0);
-  const emojiScale = useSharedValue(1);
-  const emojiRotation = useSharedValue(0);
-  const contentOpacity = useSharedValue(1);
-  const contentTranslateY = useSharedValue(0);
-
-  const currentSlide = SLIDES[currentIndex];
-
-  // Initial entrance animation
-  useEffect(() => {
-    contentOpacity.value = 0;
-    contentTranslateY.value = 20;
-
-    contentOpacity.value = withDelay(200, withTiming(1, TIMINGS.medium));
-    contentTranslateY.value = withDelay(200, withSpring(0, SPRINGS.gentle));
-  }, [currentIndex]);
 
   const handleNext = useCallback(async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
-    // Bounce animation on emoji
-    emojiScale.value = withSequence(
-      withSpring(0.8, { damping: 10 }),
-      withSpring(1.1, { damping: 8 }),
-      withSpring(1, { damping: 12 })
-    );
-    emojiRotation.value = withSequence(
-      withSpring(-10, { damping: 10 }),
-      withSpring(10, { damping: 8 }),
-      withSpring(0, { damping: 12 })
-    );
+    if (activeIndex < SLIDES.length - 1) {
+      flatListRef.current?.scrollToIndex({ index: activeIndex + 1 });
 
-    // Content fade out and slide
-    contentOpacity.value = withTiming(0, { duration: 150 });
-    contentTranslateY.value = withTiming(-20, { duration: 150 });
-
-    if (currentIndex < SLIDES.length - 1) {
-      setTimeout(() => {
-        setCurrentIndex((prev) => prev + 1);
-        slideProgress.value = withSpring((currentIndex + 1) / (SLIDES.length - 1));
-
-        analytics.trackEvent('onboarding_page_view', {
-          screen: 'onboarding',
-          page_number: currentIndex + 2,
-          page_id: SLIDES[currentIndex + 1].id,
-        });
-      }, 150);
+      analytics.trackEvent('onboarding_page_view', {
+        screen: 'onboarding',
+        page_number: activeIndex + 2,
+        page_id: SLIDES[activeIndex + 1].id,
+      });
     } else {
       analytics.trackEvent('onboarding_completed', {
         screen: 'onboarding',
@@ -283,134 +102,83 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
         navigation.replace('Welcome');
       }
     }
-  }, [currentIndex, navigation, analytics, completeOnboarding]);
+  }, [activeIndex, navigation, analytics, completeOnboarding]);
 
-  const handleSkip = useCallback(async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  const renderItem = ({ item }: { item: (typeof SLIDES)[0] }) => (
+    <View style={styles.slide}>
+      <ImageBackground source={{ uri: item.image }} style={styles.image} resizeMode="cover">
+        <LinearGradient
+          colors={['transparent', 'rgba(0,0,0,0.6)', 'black']}
+          style={styles.gradient}
+        />
+      </ImageBackground>
+    </View>
+  );
 
-    analytics.trackEvent('onboarding_skipped', {
-      screen: 'onboarding',
-      current_screen: currentIndex + 1,
-      total_screens: SLIDES.length,
-    });
-
-    await completeOnboarding();
-    navigation.replace('Welcome');
-  }, [navigation, currentIndex, analytics, completeOnboarding]);
-
-  const emojiAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: emojiScale.value },
-      { rotate: `${emojiRotation.value}deg` },
-    ],
-  }));
-
-  const contentAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: contentOpacity.value,
-    transform: [{ translateY: contentTranslateY.value }],
-  }));
+  const currentSlide = SLIDES[activeIndex];
 
   return (
     <View style={styles.container}>
-      {/* Background Gradient */}
-      <LinearGradient
-        colors={currentSlide.gradientColors}
-        locations={[0, 0.35, 1]}
-        style={StyleSheet.absoluteFill}
+      <FlatList
+        ref={flatListRef}
+        data={SLIDES}
+        renderItem={renderItem}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={(ev) => {
+          const newIndex = Math.round(ev.nativeEvent.contentOffset.x / width);
+          if (newIndex !== activeIndex) {
+            setActiveIndex(newIndex);
+            analytics.trackEvent('onboarding_page_view', {
+              screen: 'onboarding',
+              page_number: newIndex + 1,
+              page_id: SLIDES[newIndex].id,
+            });
+          }
+        }}
+        keyExtractor={(item) => item.id}
       />
 
-      {/* Floating Elements with Parallax */}
-      {currentSlide.floatingElements.map((element, idx) => (
-        <FloatingElement
-          key={`${currentSlide.id}-${idx}`}
-          {...element}
-          slideProgress={slideProgress}
-          index={idx}
-        />
-      ))}
-
-      {/* Main Emoji - Centered */}
-      <View style={styles.emojiContainer}>
-        <Reanimated.Text
-          style={[
-            styles.mainEmoji,
-            { fontSize: currentSlide.emojiSize },
-            emojiAnimatedStyle,
-          ]}
+      {/* Content Overlay */}
+      <View style={[styles.overlay, { paddingBottom: insets.bottom + 30 }]}>
+        <Animated.View
+          key={currentSlide.id}
+          entering={FadeInDown.springify()}
+          style={styles.textContainer}
         >
-          {currentSlide.emoji}
-        </Reanimated.Text>
-      </View>
+          <Text style={styles.title}>{currentSlide.title}</Text>
+          <Text style={styles.desc}>{currentSlide.desc}</Text>
+        </Animated.View>
 
-      {/* Content */}
-      <Reanimated.View style={[styles.contentContainer, contentAnimatedStyle]}>
-        <Text style={styles.headline}>{t(`onboarding.slides.${currentSlide.id}.headline`)}</Text>
-        <Text style={styles.subheadline}>{t(`onboarding.slides.${currentSlide.id}.subheadline`)}</Text>
-      </Reanimated.View>
-
-      {/* Bottom Controls */}
-      <View
-        style={[
-          styles.bottomContainer,
-          { paddingBottom: insets.bottom + 20 },
-        ]}
-      >
-        {/* Progress Dots */}
-        <View style={styles.dotsContainer}>
-          {SLIDES.map((_, idx) => (
-            <View
-              key={idx}
-              style={[
-                styles.dot,
-                idx === currentIndex ? styles.dotActive : styles.dotInactive,
-              ]}
-            />
-          ))}
-        </View>
-
-        {/* CTA Button */}
-        <Pressable
-          onPress={handleNext}
-          style={styles.ctaButton}
-          accessible={true}
-          accessibilityLabel={currentIndex === SLIDES.length - 1 ? 'Başla' : 'Devam et'}
-          accessibilityRole="button"
-          accessibilityHint={currentIndex === SLIDES.length - 1 ? 'Uygulamaya başlar' : 'Bir sonraki ekrana geçer'}
-        >
-          <LinearGradient
-            colors={['rgba(255,255,255,0.2)', 'rgba(255,255,255,0.1)']}
-            style={styles.ctaGradient}
-          >
-            <BlurView
-              intensity={Platform.OS === 'ios' ? 20 : 50}
-              tint="light"
-              style={styles.ctaBlur}
-            >
-              <Text style={styles.ctaText}>
-                {currentIndex === SLIDES.length - 1 ? t('onboarding.start') : t('onboarding.continue')}
-              </Text>
-              <MaterialCommunityIcons
-                name="arrow-right"
-                size={20}
-                color={PALETTE.white}
+        {/* Footer Actions */}
+        <View style={styles.footer}>
+          {/* Paginator */}
+          <View style={styles.paginator}>
+            {SLIDES.map((_, index) => (
+              <View
+                key={index}
+                style={[styles.dot, activeIndex === index && styles.activeDot]}
               />
-            </BlurView>
-          </LinearGradient>
-        </Pressable>
+            ))}
+          </View>
 
-        {/* Skip Link */}
-        {currentIndex < SLIDES.length - 1 && (
-          <Pressable
-            style={styles.skipLink}
-            onPress={handleSkip}
+          {/* Next Button */}
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleNext}
             accessible={true}
-            accessibilityLabel="Tanıtımı atla"
+            accessibilityLabel={activeIndex === SLIDES.length - 1 ? 'Get Started' : 'Next'}
             accessibilityRole="button"
-            accessibilityHint="Tanıtımı atlayarak hoş geldiniz ekranına gider"
           >
-            <Text style={styles.skipText}>{t('onboarding.skip')}</Text>
-          </Pressable>
-        )}
+            <LinearGradient
+              colors={[COLORS.brand.primary, '#A2FF00']}
+              style={styles.btnGradient}
+            >
+              <Ionicons name="arrow-forward" size={24} color="black" />
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -422,96 +190,69 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'black',
   },
-  floatingEmoji: {
-    position: 'absolute',
+  slide: {
+    width,
+    height,
   },
-  emojiContainer: {
-    position: 'absolute',
-    top: SCREEN_HEIGHT * 0.22,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
+  image: {
+    width: '100%',
+    height: '100%',
   },
-  mainEmoji: {
-    textShadowColor: 'rgba(0,0,0,0.3)',
-    textShadowOffset: { width: 0, height: 8 },
-    textShadowRadius: 20,
+  gradient: {
+    ...StyleSheet.absoluteFillObject,
   },
-  contentContainer: {
-    position: 'absolute',
-    bottom: 260,
-    left: 32,
-    right: 32,
-  },
-  headline: {
-    ...TYPE_SCALE.display.h1,
-    color: PALETTE.white,
-    marginBottom: 16,
-    textShadowColor: 'rgba(0,0,0,0.4)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 8,
-  },
-  subheadline: {
-    ...TYPE_SCALE.body.large,
-    color: 'rgba(255,255,255,0.8)',
-    lineHeight: 28,
-  },
-  bottomContainer: {
+  overlay: {
     position: 'absolute',
     bottom: 0,
-    left: 32,
-    right: 32,
+    width: '100%',
+    padding: 30,
+  },
+  textContainer: {
+    marginBottom: 40,
+  },
+  title: {
+    fontSize: 42,
+    fontWeight: '900',
+    color: 'white',
+    marginBottom: 16,
+    lineHeight: 46,
+  },
+  desc: {
+    fontSize: 16,
+    color: 'rgba(255,255,255,0.8)',
+    lineHeight: 24,
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
-  dotsContainer: {
+  paginator: {
     flexDirection: 'row',
-    marginBottom: 32,
     gap: 8,
   },
   dot: {
+    width: 8,
     height: 8,
     borderRadius: 4,
+    backgroundColor: 'rgba(255,255,255,0.2)',
   },
-  dotActive: {
-    width: 28,
-    backgroundColor: PALETTE.white,
+  activeDot: {
+    backgroundColor: COLORS.brand.primary,
+    width: 24,
   },
-  dotInactive: {
-    width: 8,
-    backgroundColor: 'rgba(255,255,255,0.3)',
-  },
-  ctaButton: {
-    width: '100%',
-    borderRadius: 28,
+  button: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     overflow: 'hidden',
   },
-  ctaGradient: {
-    borderRadius: 28,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
-  },
-  ctaBlur: {
-    flexDirection: 'row',
+  btnGradient: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 18,
-    gap: 8,
-    overflow: 'hidden',
-    borderRadius: 28,
-  },
-  ctaText: {
-    ...TYPE_SCALE.label.large,
-    color: PALETTE.white,
-  },
-  skipLink: {
-    marginTop: 20,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-  },
-  skipText: {
-    ...TYPE_SCALE.body.base,
-    color: 'rgba(255,255,255,0.6)',
   },
 });
 
