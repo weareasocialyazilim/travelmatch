@@ -42,7 +42,8 @@ site_url = "https://travelmatch.app"
 additional_redirect_urls = [
   "https://www.travelmatch.app",
   "https://staging.travelmatch.app",
-  "travelmatch://",  # Mobile app deep link
+  "travelmatch://",  # Mobile app deep link (prefix match)
+  "travelmatch://auth/callback",  # OAuth callback for social login
 ]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true

@@ -1,6 +1,6 @@
 // Note: import/order disabled because lazyLoad imports are grouped by feature, not alphabetically
-import React, { Suspense, useState, useEffect } from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import React, { Suspense, useState, useEffect, useCallback } from 'react';
+import { View, ActivityIndicator, Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -10,6 +10,8 @@ import { lazyLoad } from '../utils/lazyLoad';
 import { navigationRef } from '../services/navigationService';
 import { apiClient } from '../services/apiV1Service';
 import { deepLinkHandler } from '../services/deepLinkHandler';
+import { useAuth } from '../context/AuthContext';
+import { logger } from '../utils/logger';
 
 // Loading fallback for lazy-loaded screens
 const loadingStyle = {
@@ -230,6 +232,52 @@ const AppNavigator = () => {
   const [initialRoute, setInitialRoute] = useState<
     'Splash' | 'Onboarding' | 'Welcome' | null
   >(null);
+
+  // Get OAuth callback handler from AuthContext
+  const { handleOAuthCallback, isAuthenticated } = useAuth();
+
+  // Handle OAuth callback from deep link
+  const processOAuthCallback = useCallback(async (url: string) => {
+    if (url.includes('/auth/callback')) {
+      logger.info('[AppNavigator] Processing OAuth callback:', url);
+      try {
+        await handleOAuthCallback(url);
+        logger.info('[AppNavigator] OAuth callback processed successfully');
+        // Navigate to main app after successful OAuth
+        if (navigationRef.isReady()) {
+          (navigationRef.navigate as (name: string) => void)('Discover');
+        }
+      } catch (error) {
+        logger.error('[AppNavigator] OAuth callback error:', error);
+      }
+    }
+  }, [handleOAuthCallback]);
+
+  // Listen for OAuth callbacks via deep links
+  useEffect(() => {
+    // Handle initial URL (app opened from OAuth callback)
+    const handleInitialURL = async () => {
+      const url = await Linking.getInitialURL();
+      if (url && url.includes('/auth/callback')) {
+        logger.info('[AppNavigator] Initial URL is OAuth callback');
+        await processOAuthCallback(url);
+      }
+    };
+
+    void handleInitialURL();
+
+    // Listen for deep links while app is running
+    const subscription = Linking.addEventListener('url', ({ url }) => {
+      if (url.includes('/auth/callback')) {
+        logger.info('[AppNavigator] Received OAuth callback deep link');
+        void processOAuthCallback(url);
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [processOAuthCallback]);
 
   useEffect(() => {
     const checkOnboarding = async () => {
