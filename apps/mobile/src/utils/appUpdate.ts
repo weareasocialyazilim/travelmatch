@@ -5,6 +5,7 @@
 
 import { Alert, Linking, Platform } from 'react-native';
 import * as Application from 'expo-application';
+import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logger } from './logger';
 import { STORE_METADATA } from '../config/storeMetadata';
@@ -12,6 +13,31 @@ import { STORE_METADATA } from '../config/storeMetadata';
 const UPDATE_CHECK_KEY = '@app_update_last_check';
 const UPDATE_SKIP_KEY = '@app_update_skipped_version';
 const CHECK_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours
+
+/** Version check result type */
+export type VersionCheckResult = 'FORCE' | 'OPTIONAL' | 'NONE';
+
+/** Remote version configuration (typically from API or Firebase Remote Config) */
+interface VersionConfig {
+  minSupportedVersion: string; // If user version is below this, FORCE update
+  currentVersion: string;      // Latest available version for OPTIONAL update prompt
+  storeUrl: {
+    ios: string;
+    android: string;
+  };
+  forceUpdate: boolean; // Emergency flag to force update from backend
+}
+
+/** Mock remote config - replace with actual API call in production */
+const MOCK_REMOTE_CONFIG: VersionConfig = {
+  minSupportedVersion: '1.0.0',
+  currentVersion: '1.1.0',
+  storeUrl: {
+    ios: 'https://apps.apple.com/app/id...',
+    android: 'https://play.google.com/store/apps/details?id=...',
+  },
+  forceUpdate: false,
+};
 
 interface VersionInfo {
   currentVersion: string;
@@ -60,6 +86,46 @@ export function compareVersions(v1: string, v2: string): number {
   }
 
   return 0;
+}
+
+/**
+ * Simple version check that returns update requirement status
+ * Uses expo-constants for installed version and mock config for remote version
+ *
+ * @returns 'FORCE' if update is mandatory, 'OPTIONAL' if update available, 'NONE' if up-to-date
+ *
+ * @example
+ * const status = await checkAppVersion();
+ * if (status === 'FORCE') {
+ *   // Show blocking update modal
+ * } else if (status === 'OPTIONAL') {
+ *   // Show optional update prompt
+ * }
+ */
+export async function checkAppVersion(): Promise<VersionCheckResult> {
+  try {
+    const installedVersion = Constants.expoConfig?.version || '1.0.0';
+
+    // In production, replace with actual API call:
+    // const config = await api.get('/system/version-check');
+    const config = MOCK_REMOTE_CONFIG;
+
+    // Backend emergency force update flag
+    if (config.forceUpdate) return 'FORCE';
+
+    // Check if installed version is below minimum supported
+    const isOutdated = compareVersions(installedVersion, config.minSupportedVersion) < 0;
+    if (isOutdated) return 'FORCE';
+
+    // Check if there's a newer version available
+    const hasUpdate = compareVersions(installedVersion, config.currentVersion) < 0;
+    if (hasUpdate) return 'OPTIONAL';
+
+    return 'NONE';
+  } catch (error) {
+    logger.warn('Version check failed', error);
+    return 'NONE';
+  }
 }
 
 /**
@@ -311,6 +377,7 @@ export default {
   getStoreUrl,
   openStore,
   checkForUpdates,
+  checkAppVersion,
   showUpdatePrompt,
   checkAndPromptUpdate,
 };
