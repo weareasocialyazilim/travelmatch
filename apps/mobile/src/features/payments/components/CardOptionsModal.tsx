@@ -51,9 +51,9 @@ export const CardOptionsModal = ({
               <TouchableOpacity style={styles.optionItem} onPress={onSetDefault}>
                 <MaterialCommunityIcons name="star-outline" size={24} color={COLORS.text.primary} />
                 <View style={styles.optionText}>
-                  <Text style={styles.optionTitle}>Set as default</Text>
+                  <Text style={styles.optionTitle}>Varsayılan Yap</Text>
                   <Text style={styles.optionDescription}>
-                    Use this card for all payments
+                    Tüm ödemelerde bu kartı kullan
                   </Text>
                 </View>
                 <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.softGray} />
@@ -63,9 +63,9 @@ export const CardOptionsModal = ({
             <TouchableOpacity style={styles.optionItem} onPress={onEdit}>
               <MaterialCommunityIcons name="pencil-outline" size={24} color={COLORS.text.primary} />
               <View style={styles.optionText}>
-                <Text style={styles.optionTitle}>Update card details</Text>
+                <Text style={styles.optionTitle}>Kart Bilgilerini Güncelle</Text>
                 <Text style={styles.optionDescription}>
-                  Change expiry date or CVV
+                  Son kullanma tarihi veya CVV değiştir
                 </Text>
               </View>
               <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.softGray} />
@@ -74,9 +74,9 @@ export const CardOptionsModal = ({
             <TouchableOpacity style={styles.optionItemDanger} onPress={onRemove}>
               <MaterialCommunityIcons name="delete-outline" size={24} color={COLORS.destructive} />
               <View style={styles.optionText}>
-                <Text style={styles.optionTitleDanger}>Remove card</Text>
+                <Text style={styles.optionTitleDanger}>Kartı Kaldır</Text>
                 <Text style={styles.optionDescription}>
-                  This action cannot be undone
+                  Bu işlem geri alınamaz
                 </Text>
               </View>
               <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.destructive} />

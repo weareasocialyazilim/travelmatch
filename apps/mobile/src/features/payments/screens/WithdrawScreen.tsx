@@ -55,9 +55,9 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
 
       if (!verified) {
         Alert.alert(
-          'Authentication Required',
-          `Please verify with ${biometricTypeName} to withdraw funds.`,
-          [{ text: 'OK' }],
+          'Kimlik Doğrulama Gerekli',
+          `Para çekmek için lütfen ${biometricTypeName} ile doğrulayın.`,
+          [{ text: 'Tamam' }],
         );
         return;
       }
@@ -72,8 +72,8 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
       type: 'withdraw',
       details: {
         amount: parseFloat(data.amount),
-        destination: 'Bank Account (••• 4242)',
-        estimatedArrival: '1-3 business days',
+        destination: 'Banka Hesabı (••• 4242)',
+        estimatedArrival: '1-3 iş günü',
         referenceId: 'WD-' + Date.now().toString().slice(-8),
       },
     });
@@ -95,7 +95,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
-          {...a11y.button('Go back', 'Return to wallet')}
+          {...a11y.button('Geri dön', 'Cüzdana dön')}
         >
           <MaterialCommunityIcons
             name="arrow-left"
@@ -104,8 +104,8 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
             accessible={false}
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle} {...a11y.header('Withdraw')}>
-          Withdraw
+        <Text style={styles.headerTitle} {...a11y.header('Para Çekme')}>
+          Para Çekme
         </Text>
         <View style={styles.backButton} />
       </View>
@@ -124,9 +124,9 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
             <Text
               style={styles.balanceLabel}
               accessible={true}
-              accessibilityLabel="Available to withdraw"
+              accessibilityLabel="Çekilebilir bakiye"
             >
-              Available to withdraw
+              Çekilebilir Bakiye
             </Text>
             <Text
               style={styles.balanceAmount}
@@ -142,16 +142,16 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
         <View
           style={styles.infoRow}
           accessible={true}
-          accessibilityLabel={`Pending in escrow: ${formatCurrency(
+          accessibilityLabel={`Emanette bekleyen: ${formatCurrency(
             pendingEscrow,
           )}`}
         >
-          <Text style={styles.infoLabel}>Pending in escrow</Text>
+          <Text style={styles.infoLabel}>Emanette Bekleyen</Text>
           <Text style={styles.infoValue}>${pendingEscrow.toFixed(2)}</Text>
         </View>
 
         {/* Payout Account Section */}
-        <Text style={styles.sectionTitle}>Payout account</Text>
+        <Text style={styles.sectionTitle}>Ödeme Hesabı</Text>
         <View style={styles.accountCard}>
           <View style={styles.accountInfo}>
             <View style={styles.iconContainer}>
@@ -163,7 +163,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
             </View>
             <View style={styles.accountDetails}>
               <Text style={styles.accountNumber}>•••• 1234</Text>
-              <Text style={styles.accountBank}>Bank of America</Text>
+              <Text style={styles.accountBank}>Banka Hesabı</Text>
             </View>
           </View>
           <TouchableOpacity
@@ -172,12 +172,12 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
             onPress={() => navigation.navigate('PaymentMethods')}
             activeOpacity={0.7}
           >
-            <Text style={styles.changeButtonText}>Change</Text>
+            <Text style={styles.changeButtonText}>Değiştir</Text>
           </TouchableOpacity>
         </View>
 
         {/* Amount Input */}
-        <Text style={styles.sectionTitle}>Amount</Text>
+        <Text style={styles.sectionTitle}>Tutar</Text>
         <Controller
           control={control}
           name="amount"
@@ -190,7 +190,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
                 testID="amount-input"
                 name="amount"
                 control={control}
-                placeholder="$0.00"
+                placeholder="₺0,00"
                 keyboardType="decimal-pad"
               />
             </View>
@@ -210,7 +210,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
                 testID="note-input"
                 name="note"
                 control={control}
-                placeholder="Note (optional)"
+                placeholder="Not (isteğe bağlı)"
                 multiline
                 numberOfLines={3}
               />
@@ -227,18 +227,18 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
           <Text
             style={styles.processingWarning}
             {...a11y.alert(
-              'Processing withdrawal. This may take a few seconds.',
+              'Para çekme işleniyor. Bu birkaç saniye sürebilir.',
             )}
           >
-            Processing withdrawal. This may take a few seconds.
+            Para çekme işleniyor. Bu birkaç saniye sürebilir.
           </Text>
         )}
         <Text
           style={styles.footerText}
           accessible={true}
-          accessibilityLabel="Payouts typically arrive in 1 to 3 business days"
+          accessibilityLabel="Ödemeler genellikle 1-3 iş günü içinde hesabınıza ulaşır"
         >
-          Payouts typically arrive in 1-3 business days
+          Ödemeler genellikle 1-3 iş günü içinde ulaşır
         </Text>
         <TouchableOpacity
           testID="withdraw-button"
@@ -249,10 +249,10 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
           onPress={handleSubmit(onSubmit)}
           disabled={isSubmitDisabled || isSubmitting}
           {...a11y.button(
-            isSubmitting ? 'Processing withdrawal' : 'Confirm withdraw',
+            isSubmitting ? 'Para çekme işleniyor' : 'Çekimi onayla',
             biometricEnabled
-              ? `This will require ${biometricTypeName} verification`
-              : 'Process withdrawal to your bank account',
+              ? `${biometricTypeName} doğrulaması gerekecek`
+              : 'Banka hesabınıza para çekme işlemini başlat',
             isSubmitDisabled || isSubmitting,
           )}
         >
@@ -263,10 +263,10 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
                 color={COLORS.utility.white}
                 style={styles.loadingIndicator}
               />
-              <Text style={styles.confirmButtonText}>Processing...</Text>
+              <Text style={styles.confirmButtonText}>İşleniyor...</Text>
             </>
           ) : (
-            <Text style={styles.confirmButtonText}>Confirm withdraw</Text>
+            <Text style={styles.confirmButtonText}>Çekimi Onayla</Text>
           )}
         </TouchableOpacity>
       </View>

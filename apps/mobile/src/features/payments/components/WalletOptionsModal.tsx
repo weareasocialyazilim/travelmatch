@@ -56,9 +56,9 @@ export const WalletOptionsModal = ({
             <TouchableOpacity style={styles.optionItem} onPress={onConfigure}>
               <MaterialCommunityIcons name="cog-outline" size={24} color={COLORS.text.primary} />
               <View style={styles.optionText}>
-                <Text style={styles.optionTitle}>Configure wallet</Text>
+                <Text style={styles.optionTitle}>Cüzdanı Yapılandır</Text>
                 <Text style={styles.optionDescription}>
-                  Manage payment settings and preferences
+                  Ödeme ayarları ve tercihlerini yönet
                 </Text>
               </View>
               <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.softGray} />
@@ -67,16 +67,16 @@ export const WalletOptionsModal = ({
             {settings.isDefaultPayment && (
               <View style={styles.defaultIndicator}>
                 <MaterialCommunityIcons name="star" size={20} color={COLORS.mint} />
-                <Text style={styles.defaultText}>Default payment method</Text>
+                <Text style={styles.defaultText}>Varsayılan ödeme yöntemi</Text>
               </View>
             )}
 
             <TouchableOpacity style={styles.optionItemDanger} onPress={onDisconnect}>
               <MaterialCommunityIcons name="link-variant-off" size={24} color={COLORS.destructive} />
               <View style={styles.optionText}>
-                <Text style={styles.optionTitleDanger}>Disconnect wallet</Text>
+                <Text style={styles.optionTitleDanger}>Cüzdanı Ayır</Text>
                 <Text style={styles.optionDescription}>
-                  You can reconnect anytime
+                  İstediğiniz zaman yeniden bağlayabilirsiniz
                 </Text>
               </View>
               <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.destructive} />
