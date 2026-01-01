@@ -100,3 +100,6 @@ export type { SavedCard, Wallet, WalletSettings } from './payment';
 
 // Layout Components (TravelMatch: The Rebirth)
 export { FloatingDock } from './layout';
+
+// Trust Badge
+export { TrustBadge } from './ui/TrustBadge';
