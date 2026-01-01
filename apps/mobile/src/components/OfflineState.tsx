@@ -1,8 +1,8 @@
 /**
  * OfflineState Component
- * Finalized single source for offline UI
+ * Space-themed offline UI for TravelMatch
  *
- * Shows a clean offline state with optional retry button
+ * Shows a creative "drifting in space" metaphor when offline
  */
 
 import React, { useCallback, useState } from 'react';
@@ -22,7 +22,7 @@ import type { ViewStyle } from 'react-native';
 export interface OfflineStateProps {
   /**
    * Custom message to display
-   * @default "Bağlantı Yok"
+   * @default "It seems you've lost connection to the TravelMatch network. Check your signal."
    */
   message?: string;
 
@@ -33,12 +33,12 @@ export interface OfflineStateProps {
 
   /**
    * Custom retry button text
-   * @default "Tekrar Dene"
+   * @default "Reconnect Mission"
    */
   retryText?: string;
 
   /**
-   * Show as banner instead of full screen
+   * Show as compact banner instead of full screen
    * @default false
    */
   compact?: boolean;
@@ -55,7 +55,7 @@ export interface OfflineStateProps {
 }
 
 /**
- * OfflineState - Single source for offline UI
+ * OfflineState - Space-themed offline UI
  *
  * @example
  * // Full screen
@@ -66,9 +66,9 @@ export interface OfflineStateProps {
  * <OfflineState compact onRetry={handleRetry} />
  */
 export const OfflineState: React.FC<OfflineStateProps> = ({
-  message = 'Bağlantı Yok',
+  message,
   onRetry,
-  retryText = 'Tekrar Dene',
+  retryText = 'Reconnect Mission',
   compact = false,
   style,
   testID = 'offline-state',
@@ -86,159 +86,126 @@ export const OfflineState: React.FC<OfflineStateProps> = ({
     }
   }, [onRetry]);
 
+  // Compact banner mode
   if (compact) {
     return (
-      <View style={[styles.compactContainer, style]} testID={testID}>
-        <View style={styles.compactContent}>
-          <MaterialCommunityIcons
-            name="wifi-off"
-            size={18}
-            color={COLORS.text.secondary}
-          />
-          <Text style={styles.compactMessage}>{message}</Text>
-        </View>
-
-        {onRetry && (
-          <TouchableOpacity
-            style={styles.compactRetryButton}
-            onPress={handleRetry}
-            disabled={isRetrying}
-            activeOpacity={0.7}
-            testID={`${testID}-retry`}
-          >
-            {isRetrying ? (
-              <ActivityIndicator size="small" color={COLORS.brand.primary} />
-            ) : (
-              <Text style={styles.compactRetryText}>{retryText}</Text>
-            )}
-          </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.compactContainer, style]}
+        onPress={handleRetry}
+        disabled={isRetrying || !onRetry}
+        activeOpacity={0.8}
+        testID={testID}
+      >
+        {isRetrying ? (
+          <ActivityIndicator size="small" color={COLORS.white} />
+        ) : (
+          <MaterialCommunityIcons name="wifi-off" size={16} color={COLORS.white} />
         )}
-      </View>
+        <Text style={styles.compactText}>
+          {message || 'No connection. Tap to retry.'}
+        </Text>
+      </TouchableOpacity>
     );
   }
 
+  // Full screen mode - Space themed
   return (
     <View style={[styles.container, style]} testID={testID}>
-      <View style={styles.content}>
-        <View style={styles.iconContainer}>
-          <MaterialCommunityIcons
-            name="wifi-off"
-            size={64}
-            color={COLORS.text.secondary}
-          />
-        </View>
-
-        <Text style={styles.title}>İnternet Bağlantısı Yok</Text>
-        <Text style={styles.message}>{message}</Text>
-
-        {onRetry && (
-          <TouchableOpacity
-            style={styles.retryButton}
-            onPress={handleRetry}
-            disabled={isRetrying}
-            activeOpacity={0.8}
-            testID={`${testID}-retry`}
-          >
-            {isRetrying ? (
-              <ActivityIndicator size="small" color={COLORS.utility.white} />
-            ) : (
-              <>
-                <MaterialCommunityIcons
-                  name="refresh"
-                  size={20}
-                  color={COLORS.utility.white}
-                />
-                <Text style={styles.retryButtonText}>{retryText}</Text>
-              </>
-            )}
-          </TouchableOpacity>
-        )}
+      <View style={styles.iconCircle}>
+        <MaterialCommunityIcons
+          name="rocket-launch-outline"
+          size={60}
+          color={COLORS.brand.primary}
+        />
       </View>
+
+      <Text style={styles.title}>You're drifting in space</Text>
+      <Text style={styles.desc}>
+        {message ||
+          "It seems you've lost connection to the TravelMatch network. Check your signal."}
+      </Text>
+
+      {onRetry && (
+        <TouchableOpacity
+          style={styles.btn}
+          onPress={handleRetry}
+          disabled={isRetrying}
+          activeOpacity={0.8}
+          testID={`${testID}-retry`}
+        >
+          {isRetrying ? (
+            <ActivityIndicator size="small" color={COLORS.black} />
+          ) : (
+            <Text style={styles.btnText}>{retryText}</Text>
+          )}
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  // Full screen styles
+  // Full screen styles - Space themed
   container: {
     flex: 1,
-    backgroundColor: COLORS.bg.primary,
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'center',
-    padding: SPACING.lg,
+    padding: SPACING.xxl,
+    backgroundColor: COLORS.backgroundDark,
   },
-  content: {
+  iconCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: 'rgba(245, 158, 11, 0.08)',
     alignItems: 'center',
-    maxWidth: 320,
-  },
-  iconContainer: {
+    justifyContent: 'center',
     marginBottom: SPACING.xl,
   },
   title: {
     ...TYPOGRAPHY.h2,
-    fontSize: 20,
-    fontWeight: '600',
-    color: COLORS.text.primary,
-    marginBottom: SPACING.sm,
+    fontSize: 24,
+    fontWeight: '900',
+    color: COLORS.white,
     textAlign: 'center',
+    marginBottom: SPACING.sm,
   },
-  message: {
+  desc: {
     ...TYPOGRAPHY.body,
     color: COLORS.text.secondary,
     textAlign: 'center',
-    marginBottom: SPACING.xl,
-    lineHeight: 22,
+    fontSize: 16,
+    lineHeight: 24,
+    marginBottom: SPACING.xxl,
+    maxWidth: 300,
   },
-  retryButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.brand.primary,
+  btn: {
     paddingHorizontal: SPACING.xl,
     paddingVertical: SPACING.md,
-    borderRadius: 12,
-    minWidth: 160,
-    gap: SPACING.xs,
+    backgroundColor: COLORS.brand.primary,
+    borderRadius: 30,
+    minWidth: 180,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  retryButtonText: {
-    color: COLORS.utility.white,
+  btnText: {
+    color: COLORS.black,
+    fontWeight: 'bold',
     fontSize: 16,
-    fontWeight: '600',
   },
 
   // Compact banner styles
   compactContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: COLORS.warningLight,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border.default,
-  },
-  compactContent: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
+    justifyContent: 'center',
+    padding: SPACING.sm,
     gap: SPACING.sm,
+    backgroundColor: COLORS.error,
   },
-  compactMessage: {
-    ...TYPOGRAPHY.bodySmall,
-    color: COLORS.text.primary,
-    flex: 1,
-  },
-  compactRetryButton: {
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.xs,
-    borderRadius: 8,
-    backgroundColor: COLORS.utility.white,
-    minWidth: 80,
-    alignItems: 'center',
-  },
-  compactRetryText: {
-    ...TYPOGRAPHY.bodySmall,
+  compactText: {
+    color: COLORS.white,
+    fontSize: 12,
     fontWeight: '600',
-    color: COLORS.brand.primary,
   },
 });
