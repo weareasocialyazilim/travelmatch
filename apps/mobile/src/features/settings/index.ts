@@ -11,6 +11,7 @@ export { AboutScreen } from './screens/AboutScreen';
 export { FAQScreen } from './screens/FAQScreen';
 export { SupportScreen } from './screens/SupportScreen';
 export { default as SafetyScreen } from './screens/SafetyScreen';
+export { SafetyTipsScreen } from './screens/SafetyTipsScreen';
 export { default as PrivacyPolicyScreen } from './screens/PrivacyPolicyScreen';
 export { default as TermsOfServiceScreen } from './screens/TermsOfServiceScreen';
 export { RefundPolicyScreen } from './screens/RefundPolicyScreen';
