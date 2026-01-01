@@ -72,6 +72,7 @@ export type RootStackParamList = {
   CreateMoment: undefined;
   EditMoment: { momentId: string };
   MomentDetail: { moment: Moment; isOwner?: boolean; pendingRequests?: number };
+  MomentComments: { momentId: string; commentCount?: number };
   Profile: undefined;
   ProfileDetail: { userId: string };
   Review: {
