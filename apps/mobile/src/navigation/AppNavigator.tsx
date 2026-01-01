@@ -224,6 +224,7 @@ import {
   ReportUserScreen,
   MaintenanceScreen,
   DataPrivacyScreen,
+  DietaryPreferencesScreen,
 } from '../features/settings';
 
 // Legal screens - Turkish compliance
@@ -658,6 +659,12 @@ const AppNavigator = () => {
             <Stack.Screen
               name="DeletedMoments"
               component={DeletedMomentsScreen}
+            />
+
+            {/* Dietary Preferences */}
+            <Stack.Screen
+              name="DietaryPreferences"
+              component={DietaryPreferencesScreen}
             />
           </Stack.Navigator>
         </Suspense>
