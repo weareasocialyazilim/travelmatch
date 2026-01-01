@@ -4,6 +4,7 @@
 export { default as MessagesScreen } from './screens/MessagesScreen';
 export { default as ChatScreen } from './screens/ChatScreen';
 export { default as ArchivedChatsScreen } from './screens/ArchivedChatsScreen';
+export { ChatCameraScreen } from './screens/ChatCameraScreen';
 
 // Hooks
 export {
@@ -13,7 +14,7 @@ export {
   useSendMessage,
   useGetOrCreateConversation,
   useArchiveConversation,
-  useMarkAsRead
+  useMarkAsRead,
 } from './hooks/useMessages';
 
 // Services
