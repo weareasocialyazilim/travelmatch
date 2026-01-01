@@ -12,8 +12,8 @@ export const WalletConnectButton = ({ onPress }: WalletConnectButtonProps) => {
   const walletName = Platform.OS === 'ios' ? 'Apple Pay' : 'Google Pay';
   const helpText =
     Platform.OS === 'ios'
-      ? 'Make sure Apple Pay is set up on your device'
-      : 'Make sure Google Pay is set up on your device';
+      ? 'Cihazınızda Apple Pay kurulu olduğundan emin olun'
+      : 'Cihazınızda Google Pay kurulu olduğundan emin olun';
 
   return (
     <View>
@@ -27,7 +27,7 @@ export const WalletConnectButton = ({ onPress }: WalletConnectButtonProps) => {
           size={24}
           color={COLORS.text.primary}
         />
-        <Text style={styles.connectWalletText}>Connect {walletName}</Text>
+        <Text style={styles.connectWalletText}>{walletName} Bağla</Text>
         <MaterialCommunityIcons name="plus-circle-outline" size={20} color={COLORS.text.primary} />
       </TouchableOpacity>
       <Text style={styles.walletHelpText}>{helpText}</Text>

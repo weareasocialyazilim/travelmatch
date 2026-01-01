@@ -108,7 +108,7 @@ const PaymentMethodsScreen = () => {
             <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
               <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text.primary} />
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>Payment methods</Text>
+            <Text style={styles.headerTitle}>Ödeme Yöntemleri</Text>
             <View style={styles.backButton} />
           </View>
 
@@ -120,7 +120,7 @@ const PaymentMethodsScreen = () => {
         >
           {/* Wallets Section */}
           <Text style={styles.sectionTitle}>
-            {isWalletConnected ? 'Wallets' : 'Digital Wallets'}
+            {isWalletConnected ? 'Cüzdanlar' : 'Dijital Cüzdanlar'}
           </Text>
           <View style={styles.section}>
             {isWalletConnected ? (
@@ -138,7 +138,7 @@ const PaymentMethodsScreen = () => {
           </View>
 
           {/* Cards Section */}
-          <Text style={styles.sectionTitle}>Cards</Text>
+          <Text style={styles.sectionTitle}>Kartlar</Text>
           <View style={styles.section}>
             {savedCards.map((card) => (
               <CardListItem
@@ -166,8 +166,7 @@ const PaymentMethodsScreen = () => {
               color={COLORS.text.secondary}
             />
             <Text style={styles.securityText}>
-              All payment data is encrypted and{'\n'}securely stored. We never store full card
-              numbers.
+              Tüm ödeme verileri şifreli ve{'\n'}güvenli bir şekilde saklanır. Tam kart numaralarını asla saklamayız.
             </Text>
           </View>
 
@@ -178,7 +177,7 @@ const PaymentMethodsScreen = () => {
             onPress={handleAddCard}
             activeOpacity={0.7}
           >
-            <Text style={styles.addCardButtonText}>Add new card</Text>
+            <Text style={styles.addCardButtonText}>Yeni Kart Ekle</Text>
           </TouchableOpacity>
         </ScrollView>
         </NetworkGuard>

@@ -82,7 +82,7 @@ export const EditCardModal = ({
     if (!card) return;
 
     if (!validateExpiry(expiry)) {
-      setError('Please enter a valid expiry date (MM/YY)');
+      setError('Geçerli bir son kullanma tarihi girin (AA/YY)');
       return;
     }
 
@@ -91,7 +91,7 @@ export const EditCardModal = ({
       await onSave(card.id, expiry);
       onClose();
     } catch {
-      setError('Failed to update card. Please try again.');
+      setError('Kart güncellenemedi. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);
     }
@@ -120,7 +120,7 @@ export const EditCardModal = ({
 
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>Update Card</Text>
+            <Text style={styles.title}>Kartı Güncelle</Text>
             <TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
               <MaterialCommunityIcons name="close" size={24} color={COLORS.text.primary} />
             </TouchableOpacity>
@@ -141,7 +141,7 @@ export const EditCardModal = ({
 
           {/* Expiry Input */}
           <View style={styles.inputSection}>
-            <Text style={styles.inputLabel}>New Expiry Date</Text>
+            <Text style={styles.inputLabel}>Yeni Son Kullanma Tarihi</Text>
             <View style={[styles.inputContainer, error && styles.inputError]}>
               <MaterialCommunityIcons
                 name="calendar-month"
@@ -152,7 +152,7 @@ export const EditCardModal = ({
                 style={styles.input}
                 value={expiry}
                 onChangeText={handleExpiryChange}
-                placeholder="MM/YY"
+                placeholder="AA/YY"
                 placeholderTextColor={COLORS.text.secondary}
                 keyboardType="number-pad"
                 maxLength={5}
@@ -170,14 +170,14 @@ export const EditCardModal = ({
               color={COLORS.brand.primary}
             />
             <Text style={styles.infoText}>
-              For security, you cannot change the card number. Add a new card if you have a different card.
+              Güvenlik nedeniyle kart numarasını değiştiremezsiniz. Farklı bir kartınız varsa yeni kart ekleyin.
             </Text>
           </View>
 
           {/* Action Buttons */}
           <View style={styles.actions}>
             <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-              <Text style={styles.cancelButtonText}>Cancel</Text>
+              <Text style={styles.cancelButtonText}>İptal</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.saveButton, (!expiry || isLoading) && styles.saveButtonDisabled]}
@@ -187,7 +187,7 @@ export const EditCardModal = ({
               {isLoading ? (
                 <ActivityIndicator size="small" color={COLORS.utility.white} />
               ) : (
-                <Text style={styles.saveButtonText}>Update Card</Text>
+                <Text style={styles.saveButtonText}>Kartı Güncelle</Text>
               )}
             </TouchableOpacity>
           </View>

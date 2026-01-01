@@ -86,7 +86,7 @@ export const TransactionDetailScreen: React.FC<
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString('tr-TR', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -105,7 +105,7 @@ export const TransactionDetailScreen: React.FC<
           >
             <Icon name="arrow-left" size={24} color={COLORS.text.primary} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Transaction Details</Text>
+          <Text style={styles.headerTitle}>İşlem Detayları</Text>
           <View style={styles.placeholder} />
         </View>
         <ScrollView style={styles.content}>
@@ -135,12 +135,12 @@ export const TransactionDetailScreen: React.FC<
     return (
       <SafeAreaView style={styles.container}>
         <View style={[styles.container, styles.centerContent]}>
-          <Text style={styles.errorText}>Transaction not found</Text>
+          <Text style={styles.errorText}>İşlem bulunamadı</Text>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={styles.goBackButton}
           >
-            <Text style={styles.goBackText}>Go Back</Text>
+            <Text style={styles.goBackText}>Geri Dön</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -151,7 +151,7 @@ export const TransactionDetailScreen: React.FC<
   const displayTransaction = {
     ...transaction,
     recipient: transaction.metadata?.recipient || {
-      name: 'Unknown',
+      name: 'Bilinmiyor',
       avatar: null,
     },
     paymentMethod: transaction.metadata?.paymentMethod || {
@@ -181,7 +181,7 @@ export const TransactionDetailScreen: React.FC<
         >
           <Icon name="arrow-left" size={24} color="#FFF" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Transaction Details</Text>
+        <Text style={styles.headerTitle}>İşlem Detayları</Text>
         <View style={styles.spacer} />
       </LinearGradient>
 
@@ -218,10 +218,10 @@ export const TransactionDetailScreen: React.FC<
 
         {/* Transaction Details */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Details</Text>
+          <Text style={styles.sectionTitle}>Detaylar</Text>
 
           <View style={styles.row}>
-            <Text style={styles.label}>Type</Text>
+            <Text style={styles.label}>Tür</Text>
             <Text style={styles.value}>
               {tx.type.replace('_', ' ').toUpperCase()}
             </Text>
@@ -230,23 +230,23 @@ export const TransactionDetailScreen: React.FC<
           <View style={styles.divider} />
 
           <View style={styles.row}>
-            <Text style={styles.label}>Description</Text>
+            <Text style={styles.label}>Açıklama</Text>
             <Text style={styles.value}>{tx.description}</Text>
           </View>
 
           <View style={styles.divider} />
 
           <View style={styles.row}>
-            <Text style={styles.label}>Reference</Text>
+            <Text style={styles.label}>Referans</Text>
             <Text style={styles.value}>{tx.reference}</Text>
           </View>
         </View>
 
         {/* Recipient Info (if applicable) */}
-        {tx.recipient && tx.recipient.name !== 'Unknown' && (
+        {tx.recipient && tx.recipient.name !== 'Bilinmiyor' && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>
-              {tx.type.includes('sent') ? 'Recipient' : 'Sender'}
+              {tx.type.includes('sent') ? 'Alıcı' : 'Gönderen'}
             </Text>
             <View style={styles.recipientContainer}>
               <Image
@@ -269,7 +269,7 @@ export const TransactionDetailScreen: React.FC<
 
         {/* Payment Method */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Payment Method</Text>
+          <Text style={styles.sectionTitle}>Ödeme Yöntemi</Text>
           <View style={styles.paymentMethodContainer}>
             <Icon name="credit-card" size={24} color={COLORS.text.primary} />
             <Text style={styles.paymentMethodText}>
@@ -281,21 +281,21 @@ export const TransactionDetailScreen: React.FC<
 
         {/* Breakdown */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Summary</Text>
+          <Text style={styles.sectionTitle}>Özet</Text>
 
           <View style={styles.row}>
-            <Text style={styles.label}>Subtotal</Text>
+            <Text style={styles.label}>Ara Toplam</Text>
             <Text style={styles.value}>
-              {tx.currency === 'USD' ? '$' : tx.currency}
+              {tx.currency === 'USD' ? '$' : tx.currency === 'TRY' ? '₺' : tx.currency}
               {tx.amount.toFixed(2)}
             </Text>
           </View>
 
           {tx.fees > 0 && (
             <View style={styles.row}>
-              <Text style={styles.label}>Fees</Text>
+              <Text style={styles.label}>İşlem Ücreti</Text>
               <Text style={styles.value}>
-                {tx.currency === 'USD' ? '$' : tx.currency}
+                {tx.currency === 'USD' ? '$' : tx.currency === 'TRY' ? '₺' : tx.currency}
                 {tx.fees.toFixed(2)}
               </Text>
             </View>
@@ -304,9 +304,9 @@ export const TransactionDetailScreen: React.FC<
           <View style={styles.divider} />
 
           <View style={styles.row}>
-            <Text style={styles.totalLabel}>Total</Text>
+            <Text style={styles.totalLabel}>Toplam</Text>
             <Text style={styles.totalValue}>
-              {tx.currency === 'USD' ? '$' : tx.currency}
+              {tx.currency === 'USD' ? '$' : tx.currency === 'TRY' ? '₺' : tx.currency}
               {tx.total.toFixed(2)}
             </Text>
           </View>
@@ -316,7 +316,7 @@ export const TransactionDetailScreen: React.FC<
         <View style={styles.actions}>
           <TouchableOpacity style={styles.helpButton}>
             <Icon name="help-circle-outline" size={20} color={COLORS.brand.primary} />
-            <Text style={styles.helpButtonText}>Report an Issue</Text>
+            <Text style={styles.helpButtonText}>Sorun Bildir</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
