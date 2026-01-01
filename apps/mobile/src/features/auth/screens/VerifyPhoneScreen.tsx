@@ -26,6 +26,7 @@ import { LoadingState } from '@/components/LoadingState';
 import { OTPInput } from '@/components/ui';
 import { useToast } from '@/context/ToastContext';
 import { twilioClient } from '@/services/twilioService';
+import { supabase } from '@/config/supabase';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
@@ -108,6 +109,24 @@ export const VerifyPhoneScreen: React.FC<VerifyPhoneScreenProps> = ({
       const result = await twilioClient.verifyPhoneOtp(phone, codeToVerify);
 
       if (result.success && result.valid) {
+        // Update user metadata with verified phone number
+        try {
+          const { error: updateError } = await supabase.auth.updateUser({
+            phone: phone,
+            data: {
+              phone_verified: true,
+              phone_verified_at: new Date().toISOString(),
+            },
+          });
+
+          if (updateError) {
+            logger.warn('Failed to update user phone metadata:', updateError);
+            // Continue anyway - phone was verified via Twilio
+          }
+        } catch (updateErr) {
+          logger.warn('Error updating user metadata:', updateErr);
+        }
+
         showToast('Telefon numarası doğrulandı!', 'success');
         // Navigate to main app after phone verification
         navigation.reset({
