@@ -76,6 +76,11 @@ import {
 } from '../features/messages';
 
 // ===================================
+// INBOX / VIBE ROOM FEATURE SCREENS
+// ===================================
+import { InboxScreen } from '../features/inbox';
+
+// ===================================
 // PROFILE FEATURE SCREENS
 // ===================================
 const ProfileScreen = lazyLoad(() =>
@@ -92,7 +97,11 @@ const TrustGardenDetailScreen = lazyLoad(() =>
     default: m.TrustGardenDetailScreen,
   })),
 );
-import { TrustNotesScreen, ProfileDetailScreen, VerificationScreen } from '../features/profile';
+import {
+  TrustNotesScreen,
+  ProfileDetailScreen,
+  VerificationScreen,
+} from '../features/profile';
 
 // Review Screen
 const ReviewScreen = lazyLoad(() =>
@@ -246,21 +255,24 @@ const AppNavigator = () => {
   const { handleOAuthCallback, isAuthenticated } = useAuth();
 
   // Handle OAuth callback from deep link
-  const processOAuthCallback = useCallback(async (url: string) => {
-    if (url.includes('/auth/callback')) {
-      logger.info('[AppNavigator] Processing OAuth callback:', url);
-      try {
-        await handleOAuthCallback(url);
-        logger.info('[AppNavigator] OAuth callback processed successfully');
-        // Navigate to main app after successful OAuth
-        if (navigationRef.isReady()) {
-          (navigationRef.navigate as (name: string) => void)('Discover');
+  const processOAuthCallback = useCallback(
+    async (url: string) => {
+      if (url.includes('/auth/callback')) {
+        logger.info('[AppNavigator] Processing OAuth callback:', url);
+        try {
+          await handleOAuthCallback(url);
+          logger.info('[AppNavigator] OAuth callback processed successfully');
+          // Navigate to main app after successful OAuth
+          if (navigationRef.isReady()) {
+            (navigationRef.navigate as (name: string) => void)('Discover');
+          }
+        } catch (error) {
+          logger.error('[AppNavigator] OAuth callback error:', error);
         }
-      } catch (error) {
-        logger.error('[AppNavigator] OAuth callback error:', error);
       }
-    }
-  }, [handleOAuthCallback]);
+    },
+    [handleOAuthCallback],
+  );
 
   // Listen for OAuth callbacks via deep links
   useEffect(() => {
@@ -417,10 +429,7 @@ const AppNavigator = () => {
               name="PaymentFailed"
               component={PaymentFailedScreen}
             />
-            <Stack.Screen
-              name="VerifyPhone"
-              component={VerifyPhoneScreen}
-            />
+            <Stack.Screen name="VerifyPhone" component={VerifyPhoneScreen} />
             <Stack.Screen
               name="CompleteProfile"
               component={CompleteProfileScreen}
@@ -432,9 +441,13 @@ const AppNavigator = () => {
             {/* Main App - New consolidated screens */}
             <Stack.Screen name="Discover" component={DiscoverScreen} />
             <Stack.Screen name="Requests" component={RequestsScreen} />
-            <Stack.Screen name="RequestManager" component={RequestManagerScreen} />
+            <Stack.Screen
+              name="RequestManager"
+              component={RequestManagerScreen}
+            />
             <Stack.Screen name="Messages" component={MessagesScreen} />
             <Stack.Screen name="SearchMap" component={SearchMapScreen} />
+            <Stack.Screen name="Inbox" component={InboxScreen} />
 
             <Stack.Screen name="CreateMoment" component={CreateMomentScreen} />
             <Stack.Screen name="EditMoment" component={EditMomentScreen} />
@@ -527,10 +540,7 @@ const AppNavigator = () => {
               name="IdentityVerification"
               component={KYCIntroScreen}
             />
-            <Stack.Screen
-              name="GetVerified"
-              component={VerificationScreen}
-            />
+            <Stack.Screen name="GetVerified" component={VerificationScreen} />
             <Stack.Screen
               name="KYCDocumentType"
               component={KYCDocumentTypeScreen}
@@ -636,10 +646,7 @@ const AppNavigator = () => {
               name="UnifiedGiftFlow"
               component={UnifiedGiftFlowScreen}
             />
-            <Stack.Screen
-              name="PayTRWebView"
-              component={PayTRWebViewScreen}
-            />
+            <Stack.Screen name="PayTRWebView" component={PayTRWebViewScreen} />
 
             {/* Footer Pages */}
             {/* <Stack.Screen name="Contact" component={ContactScreen} />
