@@ -3,6 +3,7 @@ export { default as ProfileScreen } from './screens/ProfileScreen';
 export { ProfileDetailScreen } from './screens/ProfileDetailScreen';
 export { UserProfileScreen } from './screens/UserProfileScreen';
 export { default as EditProfileScreen } from './screens/EditProfileScreen';
+export { default as UserProfileScreen } from './screens/UserProfileScreen';
 
 // Reputation & Trust
 export { default as ReputationScreen } from './screens/ReputationScreen';
@@ -35,16 +36,16 @@ export { DeletedMomentsScreen } from './screens/DeletedMomentsScreen';
 export { MomentCommentsScreen } from './screens/MomentCommentsScreen';
 
 // Hooks
-export { 
-  useProfile, 
-  useMyProfile, 
-  useUpdateProfile, 
-  useReputation, 
-  useTrustScore, 
+export {
+  useProfile,
+  useMyProfile,
+  useUpdateProfile,
+  useReputation,
+  useTrustScore,
   useProofHistory,
   useMyMoments,
   useCreateMoment,
-  useDeleteMoment
+  useDeleteMoment,
 } from './hooks/useProfile';
 
 // Services

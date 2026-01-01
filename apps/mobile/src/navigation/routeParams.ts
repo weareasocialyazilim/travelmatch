@@ -61,8 +61,10 @@ export type RootStackParamList = {
     details?: SuccessDetails;
   };
 
-  // Main App
+  // Main App - Tab Screens
   Discover: undefined;
+  Search: undefined;
+  Inbox: undefined;
   Requests: { initialTab?: 'pending' | 'notifications' } | undefined;
   RequestManager: { momentId?: string } | undefined;
   Messages: undefined;
@@ -119,6 +121,25 @@ export type RootStackParamList = {
 
   // Communication
   Chat: { otherUser: User; conversationId?: string };
+  ChatDetail: { conversationId: string; otherUser: User };
+
+  // User Profile (Public View)
+  UserProfile: { userId: string };
+
+  // Checkout & Reviews
+  Checkout: {
+    momentId?: string;
+    amount?: number;
+    recipientId?: string;
+    recipientName?: string;
+  };
+  Review: {
+    momentId?: string;
+    userId?: string;
+    userName?: string;
+    userAvatar?: string;
+    momentTitle?: string;
+  };
 
   // Transactions
   TransactionDetail: { transactionId: string };
