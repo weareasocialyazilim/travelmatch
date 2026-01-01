@@ -190,6 +190,7 @@ import {
 import {
   NotificationDetailScreen,
   GestureReceivedScreen,
+  NotificationsScreen,
 } from '../features/notifications';
 
 // ===================================
@@ -595,6 +596,10 @@ const AppNavigator = () => {
             {/* Wallet & Settings */}
             <Stack.Screen name="Wallet" component={WalletScreen} />
             <Stack.Screen name="Settings" component={AppSettingsScreen} />
+            <Stack.Screen
+              name="Notifications"
+              component={NotificationsScreen}
+            />
             <Stack.Screen
               name="NotificationDetail"
               component={NotificationDetailScreen}
