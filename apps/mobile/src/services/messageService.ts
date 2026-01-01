@@ -35,13 +35,20 @@ export interface Message {
   conversationId: string;
   senderId: string;
   content: string;
-  type: 'text' | 'image' | 'system' | 'location';
+  type: 'text' | 'image' | 'system' | 'location' | 'offer';
   imageUrl?: string | null;
   location?: {
     lat: number;
     lng: number;
     name: string;
   };
+  // Offer-specific fields
+  giftId?: string;
+  amount?: number;
+  currency?: string;
+  offerStatus?: 'pending' | 'accepted' | 'declined' | 'expired';
+  momentId?: string;
+  momentTitle?: string;
   createdAt: string | null;
   readAt?: string;
   status: 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
@@ -72,6 +79,15 @@ export interface SendMessageRequest {
     lng: number;
     name: string;
   };
+}
+
+export interface SendOfferMessageRequest {
+  conversationId: string;
+  giftId: string;
+  amount: number;
+  currency?: string;
+  momentId?: string;
+  momentTitle?: string;
 }
 
 // Message Service
@@ -328,6 +344,59 @@ export const messageService = {
       };
     } catch (error) {
       logger.error('Send message error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Send an offer message (gift offer in chat)
+   */
+  sendOfferMessage: async (data: SendOfferMessageRequest): Promise<Message> => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) throw new Error('Not authenticated');
+
+      // Create the offer message content
+      const offerContent = JSON.stringify({
+        type: 'offer',
+        giftId: data.giftId,
+        amount: data.amount,
+        currency: data.currency || 'TRY',
+        momentId: data.momentId,
+        momentTitle: data.momentTitle,
+      });
+
+      const { data: message, error } = await dbMessagesService.send({
+        conversation_id: data.conversationId,
+        sender_id: user.id,
+        content: offerContent,
+        type: 'system', // Store as system type in DB, parsed as offer in UI
+        read_at: null,
+      });
+
+      if (error) throw error;
+      if (!message) throw new Error('Failed to create offer message');
+
+      return {
+        id: message.id,
+        conversationId: message.conversation_id,
+        senderId: message.sender_id,
+        content: `Gift offer: ${data.currency || 'TRY'} ${data.amount}`,
+        type: 'offer',
+        giftId: data.giftId,
+        amount: data.amount,
+        currency: data.currency || 'TRY',
+        offerStatus: 'pending',
+        momentId: data.momentId,
+        momentTitle: data.momentTitle,
+        createdAt: message.created_at,
+        status: 'sent' as MessageStatus,
+      };
+    } catch (error) {
+      logger.error('Send offer message error:', error);
       throw error;
     }
   },
