@@ -2,16 +2,19 @@
  * TrustScoreCircle Component
  *
  * Premium circular trust score visualization
- * Inspired by modern health/cycle tracking apps (like Image 9)
+ * Design inspired by DailyLoop's minimal aesthetic
  *
  * Features:
  * - Animated circular progress ring
  * - Color-coded segments for trust factors
  * - Central score display with level icon
- * - Info cards with key metrics
- * - Premium "jewelry" aesthetic
+ * - Floating stat cards below
+ * - Premium "jewelry" aesthetic with soft shadows
  *
- * UX Best Practice: Dashboard visualization shows key metrics at a glance
+ * Following 60-30-10 color rule:
+ * - 60% Background (stone[50])
+ * - 30% Text/Secondary (stone[900], stone[500])
+ * - 10% Accent (gradient amber → magenta)
  */
 
 import React, { useEffect, useMemo } from 'react';
@@ -19,13 +22,15 @@ import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedProps,
+  useAnimatedStyle,
   withTiming,
   withDelay,
+  withSpring,
   Easing,
 } from 'react-native-reanimated';
 import Svg, { Circle, G, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, primitives } from '../../constants/colors';
+import { COLORS, primitives, SHADOWS } from '../../constants/colors';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -53,15 +58,6 @@ export interface TrustScoreCircleProps {
   strokeWidth?: number;
   /** Show animation on mount */
   animated?: boolean;
-  /** Show dashboard info cards below */
-  showDashboard?: boolean;
-  /** Additional dashboard data */
-  dashboardData?: {
-    averageScore?: number;
-    completedProofs?: number;
-    regularity?: number;
-    nextMilestone?: { name: string; daysLeft: number };
-  };
 }
 
 // Default trust factors if none provided
@@ -77,13 +73,14 @@ export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({
   score,
   level,
   factors = DEFAULT_FACTORS,
-  size = SCREEN_WIDTH * 0.65,
-  strokeWidth = 14,
+  size = SCREEN_WIDTH * 0.55,
+  strokeWidth = 12,
   animated = true,
-  showDashboard = true,
-  dashboardData,
 }) => {
   const progress = useSharedValue(0);
+  const cardScale = useSharedValue(0.9);
+  const cardOpacity = useSharedValue(0);
+
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const center = size / 2;
@@ -91,17 +88,21 @@ export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({
   // Animate on mount
   useEffect(() => {
     if (animated) {
+      cardScale.value = withSpring(1, { damping: 15, stiffness: 100 });
+      cardOpacity.value = withTiming(1, { duration: 600 });
       progress.value = withDelay(
-        300,
+        400,
         withTiming(score / 100, {
           duration: 1500,
           easing: Easing.bezier(0.25, 0.1, 0.25, 1),
         })
       );
     } else {
+      cardScale.value = 1;
+      cardOpacity.value = 1;
       progress.value = score / 100;
     }
-  }, [score, animated, progress]);
+  }, [score, animated, progress, cardScale, cardOpacity]);
 
   // Get level color based on score
   const levelColor = useMemo(() => {
@@ -111,9 +112,23 @@ export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({
     return primitives.magenta[500];
   }, [score]);
 
+  // Get level icon
+  const getLevelIcon = (): keyof typeof MaterialCommunityIcons.glyphMap => {
+    if (score >= 90) return 'crown';
+    if (score >= 70) return 'flower';
+    if (score >= 40) return 'leaf';
+    return 'sprout';
+  };
+
   // Animated props for main progress circle
   const animatedProps = useAnimatedProps(() => ({
     strokeDashoffset: circumference * (1 - progress.value),
+  }));
+
+  // Card animation
+  const cardAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: cardScale.value }],
+    opacity: cardOpacity.value,
   }));
 
   // Calculate factor segments
@@ -133,225 +148,154 @@ export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({
     });
   }, [factors]);
 
-  // Get level icon
-  const getLevelIcon = () => {
-    if (score >= 90) return 'crown';
-    if (score >= 70) return 'flower';
-    if (score >= 40) return 'leaf';
-    return 'sprout';
-  };
-
   return (
     <View style={styles.container}>
-      {/* Main Circle */}
-      <View style={[styles.circleContainer, { width: size, height: size }]}>
-        <Svg width={size} height={size}>
-          <Defs>
-            <LinearGradient id="scoreGradient" x1="0" y1="0" x2="1" y2="1">
-              <Stop offset="0%" stopColor={primitives.amber[500]} />
-              <Stop offset="100%" stopColor={primitives.magenta[500]} />
-            </LinearGradient>
-          </Defs>
+      {/* Stacked Card Background Effect (DailyLoop style) */}
+      <View style={styles.stackContainer}>
+        <View style={[styles.stackedCard, styles.stackedCard2]} />
+        <View style={[styles.stackedCard, styles.stackedCard1]} />
 
-          {/* Background track */}
-          <Circle
-            cx={center}
-            cy={center}
-            r={radius}
-            stroke={primitives.stone[100]}
-            strokeWidth={strokeWidth}
-            fill="none"
-          />
+        {/* Main Circle Card */}
+        <Animated.View style={[styles.circleCard, cardAnimatedStyle]}>
+          <View style={[styles.circleContainer, { width: size, height: size }]}>
+            <Svg width={size} height={size}>
+              <Defs>
+                <LinearGradient id="trustScoreGradient" x1="0" y1="0" x2="1" y2="1">
+                  <Stop offset="0%" stopColor={primitives.amber[500]} />
+                  <Stop offset="100%" stopColor={primitives.magenta[500]} />
+                </LinearGradient>
+              </Defs>
 
-          {/* Factor segment indicators (outer ring) */}
-          <G rotation={-90} origin={`${center}, ${center}`}>
-            {factorSegments.map((segment) => {
-              const segmentRadius = radius + strokeWidth / 2 + 4;
-              const segmentCircumference = 2 * Math.PI * segmentRadius;
-              const segmentLength = (segment.endAngle - segment.startAngle) / 360;
-              const gapSize = 0.008;
+              {/* Background track */}
+              <Circle
+                cx={center}
+                cy={center}
+                r={radius}
+                stroke={primitives.stone[100]}
+                strokeWidth={strokeWidth}
+                fill="none"
+              />
 
-              return (
-                <Circle
-                  key={segment.id}
+              {/* Factor segment indicators (outer ring) */}
+              <G rotation={-90} origin={`${center}, ${center}`}>
+                {factorSegments.map((segment) => {
+                  const segmentRadius = radius + strokeWidth / 2 + 6;
+                  const segmentCircumference = 2 * Math.PI * segmentRadius;
+                  const segmentLength = (segment.endAngle - segment.startAngle) / 360;
+                  const gapSize = 0.012;
+
+                  return (
+                    <Circle
+                      key={segment.id}
+                      cx={center}
+                      cy={center}
+                      r={segmentRadius}
+                      stroke={segment.color}
+                      strokeWidth={4}
+                      fill="none"
+                      strokeDasharray={`${segmentCircumference * (segmentLength - gapSize)} ${segmentCircumference}`}
+                      strokeDashoffset={-segmentCircumference * (segment.startAngle / 360)}
+                      strokeLinecap="round"
+                      opacity={0.25 + segment.fillPercentage * 0.75}
+                    />
+                  );
+                })}
+              </G>
+
+              {/* Main progress arc */}
+              <G rotation={-90} origin={`${center}, ${center}`}>
+                <AnimatedCircle
                   cx={center}
                   cy={center}
-                  r={segmentRadius}
-                  stroke={segment.color}
-                  strokeWidth={3}
+                  r={radius}
+                  stroke="url(#trustScoreGradient)"
+                  strokeWidth={strokeWidth}
                   fill="none"
-                  strokeDasharray={`${segmentCircumference * (segmentLength - gapSize)} ${segmentCircumference}`}
-                  strokeDashoffset={-segmentCircumference * (segment.startAngle / 360)}
+                  strokeDasharray={circumference}
+                  animatedProps={animatedProps}
                   strokeLinecap="round"
-                  opacity={0.3 + segment.fillPercentage * 0.7}
                 />
-              );
-            })}
-          </G>
+              </G>
+            </Svg>
 
-          {/* Main progress arc */}
-          <G rotation={-90} origin={`${center}, ${center}`}>
-            <AnimatedCircle
-              cx={center}
-              cy={center}
-              r={radius}
-              stroke="url(#scoreGradient)"
-              strokeWidth={strokeWidth}
-              fill="none"
-              strokeDasharray={circumference}
-              animatedProps={animatedProps}
-              strokeLinecap="round"
-            />
-          </G>
-        </Svg>
-
-        {/* Center Content */}
-        <View style={styles.centerContent}>
-          <View style={[styles.levelIconContainer, { backgroundColor: `${levelColor}15` }]}>
-            <MaterialCommunityIcons
-              name={getLevelIcon()}
-              size={28}
-              color={levelColor}
-            />
+            {/* Center Content */}
+            <View style={styles.centerContent}>
+              <View style={[styles.levelIconContainer, { backgroundColor: `${levelColor}12` }]}>
+                <MaterialCommunityIcons
+                  name={getLevelIcon()}
+                  size={24}
+                  color={levelColor}
+                />
+              </View>
+              <Text style={styles.scoreText}>{score}</Text>
+              <Text style={styles.scoreLabel}>/ 100</Text>
+              <Text style={[styles.levelText, { color: levelColor }]}>{level}</Text>
+            </View>
           </View>
-          <Text style={styles.scoreText}>{score}</Text>
-          <Text style={styles.scoreLabel}>/ 100</Text>
-          <Text style={[styles.levelText, { color: levelColor }]}>{level}</Text>
-        </View>
+        </Animated.View>
       </View>
 
-      {/* Dashboard Info Cards */}
-      {showDashboard && (
-        <>
-          {/* Quick Info Row */}
-          <View style={styles.quickInfoRow}>
-            <View style={styles.quickInfoCard}>
-              <View style={[styles.quickInfoIcon, { backgroundColor: `${primitives.emerald[500]}15` }]}>
-                <MaterialCommunityIcons
-                  name="trending-up"
-                  size={18}
-                  color={primitives.emerald[500]}
-                />
-              </View>
-              <View>
-                <Text style={styles.quickInfoLabel}>Gelişim</Text>
-                <Text style={[styles.quickInfoValue, { color: primitives.emerald[500] }]}>
-                  +{dashboardData?.averageScore || 5} puan
-                </Text>
-              </View>
-            </View>
+      {/* Factor Stats Cards - Floating design */}
+      <View style={styles.statsContainer}>
+        {factors.slice(0, 3).map((factor, index) => (
+          <StatCard key={factor.id} factor={factor} index={index} animated={animated} />
+        ))}
+      </View>
 
-            <View style={styles.quickInfoCard}>
-              <View style={[styles.quickInfoIcon, { backgroundColor: `${primitives.magenta[500]}15` }]}>
-                <MaterialCommunityIcons
-                  name="calendar-check"
-                  size={18}
-                  color={primitives.magenta[500]}
-                />
-              </View>
-              <View>
-                <Text style={styles.quickInfoLabel}>Sonraki Hedef</Text>
-                <Text style={[styles.quickInfoValue, { color: primitives.magenta[500] }]}>
-                  {dashboardData?.nextMilestone?.daysLeft || 7} gün
-                </Text>
-              </View>
-            </View>
+      {/* Additional Stats Row */}
+      <View style={styles.additionalStats}>
+        {factors.slice(3).map((factor) => (
+          <View key={factor.id} style={styles.additionalStatItem}>
+            <View style={[styles.additionalStatDot, { backgroundColor: factor.color }]} />
+            <Text style={styles.additionalStatLabel}>{factor.name}</Text>
+            <Text style={styles.additionalStatValue}>
+              {factor.value}/{factor.maxValue}
+            </Text>
           </View>
-
-          {/* Factor Stats Cards */}
-          <View style={styles.statsContainer}>
-            {factors.slice(0, 3).map((factor) => (
-              <View key={factor.id} style={styles.statCard}>
-                <View style={[styles.statIcon, { backgroundColor: `${factor.color}15` }]}>
-                  <MaterialCommunityIcons
-                    name={factor.icon}
-                    size={18}
-                    color={factor.color}
-                  />
-                </View>
-                <Text style={styles.statValue}>
-                  {factor.id === '5' ? factor.value.toFixed(1) : factor.value}
-                </Text>
-                <Text style={styles.statLabel}>{factor.name}</Text>
-              </View>
-            ))}
-          </View>
-
-          {/* Additional Stats Row */}
-          <View style={styles.additionalStats}>
-            {factors.slice(3).map((factor) => (
-              <View key={factor.id} style={styles.additionalStatItem}>
-                <View style={[styles.additionalStatDot, { backgroundColor: factor.color }]} />
-                <Text style={styles.additionalStatLabel}>{factor.name}</Text>
-                <Text style={styles.additionalStatValue}>
-                  {factor.value}/{factor.maxValue}
-                </Text>
-              </View>
-            ))}
-          </View>
-
-          {/* Bottom metrics row */}
-          <View style={styles.metricsRow}>
-            <View style={styles.metricItem}>
-              <View style={[styles.metricIcon, { backgroundColor: primitives.blue[50] }]}>
-                <MaterialCommunityIcons name="chart-line" size={16} color={primitives.blue[500]} />
-              </View>
-              <Text style={styles.metricValue}>{dashboardData?.averageScore || 28}</Text>
-              <Text style={styles.metricLabel}>Ort. Skor</Text>
-            </View>
-            <View style={styles.metricItem}>
-              <View style={[styles.metricIcon, { backgroundColor: primitives.magenta[50] }]}>
-                <MaterialCommunityIcons name="check-decagram" size={16} color={primitives.magenta[500]} />
-              </View>
-              <Text style={styles.metricValue}>{dashboardData?.completedProofs || 5}</Text>
-              <Text style={styles.metricLabel}>Kanıt</Text>
-            </View>
-            <View style={styles.metricItem}>
-              <View style={[styles.metricIcon, { backgroundColor: primitives.amber[50] }]}>
-                <MaterialCommunityIcons name="percent" size={16} color={primitives.amber[500]} />
-              </View>
-              <Text style={styles.metricValue}>{dashboardData?.regularity || 92}%</Text>
-              <Text style={styles.metricLabel}>Düzenlilik</Text>
-            </View>
-          </View>
-        </>
-      )}
-
-      {/* Legacy support - simple stats when dashboard is off */}
-      {!showDashboard && (
-        <>
-          <View style={styles.statsContainer}>
-            {factors.slice(0, 3).map((factor) => (
-              <View key={factor.id} style={styles.statCard}>
-                <View style={[styles.statIcon, { backgroundColor: `${factor.color}15` }]}>
-                  <MaterialCommunityIcons
-                    name={factor.icon}
-                    size={18}
-                    color={factor.color}
-                  />
-                </View>
-                <Text style={styles.statValue}>
-                  {factor.id === '5' ? factor.value.toFixed(1) : factor.value}
-                </Text>
-                <Text style={styles.statLabel}>{factor.name}</Text>
-              </View>
-            ))}
-          </View>
-
-          <View style={styles.additionalStats}>
-            {factors.slice(3).map((factor) => (
-              <View key={factor.id} style={styles.additionalStatItem}>
-                <View style={[styles.additionalStatDot, { backgroundColor: factor.color }]} />
-                <Text style={styles.additionalStatLabel}>{factor.name}</Text>
-                <Text style={styles.additionalStatValue}>
-                  {factor.value}/{factor.maxValue}
-                </Text>
-              </View>
-            ))}
-          </View>
-        </>
-      )}
+        ))}
+      </View>
     </View>
+  );
+};
+
+// Animated Stat Card Component
+const StatCard: React.FC<{ factor: TrustFactor; index: number; animated: boolean }> = ({
+  factor,
+  index,
+  animated
+}) => {
+  const cardOpacity = useSharedValue(0);
+  const cardTranslateY = useSharedValue(20);
+
+  useEffect(() => {
+    if (animated) {
+      cardOpacity.value = withDelay(800 + index * 100, withTiming(1, { duration: 400 }));
+      cardTranslateY.value = withDelay(800 + index * 100, withSpring(0, { damping: 15 }));
+    } else {
+      cardOpacity.value = 1;
+      cardTranslateY.value = 0;
+    }
+  }, [index, animated, cardOpacity, cardTranslateY]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: cardOpacity.value,
+    transform: [{ translateY: cardTranslateY.value }],
+  }));
+
+  return (
+    <Animated.View style={[styles.statCard, animatedStyle]}>
+      <View style={[styles.statIcon, { backgroundColor: `${factor.color}12` }]}>
+        <MaterialCommunityIcons
+          name={factor.icon}
+          size={18}
+          color={factor.color}
+        />
+      </View>
+      <Text style={styles.statValue}>
+        {factor.id === '5' ? factor.value.toFixed(1) : factor.value}
+      </Text>
+      <Text style={styles.statLabel}>{factor.name}</Text>
+    </Animated.View>
   );
 };
 
@@ -428,12 +372,42 @@ export const TrustScoreRingCompact: React.FC<{
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingVertical: 16,
+  },
+
+  // Stack Container for DailyLoop effect
+  stackContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  stackedCard: {
+    position: 'absolute',
+    width: SCREEN_WIDTH * 0.7,
+    height: SCREEN_WIDTH * 0.7,
+    backgroundColor: primitives.white,
+    borderRadius: 28,
+  },
+  stackedCard2: {
+    top: 8,
+    opacity: 0.3,
+    transform: [{ scale: 0.92 }],
+  },
+  stackedCard1: {
+    top: 4,
+    opacity: 0.6,
+    transform: [{ scale: 0.96 }],
+  },
+
+  // Main Circle Card
+  circleCard: {
+    backgroundColor: primitives.white,
+    borderRadius: 28,
+    padding: 20,
+    ...SHADOWS.card,
   },
   circleContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 24,
   },
   centerContent: {
     position: 'absolute',
@@ -441,120 +415,74 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   levelIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   scoreText: {
-    fontSize: 48,
+    fontSize: 42,
     fontWeight: '800',
-    color: COLORS.text.primary,
+    color: primitives.stone[900],
     letterSpacing: -2,
   },
   scoreLabel: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '500',
-    color: COLORS.text.secondary,
-    marginTop: -4,
+    color: primitives.stone[400],
+    marginTop: -2,
   },
   levelText: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: '700',
-    marginTop: 8,
+    marginTop: 6,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: 1.5,
   },
 
-  // Quick Info Row - Dashboard style
-  quickInfoRow: {
+  // Stats Cards
+  statsContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 12,
     marginBottom: 16,
-    paddingHorizontal: 16,
-  },
-  quickInfoCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderRadius: 14,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    gap: 10,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
-    minWidth: 140,
-  },
-  quickInfoIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  quickInfoLabel: {
-    fontSize: 11,
-    color: COLORS.text.secondary,
-    marginBottom: 2,
-  },
-  quickInfoValue: {
-    fontSize: 14,
-    fontWeight: '700',
-  },
-
-  // Stats Container
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    paddingHorizontal: 16,
-    marginBottom: 16,
   },
   statCard: {
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: primitives.white,
     borderRadius: 16,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    minWidth: 90,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    minWidth: 85,
+    ...SHADOWS.subtle,
   },
   statIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
+    width: 32,
+    height: 32,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   statValue: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text.primary,
+    color: primitives.stone[900],
     marginBottom: 2,
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '500',
-    color: COLORS.text.secondary,
+    color: primitives.stone[400],
   },
 
   // Additional Stats
   additionalStats: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 24,
-    marginBottom: 20,
+    gap: 20,
   },
   additionalStatItem: {
     flexDirection: 'row',
@@ -567,51 +495,13 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   additionalStatLabel: {
-    fontSize: 13,
-    color: COLORS.text.secondary,
+    fontSize: 12,
+    color: primitives.stone[500],
   },
   additionalStatValue: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
-    color: COLORS.text.primary,
-  },
-
-  // Metrics Row - Dashboard bottom stats
-  metricsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    backgroundColor: COLORS.white,
-    borderRadius: 16,
-    paddingVertical: 16,
-    paddingHorizontal: 12,
-    marginHorizontal: 16,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  metricItem: {
-    alignItems: 'center',
-    gap: 6,
-  },
-  metricIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  metricValue: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.text.primary,
-  },
-  metricLabel: {
-    fontSize: 11,
-    fontWeight: '500',
-    color: COLORS.text.secondary,
+    color: primitives.stone[700],
   },
 });
 
