@@ -27,7 +27,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   // ============================================
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'com.kemalteksal.travelmatch',
+    bundleIdentifier: 'com.travelmatch.mobile',
     buildNumber: '24',
     associatedDomains: ['applinks:travelmatch.app'],
     config: {
