@@ -67,6 +67,7 @@ export type RootStackParamList = {
   RequestManager: { momentId?: string } | undefined;
   Messages: undefined;
   SearchMap: undefined;
+  Inbox: { initialTab?: 'active' | 'requests' } | undefined;
 
   CreateMoment: undefined;
   EditMoment: { momentId: string };
@@ -85,11 +86,11 @@ export type RootStackParamList = {
 
   // Proof System
   ProofFlow: {
-    escrowId?: string;       // Escrow transaction ID
-    giftId?: string;         // Gift ID
-    momentId?: string;       // Moment being proven
-    momentTitle?: string;    // Moment title for display
-    senderId?: string;       // Gift sender's user ID (for notifications)
+    escrowId?: string; // Escrow transaction ID
+    giftId?: string; // Gift ID
+    momentId?: string; // Moment being proven
+    momentTitle?: string; // Moment title for display
+    senderId?: string; // Gift sender's user ID (for notifications)
   };
   ProofDetail: { proofId: string };
   ProofReview: {
@@ -137,7 +138,7 @@ export type RootStackParamList = {
   };
   GestureReceived: {
     gestureId: string;
-    senderId: string;  // User ID of the gift sender
+    senderId: string; // User ID of the gift sender
     momentTitle: string;
     amount: number;
     senderName?: string;
@@ -222,12 +223,14 @@ export type RootStackParamList = {
   PaymentMethods: undefined;
 
   // Checkout
-  Checkout: {
-    title?: string;
-    price?: number;
-    fee?: number;
-    momentId?: string;
-  } | undefined;
+  Checkout:
+    | {
+        title?: string;
+        price?: number;
+        fee?: number;
+        momentId?: string;
+      }
+    | undefined;
 
   // Wallet & Settings
   Wallet: undefined;
