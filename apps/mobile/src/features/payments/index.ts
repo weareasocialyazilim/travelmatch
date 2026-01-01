@@ -29,6 +29,7 @@ export { SubscriptionScreen } from './screens/SubscriptionScreen';
 export { SuccessConfirmationScreen } from './screens/SuccessConfirmationScreen';
 export { UnifiedGiftFlowScreen } from './screens/UnifiedGiftFlowScreen';
 export { MyGiftsScreen } from './screens/MyGiftsScreen';
+export { GiftCardMarketScreen } from './screens/GiftCardMarketScreen';
 export { ProofReviewScreen } from './screens/ProofReviewScreen';
 export { PayTRWebViewScreen } from './screens/PayTRWebViewScreen';
 
