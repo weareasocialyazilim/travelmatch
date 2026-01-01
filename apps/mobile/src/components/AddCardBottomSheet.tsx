@@ -61,7 +61,7 @@ export const AddCardBottomSheet: React.FC<AddCardBottomSheetProps> = memo(
             {/* Header */}
             <View style={styles.header}>
               <View style={styles.headerSpacer} />
-              <Text style={styles.headerTitle}>Add card</Text>
+              <Text style={styles.headerTitle}>Kart Ekle</Text>
               <TouchableOpacity
                 style={styles.closeButton}
                 onPress={onClose}
@@ -77,7 +77,7 @@ export const AddCardBottomSheet: React.FC<AddCardBottomSheetProps> = memo(
 
             {/* Card Number Field */}
             <View style={styles.fieldContainer}>
-              <Text style={styles.label}>Card number</Text>
+              <Text style={styles.label}>Kart Numarası</Text>
               <View style={styles.inputWrapper}>
                 <MaterialCommunityIcons
                   name={'credit-card' as IconName}
@@ -100,10 +100,10 @@ export const AddCardBottomSheet: React.FC<AddCardBottomSheetProps> = memo(
             {/* Expiry and CVV Fields */}
             <View style={styles.rowFields}>
               <View style={[styles.fieldContainer, styles.flexField]}>
-                <Text style={styles.label}>Expiry</Text>
+                <Text style={styles.label}>Son Kullanma</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="MM/YY"
+                  placeholder="AA/YY"
                   placeholderTextColor={COLORS.text.secondary}
                   value={expiry}
                   onChangeText={setExpiry}
@@ -144,7 +144,7 @@ export const AddCardBottomSheet: React.FC<AddCardBottomSheetProps> = memo(
                 />
               </View>
               <Text style={styles.securityText}>
-                Your payment information is secure.
+                Ödeme bilgileriniz güvende.
               </Text>
             </View>
 
@@ -160,7 +160,7 @@ export const AddCardBottomSheet: React.FC<AddCardBottomSheetProps> = memo(
                 disabled={!cardNumber.trim() || !expiry.trim() || !cvv.trim()}
                 activeOpacity={0.8}
               >
-                <Text style={styles.addButtonText}>Add card</Text>
+                <Text style={styles.addButtonText}>Kart Ekle</Text>
               </TouchableOpacity>
             </View>
           </View>
