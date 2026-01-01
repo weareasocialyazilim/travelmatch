@@ -218,7 +218,7 @@ export const LoginScreen: React.FC = () => {
                     placeholder="E-posta"
                     placeholderTextColor={COLORS.text.secondary}
                     value={value}
-                    onChangeText={onChange}
+                    onChangeText={(text) => onChange(text.toLowerCase())}
                     onBlur={onBlur}
                     keyboardType="email-address"
                     autoCapitalize="none"

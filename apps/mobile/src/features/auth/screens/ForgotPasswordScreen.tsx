@@ -30,7 +30,7 @@ export const ForgotPasswordScreen = ({ navigation }: any) => {
           placeholder="Enter your email"
           placeholderTextColor="#666"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(text) => setEmail(text.toLowerCase())}
           autoCapitalize="none"
           keyboardType="email-address"
         />

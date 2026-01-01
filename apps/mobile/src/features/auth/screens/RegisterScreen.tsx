@@ -153,7 +153,7 @@ export const RegisterScreen: React.FC = () => {
                 secureTextEntry={activeStepData.secure}
                 autoFocus
                 value={formData[activeStepData.id as keyof FormData]}
-                onChangeText={(text) => setFormData(prev => ({ ...prev, [activeStepData.id]: text }))}
+                onChangeText={(text) => setFormData(prev => ({ ...prev, [activeStepData.id]: activeStepData.id === 'email' ? text.toLowerCase() : text }))}
                 keyboardType={activeStepData.id === 'email' ? 'email-address' : 'default'}
                 autoCapitalize={activeStepData.id === 'email' ? 'none' : activeStepData.id === 'name' ? 'words' : 'none'}
                 autoCorrect={false}
