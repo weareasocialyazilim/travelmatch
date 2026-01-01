@@ -3,38 +3,26 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
-  ScrollView,
+  TextInput,
   TouchableOpacity,
-  Image,
-  ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
 import { NetworkGuard } from '@/components/NetworkGuard';
-import { useBiometric } from '@/context/BiometricAuthContext';
-import { useAccessibility } from '@/hooks/useAccessibility';
-import { useScreenSecurity } from '@/hooks/useScreenSecurity';
-import { COLORS } from '@/constants/colors';
-import { TYPOGRAPHY } from '@/theme/typography';
-import { withdrawSchema, type WithdrawInput } from '@/utils/forms';
-import { canSubmitForm } from '@/utils/forms/helpers';
-import { ControlledInput } from '@/components/ui/ControlledInput';
+import { COLORS_DARK } from '@/theme/colors';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 
 type WithdrawScreenProps = StackScreenProps<RootStackParamList, 'Withdraw'>;
 
 function WithdrawScreen({ navigation }: WithdrawScreenProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const availableBalance = 1250.0;
-  const pendingEscrow = 500.0;
-  const { biometricEnabled, biometricTypeName, authenticateForAction } =
-    useBiometric();
-  const { props: a11y, formatCurrency } = useAccessibility();
+  const insets = useSafeAreaInsets();
+  const [amount, setAmount] = useState('');
+  const BALANCE = 1240.50;
 
   // Enable screenshot protection for this sensitive screen
   useScreenSecurity();
@@ -80,14 +68,6 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
     setIsSubmitting(false);
   };
 
-  const isSubmitDisabled = !canSubmitForm(
-    { formState },
-    {
-      requireDirty: false,
-      requireValid: true,
-    },
-  );
-
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -110,15 +90,20 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
         <View style={styles.backButton} />
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Balance Card */}
-        <View style={styles.balanceCard}>
-          <Image
-            source={{
-              uri: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19',
-            }}
-            style={styles.balanceImage}
-            {...a11y.image('Balance card background')}
+      <View style={styles.content}>
+        <Text style={styles.label}>Available Balance</Text>
+        <Text style={styles.balance}>${BALANCE.toFixed(2)}</Text>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.currency}>$</Text>
+          <TextInput
+            style={styles.input}
+            value={amount}
+            onChangeText={setAmount}
+            keyboardType="decimal-pad"
+            placeholder="0.00"
+            placeholderTextColor="rgba(255,255,255,0.2)"
+            autoFocus
           />
           <View style={styles.balanceOverlay}>
             <Text
@@ -270,187 +255,105 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
           )}
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.bg.primary,
-  },
-  loadingIndicator: {
-    marginRight: 8,
+    backgroundColor: COLORS_DARK.background.primary,
   },
   header: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 20,
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    backgroundColor: COLORS.utility.white,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border.default,
-  },
-  backButton: {
-    width: 48,
-    height: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   headerTitle: {
-    flex: 1,
-    ...TYPOGRAPHY.h4,
-    fontWeight: '700',
-    color: COLORS.text.primary,
-    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'white',
   },
   content: {
     flex: 1,
+    padding: 24,
+    alignItems: 'center',
   },
-  balanceCard: {
-    margin: 16,
-    borderRadius: 12,
-    overflow: 'hidden',
-    height: 180,
+  label: {
+    color: COLORS_DARK.text.secondary,
+    fontSize: 14,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
-  balanceImage: {
+  balance: {
+    color: COLORS_DARK.brand.primary,
+    fontSize: 32,
+    fontWeight: '900',
+    marginTop: 8,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 40,
+    marginBottom: 40,
+  },
+  currency: {
+    fontSize: 40,
+    color: 'white',
+    fontWeight: 'bold',
+    marginRight: 4,
+  },
+  input: {
+    fontSize: 60,
+    color: 'white',
+    fontWeight: 'bold',
+    minWidth: 100,
+  },
+  bankCard: {
     width: '100%',
-    height: '100%',
-    position: 'absolute',
-  },
-  balanceOverlay: {
-    flex: 1,
-    backgroundColor: COLORS.overlay40,
-    justifyContent: 'flex-end',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.05)',
     padding: 16,
-  },
-  balanceLabel: {
-    ...TYPOGRAPHY.h2,
-    fontWeight: '700',
-    color: COLORS.utility.white,
-    marginBottom: 4,
-  },
-  balanceAmount: {
-    ...TYPOGRAPHY.bodyLarge,
-    fontWeight: '500',
-    color: COLORS.utility.white,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  infoLabel: {
-    ...TYPOGRAPHY.bodySmall,
-    color: COLORS.text.secondary,
-  },
-  infoValue: {
-    ...TYPOGRAPHY.bodySmall,
-    fontWeight: '500',
-    color: COLORS.text.primary,
-  },
-  inputWrapper: {
-    marginHorizontal: 16,
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    ...TYPOGRAPHY.h4,
-    fontWeight: '700',
-    color: COLORS.text.primary,
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 8,
-  },
-  accountCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: COLORS.utility.white,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    marginHorizontal: 16,
-    marginBottom: 8,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: COLORS.border.default,
-  },
-  accountInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 8,
-    backgroundColor: COLORS.bg.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 16,
-  },
-  accountDetails: {
-    flex: 1,
-  },
-  accountNumber: {
-    ...TYPOGRAPHY.bodyLarge,
-    fontWeight: '600',
-    color: COLORS.text.primary,
-    marginBottom: 2,
-  },
-  accountBank: {
-    ...TYPOGRAPHY.bodySmall,
-    color: COLORS.text.secondary,
-  },
-  changeButton: {
-    backgroundColor: COLORS.bg.primary,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
     borderRadius: 16,
+    gap: 16,
   },
-  changeButtonText: {
-    ...TYPOGRAPHY.bodySmall,
-    fontWeight: '600',
-    color: COLORS.text.primary,
-  },
-  bottomSpacer: {
-    height: 24,
-  },
-  footer: {
-    padding: 16,
-    backgroundColor: COLORS.utility.white,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border.default,
-  },
-  footerText: {
-    ...TYPOGRAPHY.bodySmall,
-    color: COLORS.text.secondary,
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  confirmButton: {
-    backgroundColor: COLORS.brand.primary,
-    paddingVertical: 16,
-    borderRadius: 28,
+  bankIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.1)',
     alignItems: 'center',
-    flexDirection: 'row',
     justifyContent: 'center',
   },
-  confirmButtonDisabled: {
-    backgroundColor: COLORS.border.default,
-    opacity: 0.6,
+  bankName: {
+    color: 'white',
+    fontWeight: 'bold',
   },
-  confirmButtonText: {
-    ...TYPOGRAPHY.bodyLarge,
-    fontWeight: '700',
-    color: COLORS.utility.white,
+  bankAccount: {
+    color: '#888',
+    fontSize: 12,
   },
-  processingWarning: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.feedback.warning,
-    textAlign: 'center',
-    marginBottom: 8,
+  changeText: {
+    color: COLORS_DARK.brand.primary,
     fontWeight: '600',
+  },
+  btn: {
+    width: '100%',
+    backgroundColor: COLORS_DARK.brand.primary,
+    padding: 18,
+    borderRadius: 16,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  disabledBtn: {
+    backgroundColor: '#333',
+  },
+  btnText: {
+    color: 'black',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
 
