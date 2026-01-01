@@ -176,6 +176,9 @@ export type RootStackParamList = {
     canStartChat: boolean;
   };
 
+  // Notifications
+  Notifications: undefined;
+
   // Settings
   Subscription: undefined;
   Support: undefined;
