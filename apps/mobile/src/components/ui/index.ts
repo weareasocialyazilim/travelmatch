@@ -11,6 +11,7 @@ export { Input } from './Input';
 export { Badge, NotificationBadge } from './Badge';
 export { Divider } from './Divider';
 export { EmptyState } from './EmptyState';
+export { FlashMessage } from './FlashMessage';
 export { LoadingSpinner } from './LoadingSpinner';
 export { SkeletonList } from './SkeletonList';
 export type { SkeletonItemType } from './SkeletonList';
