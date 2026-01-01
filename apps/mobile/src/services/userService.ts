@@ -197,7 +197,35 @@ export const userService = {
       throw error;
     }
 
-    return { user: profile as unknown as UserProfile, error: null };
+    // Map database fields to UserProfile interface
+    const mappedProfile: UserProfile = {
+      id: profile.id,
+      email: profile.email || '',
+      name: profile.full_name || 'User',
+      username: profile.username || '',
+      avatar: profile.avatar_url || '',
+      bio: profile.bio || undefined,
+      location: profile.location
+        ? typeof profile.location === 'string'
+          ? { city: profile.location, country: '' }
+          : (profile.location as { city: string; country: string })
+        : undefined,
+      languages: (profile.languages as string[]) || [],
+      interests: (profile.interests as string[]) || [],
+      isVerified: profile.verified || false,
+      kycStatus: 'unverified',
+      rating: profile.rating || 0,
+      reviewCount: profile.review_count || 0,
+      momentCount: 0,
+      followerCount: 0,
+      followingCount: 0,
+      giftsSent: 0,
+      giftsReceived: 0,
+      createdAt: profile.created_at || '',
+      lastActiveAt: profile.updated_at || '',
+    };
+
+    return { user: mappedProfile, error: null };
   },
 
   /**
@@ -230,7 +258,35 @@ export const userService = {
       throw error;
     }
 
-    return { user: profile as unknown as UserProfile };
+    // Map database fields to UserProfile interface
+    const mappedProfile: UserProfile = {
+      id: profile.id,
+      email: '',
+      name: profile.full_name || 'User',
+      username: profile.username || '',
+      avatar: profile.avatar_url || '',
+      bio: profile.bio || undefined,
+      location: profile.location
+        ? typeof profile.location === 'string'
+          ? { city: profile.location, country: '' }
+          : (profile.location as { city: string; country: string })
+        : undefined,
+      languages: (profile.languages as string[]) || [],
+      interests: (profile.interests as string[]) || [],
+      isVerified: profile.verified || false,
+      kycStatus: 'unverified',
+      rating: profile.rating || 0,
+      reviewCount: profile.review_count || 0,
+      momentCount: 0,
+      followerCount: 0,
+      followingCount: 0,
+      giftsSent: 0,
+      giftsReceived: 0,
+      createdAt: '',
+      lastActiveAt: '',
+    };
+
+    return { user: mappedProfile };
   },
 
   /**
@@ -265,7 +321,35 @@ export const userService = {
       throw error;
     }
 
-    return { user: profile as unknown as UserProfile };
+    // Map database fields to UserProfile interface
+    const mappedProfile: UserProfile = {
+      id: profile.id,
+      email: '',
+      name: profile.full_name || 'User',
+      username: profile.username || '',
+      avatar: profile.avatar_url || '',
+      bio: profile.bio || undefined,
+      location: profile.location
+        ? typeof profile.location === 'string'
+          ? { city: profile.location, country: '' }
+          : (profile.location as { city: string; country: string })
+        : undefined,
+      languages: (profile.languages as string[]) || [],
+      interests: (profile.interests as string[]) || [],
+      isVerified: profile.verified || false,
+      kycStatus: 'unverified',
+      rating: profile.rating || 0,
+      reviewCount: profile.review_count || 0,
+      momentCount: 0,
+      followerCount: 0,
+      followingCount: 0,
+      giftsSent: 0,
+      giftsReceived: 0,
+      createdAt: '',
+      lastActiveAt: '',
+    };
+
+    return { user: mappedProfile };
   },
 
   /**

@@ -34,6 +34,8 @@ import * as Haptics from 'expo-haptics';
 import { COLORS, GRADIENTS, PALETTE } from '../../../constants/colors';
 import { TYPE_SCALE } from '../../../theme/typography';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useAuth } from '../../../context/AuthContext';
+import { logger } from '../../../utils/logger';
 
 // ============================================
 // TYPES
@@ -207,6 +209,7 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
 export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const { socialAuth, isLoading } = useAuth();
 
   const titleOpacity = useSharedValue(0);
   const subtitleOpacity = useSharedValue(0);
@@ -224,13 +227,29 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
     opacity: subtitleOpacity.value,
   }));
 
-  const handleAppleLogin = useCallback(() => {
-    navigation.navigate('Register');
-  }, [navigation]);
+  const handleAppleLogin = useCallback(async () => {
+    try {
+      logger.info('[WelcomeScreen] Starting Apple Sign In');
+      const result = await socialAuth({ provider: 'apple', token: '' });
+      if (!result.success && result.error) {
+        logger.error('[WelcomeScreen] Apple Sign In failed:', result.error);
+      }
+    } catch (error) {
+      logger.error('[WelcomeScreen] Apple Sign In exception:', error);
+    }
+  }, [socialAuth]);
 
-  const handleGoogleLogin = useCallback(() => {
-    navigation.navigate('Register');
-  }, [navigation]);
+  const handleGoogleLogin = useCallback(async () => {
+    try {
+      logger.info('[WelcomeScreen] Starting Google Sign In');
+      const result = await socialAuth({ provider: 'google', token: '' });
+      if (!result.success && result.error) {
+        logger.error('[WelcomeScreen] Google Sign In failed:', result.error);
+      }
+    } catch (error) {
+      logger.error('[WelcomeScreen] Google Sign In exception:', error);
+    }
+  }, [socialAuth]);
 
   const handleCreateAccount = useCallback(() => {
     navigation.navigate('Register');

@@ -24,6 +24,9 @@ import {
   getRecentTrustNotes,
   type TrustNote,
 } from '@/services/trustNotesService';
+import { userService, type UserProfile } from '@/services/userService';
+import { momentsService } from '@/services/supabaseDbService';
+import { logger } from '@/utils/logger';
 
 const { width: _SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -36,52 +39,65 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
   navigation,
   route,
 }) => {
-  const { showToast: _showToast } = useToast();
+  const { showToast } = useToast();
   const { showConfirmation: _showConfirmation } = useConfirmation();
   const { userId } = route.params;
   const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
   const [showReportSheet, setShowReportSheet] = useState(false);
 
+  // User profile state
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [userLoading, setUserLoading] = useState(true);
+  const [userError, setUserError] = useState<string | null>(null);
+
+  // User moments state
+  const [userMoments, setUserMoments] = useState<any[]>([]);
+  const [momentsLoading, setMomentsLoading] = useState(true);
+
   // Trust Notes state
   const [trustNotes, setTrustNotes] = useState<TrustNote[]>([]);
   const [trustNotesLoading, setTrustNotesLoading] = useState(true);
 
-  // Mock user data based on userId - Only PUBLIC info shown
-  const getUserData = (id: string) => {
-    if (id === 'user-jessica') {
-      return {
-        id,
-        name: 'Jessica Chen',
-        role: 'Traveler',
-        location: 'Paris, France',
-        avatar:
-          'https://images.unsplash.com/photo-1544025162-d76694265947?w=400',
-        headerImage:
-          'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800',
-        isVerified: true,
-        proofScore: 9.5,
-        successfulExchanges: 12,
-        isFastResponder: true,
-      };
-    }
-    // Default user (Alexandra)
-    return {
-      id,
-      name: 'Alexandra Adams',
-      role: 'Traveler',
-      location: 'San Francisco, CA',
-      avatar:
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
-      headerImage:
-        'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
-      isVerified: true,
-      proofScore: 9.8,
-      successfulExchanges: 18,
-      isFastResponder: true,
+  // Fetch user profile
+  useEffect(() => {
+    const fetchUser = async () => {
+      setUserLoading(true);
+      setUserError(null);
+      try {
+        const { user: profile } = await userService.getUserById(userId);
+        setUser(profile);
+      } catch (error) {
+        logger.error('Failed to fetch user profile:', error);
+        setUserError('Kullanıcı profili yüklenemedi');
+        showToast('Kullanıcı profili yüklenemedi', 'error');
+      } finally {
+        setUserLoading(false);
+      }
     };
-  };
 
-  const user = getUserData(userId);
+    fetchUser();
+  }, [userId, showToast]);
+
+  // Fetch user moments
+  useEffect(() => {
+    const fetchMoments = async () => {
+      setMomentsLoading(true);
+      try {
+        const { data } = await momentsService.list({
+          userId,
+          status: 'active',
+          limit: 20,
+        });
+        setUserMoments(data || []);
+      } catch (error) {
+        logger.error('Failed to fetch user moments:', error);
+      } finally {
+        setMomentsLoading(false);
+      }
+    };
+
+    fetchMoments();
+  }, [userId]);
 
   // Fetch trust notes for this user
   useEffect(() => {
@@ -98,95 +114,35 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
     fetchTrustNotes();
   }, [userId]);
 
-  // Mock moments data (simplified for profile view, not full Moment type)
-  interface ProfileMoment {
-    id: string;
-    title: string;
-    location: string;
-    price: string;
-    image: string;
-    status: string;
-    creator: {
-      id: string;
-      name: string;
-      avatar: string;
-      proofScore: number;
-    };
-  }
+  // Filter moments by status
+  const activeMomentsList = userMoments.filter((m) => m.status === 'active');
+  const pastMomentsList = userMoments.filter((m) => m.status === 'completed');
 
-  const userMoments: ProfileMoment[] = [
-    {
-      id: 'moment-1',
-      title: 'Sunset at the Beach',
-      location: 'Malibu, California',
-      price: '$25',
-      image:
-        'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400',
-      status: 'active',
-      creator: {
-        id: user.id,
-        name: user.name,
-        avatar: user.avatar,
-        proofScore: user.proofScore,
-      },
-    },
-    {
-      id: 'moment-2',
-      title: 'Morning Coffee Ritual',
-      location: 'Paris, France',
-      price: '$15',
-      image:
-        'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400',
-      status: 'active',
-      creator: {
-        id: user.id,
-        name: user.name,
-        avatar: user.avatar,
-        proofScore: user.proofScore,
-      },
-    },
-  ];
-
-  const pastMoments: ProfileMoment[] = [
-    {
-      id: 'moment-3',
-      title: 'Mountain Hike Adventure',
-      location: 'Swiss Alps',
-      price: '$40',
-      image:
-        'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400',
-      status: 'completed',
-      creator: {
-        id: user.id,
-        name: user.name,
-        avatar: user.avatar,
-        proofScore: user.proofScore,
-      },
-    },
-  ];
-
-  const handleMomentPress = (moment: ProfileMoment) => {
+  const handleMomentPress = (moment: any) => {
     // Navigate to MomentDetail with full moment data
+    const locationStr = typeof moment.location === 'string'
+      ? moment.location
+      : moment.location?.city || 'Unknown';
+
     navigation.navigate('MomentDetail', {
       moment: {
         id: moment.id,
         title: moment.title,
-        story: moment.title, // Use title as story for simplified data
-        imageUrl: moment.image,
-        price: parseInt(moment.price?.replace('$', '') || '0') || 0,
-        availability: 'Available',
+        story: moment.description || moment.title,
+        imageUrl: moment.images?.[0] || '',
+        price: moment.price || moment.pricePerGuest || 0,
+        availability: moment.status === 'active' ? 'Available' : 'Completed',
         location: {
-          name: moment.location || 'Unknown Location',
-          city: moment.location?.split(', ')[0] || 'Unknown City',
-          country: moment.location?.split(', ')[1] || 'Unknown Country',
+          name: locationStr,
+          city: typeof moment.location === 'object' ? moment.location?.city : locationStr.split(', ')[0],
+          country: typeof moment.location === 'object' ? moment.location?.country : locationStr.split(', ')[1] || '',
         },
         user: {
-          id: moment.creator?.id || 'unknown',
-          name: moment.creator?.name || 'Anonymous',
-          avatar: moment.creator?.avatar || '',
+          id: user?.id || 'unknown',
+          name: user?.name || 'Anonymous',
+          avatar: user?.avatar || '',
         },
-        status:
-          (moment.status as 'active' | 'pending' | 'completed') || 'active',
+        status: (moment.status as 'active' | 'pending' | 'completed') || 'active',
       },
     });
   };
@@ -222,6 +178,54 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
     }
   };
 
+  // Loading state
+  if (userLoading) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text.primary} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Profil</Text>
+          <View style={styles.moreButton} />
+        </View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.brand.primary} />
+          <Text style={styles.loadingText}>Profil yükleniyor...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Error state
+  if (userError || !user) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text.primary} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Profil</Text>
+          <View style={styles.moreButton} />
+        </View>
+        <View style={styles.errorContainer}>
+          <MaterialCommunityIcons name="account-alert" size={64} color={COLORS.text.tertiary} />
+          <Text style={styles.errorText}>{userError || 'Kullanıcı bulunamadı'}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={() => navigation.goBack()}>
+            <Text style={styles.retryButtonText}>Geri Dön</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Get location string
+  const locationStr = user.location
+    ? typeof user.location === 'string'
+      ? user.location
+      : `${user.location.city || ''}${user.location.country ? ', ' + user.location.country : ''}`
+    : '';
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
@@ -236,7 +240,7 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
             color={COLORS.text.primary}
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Profile</Text>
+        <Text style={styles.headerTitle}>Profil</Text>
         <TouchableOpacity
           style={styles.moreButton}
           onPress={() => setShowReportSheet(true)}
@@ -254,10 +258,10 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header Image */}
+        {/* Header Image - Use avatar as fallback */}
         <View style={styles.headerImageContainer}>
           <Image
-            source={{ uri: user.headerImage }}
+            source={{ uri: user.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name) }}
             style={styles.headerImage}
             resizeMode="cover"
           />
@@ -265,41 +269,48 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
 
         {/* Profile Header */}
         <View style={styles.profileHeader}>
-          <Image source={{ uri: user.avatar }} style={styles.avatar} />
+          <Image
+            source={{ uri: user.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name) }}
+            style={styles.avatar}
+          />
           <View style={styles.profileInfo}>
             <Text style={styles.name}>{user.name}</Text>
             <Text style={styles.role}>
-              {user.role} • {user.isVerified ? 'Verified' : 'Not Verified'} •{' '}
-              {user.location}
+              Traveler • {user.isVerified ? 'Doğrulanmış' : 'Doğrulanmamış'}
+              {locationStr ? ` • ${locationStr}` : ''}
             </Text>
           </View>
-          <TouchableOpacity style={styles.proofScoreBadge}>
-            <Text style={styles.proofScoreText}>
-              ProofScore: {user.proofScore}
-            </Text>
-          </TouchableOpacity>
+          {user.rating > 0 && (
+            <TouchableOpacity style={styles.proofScoreBadge}>
+              <Text style={styles.proofScoreText}>
+                Puan: {user.rating.toFixed(1)}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Public Badges - Only non-private info */}
         <View style={styles.badgesContainer}>
-          <View style={styles.badge}>
-            <MaterialCommunityIcons
-              name="handshake"
-              size={16}
-              color={COLORS.brand.primary}
-            />
-            <Text style={styles.badgeText}>
-              {user.successfulExchanges} successful exchanges
-            </Text>
-          </View>
-          {user.isFastResponder && (
+          {user.reviewCount > 0 && (
             <View style={styles.badge}>
               <MaterialCommunityIcons
-                name="lightning-bolt"
+                name="handshake"
                 size={16}
-                color={COLORS.feedback.warning}
+                color={COLORS.brand.primary}
               />
-              <Text style={styles.badgeText}>Fast responder</Text>
+              <Text style={styles.badgeText}>
+                {user.reviewCount} değerlendirme
+              </Text>
+            </View>
+          )}
+          {user.isVerified && (
+            <View style={styles.badge}>
+              <MaterialCommunityIcons
+                name="check-decagram"
+                size={16}
+                color={COLORS.feedback.success}
+              />
+              <Text style={styles.badgeText}>Doğrulanmış hesap</Text>
             </View>
           )}
         </View>
@@ -407,79 +418,98 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
           </TouchableOpacity>
         </View>
 
+        {/* Moments Loading */}
+        {momentsLoading && (
+          <View style={styles.momentsLoading}>
+            <ActivityIndicator size="small" color={COLORS.brand.primary} />
+          </View>
+        )}
+
         {/* Active Moments */}
-        {activeTab === 'active' && userMoments.length > 0 && (
+        {!momentsLoading && activeTab === 'active' && activeMomentsList.length > 0 && (
           <View style={styles.momentsGrid}>
-            {userMoments.map((moment) => (
-              <TouchableOpacity
-                key={moment.id}
-                style={styles.momentCard}
-                onPress={() => handleMomentPress(moment)}
-              >
-                <Image
-                  source={{ uri: moment.image }}
-                  style={styles.momentImage}
-                  resizeMode="cover"
-                />
-                <View style={styles.momentOverlay}>
-                  <Text style={styles.momentTitle} numberOfLines={1}>
-                    {moment.title}
-                  </Text>
-                  <Text style={styles.momentLocation} numberOfLines={1}>
-                    {moment.location}
-                  </Text>
-                  <Text style={styles.momentPrice}>{moment.price}</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
+            {activeMomentsList.map((moment) => {
+              const momentLocation = typeof moment.location === 'string'
+                ? moment.location
+                : moment.location?.city || '';
+              return (
+                <TouchableOpacity
+                  key={moment.id}
+                  style={styles.momentCard}
+                  onPress={() => handleMomentPress(moment)}
+                >
+                  <Image
+                    source={{ uri: moment.images?.[0] || 'https://ui-avatars.com/api/?name=M' }}
+                    style={styles.momentImage}
+                    resizeMode="cover"
+                  />
+                  <View style={styles.momentOverlay}>
+                    <Text style={styles.momentTitle} numberOfLines={1}>
+                      {moment.title}
+                    </Text>
+                    <Text style={styles.momentLocation} numberOfLines={1}>
+                      {momentLocation}
+                    </Text>
+                    <Text style={styles.momentPrice}>
+                      ${moment.price || moment.pricePerGuest || 0}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         )}
 
         {/* Empty State for Active */}
-        {activeTab === 'active' && userMoments.length === 0 && (
+        {!momentsLoading && activeTab === 'active' && activeMomentsList.length === 0 && (
           <EmptyState
             icon="compass-outline"
-            title="No active moments yet"
-            description={`Check back soon to support ${user.name.split(' ')[0]}'s next adventure!`}
+            title="Henüz aktif moment yok"
+            description={`${user.name.split(' ')[0]} henüz moment oluşturmamış`}
           />
         )}
 
         {/* Past Moments */}
-        {activeTab === 'past' && pastMoments.length > 0 && (
+        {!momentsLoading && activeTab === 'past' && pastMomentsList.length > 0 && (
           <View style={styles.momentsGrid}>
-            {pastMoments.map((moment) => (
-              <TouchableOpacity
-                key={moment.id}
-                style={styles.momentCard}
-                onPress={() => handleMomentPress(moment)}
-              >
-                <Image
-                  source={{ uri: moment.image }}
-                  style={styles.momentImage}
-                  resizeMode="cover"
-                />
-                <View style={styles.momentOverlay}>
-                  <Text style={styles.momentTitle} numberOfLines={1}>
-                    {moment.title}
-                  </Text>
-                  <Text style={styles.momentLocation} numberOfLines={1}>
-                    {moment.location}
-                  </Text>
-                  <View style={styles.completedBadge}>
-                    <Text style={styles.completedText}>Completed</Text>
+            {pastMomentsList.map((moment) => {
+              const momentLocation = typeof moment.location === 'string'
+                ? moment.location
+                : moment.location?.city || '';
+              return (
+                <TouchableOpacity
+                  key={moment.id}
+                  style={styles.momentCard}
+                  onPress={() => handleMomentPress(moment)}
+                >
+                  <Image
+                    source={{ uri: moment.images?.[0] || 'https://ui-avatars.com/api/?name=M' }}
+                    style={styles.momentImage}
+                    resizeMode="cover"
+                  />
+                  <View style={styles.momentOverlay}>
+                    <Text style={styles.momentTitle} numberOfLines={1}>
+                      {moment.title}
+                    </Text>
+                    <Text style={styles.momentLocation} numberOfLines={1}>
+                      {momentLocation}
+                    </Text>
+                    <View style={styles.completedBadge}>
+                      <Text style={styles.completedText}>Tamamlandı</Text>
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
-            ))}
+                </TouchableOpacity>
+              );
+            })}
           </View>
         )}
 
         {/* Empty State for Past */}
-        {activeTab === 'past' && pastMoments.length === 0 && (
+        {!momentsLoading && activeTab === 'past' && pastMomentsList.length === 0 && (
           <EmptyState
             icon="history"
-            title="No past moments"
-            description="Completed moments will appear here"
+            title="Geçmiş moment yok"
+            description="Tamamlanan momentler burada görünecek"
           />
         )}
 
@@ -506,6 +536,43 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
 };
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 16,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: COLORS.text.secondary,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+    gap: 16,
+  },
+  errorText: {
+    fontSize: 16,
+    color: COLORS.text.secondary,
+    textAlign: 'center',
+  },
+  retryButton: {
+    backgroundColor: COLORS.brand.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.text.primary,
+  },
+  momentsLoading: {
+    paddingVertical: 32,
+    alignItems: 'center',
+  },
   backButton: {
     alignItems: 'center',
     height: 40,

@@ -10,11 +10,13 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   Platform,
   KeyboardAvoidingView,
   ActivityIndicator,
   Modal,
   Alert,
+  Keyboard,
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -99,9 +101,15 @@ const CreateMomentScreen: React.FC = () => {
     return 'Escrow protected • Proof required';
   }, [amount]);
 
+  // Dismiss keyboard when tapping outside inputs
+  const dismissKeyboard = useCallback(() => {
+    Keyboard.dismiss();
+  }, []);
+
   // Handle publish
   const onPublish = useCallback(
     async (data: CreateMomentInput) => {
+      Keyboard.dismiss();
       setIsSubmitting(true);
 
       try {
@@ -205,6 +213,7 @@ const CreateMomentScreen: React.FC = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
+          onScrollBeginDrag={dismissKeyboard}
         >
           {/* Photo Section */}
           <PhotoSection
@@ -274,35 +283,51 @@ const CreateMomentScreen: React.FC = () => {
         </ScrollView>
 
         {/* Sticky Publish Button */}
-        <View style={styles.publishSection}>
-          <Text style={styles.publishHint}>{paymentHint}</Text>
-          <TouchableOpacity
-            testID="create-moment-button"
-            style={[
-              styles.publishButton,
-              (!isValid || isSubmitting) && styles.publishButtonDisabled,
-            ]}
-            onPress={handleSubmit(onPublish)}
-            activeOpacity={0.8}
-            disabled={!isValid || isSubmitting}
-            accessibilityRole="button"
-            accessibilityLabel="Publish moment"
-            accessibilityState={{ disabled: !isValid || isSubmitting }}
-          >
-            {isSubmitting ? (
-              <ActivityIndicator size="small" color={COLORS.text.primary} />
-            ) : (
-              <>
-                <MaterialCommunityIcons
-                  name="check"
-                  size={20}
-                  color={COLORS.text.primary}
-                />
-                <Text style={styles.publishButtonText}>Publish Moment</Text>
-              </>
+        <TouchableWithoutFeedback onPress={dismissKeyboard}>
+          <View style={styles.publishSection}>
+            {/* Show validation errors if form is incomplete */}
+            {!isValid && (
+              <View style={styles.validationHint}>
+                {errors.title && (
+                  <Text style={styles.validationError}>• Başlık en az 5 karakter olmalı</Text>
+                )}
+                {errors.category && (
+                  <Text style={styles.validationError}>• Kategori seçin</Text>
+                )}
+                {errors.amount && (
+                  <Text style={styles.validationError}>• Tutar girin (0'dan büyük)</Text>
+                )}
+              </View>
             )}
-          </TouchableOpacity>
-        </View>
+            <Text style={styles.publishHint}>{paymentHint}</Text>
+            <TouchableOpacity
+              testID="create-moment-button"
+              style={[
+                styles.publishButton,
+                (!isValid || isSubmitting) && styles.publishButtonDisabled,
+              ]}
+              onPress={handleSubmit(onPublish)}
+              activeOpacity={0.8}
+              disabled={!isValid || isSubmitting}
+              accessibilityRole="button"
+              accessibilityLabel="Publish moment"
+              accessibilityState={{ disabled: !isValid || isSubmitting }}
+            >
+              {isSubmitting ? (
+                <ActivityIndicator size="small" color={COLORS.text.primary} />
+              ) : (
+                <>
+                  <MaterialCommunityIcons
+                    name="check"
+                    size={20}
+                    color={COLORS.text.primary}
+                  />
+                  <Text style={styles.publishButtonText}>Publish Moment</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          </View>
+        </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
 
       {/* Date Picker Modal */}
@@ -458,6 +483,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 4,
     marginHorizontal: LAYOUT.padding,
+  },
+  validationHint: {
+    backgroundColor: COLORS.feedback.errorBg || '#FEF2F2',
+    borderRadius: 8,
+    marginBottom: 12,
+    padding: 12,
+  },
+  validationError: {
+    color: COLORS.feedback.error,
+    fontSize: 13,
+    lineHeight: 20,
   },
 });
 
