@@ -13,6 +13,7 @@ export { default as MatchConfirmationScreen } from './screens/MatchConfirmationS
 export { ReceiverApprovalScreen } from './screens/ReceiverApprovalScreen';
 export { DisputeFlowScreen } from './screens/DisputeFlowScreen';
 export { default as RequestsScreen } from './screens/RequestsScreen';
+export { default as RequestManagerScreen } from './screens/RequestManagerScreen';
 
 // Hooks
 export { useTrips, useTrip, useCreateTrip, useUpdateTrip, useDeleteTrip, useMyTrips, useBooking } from './hooks/useTrips';
