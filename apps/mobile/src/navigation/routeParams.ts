@@ -78,11 +78,11 @@ export type RootStackParamList = {
 
   // Proof System
   ProofFlow: {
-    escrowId?: string;       // Escrow transaction ID
-    giftId?: string;         // Gift ID
-    momentId?: string;       // Moment being proven
-    momentTitle?: string;    // Moment title for display
-    senderId?: string;       // Gift sender's user ID (for notifications)
+    escrowId?: string; // Escrow transaction ID
+    giftId?: string; // Gift ID
+    momentId?: string; // Moment being proven
+    momentTitle?: string; // Moment title for display
+    senderId?: string; // Gift sender's user ID (for notifications)
   };
   ProofDetail: { proofId: string };
   ProofReview: {
@@ -130,7 +130,7 @@ export type RootStackParamList = {
   };
   GestureReceived: {
     gestureId: string;
-    senderId: string;  // User ID of the gift sender
+    senderId: string; // User ID of the gift sender
     momentTitle: string;
     amount: number;
     senderName?: string;
@@ -227,6 +227,7 @@ export type RootStackParamList = {
 
   // Missing routes
   BookingDetail: { bookingId: string };
+  Ticket: { bookingId: string };
   UnifiedGiftFlow: {
     recipientId: string;
     recipientName: string;

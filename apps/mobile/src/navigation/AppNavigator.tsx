@@ -60,6 +60,7 @@ import {
   ReceiverApprovalScreen,
   DisputeFlowScreen,
   RequestsScreen,
+  TicketScreen,
 } from '../features/trips';
 
 // ===================================
@@ -360,10 +361,7 @@ const AppNavigator = () => {
               name="PaymentFailed"
               component={PaymentFailedScreen}
             />
-            <Stack.Screen
-              name="VerifyPhone"
-              component={VerifyPhoneScreen}
-            />
+            <Stack.Screen name="VerifyPhone" component={VerifyPhoneScreen} />
             <Stack.Screen
               name="CompleteProfile"
               component={CompleteProfileScreen}
@@ -560,15 +558,13 @@ const AppNavigator = () => {
               name="BookingDetail"
               component={BookingDetailScreen}
             />
+            <Stack.Screen name="Ticket" component={TicketScreen} />
             <Stack.Screen name="ShareMoment" component={ShareMomentScreen} />
             <Stack.Screen
               name="UnifiedGiftFlow"
               component={UnifiedGiftFlowScreen}
             />
-            <Stack.Screen
-              name="PayTRWebView"
-              component={PayTRWebViewScreen}
-            />
+            <Stack.Screen name="PayTRWebView" component={PayTRWebViewScreen} />
 
             {/* Footer Pages */}
             {/* <Stack.Screen name="Contact" component={ContactScreen} />
