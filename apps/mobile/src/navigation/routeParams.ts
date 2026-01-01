@@ -61,10 +61,13 @@ export type RootStackParamList = {
     details?: SuccessDetails;
   };
 
-  // Main App
+  // Main App - Tab Screens
   Discover: undefined;
+  Search: undefined;
+  Inbox: undefined;
   Requests: { initialTab?: 'pending' | 'notifications' } | undefined;
   Messages: undefined;
+  Notifications: undefined;
 
   CreateMoment: undefined;
   EditMoment: { momentId: string };
@@ -78,11 +81,11 @@ export type RootStackParamList = {
 
   // Proof System
   ProofFlow: {
-    escrowId?: string;       // Escrow transaction ID
-    giftId?: string;         // Gift ID
-    momentId?: string;       // Moment being proven
-    momentTitle?: string;    // Moment title for display
-    senderId?: string;       // Gift sender's user ID (for notifications)
+    escrowId?: string; // Escrow transaction ID
+    giftId?: string; // Gift ID
+    momentId?: string; // Moment being proven
+    momentTitle?: string; // Moment title for display
+    senderId?: string; // Gift sender's user ID (for notifications)
   };
   ProofDetail: { proofId: string };
   ProofReview: {
@@ -108,6 +111,25 @@ export type RootStackParamList = {
 
   // Communication
   Chat: { otherUser: User; conversationId?: string };
+  ChatDetail: { conversationId: string; otherUser: User };
+
+  // User Profile (Public View)
+  UserProfile: { userId: string };
+
+  // Checkout & Reviews
+  Checkout: {
+    momentId?: string;
+    amount?: number;
+    recipientId?: string;
+    recipientName?: string;
+  };
+  Review: {
+    momentId?: string;
+    userId?: string;
+    userName?: string;
+    userAvatar?: string;
+    momentTitle?: string;
+  };
 
   // Transactions
   TransactionDetail: { transactionId: string };
@@ -130,7 +152,7 @@ export type RootStackParamList = {
   };
   GestureReceived: {
     gestureId: string;
-    senderId: string;  // User ID of the gift sender
+    senderId: string; // User ID of the gift sender
     momentTitle: string;
     amount: number;
     senderName?: string;

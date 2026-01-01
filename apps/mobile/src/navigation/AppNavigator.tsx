@@ -1,9 +1,9 @@
 // Note: import/order disabled because lazyLoad imports are grouped by feature, not alphabetically
 import React, { Suspense, useState, useEffect } from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, StatusBar } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationErrorBoundary } from '../components/ErrorBoundary';
 import { COLORS } from '../constants/colors';
 import { lazyLoad } from '../utils/lazyLoad';
@@ -72,6 +72,16 @@ import {
 } from '../features/messages';
 
 // ===================================
+// NEW FEATURE SCREENS
+// ===================================
+import { SearchMapScreen } from '../features/discovery';
+import { InboxScreen, ChatDetailScreen } from '../features/chat';
+import { WalletScreen as WalletFeatureScreen } from '../features/wallet';
+import { NotificationsScreen } from '../features/notifications';
+import { CheckoutScreen } from '../features/payment';
+import { ReviewScreen } from '../features/reviews';
+
+// ===================================
 // PROFILE FEATURE SCREENS
 // ===================================
 const ProfileScreen = lazyLoad(() =>
@@ -88,7 +98,11 @@ const TrustGardenDetailScreen = lazyLoad(() =>
     default: m.TrustGardenDetailScreen,
   })),
 );
-import { TrustNotesScreen, ProfileDetailScreen } from '../features/profile';
+import {
+  TrustNotesScreen,
+  ProfileDetailScreen,
+  UserProfileScreen,
+} from '../features/profile';
 
 // Proof system screens
 const ProofHistoryScreen = lazyLoad(() =>
@@ -221,7 +235,7 @@ import { RootStackParamList } from './routeParams';
 export type { RootStackParamList } from './routeParams';
 export type { SuccessDetails } from './routeParams';
 
-const Stack = createStackNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const ONBOARDING_KEY = '@has_seen_onboarding';
 
@@ -283,30 +297,18 @@ const AppNavigator = () => {
   return (
     <NavigationErrorBoundary>
       <NavigationContainer linking={linking} ref={navigationRef}>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
+        />
         <Suspense fallback={<LoadingFallback />}>
           <Stack.Navigator
             initialRouteName={initialRoute}
             screenOptions={{
               headerShown: false,
-              cardStyleInterpolator: ({ current: { progress } }) => ({
-                cardStyle: {
-                  opacity: progress,
-                },
-              }),
-              transitionSpec: {
-                open: {
-                  animation: 'timing',
-                  config: {
-                    duration: 200,
-                  },
-                },
-                close: {
-                  animation: 'timing',
-                  config: {
-                    duration: 200,
-                  },
-                },
-              },
+              animation: 'slide_from_right',
+              contentStyle: { backgroundColor: '#050505' },
             }}
           >
             {/* Splash & Onboarding */}
@@ -360,10 +362,7 @@ const AppNavigator = () => {
               name="PaymentFailed"
               component={PaymentFailedScreen}
             />
-            <Stack.Screen
-              name="VerifyPhone"
-              component={VerifyPhoneScreen}
-            />
+            <Stack.Screen name="VerifyPhone" component={VerifyPhoneScreen} />
             <Stack.Screen
               name="CompleteProfile"
               component={CompleteProfileScreen}
@@ -372,15 +371,41 @@ const AppNavigator = () => {
             {/* Unified Success Screen */}
             <Stack.Screen name="Success" component={SuccessScreen} />
 
-            {/* Main App - New consolidated screens */}
-            <Stack.Screen name="Discover" component={DiscoverScreen} />
+            {/* Main App - Tab Screens */}
+            <Stack.Screen
+              name="Discover"
+              component={DiscoverScreen}
+              options={{ animation: 'fade' }}
+            />
+            <Stack.Screen
+              name="Search"
+              component={SearchMapScreen}
+              options={{ animation: 'fade' }}
+            />
+            <Stack.Screen
+              name="Inbox"
+              component={InboxScreen}
+              options={{ animation: 'fade' }}
+            />
             <Stack.Screen name="Requests" component={RequestsScreen} />
             <Stack.Screen name="Messages" component={MessagesScreen} />
+            <Stack.Screen
+              name="Notifications"
+              component={NotificationsScreen}
+            />
 
-            <Stack.Screen name="CreateMoment" component={CreateMomentScreen} />
+            <Stack.Screen
+              name="CreateMoment"
+              component={CreateMomentScreen}
+              options={{ presentation: 'modal' }}
+            />
             <Stack.Screen name="EditMoment" component={EditMomentScreen} />
             <Stack.Screen name="MomentDetail" component={MomentDetailScreen} />
-            <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen
+              name="Profile"
+              component={ProfileScreen}
+              options={{ animation: 'fade' }}
+            />
             <Stack.Screen
               name="ProfileDetail"
               component={ProfileDetailScreen}
@@ -410,6 +435,22 @@ const AppNavigator = () => {
 
             {/* Communication */}
             <Stack.Screen name="Chat" component={ChatScreen} />
+            <Stack.Screen name="ChatDetail" component={ChatDetailScreen} />
+
+            {/* User Profile (Public View) */}
+            <Stack.Screen name="UserProfile" component={UserProfileScreen} />
+
+            {/* Checkout & Reviews (Modals) */}
+            <Stack.Screen
+              name="Checkout"
+              component={CheckoutScreen}
+              options={{ presentation: 'modal' }}
+            />
+            <Stack.Screen
+              name="Review"
+              component={ReviewScreen}
+              options={{ presentation: 'modal' }}
+            />
 
             {/* Transactions */}
             <Stack.Screen
@@ -565,10 +606,7 @@ const AppNavigator = () => {
               name="UnifiedGiftFlow"
               component={UnifiedGiftFlowScreen}
             />
-            <Stack.Screen
-              name="PayTRWebView"
-              component={PayTRWebViewScreen}
-            />
+            <Stack.Screen name="PayTRWebView" component={PayTRWebViewScreen} />
 
             {/* Footer Pages */}
             {/* <Stack.Screen name="Contact" component={ContactScreen} />
