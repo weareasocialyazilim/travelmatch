@@ -47,6 +47,7 @@ import SessionExpiredScreen from '../screens/SessionExpiredScreen';
 import LinkNotFoundScreen from '../screens/LinkNotFoundScreen';
 import LinkExpiredScreen from '../screens/LinkExpiredScreen';
 import LinkInvalidScreen from '../screens/LinkInvalidScreen';
+import SearchMapScreen from '../screens/SearchMapScreen';
 
 // ===================================
 // TRIPS FEATURE SCREENS
@@ -376,6 +377,7 @@ const AppNavigator = () => {
             <Stack.Screen name="Discover" component={DiscoverScreen} />
             <Stack.Screen name="Requests" component={RequestsScreen} />
             <Stack.Screen name="Messages" component={MessagesScreen} />
+            <Stack.Screen name="SearchMap" component={SearchMapScreen} />
 
             <Stack.Screen name="CreateMoment" component={CreateMomentScreen} />
             <Stack.Screen name="EditMoment" component={EditMomentScreen} />
