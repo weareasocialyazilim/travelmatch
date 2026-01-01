@@ -172,6 +172,7 @@ import {
   PaymentFailedScreen,
   ProofReviewScreen,
   PayTRWebViewScreen,
+  CheckoutScreen,
   // KYC Screens
   KYCIntroScreen,
   KYCDocumentTypeScreen,
@@ -539,6 +540,9 @@ const AppNavigator = () => {
               name="PaymentMethods"
               component={PaymentMethodsScreen}
             />
+
+            {/* Checkout */}
+            <Stack.Screen name="Checkout" component={CheckoutScreen} />
 
             {/* Wallet & Settings */}
             <Stack.Screen name="Wallet" component={WalletScreen} />
