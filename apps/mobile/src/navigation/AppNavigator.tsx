@@ -224,6 +224,7 @@ import {
   ReportUserScreen,
   MaintenanceScreen,
   DataPrivacyScreen,
+  NPSScreen,
 } from '../features/settings';
 
 // Legal screens - Turkish compliance
@@ -659,6 +660,9 @@ const AppNavigator = () => {
               name="DeletedMoments"
               component={DeletedMomentsScreen}
             />
+
+            {/* NPS Feedback */}
+            <Stack.Screen name="NPS" component={NPSScreen} />
           </Stack.Navigator>
         </Suspense>
       </NavigationContainer>
