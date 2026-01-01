@@ -88,7 +88,7 @@ const TrustGardenDetailScreen = lazyLoad(() =>
     default: m.TrustGardenDetailScreen,
   })),
 );
-import { TrustNotesScreen, ProfileDetailScreen } from '../features/profile';
+import { TrustNotesScreen, ProfileDetailScreen, VerificationScreen } from '../features/profile';
 
 // Proof system screens
 const ProofHistoryScreen = lazyLoad(() =>
@@ -466,6 +466,10 @@ const AppNavigator = () => {
             <Stack.Screen
               name="IdentityVerification"
               component={KYCIntroScreen}
+            />
+            <Stack.Screen
+              name="GetVerified"
+              component={VerificationScreen}
             />
             <Stack.Screen
               name="KYCDocumentType"
