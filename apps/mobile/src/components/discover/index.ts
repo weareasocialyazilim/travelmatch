@@ -17,6 +17,9 @@ export { HomeWelcomeCard } from './HomeWelcomeCard';
 // New iOS 26.3 components
 export { CategoryChips, TabChips } from './CategoryChips';
 
+// TravelMatch: The Rebirth - Immersive components
+export { ImmersiveMomentCard } from './ImmersiveMomentCard';
+
 // Re-export types and constants
 export * from './types';
 export * from './constants';

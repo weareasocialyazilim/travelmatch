@@ -1,33 +1,41 @@
 /**
- * TravelMatch Awwwards Design System - Colors
+ * TravelMatch: The Rebirth - Design System
  *
- * Premium color palette designed for modern travel experiences
- * with careful attention to contrast ratios and accessibility
+ * "Neon Lime + Ultra Black" aesthetic
+ * Inspired by TikTok, premium fashion apps, and nightclub vibes
+ *
+ * Core Philosophy:
+ * - Dark-first, immersive experience
+ * - High contrast neon accents
+ * - Glassmorphism UI elements
  */
 
 // ============================================
-// 1. BRAND COLORS
+// 1. BRAND COLORS - Neon Lime + Ultra Black
 // ============================================
 export const COLORS = {
   brand: {
-    primary: '#FF6B6B',
-    primaryLight: '#FF8E8E',
-    primaryDark: '#E85555',
-    secondary: '#4ECDC4',
-    secondaryLight: '#6FD9D1',
-    secondaryDark: '#3AAFA7',
-    accent: '#FFD43B',
+    primary: '#CCFF00',      // Neon Lime - Main action color
+    primaryLight: '#E0FF4D', // Lighter lime for hover states
+    primaryDark: '#A3CC00',  // Darker lime for pressed states
+    secondary: '#FF00FF',    // Electric Magenta - Accent
+    secondaryLight: '#FF4DFF',
+    secondaryDark: '#CC00CC',
+    accent: '#00FFFF',       // Cyan - Discovery/Explore
   },
 
   // ============================================
   // 2. TEXT COLORS
   // ============================================
   text: {
-    primary: '#212529',
-    secondary: '#6C757D',
-    tertiary: '#ADB5BD',
-    muted: '#CED4DA',
-    link: '#FF6B6B',
+    primary: '#FFFFFF',
+    secondary: 'rgba(255, 255, 255, 0.7)',
+    tertiary: 'rgba(255, 255, 255, 0.5)',
+    muted: 'rgba(255, 255, 255, 0.4)',
+    link: '#CCFF00',
+    // On light backgrounds
+    onLight: '#0A0A0A',
+    onLightSecondary: 'rgba(10, 10, 10, 0.7)',
     // On dark backgrounds
     onDark: '#FFFFFF',
     onDarkSecondary: 'rgba(255, 255, 255, 0.85)',
@@ -35,46 +43,52 @@ export const COLORS = {
   },
 
   // ============================================
-  // 3. BACKGROUND COLORS
+  // 3. BACKGROUND COLORS - Ultra Black
   // ============================================
   background: {
-    primary: '#FFFFFF',
-    secondary: '#F8F9FA',
-    tertiary: '#E9ECEF',
-    elevated: '#FFFFFF',
+    primary: '#0A0A0A',      // Ultra Black
+    secondary: '#121212',    // Slightly lighter
+    tertiary: '#1A1A1A',     // Card backgrounds
+    elevated: '#1F1F1F',     // Elevated surfaces
+    glass: 'rgba(20, 20, 20, 0.75)', // Glassmorphism base
   },
 
   // ============================================
   // 4. SURFACE COLORS
   // ============================================
   surface: {
-    card: '#FFFFFF',
-    modal: '#FFFFFF',
-    overlay: 'rgba(0, 0, 0, 0.5)',
+    card: 'rgba(30, 30, 30, 0.8)',
+    cardSolid: '#1E1E1E',
+    modal: 'rgba(20, 20, 20, 0.95)',
+    overlay: 'rgba(0, 0, 0, 0.6)',
+    overlayHeavy: 'rgba(0, 0, 0, 0.85)',
+    glass: 'rgba(255, 255, 255, 0.08)',
+    glassBorder: 'rgba(255, 255, 255, 0.1)',
   },
 
   // ============================================
   // 5. BORDER COLORS
   // ============================================
   border: {
-    default: '#DEE2E6',
-    light: '#E9ECEF',
-    dark: '#ADB5BD',
-    focus: '#FF6B6B',
+    default: 'rgba(255, 255, 255, 0.1)',
+    light: 'rgba(255, 255, 255, 0.05)',
+    dark: 'rgba(255, 255, 255, 0.2)',
+    focus: '#CCFF00',
+    glow: 'rgba(204, 255, 0, 0.3)',
   },
 
   // ============================================
   // 6. FEEDBACK COLORS
   // ============================================
   feedback: {
-    success: '#51CF66',
-    successLight: '#D3F9D8',
-    warning: '#FFD43B',
-    warningLight: '#FFF3BF',
-    error: '#FF6B6B',
-    errorLight: '#FFE3E3',
-    info: '#339AF0',
-    infoLight: '#D0EBFF',
+    success: '#00FF88',      // Neon Green
+    successLight: 'rgba(0, 255, 136, 0.15)',
+    warning: '#FFB800',      // Amber
+    warningLight: 'rgba(255, 184, 0, 0.15)',
+    error: '#FF4757',        // Neon Red
+    errorLight: 'rgba(255, 71, 87, 0.15)',
+    info: '#00D4FF',         // Cyan
+    infoLight: 'rgba(0, 212, 255, 0.15)',
   },
 
   // ============================================
@@ -83,93 +97,123 @@ export const COLORS = {
   utility: {
     white: '#FFFFFF',
     black: '#000000',
+    ultraBlack: '#0A0A0A',
     transparent: 'transparent',
-    disabled: '#CED4DA',
+    disabled: 'rgba(255, 255, 255, 0.3)',
   },
 
   // ============================================
   // 8. GRADIENT COLORS
   // ============================================
   gradient: {
-    primary: ['#FF6B6B', '#FF8E8E'],
-    secondary: ['#4ECDC4', '#6FD9D1'],
-    warm: ['#FFD43B', '#FF6B6B'],
-    cool: ['#339AF0', '#4ECDC4'],
-    dark: ['#212529', '#495057'],
+    primary: ['#CCFF00', '#00FFFF'],       // Lime to Cyan
+    secondary: ['#FF00FF', '#00FFFF'],     // Magenta to Cyan
+    warm: ['#CCFF00', '#FF00FF'],          // Lime to Magenta
+    dark: ['transparent', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.95)'], // Card overlay
+    glass: ['rgba(255,255,255,0.1)', 'rgba(255,255,255,0.05)'],
+    cardOverlay: ['transparent', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.95)'],
+  },
+
+  // ============================================
+  // 9. SPECIAL EFFECTS
+  // ============================================
+  glow: {
+    primary: 'rgba(204, 255, 0, 0.4)',     // Lime glow
+    secondary: 'rgba(255, 0, 255, 0.4)',   // Magenta glow
+    accent: 'rgba(0, 255, 255, 0.4)',      // Cyan glow
   },
 } as const;
 
 // ============================================
-// 9. DARK MODE COLORS
+// LIGHT MODE (for specific screens if needed)
 // ============================================
-export const COLORS_DARK = {
+export const COLORS_LIGHT = {
   brand: {
-    primary: '#FF8E8E',
-    primaryLight: '#FFB1B1',
-    primaryDark: '#FF6B6B',
-    secondary: '#6FD9D1',
-    secondaryLight: '#92E3DC',
-    secondaryDark: '#4ECDC4',
-    accent: '#FFE066',
+    primary: '#CCFF00',
+    primaryLight: '#E0FF4D',
+    primaryDark: '#A3CC00',
+    secondary: '#FF00FF',
+    secondaryLight: '#FF4DFF',
+    secondaryDark: '#CC00CC',
+    accent: '#00CCCC',
   },
 
   text: {
-    primary: '#E9ECEF',
-    secondary: '#ADB5BD',
-    tertiary: '#6C757D',
-    muted: '#495057',
-    link: '#FF8E8E',
+    primary: '#0A0A0A',
+    secondary: 'rgba(10, 10, 10, 0.7)',
+    tertiary: 'rgba(10, 10, 10, 0.5)',
+    muted: 'rgba(10, 10, 10, 0.4)',
+    link: '#A3CC00',
+    onLight: '#0A0A0A',
+    onLightSecondary: 'rgba(10, 10, 10, 0.7)',
     onDark: '#FFFFFF',
     onDarkSecondary: 'rgba(255, 255, 255, 0.85)',
     onDarkMuted: 'rgba(255, 255, 255, 0.6)',
   },
 
   background: {
-    primary: '#121212',
-    secondary: '#1E1E1E',
-    tertiary: '#2A2A2A',
-    elevated: '#2A2A2A',
+    primary: '#FFFFFF',
+    secondary: '#F8F9FA',
+    tertiary: '#E9ECEF',
+    elevated: '#FFFFFF',
+    glass: 'rgba(255, 255, 255, 0.9)',
   },
 
   surface: {
-    card: '#2A2A2A',
-    modal: '#1E1E1E',
-    overlay: 'rgba(0, 0, 0, 0.7)',
+    card: '#FFFFFF',
+    cardSolid: '#FFFFFF',
+    modal: '#FFFFFF',
+    overlay: 'rgba(0, 0, 0, 0.5)',
+    overlayHeavy: 'rgba(0, 0, 0, 0.7)',
+    glass: 'rgba(255, 255, 255, 0.8)',
+    glassBorder: 'rgba(0, 0, 0, 0.1)',
   },
 
   border: {
-    default: '#343A40',
-    light: '#2C3135',
-    dark: '#495057',
-    focus: '#FF8E8E',
+    default: 'rgba(0, 0, 0, 0.1)',
+    light: 'rgba(0, 0, 0, 0.05)',
+    dark: 'rgba(0, 0, 0, 0.2)',
+    focus: '#A3CC00',
+    glow: 'rgba(163, 204, 0, 0.3)',
   },
 
   feedback: {
-    success: '#69DB7C',
-    successLight: '#1A3B23',
-    warning: '#FFE066',
-    warningLight: '#3B3510',
-    error: '#FF8787',
-    errorLight: '#3B1A1A',
-    info: '#4DABF7',
-    infoLight: '#102A40',
+    success: '#00CC6A',
+    successLight: 'rgba(0, 204, 106, 0.15)',
+    warning: '#CC9300',
+    warningLight: 'rgba(204, 147, 0, 0.15)',
+    error: '#CC3A47',
+    errorLight: 'rgba(204, 58, 71, 0.15)',
+    info: '#00A8CC',
+    infoLight: 'rgba(0, 168, 204, 0.15)',
   },
 
   utility: {
     white: '#FFFFFF',
     black: '#000000',
+    ultraBlack: '#0A0A0A',
     transparent: 'transparent',
-    disabled: '#495057',
+    disabled: 'rgba(0, 0, 0, 0.3)',
   },
 
   gradient: {
-    primary: ['#FF8E8E', '#FFB1B1'],
-    secondary: ['#6FD9D1', '#92E3DC'],
-    warm: ['#FFE066', '#FF8E8E'],
-    cool: ['#4DABF7', '#6FD9D1'],
-    dark: ['#2A2A2A', '#1E1E1E'],
+    primary: ['#CCFF00', '#00CCCC'],
+    secondary: ['#CC00CC', '#00CCCC'],
+    warm: ['#A3CC00', '#CC00CC'],
+    dark: ['#212529', '#495057'],
+    glass: ['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.7)'],
+    cardOverlay: ['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)'],
+  },
+
+  glow: {
+    primary: 'rgba(163, 204, 0, 0.4)',
+    secondary: 'rgba(204, 0, 204, 0.4)',
+    accent: 'rgba(0, 204, 204, 0.4)',
   },
 } as const;
+
+// Backward compatibility alias
+export const COLORS_DARK = COLORS;
 
 // Type exports
 export type Colors = typeof COLORS;

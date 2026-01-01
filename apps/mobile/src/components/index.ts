@@ -97,3 +97,6 @@ export {
   WalletSettingsModal,
 } from './payment';
 export type { SavedCard, Wallet, WalletSettings } from './payment';
+
+// Layout Components (TravelMatch: The Rebirth)
+export { FloatingDock } from './layout';
