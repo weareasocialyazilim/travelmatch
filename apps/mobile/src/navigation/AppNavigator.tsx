@@ -7,6 +7,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationErrorBoundary } from '../components/ErrorBoundary';
 import { COLORS } from '../constants/colors';
 import { lazyLoad } from '../utils/lazyLoad';
+import { MainTabNavigator } from './MainTabNavigator';
 import { navigationRef } from '../services/navigationService';
 import { apiClient } from '../services/apiV1Service';
 import { deepLinkHandler } from '../services/deepLinkHandler';
@@ -387,7 +388,14 @@ const AppNavigator = () => {
             {/* Unified Success Screen */}
             <Stack.Screen name="Success" component={SuccessScreen} />
 
-            {/* Main App - Tab Screens */}
+            {/* Main App - Tab Navigator */}
+            <Stack.Screen
+              name="MainTabs"
+              component={MainTabNavigator}
+              options={{ animation: 'fade', gestureEnabled: false }}
+            />
+
+            {/* Individual Screens (for deep linking) */}
             <Stack.Screen
               name="Discover"
               component={DiscoverScreen}
