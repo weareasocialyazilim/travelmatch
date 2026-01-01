@@ -50,6 +50,7 @@ import LinkNotFoundScreen from '../screens/LinkNotFoundScreen';
 import LinkExpiredScreen from '../screens/LinkExpiredScreen';
 import LinkInvalidScreen from '../screens/LinkInvalidScreen';
 import SearchMapScreen from '../screens/SearchMapScreen';
+import PickLocationScreen from '../screens/PickLocationScreen';
 
 // ===================================
 // TRIPS FEATURE SCREENS
@@ -659,6 +660,9 @@ const AppNavigator = () => {
               name="DeletedMoments"
               component={DeletedMomentsScreen}
             />
+
+            {/* Location Picker */}
+            <Stack.Screen name="PickLocation" component={PickLocationScreen} />
           </Stack.Navigator>
         </Suspense>
       </NavigationContainer>
