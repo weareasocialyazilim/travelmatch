@@ -224,6 +224,7 @@ import {
   ReportUserScreen,
   MaintenanceScreen,
   DataPrivacyScreen,
+  DataSettingsScreen,
 } from '../features/settings';
 
 // Legal screens - Turkish compliance
@@ -627,6 +628,7 @@ const AppNavigator = () => {
               component={ChangePasswordScreen}
             />
             <Stack.Screen name="AppSettings" component={AppSettingsScreen} />
+            <Stack.Screen name="DataSettings" component={DataSettingsScreen} />
             <Stack.Screen
               name="ConnectedAccounts"
               component={ConnectedAccountsScreen}
