@@ -16,6 +16,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LanguageSelectionBottomSheet } from '@/components/LanguageSelectionBottomSheet';
+import { useI18n } from '@/context/I18nContext';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { logger } from '@/utils/logger';
@@ -42,6 +43,7 @@ const AppSettingsScreen: React.FC = () => {
   const { user, logout } = useAuth();
   const { isConnected, refresh: refreshNetwork } = useNetworkStatus();
   const { showToast } = useToast();
+  const { language, setLanguage, t, supportedLanguages } = useI18n();
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -65,8 +67,10 @@ const AppSettingsScreen: React.FC = () => {
     : new Date().getFullYear().toString();
 
   // Language
-  const [selectedLanguage, setSelectedLanguage] = useState('English');
   const [isLanguageSheetVisible, setIsLanguageSheetVisible] = useState(false);
+
+  // Get display name for current language
+  const currentLanguageDisplay = supportedLanguages.find(l => l.code === language)?.nativeName || 'English';
 
   const toggleNotifications = useCallback(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -383,8 +387,8 @@ const AppSettingsScreen: React.FC = () => {
                   />
                 </View>
                 <View style={styles.settingContent}>
-                  <Text style={styles.settingLabel}>Language</Text>
-                  <Text style={styles.settingDesc}>{selectedLanguage}</Text>
+                  <Text style={styles.settingLabel}>{t('settings.language')}</Text>
+                  <Text style={styles.settingDesc}>{currentLanguageDisplay}</Text>
                 </View>
                 <MaterialCommunityIcons
                   name="chevron-right"
@@ -516,11 +520,14 @@ const AppSettingsScreen: React.FC = () => {
       <LanguageSelectionBottomSheet
         visible={isLanguageSheetVisible}
         onClose={() => setIsLanguageSheetVisible(false)}
-        onLanguageChange={(lang: string) => {
-          setSelectedLanguage(
-            lang === 'en' ? 'English' : lang === 'tr' ? 'Türkçe' : lang,
-          );
+        currentLanguage={language}
+        onLanguageChange={async (lang: string) => {
+          await setLanguage(lang as 'en' | 'tr');
           setIsLanguageSheetVisible(false);
+          showToast(
+            lang === 'tr' ? 'Dil Türkçe olarak değiştirildi' : 'Language changed to English',
+            'success'
+          );
         }}
       />
     </SafeAreaView>
