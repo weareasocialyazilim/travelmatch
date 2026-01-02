@@ -1,10 +1,18 @@
 /**
  * TravelMatch Awwwards Design System 2026 - Typography V2
+ * "Sophisticated Typography" - Awwwards projelerinin %70'i tipografidir
  *
  * Premium Typography System featuring:
  * - Display: "Clash Display" - Bold, geometric, modern (for headlines)
  * - Body: "Satoshi" - Clean, readable, warm (for paragraphs)
  * - Mono: "JetBrains Mono" - For prices and numbers
+ *
+ * Tipografi Stratejisi:
+ * - 40 yaş üstü için: Yüksek okunabilirlik (bodyL: 18px, relaxed line-height: 1.7)
+ * - GenZ için: Estetik hiyerarşi (tight letter-spacing, bold display fonts)
+ *
+ * Başlıklar: Modern Serif veya Bold Sans (Prestij hissi)
+ * Gövde: Temiz Geometric Sans (Netlik ve GenZ estetiği)
  *
  * All sizes follow 8pt grid system
  * WCAG 2.1 Level AA compliant line heights
@@ -517,7 +525,62 @@ export type FontSize = keyof typeof FONT_SIZES_V2;
 export type TypographyCategory = keyof typeof TYPE_SCALE;
 
 // ============================================
-// 9. BACKWARD COMPATIBILITY (Legacy API Support)
+// 9. SIMPLIFIED TYPOGRAPHY API (Awwwards Style)
+// ============================================
+
+/**
+ * Tipografi Stratejisi:
+ * - Başlıklar: Modern Serif veya Bold Sans (Prestij hissi)
+ * - Gövde: Temiz Geometric Sans (Netlik ve GenZ estetiği)
+ *
+ * 40+ Okunabilirlik: bodyL (18px) + relaxed line-height (1.7)
+ * GenZ Estetik: tight letter-spacing + bold display fonts
+ */
+export const TYPOGRAPHY_SYSTEM = {
+  families: {
+    // Heading: Prestij ve modernlik için bold geometric font
+    heading: FONTS.display.bold,
+    // Body: Temiz, okunabilir geometric sans
+    body: FONTS.body.regular,
+    // Mono: Fiyatlar ve sayılar için
+    mono: FONTS.mono.medium,
+  },
+
+  sizes: {
+    display: 40, // Büyük kahraman metinler (splash, onboarding)
+    h1: 32, // Ana başlıklar
+    h2: 24, // Alt başlıklar
+    h3: 20, // Bölüm başlıkları
+    bodyL: 18, // Geniş okunabilirlik (40 yaş dostu)
+    bodyM: 16, // Standart metin
+    bodyS: 14, // Küçük açıklamalar
+    caption: 12, // Etiketler
+  },
+
+  weights: {
+    light: '300' as const,
+    regular: '400' as const,
+    medium: '500' as const,
+    semibold: '600' as const,
+    bold: '700' as const,
+    black: '900' as const,
+  },
+
+  lineHeights: {
+    tight: 1.2, // Display ve başlıklar için
+    normal: 1.5, // Standart metin (WCAG uyumlu)
+    relaxed: 1.7, // 40+ yaş okunabilirlik için
+  },
+
+  letterSpacing: {
+    tight: -0.5, // Display için prestijli görünüm
+    normal: 0, // Body için
+    wide: 0.3, // Labels için
+  },
+} as const;
+
+// ============================================
+// 10. BACKWARD COMPATIBILITY (Legacy API Support)
 // ============================================
 
 /**
