@@ -44,11 +44,12 @@ export async function GET(request: NextRequest) {
     if (error) throw error;
 
     // Calculate summary stats
+    type Transaction = { type?: string; amount?: number };
     const summary = {
-      totalRevenue: transactions?.filter(t => t.type === 'subscription' || t.type === 'boost').reduce((sum, t) => sum + (t.amount || 0), 0) || 0,
-      totalRefunds: transactions?.filter(t => t.type === 'refund').reduce((sum, t) => sum + (t.amount || 0), 0) || 0,
-      subscriptionRevenue: transactions?.filter(t => t.type === 'subscription').reduce((sum, t) => sum + (t.amount || 0), 0) || 0,
-      boostRevenue: transactions?.filter(t => t.type === 'boost').reduce((sum, t) => sum + (t.amount || 0), 0) || 0,
+      totalRevenue: transactions?.filter((t: Transaction) => t.type === 'subscription' || t.type === 'boost').reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) || 0,
+      totalRefunds: transactions?.filter((t: Transaction) => t.type === 'refund').reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) || 0,
+      subscriptionRevenue: transactions?.filter((t: Transaction) => t.type === 'subscription').reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) || 0,
+      boostRevenue: transactions?.filter((t: Transaction) => t.type === 'boost').reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) || 0,
       transactionCount: count || 0,
     };
 

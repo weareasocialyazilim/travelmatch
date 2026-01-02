@@ -52,14 +52,15 @@ export async function GET(request: NextRequest) {
     }
 
     // Calculate summary
+    type EscrowTransaction = { status?: string; amount?: number };
     const summary = {
       total: count || 0,
-      pending: escrowTransactions?.filter(e => e.status === 'pending').length || 0,
-      released: escrowTransactions?.filter(e => e.status === 'released').length || 0,
-      refunded: escrowTransactions?.filter(e => e.status === 'refunded').length || 0,
-      expired: escrowTransactions?.filter(e => e.status === 'expired').length || 0,
-      totalAmount: escrowTransactions?.reduce((sum, e) => sum + (e.amount || 0), 0) || 0,
-      pendingAmount: escrowTransactions?.filter(e => e.status === 'pending').reduce((sum, e) => sum + (e.amount || 0), 0) || 0,
+      pending: escrowTransactions?.filter((e: EscrowTransaction) => e.status === 'pending').length || 0,
+      released: escrowTransactions?.filter((e: EscrowTransaction) => e.status === 'released').length || 0,
+      refunded: escrowTransactions?.filter((e: EscrowTransaction) => e.status === 'refunded').length || 0,
+      expired: escrowTransactions?.filter((e: EscrowTransaction) => e.status === 'expired').length || 0,
+      totalAmount: escrowTransactions?.reduce((sum: number, e: EscrowTransaction) => sum + (e.amount || 0), 0) || 0,
+      pendingAmount: escrowTransactions?.filter((e: EscrowTransaction) => e.status === 'pending').reduce((sum: number, e: EscrowTransaction) => sum + (e.amount || 0), 0) || 0,
     };
 
     return NextResponse.json({
