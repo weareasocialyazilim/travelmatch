@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
   // Unlocked vault styles
   unlockedContainer: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.backgroundPrimary,
   },
   vaultHeader: {
     flexDirection: 'row',

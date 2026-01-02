@@ -20,7 +20,7 @@ import { withErrorBoundary } from '@/components/withErrorBoundary';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: _SCREEN_HEIGHT } = Dimensions.get('window');
 
 interface MapLocation {
   latitude: number;
@@ -28,7 +28,7 @@ interface MapLocation {
 }
 
 const SearchMapScreen: React.FC = () => {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const _navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const mapRef = useRef<MapboxGL.MapView>(null);
   const cameraRef = useRef<MapboxGL.Camera>(null);
 
@@ -36,7 +36,7 @@ const SearchMapScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [userLocation, setUserLocation] = useState<MapLocation | null>(null);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [mapLoaded, setMapLoaded] = useState(false);
+  const [_mapLoaded, setMapLoaded] = useState(false);
 
   // Animation
   const searchBarAnim = useRef(new Animated.Value(0)).current;
@@ -199,7 +199,7 @@ const SearchMapScreen: React.FC = () => {
       </View>
 
       {/* Bottom Navigation */}
-      <BottomNav />
+      <BottomNav activeTab="Discover" />
     </View>
   );
 };
@@ -285,4 +285,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withErrorBoundary(SearchMapScreen, 'SearchMapScreen');
+export default withErrorBoundary(SearchMapScreen, { displayName: 'SearchMapScreen' });

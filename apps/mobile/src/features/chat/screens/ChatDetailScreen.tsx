@@ -430,4 +430,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withErrorBoundary(ChatDetailScreen, 'ChatDetailScreen');
+export default withErrorBoundary(ChatDetailScreen, { displayName: 'ChatDetailScreen' });

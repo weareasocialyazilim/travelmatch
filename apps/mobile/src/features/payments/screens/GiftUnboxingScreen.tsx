@@ -14,7 +14,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const { width } = Dimensions.get('window');
+const { width: _width } = Dimensions.get('window');
 
 export const GiftUnboxingScreen = () => {
   const navigation = useNavigation();
@@ -73,7 +73,7 @@ export const GiftUnboxingScreen = () => {
 
         <TouchableOpacity
           style={styles.btn}
-          onPress={() => navigation.navigate('ChatDetail', { chatId: 'new' })}
+          onPress={() => navigation.navigate('ChatDetail', { conversationId: 'new', otherUser: { id: 'giver', name: 'Gift Giver', role: 'Traveler' as const, kyc: 'Unverified' as const, location: '' } })}
         >
           <Text style={styles.btnText}>Say Thanks & Chat</Text>
         </TouchableOpacity>
