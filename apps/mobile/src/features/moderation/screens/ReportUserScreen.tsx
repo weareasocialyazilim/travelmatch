@@ -59,10 +59,7 @@ export const ReportUserScreen: React.FC<ReportUserScreenProps> = ({
     });
 
     navigation.goBack();
-    showToast({
-      message: 'Report submitted successfully',
-      type: 'success',
-    });
+    showToast('Report submitted successfully', 'success');
   }, [userId, selectedReason, desc, navigation, showToast]);
 
   return (
@@ -78,7 +75,10 @@ export const ReportUserScreen: React.FC<ReportUserScreenProps> = ({
         <View style={styles.headerSpacer} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+      >
         <Text style={styles.helperText}>
           Why are you reporting this user? Your report is anonymous.
         </Text>

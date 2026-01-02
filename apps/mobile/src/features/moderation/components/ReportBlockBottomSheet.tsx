@@ -12,8 +12,8 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS } from '../constants/colors';
-import { logger } from '../utils/logger';
+import { COLORS } from '@/constants/colors';
+import { logger } from '@/utils/logger';
 
 interface ReportBlockBottomSheetProps {
   visible: boolean;
@@ -71,10 +71,10 @@ export const ReportBlockBottomSheet: React.FC<ReportBlockBottomSheetProps> = ({
       selectedReason === 'scam'
         ? 'Scam or fake story'
         : selectedReason === 'hate'
-        ? 'Hate / harassment'
-        : selectedReason === 'inappropriate'
-        ? 'Inappropriate content'
-        : 'Other';
+          ? 'Hate / harassment'
+          : selectedReason === 'inappropriate'
+            ? 'Inappropriate content'
+            : 'Other';
     onSubmit('report', reasonText, details);
     onClose();
   };

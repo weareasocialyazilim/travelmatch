@@ -18,8 +18,14 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { COLORS } from '../constants/colors';
-import { logger } from '../utils/logger';
+import { COLORS } from '@/constants/colors';
+import { logger } from '@/utils/logger';
+import { useToast } from '@/context/ToastContext';
+import {
+  moderationService,
+  REPORT_REASONS,
+} from '@/services/moderationService';
+import type { ReportReason, ReportTarget } from '@/services/moderationService';
 
 // Color aliases for easier use
 const colors = {
@@ -32,12 +38,6 @@ const colors = {
   border: { light: COLORS.border.default, medium: COLORS.border.default },
   status: { error: COLORS.danger },
 };
-import { useToast } from '../context/ToastContext';
-import {
-  moderationService,
-  REPORT_REASONS,
-} from '../services/moderationService';
-import type { ReportReason, ReportTarget } from '../services/moderationService';
 
 interface ReportModalProps {
   visible: boolean;
@@ -97,7 +97,12 @@ export const ReportModal: React.FC<ReportModalProps> = ({
       showToast('Şikayetiniz başarıyla gönderildi', 'success');
       handleClose();
     } catch (err) {
-      logger.error('[ReportModal] Failed to submit report', { targetType, targetId, reason: selectedReason, error: err });
+      logger.error('[ReportModal] Failed to submit report', {
+        targetType,
+        targetId,
+        reason: selectedReason,
+        error: err,
+      });
       showToast('Şikayetiniz gönderilemedi. Lütfen tekrar deneyin', 'error');
     } finally {
       setLoading(false);
