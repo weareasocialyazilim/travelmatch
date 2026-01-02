@@ -51,7 +51,11 @@ type Step = 'media' | 'details' | 'price' | 'review';
 
 // Category options with Material Community Icons
 const CATEGORIES = [
-  { id: 'dining', label: 'Fine Dining', icon: 'silverware-fork-knife' as const },
+  {
+    id: 'dining',
+    label: 'Fine Dining',
+    icon: 'silverware-fork-knife' as const,
+  },
   { id: 'nightlife', label: 'Nightlife', icon: 'glass-cocktail' as const },
   { id: 'culture', label: 'Art & Culture', icon: 'palette' as const },
   { id: 'adventure', label: 'Adventure', icon: 'compass' as const },
@@ -106,8 +110,6 @@ const CreateMomentScreen: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const _categoryObj = CATEGORIES.find((c) => c.id === selectedCategory);
-
       const momentData = {
         title: title.trim(),
         description: '',
@@ -130,7 +132,12 @@ const CreateMomentScreen: React.FC = () => {
         Alert.alert(
           t('screens.createMoment.successTitle'),
           t('screens.createMoment.successMessage'),
-          [{ text: t('screens.createMoment.successButton'), onPress: () => navigation.navigate('Discover') }],
+          [
+            {
+              text: t('screens.createMoment.successButton'),
+              onPress: () => navigation.navigate('Discover'),
+            },
+          ],
         );
       } else {
         showToast('Could not create moment. Please try again.', 'error');
@@ -140,7 +147,16 @@ const CreateMomentScreen: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [title, selectedCategory, imageUri, price, createMoment, navigation, showToast, t]);
+  }, [
+    title,
+    selectedCategory,
+    imageUri,
+    price,
+    createMoment,
+    navigation,
+    showToast,
+    t,
+  ]);
 
   // Navigate back to media step
   const handleBack = useCallback(() => {
@@ -168,7 +184,11 @@ const CreateMomentScreen: React.FC = () => {
           style={styles.gradientBorder}
         >
           <View style={styles.uploadInner}>
-            <MaterialCommunityIcons name="camera-plus" size={40} color="white" />
+            <MaterialCommunityIcons
+              name="camera-plus"
+              size={40}
+              color="white"
+            />
             <Text style={styles.uploadText}>Upload Visual</Text>
           </View>
         </LinearGradient>
@@ -237,7 +257,9 @@ const CreateMomentScreen: React.FC = () => {
                     onPress={() => setSelectedCategory(cat.id)}
                     accessibilityLabel={cat.label}
                     accessibilityRole="button"
-                    accessibilityState={{ selected: selectedCategory === cat.id }}
+                    accessibilityState={{
+                      selected: selectedCategory === cat.id,
+                    }}
                   >
                     <MaterialCommunityIcons
                       name={cat.icon}
@@ -247,7 +269,8 @@ const CreateMomentScreen: React.FC = () => {
                     <Text
                       style={[
                         styles.categoryText,
-                        selectedCategory === cat.id && styles.categoryTextActive,
+                        selectedCategory === cat.id &&
+                          styles.categoryTextActive,
                       ]}
                     >
                       {cat.label}

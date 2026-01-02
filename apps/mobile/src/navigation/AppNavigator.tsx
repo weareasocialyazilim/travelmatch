@@ -126,7 +126,9 @@ const MyMomentsScreen = lazyLoad(() =>
   import('../features/profile').then((m) => ({ default: m.MyMomentsScreen })),
 );
 const MyHostedMomentsScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({ default: m.MyHostedMomentsScreen })),
+  import('../features/profile').then((m) => ({
+    default: m.MyHostedMomentsScreen,
+  })),
 );
 const CreateMomentScreen = lazyLoad(() =>
   import('../features/profile').then((m) => ({
@@ -235,7 +237,7 @@ import {
   ReportUserScreen,
   MaintenanceScreen,
   DataPrivacyScreen,
-  DietaryPreferencesScreen,
+  DietaryPreferencesScreen as _DietaryPreferencesScreen,
   DataSettingsScreen,
 } from '../features/settings';
 

@@ -6,7 +6,15 @@
 import { Linking } from 'react-native';
 import { logger } from './logger';
 import type { RootStackParamList } from '../navigation/types';
-import type { NavigationContainerRef } from '@react-navigation/native';
+import type {
+  NavigationContainerRef,
+  NavigationProp,
+} from '@react-navigation/native';
+
+// Type that works with both NavigationContainerRef and NavigationProp
+type NavigationRefLike =
+  | NavigationContainerRef<RootStackParamList>
+  | (NavigationProp<RootStackParamList> & { isReady?: () => boolean });
 
 export const DEEP_LINK_CONFIG = {
   prefixes: ['travelmatch://', 'https://travelmatch.app'],
@@ -110,7 +118,7 @@ export function parseDeepLink(url: string): {
  */
 export function handleDeepLink(
   url: string,
-  navigation: NavigationContainerRef<RootStackParamList>,
+  navigation: NavigationRefLike,
   onOAuthCallback?: (url: string) => void,
 ) {
   // Check if this is an OAuth callback
@@ -124,7 +132,13 @@ export function handleDeepLink(
 
   const { screen, params } = parseDeepLink(url);
 
-  if (screen && navigation.isReady()) {
+  // Check if navigation is ready (if method exists) or assume ready
+  const isReady =
+    'isReady' in navigation && typeof navigation.isReady === 'function'
+      ? navigation.isReady()
+      : true;
+
+  if (screen && isReady) {
     // Type assertion needed for dynamic navigation with parsed params
     // @ts-expect-error - Navigation params are validated by parseDeepLink
     navigation.navigate(screen, params);
