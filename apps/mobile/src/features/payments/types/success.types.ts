@@ -13,4 +13,5 @@ export type SuccessType =
   | 'proof_uploaded'
   | 'proof_approved'
   | 'profile_complete'
+  | 'review'
   | 'generic';

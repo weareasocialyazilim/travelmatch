@@ -57,7 +57,7 @@ export const MomentCommentsScreen: React.FC = () => {
   const [text, setText] = useState('');
   const [comments, setComments] = useState<Comment[]>(MOCK_COMMENTS);
 
-  const { momentId, commentCount = comments.length } = route.params || {};
+  const { momentId: _momentId, commentCount = comments.length } = route.params || {};
 
   const handleSend = () => {
     if (!text.trim()) return;
@@ -119,7 +119,7 @@ export const MomentCommentsScreen: React.FC = () => {
           <Ionicons name="close" size={24} color="white" />
         </TouchableOpacity>
         <Text style={styles.title}>Comments ({commentCount})</Text>
-        <View style={{ width: 24 }} />
+        <View style={styles.headerSpacer} />
       </View>
 
       <FlatList
@@ -278,6 +278,9 @@ const styles = StyleSheet.create({
   },
   sendBtnDisabled: {
     opacity: 0.5,
+  },
+  headerSpacer: {
+    width: 24,
   },
 });
 

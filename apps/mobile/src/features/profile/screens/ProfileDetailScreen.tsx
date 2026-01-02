@@ -167,7 +167,7 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
     } else if (action === 'block') {
       Alert.alert(
         'User Blocked',
-        `You have blocked ${user.name}. You won't see their content anymore.`,
+        `You have blocked ${user?.name ?? 'this user'}. You won't see their content anymore.`,
         [
           {
             text: 'OK',
