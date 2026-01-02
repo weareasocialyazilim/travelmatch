@@ -25,7 +25,7 @@ export const SessionExpiredScreen = ({ navigation }: any) => {
         Please sign in again to continue your journey.
       </Text>
 
-      <TouchableOpacity onPress={handleLogin} style={{ width: '100%' }}>
+      <TouchableOpacity onPress={handleLogin} style={styles.touchable}>
         <LinearGradient
           colors={[COLORS.brand.primary, COLORS.brand.secondary]}
           start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
@@ -40,6 +40,7 @@ export const SessionExpiredScreen = ({ navigation }: any) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background.primary, alignItems: 'center', justifyContent: 'center', padding: 30 },
+  touchable: { width: '100%' },
   iconCircle: { width: 120, height: 120, borderRadius: 60, backgroundColor: COLORS.brand.primary, alignItems: 'center', justifyContent: 'center', marginBottom: 30 },
   title: { fontSize: 28, fontWeight: '900', color: 'white', marginBottom: 12 },
   desc: { color: COLORS.text.secondary, textAlign: 'center', fontSize: 16, lineHeight: 24, marginBottom: 50 },
