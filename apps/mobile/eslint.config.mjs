@@ -130,6 +130,10 @@ export default tseslint.config(
       '**/*.spec.tsx',
     ],
     languageOptions: {
+      parserOptions: {
+        project: './tsconfig.test.json',
+        tsconfigRootDir: __dirname,
+      },
       globals: {
         jest: 'readonly',
         describe: 'readonly',
