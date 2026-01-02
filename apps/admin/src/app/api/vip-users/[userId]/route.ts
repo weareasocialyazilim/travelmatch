@@ -16,7 +16,7 @@ import { getAdminSession, hasPermission } from '@/lib/auth';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const session = await getAdminSession();
@@ -28,7 +28,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Yetersiz yetki' }, { status: 403 });
     }
 
-    const { userId } = params;
+    const { userId } = await params;
 
     if (!userId) {
       return NextResponse.json(
@@ -42,7 +42,7 @@ export async function DELETE(
     // Remove VIP status using admin function
     const { data, error } = await supabase.rpc('admin_remove_user_vip', {
       p_user_id: userId,
-      p_removed_by: session.user.id,
+      p_removed_by: session.admin.id,
     });
 
     if (error) {
@@ -66,7 +66,7 @@ export async function DELETE(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const session = await getAdminSession();
@@ -78,7 +78,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Yetersiz yetki' }, { status: 403 });
     }
 
-    const { userId } = params;
+    const { userId } = await params;
     const body = await request.json();
 
     if (!userId) {
