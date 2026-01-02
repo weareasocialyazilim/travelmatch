@@ -546,5 +546,34 @@
   },
   "tagline": {
     "main": "Anları paylaş, deneyimleri hediye et"
+  },
+  "screens": {
+    "linkInvalid": {
+      "title": "Geçersiz Link",
+      "defaultMessage": "Bu link geçersiz",
+      "description": "Link hatalı veya bozuk görünüyor. Lütfen linki kontrol edip tekrar deneyin.",
+      "goHome": "Ana Sayfaya Dön",
+      "infoHint": "Eğer bu linki bir bildirim veya mesajdan aldıysanız, lütfen kaynağı kontrol edin."
+    },
+    "linkExpired": {
+      "title": "Link Süresi Doldu",
+      "description": "Bu linkin süresi dolmuş ve artık geçerli değil.",
+      "goHome": "Ana Sayfaya Dön"
+    },
+    "sessionExpired": {
+      "title": "Oturum Süresi Doldu",
+      "description": "Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.",
+      "login": "Tekrar Giriş Yap"
+    },
+    "forceUpdate": {
+      "title": "Güncelleme Gerekli",
+      "description": "TravelMatch'in yeni bir sürümü mevcut. Devam etmek için lütfen güncelleyin.",
+      "update": "Şimdi Güncelle"
+    },
+    "notFound": {
+      "title": "Sayfa Bulunamadı",
+      "description": "Aradığınız sayfa mevcut değil.",
+      "goHome": "Ana Sayfaya Dön"
+    }
   }
 }
