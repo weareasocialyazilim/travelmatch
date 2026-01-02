@@ -175,10 +175,10 @@ export const TMPill: React.FC<TMPillProps> = ({
         style={[
           styles.pill,
           sizeStyles[size],
+          effectiveVariant === 'outlined' ? styles.pillOutlined : styles.pillNotOutlined,
           {
             backgroundColor: getBackgroundColor(),
             borderColor: getBorderColor(),
-            borderWidth: effectiveVariant === 'outlined' ? 1 : 0,
           },
           disabled && styles.disabled,
           style,
@@ -201,10 +201,10 @@ export const TMPill: React.FC<TMPillProps> = ({
       style={[
         styles.pill,
         sizeStyles[size],
+        effectiveVariant === 'outlined' ? styles.pillOutlined : styles.pillNotOutlined,
         {
           backgroundColor: getBackgroundColor(),
           borderColor: getBorderColor(),
-          borderWidth: effectiveVariant === 'outlined' ? 1 : 0,
         },
         disabled && styles.disabled,
         animatedStyle,
@@ -249,6 +249,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: RADIUS.chip,
     gap: SPACING.xs,
+  },
+  pillOutlined: {
+    borderWidth: 1,
+  },
+  pillNotOutlined: {
+    borderWidth: 0,
   },
   text: {
     textAlign: 'center',
