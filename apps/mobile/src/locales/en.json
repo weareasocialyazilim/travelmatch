@@ -147,7 +147,17 @@
     "notVerified": "Not Verified",
     "memberSince": "Member since {{date}}",
     "reviews": "Reviews",
-    "rating": "Rating"
+    "rating": "Rating",
+    "moments": {
+      "noActive": "No active moments yet",
+      "noPast": "No past moments"
+    },
+    "saved": {
+      "empty": {
+        "title": "No Saved Vibes Yet",
+        "subtitle": "Tap the heart icon on moments you'd like to save for later."
+      }
+    }
   },
   "settings": {
     "settings": "Settings",
@@ -507,9 +517,17 @@
     },
     "addDetails": "Add details (optional)",
     "detailsPlaceholder": "Please provide more information...",
+    "details": {
+      "placeholder": "Provide more context about your report..."
+    },
     "sendReport": "Send Report",
     "reportSubmitted": "Report Submitted",
     "thankYou": "Thank you for reporting. We will review this."
+  },
+  "review": {
+    "details": {
+      "placeholder": "Share details of your experience..."
+    }
   },
   "trust": {
     "factors": {
@@ -567,7 +585,20 @@
   },
   "messages": {
     "offline": "Internet connection required to view messages",
-    "cached": "Showing last loaded messages"
+    "cached": "Showing last loaded messages",
+    "empty": {
+      "title": "No Messages Yet",
+      "description": "When you connect with travelers or hosts, your conversations will appear here."
+    },
+    "search": {
+      "placeholder": "Search conversations..."
+    },
+    "archived": {
+      "empty": "No archived chats"
+    },
+    "input": {
+      "placeholder": "Message..."
+    }
   },
   "wishCard": {
     "approximately": "approximately"

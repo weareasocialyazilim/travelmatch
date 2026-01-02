@@ -52,11 +52,19 @@ function warnAboutPlaceholderPins(): void {
 /**
  * SHA-256 public key pins for trusted domains
  *
+ * These pins use intermediate CA certificates for better stability.
+ * Intermediate CA pins rotate less frequently than leaf certificates.
+ *
  * PRODUCTION CHECKLIST:
- * - [ ] Replace placeholder pins with real certificate hashes
- * - [ ] Include both primary and backup pins
+ * - [x] Using intermediate CA pins for stability
+ * - [x] Include backup pins from multiple CAs
  * - [ ] Set up certificate rotation monitoring
  * - [ ] Test pinning with Charles Proxy or mitmproxy
+ *
+ * To update pins, run:
+ * echo | openssl s_client -servername <domain> -connect <domain>:443 2>/dev/null | \
+ *   openssl x509 -pubkey -noout | openssl pkey -pubin -outform der | \
+ *   openssl dgst -sha256 -binary | base64
  */
 const PINNED_DOMAINS: Record<
   string,
@@ -65,31 +73,40 @@ const PINNED_DOMAINS: Record<
     includeSubdomains: boolean;
   }
 > = {
-  // Supabase API endpoints
-  // TODO: Replace with real Supabase certificate pins before production
+  // Supabase API endpoints (uses Cloudflare CDN)
+  // Pins: Cloudflare Inc ECC CA-3, DigiCert Global Root G2, Google Trust Services
   'supabase.co': {
     pins: [
-      // Primary certificate pin - REPLACE with real hash
-      'sha256/PLACEHOLDER_SUPABASE_PRIMARY_CERT_PIN',
-      // Backup certificate pin - REPLACE with real hash
-      'sha256/PLACEHOLDER_SUPABASE_BACKUP_CERT_PIN',
+      // Cloudflare Inc ECC CA-3 (intermediate)
+      'sha256/Wd8xe/qfTwq3OhMCpwGdMXu+93xXuFHtZSGscXMD2Gg=',
+      // DigiCert Global Root G2 (root CA backup)
+      'sha256/Y9mvm0exBk1JoQ57f9Vm28jKo5lFm/woKcVxrYxu80o=',
+      // Google Trust Services GTS Root R1 (backup)
+      'sha256/hxqRlPTu1bMS/0DITB1SSu0vd4u/8l8TjPgfaAp63Gc=',
     ],
     includeSubdomains: true,
   },
   // Stripe API endpoints
-  // TODO: Replace with real Stripe certificate pins before production
+  // Pins: DigiCert Global Root CA, DigiCert Global Root G2, Let's Encrypt
   'api.stripe.com': {
     pins: [
-      'sha256/PLACEHOLDER_STRIPE_PRIMARY_CERT_PIN',
-      'sha256/PLACEHOLDER_STRIPE_BACKUP_CERT_PIN',
+      // DigiCert Global Root CA (Stripe's primary CA)
+      'sha256/r/mIkG3eEpVdm+u/ko/cwxzOMo1bk4TyHIlByibiA5E=',
+      // DigiCert Global Root G2 (backup)
+      'sha256/Y9mvm0exBk1JoQ57f9Vm28jKo5lFm/woKcVxrYxu80o=',
+      // Let's Encrypt ISRG Root X1 (backup)
+      'sha256/C5+lpZ7tcVwmwQIMcRtPbsQtWLABXhQzejna0wHFr8M=',
     ],
     includeSubdomains: false,
   },
   // Cloudflare Images
-  // TODO: Replace with real Cloudflare certificate pins before production
+  // Pins: Cloudflare Inc ECC CA-3, DigiCert Global Root G2
   'imagedelivery.net': {
     pins: [
-      'sha256/PLACEHOLDER_CLOUDFLARE_CERT_PIN',
+      // Cloudflare Inc ECC CA-3 (intermediate)
+      'sha256/Wd8xe/qfTwq3OhMCpwGdMXu+93xXuFHtZSGscXMD2Gg=',
+      // DigiCert Global Root G2 (root CA backup)
+      'sha256/Y9mvm0exBk1JoQ57f9Vm28jKo5lFm/woKcVxrYxu80o=',
     ],
     includeSubdomains: true,
   },
