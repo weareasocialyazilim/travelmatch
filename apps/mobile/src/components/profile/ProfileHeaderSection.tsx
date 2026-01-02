@@ -46,6 +46,8 @@ import { SPRINGS } from '../../hooks/useAnimations';
 interface UserShape {
   id?: string;
   name?: string;
+  username?: string;
+  bio?: string;
   avatar?: string;
   location?: { city?: string; country?: string } | string;
   kyc?: boolean;
@@ -60,6 +62,8 @@ interface ProfileHeaderSectionProps {
   user?: UserShape;
   avatarUrl?: string;
   userName?: string;
+  username?: string;
+  bio?: string;
   location?: string | { city?: string; country?: string };
   isVerified?: boolean;
   trustScore?: number;
@@ -121,6 +125,19 @@ const AnimatedTrustRing: React.FC<AnimatedTrustRingProps> = ({
 
   return (
     <View style={[styles.trustRingContainer, { width: size, height: size }]}>
+      {/* Neon Glow Effect - Outer */}
+      <View
+        style={[
+          styles.avatarGlow,
+          {
+            width: size + 20,
+            height: size + 20,
+            borderRadius: (size + 20) / 2,
+            backgroundColor: colors[0],
+          },
+        ]}
+      />
+
       {/* Background Circle */}
       <Svg
         width={size}
@@ -166,8 +183,8 @@ const AnimatedTrustRing: React.FC<AnimatedTrustRingProps> = ({
         {children}
       </View>
 
-      {/* Trust Badge */}
-      <View style={[styles.trustBadge, { backgroundColor: colors[0] }]}>
+      {/* Trust Badge with Neon Glow */}
+      <View style={[styles.trustBadge, styles.trustBadgeGlow, { backgroundColor: colors[0] }]}>
         <Text style={styles.trustBadgeText}>{score}</Text>
       </View>
     </View>
@@ -236,6 +253,8 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
     user,
     avatarUrl,
     userName,
+    username,
+    bio,
     location,
     isVerified,
     trustScore,
@@ -253,6 +272,8 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
     // Normalize values to support both `user` shape and individual props
     const resolvedAvatar = avatarUrl || user?.avatar || '';
     const resolvedName = userName || user?.name || '';
+    const resolvedUsername = username || user?.username || '';
+    const resolvedBio = bio || user?.bio || '';
     const resolvedLocation =
       typeof location === 'string'
         ? location
@@ -348,13 +369,23 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
           <View style={styles.nameRow}>
             <Text style={styles.userName}>{resolvedName}</Text>
             {resolvedVerified && (
-              <MaterialCommunityIcons
-                name="check-decagram"
-                size={22}
-                color={COLORS.trust.primary}
-              />
+              <View style={styles.verifiedBadgeContainer}>
+                <MaterialCommunityIcons
+                  name="check-decagram"
+                  size={24}
+                  color={COLORS.primary}
+                />
+              </View>
             )}
           </View>
+
+          {resolvedUsername && (
+            <Text style={styles.usernameText}>{resolvedUsername}</Text>
+          )}
+
+          {resolvedBio && (
+            <Text style={styles.bioText}>{resolvedBio}</Text>
+          )}
 
           {resolvedLocation && (
             <View style={styles.locationRow}>
@@ -473,6 +504,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
   },
+  avatarGlow: {
+    position: 'absolute',
+    opacity: 0.25,
+    // Neon glow effect
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 20,
+  },
   avatarWrapper: {
     position: 'absolute',
     borderRadius: 100,
@@ -497,6 +537,14 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: PALETTE.white,
   },
+  trustBadgeGlow: {
+    // Neon glow on badge
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 8,
+    elevation: 4,
+  },
   trustBadgeText: {
     ...TYPE_SCALE.label.small,
     color: PALETTE.white,
@@ -516,6 +564,27 @@ const styles = StyleSheet.create({
   userName: {
     ...TYPE_SCALE.display.h2,
     color: PALETTE.white,
+  },
+  verifiedBadgeContainer: {
+    // Neon glow on verified badge
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
+  },
+  usernameText: {
+    ...TYPE_SCALE.body.base,
+    color: COLORS.primary,
+    marginTop: 4,
+    fontWeight: '600',
+  },
+  bioText: {
+    ...TYPE_SCALE.body.small,
+    color: 'rgba(255,255,255,0.8)',
+    textAlign: 'center',
+    marginTop: 12,
+    lineHeight: 20,
+    paddingHorizontal: 20,
   },
   locationRow: {
     flexDirection: 'row',
