@@ -114,3 +114,8 @@ export { BlurFilterModal } from './BlurFilterModal';
 // ═══════════════════════════════════════════════════════════════════
 export { GlassModal } from './GlassModal';
 export type { GlassModalProps } from './GlassModal';
+
+// ═══════════════════════════════════════════════════════════════════
+// Glass Components (iOS 26 Liquid Glass)
+// ═══════════════════════════════════════════════════════════════════
+export { GlassCard, GlassView, GlassButton } from './GlassCard';
