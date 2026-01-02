@@ -50,8 +50,8 @@ export async function GET(request: NextRequest) {
       .select(
         `
         *,
-        sender:profiles!transactions_sender_id_fkey(id, display_name, avatar_url, email),
-        receiver:profiles!transactions_receiver_id_fkey(id, display_name, avatar_url, email),
+        sender:users!transactions_sender_id_fkey(id, display_name, avatar_url, email),
+        receiver:users!transactions_receiver_id_fkey(id, display_name, avatar_url, email),
         moment:moments(id, title)
       `,
         { count: 'exact' }

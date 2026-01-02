@@ -307,33 +307,35 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
       }
 
       // 3. Create proof_verifications record
-      // NOTE: The actual table schema may differ from TypeScript types
+      // NOTE: The actual table schema may differ from generated TypeScript types
       // This uses runtime insertion - schema validation happens at database level
+      const proofInsertData = {
+        user_id: user.id,
+        moment_id: momentId || '',
+        photo_urls: uploadedPhotoUrls,
+        ticket_url: ticketUrl,
+        location: data.location
+          ? {
+              lat: data.location.lat,
+              lng: data.location.lng,
+              name: data.location.name,
+            }
+          : null,
+        title: data.title,
+        description: data.description,
+        proof_type: data.type,
+        status: 'pending_review',
+        submitted_at: new Date().toISOString(),
+        // Required fields for AI verification (will be updated later)
+        video_url: uploadedPhotoUrls[0] || '',
+        claimed_location: data.location?.name || '',
+        ai_verified: false,
+        confidence_score: 0,
+      };
+
       const { data: proofRecord, error: proofError } = await supabase
         .from('proof_verifications')
-        .insert({
-          user_id: user.id,
-          moment_id: momentId || '',
-          photo_urls: uploadedPhotoUrls,
-          ticket_url: ticketUrl,
-          location: data.location
-            ? {
-                lat: data.location.lat,
-                lng: data.location.lng,
-                name: data.location.name,
-              }
-            : null,
-          title: data.title,
-          description: data.description,
-          proof_type: data.type,
-          status: 'pending_review',
-          submitted_at: new Date().toISOString(),
-          // Required fields for AI verification (will be updated later)
-          video_url: uploadedPhotoUrls[0] || '',
-          claimed_location: data.location?.name || '',
-          ai_verified: false,
-          confidence_score: 0,
-        } as never)
+        .insert(proofInsertData as Record<string, unknown>)
         .select('id')
         .single();
 

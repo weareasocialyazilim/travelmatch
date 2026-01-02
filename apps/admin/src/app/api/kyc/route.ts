@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       .select(
         `
         *,
-        user:profiles!kyc_submissions_user_id_fkey(
+        user:users!kyc_submissions_user_id_fkey(
           id,
           display_name,
           avatar_url,
@@ -58,27 +58,27 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('KYC query error:', error);
-      // If table doesn't exist, query profiles for KYC status
-      const profilesQuery = supabase
-        .from('profiles')
+      // If table doesn't exist, query users for KYC status
+      const usersQuery = supabase
+        .from('users')
         .select('id, display_name, avatar_url, email, phone, kyc_status, kyc_submitted_at, kyc_reviewed_at, created_at', { count: 'exact' })
         .order('created_at', { ascending: false })
         .range(offset, offset + limit - 1);
 
       if (status === 'pending') {
-        profilesQuery.eq('kyc_status', 'pending');
+        usersQuery.eq('kyc_status', 'pending');
       } else if (status) {
-        profilesQuery.eq('kyc_status', status);
+        usersQuery.eq('kyc_status', status);
       }
 
-      const { data: profiles, count: profileCount, error: profileError } = await profilesQuery;
+      const { data: users, count: userCount, error: userError } = await usersQuery;
 
-      if (profileError) {
+      if (userError) {
         return NextResponse.json({ error: 'KYC verileri yüklenemedi' }, { status: 500 });
       }
 
       return NextResponse.json({
-        submissions: profiles?.map(p => ({
+        submissions: users?.map(p => ({
           id: p.id,
           user_id: p.id,
           status: p.kyc_status,
@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
             phone: p.phone,
           },
         })),
-        total: profileCount || 0,
+        total: userCount || 0,
         limit,
         offset,
       });
@@ -156,9 +156,9 @@ export async function PUT(request: NextRequest) {
 
     const supabase = createServiceClient();
 
-    // Get current user profile
+    // Get current user data
     const { data: profile, error: fetchError } = await supabase
-      .from('profiles')
+      .from('users')
       .select('*')
       .eq('id', user_id)
       .single();
@@ -184,7 +184,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const { data: updated, error: updateError } = await supabase
-      .from('profiles')
+      .from('users')
       .update(updates)
       .eq('id', user_id)
       .select()

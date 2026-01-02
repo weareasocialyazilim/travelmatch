@@ -83,7 +83,7 @@ export async function extractUserFeatures(
 ): Promise<UserFeatures> {
   // Get user profile - SECURITY: explicit column selection
   const { data: profile } = await supabase
-    .from('profiles')
+    .from('users')
     .select('id, created_at, kyc_status, trust_score, last_active_at')
     .eq('id', userId)
     .single();

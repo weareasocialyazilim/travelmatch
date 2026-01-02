@@ -45,11 +45,11 @@ export async function GET(request: NextRequest) {
       pendingTasksResult,
     ] = await Promise.all([
       // Total users
-      supabase.from('profiles').select('*', { count: 'exact', head: true }),
+      supabase.from('users').select('*', { count: 'exact', head: true }),
 
       // Active users (last 7 days - more realistic than 24h)
       supabase
-        .from('profiles')
+        .from('users')
         .select('*', { count: 'exact', head: true })
         .gte('last_active_at', sevenDaysAgo),
 
@@ -58,13 +58,13 @@ export async function GET(request: NextRequest) {
 
       // Users 30-60 days ago for growth calculation
       supabase
-        .from('profiles')
+        .from('users')
         .select('*', { count: 'exact', head: true })
         .lte('created_at', thirtyDaysAgo),
 
       // Active users 7-14 days ago
       supabase
-        .from('profiles')
+        .from('users')
         .select('*', { count: 'exact', head: true })
         .gte('last_active_at', fourteenDaysAgo)
         .lte('last_active_at', sevenDaysAgo),
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
 
       // Today's registrations
       supabase
-        .from('profiles')
+        .from('users')
         .select('*', { count: 'exact', head: true })
         .gte('created_at', today),
 
@@ -164,7 +164,7 @@ export async function GET(request: NextRequest) {
     // Get active sessions (users active in last 15 minutes as approximation)
     const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000).toISOString();
     const activeSessionsResult = await supabase
-      .from('profiles')
+      .from('users')
       .select('*', { count: 'exact', head: true })
       .gte('last_active_at', fifteenMinutesAgo);
 
