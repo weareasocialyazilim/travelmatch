@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation, CommonActions } from '@react-navigation/native';
 import { COLORS } from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -19,7 +20,8 @@ const INTERESTS = [
   { id: 'gaming', label: 'Gaming 🎮' },
 ];
 
-export const InterestSelectionScreen = ({ navigation }: any) => {
+export const InterestSelectionScreen = () => {
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [selected, setSelected] = useState<string[]>([]);
 
