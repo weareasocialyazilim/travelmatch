@@ -6,7 +6,7 @@ import { COLORS } from '@/constants/colors';
 export const NotFoundScreen = ({ navigation }: any) => {
   return (
     <View style={styles.container}>
-      <MaterialCommunityIcons name="ghost" size={80} color="rgba(255,255,255,0.2)" style={{ marginBottom: 20 }} />
+      <MaterialCommunityIcons name="ghost" size={80} color="rgba(255,255,255,0.2)" style={styles.icon} />
       <Text style={styles.code}>404</Text>
       <Text style={styles.title}>Vibe Not Found</Text>
       <Text style={styles.desc}>
@@ -22,6 +22,7 @@ export const NotFoundScreen = ({ navigation }: any) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background.primary, alignItems: 'center', justifyContent: 'center', padding: 40 },
+  icon: { marginBottom: 20 },
   code: { fontSize: 80, fontWeight: '900', color: 'rgba(255,255,255,0.05)', position: 'absolute', top: 100 },
   title: { fontSize: 28, fontWeight: 'bold', color: 'white', marginBottom: 16 },
   desc: { color: COLORS.text.secondary, textAlign: 'center', fontSize: 16, lineHeight: 24, marginBottom: 40 },
