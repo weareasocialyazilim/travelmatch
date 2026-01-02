@@ -41,7 +41,7 @@ interface ShareMomentBottomSheetProps {
  * <ShareMomentBottomSheet
  *   visible={showShare}
  *   onClose={() => setShowShare(false)}
- *   momentUrl="https://travelmatch.com/moment/123"
+ *   momentUrl="https://travelmatch.app/moment/123"
  *   momentTitle="Amazing coffee experience!"
  * />
  * ```
@@ -49,7 +49,7 @@ interface ShareMomentBottomSheetProps {
 export const ShareMomentBottomSheet: React.FC<ShareMomentBottomSheetProps> = ({
   visible,
   onClose,
-  momentUrl = 'https://travelmatch.com/moment/123',
+  momentUrl = 'https://travelmatch.app/moment/123',
   momentTitle = 'Check out this amazing travel moment!',
 }) => {
   const { showToast } = useToast();
