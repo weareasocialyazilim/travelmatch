@@ -19,6 +19,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '../constants/colors';
+import { logger } from '../utils/logger';
 
 // Color aliases for easier use
 const colors = {
@@ -95,7 +96,8 @@ export const ReportModal: React.FC<ReportModalProps> = ({
 
       showToast('Şikayetiniz başarıyla gönderildi', 'success');
       handleClose();
-    } catch {
+    } catch (err) {
+      logger.error('[ReportModal] Failed to submit report', { targetType, targetId, reason: selectedReason, error: err });
       showToast('Şikayetiniz gönderilemedi. Lütfen tekrar deneyin', 'error');
     } finally {
       setLoading(false);

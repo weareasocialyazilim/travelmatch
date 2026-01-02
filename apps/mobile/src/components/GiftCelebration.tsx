@@ -16,6 +16,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { logger } from '../utils/logger';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import Animated, {
@@ -127,8 +128,9 @@ export const GiftCelebration: React.FC<GiftCelebrationProps> = ({
         message,
         title: 'TravelMatch ile Hediye Ettim!',
       });
-    } catch {
-      // User cancelled or error - silently ignore
+    } catch (err) {
+      // User cancelled sharing - log but don't show error to user
+      logger.debug('[GiftCelebration] Share cancelled or failed', { error: err });
     }
   }, [onShare, recipientName, momentTitle]);
 
