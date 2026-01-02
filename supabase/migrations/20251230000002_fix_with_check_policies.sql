@@ -84,13 +84,13 @@ BEGIN
     DROP POLICY IF EXISTS "cache_invalidation_service_only" ON cache_invalidation;
 
     -- Create policy with validation for inserts
+    -- Note: Using actual column names from the table (cache_key, not table_name)
     CREATE POLICY "cache_invalidation_service_validated" ON cache_invalidation
       FOR ALL TO service_role
       USING (true)
       WITH CHECK (
         -- Required fields for cache invalidation
-        table_name IS NOT NULL AND
-        record_id IS NOT NULL
+        cache_key IS NOT NULL
       );
 
     RAISE NOTICE '✅ cache_invalidation: Policy updated with validation';

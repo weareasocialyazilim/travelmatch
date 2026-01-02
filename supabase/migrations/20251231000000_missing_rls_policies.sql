@@ -127,10 +127,11 @@ BEGIN
       RAISE NOTICE '✅ user_limits: RLS enabled';
     END IF;
 
-    -- Users can only read their own limits
+    -- user_limits is a config table (no user_id column)
+    -- All authenticated users can read active limits
     DROP POLICY IF EXISTS "user_limits_read_own" ON public.user_limits;
-    CREATE POLICY "user_limits_read_own" ON public.user_limits
-      FOR SELECT TO authenticated USING (auth.uid() = user_id);
+    CREATE POLICY "user_limits_read_authenticated" ON public.user_limits
+      FOR SELECT TO authenticated USING (is_active = true);
 
     -- Service role full access for management
     DROP POLICY IF EXISTS "user_limits_service_role_all" ON public.user_limits;

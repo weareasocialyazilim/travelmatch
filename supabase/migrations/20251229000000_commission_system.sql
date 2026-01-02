@@ -603,11 +603,19 @@ CREATE POLICY "Users can view own commission ledger"
   TO authenticated
   USING (auth.uid() IN (giver_id, receiver_id));
 
--- Gifts - parties can view own
-CREATE POLICY "Users can view own gifts"
-  ON gifts FOR SELECT
-  TO authenticated
-  USING (auth.uid() IN (giver_id, receiver_id));
+-- Gifts - parties can view own (skip if already exists from earlier migration)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'gifts' AND policyname = 'Users can view own gifts'
+  ) THEN
+    CREATE POLICY "Users can view own gifts"
+      ON gifts FOR SELECT
+      TO authenticated
+      USING (auth.uid() IN (giver_id, receiver_id));
+  END IF;
+END $$;
 
 -- ============================================
 -- 10. GRANTS

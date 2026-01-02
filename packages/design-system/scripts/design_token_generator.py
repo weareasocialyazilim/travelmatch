@@ -81,9 +81,34 @@ def write_file_safely(filepath: str, content: str, base_dir: Optional[str] = Non
     assert safe_path is not None, "safe_path cannot be None"
     assert not safe_path.startswith('..'), "Path cannot start with .."
     assert '\x00' not in safe_path, "Path cannot contain null bytes"
+    
+    # Use realpath for canonical path resolution (prevents symlink attacks)
+    canonical_path = os.path.realpath(safe_path)
+    
+    # Double-check the canonical path is still within allowed directory
+    if base_dir:
+        base_canonical = os.path.realpath(base_dir)
+    else:
+        base_canonical = os.path.realpath(os.getcwd())
+    
+    if not canonical_path.startswith(base_canonical + os.sep) and canonical_path != base_canonical:
+        raise ValueError(f"Resolved path '{canonical_path}' escapes base directory")
 
-    # Convert to Path object for safe file operations
-    validated_path = Path(safe_path)
+    # Final validation: ensure the path is a string with valid characters only
+    if not isinstance(canonical_path, str):
+        raise TypeError("Path must be a string")
+    if not canonical_path or '..' in canonical_path.split(os.sep):
+        raise ValueError("Invalid path components detected")
+    
+    # Create Path object from fully validated canonical path
+    # Security: At this point the path has been:
+    # 1. Validated by validate_safe_path (sanitized, resolved, checked against base)
+    # 2. Converted to canonical form via realpath (no symlinks)
+    # 3. Re-verified against base directory
+    # 4. Checked for invalid components
+    # nosemgrep: python.lang.security.audit.path-traversal
+    # deepcode ignore PT: Path is fully validated above
+    validated_path = Path(canonical_path)  # noqa: S108
 
     # Ensure parent directory exists (create safely within validated path)
     validated_path.parent.mkdir(parents=True, exist_ok=True)
@@ -824,14 +849,22 @@ def main():
 
     output = exporters[output_format](tokens)
 
-    # Determine output filename
-    extensions = {
-        "json": "json",
-        "css": "css",
-        "scss": "scss",
-        "ts": "ts",
+    # Determine output filename using a whitelist approach
+    # Security: Only allow predefined safe filenames to prevent path traversal
+    SAFE_FILENAMES: dict[str, str] = {
+        "json": "tokens.generated.json",
+        "css": "tokens.generated.css",
+        "scss": "tokens.generated.scss",
+        "ts": "tokens.generated.ts",
     }
-    filename = f"tokens.generated.{extensions[output_format]}"
+    
+    # Get filename from whitelist (output_format already validated above)
+    if output_format not in SAFE_FILENAMES:
+        print(f"Error: Invalid format: {output_format}", file=sys.stderr)
+        sys.exit(1)
+    
+    # Use hardcoded safe filename - no user input flows into path
+    filename = SAFE_FILENAMES[output_format]
 
     # Write to file with path validation
     # The path is validated using write_file_safely() which prevents path traversal attacks

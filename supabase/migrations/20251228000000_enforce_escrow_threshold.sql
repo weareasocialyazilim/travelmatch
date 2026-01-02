@@ -165,10 +165,3 @@ EXCEPTION
     RAISE EXCEPTION 'Transfer failed: %', SQLERRM;
 END;
 $$;
-
--- Add comment documenting the security feature
-COMMENT ON FUNCTION public.atomic_transfer IS
-'Atomic fund transfer with escrow threshold enforcement.
-Amounts >= $100 are BLOCKED and must use create_escrow_transaction.
-Amounts $30-$100 trigger a NOTICE log but proceed.
-Amounts < $30 proceed normally as direct transfers.';

@@ -6,10 +6,8 @@
 -- Uses FOR UPDATE locks to prevent race conditions
 -- ============================================
 
--- Drop existing function if exists
-DROP FUNCTION IF EXISTS public.atomic_transfer(UUID, UUID, DECIMAL, UUID, TEXT);
-
 -- Create atomic transfer function with proper locking
+-- (CREATE OR REPLACE handles existing function automatically)
 CREATE OR REPLACE FUNCTION public.atomic_transfer(
   p_sender_id UUID,
   p_recipient_id UUID,
@@ -148,9 +146,3 @@ EXCEPTION
     );
 END;
 $$;
-
--- Grant execute permission to authenticated users
-GRANT EXECUTE ON FUNCTION public.atomic_transfer TO authenticated;
-
--- Add comment for documentation
-COMMENT ON FUNCTION public.atomic_transfer IS 'Atomically transfers funds between two users with FOR UPDATE locks to prevent race conditions. Returns JSON with success status, transaction_id, and new balances.';

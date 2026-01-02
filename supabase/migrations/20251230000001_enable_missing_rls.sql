@@ -67,7 +67,7 @@ BEGIN
   END IF;
 END $$;
 
--- user_limits - Per-user limits (users can only read their own)
+-- user_limits - Global limit configuration (all authenticated can read)
 DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'public' AND tablename = 'user_limits') THEN
@@ -77,9 +77,11 @@ BEGIN
       RAISE NOTICE '✅ user_limits: RLS enabled';
     END IF;
 
+    -- Note: user_limits is a config table without user_id column
+    -- All authenticated users can read active limits
     DROP POLICY IF EXISTS "Users read own limits" ON user_limits;
-    CREATE POLICY "Users read own limits" ON user_limits
-      FOR SELECT TO authenticated USING (auth.uid() = user_id);
+    CREATE POLICY "Authenticated can read limits" ON user_limits
+      FOR SELECT TO authenticated USING (is_active = true);
 
     DROP POLICY IF EXISTS "Service role manages user limits" ON user_limits;
     CREATE POLICY "Service role manages user limits" ON user_limits

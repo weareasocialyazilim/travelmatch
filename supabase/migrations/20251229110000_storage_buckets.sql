@@ -123,17 +123,9 @@ USING (
   AND auth.uid()::text = (storage.foldername(name))[1]
 );
 
-DROP POLICY IF EXISTS "Users involved in escrow can view proofs" ON storage.objects;
-CREATE POLICY "Users involved in escrow can view proofs"
-ON storage.objects FOR SELECT
-USING (
-  bucket_id = 'proofs'
-  AND EXISTS (
-    SELECT 1 FROM escrow_transactions et
-    WHERE et.proof_photos @> ARRAY[storage.filename(name)]
-    AND (et.sender_id = auth.uid() OR et.receiver_id = auth.uid())
-  )
-);
+-- Note: "Users involved in escrow can view proofs" policy removed
+-- escrow_transactions table doesn't have proof_photos column
+-- Proofs are linked via metadata jsonb field instead
 
 DROP POLICY IF EXISTS "Users can upload proofs" ON storage.objects;
 CREATE POLICY "Users can upload proofs"
@@ -179,7 +171,7 @@ USING (
     OR EXISTS (
       SELECT 1 FROM conversations c
       WHERE c.id::text = (storage.foldername(name))[2]
-      AND auth.uid() = ANY(c.participants)
+      AND auth.uid() = ANY(c.participant_ids)
     )
   )
 );
@@ -313,15 +305,17 @@ WITH CHECK (
 );
 
 -- Admin can view all KYC documents (for verification)
+-- Using service role check - admins should use service role for KYC verification
 DROP POLICY IF EXISTS "Admins can view all KYC documents" ON storage.objects;
 CREATE POLICY "Admins can view all KYC documents"
 ON storage.objects FOR SELECT
 USING (
   bucket_id = 'kyc-documents'
-  AND EXISTS (
-    SELECT 1 FROM users u
-    WHERE u.id = auth.uid()
-    AND u.role = 'admin'
+  AND (
+    -- Service role can view all
+    current_setting('role', true) = 'service_role'
+    -- Or user can view their own
+    OR auth.uid()::text = (storage.foldername(name))[1]
   )
 );
 

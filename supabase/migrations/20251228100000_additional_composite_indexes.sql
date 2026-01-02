@@ -8,12 +8,11 @@
 -- CONVERSATIONS & MESSAGES OPTIMIZATION
 -- ===========================================
 
--- Optimize conversation list queries (participant + last message)
-CREATE INDEX IF NOT EXISTS idx_conversations_participant_updated
-ON conversations(participant_1, updated_at DESC);
-
-CREATE INDEX IF NOT EXISTS idx_conversations_participant2_updated
-ON conversations(participant_2, updated_at DESC);
+-- Optimize conversation list queries by updated_at
+-- Note: conversations table uses conversation_participants junction table
+-- so we index on updated_at for efficient sorting
+CREATE INDEX IF NOT EXISTS idx_conversations_updated
+ON conversations(updated_at DESC);
 
 -- Optimize unread message count queries
 CREATE INDEX IF NOT EXISTS idx_messages_conversation_read
@@ -28,19 +27,20 @@ ON messages(sender_id, type) WHERE type = 'text';
 -- ===========================================
 
 -- Optimize moment discovery by location + status
-CREATE INDEX IF NOT EXISTS idx_moments_location_status_created
-ON moments(location_city, status, created_at DESC)
-WHERE status = 'active';
+-- Note: Using 'location' column (not location_city) as per actual schema
+-- This index already exists as idx_moments_location_status, skip
+-- CREATE INDEX IF NOT EXISTS idx_moments_location_status_created
+-- ON moments(location, status, created_at DESC)
+-- WHERE status = 'active';
 
--- Optimize category-based discovery
-CREATE INDEX IF NOT EXISTS idx_moments_category_status_created
-ON moments(category_id, status, created_at DESC)
-WHERE status = 'active';
+-- Optimize category-based discovery  
+-- Note: Using 'category' column (not category_id) as per actual schema
+-- This index already exists as idx_moments_category_date, skip
+-- CREATE INDEX IF NOT EXISTS idx_moments_category_status_created
+-- ON moments(category, status, created_at DESC)
+-- WHERE status = 'active';
 
--- Optimize price range filtering
-CREATE INDEX IF NOT EXISTS idx_moments_price_status
-ON moments(price, status)
-WHERE status = 'active';
+-- Note: idx_moments_price already exists, skip price index
 
 -- Optimize user's active moments lookup
 CREATE INDEX IF NOT EXISTS idx_moments_user_active
@@ -64,23 +64,29 @@ WHERE status IN ('pending', 'processing');
 -- USER & PROFILE OPTIMIZATION
 -- ===========================================
 
+-- Enable pg_trgm extension for fuzzy text search (if not already enabled)
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
 -- Optimize user search by name
 CREATE INDEX IF NOT EXISTS idx_users_name_trgm
 ON users USING GIN (full_name gin_trgm_ops);
 
--- Optimize verified user lookups
-CREATE INDEX IF NOT EXISTS idx_users_kyc_verified
-ON users(is_kyc_verified, created_at DESC)
-WHERE is_kyc_verified = true;
+-- Optimize verified user lookups (kyc_status column)
+-- Note: idx_users_kyc_status already exists
+CREATE INDEX IF NOT EXISTS idx_users_kyc_verified_created
+ON users(kyc_status, created_at DESC)
+WHERE kyc_status = 'verified';
 
 -- ===========================================
 -- NOTIFICATIONS OPTIMIZATION
 -- ===========================================
 
 -- Optimize unread notification queries
-CREATE INDEX IF NOT EXISTS idx_notifications_user_unread
+-- Note: idx_notifications_unread already exists with (user_id, read)
+-- Creating additional index for sorted unread lookups
+CREATE INDEX IF NOT EXISTS idx_notifications_user_unread_sorted
 ON notifications(user_id, created_at DESC)
-WHERE read_at IS NULL;
+WHERE read = false;
 
 -- ===========================================
 -- BOOKINGS & REQUESTS OPTIMIZATION
@@ -90,8 +96,9 @@ WHERE read_at IS NULL;
 CREATE INDEX IF NOT EXISTS idx_bookings_user_status
 ON bookings(user_id, status, created_at DESC);
 
-CREATE INDEX IF NOT EXISTS idx_bookings_moment_status
-ON bookings(moment_id, status);
+-- Optimize trip bookings lookup
+CREATE INDEX IF NOT EXISTS idx_bookings_trip_status
+ON bookings(trip_id, status);
 
 -- Optimize trip request queries
 CREATE INDEX IF NOT EXISTS idx_trip_requests_user_status
@@ -102,12 +109,11 @@ ON trip_requests(user_id, status, created_at DESC);
 -- ===========================================
 
 -- Optimize review aggregation queries
-CREATE INDEX IF NOT EXISTS idx_reviews_target_rating
-ON reviews(target_user_id, rating);
+-- Note: using reviewed_id (not target_user_id), idx_reviews_reviewed_rating already exists
+-- Skip creating duplicate index
 
 -- Trust notes lookup optimization
-CREATE INDEX IF NOT EXISTS idx_trust_notes_target_created
-ON trust_notes(target_user_id, created_at DESC);
+-- Note: trust_notes table doesn't exist in current schema, skip
 
 -- ===========================================
 -- FAVORITES & SAVED OPTIMIZATION

@@ -95,6 +95,9 @@ COMMENT ON FUNCTION refund_expired_escrow() IS 'Automatically refunds expired es
 -- ============================================================
 
 -- Feed delta cleanup (keep last 30 days)
+-- Must DROP first because we're changing the return type (void -> INTEGER)
+DROP FUNCTION IF EXISTS cleanup_old_feed_delta();
+
 CREATE OR REPLACE FUNCTION cleanup_old_feed_delta()
 RETURNS INTEGER
 LANGUAGE plpgsql
@@ -113,6 +116,8 @@ END;
 $$;
 
 -- Deep link events cleanup (keep last 90 days)
+DROP FUNCTION IF EXISTS cleanup_old_deep_link_events();
+
 CREATE OR REPLACE FUNCTION cleanup_old_deep_link_events()
 RETURNS INTEGER
 LANGUAGE plpgsql

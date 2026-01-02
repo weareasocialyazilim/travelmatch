@@ -76,24 +76,19 @@ BEGIN
     DROP POLICY IF EXISTS "reviews_select_policy" ON public.reviews;
 
     -- Optimized policy with cached auth.uid() calls
+    -- reviews table only has: id, moment_id, reviewer_id, reviewed_id, rating, comment, created_at
     CREATE POLICY "reviews_secure_select" ON public.reviews
       FOR SELECT
       USING (
-        -- Only show non-deleted reviews
-        deleted_at IS NULL
-        AND (
-          -- Public reviews (for completed moments)
-          is_public = true
-          -- OR user is the reviewer
-          OR reviewer_id = (SELECT auth.uid())
-          -- OR user is being reviewed
-          OR reviewed_id = (SELECT auth.uid())
-          -- OR review is for a completed moment the user participated in
-          OR EXISTS (
-            SELECT 1 FROM moments m
-            WHERE m.id = reviews.moment_id
-            AND m.status = 'completed'
-          )
+        -- User is the reviewer
+        reviewer_id = (SELECT auth.uid())
+        -- OR user is being reviewed
+        OR reviewed_id = (SELECT auth.uid())
+        -- OR review is for a moment the user owns
+        OR EXISTS (
+          SELECT 1 FROM moments m
+          WHERE m.id = reviews.moment_id
+          AND m.user_id = (SELECT auth.uid())
         )
       );
 

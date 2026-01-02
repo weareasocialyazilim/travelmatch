@@ -27,16 +27,16 @@ CREATE TABLE IF NOT EXISTS commission_tiers (
   total_rate DECIMAL(5, 4) NOT NULL,  -- e.g., 0.10 for 10%
   giver_share DECIMAL(5, 4) NOT NULL DEFAULT 0.70,  -- 70% of commission from giver
   receiver_share DECIMAL(5, 4) NOT NULL DEFAULT 0.30,  -- 30% from receiver
-  description TEXT,
   is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Commission tiers (USD-based thresholds)
-INSERT INTO commission_tiers (name, min_amount, max_amount, total_rate, giver_share, receiver_share, description) VALUES
-  ('low', 0, 30, 0.10, 0.70, 0.30, 'Small gifts: 10% total (7% giver, 3% receiver)'),
-  ('medium', 30, 100, 0.10, 0.70, 0.30, 'Medium gifts: 10% total (7% giver, 3% receiver)'),
-  ('high', 100, NULL, 0.08, 0.70, 0.30, 'Large gifts: 8% total (5.6% giver, 2.4% receiver)')
+-- Note: description column removed as existing table doesn't have it
+INSERT INTO commission_tiers (name, min_amount, max_amount, total_rate, giver_share, receiver_share) VALUES
+  ('low', 0, 30, 0.10, 0.70, 0.30),
+  ('medium', 30, 100, 0.10, 0.70, 0.30),
+  ('high', 100, NULL, 0.08, 0.70, 0.30)
 ON CONFLICT (name) DO UPDATE SET
   min_amount = EXCLUDED.min_amount,
   max_amount = EXCLUDED.max_amount,
@@ -54,15 +54,13 @@ CREATE TABLE IF NOT EXISTS user_commission_settings (
   account_type TEXT NOT NULL DEFAULT 'standard' CHECK (account_type IN ('standard', 'vip', 'influencer', 'exempt')),
   custom_rate DECIMAL(5, 4),  -- Override commission rate
   notes TEXT,
-  is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_user_commission_active
-ON user_commission_settings(user_id, is_active)
-WHERE is_active = TRUE;
+-- Note: idx_user_commission_active index removed as is_active column doesn't exist
+-- Account status is determined by account_type column instead
 
 -- ============================================
 -- 3. COMMISSION LEDGER
