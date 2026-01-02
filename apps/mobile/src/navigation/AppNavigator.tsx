@@ -63,6 +63,9 @@ import {
   DisputeFlowScreen,
   RequestsScreen,
   TicketScreen,
+  TripDetailsScreen,
+  RequestManagerScreen,
+  MyTripsScreen,
 } from '../features/trips';
 
 // ===================================
@@ -78,7 +81,8 @@ import {
 // NEW FEATURE SCREENS
 // ===================================
 import { SearchMapScreen } from '../features/discovery';
-import { InboxScreen, ChatDetailScreen } from '../features/chat';
+import { ChatDetailScreen } from '../features/chat';
+import { InboxScreen } from '../features/inbox';
 // WalletScreen is imported from payments feature, not wallet feature
 // import { WalletScreen as WalletFeatureScreen } from '../features/wallet';
 import { NotificationsScreen } from '../features/notifications';
@@ -178,6 +182,7 @@ const MomentCommentsScreen = lazyLoad(() =>
 import {
   WalletScreen,
   WithdrawScreen,
+  AddMoneyScreen,
   PaymentMethodsScreen,
   AddCardScreen,
   TransactionDetailScreen,
@@ -586,8 +591,9 @@ const AppNavigator = () => {
               component={MesafeliSatisScreen}
             />
 
-            {/* Withdraw */}
+            {/* Withdraw & AddMoney */}
             <Stack.Screen name="Withdraw" component={WithdrawScreen} />
+            <Stack.Screen name="AddMoney" component={AddMoneyScreen} />
 
             {/* Moment Publishing */}
             {/* <Stack.Screen
@@ -669,6 +675,11 @@ const AppNavigator = () => {
 
             {/* Calendar */}
             <Stack.Screen name="MyCalendar" component={MyCalendarScreen} />
+
+            {/* Trips */}
+            <Stack.Screen name="TripDetails" component={TripDetailsScreen} />
+            <Stack.Screen name="RequestManager" component={RequestManagerScreen} />
+            <Stack.Screen name="MyTrips" component={MyTripsScreen} />
 
             {/* Image Viewer */}
             <Stack.Screen
