@@ -71,7 +71,11 @@ export type { OTPInputProps } from './OTPInput';
 // ═══════════════════════════════════════════════════════════════════
 // Trust Score Components
 // ═══════════════════════════════════════════════════════════════════
-export { TrustScoreCircle, TrustScoreRingCompact } from './TrustScoreCircle';
+export {
+  TrustScoreCircle,
+  TrustScoreRingCompact,
+  AwwwardsTrustScoreCircle,
+} from './TrustScoreCircle';
 export type { TrustScoreCircleProps, TrustFactor } from './TrustScoreCircle';
 
 // ═══════════════════════════════════════════════════════════════════
