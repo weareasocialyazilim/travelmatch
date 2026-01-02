@@ -16,7 +16,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { Image } from 'expo-image';
+import { Image as _Image } from 'expo-image';
 import { COLORS } from '@/constants/colors';
 import { usePayments } from '@/hooks/usePayments';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
@@ -439,4 +439,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withErrorBoundary(CheckoutScreen, 'CheckoutScreen');
+export default withErrorBoundary(CheckoutScreen, { displayName: 'CheckoutScreen' });

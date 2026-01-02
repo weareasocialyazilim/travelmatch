@@ -49,7 +49,7 @@ const NOTIFICATIONS = [
 
 type NotificationItem = typeof NOTIFICATIONS[0];
 
-export const NotificationsScreen = ({ navigation }: any) => {
+export const NotificationsScreen = ({ navigation: _navigation }: any) => {
   const insets = useSafeAreaInsets();
   const [notifications, setNotifications] = useState(NOTIFICATIONS);
 

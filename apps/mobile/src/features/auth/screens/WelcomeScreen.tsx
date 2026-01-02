@@ -209,7 +209,7 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
 export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
-  const { socialAuth, isLoading } = useAuth();
+  const { socialAuth, isLoading: _isLoading } = useAuth();
 
   const titleOpacity = useSharedValue(0);
   const subtitleOpacity = useSharedValue(0);
