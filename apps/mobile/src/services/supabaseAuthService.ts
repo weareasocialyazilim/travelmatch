@@ -6,7 +6,26 @@
 import { auth, supabase, isSupabaseConfigured } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { VALUES } from '../constants/values';
+import { secureStorage, StorageKeys } from '../utils/secureStorage';
 import type { User, Session, AuthError } from '@supabase/supabase-js';
+
+/**
+ * Generate a cryptographically secure random state for CSRF protection
+ */
+const generateOAuthState = (): string => {
+  const array = new Uint8Array(32);
+  // Use crypto.getRandomValues for secure random generation
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    crypto.getRandomValues(array);
+  } else {
+    // Fallback for environments without crypto
+    for (let i = 0; i < array.length; i++) {
+      array[i] = Math.floor(Math.random() * 256);
+    }
+  }
+  // Convert to base64-like string
+  return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('');
+};
 
 export interface AuthResult {
   user: User | null;
@@ -111,6 +130,7 @@ export const signInWithEmail = async (
 
 /**
  * Sign in with OAuth provider (Google, Apple, etc.)
+ * Includes CSRF protection via state parameter
  */
 export const signInWithOAuth = async (
   provider: 'google' | 'apple' | 'facebook',
@@ -124,15 +144,25 @@ export const signInWithOAuth = async (
   }
 
   try {
+    // Generate and store a random state for CSRF protection
+    const state = generateOAuthState();
+    await secureStorage.setItem(StorageKeys.SECURE.OAUTH_STATE, state);
+    logger.debug('[Auth] OAuth state generated and stored');
+
     const { data, error } = await auth.signInWithOAuth({
       provider,
       options: {
         redirectTo: VALUES.DEEP_LINKS.AUTH_CALLBACK,
         skipBrowserRedirect: true,
+        queryParams: {
+          state, // Include state for CSRF protection
+        },
       },
     });
 
     if (error) {
+      // Clean up stored state on error
+      await secureStorage.deleteItem(StorageKeys.SECURE.OAUTH_STATE);
       logger.error('[Auth] OAuth error:', error);
       return { url: null, error };
     }
@@ -140,6 +170,8 @@ export const signInWithOAuth = async (
     logger.info('[Auth] OAuth URL generated for', provider);
     return { url: data.url, error: null };
   } catch (error) {
+    // Clean up stored state on exception
+    await secureStorage.deleteItem(StorageKeys.SECURE.OAUTH_STATE);
     logger.error('[Auth] OAuth exception:', error);
     return { url: null, error: error as AuthError };
   }
@@ -186,7 +218,7 @@ export const getCurrentUser = async (): Promise<User | null> => {
 
 /**
  * Handle OAuth callback from deep link
- * Extracts session from OAuth callback URL
+ * Extracts session from OAuth callback URL and validates state for CSRF protection
  */
 export const handleOAuthCallback = async (
   url: string,
@@ -199,10 +231,32 @@ export const handleOAuthCallback = async (
   }
 
   try {
-    // Extract tokens from URL hash/query
+    // Extract tokens and state from URL hash/query
     // Supabase returns tokens in URL hash after OAuth redirect
     const urlObj = new URL(url);
     const hashParams = new URLSearchParams(urlObj.hash.substring(1));
+    const queryParams = urlObj.searchParams;
+
+    // Validate state parameter for CSRF protection
+    const receivedState = hashParams.get('state') || queryParams.get('state');
+    const storedState = await secureStorage.getItem(StorageKeys.SECURE.OAUTH_STATE);
+
+    // Clean up stored state immediately (one-time use)
+    await secureStorage.deleteItem(StorageKeys.SECURE.OAUTH_STATE);
+
+    if (!receivedState || !storedState || receivedState !== storedState) {
+      logger.error('[Auth] OAuth state validation failed - potential CSRF attack', {
+        hasReceivedState: !!receivedState,
+        hasStoredState: !!storedState,
+        match: receivedState === storedState,
+      });
+      return {
+        session: null,
+        error: { message: 'OAuth state validation failed. Please try again.' } as AuthError,
+      };
+    }
+
+    logger.debug('[Auth] OAuth state validated successfully');
 
     const accessToken = hashParams.get('access_token');
     const refreshToken = hashParams.get('refresh_token');
@@ -229,6 +283,8 @@ export const handleOAuthCallback = async (
     logger.info('[Auth] OAuth session established successfully');
     return { session: data.session, error: null };
   } catch (error) {
+    // Ensure state is cleaned up on any error
+    await secureStorage.deleteItem(StorageKeys.SECURE.OAUTH_STATE);
     logger.error('[Auth] OAuth callback exception:', error);
     return { session: null, error: error as AuthError };
   }

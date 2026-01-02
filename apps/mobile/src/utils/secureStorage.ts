@@ -138,6 +138,7 @@ export const StorageKeys = {
     BIOMETRIC_KEY: securePrefix('biometric_key'),
     PIN_CODE: securePrefix('pin_code'),
     PAYMENT_METHOD: securePrefix('payment_method'),
+    OAUTH_STATE: securePrefix('oauth_state'), // CSRF protection for OAuth
   },
 
   // NON-SENSITIVE - Can use AsyncStorage (public data)

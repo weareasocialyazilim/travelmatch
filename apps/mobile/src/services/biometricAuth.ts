@@ -21,6 +21,7 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import { Platform } from 'react-native';
 import { secureStorage } from '../utils/secureStorage';
 import { logger } from '../utils/logger';
+import { encryptCredentials, decryptCredentials } from '../utils/security';
 
 // Storage keys
 const BIOMETRIC_ENABLED_KEY = 'biometric_auth_enabled';
@@ -267,14 +268,14 @@ class BiometricAuthService {
   /**
    * Save credentials for biometric login
    * Called after successful password login when biometric is enabled
+   * Credentials are encrypted before storage for additional security
    */
   async saveCredentials(credentials: BiometricCredentials): Promise<void> {
     try {
-      await secureStorage.setItem(
-        BIOMETRIC_CREDENTIALS_KEY,
-        JSON.stringify(credentials)
-      );
-      logger.info('BiometricAuth', 'Credentials saved for biometric login');
+      // Encrypt credentials before storing for defense in depth
+      const encryptedData = await encryptCredentials(JSON.stringify(credentials));
+      await secureStorage.setItem(BIOMETRIC_CREDENTIALS_KEY, encryptedData);
+      logger.info('BiometricAuth', 'Encrypted credentials saved for biometric login');
     } catch (error) {
       logger.error('BiometricAuth', 'Failed to save credentials', error);
       throw error;
@@ -284,12 +285,31 @@ class BiometricAuthService {
   /**
    * Get saved credentials for biometric login
    * Returns null if no credentials are saved
+   * Decrypts credentials after retrieval
    */
   async getCredentials(): Promise<BiometricCredentials | null> {
     try {
-      const data = await secureStorage.getItem(BIOMETRIC_CREDENTIALS_KEY);
-      if (!data) return null;
-      return JSON.parse(data) as BiometricCredentials;
+      const encryptedData = await secureStorage.getItem(BIOMETRIC_CREDENTIALS_KEY);
+      if (!encryptedData) return null;
+
+      // Try to decrypt - handles both encrypted and legacy unencrypted formats
+      try {
+        const decryptedData = await decryptCredentials(encryptedData);
+        return JSON.parse(decryptedData) as BiometricCredentials;
+      } catch {
+        // Fallback: try parsing as legacy unencrypted JSON
+        // This handles migration from old unencrypted storage
+        try {
+          const legacyCredentials = JSON.parse(encryptedData) as BiometricCredentials;
+          // Re-save with encryption for future use
+          await this.saveCredentials(legacyCredentials);
+          logger.info('BiometricAuth', 'Migrated legacy credentials to encrypted format');
+          return legacyCredentials;
+        } catch {
+          logger.error('BiometricAuth', 'Failed to parse credentials in any format');
+          return null;
+        }
+      }
     } catch (error) {
       logger.error('BiometricAuth', 'Failed to get credentials', error);
       return null;
