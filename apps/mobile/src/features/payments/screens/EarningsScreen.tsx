@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/theme/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,7 +11,8 @@ const { width } = Dimensions.get('window');
 
 const CHART_DATA = [40, 65, 30, 80, 55, 90, 70]; // Mock data for bar chart
 
-export const EarningsScreen = ({ navigation }: any) => {
+export const EarningsScreen = () => {
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
 
   return (

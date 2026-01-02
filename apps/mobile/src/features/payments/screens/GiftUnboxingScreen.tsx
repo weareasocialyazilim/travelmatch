@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/theme/colors';
 import Animated, {
@@ -15,7 +16,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('window');
 
-export const GiftUnboxingScreen = ({ navigation }: any) => {
+export const GiftUnboxingScreen = () => {
+  const navigation = useNavigation();
   const scale = useSharedValue(0);
   const rotate = useSharedValue(0);
   const opacity = useSharedValue(0);

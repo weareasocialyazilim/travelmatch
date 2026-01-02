@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/theme/colors';
 
-export const RefundRequestScreen = ({ navigation, route }: any) => {
+export const RefundRequestScreen = () => {
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  // route.params?.transactionId normalde burada kullanılır
   const [reason, setReason] = useState('');
 
   const REASONS = [

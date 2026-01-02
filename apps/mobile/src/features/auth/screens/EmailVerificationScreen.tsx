@@ -1,11 +1,13 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Keyboard } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/theme/colors';
 import { LinearGradient } from 'expo-linear-gradient';
 
-export const EmailVerificationScreen = ({ navigation }: any) => {
+export const EmailVerificationScreen = () => {
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [code, setCode] = useState(['', '', '', '']);
   const inputs = useRef<Array<TextInput | null>>([]);

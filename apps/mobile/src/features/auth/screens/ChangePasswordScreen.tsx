@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/theme/colors';
 
-export const ChangePasswordScreen = ({ navigation }: any) => {
+export const ChangePasswordScreen = () => {
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [oldPass, setOldPass] = useState('');
   const [newPass, setNewPass] = useState('');
