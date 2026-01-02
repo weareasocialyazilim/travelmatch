@@ -24,13 +24,14 @@ describe('SkeletonList', () => {
     });
 
     it('should not render when show prop is false initially', () => {
-      const { queryByTestId, toJSON } = render(
+      const { toJSON } = render(
         <SkeletonList type="gift" show={false} />,
       );
       // Component returns null, but render may wrap in container
       // Check that no skeleton items are rendered
       const json = toJSON();
-      expect(json?.children).toBeFalsy();
+      const hasChildren = json && typeof json === 'object' && 'children' in json && json.children;
+      expect(hasChildren).toBeFalsy();
     });
   });
 
@@ -81,7 +82,8 @@ describe('SkeletonList', () => {
       jest.advanceTimersByTime(250);
       const json = toJSON();
       // Component returns null, but render may wrap in container
-      expect(json?.children).toBeFalsy();
+      const hasChildren = json && typeof json === 'object' && 'children' in json && json.children;
+      expect(hasChildren).toBeFalsy();
     });
   });
 });
