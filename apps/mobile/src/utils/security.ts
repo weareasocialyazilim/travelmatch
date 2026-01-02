@@ -1,7 +1,151 @@
 /**
- * Security utilities for input validation and sanitization
+ * Security utilities for input validation, sanitization, and encryption
  * Note: For secure storage, use secureStorage from './secureStorage'
  */
+
+import * as Crypto from 'expo-crypto';
+import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
+
+// Device-specific encryption key storage
+const ENCRYPTION_KEY_STORAGE_KEY = 'device_encryption_key';
+
+/**
+ * Get or generate a device-specific encryption key
+ * This key is stored in secure storage and persists across app launches
+ */
+const getDeviceEncryptionKey = async (): Promise<string> => {
+  try {
+    // Try to get existing key from secure store
+    if (Platform.OS !== 'web') {
+      const existingKey = await SecureStore.getItemAsync(ENCRYPTION_KEY_STORAGE_KEY);
+      if (existingKey) {
+        return existingKey;
+      }
+    }
+
+    // Generate new key if none exists
+    const randomBytes = await Crypto.getRandomBytesAsync(32);
+    const key = Array.from(randomBytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+
+    // Store the key securely
+    if (Platform.OS !== 'web') {
+      await SecureStore.setItemAsync(ENCRYPTION_KEY_STORAGE_KEY, key);
+    }
+
+    return key;
+  } catch {
+    // Fallback to a deterministic key based on timestamp (less secure, but better than nothing)
+    return await Crypto.digestStringAsync(
+      Crypto.CryptoDigestAlgorithm.SHA256,
+      `travelmatch-${Date.now()}-fallback`
+    );
+  }
+};
+
+/**
+ * Encrypt sensitive data using device-specific key
+ * Uses SHA256 for key derivation and XOR-based encryption
+ * @param plaintext - The data to encrypt
+ * @param salt - Optional additional salt for encryption
+ * @returns Encrypted string with salt prefix
+ */
+export const encryptCredentials = async (plaintext: string, salt?: string): Promise<string> => {
+  try {
+    // Get device-specific encryption key
+    const deviceKey = await getDeviceEncryptionKey();
+
+    // Generate random salt if not provided
+    const encryptionSalt = salt || Array.from(
+      await Crypto.getRandomBytesAsync(16),
+      (byte) => byte.toString(16).padStart(2, '0')
+    ).join('');
+
+    // Derive encryption key from device key + salt
+    const derivedKey = await Crypto.digestStringAsync(
+      Crypto.CryptoDigestAlgorithm.SHA256,
+      `${deviceKey}:${encryptionSalt}`
+    );
+
+    // Convert plaintext to bytes
+    const textEncoder = new TextEncoder();
+    const plaintextBytes = textEncoder.encode(plaintext);
+
+    // XOR encryption with derived key
+    const encryptedBytes = new Uint8Array(plaintextBytes.length);
+    for (let i = 0; i < plaintextBytes.length; i++) {
+      const keyIndex = i % (derivedKey.length / 2);
+      const keyByte = parseInt(derivedKey.substr(keyIndex * 2, 2), 16);
+      encryptedBytes[i] = plaintextBytes[i] ^ keyByte;
+    }
+
+    // Convert to hex string
+    const encryptedHex = Array.from(encryptedBytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+
+    // Return salt:encrypted format
+    return `${encryptionSalt}:${encryptedHex}`;
+  } catch {
+    // If encryption fails, return base64 encoded (fallback, less secure)
+    return `plain:${btoa(plaintext)}`;
+  }
+};
+
+/**
+ * Decrypt sensitive data encrypted with encryptCredentials
+ * @param encrypted - The encrypted string (salt:encryptedHex format)
+ * @returns Decrypted plaintext
+ */
+export const decryptCredentials = async (encrypted: string): Promise<string> => {
+  try {
+    const [salt, encryptedHex] = encrypted.split(':');
+
+    // Handle fallback plain encoding
+    if (salt === 'plain') {
+      return atob(encryptedHex);
+    }
+
+    if (!salt || !encryptedHex) {
+      throw new Error('Invalid encrypted format');
+    }
+
+    // Get device-specific encryption key
+    const deviceKey = await getDeviceEncryptionKey();
+
+    // Derive encryption key from device key + salt
+    const derivedKey = await Crypto.digestStringAsync(
+      Crypto.CryptoDigestAlgorithm.SHA256,
+      `${deviceKey}:${salt}`
+    );
+
+    // Convert hex to bytes
+    const encryptedBytes = new Uint8Array(encryptedHex.length / 2);
+    for (let i = 0; i < encryptedBytes.length; i++) {
+      encryptedBytes[i] = parseInt(encryptedHex.substr(i * 2, 2), 16);
+    }
+
+    // XOR decryption with derived key
+    const decryptedBytes = new Uint8Array(encryptedBytes.length);
+    for (let i = 0; i < encryptedBytes.length; i++) {
+      const keyIndex = i % (derivedKey.length / 2);
+      const keyByte = parseInt(derivedKey.substr(keyIndex * 2, 2), 16);
+      decryptedBytes[i] = encryptedBytes[i] ^ keyByte;
+    }
+
+    // Convert bytes to string
+    const textDecoder = new TextDecoder();
+    return textDecoder.decode(decryptedBytes);
+  } catch {
+    // If decryption fails, try treating as plain base64
+    try {
+      if (encrypted.startsWith('plain:')) {
+        return atob(encrypted.substring(6));
+      }
+      return atob(encrypted);
+    } catch {
+      throw new Error('Failed to decrypt credentials');
+    }
+  }
+};
 
 /**
  * Sanitize user input to prevent XSS and injection attacks

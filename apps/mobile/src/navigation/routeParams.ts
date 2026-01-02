@@ -325,4 +325,11 @@ export type RootStackParamList = {
 
   // Image Viewer (fullscreen modal)
   ImageViewer: { imageUrl: string };
+
+  // Date Time Picker Modal
+  DateTimePicker: {
+    initialDate?: string; // YYYY-MM-DD format
+    initialTime?: string; // HH:mm format
+    onSelect?: (date: string, time: string) => void;
+  } | undefined;
 };

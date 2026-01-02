@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '@/theme/colors';
+import { COLORS } from '@/constants/colors';
 
-export const PayoutSettingsScreen = ({ navigation }: any) => {
+export const PayoutSettingsScreen = () => {
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
 
   return (

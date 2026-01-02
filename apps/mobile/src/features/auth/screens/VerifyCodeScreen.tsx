@@ -8,7 +8,7 @@ import {
   Keyboard,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@/hooks/useNavigationHelpers';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useToast } from '@/context/ToastContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
@@ -90,7 +90,7 @@ export const VerifyCodeScreen: React.FC = () => {
         inputRefs.current[0]?.focus();
       } else {
         showToast('Code verified successfully!', 'success');
-        navigation.navigate('SetPassword' as never);
+        navigation.navigate('SetPassword');
       }
     } catch {
       showToast('Verification failed. Please try again.', 'error');

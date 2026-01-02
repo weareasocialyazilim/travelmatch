@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       .select(
         `
         *,
-        user:profiles!proofs_user_id_fkey(id, display_name, avatar_url, email),
+        user:users!proofs_user_id_fkey(id, display_name, avatar_url, email),
         moment:moments(id, title, price, user_id),
         verified_by_admin:admin_users!proofs_verified_by_fkey(id, name)
       `,

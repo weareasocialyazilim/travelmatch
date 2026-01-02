@@ -352,11 +352,15 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
           onLoadEnd={() => setIsLoading(false)}
           injectedJavaScript={injectedJavaScript}
           javaScriptEnabled={true}
+          // Note: domStorageEnabled needed for PayTR session management
           domStorageEnabled={true}
-          thirdPartyCookiesEnabled={true}
-          sharedCookiesEnabled={true}
-          originWhitelist={['*']}
-          mixedContentMode="compatibility"
+          // Security: Disable third-party cookies for payment security
+          thirdPartyCookiesEnabled={false}
+          sharedCookiesEnabled={false}
+          // Security: Restrict to trusted PayTR domains only
+          originWhitelist={['https://www.paytr.com', 'https://sandbox-paytr.com', 'https://*.paytr.com']}
+          // Security: Never allow mixed content in payment context
+          mixedContentMode="never"
           allowsInlineMediaPlayback={true}
           mediaPlaybackRequiresUserAction={false}
           startInLoadingState={true}

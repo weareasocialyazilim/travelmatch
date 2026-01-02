@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
-import { COLORS } from '@/theme/colors';
+import { COLORS } from '@/constants/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const TripDetailsScreen = ({ navigation }: any) => {

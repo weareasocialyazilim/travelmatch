@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView, Keyboard } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '@/theme/colors';
+import { COLORS } from '@/constants/colors';
 
-export const DeleteAccountScreen = ({ navigation }: any) => {
+export const DeleteAccountScreen = () => {
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [confirmText, setConfirmText] = useState('');
   const CONFIRMATION_KEY = "DELETE";
 
   const handleDelete = () => {
     if (confirmText !== CONFIRMATION_KEY) return;
+    Keyboard.dismiss();
 
     Alert.alert(
       "Final Goodbye",
@@ -34,7 +37,7 @@ export const DeleteAccountScreen = ({ navigation }: any) => {
         <View style={{ width: 24 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <View style={styles.warningBox}>
           <MaterialCommunityIcons name="alert-decagram" size={48} color="#FF4444" />
           <Text style={styles.warningTitle}>Warning: Irreversible Action</Text>

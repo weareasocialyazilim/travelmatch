@@ -1,26 +1,56 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView, Keyboard, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '@/theme/colors';
+import { useNavigation } from '@/hooks/useNavigationHelpers';
+import { COLORS } from '@/constants/colors';
+import { useAuth } from '@/context/AuthContext';
 
-export const ForgotPasswordScreen = ({ navigation }: any) => {
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export const ForgotPasswordScreen = () => {
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const { forgotPassword } = useAuth();
   const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleReset = () => {
-    Alert.alert('Link Sent', `Reset instructions sent to ${email}`, [
-      { text: 'Back to Login', onPress: () => navigation.goBack() }
-    ]);
+  const isValidEmail = EMAIL_REGEX.test(email.trim());
+
+  const handleReset = async () => {
+    Keyboard.dismiss();
+
+    if (!isValidEmail) {
+      Alert.alert('Invalid Email', 'Please enter a valid email address');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const result = await forgotPassword(email.trim());
+      if (result.success) {
+        Alert.alert('Link Sent', `Reset instructions sent to ${email}`, [
+          { text: 'Back to Login', onPress: () => navigation.goBack() }
+        ]);
+      } else {
+        Alert.alert('Error', result.error || 'Failed to send reset link. Please try again.');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()}><Ionicons name="arrow-back" size={24} color="white" /></TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.goBack()} disabled={isLoading}>
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
       </View>
 
-      <View style={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <Text style={styles.title}>Forgot Password?</Text>
         <Text style={styles.desc}>Don't worry! It happens. Please enter the email associated with your account.</Text>
 
@@ -33,16 +63,22 @@ export const ForgotPasswordScreen = ({ navigation }: any) => {
           onChangeText={(text) => setEmail(text.toLowerCase())}
           autoCapitalize="none"
           keyboardType="email-address"
+          editable={!isLoading}
+          autoCorrect={false}
         />
 
         <TouchableOpacity
-          style={[styles.btn, !email && styles.disabledBtn]}
+          style={[styles.btn, (!isValidEmail || isLoading) && styles.disabledBtn]}
           onPress={handleReset}
-          disabled={!email}
+          disabled={!isValidEmail || isLoading}
         >
-          <Text style={styles.btnText}>Send Reset Link</Text>
+          {isLoading ? (
+            <ActivityIndicator color="black" />
+          ) : (
+            <Text style={styles.btnText}>Send Reset Link</Text>
+          )}
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </View>
   );
 };

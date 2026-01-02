@@ -9,8 +9,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import type { NavigationProp } from '@react-navigation/native';
+import { useNavigation } from '@/hooks/useNavigationHelpers';
 import { COLORS } from '@/constants/colors';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
@@ -98,7 +97,7 @@ export const MyHostedMomentsScreen: React.FC = () => {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>My Drops</Text>
         <TouchableOpacity
-          onPress={() => navigation.navigate('CreateMoment' as never)}
+          onPress={() => navigation.navigate('CreateMoment')}
         >
           <MaterialCommunityIcons
             name="plus"

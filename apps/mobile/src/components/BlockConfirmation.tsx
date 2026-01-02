@@ -16,6 +16,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '../constants/colors';
+import { logger } from '../utils/logger';
 
 // Color aliases for easier use
 const colors = {
@@ -64,7 +65,8 @@ export const BlockConfirmation: React.FC<BlockConfirmationProps> = ({
       showToast(`${userName} has been blocked`, 'success');
       onBlocked?.();
       onClose();
-    } catch {
+    } catch (err) {
+      logger.error('[BlockConfirmation] Failed to block user', { userId, error: err });
       showToast('Failed to block user', 'error');
     } finally {
       setLoading(false);

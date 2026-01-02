@@ -16,6 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NavigationProp } from '@react-navigation/native';
 import { COLORS } from '../constants/colors';
 import type { RootStackParamList } from '../navigation/routeParams';
+import { logger } from '../utils/production-logger';
 
 // Initialize Mapbox
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN || '');
@@ -56,7 +57,7 @@ export const SearchMapScreen = () => {
 
   const handleMarkerPress = (spot: Hotspot) => {
     // Navigate to relevant screen or show detail
-    console.log('Marker pressed:', spot.title);
+    logger.debug('Marker pressed', { title: spot.title });
   };
 
   return (

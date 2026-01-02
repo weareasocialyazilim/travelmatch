@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '@/theme/colors';
+import { COLORS } from '@/constants/colors';
 
 const LANGUAGES = [
   { id: 'en', label: 'English', flag: '🇬🇧' },

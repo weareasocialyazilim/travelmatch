@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, Keyboard } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '@/theme/colors';
+import { COLORS } from '@/constants/colors';
 
-export const ContactSupportScreen = ({ navigation }: any) => {
+export const ContactSupportScreen = () => {
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
 
   const handleSubmit = () => {
+    Keyboard.dismiss();
     Alert.alert('Message Sent', 'Our team will get back to you within 24 hours.', [
       { text: 'OK', onPress: () => navigation.goBack() }
     ]);
@@ -23,7 +26,7 @@ export const ContactSupportScreen = ({ navigation }: any) => {
         <View style={{ width: 28 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <Text style={styles.label}>Topic</Text>
         <TextInput
           style={styles.input}

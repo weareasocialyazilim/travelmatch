@@ -23,7 +23,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
-import { COLORS } from '@/theme/colors';
+import { COLORS } from '@/constants/colors';
 import type { Moment } from '@/hooks/useMoments';
 
 const { width, height } = Dimensions.get('window');

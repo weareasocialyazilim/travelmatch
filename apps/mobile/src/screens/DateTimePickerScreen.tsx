@@ -6,20 +6,37 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { Calendar } from 'react-native-calendars';
-import { COLORS } from '@/theme/colors';
+import { Calendar, DateData } from 'react-native-calendars';
+import { COLORS } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRoute, RouteProp } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@/hooks/useNavigationHelpers';
+import type { RootStackParamList } from '@/navigation/routeParams';
 
-export const DateTimePickerScreen = ({ navigation }: any) => {
+type DateTimePickerRouteProp = RouteProp<RootStackParamList, 'DateTimePicker'>;
+
+export const DateTimePickerScreen = () => {
+  const navigation = useNavigation();
+  const route = useRoute<DateTimePickerRouteProp>();
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-  const [selectedDate, setSelectedDate] = useState('');
-  const [selectedTime, setSelectedTime] = useState('20:00');
+
+  const { initialDate, initialTime, onSelect } = route.params || {};
+  const [selectedDate, setSelectedDate] = useState(initialDate || '');
+  const [selectedTime, setSelectedTime] = useState(initialTime || '20:00');
 
   const TIMES = ['18:00', '19:00', '20:00', '21:00', '22:00', '23:00'];
 
+  // Get today's date in YYYY-MM-DD format for minDate
+  const today = new Date().toISOString().split('T')[0];
+
   const handleConfirm = () => {
-    navigation.goBack(); // Normalde seçilen tarihi geri döner
+    if (onSelect) {
+      onSelect(selectedDate, selectedTime);
+    }
+    navigation.goBack();
   };
 
   return (
@@ -28,14 +45,15 @@ export const DateTimePickerScreen = ({ navigation }: any) => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="close" size={24} color="white" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Select Date & Time</Text>
+        <Text style={styles.headerTitle}>{t('screens.dateTimePicker.title')}</Text>
         <View style={{ width: 24 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.label}>DATE</Text>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        <Text style={styles.label}>{t('screens.dateTimePicker.date')}</Text>
         <Calendar
           style={styles.calendar}
+          minDate={today}
           theme={{
             backgroundColor: 'transparent',
             calendarBackground: 'transparent',
@@ -49,13 +67,13 @@ export const DateTimePickerScreen = ({ navigation }: any) => {
             monthTextColor: 'white',
             textMonthFontWeight: 'bold',
           }}
-          onDayPress={(day: any) => setSelectedDate(day.dateString)}
+          onDayPress={(day: DateData) => setSelectedDate(day.dateString)}
           markedDates={{
             [selectedDate]: { selected: true, disableTouchEvent: true },
           }}
         />
 
-        <Text style={styles.label}>TIME</Text>
+        <Text style={styles.label}>{t('screens.dateTimePicker.time')}</Text>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -87,7 +105,7 @@ export const DateTimePickerScreen = ({ navigation }: any) => {
           onPress={handleConfirm}
           disabled={!selectedDate}
         >
-          <Text style={styles.confirmText}>Set Schedule</Text>
+          <Text style={styles.confirmText}>{t('screens.dateTimePicker.setSchedule')}</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>

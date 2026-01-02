@@ -8,7 +8,7 @@ import {
   Easing,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@/hooks/useNavigationHelpers';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useToast } from '@/context/ToastContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
@@ -94,7 +94,7 @@ export const WaitingForCodeScreen: React.FC = () => {
   };
 
   const handleManualEntry = () => {
-    navigation.navigate('VerifyCode' as never);
+    navigation.navigate('VerifyCode');
   };
 
   return (

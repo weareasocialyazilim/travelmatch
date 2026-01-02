@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  Keyboard,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -49,6 +50,7 @@ export const ReportUserScreen: React.FC<ReportUserScreenProps> = ({
 
   const handleSubmit = useCallback(() => {
     if (!selectedReason) return;
+    Keyboard.dismiss();
 
     logger.info('Report submitted', {
       userId,
@@ -76,7 +78,7 @@ export const ReportUserScreen: React.FC<ReportUserScreenProps> = ({
         <View style={styles.headerSpacer} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <Text style={styles.helperText}>
           Why are you reporting this user? Your report is anonymous.
         </Text>

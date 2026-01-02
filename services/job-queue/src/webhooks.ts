@@ -1,6 +1,7 @@
 import express from 'express';
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
+import { logger } from '../shared/utils/logger.js';
 
 dotenv.config();
 
@@ -45,7 +46,7 @@ app.post('/webhooks/job-complete', async (req, res) => {
       .replace(/[\n\r\t%]/g, '')
       .slice(0, 50);
 
-    console.log('Webhook received:', {
+    logger.info('Webhook received', {
       type: safeType,
       jobId: safeJobId,
       userId: safeUserId,
@@ -67,12 +68,13 @@ app.post('/webhooks/job-complete', async (req, res) => {
         break;
 
       default:
-        console.warn('Unknown job type:', safeType);
+        logger.warn('Unknown job type', { type: safeType });
     }
 
     res.json({ success: true });
-  } catch (err: any) {
-    console.error('Webhook error:', err?.message || 'Unknown error');
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    logger.error('Webhook error', err instanceof Error ? err : undefined, { message: errorMessage });
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -116,7 +118,7 @@ async function handleKycComplete(
       created_at: new Date().toISOString(),
     });
 
-    console.log('KYC verification completed:', {
+    logger.info('KYC verification completed', {
       status: result.status,
       userId,
     });
@@ -148,7 +150,7 @@ async function handleKycComplete(
       typeof error === 'string'
         ? error.replace(/[\n\r\t%]/g, ' ').slice(0, 500)
         : JSON.stringify(error).slice(0, 500);
-    console.error('KYC verification failed:', {
+    logger.error('KYC verification failed', undefined, {
       userId,
       error: sanitizedError,
     });
@@ -165,7 +167,7 @@ async function handleImageComplete(
   error: unknown,
 ): Promise<void> {
   if (status === 'completed') {
-    console.log('Image processing completed:', { userId });
+    logger.info('Image processing completed', { userId });
     // Update image URLs in database
     // Send notification if needed
   } else {
@@ -174,7 +176,7 @@ async function handleImageComplete(
       typeof error === 'string'
         ? error.replace(/[\n\r\t%]/g, ' ').slice(0, 500)
         : JSON.stringify(error).slice(0, 500);
-    console.error('Image processing failed:', {
+    logger.error('Image processing failed', undefined, {
       userId,
       error: sanitizedError,
     });
@@ -191,14 +193,14 @@ async function handleEmailComplete(
   error: unknown,
 ): Promise<void> {
   if (status === 'completed') {
-    console.log('Email sent successfully:', { userId });
+    logger.info('Email sent successfully', { userId });
   } else {
     // Sanitize error for logging to prevent log injection
     const sanitizedError =
       typeof error === 'string'
         ? error.replace(/[\n\r\t%]/g, ' ').slice(0, 500)
         : JSON.stringify(error).slice(0, 500);
-    console.error('Email sending failed:', { userId, error: sanitizedError });
+    logger.error('Email sending failed', undefined, { userId, error: sanitizedError });
     // Retry logic or alert admin
   }
 }
@@ -213,17 +215,8 @@ app.get('/health', (_req, res) => {
 const PORT = process.env.WEBHOOK_PORT || 3003;
 
 app.listen(PORT, () => {
-  console.log(`
-╔════════════════════════════════════════════════════════════╗
-║                                                            ║
-║  Job Queue Webhooks                                        ║
-║                                                            ║
-║  Listening on: http://localhost:${PORT}                   ║
-║                                                            ║
-║  Endpoints:                                                ║
-║  • POST /webhooks/job-complete                             ║
-║  • GET  /health                                            ║
-║                                                            ║
-╚════════════════════════════════════════════════════════════╝
-  `);
+  logger.info('Job Queue Webhooks server started', {
+    port: PORT,
+    url: `http://localhost:${PORT}`,
+  });
 });

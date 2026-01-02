@@ -24,6 +24,7 @@ import * as Haptics from 'expo-haptics';
 import { COLORS } from '@/constants/colors';
 import { useMessages } from '@/hooks/useMessages';
 import { useAuth } from '@/context/AuthContext';
+import { logger } from '@/utils/logger';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
@@ -155,7 +156,10 @@ const ChatDetailScreen: React.FC = () => {
         prev.map((m) => (m.id === tempId ? { ...m, status: 'sent' } : m)),
       );
     } catch (error) {
-      // Handle error - could show retry option
+      logger.error('[Chat] Failed to send message:', error);
+      setMessages((prev) =>
+        prev.map((m) => (m.id === tempId ? { ...m, status: 'sending' } : m)),
+      );
     }
   }, [messageText, conversationId, currentUser, sendMessage]);
 

@@ -25,7 +25,7 @@ import * as Haptics from 'expo-haptics';
 import { ImmersiveMomentCard } from '@/components/discover/ImmersiveMomentCard';
 import { FloatingDock } from '@/components/layout/FloatingDock';
 import { useMoments, type Moment } from '@/hooks/useMoments';
-import { COLORS } from '@/theme/colors';
+import { COLORS } from '@/constants/colors';
 import { withErrorBoundary } from '../../../components/withErrorBoundary';
 import type { NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/routeParams';
@@ -147,9 +147,20 @@ const DiscoverScreen = () => {
     (moment: Moment) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       // Navigate to gift flow
-      navigation.navigate('UnifiedGiftFlow' as never, {
-        moment: moment as any,
-      } as never);
+      navigation.navigate('UnifiedGiftFlow', {
+        moment: {
+          id: moment.id,
+          title: moment.title,
+          description: moment.description || '',
+          image: moment.image || moment.images?.[0] || '',
+          price: moment.price || moment.pricePerGuest || 0,
+          hostId: moment.hostId,
+          hostName: moment.hostName || '',
+          hostAvatar: moment.hostAvatar || '',
+          category: typeof moment.category === 'string' ? moment.category : moment.category?.id || '',
+          location: typeof moment.location === 'string' ? moment.location : `${moment.location?.city || ''}, ${moment.location?.country || ''}`,
+        },
+      });
     },
     [navigation],
   );
@@ -166,9 +177,9 @@ const DiscoverScreen = () => {
   // Handle User Press
   const handleUserPress = useCallback(
     (moment: Moment) => {
-      navigation.navigate('Profile' as never, {
+      navigation.navigate('ProfileDetail', {
         userId: moment.hostId,
-      } as never);
+      });
     },
     [navigation],
   );

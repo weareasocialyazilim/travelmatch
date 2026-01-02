@@ -7,10 +7,11 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
+  Keyboard,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '@/theme/colors';
+import { COLORS } from '@/constants/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FlipInYRight } from 'react-native-reanimated';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -54,6 +55,7 @@ export const AddCardScreen = ({ navigation }: Props) => {
   };
 
   const handleSave = () => {
+    Keyboard.dismiss();
     // TODO: Implement card saving logic
     navigation.goBack();
   };
@@ -71,7 +73,7 @@ export const AddCardScreen = ({ navigation }: Props) => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         {/* LIVE CARD PREVIEW */}
         <Animated.View entering={FlipInYRight.duration(600)} style={styles.cardContainer}>
           <LinearGradient

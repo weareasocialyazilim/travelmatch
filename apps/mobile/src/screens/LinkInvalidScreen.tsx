@@ -1,6 +1,6 @@
 /**
  * Link Invalid Screen
- * 
+ *
  * Shown when deep link has invalid format/params
  */
 
@@ -13,7 +13,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useRoute, RouteProp } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@/hooks/useNavigationHelpers';
 import type { RootStackParamList } from '@/navigation/types';
 import { COLORS } from '../constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
@@ -23,12 +25,13 @@ type LinkInvalidRouteProp = RouteProp<RootStackParamList, 'LinkInvalid'>;
 const LinkInvalidScreen: React.FC = () => {
   const navigation = useNavigation();
   const route = useRoute<LinkInvalidRouteProp>();
-  const message = route.params?.message || 'Link geçersiz';
+  const { t } = useTranslation();
+  const message = route.params?.message || t('screens.linkInvalid.defaultMessage');
 
   const handleGoHome = () => {
     navigation.reset({
       index: 0,
-      routes: [{ name: 'Discover' as never }],
+      routes: [{ name: 'Discover' }],
     });
   };
 
@@ -45,13 +48,13 @@ const LinkInvalidScreen: React.FC = () => {
         </View>
 
         {/* Title */}
-        <Text style={styles.title}>Geçersiz Link</Text>
+        <Text style={styles.title}>{t('screens.linkInvalid.title')}</Text>
 
         {/* Message */}
         <Text style={styles.message}>{message}</Text>
 
         <Text style={styles.submessage}>
-          Link hatalı veya bozuk görünüyor. Linki kontrol edip tekrar deneyin.
+          {t('screens.linkInvalid.description')}
         </Text>
 
         {/* Actions */}
@@ -66,7 +69,7 @@ const LinkInvalidScreen: React.FC = () => {
             color={COLORS.utility.white}
             style={styles.buttonIcon}
           />
-          <Text style={styles.primaryButtonText}>Ana Sayfaya Dön</Text>
+          <Text style={styles.primaryButtonText}>{t('screens.linkInvalid.goHome')}</Text>
         </TouchableOpacity>
 
         {/* Info */}
@@ -77,7 +80,7 @@ const LinkInvalidScreen: React.FC = () => {
             color={COLORS.text.secondary}
           />
           <Text style={styles.infoText}>
-            Eğer bu linki bir bildirim veya mesajdan aldıysanız, lütfen kaynağı kontrol edin.
+            {t('screens.linkInvalid.infoHint')}
           </Text>
         </View>
       </View>

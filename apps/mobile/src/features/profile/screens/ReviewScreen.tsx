@@ -11,7 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NavigationProp } from '@react-navigation/native';
-import { COLORS_DARK as COLORS } from '@/theme/colors';
+import { COLORS_DARK as COLORS } from '@/constants/colors';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
 const TAGS = ['Good Vibes ✨', 'Generous 🎁', 'Punctual ⏰', 'Fun 🥳'];

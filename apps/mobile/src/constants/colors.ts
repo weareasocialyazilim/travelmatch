@@ -329,14 +329,25 @@ export const COLORS = {
   },
 
   // ─────────────────────────────────────────────
-  // Background - "Cinematic" gradient-ready
+  // Background - "Cinematic" gradient-ready (nested for backward compatibility)
   // ─────────────────────────────────────────────
-  background: '#FFFCF8', // Warm cream (light mode)
-  backgroundSecondary: '#FFF9F2', // Slightly warmer
-  backgroundTertiary: '#FFF5E8', // Sunset tint
+  background: {
+    primary: '#0C0A09', // Midnight travel (dark mode default)
+    secondary: '#1C1917',
+    tertiary: '#292524',
+    elevated: '#1F1F1F',
+    glass: 'rgba(12, 10, 9, 0.88)',
+    // Light mode variants
+    light: '#FFFCF8',
+    lightSecondary: '#FFF9F2',
+    lightTertiary: '#FFF5E8',
+  },
+  // Flat background aliases for backwards compatibility
+  backgroundPrimary: '#0C0A09',
+  backgroundSecondary: '#1C1917',
+  backgroundTertiary: '#292524',
   backgroundLight: primitives.white,
-
-  backgroundDark: '#0C0A09', // Midnight travel (dark mode)
+  backgroundDark: '#0C0A09',
   backgroundDarkSecondary: '#1C1917',
   backgroundDarkTertiary: '#292524',
 

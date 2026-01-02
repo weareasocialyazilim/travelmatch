@@ -163,10 +163,10 @@ class DeepLinkTracker {
   } {
     // Parse URL
     // Format: travelmatch://profile/123?utm_source=instagram&utm_campaign=summer
-    // Or: https://travelmatch.com/p/123?utm_source=instagram
+    // Or: https://travelmatch.app/p/123?utm_source=instagram
 
     const urlObj = new URL(
-      url.replace('travelmatch://', 'https://travelmatch.com/'),
+      url.replace('travelmatch://', 'https://travelmatch.app/'),
     );
     const pathParts = urlObj.pathname.split('/').filter(Boolean);
     const params = Object.fromEntries(urlObj.searchParams.entries());
@@ -442,7 +442,7 @@ class DeepLinkTracker {
       content?: string;
     },
   ): string {
-    const baseUrl = 'https://travelmatch.com';
+    const baseUrl = 'https://travelmatch.app';
     const params = new URLSearchParams();
 
     if (options?.source) params.set('utm_source', options.source);

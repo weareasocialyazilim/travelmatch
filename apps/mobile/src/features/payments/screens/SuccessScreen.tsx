@@ -1,10 +1,20 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '@/theme/colors';
+import { COLORS } from '@/constants/colors';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withDelay } from 'react-native-reanimated';
 
-export const SuccessScreen = ({ navigation, route }: any) => {
+type SuccessParams = {
+  title?: string;
+  message?: string;
+  buttonText?: string;
+  nextScreen?: string;
+};
+
+export const SuccessScreen = () => {
+  const navigation = useNavigation();
+  const route = useRoute<RouteProp<{ Success: SuccessParams }, 'Success'>>();
   const { title = 'Success!', message = 'Operation completed successfully.', buttonText = 'Continue', nextScreen = 'Discover' } = route.params || {};
 
   const scale = useSharedValue(0);

@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
 
     // Check if user exists
     const { data: existingUser } = await supabase
-      .from('profiles')
+      .from('users')
       .select('id')
       .eq('id', userId)
       .single();

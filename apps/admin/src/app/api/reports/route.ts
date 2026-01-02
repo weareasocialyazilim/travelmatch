@@ -14,8 +14,8 @@ export async function GET(request: NextRequest) {
       .from('reports')
       .select(`
         *,
-        reporter:profiles!reporter_id(id, full_name, avatar_url),
-        reported:profiles!reported_id(id, full_name, avatar_url),
+        reporter:users!reporter_id(id, full_name, avatar_url),
+        reported:users!reported_id(id, full_name, avatar_url),
         assigned_to:admin_users!assigned_to(id, full_name)
       `, { count: 'exact' })
       .order('created_at', { ascending: false });
