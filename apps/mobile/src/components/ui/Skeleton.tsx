@@ -192,32 +192,6 @@ export const SkeletonListItem: React.FC<{ style?: ViewStyle }> = ({
 );
 
 /**
- * SkeletonWishCard - Skeleton for WishCard component
- */
-export const SkeletonWishCard: React.FC<{ style?: ViewStyle }> = ({
-  style,
-}) => {
-  const cardWidth = SCREEN_WIDTH - 32;
-  const cardHeight = cardWidth * 1.25;
-
-  return (
-    <View style={[styles.wishCard, { width: cardWidth }, style]}>
-      {/* Hero image */}
-      <Skeleton width="100%" height={cardHeight} borderRadius={0} />
-
-      {/* Bottom section */}
-      <View style={styles.wishCardBottom}>
-        <View>
-          <Skeleton width={50} height={12} />
-          <Skeleton width={80} height={24} style={styles.marginTopSm} />
-        </View>
-        <Skeleton width={140} height={52} borderRadius={26} />
-      </View>
-    </View>
-  );
-};
-
-/**
  * SkeletonMessage - Skeleton for chat message
  */
 export const SkeletonMessage: React.FC<{
@@ -317,23 +291,6 @@ const styles = StyleSheet.create({
   listItemContent: {
     flex: 1,
     marginLeft: 12,
-  },
-  wishCard: {
-    backgroundColor: COLORS.utility.white,
-    borderRadius: 24,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 5,
-    marginBottom: 16,
-  },
-  wishCardBottom: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
   },
   message: {
     flexDirection: 'row',
