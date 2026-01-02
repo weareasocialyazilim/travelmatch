@@ -18,6 +18,7 @@ export { HomeWelcomeCard } from './HomeWelcomeCard';
 export { CategoryChips, TabChips } from './CategoryChips';
 export { GlassCategorySelector } from './GlassCategorySelector';
 export type { GlassCategory } from './GlassCategorySelector';
+export { EnhancedSearchBar } from './EnhancedSearchBar';
 
 // TravelMatch: The Rebirth - Immersive components
 export { ImmersiveMomentCard } from './ImmersiveMomentCard';
