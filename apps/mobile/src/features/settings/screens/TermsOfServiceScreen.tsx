@@ -24,7 +24,7 @@ export default function TermsOfServiceScreen({
           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Terms of Service</Text>
-        <View style={{ width: 24 }} />
+        <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -42,7 +42,7 @@ export default function TermsOfServiceScreen({
         <Text style={styles.section}>4. Safety</Text>
         <Text style={styles.para}>While we verify users, you are responsible for your own safety. Please read our Safety Tips section before meeting anyone.</Text>
 
-        <View style={{ height: 40 }} />
+        <View style={styles.bottomSpacer} />
       </ScrollView>
     </View>
   );
@@ -51,9 +51,11 @@ export default function TermsOfServiceScreen({
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background.primary },
   header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#222' },
+  headerSpacer: { width: 24 },
   headerTitle: { fontSize: 16, fontWeight: 'bold', color: 'white' },
   content: { padding: 24 },
   lastUpdated: { color: '#666', fontSize: 12, marginBottom: 20 },
   section: { color: 'white', fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 10 },
   para: { color: COLORS.text.secondary, fontSize: 15, lineHeight: 24 },
+  bottomSpacer: { height: 40 },
 });

@@ -19,7 +19,7 @@ export const CommunityGuidelinesScreen = ({ navigation }: any) => {
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}><Ionicons name="close" size={28} color="white" /></TouchableOpacity>
         <Text style={styles.headerTitle}>Guidelines</Text>
-        <View style={{ width: 28 }} />
+        <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -49,6 +49,7 @@ export const CommunityGuidelinesScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background.primary },
   header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center' },
+  headerSpacer: { width: 28 },
   headerTitle: { fontSize: 16, fontWeight: 'bold', color: 'white' },
   content: { padding: 20 },
   hero: { fontSize: 32, fontWeight: '900', color: 'white', marginBottom: 8 },

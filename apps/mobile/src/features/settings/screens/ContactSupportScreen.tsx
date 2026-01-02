@@ -23,7 +23,7 @@ export const ContactSupportScreen = () => {
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}><Ionicons name="close" size={28} color="white" /></TouchableOpacity>
         <Text style={styles.headerTitle}>Contact Support</Text>
-        <View style={{ width: 28 }} />
+        <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
@@ -66,6 +66,7 @@ export const ContactSupportScreen = () => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background.primary },
   header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center' },
+  headerSpacer: { width: 28 },
   headerTitle: { fontSize: 16, fontWeight: 'bold', color: 'white' },
   content: { padding: 24 },
   label: { color: 'white', fontWeight: 'bold', marginBottom: 8, marginTop: 16 },
