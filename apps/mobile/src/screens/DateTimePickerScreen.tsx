@@ -10,8 +10,9 @@ import { Calendar, DateData } from 'react-native-calendars';
 import { COLORS } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useRoute, RouteProp } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@/hooks/useNavigationHelpers';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
 type DateTimePickerRouteProp = RouteProp<RootStackParamList, 'DateTimePicker'>;
