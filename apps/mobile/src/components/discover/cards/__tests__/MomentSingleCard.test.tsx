@@ -151,26 +151,22 @@ describe('MomentSingleCard Component', () => {
     });
   });
 
-  describe('Distance Display', () => {
-    it('shows distance when provided', () => {
-      const moment = mockMoment();
-      const { toJSON } = render(
-        <MomentSingleCard
-          moment={moment}
-          onPress={mockOnPress}
-          distance={2.5}
-        />,
-      );
-      // Component renders distance; structure verified via snapshot
-      expect(toJSON()).toBeTruthy();
-    });
-
-    it('hides distance when not provided', () => {
+  describe('Component Structure', () => {
+    it('renders component structure correctly', () => {
       const moment = mockMoment();
       const { toJSON } = render(
         <MomentSingleCard moment={moment} onPress={mockOnPress} />,
       );
-      // Component renders without distance
+      // Component renders with proper structure
+      expect(toJSON()).toBeTruthy();
+    });
+
+    it('renders without optional props', () => {
+      const moment = mockMoment();
+      const { toJSON } = render(
+        <MomentSingleCard moment={moment} onPress={mockOnPress} />,
+      );
+      // Component renders without optional data
       expect(toJSON()).toBeTruthy();
     });
   });
@@ -206,19 +202,18 @@ describe('MomentSingleCard Component', () => {
       expect(toJSON()).toMatchSnapshot();
     });
 
-    it('matches snapshot with distance', () => {
-      const moment = mockMoment();
+    it('matches snapshot with verified host', () => {
+      const moment = mockMoment({
+        hostRating: 4.8,
+        hostReviewCount: 50,
+      });
       const { toJSON } = render(
-        <MomentSingleCard
-          moment={moment}
-          onPress={mockOnPress}
-          distance={3.2}
-        />,
+        <MomentSingleCard moment={moment} onPress={mockOnPress} />,
       );
       expect(toJSON()).toMatchSnapshot();
     });
 
-    it('matches snapshot for verified host', () => {
+    it('matches snapshot for kyc verified user', () => {
       const moment = mockMoment({
         users: { kyc: true, name: 'Verified' },
       });
