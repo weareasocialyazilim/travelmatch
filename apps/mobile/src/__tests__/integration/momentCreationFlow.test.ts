@@ -160,7 +160,7 @@ describe('Moment Creation Flow Integration', () => {
       expect(uploadedImages[0].url).toContain('storage.supabase.co');
 
       // Step 3: Update moment with image URLs and publish
-      const imageUrls = uploadedImages.map((img) => img.url);
+      const imageUrls = uploadedImages.map((img: { url: string }) => img.url);
       const publishData = {
         images: imageUrls,
         status: 'active',
@@ -255,7 +255,7 @@ describe('Moment Creation Flow Integration', () => {
 
       // Assert: All uploads successful
       expect(results).toHaveLength(4);
-      results.forEach((result, idx) => {
+      results.forEach((result: { url: string; size: number }, idx: number) => {
         expect(result.url).toBe(mockResults[idx].url);
         expect(result.size).toBeGreaterThan(0);
       });
