@@ -602,14 +602,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   /**
    * Update user locally (for optimistic updates)
+   * Uses functional update pattern to avoid stale closure issues
    */
-  const updateUser = (data: Partial<User>): void => {
-    if (user) {
-      const updatedUser = { ...user, ...data };
-      setUser(updatedUser);
+  const updateUser = useCallback((data: Partial<User>): void => {
+    setUser((prevUser) => {
+      if (!prevUser) return prevUser;
+      const updatedUser = { ...prevUser, ...data };
       void AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser));
-    }
-  };
+      return updatedUser;
+    });
+  }, []);
 
   /**
    * Forgot password
@@ -667,6 +669,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   // Memoize context value to prevent unnecessary re-renders
+  // Note: Functions like login, register, socialAuth, logout, refreshUser,
+  // handleOAuthCallback, getAccessToken, forgotPassword, resetPassword, changePassword
+  // are intentionally excluded from dependencies because they only use:
+  // - Stable state setters (setUser, setAuthState, setTokens)
+  // - Stable helper functions (saveTokens, saveUser, clearAuthData)
+  // - External services (authService) which are module-level imports
+  // updateUser is included because it's wrapped in useCallback
   const contextValue = useMemo(
     () => ({
       // State
@@ -694,8 +703,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       resetPassword,
       changePassword,
     }),
-
-    [user, authState, isAuthenticated, isLoading],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [user, authState, isAuthenticated, isLoading, updateUser],
   );
 
   return (
