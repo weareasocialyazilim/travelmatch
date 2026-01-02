@@ -39,7 +39,7 @@ export const DevMenuScreen = ({ navigation }: Props) => {
           <TouchableOpacity
             key={index}
             style={styles.item}
-            onPress={() => navigation.navigate(screen.route)}
+            onPress={() => (navigation as any).navigate(screen.route)}
           >
             <Text style={styles.itemText}>{screen.name}</Text>
             <Text style={styles.arrow}>→</Text>

@@ -64,7 +64,7 @@ export const GiftCardMarketScreen: React.FC<GiftCardMarketScreenProps> = ({
           <Ionicons name="arrow-back" size={24} color={COLORS.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Gift Cards</Text>
-        <View style={{ width: 24 }} />
+        <View style={styles.spacer} />
       </View>
 
       <Text style={styles.sub}>Send instant travel vibes to friends.</Text>
@@ -134,5 +134,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     opacity: 0.8,
+  },
+  spacer: {
+    width: 24,
   },
 });

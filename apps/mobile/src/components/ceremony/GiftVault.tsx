@@ -519,10 +519,6 @@ const styles = StyleSheet.create({
   experienceGrid: {
     padding: SPACING.sm,
   },
-  experienceRow: {
-    justifyContent: 'space-between',
-    marginBottom: SPACING.sm,
-  },
   experienceCard: {
     width: '48%',
     aspectRatio: 1,

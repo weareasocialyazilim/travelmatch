@@ -51,7 +51,7 @@ const SearchMapScreen: React.FC = () => {
             longitude: location.coords.longitude,
           });
         }
-      } catch (error) {
+      } catch {
         // Default to a central location if permission denied
         setUserLocation({
           latitude: 41.0082, // Istanbul

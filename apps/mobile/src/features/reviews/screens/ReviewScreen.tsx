@@ -88,7 +88,7 @@ const ReviewScreen: React.FC = () => {
         title: 'Review Submitted',
         subtitle: 'Thank you for your feedback!',
       });
-    } catch (error) {
+    } catch {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setIsSubmitting(false);
