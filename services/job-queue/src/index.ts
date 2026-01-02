@@ -14,6 +14,7 @@ import {
   JobPriorities,
   QueueNames,
 } from './jobs/index.js';
+import { logger } from '../shared/utils/logger.js';
 
 // Load environment variables
 import dotenv from 'dotenv';
@@ -32,8 +33,8 @@ app.use(express.json());
 const JOB_QUEUE_API_KEY = process.env.JOB_QUEUE_API_KEY;
 
 if (!JOB_QUEUE_API_KEY) {
-  console.error('CRITICAL: JOB_QUEUE_API_KEY environment variable is not set!');
-  console.error('The job queue service will reject all requests until this is configured.');
+  logger.error('CRITICAL: JOB_QUEUE_API_KEY environment variable is not set!');
+  logger.error('The job queue service will reject all requests until this is configured.');
 }
 
 /**
@@ -71,7 +72,7 @@ function authenticateApiKey(req: Request, res: Response, next: NextFunction): vo
 
   if (!secureCompare(apiKey, JOB_QUEUE_API_KEY)) {
     // Log failed authentication attempts
-    console.warn(`[SECURITY] Failed authentication attempt from IP: ${req.ip}`);
+    logger.warn('[SECURITY] Failed authentication attempt', { ip: req.ip });
     res.status(401).json({
       error: 'Unauthorized',
       message: 'Invalid API key',
@@ -382,31 +383,16 @@ app.post('/admin/clean', async (req: Request, res: Response) => {
 const PORT = process.env.PORT || 3002;
 
 app.listen(PORT, () => {
-  console.log(`
-╔════════════════════════════════════════════════════════════╗
-║                                                            ║
-║  TravelMatch Job Queue Server                              ║
-║                                                            ║
-║  API Server:   http://localhost:${PORT}                   ║
-║  Bull Board:   http://localhost:${PORT}/admin/queues      ║
-║                                                            ║
-║  Endpoints:                                                ║
-║  • POST /jobs/kyc              Add KYC verification        ║
-║  • POST /jobs/image            Add image processing        ║
-║  • POST /jobs/email            Add email job               ║
-║  • POST /jobs/notification     Add notification            ║
-║  • POST /jobs/analytics        Add analytics event         ║
-║  • GET  /jobs/:jobId           Get job status              ║
-║  • GET  /stats                 Get queue statistics        ║
-║  • GET  /health                Health check                ║
-║                                                            ║
-╚════════════════════════════════════════════════════════════╝
-  `);
+  logger.info('TravelMatch Job Queue Server started', {
+    port: PORT,
+    apiServer: `http://localhost:${PORT}`,
+    bullBoard: `http://localhost:${PORT}/admin/queues`,
+  });
 });
 
 // Graceful shutdown
 process.on('SIGTERM', async () => {
-  console.log('Shutting down gracefully...');
+  logger.info('Shutting down gracefully...');
   await Promise.all([
     kycQueue.close(),
     imageQueue.close(),
