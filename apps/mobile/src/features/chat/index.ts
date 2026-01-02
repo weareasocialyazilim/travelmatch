@@ -1,3 +1,3 @@
 // Chat Feature Exports
-export { default as InboxScreen } from './screens/InboxScreen';
+// Note: InboxScreen moved to features/inbox (Vibe Room design)
 export { default as ChatDetailScreen } from './screens/ChatDetailScreen';

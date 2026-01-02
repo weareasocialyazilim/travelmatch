@@ -272,6 +272,10 @@ export type RootStackParamList = {
   TrustGardenDetail: undefined;
   ChangePassword: undefined;
 
+  // Trips
+  TripDetails: { tripId: string };
+  MyTrips: undefined;
+
   // Missing routes
   BookingDetail: { bookingId: string };
   Ticket: { bookingId: string };

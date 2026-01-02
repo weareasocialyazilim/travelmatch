@@ -15,8 +15,7 @@ export { ProofFlowScreen } from './screens/ProofFlowScreen';
 export { ProofDetailScreen } from './screens/ProofDetailScreen';
 export { ProofHistoryScreen } from './screens/ProofHistoryScreen';
 
-// Review
-export { ReviewScreen } from './screens/ReviewScreen';
+// Note: ReviewScreen is in features/reviews
 
 // Achievements
 export { AchievementsScreen } from './screens/AchievementsScreen';
