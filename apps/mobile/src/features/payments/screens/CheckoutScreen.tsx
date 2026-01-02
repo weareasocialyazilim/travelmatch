@@ -1,3 +1,17 @@
+/**
+ * CheckoutScreen - Premium Checkout Experience
+ *
+ * Awwwards-quality checkout with:
+ * - Liquid Glass moment summary card
+ * - Neon-accented payment method selector
+ * - Trust indicators (Escrow badge)
+ * - Premium typography hierarchy
+ *
+ * Design Philosophy:
+ * - Clarity for 40+ demographic (readable prices, clear CTAs)
+ * - Aesthetic for GenZ (glass effects, neon accents)
+ */
+
 import React, { useState, useCallback } from 'react';
 import {
   View,
@@ -7,19 +21,21 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   useNavigation,
   useRoute,
   type RouteProp,
 } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { Image as _Image } from 'expo-image';
-import { COLORS } from '@/constants/colors';
+import { COLORS, GRADIENTS } from '@/constants/colors';
+import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
 import { usePayments } from '@/hooks/usePayments';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { PaymentSecurityBadge } from '../components/PaymentSecurityBadge';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 
@@ -30,12 +46,13 @@ interface PaymentMethod {
   type: 'card' | 'wallet' | 'bank';
   name: string;
   last4?: string;
-  icon: string;
+  icon: keyof typeof Ionicons.glyphMap;
 }
 
 const CheckoutScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<CheckoutRouteProp>();
+  const insets = useSafeAreaInsets();
   const [selectedMethod, setSelectedMethod] = useState<string>('wallet');
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -44,6 +61,7 @@ const CheckoutScreen: React.FC = () => {
     amount,
     recipientId: _recipientId,
     recipientName,
+    momentTitle,
   } = route.params || {};
 
   const { cards, createPaymentIntent, confirmPayment } = usePayments();
@@ -52,44 +70,37 @@ const CheckoutScreen: React.FC = () => {
     return new Intl.NumberFormat('tr-TR', {
       style: 'currency',
       currency: 'TRY',
-      minimumFractionDigits: 2,
+      minimumFractionDigits: 0,
     }).format(value);
   };
 
-  const defaultPaymentMethods: PaymentMethod[] = [
-    {
-      id: 'wallet',
-      type: 'wallet',
-      name: 'TravelMatch Wallet',
-      icon: 'wallet',
-    },
-    {
-      id: 'card-1',
-      type: 'card',
-      name: 'Visa',
-      last4: '4242',
-      icon: 'credit-card',
-    },
-  ];
-
-  // Convert cards to PaymentMethod format and add wallet
+  // Build payment methods list
   const cardMethods: PaymentMethod[] = cards.map((card) => ({
     id: card.id,
     type: 'card' as const,
     name: card.brand || 'Card',
     last4: card.last4,
-    icon: 'credit-card',
+    icon: 'card-outline',
   }));
+
   const methods: PaymentMethod[] = [
     {
       id: 'wallet',
       type: 'wallet',
       name: 'TravelMatch Wallet',
-      icon: 'wallet',
+      icon: 'wallet-outline',
     },
     ...cardMethods,
     ...(cardMethods.length === 0
-      ? defaultPaymentMethods.filter((m) => m.type === 'card')
+      ? [
+          {
+            id: 'card-1',
+            type: 'card' as const,
+            name: 'Visa',
+            last4: '4242',
+            icon: 'card-outline' as const,
+          },
+        ]
       : []),
   ];
 
@@ -100,13 +111,11 @@ const CheckoutScreen: React.FC = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
-      // Create payment intent
       const paymentIntent = await createPaymentIntent(momentId, amount || 0);
       if (!paymentIntent) {
         throw new Error('Failed to create payment intent');
       }
 
-      // Confirm payment with selected method
       const success = await confirmPayment(paymentIntent.id, selectedMethod);
       if (!success) {
         throw new Error('Payment confirmation failed');
@@ -115,13 +124,13 @@ const CheckoutScreen: React.FC = () => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       navigation.navigate('Success', {
         type: 'payment',
-        title: 'Payment Successful',
-        subtitle: `You sent ${formatCurrency(amount || 0)} to ${recipientName}`,
+        title: 'Ödeme Başarılı',
+        subtitle: `${formatCurrency(amount || 0)} tutarında hediye gönderildi`,
       });
     } catch {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       navigation.navigate('PaymentFailed', {
-        error: 'Payment failed. Please try again.',
+        error: 'Ödeme başarısız oldu. Lütfen tekrar deneyin.',
       });
     } finally {
       setIsProcessing(false);
@@ -130,7 +139,6 @@ const CheckoutScreen: React.FC = () => {
     selectedMethod,
     amount,
     momentId,
-    recipientName,
     createPaymentIntent,
     confirmPayment,
     navigation,
@@ -138,108 +146,85 @@ const CheckoutScreen: React.FC = () => {
   ]);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={() => navigation.goBack()}
-          >
-            <MaterialCommunityIcons
-              name="close"
-              size={24}
-              color={COLORS.text.primary}
-            />
-          </TouchableOpacity>
-          <Text style={styles.title}>Checkout</Text>
-          <View style={styles.placeholder} />
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
+          <Ionicons name="chevron-back" size={28} color={COLORS.text.primary} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Ödeme Detayları</Text>
+        <View style={styles.headerSpacer} />
+      </View>
+
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Moment Summary Card - Liquid Glass */}
+        <GlassCard intensity={15} tint="light" style={styles.momentSummary}>
+          <Text style={styles.summaryLabel}>DENEYİM</Text>
+          <Text style={styles.summaryTitle}>
+            {momentTitle || recipientName || 'Premium Moment'}
+          </Text>
+          <View style={styles.divider} />
+          <View style={styles.priceRow}>
+            <Text style={styles.summaryLabel}>TOPLAM TUTAR</Text>
+            <Text style={styles.totalPrice}>{formatCurrency(amount || 0)}</Text>
+          </View>
+        </GlassCard>
+
+        {/* Security Badge - Trust Indicator */}
+        <View style={styles.section}>
+          <PaymentSecurityBadge mode="ESCROW" />
         </View>
 
-        {/* Order Summary */}
+        {/* Payment Method Selection */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Order Summary</Text>
-          <View style={styles.orderCard}>
-            <View style={styles.orderRow}>
-              <Text style={styles.orderLabel}>Gift Amount</Text>
-              <Text style={styles.orderValue}>
-                {formatCurrency(amount || 0)}
-              </Text>
-            </View>
-            <View style={styles.orderRow}>
-              <Text style={styles.orderLabel}>Service Fee</Text>
-              <Text style={styles.orderValue}>{formatCurrency(0)}</Text>
-            </View>
-            <View style={styles.divider} />
-            <View style={styles.orderRow}>
-              <Text style={styles.totalLabel}>Total</Text>
-              <Text style={styles.totalValue}>
-                {formatCurrency(amount || 0)}
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Recipient */}
-        {recipientName && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Sending to</Text>
-            <View style={styles.recipientCard}>
-              <View style={styles.recipientAvatar}>
-                <MaterialCommunityIcons
-                  name="account"
-                  size={28}
-                  color={COLORS.text.secondary}
-                />
-              </View>
-              <Text style={styles.recipientName}>{recipientName}</Text>
-            </View>
-          </View>
-        )}
-
-        {/* Payment Methods */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Payment Method</Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('PaymentMethods')}
-            >
-              <Text style={styles.addMethodText}>+ Add New</Text>
-            </TouchableOpacity>
-          </View>
+          <Text style={styles.sectionTitle}>ÖDEME YÖNTEMİ</Text>
 
           {methods.map((method) => (
             <TouchableOpacity
               key={method.id}
               style={[
-                styles.paymentMethodItem,
-                selectedMethod === method.id && styles.selectedMethod,
+                styles.methodSelector,
+                selectedMethod === method.id && styles.methodSelectorActive,
               ]}
               onPress={() => setSelectedMethod(method.id)}
+              activeOpacity={0.7}
             >
-              <View style={styles.methodIcon}>
-                <MaterialCommunityIcons
-                  name={
-                    method.icon as keyof typeof MaterialCommunityIcons.glyphMap
-                  }
-                  size={24}
-                  color={
-                    selectedMethod === method.id
-                      ? COLORS.brand.primary
-                      : COLORS.text.secondary
-                  }
-                />
+              <View style={styles.methodLeft}>
+                <View
+                  style={[
+                    styles.cardIcon,
+                    selectedMethod === method.id && styles.cardIconActive,
+                  ]}
+                >
+                  <Ionicons
+                    name={method.icon}
+                    size={20}
+                    color={
+                      selectedMethod === method.id
+                        ? COLORS.primary
+                        : COLORS.text.secondary
+                    }
+                  />
+                </View>
+                <View>
+                  <Text style={styles.methodText}>{method.name}</Text>
+                  {method.last4 && (
+                    <Text style={styles.methodSubtext}>•••• {method.last4}</Text>
+                  )}
+                </View>
               </View>
-              <View style={styles.methodDetails}>
-                <Text style={styles.methodName}>{method.name}</Text>
-                {method.last4 && (
-                  <Text style={styles.methodLast4}>**** {method.last4}</Text>
-                )}
-              </View>
+
+              {/* Radio Button */}
               <View
                 style={[
                   styles.radioButton,
-                  selectedMethod === method.id && styles.radioButtonSelected,
+                  selectedMethod === method.id && styles.radioButtonActive,
                 ]}
               >
                 {selectedMethod === method.id && (
@@ -248,223 +233,266 @@ const CheckoutScreen: React.FC = () => {
               </View>
             </TouchableOpacity>
           ))}
+
+          {/* Add New Method */}
+          <TouchableOpacity
+            style={styles.addMethodButton}
+            onPress={() => navigation.navigate('PaymentMethods')}
+          >
+            <Ionicons name="add-circle-outline" size={20} color={COLORS.primary} />
+            <Text style={styles.addMethodText}>Yeni Yöntem Ekle</Text>
+          </TouchableOpacity>
         </View>
+
+        {/* Legal Note */}
+        <Text style={styles.legalNote}>
+          "Öde" butonuna basarak Kullanım Koşullarını ve İptal Politikasını kabul
+          etmiş sayılırsınız.
+        </Text>
       </ScrollView>
 
-      {/* Pay Button */}
-      <View style={styles.footer}>
+      {/* Footer - Pay Button */}
+      <View style={[styles.footer, { paddingBottom: insets.bottom + 20 }]}>
         <TouchableOpacity
           style={[styles.payButton, isProcessing && styles.payButtonDisabled]}
           onPress={handlePayment}
           disabled={isProcessing}
+          activeOpacity={0.9}
         >
           <LinearGradient
-            colors={['#6366F1', '#8B5CF6']}
+            colors={GRADIENTS.gift as unknown as string[]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.payButtonGradient}
           >
             {isProcessing ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={COLORS.white} size="small" />
             ) : (
               <>
-                <MaterialCommunityIcons name="lock" size={20} color="#fff" />
+                <Ionicons name="lock-closed" size={20} color={COLORS.white} />
                 <Text style={styles.payButtonText}>
-                  Pay {formatCurrency(amount || 0)}
+                  Şimdi Öde • {formatCurrency(amount || 0)}
                 </Text>
               </>
             )}
           </LinearGradient>
         </TouchableOpacity>
+
         <Text style={styles.securityText}>
-          Your payment is secured with encryption
+          <Ionicons name="shield-checkmark" size={12} color={COLORS.trust.primary} />{' '}
+          256-bit SSL ile şifrelenmiş güvenli ödeme
         </Text>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background.primary,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingBottom: 20,
   },
-  closeButton: {
-    padding: 4,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: COLORS.text.primary,
-  },
-  placeholder: {
-    width: 32,
-  },
-  section: {
-    padding: 16,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.text.primary,
-    marginBottom: 12,
-  },
-  addMethodText: {
-    fontSize: 14,
-    color: COLORS.brand.primary,
-    fontWeight: '500',
-  },
-  orderCard: {
-    backgroundColor: COLORS.background.secondary,
-    borderRadius: 12,
-    padding: 16,
-  },
-  orderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-  },
-  orderLabel: {
-    fontSize: 14,
-    color: COLORS.text.secondary,
-  },
-  orderValue: {
-    fontSize: 14,
-    color: COLORS.text.primary,
-    fontWeight: '500',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: COLORS.border.default,
-    marginVertical: 8,
-  },
-  totalLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.text.primary,
-  },
-  totalValue: {
-    fontSize: 18,
+  headerTitle: {
+    fontSize: FONT_SIZES_V2.bodyLarge,
+    fontFamily: FONTS.display.bold,
     fontWeight: '700',
     color: COLORS.text.primary,
   },
-  recipientCard: {
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+  },
+  headerSpacer: {
+    width: 40,
+  },
+  scrollContent: {
+    padding: 20,
+    paddingBottom: 40,
+  },
+
+  // Moment Summary - Liquid Glass
+  momentSummary: {
+    marginBottom: 24,
+  },
+  summaryLabel: {
+    fontSize: 10,
+    color: COLORS.text.secondary,
+    fontFamily: FONTS.mono.medium,
+    textTransform: 'uppercase',
+    letterSpacing: 1.5,
+  },
+  summaryTitle: {
+    fontSize: FONT_SIZES_V2.h3,
+    color: COLORS.text.primary,
+    fontFamily: FONTS.display.bold,
+    marginTop: 4,
+    fontWeight: '600',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: COLORS.border.light,
+    marginVertical: 16,
+  },
+  priceRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  totalPrice: {
+    fontSize: 28,
+    color: COLORS.primary,
+    fontFamily: FONTS.mono.medium,
+    fontWeight: '900',
+  },
+
+  // Sections
+  section: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 10,
+    color: COLORS.text.muted,
+    fontFamily: FONTS.mono.medium,
+    letterSpacing: 1.5,
+    marginBottom: 12,
+  },
+
+  // Method Selector
+  methodSelector: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.background.secondary,
-    borderRadius: 12,
+    justifyContent: 'space-between',
+    backgroundColor: COLORS.surface.base,
     padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: COLORS.border.light,
+    marginBottom: 8,
+  },
+  methodSelectorActive: {
+    borderColor: COLORS.primary,
+    borderWidth: 2,
+  },
+  methodLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 12,
   },
-  recipientAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: COLORS.background.tertiary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  recipientName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.text.primary,
-  },
-  paymentMethodItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.background.secondary,
+  cardIcon: {
+    width: 40,
+    height: 40,
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 8,
-    borderWidth: 1.5,
-    borderColor: 'transparent',
-  },
-  selectedMethod: {
-    borderColor: COLORS.brand.primary,
-  },
-  methodIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: COLORS.background.tertiary,
+    backgroundColor: COLORS.surface.muted,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
   },
-  methodDetails: {
-    flex: 1,
+  cardIconActive: {
+    backgroundColor: COLORS.primaryMuted,
   },
-  methodName: {
-    fontSize: 15,
-    fontWeight: '500',
+  methodText: {
     color: COLORS.text.primary,
+    fontFamily: FONTS.body.semibold,
+    fontSize: FONT_SIZES_V2.body,
   },
-  methodLast4: {
-    fontSize: 13,
+  methodSubtext: {
     color: COLORS.text.muted,
+    fontFamily: FONTS.mono.regular,
+    fontSize: FONT_SIZES_V2.caption,
     marginTop: 2,
   },
+
+  // Radio Button
   radioButton: {
     width: 22,
     height: 22,
     borderRadius: 11,
     borderWidth: 2,
-    borderColor: COLORS.text.muted,
+    borderColor: COLORS.border.default,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  radioButtonSelected: {
-    borderColor: COLORS.brand.primary,
+  radioButtonActive: {
+    borderColor: COLORS.primary,
   },
   radioButtonInner: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: COLORS.brand.primary,
+    backgroundColor: COLORS.primary,
   },
+
+  // Add Method
+  addMethodButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 12,
+  },
+  addMethodText: {
+    color: COLORS.primary,
+    fontFamily: FONTS.body.semibold,
+    fontSize: FONT_SIZES_V2.bodySmall,
+  },
+
+  // Legal Note
+  legalNote: {
+    fontSize: FONT_SIZES_V2.caption,
+    color: COLORS.text.muted,
+    textAlign: 'center',
+    lineHeight: 18,
+    paddingHorizontal: 20,
+    fontFamily: FONTS.body.regular,
+  },
+
+  // Footer
   footer: {
-    padding: 16,
-    paddingBottom: 32,
-    borderTopWidth: 0.5,
-    borderTopColor: COLORS.border.default,
+    paddingHorizontal: 20,
+    backgroundColor: COLORS.bg.primary,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border.light,
+    paddingTop: 16,
   },
   payButton: {
-    borderRadius: 12,
+    borderRadius: 32,
     overflow: 'hidden',
+    // Neon glow effect
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 15,
+    elevation: 10,
   },
   payButtonDisabled: {
-    opacity: 0.7,
+    opacity: 0.6,
   },
   payButtonGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
-    gap: 8,
+    height: 64,
+    gap: 10,
   },
   payButtonText: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: '#fff',
+    fontSize: FONT_SIZES_V2.bodyLarge,
+    fontWeight: '800',
+    color: COLORS.white,
+    fontFamily: FONTS.body.bold,
   },
   securityText: {
-    fontSize: 12,
+    fontSize: FONT_SIZES_V2.caption,
     color: COLORS.text.muted,
     textAlign: 'center',
     marginTop: 12,
+    fontFamily: FONTS.body.regular,
   },
 });
 
