@@ -281,7 +281,7 @@ export function ProofReviewPanel({
             </label>
             <Textarea
               value={rejectReason}
-              onChange={(e) => setRejectReason(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setRejectReason(e.target.value)}
               placeholder="Kullanıcıya gösterilecek red nedenini yazın..."
               className="mt-2"
               rows={4}
@@ -310,7 +310,7 @@ export function ProofReviewPanel({
             </label>
             <Textarea
               value={infoMessage}
-              onChange={(e) => setInfoMessage(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInfoMessage(e.target.value)}
               placeholder="Kullanıcıdan ne tür bilgi istediğinizi açıklayın..."
               className="mt-2"
               rows={4}

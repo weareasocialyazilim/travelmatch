@@ -172,7 +172,7 @@ export function QuickTransferWidget({ recipients = [], onTransfer, className }: 
             <Input
               type="text"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAmount(e.target.value)}
               className="transfer-input pl-8"
               placeholder="0.00"
             />

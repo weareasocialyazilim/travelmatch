@@ -71,7 +71,10 @@ export const ChartGradients = () => (
 );
 
 // Custom tooltip component
-interface CustomTooltipProps extends TooltipProps<number, string> {
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{ value?: number; name?: string; color?: string }>;
+  label?: string;
   formatter?: (value: number, name: string) => [string, string];
 }
 
@@ -82,7 +85,7 @@ export function CustomTooltip({ active, payload, label, formatter }: CustomToolt
     <div className="rounded-lg border bg-popover p-3 shadow-md">
       <p className="mb-2 text-sm font-medium text-foreground">{label}</p>
       <div className="space-y-1">
-        {payload.map((entry, index) => {
+        {payload.map((entry: { value?: number; name?: string; color?: string }, index: number) => {
           const [formattedValue, formattedName] = formatter
             ? formatter(entry.value as number, entry.name as string)
             : [String(entry.value), entry.name as string];
@@ -449,14 +452,14 @@ export function AdminPieChart({
           outerRadius={outerRadius}
           paddingAngle={2}
           dataKey="value"
-          label={showLabels ? ({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%` : false}
+          label={showLabels ? ({ name, percent }: { name: string; percent?: number }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%` : false}
         >
           {dataWithColors.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={entry.color} />
           ))}
         </Pie>
         <Tooltip
-          formatter={(value: number) => [formatter ? formatter(value) : value, '']}
+          formatter={(value: number | undefined) => [formatter && value !== undefined ? formatter(value) : (value ?? 0), '']}
         />
         {showLegend && <Legend />}
       </PieChart>
