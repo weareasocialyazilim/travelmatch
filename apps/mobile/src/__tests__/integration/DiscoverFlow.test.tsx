@@ -89,7 +89,7 @@ describe.skip('Discover Flow Integration', () => {
   describe('Initial Load', () => {
     it('displays all moments on initial load', () => {
       const DiscoverScreen =
-        require('../../features/trips/screens/DiscoverScreen').default;
+        require('../../features/discover/screens/DiscoverScreen').default;
       const { getByText } = render(<DiscoverScreen />);
 
       expect(getByText('Beach Adventure')).toBeTruthy();
@@ -106,7 +106,7 @@ describe.skip('Discover Flow Integration', () => {
       });
 
       const DiscoverScreen =
-        require('../../features/trips/screens/DiscoverScreen').default;
+        require('../../features/discover/screens/DiscoverScreen').default;
       const { getByTestId } = render(<DiscoverScreen />);
 
       expect(getByTestId('loading-indicator')).toBeTruthy();
@@ -122,7 +122,7 @@ describe.skip('Discover Flow Integration', () => {
       });
 
       const DiscoverScreen =
-        require('../../features/trips/screens/DiscoverScreen').default;
+        require('../../features/discover/screens/DiscoverScreen').default;
       const { getByText } = render(<DiscoverScreen />);
 
       expect(getByText(/failed/i)).toBeTruthy();
@@ -136,7 +136,7 @@ describe.skip('Discover Flow Integration', () => {
       });
 
       const DiscoverScreen =
-        require('../../features/trips/screens/DiscoverScreen').default;
+        require('../../features/discover/screens/DiscoverScreen').default;
       const { getByText } = render(<DiscoverScreen />);
 
       expect(getByText(/no moments/i)).toBeTruthy();
@@ -146,7 +146,7 @@ describe.skip('Discover Flow Integration', () => {
   describe('Filtering', () => {
     it('filters moments by category', async () => {
       const DiscoverScreen =
-        require('../../features/trips/screens/DiscoverScreen').default;
+        require('../../features/discover/screens/DiscoverScreen').default;
       const { getByText } = render(<DiscoverScreen />);
 
       // Open filter
@@ -167,7 +167,7 @@ describe.skip('Discover Flow Integration', () => {
 
     it('filters moments by price range', async () => {
       const DiscoverScreen =
-        require('../../features/trips/screens/DiscoverScreen').default;
+        require('../../features/discover/screens/DiscoverScreen').default;
       const { getByText, getByPlaceholderText } = render(<DiscoverScreen />);
 
       fireEvent.press(getByText('Filter'));
@@ -192,7 +192,7 @@ describe.skip('Discover Flow Integration', () => {
 
     it('clears filters', async () => {
       const DiscoverScreen =
-        require('../../features/trips/screens/DiscoverScreen').default;
+        require('../../features/discover/screens/DiscoverScreen').default;
       const { getByText } = render(<DiscoverScreen />);
 
       fireEvent.press(getByText('Filter'));
@@ -207,7 +207,7 @@ describe.skip('Discover Flow Integration', () => {
   describe('Pagination', () => {
     it('loads more moments on scroll', async () => {
       const DiscoverScreen =
-        require('../../features/trips/screens/DiscoverScreen').default;
+        require('../../features/discover/screens/DiscoverScreen').default;
       const { getByTestId } = render(<DiscoverScreen />);
 
       const flatList = getByTestId('moments-list');
@@ -233,7 +233,7 @@ describe.skip('Discover Flow Integration', () => {
       });
 
       const DiscoverScreen =
-        require('../../features/trips/screens/DiscoverScreen').default;
+        require('../../features/discover/screens/DiscoverScreen').default;
       const { getByTestId } = render(<DiscoverScreen />);
 
       const flatList = getByTestId('moments-list');
@@ -255,7 +255,7 @@ describe.skip('Discover Flow Integration', () => {
   describe('Pull to Refresh', () => {
     it('refreshes moments on pull down', async () => {
       const DiscoverScreen =
-        require('../../features/trips/screens/DiscoverScreen').default;
+        require('../../features/discover/screens/DiscoverScreen').default;
       const { getByTestId } = render(<DiscoverScreen />);
 
       const flatList = getByTestId('moments-list');
@@ -275,7 +275,7 @@ describe.skip('Discover Flow Integration', () => {
       };
 
       const DiscoverScreen =
-        require('../../features/trips/screens/DiscoverScreen').default;
+        require('../../features/discover/screens/DiscoverScreen').default;
       const { getByText } = render(
         <DiscoverScreen navigation={mockNavigation} />,
       );
@@ -294,7 +294,7 @@ describe.skip('Discover Flow Integration', () => {
   describe('View Toggle', () => {
     it('switches between list and grid view', () => {
       const DiscoverScreen =
-        require('../../features/trips/screens/DiscoverScreen').default;
+        require('../../features/discover/screens/DiscoverScreen').default;
       const { getByTestId } = render(<DiscoverScreen />);
 
       const viewToggle = getByTestId('view-toggle');
@@ -315,7 +315,7 @@ describe.skip('Discover Flow Integration', () => {
   describe('Search Integration', () => {
     it('searches moments by keyword', async () => {
       const DiscoverScreen =
-        require('../../features/trips/screens/DiscoverScreen').default;
+        require('../../features/discover/screens/DiscoverScreen').default;
       const { getByPlaceholderText } = render(<DiscoverScreen />);
 
       const searchInput = getByPlaceholderText('Search moments...');
@@ -338,7 +338,7 @@ describe.skip('Discover Flow Integration', () => {
       jest.useFakeTimers();
 
       const DiscoverScreen =
-        require('../../features/trips/screens/DiscoverScreen').default;
+        require('../../features/discover/screens/DiscoverScreen').default;
       const { getByPlaceholderText } = render(<DiscoverScreen />);
 
       const searchInput = getByPlaceholderText('Search moments...');

@@ -1,7 +1,7 @@
 /**
- * Trips Feature - Barrel Exports
+ * Discover Feature - Barrel Exports
  *
- * Seyahat discovery, booking, escrow yönetimi
+ * Moment discovery, booking, escrow yönetimi
  */
 
 // Screens

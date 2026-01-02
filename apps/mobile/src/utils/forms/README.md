@@ -148,7 +148,7 @@
     - Target: `reportSchema`
     - Fields: reason, description
 
-25. **DisputeFlowScreen** (`/features/trips/screens/DisputeFlowScreen.tsx`)
+25. **DisputeFlowScreen** (`/features/discover/screens/DisputeFlowScreen.tsx`)
     - Current: Manual validation
     - Target: `disputeSchema`
     - Fields: reason, description, evidence
