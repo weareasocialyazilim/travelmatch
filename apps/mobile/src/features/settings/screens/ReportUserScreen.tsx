@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS_DARK } from '@/constants/colors';
+import { COLORS } from '@/constants/colors';
 import { logger } from '@/utils/logger';
 import { useToast } from '../context/ToastContext';
 import type { RootStackParamList } from '@/navigation/routeParams';
@@ -136,7 +136,7 @@ export const ReportUserScreen: React.FC<ReportUserScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS_DARK.background.primary,
+    backgroundColor: COLORS.background.primary,
   },
   header: {
     flexDirection: 'row',
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   helperText: {
-    color: COLORS_DARK.text.secondary,
+    color: COLORS.text.secondary,
     marginBottom: 24,
     fontSize: 16,
   },
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   activeReason: {
-    backgroundColor: COLORS_DARK.brand.primary,
+    backgroundColor: COLORS.brand.primary,
   },
   reasonText: {
     color: 'white',

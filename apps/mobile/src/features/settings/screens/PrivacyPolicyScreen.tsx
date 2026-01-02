@@ -12,7 +12,7 @@ export const PrivacyPolicyScreen = ({ navigation }: any) => {
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}><Ionicons name="arrow-back" size={24} color="white" /></TouchableOpacity>
         <Text style={styles.headerTitle}>Privacy Policy</Text>
-        <View style={{ width: 24 }} />
+        <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -28,7 +28,7 @@ export const PrivacyPolicyScreen = ({ navigation }: any) => {
         <Text style={styles.section}>4. Sharing of Information</Text>
         <Text style={styles.para}>We may share the information we collect about you as described in this Statement or as described at the time of collection or sharing.</Text>
 
-        <View style={{ height: 40 }} />
+        <View style={styles.bottomSpacer} />
       </ScrollView>
     </View>
   );
@@ -37,10 +37,12 @@ export const PrivacyPolicyScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background.primary },
   header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#222' },
+  headerSpacer: { width: 24 },
   headerTitle: { fontSize: 16, fontWeight: 'bold', color: 'white' },
   content: { padding: 24 },
   section: { color: 'white', fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 10 },
   para: { color: COLORS.text.secondary, fontSize: 15, lineHeight: 24 },
+  bottomSpacer: { height: 40 },
 });
 
 export default PrivacyPolicyScreen;
