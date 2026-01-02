@@ -33,7 +33,7 @@ Examples:
 
 import sys
 import json
-from typing import Dict, Any, List, Union
+from typing import Dict, Any, List, Optional
 
 
 # Standard breakpoints (matching design system)
@@ -110,8 +110,8 @@ def scale_value(
     if breakpoints is None:
         breakpoints = list(BREAKPOINTS.keys())
 
-    scaled = {}
-    for bp in breakpoints:
+    scaled: Dict[str, float] = {}
+    for bp in breakpoints:  # pyright: ignore[reportUnknownVariableType]
         if bp in SCALE_FACTORS:
             scaled[bp] = round(base_value * SCALE_FACTORS[bp], 2)
 
@@ -236,7 +236,7 @@ def responsive_spacing_scale(base: float = 4) -> Dict[str, Any]:
     Generate a complete responsive spacing scale.
     """
     # Base spacing tokens
-    tokens = {
+    tokens: Dict[str, Any] = {
         "none": 0,
         "px": 1,
         "0.5": base * 0.5,
@@ -303,7 +303,7 @@ def responsive_spacing_scale(base: float = 4) -> Dict[str, Any]:
 
 def generate_responsive_report(container_width: float = 1200) -> str:
     """Generate a complete responsive design report."""
-    report = []
+    report: List[str] = []
     report.append("=" * 60)
     report.append("RESPONSIVE DESIGN CALCULATOR REPORT")
     report.append("=" * 60)

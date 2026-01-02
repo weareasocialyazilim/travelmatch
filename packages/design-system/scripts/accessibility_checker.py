@@ -102,7 +102,7 @@ def check_wcag_compliance(ratio: float) -> Dict[str, Any]:
 
 def get_contrast_recommendations(ratio: float) -> List[str]:
     """Get recommendations based on contrast ratio."""
-    recs = []
+    recs: List[str] = []
 
     if ratio >= 7.0:
         recs.append("Excellent! Passes WCAG AAA for all text sizes.")
@@ -136,7 +136,7 @@ def suggest_accessible_color(
             "suggestions": []
         }
 
-    suggestions = []
+    suggestions: List[Dict[str, Any]] = []
     fg_rgb = hex_to_rgb(foreground)
     bg_rgb = hex_to_rgb(background)
 
@@ -236,7 +236,7 @@ def check_touch_target(width: float, height: float) -> Dict[str, Any]:
     meets_wcag = width >= wcag_min and height >= wcag_min
     meets_material = width >= material_min and height >= material_min
 
-    issues = []
+    issues: List[str] = []
     if width < wcag_min:
         issues.append(f"Width ({width}px) is below minimum ({wcag_min}px)")
     if height < wcag_min:
@@ -272,9 +272,8 @@ def check_focus_indicator(
     WCAG 2.1 SC 2.4.7: Focus visible
     WCAG 2.2 SC 2.4.11: Focus appearance (minimum)
     """
-    # Minimum focus indicator area
+    # Minimum focus indicator width
     min_width = 2
-    min_area = outline_width * 2 * 4  # Approximate perimeter area
 
     # Check contrast of focus indicator
     contrast = calculate_contrast_ratio(outline_color, background_color)
@@ -301,7 +300,7 @@ def audit_color_palette(colors: Dict[str, Dict[str, str]]) -> Dict[str, Any]:
     """
     Audit an entire color palette for accessibility.
     """
-    results = {
+    results: Dict[str, Any] = {
         "summary": {
             "total_combinations": 0,
             "passing_aa": 0,
@@ -317,11 +316,13 @@ def audit_color_palette(colors: Dict[str, Dict[str, str]]) -> Dict[str, Any]:
     backgrounds = ["#FFFFFF", "#F5F5F5", "#212121", "#000000"]
 
     for palette_name, palette in colors.items():
-        if not isinstance(palette, dict):
+        # Skip non-dict values (though type hint ensures dict)
+        if not palette:
             continue
 
         for shade, color in palette.items():
-            if not isinstance(color, str) or not color.startswith('#'):
+            # Validate color format
+            if not color.startswith('#'):
                 continue
 
             for bg in backgrounds:
@@ -330,7 +331,7 @@ def audit_color_palette(colors: Dict[str, Dict[str, str]]) -> Dict[str, Any]:
 
                 results["summary"]["total_combinations"] += 1
 
-                combo = {
+                combo: Dict[str, Any] = {
                     "foreground": f"{palette_name}.{shade}",
                     "foregroundColor": color,
                     "background": bg,
@@ -353,10 +354,12 @@ def audit_color_palette(colors: Dict[str, Dict[str, str]]) -> Dict[str, Any]:
                 results["combinations"].append(combo)
 
     # Calculate pass rates
-    total = results["summary"]["total_combinations"]
+    total: int = int(results["summary"]["total_combinations"])
     if total > 0:
-        results["summary"]["aa_pass_rate"] = f"{(results['summary']['passing_aa'] / total * 100):.1f}%"
-        results["summary"]["aaa_pass_rate"] = f"{(results['summary']['passing_aaa'] / total * 100):.1f}%"
+        passing_aa: int = int(results["summary"]["passing_aa"])
+        passing_aaa: int = int(results["summary"]["passing_aaa"])
+        results["summary"]["aa_pass_rate"] = f"{(passing_aa / total * 100):.1f}%"
+        results["summary"]["aaa_pass_rate"] = f"{(passing_aaa / total * 100):.1f}%"
 
     return results
 
