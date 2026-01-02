@@ -12,14 +12,15 @@
  */
 
 import { renderHook, act, waitFor } from '@testing-library/react-native';
-import { usePayments } from '@/hooks/usePayments';
-import { logger } from '@/utils/logger';
+import { usePayments } from '../usePayments';
+import { logger } from '../../utils/logger';
+import type { PaymentCard } from '../../services/paymentService';
 
 // Mock logger
-jest.mock('@/utils/logger');
+jest.mock('../../utils/logger');
 
 // Mock paymentService
-jest.mock('@/services/paymentService', () => ({
+jest.mock('../../services/paymentService', () => ({
   paymentService: {
     getWalletBalance: jest.fn(),
     getTransactions: jest.fn(),
@@ -36,7 +37,7 @@ jest.mock('@/services/paymentService', () => ({
   },
 }));
 
-import { paymentService } from '@/services/paymentService';
+import { paymentService } from '../../services/paymentService';
 
 const mockPaymentService = paymentService as jest.Mocked<typeof paymentService>;
 const mockLogger = logger as jest.Mocked<typeof logger>;
@@ -473,8 +474,8 @@ describe('usePayments', () => {
         await result.current.setDefaultCard('card_2');
       });
 
-      const card1 = result.current.cards.find(c => c.id === 'card_1');
-      const card2 = result.current.cards.find(c => c.id === 'card_2');
+      const card1 = result.current.cards.find((c: PaymentCard) => c.id === 'card_1');
+      const card2 = result.current.cards.find((c: PaymentCard) => c.id === 'card_2');
 
       expect(card1?.isDefault).toBe(false);
       expect(card2?.isDefault).toBe(true);
