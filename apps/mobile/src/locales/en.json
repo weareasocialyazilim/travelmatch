@@ -580,6 +580,24 @@
       "date": "DATE",
       "time": "TIME",
       "setSchedule": "Set Schedule"
+    },
+    "createMoment": {
+      "uploadHint": "Select a high-quality, vertical photo.\nThis is your showcase.",
+      "missingInfoTitle": "Missing Information",
+      "missingInfoMessage": "Please fill in all fields to complete your vibe. ✨",
+      "successTitle": "Boom! 💥",
+      "successMessage": "Moment dropped successfully. Now wait for matches!",
+      "successButton": "Let's Go",
+      "priceHint": "The matched person will pay this amount (or you'll share).",
+      "a11y": {
+        "back": "Back",
+        "close": "Close",
+        "momentTitle": "Moment title",
+        "nextPrice": "Next: Set Price",
+        "price": "Price",
+        "reviewDrop": "Review Drop",
+        "dropMoment": "Drop Moment"
+      }
     }
   }
 }

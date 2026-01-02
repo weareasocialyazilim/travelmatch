@@ -580,6 +580,24 @@
       "date": "TARİH",
       "time": "SAAT",
       "setSchedule": "Planla"
+    },
+    "createMoment": {
+      "uploadHint": "Yüksek kaliteli, dikey bir fotoğraf seç.\nBu senin vitrinin.",
+      "missingInfoTitle": "Eksik Bilgi",
+      "missingInfoMessage": "Lütfen tüm alanları doldur, vibe yarım kalmasın. ✨",
+      "successTitle": "Boom! 💥",
+      "successMessage": "Moment başarıyla drop edildi. Şimdi eşleşmeleri bekle!",
+      "successButton": "Hadi!",
+      "priceHint": "Bu tutarı eşleştiğin kişi ödeyecek (veya paylaşacaksınız).",
+      "a11y": {
+        "back": "Geri",
+        "close": "Kapat",
+        "momentTitle": "Moment başlığı",
+        "nextPrice": "Sonraki: Fiyat Belirle",
+        "price": "Fiyat",
+        "reviewDrop": "Drop'u Gözden Geçir",
+        "dropMoment": "Moment'ı Drop Et"
+      }
     }
   }
 }
