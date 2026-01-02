@@ -573,7 +573,7 @@ describe('Payment Flow Integration', () => {
         { amount: 100, id: 'txn-3' },
       ];
 
-      mockTransactionsService.create.mockImplementation((data) => {
+      mockTransactionsService.create.mockImplementation((data: Record<string, unknown>) => {
         return Promise.resolve({
           data: {
             id: `txn-${Date.now()}`,
@@ -598,7 +598,7 @@ describe('Payment Flow Integration', () => {
 
       // Verify all completed successfully
       expect(results).toHaveLength(3);
-      results.forEach((result) => {
+      results.forEach((result: { transaction: { status: string } }) => {
         expect(result.transaction.status).toBe('completed');
       });
 
