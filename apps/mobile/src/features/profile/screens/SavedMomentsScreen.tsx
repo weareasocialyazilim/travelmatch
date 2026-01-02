@@ -119,7 +119,7 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
         <Text style={styles.title}>Saved Vibes</Text>
-        <View style={{ width: 24 }} />
+        <View style={styles.spacer} />
       </View>
 
       {savedMoments.length === 0 ? (
@@ -206,6 +206,7 @@ const styles = StyleSheet.create({
     padding: 6,
     borderRadius: 12,
   },
+  spacer: { width: 24 },
   headerSpacer: {
     width: 24,
   },
