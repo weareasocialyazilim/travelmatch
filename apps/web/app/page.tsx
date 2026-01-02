@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import {
   Zap,
   Menu,
@@ -425,13 +426,13 @@ const StashCard = ({ item, onSelect, content }: { item: GiftItem, onSelect: (i: 
       <div className="absolute inset-0 bg-black border-4 border-white rounded-[30px] overflow-hidden z-10 flex flex-col">
 
          <div className="relative flex-1 overflow-hidden">
-             <img src={item.img} alt={item.title} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-105 group-hover:scale-110" />
+             <Image src={item.img} alt={item.title} fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-105 group-hover:scale-110" unoptimized />
              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
 
              {/* Top User Badge */}
              <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md border border-white/20 py-1.5 pl-1.5 pr-4 rounded-full flex items-center gap-3 shadow-lg">
-                <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden">
-                    <img src={item.userImg} className="w-full h-full object-cover" alt={item.user} />
+                <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden relative">
+                    <Image src={item.userImg} fill className="object-cover" alt={item.user} unoptimized />
                 </div>
                 <div className="flex flex-col">
                     <span className="text-white text-xs font-bold leading-none">{item.user}</span>
@@ -546,7 +547,7 @@ const Manifesto = ({ onNotify, content }: { onNotify: (msg: string) => void, con
               onClick={() => onNotify(content.manifesto.videoAlert)}
             >
                 <div className="w-full h-full bg-[#1a1a1a] relative overflow-hidden border-2 border-white/20">
-                    <img src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=1000&auto=format&fit=crop" className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-500 grayscale group-hover:grayscale-0" alt="Manifesto video" />
+                    <Image src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=1000&auto=format&fit=crop" fill className="object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-500 grayscale group-hover:grayscale-0" alt="Manifesto video" unoptimized />
 
                     <div className="absolute inset-0 flex items-center justify-center">
                         <div className="w-24 h-24 rounded-full border-[6px] border-white flex items-center justify-center group-hover:scale-110 transition-transform bg-black/40 backdrop-blur-sm group-hover:bg-[#CCFF00] group-hover:border-black">
@@ -565,7 +566,7 @@ const Manifesto = ({ onNotify, content }: { onNotify: (msg: string) => void, con
     </section>
 );
 
-const Footer = ({ onNotify, content }: { onNotify: (msg: string) => void, content: ContentType }) => {
+const Footer = ({ content }: { content: ContentType }) => {
     const [email, setEmail] = useState('');
 
     const handleJoin = () => {
@@ -652,7 +653,7 @@ const GiftPopup = ({ item, onClose, onConfirm, content }: { item: GiftItem, onCl
       <div className="flex flex-col items-center mt-4 mb-8">
          <div className="relative mb-4 group cursor-pointer">
             <div className="absolute inset-0 bg-[#CCFF00] rounded-full blur-md opacity-50 group-hover:opacity-100 transition-opacity"></div>
-            <img src={item.userImg} className="w-28 h-28 rounded-full border-4 border-[#CCFF00] relative z-10 object-cover" alt={item.user} />
+            <Image src={item.userImg} width={112} height={112} className="rounded-full border-4 border-[#CCFF00] relative z-10 object-cover" alt={item.user} unoptimized />
             <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-black text-white text-sm font-bold px-4 py-1 border-2 border-white rounded-full z-20 whitespace-nowrap">
                {item.user}
             </div>
@@ -766,7 +767,7 @@ export default function Home() {
         <Marquee />
         <TheStash onGiftSelect={setSelectedGift} onNotify={setNotification} content={c} />
         <Manifesto onNotify={setNotification} content={c} />
-        <Footer onNotify={setNotification} content={c} />
+        <Footer content={c} />
       </main>
 
       {/* Modals */}
