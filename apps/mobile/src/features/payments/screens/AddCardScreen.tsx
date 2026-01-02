@@ -14,12 +14,12 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FlipInYRight } from 'react-native-reanimated';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
-const { width } = Dimensions.get('window');
+const _screenWidth = Dimensions.get('window').width;
 
-type Props = NativeStackScreenProps<RootStackParamList, 'AddCard'>;
+type Props = StackScreenProps<RootStackParamList, 'AddCard'>;
 
 export const AddCardScreen = ({ navigation }: Props) => {
   const insets = useSafeAreaInsets();

@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { TransactionHistoryScreen } from '@/screens/TransactionHistoryScreen';
+import TransactionHistoryScreen from '../TransactionHistoryScreen';
 
 // Mock navigation
 const mockNavigation = {

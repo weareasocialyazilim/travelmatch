@@ -59,23 +59,20 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
     >
       <View style={styles.avatarContainer}>
         <Image
-          source={{ uri: conversation.otherUser.avatarUrl }}
+          source={{ uri: conversation.participantAvatar ?? undefined }}
           style={styles.avatar}
           contentFit="cover"
         />
-        {conversation.otherUser.isOnline && (
-          <View style={styles.onlineIndicator} />
-        )}
       </View>
 
       <View style={styles.conversationContent}>
         <View style={styles.conversationHeader}>
           <Text style={[styles.userName, hasUnread && styles.userNameUnread]}>
-            {conversation.otherUser.name}
+            {conversation.participantName}
           </Text>
           <Text style={styles.timestamp}>
             {formatTimeAgo(
-              conversation.lastMessage?.createdAt || conversation.updatedAt,
+              conversation.lastMessageAt || new Date().toISOString(),
             )}
           </Text>
         </View>
@@ -84,7 +81,7 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
             style={[styles.lastMessage, hasUnread && styles.lastMessageUnread]}
             numberOfLines={1}
           >
-            {conversation.lastMessage?.content || 'No messages yet'}
+            {conversation.lastMessage || 'No messages yet'}
           </Text>
           {hasUnread && (
             <View style={styles.unreadBadge}>
@@ -105,7 +102,7 @@ const InboxScreen: React.FC = () => {
   const {
     conversations,
     conversationsLoading: isLoading,
-    conversationsError: error,
+    conversationsError: _error,
     refreshConversations,
   } = useMessages();
 
@@ -118,8 +115,8 @@ const InboxScreen: React.FC = () => {
     const query = searchQuery.toLowerCase();
     return conversations.filter(
       (c) =>
-        c.otherUser.name.toLowerCase().includes(query) ||
-        c.lastMessage?.content.toLowerCase().includes(query),
+        (c.participantName?.toLowerCase().includes(query) ?? false) ||
+        (c.lastMessage?.toLowerCase().includes(query) ?? false),
     );
   }, [conversations, searchQuery]);
 
@@ -138,7 +135,15 @@ const InboxScreen: React.FC = () => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       navigation.navigate('ChatDetail', {
         conversationId: conversation.id,
-        otherUser: conversation.otherUser,
+        otherUser: {
+          id: conversation.participantId,
+          name: conversation.participantName || 'User',
+          avatar: conversation.participantAvatar,
+          isVerified: conversation.participantVerified ?? false,
+          role: 'Traveler',
+          kyc: conversation.participantVerified ? 'Verified' : 'Pending',
+          location: '',
+        },
       });
     },
     [navigation],
@@ -160,8 +165,8 @@ const InboxScreen: React.FC = () => {
         <View style={styles.header}>
           <Text style={styles.title}>Messages</Text>
         </View>
-        <SkeletonList count={8} />
-        <BottomNav />
+        <SkeletonList type="chat" count={8} />
+        <BottomNav activeTab="Messages" />
       </SafeAreaView>
     );
   }
@@ -234,7 +239,7 @@ const InboxScreen: React.FC = () => {
         />
       )}
 
-      <BottomNav />
+      <BottomNav activeTab="Messages" />
     </SafeAreaView>
   );
 };
@@ -360,4 +365,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withErrorBoundary(InboxScreen, 'InboxScreen');
+export default withErrorBoundary(InboxScreen, {
+  fallbackType: 'generic',
+  displayName: 'InboxScreen',
+});

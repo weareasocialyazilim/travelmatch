@@ -92,7 +92,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
 
               if (result) {
                 navigation.navigate('Success', {
-                  type: 'withdrawal',
+                  type: 'withdraw',
                   title: t('withdrawal.withdrawalStarted'),
                   subtitle: t('withdrawal.withdrawalMessage'),
                   details: {
