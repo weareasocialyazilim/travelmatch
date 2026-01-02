@@ -115,7 +115,7 @@ export const TicketScreen: React.FC = () => {
             <Skeleton width="100%" height={200} borderRadius={0} />
             <View style={styles.ticketBottom}>
               <Skeleton width={150} height={150} borderRadius={8} />
-              <Skeleton width={120} height={24} style={{ marginTop: 16 }} />
+              <Skeleton width={120} height={24} style={styles.skeletonMarginTop} />
             </View>
           </View>
         </View>
@@ -389,6 +389,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.text.primary,
     marginTop: 4,
+  },
+  skeletonMarginTop: {
+    marginTop: 16,
   },
 });
 

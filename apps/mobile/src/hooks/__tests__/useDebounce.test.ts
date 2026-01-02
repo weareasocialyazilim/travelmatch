@@ -258,16 +258,17 @@ describe('useDebounce Hook', () => {
 
     it('returns stable function reference', () => {
       const callback = jest.fn() as jest.Mock;
-      const { result, rerender } = renderHook(() => 
-        useDebouncedCallback(callback, 500)
+      const { result, rerender } = renderHook(
+        ({ cb }) => useDebouncedCallback(cb, 500),
+        { initialProps: { cb: callback } }
       );
 
       const firstRef = result.current;
-      
-      rerender();
-      
+
+      rerender({ cb: callback });
+
       const secondRef = result.current;
-      
+
       expect(firstRef).toBe(secondRef);
     });
   });

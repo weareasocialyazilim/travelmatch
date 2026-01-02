@@ -28,7 +28,7 @@ export const DisputeScreen = () => {
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}><Ionicons name="close" size={28} color="white" /></TouchableOpacity>
         <Text style={styles.headerTitle}>Open Dispute</Text>
-        <View style={{ width: 28 }} />
+        <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
@@ -93,4 +93,5 @@ const styles = StyleSheet.create({
   submitBtn: { backgroundColor: '#FF4444', padding: 18, borderRadius: 16, alignItems: 'center' },
   disabledBtn: { backgroundColor: '#333' },
   submitText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
+  headerSpacer: { width: 28 },
 });

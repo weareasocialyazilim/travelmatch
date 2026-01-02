@@ -98,5 +98,9 @@
       "fast-xml-parser": "^4.5.0",
       "glob": "^9.0.0"
     }
+  },
+  "dependencies": {
+    "react-native-qrcode-svg": "^6.3.21",
+    "react-native-svg": "^15.15.1"
   }
 }
