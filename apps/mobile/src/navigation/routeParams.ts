@@ -322,6 +322,12 @@ export type RootStackParamList = {
   // Image Viewer (fullscreen modal)
   ImageViewer: { imageUrl: string };
 
+  // Location Picker
+  PickLocation: undefined;
+
+  // Not Found (404)
+  NotFound: undefined;
+
   // Date Time Picker Modal
   DateTimePicker:
     | {
