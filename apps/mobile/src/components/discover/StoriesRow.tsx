@@ -1,6 +1,15 @@
 /**
  * StoriesRow Component
- * Horizontal stories row for Discover screen
+ *
+ * Keşfet ekranı yatay Story şeridi.
+ * "Enerji bandı" gibi görünecek şekilde tasarlandı.
+ *
+ * Features:
+ * - Soft Dark tema ile uyumlu spacing ve hiyerarşi
+ * - Canlı deneyimler için özel styling
+ * - Premium spacing (20px horizontal padding)
+ *
+ * Part of TravelMatch "Cinematic Trust Jewelry" Design System.
  */
 
 import React, { memo } from 'react';
@@ -14,18 +23,34 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
+import { TYPOGRAPHY_SYSTEM } from '../../constants/typography';
 import type { UserStory } from './types';
 
 interface StoriesRowProps {
   stories: UserStory[];
   onStoryPress: (story: UserStory, index: number) => void;
   onCreatePress: () => void;
+  /** Section title (default: "Canlı Deneyimler") */
+  sectionTitle?: string;
+  /** Hide section title */
+  hideTitle?: boolean;
 }
 
 const StoriesRow: React.FC<StoriesRowProps> = memo(
-  ({ stories, onStoryPress, onCreatePress }) => {
+  ({
+    stories,
+    onStoryPress,
+    onCreatePress,
+    sectionTitle = 'Canlı Deneyimler',
+    hideTitle = false,
+  }) => {
     return (
       <View style={styles.storiesSection}>
+        {/* Section Title - Energy Band Label */}
+        {!hideTitle && (
+          <Text style={styles.sectionTitle}>{sectionTitle}</Text>
+        )}
+
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -88,19 +113,36 @@ const StoriesRow: React.FC<StoriesRowProps> = memo(
 StoriesRow.displayName = 'StoriesRow';
 
 const styles = StyleSheet.create({
+  // Container - "Enerji bandı" background
   storiesSection: {
-    backgroundColor: COLORS.utility.white,
-    paddingBottom: 16,
-    paddingTop: 8,
+    backgroundColor: COLORS.bg.primary,
+    paddingVertical: 8,
   },
+
+  // Section Title - Uppercase label
+  sectionTitle: {
+    fontSize: TYPOGRAPHY_SYSTEM.sizes.bodyS,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.body,
+    color: COLORS.text.secondary,
+    paddingHorizontal: 20,
+    marginBottom: 16,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+
+  // Horizontal scroll content
   storiesScroll: {
     gap: 16,
     paddingHorizontal: 20,
   },
+
+  // Individual story item
   storyItem: {
     alignItems: 'center',
     width: 72,
   },
+
+  // Create button - dashed border
   createStoryRing: {
     alignItems: 'center',
     backgroundColor: COLORS.bg.primary,
@@ -114,12 +156,14 @@ const styles = StyleSheet.create({
   },
   createStoryInner: {
     alignItems: 'center',
-    backgroundColor: COLORS.utility.white,
+    backgroundColor: COLORS.surface.base,
     borderRadius: 30,
     height: 60,
     justifyContent: 'center',
     width: 60,
   },
+
+  // Story ring - gradient border for new stories
   storyRing: {
     alignItems: 'center',
     borderRadius: 36,
@@ -132,23 +176,43 @@ const styles = StyleSheet.create({
   storyRingNew: {
     borderColor: COLORS.brand.primary,
   },
+  storyRingLive: {
+    borderColor: COLORS.success,
+  },
   storyRingViewed: {
     borderColor: COLORS.border.default,
   },
+
+  // Avatar
   storyAvatar: {
     borderRadius: 30,
     height: 60,
     width: 60,
   },
+
+  // Name - using typography system
   storyName: {
     color: COLORS.text.primary,
-    fontSize: 12,
+    fontSize: TYPOGRAPHY_SYSTEM.sizes.caption,
     marginTop: 6,
     textAlign: 'center',
   },
+
+  // Live/New indicator dot
   newIndicator: {
     backgroundColor: COLORS.brand.primary,
-    borderColor: COLORS.utility.white,
+    borderColor: COLORS.bg.primary,
+    borderRadius: 6,
+    borderWidth: 2,
+    height: 12,
+    position: 'absolute',
+    right: 12,
+    top: 0,
+    width: 12,
+  },
+  liveIndicator: {
+    backgroundColor: COLORS.success,
+    borderColor: COLORS.bg.primary,
     borderRadius: 6,
     borderWidth: 2,
     height: 12,
