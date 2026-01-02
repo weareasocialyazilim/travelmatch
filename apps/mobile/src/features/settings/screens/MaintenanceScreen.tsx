@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Linking } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
-import { LinearGradient } from 'expo-linear-gradient';
 
 export const MaintenanceScreen = () => {
   const handleCheckStatus = () => {

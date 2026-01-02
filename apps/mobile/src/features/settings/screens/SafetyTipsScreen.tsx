@@ -16,7 +16,7 @@ interface SafetyTip {
 
 const TIPS: SafetyTip[] = [
   { icon: 'map-marker-star', title: 'Meet in Public', desc: 'Always meet your match in a busy, public place like a cafe or restaurant. Never at a private residence for the first time.' },
-  { icon: 'wallet-off', title: 'Keep Payments In-App', desc: 'Never send cash or wire transfers. TravelMatch protects your payments only if they happen within the app.' },
+  { icon: 'cash-off', title: 'Keep Payments In-App', desc: 'Never send cash or wire transfers. TravelMatch protects your payments only if they happen within the app.' },
   { icon: 'share-variant', title: 'Share Your Plans', desc: 'Tell a friend or family member where you are going and who you are meeting.' },
   { icon: 'alert-decagram', title: 'Trust Your Gut', desc: 'If something feels off, leave. Your safety is more important than politeness.' },
 ];
@@ -33,7 +33,7 @@ export const SafetyTipsScreen: React.FC<SafetyTipsScreenProps> = ({ navigation }
           <Ionicons name="close" size={28} color="white" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Travel Safe</Text>
-        <View style={{ width: 28 }} />
+        <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -62,6 +62,7 @@ export const SafetyTipsScreen: React.FC<SafetyTipsScreenProps> = ({ navigation }
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background.primary },
   header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center' },
+  headerSpacer: { width: 28 },
   headerTitle: { fontSize: 18, fontWeight: 'bold', color: 'white' },
   content: { padding: 20 },
   hero: { fontSize: 28, fontWeight: '900', color: 'white', marginBottom: 30, lineHeight: 34 },
