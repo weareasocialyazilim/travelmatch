@@ -77,8 +77,9 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'KYC verileri yüklenemedi' }, { status: 500 });
       }
 
+      type UserKyc = { id: string; kyc_status?: string; kyc_submitted_at?: string; kyc_reviewed_at?: string; created_at: string; display_name?: string; avatar_url?: string; email?: string; phone?: string };
       return NextResponse.json({
-        submissions: users?.map(p => ({
+        submissions: users?.map((p: UserKyc) => ({
           id: p.id,
           user_id: p.id,
           status: p.kyc_status,
@@ -99,11 +100,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Calculate summary
+    type Submission = { status?: string };
     const summary = {
       total: count || 0,
-      pending: submissions?.filter(s => s.status === 'pending').length || 0,
-      approved: submissions?.filter(s => s.status === 'approved' || s.status === 'verified').length || 0,
-      rejected: submissions?.filter(s => s.status === 'rejected').length || 0,
+      pending: submissions?.filter((s: Submission) => s.status === 'pending').length || 0,
+      approved: submissions?.filter((s: Submission) => s.status === 'approved' || s.status === 'verified').length || 0,
+      rejected: submissions?.filter((s: Submission) => s.status === 'rejected').length || 0,
     };
 
     return NextResponse.json({

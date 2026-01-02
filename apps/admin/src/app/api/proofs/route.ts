@@ -65,16 +65,17 @@ export async function GET(request: NextRequest) {
     }
 
     // Calculate summary
+    type Proof = { status?: string; type?: string };
     const summary = {
       total: count || 0,
-      pending: proofs?.filter(p => p.status === 'pending').length || 0,
-      verified: proofs?.filter(p => p.status === 'verified').length || 0,
-      rejected: proofs?.filter(p => p.status === 'rejected').length || 0,
+      pending: proofs?.filter((p: Proof) => p.status === 'pending').length || 0,
+      verified: proofs?.filter((p: Proof) => p.status === 'verified').length || 0,
+      rejected: proofs?.filter((p: Proof) => p.status === 'rejected').length || 0,
       byType: {
-        'micro-kindness': proofs?.filter(p => p.type === 'micro-kindness').length || 0,
-        'verified-experience': proofs?.filter(p => p.type === 'verified-experience').length || 0,
-        'community-proof': proofs?.filter(p => p.type === 'community-proof').length || 0,
-        'milestone': proofs?.filter(p => p.type === 'milestone').length || 0,
+        'micro-kindness': proofs?.filter((p: Proof) => p.type === 'micro-kindness').length || 0,
+        'verified-experience': proofs?.filter((p: Proof) => p.type === 'verified-experience').length || 0,
+        'community-proof': proofs?.filter((p: Proof) => p.type === 'community-proof').length || 0,
+        'milestone': proofs?.filter((p: Proof) => p.type === 'milestone').length || 0,
       },
     };
 
