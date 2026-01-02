@@ -189,7 +189,7 @@ const customRender = (
   // Fallback getByPlaceholderText to handle cases where scoped queries don't
   // find inputs rendered by NavigationContainer/modal roots.
   const originalGetByPlaceholderText = result.getByPlaceholderText;
-  result.getByPlaceholderText = (text: string) => {
+  (result as any).getByPlaceholderText = (text: string) => {
     try {
       return originalGetByPlaceholderText(text as any);
     } catch (err) {
@@ -341,9 +341,9 @@ export const createSnapshot = (component: ReactElement) => {
  * Accessibility test helpers
  */
 export const checkAccessibility = (component: ReactElement) => {
-  const { getByLabelText, getByA11yRole, getByA11yHint } = render(component);
+  const { getByLabelText, getByRole, getByHintText } = render(component);
   // Add accessibility checks here
-  return { getByLabelText, getByA11yRole, getByA11yHint };
+  return { getByLabelText, getByRole, getByHintText };
 };
 
 // Jest requires at least one test in test files
