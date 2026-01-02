@@ -51,19 +51,14 @@ export const options = {
   thresholds: {
     // Error rate must be below 1%
     'errors': ['rate<0.01'],
-    
-    // 95th percentile response time must be < 100ms
-    'http_req_duration': ['p(95)<100'],
-    
-    // 99th percentile < 200ms
-    'http_req_duration': ['p(99)<200'],
-    
-    // Average response time < 50ms
-    'http_req_duration': ['avg<50'],
-    
+
+    // HTTP request duration thresholds (combined)
+    // p95 < 100ms, p99 < 200ms, avg < 50ms
+    'http_req_duration': ['p(95)<100', 'p(99)<200', 'avg<50'],
+
     // Request rate > 500/s
     'http_reqs': ['rate>500'],
-    
+
     // Specific endpoint thresholds
     'api_latency': ['p(95)<100'],
     'moments_latency': ['p(95)<150'],
