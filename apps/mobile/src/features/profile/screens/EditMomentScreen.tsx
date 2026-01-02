@@ -13,7 +13,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS } from '@/theme/colors';
+import { COLORS } from '@/constants/colors';
 
 export const EditMomentScreen = ({ navigation }: any) => {
   const insets = useSafeAreaInsets();

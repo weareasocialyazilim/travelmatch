@@ -320,7 +320,7 @@ export const useMessages = (): UseMessagesReturn => {
   const archiveConversation = useCallback(
     async (conversationId: string): Promise<boolean> => {
       try {
-        messageService.archiveConversation(conversationId);
+        await messageService.archiveConversation(conversationId);
 
         if (!mountedRef.current) return true;
 

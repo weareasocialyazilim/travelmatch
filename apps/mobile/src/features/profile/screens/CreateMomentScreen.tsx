@@ -37,6 +37,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import type { NavigationProp } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import { COLORS, GRADIENTS } from '@/constants/colors';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
@@ -63,6 +64,7 @@ const CreateMomentScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const { createMoment } = useMoments();
   const { showToast } = useToast();
+  const { t } = useTranslation();
 
   // Step state
   const [step, setStep] = useState<Step>('media');
@@ -95,8 +97,8 @@ const CreateMomentScreen: React.FC = () => {
   const handleDrop = useCallback(async () => {
     if (!title || !selectedCategory || !imageUri) {
       Alert.alert(
-        'Eksik Bilgi',
-        'Lütfen tüm alanları doldur, vibe yarım kalmasın. ✨',
+        t('screens.createMoment.missingInfoTitle'),
+        t('screens.createMoment.missingInfoMessage'),
       );
       return;
     }
@@ -126,9 +128,9 @@ const CreateMomentScreen: React.FC = () => {
 
       if (createdMoment) {
         Alert.alert(
-          'Boom! 💥',
-          'Moment başarıyla drop edildi. Şimdi eşleşmeleri bekle!',
-          [{ text: 'Lets Go', onPress: () => navigation.navigate('Discover') }],
+          t('screens.createMoment.successTitle'),
+          t('screens.createMoment.successMessage'),
+          [{ text: t('screens.createMoment.successButton'), onPress: () => navigation.navigate('Discover') }],
         );
       } else {
         showToast('Could not create moment. Please try again.', 'error');
@@ -138,7 +140,7 @@ const CreateMomentScreen: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [title, selectedCategory, imageUri, price, createMoment, navigation, showToast]);
+  }, [title, selectedCategory, imageUri, price, createMoment, navigation, showToast, t]);
 
   // Navigate back to media step
   const handleBack = useCallback(() => {
@@ -172,7 +174,7 @@ const CreateMomentScreen: React.FC = () => {
         </LinearGradient>
       </TouchableOpacity>
       <Text style={styles.stepHint}>
-        Yüksek kaliteli, dikey bir fotoğraf seç.{'\n'}Bu senin vitrinin.
+        {t('screens.createMoment.uploadHint')}
       </Text>
     </Animated.View>
   );
@@ -191,7 +193,7 @@ const CreateMomentScreen: React.FC = () => {
           <TouchableOpacity
             onPress={handleBack}
             style={styles.iconButton}
-            accessibilityLabel="Geri"
+            accessibilityLabel={t('screens.createMoment.a11y.back')}
             accessibilityRole="button"
           >
             <Ionicons name="arrow-back" size={24} color="white" />
@@ -199,7 +201,7 @@ const CreateMomentScreen: React.FC = () => {
           <TouchableOpacity
             onPress={handleClose}
             style={styles.iconButton}
-            accessibilityLabel="Kapat"
+            accessibilityLabel={t('screens.createMoment.a11y.close')}
             accessibilityRole="button"
           >
             <Ionicons name="close" size={24} color="white" />
@@ -221,7 +223,7 @@ const CreateMomentScreen: React.FC = () => {
                 onChangeText={setTitle}
                 maxLength={40}
                 autoFocus
-                accessibilityLabel="Moment başlığı"
+                accessibilityLabel={t('screens.createMoment.a11y.momentTitle')}
               />
 
               <View style={styles.categoryGrid}>
@@ -261,7 +263,7 @@ const CreateMomentScreen: React.FC = () => {
                 ]}
                 onPress={() => setStep('price')}
                 disabled={!title || !selectedCategory}
-                accessibilityLabel="Sonraki: Fiyat Belirle"
+                accessibilityLabel={t('screens.createMoment.a11y.nextPrice')}
                 accessibilityRole="button"
               >
                 <Text style={styles.nextButtonText}>Next: Set Price</Text>
@@ -287,17 +289,17 @@ const CreateMomentScreen: React.FC = () => {
                   onChangeText={setPrice}
                   keyboardType="number-pad"
                   maxLength={4}
-                  accessibilityLabel="Fiyat"
+                  accessibilityLabel={t('screens.createMoment.a11y.price')}
                 />
               </View>
               <Text style={styles.priceHint}>
-                Bu tutarı eşleştiğin kişi ödeyecek (veya paylaşacaksınız).
+                {t('screens.createMoment.priceHint')}
               </Text>
 
               <TouchableOpacity
                 style={styles.nextButton}
                 onPress={() => setStep('review')}
-                accessibilityLabel="Drop'u Gözden Geçir"
+                accessibilityLabel={t('screens.createMoment.a11y.reviewDrop')}
                 accessibilityRole="button"
               >
                 <Text style={styles.nextButtonText}>Review Drop</Text>
@@ -325,7 +327,7 @@ const CreateMomentScreen: React.FC = () => {
                 ]}
                 onPress={handleDrop}
                 disabled={isSubmitting}
-                accessibilityLabel="Moment'ı Drop Et"
+                accessibilityLabel={t('screens.createMoment.a11y.dropMoment')}
                 accessibilityRole="button"
               >
                 <Text style={[styles.nextButtonText, styles.dropButtonText]}>

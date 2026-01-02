@@ -27,8 +27,8 @@ export async function GET(request: NextRequest) {
       .select(
         `
         *,
-        sender:profiles!escrow_transactions_sender_id_fkey(id, display_name, avatar_url, email),
-        recipient:profiles!escrow_transactions_recipient_id_fkey(id, display_name, avatar_url, email),
+        sender:users!escrow_transactions_sender_id_fkey(id, display_name, avatar_url, email),
+        recipient:users!escrow_transactions_recipient_id_fkey(id, display_name, avatar_url, email),
         moment:moments(id, title, price)
       `,
         { count: 'exact' }

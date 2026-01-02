@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '@/theme/colors';
+import { COLORS } from '@/constants/colors';
 
 const TRIPS = [
   { id: '1', title: 'Dinner at Hotel Costes', date: 'Tonight, 20:00', status: 'upcoming', image: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=200', host: 'Selin Y.' },

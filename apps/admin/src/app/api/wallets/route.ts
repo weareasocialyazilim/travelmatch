@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
         .select(
           `
           *,
-          user:profiles!wallets_user_id_fkey(id, display_name, avatar_url, email, kyc_status)
+          user:users!wallets_user_id_fkey(id, display_name, avatar_url, email, kyc_status)
         `
         )
         .eq('user_id', userId)
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
       if (error) {
         // If no wallet exists, get user info and return zero balance
         const { data: user } = await supabase
-          .from('profiles')
+          .from('users')
           .select('id, display_name, avatar_url, email, kyc_status')
           .eq('id', userId)
           .single();
@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
       .select(
         `
         *,
-        user:profiles!wallets_user_id_fkey(id, display_name, avatar_url, email, kyc_status)
+        user:users!wallets_user_id_fkey(id, display_name, avatar_url, email, kyc_status)
       `,
         { count: 'exact' }
       )

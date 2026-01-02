@@ -4,6 +4,12 @@
  * Provides certificate pinning for secure API endpoints
  * to prevent man-in-the-middle attacks.
  *
+ * IMPORTANT: For production deployment, you must:
+ * 1. Obtain real certificate pins using: openssl s_client -connect domain:443 | openssl x509 -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64
+ * 2. Replace the placeholder pins below with real SHA-256 public key hashes
+ * 3. Include backup pins from intermediate certificates
+ * 4. Set up certificate rotation monitoring
+ *
  * @see https://owasp.org/www-community/controls/Certificate_and_Public_Key_Pinning
  */
 
@@ -11,8 +17,46 @@ import { Platform } from 'react-native';
 import { logger } from './logger';
 
 /**
+ * Check if a pin value is a placeholder (not a real certificate hash)
+ */
+function isPlaceholderPin(pin: string): boolean {
+  // Placeholder pins contain repeated characters like AAA, BBB, etc.
+  const placeholderPatterns = [
+    /^sha256\/[A-Z]{43}=$/,  // All same uppercase letter
+    /^sha256\/placeholder/i,
+    /^sha256\/TODO/i,
+    /^sha256\/REPLACE/i,
+  ];
+  return placeholderPatterns.some(pattern => pattern.test(pin));
+}
+
+/**
+ * Warn if placeholder pins are detected in development
+ */
+function warnAboutPlaceholderPins(): void {
+  if (__DEV__) {
+    const hasPlaeholders = Object.values(PINNED_DOMAINS).some(config =>
+      config.pins.some(isPlaceholderPin)
+    );
+    if (hasPlaeholders) {
+      logger.warn(
+        'SSL Pinning',
+        'SECURITY WARNING: Placeholder certificate pins detected. ' +
+        'Replace with real certificate hashes before production deployment. ' +
+        'See sslPinning.ts for instructions.'
+      );
+    }
+  }
+}
+
+/**
  * SHA-256 public key pins for trusted domains
- * These should be updated when certificates are rotated
+ *
+ * PRODUCTION CHECKLIST:
+ * - [ ] Replace placeholder pins with real certificate hashes
+ * - [ ] Include both primary and backup pins
+ * - [ ] Set up certificate rotation monitoring
+ * - [ ] Test pinning with Charles Proxy or mitmproxy
  */
 const PINNED_DOMAINS: Record<
   string,
@@ -22,31 +66,37 @@ const PINNED_DOMAINS: Record<
   }
 > = {
   // Supabase API endpoints
+  // TODO: Replace with real Supabase certificate pins before production
   'supabase.co': {
     pins: [
-      // Primary certificate pin (SHA-256)
-      'sha256/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=',
-      // Backup certificate pin
-      'sha256/BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=',
+      // Primary certificate pin - REPLACE with real hash
+      'sha256/PLACEHOLDER_SUPABASE_PRIMARY_CERT_PIN',
+      // Backup certificate pin - REPLACE with real hash
+      'sha256/PLACEHOLDER_SUPABASE_BACKUP_CERT_PIN',
     ],
     includeSubdomains: true,
   },
   // Stripe API endpoints
+  // TODO: Replace with real Stripe certificate pins before production
   'api.stripe.com': {
     pins: [
-      'sha256/CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC=',
-      'sha256/DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD=',
+      'sha256/PLACEHOLDER_STRIPE_PRIMARY_CERT_PIN',
+      'sha256/PLACEHOLDER_STRIPE_BACKUP_CERT_PIN',
     ],
     includeSubdomains: false,
   },
   // Cloudflare Images
+  // TODO: Replace with real Cloudflare certificate pins before production
   'imagedelivery.net': {
     pins: [
-      'sha256/EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE=',
+      'sha256/PLACEHOLDER_CLOUDFLARE_CERT_PIN',
     ],
     includeSubdomains: true,
   },
 };
+
+// Log warning in development if placeholder pins are detected
+warnAboutPlaceholderPins();
 
 /**
  * Endpoints that require SSL pinning
@@ -147,9 +197,14 @@ interface SSLValidationResult {
 
 /**
  * Validate SSL certificate for a request
- * Note: This is a placeholder for native module integration
  *
- * For production, integrate with:
+ * In Expo managed workflow, native certificate pinning is limited.
+ * This function provides:
+ * 1. Development warnings about placeholder pins
+ * 2. Logging for security monitoring
+ * 3. A hook point for future native module integration
+ *
+ * For full production security, integrate with:
  * - iOS: TrustKit or URLSession delegate
  * - Android: OkHttp CertificatePinner
  */
@@ -174,10 +229,38 @@ export async function validateSSLCertificate(
     };
   }
 
-  // In React Native, SSL pinning is typically handled at the native level
-  // This function serves as a validation check and logging mechanism
+  // Get pins for this domain
+  const pins = getPinsForDomain(domain);
+  const hasPlaceholderPins = pins.some(isPlaceholderPin);
+
+  // In development, warn about placeholder pins
   if (__DEV__) {
+    if (hasPlaceholderPins) {
+      logger.warn(
+        'SSL Pinning',
+        `Placeholder pins detected for ${domain}. ` +
+        'Replace with real certificate hashes before production.'
+      );
+    }
     logger.debug('SSL Pinning', `Validating certificate for ${domain}`);
+  }
+
+  // In production, FAIL if placeholder pins are still present
+  // This is a critical security issue that must be fixed before deployment
+  if (!__DEV__ && hasPlaceholderPins) {
+    logger.error(
+      'SSL Pinning',
+      `CRITICAL: Placeholder certificate pins detected for ${domain} in production. ` +
+      'SSL pinning is not providing protection! Request blocked for security.'
+    );
+    // SECURITY: Block requests with placeholder pins in production
+    // This prevents deploying without proper certificate pinning
+    return {
+      valid: false,
+      error: `SSL_PINNING_NOT_CONFIGURED: Placeholder pins detected for ${domain}. ` +
+        'Real certificate hashes must be configured before production deployment.',
+      domain,
+    };
   }
 
   // For Expo managed workflow, we rely on:

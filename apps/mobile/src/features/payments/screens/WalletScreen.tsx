@@ -305,7 +305,7 @@ const WalletScreen = () => {
                 <View style={styles.cardActions}>
                   <TouchableOpacity
                     style={styles.actionBtnPrimary}
-                    onPress={() => navigation.navigate('AddMoney' as never)}
+                    onPress={() => navigation.navigate('AddMoney')}
                     accessible={true}
                     accessibilityLabel="Para yükle"
                     accessibilityRole="button"

@@ -30,7 +30,7 @@ describe('ShareMomentBottomSheet', () => {
   const defaultProps = {
     visible: true,
     onClose: mockOnClose,
-    momentUrl: 'https://travelmatch.com/moment/123',
+    momentUrl: 'https://travelmatch.app/moment/123',
     momentTitle: 'Amazing coffee experience!',
   };
 
@@ -111,7 +111,7 @@ describe('ShareMomentBottomSheet', () => {
       const copyButton = getByText('Copy link');
       fireEvent.press(copyButton);
       expect(Clipboard.setString).toHaveBeenCalledWith(
-        'https://travelmatch.com/moment/123',
+        'https://travelmatch.app/moment/123',
       );
     });
 
@@ -159,8 +159,8 @@ describe('ShareMomentBottomSheet', () => {
       await waitFor(() => {
         expect(Share.share).toHaveBeenCalledWith({
           message:
-            'Amazing coffee experience!\nhttps://travelmatch.com/moment/123',
-          url: 'https://travelmatch.com/moment/123',
+            'Amazing coffee experience!\nhttps://travelmatch.app/moment/123',
+          url: 'https://travelmatch.app/moment/123',
         });
       });
     });
@@ -189,8 +189,8 @@ describe('ShareMomentBottomSheet', () => {
       await waitFor(() => {
         expect(Share.share).toHaveBeenCalledWith({
           message:
-            'Check out this amazing travel moment!\nhttps://travelmatch.com/moment/123',
-          url: 'https://travelmatch.com/moment/123',
+            'Check out this amazing travel moment!\nhttps://travelmatch.app/moment/123',
+          url: 'https://travelmatch.app/moment/123',
         });
       });
     });
@@ -328,7 +328,7 @@ describe('ShareMomentBottomSheet', () => {
     });
 
     it('handles very long momentUrl', () => {
-      const longUrl = 'https://travelmatch.com/moment/' + 'a'.repeat(500);
+      const longUrl = 'https://travelmatch.app/moment/' + 'a'.repeat(500);
       const { getByText } = render(
         <ShareMomentBottomSheet {...defaultProps} momentUrl={longUrl} />,
       );
@@ -346,15 +346,15 @@ describe('ShareMomentBottomSheet', () => {
       fireEvent.press(shareButton);
       await waitFor(() => {
         expect(Share.share).toHaveBeenCalledWith({
-          message: `${longTitle}\nhttps://travelmatch.com/moment/123`,
-          url: 'https://travelmatch.com/moment/123',
+          message: `${longTitle}\nhttps://travelmatch.app/moment/123`,
+          url: 'https://travelmatch.app/moment/123',
         });
       });
     });
 
     it('handles special characters in URL', () => {
       const specialUrl =
-        'https://travelmatch.com/moment/123?ref=share&utm_source=app';
+        'https://travelmatch.app/moment/123?ref=share&utm_source=app';
       const { getByText } = render(
         <ShareMomentBottomSheet {...defaultProps} momentUrl={specialUrl} />,
       );
@@ -372,8 +372,8 @@ describe('ShareMomentBottomSheet', () => {
       fireEvent.press(shareButton);
       await waitFor(() => {
         expect(Share.share).toHaveBeenCalledWith({
-          message: `${specialTitle}\nhttps://travelmatch.com/moment/123`,
-          url: 'https://travelmatch.com/moment/123',
+          message: `${specialTitle}\nhttps://travelmatch.app/moment/123`,
+          url: 'https://travelmatch.app/moment/123',
         });
       });
     });

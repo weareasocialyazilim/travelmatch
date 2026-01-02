@@ -577,11 +577,16 @@ export const paymentService = {
       if (!user) throw new Error('Not authenticated');
 
       // First, unset all cards as default
-      await supabase
+      const { error: unsetError } = await supabase
         .from('payment_methods')
         .update({ is_default: false })
         .eq('user_id', user.id)
         .eq('type', 'card');
+
+      if (unsetError) {
+        logger.warn('Failed to unset default cards:', unsetError);
+        // Continue anyway - the new default will still be set
+      }
 
       // Then set the selected card as default
       const { error } = await supabase

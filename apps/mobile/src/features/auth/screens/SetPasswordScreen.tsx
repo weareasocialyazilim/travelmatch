@@ -11,7 +11,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@/hooks/useNavigationHelpers';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useToast } from '@/context/ToastContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
@@ -59,7 +59,7 @@ export const SetPasswordScreen: React.FC = () => {
         showToast(error.message || 'Failed to set password', 'error');
       } else {
         showToast('Password set successfully!', 'success');
-        navigation.navigate('SuccessConfirmation' as never);
+        navigation.navigate('SuccessConfirmation');
       }
     } catch {
       showToast('An error occurred. Please try again.', 'error');

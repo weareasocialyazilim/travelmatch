@@ -8,6 +8,7 @@ import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Storage } from './storage';
 import * as SecureStore from 'expo-secure-store';
+import { logger } from './logger';
 
 // Check if SecureStore is available
 const isSecureStoreAvailable = async (): Promise<boolean> => {
@@ -33,9 +34,8 @@ export const secureStorage = {
         await SecureStore.setItemAsync(key, value);
         return;
       } catch (err) {
-        void err;
+        logger.warn('[SecureStorage] SecureStore.setItem failed, falling back to AsyncStorage', { key, error: err });
         // Try AsyncStorage as a fallback when SecureStore fails
-        // Let AsyncStorage errors propagate to the caller (no need to rethrow)
         await AsyncStorage.setItem(`@secure_${key}`, value);
         return;
       }
@@ -45,7 +45,8 @@ export const secureStorage = {
     try {
       await AsyncStorage.setItem(`@secure_${key}`, value);
       return;
-    } catch {
+    } catch (err) {
+      logger.warn('[SecureStorage] AsyncStorage.setItem failed, falling back to MMKV', { key, error: err });
       // As a last resort, persist to MMKV Storage
       await Storage.setItem(`@secure_${key}`, value);
     }
@@ -60,7 +61,7 @@ export const secureStorage = {
       try {
         return await SecureStore.getItemAsync(key);
       } catch (err) {
-        void err;
+        logger.warn('[SecureStorage] SecureStore.getItem failed, falling back to AsyncStorage', { key, error: err });
         // Fallback to AsyncStorage when SecureStore fails
         return await AsyncStorage.getItem(`@secure_${key}`);
       }
@@ -70,7 +71,7 @@ export const secureStorage = {
     try {
       return await AsyncStorage.getItem(`@secure_${key}`);
     } catch (err) {
-      void err;
+      logger.warn('[SecureStorage] AsyncStorage.getItem failed, falling back to MMKV', { key, error: err });
       // Last resort: MMKV Storage
       return await Storage.getItem(`@secure_${key}`);
     }
@@ -86,7 +87,7 @@ export const secureStorage = {
         await SecureStore.deleteItemAsync(key);
         return;
       } catch (err) {
-        void err;
+        logger.warn('[SecureStorage] SecureStore.deleteItem failed, falling back to AsyncStorage', { key, error: err });
         // Try AsyncStorage as fallback
         await AsyncStorage.removeItem(`@secure_${key}`);
         return;
@@ -98,7 +99,7 @@ export const secureStorage = {
       await AsyncStorage.removeItem(`@secure_${key}`);
       return;
     } catch (err) {
-      void err;
+      logger.warn('[SecureStorage] AsyncStorage.removeItem failed, falling back to MMKV', { key, error: err });
       // Last resort: MMKV Storage
       await Storage.removeItem(`@secure_${key}`);
     }
@@ -138,6 +139,7 @@ export const StorageKeys = {
     BIOMETRIC_KEY: securePrefix('biometric_key'),
     PIN_CODE: securePrefix('pin_code'),
     PAYMENT_METHOD: securePrefix('payment_method'),
+    OAUTH_STATE: securePrefix('oauth_state'), // CSRF protection for OAuth
   },
 
   // NON-SENSITIVE - Can use AsyncStorage (public data)
@@ -236,11 +238,11 @@ export async function migrateSensitiveDataToSecure(): Promise<void> {
       if (value) {
         await secureStorage.setItem(newKey, value);
         await Storage.removeItem(old);
-        // Migration successful (removed console.log for production)
+        logger.info('[SecureStorage] Migration successful', { from: old, to: newKey });
       }
-    } catch {
-      // Migration failed (removed console.error for production)
-      // Error is silently ignored to avoid breaking app startup
+    } catch (err) {
+      // Log migration failure but don't break app startup
+      logger.warn('[SecureStorage] Migration failed', { from: old, to: newKey, error: err });
     }
   }
 }

@@ -13,8 +13,8 @@ export async function GET(
       .from('reports')
       .select(`
         *,
-        reporter:profiles!reporter_id(id, full_name, avatar_url, email),
-        reported:profiles!reported_id(id, full_name, avatar_url, email),
+        reporter:users!reporter_id(id, full_name, avatar_url, email),
+        reported:users!reported_id(id, full_name, avatar_url, email),
         assigned_to:admin_users!assigned_to(id, full_name),
         actions:report_actions(*)
       `)

@@ -269,7 +269,7 @@ const InboxScreen: React.FC = () => {
   // Handle archive button
   const handleArchive = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    navigation.navigate('ArchivedChats' as never);
+    navigation.navigate('ArchivedChats');
   }, [navigation]);
 
   // Render chat item

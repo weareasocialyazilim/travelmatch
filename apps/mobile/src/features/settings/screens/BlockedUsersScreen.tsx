@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '@/theme/colors';
+import { COLORS } from '@/constants/colors';
 
 const BLOCKED_INIT = [
   { id: '1', name: 'Spam Account', handle: '@spam123', avatar: 'https://ui-avatars.com/api/?name=Spam' },
