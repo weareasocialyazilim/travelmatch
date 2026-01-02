@@ -18,7 +18,7 @@ export { default as TermsOfServiceScreen } from './screens/TermsOfServiceScreen'
 export { RefundPolicyScreen } from './screens/RefundPolicyScreen';
 export { default as InviteFriendsScreen } from './screens/InviteFriendsScreen';
 export { default as InviteContactsScreen } from './screens/InviteContactsScreen';
-export { ReportUserScreen } from './screens/ReportUserScreen';
+// ReportUserScreen moved to @/features/moderation
 export { MaintenanceScreen } from './screens/MaintenanceScreen';
 export { default as DataPrivacyScreen } from './screens/DataPrivacyScreen';
 export { CommunityGuidelinesScreen } from './screens/CommunityGuidelinesScreen';

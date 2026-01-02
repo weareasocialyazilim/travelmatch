@@ -12,7 +12,7 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../../constants/colors';
+import { COLORS } from '@/constants/colors';
 import { reportSchema, type ReportInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 
