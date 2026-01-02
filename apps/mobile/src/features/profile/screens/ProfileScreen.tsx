@@ -1,3 +1,13 @@
+/**
+ * ProfileScreen - Awwwards Edition
+ *
+ * Premium profile experience with Twilight Zinc dark theme.
+ * Features:
+ * - Liquid Glass card effects
+ * - Trust Constellation visualization
+ * - Neon accent colors
+ * - Smooth spring animations
+ */
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   View,
@@ -6,13 +16,22 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
+  Platform,
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  FadeInDown,
+} from 'react-native-reanimated';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { SkeletonList } from '@/components/ui/SkeletonList';
+import { GlassCard } from '@/components/ui/GlassCard';
 import { PROFILE_DEFAULTS } from '@/constants/defaultValues';
 import BottomNav from '@/components/BottomNav';
 import {
@@ -34,6 +53,15 @@ import type { NavigationProp } from '@react-navigation/native';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { useNetworkStatus } from '../../../context/NetworkContext';
 import { OfflineState } from '../../../components/OfflineState';
+import { TrustConstellation } from '../components';
+import {
+  PROFILE_COLORS,
+  PROFILE_SPACING,
+  PROFILE_TYPOGRAPHY,
+  PROFILE_SPRINGS,
+} from '../constants/theme';
+
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -92,15 +120,15 @@ const ProfileScreen: React.FC = () => {
           PROFILE_DEFAULTS.MOMENTS_COUNT,
         exchangesCount:
           (userProfile?.giftsSent || 0) + (userProfile?.giftsReceived || 0),
-        responseRate: PROFILE_DEFAULTS.RESPONSE_RATE, // Will be calculated from actual response data in future
+        responseRate: PROFILE_DEFAULTS.RESPONSE_RATE,
         activeMoments: myMoments.filter((m) =>
           ['active', 'paused', 'draft'].includes(m.status),
         ).length,
         completedMoments: myMoments.filter((m) => m.status === 'completed')
           .length,
-        walletBalance: PROFILE_DEFAULTS.WALLET_BALANCE, // Will be fetched from wallet service
+        walletBalance: PROFILE_DEFAULTS.WALLET_BALANCE,
         giftsSentCount: userProfile?.giftsSent || 0,
-        savedCount: PROFILE_DEFAULTS.SAVED_COUNT, // Will be fetched from saved items service
+        savedCount: PROFILE_DEFAULTS.SAVED_COUNT,
       };
     }
 
@@ -122,7 +150,7 @@ const ProfileScreen: React.FC = () => {
     };
   }, [authUser, myMoments, userProfile]);
 
-  // Navigation handlers - wrapped in useCallback to prevent re-renders
+  // Navigation handlers
   const handleEditProfile = useCallback(
     () => navigation.navigate('EditProfile'),
     [navigation],
@@ -151,6 +179,10 @@ const ProfileScreen: React.FC = () => {
     () => navigation.navigate('SavedMoments'),
     [navigation],
   );
+  const handleShare = useCallback(
+    () => navigation.navigate('SharePreview'),
+    [navigation],
+  );
 
   const activeMomentsList = useMemo(
     () =>
@@ -171,15 +203,15 @@ const ProfileScreen: React.FC = () => {
     () => [
       {
         icon: 'gift-outline',
-        color: COLORS.softOrange,
-        label: 'Gifts Sent',
+        color: PROFILE_COLORS.neon.lime,
+        label: 'Hediyeler',
         count: userData.giftsSentCount,
         onPress: handleMyGifts,
       },
       {
         icon: 'bookmark-outline',
-        color: COLORS.brand.secondary,
-        label: 'Saved Moments',
+        color: PROFILE_COLORS.neon.violet,
+        label: 'Kaydedilenler',
         count: userData.savedCount,
         onPress: handleSavedMoments,
       },
@@ -194,13 +226,11 @@ const ProfileScreen: React.FC = () => {
 
   const handleMomentPress = useCallback(
     (moment: Moment) => {
-      // Handle location which can be string or object
       const locationObj =
         typeof moment.location === 'string'
           ? { city: moment.location, country: '' }
           : moment.location;
 
-      // Handle category which can be string or object
       const categoryObj =
         typeof moment.category === 'string'
           ? { id: moment.category, label: moment.category, emoji: '✨' }
@@ -245,6 +275,34 @@ const ProfileScreen: React.FC = () => {
     [handleMomentPress],
   );
 
+  // Header button animation
+  const settingsScale = useSharedValue(1);
+  const shareScale = useSharedValue(1);
+
+  const settingsAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: settingsScale.value }],
+  }));
+
+  const shareAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: shareScale.value }],
+  }));
+
+  const handleSettingsPress = () => {
+    settingsScale.value = withSpring(0.9, PROFILE_SPRINGS.snappy);
+    setTimeout(() => {
+      settingsScale.value = withSpring(1, PROFILE_SPRINGS.bouncy);
+    }, 100);
+    handleSettings();
+  };
+
+  const handleSharePress = () => {
+    shareScale.value = withSpring(0.9, PROFILE_SPRINGS.snappy);
+    setTimeout(() => {
+      shareScale.value = withSpring(1, PROFILE_SPRINGS.bouncy);
+    }, 100);
+    handleShare();
+  };
+
   return (
     <View style={styles.wrapper}>
       <SafeAreaView style={styles.container} edges={['top']}>
@@ -257,37 +315,36 @@ const ProfileScreen: React.FC = () => {
           />
         )}
 
-        {/* Header */}
+        {/* Premium Dark Header */}
         <View style={styles.header}>
-          <View style={styles.headerSpacer} />
-          <Text style={styles.headerTitle}>Profile</Text>
+          <Text style={styles.headerTitle}>Profil</Text>
           <View style={styles.headerActions}>
-            <TouchableOpacity
-              testID="edit-profile-button"
-              style={styles.headerButton}
-              onPress={handleEditProfile}
-              accessibilityLabel="Edit profile"
+            <AnimatedTouchable
+              testID="share-button"
+              style={[styles.headerButton, shareAnimatedStyle]}
+              onPress={handleSharePress}
+              accessibilityLabel="Profili paylaş"
               accessibilityRole="button"
             >
-              <MaterialCommunityIcons
-                name="pencil-outline"
+              <Ionicons
+                name="share-outline"
                 size={22}
-                color={COLORS.text.primary}
+                color={PROFILE_COLORS.text.primary}
               />
-            </TouchableOpacity>
-            <TouchableOpacity
+            </AnimatedTouchable>
+            <AnimatedTouchable
               testID="settings-button"
-              style={styles.headerButton}
-              onPress={handleSettings}
-              accessibilityLabel="Settings"
+              style={[styles.headerButton, settingsAnimatedStyle]}
+              onPress={handleSettingsPress}
+              accessibilityLabel="Ayarlar"
               accessibilityRole="button"
             >
-              <MaterialCommunityIcons
-                name="cog-outline"
+              <Ionicons
+                name="settings-outline"
                 size={22}
-                color={COLORS.text.primary}
+                color={PROFILE_COLORS.text.primary}
               />
-            </TouchableOpacity>
+            </AnimatedTouchable>
           </View>
         </View>
 
@@ -298,7 +355,8 @@ const ProfileScreen: React.FC = () => {
             <RefreshControl
               refreshing={myMomentsLoading}
               onRefresh={loadMyMoments}
-              tintColor={COLORS.brand.secondary}
+              tintColor={PROFILE_COLORS.neon.lime}
+              progressBackgroundColor={PROFILE_COLORS.background.secondary}
             />
           }
         >
@@ -314,29 +372,78 @@ const ProfileScreen: React.FC = () => {
           />
 
           {/* Stats Row */}
-          <View style={styles.profileSection}>
-            <StatsRow
-              momentsCount={userData.momentsCount}
-              exchangesCount={userData.exchangesCount}
-              responseRate={userData.responseRate}
-              onMomentsPress={handleMyMoments}
-              onExchangesPress={handleMyGifts}
-            />
-          </View>
+          <Animated.View
+            entering={FadeInDown.delay(100).springify()}
+            style={styles.statsSection}
+          >
+            <GlassCard intensity={20} style={styles.statsCard} padding={0}>
+              <StatsRow
+                momentsCount={userData.momentsCount}
+                exchangesCount={userData.exchangesCount}
+                responseRate={userData.responseRate}
+                onMomentsPress={handleMyMoments}
+                onExchangesPress={handleMyGifts}
+              />
+            </GlassCard>
+          </Animated.View>
+
+          {/* Trust Constellation - WOW Factor */}
+          <Animated.View
+            entering={FadeInDown.delay(200).springify()}
+            style={styles.section}
+          >
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>GÜVEN TAKIMYILDIZI</Text>
+              <TouchableOpacity onPress={handleTrustGarden}>
+                <Text style={styles.seeAllText}>Detaylar</Text>
+              </TouchableOpacity>
+            </View>
+            <GlassCard intensity={15} style={styles.constellationCard}>
+              <View style={styles.constellationContainer}>
+                <TrustConstellation
+                  trustScore={userData.trustScore || 80}
+                  size={280}
+                />
+              </View>
+              <View style={styles.trustLegend}>
+                <View style={styles.legendItem}>
+                  <View style={[styles.legendDot, { backgroundColor: PROFILE_COLORS.neon.lime }]} />
+                  <Text style={styles.legendText}>Yüksek</Text>
+                </View>
+                <View style={styles.legendItem}>
+                  <View style={[styles.legendDot, { backgroundColor: PROFILE_COLORS.neon.cyan }]} />
+                  <Text style={styles.legendText}>Orta</Text>
+                </View>
+                <View style={styles.legendItem}>
+                  <View style={[styles.legendDot, { backgroundColor: PROFILE_COLORS.neon.rose }]} />
+                  <Text style={styles.legendText}>Düşük</Text>
+                </View>
+              </View>
+            </GlassCard>
+          </Animated.View>
 
           {/* Wallet Card */}
-          <WalletCard balance={userData.walletBalance} onPress={handleWallet} />
+          <Animated.View entering={FadeInDown.delay(300).springify()}>
+            <WalletCard balance={userData.walletBalance} onPress={handleWallet} />
+          </Animated.View>
 
           {/* Quick Links */}
-          <QuickLinks links={quickLinksData} />
+          <Animated.View entering={FadeInDown.delay(400).springify()}>
+            <QuickLinks links={quickLinksData} />
+          </Animated.View>
 
           {/* Moments Tabs */}
-          <MomentsTabs
-            activeTab={activeTab}
-            activeMomentsCount={userData.activeMoments}
-            pastMomentsCount={userData.completedMoments}
-            onTabChange={setActiveTab}
-          />
+          <Animated.View
+            entering={FadeInDown.delay(500).springify()}
+            style={styles.momentsTabs}
+          >
+            <MomentsTabs
+              activeTab={activeTab}
+              activeMomentsCount={userData.activeMoments}
+              pastMomentsCount={userData.completedMoments}
+              onTabChange={setActiveTab}
+            />
+          </Animated.View>
 
           {/* Moments Grid */}
           <View style={styles.momentsGrid}>
@@ -353,29 +460,31 @@ const ProfileScreen: React.FC = () => {
                 )}
               />
             ) : (
-              <EmptyState
-                icon={activeTab === 'active' ? 'map-marker-plus' : 'history'}
-                title={
-                  activeTab === 'active'
-                    ? 'No active moments yet'
-                    : 'No past moments'
-                }
-                description={
-                  activeTab === 'active'
-                    ? 'Create your first moment to start your journey'
-                    : 'Completed moments will appear here'
-                }
-                actionLabel={
-                  activeTab === 'active' && isConnected
-                    ? 'Create Moment'
-                    : undefined
-                }
-                onAction={
-                  activeTab === 'active' && isConnected
-                    ? () => navigation.navigate('CreateMoment')
-                    : undefined
-                }
-              />
+              <GlassCard intensity={10} style={styles.emptyCard}>
+                <EmptyState
+                  icon={activeTab === 'active' ? 'map-marker-plus' : 'history'}
+                  title={
+                    activeTab === 'active'
+                      ? 'Henüz aktif moment yok'
+                      : 'Geçmiş moment yok'
+                  }
+                  description={
+                    activeTab === 'active'
+                      ? 'İlk momentini oluşturarak yolculuğuna başla'
+                      : 'Tamamlanan momentler burada görünecek'
+                  }
+                  actionLabel={
+                    activeTab === 'active' && isConnected
+                      ? 'Moment Oluştur'
+                      : undefined
+                  }
+                  onAction={
+                    activeTab === 'active' && isConnected
+                      ? () => navigation.navigate('CreateMoment')
+                      : undefined
+                  }
+                />
+              </GlassCard>
             )}
           </View>
 
@@ -391,7 +500,7 @@ const ProfileScreen: React.FC = () => {
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    backgroundColor: COLORS.bg.primary,
+    backgroundColor: PROFILE_COLORS.background.primary,
   },
   container: {
     flex: 1,
@@ -400,52 +509,120 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: PROFILE_SPACING.screenPadding,
     paddingVertical: 12,
-    backgroundColor: COLORS.bg.primary,
-  },
-  headerSpacer: {
-    width: 80,
+    backgroundColor: PROFILE_COLORS.background.primary,
   },
   headerTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: COLORS.text.primary,
+    ...PROFILE_TYPOGRAPHY.pageTitle,
+    color: PROFILE_COLORS.text.primary,
+    fontSize: 28,
   },
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 8,
   },
   headerButton: {
-    width: 38,
-    height: 38,
+    width: 40,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 20,
+    backgroundColor: PROFILE_COLORS.glass.backgroundMedium,
+    borderWidth: 1,
+    borderColor: PROFILE_COLORS.glass.border,
   },
   scrollView: {
     flex: 1,
   },
-
-  // Profile Section - Reused for stats row wrapper
-  profileSection: {
-    backgroundColor: COLORS.utility.white,
-    marginHorizontal: 16,
-    borderRadius: 20,
-    shadowColor: COLORS.utility.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3,
+  statsSection: {
+    marginHorizontal: PROFILE_SPACING.screenPadding,
+    marginTop: 16,
+  },
+  statsCard: {
+    borderColor: PROFILE_COLORS.glass.border,
   },
 
-  // Moments Grid
+  // Section styling
+  section: {
+    marginHorizontal: PROFILE_SPACING.screenPadding,
+    marginTop: PROFILE_SPACING.sectionGap,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    ...PROFILE_TYPOGRAPHY.sectionTitle,
+    color: PROFILE_COLORS.text.secondary,
+  },
+  seeAllText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: PROFILE_COLORS.neon.lime,
+  },
+
+  // Trust Constellation
+  constellationCard: {
+    alignItems: 'center',
+    paddingVertical: 24,
+    borderColor: PROFILE_COLORS.glass.border,
+    ...Platform.select({
+      ios: {
+        shadowColor: PROFILE_COLORS.neon.lime,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.1,
+        shadowRadius: 20,
+      },
+      android: {},
+    }),
+  },
+  constellationContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+  },
+  trustLegend: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 24,
+    marginTop: 20,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: PROFILE_COLORS.glass.borderLight,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  legendDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  legendText: {
+    ...PROFILE_TYPOGRAPHY.caption,
+    color: PROFILE_COLORS.text.tertiary,
+  },
+
+  // Moments
+  momentsTabs: {
+    marginTop: PROFILE_SPACING.sectionGap,
+  },
   momentsGrid: {
-    paddingHorizontal: 16,
+    paddingHorizontal: PROFILE_SPACING.screenPadding,
     paddingTop: 16,
   },
   itemSeparator: {
     height: 12,
+  },
+  emptyCard: {
+    paddingVertical: 32,
+    borderColor: PROFILE_COLORS.glass.border,
   },
 
   bottomSpacer: {
