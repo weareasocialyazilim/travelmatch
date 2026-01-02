@@ -6,7 +6,6 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
-  Dimensions,
 } from 'react-native';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -16,8 +15,6 @@ import { COLORS } from '@/constants/colors';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 
-// Width from Dimensions not currently used
-// const { width } = Dimensions.get('window');
 
 interface RequestUser {
   name: string;
