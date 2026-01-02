@@ -38,6 +38,7 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = memo(
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
+          testID="active-filters-scroll"
         >
           {filters.map((filter) => (
             <View key={filter.key} style={styles.filterTag}>
@@ -45,6 +46,7 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = memo(
                 {filter.label}: {filter.value}
               </Text>
               <TouchableOpacity
+                testID={`remove-filter-${filter.key}`}
                 onPress={() => onRemove(filter.key)}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
@@ -59,6 +61,7 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = memo(
 
           {filters.length > 1 && (
             <TouchableOpacity
+              testID="clear-all-filters"
               style={styles.clearAllButton}
               onPress={onClearAll}
             >

@@ -31,11 +31,11 @@ describe('ActiveFilters', () => {
     });
 
     it('renders remove icon for each filter', () => {
-      const { UNSAFE_getAllByType } = render(<ActiveFilters {...defaultProps} />);
-      const { MaterialCommunityIcons } = require('@expo/vector-icons');
-      const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
-      // 3 close icons for filters + 0 (Clear All button doesn't have icon)
-      expect(icons.length).toBeGreaterThanOrEqual(3);
+      const { getByTestId } = render(<ActiveFilters {...defaultProps} />);
+      // Each filter has a remove button with testID
+      expect(getByTestId('remove-filter-category')).toBeTruthy();
+      expect(getByTestId('remove-filter-price')).toBeTruthy();
+      expect(getByTestId('remove-filter-timing')).toBeTruthy();
     });
 
     it('renders Clear All button when multiple filters', () => {
@@ -74,9 +74,8 @@ describe('ActiveFilters', () => {
     });
 
     it('renders horizontal ScrollView', () => {
-      const { UNSAFE_getByType } = render(<ActiveFilters {...defaultProps} />);
-      const { ScrollView } = require('react-native');
-      const scrollView = UNSAFE_getByType(ScrollView);
+      const { getByTestId } = render(<ActiveFilters {...defaultProps} />);
+      const scrollView = getByTestId('active-filters-scroll');
       expect(scrollView.props.horizontal).toBe(true);
       expect(scrollView.props.showsHorizontalScrollIndicator).toBe(false);
     });
@@ -84,42 +83,31 @@ describe('ActiveFilters', () => {
 
   describe('Remove Filter', () => {
     it('calls onRemove with correct key when remove icon pressed', () => {
-      const { UNSAFE_getAllByType } = render(<ActiveFilters {...defaultProps} />);
-      const { TouchableOpacity } = require('react-native');
-      const buttons = UNSAFE_getAllByType(TouchableOpacity);
-      
-      // First button is remove for first filter
-      fireEvent.press(buttons[0]);
+      const { getByTestId } = render(<ActiveFilters {...defaultProps} />);
+
+      fireEvent.press(getByTestId('remove-filter-category'));
       expect(mockOnRemove).toHaveBeenCalledWith('category');
       expect(mockOnRemove).toHaveBeenCalledTimes(1);
     });
 
     it('calls onRemove for second filter', () => {
-      const { UNSAFE_getAllByType } = render(<ActiveFilters {...defaultProps} />);
-      const { TouchableOpacity } = require('react-native');
-      const buttons = UNSAFE_getAllByType(TouchableOpacity);
-      
-      // Second button is remove for second filter
-      fireEvent.press(buttons[1]);
+      const { getByTestId } = render(<ActiveFilters {...defaultProps} />);
+
+      fireEvent.press(getByTestId('remove-filter-price'));
       expect(mockOnRemove).toHaveBeenCalledWith('price');
     });
 
     it('calls onRemove for third filter', () => {
-      const { UNSAFE_getAllByType } = render(<ActiveFilters {...defaultProps} />);
-      const { TouchableOpacity } = require('react-native');
-      const buttons = UNSAFE_getAllByType(TouchableOpacity);
-      
-      // Third button is remove for third filter
-      fireEvent.press(buttons[2]);
+      const { getByTestId } = render(<ActiveFilters {...defaultProps} />);
+
+      fireEvent.press(getByTestId('remove-filter-timing'));
       expect(mockOnRemove).toHaveBeenCalledWith('timing');
     });
 
     it('does not call onClearAll when removing individual filter', () => {
-      const { UNSAFE_getAllByType } = render(<ActiveFilters {...defaultProps} />);
-      const { TouchableOpacity } = require('react-native');
-      const buttons = UNSAFE_getAllByType(TouchableOpacity);
-      
-      fireEvent.press(buttons[0]);
+      const { getByTestId } = render(<ActiveFilters {...defaultProps} />);
+
+      fireEvent.press(getByTestId('remove-filter-category'));
       expect(mockOnClearAll).not.toHaveBeenCalled();
     });
   });
@@ -142,10 +130,10 @@ describe('ActiveFilters', () => {
     it('calls onClearAll multiple times', () => {
       const { getByText } = render(<ActiveFilters {...defaultProps} />);
       const clearAllButton = getByText('Clear All');
-      
+
       fireEvent.press(clearAllButton);
       fireEvent.press(clearAllButton);
-      
+
       expect(mockOnClearAll).toHaveBeenCalledTimes(2);
     });
   });
@@ -231,14 +219,13 @@ describe('ActiveFilters', () => {
     });
 
     it('handles rapid remove clicks', () => {
-      const { UNSAFE_getAllByType } = render(<ActiveFilters {...defaultProps} />);
-      const { TouchableOpacity } = require('react-native');
-      const buttons = UNSAFE_getAllByType(TouchableOpacity);
-      
-      fireEvent.press(buttons[0]);
-      fireEvent.press(buttons[0]);
-      fireEvent.press(buttons[0]);
-      
+      const { getByTestId } = render(<ActiveFilters {...defaultProps} />);
+      const removeButton = getByTestId('remove-filter-category');
+
+      fireEvent.press(removeButton);
+      fireEvent.press(removeButton);
+      fireEvent.press(removeButton);
+
       expect(mockOnRemove).toHaveBeenCalledTimes(3);
       expect(mockOnRemove).toHaveBeenCalledWith('category');
     });
@@ -246,11 +233,11 @@ describe('ActiveFilters', () => {
     it('handles rapid Clear All clicks', () => {
       const { getByText } = render(<ActiveFilters {...defaultProps} />);
       const clearAllButton = getByText('Clear All');
-      
+
       fireEvent.press(clearAllButton);
       fireEvent.press(clearAllButton);
       fireEvent.press(clearAllButton);
-      
+
       expect(mockOnClearAll).toHaveBeenCalledTimes(3);
     });
 
