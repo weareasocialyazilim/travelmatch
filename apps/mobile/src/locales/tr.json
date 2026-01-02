@@ -574,6 +574,12 @@
       "title": "Sayfa Bulunamadı",
       "description": "Aradığınız sayfa mevcut değil.",
       "goHome": "Ana Sayfaya Dön"
+    },
+    "dateTimePicker": {
+      "title": "Tarih ve Saat Seçin",
+      "date": "TARİH",
+      "time": "SAAT",
+      "setSchedule": "Planla"
     }
   }
 }
