@@ -93,15 +93,17 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
           accessibilityRole="button"
-          accessibilityLabel={`Chat with ${chat.user.name} about ${chat.moment.title}`}
+          accessibilityLabel={`Chat with ${chat.user.name}${chat.moment ? ` about ${chat.moment.title}` : ''}`}
         >
           {/* Left: Moment Context Strip */}
           <View style={styles.momentStrip}>
-            <Image
-              source={{ uri: chat.moment.image }}
-              style={styles.momentImage}
-              resizeMode="cover"
-            />
+            {chat.moment?.image && (
+              <Image
+                source={{ uri: chat.moment.image }}
+                style={styles.momentImage}
+                resizeMode="cover"
+              />
+            )}
             <LinearGradient
               colors={VIBE_ROOM_COLORS.gradients.momentStrip}
               style={StyleSheet.absoluteFill}
@@ -136,7 +138,7 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
                   {chat.user.isOnline && <View style={styles.onlineDot} />}
                 </View>
                 <Text style={styles.momentTitle} numberOfLines={1}>
-                  {chat.moment.emoji || '✨'} {chat.moment.title}
+                  {chat.moment?.emoji || '✨'} {chat.moment?.title || 'Chat'}
                 </Text>
               </View>
             </View>
