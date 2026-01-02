@@ -359,23 +359,25 @@ GRANT EXECUTE ON FUNCTION resolve_escrow_dispute TO authenticated;
 -- ============================================
 
 -- Schedule exchange rate updates (hourly)
+-- Note: pg_cron extension must be enabled
 DO $$
+DECLARE
+  _job_id bigint;
 BEGIN
-  -- Try to schedule the cron job for exchange rate updates
+  -- Try to unschedule existing job
   BEGIN
-    PERFORM cron.unschedule('update-exchange-rates');
+    SELECT cron.unschedule('update-exchange-rates') INTO _job_id;
   EXCEPTION WHEN OTHERS THEN
     RAISE NOTICE 'Could not unschedule update-exchange-rates: %', SQLERRM;
   END;
 
-  -- Note: The actual HTTP call to the edge function needs to be done via pg_net
-  -- For now, we'll just create a stub that can be called
+  -- Schedule the cron job
   BEGIN
-    PERFORM cron.schedule(
+    SELECT cron.schedule(
       'update-exchange-rates',
       '0 * * * *', -- Every hour
-      $$SELECT notify_exchange_rate_update()$$
-    );
+      'SELECT notify_exchange_rate_update()'
+    ) INTO _job_id;
   EXCEPTION WHEN OTHERS THEN
     RAISE NOTICE 'Could not schedule update-exchange-rates: %', SQLERRM;
   END;

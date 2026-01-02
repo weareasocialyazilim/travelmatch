@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS notification_campaigns (
   clicked_count INTEGER DEFAULT 0,
   failed_count INTEGER DEFAULT 0,
   metadata JSONB DEFAULT '{}',
-  created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  created_by UUID REFERENCES users(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS marketing_campaigns (
   utm_medium TEXT,
   utm_campaign TEXT,
   metadata JSONB DEFAULT '{}',
-  created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  created_by UUID REFERENCES users(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS promo_codes (
   valid_until TIMESTAMPTZ,
   is_active BOOLEAN DEFAULT true,
   applicable_to JSONB DEFAULT '{}',  -- { categories: [], products: [], users: [] }
-  created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  created_by UUID REFERENCES users(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
@@ -114,7 +114,7 @@ CREATE INDEX idx_promo_codes_validity ON promo_codes(valid_from, valid_until);
 CREATE TABLE IF NOT EXISTS promo_code_usage (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   promo_code_id UUID NOT NULL REFERENCES promo_codes(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   order_id UUID,  -- Reference to orders table if exists
   discount_amount NUMERIC(10, 2) NOT NULL,
   used_at TIMESTAMPTZ DEFAULT now(),
@@ -146,9 +146,9 @@ CREATE POLICY "notification_campaigns_insert_admin"
   TO authenticated
   WITH CHECK (
     EXISTS (
-      SELECT 1 FROM profiles 
+      SELECT 1 FROM users 
       WHERE id = auth.uid() 
-      AND role = 'Admin'
+      AND (SELECT current_setting('role', true)) = 'service_role'
     )
   );
 
@@ -157,9 +157,9 @@ CREATE POLICY "notification_campaigns_update_admin"
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM profiles 
+      SELECT 1 FROM users 
       WHERE id = auth.uid() 
-      AND role = 'Admin'
+      AND (SELECT current_setting('role', true)) = 'service_role'
     )
   );
 
@@ -168,9 +168,9 @@ CREATE POLICY "notification_campaigns_delete_admin"
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM profiles 
+      SELECT 1 FROM users 
       WHERE id = auth.uid() 
-      AND role = 'Admin'
+      AND (SELECT current_setting('role', true)) = 'service_role'
     )
   );
 
@@ -185,9 +185,9 @@ CREATE POLICY "marketing_campaigns_insert_admin"
   TO authenticated
   WITH CHECK (
     EXISTS (
-      SELECT 1 FROM profiles 
+      SELECT 1 FROM users 
       WHERE id = auth.uid() 
-      AND role = 'Admin'
+      AND (SELECT current_setting('role', true)) = 'service_role'
     )
   );
 
@@ -196,9 +196,9 @@ CREATE POLICY "marketing_campaigns_update_admin"
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM profiles 
+      SELECT 1 FROM users 
       WHERE id = auth.uid() 
-      AND role = 'Admin'
+      AND (SELECT current_setting('role', true)) = 'service_role'
     )
   );
 
@@ -207,9 +207,9 @@ CREATE POLICY "marketing_campaigns_delete_admin"
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM profiles 
+      SELECT 1 FROM users 
       WHERE id = auth.uid() 
-      AND role = 'Admin'
+      AND (SELECT current_setting('role', true)) = 'service_role'
     )
   );
 
@@ -218,9 +218,9 @@ CREATE POLICY "promo_codes_select_public"
   ON promo_codes FOR SELECT
   TO authenticated
   USING (is_active = true OR EXISTS (
-    SELECT 1 FROM profiles 
+    SELECT 1 FROM users 
     WHERE id = auth.uid() 
-    AND role = 'Admin'
+    AND (SELECT current_setting('role', true)) = 'service_role'
   ));
 
 CREATE POLICY "promo_codes_insert_admin"
@@ -228,9 +228,9 @@ CREATE POLICY "promo_codes_insert_admin"
   TO authenticated
   WITH CHECK (
     EXISTS (
-      SELECT 1 FROM profiles 
+      SELECT 1 FROM users 
       WHERE id = auth.uid() 
-      AND role = 'Admin'
+      AND (SELECT current_setting('role', true)) = 'service_role'
     )
   );
 
@@ -239,9 +239,9 @@ CREATE POLICY "promo_codes_update_admin"
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM profiles 
+      SELECT 1 FROM users 
       WHERE id = auth.uid() 
-      AND role = 'Admin'
+      AND (SELECT current_setting('role', true)) = 'service_role'
     )
   );
 
@@ -250,9 +250,9 @@ CREATE POLICY "promo_code_usage_select_own"
   ON promo_code_usage FOR SELECT
   TO authenticated
   USING (user_id = auth.uid() OR EXISTS (
-    SELECT 1 FROM profiles 
+    SELECT 1 FROM users 
     WHERE id = auth.uid() 
-    AND role = 'Admin'
+    AND (SELECT current_setting('role', true)) = 'service_role'
   ));
 
 CREATE POLICY "promo_code_usage_insert_own"

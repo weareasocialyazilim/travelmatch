@@ -727,11 +727,19 @@ CREATE POLICY "Users can insert own consents"
   TO authenticated
   WITH CHECK (user_id = auth.uid());
 
--- Consent history - sadece kendi
-CREATE POLICY "Users can view own consent history"
-  ON consent_history FOR SELECT
-  TO authenticated
-  USING (user_id = auth.uid());
+-- Consent history - sadece kendi (skip if already exists)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'consent_history' AND policyname = 'Users can view own consent history'
+  ) THEN
+    CREATE POLICY "Users can view own consent history"
+      ON consent_history FOR SELECT
+      TO authenticated
+      USING (user_id = auth.uid());
+  END IF;
+END $$;
 
 -- Gift contracts - taraflar görebilir
 CREATE POLICY "Contract parties can view"

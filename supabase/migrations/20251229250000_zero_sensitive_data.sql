@@ -79,14 +79,12 @@ CREATE TABLE IF NOT EXISTS saved_cards (
   last_used_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
 
-  -- Soft delete
-  is_active BOOLEAN DEFAULT TRUE,
+  -- Soft delete (removed - existing table doesn't have these)
   deleted_at TIMESTAMPTZ
 );
 
--- Indexes
-CREATE INDEX IF NOT EXISTS idx_saved_cards_user ON saved_cards(user_id) WHERE is_active = TRUE;
-CREATE INDEX IF NOT EXISTS idx_saved_cards_default ON saved_cards(user_id, is_default) WHERE is_active = TRUE;
+-- Indexes (modified - is_active column doesn't exist in existing table)
+-- These indexes already exist without the is_active filter
 
 -- RLS
 ALTER TABLE saved_cards ENABLE ROW LEVEL SECURITY;
@@ -135,41 +133,31 @@ CREATE TABLE IF NOT EXISTS kyc_verifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 
-  -- Provider bilgileri
+  -- Provider bilgileri (using existing column names)
   provider TEXT NOT NULL DEFAULT 'idenfy',
-  scan_ref TEXT NOT NULL,             -- Provider referans ID
-  session_token TEXT,                 -- Oturum token (geçici)
+  provider_id TEXT,                   -- Provider referans ID (was scan_ref)
+  provider_check_id TEXT,             -- Check ID
 
   -- Durum
   status TEXT NOT NULL DEFAULT 'pending' CHECK (
-    status IN ('pending', 'processing', 'approved', 'denied', 'expired')
+    status IN ('pending', 'processing', 'approved', 'denied', 'expired', 'verified', 'rejected', 'needs_review')
   ),
 
   -- Genel bilgiler (hassas DEĞİL)
-  document_country TEXT,              -- TR, DE, US
-  document_type TEXT,                 -- id_card, passport, driving_license
+  confidence DECIMAL(3, 2),           -- 0.00 to 1.00
 
-  -- Sonuç detayları (hassas DEĞİL)
-  auto_status TEXT,                   -- Provider otomatik karar
-  manual_status TEXT,                 -- Manuel inceleme kararı
-  denial_reason TEXT,                 -- Red nedeni (varsa)
-
-  -- ❌ BUNLAR YOK:
-  -- document_number ❌
-  -- document_image_url ❌
-  -- selfie_image_url ❌
-  -- biometric_data ❌
+  -- Sonuç detayları
+  rejection_reasons TEXT[],           -- Red nedenleri (varsa)
+  metadata JSONB,                     -- Ek veriler
 
   -- Timestamps
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  completed_at TIMESTAMPTZ,
-  expires_at TIMESTAMPTZ DEFAULT NOW() + INTERVAL '30 minutes'
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Indexes
+-- Indexes (using existing column names)
 CREATE INDEX IF NOT EXISTS idx_kyc_user ON kyc_verifications(user_id);
 CREATE INDEX IF NOT EXISTS idx_kyc_status ON kyc_verifications(status);
-CREATE INDEX IF NOT EXISTS idx_kyc_scan_ref ON kyc_verifications(scan_ref);
 
 -- RLS
 ALTER TABLE kyc_verifications ENABLE ROW LEVEL SECURITY;
@@ -208,12 +196,11 @@ CREATE TABLE IF NOT EXISTS user_bank_accounts (
   -- Meta
   is_verified BOOLEAN DEFAULT FALSE,
   verified_at TIMESTAMPTZ,
-  is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Indexes
-CREATE INDEX IF NOT EXISTS idx_bank_accounts_user ON user_bank_accounts(user_id) WHERE is_active = TRUE;
+-- Indexes (is_active removed as column doesn't exist)
+CREATE INDEX IF NOT EXISTS idx_bank_accounts_user ON user_bank_accounts(user_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_bank_accounts_iban_hash ON user_bank_accounts(iban_hash);
 
 -- RLS

@@ -9,32 +9,17 @@
 BEGIN;
 
 -- ============================================================================
--- 1. SPATIAL_REF_SYS RLS - CRITICAL ERROR FIX
+-- 1. SPATIAL_REF_SYS RLS - SKIPPED
 -- ============================================================================
 -- Problem: PostGIS's spatial_ref_sys table has RLS disabled
--- Solution: Enable RLS with read-only policy (this is reference data)
+-- Note: This is a PostGIS extension table owned by Supabase, we cannot modify it
+-- The table contains public reference data (coordinate system definitions)
+-- and is safe to leave without RLS as it's read-only reference data
 -- ============================================================================
 
 DO $$
 BEGIN
-  -- Check if spatial_ref_sys exists (PostGIS extension table)
-  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'public' AND tablename = 'spatial_ref_sys') THEN
-    -- Enable RLS on the table
-    ALTER TABLE public.spatial_ref_sys ENABLE ROW LEVEL SECURITY;
-
-    -- Drop any existing policies
-    DROP POLICY IF EXISTS "spatial_ref_sys_read" ON public.spatial_ref_sys;
-    DROP POLICY IF EXISTS "Allow read access to spatial_ref_sys" ON public.spatial_ref_sys;
-
-    -- Create read-only policy for all users (this is public reference data)
-    CREATE POLICY "spatial_ref_sys_public_read" ON public.spatial_ref_sys
-      FOR SELECT
-      USING (true);
-
-    RAISE NOTICE '✅ spatial_ref_sys: RLS enabled with read-only access';
-  ELSE
-    RAISE NOTICE 'ℹ️ spatial_ref_sys table not found (PostGIS may not be installed)';
-  END IF;
+  RAISE NOTICE 'spatial_ref_sys: Skipped (PostGIS system table - cannot modify owner)';
 END $$;
 
 -- ============================================================================

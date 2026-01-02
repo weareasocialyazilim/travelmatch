@@ -146,7 +146,7 @@ SET search_path = public, pg_temp
 AS $$
   SELECT
     tn.id,
-    u.display_name AS author_name,
+    u.full_name AS author_name,
     u.avatar_url AS author_avatar,
     tn.note,
     m.title AS moment_title,
@@ -224,7 +224,7 @@ BEGIN
     v_gift.giver_id,
     'trust_note_received',
     'Yeni Trust Note aldın! 💝',
-    (SELECT display_name FROM users WHERE id = auth.uid()) || ' sana bir teşekkür notu bıraktı.',
+    (SELECT full_name FROM users WHERE id = auth.uid()) || ' sana bir teşekkür notu bıraktı.',
     jsonb_build_object(
       'note_id', v_note_id,
       'gift_id', p_gift_id,
@@ -257,20 +257,20 @@ CREATE TRIGGER trust_notes_updated_at
   EXECUTE FUNCTION update_trust_notes_updated_at();
 
 -- ============================================
--- 5. ADD TRUST NOTE COUNT TO PROFILES
+-- 5. ADD TRUST NOTE COUNT TO USERS (not profiles - profiles table doesn't exist)
 -- ============================================
 
--- Add trust_note_count column to profiles if not exists
+-- Add trust_note_count column to users if not exists
 DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns
-    WHERE table_name = 'profiles' AND column_name = 'trust_note_count') THEN
-    ALTER TABLE profiles ADD COLUMN trust_note_count INTEGER DEFAULT 0;
+    WHERE table_name = 'users' AND column_name = 'trust_note_count') THEN
+    ALTER TABLE users ADD COLUMN trust_note_count INTEGER DEFAULT 0;
   END IF;
 END $$;
 
 -- Trigger to update count
-CREATE OR REPLACE FUNCTION update_profile_trust_note_count()
+CREATE OR REPLACE FUNCTION update_user_trust_note_count()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -278,12 +278,12 @@ SET search_path = public, pg_temp
 AS $$
 BEGIN
   IF TG_OP = 'INSERT' THEN
-    UPDATE profiles
-    SET trust_note_count = trust_note_count + 1
+    UPDATE users
+    SET trust_note_count = COALESCE(trust_note_count, 0) + 1
     WHERE id = NEW.recipient_id;
   ELSIF TG_OP = 'DELETE' THEN
-    UPDATE profiles
-    SET trust_note_count = GREATEST(0, trust_note_count - 1)
+    UPDATE users
+    SET trust_note_count = GREATEST(0, COALESCE(trust_note_count, 0) - 1)
     WHERE id = OLD.recipient_id;
   END IF;
   RETURN NULL;
@@ -294,7 +294,7 @@ DROP TRIGGER IF EXISTS update_trust_note_count_trigger ON trust_notes;
 CREATE TRIGGER update_trust_note_count_trigger
   AFTER INSERT OR DELETE ON trust_notes
   FOR EACH ROW
-  EXECUTE FUNCTION update_profile_trust_note_count();
+  EXECUTE FUNCTION update_user_trust_note_count();
 
 -- ============================================
 -- 6. COMMENTS
