@@ -37,6 +37,11 @@ import { useAuthStore } from '@/stores/auth-store';
 import { useUIStore } from '@/stores/ui-store';
 import { useAuth } from '@/hooks/use-auth';
 import { getInitials } from '@/lib/utils';
+import type { AdminUser } from '@/types/admin';
+
+interface AuthState {
+  user: AdminUser | null;
+}
 
 // Breadcrumb mapping
 const routeLabels: Record<string, string> = {
@@ -63,7 +68,7 @@ export function Header() {
   const { theme, setTheme } = useTheme();
   const [searchFocused, setSearchFocused] = useState(false);
 
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore((state: AuthState) => state.user);
   const { setCommandPaletteOpen } = useUIStore();
   const { logout } = useAuth();
 
