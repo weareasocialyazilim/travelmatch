@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { CameraView, type CameraType, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import type { NavigationProp } from '@react-navigation/native';
+import type { RootStackParamList } from '@/navigation/routeParams';
 
-export const ChatCameraScreen = ({ navigation }: any) => {
+interface ChatCameraScreenProps {
+  navigation: NavigationProp<RootStackParamList>;
+}
+
+export const ChatCameraScreen: React.FC<ChatCameraScreenProps> = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
@@ -25,7 +31,7 @@ export const ChatCameraScreen = ({ navigation }: any) => {
   if (!permission || !permission.granted) {
     return (
       <View style={styles.container}>
-        <Text style={{ color: 'white' }}>No Camera Permission</Text>
+        <Text style={styles.permissionText}>No Camera Permission</Text>
       </View>
     );
   }
@@ -68,7 +74,8 @@ export const ChatCameraScreen = ({ navigation }: any) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'black' },
+  container: { flex: 1, backgroundColor: 'black', alignItems: 'center', justifyContent: 'center' },
+  permissionText: { color: 'white' },
   camera: { flex: 1 },
   controlsTop: {
     flexDirection: 'row',
