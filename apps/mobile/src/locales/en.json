@@ -546,5 +546,34 @@
   },
   "tagline": {
     "main": "Share moments, gift experiences"
+  },
+  "screens": {
+    "linkInvalid": {
+      "title": "Invalid Link",
+      "defaultMessage": "This link is invalid",
+      "description": "The link appears to be broken or malformed. Please check the link and try again.",
+      "goHome": "Go to Home",
+      "infoHint": "If you received this link from a notification or message, please verify the source."
+    },
+    "linkExpired": {
+      "title": "Link Expired",
+      "description": "This link has expired and is no longer valid.",
+      "goHome": "Go to Home"
+    },
+    "sessionExpired": {
+      "title": "Session Expired",
+      "description": "Your session has expired. Please log in again.",
+      "login": "Login Again"
+    },
+    "forceUpdate": {
+      "title": "Update Required",
+      "description": "A new version of TravelMatch is available. Please update to continue.",
+      "update": "Update Now"
+    },
+    "notFound": {
+      "title": "Page Not Found",
+      "description": "The page you're looking for doesn't exist.",
+      "goHome": "Go to Home"
+    }
   }
 }
