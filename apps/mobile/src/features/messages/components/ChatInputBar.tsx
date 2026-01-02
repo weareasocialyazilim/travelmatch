@@ -1,7 +1,19 @@
+/**
+ * ChatInputBar - Floating Liquid Glass Input
+ *
+ * Premium input bar with:
+ * - BlurView glass effect for floating feel
+ * - Neon send button with glow
+ * - Smooth attach button interaction
+ */
+
 import React from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
+import { BlurView } from 'expo-blur';
+import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
+import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
 import { logger } from '@/utils/logger';
 import { useNetworkStatus } from '../../../context/NetworkContext';
 
@@ -22,135 +34,160 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
   isTyping,
   isSending = false,
 }) => {
+  const insets = useSafeAreaInsets();
   const { isConnected } = useNetworkStatus();
-  
-  return (
-    <View style={styles.inputBar}>
-      <View style={styles.inputContainer}>
-        <View style={styles.inputWrapper} pointerEvents="box-none">
-          <TouchableOpacity
-            style={styles.attachButton}
-            onPress={() => {
-              logger.debug('Attach button pressed - opening attachment sheet');
-              onAttachPress();
-            }}
-            disabled={!isConnected}
-            activeOpacity={0.6}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            accessibilityLabel="Attach file"
-            accessibilityRole="button"
-            accessibilityHint="Opens attachment options"
-          >
-            <MaterialCommunityIcons
-              name="plus-circle"
-              size={24}
-              color={isConnected ? COLORS.text.secondary : COLORS.softGray}
-            />
-          </TouchableOpacity>
-          <TextInput
-            style={styles.input}
-            placeholder={
-              isConnected 
-                ? "Thank them or ask a question..." 
-                : "Offline - Cannot send"
-            }
-            placeholderTextColor={COLORS.text.secondary}
-            value={messageText}
-            onChangeText={onTextChange}
-            multiline={false}
-            returnKeyType="send"
-            onSubmitEditing={onSend}
-            blurOnSubmit={false}
-            editable={isConnected}
-            contextMenuHidden={false}
-            accessibilityLabel="Message input"
-            accessibilityHint="Type your message here"
+
+  const InputContent = () => (
+    <View style={[styles.inputWrapper, { paddingBottom: insets.bottom + 12 }]}>
+      <View style={styles.inputInner}>
+        <TouchableOpacity
+          style={styles.attachButton}
+          onPress={() => {
+            logger.debug('Attach button pressed - opening attachment sheet');
+            onAttachPress();
+          }}
+          disabled={!isConnected}
+          activeOpacity={0.6}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          accessibilityLabel="Attach file"
+          accessibilityRole="button"
+        >
+          <Ionicons
+            name="add"
+            size={24}
+            color={isConnected ? COLORS.text.secondary : COLORS.text.muted}
           />
-          {isTyping && isConnected && (
-            <Text style={styles.typingIndicator}>typing...</Text>
-          )}
-        </View>
+        </TouchableOpacity>
+
+        <TextInput
+          style={styles.input}
+          placeholder={isConnected ? 'Bir mesaj yaz...' : 'Çevrimdışı - Gönderilemiyor'}
+          placeholderTextColor={COLORS.text.muted}
+          value={messageText}
+          onChangeText={onTextChange}
+          multiline
+          maxLength={1000}
+          returnKeyType="default"
+          blurOnSubmit={false}
+          editable={isConnected}
+          accessibilityLabel="Message input"
+          accessibilityHint="Type your message here"
+        />
+
+        {isTyping && isConnected && (
+          <View style={styles.typingContainer}>
+            <Text style={styles.typingText}>yazıyor...</Text>
+          </View>
+        )}
+
         <TouchableOpacity
           testID="send-message-button"
           style={[
             styles.sendButton,
+            messageText.trim().length > 0 && styles.sendButtonActive,
             (!isConnected || isSending) && styles.sendButtonDisabled,
           ]}
           onPress={onSend}
-          disabled={!isConnected || isSending}
-          accessibilityLabel={isSending ? "Sending message" : "Send message"}
+          disabled={!isConnected || isSending || messageText.trim().length === 0}
+          accessibilityLabel={isSending ? 'Sending message' : 'Send message'}
           accessibilityRole="button"
         >
-          {isSending ? (
-            <MaterialCommunityIcons
-              name="loading"
-              size={24}
-              color={COLORS.utility.white}
-            />
-          ) : (
-            <MaterialCommunityIcons
-              name="send"
-              size={24}
-              color={COLORS.utility.white}
-            />
-          )}
+          <Ionicons
+            name="paper-plane"
+            size={20}
+            color={
+              messageText.trim().length > 0 ? COLORS.text.inverse : COLORS.text.muted
+            }
+          />
         </TouchableOpacity>
       </View>
+    </View>
+  );
+
+  // Use BlurView on iOS for glass effect
+  if (Platform.OS === 'ios') {
+    return (
+      <BlurView intensity={60} tint="light" style={styles.container}>
+        <InputContent />
+      </BlurView>
+    );
+  }
+
+  return (
+    <View style={[styles.container, styles.containerAndroid]}>
+      <InputContent />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  inputBar: {
-    backgroundColor: COLORS.bg.primary,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+  container: {
     borderTopWidth: 1,
-    borderTopColor: COLORS.border.default,
+    borderTopColor: COLORS.border.light,
   },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  containerAndroid: {
+    backgroundColor: COLORS.bg.primary,
   },
   inputWrapper: {
-    flex: 1,
+    paddingTop: 12,
+    paddingHorizontal: 16,
+  },
+  inputInner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.utility.white,
-    borderRadius: 9999,
-    paddingLeft: 4,
-    marginRight: 8,
-    height: 48,
+    backgroundColor: COLORS.surface.base,
+    borderRadius: 24,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: COLORS.border.light,
+    minHeight: 48,
   },
   attachButton: {
-    width: 48,
-    height: 48,
-    alignItems: 'center',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   input: {
     flex: 1,
-    fontSize: 14,
     color: COLORS.text.primary,
-    paddingRight: 16,
+    fontFamily: FONTS.body.regular,
+    fontSize: FONT_SIZES_V2.body,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    maxHeight: 100,
   },
-  typingIndicator: {
-    position: 'absolute',
-    right: 16,
-    fontSize: 12,
-    color: COLORS.brand.primary,
+  typingContainer: {
+    paddingRight: 8,
+  },
+  typingText: {
+    fontSize: FONT_SIZES_V2.caption,
+    color: COLORS.primary,
+    fontFamily: FONTS.body.regular,
     fontStyle: 'italic',
   },
   sendButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: COLORS.brand.primary,
-    alignItems: 'center',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORS.surface.muted,
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sendButtonActive: {
+    backgroundColor: COLORS.primary,
+    // Neon glow effect
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 4,
   },
   sendButtonDisabled: {
-    backgroundColor: COLORS.softGray,
+    backgroundColor: COLORS.surface.muted,
     opacity: 0.5,
+    shadowOpacity: 0,
   },
 });
