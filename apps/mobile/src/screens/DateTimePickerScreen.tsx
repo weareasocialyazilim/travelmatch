@@ -46,7 +46,7 @@ export const DateTimePickerScreen = () => {
           <Ionicons name="close" size={24} color="white" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('screens.dateTimePicker.title')}</Text>
-        <View style={{ width: 24 }} />
+        <View style={styles.spacer} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
@@ -161,4 +161,5 @@ const styles = StyleSheet.create({
   },
   disabledBtn: { backgroundColor: '#333', opacity: 0.5 },
   confirmText: { color: 'black', fontWeight: 'bold', fontSize: 16 },
+  spacer: { width: 24 },
 });

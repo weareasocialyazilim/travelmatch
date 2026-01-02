@@ -42,7 +42,7 @@ export interface ChatUser {
 export interface InboxChat {
   id: string;
   user: ChatUser;
-  moment: MomentContext;
+  moment?: MomentContext;
   lastMessage: string;
   lastMessageAt: string;
   status: ChatStatus;

@@ -33,7 +33,7 @@ export const PromoCodeScreen = () => {
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}><Ionicons name="close" size={28} color="white" /></TouchableOpacity>
         <Text style={styles.headerTitle}>Add Promo Code</Text>
-        <View style={{ width: 28 }} />
+        <View style={styles.spacer} />
       </View>
 
       <View style={styles.content}>
@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
   applyBtn: { backgroundColor: COLORS.brand.primary, padding: 18, borderRadius: 16, alignItems: 'center' },
   disabledBtn: { backgroundColor: '#333' },
   btnText: { color: 'black', fontWeight: 'bold', fontSize: 16 },
+  spacer: { width: 28 },
 });
 
 export default PromoCodeScreen;

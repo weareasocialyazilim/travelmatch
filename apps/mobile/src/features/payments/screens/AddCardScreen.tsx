@@ -148,7 +148,7 @@ export const AddCardScreen = ({ navigation }: Props) => {
           </View>
 
           <View style={styles.row}>
-            <View style={[styles.inputGroup, { flex: 1, marginRight: 10 }]}>
+            <View style={[styles.inputGroup, styles.inputGroupLeft]}>
               <Text style={styles.label}>Expiry Date</Text>
               <View style={styles.inputWrapper}>
                 <Ionicons
@@ -169,7 +169,7 @@ export const AddCardScreen = ({ navigation }: Props) => {
               </View>
             </View>
 
-            <View style={[styles.inputGroup, { flex: 1, marginLeft: 10 }]}>
+            <View style={[styles.inputGroup, styles.inputGroupRight]}>
               <Text style={styles.label}>CVV</Text>
               <View style={styles.inputWrapper}>
                 <Ionicons
@@ -315,6 +315,14 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
+  },
+  inputGroupLeft: {
+    flex: 1,
+    marginRight: 10,
+  },
+  inputGroupRight: {
+    flex: 1,
+    marginLeft: 10,
   },
   saveBtn: {
     backgroundColor: COLORS.brand.primary,

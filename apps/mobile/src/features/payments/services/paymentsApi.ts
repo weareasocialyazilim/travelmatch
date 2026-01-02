@@ -287,7 +287,6 @@ export const paymentsApi = {
         verification_type: 'document',
         submitted_at: new Date().toISOString(),
       };
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await supabase
         .from('kyc_verifications')
         .insert(insertData as any)

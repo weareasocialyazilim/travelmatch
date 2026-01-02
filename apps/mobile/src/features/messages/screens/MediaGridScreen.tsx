@@ -31,7 +31,7 @@ export const MediaGridScreen = ({ navigation }: any) => {
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}><Ionicons name="arrow-back" size={24} color="white" /></TouchableOpacity>
         <Text style={styles.title}>Shared Media</Text>
-        <View style={{ width: 24 }} />
+        <View style={styles.spacer} />
       </View>
 
       <FlatList
@@ -50,4 +50,5 @@ const styles = StyleSheet.create({
   title: { fontSize: 16, fontWeight: 'bold', color: 'white' },
   list: { padding: 0 },
   image: { width: ITEM_SIZE, height: ITEM_SIZE, margin: 0.5, backgroundColor: '#333' },
+  spacer: { width: 24 },
 });

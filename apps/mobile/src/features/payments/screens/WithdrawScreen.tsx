@@ -119,7 +119,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}><Ionicons name="arrow-back" size={24} color="white" /></TouchableOpacity>
         <Text style={styles.headerTitle}>{t('withdrawal.title')}</Text>
-        <View style={{ width: 24 }} />
+        <View style={styles.spacer} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
@@ -220,6 +220,7 @@ const styles = StyleSheet.create({
   withdrawBtn: { backgroundColor: COLORS.brand.primary, padding: 18, borderRadius: 16, alignItems: 'center', marginTop: 20 },
   disabledBtn: { backgroundColor: '#333', opacity: 0.5 },
   withdrawText: { color: 'black', fontWeight: 'bold', fontSize: 16 },
+  spacer: { width: 24 },
 });
 
 // Wrap with ScreenErrorBoundary and NetworkGuard for critical withdrawal functionality

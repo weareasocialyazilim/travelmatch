@@ -74,13 +74,18 @@ export const MomentCommentsScreen: React.FC = () => {
         return;
       }
 
-      // Get current user to check if they're the host
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-
       // Transform data to Comment format
-      const transformedComments: Comment[] = (data || []).map((item) => {
-        const user = item.user as { id: string; full_name: string; avatar_url: string } | null;
-        const moment = item.moment as { host_id: string } | null;
+      type CommentItem = {
+        id: string;
+        content: string;
+        created_at: string;
+        likes_count: number;
+        user: { id: string; full_name: string; avatar_url: string } | null;
+        moment: { host_id: string } | null;
+      };
+      const transformedComments: Comment[] = ((data || []) as CommentItem[]).map((item) => {
+        const user = item.user;
+        const moment = item.moment;
         const createdAt = new Date(item.created_at);
         const now = new Date();
         const diffMs = now.getTime() - createdAt.getTime();
@@ -176,7 +181,7 @@ export const MomentCommentsScreen: React.FC = () => {
       // Update temp comment with real ID
       setComments((prev) =>
         prev.map((c) =>
-          c.id === tempComment.id ? { ...c, id: data.id } : c
+          c.id === tempComment.id ? { ...c, id: (data as { id: string }).id } : c
         )
       );
     } catch (error) {
@@ -196,7 +201,7 @@ export const MomentCommentsScreen: React.FC = () => {
 
     try {
       // Call API to record the like
-      const { error } = await supabase.rpc('increment_comment_likes', {
+      const { error } = await (supabase.rpc as any)('increment_comment_likes', {
         comment_id: commentId,
       });
 

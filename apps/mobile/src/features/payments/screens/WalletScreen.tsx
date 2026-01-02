@@ -184,11 +184,7 @@ const WalletScreen = () => {
               <View
                 style={[
                   styles.txIconBg,
-                  {
-                    backgroundColor: isCredit
-                      ? 'rgba(204, 255, 0, 0.1)'
-                      : 'rgba(255, 0, 153, 0.1)',
-                  },
+                  isCredit ? styles.txIconBgCredit : styles.txIconBgDebit,
                 ]}
               >
                 <MaterialCommunityIcons
@@ -355,7 +351,7 @@ const WalletScreen = () => {
                 style={[
                   styles.filterPill,
                   activeFilter === filter.key && styles.filterPillActive,
-                  index === 0 && { marginLeft: 24 },
+                  index === 0 && styles.filterPillFirst,
                 ]}
               >
                 <Text
@@ -502,21 +498,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
-  actionBtnSecondary: {
-    flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    paddingVertical: 14,
-    borderRadius: 16,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-  },
-  actionBtnTextSecondary: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-
   // Transactions
   contentSection: {
     flex: 1,
@@ -548,6 +529,9 @@ const styles = StyleSheet.create({
     backgroundColor: DARK_THEME.filterActive,
     borderColor: DARK_THEME.filterActive,
   },
+  filterPillFirst: {
+    marginLeft: 24,
+  },
   filterText: {
     color: DARK_THEME.textSecondary,
     fontWeight: '600',
@@ -578,6 +562,12 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  txIconBgCredit: {
+    backgroundColor: 'rgba(204, 255, 0, 0.1)',
+  },
+  txIconBgDebit: {
+    backgroundColor: 'rgba(255, 0, 153, 0.1)',
   },
   txInfo: {
     flex: 1,

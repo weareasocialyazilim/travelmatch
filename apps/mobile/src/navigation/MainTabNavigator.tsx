@@ -14,26 +14,10 @@ const Tab = createBottomTabNavigator();
 // Custom center (+) button component
 const CustomTabBarButton = ({ children, onPress }: any) => (
   <TouchableOpacity
-    style={{
-      top: -30,
-      justifyContent: 'center',
-      alignItems: 'center',
-      ...styles.shadow,
-    }}
+    style={[styles.customButtonContainer, styles.shadow]}
     onPress={onPress}
   >
-    <View
-      style={{
-        width: 70,
-        height: 70,
-        borderRadius: 35,
-        backgroundColor: COLORS.brand.primary,
-        borderWidth: 4,
-        borderColor: COLORS.background.primary,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
+    <View style={styles.customButton}>
       {children}
     </View>
   </TouchableOpacity>
@@ -68,7 +52,7 @@ export const MainTabNavigator = () => {
         component={DiscoverScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+            <View style={styles.tabIconContainer}>
               <MaterialCommunityIcons
                 name={focused ? 'compass' : 'compass-outline'}
                 size={28}
@@ -84,7 +68,7 @@ export const MainTabNavigator = () => {
         component={SearchMapScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+            <View style={styles.tabIconContainer}>
               <Ionicons
                 name={focused ? 'map' : 'map-outline'}
                 size={28}
@@ -116,7 +100,7 @@ export const MainTabNavigator = () => {
         component={InboxScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+            <View style={styles.tabIconContainer}>
               <View>
                 <Ionicons
                   name={focused ? 'chatbubble' : 'chatbubble-outline'}
@@ -136,7 +120,7 @@ export const MainTabNavigator = () => {
         component={ProfileScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+            <View style={styles.tabIconContainer}>
               <MaterialCommunityIcons
                 name={focused ? 'account-circle' : 'account-circle-outline'}
                 size={30}
@@ -157,6 +141,25 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.5,
     elevation: 5,
+  },
+  customButtonContainer: {
+    top: -30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  customButton: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: COLORS.brand.primary,
+    borderWidth: 4,
+    borderColor: COLORS.background.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tabIconContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   badge: {
     position: 'absolute',
