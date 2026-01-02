@@ -574,6 +574,12 @@
       "title": "Page Not Found",
       "description": "The page you're looking for doesn't exist.",
       "goHome": "Go to Home"
+    },
+    "dateTimePicker": {
+      "title": "Select Date & Time",
+      "date": "DATE",
+      "time": "TIME",
+      "setSchedule": "Set Schedule"
     }
   }
 }
