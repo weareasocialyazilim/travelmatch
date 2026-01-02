@@ -35,6 +35,20 @@ import { toast } from 'sonner';
 import { formatRelativeDate, getInitials } from '@/lib/utils';
 import { useMoments, useApproveMoment, useRejectMoment } from '@/hooks/use-moments';
 
+// Sanitize URL to prevent XSS attacks
+function sanitizeMediaUrl(url: string | null | undefined): string | undefined {
+  if (!url) return undefined;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
+      return url;
+    }
+    return undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 const statusConfig = {
   pending: { label: 'Bekliyor', variant: 'warning' as const, icon: Clock },
   approved: { label: 'Onaylandı', variant: 'success' as const, icon: CheckCircle },
@@ -77,7 +91,7 @@ export default function MomentsPage() {
   const moments = data?.moments || [];
 
   // Client-side filtering for search
-  const filteredMoments = moments.filter((moment) => {
+  const filteredMoments = moments.filter((moment: Moment) => {
     const matchesSearch =
       search === '' ||
       moment.caption?.toLowerCase().includes(search.toLowerCase()) ||
@@ -86,7 +100,7 @@ export default function MomentsPage() {
     return matchesSearch;
   });
 
-  const pendingCount = moments.filter((m) => m.status === 'pending').length;
+  const pendingCount = moments.filter((m: Moment) => m.status === 'pending').length;
 
   const handleApprove = (momentId: string) => {
     approveMoment.mutate(momentId, {
@@ -94,7 +108,7 @@ export default function MomentsPage() {
         toast.success('Moment onaylandı');
         setSelectedMoment(null);
       },
-      onError: (error) => {
+      onError: (error: Error) => {
         toast.error(error.message || 'Bir hata oluştu');
       },
     });
@@ -108,7 +122,7 @@ export default function MomentsPage() {
           toast.success('Moment reddedildi');
           setSelectedMoment(null);
         },
-        onError: (error) => {
+        onError: (error: Error) => {
           toast.error(error.message || 'Bir hata oluştu');
         },
       }
@@ -175,7 +189,7 @@ export default function MomentsPage() {
               {isLoading ? (
                 <Loader2 className="h-6 w-6 animate-spin" />
               ) : (
-                moments.filter((m) => m.status === 'approved').length
+                moments.filter((m: Moment) => m.status === 'approved').length
               )}
             </div>
             <p className="text-xs text-muted-foreground">Yayında</p>
@@ -190,7 +204,7 @@ export default function MomentsPage() {
               {isLoading ? (
                 <Loader2 className="h-6 w-6 animate-spin" />
               ) : (
-                moments.filter((m) => m.status === 'rejected').length
+                moments.filter((m: Moment) => m.status === 'rejected').length
               )}
             </div>
             <p className="text-xs text-muted-foreground">Bu dönem</p>
@@ -218,7 +232,7 @@ export default function MomentsPage() {
               <Input
                 placeholder="Başlık veya kullanıcı ara..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
                 className="pl-10"
               />
             </div>
@@ -245,7 +259,7 @@ export default function MomentsPage() {
           {/* Grid */}
           {!isLoading && (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredMoments.map((moment) => {
+              {filteredMoments.map((moment: Moment) => {
                 const statusInfo = statusConfig[moment.status as keyof typeof statusConfig] || statusConfig.pending;
                 const StatusIcon = statusInfo.icon;
 
@@ -253,9 +267,9 @@ export default function MomentsPage() {
                   <Card key={moment.id} className="overflow-hidden">
                     {/* Image */}
                     <div className="relative aspect-video bg-muted">
-                      {moment.media_url ? (
+                      {sanitizeMediaUrl(moment.media_url) ? (
                         <img
-                          src={moment.media_url}
+                          src={sanitizeMediaUrl(moment.media_url)}
                           alt={moment.caption || 'Moment'}
                           className="h-full w-full object-cover"
                         />
@@ -274,7 +288,7 @@ export default function MomentsPage() {
                     <CardContent className="p-4">
                       <div className="mb-2 flex items-center gap-2">
                         <Avatar className="h-6 w-6">
-                          <AvatarImage src={moment.user?.avatar_url || undefined} />
+                          <AvatarImage src={sanitizeMediaUrl(moment.user?.avatar_url)} />
                           <AvatarFallback className="text-xs">
                             {getInitials(moment.user?.display_name || 'Kullanıcı')}
                           </AvatarFallback>
@@ -365,10 +379,10 @@ export default function MomentsPage() {
           </DialogHeader>
           <div className="space-y-4">
             <div className="aspect-video rounded-lg bg-muted overflow-hidden">
-              {selectedMoment?.media_url ? (
+              {sanitizeMediaUrl(selectedMoment?.media_url) ? (
                 <img
-                  src={selectedMoment.media_url}
-                  alt={selectedMoment.caption || 'Moment'}
+                  src={sanitizeMediaUrl(selectedMoment?.media_url)}
+                  alt={selectedMoment?.caption || 'Moment'}
                   className="h-full w-full object-cover"
                 />
               ) : (
