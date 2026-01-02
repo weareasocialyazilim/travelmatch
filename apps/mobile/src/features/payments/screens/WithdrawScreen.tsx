@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView, Keyboard } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView, Keyboard, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
 import { NetworkGuard } from '@/components/NetworkGuard';
+import { usePayments } from '@/hooks/usePayments';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -14,13 +15,33 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
   const insets = useSafeAreaInsets();
   const [amount, setAmount] = useState('');
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Escrow & Güvenlik Limitleri
-  const MIN_WITHDRAWAL = 50;
-  const MAX_WITHDRAWAL = 5000;
-  const AVAILABLE_BALANCE = 450.00;
+  // Use the payments hook for real data
+  const {
+    balance,
+    balanceLoading,
+    withdrawalLimits,
+    bankAccounts,
+    requestWithdrawal,
+    refreshBalance,
+  } = usePayments();
 
-  const handleWithdraw = () => {
+  // Refresh balance on mount
+  useEffect(() => {
+    refreshBalance();
+  }, [refreshBalance]);
+
+  // Use limits from API or fallback defaults
+  const MIN_WITHDRAWAL = withdrawalLimits?.minAmount ?? 50;
+  const MAX_DAILY = withdrawalLimits?.remainingDaily ?? 5000;
+  const MAX_WITHDRAWAL = Math.min(
+    withdrawalLimits?.maxAmount ?? 5000,
+    MAX_DAILY
+  );
+  const AVAILABLE_BALANCE = balance?.available ?? 0;
+
+  const handleWithdraw = async () => {
     Keyboard.dismiss();
     // Virgül girilirse noktaya çevir (Türkçe klavye uyumu)
     const numericAmount = parseFloat(amount.replace(',', '.'));
@@ -52,16 +73,39 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
 
     Alert.alert(
       'Çekimi Onayla',
-      `Seçilen yönteme $${numericAmount} çekmek istiyor musunuz?`,
+      `Seçilen yönteme $${numericAmount.toFixed(2)} çekmek istiyor musunuz?`,
       [
         { text: 'İptal', style: 'cancel' },
         {
           text: 'Onayla',
-          onPress: () => {
-            navigation.navigate('SuccessScreen', {
-              title: 'Çekim Başlatıldı',
-              message: 'Paranız yola çıktı. Genellikle 1-3 iş günü sürer.'
-            });
+          onPress: async () => {
+            setIsSubmitting(true);
+            try {
+              // Get bank account ID for selected method
+              const bankAccountId = selectedMethod === 'bank'
+                ? bankAccounts?.[0]?.id ?? 'default_bank'
+                : 'crypto_wallet';
+
+              const result = await requestWithdrawal(numericAmount, bankAccountId);
+
+              if (result) {
+                navigation.navigate('Success', {
+                  type: 'withdrawal',
+                  title: 'Çekim Başlatıldı',
+                  subtitle: 'Paranız yola çıktı. Genellikle 1-3 iş günü sürer.',
+                  details: {
+                    amount: numericAmount,
+                    referenceId: result.id,
+                  },
+                });
+              } else {
+                Alert.alert('Hata', 'Çekim işlemi başarısız oldu. Lütfen tekrar deneyin.');
+              }
+            } catch {
+              Alert.alert('Hata', 'Bir hata oluştu. Lütfen tekrar deneyin.');
+            } finally {
+              setIsSubmitting(false);
+            }
           }
         }
       ]
@@ -81,7 +125,11 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
         {/* Bakiye Bilgisi */}
         <View style={styles.balanceContainer}>
           <Text style={styles.balanceLabel}>Çekilebilir Bakiye</Text>
-          <Text style={styles.balanceAmount}>${AVAILABLE_BALANCE.toFixed(2)}</Text>
+          {balanceLoading ? (
+            <ActivityIndicator size="small" color={COLORS.brand.primary} />
+          ) : (
+            <Text style={styles.balanceAmount}>${AVAILABLE_BALANCE.toFixed(2)}</Text>
+          )}
         </View>
 
         {/* Tutar Girişi */}
@@ -132,11 +180,15 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
 
         {/* Çekim Butonu */}
         <TouchableOpacity
-          style={[styles.withdrawBtn, !amount && styles.disabledBtn]}
+          style={[styles.withdrawBtn, (!amount || isSubmitting) && styles.disabledBtn]}
           onPress={handleWithdraw}
-          disabled={!amount}
+          disabled={!amount || isSubmitting}
         >
-          <Text style={styles.withdrawText}>Parayı Çek</Text>
+          {isSubmitting ? (
+            <ActivityIndicator size="small" color="black" />
+          ) : (
+            <Text style={styles.withdrawText}>Parayı Çek</Text>
+          )}
         </TouchableOpacity>
 
       </ScrollView>
