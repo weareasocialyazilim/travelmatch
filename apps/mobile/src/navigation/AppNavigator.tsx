@@ -64,7 +64,6 @@ import {
   RequestsScreen,
   TicketScreen,
   TripDetailsScreen,
-  RequestManagerScreen,
   MyTripsScreen,
 } from '../features/trips';
 
@@ -676,7 +675,6 @@ const AppNavigator = () => {
 
             {/* Trips */}
             <Stack.Screen name="TripDetails" component={TripDetailsScreen} />
-            <Stack.Screen name="RequestManager" component={RequestManagerScreen} />
             <Stack.Screen name="MyTrips" component={MyTripsScreen} />
 
             {/* Image Viewer */}

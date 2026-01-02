@@ -72,7 +72,7 @@ export const HostMomentDetailScreen = ({ navigation }: any) => {
         {/* Actions */}
         <Text style={styles.sectionTitle}>Manage</Text>
 
-        <TouchableOpacity style={styles.actionRow} onPress={() => navigation.navigate('RequestManager')}>
+        <TouchableOpacity style={styles.actionRow} onPress={() => navigation.navigate('Requests')}>
           <View style={[styles.iconBox, { backgroundColor: COLORS.brand.primary }]}>
             <MaterialCommunityIcons name="account-group" size={24} color="black" />
           </View>
