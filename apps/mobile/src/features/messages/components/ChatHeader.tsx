@@ -1,7 +1,19 @@
+/**
+ * ChatHeader - Immersive Liquid Glass Header
+ *
+ * Premium chat header with:
+ * - BlurView glass effect for immersive feel
+ * - Neon status indicator
+ * - Linked moment card with glass styling
+ */
+
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Platform } from 'react-native';
+import { BlurView } from 'expo-blur';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
+import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
 
 export interface LinkedMoment {
   id: string;
@@ -22,6 +34,7 @@ interface ChatHeaderProps {
     isVerified?: boolean | null;
   };
   linkedMoment?: LinkedMoment;
+  isOnline?: boolean;
   onBack: () => void;
   onUserPress: () => void;
   onMomentPress: () => void;
@@ -31,11 +44,14 @@ interface ChatHeaderProps {
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
   otherUser,
   linkedMoment,
+  isOnline = true,
   onBack,
   onUserPress,
   onMomentPress,
   onMorePress,
 }) => {
+  const insets = useSafeAreaInsets();
+
   const getMomentSubtitle = () => {
     if (!linkedMoment) return '';
     if (linkedMoment.status === 'paid' || linkedMoment.status === 'completed') {
@@ -44,25 +60,27 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
     if (linkedMoment.status === 'accepted') {
       return 'Offer accepted';
     }
-    const currencySymbol = linkedMoment.currency === 'TRY' ? '₺' : linkedMoment.currency === 'EUR' ? '€' : '$';
+    const currencySymbol =
+      linkedMoment.currency === 'TRY'
+        ? '₺'
+        : linkedMoment.currency === 'EUR'
+          ? '€'
+          : '$';
     return linkedMoment.price ? `${currencySymbol}${linkedMoment.price}` : 'Negotiating';
   };
 
-  return (
-    <View style={styles.header}>
-      <View style={styles.headerTop}>
+  const HeaderContent = () => (
+    <>
+      <View style={[styles.headerTop, { paddingTop: insets.top + 8 }]}>
         <TouchableOpacity
           onPress={onBack}
           style={styles.backButton}
           accessibilityLabel="Go back"
           accessibilityRole="button"
         >
-          <MaterialCommunityIcons
-            name="arrow-left"
-            size={24}
-            color={COLORS.text.primary}
-          />
+          <Ionicons name="chevron-back" size={28} color={COLORS.text.primary} />
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.headerUserInfo}
           onPress={onUserPress}
@@ -79,26 +97,38 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
               }}
               style={styles.headerAvatar}
             />
-            <View style={styles.verifiedBadge}>
-              <MaterialCommunityIcons
-                name="check"
-                size={10}
-                color={COLORS.utility.white}
-              />
-            </View>
+            {otherUser.isVerified && (
+              <View style={styles.verifiedBadge}>
+                <Ionicons name="checkmark" size={10} color={COLORS.white} />
+              </View>
+            )}
           </View>
+
           <View style={styles.headerTextInfo}>
             <View style={styles.headerNameRow}>
               <Text style={styles.headerName}>{otherUser.name}</Text>
-              <MaterialCommunityIcons
-                name="check-decagram"
-                size={18}
-                color={COLORS.brand.primary}
-              />
+              {otherUser.isVerified && (
+                <MaterialCommunityIcons
+                  name="check-decagram"
+                  size={16}
+                  color={COLORS.primary}
+                />
+              )}
             </View>
-            <Text style={styles.headerRole}>Traveler</Text>
+            <View style={styles.statusRow}>
+              <View
+                style={[
+                  styles.statusDot,
+                  { backgroundColor: isOnline ? COLORS.success : COLORS.text.muted },
+                ]}
+              />
+              <Text style={styles.statusText}>
+                {isOnline ? 'Şu an aktif' : 'Çevrimdışı'}
+              </Text>
+            </View>
           </View>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.moreButton}
           onPress={onMorePress}
@@ -106,17 +136,12 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           accessibilityLabel="More chat options"
           accessibilityRole="button"
-          accessibilityHint="Opens menu for blocking, reporting, or archiving"
         >
-          <MaterialCommunityIcons
-            name="dots-vertical"
-            size={24}
-            color={COLORS.text.primary}
-          />
+          <Ionicons name="ellipsis-horizontal" size={24} color={COLORS.text.primary} />
         </TouchableOpacity>
       </View>
 
-      {/* Linked Moment Card */}
+      {/* Linked Moment Card - Glass Style */}
       {linkedMoment && (
         <TouchableOpacity
           style={styles.linkedMomentCard}
@@ -124,11 +149,12 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           activeOpacity={0.7}
           accessibilityLabel={`View linked moment: ${linkedMoment.title}`}
           accessibilityRole="button"
-          accessibilityHint="Opens the moment details"
         >
           <Image
             source={{
-              uri: linkedMoment.image || 'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=200',
+              uri:
+                linkedMoment.image ||
+                'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=200',
             }}
             style={styles.momentThumbnail}
           />
@@ -143,19 +169,39 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           </View>
         </TouchableOpacity>
       )}
+    </>
+  );
+
+  // Use BlurView on iOS, fallback on Android
+  if (Platform.OS === 'ios') {
+    return (
+      <BlurView intensity={40} tint="light" style={styles.header}>
+        <HeaderContent />
+      </BlurView>
+    );
+  }
+
+  return (
+    <View style={[styles.header, styles.headerAndroid]}>
+      <HeaderContent />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   header: {
+    zIndex: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border.light,
+  },
+  headerAndroid: {
     backgroundColor: COLORS.bg.primary,
   },
   headerTop: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingBottom: 12,
   },
   backButton: {
     width: 40,
@@ -167,15 +213,17 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
+    marginLeft: 4,
   },
   avatarContainer: {
     position: 'relative',
   },
   headerAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 2,
+    borderColor: COLORS.primary,
   },
   verifiedBadge: {
     position: 'absolute',
@@ -184,7 +232,7 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
     borderRadius: 8,
-    backgroundColor: COLORS.feedback.success,
+    backgroundColor: COLORS.success,
     borderWidth: 2,
     borderColor: COLORS.bg.primary,
     alignItems: 'center',
@@ -197,18 +245,34 @@ const styles = StyleSheet.create({
   headerNameRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
   },
   headerName: {
-    fontSize: 16,
+    fontSize: FONT_SIZES_V2.bodyLarge,
+    fontFamily: FONTS.display.bold,
     fontWeight: '700',
     color: COLORS.text.primary,
-    marginRight: 4,
   },
-  headerRole: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: COLORS.text.secondary,
+  statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginTop: 2,
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: 6,
+    // Neon glow for online status
+    shadowColor: COLORS.success,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+  },
+  statusText: {
+    fontSize: FONT_SIZES_V2.tiny,
+    color: COLORS.text.secondary,
+    fontFamily: FONTS.body.regular,
   },
   moreButton: {
     width: 40,
@@ -216,49 +280,55 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
+  // Linked Moment Card
   linkedMomentCard: {
     flexDirection: 'row',
     alignItems: 'center',
     marginHorizontal: 16,
-    marginTop: 4,
-    marginBottom: 16,
+    marginBottom: 12,
     padding: 12,
-    backgroundColor: COLORS.utility.white,
-    borderRadius: 12,
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 1 },
+    backgroundColor: COLORS.surface.base,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: COLORS.border.light,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    shadowRadius: 8,
+    elevation: 2,
   },
   momentThumbnail: {
     width: 48,
     height: 48,
-    borderRadius: 8,
+    borderRadius: 12,
   },
   momentInfo: {
     flex: 1,
     marginLeft: 12,
   },
   momentTitle: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: FONT_SIZES_V2.bodySmall,
+    fontFamily: FONTS.body.semibold,
+    fontWeight: '600',
     color: COLORS.text.primary,
     marginBottom: 2,
   },
   momentSubtitle: {
-    fontSize: 12,
+    fontSize: FONT_SIZES_V2.caption,
+    fontFamily: FONTS.body.regular,
     color: COLORS.text.secondary,
   },
   viewButton: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 6,
-    backgroundColor: COLORS.mintTransparent,
-    borderRadius: 9999,
+    backgroundColor: COLORS.primaryMuted,
+    borderRadius: 20,
   },
   viewButtonText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: COLORS.brand.primary,
+    fontSize: FONT_SIZES_V2.caption,
+    fontFamily: FONTS.body.semibold,
+    fontWeight: '600',
+    color: COLORS.primary,
   },
 });
