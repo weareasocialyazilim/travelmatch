@@ -16,6 +16,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
+import { Image as _Image } from 'expo-image';
 import { COLORS } from '@/constants/colors';
 import { usePayments } from '@/hooks/usePayments';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
@@ -40,7 +41,7 @@ const CheckoutScreen: React.FC = () => {
 
   const { momentId, amount, recipientId, recipientName } = route.params || {};
 
-  const { createPaymentIntent, confirmPayment, cards } = usePayments();
+  const { processPayment, paymentMethods } = usePayments();
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('tr-TR', {
@@ -66,18 +67,7 @@ const CheckoutScreen: React.FC = () => {
     },
   ];
 
-  // Transform cards to PaymentMethod format
-  const cardMethods: PaymentMethod[] = cards.map((card) => ({
-    id: card.id,
-    type: 'card' as const,
-    name: card.brand,
-    last4: card.last4,
-    icon: 'credit-card',
-  }));
-
-  const methods = cardMethods.length > 0
-    ? [defaultPaymentMethods[0], ...cardMethods]
-    : defaultPaymentMethods;
+  const methods = paymentMethods || defaultPaymentMethods;
 
   const handlePayment = useCallback(async () => {
     if (!selectedMethod || isProcessing) return;
@@ -86,26 +76,20 @@ const CheckoutScreen: React.FC = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
-      // Create payment intent first
-      const paymentIntent = await createPaymentIntent(momentId || '', amount || 0);
+      await processPayment({
+        amount: amount || 0,
+        paymentMethodId: selectedMethod,
+        momentId,
+        recipientId,
+      });
 
-      if (paymentIntent) {
-        // Confirm the payment
-        const success = await confirmPayment(paymentIntent.id, selectedMethod !== 'wallet' ? selectedMethod : undefined);
-
-        if (success) {
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          navigation.navigate('Success', {
-            type: 'payment',
-            title: 'Payment Successful',
-            subtitle: `You sent ${formatCurrency(amount || 0)} to ${recipientName}`,
-          });
-          return;
-        }
-      }
-
-      throw new Error('Payment failed');
-    } catch (_error) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      navigation.navigate('Success', {
+        type: 'payment',
+        title: 'Payment Successful',
+        subtitle: `You sent ${formatCurrency(amount || 0)} to ${recipientName}`,
+      });
+    } catch (error) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       navigation.navigate('PaymentFailed', {
         error: 'Payment failed. Please try again.',
@@ -117,9 +101,9 @@ const CheckoutScreen: React.FC = () => {
     selectedMethod,
     amount,
     momentId,
+    recipientId,
     recipientName,
-    createPaymentIntent,
-    confirmPayment,
+    processPayment,
     navigation,
     isProcessing,
   ]);
@@ -455,7 +439,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withErrorBoundary(CheckoutScreen, {
-  fallbackType: 'generic',
-  displayName: 'CheckoutScreen',
-});
+export default withErrorBoundary(CheckoutScreen, { displayName: 'CheckoutScreen' });

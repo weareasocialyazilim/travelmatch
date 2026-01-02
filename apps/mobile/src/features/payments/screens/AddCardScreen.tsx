@@ -17,7 +17,7 @@ import Animated, { FadeInDown, FlipInYRight } from 'react-native-reanimated';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
-const _screenWidth = Dimensions.get('window').width;
+const { width: _width } = Dimensions.get('window');
 
 type Props = StackScreenProps<RootStackParamList, 'AddCard'>;
 

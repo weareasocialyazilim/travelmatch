@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
@@ -13,11 +13,11 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
-import type { NavigationProp } from '@react-navigation/native';
-import type { RootStackParamList } from '@/navigation/routeParams';
+
+const { width: _width } = Dimensions.get('window');
 
 export const GiftUnboxingScreen = () => {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const navigation = useNavigation();
   const scale = useSharedValue(0);
   const rotate = useSharedValue(0);
   const opacity = useSharedValue(0);
@@ -73,18 +73,7 @@ export const GiftUnboxingScreen = () => {
 
         <TouchableOpacity
           style={styles.btn}
-          onPress={() => navigation.navigate('ChatDetail', {
-            conversationId: 'new',
-            otherUser: {
-              id: 'sender-id',
-              name: 'Selin Y.',
-              avatar: null,
-              isVerified: true,
-              role: 'Traveler',
-              kyc: 'Verified',
-              location: '',
-            },
-          })}
+          onPress={() => navigation.navigate('ChatDetail', { conversationId: 'new', otherUser: { id: 'giver', name: 'Gift Giver', role: 'Traveler' as const, kyc: 'Unverified' as const, location: '' } })}
         >
           <Text style={styles.btnText}>Say Thanks & Chat</Text>
         </TouchableOpacity>

@@ -58,7 +58,7 @@ export const GlassModal = ({
               style={[styles.confirmBtn, { backgroundColor: type === 'danger' ? COLORS.feedback.error : COLORS.brand.primary }]}
               onPress={onConfirm}
             >
-              <Text style={[styles.confirmText, type === 'danger' ? { color: COLORS.utility.white } : { color: COLORS.text.primary }]}>
+              <Text style={[styles.confirmText, type === 'danger' ? { color: COLORS.utility.white } : { color: COLORS.textPrimary }]}>
                 {confirmText}
               </Text>
             </TouchableOpacity>
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: COLORS.surface.glassBorder,
-    backgroundColor: COLORS.surface.glassBackground
+    backgroundColor: COLORS.background.glass
   },
   iconCircle: {
     width: 60,
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 16,
     alignItems: 'center',
-    backgroundColor: COLORS.surface.glassBackground
+    backgroundColor: COLORS.glass
   },
   confirmBtn: {
     flex: 1,

@@ -106,7 +106,7 @@ export const RegisterScreen: React.FC = () => {
         style={styles.bgImage}
       >
         <LinearGradient
-          colors={['rgba(0,0,0,0.3)', COLORS.background]}
+          colors={['rgba(0,0,0,0.3)', COLORS.background.primary]}
           style={styles.gradient}
         />
 
@@ -202,7 +202,7 @@ export const RegisterScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.background.primary,
   },
   bgImage: {
     flex: 1,

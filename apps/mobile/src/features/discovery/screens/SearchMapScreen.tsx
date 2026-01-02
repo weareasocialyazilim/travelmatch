@@ -20,7 +20,7 @@ import { withErrorBoundary } from '@/components/withErrorBoundary';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: _SCREEN_HEIGHT } = Dimensions.get('window');
 
 interface MapLocation {
   latitude: number;
@@ -53,7 +53,7 @@ const SearchMapScreen: React.FC = () => {
             longitude: location.coords.longitude,
           });
         }
-      } catch (_error) {
+      } catch (error) {
         // Default to a central location if permission denied
         setUserLocation({
           latitude: 41.0082, // Istanbul
@@ -285,7 +285,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withErrorBoundary(SearchMapScreen, {
-  fallbackType: 'generic',
-  displayName: 'SearchMapScreen',
-});
+export default withErrorBoundary(SearchMapScreen, { displayName: 'SearchMapScreen' });
