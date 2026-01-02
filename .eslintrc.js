@@ -181,12 +181,35 @@ module.exports = {
       },
     },
     {
-      // Configuration files
+      // Configuration files (CommonJS)
       files: ['*.config.js', '*.config.ts', '.eslintrc.js', '.prettierrc.js'],
+      env: {
+        node: true,
+      },
       rules: {
         '@typescript-eslint/no-var-requires': 'off',
         '@typescript-eslint/no-unsafe-assignment': 'off',
         '@typescript-eslint/no-unsafe-member-access': 'off',
+      },
+    },
+    {
+      // k6 load testing files
+      files: ['tests/load/**/*.js'],
+      env: {
+        node: false,
+        browser: false,
+      },
+      globals: {
+        __ENV: 'readonly',
+        __VU: 'readonly',
+        __ITER: 'readonly',
+        console: 'readonly',
+      },
+      rules: {
+        'no-undef': 'off',
+        'no-console': 'off',
+        '@typescript-eslint/no-unused-expressions': 'off',
+        '@typescript-eslint/no-unused-vars': 'warn',
       },
     },
     {
