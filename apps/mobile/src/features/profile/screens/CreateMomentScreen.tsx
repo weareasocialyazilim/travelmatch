@@ -40,7 +40,10 @@ import type { NavigationProp } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import { COLORS, GRADIENTS } from '@/constants/colors';
+import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
+import { FormStepIndicator, type FormStep } from '@/components/ui/FormStepIndicator';
+import { GlassCard } from '@/components/ui/GlassCard';
 import { useMoments } from '../hooks';
 import { useToast } from '@/context/ToastContext';
 
@@ -48,6 +51,21 @@ const { width: _width, height: _height } = Dimensions.get('window');
 
 // Step-by-step flow
 type Step = 'media' | 'details' | 'price' | 'review';
+
+// Form steps for the indicator
+const FORM_STEPS: FormStep[] = [
+  { key: 'media', label: 'Görsel', icon: 'camera' },
+  { key: 'details', label: 'Detaylar', icon: 'text' },
+  { key: 'price', label: 'Fiyat', icon: 'tag' },
+  { key: 'review', label: 'Önizleme', icon: 'eye' },
+];
+
+const STEP_INDEX_MAP: Record<Step, number> = {
+  media: 0,
+  details: 1,
+  price: 2,
+  review: 3,
+};
 
 // Category options with Material Community Icons
 const CATEGORIES = [
@@ -175,27 +193,54 @@ const CreateMomentScreen: React.FC = () => {
 
   // --- Render Steps ---
 
+  // Handle step navigation from indicator
+  const handleStepPress = useCallback((stepIndex: number) => {
+    const stepKeys: Step[] = ['media', 'details', 'price', 'review'];
+    if (stepIndex < STEP_INDEX_MAP[step]) {
+      setStep(stepKeys[stepIndex]);
+    }
+  }, [step]);
+
   // Step 1: Media Selection - Clean upload UI
   const renderMediaStep = () => (
     <Animated.View entering={FadeIn} style={styles.centerContent}>
-      <TouchableOpacity onPress={pickImage} style={styles.uploadButton}>
-        <LinearGradient
-          colors={GRADIENTS.primary}
-          style={styles.gradientBorder}
-        >
-          <View style={styles.uploadInner}>
-            <MaterialCommunityIcons
-              name="camera-plus"
-              size={40}
-              color="white"
-            />
-            <Text style={styles.uploadText}>Upload Visual</Text>
-          </View>
-        </LinearGradient>
-      </TouchableOpacity>
-      <Text style={styles.stepHint}>
-        {t('screens.createMoment.uploadHint')}
-      </Text>
+      {/* Step Indicator */}
+      <View style={styles.stepIndicatorContainer}>
+        <FormStepIndicator
+          steps={FORM_STEPS}
+          currentStep={STEP_INDEX_MAP[step]}
+          onStepPress={handleStepPress}
+          showLabels={false}
+          compact
+        />
+      </View>
+
+      <View style={styles.mediaStepContent}>
+        <Text style={styles.stepTitle}>Görsel Kanıtını Yükle</Text>
+        <Text style={styles.stepSubtitle}>
+          Unutulmaz anılarını en kaliteli haliyle paylaş.
+        </Text>
+
+        <TouchableOpacity onPress={pickImage} style={styles.uploadButton}>
+          <LinearGradient
+            colors={GRADIENTS.primary}
+            style={styles.gradientBorder}
+          >
+            <View style={styles.uploadInner}>
+              <MaterialCommunityIcons
+                name="camera-plus"
+                size={40}
+                color="white"
+              />
+              <Text style={styles.uploadText}>Upload Visual</Text>
+            </View>
+          </LinearGradient>
+        </TouchableOpacity>
+
+        <Text style={styles.stepHint}>
+          {t('screens.createMoment.uploadHint')}
+        </Text>
+      </View>
     </Animated.View>
   );
 
@@ -208,7 +253,7 @@ const CreateMomentScreen: React.FC = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.overlayContainer}
       >
-        {/* Top Controls: Back & Close */}
+        {/* Top Controls: Back, Step Indicator & Close */}
         <View style={[styles.topBar, { marginTop: insets.top }]}>
           <TouchableOpacity
             onPress={handleBack}
@@ -218,6 +263,18 @@ const CreateMomentScreen: React.FC = () => {
           >
             <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
+
+          {/* Step Indicator in Header */}
+          <View style={styles.headerStepIndicator}>
+            <FormStepIndicator
+              steps={FORM_STEPS}
+              currentStep={STEP_INDEX_MAP[step]}
+              onStepPress={handleStepPress}
+              showLabels={false}
+              compact
+            />
+          </View>
+
           <TouchableOpacity
             onPress={handleClose}
             style={styles.iconButton}
@@ -331,16 +388,40 @@ const CreateMomentScreen: React.FC = () => {
             </Animated.View>
           )}
 
-          {/* STEP: REVIEW (Final Look) */}
+          {/* STEP: REVIEW (Final Look) - Liquid Glass */}
           {step === 'review' && (
             <Animated.View entering={SlideInDown} style={styles.reviewStep}>
-              <BlurView intensity={30} style={styles.reviewCard}>
+              <GlassCard intensity={30} tint="dark" style={styles.reviewCard}>
+                <View style={styles.reviewHeader}>
+                  <MaterialCommunityIcons
+                    name="check-decagram"
+                    size={24}
+                    color={COLORS.primary}
+                  />
+                  <Text style={styles.reviewLabel}>ÖNİZLEME</Text>
+                </View>
                 <Text style={styles.reviewTitle}>{title}</Text>
-                <Text style={styles.reviewMeta}>
-                  {CATEGORIES.find((c) => c.id === selectedCategory)?.label} • $
-                  {price}
-                </Text>
-              </BlurView>
+                <View style={styles.reviewMetaRow}>
+                  <View style={styles.reviewMetaItem}>
+                    <MaterialCommunityIcons
+                      name={CATEGORIES.find((c) => c.id === selectedCategory)?.icon || 'tag'}
+                      size={16}
+                      color={COLORS.primary}
+                    />
+                    <Text style={styles.reviewMeta}>
+                      {CATEGORIES.find((c) => c.id === selectedCategory)?.label}
+                    </Text>
+                  </View>
+                  <View style={styles.reviewMetaItem}>
+                    <MaterialCommunityIcons
+                      name="currency-usd"
+                      size={16}
+                      color={COLORS.primary}
+                    />
+                    <Text style={styles.reviewMeta}>${price}</Text>
+                  </View>
+                </View>
+              </GlassCard>
 
               <TouchableOpacity
                 style={[
@@ -353,9 +434,16 @@ const CreateMomentScreen: React.FC = () => {
                 accessibilityLabel={t('screens.createMoment.a11y.dropMoment')}
                 accessibilityRole="button"
               >
-                <Text style={[styles.nextButtonText, styles.dropButtonText]}>
-                  {isSubmitting ? 'DROPPING...' : 'DROP MOMENT 🔥'}
-                </Text>
+                <LinearGradient
+                  colors={GRADIENTS.gift}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.dropButtonGradient}
+                >
+                  <Text style={styles.dropButtonText}>
+                    {isSubmitting ? 'DROPPING...' : 'YAYINLA 🔥'}
+                  </Text>
+                </LinearGradient>
               </TouchableOpacity>
             </Animated.View>
           )}
@@ -403,8 +491,35 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   centerContent: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  stepIndicatorContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  mediaStepContent: {
+    flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 20,
+  },
+  stepTitle: {
+    fontSize: FONT_SIZES_V2.h2,
+    fontFamily: FONTS.display.bold,
+    fontWeight: '800',
+    color: COLORS.white,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  stepSubtitle: {
+    fontSize: FONT_SIZES_V2.bodySmall,
+    fontFamily: FONTS.body.regular,
+    color: 'rgba(255,255,255,0.7)',
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 32,
+    paddingHorizontal: 40,
   },
 
   // Upload Button - Gradient border effect
@@ -446,7 +561,12 @@ const styles = StyleSheet.create({
   topBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 20,
+  },
+  headerStepIndicator: {
+    flex: 1,
+    marginHorizontal: 12,
   },
   iconButton: {
     width: 44,
@@ -538,30 +658,48 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
-  // Review Step
+  // Review Step - Liquid Glass
   reviewStep: {
     alignItems: 'center',
     width: '100%',
   },
   reviewCard: {
     width: '100%',
-    padding: 24,
-    borderRadius: 24,
-    overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.1)',
     marginBottom: 24,
+  },
+  reviewHeader: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 8,
+    marginBottom: 16,
+  },
+  reviewLabel: {
+    fontSize: 10,
+    fontFamily: FONTS.mono.medium,
+    color: COLORS.primary,
+    letterSpacing: 1.5,
+    fontWeight: '600',
   },
   reviewTitle: {
-    fontSize: 24,
+    fontSize: FONT_SIZES_V2.h3,
+    fontFamily: FONTS.display.bold,
     fontWeight: 'bold',
     color: 'white',
-    marginBottom: 8,
-    textAlign: 'center',
+    marginBottom: 12,
+  },
+  reviewMetaRow: {
+    flexDirection: 'row',
+    gap: 20,
+  },
+  reviewMetaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   reviewMeta: {
-    fontSize: 16,
-    color: COLORS.brand.primary,
+    fontSize: FONT_SIZES_V2.bodySmall,
+    fontFamily: FONTS.body.semibold,
+    color: 'rgba(255,255,255,0.8)',
     fontWeight: '600',
   },
 
@@ -590,10 +728,26 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   dropButton: {
-    backgroundColor: COLORS.secondary, // Hot Pink for Drop
+    backgroundColor: 'transparent',
+    overflow: 'hidden',
+    // Neon glow effect
+    shadowColor: COLORS.secondary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+  },
+  dropButtonGradient: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 28,
   },
   dropButtonText: {
     color: 'white',
+    fontSize: FONT_SIZES_V2.bodyLarge,
+    fontFamily: FONTS.body.bold,
+    fontWeight: 'bold',
   },
 });
 
