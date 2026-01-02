@@ -102,7 +102,6 @@ export const checkUserLimits = async (
   }
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (supabase.rpc as any)('check_user_limits', {
       p_user_id: userId,
       p_category: category,
@@ -178,7 +177,6 @@ export const checkMomentContributionLimit = async (
   }
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (supabase.rpc as any)('check_moment_contribution_limit', {
       p_moment_id: momentId,
       p_user_id: userId,
@@ -239,7 +237,6 @@ export const checkMomentCreationLimit =
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase.rpc as any)('check_moment_creation_limit', {
         p_user_id: userId,
       }) as { data: MomentCreationLimitResult | null; error: Error | null };
