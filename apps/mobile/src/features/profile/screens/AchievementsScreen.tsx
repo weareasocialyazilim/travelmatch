@@ -18,7 +18,7 @@ export const AchievementsScreen = ({ navigation }: any) => {
     <View style={[styles.card, !item.unlocked && styles.lockedCard]}>
       <Image source={{ uri: item.icon }} style={[styles.icon, !item.unlocked && styles.lockedIcon]} />
       <View style={styles.info}>
-        <Text style={[styles.badgeTitle, !item.unlocked && { color: '#666' }]}>{item.title}</Text>
+        <Text style={[styles.badgeTitle, !item.unlocked && styles.lockedText]}>{item.title}</Text>
         <Text style={styles.badgeDesc}>{item.desc}</Text>
       </View>
       {item.unlocked ? (
@@ -34,7 +34,7 @@ export const AchievementsScreen = ({ navigation }: any) => {
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <Ionicons name="arrow-back" size={24} color="white" onPress={() => navigation.goBack()} />
         <Text style={styles.headerTitle}>Achievements</Text>
-        <View style={{ width: 24 }} />
+        <View style={styles.headerSpacer} />
       </View>
 
       <FlatList
@@ -58,4 +58,6 @@ const styles = StyleSheet.create({
   info: { flex: 1 },
   badgeTitle: { color: 'white', fontWeight: 'bold', fontSize: 16, marginBottom: 4 },
   badgeDesc: { color: '#888', fontSize: 12 },
+  lockedText: { color: '#666' },
+  headerSpacer: { width: 24 },
 });

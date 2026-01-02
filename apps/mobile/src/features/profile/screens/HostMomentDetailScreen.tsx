@@ -79,7 +79,7 @@ export const HostMomentDetailScreen = ({ navigation }: any) => {
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionRow}>
-          <View style={[styles.iconBox, { backgroundColor: '#FFD700' }]}>
+          <View style={[styles.iconBox, styles.iconBoxGold]}>
             <MaterialCommunityIcons name="rocket-launch" size={24} color="black" />
           </View>
           <View style={styles.actionText}>
@@ -117,6 +117,7 @@ const styles = StyleSheet.create({
   sectionTitle: { color: '#666', fontSize: 14, fontWeight: 'bold', marginBottom: 16, textTransform: 'uppercase' },
   actionRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.05)', padding: 16, borderRadius: 16, marginBottom: 12 },
   iconBox: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginRight: 16 },
+  iconBoxGold: { backgroundColor: '#FFD700' },
   actionText: { flex: 1 },
   actionTitle: { color: 'white', fontWeight: 'bold', fontSize: 16 },
   actionDesc: { color: '#888', fontSize: 12, marginTop: 2 },

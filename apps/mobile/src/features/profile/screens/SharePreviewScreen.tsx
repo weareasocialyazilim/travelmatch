@@ -15,7 +15,7 @@ export const SharePreviewScreen = ({ navigation }: any) => {
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}><Ionicons name="close" size={28} color="white" /></TouchableOpacity>
         <Text style={styles.headerTitle}>Share Moment</Text>
-        <View style={{ width: 28 }} />
+        <View style={styles.headerSpacer} />
       </View>
 
       <View style={styles.previewContainer}>
@@ -23,7 +23,7 @@ export const SharePreviewScreen = ({ navigation }: any) => {
           <ImageBackground
             source={{ uri: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=600' }}
             style={styles.cardImage}
-            imageStyle={{ borderRadius: 20 }}
+            imageStyle={styles.cardImageBorderRadius}
           >
             <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)']} style={styles.gradient} />
             <View style={styles.cardContent}>
@@ -75,6 +75,8 @@ const styles = StyleSheet.create({
   shareText: { color: 'white', fontSize: 12, fontWeight: '600' },
   copyBtn: { alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.05)', padding: 16, borderRadius: 16, width: '30%' },
   copyText: { color: 'white', fontSize: 12, fontWeight: '600' },
+  headerSpacer: { width: 28 },
+  cardImageBorderRadius: { borderRadius: 20 },
 });
 
 export default SharePreviewScreen;
