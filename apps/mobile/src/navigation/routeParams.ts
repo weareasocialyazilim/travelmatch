@@ -69,7 +69,6 @@ export type RootStackParamList = {
   Search: undefined;
   Inbox: { initialTab?: 'active' | 'requests' } | undefined;
   Requests: { initialTab?: 'pending' | 'notifications' } | undefined;
-  RequestManager: { momentId?: string } | undefined;
   Messages: undefined;
   SearchMap: undefined;
 
