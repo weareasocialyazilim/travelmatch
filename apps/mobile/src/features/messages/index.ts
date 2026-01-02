@@ -5,6 +5,7 @@ export { default as MessagesScreen } from './screens/MessagesScreen';
 export { default as ChatScreen } from './screens/ChatScreen';
 export { default as ArchivedChatsScreen } from './screens/ArchivedChatsScreen';
 export { ChatCameraScreen } from './screens/ChatCameraScreen';
+export { ChatDetailScreen } from './screens/ChatDetailScreen';
 
 // Hooks
 export {
