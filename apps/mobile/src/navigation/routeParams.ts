@@ -67,12 +67,11 @@ export type RootStackParamList = {
   // Individual Tab Screens (for deep linking)
   Discover: undefined;
   Search: undefined;
-  Inbox: undefined;
+  Inbox: { initialTab?: 'active' | 'requests' } | undefined;
   Requests: { initialTab?: 'pending' | 'notifications' } | undefined;
   RequestManager: { momentId?: string } | undefined;
   Messages: undefined;
   SearchMap: undefined;
-  Inbox: { initialTab?: 'active' | 'requests' } | undefined;
 
   CreateMoment: undefined;
   EditMoment: { momentId: string };
@@ -84,8 +83,10 @@ export type RootStackParamList = {
     userId: string;
     userName: string;
     userAvatar: string;
+    momentId?: string;
+    momentTitle?: string;
   };
-  UserProfile: { userId?: string } | undefined;
+  UserProfile: { userId: string };
   MyGifts: undefined;
   GiftCardMarket: undefined;
   TrustNotes: undefined;
@@ -125,24 +126,6 @@ export type RootStackParamList = {
   // Communication
   Chat: { otherUser: User; conversationId?: string };
   ChatDetail: { conversationId: string; otherUser: User };
-
-  // User Profile (Public View)
-  UserProfile: { userId: string };
-
-  // Checkout & Reviews
-  Checkout: {
-    momentId?: string;
-    amount?: number;
-    recipientId?: string;
-    recipientName?: string;
-  };
-  Review: {
-    momentId?: string;
-    userId?: string;
-    userName?: string;
-    userAvatar?: string;
-    momentTitle?: string;
-  };
 
   // Transactions
   TransactionDetail: { transactionId: string };
@@ -256,14 +239,15 @@ export type RootStackParamList = {
   AddCard: undefined;
 
   // Checkout
-  Checkout:
-    | {
-        title?: string;
-        price?: number;
-        fee?: number;
-        momentId?: string;
-      }
-    | undefined;
+  Checkout: {
+    momentId?: string;
+    amount?: number;
+    recipientId?: string;
+    recipientName?: string;
+    title?: string;
+    price?: number;
+    fee?: number;
+  } | undefined;
 
   // Wallet & Settings
   Wallet: undefined;

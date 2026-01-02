@@ -267,6 +267,7 @@ export const COLORS = {
     muted: primitives.stone[400],
     disabled: primitives.stone[300],
     inverse: '#FFFFFF',
+    onDark: '#FFFFFF', // White text on dark backgrounds
   },
   textPrimary: primitives.stone[900],
   textSecondary: primitives.stone[500],

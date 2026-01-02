@@ -16,7 +16,8 @@ import { COLORS } from '@/constants/colors';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 
-const { width } = Dimensions.get('window');
+// Width from Dimensions not currently used
+// const { width } = Dimensions.get('window');
 
 interface RequestUser {
   name: string;
@@ -65,14 +66,18 @@ const RequestManagerScreen = () => {
 
   const handleAction = (id: string, action: 'accept' | 'reject') => {
     // API Call here
+    const request = requests.find((r) => r.id === id);
     setRequests((prev) => prev.filter((req) => req.id !== id));
-    if (action === 'accept') {
-      // Navigate to chat with a placeholder user object
+    if (action === 'accept' && request) {
+      // Navigate to chat with a complete user object
       navigation.navigate('Chat', {
         otherUser: {
           id: id,
-          name: requests.find((r) => r.id === id)?.user.name || 'User',
-          avatar: requests.find((r) => r.id === id)?.user.avatar || '',
+          name: request.user.name,
+          avatar: request.user.avatar,
+          role: 'Traveler' as const,
+          kyc: 'Verified' as const,
+          location: { lat: 0, lng: 0 },
         },
         conversationId: `new_chat_${id}`,
       });

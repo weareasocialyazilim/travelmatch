@@ -4,6 +4,7 @@
  * Note: The proper implementation is in @/features/profile/hooks/useProfile
  * This re-export provides a shorter import path for common usage.
  */
-export { useProfile } from '@/features/profile/hooks/useProfile';
-export { useMyProfile, useUpdateProfile } from '@/features/profile/hooks/useProfile';
-export { default } from '@/features/profile/hooks/useProfile';
+export { useProfile, useMyProfile, useUpdateProfile, useReputation, useTrustScore, useProofHistory, useMyMoments, useCreateMoment, useDeleteMoment } from '@/features/profile/hooks/useProfile';
+
+// Default export for convenience
+export { useProfile as default } from '@/features/profile/hooks/useProfile';
