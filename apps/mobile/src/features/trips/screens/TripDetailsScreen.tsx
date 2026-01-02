@@ -13,7 +13,7 @@ export const TripDetailsScreen = ({ navigation }: any) => {
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}><Ionicons name="arrow-back" size={24} color="white" /></TouchableOpacity>
         <Text style={styles.headerTitle}>Trip Itinerary</Text>
-        <View style={{ width: 24 }} />
+        <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -45,7 +45,7 @@ export const TripDetailsScreen = ({ navigation }: any) => {
           <Text style={styles.sectionHeader}>Meeting With</Text>
           <TouchableOpacity style={styles.hostCard} onPress={() => navigation.navigate('UserProfile')}>
             <Image source={{ uri: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100' }} style={styles.avatar} />
-            <View style={{ flex: 1 }}>
+            <View style={styles.hostInfo}>
               <Text style={styles.hostName}>Selin Yılmaz</Text>
               <Text style={styles.hostRole}>Verified Host</Text>
             </View>
@@ -107,4 +107,6 @@ const styles = StyleSheet.create({
   directionsText: { color: 'black', fontWeight: 'bold', fontSize: 12 },
   ticketBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, backgroundColor: COLORS.brand.primary, padding: 18, borderRadius: 16, marginBottom: 40 },
   ticketBtnText: { color: 'black', fontWeight: 'bold', fontSize: 16 },
+  headerSpacer: { width: 24 },
+  hostInfo: { flex: 1 },
 });

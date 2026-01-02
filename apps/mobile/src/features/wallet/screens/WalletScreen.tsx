@@ -109,13 +109,8 @@ const WalletScreen: React.FC = () => {
         >
           <Text style={styles.balanceLabel}>Available Balance</Text>
           <Text style={styles.balanceAmount}>
-            {formatCurrency(balance?.available || 0)}
+            {formatCurrency(balance || 0)}
           </Text>
-          {balance?.pending > 0 && (
-            <Text style={styles.pendingBalance}>
-              +{formatCurrency(balance.pending)} pending
-            </Text>
-          )}
         </LinearGradient>
 
         {/* Quick Actions */}
