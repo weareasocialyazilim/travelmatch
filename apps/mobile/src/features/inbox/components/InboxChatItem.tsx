@@ -1,16 +1,16 @@
 /**
- * TravelMatch Vibe Room - Inbox Chat Item
+ * TravelMatch Inbox Chat Item - Awwwards Edition
  *
- * Smart list item with:
+ * Premium list item with:
  * - Left: Moment context strip (photo with gradient overlay)
  * - Center: User info and last message
- * - Right: Time and status badge
+ * - Right: Time and status badge with neon accents
  *
  * "Context is King" - Every chat shows the connected Moment.
  */
 
 import React, { memo, useCallback } from 'react';
-import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Image, Pressable, StyleSheet, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, {
@@ -26,6 +26,7 @@ import {
   VIBE_ROOM_COLORS,
   INBOX_SPACING,
   INBOX_SPRINGS,
+  INBOX_TYPOGRAPHY,
 } from '../constants/theme';
 import StatusBadge from './StatusBadge';
 import type { InboxChat } from '../types/inbox.types';
@@ -43,7 +44,7 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
     const scale = useSharedValue(1);
 
     const handlePressIn = useCallback(() => {
-      scale.value = withSpring(0.98, INBOX_SPRINGS.snappy);
+      scale.value = withSpring(0.97, INBOX_SPRINGS.snappy);
     }, [scale]);
 
     const handlePressOut = useCallback(() => {
@@ -59,7 +60,7 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
       transform: [{ scale: scale.value }],
     }));
 
-    // Format relative time
+    // Format relative time (Turkish)
     const formatTime = (dateString: string): string => {
       const date = new Date(dateString);
       const now = new Date();
@@ -68,14 +69,14 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
       const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
       const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-      if (diffMins < 1) return 'now';
-      if (diffMins < 60) return `${diffMins}m`;
-      if (diffHours < 24) return `${diffHours}h`;
-      if (diffDays === 1) return '1d';
-      if (diffDays < 7) return `${diffDays}d`;
-      return date.toLocaleDateString('en-US', {
-        month: 'short',
+      if (diffMins < 1) return 'şimdi';
+      if (diffMins < 60) return `${diffMins}dk`;
+      if (diffHours < 24) return `${diffHours}sa`;
+      if (diffDays === 1) return 'dün';
+      if (diffDays < 7) return `${diffDays}g`;
+      return date.toLocaleDateString('tr-TR', {
         day: 'numeric',
+        month: 'short',
       });
     };
 
@@ -84,7 +85,7 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
 
     return (
       <Animated.View
-        entering={FadeInRight.delay(index * 80).springify()}
+        entering={FadeInRight.delay(index * 60).springify()}
         layout={Layout.springify()}
       >
         <AnimatedPressable
@@ -93,7 +94,7 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
           accessibilityRole="button"
-          accessibilityLabel={`Chat with ${chat.user.name}${chat.moment ? ` about ${chat.moment.title}` : ''}`}
+          accessibilityLabel={`${chat.user.name} ile sohbet${chat.moment ? `, ${chat.moment.title}` : ''}`}
         >
           {/* Left: Moment Context Strip */}
           <View style={styles.momentStrip}>
@@ -108,11 +109,11 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
               colors={VIBE_ROOM_COLORS.gradients.momentStrip}
               style={StyleSheet.absoluteFill}
             />
-            {/* Moment icon/emoji overlay */}
+            {/* Moment icon overlay */}
             <View style={styles.momentOverlay}>
               <MaterialCommunityIcons
                 name="image-filter-hdr"
-                size={14}
+                size={12}
                 color="white"
               />
             </View>
@@ -129,16 +130,18 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
                     {chat.user.name}
                   </Text>
                   {chat.user.isVerified && (
-                    <MaterialCommunityIcons
-                      name="check-decagram"
-                      size={14}
-                      color={VIBE_ROOM_COLORS.neon.amber}
-                    />
+                    <View style={styles.verifiedBadge}>
+                      <MaterialCommunityIcons
+                        name="check-decagram"
+                        size={14}
+                        color={VIBE_ROOM_COLORS.neon.cyan}
+                      />
+                    </View>
                   )}
                   {chat.user.isOnline && <View style={styles.onlineDot} />}
                 </View>
                 <Text style={styles.momentTitle} numberOfLines={1}>
-                  {chat.moment?.emoji || '✨'} {chat.moment?.title || 'Chat'}
+                  {chat.moment?.emoji || '✨'} {chat.moment?.title || 'Sohbet'}
                 </Text>
               </View>
             </View>
@@ -146,7 +149,7 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
             {/* Last Message */}
             {isTyping ? (
               <View style={styles.typingRow}>
-                <Text style={styles.typingText}>typing</Text>
+                <Text style={styles.typingText}>yazıyor</Text>
                 <View style={styles.typingDots}>
                   <View style={[styles.typingDot, styles.dot1]} />
                   <View style={[styles.typingDot, styles.dot2]} />
@@ -200,7 +203,7 @@ const styles = StyleSheet.create({
     backgroundColor: VIBE_ROOM_COLORS.glass.backgroundLight,
     borderRadius: 20,
     marginBottom: INBOX_SPACING.cardGap,
-    height: 88,
+    height: 92,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: VIBE_ROOM_COLORS.glass.border,
@@ -211,6 +214,7 @@ const styles = StyleSheet.create({
     width: INBOX_SPACING.momentStripWidth,
     height: '100%',
     position: 'relative',
+    backgroundColor: VIBE_ROOM_COLORS.background.tertiary,
   },
   momentImage: {
     width: '100%',
@@ -220,10 +224,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 8,
     left: 8,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -231,8 +235,8 @@ const styles = StyleSheet.create({
   // Content (Center)
   content: {
     flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
     justifyContent: 'center',
   },
   userRow: {
@@ -245,7 +249,7 @@ const styles = StyleSheet.create({
     width: INBOX_SPACING.avatarSize,
     height: INBOX_SPACING.avatarSize,
     borderRadius: INBOX_SPACING.avatarSize / 2,
-    borderWidth: 1.5,
+    borderWidth: 2,
     borderColor: VIBE_ROOM_COLORS.glass.borderActive,
   },
   userInfo: {
@@ -254,31 +258,48 @@ const styles = StyleSheet.create({
   nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 5,
   },
   userName: {
+    ...INBOX_TYPOGRAPHY.cardTitle,
     color: VIBE_ROOM_COLORS.text.primary,
-    fontSize: 15,
-    fontWeight: '700',
-    letterSpacing: -0.3,
+    maxWidth: 140,
+  },
+  verifiedBadge: {
+    ...Platform.select({
+      ios: {
+        shadowColor: VIBE_ROOM_COLORS.neon.cyan,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.5,
+        shadowRadius: 4,
+      },
+      android: {},
+    }),
   },
   onlineDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
     backgroundColor: VIBE_ROOM_COLORS.neon.emerald,
     marginLeft: 2,
+    ...Platform.select({
+      ios: {
+        shadowColor: VIBE_ROOM_COLORS.neon.emerald,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.6,
+        shadowRadius: 4,
+      },
+      android: {},
+    }),
   },
   momentTitle: {
+    ...INBOX_TYPOGRAPHY.caption,
     color: VIBE_ROOM_COLORS.text.tertiary,
-    fontSize: 12,
-    fontStyle: 'italic',
-    marginTop: 1,
+    marginTop: 2,
   },
   lastMessage: {
+    ...INBOX_TYPOGRAPHY.cardSubtitle,
     color: VIBE_ROOM_COLORS.text.secondary,
-    fontSize: 13,
-    lineHeight: 18,
   },
   lastMessageUnread: {
     color: VIBE_ROOM_COLORS.text.primary,
@@ -289,22 +310,22 @@ const styles = StyleSheet.create({
   typingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
   },
   typingText: {
-    color: VIBE_ROOM_COLORS.neon.amber,
-    fontSize: 13,
+    ...INBOX_TYPOGRAPHY.cardSubtitle,
+    color: VIBE_ROOM_COLORS.neon.lime,
     fontStyle: 'italic',
   },
   typingDots: {
     flexDirection: 'row',
-    gap: 2,
+    gap: 3,
   },
   typingDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: VIBE_ROOM_COLORS.neon.amber,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: VIBE_ROOM_COLORS.neon.lime,
   },
   dot1: { opacity: 0.4 },
   dot2: { opacity: 0.6 },
@@ -315,26 +336,36 @@ const styles = StyleSheet.create({
     width: 72,
     alignItems: 'flex-end',
     justifyContent: 'space-between',
-    paddingVertical: 12,
-    paddingRight: 12,
+    paddingVertical: 14,
+    paddingRight: 14,
   },
   timeText: {
+    ...INBOX_TYPOGRAPHY.badge,
     color: VIBE_ROOM_COLORS.text.muted,
-    fontSize: 11,
-    fontWeight: '600',
   },
   unreadBadge: {
-    minWidth: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: VIBE_ROOM_COLORS.neon.magenta,
+    minWidth: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: VIBE_ROOM_COLORS.neon.lime,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 6,
+    ...Platform.select({
+      ios: {
+        shadowColor: VIBE_ROOM_COLORS.neon.lime,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.5,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
   unreadText: {
-    color: VIBE_ROOM_COLORS.text.primary,
-    fontSize: 10,
+    color: VIBE_ROOM_COLORS.text.inverse,
+    fontSize: 11,
     fontWeight: '800',
   },
 });
