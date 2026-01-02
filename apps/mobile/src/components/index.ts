@@ -47,7 +47,6 @@ export { LeaveTrustNoteBottomSheet } from './LeaveTrustNoteBottomSheet';
 export { FilterBottomSheet } from './FilterBottomSheet';
 export { UnblockUserBottomSheet } from './UnblockUserBottomSheet';
 export { CompleteGiftBottomSheet } from './CompleteGiftBottomSheet';
-export { ReportBlockBottomSheet } from './ReportBlockBottomSheet';
 export { FeedbackModal } from './FeedbackModal';
 export { EmailVerificationModal } from './EmailVerificationModal';
 export { EmptyStateIllustration } from './ui/EmptyStateIllustration';
@@ -72,10 +71,6 @@ export {
   useShakeAnimation,
   SuccessAnimation,
 } from './AnimatedComponents';
-
-// Moderation
-export { ReportModal } from './ReportModal';
-export { default as BlockConfirmation } from './BlockConfirmation';
 
 // Smart Components
 export { default as SmartImage, AvatarImage, Thumbnail } from './SmartImage';

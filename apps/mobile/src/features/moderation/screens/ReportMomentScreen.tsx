@@ -1,9 +1,8 @@
 import React, { useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { logger } from '@/utils/logger';
-import { BaseReportScreen, ReportSummaryCard } from '@/components/report';
+import { BaseReportScreen, ReportSummaryCard, type ReportOption } from '../components';
 import { COLORS } from '@/constants/colors';
-import type { ReportOption } from '@/components/report';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';

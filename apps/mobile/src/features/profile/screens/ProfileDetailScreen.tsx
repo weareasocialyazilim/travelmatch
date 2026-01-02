@@ -13,7 +13,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { ReportBlockBottomSheet } from '@/components/ReportBlockBottomSheet';
+import { ReportBlockBottomSheet } from '@/features/moderation';
 import { COLORS } from '@/constants/colors';
 import { TRUST_NOTES_UI } from '@/constants/trustNotesRules';
 import type { RootStackParamList } from '@/navigation/routeParams';

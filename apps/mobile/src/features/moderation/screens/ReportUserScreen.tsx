@@ -12,7 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { logger } from '@/utils/logger';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '@/context/ToastContext';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
