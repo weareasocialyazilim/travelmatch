@@ -13,9 +13,9 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { ControlledInput } from '@/components/ui/ControlledInput';
+import { ControlledInput } from '../ControlledInput';
 import { View } from 'react-native';
-import { ToastProvider } from '@/context/ToastContext';
+import { ToastProvider } from '../../../context/ToastContext';
 
 // Helper to wrap component with required providers
 const render = (ui: React.ReactElement, options?: RenderOptions) => {
