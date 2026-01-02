@@ -86,3 +86,13 @@ export { FloatingDock } from './layout';
 
 // Trust Badge
 export { TrustBadge } from './ui/TrustBadge';
+
+// Gift Components
+export { GiftButton } from './GiftButton';
+
+// KYC Components
+export { KYCBadge, getKYCLabel, getNextKYCLevel } from './KYCBadge';
+export type { KYCLevel } from './KYCBadge';
+
+// App Bootstrap
+export { InitializationScreen } from './InitializationScreen';

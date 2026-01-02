@@ -1,10 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { COLORS } from '@/constants/colors';
 import { LinearGradient } from 'expo-linear-gradient';
+import type { RootStackParamList } from '@/navigation/routeParams';
 
-export const SessionExpiredScreen = ({ navigation }: any) => {
+type Props = NativeStackScreenProps<RootStackParamList, 'SessionExpired'>;
+
+export const SessionExpiredScreen = ({ navigation }: Props) => {
   const handleLogin = () => {
     // Reset navigation to Auth stack
     navigation.reset({

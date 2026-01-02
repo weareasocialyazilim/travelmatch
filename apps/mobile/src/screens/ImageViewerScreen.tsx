@@ -3,10 +3,14 @@ import { View, StyleSheet, TouchableOpacity, Dimensions, Image } from 'react-nat
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn } from 'react-native-reanimated';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '@/navigation/routeParams';
 
 const { width, height } = Dimensions.get('window');
 
-export const ImageViewerScreen = ({ route, navigation }: any) => {
+type Props = NativeStackScreenProps<RootStackParamList, 'ImageViewer'>;
+
+export const ImageViewerScreen = ({ route, navigation }: Props) => {
   const { imageUrl } = route.params;
   const insets = useSafeAreaInsets();
 

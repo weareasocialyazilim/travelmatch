@@ -1,9 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { COLORS } from '@/constants/colors';
+import type { RootStackParamList } from '@/navigation/routeParams';
 
-export const LinkExpiredScreen = ({ navigation }: any) => {
+type Props = NativeStackScreenProps<RootStackParamList, 'LinkExpired'>;
+
+export const LinkExpiredScreen = ({ navigation }: Props) => {
   return (
     <View style={styles.container}>
       <MaterialCommunityIcons name="link-variant-off" size={80} color="#FF4444" style={styles.icon} />
