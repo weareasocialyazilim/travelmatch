@@ -1,34 +1,41 @@
 /**
- * Color Palette
- * TravelMatch "Liquid Warmth" Design System
- * Design system colors used across all platforms
+ * TravelMatch Shared - Awwwards Edition Color Palette
+ *
+ * Felsefe: Twilight Zinc (Yumuşak Koyu) zemin üzerinde
+ * GenZ enerjisini temsil eden yüksek kontrastlı Neon dokunuşlar.
+ *
+ * Bu dosya platform genelinde paylaşılan renk değerlerini içerir.
+ * Merkezi kaynak: packages/design-system/src/tokens/colors.ts
  */
 
-// Primitive palette for internal use
+// ═══════════════════════════════════════════════════════════════════
+// PRIMITIVES - Raw color values
+// ═══════════════════════════════════════════════════════════════════
 const primitives = {
-  orange: {
-    50: '#FFF7ED',
-    100: '#FFEDD5',
-    200: '#FED7AA',
-    300: '#FDBA74',
-    400: '#FB923C',
-    500: '#F97316',
-    600: '#EA580C',
-    700: '#C2410C',
-    800: '#9A3412',
-    900: '#7C2D12',
+  zinc: {
+    50: '#FAFAFA',
+    100: '#F4F4F5',
+    200: '#E4E4E7',
+    300: '#D4D4D8',
+    400: '#A1A1AA',
+    500: '#71717A',
+    600: '#52525B',
+    700: '#3F3F46',
+    800: '#27272A',
+    900: '#18181B',
+    950: '#09090B',
   },
-  rose: {
-    50: '#FFF1F2',
-    100: '#FFE4E6',
-    200: '#FECDD3',
-    300: '#FDA4AF',
-    400: '#FB7185',
-    500: '#F43F5E',
-    600: '#E11D48',
-    700: '#BE123C',
-    800: '#9F1239',
-    900: '#881337',
+  lime: {
+    50: '#F7FEE7',
+    100: '#ECFCCB',
+    200: '#D9F99D',
+    300: '#BEF264',
+    400: '#A3E635',
+    500: '#DFFF00',
+    600: '#C8E600',
+    700: '#A3CC00',
+    800: '#84A300',
+    900: '#657A00',
   },
   violet: {
     50: '#FAF5FF',
@@ -42,6 +49,42 @@ const primitives = {
     800: '#6B21A8',
     900: '#581C87',
   },
+  rose: {
+    50: '#FFF1F2',
+    100: '#FFE4E6',
+    200: '#FECDD3',
+    300: '#FDA4AF',
+    400: '#FB7185',
+    500: '#F43F5E',
+    600: '#E11D48',
+    700: '#BE123C',
+    800: '#9F1239',
+    900: '#881337',
+  },
+  cyan: {
+    50: '#ECFEFF',
+    100: '#CFFAFE',
+    200: '#A5F3FC',
+    300: '#67E8F9',
+    400: '#22D3EE',
+    500: '#06B6D4',
+    600: '#0891B2',
+    700: '#0E7490',
+    800: '#155E75',
+    900: '#164E63',
+  },
+  amber: {
+    50: '#FFFBEB',
+    100: '#FEF3C7',
+    200: '#FDE68A',
+    300: '#FCD34D',
+    400: '#FBBF24',
+    500: '#F59E0B',
+    600: '#D97706',
+    700: '#B45309',
+    800: '#92400E',
+    900: '#78350F',
+  },
   emerald: {
     50: '#ECFDF5',
     100: '#D1FAE5',
@@ -53,18 +96,6 @@ const primitives = {
     700: '#047857',
     800: '#065F46',
     900: '#064E3B',
-  },
-  sky: {
-    50: '#F0F9FF',
-    100: '#E0F2FE',
-    200: '#BAE6FD',
-    300: '#7DD3FC',
-    400: '#38BDF8',
-    500: '#0EA5E9',
-    600: '#0284C7',
-    700: '#0369A1',
-    800: '#075985',
-    900: '#0C4A6E',
   },
   red: {
     50: '#FEF2F2',
@@ -78,84 +109,89 @@ const primitives = {
     800: '#991B1B',
     900: '#7F1D1D',
   },
-  stone: {
-    0: '#FFFFFF',
-    50: '#FAFAF9',
-    100: '#F5F5F4',
-    200: '#E7E5E4',
-    300: '#D6D3D1',
-    400: '#A8A29E',
-    500: '#78716C',
-    600: '#57534E',
-    700: '#44403C',
-    800: '#292524',
-    900: '#1C1917',
-    950: '#0C0A09',
+  blue: {
+    50: '#EFF6FF',
+    100: '#DBEAFE',
+    200: '#BFDBFE',
+    300: '#93C5FD',
+    400: '#60A5FA',
+    500: '#3B82F6',
+    600: '#2563EB',
+    700: '#1D4ED8',
+    800: '#1E40AF',
+    900: '#1E3A8A',
   },
-} as const;
-
-export const COLORS = {
-  // Primary (Warm Orange)
-  primary: primitives.orange[500],
-  primaryDark: primitives.orange[600],
-  primaryLight: primitives.orange[400],
-
-  // Secondary (Rose)
-  secondary: primitives.rose[500],
-  secondaryDark: primitives.rose[600],
-  secondaryLight: primitives.rose[400],
-
-  // Accent (Violet)
-  accent: primitives.violet[500],
-  accentDark: primitives.violet[600],
-  accentLight: primitives.violet[400],
-
-  // Semantic
-  success: primitives.emerald[500],
-  warning: primitives.orange[500],
-  error: primitives.red[500],
-  info: primitives.sky[500],
-
-  // Text
-  text: primitives.stone[900],
-  textSecondary: primitives.stone[500],
-  textDisabled: primitives.stone[300],
-
-  // Neutral
   white: '#FFFFFF',
   black: '#000000',
-  background: '#FFFCF7', // Warm cream
-  border: primitives.stone[200],
+} as const;
+
+// ═══════════════════════════════════════════════════════════════════
+// SEMANTIC COLORS - Twilight Zinc & Neon Energy
+// ═══════════════════════════════════════════════════════════════════
+export const COLORS = {
+  // Primary (Neon Lime)
+  primary: '#DFFF00',
+  primaryDark: '#C8E600',
+  primaryLight: '#E8FF4D',
+
+  // Secondary (Electric Violet)
+  secondary: primitives.violet[500],
+  secondaryDark: primitives.violet[600],
+  secondaryLight: primitives.violet[400],
+
+  // Accent (Cyan)
+  accent: primitives.cyan[500],
+  accentDark: primitives.cyan[600],
+  accentLight: primitives.cyan[400],
+
+  // Semantic Feedback
+  success: primitives.emerald[500],
+  warning: primitives.amber[500],
+  error: primitives.rose[500],
+  info: primitives.cyan[500],
+
+  // Text
+  text: '#F8FAFC',
+  textSecondary: '#94A3B8',
+  textDisabled: '#334155',
+
+  // Backgrounds
+  white: '#FFFFFF',
+  black: '#000000',
+  background: '#121214',
+  border: 'rgba(255, 255, 255, 0.08)',
 
   // Grayscale
-  gray50: primitives.stone[50],
-  gray100: primitives.stone[100],
-  gray200: primitives.stone[200],
-  gray300: primitives.stone[300],
-  gray400: primitives.stone[400],
-  gray500: primitives.stone[500],
-  gray600: primitives.stone[600],
-  gray700: primitives.stone[700],
-  gray800: primitives.stone[800],
-  gray900: primitives.stone[900],
+  gray50: primitives.zinc[50],
+  gray100: primitives.zinc[100],
+  gray200: primitives.zinc[200],
+  gray300: primitives.zinc[300],
+  gray400: primitives.zinc[400],
+  gray500: primitives.zinc[500],
+  gray600: primitives.zinc[600],
+  gray700: primitives.zinc[700],
+  gray800: primitives.zinc[800],
+  gray900: primitives.zinc[900],
 
   // Named colors
-  coral: primitives.rose[500],
-  mint: primitives.emerald[500],
-  lavender: primitives.violet[500],
-  sky: primitives.sky[500],
-  peach: primitives.orange[300],
+  coral: primitives.rose[400],
+  mint: primitives.emerald[400],
+  lavender: primitives.violet[400],
+  sky: primitives.cyan[400],
+  peach: primitives.amber[300],
 
   // Trust colors
-  trust: primitives.emerald[500],
-  trustLight: primitives.emerald[400],
-  trustDark: primitives.emerald[600],
+  trust: primitives.cyan[500],
+  trustLight: primitives.cyan[400],
+  trustDark: primitives.cyan[600],
 
   // Additional colors
-  orange: primitives.orange[500],
+  orange: primitives.amber[500],
   rose: primitives.rose[500],
   violet: primitives.violet[500],
   emerald: primitives.emerald[500],
+  lime: '#DFFF00',
+  cyan: primitives.cyan[500],
 
   // Metallic
   gold: '#FFD700',
