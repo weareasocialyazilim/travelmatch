@@ -10,8 +10,6 @@ import {
   subscribeToDeepLinks,
   handleDeepLink,
 } from '../utils/deepLinking';
-import type { NavigationProp } from '@react-navigation/native';
-import type { RootStackParamList } from '@/navigation/routeParams';
 
 /**
  * Handle deep links automatically
@@ -27,13 +25,14 @@ export function useDeepLinking() {
     // Handle initial URL (app opened from link)
     void getInitialURL().then((url) => {
       if (url) {
-        handleDeepLink(url, navigation as NavigationProp<RootStackParamList>);
+        // Navigation from useNavigation hook is compatible with NavigationRefLike
+        handleDeepLink(url, navigation as Parameters<typeof handleDeepLink>[1]);
       }
     });
 
     // Handle URLs while app is running
     const unsubscribe = subscribeToDeepLinks((url) => {
-      handleDeepLink(url, navigation as NavigationProp<RootStackParamList>);
+      handleDeepLink(url, navigation as Parameters<typeof handleDeepLink>[1]);
     });
 
     return unsubscribe;

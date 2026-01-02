@@ -10,11 +10,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@/hooks/useNavigationHelpers';
-import type { StackNavigationProp } from '@react-navigation/stack';
 import { COLORS } from '@/constants/colors';
 import type { RootStackParamList } from '@/navigation/routeParams';
-
-type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 const MOMENTS = [
   {
@@ -46,7 +43,7 @@ const MOMENTS = [
 type MomentItem = (typeof MOMENTS)[0];
 
 export const MyHostedMomentsScreen: React.FC = () => {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [filter, setFilter] = useState<'active' | 'history'>('active');
 
@@ -64,7 +61,12 @@ export const MyHostedMomentsScreen: React.FC = () => {
   const renderItem = ({ item }: { item: MomentItem }) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate('MomentDetail', { moment: item as unknown as RootStackParamList['MomentDetail']['moment'] })}
+      onPress={() =>
+        navigation.navigate('MomentDetail', {
+          moment:
+            item as unknown as RootStackParamList['MomentDetail']['moment'],
+        })
+      }
       activeOpacity={0.7}
     >
       <Image source={{ uri: item.image }} style={styles.image} />
@@ -72,11 +74,16 @@ export const MyHostedMomentsScreen: React.FC = () => {
         <View style={styles.topRow}>
           <Text style={styles.title}>{item.title}</Text>
           <View
-            style={[styles.dot, { backgroundColor: getStatusColor(item.status) }]}
+            style={[
+              styles.dot,
+              { backgroundColor: getStatusColor(item.status) },
+            ]}
           />
         </View>
         <Text style={styles.date}>{item.date}</Text>
-        <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
+        <Text
+          style={[styles.statusText, { color: getStatusColor(item.status) }]}
+        >
           {item.status.toUpperCase()}
         </Text>
       </View>
@@ -99,9 +106,7 @@ export const MyHostedMomentsScreen: React.FC = () => {
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>My Drops</Text>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('CreateMoment')}
-        >
+        <TouchableOpacity onPress={() => navigation.navigate('CreateMoment')}>
           <MaterialCommunityIcons
             name="plus"
             size={24}
@@ -116,7 +121,10 @@ export const MyHostedMomentsScreen: React.FC = () => {
           style={[styles.tab, filter === 'active' && styles.activeTab]}
         >
           <Text
-            style={[styles.tabText, filter === 'active' && styles.activeTabText]}
+            style={[
+              styles.tabText,
+              filter === 'active' && styles.activeTabText,
+            ]}
           >
             Active
           </Text>

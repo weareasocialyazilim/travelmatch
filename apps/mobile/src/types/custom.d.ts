@@ -110,7 +110,12 @@ declare module 'expo-image' {
   }
 
   export const Image: ComponentType<ExpoImageProps>;
-  export type ImageContentFit = 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
+  export type ImageContentFit =
+    | 'cover'
+    | 'contain'
+    | 'fill'
+    | 'none'
+    | 'scale-down';
 
   const ExpoImage: ComponentType<ExpoImageProps>;
   export default ExpoImage;
@@ -171,7 +176,7 @@ declare module 'react-native-view-shot' {
   }
 
   export function captureRef(
-    view: RefObject<View> | View | number,
+    view: RefObject<View | ViewShot | null> | View | number,
     options?: CaptureOptions,
   ): Promise<string>;
 
@@ -261,7 +266,9 @@ declare module 'expo-media-library' {
     asset: Asset | string,
     options?: { shouldDownloadFromNetwork?: boolean },
   ): Promise<AssetInfo>;
-  export function deleteAssetsAsync(assets: Asset[] | string[]): Promise<boolean>;
+  export function deleteAssetsAsync(
+    assets: Asset[] | string[],
+  ): Promise<boolean>;
   export function getAlbumsAsync(): Promise<Album[]>;
   export function getAlbumAsync(title: string): Promise<Album | null>;
   export function createAlbumAsync(
@@ -280,3 +287,243 @@ declare module 'expo-media-library' {
 // real helpers; these are only to avoid TS noise while we fix calls.
 declare const showToast: (msg: string, opts?: any) => void;
 declare const secretKey: string;
+
+// react-native-calendars type declarations
+declare module 'react-native-calendars' {
+  import { ComponentType } from 'react';
+  import { ViewStyle, StyleProp, TextStyle } from 'react-native';
+
+  export interface DateData {
+    year: number;
+    month: number;
+    day: number;
+    timestamp: number;
+    dateString: string;
+  }
+
+  export interface MarkedDates {
+    [date: string]: {
+      selected?: boolean;
+      marked?: boolean;
+      selectedColor?: string;
+      dotColor?: string;
+      activeOpacity?: number;
+      disabled?: boolean;
+      disableTouchEvent?: boolean;
+      customStyles?: {
+        container?: StyleProp<ViewStyle>;
+        text?: StyleProp<TextStyle>;
+      };
+    };
+  }
+
+  export interface CalendarProps {
+    current?: string;
+    minDate?: string;
+    maxDate?: string;
+    markedDates?: MarkedDates;
+    onDayPress?: (day: DateData) => void;
+    onDayLongPress?: (day: DateData) => void;
+    onMonthChange?: (month: DateData) => void;
+    hideExtraDays?: boolean;
+    disableMonthChange?: boolean;
+    firstDay?: number;
+    hideDayNames?: boolean;
+    showWeekNumbers?: boolean;
+    onPressArrowLeft?: (subtractMonth: () => void, month?: DateData) => void;
+    onPressArrowRight?: (addMonth: () => void, month?: DateData) => void;
+    hideArrows?: boolean;
+    renderArrow?: (direction: 'left' | 'right') => React.ReactNode;
+    disableArrowLeft?: boolean;
+    disableArrowRight?: boolean;
+    disableAllTouchEventsForDisabledDays?: boolean;
+    enableSwipeMonths?: boolean;
+    style?: StyleProp<ViewStyle>;
+    theme?: Record<string, unknown>;
+  }
+
+  export const Calendar: ComponentType<CalendarProps>;
+  export const CalendarList: ComponentType<
+    CalendarProps & { pastScrollRange?: number; futureScrollRange?: number }
+  >;
+  export const Agenda: ComponentType<any>;
+}
+
+// expo-camera type declarations
+declare module 'expo-camera' {
+  import { ComponentType } from 'react';
+  import { ViewStyle, StyleProp, ViewProps } from 'react-native';
+
+  export type CameraType = 'front' | 'back';
+  export type FlashMode = 'off' | 'on' | 'auto' | 'torch';
+
+  export interface CameraViewProps extends ViewProps {
+    facing?: CameraType;
+    flash?: FlashMode;
+    zoom?: number;
+    style?: StyleProp<ViewStyle>;
+    onCameraReady?: () => void;
+    onMountError?: (event: { message: string }) => void;
+  }
+
+  export interface CameraViewRef {
+    takePictureAsync: (options?: {
+      quality?: number;
+      base64?: boolean;
+      exif?: boolean;
+      skipProcessing?: boolean;
+    }) => Promise<{
+      uri: string;
+      width: number;
+      height: number;
+      base64?: string;
+      exif?: Record<string, unknown>;
+    }>;
+    recordAsync: (options?: {
+      maxDuration?: number;
+      maxFileSize?: number;
+      quality?: string;
+      mute?: boolean;
+    }) => Promise<{ uri: string }>;
+    stopRecording: () => void;
+  }
+
+  export const CameraView: ComponentType<CameraViewProps>;
+  export function useCameraPermissions(): [
+    { granted: boolean; canAskAgain: boolean; status: string } | null,
+    () => Promise<{ granted: boolean; canAskAgain: boolean; status: string }>,
+  ];
+}
+
+// expo-clipboard type declarations
+declare module 'expo-clipboard' {
+  export function getStringAsync(): Promise<string>;
+  export function setStringAsync(text: string): Promise<boolean>;
+  export function hasStringAsync(): Promise<boolean>;
+  export function getImageAsync(options?: {
+    format?: 'png' | 'jpeg';
+  }): Promise<{ data: string; size: { width: number; height: number } } | null>;
+  export function setImageAsync(base64Image: string): Promise<void>;
+  export function hasImageAsync(): Promise<boolean>;
+  export function addClipboardListener(
+    listener: (event: { contentTypes: string[] }) => void,
+  ): { remove: () => void };
+}
+
+// react-native-maps type declarations
+declare module 'react-native-maps' {
+  import { Component, ComponentType } from 'react';
+  import { ViewStyle, StyleProp, ViewProps } from 'react-native';
+
+  export interface Region {
+    latitude: number;
+    longitude: number;
+    latitudeDelta: number;
+    longitudeDelta: number;
+  }
+
+  export interface LatLng {
+    latitude: number;
+    longitude: number;
+  }
+
+  export interface MapViewProps extends ViewProps {
+    region?: Region;
+    initialRegion?: Region;
+    onRegionChange?: (region: Region) => void;
+    onRegionChangeComplete?: (region: Region) => void;
+    onPress?: (event: { nativeEvent: { coordinate: LatLng } }) => void;
+    onLongPress?: (event: { nativeEvent: { coordinate: LatLng } }) => void;
+    onMarkerPress?: (event: any) => void;
+    showsUserLocation?: boolean;
+    followsUserLocation?: boolean;
+    showsMyLocationButton?: boolean;
+    showsCompass?: boolean;
+    showsScale?: boolean;
+    showsBuildings?: boolean;
+    showsTraffic?: boolean;
+    showsIndoors?: boolean;
+    zoomEnabled?: boolean;
+    zoomTapEnabled?: boolean;
+    zoomControlEnabled?: boolean;
+    rotateEnabled?: boolean;
+    scrollEnabled?: boolean;
+    pitchEnabled?: boolean;
+    toolbarEnabled?: boolean;
+    moveOnMarkerPress?: boolean;
+    mapType?:
+      | 'standard'
+      | 'satellite'
+      | 'hybrid'
+      | 'terrain'
+      | 'none'
+      | 'mutedStandard';
+    style?: StyleProp<ViewStyle>;
+    customMapStyle?: object[];
+    provider?: 'google' | null;
+    minZoomLevel?: number;
+    maxZoomLevel?: number;
+    liteMode?: boolean;
+    loadingEnabled?: boolean;
+    loadingIndicatorColor?: string;
+    loadingBackgroundColor?: string;
+    cacheEnabled?: boolean;
+    camera?: {
+      center: LatLng;
+      pitch?: number;
+      heading?: number;
+      altitude?: number;
+      zoom?: number;
+    };
+  }
+
+  export interface MarkerProps extends ViewProps {
+    coordinate: LatLng;
+    title?: string;
+    description?: string;
+    image?: any;
+    icon?: any;
+    pinColor?: string;
+    anchor?: { x: number; y: number };
+    centerOffset?: { x: number; y: number };
+    calloutAnchor?: { x: number; y: number };
+    flat?: boolean;
+    identifier?: string;
+    rotation?: number;
+    draggable?: boolean;
+    tracksViewChanges?: boolean;
+    tracksInfoWindowChanges?: boolean;
+    stopPropagation?: boolean;
+    opacity?: number;
+    onPress?: (event: any) => void;
+    onSelect?: (event: any) => void;
+    onDeselect?: (event: any) => void;
+    onCalloutPress?: (event: any) => void;
+    onDragStart?: (event: any) => void;
+    onDrag?: (event: any) => void;
+    onDragEnd?: (event: any) => void;
+  }
+
+  export default class MapView extends Component<MapViewProps> {
+    animateToRegion(region: Region, duration?: number): void;
+    animateCamera(camera: object, options?: { duration?: number }): void;
+    fitToCoordinates(
+      coordinates: LatLng[],
+      options?: { edgePadding?: object; animated?: boolean },
+    ): void;
+    getCamera(): Promise<object>;
+    setCamera(camera: object): void;
+  }
+
+  export const Marker: ComponentType<MarkerProps>;
+  export const Callout: ComponentType<ViewProps>;
+  export const Polygon: ComponentType<any>;
+  export const Polyline: ComponentType<any>;
+  export const Circle: ComponentType<any>;
+  export const Overlay: ComponentType<any>;
+  export const Heatmap: ComponentType<any>;
+  export const Geojson: ComponentType<any>;
+
+  export const PROVIDER_GOOGLE: 'google';
+  export const PROVIDER_DEFAULT: null;
+}

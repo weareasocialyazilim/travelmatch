@@ -39,9 +39,14 @@ const CheckoutScreen: React.FC = () => {
   const [selectedMethod, setSelectedMethod] = useState<string>('wallet');
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const { momentId, amount, recipientId, recipientName } = route.params || {};
+  const {
+    momentId,
+    amount,
+    recipientId: _recipientId,
+    recipientName,
+  } = route.params || {};
 
-  const { processPayment, paymentMethods } = usePayments();
+  const { cards, createPaymentIntent, confirmPayment } = usePayments();
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('tr-TR', {
@@ -67,21 +72,45 @@ const CheckoutScreen: React.FC = () => {
     },
   ];
 
-  const methods = paymentMethods || defaultPaymentMethods;
+  // Convert cards to PaymentMethod format and add wallet
+  const cardMethods: PaymentMethod[] = cards.map((card) => ({
+    id: card.id,
+    type: 'card' as const,
+    name: card.brand || 'Card',
+    last4: card.last4,
+    icon: 'credit-card',
+  }));
+  const methods: PaymentMethod[] = [
+    {
+      id: 'wallet',
+      type: 'wallet',
+      name: 'TravelMatch Wallet',
+      icon: 'wallet',
+    },
+    ...cardMethods,
+    ...(cardMethods.length === 0
+      ? defaultPaymentMethods.filter((m) => m.type === 'card')
+      : []),
+  ];
 
   const handlePayment = useCallback(async () => {
-    if (!selectedMethod || isProcessing) return;
+    if (!selectedMethod || isProcessing || !momentId) return;
 
     setIsProcessing(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
-      await processPayment({
-        amount: amount || 0,
-        paymentMethodId: selectedMethod,
-        momentId,
-        recipientId,
-      });
+      // Create payment intent
+      const paymentIntent = await createPaymentIntent(momentId, amount || 0);
+      if (!paymentIntent) {
+        throw new Error('Failed to create payment intent');
+      }
+
+      // Confirm payment with selected method
+      const success = await confirmPayment(paymentIntent.id, selectedMethod);
+      if (!success) {
+        throw new Error('Payment confirmation failed');
+      }
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       navigation.navigate('Success', {
@@ -89,7 +118,7 @@ const CheckoutScreen: React.FC = () => {
         title: 'Payment Successful',
         subtitle: `You sent ${formatCurrency(amount || 0)} to ${recipientName}`,
       });
-    } catch (error) {
+    } catch (_error) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       navigation.navigate('PaymentFailed', {
         error: 'Payment failed. Please try again.',
@@ -101,9 +130,9 @@ const CheckoutScreen: React.FC = () => {
     selectedMethod,
     amount,
     momentId,
-    recipientId,
     recipientName,
-    processPayment,
+    createPaymentIntent,
+    confirmPayment,
     navigation,
     isProcessing,
   ]);
@@ -439,4 +468,6 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withErrorBoundary(CheckoutScreen, { displayName: 'CheckoutScreen' });
+export default withErrorBoundary(CheckoutScreen, {
+  displayName: 'CheckoutScreen',
+});

@@ -10,7 +10,9 @@ interface ChatCameraScreenProps {
   navigation: NavigationProp<RootStackParamList>;
 }
 
-export const ChatCameraScreen: React.FC<ChatCameraScreenProps> = ({ navigation }) => {
+export const ChatCameraScreen: React.FC<ChatCameraScreenProps> = ({
+  navigation,
+}) => {
   const insets = useSafeAreaInsets();
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
@@ -20,7 +22,7 @@ export const ChatCameraScreen: React.FC<ChatCameraScreenProps> = ({ navigation }
   }, []);
 
   const toggleCameraType = () => {
-    setFacing((current) => (current === 'back' ? 'front' : 'back'));
+    setFacing((current: CameraType) => (current === 'back' ? 'front' : 'back'));
   };
 
   const takePicture = () => {
@@ -74,7 +76,12 @@ export const ChatCameraScreen: React.FC<ChatCameraScreenProps> = ({ navigation }
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'black', alignItems: 'center', justifyContent: 'center' },
+  container: {
+    flex: 1,
+    backgroundColor: 'black',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   permissionText: { color: 'white' },
   camera: { flex: 1 },
   controlsTop: {
