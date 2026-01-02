@@ -2,7 +2,15 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission } from '@/lib/auth';
-import { escapeSupabaseFilter } from '@/lib/security';
+
+interface WalletWithUser {
+  available_balance?: number;
+  pending_balance?: number;
+  user?: {
+    display_name?: string;
+    email?: string;
+  };
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -101,7 +109,7 @@ export async function GET(request: NextRequest) {
     let filteredWallets = wallets;
     if (search && wallets) {
       const safeSearch = search.toLowerCase();
-      filteredWallets = wallets.filter((w: any) =>
+      filteredWallets = wallets.filter((w: WalletWithUser) =>
         w.user?.display_name?.toLowerCase().includes(safeSearch) ||
         w.user?.email?.toLowerCase().includes(safeSearch)
       );
@@ -110,10 +118,10 @@ export async function GET(request: NextRequest) {
     // Calculate summary
     const summary = {
       totalWallets: count || 0,
-      totalAvailableBalance: wallets?.reduce((sum, w: any) => sum + (w.available_balance || 0), 0) || 0,
-      totalPendingBalance: wallets?.reduce((sum, w: any) => sum + (w.pending_balance || 0), 0) || 0,
+      totalAvailableBalance: wallets?.reduce((sum: number, w: WalletWithUser) => sum + (w.available_balance || 0), 0) || 0,
+      totalPendingBalance: wallets?.reduce((sum: number, w: WalletWithUser) => sum + (w.pending_balance || 0), 0) || 0,
       averageBalance: wallets && wallets.length > 0
-        ? wallets.reduce((sum, w: any) => sum + (w.available_balance || 0), 0) / wallets.length
+        ? wallets.reduce((sum: number, w: WalletWithUser) => sum + (w.available_balance || 0), 0) / wallets.length
         : 0,
     };
 
