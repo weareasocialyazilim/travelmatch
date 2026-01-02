@@ -11,7 +11,7 @@ import {
   Platform,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@/hooks/useNavigationHelpers';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useToast } from '@/context/ToastContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
@@ -103,7 +103,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
   };
 
   const handleFinish = () => {
-    navigation.navigate('Settings' as never);
+    navigation.navigate('Settings');
   };
 
   const isCodeComplete = code.every((digit) => digit !== '');

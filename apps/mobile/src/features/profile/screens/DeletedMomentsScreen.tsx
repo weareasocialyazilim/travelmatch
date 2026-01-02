@@ -16,7 +16,7 @@ import { useAuth } from '@/context/AuthContext';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Undo2 } from 'lucide-react-native';
 import { formatDistanceToNow } from 'date-fns';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@/hooks/useNavigationHelpers';
 import { COLORS } from '@/constants/colors';
 
 interface DeletedMoment {
@@ -136,7 +136,7 @@ export function DeletedMomentsScreen() {
               title="No deleted moments"
               description="Deleted moments will appear here and can be restored within 90 days"
               actionLabel="My Moments"
-              onAction={() => navigation.navigate('MyMoments' as never)}
+              onAction={() => navigation.navigate('MyMoments')}
             />
           }
           contentContainerStyle={styles.listContent}
