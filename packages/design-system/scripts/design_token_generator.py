@@ -29,7 +29,7 @@ import sys
 import re
 import os
 from datetime import datetime
-from typing import Dict, Any, Tuple, Optional
+from typing import Dict, Any, Tuple, Optional, Union, cast
 from pathlib import Path
 
 
@@ -111,7 +111,7 @@ def generate_color_scale(base_color: str, name: str = "primary") -> Dict[str, st
     hsl = rgb_to_hsl(rgb)
 
     # Lightness values for 50-900 scale
-    lightness_map = {
+    lightness_map: Dict[int, float] = {
         50: 95,
         100: 90,
         200: 80,
@@ -124,9 +124,9 @@ def generate_color_scale(base_color: str, name: str = "primary") -> Dict[str, st
         900: max(hsl[2] - 40, 5),
     }
 
-    scale = {}
+    scale: Dict[str, str] = {}
     for step, lightness in lightness_map.items():
-        adjusted_hsl = (hsl[0], hsl[1], lightness)
+        adjusted_hsl: Tuple[float, float, float] = (hsl[0], hsl[1], lightness)
         scale[str(step)] = rgb_to_hex(hsl_to_rgb(adjusted_hsl))
 
     return scale
@@ -162,7 +162,7 @@ def generate_neutral_scale() -> Dict[str, str]:
 
 def get_typography_config(style: str) -> Dict[str, Any]:
     """Get typography configuration based on style."""
-    configs = {
+    configs: Dict[str, Dict[str, Any]] = {
         "modern": {
             "fontFamily": {
                 "primary": 'SF Pro Display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
@@ -214,7 +214,7 @@ def generate_typography_scale(style: str = "modern") -> Dict[str, Any]:
         "6xl": round(base * (ratio ** 7)),
     }
 
-    line_heights = {
+    line_heights: Dict[str, float] = {
         "tight": 1.2,
         "normal": 1.5,
         "relaxed": 1.75,
@@ -230,7 +230,7 @@ def generate_typography_scale(style: str = "modern") -> Dict[str, Any]:
         "extrabold": "800",
     }
 
-    letter_spacing = {
+    letter_spacing: Dict[str, float] = {
         "tight": -0.5,
         "normal": 0,
         "wide": 0.5,
@@ -238,7 +238,7 @@ def generate_typography_scale(style: str = "modern") -> Dict[str, Any]:
     }
 
     # Text style presets
-    styles = {
+    styles: Dict[str, Dict[str, Any]] = {
         "h1": {
             "fontSize": font_sizes["5xl"],
             "lineHeight": line_heights["tight"],
@@ -480,7 +480,7 @@ def export_css(tokens: Dict[str, Any]) -> str:
     lines.append("  /* Colors */")
     for palette_name, palette in tokens["colors"].items():
         if isinstance(palette, dict):
-            for shade, value in palette.items():
+            for shade, value in cast(Dict[str, str], palette).items():
                 lines.append(f"  --color-{palette_name}-{shade}: {value};")
 
     lines.append("")
@@ -538,12 +538,14 @@ def export_scss(tokens: Dict[str, Any]) -> str:
     # Color maps
     lines.append("// Color Palettes")
     for palette_name, palette in tokens["colors"].items():
-        if isinstance(palette, dict) and all(isinstance(v, str) for v in palette.values()):
-            lines.append(f"${palette_name}-colors: (")
-            for shade, value in palette.items():
-                lines.append(f"  '{shade}': {value},")
-            lines.append(");")
-            lines.append("")
+        if isinstance(palette, dict):
+            palette_dict = cast(Dict[str, str], palette)
+            if all(isinstance(v, str) for v in palette_dict.values()):
+                lines.append(f"${palette_name}-colors: (")
+                for shade, value in palette_dict.items():
+                    lines.append(f"  '{shade}': {value},")
+                lines.append(");")
+                lines.append("")
 
     # Typography
     lines.append("// Typography")
@@ -636,7 +638,7 @@ def export_typescript(tokens: Dict[str, Any]) -> str:
     for palette_name, palette in tokens["colors"].items():
         if isinstance(palette, dict):
             lines.append(f"  {palette_name}: {{")
-            for shade, value in palette.items():
+            for shade, value in cast(Dict[str, str], palette).items():
                 lines.append(f"    '{shade}': '{value}',")
             lines.append("  },")
     lines.append("} as const;")
