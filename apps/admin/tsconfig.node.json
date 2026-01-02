@@ -7,5 +7,5 @@
     "allowSyntheticDefaultImports": true,
     "strict": true
   },
-  "include": ["next.config.js", "next.config.mjs"]
+  "include": ["next.config.js"]
 }
