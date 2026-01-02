@@ -44,7 +44,7 @@ import {
   ForgotPasswordScreen,
   ChangePasswordScreen,
 } from '../features/auth';
-import SessionExpiredScreen from '../screens/SessionExpiredScreen';
+import { SessionExpiredScreen } from '../screens/SessionExpiredScreen';
 import LinkNotFoundScreen from '../screens/LinkNotFoundScreen';
 import { LinkExpiredScreen } from '../screens/LinkExpiredScreen';
 import LinkInvalidScreen from '../screens/LinkInvalidScreen';
@@ -79,7 +79,8 @@ import {
 // ===================================
 import { SearchMapScreen } from '../features/discovery';
 import { InboxScreen, ChatDetailScreen } from '../features/chat';
-import { WalletScreen as WalletFeatureScreen } from '../features/wallet';
+// WalletScreen is imported from payments feature, not wallet feature
+// import { WalletScreen as WalletFeatureScreen } from '../features/wallet';
 import { NotificationsScreen } from '../features/notifications';
 import { CheckoutScreen } from '../features/payment';
 import { ReviewScreen } from '../features/reviews';
@@ -123,6 +124,9 @@ const ProofDetailScreen = lazyLoad(() =>
 // Moments screens
 const MyMomentsScreen = lazyLoad(() =>
   import('../features/profile').then((m) => ({ default: m.MyMomentsScreen })),
+);
+const MyHostedMomentsScreen = lazyLoad(() =>
+  import('../features/profile').then((m) => ({ default: m.MyHostedMomentsScreen })),
 );
 const CreateMomentScreen = lazyLoad(() =>
   import('../features/profile').then((m) => ({
@@ -188,6 +192,7 @@ import {
   PaymentFailedScreen,
   ProofReviewScreen,
   PayTRWebViewScreen,
+  PromoCodeScreen,
   // KYC Screens
   KYCIntroScreen,
   KYCDocumentTypeScreen,
@@ -231,6 +236,7 @@ import {
   MaintenanceScreen,
   DataPrivacyScreen,
   DietaryPreferencesScreen,
+  DataSettingsScreen,
 } from '../features/settings';
 
 // Legal screens - Turkish compliance

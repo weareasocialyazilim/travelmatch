@@ -40,7 +40,8 @@ const CustomTabBarButton = ({ children, onPress }: any) => (
 );
 
 export const MainTabNavigator = () => {
-  const insets = useSafeAreaInsets();
+  // Safe area insets available for future use
+  const _insets = useSafeAreaInsets();
 
   return (
     <Tab.Navigator
@@ -52,7 +53,6 @@ export const MainTabNavigator = () => {
           bottom: 25,
           left: 20,
           right: 20,
-          elevation: 0,
           backgroundColor: 'rgba(20,20,20,0.95)',
           borderRadius: 25,
           height: 80,
@@ -60,7 +60,8 @@ export const MainTabNavigator = () => {
           borderColor: 'rgba(255,255,255,0.1)',
           borderWidth: 1,
           paddingBottom: 0,
-          ...styles.shadow
+          ...styles.shadow,
+          elevation: 0, // Placed after spread to ensure it takes precedence
         }
       }}
     >
@@ -101,7 +102,7 @@ export const MainTabNavigator = () => {
         name="Create"
         component={CreateMomentScreen}
         options={{
-          tabBarIcon: ({ focused }) => (
+          tabBarIcon: () => (
             <Ionicons name="add" size={35} color="black" />
           ),
           tabBarButton: (props) => (

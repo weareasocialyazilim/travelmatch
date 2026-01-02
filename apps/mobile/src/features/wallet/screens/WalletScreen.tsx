@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -42,7 +42,7 @@ const WalletScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [refreshing, setRefreshing] = useState(false);
 
-  const { balance, transactions, isLoading, refresh } = useWallet();
+  const { balance, transactions, refresh } = useWallet();
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -208,7 +208,7 @@ const WalletScreen: React.FC = () => {
         </View>
       </ScrollView>
 
-      <BottomNav />
+      <BottomNav activeTab="Profile" />
     </SafeAreaView>
   );
 };
@@ -357,4 +357,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withErrorBoundary(WalletScreen, 'WalletScreen');
+export default withErrorBoundary(WalletScreen, { displayName: 'WalletScreen' });
