@@ -197,7 +197,7 @@ ignore:
   # Snyk Code PT rule for Python path traversal
   python/PT:
     - '**/design_token_generator.py':
-        reason: 'Mitigated with validate_safe_path() - ensures paths stay within CWD.'
+        reason: 'Mitigated with validate_safe_path() - ensures paths stay within CWD using commonpath and relative_to validation.'
         expires: 2099-12-31T00:00:00.000Z
     - '**/design_validator.py':
         reason: 'Mitigated with validate_safe_path() - ensures paths stay within CWD.'

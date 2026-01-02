@@ -1,11 +1,14 @@
 # ML Service - Containerized Machine Learning Inference
 
 ## Overview
-Isolated containerized service for ML inference, separating compute-intensive operations from Edge Functions.
+
+Isolated containerized service for ML inference, separating compute-intensive operations from Edge
+Functions.
 
 ## Why Separate ML Service?
 
 ### Problems with Edge Functions for ML:
+
 - ❌ **Limited CPU/Memory**: Edge Functions have strict resource limits
 - ❌ **Cold Starts**: Loading ML models on every request
 - ❌ **Timeout Risk**: Inference can take > 10s for complex models
@@ -13,6 +16,7 @@ Isolated containerized service for ML inference, separating compute-intensive op
 - ❌ **Large Bundle Size**: ML libraries exceed Edge Function limits
 
 ### Benefits of Containerized ML Service:
+
 - ✅ **Dedicated Resources**: CPU/GPU optimized containers
 - ✅ **Model Caching**: Models stay loaded in memory
 - ✅ **No Timeout**: Long-running inference supported
@@ -48,9 +52,11 @@ Isolated containerized service for ML inference, separating compute-intensive op
 ## Services
 
 ### 1. Match Scoring Service
+
 **Purpose**: Score user compatibility for travel matching
 
 **Input**:
+
 ```json
 {
   "user_a_id": "uuid",
@@ -64,6 +70,7 @@ Isolated containerized service for ML inference, separating compute-intensive op
 ```
 
 **Output**:
+
 ```json
 {
   "score": 0.87,
@@ -78,9 +85,11 @@ Isolated containerized service for ML inference, separating compute-intensive op
 ```
 
 ### 2. Recommendation Service
+
 **Purpose**: Personalized travel recommendations
 
 **Input**:
+
 ```json
 {
   "user_id": "uuid",
@@ -93,6 +102,7 @@ Isolated containerized service for ML inference, separating compute-intensive op
 ```
 
 **Output**:
+
 ```json
 {
   "recommendations": [
@@ -106,9 +116,11 @@ Isolated containerized service for ML inference, separating compute-intensive op
 ```
 
 ### 3. Smart Notifications Service
+
 **Purpose**: Predict optimal notification timing
 
 **Input**:
+
 ```json
 {
   "user_id": "uuid",
@@ -118,6 +130,7 @@ Isolated containerized service for ML inference, separating compute-intensive op
 ```
 
 **Output**:
+
 ```json
 {
   "send_at": "2024-07-15T14:30:00Z",
@@ -129,21 +142,38 @@ Isolated containerized service for ML inference, separating compute-intensive op
 
 ## Tech Stack
 
-- **Framework**: FastAPI (async Python)
-- **ML Libraries**: scikit-learn, PyTorch, Transformers
-- **Inference**: ONNX Runtime (optimized)
-- **Cache**: Redis (feature store, prediction cache)
-- **Monitoring**: Prometheus + Grafana
-- **Deployment**: Docker + GPU support (optional)
+- **Framework**: FastAPI 0.115+ (async Python, production-ready)
+- **ML Core**: PyTorch 2.5.1, scikit-learn 1.6, NumPy 2.2
+- **NLP**: Transformers 4.47, Sentence-Transformers 3.3
+- **Inference**: ONNX Runtime 1.20 (optimized cross-platform)
+- **Computer Vision**: OpenCV (headless), MediaPipe, Pillow
+- **Cache**: Redis 5.2 + hiredis (feature store, prediction cache)
+- **Monitoring**: Prometheus, OpenTelemetry
+- **Data**: Pandas, PyArrow (efficient serialization)
+- **Python**: 3.13+ compatible, all dependencies pinned
+- **Deployment**: Docker + GPU support (CUDA 12.1)
 
 ## Quick Start
 
+### Installation
+
+```bash
+# CPU-only (recommended for development)
+cd services/ml-service
+pip install -r requirements.txt
+
+# GPU version (production with NVIDIA GPUs)
+pip install -r requirements.txt
+pip install -r requirements-gpu.txt  # Overrides with CUDA versions
+```
+
 ### Start ML Service
+
 ```bash
 # CPU-only
 docker-compose up ml-service -d
 
-# With GPU (requires NVIDIA Docker)
+# With GPU (requires NVIDIA Docker Runtime)
 docker-compose -f docker-compose.gpu.yml up ml-service -d
 
 # Or using CLI
@@ -151,6 +181,7 @@ tm docker up ml-service
 ```
 
 ### Call from Edge Function
+
 ```typescript
 // supabase/functions/match-users/index.ts
 const response = await fetch('http://ml-service:8000/match/score', {
@@ -174,6 +205,7 @@ console.log('Match score:', prediction.score); // 0.87
 **Endpoint**: `POST /match/score`
 
 **Request**:
+
 ```json
 {
   "user_a_id": "uuid",
@@ -187,6 +219,7 @@ console.log('Match score:', prediction.score); // 0.87
 ```
 
 **Response**:
+
 ```json
 {
   "score": 0.87,
@@ -205,6 +238,7 @@ console.log('Match score:', prediction.score); // 0.87
 **Endpoint**: `POST /recommend/destinations`
 
 **Request**:
+
 ```json
 {
   "user_id": "uuid",
@@ -217,6 +251,7 @@ console.log('Match score:', prediction.score); // 0.87
 ```
 
 **Response**:
+
 ```json
 {
   "recommendations": [
@@ -234,6 +269,7 @@ console.log('Match score:', prediction.score); // 0.87
 **Endpoint**: `POST /notifications/optimize`
 
 **Request**:
+
 ```json
 {
   "user_id": "uuid",
@@ -243,6 +279,7 @@ console.log('Match score:', prediction.score); // 0.87
 ```
 
 **Response**:
+
 ```json
 {
   "send_at": "2024-07-15T14:30:00Z",
@@ -257,6 +294,7 @@ console.log('Match score:', prediction.score); // 0.87
 **Endpoint**: `GET /health`
 
 **Response**:
+
 ```json
 {
   "status": "healthy",
@@ -269,16 +307,19 @@ console.log('Match score:', prediction.score); // 0.87
 ## Performance
 
 ### Latency Targets
+
 - Match Scoring: < 100ms (p95)
 - Recommendations: < 200ms (p95)
 - Smart Notifications: < 50ms (p95)
 
 ### Throughput
+
 - Requests/sec: 100+ (CPU), 500+ (GPU)
 - Concurrent requests: 50
 - Model batch size: 32 (for batching multiple requests)
 
 ### Optimization
+
 - **Model Quantization**: INT8 (4x smaller, 2-4x faster)
 - **ONNX Runtime**: 2-3x faster than native PyTorch
 - **Response Caching**: Redis cache for repeated predictions
@@ -318,6 +359,7 @@ LOG_LEVEL=info
 ## Scaling
 
 ### Horizontal Scaling
+
 ```bash
 # Scale to 5 replicas
 docker-compose up --scale ml-service=5 -d
@@ -329,6 +371,7 @@ kubectl autoscale deployment ml-service \
 ```
 
 ### Vertical Scaling
+
 ```yaml
 # docker-compose.yml
 ml-service:
@@ -343,6 +386,7 @@ ml-service:
 ```
 
 ### GPU Scaling
+
 ```yaml
 # docker-compose.gpu.yml
 ml-service:
@@ -358,6 +402,7 @@ ml-service:
 ## Monitoring
 
 ### Prometheus Metrics
+
 ```
 # Request metrics
 ml_inference_requests_total
@@ -375,6 +420,7 @@ ml_cache_misses_total
 ```
 
 ### Grafana Dashboard
+
 ```
 http://localhost:3001/d/ml-service
 
@@ -390,6 +436,7 @@ Panels:
 ## Development
 
 ### Local Development
+
 ```bash
 # Install dependencies
 cd services/ml-service
@@ -405,6 +452,7 @@ curl -X POST http://localhost:8000/match/score \
 ```
 
 ### Add New Model
+
 ```python
 # app/models/new_model.py
 from app.core.base_model import BaseModel
@@ -413,13 +461,14 @@ class NewModel(BaseModel):
     def load(self):
         # Load model from disk/S3
         pass
-    
+
     def predict(self, features):
         # Run inference
         pass
 ```
 
 ### Register Model
+
 ```python
 # app/main.py
 from app.models.new_model import NewModel
@@ -433,6 +482,7 @@ async def load_models():
 ## Migration from Edge Functions
 
 ### Before (Edge Function - BAD)
+
 ```typescript
 // supabase/functions/match-users/index.ts
 import { someHeavyMLLibrary } from 'npm:heavy-ml-lib'; // Too large!
@@ -446,6 +496,7 @@ serve(async (req) => {
 ```
 
 ### After (ML Service - GOOD)
+
 ```typescript
 // supabase/functions/match-users/index.ts
 serve(async (req) => {
@@ -454,7 +505,7 @@ serve(async (req) => {
     method: 'POST',
     body: JSON.stringify({ user_a_id, user_b_id }),
   });
-  
+
   const prediction = await response.json();
   return Response.json(prediction);
 });
@@ -474,6 +525,7 @@ serve(async (req) => {
 ## Troubleshooting
 
 ### High Latency?
+
 - Check model size (quantize if > 1GB)
 - Enable prediction caching
 - Use GPU if available
@@ -481,12 +533,14 @@ serve(async (req) => {
 - Pre-compute features
 
 ### Out of Memory?
+
 - Reduce model size (quantization)
 - Lower batch size
 - Scale horizontally (more replicas)
 - Use model sharding
 
 ### Low Throughput?
+
 - Increase worker count
 - Enable GPU
 - Batch requests
@@ -495,6 +549,7 @@ serve(async (req) => {
 ---
 
 **Files Created**:
+
 - `services/ml-service/` - FastAPI ML inference service
 - Dockerfile with GPU support
 - Updated docker-compose.yml

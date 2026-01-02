@@ -32,7 +32,7 @@ Examples:
 import sys
 import json
 from datetime import datetime
-from typing import Dict, Any, List, Optional, Union
+from typing import Dict, List, Optional, Any
 
 
 # Design system metadata
@@ -48,7 +48,7 @@ DESIGN_SYSTEM = {
 COMPONENT_TYPES = ["atom", "molecule", "organism", "template", "page"]
 
 # Standard props for different component types
-STANDARD_PROPS = {
+STANDARD_PROPS: Dict[str, List[Dict[str, Any]]] = {
     "atom": [
         {"name": "testID", "type": "string", "required": False, "description": "Test identifier for automation"},
         {"name": "accessibilityLabel", "type": "string", "required": False, "description": "Accessibility label for screen readers"},
@@ -70,21 +70,21 @@ def generate_component_spec(
     name: str,
     component_type: str,
     description: str = "",
-    props: Optional[List[Dict]] = None,
+    props: Optional[List[Dict[str, Any]]] = None,
     variants: Optional[List[str]] = None,
-    examples: Optional[List[Dict]] = None
+    examples: Optional[List[Dict[str, Any]]] = None
 ) -> str:
     """Generate a component specification document in Markdown."""
     now = datetime.now().strftime("%Y-%m-%d")
 
     # Default props based on type
-    all_props = STANDARD_PROPS.get("atom", []).copy()
+    all_props: List[Dict[str, Any]] = list(STANDARD_PROPS.get("atom", []))  # pyright: ignore[reportUnknownMemberType]
     if component_type in ["atom", "molecule"]:
-        all_props.extend(STANDARD_PROPS.get("interactive", []))
-        all_props.extend(STANDARD_PROPS.get("styled", []))
+        all_props.extend(STANDARD_PROPS.get("interactive", []))  # pyright: ignore[reportUnknownMemberType]
+        all_props.extend(STANDARD_PROPS.get("styled", []))  # pyright: ignore[reportUnknownMemberType]
 
     if props:
-        all_props.extend(props)
+        all_props.extend(props)  # pyright: ignore[reportUnknownMemberType]
 
     if variants is None:
         variants = ["default", "primary", "secondary", "outline", "ghost"]
@@ -118,9 +118,9 @@ def generate_component_spec(
         "|------|------|----------|---------|-------------|",
     ]
 
-    for prop in all_props:
-        required = "Yes" if prop.get("required", False) else "No"
-        default = prop.get("default", "-")
+    for prop in all_props:  # pyright: ignore[reportUnknownVariableType]
+        required = "Yes" if prop.get("required", False) else "No"  # pyright: ignore[reportUnknownMemberType]
+        default = prop.get("default", "-")  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
         lines.append(f"| `{prop['name']}` | `{prop['type']}` | {required} | {default} | {prop['description']} |")
 
     lines.extend([
@@ -218,7 +218,7 @@ def generate_component_spec(
 
 def generate_token_documentation(format: str = "md") -> str:
     """Generate design token documentation."""
-    tokens = {
+    tokens: Dict[str, Any] = {
         "colors": {
             "primary": {"500": "#2196F3", "600": "#1E88E5", "700": "#1976D2"},
             "secondary": {"500": "#E91E63", "600": "#D81B60"},
@@ -268,7 +268,7 @@ def generate_token_documentation(format: str = "md") -> str:
     return generate_markdown_token_docs(tokens)
 
 
-def generate_markdown_token_docs(tokens: Dict) -> str:
+def generate_markdown_token_docs(tokens: Dict[str, Any]) -> str:
     """Generate Markdown token documentation."""
     lines = [
         "# TravelMatch Design Tokens",
@@ -286,7 +286,7 @@ def generate_markdown_token_docs(tokens: Dict) -> str:
         "|-------|-------|---------|",
     ]
 
-    for shade, value in tokens["colors"]["primary"].items():
+    for shade, value in tokens["colors"]["primary"].items():  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
         lines.append(f"| `primary.{shade}` | `{value}` | ![{value}](https://via.placeholder.com/20/{value[1:]}/{value[1:]}) |")
 
     lines.extend([
@@ -298,7 +298,7 @@ def generate_markdown_token_docs(tokens: Dict) -> str:
     ])
 
     for name in ["success", "warning", "error", "info"]:
-        value = tokens["colors"][name]["500"]
+        value = tokens["colors"][name]["500"]  # pyright: ignore[reportUnknownVariableType]
         lines.append(f"| {name.capitalize()} | `{name}.500` | `{value}` |")
 
     lines.extend([
@@ -313,7 +313,7 @@ def generate_markdown_token_docs(tokens: Dict) -> str:
         "|-------|-------|",
     ])
 
-    for name, value in tokens["typography"]["fontFamily"].items():
+    for name, value in tokens["typography"]["fontFamily"].items():  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
         lines.append(f"| `fontFamily.{name}` | `{value}` |")
 
     lines.extend([
@@ -324,7 +324,7 @@ def generate_markdown_token_docs(tokens: Dict) -> str:
         "|-------|-------|---------|",
     ])
 
-    for name, value in tokens["typography"]["fontSize"].items():
+    for name, value in tokens["typography"]["fontSize"].items():  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
         lines.append(f"| `fontSize.{name}` | `{value}` | <span style='font-size:{value}'>Aa</span> |")
 
     lines.extend([
@@ -339,8 +339,8 @@ def generate_markdown_token_docs(tokens: Dict) -> str:
         "|-------|-------|--------|",
     ])
 
-    for name, value in tokens["spacing"].items():
-        lines.append(f"| `spacing.{name}` | `{value}` | `{'█' * (int(value.replace('px', '')) // 4)}` |")
+    for name, value in tokens["spacing"].items():  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
+        lines.append(f"| `spacing.{name}` | `{value}` | `{'█' * (int(str(value).replace('px', '')) // 4)}` |")
 
     lines.extend([
         "",
@@ -352,7 +352,7 @@ def generate_markdown_token_docs(tokens: Dict) -> str:
         "|-------|-------|",
     ])
 
-    for name, value in tokens["radius"].items():
+    for name, value in tokens["radius"].items():  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
         lines.append(f"| `radius.{name}` | `{value}` |")
 
     lines.extend([
@@ -365,7 +365,7 @@ def generate_markdown_token_docs(tokens: Dict) -> str:
         "|-------|-------|",
     ])
 
-    for name, value in tokens["shadows"].items():
+    for name, value in tokens["shadows"].items():  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
         lines.append(f"| `shadow.{name}` | `{value}` |")
 
     lines.extend([
@@ -417,7 +417,7 @@ def generate_markdown_token_docs(tokens: Dict) -> str:
     return "\n".join(lines)
 
 
-def generate_html_token_docs(tokens: Dict) -> str:
+def generate_html_token_docs(tokens: Dict[str, Any]) -> str:
     """Generate HTML token documentation."""
     html = [
         "<!DOCTYPE html>",
@@ -445,8 +445,8 @@ def generate_html_token_docs(tokens: Dict) -> str:
         "    <tr><th>Token</th><th>Value</th><th>Preview</th></tr>",
     ]
 
-    for palette_name, palette in tokens["colors"].items():
-        for shade, value in palette.items():
+    for palette_name, palette in tokens["colors"].items():  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
+        for shade, value in palette.items():  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
             html.append(f"    <tr><td><code>{palette_name}.{shade}</code></td><td>{value}</td><td><div class='swatch' style='background:{value}'></div></td></tr>")
 
     html.extend([
@@ -457,7 +457,7 @@ def generate_html_token_docs(tokens: Dict) -> str:
         "    <tr><th>Token</th><th>Value</th></tr>",
     ])
 
-    for name, value in tokens["spacing"].items():
+    for name, value in tokens["spacing"].items():  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
         html.append(f"    <tr><td><code>spacing.{name}</code></td><td>{value}</td></tr>")
 
     html.extend([
@@ -525,7 +525,7 @@ def generate_implementation_checklist(component_name: str) -> str:
     return "\n".join(lines)
 
 
-def generate_changelog_entry(version: str, changes: Optional[List[Dict]] = None) -> str:
+def generate_changelog_entry(version: str, changes: Optional[List[Dict[str, Any]]] = None) -> str:
     """Generate changelog entry."""
     date = datetime.now().strftime("%Y-%m-%d")
 
@@ -542,12 +542,12 @@ def generate_changelog_entry(version: str, changes: Optional[List[Dict]] = None)
     ]
 
     # Group changes by type
-    grouped = {}
-    for change in changes:
-        change_type = change["type"].capitalize()
+    grouped: Dict[str, List[str]] = {}
+    for change in changes:  # pyright: ignore[reportUnknownVariableType]
+        change_type: str = str(change["type"]).capitalize()  # pyright: ignore[reportUnknownMemberType]
         if change_type not in grouped:
             grouped[change_type] = []
-        grouped[change_type].append(change["description"])
+        grouped[change_type].append(str(change["description"]))  # pyright: ignore[reportUnknownMemberType,reportUnknownArgumentType]
 
     for change_type in ["Added", "Changed", "Deprecated", "Removed", "Fixed", "Security"]:
         if change_type in grouped:
