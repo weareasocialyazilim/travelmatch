@@ -8,7 +8,6 @@ import {
   Animated,
   Dimensions,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import MapboxGL from '@rnmapbox/maps';
@@ -17,10 +16,9 @@ import * as Location from 'expo-location';
 import BottomNav from '@/components/BottomNav';
 import { COLORS } from '@/constants/colors';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
-import type { RootStackParamList } from '@/navigation/routeParams';
-import type { NavigationProp } from '@react-navigation/native';
 
-const { width: SCREEN_WIDTH, height: _SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: _SCREEN_HEIGHT } =
+  Dimensions.get('window');
 
 interface MapLocation {
   latitude: number;
@@ -28,7 +26,7 @@ interface MapLocation {
 }
 
 const SearchMapScreen: React.FC = () => {
-  const _navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  // Navigation available for future features when needed
   const mapRef = useRef<MapboxGL.MapView>(null);
   const cameraRef = useRef<MapboxGL.Camera>(null);
 
@@ -285,4 +283,6 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withErrorBoundary(SearchMapScreen, { displayName: 'SearchMapScreen' });
+export default withErrorBoundary(SearchMapScreen, {
+  displayName: 'SearchMapScreen',
+});

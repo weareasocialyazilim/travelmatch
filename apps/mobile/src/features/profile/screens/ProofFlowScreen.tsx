@@ -333,9 +333,10 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
         confidence_score: 0,
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: proofRecord, error: proofError } = await supabase
         .from('proof_verifications')
-        .insert(proofInsertData as Record<string, unknown>)
+        .insert(proofInsertData as any)
         .select('id')
         .single();
 

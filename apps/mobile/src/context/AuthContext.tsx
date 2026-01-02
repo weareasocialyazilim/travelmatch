@@ -663,7 +663,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       if (error) throw error;
       return { success: true };
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Şifre değiştirilemedi';
+      const message =
+        error instanceof Error ? error.message : 'Şifre değiştirilemedi';
       return { success: false, error: message };
     }
   };
@@ -703,7 +704,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       resetPassword,
       changePassword,
     }),
-    [user, authState, isAuthenticated, isLoading, updateUser, forgotPassword, resetPassword, changePassword, socialAuth, linkSocialAccount, unlinkSocialAccount, login, register, logout, refreshToken, sendVerificationEmail, verifyEmail, resendVerificationEmail, requestAccountDeletion, cancelAccountDeletion, deleteAccount, enableBiometricAuth, disableBiometricAuth, signInWithBiometrics],
+    [
+      user,
+      authState,
+      isAuthenticated,
+      isLoading,
+      updateUser,
+      forgotPassword,
+      resetPassword,
+      changePassword,
+      socialAuth,
+      login,
+      register,
+      logout,
+      refreshUser,
+      handleOAuthCallback,
+      getAccessToken,
+    ],
   );
 
   return (

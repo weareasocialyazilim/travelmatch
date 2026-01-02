@@ -64,8 +64,13 @@ const ReviewScreen: React.FC = () => {
   const [reviewText, setReviewText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { momentId, userId, userName, userAvatar, momentTitle } =
-    route.params || {};
+  const {
+    momentId: _momentId,
+    userId: _userId,
+    userName,
+    userAvatar,
+    momentTitle,
+  } = route.params || {};
 
   const handleSubmit = useCallback(async () => {
     if (rating === 0 || isSubmitting) return;

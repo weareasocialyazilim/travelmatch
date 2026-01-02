@@ -1,6 +1,6 @@
 /**
  * Payments Feature - Barrel Exports
- * 
+ *
  * Bu feature şunları içerir:
  * - Wallet yönetimi (WalletScreen, WithdrawScreen)
  * - Payment methods (PaymentMethodsScreen)
@@ -16,7 +16,7 @@ export { default as WithdrawScreen } from './screens/WithdrawScreen';
 export { default as PaymentMethodsScreen } from './screens/PaymentMethodsScreen';
 export { default as AddCardScreen } from './screens/AddCardScreen';
 export { default as TransactionDetailScreen } from './screens/TransactionDetailScreen';
-export { default as RefundRequestScreen } from './screens/RefundRequestScreen';
+export { RefundRequestScreen } from './screens/RefundRequestScreen';
 export { default as SuccessScreen } from './screens/SuccessScreen';
 export { default as GiftInboxScreen } from './screens/GiftInboxScreen';
 export { default as GiftInboxDetailScreen } from './screens/GiftInboxDetailScreen';
@@ -56,7 +56,7 @@ export {
   useSubmitKYC,
   useSubscription,
   useCreateSubscription,
-  useCancelSubscription
+  useCancelSubscription,
 } from './hooks/usePayments';
 
 // Services
