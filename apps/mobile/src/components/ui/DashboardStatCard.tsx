@@ -137,7 +137,7 @@ export const DashboardStatCard = memo<DashboardStatCardProps>(
             <View
               style={[
                 styles.trendBadge,
-                { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : trendConfig.bgColor },
+                isDark ? styles.trendBadgeDark : { backgroundColor: trendConfig.bgColor },
               ]}
             >
               <MaterialCommunityIcons
@@ -286,6 +286,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
+  },
+  trendBadgeDark: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
   },
   trendText: {
     fontSize: 12,

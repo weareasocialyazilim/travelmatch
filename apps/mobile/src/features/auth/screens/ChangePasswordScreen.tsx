@@ -52,7 +52,7 @@ export const ChangePasswordScreen = () => {
       } else {
         Alert.alert('Error', result.error || 'Failed to update password');
       }
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
@@ -68,7 +68,7 @@ export const ChangePasswordScreen = () => {
           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Change Password</Text>
-        <View style={{ width: 24 }} />
+        <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
@@ -135,6 +135,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background.primary },
   header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center' },
   headerTitle: { fontSize: 16, fontWeight: 'bold', color: 'white' },
+  headerSpacer: { width: 24 },
   content: { padding: 24 },
   group: { marginBottom: 24 },
   label: { color: COLORS.text.secondary, marginBottom: 10, fontSize: 12, textTransform: 'uppercase' },

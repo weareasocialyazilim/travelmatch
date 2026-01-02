@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation, CommonActions } from '@react-navigation/native';
+import { useNavigation } from '@/hooks/useNavigationHelpers';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -26,8 +26,8 @@ export const LocationPermissionScreen = () => {
             <MaterialCommunityIcons name="map-marker-radius" size={80} color="black" />
           </LinearGradient>
           {/* Decorative Rings */}
-          <View style={[styles.ring, { width: 160, height: 160, opacity: 0.3 }]} />
-          <View style={[styles.ring, { width: 220, height: 220, opacity: 0.1 }]} />
+          <View style={[styles.ring, styles.ringMedium]} />
+          <View style={[styles.ring, styles.ringLarge]} />
         </View>
 
         <Text style={styles.title}>Find Vibes Near You</Text>
@@ -46,7 +46,7 @@ export const LocationPermissionScreen = () => {
           </View>
         </View>
 
-        <View style={{ flex: 1 }} />
+        <View style={styles.spacer} />
 
         <TouchableOpacity style={styles.primaryBtn} onPress={handleEnable}>
           <Text style={styles.primaryText}>Enable Location</Text>
@@ -56,7 +56,7 @@ export const LocationPermissionScreen = () => {
           <Text style={styles.secondaryText}>Maybe Later</Text>
         </TouchableOpacity>
 
-        <View style={{ height: insets.bottom + 20 }} />
+        <View style={[styles.bottomSpacer, { height: insets.bottom + 20 }]} />
       </View>
     </View>
   );
@@ -68,6 +68,10 @@ const styles = StyleSheet.create({
   iconContainer: { alignItems: 'center', justifyContent: 'center', marginBottom: 40, marginTop: 60 },
   iconGradient: { width: 120, height: 120, borderRadius: 60, alignItems: 'center', justifyContent: 'center', zIndex: 2 },
   ring: { position: 'absolute', borderRadius: 999, borderWidth: 1, borderColor: COLORS.brand.primary },
+  ringMedium: { width: 160, height: 160, opacity: 0.3 },
+  ringLarge: { width: 220, height: 220, opacity: 0.1 },
+  spacer: { flex: 1 },
+  bottomSpacer: {},
   title: { fontSize: 32, fontWeight: '900', color: 'white', textAlign: 'center', marginBottom: 16 },
   desc: { color: COLORS.text.secondary, textAlign: 'center', fontSize: 16, lineHeight: 24, marginBottom: 40 },
   features: { alignSelf: 'flex-start', marginLeft: 20, gap: 16 },

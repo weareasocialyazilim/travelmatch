@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Keyboard } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@/hooks/useNavigationHelpers';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -49,7 +49,7 @@ export const EmailVerificationScreen = () => {
           {code.map((digit, index) => (
             <TextInput
               key={index}
-              ref={el => inputs.current[index] = el}
+              ref={(el) => { inputs.current[index] = el; }}
               style={[styles.codeInput, digit && styles.codeInputActive]}
               keyboardType="number-pad"
               maxLength={1}
