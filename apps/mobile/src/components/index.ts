@@ -43,7 +43,6 @@ export { LazyLocationPicker } from './LazyLocationPicker'; // Lazy-loaded versio
 export type { Location } from './LazyLocationPicker';
 export { SetPriceBottomSheet } from './SetPriceBottomSheet';
 export { ChooseCategoryBottomSheet } from './ChooseCategoryBottomSheet';
-export { DeleteMomentModal } from './DeleteMomentModal';
 export { LeaveTrustNoteBottomSheet } from './LeaveTrustNoteBottomSheet';
 export { FilterBottomSheet } from './FilterBottomSheet';
 export { UnblockUserBottomSheet } from './UnblockUserBottomSheet';

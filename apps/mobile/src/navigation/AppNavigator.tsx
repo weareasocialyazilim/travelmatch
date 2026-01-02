@@ -79,14 +79,14 @@ import {
 // ===================================
 // NEW FEATURE SCREENS
 // ===================================
-import { SearchMapScreen } from '../features/discovery';
-import { ChatDetailScreen } from '../features/chat';
+import { SearchMapScreen } from '../features/discover';
 import { InboxScreen } from '../features/inbox';
 // WalletScreen is imported from payments feature, not wallet feature
 // import { WalletScreen as WalletFeatureScreen } from '../features/wallet';
 import { NotificationsScreen } from '../features/notifications';
-import { CheckoutScreen } from '../features/payment';
+import { CheckoutScreen } from '../features/payments';
 import { ReviewScreen } from '../features/reviews';
+import { ChatDetailScreen } from '../features/messages';
 
 // ===================================
 // PROFILE FEATURE SCREENS

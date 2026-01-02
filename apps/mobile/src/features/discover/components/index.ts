@@ -1,6 +1,6 @@
 /**
- * Trips Feature Components
+ * Discover Feature Components
  */
 
-export { NotificationCard } from './NotificationCard';
-export { RequestCard } from './RequestCard';
+// Components are in /components/ folder, not here
+// This file kept for potential future discover-specific components
