@@ -84,17 +84,18 @@ export async function GET(request: NextRequest) {
     }
 
     // Calculate summary stats
+    type Transaction = { amount?: number; status?: string; type?: string };
     const summary = {
       total: count || 0,
-      totalAmount: transactions?.reduce((sum, t) => sum + (t.amount || 0), 0) || 0,
-      completedAmount: transactions?.filter(t => t.status === 'completed').reduce((sum, t) => sum + (t.amount || 0), 0) || 0,
-      pendingAmount: transactions?.filter(t => t.status === 'pending').reduce((sum, t) => sum + (t.amount || 0), 0) || 0,
-      failedAmount: transactions?.filter(t => t.status === 'failed').reduce((sum, t) => sum + (t.amount || 0), 0) || 0,
+      totalAmount: transactions?.reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) || 0,
+      completedAmount: transactions?.filter((t: Transaction) => t.status === 'completed').reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) || 0,
+      pendingAmount: transactions?.filter((t: Transaction) => t.status === 'pending').reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) || 0,
+      failedAmount: transactions?.filter((t: Transaction) => t.status === 'failed').reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) || 0,
       byType: {
-        gift: transactions?.filter(t => t.type === 'gift').length || 0,
-        withdrawal: transactions?.filter(t => t.type === 'withdrawal').length || 0,
-        refund: transactions?.filter(t => t.type === 'refund').length || 0,
-        deposit: transactions?.filter(t => t.type === 'deposit').length || 0,
+        gift: transactions?.filter((t: Transaction) => t.type === 'gift').length || 0,
+        withdrawal: transactions?.filter((t: Transaction) => t.type === 'withdrawal').length || 0,
+        refund: transactions?.filter((t: Transaction) => t.type === 'refund').length || 0,
+        deposit: transactions?.filter((t: Transaction) => t.type === 'deposit').length || 0,
       },
     };
 

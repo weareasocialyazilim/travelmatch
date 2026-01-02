@@ -48,12 +48,13 @@ export async function GET(request: NextRequest) {
     const integrations = await getAllIntegrationsHealth();
 
     // Calculate summary
+    type IntegrationItem = { status: string };
     const summary = {
       total: integrations.length,
-      healthy: integrations.filter((i) => i.status === 'healthy').length,
-      warning: integrations.filter((i) => i.status === 'warning').length,
-      error: integrations.filter((i) => i.status === 'error').length,
-      unknown: integrations.filter((i) => i.status === 'unknown').length,
+      healthy: integrations.filter((i: IntegrationItem) => i.status === 'healthy').length,
+      warning: integrations.filter((i: IntegrationItem) => i.status === 'warning').length,
+      error: integrations.filter((i: IntegrationItem) => i.status === 'error').length,
+      unknown: integrations.filter((i: IntegrationItem) => i.status === 'unknown').length,
     };
 
     return NextResponse.json({
