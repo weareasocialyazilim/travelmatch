@@ -348,6 +348,7 @@ const ProfileScreen: React.FC = () => {
                 renderItem={renderMomentCard}
                 numColumns={2}
                 scrollEnabled={false}
+                estimatedItemSize={180}
                 ItemSeparatorComponent={() => (
                   <View style={styles.itemSeparator} />
                 )}
