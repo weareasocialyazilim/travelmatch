@@ -114,3 +114,10 @@ export { BlurFilterModal } from './BlurFilterModal';
 // ═══════════════════════════════════════════════════════════════════
 export { GlassModal } from './GlassModal';
 export type { GlassModalProps } from './GlassModal';
+
+// ═══════════════════════════════════════════════════════════════════
+// Map Components
+// ═══════════════════════════════════════════════════════════════════
+
+// NeonPulseMarker - Animated map marker with "Breathing Neon" effect
+export { NeonPulseMarker } from './NeonPulseMarker';
