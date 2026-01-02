@@ -9,7 +9,7 @@ import {
 import { Calendar, DateData } from 'react-native-calendars';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '@/theme/colors';
+import { COLORS } from '@/constants/colors';
 import type { RootStackScreenProps } from '@/navigation/types';
 
 const EVENTS: Record<string, { marked: boolean; dotColor: string }> = {

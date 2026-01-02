@@ -25,7 +25,7 @@ import * as Haptics from 'expo-haptics';
 import { ImmersiveMomentCard } from '@/components/discover/ImmersiveMomentCard';
 import { FloatingDock } from '@/components/layout/FloatingDock';
 import { useMoments, type Moment } from '@/hooks/useMoments';
-import { COLORS } from '@/theme/colors';
+import { COLORS } from '@/constants/colors';
 import { withErrorBoundary } from '../../../components/withErrorBoundary';
 import type { NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/routeParams';
