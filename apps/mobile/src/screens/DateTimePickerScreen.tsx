@@ -6,17 +6,22 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { Calendar } from 'react-native-calendars';
+import { Calendar, DateData } from 'react-native-calendars';
 import { COLORS } from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 
-export const DateTimePickerScreen = ({ navigation }: any) => {
+export const DateTimePickerScreen = () => {
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('20:00');
 
   const TIMES = ['18:00', '19:00', '20:00', '21:00', '22:00', '23:00'];
+
+  // Get today's date in YYYY-MM-DD format for minDate
+  const today = new Date().toISOString().split('T')[0];
 
   const handleConfirm = () => {
     navigation.goBack(); // Normalde seçilen tarihi geri döner
@@ -32,10 +37,11 @@ export const DateTimePickerScreen = ({ navigation }: any) => {
         <View style={{ width: 24 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <Text style={styles.label}>DATE</Text>
         <Calendar
           style={styles.calendar}
+          minDate={today}
           theme={{
             backgroundColor: 'transparent',
             calendarBackground: 'transparent',
@@ -49,7 +55,7 @@ export const DateTimePickerScreen = ({ navigation }: any) => {
             monthTextColor: 'white',
             textMonthFontWeight: 'bold',
           }}
-          onDayPress={(day: any) => setSelectedDate(day.dateString)}
+          onDayPress={(day: DateData) => setSelectedDate(day.dateString)}
           markedDates={{
             [selectedDate]: { selected: true, disableTouchEvent: true },
           }}

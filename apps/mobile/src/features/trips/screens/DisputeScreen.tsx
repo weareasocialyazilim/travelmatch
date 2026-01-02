@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert, Keyboard } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/theme/colors';
 
-export const DisputeScreen = ({ navigation }: any) => {
+export const DisputeScreen = () => {
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [selectedIssue, setSelectedIssue] = useState<string | null>(null);
 
@@ -16,6 +18,7 @@ export const DisputeScreen = ({ navigation }: any) => {
   ];
 
   const handleSubmit = () => {
+    Keyboard.dismiss();
     Alert.alert('Dispute Filed', 'Case #9281 opened. Our trust & safety team will review it within 48 hours.');
     navigation.goBack();
   };
@@ -28,7 +31,7 @@ export const DisputeScreen = ({ navigation }: any) => {
         <View style={{ width: 28 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <View style={styles.warningBox}>
           <MaterialCommunityIcons name="shield-alert" size={24} color="#FF4444" />
           <Text style={styles.warningText}>Please attempt to resolve the issue with the user via chat before opening a dispute.</Text>

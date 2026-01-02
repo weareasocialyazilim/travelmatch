@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Keyboard } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,6 +19,7 @@ export const RefundRequestScreen = () => {
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
 
   const handleSubmit = () => {
+    Keyboard.dismiss();
     navigation.goBack();
     // Show success toast
   };
@@ -31,7 +32,7 @@ export const RefundRequestScreen = () => {
         <View style={{ width: 24 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <View style={styles.txSummary}>
           <Text style={styles.txLabel}>Transaction #TM-8921</Text>
           <Text style={styles.txAmount}>$150.00</Text>

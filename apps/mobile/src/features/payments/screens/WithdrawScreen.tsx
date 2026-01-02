@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView, Keyboard } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/theme/colors';
@@ -21,6 +21,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
   const AVAILABLE_BALANCE = 450.00;
 
   const handleWithdraw = () => {
+    Keyboard.dismiss();
     // Virgül girilirse noktaya çevir (Türkçe klavye uyumu)
     const numericAmount = parseFloat(amount.replace(',', '.'));
 
@@ -75,7 +76,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
         <View style={{ width: 24 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
 
         {/* Bakiye Bilgisi */}
         <View style={styles.balanceContainer}>
