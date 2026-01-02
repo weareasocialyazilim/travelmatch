@@ -34,7 +34,7 @@ export const DeleteAccountScreen = () => {
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}><Ionicons name="arrow-back" size={24} color="white" /></TouchableOpacity>
         <Text style={styles.headerTitle}>Delete Account</Text>
-        <View style={{ width: 24 }} />
+        <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
@@ -77,6 +77,7 @@ export const DeleteAccountScreen = () => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background.primary },
   header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, alignItems: 'center' },
+  headerSpacer: { width: 24 },
   headerTitle: { fontSize: 16, fontWeight: 'bold', color: 'white' },
   content: { padding: 24, alignItems: 'center' },
   warningBox: { backgroundColor: 'rgba(255, 68, 68, 0.1)', padding: 24, borderRadius: 20, alignItems: 'center', marginBottom: 40, borderWidth: 1, borderColor: 'rgba(255, 68, 68, 0.3)' },

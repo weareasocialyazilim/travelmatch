@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   faqItemActive: {
-    backgroundColor: COLORS.surface.elevated,
+    backgroundColor: COLORS.surface.muted,
   },
   header: {
     alignItems: 'center',

@@ -279,6 +279,10 @@ export type RootStackParamList = {
   // Footer pages
   Safety: undefined;
   CommunityGuidelines: undefined;
+  SafetyTips: undefined;
+  Emergency: undefined;
+  DietaryPreferences: undefined;
+  Referral: undefined;
 
   // Deep Link Error Screens
   LinkInvalid: { message?: string };
