@@ -14,18 +14,24 @@
  */
 
 import * as SecureStore from 'expo-secure-store';
+import Constants from 'expo-constants';
 import { logger } from '../utils/logger';
 
-// Infisical configuration
+// Infisical configuration - loaded from environment variables
+// SECURITY: These are NOT secrets, just infrastructure identifiers
+// The actual secrets are fetched via authenticated API calls
 const INFISICAL_CONFIG = {
-  // Organization details from your Infisical setup
-  siteUrl: 'https://app.infisical.com',
-  organizationId: 'cafe77a6-a1d6-4725-89d4-e1ec88c0f2b9',
-  organizationSlug: 'travelmatch-w-mw-u',
-  
+  // Organization details from environment or Expo config
+  siteUrl: process.env.EXPO_PUBLIC_INFISICAL_URL || 'https://app.infisical.com',
+  // Organization ID should be set via environment variable
+  organizationId: process.env.EXPO_PUBLIC_INFISICAL_ORG_ID ||
+    (Constants.expoConfig?.extra?.infisicalOrgId as string | undefined) || '',
+  organizationSlug: process.env.EXPO_PUBLIC_INFISICAL_ORG_SLUG ||
+    (Constants.expoConfig?.extra?.infisicalOrgSlug as string | undefined) || '',
+
   // Cache duration for secrets (5 minutes)
   cacheDuration: 5 * 60 * 1000,
-  
+
   // Secret paths
   paths: {
     supabase: '/supabase',
@@ -35,6 +41,12 @@ const INFISICAL_CONFIG = {
     analytics: '/analytics',
   },
 } as const;
+
+// Validate configuration at startup
+if (!__DEV__ && (!INFISICAL_CONFIG.organizationId || !INFISICAL_CONFIG.organizationSlug)) {
+  logger.error('Infisical', 'CRITICAL: Missing Infisical organization configuration. ' +
+    'Set EXPO_PUBLIC_INFISICAL_ORG_ID and EXPO_PUBLIC_INFISICAL_ORG_SLUG environment variables.');
+}
 
 // Secret keys we manage through Infisical
 export const SECRET_KEYS = {

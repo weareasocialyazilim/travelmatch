@@ -28,8 +28,8 @@ export async function GET(request: NextRequest) {
       .select(
         `
         *,
-        requester:profiles!disputes_requester_id_fkey(id, display_name, avatar_url),
-        responder:profiles!disputes_responder_id_fkey(id, display_name, avatar_url)
+        requester:users!disputes_requester_id_fkey(id, display_name, avatar_url),
+        responder:users!disputes_responder_id_fkey(id, display_name, avatar_url)
       `,
         { count: 'exact' }
       )

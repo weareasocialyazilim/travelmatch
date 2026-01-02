@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     const supabase = createServiceClient();
 
     let query = supabase
-      .from('profiles')
+      .from('users')
       .select('*', { count: 'exact' })
       .order(safeSortBy, { ascending: sortOrder === 'asc' })
       .range(offset, offset + limit - 1);

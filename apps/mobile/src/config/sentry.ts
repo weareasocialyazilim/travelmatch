@@ -15,10 +15,10 @@ import { logger } from '../utils/logger';
 const isDev = typeof __DEV__ !== 'undefined' ? __DEV__ : true;
 
 // Sentry DSN from environment variables (configured in EAS)
+// SECURITY: DSN must be set via environment variable, no hardcoded fallback
 const SENTRY_DSN =
   (Constants.expoConfig?.extra?.sentryDsn as string | undefined) ||
-  process.env.EXPO_PUBLIC_SENTRY_DSN ||
-  'https://4e851e74a8a6ecab750e2f4a8933e6c8@o4510544957800448.ingest.de.sentry.io/4510550169354320';
+  process.env.EXPO_PUBLIC_SENTRY_DSN || '';
 
 // Track if Sentry has been initialized
 let isInitialized = false;
@@ -35,6 +35,12 @@ export function initSentry() {
   // Skip initialization in development to avoid JSI issues
   if (isDev) {
     logger.debug('Sentry disabled in development');
+    return;
+  }
+
+  // Skip if DSN is not configured
+  if (!SENTRY_DSN) {
+    logger.warn('Sentry', 'Sentry DSN not configured. Set EXPO_PUBLIC_SENTRY_DSN environment variable.');
     return;
   }
 

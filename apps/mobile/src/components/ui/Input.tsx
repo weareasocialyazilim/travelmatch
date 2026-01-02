@@ -11,7 +11,7 @@
  */
 
 import React, { useState, memo, useCallback, useMemo } from 'react';
-import type { ViewStyle, TextInputProps } from 'react-native';
+import type { ViewStyle, TextInputProps, NativeSyntheticEvent, TextInputFocusEventData } from 'react-native';
 import {
   View,
   TextInput,
@@ -107,16 +107,16 @@ export const Input: React.FC<InputProps> = memo(
 
     // Memoize callbacks
     const handleFocus = useCallback(
-      (e?: unknown) => {
+      (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
         setIsFocused(true);
-        onFocusProp?.(e as never);
+        onFocusProp?.(e);
       },
       [onFocusProp],
     );
     const handleBlur = useCallback(
-      (e?: unknown) => {
+      (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
         setIsFocused(false);
-        onBlurProp?.(e as never);
+        onBlurProp?.(e);
       },
       [onBlurProp],
     );

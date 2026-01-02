@@ -245,16 +245,22 @@ export async function validateSSLCertificate(
     logger.debug('SSL Pinning', `Validating certificate for ${domain}`);
   }
 
-  // In production, log if placeholder pins are still present
-  // This helps catch configuration issues
+  // In production, FAIL if placeholder pins are still present
+  // This is a critical security issue that must be fixed before deployment
   if (!__DEV__ && hasPlaceholderPins) {
     logger.error(
       'SSL Pinning',
       `CRITICAL: Placeholder certificate pins detected for ${domain} in production. ` +
-      'SSL pinning is not providing protection!'
+      'SSL pinning is not providing protection! Request blocked for security.'
     );
-    // Continue to allow request but log the security issue
-    // A strict implementation would return valid: false here
+    // SECURITY: Block requests with placeholder pins in production
+    // This prevents deploying without proper certificate pinning
+    return {
+      valid: false,
+      error: `SSL_PINNING_NOT_CONFIGURED: Placeholder pins detected for ${domain}. ` +
+        'Real certificate hashes must be configured before production deployment.',
+      domain,
+    };
   }
 
   // For Expo managed workflow, we rely on:

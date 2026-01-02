@@ -32,16 +32,16 @@ export async function GET(request: NextRequest) {
 
     // Fetch user metrics
     const { count: totalUsers } = await supabase
-      .from('profiles')
+      .from('users')
       .select('*', { count: 'exact', head: true });
 
     const { count: newUsers } = await supabase
-      .from('profiles')
+      .from('users')
       .select('*', { count: 'exact', head: true })
       .gte('created_at', startDate.toISOString());
 
     const { count: activeUsers } = await supabase
-      .from('profiles')
+      .from('users')
       .select('*', { count: 'exact', head: true })
       .gte('last_active', startDate.toISOString());
 

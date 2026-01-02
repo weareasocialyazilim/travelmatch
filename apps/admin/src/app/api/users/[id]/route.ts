@@ -32,7 +32,7 @@ export async function GET(
 
     // Get user profile with related data
     const { data: user, error } = await supabase
-      .from('profiles')
+      .from('users')
       .select('*')
       .eq('id', id)
       .single();
@@ -94,7 +94,7 @@ export async function PATCH(
 
     // Get current user data
     const { data: currentUser, error: fetchError } = await supabase
-      .from('profiles')
+      .from('users')
       .select('*')
       .eq('id', id)
       .single();
@@ -129,7 +129,7 @@ export async function PATCH(
     }
 
     const { data: user, error } = await supabase
-      .from('profiles')
+      .from('users')
       .update(updateData)
       .eq('id', id)
       .select()
