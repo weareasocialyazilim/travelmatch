@@ -51,7 +51,7 @@ import LinkInvalidScreen from '../screens/LinkInvalidScreen';
 import { ImageViewerScreen } from '../screens/ImageViewerScreen';
 
 // ===================================
-// TRIPS FEATURE SCREENS
+// DISCOVER FEATURE SCREENS
 // ===================================
 import {
   DiscoverScreen,
@@ -65,7 +65,7 @@ import {
   TicketScreen,
   TripDetailsScreen,
   MyTripsScreen,
-} from '../features/trips';
+} from '../features/discover';
 
 // ===================================
 // MESSAGES FEATURE SCREENS
