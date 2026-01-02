@@ -1,4 +1,8 @@
 {
+  // Deno - Enable for Supabase Edge Functions
+  "deno.enable": false,
+  "deno.enablePaths": ["./supabase/functions"],
+
   // Editor
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",

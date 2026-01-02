@@ -2,7 +2,11 @@
 
 import { useMemo } from 'react';
 import { useAuthStore } from '@/stores/auth-store';
-import type { AdminRole, Resource, Action } from '@/types/admin';
+import type { AdminRole, Resource, Action, AdminUser } from '@/types/admin';
+
+interface AuthState {
+  user: AdminUser | null;
+}
 
 // Permission matrix
 const ROLE_PERMISSIONS: Record<AdminRole, Record<Resource, Action[]>> = {
@@ -93,7 +97,7 @@ const ROLE_PERMISSIONS: Record<AdminRole, Record<Resource, Action[]>> = {
 };
 
 export function usePermission() {
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore((state: AuthState) => state.user);
 
   const permissions = useMemo(() => {
     if (!user) return null;
