@@ -8,13 +8,17 @@ import {
 } from 'react-native';
 import MapView, { Region } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { COLORS } from '@/constants/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
+import type { RootStackParamList } from '@/navigation/routeParams';
 
 const { width, height } = Dimensions.get('window');
 
-export const PickLocationScreen = ({ navigation }: any) => {
+type Props = NativeStackScreenProps<RootStackParamList, 'PickLocation'>;
+
+export const PickLocationScreen = ({ navigation }: Props) => {
   const insets = useSafeAreaInsets();
   const [selectedLocation, setSelectedLocation] = useState({
     latitude: 41.0082,
