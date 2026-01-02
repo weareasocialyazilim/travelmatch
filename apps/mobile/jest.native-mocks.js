@@ -1,3 +1,4 @@
+/* eslint-env jest */
 /**
  * Comprehensive React Native Native Module Mocks
  *
@@ -38,7 +39,7 @@ const mockUIManager = {
   setLayoutAnimationEnabledExperimental: jest.fn(),
 
   // ViewManager config - Returns empty config for any view component
-  getViewManagerConfig: jest.fn((viewManagerName) => {
+  getViewManagerConfig: jest.fn((_viewManagerName) => {
     return {
       Commands: {},
       Constants: {},
@@ -59,8 +60,10 @@ const mockUIManager = {
   dispatchViewManagerCommand: jest.fn(),
 
   // Layout animation
-  configureNextLayoutAnimation: jest.fn((config, onComplete) => {
-    onComplete && onComplete();
+  configureNextLayoutAnimation: jest.fn((_config, onComplete) => {
+    if (onComplete) {
+      onComplete();
+    }
   }),
 
   // View hierarchy
@@ -381,7 +384,7 @@ const mockTextInputComponent = () => {
  */
 const mockImageComponent = () => {
   const ImageComponent = React.forwardRef((props, ref) => {
-    const { source, onLoad, onError, style, ...otherProps } = props;
+    const { source, onLoad, onError: _onError, style, ...otherProps } = props;
 
     // Trigger onLoad in next tick to simulate async loading
     React.useEffect(() => {
