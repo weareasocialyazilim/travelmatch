@@ -43,7 +43,6 @@ export { LazyLocationPicker } from './LazyLocationPicker'; // Lazy-loaded versio
 export type { Location } from './LazyLocationPicker';
 export { SetPriceBottomSheet } from './SetPriceBottomSheet';
 export { ChooseCategoryBottomSheet } from './ChooseCategoryBottomSheet';
-export { DeleteMomentModal } from './DeleteMomentModal';
 export { LeaveTrustNoteBottomSheet } from './LeaveTrustNoteBottomSheet';
 export { FilterBottomSheet } from './FilterBottomSheet';
 export { UnblockUserBottomSheet } from './UnblockUserBottomSheet';
@@ -86,17 +85,6 @@ export {
   KeyboardAwareScrollView,
   FormInput,
 } from './FormComponents';
-
-// Payment Components
-export {
-  CardItem,
-  WalletItem,
-  CardOptionsModal,
-  WalletOptionsModal,
-  EditCardModal,
-  WalletSettingsModal,
-} from './payment';
-export type { SavedCard, Wallet, WalletSettings } from './payment';
 
 // Layout Components (TravelMatch: The Rebirth)
 export { FloatingDock } from './layout';

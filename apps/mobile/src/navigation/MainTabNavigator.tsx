@@ -5,8 +5,7 @@ import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 
 // Screens
-import { DiscoverScreen } from '@/features/trips';
-import { SearchMapScreen } from '@/features/discovery';
+import { DiscoverScreen, SearchMapScreen } from '@/features/discover';
 import { InboxScreen } from '@/features/inbox';
 import { ProfileScreen, CreateMomentScreen } from '@/features/profile';
 

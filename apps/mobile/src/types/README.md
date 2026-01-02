@@ -222,7 +222,6 @@ use `Database['public']['Tables']` instead:
 | `hooks/useMoments.ts` | `Moment` | MEDIUM |
 | `services/messageService.ts` | `Conversation`, `Message` | MEDIUM |
 | `features/discover/types/discover.types.ts` | `Profile`, `Message` | LOW |
-| `features/moments/types/moments.types.ts` | `Moment` | LOW |
 
 ### Type Extension Pattern
 

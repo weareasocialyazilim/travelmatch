@@ -51,7 +51,7 @@ import LinkInvalidScreen from '../screens/LinkInvalidScreen';
 import { ImageViewerScreen } from '../screens/ImageViewerScreen';
 
 // ===================================
-// TRIPS FEATURE SCREENS
+// DISCOVER FEATURE SCREENS
 // ===================================
 import {
   DiscoverScreen,
@@ -63,7 +63,9 @@ import {
   DisputeFlowScreen,
   RequestsScreen,
   TicketScreen,
-} from '../features/trips';
+  TripDetailsScreen,
+  MyTripsScreen,
+} from '../features/discover';
 
 // ===================================
 // MESSAGES FEATURE SCREENS
@@ -77,13 +79,14 @@ import {
 // ===================================
 // NEW FEATURE SCREENS
 // ===================================
-import { SearchMapScreen } from '../features/discovery';
-import { InboxScreen, ChatDetailScreen } from '../features/chat';
+import { SearchMapScreen } from '../features/discover';
+import { InboxScreen } from '../features/inbox';
 // WalletScreen is imported from payments feature, not wallet feature
 // import { WalletScreen as WalletFeatureScreen } from '../features/wallet';
 import { NotificationsScreen } from '../features/notifications';
-import { CheckoutScreen } from '../features/payment';
+import { CheckoutScreen } from '../features/payments';
 import { ReviewScreen } from '../features/reviews';
+import { ChatDetailScreen } from '../features/messages';
 
 // ===================================
 // PROFILE FEATURE SCREENS
@@ -669,6 +672,10 @@ const AppNavigator = () => {
 
             {/* Calendar */}
             <Stack.Screen name="MyCalendar" component={MyCalendarScreen} />
+
+            {/* Trips */}
+            <Stack.Screen name="TripDetails" component={TripDetailsScreen} />
+            <Stack.Screen name="MyTrips" component={MyTripsScreen} />
 
             {/* Image Viewer */}
             <Stack.Screen
