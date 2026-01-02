@@ -14,7 +14,7 @@ import { StatusBar } from 'expo-status-bar';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
-const { width } = Dimensions.get('window');
+const { width: _width } = Dimensions.get('window');
 
 type SplashScreenProps = StackScreenProps<RootStackParamList, 'Splash'>;
 

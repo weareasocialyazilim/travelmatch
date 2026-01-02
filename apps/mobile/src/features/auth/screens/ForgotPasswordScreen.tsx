@@ -35,7 +35,7 @@ export const ForgotPasswordScreen = () => {
       } else {
         Alert.alert('Error', result.error || 'Failed to send reset link. Please try again.');
       }
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);

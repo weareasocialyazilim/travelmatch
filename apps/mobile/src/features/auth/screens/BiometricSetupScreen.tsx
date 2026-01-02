@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useNavigation, CommonActions } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -36,7 +36,7 @@ export const BiometricSetupScreen = () => {
              colors={[COLORS.brand.primary, '#A2FF00']}
              style={styles.gradient}
           >
-            <MaterialCommunityIcons name="fingerprint" size={24} color="black" style={{ marginRight: 10 }} />
+            <MaterialCommunityIcons name="fingerprint" size={24} color="black" style={styles.fingerprintIcon} />
             <Text style={styles.btnText}>Enable Biometrics</Text>
           </LinearGradient>
         </TouchableOpacity>
@@ -59,6 +59,7 @@ const styles = StyleSheet.create({
   spacer: { flex: 1 },
   enableBtn: { width: '100%', borderRadius: 20, overflow: 'hidden', marginBottom: 20 },
   gradient: { paddingVertical: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
+  fingerprintIcon: { marginRight: 10 },
   btnText: { color: 'black', fontWeight: 'bold', fontSize: 16 },
   skipBtn: { padding: 12 },
   skipText: { color: '#666', fontWeight: '600' },
