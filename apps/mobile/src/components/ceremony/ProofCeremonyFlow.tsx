@@ -744,29 +744,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.backgroundPrimary,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-  },
-  progress: {
-    flexDirection: 'row',
-    gap: SPACING.xs,
-  },
-  progressDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: COLORS.borderDefault,
-  },
-  progressDotActive: {
-    backgroundColor: COLORS.primary,
-  },
-  progressDotCurrent: {
-    width: 24,
-  },
   content: {
     flex: 1,
   },
@@ -884,61 +861,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.textPrimary,
   },
-  captureContent: {
-    flex: 1,
-  },
-  cameraPreview: {
-    flex: 1,
-    backgroundColor: COLORS.surfaceMuted,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: SPACING.lg,
-  },
-  previewText: {
-    fontSize: 14,
-    color: COLORS.textMuted,
-    marginTop: SPACING.sm,
-  },
-  captureInfo: {
-    marginBottom: SPACING.md,
-  },
-  captureInfoTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.textPrimary,
-    marginBottom: SPACING.xxs,
-  },
-  captureInfoText: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    lineHeight: 20,
-  },
-  captureTips: {
-    gap: SPACING.xs,
-    marginBottom: SPACING.lg,
-  },
-  tipItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.xs,
-  },
-  tipText: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-  },
-  captureButton: {
-    alignSelf: 'center',
-    borderRadius: 40,
-    overflow: 'hidden',
-  },
-  captureButtonGradient: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
 
   // Celebration
   celebrationContainer: {
@@ -978,11 +900,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     gap: SPACING.sm,
     marginVertical: SPACING.lg,
-  },
-  transferText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: COLORS.success,
   },
   transferTextContainer: {
     flex: 1,

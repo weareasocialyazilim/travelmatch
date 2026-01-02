@@ -29,7 +29,7 @@ export const RefundRequestScreen = () => {
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}><Ionicons name="close" size={24} color="white" /></TouchableOpacity>
         <Text style={styles.headerTitle}>Request Refund</Text>
-        <View style={{ width: 24 }} />
+        <View style={styles.spacer} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
@@ -98,4 +98,5 @@ const styles = StyleSheet.create({
   submitBtn: { backgroundColor: COLORS.brand.primary, padding: 18, borderRadius: 16, alignItems: 'center' },
   disabledBtn: { backgroundColor: '#333' },
   submitText: { color: 'black', fontWeight: 'bold', fontSize: 16 },
+  spacer: { width: 24 },
 });

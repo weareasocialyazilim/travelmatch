@@ -118,7 +118,7 @@ const CheckoutScreen: React.FC = () => {
         title: 'Payment Successful',
         subtitle: `You sent ${formatCurrency(amount || 0)} to ${recipientName}`,
       });
-    } catch (_error) {
+    } catch {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       navigation.navigate('PaymentFailed', {
         error: 'Payment failed. Please try again.',

@@ -65,7 +65,7 @@ export const TransactionDetailScreen = () => {
 
           <View style={styles.row}>
             <Text style={styles.label}>Reference ID</Text>
-            <Text style={[styles.value, { fontFamily: 'monospace', fontSize: 12 }]}>#TM-8921-X92</Text>
+            <Text style={[styles.value, styles.monoValue]}>#TM-8921-X92</Text>
           </View>
         </View>
 
@@ -93,6 +93,7 @@ const styles = StyleSheet.create({
   divider: { height: 1, backgroundColor: 'rgba(255,255,255,0.1)', marginVertical: 12 },
   reportBtn: { marginTop: 40 },
   reportText: { color: '#666', fontSize: 14, fontWeight: '600' },
+  monoValue: { fontFamily: 'monospace', fontSize: 12 },
 });
 
 export default TransactionDetailScreen;

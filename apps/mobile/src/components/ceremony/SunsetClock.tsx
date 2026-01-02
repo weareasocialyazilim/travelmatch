@@ -274,7 +274,7 @@ export const SunsetClock: React.FC<SunsetClockProps> = ({
         <Animated.View
           style={[
             styles.sunContainer,
-            { top: isCompact ? 8 : 20 },
+            isCompact ? styles.sunContainerCompact : styles.sunContainerNormal,
             sunAnimatedStyle,
           ]}
         >
@@ -302,11 +302,10 @@ export const SunsetClock: React.FC<SunsetClockProps> = ({
                 width: sunSize,
                 height: sunSize,
                 borderRadius: sunSize / 2,
-                backgroundColor:
-                  phase === 'twilight' || phase === 'urgent'
-                    ? '#FF6B6B'
-                    : '#FCD34D',
               },
+              phase === 'twilight' || phase === 'urgent'
+                ? styles.sunUrgent
+                : styles.sunNormal,
             ]}
           />
         </Animated.View>
@@ -328,13 +327,10 @@ export const SunsetClock: React.FC<SunsetClockProps> = ({
       <View
         style={[
           styles.ground,
-          {
-            height: isCompact ? 20 : 40,
-            backgroundColor:
-              phase === 'twilight' || phase === 'expired'
-                ? '#1E1B4B'
-                : '#0EA5E9',
-          },
+          isCompact ? styles.groundCompact : styles.groundNormal,
+          phase === 'twilight' || phase === 'expired'
+            ? styles.groundNight
+            : styles.groundDay,
         ]}
       >
         {/* Wave effect */}
@@ -466,7 +462,8 @@ const WaveEffect: React.FC<{ phase: SunsetPhase; isCompact: boolean }> = ({
       <View
         style={[
           styles.waveLine,
-          { backgroundColor: waveColor, height: isCompact ? 2 : 3 },
+          { backgroundColor: waveColor },
+          isCompact ? styles.waveLineCompact : styles.waveLineNormal,
         ]}
       />
     </Animated.View>
@@ -489,6 +486,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  sunContainerCompact: {
+    top: 8,
+  },
+  sunContainerNormal: {
+    top: 20,
+  },
   sunGlow: {
     position: 'absolute',
   },
@@ -498,6 +501,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 20,
     elevation: 10,
+  },
+  sunNormal: {
+    backgroundColor: '#FCD34D',
+  },
+  sunUrgent: {
+    backgroundColor: '#FF6B6B',
   },
   starsContainer: {
     ...StyleSheet.absoluteFillObject,
@@ -513,6 +522,18 @@ const styles = StyleSheet.create({
   ground: {
     overflow: 'hidden',
   },
+  groundCompact: {
+    height: 20,
+  },
+  groundNormal: {
+    height: 40,
+  },
+  groundDay: {
+    backgroundColor: '#0EA5E9',
+  },
+  groundNight: {
+    backgroundColor: '#1E1B4B',
+  },
   wave: {
     position: 'absolute',
     top: 4,
@@ -522,6 +543,12 @@ const styles = StyleSheet.create({
   waveLine: {
     width: '200%',
     borderRadius: 2,
+  },
+  waveLineCompact: {
+    height: 2,
+  },
+  waveLineNormal: {
+    height: 3,
   },
   timeContainer: {
     position: 'absolute',
