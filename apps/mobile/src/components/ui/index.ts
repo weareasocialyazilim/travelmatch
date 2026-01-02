@@ -78,6 +78,9 @@ export {
 } from './TrustScoreCircle';
 export type { TrustScoreCircleProps, TrustFactor } from './TrustScoreCircle';
 
+// TrustConstellation - SVG trust network visualization
+export { TrustConstellation } from './TrustConstellation';
+
 // ═══════════════════════════════════════════════════════════════════
 // Performance Optimized Components
 // ═══════════════════════════════════════════════════════════════════
