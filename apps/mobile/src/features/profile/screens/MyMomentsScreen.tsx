@@ -130,7 +130,7 @@ const MyMomentsScreen: React.FC = () => {
   };
 
   const handleCreateMoment = () => {
-    navigation.navigate('CreateMoment' as never);
+    navigation.navigate('CreateMoment');
   };
 
   return (

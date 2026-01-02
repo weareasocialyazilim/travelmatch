@@ -13,7 +13,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation } from '@/hooks/useNavigationHelpers';
 import type { RootStackParamList } from '@/navigation/types';
 import { COLORS } from '../constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
@@ -28,7 +29,7 @@ const LinkNotFoundScreen: React.FC = () => {
   const handleGoHome = () => {
     navigation.reset({
       index: 0,
-      routes: [{ name: 'Discover' as never }],
+      routes: [{ name: 'Discover' }],
     });
   };
 
