@@ -5,8 +5,11 @@
  * Integrates with existing message and realtime services.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRealtime, useRealtimeEvent } from '@/context/RealtimeContext';
+import { messageService } from '@/services/messageService';
+import { supabase } from '@/config/supabase';
+import { logger } from '@/utils/logger';
 import type { InboxChat, InboxTab } from '../types/inbox.types';
 
 interface UseInboxOptions {
@@ -53,32 +56,87 @@ export const useInbox = (options: UseInboxOptions = {}): UseInboxReturn => {
   // Track typing users
   const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set());
 
+  // Ref to track component mount state
+  const isMountedRef = useRef(true);
+
   // Fetch inbox data
   const fetchInbox = useCallback(async () => {
     try {
       setError(null);
 
-      // TODO: Replace with actual API calls
-      // const [chatsResponse, requestsResponse] = await Promise.all([
-      //   inboxApi.getActiveChats(),
-      //   inboxApi.getRequests(),
-      // ]);
-      // setChats(chatsResponse);
-      // setRequests(requestsResponse);
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        if (isMountedRef.current) {
+          setIsLoading(false);
+          setIsRefreshing(false);
+        }
+        return;
+      }
 
-      // Simulating API delay for now
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      // Fetch conversations from messageService
+      const { conversations } = await messageService.getConversations();
+
+      if (!isMountedRef.current) return;
+
+      // Transform conversations to InboxChat format
+      // Active chats = conversations with matched/paid/completed status
+      // Requests = conversations with offer_received/offer_sent status
+      const activeChats: InboxChat[] = [];
+      const requestChats: InboxChat[] = [];
+
+      for (const conv of conversations) {
+        const inboxChat: InboxChat = {
+          id: conv.id,
+          user: {
+            id: conv.participantId,
+            name: conv.participantName || 'Unknown',
+            avatar: conv.participantAvatar || '',
+            isVerified: conv.participantVerified || false,
+            isOnline: false, // Will be updated by realtime
+          },
+          moment: conv.momentId ? {
+            id: conv.momentId,
+            title: conv.momentTitle || '',
+            image: '',
+            emoji: '✨',
+          } : undefined,
+          lastMessage: conv.lastMessage,
+          lastMessageAt: conv.lastMessageAt || new Date().toISOString(),
+          status: 'matched', // Default status, should come from API
+          unreadCount: conv.unreadCount,
+        };
+
+        // For now, put all in active chats
+        // In a real app, you'd check the conversation status
+        activeChats.push(inboxChat);
+      }
+
+      if (isMountedRef.current) {
+        setChats(activeChats);
+        setRequests(requestChats);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load inbox');
+      logger.error('Failed to fetch inbox:', err);
+      if (isMountedRef.current) {
+        setError(err instanceof Error ? err.message : 'Failed to load inbox');
+      }
     } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
+      if (isMountedRef.current) {
+        setIsLoading(false);
+        setIsRefreshing(false);
+      }
     }
   }, []);
 
-  // Initial fetch
+  // Initial fetch with cleanup
   useEffect(() => {
+    isMountedRef.current = true;
     fetchInbox();
+
+    return () => {
+      isMountedRef.current = false;
+    };
   }, [fetchInbox]);
 
   // Refresh inbox
@@ -115,6 +173,9 @@ export const useInbox = (options: UseInboxOptions = {}): UseInboxReturn => {
     [refreshInbox],
   );
 
+  // Track active typing timeouts for cleanup
+  const typingTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+
   // Listen for typing indicators
   useRealtimeEvent<{
     conversationId: string;
@@ -125,15 +186,34 @@ export const useInbox = (options: UseInboxOptions = {}): UseInboxReturn => {
     (data) => {
       if (data.isTyping) {
         setTypingUsers((prev) => new Set([...prev, data.conversationId]));
+
+        // Clear existing timeout for this conversation
+        const existingTimeout = typingTimeoutsRef.current.get(data.conversationId);
+        if (existingTimeout) {
+          clearTimeout(existingTimeout);
+        }
+
         // Auto-remove after 5 seconds
-        setTimeout(() => {
-          setTypingUsers((prev) => {
-            const next = new Set(prev);
-            next.delete(data.conversationId);
-            return next;
-          });
+        const timeout = setTimeout(() => {
+          if (isMountedRef.current) {
+            setTypingUsers((prev) => {
+              const next = new Set(prev);
+              next.delete(data.conversationId);
+              return next;
+            });
+          }
+          typingTimeoutsRef.current.delete(data.conversationId);
         }, 5000);
+
+        typingTimeoutsRef.current.set(data.conversationId, timeout);
       } else {
+        // Clear timeout if user stopped typing
+        const existingTimeout = typingTimeoutsRef.current.get(data.conversationId);
+        if (existingTimeout) {
+          clearTimeout(existingTimeout);
+          typingTimeoutsRef.current.delete(data.conversationId);
+        }
+
         setTypingUsers((prev) => {
           const next = new Set(prev);
           next.delete(data.conversationId);
@@ -143,6 +223,14 @@ export const useInbox = (options: UseInboxOptions = {}): UseInboxReturn => {
     },
     [],
   );
+
+  // Cleanup typing timeouts on unmount
+  useEffect(() => {
+    return () => {
+      typingTimeoutsRef.current.forEach((timeout) => clearTimeout(timeout));
+      typingTimeoutsRef.current.clear();
+    };
+  }, []);
 
   // Update chats with typing status
   const chatsWithTyping = chats.map((chat) => ({

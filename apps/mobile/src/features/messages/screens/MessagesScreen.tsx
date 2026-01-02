@@ -21,6 +21,7 @@ import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { useRealtime, useRealtimeEvent } from '@/context/RealtimeContext';
 import { useMessages } from '@/hooks/useMessages';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { MessageEvent } from '@/context/RealtimeContext';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { Conversation } from '@/services/messageService';
@@ -47,6 +48,7 @@ const formatTimeAgo = (dateString: string): string => {
 
 const MessagesScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
 
   // Use messages hook
@@ -80,6 +82,9 @@ const MessagesScreen: React.FC = () => {
     [refreshConversations],
   );
 
+  // Track typing timeouts for cleanup
+  const typingTimeoutsRef = React.useRef<Map<string, NodeJS.Timeout>>(new Map());
+
   // Listen for typing indicators
   useRealtimeEvent<{
     conversationId: string;
@@ -92,15 +97,32 @@ const MessagesScreen: React.FC = () => {
         setTypingConversations(
           (prev) => new Set([...prev, data.conversationId]),
         );
-        // Auto-remove after 5 seconds
-        setTimeout(() => {
+
+        // Clear existing timeout for this conversation
+        const existingTimeout = typingTimeoutsRef.current.get(data.conversationId);
+        if (existingTimeout) {
+          clearTimeout(existingTimeout);
+        }
+
+        // Auto-remove after 5 seconds with cleanup
+        const timeout = setTimeout(() => {
           setTypingConversations((prev) => {
             const next = new Set(prev);
             next.delete(data.conversationId);
             return next;
           });
+          typingTimeoutsRef.current.delete(data.conversationId);
         }, 5000);
+
+        typingTimeoutsRef.current.set(data.conversationId, timeout);
       } else {
+        // Clear timeout when user stops typing
+        const existingTimeout = typingTimeoutsRef.current.get(data.conversationId);
+        if (existingTimeout) {
+          clearTimeout(existingTimeout);
+          typingTimeoutsRef.current.delete(data.conversationId);
+        }
+
         setTypingConversations((prev) => {
           const next = new Set(prev);
           next.delete(data.conversationId);
@@ -110,6 +132,14 @@ const MessagesScreen: React.FC = () => {
     },
     [],
   );
+
+  // Cleanup typing timeouts on unmount
+  useEffect(() => {
+    return () => {
+      typingTimeoutsRef.current.forEach((timeout) => clearTimeout(timeout));
+      typingTimeoutsRef.current.clear();
+    };
+  }, []);
 
   const totalUnreadCount = useMemo(
     () => conversations.reduce((sum, c) => sum + (c.unreadCount || 0), 0),
@@ -242,14 +272,14 @@ const MessagesScreen: React.FC = () => {
     () => (
       <EmptyState
         icon="chat-outline"
-        title="No Messages Yet"
-        description="When you connect with travelers or hosts, your conversations will appear here."
-        actionLabel="Discover Moments"
+        title={t('messages.empty.title')}
+        description={t('messages.empty.description')}
+        actionLabel={t('navigation.discover')}
         onAction={() => navigation.navigate('Discover')}
         style={styles.emptyStateContainer}
       />
     ),
-    [navigation]
+    [navigation, t]
   );
 
   // Loading state - show skeleton
@@ -265,7 +295,7 @@ const MessagesScreen: React.FC = () => {
             />
             <TextInput
               style={styles.searchInput}
-              placeholder="Search conversations..."
+              placeholder={t('messages.search.placeholder')}
               placeholderTextColor={COLORS.text.secondary}
               editable={false}
             />
@@ -316,10 +346,11 @@ const MessagesScreen: React.FC = () => {
             />
             <TextInput
               style={styles.searchInput}
-              placeholder="Search conversations..."
+              placeholder={t('messages.search.placeholder')}
               placeholderTextColor={COLORS.text.secondary}
               value={searchQuery}
               onChangeText={setSearchQuery}
+              accessibilityLabel={t('messages.search.placeholder')}
             />
             {searchQuery.length > 0 && (
               <TouchableOpacity onPress={() => setSearchQuery('')}>
