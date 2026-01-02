@@ -71,6 +71,7 @@
     "@supabase/supabase-js": "^2.88.0",
     "@typescript-eslint/eslint-plugin": "^8.50.0",
     "@typescript-eslint/parser": "^8.50.0",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",

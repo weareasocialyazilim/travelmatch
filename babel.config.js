@@ -1,5 +1,8 @@
 module.exports = function (api) {
   api.cache(true);
+  
+  const isProduction = process.env.NODE_ENV === 'production';
+  
   return {
     presets: ['babel-preset-expo'],
     plugins: [
@@ -27,6 +30,8 @@ module.exports = function (api) {
           },
         },
       ],
+      // Remove console.* calls in production builds
+      ...(isProduction ? ['transform-remove-console'] : []),
       // Reanimated MUST be last
       'react-native-reanimated/plugin',
     ],
