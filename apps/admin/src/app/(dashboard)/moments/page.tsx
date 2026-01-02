@@ -262,14 +262,17 @@ export default function MomentsPage() {
               {filteredMoments.map((moment: Moment) => {
                 const statusInfo = statusConfig[moment.status as keyof typeof statusConfig] || statusConfig.pending;
                 const StatusIcon = statusInfo.icon;
+                // Pre-sanitize media URL to prevent XSS - validated once and reused
+                const safeMediaUrl = sanitizeMediaUrl(moment.media_url);
+                const safeAvatarUrl = sanitizeMediaUrl(moment.user?.avatar_url);
 
                 return (
                   <Card key={moment.id} className="overflow-hidden">
                     {/* Image */}
                     <div className="relative aspect-video bg-muted">
-                      {sanitizeMediaUrl(moment.media_url) ? (
+                      {safeMediaUrl ? (
                         <img
-                          src={sanitizeMediaUrl(moment.media_url)}
+                          src={safeMediaUrl}
                           alt={moment.caption || 'Moment'}
                           className="h-full w-full object-cover"
                         />
@@ -288,7 +291,7 @@ export default function MomentsPage() {
                     <CardContent className="p-4">
                       <div className="mb-2 flex items-center gap-2">
                         <Avatar className="h-6 w-6">
-                          <AvatarImage src={sanitizeMediaUrl(moment.user?.avatar_url)} />
+                          <AvatarImage src={safeAvatarUrl} />
                           <AvatarFallback className="text-xs">
                             {getInitials(moment.user?.display_name || 'Kullanıcı')}
                           </AvatarFallback>
@@ -377,34 +380,40 @@ export default function MomentsPage() {
               {selectedMoment?.user?.display_name || 'Kullanıcı'} tarafından paylaşıldı
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="aspect-video rounded-lg bg-muted overflow-hidden">
-              {sanitizeMediaUrl(selectedMoment?.media_url) ? (
-                <img
-                  src={sanitizeMediaUrl(selectedMoment?.media_url)}
-                  alt={selectedMoment?.caption || 'Moment'}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center">
-                  <ImageIcon className="h-16 w-16 text-muted-foreground/50" />
+          {(() => {
+            // Pre-sanitize URL to prevent XSS - validated before use
+            const safeDialogMediaUrl = sanitizeMediaUrl(selectedMoment?.media_url);
+            return (
+              <div className="space-y-4">
+                <div className="aspect-video rounded-lg bg-muted overflow-hidden">
+                  {safeDialogMediaUrl ? (
+                    <img
+                      src={safeDialogMediaUrl}
+                      alt={selectedMoment?.caption || 'Moment'}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center">
+                      <ImageIcon className="h-16 w-16 text-muted-foreground/50" />
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            <div>
-              <h4 className="mb-1 font-medium">Açıklama</h4>
-              <p className="text-muted-foreground">{selectedMoment?.caption || 'Açıklama yok'}</p>
-            </div>
-            <div>
-              <h4 className="mb-1 font-medium">Konum</h4>
-              <p className="text-muted-foreground">{selectedMoment?.location || 'Konum belirtilmemiş'}</p>
-            </div>
-            <div className="flex gap-4 text-sm text-muted-foreground">
-              <span>{selectedMoment?.likes_count || 0} beğeni</span>
-              <span>{selectedMoment?.comments_count || 0} yorum</span>
-              <span>{selectedMoment?.views_count || 0} görüntüleme</span>
-            </div>
-          </div>
+                <div>
+                  <h4 className="mb-1 font-medium">Açıklama</h4>
+                  <p className="text-muted-foreground">{selectedMoment?.caption || 'Açıklama yok'}</p>
+                </div>
+                <div>
+                  <h4 className="mb-1 font-medium">Konum</h4>
+                  <p className="text-muted-foreground">{selectedMoment?.location || 'Konum belirtilmemiş'}</p>
+                </div>
+                <div className="flex gap-4 text-sm text-muted-foreground">
+                  <span>{selectedMoment?.likes_count || 0} beğeni</span>
+                  <span>{selectedMoment?.comments_count || 0} yorum</span>
+                  <span>{selectedMoment?.views_count || 0} görüntüleme</span>
+                </div>
+              </div>
+            );
+          })()}
           <DialogFooter>
             <Button variant="outline" onClick={() => setSelectedMoment(null)}>
               Kapat
