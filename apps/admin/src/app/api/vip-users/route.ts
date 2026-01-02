@@ -12,6 +12,14 @@ import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission } from '@/lib/auth';
 import { escapeSupabaseFilter } from '@/lib/security';
 
+interface VIPUserWithDetails {
+  user?: {
+    display_name?: string;
+    full_name?: string;
+    email?: string;
+  };
+}
+
 // =============================================================================
 // GET - List VIP Users
 // =============================================================================
@@ -76,7 +84,7 @@ export async function GET(request: NextRequest) {
       const safeSearch = escapeSupabaseFilter(search)?.toLowerCase();
       if (safeSearch) {
         filteredUsers = filteredUsers.filter(
-          (u) =>
+          (u: VIPUserWithDetails) =>
             u.user?.display_name?.toLowerCase().includes(safeSearch) ||
             u.user?.full_name?.toLowerCase().includes(safeSearch) ||
             u.user?.email?.toLowerCase().includes(safeSearch)
@@ -184,7 +192,7 @@ export async function POST(request: NextRequest) {
       p_giver_pays_commission: giverPaysCommission || false,
       p_valid_until: validUntil || null,
       p_reason: reason || null,
-      p_granted_by: session.user.id,
+      p_granted_by: session.admin.id,
     });
 
     if (error) {

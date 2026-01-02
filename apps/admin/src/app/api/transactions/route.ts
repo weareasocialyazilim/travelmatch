@@ -4,6 +4,12 @@ import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission } from '@/lib/auth';
 import { escapeSupabaseFilter } from '@/lib/security';
 
+interface Transaction {
+  amount?: number;
+  status?: string;
+  type?: string;
+}
+
 export async function GET(request: NextRequest) {
   try {
     const session = await getAdminSession();
