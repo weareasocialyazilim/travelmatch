@@ -9,7 +9,7 @@
 import {
   assertEquals,
   assertExists,
-} from 'https://deno.land/std@0.168.0/testing/asserts.ts';
+} from 'std/testing/asserts.ts';
 
 // Mock environment variables
 const mockEnv = {

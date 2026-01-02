@@ -1,6 +1,6 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { z } from 'https://deno.land/x/zod@v3.21.4/mod.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { serve } from 'std/http/server.ts';
+import { z } from 'zod';
+import { createClient } from '@supabase/supabase-js';
 import { createRateLimiter, RateLimitPresets } from '../_shared/rateLimit.ts';
 import { Logger } from '../_shared/logger.ts';
 
@@ -26,7 +26,7 @@ const kycLimiter = createRateLimiter(RateLimitPresets.auth);
 // Job Queue API URL (from environment)
 const JOB_QUEUE_URL = Deno.env.get('JOB_QUEUE_URL') || 'http://localhost:3002';
 
-serve(async (req) => {
+serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -187,7 +187,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error.message,
+        message: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,
