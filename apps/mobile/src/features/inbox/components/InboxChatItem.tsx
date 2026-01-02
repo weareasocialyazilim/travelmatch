@@ -7,10 +7,23 @@
  * - Right: Time and status badge
  *
  * "Context is King" - Every chat shows the connected Moment.
+ *
+ * Also includes AwwwardsInboxChatItem variant:
+ * - Minimalist hierarchy design
+ * - Neon notification glow effect
+ * - TYPOGRAPHY_SYSTEM integration
+ * - Premium "Soft Glass" aesthetic
  */
 
 import React, { memo, useCallback } from 'react';
-import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, {
@@ -27,6 +40,8 @@ import {
   INBOX_SPACING,
   INBOX_SPRINGS,
 } from '../constants/theme';
+import { COLORS } from '../../../constants/colors';
+import { TYPOGRAPHY_SYSTEM } from '../../../constants/typography';
 import StatusBadge from './StatusBadge';
 import type { InboxChat } from '../types/inbox.types';
 
@@ -340,5 +355,226 @@ const styles = StyleSheet.create({
 });
 
 InboxChatItem.displayName = 'InboxChatItem';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// AwwwardsInboxChatItem - Minimalist Design Variant
+// "Soft Glass" aesthetic with neon notification glow
+// ═══════════════════════════════════════════════════════════════════════════
+
+interface AwwwardsInboxChatItemProps {
+  chat: {
+    id: string;
+    name: string;
+    avatar: string;
+    lastMessage: string;
+    time: string;
+    unread: number;
+    isOnline?: boolean;
+    isVerified?: boolean;
+  };
+  onPress: () => void;
+}
+
+/**
+ * Awwwards-style Inbox Chat Item
+ *
+ * Minimalist hierarchy with:
+ * - Neon glow for unread notifications
+ * - Premium typography from TYPOGRAPHY_SYSTEM
+ * - "Soft Glass" card aesthetic
+ * - Haptic feedback on press
+ */
+export const AwwwardsInboxChatItem: React.FC<AwwwardsInboxChatItemProps> = memo(
+  ({ chat, onPress }) => {
+    const handlePress = useCallback(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      onPress();
+    }, [onPress]);
+
+    const hasUnread = chat.unread > 0;
+
+    return (
+      <TouchableOpacity
+        style={awwwardsStyles.container}
+        onPress={handlePress}
+        activeOpacity={0.7}
+        accessibilityRole="button"
+        accessibilityLabel={`Chat with ${chat.name}`}
+      >
+        {/* Avatar with Neon Glow */}
+        <View style={awwwardsStyles.avatarContainer}>
+          <Image source={{ uri: chat.avatar }} style={awwwardsStyles.avatar} />
+          {hasUnread && <View style={awwwardsStyles.onlineGlow} />}
+          {chat.isOnline && <View style={awwwardsStyles.onlineDot} />}
+        </View>
+
+        {/* Content */}
+        <View style={awwwardsStyles.content}>
+          {/* Name Row */}
+          <View style={awwwardsStyles.nameRow}>
+            <Text style={awwwardsStyles.name} numberOfLines={1}>
+              {chat.name}
+            </Text>
+            {chat.isVerified && (
+              <MaterialCommunityIcons
+                name="check-decagram"
+                size={14}
+                color={COLORS.brand.primary}
+              />
+            )}
+            <Text style={awwwardsStyles.time}>{chat.time}</Text>
+          </View>
+
+          {/* Last Message Row */}
+          <View style={awwwardsStyles.messageRow}>
+            <Text
+              style={[
+                awwwardsStyles.lastMessage,
+                hasUnread && awwwardsStyles.lastMessageUnread,
+              ]}
+              numberOfLines={1}
+            >
+              {chat.lastMessage}
+            </Text>
+            {hasUnread && (
+              <View style={awwwardsStyles.unreadBadge}>
+                <Text style={awwwardsStyles.unreadText}>
+                  {chat.unread > 99 ? '99+' : chat.unread}
+                </Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  },
+);
+
+AwwwardsInboxChatItem.displayName = 'AwwwardsInboxChatItem';
+
+const awwwardsStyles = StyleSheet.create({
+  // Container - Soft Glass card
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.surface.base,
+    borderRadius: 16,
+    padding: 12,
+    marginHorizontal: 20,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: COLORS.border.default,
+  },
+
+  // Avatar with neon glow container
+  avatarContainer: {
+    position: 'relative',
+    marginRight: 12,
+  },
+  avatar: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: COLORS.bg.secondary,
+  },
+
+  // Neon glow effect for unread
+  onlineGlow: {
+    position: 'absolute',
+    top: -3,
+    left: -3,
+    right: -3,
+    bottom: -3,
+    borderRadius: 30,
+    borderWidth: 2,
+    borderColor: COLORS.brand.primary,
+    // Glow effect via shadow
+    shadowColor: COLORS.brand.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+
+  // Online status dot
+  onlineDot: {
+    position: 'absolute',
+    bottom: 2,
+    right: 2,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: COLORS.success,
+    borderWidth: 2,
+    borderColor: COLORS.surface.base,
+  },
+
+  // Content area
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+
+  // Name row with time
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
+  },
+  name: {
+    flex: 1,
+    fontSize: TYPOGRAPHY_SYSTEM.sizes.bodyM,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.heading,
+    fontWeight: '600',
+    color: COLORS.text.primary,
+    letterSpacing: TYPOGRAPHY_SYSTEM.letterSpacing.tight,
+  },
+  time: {
+    fontSize: TYPOGRAPHY_SYSTEM.sizes.caption,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.body,
+    color: COLORS.text.tertiary,
+  },
+
+  // Message row with badge
+  messageRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  lastMessage: {
+    flex: 1,
+    fontSize: TYPOGRAPHY_SYSTEM.sizes.bodyS,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.body,
+    color: COLORS.text.secondary,
+    lineHeight: TYPOGRAPHY_SYSTEM.sizes.bodyS * TYPOGRAPHY_SYSTEM.lineHeights.normal,
+  },
+  lastMessageUnread: {
+    color: COLORS.text.primary,
+    fontWeight: '500',
+  },
+
+  // Unread badge - Neon magenta
+  unreadBadge: {
+    minWidth: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: COLORS.brand.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 6,
+    // Neon glow
+    shadowColor: COLORS.brand.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  unreadText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+});
 
 export default InboxChatItem;
