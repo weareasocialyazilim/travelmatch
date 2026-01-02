@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,12 +9,15 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NavigationProp } from '@react-navigation/native';
 import { COLORS } from '@/constants/colors';
+import { supabase } from '@/config/supabase';
+import { logger } from '@/utils/logger';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
 interface Comment {
@@ -27,27 +30,6 @@ interface Comment {
   isHost?: boolean;
 }
 
-// Mock data - replace with API data
-const MOCK_COMMENTS: Comment[] = [
-  {
-    id: '1',
-    user: 'Marc B.',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=100',
-    text: 'Is there a dress code?',
-    time: '2m',
-    likes: 4,
-  },
-  {
-    id: '2',
-    user: 'Selin Y.',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100',
-    text: 'Yes, smart casual! 👔',
-    time: '1m',
-    likes: 12,
-    isHost: true,
-  },
-];
-
 type MomentCommentsRouteProp = RouteProp<RootStackParamList, 'MomentComments'>;
 
 export const MomentCommentsScreen: React.FC = () => {
@@ -55,27 +37,155 @@ export const MomentCommentsScreen: React.FC = () => {
   const route = useRoute<MomentCommentsRouteProp>();
   const insets = useSafeAreaInsets();
   const [text, setText] = useState('');
-  const [comments, setComments] = useState<Comment[]>(MOCK_COMMENTS);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const { momentId: _momentId, commentCount = comments.length } = route.params || {};
+  const { momentId, commentCount: initialCount = 0 } = route.params || {};
 
-  const handleSend = () => {
-    if (!text.trim()) return;
+  // Fetch comments from API
+  const fetchComments = useCallback(async () => {
+    if (!momentId) {
+      setLoading(false);
+      return;
+    }
 
-    const newComment: Comment = {
-      id: Date.now().toString(),
-      user: 'You',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100',
-      text: text.trim(),
-      time: 'now',
-      likes: 0,
+    try {
+      const { data, error } = await supabase
+        .from('moment_comments')
+        .select(`
+          id,
+          content,
+          created_at,
+          likes_count,
+          user:users!user_id (
+            id,
+            full_name,
+            avatar_url
+          ),
+          moment:moments!moment_id (
+            host_id
+          )
+        `)
+        .eq('moment_id', momentId)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        logger.error('Failed to fetch comments:', error);
+        return;
+      }
+
+      // Get current user to check if they're the host
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+
+      // Transform data to Comment format
+      const transformedComments: Comment[] = (data || []).map((item) => {
+        const user = item.user as { id: string; full_name: string; avatar_url: string } | null;
+        const moment = item.moment as { host_id: string } | null;
+        const createdAt = new Date(item.created_at);
+        const now = new Date();
+        const diffMs = now.getTime() - createdAt.getTime();
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+        const diffDays = Math.floor(diffHours / 24);
+
+        let timeStr = 'now';
+        if (diffDays > 0) timeStr = `${diffDays}d`;
+        else if (diffHours > 0) timeStr = `${diffHours}h`;
+        else if (diffMins > 0) timeStr = `${diffMins}m`;
+
+        return {
+          id: item.id,
+          user: user?.full_name || 'Unknown',
+          avatar: user?.avatar_url || '',
+          text: item.content,
+          time: timeStr,
+          likes: item.likes_count || 0,
+          isHost: user?.id === moment?.host_id,
+        };
+      });
+
+      setComments(transformedComments);
+    } catch (error) {
+      logger.error('Error fetching comments:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [momentId]);
+
+  // Initial fetch
+  useEffect(() => {
+    let isMounted = true;
+
+    const load = async () => {
+      if (isMounted) {
+        await fetchComments();
+      }
     };
 
-    setComments((prev) => [...prev, newComment]);
-    setText('');
+    load();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [fetchComments]);
+
+  const commentCount = comments.length || initialCount;
+
+  const handleSend = async () => {
+    if (!text.trim() || !momentId) return;
+
+    const content = text.trim();
+    setText(''); // Clear input immediately for better UX
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        logger.warn('User not authenticated');
+        return;
+      }
+
+      // Optimistic update
+      const tempComment: Comment = {
+        id: `temp-${Date.now()}`,
+        user: 'You',
+        avatar: user.user_metadata?.avatar_url || '',
+        text: content,
+        time: 'now',
+        likes: 0,
+      };
+      setComments((prev) => [...prev, tempComment]);
+
+      // Post to API
+      const { data, error } = await supabase
+        .from('moment_comments')
+        .insert({
+          moment_id: momentId,
+          user_id: user.id,
+          content,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        logger.error('Failed to post comment:', error);
+        // Revert optimistic update
+        setComments((prev) => prev.filter((c) => c.id !== tempComment.id));
+        return;
+      }
+
+      // Update temp comment with real ID
+      setComments((prev) =>
+        prev.map((c) =>
+          c.id === tempComment.id ? { ...c, id: data.id } : c
+        )
+      );
+    } catch (error) {
+      logger.error('Error posting comment:', error);
+    }
   };
 
-  const handleLike = (commentId: string) => {
+  const handleLike = async (commentId: string) => {
+    // Optimistic update
     setComments((prev) =>
       prev.map((comment) =>
         comment.id === commentId
@@ -83,6 +193,27 @@ export const MomentCommentsScreen: React.FC = () => {
           : comment
       )
     );
+
+    try {
+      // Call API to record the like
+      const { error } = await supabase.rpc('increment_comment_likes', {
+        comment_id: commentId,
+      });
+
+      if (error) {
+        // Revert on error
+        logger.error('Failed to like comment:', error);
+        setComments((prev) =>
+          prev.map((comment) =>
+            comment.id === commentId
+              ? { ...comment, likes: comment.likes - 1 }
+              : comment
+          )
+        );
+      }
+    } catch (error) {
+      logger.error('Error liking comment:', error);
+    }
   };
 
   const renderComment = ({ item }: { item: Comment }) => (
@@ -122,13 +253,24 @@ export const MomentCommentsScreen: React.FC = () => {
         <View style={styles.headerSpacer} />
       </View>
 
-      <FlatList
-        data={comments}
-        renderItem={renderComment}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
-        showsVerticalScrollIndicator={false}
-      />
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.brand.primary} />
+        </View>
+      ) : (
+        <FlatList
+          data={comments}
+          renderItem={renderComment}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No comments yet. Be the first!</Text>
+            </View>
+          }
+        />
+      )}
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -185,6 +327,22 @@ const styles = StyleSheet.create({
   },
   list: {
     padding: 20,
+    flexGrow: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  emptyText: {
+    color: '#888',
+    fontSize: 15,
   },
   commentRow: {
     flexDirection: 'row',

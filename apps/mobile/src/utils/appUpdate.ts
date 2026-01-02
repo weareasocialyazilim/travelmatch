@@ -28,10 +28,62 @@ interface VersionConfig {
   forceUpdate: boolean; // Emergency flag to force update from backend
 }
 
-/** Mock remote config - replace with actual API call in production */
-const MOCK_REMOTE_CONFIG: VersionConfig = {
+/**
+ * Fetch remote version config from Supabase Edge Function
+ * Falls back to default config if API is not available
+ */
+async function fetchRemoteVersionConfig(): Promise<VersionConfig | null> {
+  try {
+    const { SUPABASE_EDGE_URL, isSupabaseConfigured } = await import(
+      '../config/supabase'
+    );
+
+    if (!isSupabaseConfigured()) {
+      logger.debug('Version config: Supabase not configured');
+      return null;
+    }
+
+    const response = await fetch(
+      `${SUPABASE_EDGE_URL}/functions/v1/app-version-config`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Platform': Platform.OS,
+          'X-App-Version': getCurrentVersion(),
+        },
+      },
+    );
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        logger.debug('Version config endpoint not deployed yet');
+      } else {
+        logger.warn(`Version config returned status ${response.status}`);
+      }
+      return null;
+    }
+
+    const data = await response.json();
+    return {
+      minSupportedVersion: data.minSupportedVersion || '1.0.0',
+      currentVersion: data.currentVersion || '1.0.0',
+      storeUrl: data.storeUrl || {
+        ios: getStoreUrl(),
+        android: getStoreUrl(),
+      },
+      forceUpdate: data.forceUpdate || false,
+    };
+  } catch (error) {
+    logger.debug('Version config fetch failed:', error);
+    return null;
+  }
+}
+
+/** Default version config - used when API is not available */
+const DEFAULT_VERSION_CONFIG: VersionConfig = {
   minSupportedVersion: '1.0.0',
-  currentVersion: '1.1.0',
+  currentVersion: '1.0.0',
   storeUrl: {
     ios: 'https://apps.apple.com/app/id...',
     android: 'https://play.google.com/store/apps/details?id=...',
@@ -106,9 +158,9 @@ export async function checkAppVersion(): Promise<VersionCheckResult> {
   try {
     const installedVersion = Constants.expoConfig?.version || '1.0.0';
 
-    // In production, replace with actual API call:
-    // const config = await api.get('/system/version-check');
-    const config = MOCK_REMOTE_CONFIG;
+    // Fetch remote config from API, fallback to defaults if unavailable
+    const remoteConfig = await fetchRemoteVersionConfig();
+    const config = remoteConfig || DEFAULT_VERSION_CONFIG;
 
     // Backend emergency force update flag
     if (config.forceUpdate) return 'FORCE';
