@@ -185,13 +185,14 @@ export const FloatingDock = memo(() => {
 
   const handleTabPress = useCallback(
     (screen: keyof RootStackParamList) => {
-      navigation.navigate(screen as never);
+      // Type-safe navigation for screens without required params
+      (navigation.navigate as (screen: string) => void)(screen);
     },
     [navigation],
   );
 
   const handleCreatePress = useCallback(() => {
-    navigation.navigate('CreateMoment' as never);
+    navigation.navigate('CreateMoment');
   }, [navigation]);
 
   return (
