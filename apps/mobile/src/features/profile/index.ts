@@ -28,7 +28,7 @@ export { EditMomentScreen } from './screens/EditMomentScreen';
 export { default as MomentDetailScreen } from './screens/MomentDetailScreen';
 export { MomentGalleryScreen } from './screens/MomentGalleryScreen';
 export { ShareMomentScreen } from './screens/ShareMomentScreen';
-export { ReportMomentScreen } from './screens/ReportMomentScreen';
+// ReportMomentScreen moved to @/features/moderation
 export { SavedMomentsScreen } from './screens/SavedMomentsScreen';
 export { DeletedMomentsScreen } from './screens/DeletedMomentsScreen';
 export { MomentCommentsScreen } from './screens/MomentCommentsScreen';
