@@ -539,7 +539,7 @@ const EditProfileScreen = () => {
                 <Text style={styles.inputLabel}>Phone</Text>
                 <TextInput
                   style={[styles.textInput, styles.disabledInput]}
-                  value={user?.phone ? maskPhone(user.phone) : ''}
+                  value={(user as { phone?: string })?.phone ? maskPhone((user as { phone?: string }).phone!) : ''}
                   editable={false}
                   placeholder="No phone set"
                   placeholderTextColor={COLORS.text.tertiary}

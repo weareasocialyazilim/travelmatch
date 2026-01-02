@@ -105,7 +105,7 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
             <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
           <Text style={styles.title}>Saved Vibes</Text>
-          <View style={{ width: 24 }} />
+          <View style={styles.headerSpacer} />
         </View>
         <LoadingState type="skeleton" count={4} />
       </View>
@@ -205,5 +205,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
     padding: 6,
     borderRadius: 12,
+  },
+  headerSpacer: {
+    width: 24,
   },
 });

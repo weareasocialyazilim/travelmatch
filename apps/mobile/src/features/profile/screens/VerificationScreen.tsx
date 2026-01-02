@@ -35,7 +35,7 @@ const VerificationScreen: React.FC = () => {
             <Ionicons name="close" size={28} color="white" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Get Verified</Text>
-          <View style={{ width: 28 }} />
+          <View style={styles.headerSpacer} />
         </View>
 
         <View style={styles.content}>
@@ -157,6 +157,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     color: 'black',
+  },
+  headerSpacer: {
+    width: 28,
   },
 });
 

@@ -10,8 +10,11 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@/hooks/useNavigationHelpers';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import { COLORS } from '@/constants/colors';
 import type { RootStackParamList } from '@/navigation/routeParams';
+
+type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 const MOMENTS = [
   {
@@ -61,7 +64,7 @@ export const MyHostedMomentsScreen: React.FC = () => {
   const renderItem = ({ item }: { item: MomentItem }) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate('MomentDetail', { momentId: item.id })}
+      onPress={() => navigation.navigate('MomentDetail', { moment: item as unknown as RootStackParamList['MomentDetail']['moment'] })}
       activeOpacity={0.7}
     >
       <Image source={{ uri: item.image }} style={styles.image} />

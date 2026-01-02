@@ -140,7 +140,7 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({
         onScroll={scrollHandler}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={styles.scrollContent}
       >
         {/* PARALLAX IMAGE */}
         <Animated.View style={[styles.headerContainer, headerStyle]}>
@@ -223,6 +223,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: DARK_THEME.background,
+  },
+  scrollContent: {
+    paddingBottom: 100,
   },
   topActions: {
     position: 'absolute',
