@@ -321,21 +321,12 @@ const WalletScreen = () => {
                 <View style={styles.cardActions}>
                   <TouchableOpacity
                     style={styles.actionBtnPrimary}
-                    onPress={() => navigation.navigate('AddMoney')}
-                    accessible={true}
-                    accessibilityLabel="Para yükle"
-                    accessibilityRole="button"
-                  >
-                    <Text style={styles.actionBtnTextPrimary}>+ Yükle</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.actionBtnSecondary}
                     onPress={() => navigation.navigate('Withdraw')}
                     accessible={true}
                     accessibilityLabel="Para çek"
                     accessibilityRole="button"
                   >
-                    <Text style={styles.actionBtnTextSecondary}>Çek</Text>
+                    <Text style={styles.actionBtnTextPrimary}>Para Çek</Text>
                   </TouchableOpacity>
                 </View>
               </BlurView>
