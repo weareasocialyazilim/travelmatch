@@ -1,0 +1,15 @@
+{
+  "include": ["app", "src"],
+  "exclude": ["**/__pycache__", "**/node_modules", ".venv", "venv"],
+  "typeCheckingMode": "off",
+  "reportMissingImports": false,
+  "reportMissingModuleSource": false,
+  "reportUnknownMemberType": false,
+  "reportUnknownVariableType": false,
+  "reportUnknownParameterType": false,
+  "reportMissingParameterType": false,
+  "reportUntypedBaseClass": false,
+  "pythonVersion": "3.11",
+  "venvPath": ".",
+  "venv": ".venv"
+}

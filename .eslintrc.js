@@ -273,6 +273,7 @@ module.exports = {
     '**/*.stories.tsx',
     '**/*.stories.ts',
     'tests/**/*',
+    'services/**/*',
     '.github/workflows/*.yml',
     '.github/workflows/*.yaml',
   ],
