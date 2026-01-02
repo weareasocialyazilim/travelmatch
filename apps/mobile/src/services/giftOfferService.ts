@@ -65,7 +65,8 @@ export const giftOfferService = {
       if (error) throw error;
       if (!gift) throw new Error('Failed to create gift');
 
-      logger.info('[GiftOffer] Offer created:', gift.id);
+      const createdGift = gift as GiftOffer;
+      logger.info('[GiftOffer] Offer created:', createdGift.id);
       return { success: true, gift: gift as GiftOffer };
     } catch (error) {
       logger.error('[GiftOffer] Create offer error:', error);
