@@ -7,7 +7,7 @@ import { ChatHeader, type LinkedMoment } from '../components/ChatHeader';
 import { MessageBubble } from '../components/MessageBubble';
 import { ChatInputBar } from '../components/ChatInputBar';
 import { ChatAttachmentBottomSheet } from '@/components/ChatAttachmentBottomSheet';
-import { ReportBlockBottomSheet } from '@/components/ReportBlockBottomSheet';
+import { ReportBlockBottomSheet } from '@/features/moderation';
 import { COLORS } from '@/constants/colors';
 import { useChatScreen, type Message } from '../hooks/useChatScreen';
 import { CHAT_LIST_CONFIG } from '@/utils/listOptimization';

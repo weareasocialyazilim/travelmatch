@@ -160,7 +160,7 @@ const EditMomentScreen = lazyLoad(() =>
   import('../features/profile').then((m) => ({ default: m.EditMomentScreen })),
 );
 const ReportMomentScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({
+  import('../features/moderation').then((m) => ({
     default: m.ReportMomentScreen,
   })),
 );
@@ -237,12 +237,12 @@ import {
   RefundPolicyScreen,
   InviteFriendsScreen,
   InviteContactsScreen,
-  ReportUserScreen,
   MaintenanceScreen,
   DataPrivacyScreen,
   DietaryPreferencesScreen as _DietaryPreferencesScreen,
   DataSettingsScreen,
 } from '../features/settings';
+import { ReportUserScreen } from '../features/moderation';
 
 // Legal screens - Turkish compliance
 import {

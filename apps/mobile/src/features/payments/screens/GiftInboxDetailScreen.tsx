@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ReportBlockBottomSheet } from '@/components/ReportBlockBottomSheet';
+import { ReportBlockBottomSheet } from '@/features/moderation';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import type { RootStackParamList } from '@/navigation/routeParams';

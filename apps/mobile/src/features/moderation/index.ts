@@ -1,7 +1,24 @@
 /**
  * Moderation Feature - Public API
- * TODO: Add screens, components and hooks when implemented
+ *
+ * Content and user moderation (reporting, blocking, safety)
  */
+
+// Screens
+export { ReportMomentScreen } from './screens/ReportMomentScreen';
+export { ReportUserScreen } from './screens/ReportUserScreen';
+
+// Components
+export {
+  BaseReportScreen,
+  ReportSummaryCard,
+  ReportModal,
+  ReportBlockBottomSheet,
+  BlockConfirmation,
+  type ReportOption,
+  type BaseReportScreenProps,
+  type ReportSummaryCardProps,
+} from './components';
 
 // Types
 export * from './types/moderation.types';
