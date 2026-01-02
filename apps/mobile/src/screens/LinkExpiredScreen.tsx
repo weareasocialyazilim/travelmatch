@@ -6,7 +6,7 @@ import { COLORS } from '@/constants/colors';
 export const LinkExpiredScreen = ({ navigation }: any) => {
   return (
     <View style={styles.container}>
-      <MaterialCommunityIcons name="link-variant-off" size={80} color="#FF4444" style={{ marginBottom: 20 }} />
+      <MaterialCommunityIcons name="link-variant-off" size={80} color="#FF4444" style={styles.icon} />
 
       <Text style={styles.title}>Link Expired</Text>
       <Text style={styles.desc}>
@@ -33,6 +33,7 @@ export const LinkExpiredScreen = ({ navigation }: any) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background.primary, alignItems: 'center', justifyContent: 'center', padding: 30 },
+  icon: { marginBottom: 20 },
   title: { fontSize: 32, fontWeight: 'bold', color: 'white', marginBottom: 12 },
   desc: { color: COLORS.text.secondary, textAlign: 'center', fontSize: 16, lineHeight: 24, marginBottom: 40 },
   btn: { width: '100%', backgroundColor: 'white', paddingVertical: 18, borderRadius: 16, alignItems: 'center', marginBottom: 16 },
