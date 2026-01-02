@@ -252,11 +252,12 @@ export const messageService = {
         userId,
       ]);
       if (error) throw error;
+      if (!data) throw new Error('Failed to create or get conversation');
 
       // Return a basic conversation object
       return {
         conversation: {
-          id: data!.id,
+          id: data.id,
           participantId: userId,
           participantName: '', // Fetched elsewhere
           participantAvatar: '',

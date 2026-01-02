@@ -138,12 +138,13 @@ export const requestService = {
       const { data: newRequest, error } =
         await dbRequestsService.create(requestData);
       if (error) throw error;
+      if (!newRequest) throw new Error('Failed to create request - no data returned');
 
       const computedTotal =
         Number(momentRow.price || 0) * Number(data.guestCount || 0);
 
       const request: GiftRequest = {
-        id: newRequest!.id,
+        id: newRequest.id,
         type: 'gift_request',
         status: 'pending',
         momentId: data.momentId,
@@ -163,8 +164,8 @@ export const requestService = {
         // Compute totalPrice locally to ensure UI/client consistency
         totalPrice: computedTotal,
         currency: momentRow.currency || 'USD',
-        createdAt: newRequest!.created_at,
-        updatedAt: newRequest!.created_at,
+        createdAt: newRequest.created_at,
+        updatedAt: newRequest.created_at,
       };
 
       return { request };
@@ -373,12 +374,16 @@ export const requestService = {
 
       // Also update selected date if provided
       if (data.selectedDate) {
-        await supabase
+        const { error: dateUpdateError } = await supabase
           .from('requests')
           .update({
             selected_date: data.selectedDate,
           } as Database['public']['Tables']['requests']['Update'])
           .eq('id', requestId);
+
+        if (dateUpdateError) {
+          logger.warn('Failed to update selected date:', dateUpdateError);
+        }
       }
 
       // Return updated request (simplified)

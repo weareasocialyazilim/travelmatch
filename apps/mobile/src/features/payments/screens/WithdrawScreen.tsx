@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView, Keyboard, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { COLORS } from '@/constants/colors';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
 import { NetworkGuard } from '@/components/NetworkGuard';
@@ -12,6 +13,7 @@ import type { StackScreenProps } from '@react-navigation/stack';
 type WithdrawScreenProps = StackScreenProps<RootStackParamList, 'Withdraw'>;
 
 function WithdrawScreen({ navigation }: WithdrawScreenProps) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [amount, setAmount] = useState('');
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
@@ -43,41 +45,41 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
 
   const handleWithdraw = async () => {
     Keyboard.dismiss();
-    // Virgül girilirse noktaya çevir (Türkçe klavye uyumu)
+    // Convert comma to period for Turkish keyboard compatibility
     const numericAmount = parseFloat(amount.replace(',', '.'));
 
     if (!selectedMethod) {
-      Alert.alert('Yöntem Seçin', 'Lütfen devam etmek için bir ödeme yöntemi seçin.');
+      Alert.alert(t('withdrawal.selectMethod'), t('withdrawal.selectMethodMessage'));
       return;
     }
 
     if (isNaN(numericAmount)) {
-      Alert.alert('Geçersiz Tutar', 'Lütfen geçerli bir sayı girin.');
+      Alert.alert(t('withdrawal.invalidAmount'), t('withdrawal.invalidAmountMessage'));
       return;
     }
 
     if (numericAmount < MIN_WITHDRAWAL) {
-      Alert.alert('Tutar Çok Düşük', `Minimum çekim tutarı $${MIN_WITHDRAWAL}.`);
+      Alert.alert(t('withdrawal.amountTooLow'), t('withdrawal.amountTooLowMessage', { min: MIN_WITHDRAWAL }));
       return;
     }
 
     if (numericAmount > MAX_WITHDRAWAL) {
-      Alert.alert('Limit Aşıldı', `Günlük maksimum çekim limiti $${MAX_WITHDRAWAL}.`);
+      Alert.alert(t('withdrawal.limitExceeded'), t('withdrawal.limitExceededMessage', { max: MAX_WITHDRAWAL }));
       return;
     }
 
     if (numericAmount > AVAILABLE_BALANCE) {
-      Alert.alert('Yetersiz Bakiye', 'Bu çekim işlemi için yeterli bakiyeniz bulunmuyor.');
+      Alert.alert(t('withdrawal.insufficientBalance'), t('withdrawal.insufficientBalanceMessage'));
       return;
     }
 
     Alert.alert(
-      'Çekimi Onayla',
-      `Seçilen yönteme $${numericAmount.toFixed(2)} çekmek istiyor musunuz?`,
+      t('withdrawal.confirmWithdrawal'),
+      t('withdrawal.confirmMessage', { amount: numericAmount.toFixed(2) }),
       [
-        { text: 'İptal', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Onayla',
+          text: t('withdrawal.confirm'),
           onPress: async () => {
             setIsSubmitting(true);
             try {
@@ -91,18 +93,18 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
               if (result) {
                 navigation.navigate('Success', {
                   type: 'withdrawal',
-                  title: 'Çekim Başlatıldı',
-                  subtitle: 'Paranız yola çıktı. Genellikle 1-3 iş günü sürer.',
+                  title: t('withdrawal.withdrawalStarted'),
+                  subtitle: t('withdrawal.withdrawalMessage'),
                   details: {
                     amount: numericAmount,
                     referenceId: result.id,
                   },
                 });
               } else {
-                Alert.alert('Hata', 'Çekim işlemi başarısız oldu. Lütfen tekrar deneyin.');
+                Alert.alert(t('common.error'), t('withdrawal.withdrawalFailed'));
               }
             } catch {
-              Alert.alert('Hata', 'Bir hata oluştu. Lütfen tekrar deneyin.');
+              Alert.alert(t('common.error'), t('withdrawal.errorOccurred'));
             } finally {
               setIsSubmitting(false);
             }
@@ -116,15 +118,15 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}><Ionicons name="arrow-back" size={24} color="white" /></TouchableOpacity>
-        <Text style={styles.headerTitle}>Para Çek</Text>
+        <Text style={styles.headerTitle}>{t('withdrawal.title')}</Text>
         <View style={{ width: 24 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
 
-        {/* Bakiye Bilgisi */}
+        {/* Balance Info */}
         <View style={styles.balanceContainer}>
-          <Text style={styles.balanceLabel}>Çekilebilir Bakiye</Text>
+          <Text style={styles.balanceLabel}>{t('withdrawal.availableBalance')}</Text>
           {balanceLoading ? (
             <ActivityIndicator size="small" color={COLORS.brand.primary} />
           ) : (
@@ -132,8 +134,8 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
           )}
         </View>
 
-        {/* Tutar Girişi */}
-        <Text style={styles.sectionTitle}>Tutar</Text>
+        {/* Amount Input */}
+        <Text style={styles.sectionTitle}>{t('withdrawal.amount')}</Text>
         <View style={styles.inputWrapper}>
           <Text style={styles.currencyPrefix}>$</Text>
           <TextInput
@@ -145,10 +147,10 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
             onChangeText={setAmount}
           />
         </View>
-        <Text style={styles.limitText}>Min: ${MIN_WITHDRAWAL} • Maks: ${MAX_WITHDRAWAL}</Text>
+        <Text style={styles.limitText}>{t('withdrawal.minMax', { min: MIN_WITHDRAWAL, max: MAX_WITHDRAWAL })}</Text>
 
-        {/* Ödeme Yöntemleri */}
-        <Text style={styles.sectionTitle}>Hedef Seçin</Text>
+        {/* Payment Methods */}
+        <Text style={styles.sectionTitle}>{t('withdrawal.selectDestination')}</Text>
 
         <TouchableOpacity
           style={[styles.methodCard, selectedMethod === 'bank' && styles.selectedMethod]}
@@ -157,7 +159,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
           <View style={styles.methodInfo}>
             <View style={styles.iconBox}><MaterialCommunityIcons name="bank" size={24} color="white" /></View>
             <View>
-              <Text style={styles.methodTitle}>Banka Hesabı</Text>
+              <Text style={styles.methodTitle}>{t('withdrawal.bankAccount')}</Text>
               <Text style={styles.methodSub}>•••• 8392</Text>
             </View>
           </View>
@@ -171,14 +173,14 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
           <View style={styles.methodInfo}>
             <View style={styles.iconBox}><MaterialCommunityIcons name="bitcoin" size={24} color="white" /></View>
             <View>
-              <Text style={styles.methodTitle}>Kripto Cüzdan</Text>
+              <Text style={styles.methodTitle}>{t('withdrawal.cryptoWallet')}</Text>
               <Text style={styles.methodSub}>USDC (ERC-20)</Text>
             </View>
           </View>
           {selectedMethod === 'crypto' && <Ionicons name="checkmark-circle" size={24} color={COLORS.brand.primary} />}
         </TouchableOpacity>
 
-        {/* Çekim Butonu */}
+        {/* Withdraw Button */}
         <TouchableOpacity
           style={[styles.withdrawBtn, (!amount || isSubmitting) && styles.disabledBtn]}
           onPress={handleWithdraw}
@@ -187,7 +189,7 @@ function WithdrawScreen({ navigation }: WithdrawScreenProps) {
           {isSubmitting ? (
             <ActivityIndicator size="small" color="black" />
           ) : (
-            <Text style={styles.withdrawText}>Parayı Çek</Text>
+            <Text style={styles.withdrawText}>{t('withdrawal.withdrawButton')}</Text>
           )}
         </TouchableOpacity>
 
@@ -221,12 +223,15 @@ const styles = StyleSheet.create({
 });
 
 // Wrap with ScreenErrorBoundary and NetworkGuard for critical withdrawal functionality
-const WithdrawScreenWithErrorBoundary = (props: WithdrawScreenProps) => (
-  <ScreenErrorBoundary>
-    <NetworkGuard offlineMessage="Para çekme işlemi için internet bağlantısı gerekli.">
-      <WithdrawScreen {...props} />
-    </NetworkGuard>
-  </ScreenErrorBoundary>
-);
+function WithdrawScreenWithErrorBoundary(props: WithdrawScreenProps) {
+  const { t } = useTranslation();
+  return (
+    <ScreenErrorBoundary>
+      <NetworkGuard offlineMessage={t('withdrawal.offlineMessage')}>
+        <WithdrawScreen {...props} />
+      </NetworkGuard>
+    </ScreenErrorBoundary>
+  );
+}
 
 export default WithdrawScreenWithErrorBoundary;
