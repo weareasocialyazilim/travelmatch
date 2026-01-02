@@ -1,11 +1,11 @@
 /**
  * Production Monitoring Examples
- * 
+ *
  * Real-world examples of how to use the monitoring service and hooks
  * throughout the TravelMatch application.
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Button, FlatList } from 'react-native';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import {
@@ -16,13 +16,58 @@ import {
   useApiTracking,
 } from '../hooks/useMonitoring';
 import { monitoringService } from '../services/monitoring';
-import { supabaseDb } from '../services/supabaseDbService';
+
+// Types
+interface Moment {
+  id: string;
+  category: string;
+  location: string;
+  price: number;
+  images?: string[];
+}
+
+interface RouteParams {
+  momentId: string;
+  source?: string;
+}
+
+interface MomentDetailScreenProps {
+  route: {
+    params: RouteParams;
+    name: string;
+  };
+}
+
+interface MomentCardProps {
+  moment: Moment;
+}
+
+interface BookingDetails {
+  total: number;
+}
+
+interface ImageFile {
+  size: number;
+  format?: string;
+}
+
+// Mock database service for examples
+const supabaseDb = {
+  moments: {
+    like: async (_id: string): Promise<void> => {},
+    getAll: async (): Promise<{ data: Moment[] | null; error: Error | null }> => ({ data: [], error: null }),
+    create: async (data: Partial<Moment>): Promise<{ data: Moment | null; error: Error | null }> => ({
+      data: data as Moment,
+      error: null
+    }),
+  },
+};
 
 // ==========================================
 // Example 1: Screen Tracking
 // ==========================================
 
-export function MomentDetailScreen({ route }) {
+export function MomentDetailScreen({ route }: MomentDetailScreenProps) {
   const { momentId } = route.params;
 
   // Automatically track screen views
@@ -42,7 +87,7 @@ export function MomentDetailScreen({ route }) {
 // Example 2: Action Tracking
 // ==========================================
 
-export function MomentCard({ moment }) {
+export function MomentCard({ moment }: MomentCardProps) {
   const trackAction = useActionTracking();
 
   // Track user actions
@@ -88,14 +133,14 @@ export function MomentsListScreen() {
     queryKey: ['moments'],
     queryFn: async () => {
       startTiming();
-      
+
       const result = await supabaseDb.moments.getAll();
-      
+
       endTiming({
         count: result.data?.length || 0,
         has_filters: false,
       });
-      
+
       return result.data;
     },
   });
@@ -122,28 +167,29 @@ export function CreateMomentScreen() {
   const trackError = useErrorTracking('moment_creation');
 
   const createMutation = useMutation({
-    mutationFn: async (data) => {
+    mutationFn: async (data: Partial<Moment>) => {
       try {
         const result = await supabaseDb.moments.create(data);
-        
+
         if (result.error) {
           throw result.error;
         }
-        
+
         // Track success
         monitoringService.trackAction('moment_created', {
           category: data.category,
           location: data.location,
           price: data.price,
         });
-        
+
         return result.data;
       } catch (error) {
         // Track error with context
-        trackError(error, {
+        const err = error instanceof Error ? error : new Error(String(error));
+        trackError(err, {
           form_data: {
             category: data.category,
-            has_image: !!data.images?.length,
+            has_image: !!(data.images?.length),
             location: data.location,
           },
         });
@@ -159,30 +205,31 @@ export function CreateMomentScreen() {
 // Example 5: API Call Tracking
 // ==========================================
 
-export function useSearchMoments() {
+export function useSearchMoments(searchQuery: string, category?: string) {
   const trackApi = useApiTracking();
 
   return useQuery({
-    queryKey: ['search', query],
+    queryKey: ['search', searchQuery],
     queryFn: async () => {
       const { start, success, error } = trackApi('GET', '/api/search');
       const resourceId = start({
-        query,
-        filters: { category, location },
+        query: searchQuery,
+        filters: { category },
       });
 
       try {
-        const response = await fetch(`/api/search?q=${query}`);
-        
+        const response = await fetch(`/api/search?q=${searchQuery}`);
+        const responseData = await response.json();
+
         success(resourceId, {
           status: response.status,
-          result_count: data.length,
+          result_count: responseData.length,
         });
-        
-        const data = await response.json();
-        return data;
+
+        return responseData;
       } catch (err) {
-        error(resourceId, err);
+        const errObj = err instanceof Error ? err : new Error(String(err));
+        error(resourceId, errObj);
         throw err;
       }
     },
@@ -194,7 +241,7 @@ export function useSearchMoments() {
 // ==========================================
 
 export function ImageUploadComponent() {
-  const handleUpload = async (image) => {
+  const handleUpload = async (image: ImageFile) => {
     const startTime = Date.now();
 
     try {
@@ -217,7 +264,8 @@ export function ImageUploadComponent() {
       // Track complete flow
       monitoringService.addTiming('image_upload_total', Date.now() - startTime);
     } catch (error) {
-      monitoringService.trackError(error, {
+      const err = error instanceof Error ? error : new Error(String(error));
+      monitoringService.trackError(err, {
         context: 'image_upload',
         image_size: image.size,
       });
@@ -233,21 +281,23 @@ export function ImageUploadComponent() {
 
 export function BookingFlow() {
   const trackAction = useActionTracking();
+  const [selectedMoment, setSelectedMoment] = useState<Moment | null>(null);
+  const [bookingDetails, setBookingDetails] = useState<BookingDetails | null>(null);
 
   // Step 1: Select moment
-  const handleSelectMoment = trackAction('booking_step_1_moment_selected', (moment) => {
+  const handleSelectMoment = trackAction('booking_step_1_moment_selected', (moment: Moment) => {
     setSelectedMoment(moment);
   });
 
   // Step 2: Fill details
-  const handleFillDetails = trackAction('booking_step_2_details_filled', (details) => {
+  const handleFillDetails = trackAction('booking_step_2_details_filled', (details: BookingDetails) => {
     setBookingDetails(details);
   });
 
   // Step 3: Payment
   const handlePayment = trackAction(
     'booking_step_3_payment_initiated',
-    async (paymentMethod) => {
+    async (paymentMethod: string) => {
       const startTime = Date.now();
 
       try {
@@ -255,23 +305,24 @@ export function BookingFlow() {
 
         monitoringService.addTiming('payment_processing', Date.now() - startTime, {
           method: paymentMethod,
-          amount: bookingDetails.total,
+          amount: bookingDetails?.total,
           success: true,
         });
 
         monitoringService.trackAction('booking_completed', {
-          moment_id: selectedMoment.id,
+          moment_id: selectedMoment?.id,
           payment_method: paymentMethod,
-          total_amount: bookingDetails.total,
+          total_amount: bookingDetails?.total,
           duration_minutes: Math.floor((Date.now() - startTime) / 60000),
         });
 
         return result;
       } catch (error) {
-        monitoringService.trackError(error, {
+        const err = error instanceof Error ? error : new Error(String(error));
+        monitoringService.trackError(err, {
           context: 'payment_processing',
           payment_method: paymentMethod,
-          amount: bookingDetails.total,
+          amount: bookingDetails?.total,
         });
         throw error;
       }
@@ -313,6 +364,14 @@ export function AdvancedFeature() {
 // Example 9: Global Context
 // ==========================================
 
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  verified: boolean;
+  subscription_tier: string;
+}
+
 export function AppWithMonitoring() {
   useEffect(() => {
     // Add global attributes
@@ -327,7 +386,7 @@ export function AppWithMonitoring() {
     });
 
     // Update on user changes
-    const updateUserContext = (user) => {
+    const updateUserContext = (user: User) => {
       monitoringService.setUser({
         id: user.id,
         email: user.email,
@@ -355,7 +414,24 @@ export function AppWithMonitoring() {
 // Example 10: Error Boundary Integration
 // ==========================================
 
-export class MonitoredErrorBoundary extends React.Component {
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+}
+
+export class MonitoredErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(_error: Error): ErrorBoundaryState {
+    return { hasError: true };
+  }
+
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // Track React errors
     monitoringService.trackError(error, {
@@ -366,6 +442,9 @@ export class MonitoredErrorBoundary extends React.Component {
   }
 
   render() {
+    if (this.state.hasError) {
+      return <View>{/* Error fallback UI */}</View>;
+    }
     return this.props.children;
   }
 }
@@ -374,22 +453,24 @@ export class MonitoredErrorBoundary extends React.Component {
 // Helper Functions
 // ==========================================
 
-async function shareToSocial(moment: any) {
+async function shareToSocial(_moment: Moment): Promise<void> {
   // Implementation
 }
 
-async function compressImage(image: any) {
+async function compressImage(image: ImageFile): Promise<ImageFile> {
+  // Implementation - return compressed image
+  return { size: image.size * 0.7, format: 'jpeg' };
+}
+
+async function uploadToSupabase(_image: ImageFile): Promise<void> {
   // Implementation
 }
 
-async function uploadToSupabase(image: any) {
+async function processPayment(_method: string): Promise<{ success: boolean }> {
   // Implementation
+  return { success: true };
 }
 
-async function processPayment(method: string) {
-  // Implementation
-}
-
-function getTimeSpent() {
+function getTimeSpent(): number {
   return 0;
 }
