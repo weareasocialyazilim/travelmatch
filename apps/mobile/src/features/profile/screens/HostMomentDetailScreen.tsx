@@ -1,23 +1,28 @@
-import React from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
+import { DeleteMomentDialog } from '@/components/DeleteMomentDialog';
 
 export const HostMomentDetailScreen = ({ navigation }: any) => {
   const insets = useSafeAreaInsets();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Mock moment data - would come from route params in real app
+  const momentTitle = 'Dinner at Hotel Costes';
 
   const handleDelete = () => {
-    Alert.alert(
-      "Delete Moment?",
-      "This action cannot be undone. Current applicants will be notified.",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Delete", style: "destructive", onPress: () => navigation.goBack() }
-      ]
-    );
+    setIsDeleting(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsDeleting(false);
+      setShowDeleteDialog(false);
+      navigation.goBack();
+    }, 1000);
   };
 
   return (
@@ -89,10 +94,19 @@ export const HostMomentDetailScreen = ({ navigation }: any) => {
           <Ionicons name="chevron-forward" size={24} color="#666" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.deleteBtn} onPress={handleDelete}>
+        <TouchableOpacity style={styles.deleteBtn} onPress={() => setShowDeleteDialog(true)}>
           <Text style={styles.deleteText}>Archive / Delete Moment</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteMomentDialog
+        visible={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+        onConfirm={handleDelete}
+        momentTitle={momentTitle}
+        isDeleting={isDeleting}
+      />
     </View>
   );
 };
