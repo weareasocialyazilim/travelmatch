@@ -1,6 +1,4 @@
 /**
- * Discover Feature Components
+ * Discover Feature Components - Barrel exports
  */
-
-// Components are in /components/ folder, not here
-// This file kept for potential future discover-specific components
+export { NeonPulseMarker } from "./NeonPulseMarker";
