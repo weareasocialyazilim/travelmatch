@@ -36,7 +36,11 @@ import BottomNav from '@/components/BottomNav';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
 import { NetworkGuard } from '@/components/NetworkGuard';
 import { useToast } from '@/context/ToastContext';
-import { COLORS as _COLORS, primitives as _primitives, GRADIENTS as _GRADIENTS } from '@/constants/colors';
+import {
+  COLORS as _COLORS,
+  primitives,
+  GRADIENTS as _GRADIENTS,
+} from '@/constants/colors';
 import { TYPOGRAPHY as _TYPOGRAPHY } from '@/theme/typography';
 import { usePayments } from '@/hooks/usePayments';
 import type { RootStackParamList } from '@/navigation/routeParams';
@@ -94,8 +98,12 @@ const WalletScreen = () => {
       date: t.status || '',
       amount: t.amount,
       isPositive: t.type !== 'withdrawal' && t.type !== 'gift_sent',
-      category: t.type === 'gift_received' || t.type === 'gift_sent' ? 'gift' :
-                t.type === 'deposit' ? 'topup' : 'refund',
+      category:
+        t.type === 'gift_received' || t.type === 'gift_sent'
+          ? 'gift'
+          : t.type === 'deposit'
+            ? 'topup'
+            : 'refund',
     }));
   }, [transactions]);
 
@@ -145,7 +153,13 @@ const WalletScreen = () => {
 
   // Render transaction item
   const renderTransaction = useCallback(
-    ({ item, index }: { item: (typeof displayTransactions)[0]; index: number }) => {
+    ({
+      item,
+      index,
+    }: {
+      item: (typeof displayTransactions)[0];
+      index: number;
+    }) => {
       const isCredit = item.isPositive;
 
       return (
@@ -193,7 +207,9 @@ const WalletScreen = () => {
             <Text
               style={[
                 styles.txAmount,
-                { color: isCredit ? DARK_THEME.accent : DARK_THEME.textPrimary },
+                {
+                  color: isCredit ? DARK_THEME.accent : DARK_THEME.textPrimary,
+                },
               ]}
             >
               {isCredit ? '+' : '-'}
@@ -267,7 +283,11 @@ const WalletScreen = () => {
                 accessibilityLabel="İşlem geçmişi"
                 accessibilityRole="button"
               >
-                <MaterialCommunityIcons name="history" size={24} color="white" />
+                <MaterialCommunityIcons
+                  name="history"
+                  size={24}
+                  color="white"
+                />
               </TouchableOpacity>
             </View>
 
@@ -276,11 +296,7 @@ const WalletScreen = () => {
               entering={FadeInDown.delay(200).duration(600).springify()}
               style={styles.balanceCardContainer}
             >
-              <BlurView
-                intensity={40}
-                tint="dark"
-                style={styles.balanceCard}
-              >
+              <BlurView intensity={40} tint="dark" style={styles.balanceCard}>
                 <LinearGradient
                   colors={['rgba(255,255,255,0.05)', 'transparent']}
                   style={StyleSheet.absoluteFill}

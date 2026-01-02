@@ -3,7 +3,6 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Screens
 import { DiscoverScreen } from '@/features/trips';
@@ -20,29 +19,29 @@ const CustomTabBarButton = ({ children, onPress }: any) => (
       top: -30,
       justifyContent: 'center',
       alignItems: 'center',
-      ...styles.shadow
+      ...styles.shadow,
     }}
     onPress={onPress}
   >
-    <View style={{
-      width: 70,
-      height: 70,
-      borderRadius: 35,
-      backgroundColor: COLORS.brand.primary,
-      borderWidth: 4,
-      borderColor: COLORS.background.primary,
-      justifyContent: 'center',
-      alignItems: 'center'
-    }}>
+    <View
+      style={{
+        width: 70,
+        height: 70,
+        borderRadius: 35,
+        backgroundColor: COLORS.brand.primary,
+        borderWidth: 4,
+        borderColor: COLORS.background.primary,
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
       {children}
     </View>
   </TouchableOpacity>
 );
 
 export const MainTabNavigator = () => {
-  // Safe area insets available for future use
-  const _insets = useSafeAreaInsets();
-
+  // Safe area insets are handled by individual screens
   return (
     <Tab.Navigator
       screenOptions={{
@@ -62,7 +61,7 @@ export const MainTabNavigator = () => {
           paddingBottom: 0,
           ...styles.shadow,
           elevation: 0, // Placed after spread to ensure it takes precedence
-        }
+        },
       }}
     >
       <Tab.Screen
@@ -72,12 +71,12 @@ export const MainTabNavigator = () => {
           tabBarIcon: ({ focused }) => (
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               <MaterialCommunityIcons
-                name={focused ? "compass" : "compass-outline"}
+                name={focused ? 'compass' : 'compass-outline'}
                 size={28}
-                color={focused ? COLORS.brand.primary : "gray"}
+                color={focused ? COLORS.brand.primary : 'gray'}
               />
             </View>
-          )
+          ),
         }}
       />
 
@@ -88,12 +87,12 @@ export const MainTabNavigator = () => {
           tabBarIcon: ({ focused }) => (
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               <Ionicons
-                name={focused ? "map" : "map-outline"}
+                name={focused ? 'map' : 'map-outline'}
                 size={28}
-                color={focused ? COLORS.brand.primary : "gray"}
+                color={focused ? COLORS.brand.primary : 'gray'}
               />
             </View>
-          )
+          ),
         }}
       />
 
@@ -102,12 +101,8 @@ export const MainTabNavigator = () => {
         name="Create"
         component={CreateMomentScreen}
         options={{
-          tabBarIcon: () => (
-            <Ionicons name="add" size={35} color="black" />
-          ),
-          tabBarButton: (props) => (
-            <CustomTabBarButton {...props} />
-          ),
+          tabBarIcon: () => <Ionicons name="add" size={35} color="black" />,
+          tabBarButton: (props) => <CustomTabBarButton {...props} />,
         }}
         listeners={({ navigation }) => ({
           tabPress: (e) => {
@@ -125,15 +120,15 @@ export const MainTabNavigator = () => {
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               <View>
                 <Ionicons
-                  name={focused ? "chatbubble" : "chatbubble-outline"}
+                  name={focused ? 'chatbubble' : 'chatbubble-outline'}
                   size={28}
-                  color={focused ? COLORS.brand.primary : "gray"}
+                  color={focused ? COLORS.brand.primary : 'gray'}
                 />
                 {/* Notification Badge */}
                 <View style={styles.badge} />
               </View>
             </View>
-          )
+          ),
         }}
       />
 
@@ -144,12 +139,12 @@ export const MainTabNavigator = () => {
           tabBarIcon: ({ focused }) => (
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               <MaterialCommunityIcons
-                name={focused ? "account-circle" : "account-circle-outline"}
+                name={focused ? 'account-circle' : 'account-circle-outline'}
                 size={30}
-                color={focused ? COLORS.brand.primary : "gray"}
+                color={focused ? COLORS.brand.primary : 'gray'}
               />
             </View>
-          )
+          ),
         }}
       />
     </Tab.Navigator>
@@ -162,7 +157,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.25,
     shadowRadius: 3.5,
-    elevation: 5
+    elevation: 5,
   },
   badge: {
     position: 'absolute',
@@ -173,8 +168,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#FF4444',
     borderWidth: 1,
-    borderColor: 'black'
-  }
+    borderColor: 'black',
+  },
 });
 
 export default MainTabNavigator;

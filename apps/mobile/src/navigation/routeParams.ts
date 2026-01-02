@@ -239,15 +239,17 @@ export type RootStackParamList = {
   AddCard: undefined;
 
   // Checkout
-  Checkout: {
-    momentId?: string;
-    amount?: number;
-    recipientId?: string;
-    recipientName?: string;
-    title?: string;
-    price?: number;
-    fee?: number;
-  } | undefined;
+  Checkout:
+    | {
+        momentId?: string;
+        amount?: number;
+        recipientId?: string;
+        recipientName?: string;
+        title?: string;
+        price?: number;
+        fee?: number;
+      }
+    | undefined;
 
   // Wallet & Settings
   Wallet: undefined;
@@ -319,21 +321,17 @@ export type RootStackParamList = {
   ImageViewer: { imageUrl: string };
 
   // Date Time Picker Modal
-  DateTimePicker: {
-    initialDate?: string; // YYYY-MM-DD format
-    initialTime?: string; // HH:mm format
-    onSelect?: (date: string, time: string) => void;
-  } | undefined;
+  DateTimePicker:
+    | {
+        initialDate?: string; // YYYY-MM-DD format
+        initialTime?: string; // HH:mm format
+        onSelect?: (date: string, time: string) => void;
+      }
+    | undefined;
 
-  // Calendar
-  MyCalendar: undefined;
+  // Biometric Setup (auth flow)
+  BiometricSetup: undefined;
 
-  // Settings subscreens
-  DietaryPreferences: undefined;
-  Emergency: undefined;
-  Referral: undefined;
-  SafetyTips: undefined;
-
-  // Wallet
-  AddMoney: undefined;
+  // Promo Code
+  PromoCode: undefined;
 };

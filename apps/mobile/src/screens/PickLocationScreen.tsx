@@ -6,7 +6,7 @@ import {
   Text,
   Dimensions,
 } from 'react-native';
-import MapView from 'react-native-maps';
+import MapView, { Region } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -36,7 +36,7 @@ export const PickLocationScreen = ({ navigation }: any) => {
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         }}
-        onRegionChangeComplete={(region) => setSelectedLocation(region)}
+        onRegionChangeComplete={(region: Region) => setSelectedLocation(region)}
       >
         {/* Center Marker is static in UI, map moves underneath */}
       </MapView>

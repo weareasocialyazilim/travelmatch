@@ -11,7 +11,13 @@
  */
 
 import React, { useState, memo, useCallback, useMemo } from 'react';
-import type { ViewStyle, TextInputProps, NativeSyntheticEvent, TextInputFocusEventData } from 'react-native';
+import type {
+  ViewStyle,
+  TextInputProps,
+  NativeSyntheticEvent,
+  TextInputFocusEventData,
+  TargetedEvent,
+} from 'react-native';
 import {
   View,
   TextInput,
@@ -88,7 +94,7 @@ export const Input: React.FC<InputProps> = memo(
           withTiming(8, { duration: 50 }),
           withTiming(-6, { duration: 50 }),
           withTiming(6, { duration: 50 }),
-          withTiming(0, { duration: 50 })
+          withTiming(0, { duration: 50 }),
         );
       }
     }, [error, shakeValue]);
@@ -105,18 +111,18 @@ export const Input: React.FC<InputProps> = memo(
       return primitives.stone[200];
     }, [error, showSuccess, isFocused]);
 
-    // Memoize callbacks
+    // Memoize callbacks - use TargetedEvent for React Native's new TextInput types
     const handleFocus = useCallback(
-      (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+      (e: NativeSyntheticEvent<TargetedEvent>) => {
         setIsFocused(true);
-        onFocusProp?.(e);
+        onFocusProp?.(e as NativeSyntheticEvent<TextInputFocusEventData>);
       },
       [onFocusProp],
     );
     const handleBlur = useCallback(
-      (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+      (e: NativeSyntheticEvent<TargetedEvent>) => {
         setIsFocused(false);
-        onBlurProp?.(e);
+        onBlurProp?.(e as NativeSyntheticEvent<TextInputFocusEventData>);
       },
       [onBlurProp],
     );
@@ -131,7 +137,9 @@ export const Input: React.FC<InputProps> = memo(
     }, [onClear]);
 
     return (
-      <Animated.View style={[styles.container, containerStyle, shakeAnimatedStyle]}>
+      <Animated.View
+        style={[styles.container, containerStyle, shakeAnimatedStyle]}
+      >
         {label && (
           <Text style={styles.label}>
             {label}
@@ -163,7 +171,8 @@ export const Input: React.FC<InputProps> = memo(
             style={[
               styles.input,
               leftIcon && styles.inputWithLeftIcon,
-              (rightIcon || isPassword || (showClearButton && hasValue)) && styles.inputWithRightIcon,
+              (rightIcon || isPassword || (showClearButton && hasValue)) &&
+                styles.inputWithRightIcon,
             ]}
             placeholderTextColor={primitives.stone[400]}
             onFocus={handleFocus}
@@ -175,23 +184,27 @@ export const Input: React.FC<InputProps> = memo(
           />
 
           {/* Clear button - UX best practice: quick delete option */}
-          {showClearButton && hasValue && !isPassword && !showSuccess && !rightIcon && (
-            <TouchableOpacity
-              onPress={handleClear}
-              style={styles.clearButton}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              accessibilityLabel="Clear input"
-              accessibilityRole="button"
-            >
-              <View style={styles.clearButtonInner}>
-                <MaterialCommunityIcons
-                  name="close"
-                  size={14}
-                  color={primitives.stone[0]}
-                />
-              </View>
-            </TouchableOpacity>
-          )}
+          {showClearButton &&
+            hasValue &&
+            !isPassword &&
+            !showSuccess &&
+            !rightIcon && (
+              <TouchableOpacity
+                onPress={handleClear}
+                style={styles.clearButton}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                accessibilityLabel="Clear input"
+                accessibilityRole="button"
+              >
+                <View style={styles.clearButtonInner}>
+                  <MaterialCommunityIcons
+                    name="close"
+                    size={14}
+                    color={primitives.stone[0]}
+                  />
+                </View>
+              </TouchableOpacity>
+            )}
 
           {isPassword && (
             <TouchableOpacity
