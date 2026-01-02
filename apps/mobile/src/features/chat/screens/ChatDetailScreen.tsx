@@ -119,18 +119,19 @@ const ChatDetailScreen: React.FC = () => {
   const [messageText, setMessageText] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
 
-  const { sendMessage, loadMessages, markAsRead } = useMessages();
+  const { sendMessage, getConversationMessages, markAsRead } = useMessages();
 
   // Load messages on mount
   useEffect(() => {
     if (conversationId) {
-      const fetchMessages = async () => {
-        await loadMessages(conversationId);
+      const loadMessages = async () => {
+        const msgs = await getConversationMessages(conversationId);
+        setMessages(msgs);
         markAsRead(conversationId);
       };
-      fetchMessages();
+      loadMessages();
     }
-  }, [conversationId, loadMessages, markAsRead]);
+  }, [conversationId, getConversationMessages, markAsRead]);
 
   const handleSend = useCallback(async () => {
     if (!messageText.trim() || !conversationId) return;
@@ -150,11 +151,7 @@ const ChatDetailScreen: React.FC = () => {
     setMessageText('');
 
     try {
-      await sendMessage({
-        conversationId,
-        content: messageText.trim(),
-        type: 'text',
-      });
+      await sendMessage(conversationId, messageText.trim());
       setMessages((prev) =>
         prev.map((m) => (m.id === tempId ? { ...m, status: 'sent' } : m)),
       );
@@ -179,7 +176,7 @@ const ChatDetailScreen: React.FC = () => {
           message={item}
           isOwnMessage={isOwnMessage}
           showAvatar={showAvatar}
-          otherUserAvatar={otherUser.avatar ?? undefined}
+          otherUserAvatar={otherUser.avatarUrl}
         />
       );
     },
@@ -208,13 +205,15 @@ const ChatDetailScreen: React.FC = () => {
           }
         >
           <Image
-            source={{ uri: otherUser.avatar ?? undefined }}
+            source={{ uri: otherUser.avatarUrl }}
             style={styles.headerAvatar}
             contentFit="cover"
           />
           <View>
             <Text style={styles.headerName}>{otherUser.name}</Text>
-            <Text style={styles.headerStatus}>Active</Text>
+            <Text style={styles.headerStatus}>
+              {otherUser.isOnline ? 'Online' : 'Offline'}
+            </Text>
           </View>
         </TouchableOpacity>
 
@@ -431,7 +430,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withErrorBoundary(ChatDetailScreen, {
-  fallbackType: 'generic',
-  displayName: 'ChatDetailScreen',
-});
+export default withErrorBoundary(ChatDetailScreen, { displayName: 'ChatDetailScreen' });

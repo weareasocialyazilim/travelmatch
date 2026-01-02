@@ -12,18 +12,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NavigationProp } from '@react-navigation/native';
 import { COLORS } from '@/constants/colors';
-
-// Create color mappings for dark mode
-const DarkColors = {
-  background: {
-    primary: COLORS.backgroundDark,
-  },
-  text: {
-    primary: COLORS.textOnDark,
-    secondary: COLORS.textOnDarkSecondary,
-  },
-  brand: COLORS.brand,
-};
 import type { RootStackParamList } from '@/navigation/routeParams';
 
 const TAGS = ['Good Vibes ✨', 'Generous 🎁', 'Punctual ⏰', 'Fun 🥳'];
@@ -118,7 +106,7 @@ export const ReviewScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: DarkColors.background.primary,
+    backgroundColor: COLORS.background.primary,
   },
   content: {
     flex: 1,
@@ -129,11 +117,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '900',
-    color: DarkColors.text.primary,
+    color: COLORS.text.primary,
     marginBottom: 8,
   },
   subtitle: {
-    color: DarkColors.text.secondary,
+    color: COLORS.text.secondary,
     marginBottom: 30,
     fontSize: 16,
   },
@@ -143,7 +131,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     marginBottom: 24,
     borderWidth: 2,
-    borderColor: DarkColors.brand.primary,
+    borderColor: COLORS.brand.primary,
   },
   stars: {
     flexDirection: 'row',
@@ -165,11 +153,11 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.2)',
   },
   activeTag: {
-    backgroundColor: DarkColors.brand.primary,
-    borderColor: DarkColors.brand.primary,
+    backgroundColor: COLORS.brand.primary,
+    borderColor: COLORS.brand.primary,
   },
   tagText: {
-    color: DarkColors.text.primary,
+    color: COLORS.text.primary,
     fontWeight: '600',
   },
   activeTagText: {
@@ -180,14 +168,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.05)',
     borderRadius: 16,
     padding: 16,
-    color: DarkColors.text.primary,
+    color: COLORS.text.primary,
     height: 100,
     textAlignVertical: 'top',
     marginBottom: 24,
   },
   submitBtn: {
     width: '100%',
-    backgroundColor: DarkColors.brand.primary,
+    backgroundColor: COLORS.brand.primary,
     padding: 16,
     borderRadius: 16,
     alignItems: 'center',

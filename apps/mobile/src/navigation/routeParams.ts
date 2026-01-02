@@ -324,4 +324,16 @@ export type RootStackParamList = {
     initialTime?: string; // HH:mm format
     onSelect?: (date: string, time: string) => void;
   } | undefined;
+
+  // Calendar
+  MyCalendar: undefined;
+
+  // Settings subscreens
+  DietaryPreferences: undefined;
+  Emergency: undefined;
+  Referral: undefined;
+  SafetyTips: undefined;
+
+  // Wallet
+  AddMoney: undefined;
 };

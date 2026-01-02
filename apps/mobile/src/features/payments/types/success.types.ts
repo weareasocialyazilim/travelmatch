@@ -9,10 +9,11 @@ export type SuccessType =
   | 'cache_cleared'
   | 'gift_sent'
   | 'withdraw'
+  | 'withdrawal'
   | 'payment'
+  | 'review'
   | 'dispute'
   | 'proof_uploaded'
   | 'proof_approved'
   | 'profile_complete'
-  | 'review'
   | 'generic';

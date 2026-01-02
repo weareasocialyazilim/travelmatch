@@ -59,10 +59,13 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
     >
       <View style={styles.avatarContainer}>
         <Image
-          source={{ uri: conversation.participantAvatar ?? undefined }}
+          source={{ uri: conversation.participantAvatar || undefined }}
           style={styles.avatar}
           contentFit="cover"
         />
+        {conversation.participantVerified && (
+          <View style={styles.onlineIndicator} />
+        )}
       </View>
 
       <View style={styles.conversationContent}>
@@ -115,8 +118,8 @@ const InboxScreen: React.FC = () => {
     const query = searchQuery.toLowerCase();
     return conversations.filter(
       (c) =>
-        (c.participantName?.toLowerCase().includes(query) ?? false) ||
-        (c.lastMessage?.toLowerCase().includes(query) ?? false),
+        c.participantName?.toLowerCase().includes(query) ||
+        c.lastMessage?.toLowerCase().includes(query),
     );
   }, [conversations, searchQuery]);
 
@@ -137,12 +140,12 @@ const InboxScreen: React.FC = () => {
         conversationId: conversation.id,
         otherUser: {
           id: conversation.participantId,
-          name: conversation.participantName || 'User',
-          avatar: conversation.participantAvatar,
-          isVerified: conversation.participantVerified ?? false,
-          role: 'Traveler',
-          kyc: conversation.participantVerified ? 'Verified' : 'Pending',
+          name: conversation.participantName || 'Unknown',
+          avatarUrl: conversation.participantAvatar,
+          role: 'Traveler' as const,
+          kyc: 'Unverified' as const,
           location: '',
+          isVerified: conversation.participantVerified,
         },
       });
     },
@@ -365,7 +368,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withErrorBoundary(InboxScreen, {
-  fallbackType: 'generic',
-  displayName: 'InboxScreen',
-});
+export default withErrorBoundary(InboxScreen, { displayName: 'InboxScreen' });

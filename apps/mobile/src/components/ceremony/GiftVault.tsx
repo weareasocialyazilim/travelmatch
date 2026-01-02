@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
   // Unlocked vault styles
   unlockedContainer: {
     flex: 1,
-    backgroundColor: COLORS.background.primary,
+    backgroundColor: COLORS.backgroundPrimary,
   },
   vaultHeader: {
     flexDirection: 'row',
@@ -518,6 +518,10 @@ const styles = StyleSheet.create({
   },
   experienceGrid: {
     padding: SPACING.sm,
+  },
+  experienceRow: {
+    justifyContent: 'space-between',
+    marginBottom: SPACING.sm,
   },
   experienceCard: {
     width: '48%',
