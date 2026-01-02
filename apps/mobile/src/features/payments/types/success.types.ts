@@ -9,6 +9,7 @@ export type SuccessType =
   | 'cache_cleared'
   | 'gift_sent'
   | 'withdraw'
+  | 'payment'
   | 'dispute'
   | 'proof_uploaded'
   | 'proof_approved'
