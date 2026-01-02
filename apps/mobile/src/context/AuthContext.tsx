@@ -703,8 +703,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       resetPassword,
       changePassword,
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [user, authState, isAuthenticated, isLoading, updateUser],
+    [user, authState, isAuthenticated, isLoading, updateUser, forgotPassword, resetPassword, changePassword, socialAuth, linkSocialAccount, unlinkSocialAccount, login, register, logout, refreshToken, sendVerificationEmail, verifyEmail, resendVerificationEmail, requestAccountDeletion, cancelAccountDeletion, deleteAccount, enableBiometricAuth, disableBiometricAuth, signInWithBiometrics],
   );
 
   return (

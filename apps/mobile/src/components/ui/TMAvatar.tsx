@@ -217,12 +217,12 @@ export const TMAvatar: React.FC<TMAvatarProps> = ({
         <View
           style={[
             styles.statusIndicator,
+            size === 'xxs' ? styles.statusBorderThin : styles.statusBorderNormal,
             {
               width: STATUS_SIZE[size],
               height: STATUS_SIZE[size],
               borderRadius: STATUS_SIZE[size] / 2,
               backgroundColor: getStatusColor(status),
-              borderWidth: size === 'xxs' ? 1 : 2,
             },
           ]}
           accessibilityLabel={`Status: ${status}`}
@@ -276,6 +276,12 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 0,
     borderColor: COLORS.white,
+  },
+  statusBorderThin: {
+    borderWidth: 1,
+  },
+  statusBorderNormal: {
+    borderWidth: 2,
   },
   verifiedBadge: {
     position: 'absolute',
