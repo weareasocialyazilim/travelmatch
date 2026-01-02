@@ -63,9 +63,10 @@ export const giftOfferService = {
         .single();
 
       if (error) throw error;
+      if (!gift) throw new Error('Failed to create gift');
 
       logger.info('[GiftOffer] Offer created:', gift.id);
-      return { success: true, gift };
+      return { success: true, gift: gift as GiftOffer };
     } catch (error) {
       logger.error('[GiftOffer] Create offer error:', error);
       return {
@@ -93,8 +94,9 @@ export const giftOfferService = {
 
       if (fetchError) throw fetchError;
       if (!existingGift) throw new Error('Gift offer not found');
-      if (existingGift.receiver_id !== user.id) throw new Error('Not authorized to accept this offer');
-      if (existingGift.status !== 'pending') throw new Error('Offer is no longer pending');
+      const giftData = existingGift as { id: string; receiver_id: string; status: string; giver_id: string; amount: number; currency: string; moment_id: string | null };
+      if (giftData.receiver_id !== user.id) throw new Error('Not authorized to accept this offer');
+      if (giftData.status !== 'pending') throw new Error('Offer is no longer pending');
 
       // Update gift status to completed (payment would be processed here in production)
       // In a real implementation, this would trigger the payment flow
@@ -110,9 +112,10 @@ export const giftOfferService = {
         .single();
 
       if (error) throw error;
+      if (!gift) throw new Error('Failed to update gift');
 
       logger.info('[GiftOffer] Offer accepted:', giftId);
-      return { success: true, gift };
+      return { success: true, gift: gift as GiftOffer };
     } catch (error) {
       logger.error('[GiftOffer] Accept offer error:', error);
       return {
@@ -139,8 +142,9 @@ export const giftOfferService = {
 
       if (fetchError) throw fetchError;
       if (!existingGift) throw new Error('Gift offer not found');
-      if (existingGift.receiver_id !== user.id) throw new Error('Not authorized to decline this offer');
-      if (existingGift.status !== 'pending') throw new Error('Offer is no longer pending');
+      const declineGiftData = existingGift as { id: string; receiver_id: string; status: string };
+      if (declineGiftData.receiver_id !== user.id) throw new Error('Not authorized to decline this offer');
+      if (declineGiftData.status !== 'pending') throw new Error('Offer is no longer pending');
 
       // Update gift status to cancelled
       const { data: gift, error } = await supabase
@@ -155,9 +159,10 @@ export const giftOfferService = {
         .single();
 
       if (error) throw error;
+      if (!gift) throw new Error('Failed to update gift');
 
       logger.info('[GiftOffer] Offer declined:', giftId);
-      return { success: true, gift };
+      return { success: true, gift: gift as GiftOffer };
     } catch (error) {
       logger.error('[GiftOffer] Decline offer error:', error);
       return {
@@ -195,7 +200,7 @@ export const giftOfferService = {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data || [];
+      return (data as GiftOffer[]) || [];
     } catch (error) {
       logger.error('[GiftOffer] Get pending offers error:', error);
       return [];
@@ -229,13 +234,15 @@ export const giftOfferService = {
         .single();
 
       if (error) throw error;
+      if (!data) return null;
 
+      const giftOffer = data as GiftOffer;
       // Verify user is either giver or receiver
-      if (data.giver_id !== user.id && data.receiver_id !== user.id) {
+      if (giftOffer.giver_id !== user.id && giftOffer.receiver_id !== user.id) {
         return null;
       }
 
-      return data;
+      return giftOffer;
     } catch (error) {
       logger.error('[GiftOffer] Get offer error:', error);
       return null;
@@ -263,9 +270,10 @@ export const giftOfferService = {
         .single();
 
       if (error) throw error;
+      if (!gift) throw new Error('Failed to cancel gift');
 
       logger.info('[GiftOffer] Offer cancelled:', giftId);
-      return { success: true, gift };
+      return { success: true, gift: gift as GiftOffer };
     } catch (error) {
       logger.error('[GiftOffer] Cancel offer error:', error);
       return {

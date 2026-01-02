@@ -38,7 +38,36 @@ const DARK_COLORS = {
   switchTrack: '#3e3e3e',
 };
 
-const SECTIONS = [
+// Settings item types
+interface BaseSettingsItem {
+  id: string;
+  icon: string;
+  label: string;
+}
+
+interface LinkSettingsItem extends BaseSettingsItem {
+  type: 'link';
+  badge?: string;
+}
+
+interface SwitchSettingsItem extends BaseSettingsItem {
+  type: 'switch';
+  defaultValue: boolean;
+}
+
+interface ValueSettingsItem extends BaseSettingsItem {
+  type: 'value';
+  displayValue: string;
+}
+
+type SettingsItem = LinkSettingsItem | SwitchSettingsItem | ValueSettingsItem;
+
+interface SettingsSection {
+  title: string;
+  items: SettingsItem[];
+}
+
+const SECTIONS: SettingsSection[] = [
   {
     title: 'Account',
     items: [
@@ -50,10 +79,10 @@ const SECTIONS = [
   {
     title: 'Preferences',
     items: [
-      { id: 'notifications', icon: 'notifications-outline', label: 'Push Notifications', type: 'switch', value: true },
-      { id: 'biometric', icon: 'finger-print', label: 'FaceID / TouchID', type: 'switch', value: true },
-      { id: 'currency', icon: 'cash-outline', label: 'Currency', type: 'value', value: 'USD ($)' },
-      { id: 'language', icon: 'globe-outline', label: 'Language', type: 'value', value: 'English' },
+      { id: 'notifications', icon: 'notifications-outline', label: 'Push Notifications', type: 'switch', defaultValue: true },
+      { id: 'biometric', icon: 'finger-print', label: 'FaceID / TouchID', type: 'switch', defaultValue: true },
+      { id: 'currency', icon: 'cash-outline', label: 'Currency', type: 'value', displayValue: 'USD ($)' },
+      { id: 'language', icon: 'globe-outline', label: 'Language', type: 'value', displayValue: 'English' },
     ],
   },
   {
@@ -139,7 +168,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
     );
   };
 
-  const renderItem = (item: typeof SECTIONS[0]['items'][0]) => (
+  const renderItem = (item: SettingsItem) => (
     <TouchableOpacity
       key={item.id}
       style={styles.itemRow}
@@ -167,7 +196,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
 
         {item.type === 'value' && (
           <View style={styles.valueContainer}>
-            <Text style={styles.valueText}>{item.value}</Text>
+            <Text style={styles.valueText}>{item.displayValue}</Text>
             <Ionicons name="chevron-forward" size={20} color={DARK_COLORS.textSecondary} />
           </View>
         )}
@@ -186,7 +215,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
   );
 
   // User display info
-  const displayName = user?.displayName || user?.name || 'Traveler';
+  const displayName = user?.name || 'Traveler';
   const displayEmail = user?.email || 'traveler@travelmatch.app';
   const avatarUrl = user?.photoUrl || user?.avatar || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200';
 

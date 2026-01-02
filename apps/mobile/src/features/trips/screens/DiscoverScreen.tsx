@@ -19,7 +19,8 @@ import {
   ActivityIndicator,
   Text,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+// SafeAreaView imported but not currently used - reserved for future layout changes
+// import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
 import { ImmersiveMomentCard } from '@/components/discover/ImmersiveMomentCard';
@@ -30,7 +31,7 @@ import { withErrorBoundary } from '../../../components/withErrorBoundary';
 import type { NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
-const { height, width } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 // Tier system for counter-offer validation
 interface PlaceTier {
@@ -148,18 +149,9 @@ const DiscoverScreen = () => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       // Navigate to gift flow
       navigation.navigate('UnifiedGiftFlow', {
-        moment: {
-          id: moment.id,
-          title: moment.title,
-          description: moment.description || '',
-          image: moment.image || moment.images?.[0] || '',
-          price: moment.price || moment.pricePerGuest || 0,
-          hostId: moment.hostId,
-          hostName: moment.hostName || '',
-          hostAvatar: moment.hostAvatar || '',
-          category: typeof moment.category === 'string' ? moment.category : moment.category?.id || '',
-          location: typeof moment.location === 'string' ? moment.location : `${moment.location?.city || ''}, ${moment.location?.country || ''}`,
-        },
+        recipientId: moment.hostId,
+        recipientName: moment.hostName || 'Host',
+        momentId: moment.id,
       });
     },
     [navigation],
@@ -167,9 +159,9 @@ const DiscoverScreen = () => {
 
   // Handle Like Press
   const handleLikePress = useCallback(
-    (moment: Moment) => {
+    (_moment: Moment) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      // TODO: Implement save/unsave logic
+      // TODO: Implement save/unsave logic using _moment.id
     },
     [],
   );
@@ -185,9 +177,9 @@ const DiscoverScreen = () => {
   );
 
   // Handle Share Press
-  const handleSharePress = useCallback((moment: Moment) => {
+  const handleSharePress = useCallback((_moment: Moment) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    // TODO: Implement share logic
+    // TODO: Implement share logic using _moment.id
   }, []);
 
   // Render each moment card
