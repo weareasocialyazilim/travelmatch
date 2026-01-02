@@ -32,6 +32,7 @@ import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LoadingState } from '@/components/LoadingState';
 import { NetworkGuard } from '@/components/NetworkGuard';
+import { GiftCelebration } from '@/components/GiftCelebration';
 import { COLORS, primitives } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { RADII } from '../constants/radii';
@@ -115,6 +116,7 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
   );
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
   const [submittedData, setSubmittedData] = useState<SendGiftInput | null>(
     null,
   );
@@ -193,7 +195,7 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
       // Simulate API call
       setTimeout(() => {
         setLoading(false);
-        setSuccess(true);
+        setShowCelebration(true); // Show celebration first
         impact('success');
 
         trackInteraction('gift_completed', {
@@ -211,6 +213,12 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
     [moment, selectedPayment, impact, trackEvent, trackInteraction],
   );
 
+  // Handle celebration close - transition to success screen
+  const handleCelebrationClose = useCallback(() => {
+    setShowCelebration(false);
+    setSuccess(true);
+  }, []);
+
   // Handle share
   const handleShare = useCallback(() => {
     impact('light');
@@ -224,6 +232,20 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
     impact('light');
     navigation.navigate('Discover');
   }, [impact, navigation]);
+
+  // Celebration modal
+  if (showCelebration) {
+    return (
+      <GiftCelebration
+        visible={showCelebration}
+        recipientName={recipientName || submittedData?.recipientEmail || 'User'}
+        giftAmount={moment.price}
+        currency="₺"
+        momentTitle={moment.title}
+        onClose={handleCelebrationClose}
+      />
+    );
+  }
 
   // Loading state
   if (loading) {

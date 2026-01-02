@@ -69,7 +69,6 @@ export type RootStackParamList = {
   Search: undefined;
   Inbox: { initialTab?: 'active' | 'requests' } | undefined;
   Requests: { initialTab?: 'pending' | 'notifications' } | undefined;
-  RequestManager: { momentId?: string } | undefined;
   Messages: undefined;
   SearchMap: undefined;
 
@@ -253,7 +252,6 @@ export type RootStackParamList = {
 
   // Wallet & Settings
   Wallet: undefined;
-  AddMoney: undefined;
   TransactionHistory: undefined;
   Settings: undefined;
   NotificationDetail: { notificationId: string };
@@ -271,6 +269,10 @@ export type RootStackParamList = {
   ConnectedAccounts: undefined;
   TrustGardenDetail: undefined;
   ChangePassword: undefined;
+
+  // Trips
+  TripDetails: { tripId: string };
+  MyTrips: undefined;
 
   // Missing routes
   BookingDetail: { bookingId: string };

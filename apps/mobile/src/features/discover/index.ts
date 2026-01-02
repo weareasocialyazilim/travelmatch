@@ -1,11 +1,12 @@
 /**
- * Trips Feature - Barrel Exports
+ * Discover Feature - Barrel Exports
  *
- * Seyahat discovery, booking, escrow yönetimi
+ * Moment discovery, booking, escrow yönetimi
  */
 
 // Screens
 export { default as DiscoverScreen } from './screens/DiscoverScreen';
+export { SearchMapScreen } from './screens/SearchMapScreen';
 export { default as BookingDetailScreen } from './screens/BookingDetailScreen';
 export { default as EscrowStatusScreen } from './screens/EscrowStatusScreen';
 export { HowEscrowWorksScreen } from './screens/HowEscrowWorksScreen';
@@ -14,7 +15,6 @@ export { ReceiverApprovalScreen } from './screens/ReceiverApprovalScreen';
 export { DisputeFlowScreen } from './screens/DisputeFlowScreen';
 export { TripDetailsScreen } from './screens/TripDetailsScreen';
 export { default as RequestsScreen } from './screens/RequestsScreen';
-export { default as RequestManagerScreen } from './screens/RequestManagerScreen';
 export { MyTripsScreen } from './screens/MyTripsScreen';
 export { default as TicketScreen } from './screens/TicketScreen';
 

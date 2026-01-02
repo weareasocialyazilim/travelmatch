@@ -1,189 +1,473 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import {
+  useNavigation,
+  useRoute,
+  type RouteProp,
+} from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import type { StackNavigationProp } from '@react-navigation/stack';
+import * as Haptics from 'expo-haptics';
+import { Image as _Image } from 'expo-image';
 import { COLORS } from '@/constants/colors';
+import { usePayments } from '@/hooks/usePayments';
+import { withErrorBoundary } from '@/components/withErrorBoundary';
 import type { RootStackParamList } from '@/navigation/routeParams';
+import type { NavigationProp } from '@react-navigation/native';
 
 type CheckoutRouteProp = RouteProp<RootStackParamList, 'Checkout'>;
-type CheckoutNavigationProp = StackNavigationProp<RootStackParamList, 'Checkout'>;
 
-export const CheckoutScreen = () => {
-  const navigation = useNavigation<CheckoutNavigationProp>();
+interface PaymentMethod {
+  id: string;
+  type: 'card' | 'wallet' | 'bank';
+  name: string;
+  last4?: string;
+  icon: string;
+}
+
+const CheckoutScreen: React.FC = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<CheckoutRouteProp>();
+  const [selectedMethod, setSelectedMethod] = useState<string>('wallet');
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  // Get moment info from route params with defaults
   const {
-    title = 'Dinner at Hotel Costes',
-    price = 150,
-    fee = 5,
+    momentId,
+    amount,
+    recipientId: _recipientId,
+    recipientName,
   } = route.params || {};
 
-  const total = price + fee;
+  const { cards, createPaymentIntent, confirmPayment } = usePayments();
 
-  const handlePay = () => {
-    navigation.navigate('Messages');
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('tr-TR', {
+      style: 'currency',
+      currency: 'TRY',
+      minimumFractionDigits: 2,
+    }).format(value);
   };
 
+  const defaultPaymentMethods: PaymentMethod[] = [
+    {
+      id: 'wallet',
+      type: 'wallet',
+      name: 'TravelMatch Wallet',
+      icon: 'wallet',
+    },
+    {
+      id: 'card-1',
+      type: 'card',
+      name: 'Visa',
+      last4: '4242',
+      icon: 'credit-card',
+    },
+  ];
+
+  // Convert cards to PaymentMethod format and add wallet
+  const cardMethods: PaymentMethod[] = cards.map((card) => ({
+    id: card.id,
+    type: 'card' as const,
+    name: card.brand || 'Card',
+    last4: card.last4,
+    icon: 'credit-card',
+  }));
+  const methods: PaymentMethod[] = [
+    {
+      id: 'wallet',
+      type: 'wallet',
+      name: 'TravelMatch Wallet',
+      icon: 'wallet',
+    },
+    ...cardMethods,
+    ...(cardMethods.length === 0
+      ? defaultPaymentMethods.filter((m) => m.type === 'card')
+      : []),
+  ];
+
+  const handlePayment = useCallback(async () => {
+    if (!selectedMethod || isProcessing || !momentId) return;
+
+    setIsProcessing(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+    try {
+      // Create payment intent
+      const paymentIntent = await createPaymentIntent(momentId, amount || 0);
+      if (!paymentIntent) {
+        throw new Error('Failed to create payment intent');
+      }
+
+      // Confirm payment with selected method
+      const success = await confirmPayment(paymentIntent.id, selectedMethod);
+      if (!success) {
+        throw new Error('Payment confirmation failed');
+      }
+
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      navigation.navigate('Success', {
+        type: 'payment',
+        title: 'Payment Successful',
+        subtitle: `You sent ${formatCurrency(amount || 0)} to ${recipientName}`,
+      });
+    } catch (_error) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      navigation.navigate('PaymentFailed', {
+        error: 'Payment failed. Please try again.',
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [
+    selectedMethod,
+    amount,
+    momentId,
+    recipientName,
+    createPaymentIntent,
+    confirmPayment,
+    navigation,
+    isProcessing,
+  ]);
+
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <View style={styles.handle} />
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => navigation.goBack()}
+          >
+            <MaterialCommunityIcons
+              name="close"
+              size={24}
+              color={COLORS.text.primary}
+            />
+          </TouchableOpacity>
+          <Text style={styles.title}>Checkout</Text>
+          <View style={styles.placeholder} />
+        </View>
 
-        <Text style={styles.title}>Confirm Gift</Text>
-        <Text style={styles.subtitle}>You're about to make someone's day!</Text>
-
-        {/* Receipt */}
-        <View style={styles.receipt}>
-          <View style={styles.row}>
-            <Text style={styles.label}>{title}</Text>
-            <Text style={styles.value}>${price}</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Platform Fee</Text>
-            <Text style={styles.value}>${fee}</Text>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.row}>
-            <Text style={styles.totalLabel}>Total</Text>
-            <Text style={styles.totalValue}>${total}</Text>
+        {/* Order Summary */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Order Summary</Text>
+          <View style={styles.orderCard}>
+            <View style={styles.orderRow}>
+              <Text style={styles.orderLabel}>Gift Amount</Text>
+              <Text style={styles.orderValue}>
+                {formatCurrency(amount || 0)}
+              </Text>
+            </View>
+            <View style={styles.orderRow}>
+              <Text style={styles.orderLabel}>Service Fee</Text>
+              <Text style={styles.orderValue}>{formatCurrency(0)}</Text>
+            </View>
+            <View style={styles.divider} />
+            <View style={styles.orderRow}>
+              <Text style={styles.totalLabel}>Total</Text>
+              <Text style={styles.totalValue}>
+                {formatCurrency(amount || 0)}
+              </Text>
+            </View>
           </View>
         </View>
 
-        {/* Payment Method */}
-        <TouchableOpacity style={styles.paymentMethod}>
-          <View style={styles.methodLeft}>
-            <MaterialCommunityIcons name="apple" size={24} color="white" />
-            <Text style={styles.methodText}>Apple Pay</Text>
+        {/* Recipient */}
+        {recipientName && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Sending to</Text>
+            <View style={styles.recipientCard}>
+              <View style={styles.recipientAvatar}>
+                <MaterialCommunityIcons
+                  name="account"
+                  size={28}
+                  color={COLORS.text.secondary}
+                />
+              </View>
+              <Text style={styles.recipientName}>{recipientName}</Text>
+            </View>
           </View>
-          <Ionicons name="chevron-forward" size={20} color={COLORS.gray[500]} />
-        </TouchableOpacity>
+        )}
 
-        {/* Pay Button */}
-        <TouchableOpacity style={styles.payButton} onPress={handlePay}>
+        {/* Payment Methods */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Payment Method</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('PaymentMethods')}
+            >
+              <Text style={styles.addMethodText}>+ Add New</Text>
+            </TouchableOpacity>
+          </View>
+
+          {methods.map((method) => (
+            <TouchableOpacity
+              key={method.id}
+              style={[
+                styles.paymentMethodItem,
+                selectedMethod === method.id && styles.selectedMethod,
+              ]}
+              onPress={() => setSelectedMethod(method.id)}
+            >
+              <View style={styles.methodIcon}>
+                <MaterialCommunityIcons
+                  name={
+                    method.icon as keyof typeof MaterialCommunityIcons.glyphMap
+                  }
+                  size={24}
+                  color={
+                    selectedMethod === method.id
+                      ? COLORS.brand.primary
+                      : COLORS.text.secondary
+                  }
+                />
+              </View>
+              <View style={styles.methodDetails}>
+                <Text style={styles.methodName}>{method.name}</Text>
+                {method.last4 && (
+                  <Text style={styles.methodLast4}>**** {method.last4}</Text>
+                )}
+              </View>
+              <View
+                style={[
+                  styles.radioButton,
+                  selectedMethod === method.id && styles.radioButtonSelected,
+                ]}
+              >
+                {selectedMethod === method.id && (
+                  <View style={styles.radioButtonInner} />
+                )}
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
+
+      {/* Pay Button */}
+      <View style={styles.footer}>
+        <TouchableOpacity
+          style={[styles.payButton, isProcessing && styles.payButtonDisabled]}
+          onPress={handlePayment}
+          disabled={isProcessing}
+        >
           <LinearGradient
-            colors={[COLORS.brand.primary, '#A2FF00']}
-            style={styles.gradient}
+            colors={['#6366F1', '#8B5CF6']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.payButtonGradient}
           >
-            <MaterialCommunityIcons
-              name="face-recognition"
-              size={24}
-              color="black"
-            />
-            <Text style={styles.payText}>Double Click to Pay</Text>
+            {isProcessing ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <>
+                <MaterialCommunityIcons name="lock" size={20} color="#fff" />
+                <Text style={styles.payButtonText}>
+                  Pay {formatCurrency(amount || 0)}
+                </Text>
+              </>
+            )}
           </LinearGradient>
         </TouchableOpacity>
+        <Text style={styles.securityText}>
+          Your payment is secured with encryption
+        </Text>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.overlay.dark,
-    justifyContent: 'flex-end',
+    backgroundColor: COLORS.background.primary,
   },
-  card: {
-    backgroundColor: '#1a1a1a',
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    padding: 24,
-    paddingBottom: 40,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
-  handle: {
-    width: 40,
-    height: 4,
-    backgroundColor: COLORS.gray[500],
-    borderRadius: 2,
-    alignSelf: 'center',
-    marginBottom: 20,
+  closeButton: {
+    padding: 4,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: COLORS.white,
-    marginBottom: 4,
+    fontSize: 18,
+    fontWeight: '600',
+    color: COLORS.text.primary,
   },
-  subtitle: {
-    fontSize: 14,
-    color: COLORS.text.secondary,
-    marginBottom: 24,
+  placeholder: {
+    width: 32,
   },
-  receipt: {
-    backgroundColor: COLORS.whiteTransparentDarkest,
-    borderRadius: 16,
+  section: {
     padding: 16,
-    marginBottom: 20,
   },
-  row: {
+  sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    alignItems: 'center',
+    marginBottom: 12,
   },
-  label: {
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.text.primary,
+    marginBottom: 12,
+  },
+  addMethodText: {
+    fontSize: 14,
+    color: COLORS.brand.primary,
+    fontWeight: '500',
+  },
+  orderCard: {
+    backgroundColor: COLORS.background.secondary,
+    borderRadius: 12,
+    padding: 16,
+  },
+  orderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+  },
+  orderLabel: {
+    fontSize: 14,
     color: COLORS.text.secondary,
   },
-  value: {
-    color: COLORS.white,
-    fontWeight: '600',
+  orderValue: {
+    fontSize: 14,
+    color: COLORS.text.primary,
+    fontWeight: '500',
   },
   divider: {
     height: 1,
-    backgroundColor: COLORS.hairlineLight,
+    backgroundColor: COLORS.border.default,
     marginVertical: 8,
   },
   totalLabel: {
-    color: COLORS.white,
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  totalValue: {
-    color: COLORS.brand.primary,
-    fontWeight: '900',
-    fontSize: 18,
-  },
-  paymentMethod: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    borderRadius: 16,
-    backgroundColor: COLORS.black,
-    marginBottom: 24,
-    borderWidth: 1,
-    borderColor: COLORS.hairlineLight,
-  },
-  methodLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  methodText: {
-    color: COLORS.white,
     fontSize: 16,
     fontWeight: '600',
+    color: COLORS.text.primary,
+  },
+  totalValue: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: COLORS.text.primary,
+  },
+  recipientCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.background.secondary,
+    borderRadius: 12,
+    padding: 16,
+    gap: 12,
+  },
+  recipientAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: COLORS.background.tertiary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  recipientName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.text.primary,
+  },
+  paymentMethodItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.background.secondary,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 8,
+    borderWidth: 1.5,
+    borderColor: 'transparent',
+  },
+  selectedMethod: {
+    borderColor: COLORS.brand.primary,
+  },
+  methodIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: COLORS.background.tertiary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  methodDetails: {
+    flex: 1,
+  },
+  methodName: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: COLORS.text.primary,
+  },
+  methodLast4: {
+    fontSize: 13,
+    color: COLORS.text.muted,
+    marginTop: 2,
+  },
+  radioButton: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: COLORS.text.muted,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  radioButtonSelected: {
+    borderColor: COLORS.brand.primary,
+  },
+  radioButtonInner: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: COLORS.brand.primary,
+  },
+  footer: {
+    padding: 16,
+    paddingBottom: 32,
+    borderTopWidth: 0.5,
+    borderTopColor: COLORS.border.default,
   },
   payButton: {
-    width: '100%',
-    height: 64,
-    borderRadius: 32,
+    borderRadius: 12,
     overflow: 'hidden',
   },
-  gradient: {
-    flex: 1,
+  payButtonDisabled: {
+    opacity: 0.7,
+  },
+  payButtonGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 12,
+    paddingVertical: 16,
+    gap: 8,
   },
-  payText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: COLORS.black,
+  payButtonText: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  securityText: {
+    fontSize: 12,
+    color: COLORS.text.muted,
+    textAlign: 'center',
+    marginTop: 12,
   },
 });
 
-export default CheckoutScreen;
+export default withErrorBoundary(CheckoutScreen, {
+  displayName: 'CheckoutScreen',
+});

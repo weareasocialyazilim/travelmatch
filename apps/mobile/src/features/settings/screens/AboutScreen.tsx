@@ -23,7 +23,7 @@ export const AboutScreen = ({ navigation }: any) => {
         <Text style={styles.version}>Version 1.0.0</Text>
 
         <View style={styles.menu}>
-          <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('Terms')}>
+          <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('TermsOfService')}>
             <Text style={styles.itemText}>Terms of Service</Text>
             <Ionicons name="chevron-forward" size={20} color="#666" />
           </TouchableOpacity>
