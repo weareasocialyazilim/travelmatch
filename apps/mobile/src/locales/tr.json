@@ -147,7 +147,17 @@
     "notVerified": "Doğrulanmadı",
     "memberSince": "{{date}} tarihinden beri üye",
     "reviews": "Yorumlar",
-    "rating": "Değerlendirme"
+    "rating": "Değerlendirme",
+    "moments": {
+      "noActive": "Henüz aktif moment yok",
+      "noPast": "Geçmiş moment yok"
+    },
+    "saved": {
+      "empty": {
+        "title": "Henüz Kayıtlı Vibe Yok",
+        "subtitle": "Daha sonra için kaydetmek istediğiniz momentlerdeki kalp simgesine dokunun."
+      }
+    }
   },
   "settings": {
     "settings": "Ayarlar",
@@ -507,9 +517,17 @@
     },
     "addDetails": "Detay ekle (isteğe bağlı)",
     "detailsPlaceholder": "Lütfen daha fazla bilgi verin...",
+    "details": {
+      "placeholder": "Raporunuz hakkında daha fazla bilgi verin..."
+    },
     "sendReport": "Rapor Gönder",
     "reportSubmitted": "Rapor Gönderildi",
     "thankYou": "Bildirdiğiniz için teşekkür ederiz. İnceleyeceğiz."
+  },
+  "review": {
+    "details": {
+      "placeholder": "Deneyiminizin detaylarını paylaşın..."
+    }
   },
   "trust": {
     "factors": {
@@ -567,7 +585,20 @@
   },
   "messages": {
     "offline": "Mesajları görmek için internet bağlantısı gerekli",
-    "cached": "Son yüklenen mesajları gösteriyorsunuz"
+    "cached": "Son yüklenen mesajları gösteriyorsunuz",
+    "empty": {
+      "title": "Henüz Mesaj Yok",
+      "description": "Gezginlerle veya ev sahipleriyle bağlantı kurduğunuzda, konuşmalarınız burada görünecek."
+    },
+    "search": {
+      "placeholder": "Konuşmaları ara..."
+    },
+    "archived": {
+      "empty": "Arşivlenmiş sohbet yok"
+    },
+    "input": {
+      "placeholder": "Mesaj..."
+    }
   },
   "wishCard": {
     "approximately": "yaklaşık"

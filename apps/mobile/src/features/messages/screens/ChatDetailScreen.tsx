@@ -24,6 +24,7 @@ import * as Haptics from 'expo-haptics';
 import { COLORS } from '@/constants/colors';
 import { useMessages } from '@/hooks/useMessages';
 import { useAuth } from '@/context/AuthContext';
+import { useTranslation } from '@/hooks/useTranslation';
 import { logger } from '@/utils/logger';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import type { RootStackParamList } from '@/navigation/routeParams';
@@ -113,6 +114,7 @@ const ChatDetailScreen: React.FC = () => {
   const route = useRoute<ChatDetailRouteProp>();
   const insets = useSafeAreaInsets();
   const flatListRef = useRef<FlatList>(null);
+  const { t } = useTranslation();
 
   const { conversationId, otherUser } = route.params;
   const { user: currentUser } = useAuth();
@@ -126,15 +128,23 @@ const ChatDetailScreen: React.FC = () => {
     markAsRead,
   } = useMessages();
 
-  // Load messages on mount
+  // Load messages on mount with cleanup
   useEffect(() => {
+    let isMounted = true;
+
     if (conversationId) {
       const fetchMessages = async () => {
-        await loadConversationMessages(conversationId);
-        markAsRead(conversationId);
+        if (isMounted) {
+          await loadConversationMessages(conversationId);
+          markAsRead(conversationId);
+        }
       };
       fetchMessages();
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [conversationId, loadConversationMessages, markAsRead]);
 
   // Sync messages from hook
@@ -205,6 +215,8 @@ const ChatDetailScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
+          accessibilityLabel={t('common.back')}
+          accessibilityRole="button"
         >
           <MaterialCommunityIcons
             name="chevron-left"
@@ -273,12 +285,13 @@ const ChatDetailScreen: React.FC = () => {
           <View style={styles.inputWrapper}>
             <TextInput
               style={styles.textInput}
-              placeholder="Message..."
+              placeholder={t('messages.input.placeholder')}
               placeholderTextColor={COLORS.text.muted}
               value={messageText}
               onChangeText={setMessageText}
               multiline
               maxLength={1000}
+              accessibilityLabel={t('messages.input.placeholder')}
             />
           </View>
 
