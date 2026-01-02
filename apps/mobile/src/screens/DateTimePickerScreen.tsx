@@ -7,7 +7,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Calendar, DateData } from 'react-native-calendars';
-import { COLORS } from '@/theme/colors';
+import { COLORS } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';

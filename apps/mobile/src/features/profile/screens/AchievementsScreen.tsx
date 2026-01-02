@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, FlatList, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '@/theme/colors';
+import { COLORS } from '@/constants/colors';
 
 const BADGES = [
   { id: '1', title: 'Early Adopter', desc: 'Joined in 2026', icon: 'https://cdn-icons-png.flaticon.com/512/5778/5778393.png', unlocked: true },

@@ -8,7 +8,7 @@ import Animated, {
   runOnJS
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { COLORS } from '@/theme/colors';
+import { COLORS } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
