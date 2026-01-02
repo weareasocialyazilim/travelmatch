@@ -3,8 +3,11 @@ import { View, Text, StyleSheet, TouchableOpacity, Share } from 'react-native';
 import { COLORS } from '@/theme/colors';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { logger } from '@/utils/production-logger';
 
-export const TransactionDetailScreen = ({ navigation }: any) => {
+export const TransactionDetailScreen = () => {
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
 
   const handleShare = async () => {
@@ -13,7 +16,7 @@ export const TransactionDetailScreen = ({ navigation }: any) => {
         message: 'TravelMatch Receipt: $150.00 for Dinner at Hotel Costes. Ref: #TM-8921',
       });
     } catch (error) {
-      console.log(error);
+      logger.error('Failed to share receipt', error as Error);
     }
   };
 
