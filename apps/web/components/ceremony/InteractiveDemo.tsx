@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 type DemoStep = 'gift' | 'experience' | 'proof' | 'celebrate';
@@ -9,7 +9,7 @@ export function InteractiveDemo() {
   const [activeStep, setActiveStep] = useState<DemoStep>('gift');
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
-  const steps: { id: DemoStep; title: string; description: string }[] = [
+  const steps = useMemo<{ id: DemoStep; title: string; description: string }[]>(() => [
     {
       id: 'gift',
       title: 'Hediye Gönder',
@@ -30,7 +30,7 @@ export function InteractiveDemo() {
       title: 'Kutla',
       description: 'Para aktarılır, anılar kalır',
     },
-  ];
+  ], []);
 
   // Auto-advance demo
   useEffect(() => {

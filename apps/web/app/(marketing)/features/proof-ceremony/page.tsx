@@ -1,7 +1,16 @@
+import type { Metadata } from 'next';
 import { CeremonyShowcase } from '@/components/ceremony/CeremonyShowcase';
 import { TrustBadgeDisplay } from '@/components/ceremony/TrustBadgeDisplay';
 
-export const metadata = {
+// Pre-generate star positions to avoid calling Math.random() during render
+const starPositions = Array.from({ length: 20 }, (_, i) => ({
+  id: i,
+  top: `${(i * 17 + 7) % 100}%`,
+  left: `${(i * 23 + 11) % 100}%`,
+  delay: `${(i * 0.1) % 2}s`,
+}));
+
+export const metadata: Metadata = {
   title: 'Proof Ceremony - TravelMatch',
   description: 'Hediye deneyimlerinizi unutulmaz anılara dönüştürün. AI destekli doğrulama, Sunset Clock ve daha fazlası.',
 };
@@ -78,14 +87,14 @@ export default function ProofCeremonyPage() {
           <div className="grid md:grid-cols-2 gap-12 items-center mb-24">
             <div className="order-2 md:order-1 bg-gradient-to-br from-emerald-900 to-teal-900 rounded-2xl h-64 flex items-center justify-center relative overflow-hidden">
               <div className="absolute inset-0">
-                {[...Array(20)].map((_, i) => (
+                {starPositions.map((star) => (
                   <div
-                    key={i}
+                    key={star.id}
                     className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
                     style={{
-                      top: `${Math.random() * 100}%`,
-                      left: `${Math.random() * 100}%`,
-                      animationDelay: `${Math.random() * 2}s`
+                      top: star.top,
+                      left: star.left,
+                      animationDelay: star.delay
                     }}
                   />
                 ))}
