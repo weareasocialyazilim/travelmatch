@@ -1,27 +1,31 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { COLORS } from '@/constants/colors';
+import type { RootStackParamList } from '@/navigation/routeParams';
 
 const SCREENS = [
-  { name: 'Onboarding', route: 'Onboarding' },
-  { name: 'Auth: Login', route: 'Login' },
-  { name: 'Auth: Register', route: 'Register' },
-  { name: 'Main: Discover', route: 'Discover' },
-  { name: 'Main: Inbox', route: 'Inbox' },
-  { name: 'Main: Profile', route: 'Profile' },
-  { name: 'Flow: Create Moment', route: 'CreateMoment' },
-  { name: 'Flow: Checkout', route: 'Checkout' },
-  { name: 'Detail: Chat', route: 'Chat' },
-  { name: 'Detail: Wallet', route: 'Wallet' },
-  { name: 'Detail: Gift Inbox', route: 'GiftInbox' },
-  { name: 'Wallet: Withdraw', route: 'Withdraw' },
-  { name: 'Settings: Privacy', route: 'PrivacyPolicy' },
-  { name: 'Error: Link Not Found', route: 'LinkNotFound' },
-  { name: 'Error: Maintenance', route: 'Maintenance' },
+  { name: 'Onboarding', route: 'Onboarding' as const },
+  { name: 'Auth: Login', route: 'Login' as const },
+  { name: 'Auth: Register', route: 'Register' as const },
+  { name: 'Main: Discover', route: 'Discover' as const },
+  { name: 'Main: Inbox', route: 'Inbox' as const },
+  { name: 'Main: Profile', route: 'Profile' as const },
+  { name: 'Flow: Create Moment', route: 'CreateMoment' as const },
+  { name: 'Flow: Checkout', route: 'Checkout' as const },
+  { name: 'Detail: Chat', route: 'Chat' as const },
+  { name: 'Detail: Wallet', route: 'Wallet' as const },
+  { name: 'Detail: Gift Inbox', route: 'GiftInbox' as const },
+  { name: 'Wallet: Withdraw', route: 'Withdraw' as const },
+  { name: 'Settings: Privacy', route: 'PrivacyPolicy' as const },
+  { name: 'Error: Link Not Found', route: 'LinkNotFound' as const },
+  { name: 'Error: Maintenance', route: 'Maintenance' as const },
 ];
 
-export const DevMenuScreen = ({ navigation }: any) => {
+type Props = NativeStackScreenProps<RootStackParamList, 'DevMenu'>;
+
+export const DevMenuScreen = ({ navigation }: Props) => {
   const insets = useSafeAreaInsets();
 
   return (
