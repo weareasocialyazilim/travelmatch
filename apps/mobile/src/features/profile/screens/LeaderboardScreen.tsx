@@ -17,7 +17,7 @@ import Animated, { FadeInUp } from 'react-native-reanimated';
 import { COLORS } from '@/constants/colors';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
-const { width } = Dimensions.get('window');
+const { width: _width } = Dimensions.get('window');
 
 interface Leader {
   id: string;
@@ -82,7 +82,7 @@ export const LeaderboardScreen: React.FC = () => {
     return (
       <View style={styles.podiumContainer}>
         {/* 2nd Place */}
-        <View style={[styles.podiumItem, { marginTop: 40 }]}>
+        <View style={[styles.podiumItem, styles.podiumSecond]}>
           <Image source={{ uri: second.avatar }} style={styles.podiumAvatar} />
           <View style={styles.rankBadgeSilver}>
             <Text style={styles.rankText}>2</Text>
@@ -92,7 +92,7 @@ export const LeaderboardScreen: React.FC = () => {
         </View>
 
         {/* 1st Place */}
-        <View style={[styles.podiumItem, { zIndex: 10 }]}>
+        <View style={[styles.podiumItem, styles.podiumFirst]}>
           <View style={styles.crownContainer}>
             <MaterialCommunityIcons name="crown" size={32} color="#FFD700" />
           </View>
@@ -108,7 +108,7 @@ export const LeaderboardScreen: React.FC = () => {
         </View>
 
         {/* 3rd Place */}
-        <View style={[styles.podiumItem, { marginTop: 60 }]}>
+        <View style={[styles.podiumItem, styles.podiumThird]}>
           <Image source={{ uri: third.avatar }} style={styles.podiumAvatar} />
           <View style={styles.rankBadgeBronze}>
             <Text style={styles.rankText}>3</Text>
@@ -180,7 +180,7 @@ export const LeaderboardScreen: React.FC = () => {
             renderItem={renderListItem}
             keyExtractor={(item) => item.id}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 40 }}
+            contentContainerStyle={styles.listContent}
           />
         </View>
       </LinearGradient>
@@ -219,6 +219,10 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   podiumItem: { alignItems: 'center' },
+  podiumFirst: { zIndex: 10 },
+  podiumSecond: { marginTop: 40 },
+  podiumThird: { marginTop: 60 },
+  listContent: { paddingBottom: 40 },
   crownContainer: { marginBottom: -10, zIndex: 2 },
   podiumAvatar: {
     width: 70,

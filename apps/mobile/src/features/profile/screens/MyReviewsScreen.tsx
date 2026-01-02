@@ -14,7 +14,7 @@ export const MyReviewsScreen = ({ navigation }: any) => {
   const insets = useSafeAreaInsets();
 
   const renderStars = (count: number) => (
-    <View style={{ flexDirection: 'row', gap: 2 }}>
+    <View style={styles.starsRow}>
       {[...Array(5)].map((_, i) => (
         <Ionicons key={i} name={i < count ? "star" : "star-outline"} size={14} color="#FFD700" />
       ))}
@@ -42,7 +42,7 @@ export const MyReviewsScreen = ({ navigation }: any) => {
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}><Ionicons name="arrow-back" size={24} color="white" /></TouchableOpacity>
         <Text style={styles.headerTitle}>Reviews</Text>
-        <View style={{ width: 24 }} />
+        <View style={styles.headerSpacer} />
       </View>
 
       <View style={styles.summary}>
@@ -78,4 +78,6 @@ const styles = StyleSheet.create({
   date: { color: '#666', fontSize: 12 },
   ratingBadge: { backgroundColor: 'rgba(0,0,0,0.3)', padding: 6, borderRadius: 8 },
   reviewText: { color: '#ccc', lineHeight: 20, fontStyle: 'italic' },
+  starsRow: { flexDirection: 'row', gap: 2 },
+  headerSpacer: { width: 24 },
 });

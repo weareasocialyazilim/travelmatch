@@ -64,7 +64,7 @@ const ReviewScreen: React.FC = () => {
   const [reviewText, setReviewText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { momentId, userId, userName, userAvatar, momentTitle } =
+  const { momentId: _momentId, userId: _userId, userName, userAvatar, momentTitle } =
     route.params || {};
 
   const handleSubmit = useCallback(async () => {
@@ -83,7 +83,7 @@ const ReviewScreen: React.FC = () => {
         title: 'Review Submitted',
         subtitle: 'Thank you for your feedback!',
       });
-    } catch (error) {
+    } catch {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setIsSubmitting(false);
@@ -364,4 +364,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withErrorBoundary(ReviewScreen, 'ReviewScreen');
+export default withErrorBoundary(ReviewScreen, {
+  fallbackType: 'generic',
+  displayName: 'ReviewScreen',
+});

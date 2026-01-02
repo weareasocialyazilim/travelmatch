@@ -106,7 +106,7 @@ const CreateMomentScreen: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const categoryObj = CATEGORIES.find((c) => c.id === selectedCategory);
+      const _categoryObj = CATEGORIES.find((c) => c.id === selectedCategory);
 
       const momentData = {
         title: title.trim(),
@@ -135,7 +135,7 @@ const CreateMomentScreen: React.FC = () => {
       } else {
         showToast('Could not create moment. Please try again.', 'error');
       }
-    } catch (error) {
+    } catch {
       showToast('Something went wrong. Please try again.', 'error');
     } finally {
       setIsSubmitting(false);

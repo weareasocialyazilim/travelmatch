@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS } from '@/constants/colors';
 
 export const EditMomentScreen = ({ navigation }: any) => {
@@ -21,7 +20,7 @@ export const EditMomentScreen = ({ navigation }: any) => {
   // Mock Data (Normalde route.params ile gelir)
   const [title, setTitle] = useState('Dinner at Hotel Costes');
   const [price, setPrice] = useState('150');
-  const [image, setImage] = useState('https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=600');
+  const [image, _setImage] = useState('https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=600');
 
   const handleSave = () => {
     Alert.alert('Changes Saved', 'Your moment has been updated successfully.', [
@@ -49,7 +48,7 @@ export const EditMomentScreen = ({ navigation }: any) => {
           style={styles.content}
         >
           <View style={styles.imagePreviewContainer}>
-            <ImageBackground source={{ uri: image }} style={styles.imagePreview} imageStyle={{ borderRadius: 20 }}>
+            <ImageBackground source={{ uri: image }} style={styles.imagePreview} imageStyle={styles.imagePreviewBorderRadius}>
               <TouchableOpacity style={styles.changePhotoBtn}>
                 <MaterialCommunityIcons name="camera-flip" size={24} color="white" />
                 <Text style={styles.changePhotoText}>Change Photo</Text>
@@ -122,4 +121,5 @@ const styles = StyleSheet.create({
 
   saveBtn: { backgroundColor: COLORS.brand.primary, height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
   saveBtnText: { color: 'black', fontWeight: 'bold', fontSize: 16 },
+  imagePreviewBorderRadius: { borderRadius: 20 },
 });

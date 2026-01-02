@@ -6,15 +6,15 @@ import { COLORS } from '@/constants/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 
-const { width, height } = Dimensions.get('window');
+const { width: _width, height } = Dimensions.get('window');
 
-export const MomentDetailScreen = ({ navigation, route }: any) => {
+export const MomentDetailScreen = ({ navigation, route: _route }: any) => {
   const insets = useSafeAreaInsets();
   // route.params'dan data gelir
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
         {/* Hero Image */}
         <View style={styles.imageContainer}>
@@ -65,7 +65,7 @@ export const MomentDetailScreen = ({ navigation, route }: any) => {
           <View style={styles.mapPreview}>
             <MaterialCommunityIcons name="map-marker-radius" size={24} color={COLORS.brand.primary} />
             <Text style={styles.locationText}>239 Rue Saint-Honoré, Paris</Text>
-            <Ionicons name="chevron-forward" size={20} color="#666" style={{ marginLeft: 'auto' }} />
+            <Ionicons name="chevron-forward" size={20} color="#666" style={styles.mapChevron} />
           </View>
 
           <Text style={styles.sectionTitle}>What to expect</Text>
@@ -105,6 +105,8 @@ export const MomentDetailScreen = ({ navigation, route }: any) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background.primary },
+  scrollContent: { paddingBottom: 100 },
+  mapChevron: { marginLeft: 'auto' },
   imageContainer: { height: height * 0.45, width: '100%' },
   image: { width: '100%', height: '100%' },
   gradient: { position: 'absolute', bottom: 0, width: '100%', height: 150 },

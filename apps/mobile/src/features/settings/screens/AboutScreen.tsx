@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
@@ -12,7 +12,7 @@ export const AboutScreen = ({ navigation }: any) => {
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}><Ionicons name="arrow-back" size={24} color="white" /></TouchableOpacity>
         <Text style={styles.headerTitle}>About</Text>
-        <View style={{ width: 24 }} />
+        <View style={styles.headerSpacer} />
       </View>
 
       <View style={styles.content}>
@@ -33,7 +33,7 @@ export const AboutScreen = ({ navigation }: any) => {
           </TouchableOpacity>
         </View>
 
-        <View style={{ flex: 1 }} />
+        <View style={styles.flexSpacer} />
 
         <Text style={styles.footer}>Made with ⚡️ in Istanbul</Text>
       </View>
@@ -53,4 +53,6 @@ const styles = StyleSheet.create({
   item: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 20, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' },
   itemText: { color: 'white', fontSize: 16, fontWeight: '500' },
   footer: { color: '#444', marginBottom: 20, fontSize: 12 },
+  headerSpacer: { width: 24 },
+  flexSpacer: { flex: 1 },
 });
