@@ -220,8 +220,8 @@ const InboxScreen: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<InboxTab>('active');
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [chats, setChats] = useState<InboxChat[]>(MOCK_CHATS);
-  const [requests, setRequests] = useState<InboxChat[]>(MOCK_REQUESTS);
+  const [chats] = useState<InboxChat[]>(MOCK_CHATS);
+  const [requests] = useState<InboxChat[]>(MOCK_REQUESTS);
 
   // Calculate totals
   const totalUnread = useMemo(

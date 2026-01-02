@@ -30,19 +30,17 @@ import { BlurView } from 'expo-blur';
 import Animated, {
   FadeInDown,
   FadeInUp,
-  FadeInRight,
 } from 'react-native-reanimated';
 import BottomNav from '@/components/BottomNav';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
 import { NetworkGuard } from '@/components/NetworkGuard';
 import { useToast } from '@/context/ToastContext';
-import { COLORS, primitives, GRADIENTS } from '@/constants/colors';
-import { TYPOGRAPHY } from '@/theme/typography';
+import { COLORS, primitives } from '@/constants/colors';
 import { usePayments } from '@/hooks/usePayments';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const _screenDimensions = Dimensions.get('window');
 
 type FilterType = 'all' | 'incoming' | 'outgoing' | 'gifts';
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];

@@ -251,10 +251,14 @@ export type RootStackParamList = {
 
   // Wallet & Settings
   Wallet: undefined;
+  AddMoney: undefined;
   TransactionHistory: undefined;
   Settings: undefined;
   NotificationDetail: { notificationId: string };
   EditProfile: undefined;
+
+  // Calendar
+  MyCalendar: undefined;
 
   // New Profile sub-screens
   MyMoments: undefined;

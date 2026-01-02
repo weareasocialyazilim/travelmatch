@@ -7,7 +7,7 @@ import { COLORS } from '@/constants/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 
-const { width } = Dimensions.get('window');
+const _screenWidth = Dimensions.get('window').width;
 
 const CHART_DATA = [40, 65, 30, 80, 55, 90, 70]; // Mock data for bar chart
 
