@@ -83,7 +83,7 @@ export function useRealtimeSubscription<T extends Record<string, unknown>>(
           }
         },
       )
-      .subscribe((status) => {
+      .subscribe((status: string) => {
         if (status === 'SUBSCRIBED') {
           setIsConnected(true);
           setError(null);
@@ -280,10 +280,10 @@ export function useAdminPresence(adminId: string) {
         const state = channel.presenceState();
         const admins = Object.values(state)
           .flat()
-          .map((p: Record<string, unknown>) => p.admin_id as string);
+          .map((p) => (p as Record<string, unknown>).admin_id as string);
         setOnlineAdmins(admins);
       })
-      .subscribe(async (status) => {
+      .subscribe(async (status: string) => {
         if (status === 'SUBSCRIBED') {
           await channel.track({
             admin_id: adminId,
