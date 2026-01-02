@@ -29,15 +29,15 @@ import sys
 import re
 import os
 from datetime import datetime
-from typing import Dict, Any, Tuple, List
+from typing import Dict, Any, Tuple, Optional
+from pathlib import Path
 
 
-def validate_safe_path(filepath: str, base_dir: str = None) -> str:
+def validate_safe_path(filepath: str, base_dir: Optional[str] = None) -> str:
     """
     Validate and sanitize file path to prevent path traversal attacks.
     Returns the resolved absolute path if safe, raises ValueError otherwise.
     """
-    from pathlib import Path
     if base_dir is None:
         base_dir = os.getcwd()
     
@@ -61,7 +61,7 @@ def validate_safe_path(filepath: str, base_dir: str = None) -> str:
     return str(target)
 
 
-def write_file_safely(filepath: str, content: str, base_dir: str = None) -> None:
+def write_file_safely(filepath: str, content: str, base_dir: Optional[str] = None) -> None:
     """
     Safely write to a file after validating the path.
     This function combines path validation and file writing to ensure
@@ -80,7 +80,10 @@ def write_file_safely(filepath: str, content: str, base_dir: str = None) -> None
 def hex_to_rgb(hex_color: str) -> Tuple[int, int, int]:
     """Convert hex color to RGB tuple."""
     hex_color = hex_color.lstrip('#')
-    return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+    r = int(hex_color[0:2], 16)
+    g = int(hex_color[2:4], 16)
+    b = int(hex_color[4:6], 16)
+    return (r, g, b)
 
 
 def rgb_to_hex(rgb: Tuple[int, int, int]) -> str:

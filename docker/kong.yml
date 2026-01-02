@@ -29,8 +29,8 @@ services:
     plugins:
       - name: cors
 
+  # GoTrue: /auth/v1/* -> http://auth:9999/*
   - name: auth-v1
-    _comment: "GoTrue: /auth/v1/* -> http://auth:9999/*"
     url: http://auth:9999/
     routes:
       - name: auth-v1-all
@@ -43,8 +43,8 @@ services:
         config:
           hide_credentials: false
 
+  # PostgREST: /rest/v1/* -> http://rest:3000/*
   - name: rest-v1
-    _comment: "PostgREST: /rest/v1/* -> http://rest:3000/*"
     url: http://rest:3000/
     routes:
       - name: rest-v1-all
@@ -57,8 +57,8 @@ services:
         config:
           hide_credentials: true
 
+  # Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*
   - name: realtime-v1
-    _comment: "Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*"
     url: http://realtime:4000/socket
     routes:
       - name: realtime-v1-all
@@ -71,8 +71,8 @@ services:
         config:
           hide_credentials: false
 
+  # Storage: /storage/v1/* -> http://storage:5000/*
   - name: storage-v1
-    _comment: "Storage: /storage/v1/* -> http://storage:5000/*"
     url: http://storage:5000/
     routes:
       - name: storage-v1-all
@@ -82,8 +82,8 @@ services:
     plugins:
       - name: cors
 
+  # pg-meta: /pg/* -> http://meta:8080/*
   - name: meta-v1
-    _comment: "pg-meta: /pg/* -> http://meta:8080/*"
     url: http://meta:8080/
     routes:
       - name: meta-v1-all

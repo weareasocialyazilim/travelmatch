@@ -33,7 +33,7 @@ Examples:
 
 import sys
 import json
-from typing import Dict, Any, List, Tuple, Optional
+from typing import Dict, Any, List, Union
 
 
 # Standard breakpoints (matching design system)

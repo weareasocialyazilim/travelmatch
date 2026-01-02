@@ -32,7 +32,7 @@ Examples:
 import sys
 import json
 from datetime import datetime
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Union
 
 
 # Design system metadata

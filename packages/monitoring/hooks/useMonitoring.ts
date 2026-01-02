@@ -64,7 +64,8 @@ export function useNavigationTracking(): void {
     if (!monitoringService.isEnabled()) return;
 
     const unsubscribe = navigation.addListener('state', () => {
-      const currentRouteName = navigation.getCurrentRoute()?.name;
+      const state = navigation.getState();
+      const currentRouteName = state?.routes?.[state.index]?.name;
 
       if (routeNameRef.current !== currentRouteName) {
         monitoringService.trackAction('navigation', {
