@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
       resource_type: 'task',
       resource_id: task.id,
       new_value: task,
-      ip_address: request.headers.get('x-forwarded-for') || request.ip,
+      ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined,
       user_agent: request.headers.get('user-agent'),
     });
 

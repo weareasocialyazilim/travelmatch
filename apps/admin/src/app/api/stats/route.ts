@@ -142,13 +142,14 @@ export async function GET(request: NextRequest) {
       : 0;
 
     // Calculate revenue
+    type TransactionAmount = { amount?: number };
     const currentMonthRevenue = currentMonthRevenueResult.data?.reduce(
-      (sum, t) => sum + (t.amount || 0),
+      (sum: number, t: TransactionAmount) => sum + (t.amount || 0),
       0
     ) || 0;
 
     const prevMonthRevenue = prevMonthRevenueResult.data?.reduce(
-      (sum, t) => sum + (t.amount || 0),
+      (sum: number, t: TransactionAmount) => sum + (t.amount || 0),
       0
     ) || 0;
 
@@ -157,7 +158,7 @@ export async function GET(request: NextRequest) {
       : 0;
 
     const todayRevenue = todayRevenueResult.data?.reduce(
-      (sum, t) => sum + (t.amount || 0),
+      (sum: number, t: TransactionAmount) => sum + (t.amount || 0),
       0
     ) || 0;
 
