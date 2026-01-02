@@ -1,9 +1,8 @@
 // Profile Feature Exports
 export { default as ProfileScreen } from './screens/ProfileScreen';
 export { ProfileDetailScreen } from './screens/ProfileDetailScreen';
-export { UserProfileScreen } from './screens/UserProfileScreen';
 export { default as EditProfileScreen } from './screens/EditProfileScreen';
-export { default as UserProfileScreen } from './screens/UserProfileScreen';
+export { UserProfileScreen } from './screens/UserProfileScreen';
 
 // Reputation & Trust
 export { default as ReputationScreen } from './screens/ReputationScreen';

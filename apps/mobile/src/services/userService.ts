@@ -173,7 +173,6 @@ export const userService = {
       .select(
         `
         id,
-        username,
         full_name,
         email,
         avatar_url,
@@ -202,7 +201,7 @@ export const userService = {
       id: profile.id,
       email: profile.email || '',
       name: profile.full_name || 'User',
-      username: profile.username || '',
+      username: profile.email?.split('@')[0] || '', // Derive username from email
       avatar: profile.avatar_url || '',
       bio: profile.bio || undefined,
       location: profile.location
@@ -238,8 +237,8 @@ export const userService = {
       .select(
         `
         id,
-        username,
         full_name,
+        email,
         avatar_url,
         bio,
         location,
@@ -263,7 +262,7 @@ export const userService = {
       id: profile.id,
       email: '',
       name: profile.full_name || 'User',
-      username: profile.username || '',
+      username: profile.email?.split('@')[0] || '', // Derive username from email
       avatar: profile.avatar_url || '',
       bio: profile.bio || undefined,
       location: profile.location
@@ -290,19 +289,20 @@ export const userService = {
   },
 
   /**
-   * Get user profile by username
+   * Get user profile by username (searches by email prefix since username column doesn't exist)
    */
   getUserByUsername: async (
     username: string,
   ): Promise<{ user: UserProfile }> => {
     // SECURITY: Only select public profile fields
+    // Note: Search by email since username column doesn't exist in database
     const { data: profile, error } = await supabase
       .from('users')
       .select(
         `
         id,
-        username,
         full_name,
+        email,
         avatar_url,
         bio,
         location,
@@ -313,7 +313,7 @@ export const userService = {
         interests
       `,
       )
-      .eq('username', username)
+      .ilike('email', `${username}@%`)
       .single();
 
     if (error) {
@@ -326,7 +326,7 @@ export const userService = {
       id: profile.id,
       email: '',
       name: profile.full_name || 'User',
-      username: profile.username || '',
+      username: profile.email?.split('@')[0] || '', // Derive username from email
       avatar: profile.avatar_url || '',
       bio: profile.bio || undefined,
       location: profile.location
