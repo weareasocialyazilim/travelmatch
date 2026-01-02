@@ -98,20 +98,21 @@ declare module '@shopify/flash-list' {
 
 declare module 'expo-image' {
   import { ComponentType } from 'react';
-  import { ImageProps } from 'react-native';
+  import { ImageProps, StyleProp, ViewStyle, ImageStyle } from 'react-native';
 
-  export const Image: ComponentType<
-    ImageProps & {
-      contentFit?: any;
-      placeholder?: any;
-      transition?: number;
-      priority?: string;
-      cachePolicy?: string;
-    }
-  >;
-  export type ImageContentFit = string;
+  export interface ExpoImageProps extends Omit<ImageProps, 'style'> {
+    contentFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
+    placeholder?: string | { uri: string } | number;
+    transition?: number;
+    priority?: 'low' | 'normal' | 'high';
+    cachePolicy?: 'none' | 'disk' | 'memory' | 'memory-disk';
+    style?: StyleProp<ViewStyle | ImageStyle>;
+  }
 
-  const ExpoImage: ComponentType<ImageProps>;
+  export const Image: ComponentType<ExpoImageProps>;
+  export type ImageContentFit = 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
+
+  const ExpoImage: ComponentType<ExpoImageProps>;
   export default ExpoImage;
 }
 
@@ -146,6 +147,133 @@ declare module 'expo-tracking-transparency' {
   export function getTrackingPermissionsAsync(): Promise<TrackingPermissionResponse>;
   export function requestTrackingPermissionsAsync(): Promise<TrackingPermissionResponse>;
   export function isAvailable(): boolean;
+}
+
+// react-native-view-shot type declarations
+declare module 'react-native-view-shot' {
+  import { Component, RefObject } from 'react';
+  import { ViewProps, View } from 'react-native';
+
+  export interface CaptureOptions {
+    format?: 'png' | 'jpg' | 'webm' | 'raw';
+    quality?: number;
+    result?: 'tmpfile' | 'base64' | 'data-uri' | 'zip-base64';
+    snapshotContentContainer?: boolean;
+    width?: number;
+    height?: number;
+  }
+
+  export interface ViewShotProperties extends ViewProps {
+    options?: CaptureOptions;
+    captureMode?: 'mount' | 'continuous' | 'update';
+    onCapture?: (uri: string) => void;
+    onCaptureFailure?: (error: Error) => void;
+  }
+
+  export function captureRef(
+    view: RefObject<View> | View | number,
+    options?: CaptureOptions,
+  ): Promise<string>;
+
+  export function captureScreen(options?: CaptureOptions): Promise<string>;
+
+  export function releaseCapture(uri: string): void;
+
+  export default class ViewShot extends Component<ViewShotProperties> {
+    capture(): Promise<string>;
+  }
+}
+
+// react-native-confetti-cannon type declarations
+declare module 'react-native-confetti-cannon' {
+  import { Component } from 'react';
+  import { ViewStyle, StyleProp } from 'react-native';
+
+  export interface ConfettiCannonProps {
+    count?: number;
+    origin?: { x: number; y: number };
+    explosionSpeed?: number;
+    fallSpeed?: number;
+    fadeOut?: boolean;
+    colors?: string[];
+    autoStart?: boolean;
+    autoStartDelay?: number;
+    onAnimationStart?: () => void;
+    onAnimationStop?: () => void;
+    onAnimationResume?: () => void;
+    onAnimationEnd?: () => void;
+    style?: StyleProp<ViewStyle>;
+  }
+
+  export default class ConfettiCannon extends Component<ConfettiCannonProps> {
+    start(): void;
+    stop(): void;
+    resume(): void;
+  }
+}
+
+// expo-media-library type declarations
+declare module 'expo-media-library' {
+  export type PermissionStatus = 'granted' | 'denied' | 'undetermined';
+
+  export interface PermissionResponse {
+    status: PermissionStatus;
+    granted: boolean;
+    canAskAgain: boolean;
+    expires: 'never' | number;
+  }
+
+  export interface Asset {
+    id: string;
+    filename: string;
+    uri: string;
+    mediaType: 'photo' | 'video' | 'audio' | 'unknown';
+    width: number;
+    height: number;
+    creationTime: number;
+    modificationTime: number;
+    duration: number;
+    albumId?: string;
+  }
+
+  export interface Album {
+    id: string;
+    title: string;
+    assetCount: number;
+    type?: 'album' | 'smartAlbum';
+  }
+
+  export interface AssetInfo extends Asset {
+    localUri?: string;
+    location?: {
+      latitude: number;
+      longitude: number;
+    };
+    exif?: Record<string, unknown>;
+    isFavorite?: boolean;
+  }
+
+  export function requestPermissionsAsync(): Promise<PermissionResponse>;
+  export function getPermissionsAsync(): Promise<PermissionResponse>;
+  export function saveToLibraryAsync(localUri: string): Promise<Asset>;
+  export function createAssetAsync(localUri: string): Promise<Asset>;
+  export function getAssetInfoAsync(
+    asset: Asset | string,
+    options?: { shouldDownloadFromNetwork?: boolean },
+  ): Promise<AssetInfo>;
+  export function deleteAssetsAsync(assets: Asset[] | string[]): Promise<boolean>;
+  export function getAlbumsAsync(): Promise<Album[]>;
+  export function getAlbumAsync(title: string): Promise<Album | null>;
+  export function createAlbumAsync(
+    albumName: string,
+    asset?: Asset,
+    copyAsset?: boolean,
+  ): Promise<Album>;
+  export function addAssetsToAlbumAsync(
+    assets: Asset[] | string[],
+    album: Album | string,
+    copy?: boolean,
+  ): Promise<boolean>;
 }
 
 // Some small global helpers used in older codepaths — prefer importing
