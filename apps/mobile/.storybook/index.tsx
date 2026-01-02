@@ -1,10 +1,5 @@
-import { getStorybookUI } from '@storybook/react-native';
+import { view } from './storybook.requires';
 
-import './storybook.requires';
-
-const StorybookUIRoot = getStorybookUI({
-  // Enable asyncStorage for Storybook state persistence
-  asyncStorage: require('@react-native-async-storage/async-storage').default,
-});
+const StorybookUIRoot = view;
 
 export default StorybookUIRoot;
