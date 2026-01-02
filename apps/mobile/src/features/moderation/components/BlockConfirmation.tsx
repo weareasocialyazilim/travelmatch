@@ -15,8 +15,10 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { COLORS } from '../constants/colors';
-import { logger } from '../utils/logger';
+import { COLORS } from '@/constants/colors';
+import { logger } from '@/utils/logger';
+import { useToast } from '@/context/ToastContext';
+import { moderationService } from '@/services/moderationService';
 
 // Color aliases for easier use
 const colors = {
@@ -33,8 +35,6 @@ const colors = {
     error: COLORS.danger,
   },
 };
-import { useToast } from '../context/ToastContext';
-import { moderationService } from '../services/moderationService';
 
 interface BlockConfirmationProps {
   visible: boolean;
@@ -66,7 +66,10 @@ export const BlockConfirmation: React.FC<BlockConfirmationProps> = ({
       onBlocked?.();
       onClose();
     } catch (err) {
-      logger.error('[BlockConfirmation] Failed to block user', { userId, error: err });
+      logger.error('[BlockConfirmation] Failed to block user', {
+        userId,
+        error: err,
+      });
       showToast('Failed to block user', 'error');
     } finally {
       setLoading(false);

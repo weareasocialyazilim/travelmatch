@@ -6,7 +6,7 @@
 
 // Screens
 export { default as DiscoverScreen } from './screens/DiscoverScreen';
-export { SearchMapScreen } from './screens/SearchMapScreen';
+export { default as SearchMapScreen } from './screens/SearchMapScreen';
 export { default as BookingDetailScreen } from './screens/BookingDetailScreen';
 export { default as EscrowStatusScreen } from './screens/EscrowStatusScreen';
 export { HowEscrowWorksScreen } from './screens/HowEscrowWorksScreen';
