@@ -113,6 +113,22 @@ export {
 } from './logger.ts';
 
 // =============================================================================
+// DISTRIBUTED TRACING
+// =============================================================================
+export {
+  Tracer,
+  createTracer,
+  addTraceHeaders,
+  generateTraceId,
+  generateSpanId,
+  parseTraceparent,
+  formatTraceparent,
+  type TraceContext,
+  type Span,
+  type SpanEvent,
+} from './tracing.ts';
+
+// =============================================================================
 // DATABASE
 // =============================================================================
 export {
@@ -132,6 +148,51 @@ export {
   type PaginatedResult,
   type CursorPaginatedResult,
 } from './database.ts';
+
+// =============================================================================
+// GUARD MIDDLEWARE (Zod Schema Contracts)
+// =============================================================================
+export {
+  createGuard,
+  paginationQuery,
+  cursorQuery,
+  locationQuery,
+  sortQuery,
+  combineQuery,
+  type GuardContext,
+  type GuardOptions,
+  type GuardHandler,
+  type GuardResponse,
+} from './guard-middleware.ts';
+
+// =============================================================================
+// OBSERVABILITY (Metrics & Monitoring)
+// =============================================================================
+export {
+  metrics,
+  metricsStore,
+  MetricsReporter,
+  HealthChecker,
+  healthChecker,
+  type RequestMetric,
+  type FunctionStats,
+  type HealthStatus,
+} from './observability.ts';
+
+// =============================================================================
+// CHAOS ENGINEERING (Testing & Resilience)
+// =============================================================================
+export {
+  chaosMonkey,
+  ChaosMode,
+  ChaosError,
+  ChaosScenarios,
+  ChaosTestRunner,
+  chaosTestRunner,
+  type ChaosConfig,
+  type ChaosContext,
+  type ChaosResult,
+} from './chaos.ts';
 
 // =============================================================================
 // CONVENIENCE HELPERS
