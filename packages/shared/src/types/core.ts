@@ -3,8 +3,9 @@
  * Fundamental domain types used across the application
  */
 
+import type { KYCStatus } from './enums';
+
 export type Role = 'Traveler' | 'Local';
-export type KYCStatus = 'Unverified' | 'Pending' | 'Verified';
 
 export interface UserLocation {
   latitude: number;

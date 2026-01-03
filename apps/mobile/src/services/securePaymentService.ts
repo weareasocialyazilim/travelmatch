@@ -1,60 +1,38 @@
 /**
  * Secure Payment Service (Client-Side)
  *
- * Communicates with server-side Edge Functions for PCI-compliant payment processing
- * Uses PayTR for Turkish payment processing
+ * Handles PayTR payment operations for PCI-compliant payment processing.
+ * Delegates wallet and transaction queries to specialized services.
  *
- * Features:
- * - Server-side PayTR API calls
- * - Automatic cache invalidation
- * - Error handling and retry logic
- * - Type-safe payment operations
+ * @see walletService.ts for wallet balance operations
+ * @see transactionService.ts for transaction history queries
  *
  * PayTR Edge Functions:
  * - paytr-create-payment: Create payment and get iframeToken
  * - paytr-webhook: Handle PayTR callbacks
  * - paytr-saved-cards: Manage saved cards
- * - paytr-transfer: Handle transfers
  */
 
 import { supabase, SUPABASE_EDGE_URL } from '../config/supabase';
 import { logger } from '../utils/logger';
 import {
-  getCachedWallet,
-  setCachedWallet,
   invalidateWallet,
-  getCachedTransactions,
-  setCachedTransactions,
   invalidateTransactions,
   invalidateAllPaymentCache,
 } from './cacheInvalidationService';
-import { toRecord } from '../utils/jsonHelper';
-import type { Database } from '../types/database.types';
+import { walletService, type WalletBalance } from './walletService';
+import { transactionService, type Transaction } from './transactionService';
 
-// Types
+// Re-export types for backward compatibility
+export type { WalletBalance } from './walletService';
+export type { Transaction, TransactionFilters } from './transactionService';
+
 export interface PayTRPaymentResponse {
   iframeToken: string;
   merchantOid: string;
   transactionId?: string;
   amount: number;
   currency: string;
-}
-
-export interface WalletBalance {
-  available: number;
-  pending: number;
-  currency: string;
-}
-
-export interface Transaction {
-  id: string;
-  type: string;
-  amount: number;
-  currency?: string | null;
-  status: string | null;
-  description: string | null;
-  createdAt: string | null;
-  metadata?: Record<string, unknown> | null;
 }
 
 export interface CreatePaymentParams {
@@ -65,6 +43,13 @@ export interface CreatePaymentParams {
   metadata?: Record<string, unknown>;
   saveCard?: boolean;
   cardToken?: string;
+}
+
+export interface SavedCard {
+  cardToken: string;
+  last4: string;
+  cardBrand: string;
+  isDefault: boolean;
 }
 
 class SecurePaymentService {
@@ -142,14 +127,7 @@ class SecurePaymentService {
   /**
    * Get saved cards for the user
    */
-  async getSavedCards(): Promise<
-    Array<{
-      cardToken: string;
-      last4: string;
-      cardBrand: string;
-      isDefault: boolean;
-    }>
-  > {
+  async getSavedCards(): Promise<SavedCard[]> {
     try {
       const headers = await this.getAuthHeaders();
 
@@ -201,258 +179,56 @@ class SecurePaymentService {
     }
   }
 
+  // ============================================
+  // DELEGATED METHODS (for backward compatibility)
+  // Consider migrating callers to use services directly
+  // ============================================
+
   /**
-   * Get wallet balance with caching
+   * @deprecated Use walletService.getBalance() directly
    */
   async getWalletBalance(): Promise<WalletBalance> {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      // Try cache first
-      const cached = await getCachedWallet(user.id);
-      if (cached) {
-        logger.info('Wallet balance from cache');
-        const cachedData = cached as unknown as {
-          balance?: number;
-          pendingBalance?: number;
-          currency?: string;
-        };
-        return {
-          available: cachedData.balance || 0,
-          pending: cachedData.pendingBalance || 0,
-          currency: cachedData.currency || 'TRY',
-        };
-      }
-
-      // Fetch from database
-      const { data, error } = await supabase
-        .from('users')
-        .select('balance, currency')
-        .eq('id', user.id)
-        .single();
-
-      if (error) throw error;
-
-      const dbData = data as unknown as { balance?: number; currency?: string };
-      const balance: WalletBalance = {
-        available: dbData.balance || 0,
-        pending: 0,
-        currency: dbData.currency || 'TRY',
-      };
-
-      // Cache the result
-      await setCachedWallet(user.id, {
-        balance: balance.available,
-        currency: balance.currency,
-        pendingBalance: balance.pending,
-      });
-
-      return balance;
-    } catch (error) {
-      logger.error('Get wallet balance error:', error);
-      throw error;
-    }
+    return walletService.getBalance();
   }
 
   /**
-   * Get transaction history with caching
+   * @deprecated Use transactionService.getTransactions() directly
    */
   async getTransactions(params?: {
     type?: string;
     status?: string;
     limit?: number;
   }): Promise<Transaction[]> {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      // Build cache key with params
-      const cacheKey = `${user.id}:${JSON.stringify(params || {})}`;
-
-      // Try cache first
-      const cached = await getCachedTransactions(cacheKey);
-      if (cached && Array.isArray(cached) && cached.length > 0) {
-        logger.info('Transactions from cache');
-        return cached as Transaction[];
-      }
-
-      // Build query with JOIN to fetch related data (prevents N+1)
-      let query = supabase
-        .from('transactions')
-        .select(
-          `
-          *,
-          request:requests!request_id(
-            id,
-            status,
-            moment:moments!moment_id(
-              id,
-              title,
-              price
-            )
-          )
-        `,
-        )
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (params?.type) {
-        query = query.eq('type', params.type);
-      }
-
-      if (params?.status) {
-        query = query.eq('status', params.status);
-      }
-
-      if (params?.limit) {
-        query = query.limit(params.limit);
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-
-      const transactions: Transaction[] = (data || []).map((tx) => ({
-        id: tx.id,
-        type: tx.type,
-        amount: tx.amount,
-        currency: tx.currency,
-        status: tx.status,
-        description: tx.description || '',
-        createdAt: tx.created_at ?? null,
-        metadata: toRecord(tx.metadata),
-      }));
-
-      // Cache the result
-      await setCachedTransactions(
-        cacheKey,
-        transactions.map((t) => ({
-          id: t.id,
-          amount: t.amount,
-          type: t.type,
-          status: t.status ?? 'unknown',
-          createdAt: t.createdAt ?? '',
-        })),
-      );
-
-      return transactions;
-    } catch (error) {
-      logger.error('Get transactions error:', error);
-      throw error;
-    }
+    return transactionService.getTransactions(params);
   }
 
   /**
-   * Request withdrawal to bank account via PayTR transfer
+   * @deprecated Use walletService.requestWithdrawal() directly
    */
   async requestWithdrawal(params: {
     amount: number;
     bankAccountId: string;
   }): Promise<Transaction> {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+    const result = await walletService.requestWithdrawal(params);
+    const balance = await walletService.getBalance();
 
-      // Verify sufficient balance
-      const balance = await this.getWalletBalance();
-      if (balance.available < params.amount) {
-        throw new Error('Insufficient balance');
-      }
-
-      // Call PayTR transfer edge function
-      const headers = await this.getAuthHeaders();
-      const response = await fetch(
-        `${this.EDGE_FUNCTION_BASE}/paytr-transfer`,
-        {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({
-            amount: params.amount,
-            bankAccountId: params.bankAccountId,
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Withdrawal failed');
-      }
-
-      const result = await response.json();
-
-      // Invalidate caches
-      await invalidateAllPaymentCache(user.id);
-
-      const transaction: Transaction = {
-        id: result.transactionId,
-        type: 'withdrawal',
-        amount: -params.amount,
-        currency: balance.currency,
-        status: 'pending',
-        description: 'Withdrawal to bank account',
-        createdAt: new Date().toISOString(),
-        metadata: { bank_account_id: params.bankAccountId },
-      };
-
-      logger.info('Withdrawal requested:', transaction.id);
-      return transaction;
-    } catch (error) {
-      logger.error('Request withdrawal error:', error);
-      throw error;
-    }
+    return {
+      id: result.transactionId,
+      type: 'withdrawal',
+      amount: -params.amount,
+      currency: balance.currency,
+      status: result.status,
+      description: 'Withdrawal to bank account',
+      createdAt: new Date().toISOString(),
+      metadata: { bank_account_id: params.bankAccountId },
+    };
   }
 
   /**
-   * Get payment history for a specific moment
+   * @deprecated Use transactionService.getMomentPayments() directly
    */
   async getMomentPayments(momentId: string): Promise<Transaction[]> {
-    try {
-      // SECURITY: Only select required transaction fields - never use select('*')
-      const { data, error } = await supabase
-        .from('transactions')
-        .select(
-          `
-          id,
-          type,
-          amount,
-          currency,
-          status,
-          description,
-          created_at,
-          metadata,
-          moment_id,
-          sender_id,
-          receiver_id
-        `,
-        )
-        .eq('moment_id', momentId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      const txList = (data ||
-        []) as unknown as Database['public']['Tables']['transactions']['Row'][];
-      return txList.map((row) => ({
-        id: row.id,
-        type: row.type,
-        amount: row.amount,
-        currency: row.currency,
-        status: row.status,
-        description: row.description || '',
-        createdAt: row.created_at ?? null,
-        metadata: toRecord(row.metadata),
-      }));
-    } catch (error) {
-      logger.error('Get moment payments error:', error);
-      throw error;
-    }
+    return transactionService.getMomentPayments(momentId);
   }
 
   /**
@@ -469,10 +245,10 @@ class SecurePaymentService {
       // Invalidate all caches
       await invalidateAllPaymentCache(user.id);
 
-      // Fetch fresh data
+      // Fetch fresh data using delegated services
       await Promise.all([
-        this.getWalletBalance(),
-        this.getTransactions({ limit: 20 }),
+        walletService.getBalance(),
+        transactionService.getTransactions({ limit: 20 }),
       ]);
 
       logger.info('Payment data refreshed');

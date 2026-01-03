@@ -295,14 +295,8 @@ DROP POLICY IF EXISTS "Users can view own requests" ON public.requests;
 DROP POLICY IF EXISTS "Users can update own requests" ON public.requests;
 
 -- ============================================================
--- 3. SİSTEM GÜVENLİĞİ: spatial_ref_sys
--- PostGIS sistem tablosu - sadece referans verisi içerir
--- RLS aktif olsa bile yetki hatası veriyor (supabase_admin owner)
+-- 3. PostGIS: spatial_ref_sys - FALSE POSITIVE (see SECURITY_ARCHITECTURE.md)
 -- ============================================================
-
--- NOT: spatial_ref_sys için RLS etkinleştirme girişimi "must be owner" hatası veriyor
--- Bu tablo sadece EPSG koordinat referansları içerir (hassas veri YOK)
--- FALSE POSITIVE olarak kabul edilir
 
 -- ============================================================
 -- 4. İNDEKS HİJYENİ KONTROLÜ
