@@ -1,41 +1,36 @@
-/**
- * KYCDocumentTypeScreen - Awwwards Edition
- *
- * Premium document selection with interactive glass cards.
- * Features Twilight Zinc dark theme with neon accents.
- */
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+// KYC Document Type Selection Screen - Awwwards standard glass cards
+// Featuring silky glass effects and neon selection highlights
+import React, { useState, useCallback } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  Pressable,
+} from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   useNavigation,
   useRoute,
   type RouteProp,
 } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
-  FadeInDown,
   useSharedValue,
   useAnimatedStyle,
   withSpring,
-  withRepeat,
-  withSequence,
   withTiming,
-  Easing,
-  interpolate,
+  runOnJS,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { withErrorBoundary } from '@/components/withErrorBoundary';
+import { COLORS } from '@/constants/colors';
+import { TYPOGRAPHY } from '@/theme/typography';
+import { SPACING, RADIUS } from '@/constants/spacing';
 import { GlassCard } from '@/components/ui/GlassCard';
+import { TMButton } from '@/components/ui/TMButton';
+import { withErrorBoundary } from '@/components/withErrorBoundary';
+import { KYCHeader } from './KYCHeader';
 import { KYCProgressBar } from './KYCProgressBar';
-import {
-  KYC_COLORS,
-  KYC_TYPOGRAPHY,
-  KYC_SPACING,
-  KYC_SPRINGS,
-  KYC_DOCUMENT_TYPES,
-} from './theme';
 import type { DocumentType, VerificationData } from './types';
 import type { StackNavigationProp } from '@react-navigation/stack';
 
@@ -47,162 +42,172 @@ type NavigationProp = StackNavigationProp<{
   KYCDocumentCapture: { data: VerificationData };
 }>;
 
-const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+// Enhanced document options with descriptions
+const DOCUMENT_OPTIONS = [
+  {
+    id: 'passport' as DocumentType,
+    label: 'Pasaport',
+    description: 'Uluslararası seyahat belgesi',
+    icon: 'passport' as const,
+    accentColor: COLORS.primary,
+  },
+  {
+    id: 'id_card' as DocumentType,
+    label: 'TC Kimlik Kartı',
+    description: 'Yeni nesil çipli kimlik',
+    icon: 'card-account-details' as const,
+    accentColor: COLORS.secondary,
+  },
+  {
+    id: 'drivers_license' as DocumentType,
+    label: 'Ehliyet',
+    description: 'Fotoğraflı sürücü belgesi',
+    icon: 'car' as const,
+    accentColor: COLORS.accent,
+  },
+];
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 interface DocumentCardProps {
-  doc: typeof KYC_DOCUMENT_TYPES[number];
+  option: (typeof DOCUMENT_OPTIONS)[0];
   isSelected: boolean;
   onSelect: () => void;
-  index: number;
 }
 
 const DocumentCard: React.FC<DocumentCardProps> = ({
-  doc,
+  option,
   isSelected,
   onSelect,
-  index,
 }) => {
   const scale = useSharedValue(1);
-  const glowOpacity = useSharedValue(0);
-  const borderProgress = useSharedValue(0);
+  const borderOpacity = useSharedValue(isSelected ? 1 : 0);
 
-  useEffect(() => {
-    if (isSelected) {
-      borderProgress.value = withSpring(1, KYC_SPRINGS.snappy);
-      glowOpacity.value = withRepeat(
-        withSequence(
-          withTiming(0.6, { duration: 1200, easing: Easing.inOut(Easing.ease) }),
-          withTiming(0.3, { duration: 1200, easing: Easing.inOut(Easing.ease) })
-        ),
-        -1,
-        false
-      );
-    } else {
-      borderProgress.value = withSpring(0, KYC_SPRINGS.gentle);
-      glowOpacity.value = withTiming(0, { duration: 300 });
-    }
-  }, [isSelected, borderProgress, glowOpacity]);
+  // Update border animation when selection changes
+  React.useEffect(() => {
+    borderOpacity.value = withTiming(isSelected ? 1 : 0, { duration: 200 });
+  }, [isSelected, borderOpacity]);
 
-  const cardStyle = useAnimatedStyle(() => ({
+  const triggerHaptic = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  }, []);
+
+  const handlePressIn = useCallback(() => {
+    scale.value = withSpring(0.97, { damping: 15, stiffness: 400 });
+  }, [scale]);
+
+  const handlePressOut = useCallback(() => {
+    scale.value = withSpring(1, { damping: 15, stiffness: 400 });
+  }, [scale]);
+
+  const handlePress = useCallback(() => {
+    runOnJS(triggerHaptic)();
+    onSelect();
+  }, [onSelect, triggerHaptic]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
 
-  const glowStyle = useAnimatedStyle(() => ({
-    opacity: glowOpacity.value,
+  const borderStyle = useAnimatedStyle(() => ({
+    opacity: borderOpacity.value,
   }));
 
-  const handlePressIn = () => {
-    scale.value = withSpring(0.98, KYC_SPRINGS.snappy);
-  };
-
-  const handlePressOut = () => {
-    scale.value = withSpring(1, KYC_SPRINGS.bouncy);
-  };
-
-  const handlePress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    onSelect();
-  };
-
   return (
-    <Animated.View
-      entering={FadeInDown.delay(200 + index * 100).springify()}
-      style={cardStyle}
+    <AnimatedPressable
+      onPress={handlePress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      style={animatedStyle}
     >
-      <TouchableOpacity
-        activeOpacity={1}
-        onPress={handlePress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
+      <GlassCard
+        intensity={isSelected ? 30 : 15}
+        tint="light"
+        style={styles.documentCard}
+        borderRadius={RADIUS.xl}
+        padding={0}
+        showBorder={false}
       >
-        <View style={styles.cardContainer}>
-          {/* Neon glow layer */}
-          {isSelected && (
-            <Animated.View style={[styles.cardGlow, glowStyle]} />
-          )}
+        {/* Selection border overlay */}
+        <Animated.View
+          style={[
+            styles.selectionBorder,
+            { borderColor: option.accentColor },
+            borderStyle,
+          ]}
+        />
 
-          <GlassCard
-            intensity={isSelected ? 25 : 12}
+        <View style={styles.cardContent}>
+          {/* Icon container with glow */}
+          <View
             style={[
-              styles.documentCard,
-              isSelected && styles.documentCardSelected,
+              styles.iconContainer,
+              isSelected && { backgroundColor: `${option.accentColor}20` },
             ]}
-            padding={0}
           >
-            <View style={styles.cardContent}>
-              {/* Icon Container */}
-              <View
-                style={[
-                  styles.iconContainer,
-                  isSelected && styles.iconContainerSelected,
-                ]}
-              >
-                <MaterialCommunityIcons
-                  name={doc.icon as keyof typeof MaterialCommunityIcons.glyphMap}
-                  size={28}
-                  color={isSelected ? KYC_COLORS.neon.lime : KYC_COLORS.text.secondary}
-                />
-              </View>
+            <MaterialCommunityIcons
+              name={option.icon}
+              size={28}
+              color={isSelected ? option.accentColor : COLORS.text.secondary}
+            />
+          </View>
 
-              {/* Text Content */}
-              <View style={styles.textContent}>
-                <Text
-                  style={[
-                    styles.cardTitle,
-                    isSelected && styles.cardTitleSelected,
-                  ]}
-                >
-                  {doc.title}
-                </Text>
-                <Text style={styles.cardDescription}>{doc.description}</Text>
-              </View>
+          {/* Text content */}
+          <View style={styles.textContent}>
+            <Text
+              style={[
+                styles.cardTitle,
+                isSelected && { color: option.accentColor },
+              ]}
+            >
+              {option.label}
+            </Text>
+            <Text style={styles.cardDescription}>{option.description}</Text>
+          </View>
 
-              {/* Selection Indicator */}
-              <View style={styles.selectionIndicator}>
-                {isSelected ? (
-                  <View style={styles.checkCircle}>
-                    <Ionicons
-                      name="checkmark"
-                      size={14}
-                      color={KYC_COLORS.background.primary}
-                    />
-                  </View>
-                ) : (
-                  <View style={styles.emptyCircle} />
-                )}
-              </View>
-            </View>
-          </GlassCard>
+          {/* Selection indicator */}
+          <View
+            style={[
+              styles.selectionIndicator,
+              isSelected && styles.selectionIndicatorActive,
+              isSelected && { borderColor: option.accentColor },
+            ]}
+          >
+            {isSelected && (
+              <MaterialCommunityIcons
+                name="check"
+                size={14}
+                color={option.accentColor}
+              />
+            )}
+          </View>
         </View>
-      </TouchableOpacity>
-    </Animated.View>
+
+        {/* Neon accent line */}
+        {isSelected && (
+          <View
+            style={[styles.accentLine, { backgroundColor: option.accentColor }]}
+          />
+        )}
+      </GlassCard>
+    </AnimatedPressable>
   );
 };
 
 const KYCDocumentTypeScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<RouteProp<RouteParams, 'KYCDocumentType'>>();
+  const insets = useSafeAreaInsets();
   const { data } = route.params;
 
   const [selectedType, setSelectedType] = useState<DocumentType | null>(
-    data.documentType,
+    data.documentType
   );
-
-  const buttonScale = useSharedValue(1);
-  const buttonOpacity = useSharedValue(0.5);
-
-  useEffect(() => {
-    buttonOpacity.value = withSpring(selectedType ? 1 : 0.5, KYC_SPRINGS.gentle);
-  }, [selectedType, buttonOpacity]);
-
-  const buttonAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: buttonScale.value }],
-    opacity: buttonOpacity.value,
-  }));
 
   const handleContinue = () => {
     if (!selectedType) return;
 
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     navigation.navigate('KYCDocumentCapture', {
       data: {
         ...data,
@@ -211,97 +216,60 @@ const KYCDocumentTypeScreen: React.FC = () => {
     });
   };
 
-  const handlePressIn = () => {
-    if (selectedType) {
-      buttonScale.value = withSpring(0.96, KYC_SPRINGS.snappy);
-    }
-  };
-
-  const handlePressOut = () => {
-    buttonScale.value = withSpring(1, KYC_SPRINGS.bouncy);
-  };
-
   return (
     <View style={styles.container}>
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
-        {/* Header */}
-        <Animated.View
-          entering={FadeInDown.delay(100).springify()}
-          style={styles.header}
-        >
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
-            <Ionicons
-              name="chevron-back"
-              size={24}
-              color={KYC_COLORS.text.primary}
+      <KYCHeader title="Belge Seçimi" />
+      <KYCProgressBar currentStep="document" variant="ceremony" />
+
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Title Section */}
+        <View style={styles.titleSection}>
+          <Text style={styles.title}>Belge Türünü Seç</Text>
+          <Text style={styles.description}>
+            Kimlik doğrulama için kullanmak istediğin resmi belgeyi seç.
+          </Text>
+        </View>
+
+        {/* Document Options */}
+        <View style={styles.optionsContainer}>
+          {DOCUMENT_OPTIONS.map((option) => (
+            <DocumentCard
+              key={option.id}
+              option={option}
+              isSelected={selectedType === option.id}
+              onSelect={() => setSelectedType(option.id)}
             />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Kimlik Belgesi</Text>
-          <View style={styles.headerSpacer} />
-        </Animated.View>
+          ))}
+        </View>
 
-        {/* Progress Bar */}
-        <KYCProgressBar currentStep="document" />
+        {/* Security Note */}
+        <View style={styles.securityNote}>
+          <MaterialCommunityIcons
+            name="shield-lock-outline"
+            size={16}
+            color={COLORS.trust.primary}
+          />
+          <Text style={styles.securityText}>
+            Belgelerin 256-bit şifreleme ile korunur
+          </Text>
+        </View>
+      </ScrollView>
 
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Title Section */}
-          <Animated.View entering={FadeInDown.delay(150).springify()}>
-            <Text style={styles.title}>Hangi belgeyi kullanacaksın?</Text>
-            <Text style={styles.subtitle}>
-              Lütfen yanındaki geçerli bir resmi belgeyi seç.
-            </Text>
-          </Animated.View>
-
-          {/* Document Options */}
-          <View style={styles.optionsList}>
-            {KYC_DOCUMENT_TYPES.map((doc, index) => (
-              <DocumentCard
-                key={doc.id}
-                doc={doc}
-                isSelected={selectedType === doc.id}
-                onSelect={() => setSelectedType(doc.id as DocumentType)}
-                index={index}
-              />
-            ))}
-          </View>
-        </ScrollView>
-
-        {/* Footer with CTA */}
-        <Animated.View
-          entering={FadeInDown.delay(500).springify()}
-          style={styles.footer}
-        >
-          <AnimatedTouchable
-            style={[styles.primaryButton, buttonAnimatedStyle]}
-            onPress={handleContinue}
-            onPressIn={handlePressIn}
-            onPressOut={handlePressOut}
-            disabled={!selectedType}
-            activeOpacity={1}
-          >
-            <LinearGradient
-              colors={KYC_COLORS.gradients.primary}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.buttonGradient}
-            >
-              <Text style={styles.primaryButtonText}>Devam Et</Text>
-              <Ionicons
-                name="arrow-forward"
-                size={20}
-                color={KYC_COLORS.background.primary}
-              />
-            </LinearGradient>
-          </AnimatedTouchable>
-        </Animated.View>
-      </SafeAreaView>
+      {/* Footer */}
+      <View style={[styles.footer, { paddingBottom: insets.bottom + SPACING.lg }]}>
+        <TMButton
+          title="Devam Et"
+          variant="primary"
+          onPress={handleContinue}
+          size="large"
+          disabled={!selectedType}
+          style={styles.continueButton}
+        />
+      </View>
     </View>
   );
 };
@@ -309,177 +277,115 @@ const KYCDocumentTypeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: KYC_COLORS.background.primary,
-  },
-  safeArea: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: KYC_SPACING.screenPadding,
-    paddingVertical: 12,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 20,
-    backgroundColor: KYC_COLORS.glass.backgroundMedium,
-  },
-  headerTitle: {
-    ...KYC_TYPOGRAPHY.cardTitle,
-    color: KYC_COLORS.text.primary,
-  },
-  headerSpacer: {
-    width: 40,
+    backgroundColor: COLORS.bg.primary,
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: KYC_SPACING.screenPadding,
-    paddingBottom: 24,
+    paddingHorizontal: SPACING.screenPadding,
+    paddingBottom: SPACING['2xl'],
   },
-
-  // Title
+  titleSection: {
+    marginBottom: SPACING.xl,
+  },
   title: {
-    ...KYC_TYPOGRAPHY.pageTitle,
-    color: KYC_COLORS.text.primary,
-    marginBottom: 8,
+    ...TYPOGRAPHY.h1,
+    fontWeight: '700',
+    color: COLORS.text.primary,
+    marginBottom: SPACING.sm,
+    letterSpacing: -0.5,
   },
-  subtitle: {
-    ...KYC_TYPOGRAPHY.body,
-    color: KYC_COLORS.text.secondary,
-    marginBottom: 32,
+  description: {
+    ...TYPOGRAPHY.bodyLarge,
+    color: COLORS.text.secondary,
+    lineHeight: 24,
   },
-
-  // Options
-  optionsList: {
-    gap: 16,
-  },
-  cardContainer: {
-    position: 'relative',
-  },
-  cardGlow: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 24,
-    backgroundColor: KYC_COLORS.neon.lime,
-    ...Platform.select({
-      ios: {
-        shadowColor: KYC_COLORS.neon.lime,
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.4,
-        shadowRadius: 16,
-      },
-      android: {},
-    }),
+  optionsContainer: {
+    gap: SPACING.md,
+    marginBottom: SPACING.xl,
   },
   documentCard: {
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: KYC_COLORS.glass.border,
+    position: 'relative',
+    overflow: 'hidden',
   },
-  documentCardSelected: {
-    borderColor: KYC_COLORS.neon.lime,
+  selectionBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderWidth: 2,
+    borderRadius: RADIUS.xl,
+    pointerEvents: 'none',
   },
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
-    gap: 16,
+    padding: SPACING.lg,
   },
   iconContainer: {
-    width: KYC_SPACING.iconSize,
-    height: KYC_SPACING.iconSize,
-    borderRadius: KYC_SPACING.iconRadius,
-    backgroundColor: KYC_COLORS.glass.backgroundLight,
-    alignItems: 'center',
+    width: 56,
+    height: 56,
+    borderRadius: RADIUS.base,
+    backgroundColor: COLORS.surface.muted,
     justifyContent: 'center',
-  },
-  iconContainerSelected: {
-    backgroundColor: `${KYC_COLORS.neon.lime}15`,
+    alignItems: 'center',
+    marginRight: SPACING.base,
   },
   textContent: {
     flex: 1,
   },
   cardTitle: {
-    ...KYC_TYPOGRAPHY.cardTitle,
-    color: KYC_COLORS.text.primary,
-    marginBottom: 4,
-  },
-  cardTitleSelected: {
-    color: KYC_COLORS.neon.lime,
+    ...TYPOGRAPHY.bodyLarge,
+    fontWeight: '700',
+    color: COLORS.text.primary,
+    marginBottom: 2,
   },
   cardDescription: {
-    ...KYC_TYPOGRAPHY.cardDesc,
-    color: KYC_COLORS.text.secondary,
+    ...TYPOGRAPHY.bodySmall,
+    color: COLORS.text.tertiary,
   },
   selectionIndicator: {
-    marginLeft: 8,
-  },
-  checkCircle: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: KYC_COLORS.neon.lime,
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...Platform.select({
-      ios: {
-        shadowColor: KYC_COLORS.neon.lime,
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.5,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
-  },
-  emptyCircle: {
     width: 24,
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: KYC_COLORS.glass.borderActive,
+    borderColor: COLORS.border.default,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-
-  // Footer
-  footer: {
-    paddingHorizontal: KYC_SPACING.screenPadding,
-    paddingBottom: 24,
-    paddingTop: 16,
+  selectionIndicatorActive: {
+    backgroundColor: 'transparent',
   },
-  primaryButton: {
-    borderRadius: 28,
-    overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: KYC_COLORS.neon.lime,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
+  accentLine: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 4,
+    borderTopLeftRadius: RADIUS.xl,
+    borderBottomLeftRadius: RADIUS.xl,
   },
-  buttonGradient: {
+  securityNote: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 18,
-    gap: 8,
+    gap: SPACING.xs,
+    paddingVertical: SPACING.base,
+    backgroundColor: `${COLORS.trust.primary}10`,
+    borderRadius: RADIUS.md,
   },
-  primaryButtonText: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: KYC_COLORS.background.primary,
-    letterSpacing: 0.3,
+  securityText: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.trust.primary,
+    fontWeight: '500',
+  },
+  footer: {
+    paddingHorizontal: SPACING.screenPadding,
+    paddingTop: SPACING.base,
+    backgroundColor: COLORS.bg.primary,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border.light,
+  },
+  continueButton: {
+    height: 56,
   },
 });
 
