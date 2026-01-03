@@ -63,8 +63,10 @@ export {
 } from './hooks/usePayments';
 
 // Services
-export { paymentsApi } from './services/paymentsApi';
-export type { CreatePaymentIntentDto } from './services/paymentsApi';
+export { paymentsApi as paymentsService } from './services/paymentsService';
+/** @deprecated Use paymentsService instead */
+export { paymentsApi } from './services/paymentsService';
+export type { CreatePaymentIntentDto } from './services/paymentsService';
 
 // Types
 export type {

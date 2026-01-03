@@ -18,4 +18,6 @@ export {
 } from './hooks/useMessages';
 
 // Services
-export { messagesApi } from './services/messagesApi';
+export { messagesApi as messagesService } from './services/messagesService';
+/** @deprecated Use messagesService instead */
+export { messagesApi } from './services/messagesService';

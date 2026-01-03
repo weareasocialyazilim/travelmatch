@@ -30,12 +30,14 @@ export {
 } from './hooks/useTrips';
 
 // Services
-export { tripsApi } from './services/tripsApi';
+export { tripsApi as tripsService } from './services/tripsService';
+/** @deprecated Use tripsService instead */
+export { tripsApi } from './services/tripsService';
 export type {
   TripFilters,
   CreateTripDto,
   UpdateTripDto,
-} from './services/tripsApi';
+} from './services/tripsService';
 
 // Types
 export type {

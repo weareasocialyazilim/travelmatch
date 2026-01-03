@@ -21,4 +21,6 @@ export { AuthSuccessScreen } from './screens/AuthSuccessScreen';
 export { BiometricSetupScreen } from './screens/BiometricSetupScreen';
 
 // Services
-export { authApi } from './services/authApi';
+export { authApi as authService } from './services/authService';
+/** @deprecated Use authService instead */
+export { authApi } from './services/authService';
