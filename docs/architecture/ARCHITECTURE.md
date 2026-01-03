@@ -36,11 +36,11 @@ TravelMatch is a social travel platform that connects travelers through shared e
 
 | Aspect | Decision |
 |--------|----------|
-| **Architecture Style** | Monorepo with microservices-ready backend |
+| **Architecture Style** | Monorepo with modular backend (Supabase Edge Functions) |
 | **Frontend** | React Native (Mobile), Next.js (Web), React (Admin) |
 | **Backend** | Supabase (PostgreSQL + Edge Functions) |
 | **State Management** | Zustand (client-side) |
-| **API Pattern** | REST via PostgREST + GraphQL-ready |
+| **API Pattern** | REST via PostgREST |
 | **Real-time** | Supabase Realtime (WebSocket) |
 | **Infrastructure** | Docker Compose (dev), Cloud-native (prod) |
 

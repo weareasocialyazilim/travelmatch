@@ -27,14 +27,8 @@ ALTER FUNCTION public.update_uploaded_images_updated_at() SET search_path = publ
 ALTER FUNCTION public.invalidate_cdn_manually(text, text[]) SET search_path = public, pg_temp;
 
 -- ============================================================
--- 2. PostGIS Tablosu (spatial_ref_sys)
--- NOT: Bu tablo PostGIS sistem tablosu, hassas veri içermiyor
--- RLS gereksiz - FALSE POSITIVE olarak işaretlendi
+-- 2. PostGIS: spatial_ref_sys - FALSE POSITIVE (see SECURITY_ARCHITECTURE.md)
 -- ============================================================
-
--- spatial_ref_sys: PostGIS koordinat sistemi referans verisi
--- Owner: supabase_admin (RLS için yetki yok)
--- Risk: DÜŞÜK - sadece okuma, hassas veri yok
 
 -- ============================================================
 -- 3. PERFORMANS FIXLERİ: RLS Optimizasyonu (DEFCON 2)
@@ -110,7 +104,7 @@ DROP INDEX IF EXISTS idx_proof_verifications_user_status;
 DO $$
 BEGIN
   RAISE NOTICE '✅ Security: Mutable search_path fixed for trigger functions';
-  RAISE NOTICE '✅ Security: spatial_ref_sys RLS enabled';
+  RAISE NOTICE '⚪ Security: spatial_ref_sys skipped (PostGIS system table - see SECURITY_ARCHITECTURE.md)';
   RAISE NOTICE '✅ Performance: reviews RLS policies optimized with cached auth.uid()';
   RAISE NOTICE '✅ Performance: Duplicate index removed from conversations';
 END $$;

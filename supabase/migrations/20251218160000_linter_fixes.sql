@@ -40,14 +40,7 @@ GRANT SELECT ON v_user_conversations TO authenticated;
 -- NOT ACTIONABLE ITEMS (Documented)
 -- =====================================================
 
--- PostGIS in public schema (WARN):
--- PostGIS extension does not support SET SCHEMA operation
--- This is a known limitation and cannot be changed
-
--- RLS disabled on spatial_ref_sys (ERROR - FALSE POSITIVE):
--- This table is owned by supabase_admin and is part of PostGIS
--- It's a reference table for coordinate systems, not user data
--- Cannot and should not enable RLS on system tables
+-- PostGIS: spatial_ref_sys - FALSE POSITIVE (see SECURITY_ARCHITECTURE.md)
 
 -- Unused indexes (INFO):
 -- 70+ indexes flagged as unused because:

@@ -733,6 +733,24 @@ Sentry.init({
 
 ---
 
+## Known Security Exceptions
+
+### PostGIS System Tables
+
+The following security exceptions are documented and accepted:
+
+| Table | Reason | Risk Level |
+|-------|--------|------------|
+| `spatial_ref_sys` | PostGIS system table containing EPSG coordinate reference definitions. Owned by `supabase_admin`, cannot enable RLS. | **LOW** - Read-only reference data, no user information |
+
+**Note**: This is a FALSE POSITIVE in security linters. The `spatial_ref_sys` table:
+- Contains only geographic coordinate system definitions (EPSG codes)
+- Is read-only for application users
+- Has no user-specific or sensitive data
+- Cannot be modified without superuser privileges
+
+---
+
 ## Related Documents
 
 - [Architecture Overview](./ARCHITECTURE.md)
