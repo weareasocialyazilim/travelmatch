@@ -3,7 +3,9 @@
  * TravelMatch: The Rebirth Design System
  */
 
-export { FloatingDock } from './FloatingDock';
+// FloatingDock is now consolidated in navigation/
+export { FloatingDock } from '../navigation/FloatingDock';
+
 export {
   LiquidScreenWrapper,
   LiquidScreenHeader,

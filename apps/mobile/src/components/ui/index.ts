@@ -7,10 +7,17 @@
 export { Button } from './Button';
 export { Card, GlassCard, GlassView, GlassButton } from './Card';
 export type { CardVariant, CardPadding, GlassTint } from './Card';
-export { Input } from './Input';
 export { Divider } from './Divider';
 export { EmptyState } from './EmptyState';
 export { FlashMessage } from './FlashMessage';
+
+// ═══════════════════════════════════════════════════════════════════
+// Input Components - LiquidInput is the master component
+// ═══════════════════════════════════════════════════════════════════
+export { LiquidInput } from './LiquidInput';
+export { ControlledLiquidInput } from './ControlledLiquidInput';
+// @deprecated aliases - use LiquidInput instead
+export { LiquidInput as Input } from './LiquidInput';
 
 // TMBadge - Consolidated badge component (replaces Badge, StatusBadge, TrustBadge)
 export { TMBadge, LiveStatusBadge, VerifiedBadge, PremiumBadge } from './TMBadge';
@@ -37,9 +44,9 @@ export type { MomentData, MomentBadgeType } from './TMCard';
 // TMPill - Chip/pill components
 export { TMPill, TMCategoryChip } from './TMPill';
 
-// TMInput - Enhanced input with floating label and validation
-export { TMInput } from './TMInput';
-export type { TMInputProps } from './TMInput';
+// TMInput - @deprecated alias for LiquidInput
+export { LiquidInput as TMInput } from './LiquidInput';
+export type { default as TMInputProps } from './LiquidInput';
 
 // TMLoading - Consolidated loading component (replaces Spinner, LoadingSpinner, LiquidLoading)
 export { TMLoading } from './TMLoading';

@@ -33,7 +33,7 @@ import React, {
 } from 'react';
 import { Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as authService from '../services/supabaseAuthService';
+import * as authService from '../features/auth/services/authService';
 import {
   secureStorage,
   AUTH_STORAGE_KEYS,
