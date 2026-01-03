@@ -1,146 +1,100 @@
 /**
- * Haptic Feedback Utilities
- * Provides tactile feedback for user interactions
- * iOS: Uses UIImpactFeedbackGenerator
- * Android: Uses Vibration API
+ * Haptic Feedback Utilities - Backward Compatibility Layer
+ *
+ * This module re-exports from HapticManager for backward compatibility.
+ * All haptic logic has been consolidated into services/HapticManager.ts
+ *
+ * @deprecated Import directly from '@/services/HapticManager' for new code
+ *
+ * Migration:
+ * - OLD: import { triggerHaptic, HapticType } from '@/utils/haptics';
+ * - NEW: import { HapticManager } from '@/services/HapticManager';
  */
 
-import { Platform } from 'react-native';
-import * as Haptics from 'expo-haptics';
-import { logger } from './logger';
+import { HapticManager } from '../services/HapticManager';
 
-/**
- * Haptic feedback types
- */
+// Legacy HapticType enum for backward compatibility
 export enum HapticType {
-  // Light impact - for small UI interactions
   LIGHT = 'light',
-  // Medium impact - for standard button presses
   MEDIUM = 'medium',
-  // Heavy impact - for important actions
   HEAVY = 'heavy',
-  // Success notification
   SUCCESS = 'success',
-  // Warning notification
   WARNING = 'warning',
-  // Error notification
   ERROR = 'error',
-  // Selection change (like picker)
   SELECTION = 'selection',
 }
 
 /**
- * Trigger haptic feedback
+ * @deprecated Use HapticManager methods directly
  */
 export const triggerHaptic = async (type: HapticType = HapticType.LIGHT) => {
-  try {
-    switch (type) {
-      case HapticType.LIGHT:
-        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        break;
-
-      case HapticType.MEDIUM:
-        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-        break;
-
-      case HapticType.HEAVY:
-        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-        break;
-
-      case HapticType.SUCCESS:
-        await Haptics.notificationAsync(
-          Haptics.NotificationFeedbackType.Success,
-        );
-        break;
-
-      case HapticType.WARNING:
-        await Haptics.notificationAsync(
-          Haptics.NotificationFeedbackType.Warning,
-        );
-        break;
-
-      case HapticType.ERROR:
-        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        break;
-
-      case HapticType.SELECTION:
-        await Haptics.selectionAsync();
-        break;
-
-      default:
-        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-  } catch (error) {
-    // Haptics may not be available on all devices
-    if (__DEV__) {
-       
-      logger.warn('Haptic feedback failed:', error);
-    }
+  switch (type) {
+    case HapticType.LIGHT:
+      return HapticManager.buttonPress();
+    case HapticType.MEDIUM:
+      return HapticManager.primaryAction();
+    case HapticType.HEAVY:
+      return HapticManager.destructiveAction();
+    case HapticType.SUCCESS:
+      return HapticManager.success();
+    case HapticType.WARNING:
+      return HapticManager.warning();
+    case HapticType.ERROR:
+      return HapticManager.error();
+    case HapticType.SELECTION:
+      return HapticManager.selectionChange();
+    default:
+      return HapticManager.buttonPress();
   }
 };
 
 /**
- * Haptic patterns for common UI interactions
+ * @deprecated Use HapticManager methods directly
  */
 export const hapticPatterns = {
-  /**
-   * Button press
-   */
-  buttonPress: () => triggerHaptic(HapticType.LIGHT),
-
-  /**
-   * Primary action (save, submit, confirm)
-   */
-  primaryAction: () => triggerHaptic(HapticType.MEDIUM),
-
-  /**
-   * Destructive action (delete, cancel)
-   */
-  destructiveAction: () => triggerHaptic(HapticType.HEAVY),
-
-  /**
-   * Success feedback
-   */
-  success: () => triggerHaptic(HapticType.SUCCESS),
-
-  /**
-   * Error feedback
-   */
-  error: () => triggerHaptic(HapticType.ERROR),
-
-  /**
-   * Warning feedback
-   */
-  warning: () => triggerHaptic(HapticType.WARNING),
-
-  /**
-   * Tab/option selection
-   */
-  selection: () => triggerHaptic(HapticType.SELECTION),
-
-  /**
-   * Pull to refresh
-   */
-  pullToRefresh: () => triggerHaptic(HapticType.MEDIUM),
-
-  /**
-   * Swipe action
-   */
-  swipeAction: () => triggerHaptic(HapticType.LIGHT),
-
-  /**
-   * Toggle switch
-   */
-  toggle: () => triggerHaptic(HapticType.SELECTION),
-
-  /**
-   * Long press
-   */
-  longPress: () => triggerHaptic(HapticType.MEDIUM),
+  buttonPress: () => HapticManager.buttonPress(),
+  primaryAction: () => HapticManager.primaryAction(),
+  destructiveAction: () => HapticManager.destructiveAction(),
+  success: () => HapticManager.success(),
+  error: () => HapticManager.error(),
+  warning: () => HapticManager.warning(),
+  selection: () => HapticManager.selectionChange(),
+  pullToRefresh: () => HapticManager.pullToRefresh(),
+  swipeAction: () => HapticManager.swipe(),
+  toggle: () => HapticManager.toggle(),
+  longPress: () => HapticManager.longPress(),
 };
 
 /**
- * Enhanced button press with haptic
+ * @deprecated Use HapticManager.isAvailable()
+ */
+export const isHapticsSupported = (): boolean => {
+  return HapticManager.isAvailable();
+};
+
+/**
+ * @deprecated Use HapticManager.setEnabled()
+ */
+export const setHapticsEnabled = (enabled: boolean) => {
+  HapticManager.setEnabled(enabled);
+};
+
+/**
+ * @deprecated Use HapticManager.getConfig().enabled
+ */
+export const getHapticsEnabled = (): boolean => {
+  return HapticManager.getConfig().enabled;
+};
+
+/**
+ * @deprecated Use HapticManager methods directly
+ */
+export const smartHaptic = (type: HapticType = HapticType.LIGHT) => {
+  return triggerHaptic(type);
+};
+
+/**
+ * @deprecated Use HapticManager methods with callbacks
  */
 export const withHaptic = <T extends (...args: unknown[]) => unknown>(
   callback: T,
@@ -152,37 +106,7 @@ export const withHaptic = <T extends (...args: unknown[]) => unknown>(
   };
 };
 
-/**
- * Check if haptics are supported
- */
-export const isHapticsSupported = (): boolean => {
-  // Haptics are generally supported on iOS 10+ and most modern Android devices
-  return Platform.OS === 'ios' || Platform.OS === 'android';
-};
-
-/**
- * Haptic settings (can be tied to user preferences)
- */
-let hapticsEnabled = true;
-
-export const setHapticsEnabled = (enabled: boolean) => {
-  hapticsEnabled = enabled;
-};
-
-export const getHapticsEnabled = (): boolean => {
-  return hapticsEnabled && isHapticsSupported();
-};
-
-/**
- * Smart haptic trigger (respects user settings)
- */
-export const smartHaptic = (type: HapticType = HapticType.LIGHT) => {
-  if (getHapticsEnabled()) {
-    return triggerHaptic(type);
-  }
-  return Promise.resolve();
-};
-
+// Default export for backward compatibility
 export default {
   trigger: triggerHaptic,
   patterns: hapticPatterns,
