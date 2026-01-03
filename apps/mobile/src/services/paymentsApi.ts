@@ -1,14 +1,32 @@
 /**
- * Payments API Service
- * Handles payment-related API calls via Supabase Edge Functions
+ * @deprecated This service is deprecated. Use paymentService instead.
  *
- * SECURITY: All payment operations are handled server-side via Edge Functions
- * Client never has access to Stripe secret keys or service_role credentials
+ * Migration Guide:
+ * ================
+ *
+ * BEFORE:
+ * ```tsx
+ * import { paymentsApi } from '@/services/paymentsApi';
+ * const methods = await paymentsApi.getPaymentMethods();
+ * ```
+ *
+ * AFTER:
+ * ```tsx
+ * import { paymentService } from '@/services/paymentService';
+ * const { cards, bankAccounts } = await paymentService.getPaymentMethods();
+ * ```
+ *
+ * This file now wraps paymentService for backward compatibility.
+ * All new code should use paymentService directly.
  */
 
+import { paymentService } from './paymentService';
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
-import { toRecord } from '../utils/jsonHelper';
+
+// ═══════════════════════════════════════════════════════════════════
+// Types (preserved for backward compatibility)
+// ═══════════════════════════════════════════════════════════════════
 
 export interface PaymentMethod {
   id: string;
@@ -45,9 +63,10 @@ interface EdgeFunctionResponse<T> {
   error?: string;
 }
 
-/**
- * Helper function to call Edge Functions with authentication
- */
+// ═══════════════════════════════════════════════════════════════════
+// Helper Functions
+// ═══════════════════════════════════════════════════════════════════
+
 async function callEdgeFunction<T>(
   functionName: string,
   payload?: Record<string, unknown>,
@@ -78,283 +97,167 @@ async function callEdgeFunction<T>(
   return data?.data as T;
 }
 
-export const paymentsApi = {
-  /**
-   * Get user's payment methods from Stripe via Edge Function
-   */
+// ═══════════════════════════════════════════════════════════════════
+// PaymentsApiService Class
+// ═══════════════════════════════════════════════════════════════════
+
+/**
+ * @deprecated Use paymentService instead
+ */
+class PaymentsApiService {
+  /** @deprecated Use paymentService.getPaymentMethods() */
   async getPaymentMethods(): Promise<PaymentMethod[]> {
     try {
-      const methods = await callEdgeFunction<PaymentMethod[]>(
-        'get-payment-methods',
-      );
-      return methods || [];
+      const { cards } = await paymentService.getPaymentMethods();
+      return cards.map((card) => ({
+        id: card.id,
+        type: 'card' as const,
+        last4: card.last4,
+        brand: card.brand,
+        expiryMonth: card.expiryMonth,
+        expiryYear: card.expiryYear,
+        isDefault: card.isDefault,
+      }));
     } catch (error) {
       logger.error('Failed to get payment methods', { error });
       throw error;
     }
-  },
+  }
 
-  /**
-   * Add a new payment method via Edge Function
-   */
+  /** @deprecated Use paymentService.addCard() */
   async addPaymentMethod(paymentMethodId: string): Promise<PaymentMethod> {
     try {
-      const method = await callEdgeFunction<PaymentMethod>(
-        'add-payment-method',
-        {
-          paymentMethodId,
-        },
-      );
-      logger.info('Added payment method', { paymentMethodId });
-      return method;
+      const { card } = await paymentService.addCard(paymentMethodId);
+      return {
+        id: card.id,
+        type: 'card',
+        last4: card.last4,
+        brand: card.brand,
+        expiryMonth: card.expiryMonth,
+        expiryYear: card.expiryYear,
+        isDefault: card.isDefault,
+      };
     } catch (error) {
       logger.error('Failed to add payment method', { error });
       throw error;
     }
-  },
+  }
 
-  /**
-   * Remove a payment method via Edge Function
-   */
+  /** @deprecated Use paymentService.removeCard() */
   async removePaymentMethod(paymentMethodId: string): Promise<void> {
-    try {
-      await callEdgeFunction<void>('remove-payment-method', {
-        paymentMethodId,
-      });
-      logger.info('Removed payment method', { paymentMethodId });
-    } catch (error) {
-      logger.error('Failed to remove payment method', { error });
-      throw error;
-    }
-  },
+    await paymentService.removeCard(paymentMethodId);
+  }
 
-  /**
-   * Set default payment method via Edge Function
-   */
+  /** @deprecated Use paymentService.setDefaultCard() */
   async setDefaultPaymentMethod(paymentMethodId: string): Promise<void> {
+    await paymentService.setDefaultCard(paymentMethodId);
+  }
+
+  /** @deprecated Use paymentService.getTransactions() */
+  async getTransactionHistory(limit = 20, offset = 0): Promise<TransactionRecord[]> {
     try {
-      await callEdgeFunction<void>('set-default-payment-method', {
-        paymentMethodId,
+      const { transactions } = await paymentService.getTransactions({
+        pageSize: limit,
+        page: Math.floor(offset / limit) + 1,
       });
-      logger.info('Set default payment method', { paymentMethodId });
-    } catch (error) {
-      logger.error('Failed to set default payment method', { error });
-      throw error;
-    }
-  },
 
-  /**
-   * Get transaction history from database
-   * Uses explicit column selection - never select('*')
-   */
-  async getTransactionHistory(
-    limit = 20,
-    offset = 0,
-  ): Promise<TransactionRecord[]> {
-    try {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session?.session?.user) {
-        throw new Error('User not authenticated');
-      }
-
-      // SECURITY: Explicit column selection - never use select('*')
-      const { data, error } = await supabase
-        .from('transactions')
-        .select(
-          'id, type, amount, currency, status, created_at, description, metadata',
-        )
-        .eq('user_id', session.session.user.id)
-        .order('created_at', { ascending: false })
-        .range(offset, offset + limit - 1);
-
-      if (error) throw error;
-
-      // Define the transaction row type based on query selection
-      type TransactionRow = {
-        id: string;
-        type: string;
-        amount: number;
-        currency: string | null;
-        status: string | null;
-        created_at: string | null;
-        description: string | null;
-        metadata: unknown;
-      };
-
-      return (data || []).map((tx: TransactionRow) => ({
+      return transactions.map((tx) => ({
         id: tx.id,
         type: tx.type as TransactionRecord['type'],
         amount: tx.amount,
-        currency: tx.currency ?? '',
-        status: (tx.status ?? 'pending') as TransactionRecord['status'],
-        createdAt: tx.created_at ?? '',
-        description: tx.description ?? undefined,
-        metadata: toRecord(tx.metadata),
+        currency: tx.currency,
+        status: tx.status as TransactionRecord['status'],
+        createdAt: tx.date,
+        description: tx.description,
+        metadata: tx.metadata,
       }));
     } catch (error) {
       logger.error('Failed to get transaction history', { error });
       throw error;
     }
-  },
+  }
 
-  /**
-   * Create a payment intent via Edge Function
-   * SECURITY: Stripe operations handled server-side
-   */
+  /** @deprecated Use paymentService.createPaymentIntent() */
   async createPaymentIntent(
     amount: number,
     currency: string,
     momentId?: string,
   ): Promise<PaymentIntent> {
     try {
-      const intent = await callEdgeFunction<PaymentIntent>(
-        'create-payment-intent',
-        {
-          amount,
-          currency,
-          momentId,
-        },
-      );
-      logger.info('Created payment intent', {
-        intentId: intent.id,
-        amount,
-        currency,
-      });
-      return intent;
+      const intent = await paymentService.createPaymentIntent(momentId || '', amount);
+      return {
+        id: intent.id,
+        amount: intent.amount,
+        currency: intent.currency,
+        status: intent.status as PaymentIntent['status'],
+        clientSecret: intent.clientSecret || '',
+      };
     } catch (error) {
       logger.error('Failed to create payment intent', { error });
       throw error;
     }
-  },
+  }
 
-  /**
-   * Get wallet balance from database
-   */
+  /** @deprecated Use paymentService.getBalance() */
   async getWallet() {
     try {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session?.session?.user) {
-        throw new Error('User not authenticated');
-      }
-
-      // SECURITY: Explicit column selection - never use select('*')
-      const { data, error } = await supabase
-        .from('users')
-        .select('balance, currency')
-        .eq('id', session.session.user.id)
-        .single();
-
-      if (error) throw error;
-
-      // Calculate pending balance from pending transactions
-      const { data: pendingTx } = await supabase
-        .from('transactions')
-        .select('amount')
-        .eq('user_id', session.session.user.id)
-        .eq('status', 'pending');
-
-      const pendingBalance = (pendingTx || []).reduce(
-        (sum, tx) => sum + tx.amount,
-        0,
-      );
-
+      const balance = await paymentService.getBalance();
       return {
-        balance: data?.balance || 0,
-        currency: data?.currency || 'USD',
-        pendingBalance,
+        balance: balance.available,
+        currency: balance.currency,
+        pendingBalance: balance.pending,
       };
     } catch (error) {
       logger.error('Failed to get wallet', { error });
       throw error;
     }
-  },
+  }
 
-  /**
-   * Get transactions (alias for getTransactionHistory)
-   */
+  /** @deprecated Use paymentService.getTransactions() */
   async getTransactions(limit = 20, offset = 0) {
     return this.getTransactionHistory(limit, offset);
-  },
+  }
 
-  /**
-   * Get transaction by ID
-   */
-  async getTransactionById(
-    transactionId: string,
-  ): Promise<TransactionRecord | null> {
+  /** @deprecated Use paymentService.getTransaction() */
+  async getTransactionById(transactionId: string): Promise<TransactionRecord | null> {
     try {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session?.session?.user) {
-        throw new Error('User not authenticated');
-      }
-
-      // SECURITY: Explicit column selection - never use select('*')
-      const { data, error } = await supabase
-        .from('transactions')
-        .select(
-          'id, type, amount, currency, status, created_at, description, metadata',
-        )
-        .eq('id', transactionId)
-        .eq('user_id', session.session.user.id)
-        .single();
-
-      if (error) {
-        if (error.code === 'PGRST116') return null; // Not found
-        throw error;
-      }
-
+      const { transaction } = await paymentService.getTransaction(transactionId);
       return {
-        id: data.id,
-        type: data.type as TransactionRecord['type'],
-        amount: data.amount,
-        currency: data.currency ?? '',
-        status: data.status as TransactionRecord['status'],
-        createdAt: data.created_at ?? '',
-        description: data.description ?? undefined,
-        metadata: toRecord(data.metadata),
+        id: transaction.id,
+        type: transaction.type as TransactionRecord['type'],
+        amount: transaction.amount,
+        currency: transaction.currency,
+        status: transaction.status as TransactionRecord['status'],
+        createdAt: transaction.date,
+        description: transaction.description,
+        metadata: transaction.metadata,
       };
-    } catch (error) {
-      logger.error('Failed to get transaction', { error, transactionId });
-      throw error;
+    } catch {
+      return null;
     }
-  },
+  }
 
-  /**
-   * Withdraw funds via Edge Function
-   * SECURITY: Withdrawal logic handled server-side with fraud checks
-   */
+  /** @deprecated Use paymentService.withdrawFunds() */
   async withdraw(amount: number, paymentMethodId: string) {
     try {
-      const result = await callEdgeFunction<{
-        success: boolean;
-        transactionId: string;
-      }>('transfer-funds', {
-        type: 'withdrawal',
+      const { transaction } = await paymentService.withdrawFunds({
         amount,
-        paymentMethodId,
+        currency: 'USD',
+        bankAccountId: paymentMethodId,
       });
-      logger.info('Withdrawal initiated', {
-        amount,
-        transactionId: result.transactionId,
-      });
-      return result;
+      return { success: true, transactionId: transaction.id };
     } catch (error) {
       logger.error('Failed to withdraw', { error, amount, paymentMethodId });
       throw error;
     }
-  },
+  }
 
-  /**
-   * Get KYC status from database
-   */
+  /** Get KYC status (unique to this API) */
   async getKYCStatus() {
     try {
       const { data: session } = await supabase.auth.getSession();
-      if (!session?.session?.user) {
-        throw new Error('User not authenticated');
-      }
+      if (!session?.session?.user) throw new Error('User not authenticated');
 
-      // SECURITY: Explicit column selection - never use select('*')
       const { data, error } = await supabase
         .from('users')
         .select('kyc_status, verified, verified_at')
@@ -363,18 +266,9 @@ export const paymentsApi = {
 
       if (error) throw error;
 
-      // Type guard for the data shape
-      const row = data as {
-        kyc_status?: string | null;
-        verified?: boolean | null;
-        verified_at?: string | null;
-      } | null;
+      const row = data as { kyc_status?: string | null; verified?: boolean | null; verified_at?: string | null } | null;
       return {
-        status: (row?.kyc_status || 'pending') as
-          | 'pending'
-          | 'in_review'
-          | 'verified'
-          | 'rejected',
+        status: (row?.kyc_status || 'pending') as 'pending' | 'in_review' | 'verified' | 'rejected',
         verified: row?.verified || false,
         verifiedAt: row?.verified_at,
       };
@@ -382,45 +276,28 @@ export const paymentsApi = {
       logger.error('Failed to get KYC status', { error });
       throw error;
     }
-  },
+  }
 
-  /**
-   * Submit KYC documents via Edge Function
-   * SECURITY: Documents processed server-side with third-party KYC provider
-   */
+  /** Submit KYC documents */
   async submitKYC(documents: Record<string, string>) {
     try {
-      const result = await callEdgeFunction<{
-        success: boolean;
-        status: string;
-      }>('verify-kyc', { documents });
-      logger.info('KYC submission initiated', { status: result.status });
-      return {
-        success: result.success,
-        status: result.status as 'pending' | 'in_review',
-      };
+      const result = await callEdgeFunction<{ success: boolean; status: string }>('verify-kyc', { documents });
+      return { success: result.success, status: result.status as 'pending' | 'in_review' };
     } catch (error) {
       logger.error('Failed to submit KYC', { error });
       throw error;
     }
-  },
+  }
 
-  /**
-   * Get subscription from database
-   */
+  /** Get subscription */
   async getSubscription() {
     try {
       const { data: session } = await supabase.auth.getSession();
-      if (!session?.session?.user) {
-        throw new Error('User not authenticated');
-      }
+      if (!session?.session?.user) throw new Error('User not authenticated');
 
-      // SECURITY: Explicit column selection - never use select('*')
       const { data, error } = await supabase
         .from('user_subscriptions')
-        .select(
-          'id, plan_id, status, current_period_start, current_period_end, cancel_at',
-        )
+        .select('id, plan_id, status, current_period_start, current_period_end, cancel_at')
         .eq('user_id', session.session.user.id)
         .eq('status', 'active')
         .order('created_at', { ascending: false })
@@ -428,68 +305,63 @@ export const paymentsApi = {
         .single();
 
       if (error) {
-        if (error.code === 'PGRST116') return null; // No active subscription
+        if (error.code === 'PGRST116') return null;
         throw error;
       }
-
       return data;
     } catch (error) {
       logger.error('Failed to get subscription', { error });
       throw error;
     }
-  },
+  }
 
-  /**
-   * Create subscription via Edge Function
-   * SECURITY: Stripe subscription created server-side
-   */
+  /** Create subscription */
   async createSubscription(planId: string, paymentMethodId: string) {
     try {
-      const result = await callEdgeFunction<{
-        id: string;
-        planId: string;
-        status: string;
-      }>('create-subscription', {
-        planId,
-        paymentMethodId,
-      });
-      logger.info('Subscription created', {
-        subscriptionId: result.id,
-        planId,
-      });
-      return {
-        id: result.id,
-        planId: result.planId,
-        status: result.status as 'active',
-      };
+      const result = await callEdgeFunction<{ id: string; planId: string; status: string }>('create-subscription', { planId, paymentMethodId });
+      return { id: result.id, planId: result.planId, status: result.status as 'active' };
     } catch (error) {
-      logger.error('Failed to create subscription', {
-        error,
-        planId,
-        paymentMethodId,
-      });
+      logger.error('Failed to create subscription', { error });
       throw error;
     }
-  },
+  }
 
-  /**
-   * Cancel subscription via Edge Function
-   */
+  /** Cancel subscription */
   async cancelSubscription() {
     try {
-      const result = await callEdgeFunction<{ success: boolean }>(
-        'cancel-subscription',
-      );
-      logger.info('Subscription cancelled');
-      return result;
+      return await callEdgeFunction<{ success: boolean }>('cancel-subscription');
     } catch (error) {
       logger.error('Failed to cancel subscription', { error });
       throw error;
     }
-  },
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Singleton Export (Backward Compatible)
+// ═══════════════════════════════════════════════════════════════════
+
+const instance = new PaymentsApiService();
+
+/** @deprecated Use paymentService instead */
+export const paymentsApi = {
+  getPaymentMethods: instance.getPaymentMethods.bind(instance),
+  addPaymentMethod: instance.addPaymentMethod.bind(instance),
+  removePaymentMethod: instance.removePaymentMethod.bind(instance),
+  setDefaultPaymentMethod: instance.setDefaultPaymentMethod.bind(instance),
+  getTransactionHistory: instance.getTransactionHistory.bind(instance),
+  createPaymentIntent: instance.createPaymentIntent.bind(instance),
+  getWallet: instance.getWallet.bind(instance),
+  getTransactions: instance.getTransactions.bind(instance),
+  getTransactionById: instance.getTransactionById.bind(instance),
+  withdraw: instance.withdraw.bind(instance),
+  getKYCStatus: instance.getKYCStatus.bind(instance),
+  submitKYC: instance.submitKYC.bind(instance),
+  getSubscription: instance.getSubscription.bind(instance),
+  createSubscription: instance.createSubscription.bind(instance),
+  cancelSubscription: instance.cancelSubscription.bind(instance),
 };
 
-// Export types
 export interface CreatePaymentIntentDto {
   amount: number;
   currency: string;
