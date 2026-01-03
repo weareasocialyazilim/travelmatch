@@ -1,205 +1,154 @@
 /**
- * KYCProgressBar - Awwwards Edition
+ * KYCProgressBar Component
  *
- * Ceremony-style progress indicator with neon glow effects.
- * Features animated step transitions and Twilight Zinc theme.
+ * Ceremony-focused silky progress bar with neon highlights.
+ * Part of the Awwwards-standard KYC verification flow.
+ *
+ * Features:
+ * - Glass-textured track
+ * - Neon glow on active steps
+ * - Mono font for step labels
+ * - Animated transitions
  */
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import Animated, {
-  useSharedValue,
   useAnimatedStyle,
-  withSpring,
-  withRepeat,
-  withSequence,
+  useSharedValue,
   withTiming,
-  interpolate,
-  interpolateColor,
-  Easing,
+  withSpring,
 } from 'react-native-reanimated';
-import {
-  KYC_COLORS,
-  KYC_TYPOGRAPHY,
-  KYC_SPRINGS,
-  KYC_STEPS,
-  getStepIndex,
-} from './theme';
+import { COLORS } from '@/constants/colors';
+import { FONTS } from '@/constants/typography';
+import { getStepProgress } from './constants';
+
+// Step labels for the ceremony progress bar
+const STEPS = ['BELGE', 'TARAMA', 'LIVENESS', 'ONAY'];
 
 interface KYCProgressBarProps {
-  /** Current step ID */
+  /** Current step identifier (from constants) */
   currentStep: string;
-  /** Show step labels */
-  showLabels?: boolean;
 }
 
-interface StepDotProps {
-  index: number;
-  currentIndex: number;
+/**
+ * Single step dot with neon glow animation
+ */
+const StepDot: React.FC<{
+  isActive: boolean;
+  isCurrent: boolean;
   label: string;
-  showLabel: boolean;
-}
-
-const StepDot: React.FC<StepDotProps> = ({
-  index,
-  currentIndex,
-  label,
-  showLabel,
-}) => {
-  const isCompleted = index < currentIndex;
-  const isCurrent = index === currentIndex;
-  const isActive = index <= currentIndex;
-
-  const scale = useSharedValue(1);
-  const glowOpacity = useSharedValue(0);
-  const progress = useSharedValue(0);
+}> = ({ isActive, isCurrent, label }) => {
+  const scale = useSharedValue(isCurrent ? 1 : 0.6);
+  const glowOpacity = useSharedValue(isCurrent ? 1 : 0);
 
   useEffect(() => {
-    progress.value = withSpring(isActive ? 1 : 0, KYC_SPRINGS.gentle);
-
-    if (isCurrent) {
-      // Pulsing glow for current step
-      glowOpacity.value = withRepeat(
-        withSequence(
-          withTiming(0.8, { duration: 1200, easing: Easing.inOut(Easing.ease) }),
-          withTiming(0.3, { duration: 1200, easing: Easing.inOut(Easing.ease) })
-        ),
-        -1,
-        false
-      );
-
-      scale.value = withRepeat(
-        withSequence(
-          withTiming(1.15, { duration: 1200, easing: Easing.inOut(Easing.ease) }),
-          withTiming(1, { duration: 1200, easing: Easing.inOut(Easing.ease) })
-        ),
-        -1,
-        false
-      );
-    } else {
-      glowOpacity.value = withTiming(0, { duration: 300 });
-      scale.value = withSpring(1, KYC_SPRINGS.gentle);
-    }
-  }, [isActive, isCurrent, progress, glowOpacity, scale]);
+    scale.value = withSpring(isCurrent ? 1 : 0.6, { damping: 15 });
+    glowOpacity.value = withTiming(isCurrent ? 1 : 0, { duration: 300 });
+  }, [isCurrent, scale, glowOpacity]);
 
   const dotStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
-    backgroundColor: interpolateColor(
-      progress.value,
-      [0, 1],
-      [KYC_COLORS.background.elevated, KYC_COLORS.neon.lime]
-    ),
   }));
 
   const glowStyle = useAnimatedStyle(() => ({
     opacity: glowOpacity.value,
-    transform: [{ scale: interpolate(glowOpacity.value, [0.3, 0.8], [1, 1.8]) }],
-  }));
-
-  const labelStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(progress.value, [0, 1], [0.5, 1]),
-    color: interpolateColor(
-      progress.value,
-      [0, 1],
-      [KYC_COLORS.text.muted, isCurrent ? KYC_COLORS.neon.lime : KYC_COLORS.text.primary]
-    ),
   }));
 
   return (
-    <View style={styles.stepContainer}>
-      <View style={styles.dotWrapper}>
-        {/* Glow effect */}
-        <Animated.View
-          style={[
-            styles.glow,
-            { backgroundColor: KYC_COLORS.neon.lime },
-            glowStyle,
-          ]}
-        />
-        {/* Main dot */}
-        <Animated.View style={[styles.dot, dotStyle]}>
-          {isCompleted && (
-            <Text style={styles.checkmark}>✓</Text>
-          )}
-        </Animated.View>
-      </View>
-      {showLabel && (
-        <Animated.Text style={[styles.stepLabel, labelStyle]}>
-          {label}
-        </Animated.Text>
-      )}
+    <View style={styles.stepItem}>
+      {/* Neon glow layer */}
+      <Animated.View style={[styles.dotGlow, glowStyle]} />
+
+      {/* Dot */}
+      <Animated.View
+        style={[
+          styles.dot,
+          isActive && styles.activeDot,
+          isCurrent && styles.currentDot,
+          dotStyle,
+        ]}
+      >
+        {isCurrent && <View style={styles.dotInner} />}
+      </Animated.View>
+
+      {/* Label */}
+      <Text
+        style={[
+          styles.label,
+          isActive && styles.activeLabel,
+          isCurrent && styles.currentLabel,
+        ]}
+      >
+        {label}
+      </Text>
     </View>
   );
 };
 
-interface StepLineProps {
+/**
+ * Animated connecting line between steps
+ */
+const ConnectingLine: React.FC<{
   isActive: boolean;
-}
-
-const StepLine: React.FC<StepLineProps> = ({ isActive }) => {
-  const progress = useSharedValue(0);
+}> = ({ isActive }) => {
+  const fillWidth = useSharedValue(isActive ? 100 : 0);
 
   useEffect(() => {
-    progress.value = withSpring(isActive ? 1 : 0, KYC_SPRINGS.gentle);
-  }, [isActive, progress]);
+    fillWidth.value = withTiming(isActive ? 100 : 0, { duration: 400 });
+  }, [isActive, fillWidth]);
 
-  const lineStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(
-      progress.value,
-      [0, 1],
-      [KYC_COLORS.background.elevated, KYC_COLORS.neon.lime]
-    ),
-  }));
-
-  const glowStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(progress.value, [0, 1], [0, 0.5]),
+  const fillStyle = useAnimatedStyle(() => ({
+    width: `${fillWidth.value}%`,
   }));
 
   return (
     <View style={styles.lineContainer}>
-      <Animated.View style={[styles.line, lineStyle]} />
-      <Animated.View
-        style={[
-          styles.lineGlow,
-          { backgroundColor: KYC_COLORS.neon.lime },
-          glowStyle,
-        ]}
-      />
+      <View style={styles.line} />
+      <Animated.View style={[styles.lineFill, fillStyle]} />
     </View>
   );
 };
 
+/**
+ * Ceremony-focused silky progress bar with neon highlights.
+ * Displays steps as dots with connecting lines and mono-font labels.
+ */
 export const KYCProgressBar: React.FC<KYCProgressBarProps> = ({
   currentStep,
-  showLabels = true,
 }) => {
-  const currentIndex = getStepIndex(currentStep);
-  const currentStepData = KYC_STEPS[currentIndex];
+  // Map step index to STEPS array index
+  // intro=0, document=1, upload=2, selfie=3, review=4
+  const stepMapping: Record<string, number> = {
+    intro: -1, // Before first step
+    document: 0, // BELGE
+    upload: 1, // TARAMA
+    selfie: 2, // LIVENESS
+    review: 3, // ONAY
+    pending: 4, // Complete
+  };
+
+  const currentStepIndex = stepMapping[currentStep] ?? 0;
 
   return (
     <View style={styles.container}>
-      {/* Step indicator text */}
-      <View style={styles.header}>
-        <Text style={styles.stepText}>
-          Adım {currentIndex + 1}/{KYC_STEPS.length}
-        </Text>
-        <Text style={styles.stepName}>{currentStepData?.label}</Text>
-      </View>
+      {/* Glass background */}
+      <View style={styles.glassBackground} />
 
-      {/* Progress dots */}
-      <View style={styles.stepsRow}>
-        {KYC_STEPS.map((step, index) => (
-          <React.Fragment key={step.id}>
-            <StepDot
-              index={index}
-              currentIndex={currentIndex}
-              label={step.label}
-              showLabel={showLabels}
-            />
-            {index < KYC_STEPS.length - 1 && (
-              <StepLine isActive={index < currentIndex} />
-            )}
-          </React.Fragment>
-        ))}
+      {/* Track with steps */}
+      <View style={styles.track}>
+        {STEPS.map((step, index) => {
+          const isActive = index <= currentStepIndex;
+          const isCurrent = index === currentStepIndex;
+
+          return (
+            <React.Fragment key={step}>
+              <StepDot isActive={isActive} isCurrent={isCurrent} label={step} />
+              {index < STEPS.length - 1 && (
+                <ConnectingLine isActive={index < currentStepIndex} />
+              )}
+            </React.Fragment>
+          );
+        })}
       </View>
     </View>
   );
@@ -208,95 +157,111 @@ export const KYCProgressBar: React.FC<KYCProgressBarProps> = ({
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 24,
-    paddingVertical: 16,
-    backgroundColor: KYC_COLORS.background.primary,
+    paddingVertical: 20,
+    position: 'relative',
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
+  glassBackground: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
   },
-  stepText: {
-    ...KYC_TYPOGRAPHY.caption,
-    color: KYC_COLORS.text.secondary,
-  },
-  stepName: {
-    ...KYC_TYPOGRAPHY.stepLabel,
-    color: KYC_COLORS.neon.lime,
-  },
-  stepsRow: {
+  track: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
   },
-  stepContainer: {
+  stepItem: {
     alignItems: 'center',
-    width: 48,
+    gap: 10,
+    position: 'relative',
   },
-  dotWrapper: {
-    width: 24,
-    height: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1,
-  },
-  glow: {
+  // Neon glow behind the dot
+  dotGlow: {
     position: 'absolute',
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    ...Platform.select({
-      ios: {
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.6,
-        shadowRadius: 8,
-      },
-      android: {},
-    }),
+    top: -4,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: COLORS.primary,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 8,
+    elevation: 8,
   },
-  checkmark: {
-    fontSize: 8,
+  // Base dot style
+  dot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: COLORS.text.muted,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  activeDot: {
+    backgroundColor: COLORS.primary,
+  },
+  currentDot: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: COLORS.primary,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  dotInner: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: COLORS.white,
+  },
+  // Label styles
+  label: {
+    fontSize: 9,
+    fontFamily: FONTS.mono.regular,
+    color: COLORS.text.muted,
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+  },
+  activeLabel: {
+    color: COLORS.text.secondary,
+  },
+  currentLabel: {
+    color: COLORS.primary,
+    fontFamily: FONTS.mono.medium,
     fontWeight: '700',
-    color: KYC_COLORS.background.primary,
+    textShadowColor: COLORS.primary,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 4,
   },
-  stepLabel: {
-    ...KYC_TYPOGRAPHY.caption,
-    marginTop: 8,
-    textAlign: 'center',
-  },
+  // Connecting line
   lineContainer: {
     flex: 1,
-    height: 24,
-    justifyContent: 'center',
-    marginHorizontal: 4,
+    height: 2,
+    marginTop: 4,
+    marginHorizontal: 8,
+    position: 'relative',
   },
   line: {
-    height: 2,
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 1,
   },
-  lineGlow: {
+  lineFill: {
     position: 'absolute',
+    top: 0,
     left: 0,
-    right: 0,
-    height: 6,
-    top: 9,
-    borderRadius: 3,
-    ...Platform.select({
-      ios: {
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.5,
-        shadowRadius: 4,
-      },
-      android: {},
-    }),
+    height: '100%',
+    backgroundColor: COLORS.primary,
+    borderRadius: 1,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
   },
 });
 

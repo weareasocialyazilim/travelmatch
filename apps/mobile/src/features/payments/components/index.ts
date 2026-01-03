@@ -14,6 +14,12 @@ export { WalletConnectButton } from './WalletConnectButton';
 export { WalletListItem } from './WalletListItem';
 export { WalletOptionsModal } from './WalletOptionsModal';
 export { WalletConfigModal } from './WalletConfigModal';
+export { TransactionListItem } from './TransactionListItem';
+export type {
+  Transaction,
+  TransactionStatus,
+  TransactionType,
+} from './TransactionListItem';
 
 // Gift inbox
 export { GiftInboxCard } from './GiftInboxCard';
