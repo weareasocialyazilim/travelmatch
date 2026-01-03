@@ -56,17 +56,32 @@ export type {
   NotificationType,
 } from './notificationService';
 
-export { paymentService } from './paymentService';
+// Payment Services (Consolidated)
+export { securePaymentService } from './securePaymentService';
+export { walletService } from './walletService';
+export { transactionService } from './transactionService';
+export { escrowService, determineEscrowMode, getEscrowExplanation } from './escrowService';
 export type {
   PaymentCard,
   BankAccount,
-  Transaction,
-  WalletBalance,
   PaymentIntent,
   PaymentStatus,
   PaymentMethod,
   TransactionType,
-} from './paymentService';
+  WalletBalance,
+  WithdrawalLimits,
+  KYCStatus,
+  Subscription,
+} from './securePaymentService';
+export type { Transaction, TransactionFilters } from './transactionService';
+export type { EscrowMode, EscrowDecision, EscrowTransaction } from './escrowService';
+
+// Backward compatibility alias
+export { securePaymentService as paymentService } from './securePaymentService';
+
+// Base Service with error recovery
+export { BaseService } from './BaseService';
+export type { RetryConfig, ServiceConfig } from './BaseService';
 
 // Re-export currency helpers from utils for backward compatibility
 export { formatCurrency } from '../utils/helpers';
