@@ -44,6 +44,9 @@ export { default as KYCSelfieScreen } from './kyc/KYCSelfieScreen';
 export { default as KYCReviewScreen } from './kyc/KYCReviewScreen';
 export { default as KYCPendingScreen } from './kyc/KYCPendingScreen';
 
+// Components
+export { PaymentSecurityBadge } from './components/PaymentSecurityBadge';
+
 // Hooks
 export {
   useWallet,
