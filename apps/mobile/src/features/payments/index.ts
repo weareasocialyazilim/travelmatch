@@ -12,7 +12,10 @@
 
 // Screens - with default exports
 export { default as WalletScreen } from './screens/WalletScreen';
-export { default as WithdrawScreen, AwwwardsWithdrawScreen } from './screens/WithdrawScreen';
+export {
+  default as WithdrawScreen,
+  AwwwardsWithdrawScreen,
+} from './screens/WithdrawScreen';
 export { WithdrawSuccessScreen } from './screens/WithdrawSuccessScreen';
 export { default as PaymentMethodsScreen } from './screens/PaymentMethodsScreen';
 export { default as AddCardScreen } from './screens/AddCardScreen';
@@ -62,11 +65,9 @@ export {
   useCancelSubscription,
 } from './hooks/usePayments';
 
-// Services
-export { paymentsApi as paymentsService } from './services/paymentsService';
-/** @deprecated Use paymentsService instead */
-export { paymentsApi } from './services/paymentsService';
-export type { CreatePaymentIntentDto } from './services/paymentsService';
+// Services - consolidated into securePaymentService
+// All payment operations now go through securePaymentService
+// Import from '@/services/securePaymentService' for new code
 
 // Types
 export type {

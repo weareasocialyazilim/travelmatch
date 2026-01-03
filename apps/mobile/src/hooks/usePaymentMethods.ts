@@ -1,11 +1,14 @@
 /**
  * usePaymentMethods Hook
  * Manages payment methods state and operations
+ *
+ * Uses securePaymentService as the single source of truth for payment operations.
  */
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { paymentsApi, type PaymentMethod } from '@/services/paymentsApi';
+import { securePaymentService } from '@/services/securePaymentService';
 import { logger } from '@/utils/logger';
+import type { PaymentMethod } from '@/types/api';
 import type {
   SavedCard,
   Wallet,
@@ -45,7 +48,29 @@ export function usePaymentMethods(): UsePaymentMethodsReturn {
     setIsLoading(true);
     setError(null);
     try {
-      const methods = await paymentsApi.getPaymentMethods();
+      const { cards, bankAccounts } =
+        await securePaymentService.getPaymentMethods();
+
+      // Convert to unified PaymentMethod format
+      const methods: PaymentMethod[] = [
+        ...cards.map((card) => ({
+          id: card.id,
+          type: 'card' as const,
+          last4: card.last4,
+          brand: card.brand,
+          expiryMonth: card.expiryMonth,
+          expiryYear: card.expiryYear,
+          isDefault: card.isDefault,
+        })),
+        ...bankAccounts.map((bank) => ({
+          id: bank.id,
+          type: 'bank_account' as const,
+          last4: bank.last4,
+          brand: bank.bankName,
+          isDefault: bank.isDefault,
+        })),
+      ];
+
       setPaymentMethods(methods);
     } catch (err) {
       const error =
@@ -63,7 +88,19 @@ export function usePaymentMethods(): UsePaymentMethodsReturn {
     setIsLoading(true);
     setError(null);
     try {
-      const newMethod = await paymentsApi.addPaymentMethod(paymentMethodId);
+      // Use securePaymentService.addCard with the token
+      const { card } = await securePaymentService.addCard(paymentMethodId);
+
+      const newMethod: PaymentMethod = {
+        id: card.id,
+        type: 'card',
+        last4: card.last4,
+        brand: card.brand,
+        expiryMonth: card.expiryMonth,
+        expiryYear: card.expiryYear,
+        isDefault: card.isDefault,
+      };
+
       setPaymentMethods((prev) => [...prev, newMethod]);
     } catch (err) {
       const error =
@@ -80,7 +117,8 @@ export function usePaymentMethods(): UsePaymentMethodsReturn {
     setIsLoading(true);
     setError(null);
     try {
-      await paymentsApi.removePaymentMethod(paymentMethodId);
+      // Use securePaymentService.removeCard
+      await securePaymentService.removeCard(paymentMethodId);
       setPaymentMethods((prev) => prev.filter((m) => m.id !== paymentMethodId));
     } catch (err) {
       const error =
@@ -100,7 +138,8 @@ export function usePaymentMethods(): UsePaymentMethodsReturn {
       setIsLoading(true);
       setError(null);
       try {
-        await paymentsApi.setDefaultPaymentMethod(paymentMethodId);
+        // Use securePaymentService.setDefaultCard
+        await securePaymentService.setDefaultCard(paymentMethodId);
         setPaymentMethods((prev) =>
           prev.map((m) => ({
             ...m,
@@ -137,13 +176,13 @@ export function usePaymentMethods(): UsePaymentMethodsReturn {
   // Extended API: Derive wallets from paymentMethods
   const wallets = useMemo<Wallet[]>(() => {
     return paymentMethods
-      .filter((m) => m.type === 'wallet')
+      .filter((m) => m.type === 'apple_pay' || m.type === 'google_pay')
       .map((m) => ({
         id: m.id,
         name:
-          m.walletType === 'apple_pay'
+          m.type === 'apple_pay'
             ? 'Apple Pay'
-            : m.walletType === 'google_pay'
+            : m.type === 'google_pay'
               ? 'Google Pay'
               : 'Wallet',
         status: 'connected',
@@ -173,17 +212,14 @@ export function usePaymentMethods(): UsePaymentMethodsReturn {
   );
 
   // Extended API: Update card expiry
-  const updateCard = useCallback(
-    async (cardId: string, expiry: string) => {
-      // In a real implementation, this would update the card via API
-      logger.info('Updating card', { cardId, expiry });
-      // Mock: Update the payment method's expiry (not persisted in this mock)
-      setPaymentMethods((prev) =>
-        prev.map((m) => (m.id === cardId ? { ...m, expiry } : m)),
-      );
-    },
-    [],
-  );
+  const updateCard = useCallback(async (cardId: string, expiry: string) => {
+    // In a real implementation, this would update the card via API
+    logger.info('Updating card', { cardId, expiry });
+    // Mock: Update the payment method's expiry (not persisted in this mock)
+    setPaymentMethods((prev) =>
+      prev.map((m) => (m.id === cardId ? { ...m, expiry } : m)),
+    );
+  }, []);
 
   // Extended API: Set card as default (sync wrapper)
   const setCardAsDefault = useCallback(
@@ -212,8 +248,7 @@ export function usePaymentMethods(): UsePaymentMethodsReturn {
     // Mock: add a wallet payment method
     const walletMethod: PaymentMethod = {
       id: `wallet_${Date.now()}`,
-      type: 'wallet',
-      walletType: 'apple_pay',
+      type: 'apple_pay',
       isDefault: false,
     };
     setPaymentMethods((prev) => [...prev, walletMethod]);
@@ -224,11 +259,12 @@ export function usePaymentMethods(): UsePaymentMethodsReturn {
     logger.info('Disconnecting wallet', { walletName });
     setPaymentMethods((prev) =>
       prev.filter((m) => {
-        if (m.type !== 'wallet') return true;
+        // Keep non-wallet types
+        if (m.type !== 'apple_pay' && m.type !== 'google_pay') return true;
         const name =
-          m.walletType === 'apple_pay'
+          m.type === 'apple_pay'
             ? 'Apple Pay'
-            : m.walletType === 'google_pay'
+            : m.type === 'google_pay'
               ? 'Google Pay'
               : 'Wallet';
         return name !== walletName;
