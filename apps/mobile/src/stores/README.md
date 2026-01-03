@@ -6,47 +6,13 @@ Zustand state management stores for global application state.
 
 | Store | Description |
 |-------|-------------|
-| `authStore` | Authentication state, user session, tokens |
 | `favoritesStore` | User favorites/bookmarks |
 | `searchStore` | Search filters and history |
-| `uiStore` | UI state (modals, toasts, theme) |
+
+> **Note:** UI state is managed via `I18nContext` (language) and `useOnboarding()` hook.
+> Authentication is handled by Supabase Auth directly via `sessionManager`.
 
 ## Usage
-
-### authStore
-
-Manages user authentication and session:
-
-```typescript
-import { useAuthStore } from '@/stores/authStore';
-
-function LoginScreen() {
-  const { login, isLoading, user } = useAuthStore();
-  
-  const handleLogin = async () => {
-    await login(email, password);
-  };
-  
-  if (user) {
-    return <Text>Welcome, {user.name}!</Text>;
-  }
-}
-```
-
-**Actions:**
-- `login(email, password)` - Authenticate user
-- `register(name, email, password)` - Create new account
-- `logout()` - Clear session
-- `updateUser(updates)` - Update user profile
-- `refreshAuth()` - Refresh access token
-- `setTokens(token, refreshToken)` - Set auth tokens
-
-**State:**
-- `user` - Current user object
-- `token` - Access token
-- `refreshToken` - Refresh token
-- `isAuthenticated` - Auth status
-- `isLoading` - Loading state
 
 ### favoritesStore
 
@@ -81,41 +47,21 @@ function SearchScreen() {
 }
 ```
 
-### uiStore
-
-Manages global UI state:
-
-```typescript
-import { useUIStore } from '@/stores/uiStore';
-
-function App() {
-  const { theme, setTheme, showToast } = useUIStore();
-  
-  const handleSuccess = () => {
-    showToast({ message: 'Success!', type: 'success' });
-  };
-}
-```
-
 ## Persistence
 
-Stores use Zustand's persist middleware with AsyncStorage:
+Stores use Zustand's persist middleware with MMKV (10-20x faster than AsyncStorage):
 
 ```typescript
-export const useAuthStore = create<AuthState>()(
+import { Storage } from '../utils/storage';
+
+export const useFavoritesStore = create<FavoritesState>()(
   persist(
     (set, get) => ({
       // ... state and actions
     }),
     {
-      name: 'auth-storage',
-      storage: createJSONStorage(() => AsyncStorage),
-      partialize: (state) => ({
-        // Only persist these fields
-        user: state.user,
-        token: state.token,
-        refreshToken: state.refreshToken,
-      }),
+      name: 'favorites-storage',
+      storage: createJSONStorage(() => Storage),
     },
   ),
 );
@@ -157,23 +103,23 @@ export const useAuthStore = create<AuthState>()(
 ## Testing
 
 ```typescript
-import { useAuthStore } from '../authStore';
-import { act } from '@testing-library/react-native';
+import { useFavoritesStore } from '../favoritesStore';
+import { act, renderHook } from '@testing-library/react-native';
 
 beforeEach(() => {
   // Reset store before each test
   act(() => {
-    useAuthStore.getState().logout();
+    useFavoritesStore.setState({ favorites: [] });
   });
 });
 
-test('login sets user and tokens', async () => {
-  await act(async () => {
-    await useAuthStore.getState().login('test@example.com', 'password');
+test('addFavorite adds moment to favorites', () => {
+  const { result } = renderHook(() => useFavoritesStore());
+
+  act(() => {
+    result.current.addFavorite('moment-123');
   });
-  
-  const { user, isAuthenticated } = useAuthStore.getState();
-  expect(user).not.toBeNull();
-  expect(isAuthenticated).toBe(true);
+
+  expect(result.current.favorites).toContain('moment-123');
 });
 ```
