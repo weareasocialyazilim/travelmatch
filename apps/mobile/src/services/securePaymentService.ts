@@ -88,7 +88,6 @@ export interface BankAccount {
   isVerified: boolean;
 }
 
-<<<<<<< HEAD
 export interface LegacyTransaction {
   id: string;
   type: TransactionType;
@@ -101,8 +100,6 @@ export interface LegacyTransaction {
   metadata?: Record<string, unknown>;
 }
 
-=======
->>>>>>> origin/claude/cleanup-payment-services-ZJSBw
 export interface PaymentIntent {
   id: string;
   paymentIntentId?: string;
@@ -118,7 +115,6 @@ export interface PaymentIntent {
   momentId?: string;
 }
 
-<<<<<<< HEAD
 // ============================================
 // ESCROW SYSTEM TYPES (Titan Plan v2.0)
 // ============================================
@@ -131,8 +127,6 @@ export interface EscrowDecision {
   reason: string;
 }
 
-=======
->>>>>>> origin/claude/cleanup-payment-services-ZJSBw
 export interface WithdrawalLimits {
   minAmount: number;
   maxAmount: number;
@@ -144,7 +138,6 @@ export interface WithdrawalLimits {
   remainingMonthly: number;
 }
 
-<<<<<<< HEAD
 export interface EscrowTransaction {
   id: string;
   sender_id: string;
@@ -208,11 +201,6 @@ export function getEscrowExplanation(mode: EscrowMode, amount: number): string {
   }
 }
 
-// ============================================
-// PAYTR TYPES
-// ============================================
-
-=======
 export interface KYCStatus {
   status: 'pending' | 'in_review' | 'verified' | 'rejected';
   verified: boolean;
@@ -228,7 +216,10 @@ export interface Subscription {
   cancel_at?: string;
 }
 
->>>>>>> origin/claude/cleanup-payment-services-ZJSBw
+// ============================================
+// PAYTR TYPES
+// ============================================
+
 export interface PayTRPaymentResponse {
   iframeToken: string;
   merchantOid: string;
@@ -281,7 +272,9 @@ class SecurePaymentService {
    * Returns an iframeToken to be used in PayTR WebView
    * The actual payment is completed in the WebView
    */
-  async createPayment(params: CreatePaymentParams): Promise<PayTRPaymentResponse> {
+  async createPayment(
+    params: CreatePaymentParams,
+  ): Promise<PayTRPaymentResponse> {
     try {
       const headers = await this.getAuthHeaders();
 
@@ -805,7 +798,9 @@ class SecurePaymentService {
   /**
    * Remove a bank account
    */
-  async removeBankAccount(bankAccountId: string): Promise<{ success: boolean }> {
+  async removeBankAccount(
+    bankAccountId: string,
+  ): Promise<{ success: boolean }> {
     try {
       const {
         data: { user },
@@ -1033,7 +1028,8 @@ class SecurePaymentService {
       });
 
       if (error) throw error;
-      if (!transaction) throw new Error('Failed to create withdrawal transaction');
+      if (!transaction)
+        throw new Error('Failed to create withdrawal transaction');
 
       return {
         transaction: {
@@ -1178,7 +1174,8 @@ class SecurePaymentService {
 
           return {
             success: true,
-            transactionId: mandatoryData.transactionId || mandatoryData.escrowId,
+            transactionId:
+              mandatoryData.transactionId || mandatoryData.escrowId,
             escrowId: mandatoryData.escrowId,
           };
         }
@@ -1279,7 +1276,10 @@ class SecurePaymentService {
         moment_id: r.moment_id || undefined,
       }));
     } catch (error) {
-      const standardized = ErrorHandler.handle(error, 'getUserEscrowTransactions');
+      const standardized = ErrorHandler.handle(
+        error,
+        'getUserEscrowTransactions',
+      );
       logger.error('Get escrow transactions error:', standardized);
       return [];
     }
@@ -1546,7 +1546,9 @@ class SecurePaymentService {
   /**
    * Remove a bank account
    */
-  async removeBankAccount(bankAccountId: string): Promise<{ success: boolean }> {
+  async removeBankAccount(
+    bankAccountId: string,
+  ): Promise<{ success: boolean }> {
     try {
       const {
         data: { user },
