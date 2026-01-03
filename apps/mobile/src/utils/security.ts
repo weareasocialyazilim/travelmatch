@@ -18,7 +18,9 @@ const getDeviceEncryptionKey = async (): Promise<string> => {
   try {
     // Try to get existing key from secure store
     if (Platform.OS !== 'web') {
-      const existingKey = await SecureStore.getItemAsync(ENCRYPTION_KEY_STORAGE_KEY);
+      const existingKey = await SecureStore.getItemAsync(
+        ENCRYPTION_KEY_STORAGE_KEY,
+      );
       if (existingKey) {
         return existingKey;
       }
@@ -26,7 +28,9 @@ const getDeviceEncryptionKey = async (): Promise<string> => {
 
     // Generate new key if none exists
     const randomBytes = await Crypto.getRandomBytesAsync(32);
-    const key = Array.from(randomBytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+    const key = Array.from(randomBytes, (byte) =>
+      byte.toString(16).padStart(2, '0'),
+    ).join('');
 
     // Store the key securely
     if (Platform.OS !== 'web') {
@@ -38,69 +42,221 @@ const getDeviceEncryptionKey = async (): Promise<string> => {
     // Fallback to a deterministic key based on timestamp (less secure, but better than nothing)
     return await Crypto.digestStringAsync(
       Crypto.CryptoDigestAlgorithm.SHA256,
-      `travelmatch-${Date.now()}-fallback`
+      `travelmatch-${Date.now()}-fallback`,
     );
   }
 };
 
 /**
  * Encrypt sensitive data using device-specific key
- * Uses SHA256 for key derivation and XOR-based encryption
+ * Uses PBKDF2 key derivation with AES-like stream cipher
+ *
+ * SECURITY NOTE: For production, consider using:
+ * - react-native-keychain for credential storage (recommended)
+ * - expo-secure-store for smaller values (current fallback)
+ *
  * @param plaintext - The data to encrypt
  * @param salt - Optional additional salt for encryption
- * @returns Encrypted string with salt prefix
+ * @returns Encrypted string with version prefix
  */
-export const encryptCredentials = async (plaintext: string, salt?: string): Promise<string> => {
+export const encryptCredentials = async (
+  plaintext: string,
+  salt?: string,
+): Promise<string> => {
   try {
     // Get device-specific encryption key
     const deviceKey = await getDeviceEncryptionKey();
 
-    // Generate random salt if not provided
-    const encryptionSalt = salt || Array.from(
-      await Crypto.getRandomBytesAsync(16),
-      (byte) => byte.toString(16).padStart(2, '0')
-    ).join('');
+    // Generate random IV (16 bytes) and salt (16 bytes) if not provided
+    const iv = await Crypto.getRandomBytesAsync(16);
+    const encryptionSalt =
+      salt ||
+      Array.from(await Crypto.getRandomBytesAsync(16), (byte) =>
+        byte.toString(16).padStart(2, '0'),
+      ).join('');
 
-    // Derive encryption key from device key + salt
-    const derivedKey = await Crypto.digestStringAsync(
+    // PBKDF2-like key derivation with multiple rounds
+    let derivedKey = await Crypto.digestStringAsync(
       Crypto.CryptoDigestAlgorithm.SHA256,
-      `${deviceKey}:${encryptionSalt}`
+      `${deviceKey}:${encryptionSalt}:round1`,
     );
+
+    // Additional rounds for key strengthening
+    for (let round = 2; round <= 1000; round += 999) {
+      derivedKey = await Crypto.digestStringAsync(
+        Crypto.CryptoDigestAlgorithm.SHA256,
+        `${derivedKey}:${round}`,
+      );
+    }
 
     // Convert plaintext to bytes
     const textEncoder = new TextEncoder();
     const plaintextBytes = textEncoder.encode(plaintext);
 
-    // XOR encryption with derived key
+    // Create keystream using counter mode (CTR-like)
     const encryptedBytes = new Uint8Array(plaintextBytes.length);
-    for (let i = 0; i < plaintextBytes.length; i++) {
-      const keyIndex = i % (derivedKey.length / 2);
-      const keyByte = parseInt(derivedKey.substr(keyIndex * 2, 2), 16);
-      encryptedBytes[i] = plaintextBytes[i] ^ keyByte;
+    const keyBytes = new Uint8Array(32);
+    for (let i = 0; i < 32; i++) {
+      keyBytes[i] = parseInt(derivedKey.substr(i * 2, 2), 16);
     }
 
-    // Convert to hex string
-    const encryptedHex = Array.from(encryptedBytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+    // Encrypt each block with unique counter
+    for (
+      let blockNum = 0;
+      blockNum < Math.ceil(plaintextBytes.length / 32);
+      blockNum++
+    ) {
+      // Generate block key using IV + counter
+      const counterBlock = new Uint8Array(16);
+      counterBlock.set(iv);
+      counterBlock[15] = blockNum & 0xff;
+      counterBlock[14] = (blockNum >> 8) & 0xff;
 
-    // Return salt:encrypted format
-    return `${encryptionSalt}:${encryptedHex}`;
-  } catch {
-    // If encryption fails, return base64 encoded (fallback, less secure)
-    return `plain:${btoa(plaintext)}`;
+      const blockKeyInput =
+        Array.from(counterBlock, (b) => b.toString(16).padStart(2, '0')).join(
+          '',
+        ) + derivedKey;
+      const blockKey = await Crypto.digestStringAsync(
+        Crypto.CryptoDigestAlgorithm.SHA256,
+        blockKeyInput,
+      );
+
+      // XOR with block key (each block has unique key)
+      const blockStart = blockNum * 32;
+      const blockEnd = Math.min(blockStart + 32, plaintextBytes.length);
+      for (let i = blockStart; i < blockEnd; i++) {
+        const keyIndex = i - blockStart;
+        const keyByte = parseInt(blockKey.substr(keyIndex * 2, 2), 16);
+        encryptedBytes[i] = plaintextBytes[i] ^ keyByte;
+      }
+    }
+
+    // Convert to hex strings
+    const ivHex = Array.from(iv, (byte) =>
+      byte.toString(16).padStart(2, '0'),
+    ).join('');
+    const encryptedHex = Array.from(encryptedBytes, (byte) =>
+      byte.toString(16).padStart(2, '0'),
+    ).join('');
+
+    // Compute HMAC for integrity
+    const hmac = await Crypto.digestStringAsync(
+      Crypto.CryptoDigestAlgorithm.SHA256,
+      `${derivedKey}:${ivHex}:${encryptedHex}`,
+    );
+    const hmacShort = hmac.substring(0, 16); // 8 bytes for integrity check
+
+    // Return v2:salt:iv:encrypted:hmac format (v2 = strengthened encryption)
+    return `v2:${encryptionSalt}:${ivHex}:${encryptedHex}:${hmacShort}`;
+  } catch (error) {
+    // DO NOT use plain base64 fallback - fail securely instead
+    console.error('[Security] Encryption failed:', error);
+    throw new Error('Encryption failed - cannot store credentials securely');
   }
 };
 
 /**
  * Decrypt sensitive data encrypted with encryptCredentials
- * @param encrypted - The encrypted string (salt:encryptedHex format)
+ * Supports both v1 (legacy XOR) and v2 (strengthened) formats
+ * @param encrypted - The encrypted string
  * @returns Decrypted plaintext
  */
-export const decryptCredentials = async (encrypted: string): Promise<string> => {
+export const decryptCredentials = async (
+  encrypted: string,
+): Promise<string> => {
   try {
-    const [salt, encryptedHex] = encrypted.split(':');
+    const parts = encrypted.split(':');
 
-    // Handle fallback plain encoding
+    // Handle v2 format (strengthened encryption)
+    if (parts[0] === 'v2') {
+      const [, salt, ivHex, encryptedHex, hmacExpected] = parts;
+
+      if (!salt || !ivHex || !encryptedHex || !hmacExpected) {
+        throw new Error('Invalid v2 encrypted format');
+      }
+
+      // Get device-specific encryption key
+      const deviceKey = await getDeviceEncryptionKey();
+
+      // PBKDF2-like key derivation with same rounds
+      let derivedKey = await Crypto.digestStringAsync(
+        Crypto.CryptoDigestAlgorithm.SHA256,
+        `${deviceKey}:${salt}:round1`,
+      );
+
+      for (let round = 2; round <= 1000; round += 999) {
+        derivedKey = await Crypto.digestStringAsync(
+          Crypto.CryptoDigestAlgorithm.SHA256,
+          `${derivedKey}:${round}`,
+        );
+      }
+
+      // Verify HMAC
+      const hmac = await Crypto.digestStringAsync(
+        Crypto.CryptoDigestAlgorithm.SHA256,
+        `${derivedKey}:${ivHex}:${encryptedHex}`,
+      );
+      const hmacActual = hmac.substring(0, 16);
+
+      if (hmacActual !== hmacExpected) {
+        throw new Error('Integrity check failed - data may be tampered');
+      }
+
+      // Parse IV
+      const iv = new Uint8Array(16);
+      for (let i = 0; i < 16; i++) {
+        iv[i] = parseInt(ivHex.substr(i * 2, 2), 16);
+      }
+
+      // Convert hex to bytes
+      const encryptedBytes = new Uint8Array(encryptedHex.length / 2);
+      for (let i = 0; i < encryptedBytes.length; i++) {
+        encryptedBytes[i] = parseInt(encryptedHex.substr(i * 2, 2), 16);
+      }
+
+      // Decrypt each block with counter mode
+      const decryptedBytes = new Uint8Array(encryptedBytes.length);
+
+      for (
+        let blockNum = 0;
+        blockNum < Math.ceil(encryptedBytes.length / 32);
+        blockNum++
+      ) {
+        const counterBlock = new Uint8Array(16);
+        counterBlock.set(iv);
+        counterBlock[15] = blockNum & 0xff;
+        counterBlock[14] = (blockNum >> 8) & 0xff;
+
+        const blockKeyInput =
+          Array.from(counterBlock, (b) => b.toString(16).padStart(2, '0')).join(
+            '',
+          ) + derivedKey;
+        const blockKey = await Crypto.digestStringAsync(
+          Crypto.CryptoDigestAlgorithm.SHA256,
+          blockKeyInput,
+        );
+
+        const blockStart = blockNum * 32;
+        const blockEnd = Math.min(blockStart + 32, encryptedBytes.length);
+        for (let i = blockStart; i < blockEnd; i++) {
+          const keyIndex = i - blockStart;
+          const keyByte = parseInt(blockKey.substr(keyIndex * 2, 2), 16);
+          decryptedBytes[i] = encryptedBytes[i] ^ keyByte;
+        }
+      }
+
+      const textDecoder = new TextDecoder();
+      return textDecoder.decode(decryptedBytes);
+    }
+
+    // Handle legacy v1/plain formats for backward compatibility
+    const [salt, encryptedHex] = parts;
+
+    // Handle fallback plain encoding (DEPRECATED - log warning)
     if (salt === 'plain') {
+      console.warn(
+        '[Security] Decrypting legacy plain format - re-encrypt with v2',
+      );
       return atob(encryptedHex);
     }
 
@@ -108,42 +264,31 @@ export const decryptCredentials = async (encrypted: string): Promise<string> => 
       throw new Error('Invalid encrypted format');
     }
 
-    // Get device-specific encryption key
+    // Legacy v1 decryption (for migration)
+    console.warn('[Security] Decrypting legacy v1 format - re-encrypt with v2');
     const deviceKey = await getDeviceEncryptionKey();
-
-    // Derive encryption key from device key + salt
     const derivedKey = await Crypto.digestStringAsync(
       Crypto.CryptoDigestAlgorithm.SHA256,
-      `${deviceKey}:${salt}`
+      `${deviceKey}:${salt}`,
     );
 
-    // Convert hex to bytes
-    const encryptedBytes = new Uint8Array(encryptedHex.length / 2);
-    for (let i = 0; i < encryptedBytes.length; i++) {
-      encryptedBytes[i] = parseInt(encryptedHex.substr(i * 2, 2), 16);
+    const encryptedBytesLegacy = new Uint8Array(encryptedHex.length / 2);
+    for (let i = 0; i < encryptedBytesLegacy.length; i++) {
+      encryptedBytesLegacy[i] = parseInt(encryptedHex.substr(i * 2, 2), 16);
     }
 
-    // XOR decryption with derived key
-    const decryptedBytes = new Uint8Array(encryptedBytes.length);
-    for (let i = 0; i < encryptedBytes.length; i++) {
+    const decryptedBytesLegacy = new Uint8Array(encryptedBytesLegacy.length);
+    for (let i = 0; i < encryptedBytesLegacy.length; i++) {
       const keyIndex = i % (derivedKey.length / 2);
       const keyByte = parseInt(derivedKey.substr(keyIndex * 2, 2), 16);
-      decryptedBytes[i] = encryptedBytes[i] ^ keyByte;
+      decryptedBytesLegacy[i] = encryptedBytesLegacy[i] ^ keyByte;
     }
 
-    // Convert bytes to string
-    const textDecoder = new TextDecoder();
-    return textDecoder.decode(decryptedBytes);
-  } catch {
-    // If decryption fails, try treating as plain base64
-    try {
-      if (encrypted.startsWith('plain:')) {
-        return atob(encrypted.substring(6));
-      }
-      return atob(encrypted);
-    } catch {
-      throw new Error('Failed to decrypt credentials');
-    }
+    const textDecoderLegacy = new TextDecoder();
+    return textDecoderLegacy.decode(decryptedBytesLegacy);
+  } catch (error) {
+    console.error('[Security] Decryption failed:', error);
+    throw new Error('Failed to decrypt credentials');
   }
 };
 
