@@ -85,7 +85,8 @@ export {
 } from './FormComponents';
 
 // Layout Components (TravelMatch: The Rebirth)
-export { FloatingDock } from './layout';
+// FloatingDock is exported from navigation for proper React Navigation integration
+export { FloatingDock } from './navigation';
 
 // Trust Badge & Ring
 export { TrustBadge } from './ui/TrustBadge';

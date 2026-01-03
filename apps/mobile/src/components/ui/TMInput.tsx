@@ -2,6 +2,12 @@
  * TMInput - TravelMatch Ultimate Design System 2026
  * Enhanced input component with floating label, validation states, and animations
  *
+ * @deprecated Use LiquidInput for new implementations.
+ * LiquidInput provides Awwwards-quality glass morphism aesthetics with neon glow.
+ * For React Hook Form integration, use ControlledLiquidInput.
+ *
+ * This component is maintained for backward compatibility only.
+ *
  * Features:
  * - Animated floating label
  * - Clear button
