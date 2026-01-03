@@ -18,6 +18,7 @@ export { EmailVerificationScreen } from './screens/EmailVerificationScreen';
 export { WaitingForCodeScreen } from './screens/WaitingForCodeScreen';
 export { ForgotPasswordScreen } from './screens/ForgotPasswordScreen';
 export { ChangePasswordScreen } from './screens/ChangePasswordScreen';
+export { AuthSuccessScreen } from './screens/AuthSuccessScreen';
 
 // Services
 export { authApi } from './services/authApi';

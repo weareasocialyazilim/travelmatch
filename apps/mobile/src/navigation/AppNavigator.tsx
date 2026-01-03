@@ -43,6 +43,7 @@ import {
   WaitingForCodeScreen,
   ForgotPasswordScreen,
   ChangePasswordScreen,
+  AuthSuccessScreen,
 } from '../features/auth';
 import { SessionExpiredScreen } from '../screens/SessionExpiredScreen';
 import LinkNotFoundScreen from '../screens/LinkNotFoundScreen';
@@ -398,6 +399,11 @@ const AppNavigator = () => {
               name="SuccessConfirmation"
               component={SuccessConfirmationScreen}
               options={{ animation: 'fade', gestureEnabled: false }}
+            />
+            <Stack.Screen
+              name="AuthSuccess"
+              component={AuthSuccessScreen}
+              options={{ gestureEnabled: false, animation: 'fade' }}
             />
             <Stack.Screen name="Maintenance" component={MaintenanceScreen} />
             <Stack.Screen name="About" component={AboutScreen} />
