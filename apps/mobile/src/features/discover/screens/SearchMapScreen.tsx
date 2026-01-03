@@ -17,14 +17,8 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-<<<<<<< Updated upstream
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import MapboxGL from '@rnmapbox/maps';
-=======
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
->>>>>>> Stashed changes
 import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import Animated, {
@@ -36,7 +30,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
 
-<<<<<<< Updated upstream
 import { COLORS } from '@/constants/colors';
 import { FONT_SIZES_V2, FONTS } from '@/constants/typography';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
@@ -45,8 +38,6 @@ import { EnhancedSearchBar } from '@/components/discover/EnhancedSearchBar';
 import { NeonPulseMarker } from '../components/NeonPulseMarker';
 import BottomNav from '@/components/BottomNav';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-=======
 // Initialize Mapbox access token
 const MAPBOX_TOKEN =
   process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ||
@@ -68,9 +59,7 @@ if (isMapboxConfigured) {
   }
 }
 
-const { width: SCREEN_WIDTH, height: _SCREEN_HEIGHT } =
-  Dimensions.get('window');
->>>>>>> Stashed changes
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 interface MapLocation {
   latitude: number;
@@ -120,17 +109,12 @@ const MOCK_MARKERS: MomentMarker[] = [
 ];
 
 const SearchMapScreen: React.FC = () => {
-<<<<<<< Updated upstream
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
-  const mapRef = useRef<MapboxGL.MapView>(null);
-  const cameraRef = useRef<MapboxGL.Camera>(null);
-=======
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mapRef = useRef<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const cameraRef = useRef<any>(null);
->>>>>>> Stashed changes
 
   // State
   const [userLocation, setUserLocation] = useState<MapLocation | null>(null);
@@ -345,10 +329,7 @@ const SearchMapScreen: React.FC = () => {
         <Animated.View
           entering={SlideInDown.springify().damping(15)}
           exiting={SlideOutDown.springify().damping(15)}
-          style={[
-            styles.bottomOverlay,
-            { paddingBottom: insets.bottom + 100 },
-          ]}
+          style={[styles.bottomOverlay, { paddingBottom: insets.bottom + 100 }]}
         >
           <GlassCard
             intensity={50}
