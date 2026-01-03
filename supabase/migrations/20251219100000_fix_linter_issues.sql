@@ -277,15 +277,8 @@ CREATE INDEX IF NOT EXISTS idx_trip_requests_responded_by
 ON public.trip_requests(responded_by);
 
 -- ============================================================
--- 5. SPATIAL_REF_SYS - FALSE POSITIVE
--- This is a PostGIS system table containing EPSG coordinate references
--- It's not sensitive data and owned by supabase_admin
--- We cannot enable RLS on it without superuser privileges
+-- 5. PostGIS: spatial_ref_sys - FALSE POSITIVE (see SECURITY_ARCHITECTURE.md)
 -- ============================================================
-
--- Note: spatial_ref_sys RLS warning is a known false positive
--- The table only contains geographic coordinate system definitions
--- No user data is stored in this table
 
 -- ============================================================
 -- 6. VERIFICATION
