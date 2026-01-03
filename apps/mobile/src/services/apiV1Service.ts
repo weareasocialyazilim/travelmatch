@@ -13,9 +13,20 @@
 import NetInfo from '@react-native-community/netinfo';
 import { logger } from '../utils/logger';
 import { sessionManager } from './sessionManager';
+import { ErrorHandler, isNetworkRelatedError, isAuthError } from '../utils/errorHandler';
 
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const API_BASE_URL = `${SUPABASE_URL}/functions/v1/api/v1`;
+
+/**
+ * Generate a unique trace ID for distributed tracing
+ * Format: tm-{timestamp}-{random} for easy identification
+ */
+const generateTraceId = (): string => {
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36).substring(2, 10);
+  return `tm-${timestamp}-${random}`;
+};
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -110,7 +121,7 @@ class ApiClient {
     }
   }
 
-  private async getHeaders(useToken?: string): Promise<HeadersInit> {
+  private async getHeaders(useToken?: string, traceId?: string): Promise<HeadersInit> {
     // Use provided token or get from session manager
     const token = useToken || (await sessionManager.getValidToken());
 
@@ -118,6 +129,10 @@ class ApiClient {
       'Content-Type': 'application/json',
       Authorization: token ? `Bearer ${token}` : '',
       apikey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '',
+      // Distributed tracing header for request correlation
+      'x-trace-id': traceId || generateTraceId(),
+      // Request timestamp for latency monitoring
+      'x-request-timestamp': new Date().toISOString(),
     };
   }
 
@@ -126,11 +141,17 @@ class ApiClient {
     path: string,
     body?: RequestBody,
     isRetry = false,
+    existingTraceId?: string,
   ): Promise<ApiResponse<T>> {
+    // Generate trace ID once per request chain (reuse on retries)
+    const traceId = existingTraceId || generateTraceId();
+    const startTime = Date.now();
+
     try {
       // OFFLINE CHECK - Return early if no connection
       const isOnline = await this.checkNetwork();
       if (!isOnline) {
+        logger.warn(`[API v1] [${traceId}] Request blocked - offline`);
         return {
           success: false,
           error: {
@@ -141,10 +162,10 @@ class ApiClient {
         };
       }
 
-      const headers = await this.getHeaders();
+      const headers = await this.getHeaders(undefined, traceId);
       const url = `${API_BASE_URL}${path}`;
 
-      logger.info(`[API v1] ${method} ${path}${isRetry ? ' (retry)' : ''}`);
+      logger.info(`[API v1] [${traceId}] ${method} ${path}${isRetry ? ' (retry)' : ''}`);
 
       const response = await fetch(url, {
         method,
@@ -158,18 +179,19 @@ class ApiClient {
       // 401 UNAUTHORIZED - Token expired/invalid
       // ============================================
       if (response.status === 401 && !isRetry) {
-        logger.warn('[API v1] 401 Unauthorized - attempting token refresh');
+        logger.warn(`[API v1] [${traceId}] 401 Unauthorized - attempting token refresh`);
 
         // Try to refresh token
         const newToken = await sessionManager.getValidToken();
 
         if (newToken) {
-          // Retry request with new token
-          logger.info('[API v1] Token refreshed, retrying request');
-          return this.request<T>(method, path, body, true);
+          // Retry request with new token (preserve trace ID)
+          logger.info(`[API v1] [${traceId}] Token refreshed, retrying request`);
+          return this.request<T>(method, path, body, true, traceId);
         } else {
           // Refresh failed - session expired
-          logger.error('[API v1] Token refresh failed - session expired');
+          const latency = Date.now() - startTime;
+          logger.error(`[API v1] [${traceId}] Token refresh failed - session expired (${latency}ms)`);
 
           // Trigger session expired callback
           if (this.sessionExpiredCallback) {
@@ -186,8 +208,10 @@ class ApiClient {
         }
       }
 
+      const latency = Date.now() - startTime;
+
       if (!response.ok) {
-        logger.error(`[API v1] Error ${response.status}:`, data);
+        logger.error(`[API v1] [${traceId}] Error ${response.status} (${latency}ms):`, data);
         return {
           success: false,
           error: data.error || {
@@ -197,25 +221,28 @@ class ApiClient {
         };
       }
 
-      logger.info(`[API v1] Success:`, data);
+      logger.info(`[API v1] [${traceId}] Success (${latency}ms)`);
       return data as ApiResponse<T>;
     } catch (error) {
-      logger.error('[API v1] Request failed:', error);
+      const latency = Date.now() - startTime;
 
-      // Better error messaging for network errors
-      const isNetworkError =
-        error instanceof TypeError &&
-        (error.message.includes('Network') || error.message.includes('fetch'));
+      // Use consolidated error handler
+      const standardizedError = ErrorHandler.handle(error, `API v1 [${traceId}]`);
+      logger.error(`[API v1] [${traceId}] Request failed (${latency}ms):`, {
+        code: standardizedError.code,
+        message: standardizedError.message,
+      });
+
+      // Use centralized error classification
+      const isNetwork = isNetworkRelatedError(error);
 
       return {
         success: false,
         error: {
-          code: isNetworkError ? 'NETWORK_ERROR' : 'REQUEST_ERROR',
-          message: isNetworkError
+          code: isNetwork ? 'NETWORK_ERROR' : 'REQUEST_ERROR',
+          message: isNetwork
             ? 'Bağlantı hatası. Lütfen internet bağlantınızı kontrol edin.'
-            : error instanceof Error
-              ? error.message
-              : 'Request failed',
+            : standardizedError.userMessage,
         },
       };
     }

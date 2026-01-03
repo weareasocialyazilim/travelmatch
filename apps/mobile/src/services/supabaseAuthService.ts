@@ -601,6 +601,49 @@ export const onAuthStateChange = (
   });
 };
 
+/**
+ * Request data export according to GDPR/KVKK
+ * Creates a data export request for the current user
+ */
+export const requestDataExport = async (): Promise<{
+  error: AuthError | null;
+  requestId?: string;
+}> => {
+  try {
+    const { data: userData } = await auth.getUser();
+    if (!userData?.user) {
+      return { error: { message: 'User not authenticated' } as AuthError };
+    }
+
+    const userId = userData.user.id;
+
+    // Create data export request
+    const { data, error } = await supabase
+      .from('data_export_requests')
+      .insert({
+        user_id: userId,
+        status: 'pending',
+        requested_at: new Date().toISOString(),
+      })
+      .select('id')
+      .single();
+
+    if (error) {
+      logger.error('[Auth] DataExport - Failed to create export request', { error });
+      return { error: error as unknown as AuthError };
+    }
+
+    const requestId = (data as { id?: string } | null)?.id;
+    logger.info('[Auth] DataExport - Export request created', { userId, requestId });
+    return { error: null, requestId };
+  } catch (error) {
+    logger.error('[Auth] DataExport - Unexpected error', { error });
+    return {
+      error: error instanceof Error ? (error as unknown as AuthError) : ({ message: 'Unknown error' } as AuthError),
+    };
+  }
+};
+
 export default {
   signUpWithEmail,
   signInWithEmail,
@@ -614,6 +657,7 @@ export default {
   changePasswordWithVerification,
   updateProfile,
   deleteAccount,
+  requestDataExport,
   signInWithPhone,
   verifyPhoneOtp,
   verifyOtp,
