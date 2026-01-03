@@ -181,6 +181,7 @@ const MomentCommentsScreen = lazyLoad(() =>
 import {
   WalletScreen,
   WithdrawScreen,
+  WithdrawSuccessScreen,
   PaymentMethodsScreen,
   AddCardScreen,
   TransactionDetailScreen,
@@ -591,6 +592,7 @@ const AppNavigator = () => {
 
             {/* Withdraw */}
             <Stack.Screen name="Withdraw" component={WithdrawScreen} />
+            <Stack.Screen name="WithdrawSuccess" component={WithdrawSuccessScreen} />
 
             {/* Moment Publishing */}
             {/* <Stack.Screen
