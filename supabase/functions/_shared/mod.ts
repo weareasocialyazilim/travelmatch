@@ -166,6 +166,35 @@ export {
 } from './guard-middleware.ts';
 
 // =============================================================================
+// OBSERVABILITY (Metrics & Monitoring)
+// =============================================================================
+export {
+  metrics,
+  metricsStore,
+  MetricsReporter,
+  HealthChecker,
+  healthChecker,
+  type RequestMetric,
+  type FunctionStats,
+  type HealthStatus,
+} from './observability.ts';
+
+// =============================================================================
+// CHAOS ENGINEERING (Testing & Resilience)
+// =============================================================================
+export {
+  chaosMonkey,
+  ChaosMode,
+  ChaosError,
+  ChaosScenarios,
+  ChaosTestRunner,
+  chaosTestRunner,
+  type ChaosConfig,
+  type ChaosContext,
+  type ChaosResult,
+} from './chaos.ts';
+
+// =============================================================================
 // CONVENIENCE HELPERS
 // =============================================================================
 
