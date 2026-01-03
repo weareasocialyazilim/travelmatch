@@ -35,7 +35,7 @@ import {
 // Note: FloatingDock is now rendered by MainTabNavigator
 import { useMoments, type Moment } from '@/hooks/useMoments';
 import { COLORS } from '@/constants/colors';
-import { withErrorBoundary } from '../../../components/withErrorBoundary';
+import { withErrorBoundary } from '@/components/withErrorBoundary';
 import type { NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
@@ -201,10 +201,10 @@ const DiscoverScreen = () => {
     if (!validation.valid) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       Alert.alert(
-        "Whoops! 📉",
+        'Whoops! 📉',
         validation.message ||
           "This doesn't match the moment's standards. Suggest something similar or better!",
-        [{ text: 'Got it, I\'ll upgrade', style: 'default' }],
+        [{ text: "Got it, I'll upgrade", style: 'default' }],
       );
       return;
     }
@@ -233,13 +233,10 @@ const DiscoverScreen = () => {
   );
 
   // Handle Like Press
-  const handleLikePress = useCallback(
-    (_moment: Moment) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      // TODO: Implement save/unsave logic using _moment.id
-    },
-    [],
-  );
+  const handleLikePress = useCallback((_moment: Moment) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    // TODO: Implement save/unsave logic using _moment.id
+  }, []);
 
   // Handle User Press
   const handleUserPress = useCallback(
