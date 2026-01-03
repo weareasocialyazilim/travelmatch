@@ -21,104 +21,110 @@ interface AddBankAccountBottomSheetProps {
   onSave: (iban: string, accountHolder: string) => void;
 }
 
-export const AddBankAccountBottomSheet: React.FC<
-  AddBankAccountBottomSheetProps
-> = memo(({ visible, onClose, onSave }) => {
-  const [iban, setIban] = useState('');
-  const [accountHolder, setAccountHolder] = useState('');
+export const AddBankAccountBottomSheet: React.FC<AddBankAccountBottomSheetProps> =
+  memo(({ visible, onClose, onSave }) => {
+    const [iban, setIban] = useState('');
+    const [accountHolder, setAccountHolder] = useState('');
 
-  const handleSave = () => {
-    if (iban.trim() && accountHolder.trim()) {
-      onSave(iban, accountHolder);
-      setIban('');
-      setAccountHolder('');
-      onClose();
-    }
-  };
+    const handleSave = () => {
+      if (iban.trim() && accountHolder.trim()) {
+        onSave(iban, accountHolder);
+        setIban('');
+        setAccountHolder('');
+        onClose();
+      }
+    };
 
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.modalContainer}
+    return (
+      <Modal
+        visible={visible}
+        transparent
+        animationType="slide"
+        onRequestClose={onClose}
+        testID="add-bank-account-modal"
       >
-        <TouchableWithoutFeedback onPress={onClose}>
-          <View style={styles.backdrop} />
-        </TouchableWithoutFeedback>
-
-        <View style={styles.bottomSheet}>
-          {/* Handle */}
-          <View style={styles.handleContainer}>
-            <View style={styles.handle} />
-          </View>
-
-          {/* Headline */}
-          <Text style={styles.headline}>Add bank account</Text>
-
-          {/* Form Fields */}
-          <View style={styles.formContainer}>
-            {/* IBAN Field */}
-            <View style={styles.fieldContainer}>
-              <Text style={styles.label}>IBAN</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="DE89 3704 0044 0532 0130 00"
-                placeholderTextColor={COLORS.text.secondary}
-                value={iban}
-                onChangeText={setIban}
-                autoCapitalize="characters"
-              />
-            </View>
-
-            {/* Account Holder Field */}
-            <View style={styles.fieldContainer}>
-              <Text style={styles.label}>Account holder</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Jane Doe"
-                placeholderTextColor={COLORS.text.secondary}
-                value={accountHolder}
-                onChangeText={setAccountHolder}
-                autoCapitalize="words"
-              />
-            </View>
-          </View>
-
-          {/* Security Info */}
-          <View style={styles.securityInfo}>
-            <MaterialCommunityIcons
-              name={'lock' as IconName}
-              size={16}
-              color={COLORS.text.secondary}
-            />
-            <Text style={styles.securityText}>
-              Your information is securely encrypted.
-            </Text>
-          </View>
-
-          {/* Save Button */}
-          <TouchableOpacity
-            style={[
-              styles.saveButton,
-              (!iban.trim() || !accountHolder.trim()) &&
-                styles.saveButtonDisabled,
-            ]}
-            onPress={handleSave}
-            disabled={!iban.trim() || !accountHolder.trim()}
-            activeOpacity={0.8}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalContainer}
+        >
+          <TouchableWithoutFeedback
+            onPress={onClose}
+            testID="bank-account-backdrop"
           >
-            <Text style={styles.saveButtonText}>Save</Text>
-          </TouchableOpacity>
-        </View>
-      </KeyboardAvoidingView>
-    </Modal>
-  );
-});
+            <View style={styles.backdrop} />
+          </TouchableWithoutFeedback>
+
+          <View style={styles.bottomSheet}>
+            {/* Handle */}
+            <View style={styles.handleContainer}>
+              <View style={styles.handle} />
+            </View>
+
+            {/* Headline */}
+            <Text style={styles.headline}>Add bank account</Text>
+
+            {/* Form Fields */}
+            <View style={styles.formContainer}>
+              {/* IBAN Field */}
+              <View style={styles.fieldContainer}>
+                <Text style={styles.label}>IBAN</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="DE89 3704 0044 0532 0130 00"
+                  placeholderTextColor={COLORS.text.secondary}
+                  value={iban}
+                  onChangeText={setIban}
+                  autoCapitalize="characters"
+                  testID="iban-input"
+                />
+              </View>
+
+              {/* Account Holder Field */}
+              <View style={styles.fieldContainer}>
+                <Text style={styles.label}>Account holder</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Jane Doe"
+                  placeholderTextColor={COLORS.text.secondary}
+                  value={accountHolder}
+                  onChangeText={setAccountHolder}
+                  autoCapitalize="words"
+                  testID="account-holder-input"
+                />
+              </View>
+            </View>
+
+            {/* Security Info */}
+            <View style={styles.securityInfo}>
+              <MaterialCommunityIcons
+                name={'lock' as IconName}
+                size={16}
+                color={COLORS.text.secondary}
+              />
+              <Text style={styles.securityText}>
+                Your information is securely encrypted.
+              </Text>
+            </View>
+
+            {/* Save Button */}
+            <TouchableOpacity
+              style={[
+                styles.saveButton,
+                (!iban.trim() || !accountHolder.trim()) &&
+                  styles.saveButtonDisabled,
+              ]}
+              onPress={handleSave}
+              disabled={!iban.trim() || !accountHolder.trim()}
+              activeOpacity={0.8}
+              testID="save-bank-account-button"
+            >
+              <Text style={styles.saveButtonText}>Save</Text>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+    );
+  });
 
 AddBankAccountBottomSheet.displayName = 'AddBankAccountBottomSheet';
 
