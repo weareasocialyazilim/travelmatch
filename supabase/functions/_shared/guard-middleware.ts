@@ -34,6 +34,7 @@ import { getCorsHeaders } from './security-middleware.ts';
 import { createLogger, Logger } from './logger.ts';
 import { createTracer, Tracer, addTraceHeaders } from './tracing.ts';
 import { createSupabaseClients, getAuthUser } from './supabase.ts';
+import { metrics } from './observability.ts';
 import type { SupabaseClient, User } from 'https://esm.sh/@supabase/supabase-js@2';
 
 // =============================================================================
@@ -197,11 +198,22 @@ export function createGuard<
   } = options;
 
   return async (req: Request): Promise<Response> => {
+    const startTime = performance.now();
     const url = new URL(req.url);
     const origin = req.headers.get('origin');
     const corsHeaders = getCorsHeaders(origin);
     const logger = createLogger(functionName, req);
     const tracer = createTracer(functionName, req);
+
+    // Helper to record metrics and return response
+    const withMetrics = (response: Response, status: number): Response => {
+      const durationMs = performance.now() - startTime;
+      metrics.recordRequest(functionName, status, durationMs, {
+        traceId: tracer.getTraceId(),
+        spanId: tracer.getCurrentSpanId(),
+      });
+      return response;
+    };
 
     // Handle CORS preflight
     if (req.method === 'OPTIONS') {
@@ -214,7 +226,7 @@ export function createGuard<
     try {
       // Validate HTTP method
       if (!methods.includes(req.method as typeof methods[number])) {
-        return jsonResponse(
+        const response = jsonResponse(
           {
             success: false,
             error: `Method ${req.method} not allowed`,
@@ -222,6 +234,7 @@ export function createGuard<
           405,
           corsHeaders
         );
+        return withMetrics(response, 405);
       }
 
       // Initialize Supabase clients
@@ -235,7 +248,7 @@ export function createGuard<
         });
 
         if (auth === 'required' && !user) {
-          return jsonResponse(
+          const response = jsonResponse(
             {
               success: false,
               error: 'Authentication required',
@@ -243,6 +256,7 @@ export function createGuard<
             401,
             corsHeaders
           );
+          return withMetrics(response, 401);
         }
       }
 
@@ -262,7 +276,8 @@ export function createGuard<
           tracer.addEvent('validation.bodyFailed', {
             errorCount: result.error.errors.length,
           });
-          return addTraceHeaders(validationErrorResponse(result.error, corsHeaders), tracer);
+          const response = validationErrorResponse(result.error, corsHeaders);
+          return withMetrics(addTraceHeaders(response, tracer), 400);
         }
         body = result.data;
       }
@@ -276,7 +291,8 @@ export function createGuard<
           tracer.addEvent('validation.queryFailed', {
             errorCount: result.error.errors.length,
           });
-          return addTraceHeaders(validationErrorResponse(result.error, corsHeaders), tracer);
+          const response = validationErrorResponse(result.error, corsHeaders);
+          return withMetrics(addTraceHeaders(response, tracer), 400);
         }
         query = result.data;
       }
@@ -293,7 +309,8 @@ export function createGuard<
 
         const result = paramsSchema.safeParse(rawParams);
         if (!result.success) {
-          return addTraceHeaders(validationErrorResponse(result.error, corsHeaders), tracer);
+          const response = validationErrorResponse(result.error, corsHeaders);
+          return withMetrics(addTraceHeaders(response, tracer), 400);
         }
         params = result.data;
       }
@@ -329,7 +346,7 @@ export function createGuard<
         corsHeaders
       );
 
-      return addTraceHeaders(response, tracer);
+      return withMetrics(addTraceHeaders(response, tracer), 200);
 
     } catch (error) {
       logger.error('Guard handler error', error as Error);
@@ -338,20 +355,28 @@ export function createGuard<
 
       // Handle Zod errors that might have slipped through
       if (error instanceof z.ZodError) {
-        return addTraceHeaders(validationErrorResponse(error, corsHeaders), tracer);
+        const response = validationErrorResponse(error, corsHeaders);
+        return withMetrics(addTraceHeaders(response, tracer), 400);
       }
 
-      return addTraceHeaders(
-        jsonResponse(
-          {
-            success: false,
-            error: error instanceof Error ? error.message : 'Internal server error',
-          },
-          500,
-          corsHeaders
-        ),
-        tracer
+      const errorResponse = jsonResponse(
+        {
+          success: false,
+          error: error instanceof Error ? error.message : 'Internal server error',
+        },
+        500,
+        corsHeaders
       );
+
+      // Record error type for observability
+      const errorType = error instanceof Error ? error.constructor.name : 'UnknownError';
+      metrics.recordRequest(functionName, 500, performance.now() - startTime, {
+        traceId: tracer.getTraceId(),
+        spanId: tracer.getCurrentSpanId(),
+        errorType,
+      });
+
+      return addTraceHeaders(errorResponse, tracer);
     }
   };
 }
