@@ -1,14 +1,29 @@
 /**
- * Spinner Component
- * Genel loading indicator
+ * @deprecated This component is deprecated. Use TMLoading with type="standard" instead.
+ *
+ * Migration Guide:
+ * ================
+ *
+ * BEFORE:
+ * ```tsx
+ * import { Spinner } from '@/components/ui/Spinner';
+ *
+ * <Spinner size="large" message="Loading..." fullScreen />
+ * ```
+ *
+ * AFTER:
+ * ```tsx
+ * import { TMLoading } from '@/components/ui/TMLoading';
+ *
+ * <TMLoading type="standard" size="large" message="Loading..." fullScreen />
+ * ```
+ *
+ * This file re-exports from TMLoading for backward compatibility.
  */
 
 import React from 'react';
 import type { ViewStyle } from 'react-native';
-import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
-import { COLORS } from '../../constants/colors';
-import { SPACING } from '../../constants/spacing';
-import { TYPOGRAPHY } from '../../constants/typography';
+import { TMLoading } from './TMLoading';
 
 interface SpinnerProps {
   size?: 'small' | 'large';
@@ -18,41 +33,24 @@ interface SpinnerProps {
   style?: ViewStyle;
 }
 
+/**
+ * @deprecated Use TMLoading with type="standard" instead
+ */
 export const Spinner: React.FC<SpinnerProps> = ({
   size = 'large',
-  color = COLORS.brand.primary,
+  color,
   message,
   fullScreen = false,
   style,
-}) => {
-  const containerStyle = fullScreen
-    ? styles.fullScreenContainer
-    : styles.container;
+}) => (
+  <TMLoading
+    type="standard"
+    size={size}
+    color={color}
+    message={message}
+    fullScreen={fullScreen}
+    style={style}
+  />
+);
 
-  return (
-    <View style={[containerStyle, style]}>
-      <ActivityIndicator size={size} color={color} />
-      {message && <Text style={styles.message}>{message}</Text>}
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: SPACING.lg,
-  },
-  fullScreenContainer: {
-    alignItems: 'center',
-    backgroundColor: COLORS.bg.primary,
-    flex: 1,
-    justifyContent: 'center',
-  },
-  message: {
-    ...TYPOGRAPHY.body,
-    color: COLORS.text.secondary,
-    marginTop: SPACING.md,
-    textAlign: 'center',
-  },
-});
+export default Spinner;

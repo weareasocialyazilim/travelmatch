@@ -1,11 +1,29 @@
 /**
- * Loading Spinner Component
- * Provides a consistent loading indicator across the app
+ * @deprecated This component is deprecated. Use TMLoading with type="simple" instead.
+ *
+ * Migration Guide:
+ * ================
+ *
+ * BEFORE:
+ * ```tsx
+ * import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+ *
+ * <LoadingSpinner size="large" color="#FFF" />
+ * ```
+ *
+ * AFTER:
+ * ```tsx
+ * import { TMLoading } from '@/components/ui/TMLoading';
+ *
+ * <TMLoading type="simple" size="large" color="#FFF" />
+ * ```
+ *
+ * This file re-exports from TMLoading for backward compatibility.
  */
 
 import React from 'react';
-import { ActivityIndicator, StyleSheet, View, ViewStyle } from 'react-native';
-import { COLORS } from '@/constants/colors';
+import type { ViewStyle } from 'react-native';
+import { TMLoading } from './TMLoading';
 
 export interface LoadingSpinnerProps {
   size?: 'small' | 'large';
@@ -13,23 +31,20 @@ export interface LoadingSpinnerProps {
   style?: ViewStyle;
 }
 
+/**
+ * @deprecated Use TMLoading with type="simple" instead
+ */
 export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   size = 'large',
-  color = COLORS.brand.primary,
+  color,
   style,
-}) => {
-  return (
-    <View style={[styles.container, style]}>
-      <ActivityIndicator size={size} color={color} />
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
+}) => (
+  <TMLoading
+    type="simple"
+    size={size}
+    color={color}
+    style={style}
+  />
+);
 
 export default LoadingSpinner;
