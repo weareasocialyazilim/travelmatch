@@ -17,9 +17,14 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
+<<<<<<< Updated upstream
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import MapboxGL from '@rnmapbox/maps';
+=======
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+>>>>>>> Stashed changes
 import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import Animated, {
@@ -31,6 +36,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
 
+<<<<<<< Updated upstream
 import { COLORS } from '@/constants/colors';
 import { FONT_SIZES_V2, FONTS } from '@/constants/typography';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
@@ -40,6 +46,31 @@ import { NeonPulseMarker } from '../components/NeonPulseMarker';
 import BottomNav from '@/components/BottomNav';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
+=======
+// Initialize Mapbox access token
+const MAPBOX_TOKEN =
+  process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ||
+  process.env.EXPO_PUBLIC_MAPBOX_PUBLIC_TOKEN ||
+  process.env.EXPO_PUBLIC_MAPBOX_TOKEN ||
+  '';
+
+// Check if Mapbox is properly configured
+const isMapboxConfigured = Boolean(MAPBOX_TOKEN);
+
+// Lazy import Mapbox only if token is available
+let MapboxGL: typeof import('@rnmapbox/maps').default | null = null;
+if (isMapboxConfigured) {
+  try {
+    MapboxGL = require('@rnmapbox/maps').default;
+    MapboxGL.setAccessToken(MAPBOX_TOKEN);
+  } catch (error) {
+    console.warn('[SearchMapScreen] Failed to load Mapbox:', error);
+  }
+}
+
+const { width: SCREEN_WIDTH, height: _SCREEN_HEIGHT } =
+  Dimensions.get('window');
+>>>>>>> Stashed changes
 
 interface MapLocation {
   latitude: number;
@@ -89,10 +120,17 @@ const MOCK_MARKERS: MomentMarker[] = [
 ];
 
 const SearchMapScreen: React.FC = () => {
+<<<<<<< Updated upstream
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
   const mapRef = useRef<MapboxGL.MapView>(null);
   const cameraRef = useRef<MapboxGL.Camera>(null);
+=======
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mapRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const cameraRef = useRef<any>(null);
+>>>>>>> Stashed changes
 
   // State
   const [userLocation, setUserLocation] = useState<MapLocation | null>(null);
@@ -101,6 +139,7 @@ const SearchMapScreen: React.FC = () => {
   );
   const [hasActiveFilters, setHasActiveFilters] = useState(false);
   const [_mapLoaded, setMapLoaded] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   // Animations
   const locationButtonScale = useSharedValue(1);
@@ -190,6 +229,27 @@ const SearchMapScreen: React.FC = () => {
   const locationButtonStyle = useAnimatedStyle(() => ({
     transform: [{ scale: locationButtonScale.value }],
   }));
+
+  // Show fallback UI if Mapbox is not configured or has error
+  if (!isMapboxConfigured || !MapboxGL || mapError) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.fallbackContainer}>
+          <MaterialCommunityIcons
+            name="map-marker-off"
+            size={64}
+            color={COLORS.text.muted}
+          />
+          <Text style={styles.fallbackTitle}>Map Unavailable</Text>
+          <Text style={styles.fallbackSubtitle}>
+            {mapError ||
+              'Map service is not configured. Please add your Mapbox token to .env file.'}
+          </Text>
+        </View>
+        <BottomNav activeTab="Discover" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -458,6 +518,24 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 6,
     elevation: 4,
+  },
+  fallbackContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  fallbackTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: COLORS.text.primary,
+    marginTop: 16,
+  },
+  fallbackSubtitle: {
+    fontSize: 14,
+    color: COLORS.text.secondary,
+    textAlign: 'center',
+    marginTop: 8,
   },
 });
 

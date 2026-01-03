@@ -9,6 +9,7 @@
  * - Dashed connection lines from center
  * - Color-coded nodes for trust levels
  * - Awwwards "WOW" aesthetic
+ * - Low Power Mode support for performance optimization
  *
  * Part of TravelMatch "Cinematic Trust Jewelry" Design System.
  */
@@ -23,6 +24,7 @@ import Svg, {
   Stop,
 } from 'react-native-svg';
 import { COLORS, primitives } from '../../constants/colors';
+import { useLowPowerMode } from '../../hooks/useLowPowerMode';
 
 interface TrustNode {
   x: number;
@@ -38,6 +40,8 @@ interface TrustConstellationProps {
   nodes?: TrustNode[];
   /** Center node color */
   centerColor?: string;
+  /** Force disable glow effects (for low-end devices) */
+  disableGlow?: boolean;
 }
 
 /**
@@ -45,9 +49,17 @@ interface TrustConstellationProps {
  *
  * Visualizes user's social trust network as a constellation.
  * Premium gradient and animation-ready structure.
+ * Respects low power mode for performance optimization.
  */
 export const TrustConstellation: React.FC<TrustConstellationProps> = memo(
-  ({ size = 300, nodes: customNodes, centerColor }) => {
+  ({ size = 300, nodes: customNodes, centerColor, disableGlow }) => {
+    // Low power mode integration
+    const { animationConfig, isLowPowerMode } = useLowPowerMode();
+
+    // Disable glow effects in low power mode or when explicitly disabled
+    const showGlow =
+      !disableGlow && !isLowPowerMode && animationConfig.enableBlur;
+
     // Default constellation nodes
     const defaultNodes: TrustNode[] = useMemo(
       () => [
@@ -86,7 +98,13 @@ export const TrustConstellation: React.FC<TrustConstellationProps> = memo(
             </RadialGradient>
 
             {/* Secondary glow for outer nodes */}
-            <RadialGradient id="nodeGlowSecondary" cx="50%" cy="50%" rx="50%" ry="50%">
+            <RadialGradient
+              id="nodeGlowSecondary"
+              cx="50%"
+              cy="50%"
+              rx="50%"
+              ry="50%"
+            >
               <Stop
                 offset="0%"
                 stopColor={primitives.emerald[500]}
@@ -121,14 +139,16 @@ export const TrustConstellation: React.FC<TrustConstellationProps> = memo(
           {/* Nodes with glow effect */}
           {nodes.map((node, i) => (
             <React.Fragment key={`node-${i}`}>
-              {/* Glow Effect */}
-              <Circle
-                cx={node.x}
-                cy={node.y}
-                r={node.r * 2.5}
-                fill={i === 0 ? 'url(#nodeGlow)' : 'url(#nodeGlowSecondary)'}
-                opacity={i === 0 ? 0.5 : 0.3}
-              />
+              {/* Glow Effect - Only render if not in low power mode */}
+              {showGlow && (
+                <Circle
+                  cx={node.x}
+                  cy={node.y}
+                  r={node.r * 2.5}
+                  fill={i === 0 ? 'url(#nodeGlow)' : 'url(#nodeGlowSecondary)'}
+                  opacity={i === 0 ? 0.5 : 0.3}
+                />
+              )}
               {/* Main Node */}
               <Circle
                 cx={node.x}
