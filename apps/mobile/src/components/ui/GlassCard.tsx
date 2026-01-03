@@ -1,100 +1,53 @@
-/**
- * GlassCard Component - Awwwards Edition
- *
- * Premium Liquid Glass style card with blur effect.
- * Optimized for Twilight Zinc dark theme.
- */
 import React from 'react';
-import { View, StyleSheet, ViewStyle, Platform } from 'react-native';
+import { StyleSheet, View, ViewProps, Platform, ViewStyle } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { COLORS } from '@/theme/colors';
+import { COLORS } from '../../constants/colors';
+import { RADII } from '../../constants/radii';
 
-interface GlassCardProps {
-  /** Card content */
-  children: React.ReactNode;
-  /** Custom style for the container */
-  style?: ViewStyle | ViewStyle[];
-  /** Blur intensity (0-100) */
+interface GlassCardProps extends ViewProps {
   intensity?: number;
-  /** Blur tint */
   tint?: 'light' | 'dark' | 'default';
-  /** Padding inside the card */
-  padding?: number;
-  /** Border radius */
-  borderRadius?: number;
-  /** Whether to show border */
-  showBorder?: boolean;
-  /** Glow color for neon effect */
-  glowColor?: string;
-  /** Whether to show neon glow */
-  showGlow?: boolean;
+  hasBorder?: boolean;
 }
 
+/**
+ * Awwwards kalitesinde "Liquid Glass" efekti.
+ * Arka planı yumuşakça bulanıklaştırır ve derinlik katar.
+ */
 export const GlassCard: React.FC<GlassCardProps> = ({
   children,
   style,
   intensity = 40,
   tint = 'dark',
-  padding = 16,
-  borderRadius = 20,
-  showBorder = true,
-  glowColor,
-  showGlow = false,
+  hasBorder = true,
+  ...props
 }) => {
-  const glowStyle = showGlow && glowColor ? {
-    ...Platform.select({
-      ios: {
-        shadowColor: glowColor,
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.3,
-        shadowRadius: 12,
-      },
-      android: {},
-    }),
-  } : {};
-
   // On Android, BlurView might not work well, so we fallback to semi-transparent background
   if (Platform.OS === 'android') {
     return (
       <View
         style={[
           styles.container,
-          {
-            borderRadius,
-            backgroundColor: COLORS.surface.glass,
-          },
-          showBorder && styles.border,
-          glowStyle,
+          styles.androidFallback,
+          hasBorder && styles.border,
           style,
         ]}
+        {...props}
       >
-        <View style={[styles.content, { padding }]}>
-          {children}
-        </View>
+        <View style={styles.innerContent}>{children}</View>
       </View>
     );
   }
 
   return (
-    <View
-      style={[
-        styles.container,
-        { borderRadius },
-        showBorder && styles.border,
-        glowStyle,
-        style,
-      ]}
+    <BlurView
+      intensity={intensity}
+      tint={tint}
+      style={[styles.container, hasBorder && styles.border, style]}
+      {...props}
     >
-      <BlurView
-        intensity={intensity}
-        tint={tint}
-        style={[styles.blur, { borderRadius }]}
-      />
-      <View style={[styles.innerContainer, { borderRadius }]} />
-      <View style={[styles.content, { padding }]}>
-        {children}
-      </View>
-    </View>
+      <View style={styles.innerContent}>{children}</View>
+    </BlurView>
   );
 };
 
@@ -103,7 +56,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
  */
 interface GlassViewProps {
   children: React.ReactNode;
-  style?: ViewStyle | ViewStyle[];
+  style?: ViewStyle;
   intensity?: number;
   tint?: 'light' | 'dark' | 'default';
 }
@@ -111,16 +64,13 @@ interface GlassViewProps {
 export const GlassView: React.FC<GlassViewProps> = ({
   children,
   style,
-  intensity = 40,
-  tint = 'dark',
+  intensity = 60,
+  tint = 'light',
 }) => {
   if (Platform.OS === 'android') {
     return (
       <View
-        style={[
-          { backgroundColor: COLORS.surface.glass },
-          style,
-        ]}
+        style={[{ backgroundColor: COLORS.surface.glassBackground }, style]}
       >
         {children}
       </View>
@@ -128,13 +78,12 @@ export const GlassView: React.FC<GlassViewProps> = ({
   }
 
   return (
-    <View style={[styles.glassViewContainer, style]}>
+    <View style={[glassViewStyles.container, style]}>
       <BlurView
         intensity={intensity}
         tint={tint}
         style={StyleSheet.absoluteFillObject}
       />
-      <View style={styles.innerContainerFill} />
       {children}
     </View>
   );
@@ -145,7 +94,7 @@ export const GlassView: React.FC<GlassViewProps> = ({
  */
 interface GlassButtonProps {
   children: React.ReactNode;
-  style?: ViewStyle | ViewStyle[];
+  style?: ViewStyle;
   intensity?: number;
   tint?: 'light' | 'dark' | 'default';
   borderRadius?: number;
@@ -154,16 +103,16 @@ interface GlassButtonProps {
 export const GlassButton: React.FC<GlassButtonProps> = ({
   children,
   style,
-  intensity = 40,
-  tint = 'dark',
-  borderRadius = 12,
+  intensity = 60,
+  tint = 'light',
+  borderRadius = RADII.lg,
 }) => {
   if (Platform.OS === 'android') {
     return (
       <View
         style={[
-          styles.glassButton,
-          { borderRadius, backgroundColor: COLORS.surface.glass },
+          glassButtonStyles.container,
+          { borderRadius, backgroundColor: COLORS.surface.glassBackground },
           style,
         ]}
       >
@@ -173,13 +122,12 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
   }
 
   return (
-    <View style={[styles.glassButton, { borderRadius }, style]}>
+    <View style={[glassButtonStyles.container, { borderRadius }, style]}>
       <BlurView
         intensity={intensity}
         tint={tint}
         style={[StyleSheet.absoluteFillObject, { borderRadius }]}
       />
-      <View style={[styles.innerContainerFill, { borderRadius }]} />
       {children}
     </View>
   );
@@ -187,41 +135,30 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
 
 const styles = StyleSheet.create({
   container: {
+    borderRadius: 24, // Apple-style xl radii
     overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
+    backgroundColor: COLORS.background.glass,
+  },
+  androidFallback: {
+    backgroundColor: COLORS.surface.glassBackground,
   },
   border: {
     borderWidth: 1,
-    borderColor: COLORS.border.default,
+    borderColor: COLORS.border.light,
   },
-  blur: {
-    ...StyleSheet.absoluteFillObject,
+  innerContent: {
+    padding: 16,
   },
-  innerContainer: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(30, 30, 32, 0.7)',
-  },
-  innerContainerFill: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(30, 30, 32, 0.7)',
-  },
-  content: {
-    position: 'relative',
-  },
-  glassViewContainer: {
+});
+
+const glassViewStyles = StyleSheet.create({
+  container: {
     overflow: 'hidden',
   },
-  glassButton: {
+});
+
+const glassButtonStyles = StyleSheet.create({
+  container: {
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
