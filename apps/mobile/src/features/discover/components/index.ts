@@ -14,7 +14,11 @@ export { CategoryFilter } from './CategoryFilter';
 export { GlassCategorySelector } from './GlassCategorySelector';
 
 // Header & Search
-export { DiscoverHeader } from './DiscoverHeader';
+export {
+  DiscoverHeader,
+  AwwwardsDiscoverHeader,
+  AnimatedDiscoverHeader,
+} from './DiscoverHeader';
 export { EnhancedSearchBar } from './EnhancedSearchBar';
 
 // Filters & Modals
@@ -44,3 +48,13 @@ export * from './ceremony';
 
 // Moment Detail Components
 export * from './moment-detail';
+
+// Types
+export type {
+  Story,
+  UserStory,
+  Category,
+  SortOption,
+  City,
+  DiscoverHeaderProps,
+} from './types';

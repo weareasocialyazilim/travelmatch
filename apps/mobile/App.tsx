@@ -11,7 +11,6 @@ import { ProviderComposer } from './src/components/ProviderComposer';
 import { AuthProvider } from './src/context/AuthContext';
 import { BiometricAuthProvider } from './src/context/BiometricAuthContext';
 import { ConfirmationProvider } from './src/context/ConfirmationContext';
-import { CurrencyProvider } from './src/context/CurrencyContext';
 import { NetworkProvider } from './src/context/NetworkContext';
 import { RealtimeProvider } from './src/context/RealtimeContext';
 import { ToastProvider } from './src/context/ToastContext';
@@ -249,7 +248,6 @@ function App() {
     SafeAreaProvider,
     NetworkProvider,
     AuthProvider,
-    CurrencyProvider,
     BiometricAuthProvider,
     RealtimeProvider,
     ToastProvider,
