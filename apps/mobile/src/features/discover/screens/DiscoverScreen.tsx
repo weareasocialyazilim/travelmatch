@@ -8,8 +8,9 @@
  * - AwwwardsDiscoverHeader with greeting & brand
  * - StoriesRow for user moments
  * - Immersive moment cards feed
- * - FloatingDock navigation
  * - Anti-Cheapskate counter-offer logic
+ *
+ * Note: FloatingDock navigation is handled by MainTabNavigator
  */
 
 import React, { useRef, useCallback, useMemo } from 'react';
@@ -30,7 +31,7 @@ import {
   AwwwardsDiscoverHeader,
 } from '@/components/discover';
 import StoriesRow from '@/components/discover/StoriesRow';
-import { FloatingDock } from '@/components/layout/FloatingDock';
+// Note: FloatingDock is now rendered by MainTabNavigator
 import { useMoments, type Moment } from '@/hooks/useMoments';
 import { COLORS } from '@/constants/colors';
 import { withErrorBoundary } from '../../../components/withErrorBoundary';
@@ -336,7 +337,6 @@ const DiscoverScreen = () => {
         <Text style={styles.emptySubtitle}>
           Be the first to create a moment!
         </Text>
-        <FloatingDock />
       </View>
     );
   }
@@ -399,8 +399,7 @@ const DiscoverScreen = () => {
         </View>
       )}
 
-      {/* Floating Navigation Dock */}
-      <FloatingDock />
+      {/* FloatingDock is rendered by MainTabNavigator */}
     </View>
   );
 };
