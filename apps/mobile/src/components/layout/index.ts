@@ -4,3 +4,8 @@
  */
 
 export { FloatingDock } from './FloatingDock';
+export {
+  LiquidScreenWrapper,
+  LiquidScreenHeader,
+  LiquidScreenBody,
+} from './LiquidScreenWrapper';
