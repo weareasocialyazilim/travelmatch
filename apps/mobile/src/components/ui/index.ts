@@ -38,8 +38,14 @@ export type { MomentData, MomentBadgeType } from './TMCard';
 export { TMPill, TMCategoryChip } from './TMPill';
 
 // TMInput - Enhanced input with floating label and validation
+// @deprecated Use LiquidInput for new implementations - TMInput is legacy
 export { TMInput } from './TMInput';
 export type { TMInputProps } from './TMInput';
+
+// LiquidInput - Awwwards-quality glass input with neon glow
+export { LiquidInput } from './LiquidInput';
+// ControlledLiquidInput - React Hook Form integrated Liquid Input
+export { ControlledLiquidInput } from './ControlledLiquidInput';
 
 // TMLoading - Consolidated loading component (replaces Spinner, LoadingSpinner, LiquidLoading)
 export { TMLoading } from './TMLoading';
@@ -139,3 +145,15 @@ export type { GlassModalProps } from './GlassModal';
 
 // NeonPulseMarker - Animated map marker with "Breathing Neon" effect
 export { NeonPulseMarker } from './NeonPulseMarker';
+
+// ═══════════════════════════════════════════════════════════════════
+// Layout Components (Re-exports)
+// ═══════════════════════════════════════════════════════════════════
+
+// LiquidScreenWrapper - Premium screen wrapper with glass background
+// Canonical source: @/components/layout/LiquidScreenWrapper
+export {
+  LiquidScreenWrapper,
+  LiquidScreenHeader,
+  LiquidScreenBody,
+} from '../layout/LiquidScreenWrapper';
