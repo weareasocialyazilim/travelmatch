@@ -1,10 +1,16 @@
 import type { Config } from 'tailwindcss';
+import { liquidTailwindExtension } from './tokens/liquid';
 
 /**
  * TravelMatch Web Design System - Tailwind Preset
- * "Cinematic Travel + Trust Jewelry"
+ * "Cinematic Travel + Trust Jewelry" + "Liquid Design"
  *
  * Use this preset for both Landing Page (apps/web) and Admin Panel (apps/admin)
+ *
+ * Liquid Design features:
+ * - Soft, flowing gradients
+ * - Glass morphism effects
+ * - Organic animations
  */
 
 const preset: Partial<Config> = {
@@ -223,7 +229,7 @@ const preset: Partial<Config> = {
       },
 
       // ═══════════════════════════════════════════
-      // SHADOWS
+      // SHADOWS (including Liquid glow effects)
       // ═══════════════════════════════════════════
       boxShadow: {
         card: '0 4px 24px -4px rgba(0, 0, 0, 0.08)',
@@ -233,6 +239,8 @@ const preset: Partial<Config> = {
         'trust-glow': '0 0 40px -8px rgba(16, 185, 129, 0.5)',
         glass: '0 8px 32px -4px rgba(0, 0, 0, 0.1)',
         'inner-glow': 'inset 0 1px 0 0 rgba(255, 255, 255, 0.1)',
+        // Liquid Design shadows
+        ...liquidTailwindExtension.boxShadow,
       },
 
       // ═══════════════════════════════════════════
@@ -325,6 +333,15 @@ const preset: Partial<Config> = {
           'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.75) 100%)',
         'gradient-radial-glow':
           'radial-gradient(circle at center, rgba(245, 158, 11, 0.15) 0%, transparent 70%)',
+        // Liquid Design gradients
+        ...liquidTailwindExtension.backgroundImage,
+      },
+
+      // ═══════════════════════════════════════════
+      // TRANSITION TIMING (including Liquid easing)
+      // ═══════════════════════════════════════════
+      transitionTimingFunction: {
+        ...liquidTailwindExtension.transitionTimingFunction,
       },
 
       // ═══════════════════════════════════════════
@@ -332,6 +349,7 @@ const preset: Partial<Config> = {
       // ═══════════════════════════════════════════
       backdropBlur: {
         xs: '2px',
+        ...liquidTailwindExtension.backdropBlur,
       },
     },
   },

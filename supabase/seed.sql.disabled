@@ -1,4 +1,0 @@
--- DISABLED: Original seed.sql moved here to avoid seeding in local dev when
--- generating types. Restore before running full local resets.
-
--- Original content preserved in this file for reference.

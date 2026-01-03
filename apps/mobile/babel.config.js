@@ -1,6 +1,8 @@
 module.exports = function (api) {
   api.cache(true);
 
+  const isProduction = process.env.NODE_ENV === 'production';
+
   return {
     presets: ['babel-preset-expo'],
     plugins: [
@@ -28,8 +30,21 @@ module.exports = function (api) {
           },
         },
       ],
+      // Remove console logs in production for performance
+      ...(isProduction ? ['transform-remove-console'] : []),
       // Reanimated MUST be last
       'react-native-reanimated/plugin',
     ],
+    // Exclude __mocks__ from production build
+    ...(isProduction && {
+      ignore: [
+        '**/__mocks__/**',
+        '**/__tests__/**',
+        '**/*.test.ts',
+        '**/*.test.tsx',
+        '**/*.spec.ts',
+        '**/*.spec.tsx',
+      ],
+    }),
   };
 };

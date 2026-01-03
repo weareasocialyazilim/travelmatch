@@ -1,6 +1,24 @@
 /**
  * Smart Notification Service
  * Intelligent notification timing and content generation
+ *
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * ⚠️  ARCHITECTURE DECISION RECORD (ADR-002)
+ * ═══════════════════════════════════════════════════════════════════════════════
+ *
+ * STATUS: PRIMARY IMPLEMENTATION
+ *
+ * This TypeScript Edge Function is the PRIMARY implementation for smart notifications.
+ * The Python implementation in services/ml-service/app/models/smart_notifications.py
+ * is DEPRECATED and should only be used for model training purposes.
+ *
+ * Decision: Real-time ML inference runs in Edge Functions (TypeScript)
+ * Reason: Lower latency, direct Supabase integration, Deno runtime efficiency
+ *
+ * Python service role: Model training, batch processing, offline analytics ONLY
+ *
+ * See: docs/ARCHITECTURE_CLEANUP_REPORT.md for full context
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 import { serve } from '@supabase/edge-runtime';
@@ -11,12 +29,17 @@ import { extractUserFeatures } from '../../shared/ml/feature-store.ts';
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL') ?? '',
-  Deno.env.get('SUPABASE_SERVICE_KEY') ?? ''
+  Deno.env.get('SUPABASE_SERVICE_KEY') ?? '',
 );
 
 interface NotificationRequest {
   userId: string;
-  type: 'gift_received' | 'moment_liked' | 'proof_verified' | 'payment_completed' | 'reminder';
+  type:
+    | 'gift_received'
+    | 'moment_liked'
+    | 'proof_verified'
+    | 'payment_completed'
+    | 'reminder';
   data: Record<string, any>;
   priority?: 'low' | 'medium' | 'high';
 }
@@ -51,13 +74,13 @@ serve(async (req: Request) => {
     // 2. Determine optimal send time
     const optimalTime = await determineOptimalSendTime(
       userFeatures,
-      notificationReq.priority || 'medium'
+      notificationReq.priority || 'medium',
     );
 
     // 3. Generate notification content
     const content = await generateNotificationContent(
       notificationReq.type,
-      notificationReq.data
+      notificationReq.data,
     );
 
     // 4. Select best channel
@@ -101,7 +124,6 @@ serve(async (req: Request) => {
     return new Response(JSON.stringify({ notification, schedule }), {
       headers: { 'Content-Type': 'application/json' },
     });
-
   } catch (error) {
     logger.error('Notification processing failed', error as Error);
     return handleError(error);
@@ -113,7 +135,7 @@ serve(async (req: Request) => {
  */
 async function determineOptimalSendTime(
   userFeatures: any,
-  priority: string
+  priority: string,
 ): Promise<string> {
   // If high priority, send immediately
   if (priority === 'high') {
@@ -122,14 +144,14 @@ async function determineOptimalSendTime(
 
   // Get user's peak activity hours
   const peakHours = userFeatures.peakActivityHours || [9, 13, 19];
-  
+
   // Get current hour
   const now = new Date();
   const currentHour = now.getHours();
 
   // Find next peak hour
   let nextPeakHour = peakHours.find((h: number) => h > currentHour);
-  
+
   // If no peak hour found today, use first peak hour tomorrow
   if (!nextPeakHour) {
     nextPeakHour = peakHours[0];
@@ -146,7 +168,7 @@ async function determineOptimalSendTime(
  */
 async function generateNotificationContent(
   type: string,
-  data: Record<string, any>
+  data: Record<string, any>,
 ): Promise<any> {
   const templates: Record<string, any> = {
     gift_received: {
@@ -187,7 +209,7 @@ async function generateNotificationContent(
  */
 function selectBestChannel(
   userFeatures: any,
-  notificationType: string
+  notificationType: string,
 ): 'push' | 'email' | 'sms' {
   // High-value notifications -> SMS
   if (notificationType === 'payment_completed') {
@@ -209,7 +231,7 @@ function selectBestChannel(
 async function sendNotification(
   notificationId: string,
   channel: string,
-  content: any
+  content: any,
 ): Promise<void> {
   logger.info('Sending immediate notification', {
     notificationId,

@@ -60,58 +60,61 @@ import {
 import { COLORS, GRADIENTS } from '@/constants/colors';
 import { SPACING } from '@/constants/spacing';
 import { logger } from '@/utils/logger';
+import { useLowPowerMode } from '@/hooks/useLowPowerMode';
 
 // Skeleton loader with shimmer effect for premium loading states
-const SkeletonLoader = memo<{ size?: 'small' | 'large' }>(({ size = 'large' }) => {
-  const shimmerValue = useSharedValue(0);
+const SkeletonLoader = memo<{ size?: 'small' | 'large' }>(
+  ({ size = 'large' }) => {
+    const shimmerValue = useSharedValue(0);
 
-  useEffect(() => {
-    shimmerValue.value = withRepeat(
-      withTiming(1, { duration: 1200 }),
-      -1,
-      false,
-    );
-  }, [shimmerValue]);
+    useEffect(() => {
+      shimmerValue.value = withRepeat(
+        withTiming(1, { duration: 1200 }),
+        -1,
+        false,
+      );
+    }, [shimmerValue]);
 
-  const shimmerStyle = useAnimatedStyle(() => {
-    const translateX = interpolate(
-      shimmerValue.value,
-      [0, 1],
-      [-100, 100],
-      Extrapolation.CLAMP,
-    );
-    return {
-      transform: [{ translateX }],
-    };
-  });
+    const shimmerStyle = useAnimatedStyle(() => {
+      const translateX = interpolate(
+        shimmerValue.value,
+        [0, 1],
+        [-100, 100],
+        Extrapolation.CLAMP,
+      );
+      return {
+        transform: [{ translateX }],
+      };
+    });
 
-  const containerSize = size === 'large' ? 100 : 24;
-  const iconSize = size === 'large' ? 40 : 16;
+    const containerSize = size === 'large' ? 100 : 24;
+    const iconSize = size === 'large' ? 40 : 16;
 
-  return (
-    <View
-      style={[
-        skeletonStyles.container,
-        { width: containerSize, height: containerSize },
-      ]}
-    >
-      <Animated.View style={[skeletonStyles.shimmer, shimmerStyle]}>
-        <LinearGradient
-          colors={['transparent', 'rgba(255,255,255,0.4)', 'transparent']}
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.5 }}
-          style={skeletonStyles.gradient}
+    return (
+      <View
+        style={[
+          skeletonStyles.container,
+          { width: containerSize, height: containerSize },
+        ]}
+      >
+        <Animated.View style={[skeletonStyles.shimmer, shimmerStyle]}>
+          <LinearGradient
+            colors={['transparent', 'rgba(255,255,255,0.4)', 'transparent']}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            style={skeletonStyles.gradient}
+          />
+        </Animated.View>
+        <MaterialCommunityIcons
+          name="camera"
+          size={iconSize}
+          color={COLORS.textSecondary}
+          style={skeletonStyles.icon}
         />
-      </Animated.View>
-      <MaterialCommunityIcons
-        name="camera"
-        size={iconSize}
-        color={COLORS.textSecondary}
-        style={skeletonStyles.icon}
-      />
-    </View>
-  );
-});
+      </View>
+    );
+  },
+);
 
 SkeletonLoader.displayName = 'SkeletonLoader';
 
@@ -190,30 +193,59 @@ export const ProofCeremonyFlow = memo<ProofCeremonyFlowProps>(
     const [_memoryCardUrl, setMemoryCardUrl] = useState<string | null>(null);
     const [showConfetti, setShowConfetti] = useState(false);
 
+    // Low Power Mode integration for animation optimization
+    const {
+      isLowPowerMode,
+      animationConfig,
+      shouldOfferLowPowerMode,
+      enableLowPowerMode,
+      recordPerformanceSample,
+    } = useLowPowerMode();
+
     // Step transition animation values
     const stepOpacity = useSharedValue(1);
     const stepTranslateX = useSharedValue(0);
 
     const currentStepIndex = CEREMONY_STEP_ORDER.indexOf(step);
 
-    // Animated step transition
+    // Track mount performance for low power mode detection
+    useEffect(() => {
+      const mountTime = performance.now();
+      return () => {
+        const duration = performance.now() - mountTime;
+        recordPerformanceSample(duration);
+      };
+    }, [recordPerformanceSample]);
+
+    // Animated step transition (respects low power mode)
     const transitionToStep = useCallback(
       (newStep: CeremonyStep) => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        // Only trigger haptics if enabled in animation config
+        if (animationConfig.enableHaptics) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        }
+
+        // Skip animations in low power mode
+        if (isLowPowerMode && !animationConfig.enableAnimations) {
+          setStep(newStep);
+          return;
+        }
+
+        const duration = animationConfig.transitionDuration;
 
         // Fade out current
-        stepOpacity.value = withTiming(0, { duration: 200 });
-        stepTranslateX.value = withTiming(-50, { duration: 200 });
+        stepOpacity.value = withTiming(0, { duration: duration * 0.67 });
+        stepTranslateX.value = withTiming(-50, { duration: duration * 0.67 });
 
         setTimeout(() => {
           setStep(newStep);
           // Fade in new
           stepTranslateX.value = 50;
-          stepOpacity.value = withTiming(1, { duration: 300 });
-          stepTranslateX.value = withTiming(0, { duration: 300 });
-        }, 200);
+          stepOpacity.value = withTiming(1, { duration });
+          stepTranslateX.value = withTiming(0, { duration });
+        }, duration * 0.67);
       },
-      [stepOpacity, stepTranslateX],
+      [stepOpacity, stepTranslateX, isLowPowerMode, animationConfig],
     );
 
     const stepAnimatedStyle = useAnimatedStyle(() => ({
@@ -343,10 +375,29 @@ export const ProofCeremonyFlow = memo<ProofCeremonyFlowProps>(
       <SafeAreaView style={styles.container} testID={testID}>
         <StatusBar barStyle="dark-content" />
 
-        {/* Confetti */}
-        {showConfetti && (
+        {/* Low Power Mode Prompt */}
+        {shouldOfferLowPowerMode && (
+          <Animated.View
+            entering={FadeIn.duration(300)}
+            style={styles.lowPowerPrompt}
+          >
+            <Text style={styles.lowPowerText}>
+              Yavaş performans algılandı. Düşük güç modunu etkinleştirmek ister
+              misiniz?
+            </Text>
+            <TouchableOpacity
+              onPress={enableLowPowerMode}
+              style={styles.lowPowerButton}
+            >
+              <Text style={styles.lowPowerButtonText}>Etkinleştir</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        )}
+
+        {/* Confetti - disabled in low power mode */}
+        {showConfetti && animationConfig.enableParticles && (
           <ConfettiCannon
-            count={200}
+            count={isLowPowerMode ? 50 : 200}
             origin={{ x: -10, y: 0 }}
             colors={[...CEREMONY_COLORS.celebration.confetti]}
             fadeOut
@@ -364,7 +415,7 @@ export const ProofCeremonyFlow = memo<ProofCeremonyFlowProps>(
             <SunsetClock
               deadline={gift.escrowUntil}
               size="compact"
-              enableHaptics
+              enableHaptics={animationConfig.enableHaptics}
             />
           </View>
         )}
@@ -605,7 +656,9 @@ const CaptureStep = memo<CaptureStepProps>(
               style={styles.addPhotoButton}
               onPress={capturePhoto}
               disabled={isCapturing}
-              accessibilityLabel={photos.length === 0 ? 'Fotoğraf çek' : 'Fotoğraf ekle'}
+              accessibilityLabel={
+                photos.length === 0 ? 'Fotoğraf çek' : 'Fotoğraf ekle'
+              }
               accessibilityRole="button"
             >
               {isCapturing ? (
@@ -646,7 +699,9 @@ const CaptureStep = memo<CaptureStepProps>(
           style={styles.locationButton}
           onPress={getLocation}
           disabled={isGettingLocation}
-          accessibilityLabel={location ? `Konum: ${location.name}` : 'Konum ekle'}
+          accessibilityLabel={
+            location ? `Konum: ${location.name}` : 'Konum ekle'
+          }
           accessibilityRole="button"
         >
           {isGettingLocation ? (
@@ -830,6 +885,43 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+
+  // Low Power Mode Prompt
+  lowPowerPrompt: {
+    position: 'absolute',
+    top: 60,
+    left: SPACING.md,
+    right: SPACING.md,
+    backgroundColor: COLORS.warningMuted,
+    borderRadius: 12,
+    padding: SPACING.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    zIndex: 1000,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  lowPowerText: {
+    flex: 1,
+    fontSize: 13,
+    color: COLORS.textPrimary,
+    marginRight: SPACING.sm,
+  },
+  lowPowerButton: {
+    backgroundColor: COLORS.warning,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: 8,
+  },
+  lowPowerButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#fff',
   },
 
   // Intro
