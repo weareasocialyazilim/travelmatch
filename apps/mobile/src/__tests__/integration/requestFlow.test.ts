@@ -20,7 +20,7 @@ jest.mock('@/utils/logger');
 
 // Import services AFTER mocking
 import { requestService } from '@/services/requestService';
-import { paymentService } from '@/services/paymentService';
+import { securePaymentService as paymentService } from '@/services/securePaymentService';
 
 // Create mock auth object that's shared
 const mockAuth = {

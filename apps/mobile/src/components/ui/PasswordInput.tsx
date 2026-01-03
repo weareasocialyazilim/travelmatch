@@ -1,45 +1,69 @@
 /**
  * Password Input Component
- * Show/hide özelliği ile şifre input component
+ * LiquidInput wrapper with password visibility toggle
  */
 
-import React, { useState, memo, useCallback, useMemo } from 'react';
-import type { TextInputProps } from 'react-native';
-import { Input } from './Input';
+import React, { useState, memo, useCallback } from 'react';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import type { TextInputProps, ViewStyle } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { LiquidInput } from './LiquidInput';
+import { COLORS } from '../../constants/colors';
 
 interface PasswordInputProps extends Omit<TextInputProps, 'secureTextEntry'> {
   label?: string;
   error?: string;
-  helperText?: string;
-  required?: boolean;
-  showSuccess?: boolean;
+  containerStyle?: ViewStyle;
 }
 
-export const PasswordInput: React.FC<PasswordInputProps> = memo((props) => {
+export const PasswordInput: React.FC<PasswordInputProps> = memo(({
+  label,
+  error,
+  containerStyle,
+  ...props
+}) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  // Memoize toggle handler
   const togglePasswordVisibility = useCallback(() => {
     setIsPasswordVisible((prev) => !prev);
   }, []);
 
-  // Memoize right icon name
-  const rightIcon = useMemo(
-    () => (isPasswordVisible ? 'eye-off-outline' : 'eye-outline'),
-    [isPasswordVisible],
-  );
-
   return (
-    <Input
-      {...props}
-      leftIcon="lock-outline"
-      rightIcon={rightIcon}
-      onRightIconPress={togglePasswordVisibility}
-      secureTextEntry={!isPasswordVisible}
-      autoCapitalize="none"
-      autoCorrect={false}
-    />
+    <View style={[styles.container, containerStyle]}>
+      <LiquidInput
+        label={label}
+        icon="lock-closed-outline"
+        error={error}
+        secureTextEntry={!isPasswordVisible}
+        autoCapitalize="none"
+        autoCorrect={false}
+        {...props}
+      />
+      <TouchableOpacity
+        style={styles.toggleButton}
+        onPress={togglePasswordVisibility}
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      >
+        <Ionicons
+          name={isPasswordVisible ? 'eye-off-outline' : 'eye-outline'}
+          size={20}
+          color={COLORS.textMuted}
+        />
+      </TouchableOpacity>
+    </View>
   );
 });
 
 PasswordInput.displayName = 'PasswordInput';
+
+const styles = StyleSheet.create({
+  container: {
+    position: 'relative',
+  },
+  toggleButton: {
+    position: 'absolute',
+    right: 16,
+    top: 38, // Adjusted for label height
+    padding: 4,
+  },
+});

@@ -4,7 +4,7 @@
  * Target Coverage: 85%+
  */
 
-import { paymentService } from '@/services/paymentService';
+import { securePaymentService as paymentService } from '@/services/securePaymentService';
 import { supabase } from '@/config/supabase';
 import { transactionsService } from '@/services/supabaseDbService';
 import { logger } from '@/utils/logger';
