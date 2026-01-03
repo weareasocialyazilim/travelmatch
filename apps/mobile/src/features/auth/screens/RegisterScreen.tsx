@@ -1,200 +1,196 @@
 import React, { useState } from 'react';
 import {
+  StyleSheet,
   View,
   Text,
-  StyleSheet,
   TextInput,
   TouchableOpacity,
-  ImageBackground,
+  ScrollView,
   KeyboardAvoidingView,
   Platform,
-  StatusBar,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeInRight, FadeOutLeft } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
-import { COLORS, GRADIENTS } from '@/constants/colors';
+import { COLORS } from '@/constants/colors';
+import { FONTS, TYPE_SCALE } from '@/constants/typography';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { TMButton } from '@/components/ui/TMButton';
 
-const STEPS = [
-  { id: 'name', title: 'Adın ne?', placeholder: 'Selin Yılmaz', icon: 'person-outline' as const },
-  { id: 'email', title: 'E-postan?', placeholder: 'selin@ornek.com', icon: 'mail-outline' as const },
-  { id: 'password', title: 'Bir şifre belirle', placeholder: '••••••••', icon: 'lock-closed-outline' as const, secure: true },
-];
-
-type FormData = {
-  name: string;
-  email: string;
-  password: string;
-};
-
+/**
+ * Awwwards standardında Kayıt Ekranı - "Liquid Register Screen"
+ * Prestijli Katılım: Kullanıcının "The Guest List"e dahil olduğu hissini veren
+ * ferah bir tasarım.
+ *
+ * Odak: Prestij, veri güvenliği vurgusu ve pürüzsüz form akışı.
+ */
 export const RegisterScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { register } = useAuth();
   const { showToast } = useToast();
-  const [currentStep, setCurrentStep] = useState(0);
+
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState<FormData>({ name: '', email: '', password: '' });
 
-  const handleNext = async () => {
-    if (currentStep < STEPS.length - 1) {
-      setCurrentStep(prev => prev + 1);
-    } else {
-      // Registration complete
-      try {
-        setIsLoading(true);
-        const result = await register({
-          email: formData.email,
-          password: formData.password,
-          name: formData.name,
-        });
+  const isFormValid = () => {
+    if (!name.trim() || name.trim().length < 2) return false;
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false;
+    if (!password || password.length < 8) return false;
+    return true;
+  };
 
-        if (result.success) {
-          showToast('Hesap oluşturuldu!', 'success');
-          navigation.reset({ index: 0, routes: [{ name: 'Discover' }] });
-        } else {
-          showToast(result.error || 'Kayıt başarısız. Lütfen tekrar deneyin.', 'error');
-        }
-      } catch (error) {
-        showToast(
-          error instanceof Error ? error.message : 'Kayıt başarısız. Lütfen tekrar deneyin.',
-          'error'
-        );
-      } finally {
-        setIsLoading(false);
+  const handleRegister = async () => {
+    if (!isFormValid()) return;
+
+    try {
+      setIsLoading(true);
+      const result = await register({
+        email: email.toLowerCase(),
+        password,
+        name: name.trim(),
+      });
+
+      if (result.success) {
+        showToast('Hesap oluşturuldu!', 'success');
+        navigation.reset({ index: 0, routes: [{ name: 'Discover' }] });
+      } else {
+        showToast(result.error || 'Kayıt başarısız. Lütfen tekrar deneyin.', 'error');
       }
+    } catch (error) {
+      showToast(
+        error instanceof Error ? error.message : 'Kayıt başarısız. Lütfen tekrar deneyin.',
+        'error'
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep(prev => prev - 1);
-    } else {
-      navigation.goBack();
-    }
-  };
-
-  const isCurrentStepValid = () => {
-    const step = STEPS[currentStep];
-    const value = formData[step.id as keyof FormData];
-
-    if (!value || value.trim() === '') return false;
-
-    if (step.id === 'email') {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-    }
-
-    if (step.id === 'password') {
-      return value.length >= 8;
-    }
-
-    return value.length >= 2;
-  };
-
-  const activeStepData = STEPS[currentStep];
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
-      <ImageBackground
-        source={{ uri: 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=80&w=1286' }}
-        style={styles.bgImage}
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={[styles.backButton, { top: insets.top + 10 }]}
+        accessible={true}
+        accessibilityLabel="Geri dön"
+        accessibilityRole="button"
+        accessibilityHint="Önceki ekrana döner"
       >
-        <LinearGradient
-          colors={['rgba(0,0,0,0.3)', COLORS.background.primary]}
-          style={styles.gradient}
-        />
+        <Ionicons name="chevron-back" size={28} color={COLORS.text.primary} />
+      </TouchableOpacity>
 
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={[styles.content, { paddingTop: insets.top }]}
+      <KeyboardAvoidingView
+        style={styles.keyboardView}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView
+          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 80 }]}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-
-          {/* Header */}
-          <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color="white" />
-          </TouchableOpacity>
-
-          {/* Progress Dots */}
-          <View style={styles.progressContainer}>
-            {STEPS.map((_, index) => (
-              <View
-                key={index}
-                style={[styles.dot, index <= currentStep && styles.activeDot]}
-              />
-            ))}
+          <View style={styles.headerSection}>
+            <Text style={styles.title}>Aramıza Katıl</Text>
+            <Text style={styles.subtitle}>
+              Sıradışı bir topluluğun parçası olmak için ilk adımı at.
+            </Text>
           </View>
 
-          {/* Form Wizard */}
-          <Animated.View
-            key={activeStepData.id}
-            entering={FadeInRight}
-            exiting={FadeOutLeft}
-            style={styles.formContainer}
-          >
-            <Text style={styles.stepTitle}>{activeStepData.title}</Text>
-
-            <View style={styles.inputWrapper}>
-              <Ionicons
-                name={activeStepData.icon}
-                size={24}
-                color={COLORS.brand.primary}
-                style={styles.inputIcon}
-              />
+          <View style={styles.formSection}>
+            <Text style={styles.label}>AD SOYAD</Text>
+            <GlassCard intensity={10} style={styles.inputWrapper} padding={0} showBorder={true}>
               <TextInput
                 style={styles.input}
-                placeholder={activeStepData.placeholder}
-                placeholderTextColor="rgba(255,255,255,0.3)"
-                secureTextEntry={activeStepData.secure}
-                autoFocus
-                value={formData[activeStepData.id as keyof FormData]}
-                onChangeText={(text) => setFormData(prev => ({ ...prev, [activeStepData.id]: activeStepData.id === 'email' ? text.toLowerCase() : text }))}
-                keyboardType={activeStepData.id === 'email' ? 'email-address' : 'default'}
-                autoCapitalize={activeStepData.id === 'email' ? 'none' : activeStepData.id === 'name' ? 'words' : 'none'}
+                placeholder="Caner Öz"
+                placeholderTextColor={COLORS.text.muted}
+                value={name}
+                onChangeText={setName}
+                autoCapitalize="words"
                 autoCorrect={false}
                 editable={!isLoading}
+                accessible={true}
+                accessibilityLabel="Ad Soyad"
+                accessibilityHint="Adınızı ve soyadınızı girin"
               />
-            </View>
-          </Animated.View>
+            </GlassCard>
 
-          {/* Next Button */}
-          <TouchableOpacity
-            style={[styles.nextButton, (!isCurrentStepValid() || isLoading) && styles.buttonDisabled]}
-            onPress={handleNext}
-            disabled={!isCurrentStepValid() || isLoading}
-          >
-            <LinearGradient
-              colors={isCurrentStepValid() && !isLoading ? GRADIENTS.gift : GRADIENTS.disabled}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.btnGradient}
+            <Text style={[styles.label, { marginTop: 24 }]}>E-POSTA</Text>
+            <GlassCard intensity={10} style={styles.inputWrapper} padding={0} showBorder={true}>
+              <TextInput
+                style={styles.input}
+                placeholder="caner@travelmatch.io"
+                placeholderTextColor={COLORS.text.muted}
+                value={email}
+                onChangeText={(text) => setEmail(text.toLowerCase())}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={!isLoading}
+                accessible={true}
+                accessibilityLabel="E-posta adresi"
+                accessibilityHint="E-posta adresinizi girin"
+              />
+            </GlassCard>
+
+            <Text style={[styles.label, { marginTop: 24 }]}>ŞİFRE BELİRLE</Text>
+            <GlassCard intensity={10} style={styles.inputWrapper} padding={0} showBorder={true}>
+              <TextInput
+                style={styles.input}
+                placeholder="En az 8 karakter"
+                placeholderTextColor={COLORS.text.muted}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={!isLoading}
+                accessible={true}
+                accessibilityLabel="Şifre"
+                accessibilityHint="En az 8 karakterli bir şifre belirleyin"
+              />
+            </GlassCard>
+          </View>
+
+          <View style={styles.policySection}>
+            <Ionicons name="shield-checkmark-outline" size={16} color={COLORS.brand.accent} />
+            <Text style={styles.policyText}>
+              Hesap oluşturarak Kullanım Koşullarını ve KVKK metnini kabul etmiş olursun.
+            </Text>
+          </View>
+
+          <View style={styles.actionSection}>
+            <TMButton
+              variant="primary"
+              onPress={handleRegister}
+              size="lg"
+              disabled={!isFormValid() || isLoading}
+              fullWidth
+              style={styles.registerButton}
             >
-              <Text style={styles.btnText}>
-                {isLoading
-                  ? 'Yükleniyor...'
-                  : currentStep === STEPS.length - 1
-                    ? 'Maceraya Başla'
-                    : 'Devam Et'}
-              </Text>
-              <Ionicons name="arrow-forward" size={20} color={COLORS.textPrimary} />
-            </LinearGradient>
-          </TouchableOpacity>
+              {isLoading ? 'Oluşturuluyor...' : 'Hesabımı Oluştur'}
+            </TMButton>
+          </View>
 
           {/* Login Link */}
           <View style={styles.loginContainer}>
             <Text style={styles.loginText}>Zaten hesabın var mı? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Login')}
+              accessible={true}
+              accessibilityLabel="Giriş yap"
+              accessibilityRole="link"
+              accessibilityHint="Giriş ekranına yönlendirir"
+            >
               <Text style={styles.loginLink}>Giriş Yap</Text>
             </TouchableOpacity>
           </View>
-
-        </KeyboardAvoidingView>
-      </ImageBackground>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 };
@@ -204,99 +200,91 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background.primary,
   },
-  bgImage: {
+  keyboardView: {
     flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-  gradient: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  content: {
-    flex: 1,
-    padding: 24,
-    justifyContent: 'space-between',
   },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    position: 'absolute',
+    left: 16,
+    zIndex: 10,
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
     alignItems: 'center',
-    justifyContent: 'center',
   },
-  progressContainer: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 20,
+  scrollContent: {
+    paddingHorizontal: 24,
+    paddingBottom: 40,
   },
-  dot: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+  headerSection: {
+    marginBottom: 40,
   },
-  activeDot: {
-    backgroundColor: COLORS.brand.primary,
-  },
-  formContainer: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  stepTitle: {
-    fontSize: 32,
+  title: {
+    fontSize: 40,
+    fontFamily: FONTS.display.black,
     fontWeight: '900',
-    color: 'white',
-    marginBottom: 24,
+    color: COLORS.text.primary,
+  },
+  subtitle: {
+    ...TYPE_SCALE.body.base,
+    color: COLORS.text.secondary,
+    marginTop: 12,
+    lineHeight: 24,
+  },
+  formSection: {
+    marginBottom: 32,
+  },
+  label: {
+    fontSize: 10,
+    fontFamily: FONTS.mono.regular,
+    color: COLORS.text.muted,
+    letterSpacing: 1.5,
+    marginBottom: 12,
+    marginLeft: 4,
   },
   inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 2,
-    borderBottomColor: 'rgba(255,255,255,0.2)',
-    paddingBottom: 12,
-  },
-  inputIcon: {
-    marginRight: 12,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: COLORS.border.default,
   },
   input: {
-    flex: 1,
-    fontSize: 24,
-    color: 'white',
-    fontWeight: '600',
+    color: COLORS.text.primary,
+    fontSize: 16,
+    fontFamily: FONTS.body.regular,
+    padding: 16,
   },
-  nextButton: {
-    marginBottom: 20,
-    borderRadius: 30,
-    overflow: 'hidden',
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  btnGradient: {
-    paddingVertical: 18,
+  policySection: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
+    gap: 12,
+    paddingHorizontal: 10,
+    marginBottom: 40,
   },
-  btnText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: COLORS.textPrimary,
+  policyText: {
+    flex: 1,
+    ...TYPE_SCALE.body.caption,
+    color: COLORS.text.muted,
+    lineHeight: 18,
+  },
+  actionSection: {
+    marginBottom: 20,
+  },
+  registerButton: {
+    height: 64,
+    borderRadius: 32,
   },
   loginContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginBottom: 20,
+    marginTop: 8,
   },
   loginText: {
-    color: 'rgba(255,255,255,0.7)',
-    fontSize: 14,
+    ...TYPE_SCALE.body.small,
+    color: COLORS.text.secondary,
   },
   loginLink: {
+    ...TYPE_SCALE.body.small,
     color: COLORS.brand.primary,
-    fontSize: 14,
     fontWeight: '600',
   },
 });
