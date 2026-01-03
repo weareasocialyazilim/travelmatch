@@ -63,7 +63,7 @@ export type { PaywallProps, PaywallFeature } from './Paywall';
 export { PasswordInput } from './PasswordInput';
 export { ControlledInput } from './ControlledInput';
 export { PasswordStrengthMeter } from './PasswordStrengthMeter';
-export { FormStepIndicator } from './FormStepIndicator';
+export { FormStepIndicator, LiquidStepIndicator, LiquidProgressBar } from './FormStepIndicator';
 export type { FormStep } from './FormStepIndicator';
 export { OTPInput } from './OTPInput';
 export type { OTPInputProps } from './OTPInput';
