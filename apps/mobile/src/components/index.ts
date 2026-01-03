@@ -103,3 +103,6 @@ export type { KYCLevel } from './KYCBadge';
 
 // App Bootstrap
 export { InitializationScreen } from './InitializationScreen';
+
+// Provider Utilities
+export { ProviderComposer } from './ProviderComposer';
