@@ -18,26 +18,43 @@ export { default as RequestsScreen } from './screens/RequestsScreen';
 export { MyTripsScreen } from './screens/MyTripsScreen';
 export { default as TicketScreen } from './screens/TicketScreen';
 
-// Hooks
+// Hooks - New Moment terminology
 export {
+  useMoments,
+  useMoment,
+  useCreateMoment,
+  useUpdateMoment,
+  useDeleteMoment,
+  useMyMoments,
+  useBooking,
+  // Legacy aliases
   useTrips,
   useTrip,
   useCreateTrip,
   useUpdateTrip,
   useDeleteTrip,
   useMyTrips,
-  useBooking,
-} from './hooks/useTrips';
+} from './hooks/useMoments';
 
-// Services
-export { tripsApi as tripsService } from './services/tripsService';
-/** @deprecated Use tripsService instead */
-export { tripsApi } from './services/tripsService';
+// Services - New Moment terminology
+export { momentsApi as momentsService } from './services/momentsService';
+/** @deprecated Use momentsService instead */
+export { momentsApi } from './services/momentsService';
+/** @deprecated Use momentsService instead */
+export { tripsApi } from './services/momentsService';
+/** @deprecated Use momentsService instead */
+export { tripsApi as tripsService } from './services/momentsService';
+
+// Types - New Moment terminology
 export type {
+  MomentFilters,
+  CreateMomentDto,
+  UpdateMomentDto,
+  // Legacy aliases
   TripFilters,
   CreateTripDto,
   UpdateTripDto,
-} from './services/tripsService';
+} from './services/momentsService';
 
 // Types
 export type {
