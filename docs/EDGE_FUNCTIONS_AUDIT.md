@@ -1,17 +1,19 @@
 # Edge Functions Audit Report
 
 > **Date**: January 2026
-> **Status**: Review Complete
+> **Status**: Cleanup Complete ✓
+> **Last Updated**: 2026-01-03
 
 ## Summary
 
 | Category | Count |
 |----------|-------|
-| Total Edge Functions | 26 |
+| Total Edge Functions | 21 |
 | Actively Used | 16 |
 | Webhook Handlers | 2 |
 | Scheduled Jobs | 1 |
-| Candidates for Review | 5 |
+| Utility Functions | 2 |
+| ~~Deleted~~ | ~~3~~ |
 
 ## Actively Used Functions (16)
 
@@ -51,20 +53,30 @@ These are triggered by external events, not client calls:
 |----------|----------|---------|
 | `update-exchange-rates` | pg_cron | Currency rate updates |
 
-## Candidates for Review (5)
+## Utility Functions (2)
 
-These functions are implemented but have no client references:
+Internal utilities not called by clients but needed for infrastructure:
 
-| Function | Status | Recommendation |
-|----------|--------|----------------|
-| `auth-login` | Unused | Evaluate if legacy or planned |
-| `cdn-invalidate` | Unused | May be used in CI/CD |
-| `feed-delta` | Unused | Planned feature? |
-| `geocode` | Metrics only | Server-side geocoding |
-| `get-user-profile` | Unused | Has Redis caching - evaluate need |
+| Function | Purpose | Why Kept |
+|----------|---------|----------|
+| `cdn-invalidate` | Cloudflare cache purge | Used by CI/CD and handle-storage-upload |
+| `geocode` | Mapbox geocoding proxy | Protects API token server-side |
+
+## Deleted Functions (3) - 2026-01-03
+
+These functions were removed after confirming no production usage:
+
+| Function | Reason for Deletion |
+|----------|---------------------|
+| `auth-login` | Redundant - client uses Supabase SDK directly |
+| `feed-delta` | Unimplemented feature - client never integrated |
+| `get-user-profile` | Redundant - RLS allows direct table queries |
+
+> **Git Recovery**: `git checkout HEAD~1 -- supabase/functions/{function-name}`
 
 ## Action Items
 
-1. **Keep**: Webhook handlers and scheduled jobs (they work correctly)
-2. **Review**: The 5 candidate functions with team before removal
-3. **Document**: Add usage comments to webhook/scheduled functions
+- [x] ~~Review the 5 candidate functions~~
+- [x] ~~Delete unused zombie functions~~
+- [x] Keep utility functions (cdn-invalidate, geocode)
+- [ ] Monitor remaining function usage via Supabase Dashboard

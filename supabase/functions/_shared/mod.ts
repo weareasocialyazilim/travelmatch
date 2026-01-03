@@ -113,6 +113,22 @@ export {
 } from './logger.ts';
 
 // =============================================================================
+// DISTRIBUTED TRACING
+// =============================================================================
+export {
+  Tracer,
+  createTracer,
+  addTraceHeaders,
+  generateTraceId,
+  generateSpanId,
+  parseTraceparent,
+  formatTraceparent,
+  type TraceContext,
+  type Span,
+  type SpanEvent,
+} from './tracing.ts';
+
+// =============================================================================
 // DATABASE
 // =============================================================================
 export {
@@ -132,6 +148,22 @@ export {
   type PaginatedResult,
   type CursorPaginatedResult,
 } from './database.ts';
+
+// =============================================================================
+// GUARD MIDDLEWARE (Zod Schema Contracts)
+// =============================================================================
+export {
+  createGuard,
+  paginationQuery,
+  cursorQuery,
+  locationQuery,
+  sortQuery,
+  combineQuery,
+  type GuardContext,
+  type GuardOptions,
+  type GuardHandler,
+  type GuardResponse,
+} from './guard-middleware.ts';
 
 // =============================================================================
 // CONVENIENCE HELPERS
