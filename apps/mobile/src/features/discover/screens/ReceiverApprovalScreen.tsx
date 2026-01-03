@@ -1,31 +1,59 @@
-import React, { useState } from 'react';
+/**
+ * ReceiverApprovalScreen - Vetting Ceremony
+ *
+ * Raya-style candidate evaluation screen where receivers review
+ * gift requests. Full-screen card focus with trust comparison.
+ *
+ * "The most critical moment: Evaluating who wants to gift you an experience."
+ */
+import React, { useState, useCallback, useEffect } from 'react';
 import {
-  Image,
-  ScrollView,
   StyleSheet,
+  View,
   Text,
   TouchableOpacity,
-  View,
+  Dimensions,
+  StatusBar,
 } from 'react-native';
-import Icon from '@expo/vector-icons/MaterialCommunityIcons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import * as Haptics from 'expo-haptics';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+  interpolate,
+  FadeIn,
+  FadeInDown,
+  SlideInUp,
+} from 'react-native-reanimated';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '@/navigation/routeParams';
+import { COLORS } from '@/constants/colors';
+import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { TMAvatar } from '@/components/ui/TMAvatar';
+import { TrustScoreCircle } from '@/components/ui/TrustScoreCircle';
 import { LoadingState } from '@/components/LoadingState';
 import { supabase } from '@/config/supabase';
-import { COLORS } from '@/constants/colors';
-import { LAYOUT } from '@/constants/layout';
-import { VALUES } from '@/constants/values';
 import { logger } from '@/utils/logger';
-import type { RootStackParamList } from '@/navigation/routeParams';
-import type { StackScreenProps } from '@react-navigation/stack';
 
-interface GiverSlot {
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+
+interface GiverCandidate {
   id: string;
   amount: number;
   giver: {
     id: string;
     name: string;
     avatar: string;
+    location?: string;
+    trustScore?: number;
+    membershipTier?: 'standard' | 'gold' | 'platinum';
   };
 }
 
@@ -34,21 +62,59 @@ type ReceiverApprovalScreenProps = StackScreenProps<
   'ReceiverApproval'
 >;
 
-export const ReceiverApprovalScreen: React.FC<ReceiverApprovalScreenProps> = ({
-  navigation,
-  route,
-}) => {
-  const [slots, setSlots] = useState<GiverSlot[]>([]);
-  const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
+export const ReceiverApprovalScreen: React.FC<
+  ReceiverApprovalScreenProps
+> = () => {
+  const navigation = useNavigation<any>();
+  const route = useRoute<ReceiverApprovalScreenProps['route']>();
+  const insets = useSafeAreaInsets();
+
+  const [candidates, setCandidates] = useState<GiverCandidate[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const momentTitle = route.params?.momentTitle || 'Moment';
-  const totalAmount = route.params?.totalAmount || 0;
+  const momentTitle = route.params?.momentTitle || 'Experience';
   const momentId = route.params?.momentId;
 
-  React.useEffect(() => {
+  // Animation values
+  const cardScale = useSharedValue(1);
+  const declineScale = useSharedValue(1);
+  const approveScale = useSharedValue(1);
+
+  // Fetch pending requests
+  useEffect(() => {
     const fetchRequests = async () => {
-      if (!momentId) return;
+      if (!momentId) {
+        // Mock data for demo
+        setCandidates([
+          {
+            id: '1',
+            amount: 85,
+            giver: {
+              id: 'g1',
+              name: 'Burak Can',
+              avatar: '',
+              location: 'İstanbul, TR',
+              trustScore: 88,
+              membershipTier: 'gold',
+            },
+          },
+          {
+            id: '2',
+            amount: 120,
+            giver: {
+              id: 'g2',
+              name: 'Elif Demir',
+              avatar: '',
+              location: 'Ankara, TR',
+              trustScore: 94,
+              membershipTier: 'platinum',
+            },
+          },
+        ]);
+        return;
+      }
+
       setLoading(true);
       try {
         const { data, error } = await supabase
@@ -65,16 +131,20 @@ export const ReceiverApprovalScreen: React.FC<ReceiverApprovalScreenProps> = ({
 
         if (error) throw error;
 
-        const mappedSlots: GiverSlot[] = (data || []).map((item: any) => ({
-          id: item.id,
-          amount: item.total_price,
-          giver: {
-            id: item.requester?.id,
-            name: item.requester?.full_name || 'Unknown',
-            avatar: item.requester?.avatar_url,
-          },
-        }));
-        setSlots(mappedSlots);
+        const mappedCandidates: GiverCandidate[] = (data || []).map(
+          (item: any) => ({
+            id: item.id,
+            amount: item.total_price,
+            giver: {
+              id: item.requester?.id,
+              name: item.requester?.full_name || 'Unknown',
+              avatar: item.requester?.avatar_url,
+              trustScore: Math.floor(Math.random() * 20) + 80, // Mock score
+              membershipTier: 'gold',
+            },
+          }),
+        );
+        setCandidates(mappedCandidates);
       } catch (err) {
         logger.error('Error fetching requests', err as Error);
       } finally {
@@ -84,487 +154,477 @@ export const ReceiverApprovalScreen: React.FC<ReceiverApprovalScreenProps> = ({
     fetchRequests();
   }, [momentId]);
 
-  const toggleSlot = (slotId: string) => {
-    if (selectedSlots.includes(slotId)) {
-      setSelectedSlots(selectedSlots.filter((id) => id !== slotId));
+  const currentCandidate = candidates[currentIndex];
+
+  // Handle decline
+  const handleDecline = useCallback(async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+    if (currentIndex < candidates.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
     } else {
-      setSelectedSlots([...selectedSlots, slotId]);
+      navigation.goBack();
     }
-  };
+  }, [currentIndex, candidates.length, navigation]);
 
-  const handleApprove = async () => {
-    if (selectedSlots.length === 0) return;
+  // Handle approve
+  const handleApprove = useCallback(async () => {
+    if (!currentCandidate) return;
 
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setLoading(true);
+
     try {
-      // Update status to accepted for selected
-      const { error } = await supabase
-        .from('requests')
-        .update({ status: 'accepted' })
-        .in('id', selectedSlots);
+      if (momentId) {
+        const { error } = await supabase
+          .from('requests')
+          .update({ status: 'accepted' })
+          .eq('id', currentCandidate.id);
 
-      if (error) throw error;
-
-      const approvedGivers = slots
-        .filter((slot) => selectedSlots.includes(slot.id))
-        .map((slot) => ({
-          id: slot.giver.id,
-          name: slot.giver.name,
-          avatar: slot.giver.avatar,
-          amount: slot.amount,
-        }));
+        if (error) throw error;
+      }
 
       navigation.navigate('MatchConfirmation', {
-        selectedGivers: approvedGivers,
+        selectedGivers: [
+          {
+            id: currentCandidate.giver.id,
+            name: currentCandidate.giver.name,
+            avatar: currentCandidate.giver.avatar,
+            amount: currentCandidate.amount,
+          },
+        ],
       });
     } catch (err) {
-      logger.error('Error approving requests', err as Error);
-      // Show error alert
+      logger.error('Error approving request', err as Error);
     } finally {
       setLoading(false);
     }
+  }, [currentCandidate, momentId, navigation]);
+
+  // Button press animations
+  const handleDeclinePressIn = useCallback(() => {
+    declineScale.value = withSpring(0.9, { damping: 15 });
+  }, [declineScale]);
+
+  const handleDeclinePressOut = useCallback(() => {
+    declineScale.value = withSpring(1, { damping: 15 });
+  }, [declineScale]);
+
+  const handleApprovePressIn = useCallback(() => {
+    approveScale.value = withSpring(0.9, { damping: 15 });
+  }, [approveScale]);
+
+  const handleApprovePressOut = useCallback(() => {
+    approveScale.value = withSpring(1, { damping: 15 });
+  }, [approveScale]);
+
+  const declineButtonStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: declineScale.value }],
+  }));
+
+  const approveButtonStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: approveScale.value }],
+  }));
+
+  // Get membership badge info
+  const getMembershipBadge = (tier?: string) => {
+    switch (tier) {
+      case 'platinum':
+        return { label: 'PLATİN ÜYE', color: '#E5E4E2' };
+      case 'gold':
+        return { label: 'GOLD ÜYE', color: COLORS.secondary };
+      default:
+        return null;
+    }
   };
 
-  const handleRejectAll = () => {
-    navigation.goBack();
-  };
+  if (loading && candidates.length === 0) {
+    return <LoadingState type="overlay" message="Yükleniyor..." />;
+  }
 
-  const selectedTotalAmount = slots
-    .filter((slot) => selectedSlots.includes(slot.id))
-    .reduce((sum, slot) => sum + slot.amount, 0);
+  if (!currentCandidate) {
+    return (
+      <View style={styles.container}>
+        <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="close" size={32} color={COLORS.text.onDark} />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.emptyState}>
+          <Ionicons
+            name="heart-dislike-outline"
+            size={64}
+            color={COLORS.textOnDarkMuted}
+          />
+          <Text style={styles.emptyTitle}>Bekleyen Teklif Yok</Text>
+          <Text style={styles.emptyText}>
+            Şu an için değerlendirilecek yeni teklif bulunmuyor.
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
+  const membershipBadge = getMembershipBadge(currentCandidate.giver.membershipTier);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      {loading && <LoadingState type="overlay" message="Processing..." />}
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" />
+
+      {/* Background Glow */}
+      <View style={styles.glowBg} />
+
       {/* Header */}
-      <LinearGradient
-        colors={[COLORS.brand.primary, COLORS.brand.accent]}
-        style={styles.header}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-      >
-        <View style={styles.headerTop}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Icon name="arrow-left" size={24} color={COLORS.utility.white} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Approve Givers</Text>
-          <View style={styles.headerSpacer} />
-        </View>
-        <Text style={styles.headerSubtitle}>{momentTitle}</Text>
-      </LinearGradient>
-
-      {/* Selection Summary */}
-      <View style={styles.summaryCard}>
-        <View style={styles.summaryRow}>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryLabel}>Total Needed</Text>
-            <Text style={styles.summaryValue}>${totalAmount}</Text>
-          </View>
-          <View style={styles.summaryDivider} />
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryLabel}>Selected</Text>
-            <Text style={[styles.summaryValue, styles.selectedValue]}>
-              ${selectedTotalAmount}
-            </Text>
-          </View>
-          <View style={styles.summaryDivider} />
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryLabel}>Givers</Text>
-            <Text style={styles.summaryValue}>
-              {selectedSlots.length}/{slots.length}
-            </Text>
-          </View>
-        </View>
-
-        {selectedTotalAmount >= totalAmount && (
-          <View style={styles.successBanner}>
-            <Icon
-              name="check-circle"
-              size={20}
-              color={COLORS.feedback.success}
-            />
-            <Text style={styles.successText}>Amount fulfilled!</Text>
-          </View>
-        )}
+      <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name="close" size={32} color={COLORS.text.onDark} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Yeni Teklif</Text>
+        <View style={styles.headerSpacer} />
       </View>
 
-      {/* Info Card */}
-      <View style={styles.infoCard}>
-        <Icon name="information" size={20} color={COLORS.feedback.info} />
-        <Text style={styles.infoText}>
-          Select one or more givers to approve. You can choose multiple givers
-          to split the cost or select the one that best fits your needs.
+      {/* Content */}
+      <Animated.View
+        style={styles.content}
+        entering={FadeIn.delay(100).duration(400)}
+      >
+        <Text style={styles.tagline}>
+          BİRİ SENİN İÇİN DENEYİM ALMAK İSTİYOR
         </Text>
-      </View>
 
-      {/* Giver Slots */}
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <Text style={styles.sectionTitle}>Available Givers</Text>
-
-        {slots.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyStateText}>
-              No pending requests found.
-            </Text>
-          </View>
-        ) : (
-          slots.map((slot, index) => {
-            const isSelected = selectedSlots.includes(slot.id);
-            return (
-              <TouchableOpacity
-                key={slot.id}
-                style={[styles.slotCard, isSelected && styles.slotCardSelected]}
-                onPress={() => toggleSlot(slot.id)}
-                activeOpacity={0.8}
-              >
-                {/* Position Badge */}
-                <View style={styles.positionBadge}>
-                  <Text style={styles.positionText}>#{index + 1}</Text>
-                </View>
-
-                {/* Selection Indicator */}
-                {isSelected && (
-                  <View style={styles.selectedBadge}>
-                    <Icon
-                      name="check-circle"
-                      size={24}
-                      color={COLORS.feedback.success}
-                    />
+        {/* Candidate Card */}
+        <Animated.View entering={FadeInDown.delay(200).springify()}>
+          <GlassCard
+            intensity={35}
+            tint="dark"
+            padding={32}
+            borderRadius={40}
+            style={styles.candidateCard}
+          >
+            {/* Candidate Info */}
+            <View style={styles.candidateInfo}>
+              <TMAvatar
+                size="xlarge"
+                name={currentCandidate.giver.name}
+                imageUrl={currentCandidate.giver.avatar}
+              />
+              <Text style={styles.candidateName}>
+                {currentCandidate.giver.name}
+              </Text>
+              <View style={styles.badgeRow}>
+                {membershipBadge && (
+                  <View
+                    style={[
+                      styles.premiumBadge,
+                      { backgroundColor: membershipBadge.color },
+                    ]}
+                  >
+                    <Ionicons name="star" size={10} color="#000" />
+                    <Text style={styles.premiumText}>
+                      {membershipBadge.label}
+                    </Text>
                   </View>
                 )}
+                {currentCandidate.giver.location && (
+                  <Text style={styles.locationText}>
+                    {currentCandidate.giver.location}
+                  </Text>
+                )}
+              </View>
+            </View>
 
-                <View style={styles.slotContent}>
-                  {/* Giver Info */}
-                  <View style={styles.giverInfo}>
-                    <Image
-                      source={{
-                        uri: slot.giver.avatar || '',
-                      }}
-                      style={styles.giverAvatar}
-                    />
-                    <View style={styles.giverDetails}>
-                      <Text style={styles.giverName}>{slot.giver.name}</Text>
-                      <View style={styles.trustBadge}>
-                        <Icon
-                          name="shield-check"
-                          size={14}
-                          color={COLORS.feedback.success}
-                        />
-                        <Text style={styles.trustScore}>100% Trust</Text>
-                      </View>
-                    </View>
-                  </View>
+            {/* Trust Score */}
+            <View style={styles.trustMetric}>
+              <TrustScoreCircle
+                score={currentCandidate.giver.trustScore || 85}
+                size={100}
+              />
+              <Text style={styles.trustNote}>Güvenli Etkileşim Skoru</Text>
+            </View>
 
-                  {/* Amount */}
-                  <View style={styles.amountContainer}>
-                    <Text style={styles.amountLabel}>Offer</Text>
-                    <Text style={styles.amountValue}>${slot.amount}</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            );
-          })
-        )}
-      </ScrollView>
-
-      {/* Bottom Actions */}
-      <View style={styles.bottomActions}>
-        <TouchableOpacity
-          style={styles.rejectButton}
-          onPress={handleRejectAll}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.rejectButtonText}>Reject All</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.approveButton,
-            selectedSlots.length === 0 && styles.approveButtonDisabled,
-          ]}
-          onPress={handleApprove}
-          disabled={loading || selectedSlots.length === 0}
-          activeOpacity={0.8}
-        >
-          <LinearGradient
-            colors={[COLORS.brand.primary, COLORS.brand.accent]}
-            style={styles.approveButtonGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-          >
-            <>
-              <Icon name="check" size={20} color={COLORS.utility.white} />
-              <Text style={styles.approveButtonText}>
-                Approve{' '}
-                {selectedSlots.length > 0 ? `(${selectedSlots.length})` : ''}
+            {/* Moment Preview */}
+            <View style={styles.momentPreview}>
+              <Text style={styles.offerLabel}>TEKLİF EDİLEN MOMENT</Text>
+              <Text style={styles.momentName}>{momentTitle}</Text>
+              <Text style={styles.offerAmount}>
+                ${currentCandidate.amount.toFixed(2)}
               </Text>
-            </>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+            </View>
+          </GlassCard>
+        </Animated.View>
+
+        {/* Action Buttons */}
+        <Animated.View
+          style={styles.actionRow}
+          entering={SlideInUp.delay(400).springify()}
+        >
+          <AnimatedTouchable
+            style={[styles.declineButton, declineButtonStyle]}
+            onPress={handleDecline}
+            onPressIn={handleDeclinePressIn}
+            onPressOut={handleDeclinePressOut}
+            activeOpacity={0.9}
+          >
+            <View style={styles.declineIconCircle}>
+              <Ionicons name="close-outline" size={32} color={COLORS.error} />
+            </View>
+            <Text style={styles.declineLabel}>Reddet</Text>
+          </AnimatedTouchable>
+
+          <AnimatedTouchable
+            style={[styles.approveButton, approveButtonStyle]}
+            onPress={handleApprove}
+            onPressIn={handleApprovePressIn}
+            onPressOut={handleApprovePressOut}
+            activeOpacity={0.9}
+          >
+            <View style={styles.approveIconCircle}>
+              <Ionicons name="checkmark-outline" size={32} color="#000" />
+            </View>
+            <Text style={styles.approveLabel}>Kabul Et</Text>
+          </AnimatedTouchable>
+        </Animated.View>
+
+        {/* Remaining count */}
+        {candidates.length > 1 && (
+          <Text style={styles.remainingText}>
+            {currentIndex + 1} / {candidates.length}
+          </Text>
+        )}
+
+        {/* Info Footer */}
+        <Text style={styles.infoFooter}>
+          Kabul ettiğinde ödeme emanet (escrow) hesabına alınır ve sohbet
+          başlar.
+        </Text>
+      </Animated.View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  amountContainer: {
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderColor: COLORS.border.default,
-    borderTopWidth: 1,
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background.primary,
+  },
+  glowBg: {
+    position: 'absolute',
+    top: -100,
+    left: -100,
+    width: 400,
+    height: 400,
+    borderRadius: 200,
+    backgroundColor: COLORS.primary,
+    opacity: 0.08,
+  },
+  // Header
+  header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: LAYOUT.padding,
-    paddingVertical: LAYOUT.padding,
-  },
-  amountLabel: {
-    color: COLORS.text.secondary,
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  amountValue: {
-    color: COLORS.brand.primary,
-    fontSize: 24,
-    fontWeight: '800',
-  },
-  approveButton: {
-    borderRadius: VALUES.borderRadius,
-    flex: 2,
-    overflow: 'hidden',
-  },
-  approveButtonDisabled: {
-    opacity: 0.5,
-  },
-  approveButtonGradient: {
     alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    paddingVertical: LAYOUT.padding * 1.5,
-  },
-  approveButtonText: {
-    color: COLORS.utility.white,
-    fontSize: 16,
-    fontWeight: '700',
-    marginLeft: LAYOUT.padding / 2,
-  },
-  backButton: {
-    padding: LAYOUT.padding / 2,
-  },
-  bottomActions: {
-    backgroundColor: COLORS.utility.white,
-    borderTopColor: COLORS.border.default,
-    borderTopWidth: 1,
-    flexDirection: 'row',
-    paddingHorizontal: LAYOUT.padding * 2,
-    paddingVertical: LAYOUT.padding * 1.5,
-  },
-  container: {
-    backgroundColor: COLORS.bg.primary,
-    flex: 1,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: LAYOUT.padding * 6,
-  },
-  emptyStateText: {
-    color: COLORS.text.secondary,
-    fontSize: 14,
-    fontWeight: '400',
-    textAlign: 'center',
-    marginTop: 8,
-  },
-  giverAvatar: {
-    borderColor: COLORS.border.default,
-    borderRadius: 30,
-    borderWidth: 2,
-    height: 60,
-    width: 60,
-  },
-  giverDetails: {
-    flex: 1,
-    marginLeft: LAYOUT.padding,
-  },
-  giverInfo: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    marginBottom: LAYOUT.padding * 1.5,
-  },
-  giverName: {
-    color: COLORS.text.primary,
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: LAYOUT.padding / 2,
-  },
-  header: {
-    paddingBottom: LAYOUT.padding * 3,
-    paddingHorizontal: LAYOUT.padding * 2,
-    paddingTop: LAYOUT.padding * 2,
-  },
-  headerSpacer: {
-    width: 40,
-  },
-  headerSubtitle: {
-    color: COLORS.utility.white,
-    fontSize: 16,
-    fontWeight: '600',
-    opacity: 0.9,
-    textAlign: 'center',
+    paddingHorizontal: 20,
+    zIndex: 10,
   },
   headerTitle: {
-    color: COLORS.utility.white,
-    fontSize: 20,
+    fontSize: FONT_SIZES_V2.bodyLarge,
+    fontFamily: FONTS.display.bold,
+    color: COLORS.text.onDark,
+    fontWeight: '700',
+  },
+  headerSpacer: {
+    width: 32,
+  },
+  // Content
+  content: {
+    flex: 1,
+    alignItems: 'center',
+    padding: 20,
+    paddingTop: 30,
+  },
+  tagline: {
+    fontSize: 10,
+    fontFamily: FONTS.mono.regular,
+    color: COLORS.textOnDarkMuted,
+    letterSpacing: 2,
+    marginBottom: 24,
+  },
+  // Candidate Card
+  candidateCard: {
+    width: SCREEN_WIDTH - 40,
+    alignItems: 'center',
+    backgroundColor: 'rgba(30, 30, 32, 0.7)',
+  },
+  candidateInfo: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  candidateName: {
+    fontSize: FONT_SIZES_V2.h3,
+    fontFamily: FONTS.display.bold,
     fontWeight: '800',
+    color: COLORS.text.onDark,
+    marginTop: 16,
   },
-  headerTop: {
+  badgeRow: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 12,
+    marginTop: 10,
+  },
+  premiumBadge: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: LAYOUT.padding,
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+    gap: 4,
   },
-  infoCard: {
-    backgroundColor: COLORS.feedback.info + '20',
-    borderRadius: VALUES.borderRadius,
-    flexDirection: 'row',
-    marginHorizontal: LAYOUT.padding * 2,
-    marginTop: LAYOUT.padding * 2,
-    padding: LAYOUT.padding * 1.5,
+  premiumText: {
+    fontSize: 8,
+    fontFamily: FONTS.mono.medium,
+    fontWeight: '900',
+    color: '#000',
+    letterSpacing: 0.5,
   },
-  infoText: {
-    color: COLORS.text.primary,
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '400',
-    lineHeight: 20,
-    marginLeft: LAYOUT.padding,
+  locationText: {
+    color: COLORS.textOnDarkSecondary,
+    fontSize: FONT_SIZES_V2.caption,
+    fontFamily: FONTS.body.regular,
   },
-  positionBadge: {
-    backgroundColor: COLORS.brand.primary,
-    borderRadius: VALUES.borderRadius / 2,
-    paddingHorizontal: LAYOUT.padding,
-    paddingVertical: LAYOUT.padding / 2,
-    position: 'absolute',
-    right: LAYOUT.padding,
-    top: LAYOUT.padding,
+  // Trust Metric
+  trustMetric: {
+    alignItems: 'center',
+    marginBottom: 24,
   },
-  positionText: {
-    color: COLORS.utility.white,
-    fontSize: 12,
+  trustNote: {
+    color: COLORS.textOnDarkMuted,
+    fontSize: 10,
+    fontFamily: FONTS.mono.regular,
+    marginTop: 10,
+    letterSpacing: 0.5,
+  },
+  // Moment Preview
+  momentPreview: {
+    width: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    padding: 18,
+    borderRadius: 20,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  offerLabel: {
+    fontSize: 9,
+    fontFamily: FONTS.mono.regular,
+    color: COLORS.primary,
+    letterSpacing: 1.5,
+  },
+  momentName: {
+    color: COLORS.text.onDark,
+    fontSize: FONT_SIZES_V2.body,
+    fontFamily: FONTS.body.semibold,
+    fontWeight: '600',
+    marginTop: 6,
+    textAlign: 'center',
+  },
+  offerAmount: {
+    color: COLORS.primary,
+    fontSize: FONT_SIZES_V2.h4,
+    fontFamily: FONTS.mono.medium,
     fontWeight: '700',
+    marginTop: 8,
   },
-  rejectButton: {
+  // Action Buttons
+  actionRow: {
+    flexDirection: 'row',
+    marginTop: 32,
+    gap: 50,
+  },
+  declineButton: {
     alignItems: 'center',
-    borderColor: COLORS.feedback.error,
-    borderRadius: VALUES.borderRadius,
+  },
+  approveButton: {
+    alignItems: 'center',
+  },
+  declineIconCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     borderWidth: 2,
-    flex: 1,
-    marginRight: LAYOUT.padding,
-    paddingVertical: LAYOUT.padding * 1.5,
-  },
-  rejectButtonText: {
-    color: COLORS.feedback.error,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  scrollContent: {
-    paddingBottom: LAYOUT.padding * 4,
-    paddingHorizontal: LAYOUT.padding * 2,
-    paddingTop: LAYOUT.padding * 2,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  sectionTitle: {
-    color: COLORS.text.primary,
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: LAYOUT.padding * 1.5,
-  },
-  selectedBadge: {
-    left: LAYOUT.padding,
-    position: 'absolute',
-    top: LAYOUT.padding,
-    zIndex: 1,
-  },
-  selectedValue: {
-    color: COLORS.brand.primary,
-  },
-  slotCard: {
-    backgroundColor: COLORS.utility.white,
-    borderColor: COLORS.border.default,
-    borderRadius: VALUES.borderRadius,
-    borderWidth: 2,
-    marginBottom: LAYOUT.padding * 1.5,
-    padding: LAYOUT.padding * 1.5,
-    position: 'relative',
-  },
-  slotCardSelected: {
-    backgroundColor: COLORS.feedback.success + '10',
-    borderColor: COLORS.feedback.success,
-  },
-  slotContent: {
-    marginTop: LAYOUT.padding / 2,
-  },
-  successBanner: {
-    alignItems: 'center',
-    backgroundColor: COLORS.feedback.success + '20',
-    borderRadius: VALUES.borderRadius / 2,
-    flexDirection: 'row',
+    borderColor: 'rgba(239, 68, 68, 0.3)',
     justifyContent: 'center',
-    marginTop: LAYOUT.padding,
-    paddingVertical: LAYOUT.padding,
-  },
-  successText: {
-    color: COLORS.feedback.success,
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: LAYOUT.padding / 2,
-  },
-  summaryCard: {
-    backgroundColor: COLORS.utility.white,
-    borderRadius: VALUES.borderRadius,
-    marginHorizontal: LAYOUT.padding * 2,
-    marginTop: -LAYOUT.padding * 2,
-    padding: LAYOUT.padding * 1.5,
-  },
-  summaryDivider: {
-    backgroundColor: COLORS.border.default,
-    marginHorizontal: LAYOUT.padding,
-    width: 1,
-  },
-  summaryItem: {
     alignItems: 'center',
+    backgroundColor: 'rgba(239, 68, 68, 0.08)',
+  },
+  approveIconCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.primary,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  declineLabel: {
+    fontSize: FONT_SIZES_V2.caption,
+    fontFamily: FONTS.body.semibold,
+    fontWeight: '700',
+    color: COLORS.textOnDarkSecondary,
+    marginTop: 12,
+  },
+  approveLabel: {
+    fontSize: FONT_SIZES_V2.caption,
+    fontFamily: FONTS.body.semibold,
+    fontWeight: '700',
+    color: COLORS.primary,
+    marginTop: 12,
+  },
+  // Remaining text
+  remainingText: {
+    marginTop: 20,
+    fontSize: FONT_SIZES_V2.caption,
+    fontFamily: FONTS.mono.regular,
+    color: COLORS.textOnDarkMuted,
+  },
+  // Info Footer
+  infoFooter: {
+    marginTop: 'auto',
+    textAlign: 'center',
+    color: COLORS.textOnDarkMuted,
+    fontSize: FONT_SIZES_V2.caption,
+    fontFamily: FONTS.body.regular,
+    lineHeight: 20,
+    paddingHorizontal: 40,
+    marginBottom: 20,
+  },
+  // Empty State
+  emptyState: {
     flex: 1,
-  },
-  summaryLabel: {
-    color: COLORS.text.secondary,
-    fontSize: 12,
-    fontWeight: '500',
-    marginBottom: LAYOUT.padding / 2,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  summaryValue: {
-    color: COLORS.text.primary,
-    fontSize: 20,
-    fontWeight: '800',
-  },
-  trustBadge: {
     alignItems: 'center',
-    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingHorizontal: 40,
   },
-  trustScore: {
-    color: COLORS.feedback.success,
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: LAYOUT.padding / 2,
+  emptyTitle: {
+    fontSize: FONT_SIZES_V2.h4,
+    fontFamily: FONTS.display.bold,
+    color: COLORS.text.onDark,
+    marginTop: 20,
+  },
+  emptyText: {
+    fontSize: FONT_SIZES_V2.body,
+    fontFamily: FONTS.body.regular,
+    color: COLORS.textOnDarkSecondary,
+    textAlign: 'center',
+    marginTop: 10,
+    lineHeight: 22,
   },
 });
+
+export default ReceiverApprovalScreen;
