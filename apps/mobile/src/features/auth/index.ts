@@ -14,7 +14,6 @@ export { LoginScreen } from './screens/LoginScreen';
 export { SetPasswordScreen } from './screens/SetPasswordScreen';
 export { TwoFactorSetupScreen } from './screens/TwoFactorSetupScreen';
 export { VerifyCodeScreen } from './screens/VerifyCodeScreen';
-export { EmailVerificationScreen } from './screens/EmailVerificationScreen';
 export { WaitingForCodeScreen } from './screens/WaitingForCodeScreen';
 export { ForgotPasswordScreen } from './screens/ForgotPasswordScreen';
 export { ChangePasswordScreen } from './screens/ChangePasswordScreen';
