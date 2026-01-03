@@ -13,6 +13,7 @@ export { Divider } from './Divider';
 export { EmptyState } from './EmptyState';
 export { FlashMessage } from './FlashMessage';
 export { LoadingSpinner } from './LoadingSpinner';
+export { LiquidLoading } from './LiquidLoading';
 export { SkeletonList } from './SkeletonList';
 export type { SkeletonItemType } from './SkeletonList';
 
