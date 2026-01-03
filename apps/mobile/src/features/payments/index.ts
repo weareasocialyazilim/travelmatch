@@ -35,6 +35,8 @@ export { ProofReviewScreen } from './screens/ProofReviewScreen';
 export { PayTRWebViewScreen } from './screens/PayTRWebViewScreen';
 export { PayoutSettingsScreen } from './screens/PayoutSettingsScreen';
 export { default as PromoCodeScreen } from './screens/PromoCodeScreen';
+export { GiftUnboxingScreen, AwwwardsGiftUnboxingScreen } from './screens/GiftUnboxingScreen';
+export { EarningsScreen } from './screens/EarningsScreen';
 
 // KYC Screens
 export { default as KYCIntroScreen } from './kyc/KYCIntroScreen';
