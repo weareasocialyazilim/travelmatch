@@ -1,8 +1,20 @@
 /**
- * Payment Components - Awwwards Edition
+ * @deprecated Import from '@/features/payments' instead.
  *
- * Premium payment-related UI components with
- * Liquid Glass aesthetics and neon accents.
+ * Migration Guide:
+ * ================
+ *
+ * BEFORE:
+ * ```tsx
+ * import { PaymentSecurityBadge } from '@/components/payment';
+ * ```
+ *
+ * AFTER:
+ * ```tsx
+ * import { PaymentSecurityBadge } from '@/features/payments';
+ * ```
+ *
+ * This file re-exports for backward compatibility.
  */
 
-export { PaymentSecurityBadge } from './PaymentSecurityBadge';
+export { PaymentSecurityBadge } from '@/features/payments';

@@ -1,24 +1,33 @@
 /**
- * TravelMatch Proof Ceremony Components
+ * @deprecated Import from '@/features/discover/components/ceremony' instead.
  *
- * Export barrel for all ceremony-related components.
- * These components transform the proof verification process
- * into an emotional, shareable experience.
+ * Migration Guide:
+ * ================
+ *
+ * BEFORE:
+ * ```tsx
+ * import { TrustConstellation, ProofCeremonyFlow } from '@/components/ceremony';
+ * ```
+ *
+ * AFTER:
+ * ```tsx
+ * import { TrustConstellation, ProofCeremonyFlow } from '@/features/discover/components/ceremony';
+ * ```
+ *
+ * This file re-exports for backward compatibility.
  */
 
-// Core ceremony components
-export { TrustConstellation } from './TrustConstellation';
-export { SunsetClock } from './SunsetClock';
-export { PassportBook } from './PassportBook';
-export { MomentAuthenticator } from './MomentAuthenticator';
-export { SacredMoments } from './SacredMoments';
-export { GiftVault } from './GiftVault';
-export { ThankYouCardCreator } from './ThankYouCardCreator';
-export { MemoryCard } from './MemoryCard';
-export { CeremonyProgress } from './CeremonyProgress';
+export {
+  TrustConstellation,
+  SunsetClock,
+  PassportBook,
+  MomentAuthenticator,
+  SacredMoments,
+  GiftVault,
+  ThankYouCardCreator,
+  MemoryCard,
+  CeremonyProgress,
+  ProofCeremonyFlow,
+} from '@/features/discover/components/ceremony';
 
-// Main flow orchestrator
-export { ProofCeremonyFlow } from './ProofCeremonyFlow';
-
-// Types
-export type { AuthenticationResult } from './MomentAuthenticator';
+export type { AuthenticationResult } from '@/features/discover/components/ceremony';
