@@ -1,6 +1,33 @@
-export { default as ProfileHeaderSection } from './ProfileHeaderSection';
-export { default as StatsRow } from './StatsRow';
-export { default as WalletCard } from './WalletCard';
-export { default as QuickLinks } from './QuickLinks';
-export { default as ProfileMomentCard } from './ProfileMomentCard';
-export { default as MomentsTabs } from './MomentsTabs';
+/**
+ * @deprecated Import from '@/features/profile/components' instead.
+ *
+ * Migration Guide:
+ * ================
+ *
+ * BEFORE:
+ * ```tsx
+ * import { ProfileHeaderSection, StatsRow } from '@/components/profile';
+ * ```
+ *
+ * AFTER:
+ * ```tsx
+ * import { ProfileHeaderSection, StatsRow } from '@/features/profile/components';
+ * ```
+ *
+ * This file re-exports for backward compatibility.
+ */
+
+// Re-export from new location
+export {
+  ProfileHeaderSection,
+  StatsRow,
+  WalletCard,
+  QuickLinks,
+  ProfileMomentCard,
+  MomentsTabs,
+  AchievementCard,
+  TrustConstellation,
+} from '@/features/profile/components';
+
+// Default exports for legacy code
+export { ProfileHeaderSection as default } from '@/features/profile/components';
