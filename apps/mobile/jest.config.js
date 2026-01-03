@@ -76,8 +76,6 @@ module.exports = {
     'testUtilsRender\\.helper\\.tsx$',
     'testUtilsAsync\\.helper\\.ts$',
     // Temporarily skip tests using deprecated UNSAFE_* APIs (pending v14 migration)
-    'ActiveFilters\\.test\\.tsx$',
-    'AddBankAccountBottomSheet\\.test\\.tsx$',
     'AddCardBottomSheet\\.test\\.tsx$',
     'BlockConfirmation\\.test\\.tsx$',
     'BottomNav\\.test\\.tsx$',

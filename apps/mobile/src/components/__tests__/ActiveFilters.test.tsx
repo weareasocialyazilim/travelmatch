@@ -46,17 +46,17 @@ describe('ActiveFilters', () => {
     it('does not render Clear All button with single filter', () => {
       const singleFilter = [mockFilters[0]];
       const { queryByText } = render(
-        <ActiveFilters {...defaultProps} filters={singleFilter} />
+        <ActiveFilters {...defaultProps} filters={singleFilter} />,
       );
       expect(queryByText('Clear All')).toBeNull();
     });
 
     it('returns null when no filters', () => {
       const { toJSON } = render(
-        <ActiveFilters {...defaultProps} filters={[]} />
+        <ActiveFilters {...defaultProps} filters={[]} />,
       );
-      // Component returns null when no filters
-      expect(toJSON()).toBeNull();
+      // Component returns null when no filters (toJSON returns null or undefined)
+      expect(toJSON()).toBeFalsy();
     });
 
     it('renders filter with long value', () => {
@@ -68,9 +68,11 @@ describe('ActiveFilters', () => {
         },
       ];
       const { getByText } = render(
-        <ActiveFilters {...defaultProps} filters={longFilter} />
+        <ActiveFilters {...defaultProps} filters={longFilter} />,
       );
-      expect(getByText('Category: Very Long Category Name That Should Truncate')).toBeTruthy();
+      expect(
+        getByText('Category: Very Long Category Name That Should Truncate'),
+      ).toBeTruthy();
     });
 
     it('renders horizontal ScrollView', () => {
@@ -149,27 +151,23 @@ describe('ActiveFilters', () => {
         { key: 'special', label: 'Café', value: '€5-€50' },
       ];
       const { getByText } = render(
-        <ActiveFilters {...defaultProps} filters={specialFilter} />
+        <ActiveFilters {...defaultProps} filters={specialFilter} />,
       );
       expect(getByText('Café: €5-€50')).toBeTruthy();
     });
 
     it('renders filter with emoji', () => {
-      const emojiFilter = [
-        { key: 'emoji', label: 'Mood', value: '😊 Happy' },
-      ];
+      const emojiFilter = [{ key: 'emoji', label: 'Mood', value: '😊 Happy' }];
       const { getByText } = render(
-        <ActiveFilters {...defaultProps} filters={emojiFilter} />
+        <ActiveFilters {...defaultProps} filters={emojiFilter} />,
       );
       expect(getByText('Mood: 😊 Happy')).toBeTruthy();
     });
 
     it('renders filter with numbers only', () => {
-      const numberFilter = [
-        { key: 'count', label: 'Guests', value: '4' },
-      ];
+      const numberFilter = [{ key: 'count', label: 'Guests', value: '4' }];
       const { getByText } = render(
-        <ActiveFilters {...defaultProps} filters={numberFilter} />
+        <ActiveFilters {...defaultProps} filters={numberFilter} />,
       );
       expect(getByText('Guests: 4')).toBeTruthy();
     });
@@ -179,7 +177,7 @@ describe('ActiveFilters', () => {
     it('renders two filters correctly', () => {
       const twoFilters = [mockFilters[0], mockFilters[1]];
       const { getByText } = render(
-        <ActiveFilters {...defaultProps} filters={twoFilters} />
+        <ActiveFilters {...defaultProps} filters={twoFilters} />,
       );
       expect(getByText('Category: Coffee')).toBeTruthy();
       expect(getByText('Price: $5-$50')).toBeTruthy();
@@ -193,7 +191,7 @@ describe('ActiveFilters', () => {
         { key: 'rating', label: 'Rating', value: '4+ stars' },
       ];
       const { getByText } = render(
-        <ActiveFilters {...defaultProps} filters={fiveFilters} />
+        <ActiveFilters {...defaultProps} filters={fiveFilters} />,
       );
       expect(getByText('Category: Coffee')).toBeTruthy();
       expect(getByText('Location: Paris')).toBeTruthy();
@@ -205,7 +203,7 @@ describe('ActiveFilters', () => {
     it('handles filter with empty value', () => {
       const emptyValueFilter = [{ key: 'empty', label: 'Test', value: '' }];
       const { getByText } = render(
-        <ActiveFilters {...defaultProps} filters={emptyValueFilter} />
+        <ActiveFilters {...defaultProps} filters={emptyValueFilter} />,
       );
       expect(getByText('Test: ')).toBeTruthy();
     });
@@ -213,7 +211,7 @@ describe('ActiveFilters', () => {
     it('handles filter with empty label', () => {
       const emptyLabelFilter = [{ key: 'empty', label: '', value: 'Value' }];
       const { getByText } = render(
-        <ActiveFilters {...defaultProps} filters={emptyLabelFilter} />
+        <ActiveFilters {...defaultProps} filters={emptyLabelFilter} />,
       );
       expect(getByText(': Value')).toBeTruthy();
     });
@@ -243,7 +241,7 @@ describe('ActiveFilters', () => {
 
     it('re-renders when filters prop changes', () => {
       const { rerender, getByText, queryByText } = render(
-        <ActiveFilters {...defaultProps} filters={[mockFilters[0]]} />
+        <ActiveFilters {...defaultProps} filters={[mockFilters[0]]} />,
       );
       expect(getByText('Category: Coffee')).toBeTruthy();
       expect(queryByText('Price: $5-$50')).toBeNull();
@@ -259,7 +257,7 @@ describe('ActiveFilters', () => {
         { key: 'same', label: 'Second', value: 'B' },
       ];
       const { getByText } = render(
-        <ActiveFilters {...defaultProps} filters={duplicateFilters} />
+        <ActiveFilters {...defaultProps} filters={duplicateFilters} />,
       );
       // Should still render both (even though keys are same - not recommended but handled)
       expect(getByText('First: A')).toBeTruthy();
