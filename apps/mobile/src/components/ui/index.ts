@@ -114,3 +114,9 @@ export { BlurFilterModal } from './BlurFilterModal';
 // ═══════════════════════════════════════════════════════════════════
 export { GlassModal } from './GlassModal';
 export type { GlassModalProps } from './GlassModal';
+
+// ═══════════════════════════════════════════════════════════════════
+// Ceremony / Feedback Components
+// ═══════════════════════════════════════════════════════════════════
+export { SuccessCeremony } from './SuccessCeremony';
+export type { SuccessCeremonyProps } from './SuccessCeremony';
