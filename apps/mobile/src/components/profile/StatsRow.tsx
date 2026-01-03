@@ -1,6 +1,43 @@
+/**
+ * StatsRow Component - Awwwards Edition
+ *
+ * Premium stats display with Twilight Zinc dark theme.
+ * Features neon text accents and smooth press animations.
+ */
 import React, { memo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { COLORS } from '../../constants/colors';
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from 'react-native-reanimated';
+
+// Twilight Zinc + Neon Energy colors
+const STATS_COLORS = {
+  background: {
+    primary: '#121214',
+    secondary: '#1E1E20',
+  },
+  text: {
+    primary: '#F8FAFC',
+    secondary: '#94A3B8',
+  },
+  neon: {
+    lime: '#DFFF00',
+    violet: '#A855F7',
+    cyan: '#06B6D4',
+  },
+  glass: {
+    border: 'rgba(255, 255, 255, 0.08)',
+  },
+};
+
+const SPRINGS = {
+  snappy: { damping: 20, stiffness: 300, mass: 0.5 },
+  bouncy: { damping: 15, stiffness: 150, mass: 0.5 },
+};
+
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 interface StatsRowProps {
   momentsCount: number;
@@ -9,6 +46,70 @@ interface StatsRowProps {
   onMomentsPress: () => void;
   onExchangesPress: () => void;
 }
+
+interface StatItemProps {
+  value: number | string;
+  label: string;
+  accentColor?: string;
+  onPress?: () => void;
+}
+
+const StatItem: React.FC<StatItemProps> = memo(({
+  value,
+  label,
+  accentColor,
+  onPress,
+}) => {
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const handlePressIn = () => {
+    if (onPress) {
+      scale.value = withSpring(0.95, SPRINGS.snappy);
+    }
+  };
+
+  const handlePressOut = () => {
+    if (onPress) {
+      scale.value = withSpring(1, SPRINGS.bouncy);
+    }
+  };
+
+  const content = (
+    <View style={styles.statItem}>
+      <Text style={[
+        styles.statNumber,
+        accentColor && { color: accentColor },
+      ]}>
+        {value}
+      </Text>
+      <Text style={styles.statLabel}>{label}</Text>
+    </View>
+  );
+
+  if (onPress) {
+    return (
+      <AnimatedTouchable
+        style={animatedStyle}
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        accessibilityLabel={`${value} ${label}. Tap to view`}
+        accessibilityRole="button"
+        activeOpacity={0.8}
+      >
+        {content}
+      </AnimatedTouchable>
+    );
+  }
+
+  return <Animated.View style={animatedStyle}>{content}</Animated.View>;
+});
+
+StatItem.displayName = 'StatItem';
 
 const StatsRow: React.FC<StatsRowProps> = memo(
   ({
@@ -20,30 +121,25 @@ const StatsRow: React.FC<StatsRowProps> = memo(
   }) => {
     return (
       <View style={styles.statsRow}>
-        <TouchableOpacity
-          style={styles.statItem}
+        <StatItem
+          value={momentsCount}
+          label="Momentler"
+          accentColor={STATS_COLORS.neon.lime}
           onPress={onMomentsPress}
-          accessibilityLabel={`${momentsCount} Moments. Tap to view`}
-          accessibilityRole="button"
-        >
-          <Text style={styles.statNumber}>{momentsCount}</Text>
-          <Text style={styles.statLabel}>Moments</Text>
-        </TouchableOpacity>
+        />
         <View style={styles.statDivider} />
-        <TouchableOpacity
-          style={styles.statItem}
+        <StatItem
+          value={exchangesCount}
+          label="Takaslar"
+          accentColor={STATS_COLORS.neon.violet}
           onPress={onExchangesPress}
-          accessibilityLabel={`${exchangesCount} Exchanges. Tap to view`}
-          accessibilityRole="button"
-        >
-          <Text style={styles.statNumber}>{exchangesCount}</Text>
-          <Text style={styles.statLabel}>Exchanges</Text>
-        </TouchableOpacity>
+        />
         <View style={styles.statDivider} />
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{responseRate}%</Text>
-          <Text style={styles.statLabel}>Response</Text>
-        </View>
+        <StatItem
+          value={`${responseRate}%`}
+          label="Yanıt"
+          accentColor={STATS_COLORS.neon.cyan}
+        />
       </View>
     );
   },
@@ -61,27 +157,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     paddingVertical: 16,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border.default,
+    paddingHorizontal: 8,
+    backgroundColor: STATS_COLORS.background.secondary,
+    borderRadius: 16,
   },
   statItem: {
     flex: 1,
     alignItems: 'center',
+    paddingVertical: 4,
   },
   statNumber: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '700',
-    color: COLORS.text.primary,
-    marginBottom: 2,
+    color: STATS_COLORS.text.primary,
+    marginBottom: 4,
+    letterSpacing: -0.5,
+    ...Platform.select({
+      ios: {
+        // Subtle glow effect for numbers
+      },
+      android: {},
+    }),
   },
   statLabel: {
     fontSize: 12,
-    color: COLORS.text.secondary,
+    fontWeight: '500',
+    color: STATS_COLORS.text.secondary,
+    letterSpacing: 0.3,
   },
   statDivider: {
     width: 1,
     height: 32,
-    backgroundColor: COLORS.border.default,
+    backgroundColor: STATS_COLORS.glass.border,
   },
 });
 
