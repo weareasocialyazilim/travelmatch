@@ -14,6 +14,7 @@ import NetInfo from '@react-native-community/netinfo';
 import { logger } from '../utils/logger';
 import { sessionManager } from './sessionManager';
 import { ErrorHandler, isNetworkRelatedError, isAuthError } from '../utils/errorHandler';
+import * as Sentry from '../config/sentry';
 
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const API_BASE_URL = `${SUPABASE_URL}/functions/v1/api/v1`;
@@ -147,11 +148,22 @@ class ApiClient {
     const traceId = existingTraceId || generateTraceId();
     const startTime = Date.now();
 
+    // Set Sentry tag for distributed tracing correlation
+    // This allows linking Sentry errors to specific API requests and Edge Function logs
+    Sentry.setTag('trace_id', traceId);
+    Sentry.setTag('api_path', path);
+    Sentry.setTag('api_method', method);
+
     try {
       // OFFLINE CHECK - Return early if no connection
       const isOnline = await this.checkNetwork();
       if (!isOnline) {
         logger.warn(`[API v1] [${traceId}] Request blocked - offline`);
+        Sentry.addBreadcrumb('API request blocked - offline', 'api', 'warning', {
+          traceId,
+          path,
+          method,
+        });
         return {
           success: false,
           error: {
@@ -164,6 +176,14 @@ class ApiClient {
 
       const headers = await this.getHeaders(undefined, traceId);
       const url = `${API_BASE_URL}${path}`;
+
+      // Add breadcrumb for request tracking
+      Sentry.addBreadcrumb('API request started', 'api', 'info', {
+        traceId,
+        path,
+        method,
+        isRetry,
+      });
 
       logger.info(`[API v1] [${traceId}] ${method} ${path}${isRetry ? ' (retry)' : ''}`);
 
@@ -212,6 +232,14 @@ class ApiClient {
 
       if (!response.ok) {
         logger.error(`[API v1] [${traceId}] Error ${response.status} (${latency}ms):`, data);
+        Sentry.addBreadcrumb('API request failed', 'api', 'error', {
+          traceId,
+          path,
+          method,
+          statusCode: response.status,
+          latency,
+          errorCode: data.error?.code,
+        });
         return {
           success: false,
           error: data.error || {
@@ -222,6 +250,12 @@ class ApiClient {
       }
 
       logger.info(`[API v1] [${traceId}] Success (${latency}ms)`);
+      Sentry.addBreadcrumb('API request succeeded', 'api', 'info', {
+        traceId,
+        path,
+        method,
+        latency,
+      });
       return data as ApiResponse<T>;
     } catch (error) {
       const latency = Date.now() - startTime;
@@ -235,6 +269,26 @@ class ApiClient {
 
       // Use centralized error classification
       const isNetwork = isNetworkRelatedError(error);
+
+      // Add Sentry breadcrumb and capture exception for non-network errors
+      Sentry.addBreadcrumb('API request exception', 'api', 'error', {
+        traceId,
+        path,
+        method,
+        latency,
+        isNetworkError: isNetwork,
+        errorCode: standardizedError.code,
+      });
+
+      // Capture exception to Sentry for debugging (non-network errors only)
+      if (!isNetwork && error instanceof Error) {
+        Sentry.captureException(error, {
+          traceId,
+          path,
+          method,
+          latency,
+        });
+      }
 
       return {
         success: false,

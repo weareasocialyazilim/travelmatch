@@ -4,6 +4,19 @@
  *
  * @note Uses MMKV - 10-20x faster than AsyncStorage
  * @security All data here is non-sensitive and safe for MMKV storage
+ *
+ * ⚠️ GHOST STORE AUDIT (2026-01-03):
+ * This store is currently NOT USED in production code.
+ * All 4 state variables are "ghost states" - written but never read.
+ *
+ * Current app patterns use:
+ * - I18nContext for language management
+ * - useOnboarding() hook for onboarding state
+ * - Component-level state for notification settings
+ *
+ * TODO: Either integrate this store into the app or remove it.
+ * @see apps/mobile/src/context/I18nContext.tsx (current language pattern)
+ * @see apps/mobile/src/hooks/useOnboarding.ts (current onboarding pattern)
  */
 
 import { create } from 'zustand';
