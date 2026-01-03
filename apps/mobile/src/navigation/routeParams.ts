@@ -28,6 +28,7 @@ export type RootStackParamList = {
   VerifyCode: undefined;
   WaitingForCode: undefined;
   SuccessConfirmation: undefined;
+  AuthSuccess: undefined;
   SetPassword: undefined;
   TwoFactorSetup: undefined;
   Maintenance: undefined;

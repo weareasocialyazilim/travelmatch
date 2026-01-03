@@ -1,4 +1,4 @@
-import React, { useState, memo, useCallback, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -6,140 +6,79 @@ import {
   Text,
   ViewStyle,
   TextInputProps,
-  NativeSyntheticEvent,
-  TextInputFocusEventData,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
-import { FONTS, TYPE_SCALE } from '../../constants/typography';
+import { FONT_FAMILIES } from '../../theme/typography';
 import { GlassCard } from './GlassCard';
 
-interface LiquidInputProps extends Omit<TextInputProps, 'style'> {
-  /** Uppercase label above input */
+interface LiquidInputProps extends TextInputProps {
   label?: string;
-  /** Left icon name from Ionicons */
   icon?: keyof typeof Ionicons.glyphMap;
-  /** Error message - shows in red below input */
   error?: string;
-  /** Container wrapper styles */
-  style?: ViewStyle;
+  containerStyle?: ViewStyle;
 }
 
 /**
- * Awwwards kalitesinde interaktif giriş alanı - "Liquid Input"
- * Odaklandığında neon glow yayar ve lüks tipografi kullanır.
- *
- * Features:
- * - GlassCard background with blur effect
- * - Neon border glow on focus
- * - Mono uppercase labels (10px, 1.5 letter spacing)
- * - Icon color transitions on focus
- * - Error state with rose accent
+ * Awwwards standardında interaktif Liquid Input bileşeni.
+ * Odaklandığında neon lime parlaması verir ve ipeksi glass dokusu kullanır.
  */
-export const LiquidInput: React.FC<LiquidInputProps> = memo(
-  ({
-    label,
-    placeholder,
-    value,
-    onChangeText,
-    icon,
-    secureTextEntry,
-    error,
-    style,
-    onFocus: onFocusProp,
-    onBlur: onBlurProp,
-    ...rest
-  }) => {
-    const [isFocused, setIsFocused] = useState(false);
+export const LiquidInput: React.FC<LiquidInputProps> = ({
+  label,
+  icon,
+  error,
+  containerStyle,
+  style,
+  ...props
+}) => {
+  const [isFocused, setIsFocused] = useState(false);
 
-    // Memoize focus handlers
-    const handleFocus = useCallback(
-      (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
-        setIsFocused(true);
-        onFocusProp?.(e);
-      },
-      [onFocusProp],
-    );
+  return (
+    <View style={[styles.wrapper, containerStyle]}>
+      {/* Üst Etiket (Mono font ile prestijli görünüm) */}
+      {label && <Text style={styles.label}>{label.toUpperCase()}</Text>}
 
-    const handleBlur = useCallback(
-      (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
-        setIsFocused(false);
-        onBlurProp?.(e);
-      },
-      [onBlurProp],
-    );
-
-    // Memoize icon color based on focus state
-    const iconColor = useMemo(
-      () => (isFocused ? COLORS.brand.primary : COLORS.text.muted),
-      [isFocused],
-    );
-
-    // Memoize container styles based on state
-    const containerStyles = useMemo(
-      () => [
-        styles.inputContainer,
-        isFocused && styles.focusedBorder,
-        error && styles.errorBorder,
-      ],
-      [isFocused, error],
-    );
-
-    return (
-      <View style={[styles.wrapper, style]}>
-        {label && <Text style={styles.label}>{label.toUpperCase()}</Text>}
-
-        <GlassCard
-          intensity={10}
-          showBorder={false}
-          padding={0}
-          style={containerStyles}
-        >
-          <View style={styles.innerRow}>
-            {icon && (
-              <Ionicons
-                name={icon}
-                size={20}
-                color={iconColor}
-                style={styles.icon}
-                accessible={false}
-              />
-            )}
-            <TextInput
-              style={styles.input}
-              placeholder={placeholder}
-              placeholderTextColor={COLORS.text.muted}
-              value={value}
-              onChangeText={onChangeText}
-              secureTextEntry={secureTextEntry}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              selectionColor={COLORS.brand.primary}
-              accessible={true}
-              accessibilityLabel={label}
-              {...rest}
+      <GlassCard
+        intensity={isFocused ? 30 : 10}
+        style={[
+          styles.inputContainer,
+          isFocused && styles.focusedBorder,
+          error ? styles.errorBorder : null,
+          style,
+        ]}
+      >
+        <View style={styles.innerRow}>
+          {/* İkon Bölümü */}
+          {icon && (
+            <Ionicons
+              name={icon}
+              size={20}
+              color={isFocused ? COLORS.brand.primary : COLORS.textMuted}
+              style={styles.icon}
             />
-          </View>
-        </GlassCard>
+          )}
 
-        {error && (
-          <Text style={styles.errorText} accessibilityRole="alert">
-            {error}
-          </Text>
-        )}
-      </View>
-    );
-  },
-  (prevProps, nextProps) =>
-    prevProps.value === nextProps.value &&
-    prevProps.error === nextProps.error &&
-    prevProps.label === nextProps.label &&
-    prevProps.placeholder === nextProps.placeholder &&
-    prevProps.icon === nextProps.icon &&
-    prevProps.secureTextEntry === nextProps.secureTextEntry,
-);
+          <TextInput
+            style={styles.input}
+            placeholderTextColor={COLORS.textMuted}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            selectionColor={COLORS.brand.primary}
+            {...props}
+          />
+        </View>
+      </GlassCard>
 
-LiquidInput.displayName = 'LiquidInput';
+      {/* Hata Mesajı (Soft Neon Kırmızı) */}
+      {error && (
+        <View style={styles.errorContainer}>
+          <Ionicons name="alert-circle" size={14} color={COLORS.error} />
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      )}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -148,48 +87,62 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 10,
-    fontFamily: FONTS.mono.regular,
-    color: COLORS.text.muted,
+    fontFamily: FONT_FAMILIES.mono,
+    color: COLORS.textMuted,
     letterSpacing: 1.5,
     marginBottom: 8,
     marginLeft: 4,
+    fontWeight: '800',
   },
   inputContainer: {
-    height: 56,
-    borderRadius: 16,
+    padding: 0,
+    height: 58,
+    borderRadius: 18,
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: 'transparent',
+    backgroundColor: COLORS.glass,
   },
   innerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    height: '100%',
+    paddingHorizontal: 18,
   },
   icon: {
-    marginRight: 12,
+    marginRight: 14,
   },
   input: {
     flex: 1,
     color: COLORS.text.primary,
     fontSize: 16,
-    fontFamily: FONTS.body.regular,
+    fontFamily: FONT_FAMILIES.regular,
     height: '100%',
+    fontWeight: '500',
   },
   focusedBorder: {
     borderColor: COLORS.brand.primary,
-    backgroundColor: 'rgba(204, 255, 0, 0.02)',
+    backgroundColor: COLORS.primaryMuted,
+    shadowColor: COLORS.brand.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
   },
   errorBorder: {
-    borderColor: COLORS.feedback.error,
+    borderColor: COLORS.error,
+    backgroundColor: COLORS.errorLight,
+  },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    marginLeft: 4,
+    gap: 6,
   },
   errorText: {
-    color: COLORS.feedback.error,
+    color: COLORS.error,
     fontSize: 12,
-    marginTop: 6,
-    marginLeft: 4,
-    fontFamily: FONTS.body.regular,
+    fontFamily: FONT_FAMILIES.regular,
+    fontWeight: '500',
   },
 });
 
