@@ -7,21 +7,16 @@
 export { Button } from './Button';
 export { Card, GlassCard, GlassView, GlassButton } from './Card';
 export type { CardVariant, CardPadding, GlassTint } from './Card';
-export { Avatar } from './Avatar';
 export { Input } from './Input';
-export { Badge, NotificationBadge } from './Badge';
-export { TMBadge, LiveStatusBadge, VerifiedBadge, PremiumBadge } from './TMBadge';
-export type { TMBadgeType, LabelVariant, StatusVariant, BadgeSize, TMBadgeProps } from './TMBadge';
 export { Divider } from './Divider';
 export { EmptyState } from './EmptyState';
 export { FlashMessage } from './FlashMessage';
-export { LoadingSpinner } from './LoadingSpinner';
-export { Spinner } from './Spinner';
-export { LiquidLoading } from './LiquidLoading';
-export { SkeletonList } from './SkeletonList';
-export type { SkeletonItemType } from './SkeletonList';
-export { ScreenSkeleton, HeaderSkeleton, TabBarSkeleton, ListSkeleton, GridSkeleton, DetailSkeleton, FormSkeleton, ProfileSkeleton, ChatSkeleton } from './NavigationSkeleton';
-export { FeedSkeleton, SkeletonListItem, SkeletonLoader } from './Skeleton';
+
+// TMBadge - Consolidated badge component (replaces Badge, StatusBadge, TrustBadge)
+export { TMBadge, LiveStatusBadge, VerifiedBadge, PremiumBadge } from './TMBadge';
+export type { TMBadgeType, LabelVariant, StatusVariant, BadgeSize, TMBadgeProps } from './TMBadge';
+// @deprecated aliases for backward compatibility
+export { TMBadge as Badge, TMBadge as StatusBadge, TMBadge as TrustBadge } from './TMBadge';
 
 // ═══════════════════════════════════════════════════════════════════
 // TravelMatch Design System Components (TM* prefix)
@@ -46,13 +41,17 @@ export { TMPill, TMCategoryChip } from './TMPill';
 export { TMInput } from './TMInput';
 export type { TMInputProps } from './TMInput';
 
-// TMLoading - Consolidated loading component
+// TMLoading - Consolidated loading component (replaces Spinner, LoadingSpinner, LiquidLoading)
 export { TMLoading } from './TMLoading';
 export type { TMLoadingType, LoadingSize, LoadingVariant, TMLoadingProps } from './TMLoading';
+// @deprecated aliases for backward compatibility
+export { TMLoading as Spinner, TMLoading as LoadingSpinner, TMLoading as LiquidLoading } from './TMLoading';
 
-// TMSkeleton - Consolidated skeleton component
+// TMSkeleton - Consolidated skeleton component (replaces Skeleton, SkeletonList, NavigationSkeleton)
 export { TMSkeleton, Skeleton, SkeletonAvatar, SkeletonText, SkeletonCard, SkeletonMessage } from './TMSkeleton';
 export type { TMSkeletonType, SkeletonListType, SkeletonScreenType, SkeletonVariant, TMSkeletonProps } from './TMSkeleton';
+// @deprecated aliases for backward compatibility - use TMSkeleton with type prop instead
+export { TMSkeleton as SkeletonList, TMSkeleton as FeedSkeleton, TMSkeleton as ScreenSkeleton } from './TMSkeleton';
 
 // TMSheet - Bottom sheet with gestures and blur
 export { TMSheet } from './TMSheet';
@@ -61,6 +60,8 @@ export type { TMSheetProps, TMSheetSize } from './TMSheet';
 // TMAvatar - Avatar with initials fallback, status, verified badge
 export { TMAvatar } from './TMAvatar';
 export type { TMAvatarProps, AvatarSize, AvatarStatus } from './TMAvatar';
+// @deprecated alias for backward compatibility
+export { TMAvatar as Avatar } from './TMAvatar';
 
 // TMGiftCard - Gift message card for chat
 export { TMGiftCard } from './TMGiftCard';
