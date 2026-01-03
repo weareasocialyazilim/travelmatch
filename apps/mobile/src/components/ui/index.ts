@@ -9,6 +9,7 @@ export { Card } from './Card';
 export { Avatar } from './Avatar';
 export { Input } from './Input';
 export { Badge, NotificationBadge } from './Badge';
+export { StatusBadge, LiveStatusBadge, VerifiedBadge, PremiumBadge } from './StatusBadge';
 export { Divider } from './Divider';
 export { EmptyState } from './EmptyState';
 export { FlashMessage } from './FlashMessage';
