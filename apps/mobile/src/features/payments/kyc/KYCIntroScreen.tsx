@@ -1,43 +1,91 @@
-/**
- * KYCIntroScreen - Awwwards Edition
- *
- * Premium intro screen for identity verification ceremony.
- * Features Twilight Zinc dark theme with glass effects and neon accents.
- */
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+// KYC Intro Screen - Awwwards standard "Güven Seremonisi" experience
+// Featuring silky glass effects and neon accents
+import React, { useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
-  FadeInDown,
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
+  withRepeat,
+  withSequence,
+  withTiming,
+  Easing,
+  interpolate,
 } from 'react-native-reanimated';
+import { COLORS } from '@/constants/colors';
+import { TYPOGRAPHY } from '@/theme/typography';
+import { SPACING, RADIUS } from '@/constants/spacing';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { TMButton } from '@/components/ui/TMButton';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { NetworkGuard } from '@/components/NetworkGuard';
-import { GlassCard } from '@/components/ui/GlassCard';
 import { INITIAL_VERIFICATION_DATA } from './constants';
-import {
-  KYC_COLORS,
-  KYC_TYPOGRAPHY,
-  KYC_SPACING,
-  KYC_SPRINGS,
-  KYC_REQUIREMENTS,
-} from './theme';
 import type { StackNavigationProp } from '@react-navigation/stack';
 
 type NavigationProp = StackNavigationProp<{
   KYCDocumentType: { data: typeof INITIAL_VERIFICATION_DATA };
 }>;
 
-const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+// Benefit data with neon theme
+const BENEFITS = [
+  {
+    id: 'transfer',
+    icon: 'flash-outline' as const,
+    title: 'Anında Transfer',
+    description: 'Onaylı hesaplarla limitlere takılmadan işlem yap.',
+    accentColor: COLORS.primary,
+  },
+  {
+    id: 'trust',
+    icon: 'star-outline' as const,
+    title: 'Yüksek Trust Score',
+    description: 'Profilinde parlayan doğrulama mührünü kazan.',
+    accentColor: COLORS.secondary,
+  },
+  {
+    id: 'security',
+    icon: 'shield-check-outline' as const,
+    title: 'Güvenli Topluluk',
+    description: 'Doğrulanmış kullanıcılarla güvenle etkileşim kur.',
+    accentColor: COLORS.trust.primary,
+  },
+];
 
 const KYCIntroScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
-  const buttonScale = useSharedValue(1);
+  const insets = useSafeAreaInsets();
+
+  // Breathing glow animation
+  const glowPulse = useSharedValue(0);
+
+  useEffect(() => {
+    glowPulse.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0, { duration: 2000, easing: Easing.inOut(Easing.ease) })
+      ),
+      -1,
+      false
+    );
+  }, [glowPulse]);
+
+  // Animated glow style
+  const glowStyle = useAnimatedStyle(() => {
+    const scale = interpolate(glowPulse.value, [0, 1], [1, 1.3]);
+    const opacity = interpolate(glowPulse.value, [0, 1], [0.4, 0.7]);
+
+    return {
+      transform: [{ scale }],
+      opacity,
+    };
+  });
+
+  // Inner glow style
+  const innerGlowStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(glowPulse.value, [0, 1], [0.6, 0.9]),
+  }));
 
   const handleStart = () => {
     navigation.navigate('KYCDocumentType', {
@@ -45,167 +93,113 @@ const KYCIntroScreen: React.FC = () => {
     });
   };
 
-  const buttonAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: buttonScale.value }],
-  }));
-
-  const handlePressIn = () => {
-    buttonScale.value = withSpring(0.96, KYC_SPRINGS.snappy);
-  };
-
-  const handlePressOut = () => {
-    buttonScale.value = withSpring(1, KYC_SPRINGS.bouncy);
-  };
-
   return (
     <NetworkGuard offlineMessage="Kimlik doğrulama için internet bağlantısı gerekli.">
       <View style={styles.container}>
-        <SafeAreaView style={styles.safeArea} edges={['top']}>
-          {/* Header */}
-          <Animated.View
-            entering={FadeInDown.delay(100).springify()}
-            style={styles.header}
-          >
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.backButton}
-            >
-              <Ionicons
-                name="chevron-back"
-                size={24}
-                color={KYC_COLORS.text.primary}
+        <ScrollView
+          contentContainerStyle={[
+            styles.scrollContent,
+            { paddingTop: insets.top + SPACING.xl },
+          ]}
+          bounces={false}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Hero Icon with Neon Glow */}
+          <View style={styles.iconContainer}>
+            {/* Outer glow ring */}
+            <Animated.View style={[styles.glowCircleOuter, glowStyle]} />
+            {/* Inner glow ring */}
+            <Animated.View style={[styles.glowCircleInner, innerGlowStyle]} />
+            {/* Icon */}
+            <View style={styles.iconWrapper}>
+              <MaterialCommunityIcons
+                name="shield-check"
+                size={64}
+                color={COLORS.primary}
               />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>Kimlik Doğrulama</Text>
-            <View style={styles.headerSpacer} />
-          </Animated.View>
+            </View>
+          </View>
 
-          <ScrollView
-            style={styles.scrollView}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-          >
-            {/* Hero Section */}
-            <Animated.View
-              entering={FadeInDown.delay(200).springify()}
-              style={styles.heroSection}
-            >
-              <View style={styles.heroIcon}>
-                <LinearGradient
-                  colors={KYC_COLORS.gradients.primary}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.heroIconGradient}
-                />
-                <View style={styles.heroIconInner}>
-                  <MaterialCommunityIcons
-                    name="shield-check"
-                    size={48}
-                    color={KYC_COLORS.neon.lime}
-                  />
-                </View>
-              </View>
+          {/* Text Group */}
+          <View style={styles.textGroup}>
+            <Text style={styles.overline}>SEÇKİN TOPLULUK</Text>
+            <Text style={styles.title}>Güven Seremonisine{'\n'}Hoş Geldin</Text>
+            <Text style={styles.subtitle}>
+              TravelMatch'te güvenli bir deneyim için kimliğini doğrulayarak
+              ipeksi bir ağın parçası ol.
+            </Text>
+          </View>
 
-              <Text style={styles.title}>Kimliğini Doğrula</Text>
-              <Text style={styles.description}>
-                Güvenli bir topluluk için kimliğini doğrulamamız gerekiyor.
-                Bu, platformdaki herkesin korunmasına yardımcı olur.
-              </Text>
-            </Animated.View>
-
-            {/* Requirements Section */}
-            <Animated.View
-              entering={FadeInDown.delay(300).springify()}
-              style={styles.requirementsSection}
-            >
-              <Text style={styles.sectionTitle}>GEREKENLER</Text>
-
-              <GlassCard intensity={15} style={styles.requirementsCard} padding={0}>
-                {KYC_REQUIREMENTS.map((req, index) => (
+          {/* Benefit Cards (Liquid Glass) */}
+          <View style={styles.benefitsContainer}>
+            {BENEFITS.map((benefit) => (
+              <GlassCard
+                key={benefit.id}
+                intensity={20}
+                tint="light"
+                style={styles.benefitCard}
+                borderRadius={RADIUS.xl}
+                padding={0}
+              >
+                <View style={styles.benefitCardInner}>
                   <View
-                    key={req.id}
                     style={[
-                      styles.requirementItem,
-                      index < KYC_REQUIREMENTS.length - 1 && styles.requirementBorder,
+                      styles.benefitIcon,
+                      { backgroundColor: `${benefit.accentColor}15` },
                     ]}
                   >
-                    <View style={styles.requirementIcon}>
-                      <MaterialCommunityIcons
-                        name={req.icon as keyof typeof MaterialCommunityIcons.glyphMap}
-                        size={24}
-                        color={KYC_COLORS.neon.lime}
-                      />
-                    </View>
-                    <Text style={styles.requirementLabel}>{req.label}</Text>
-                    <Ionicons
-                      name="checkmark-circle"
-                      size={20}
-                      color={KYC_COLORS.neon.cyan}
+                    <MaterialCommunityIcons
+                      name={benefit.icon}
+                      size={24}
+                      color={benefit.accentColor}
                     />
                   </View>
-                ))}
-              </GlassCard>
-            </Animated.View>
-
-            {/* Trust Badge */}
-            <Animated.View
-              entering={FadeInDown.delay(400).springify()}
-              style={styles.trustSection}
-            >
-              <GlassCard intensity={10} style={styles.trustCard}>
-                <View style={styles.trustContent}>
-                  <MaterialCommunityIcons
-                    name="lock-outline"
-                    size={20}
-                    color={KYC_COLORS.neon.violet}
+                  <View style={styles.benefitText}>
+                    <Text style={styles.benefitTitle}>{benefit.title}</Text>
+                    <Text style={styles.benefitDesc}>{benefit.description}</Text>
+                  </View>
+                  {/* Subtle neon accent line */}
+                  <View
+                    style={[
+                      styles.accentLine,
+                      { backgroundColor: benefit.accentColor },
+                    ]}
                   />
-                  <Text style={styles.trustText}>
-                    Verileriniz şifrelenmiş ve güvende tutulmaktadır
-                  </Text>
                 </View>
               </GlassCard>
-            </Animated.View>
-          </ScrollView>
+            ))}
+          </View>
 
-          {/* Footer with CTA */}
-          <Animated.View
-            entering={FadeInDown.delay(500).springify()}
-            style={styles.footer}
+          {/* Privacy Note */}
+          <View style={styles.privacyContainer}>
+            <MaterialCommunityIcons
+              name="lock-outline"
+              size={14}
+              color={COLORS.text.tertiary}
+            />
+            <Text style={styles.privacyNote}>
+              Verilerin uçtan uca şifrelenir ve sadece doğrulama amacıyla kullanılır.
+            </Text>
+          </View>
+        </ScrollView>
+
+        {/* Footer Actions */}
+        <View style={[styles.footer, { paddingBottom: insets.bottom + SPACING.lg }]}>
+          <TMButton
+            title="Seremoniyi Başlat"
+            variant="primary"
+            onPress={handleStart}
+            size="large"
+            style={styles.startButton}
+          />
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.laterButton}
+            activeOpacity={0.7}
           >
-            <AnimatedTouchable
-              style={[styles.primaryButton, buttonAnimatedStyle]}
-              onPress={handleStart}
-              onPressIn={handlePressIn}
-              onPressOut={handlePressOut}
-              activeOpacity={1}
-            >
-              <LinearGradient
-                colors={KYC_COLORS.gradients.primary}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.buttonGradient}
-              >
-                <Text style={styles.primaryButtonText}>Başla</Text>
-                <Ionicons
-                  name="arrow-forward"
-                  size={20}
-                  color={KYC_COLORS.background.primary}
-                />
-              </LinearGradient>
-            </AnimatedTouchable>
-
-            <View style={styles.securityNote}>
-              <MaterialCommunityIcons
-                name="shield-check-outline"
-                size={14}
-                color={KYC_COLORS.text.tertiary}
-              />
-              <Text style={styles.securityNoteText}>
-                256-bit SSL şifreleme ile korunuyor
-              </Text>
-            </View>
-          </Animated.View>
-        </SafeAreaView>
+            <Text style={styles.laterText}>Daha Sonra Yap</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </NetworkGuard>
   );
@@ -214,192 +208,154 @@ const KYCIntroScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: KYC_COLORS.background.primary,
-  },
-  safeArea: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: KYC_SPACING.screenPadding,
-    paddingVertical: 12,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 20,
-    backgroundColor: KYC_COLORS.glass.backgroundMedium,
-  },
-  headerTitle: {
-    ...KYC_TYPOGRAPHY.cardTitle,
-    color: KYC_COLORS.text.primary,
-  },
-  headerSpacer: {
-    width: 40,
-  },
-  scrollView: {
-    flex: 1,
+    backgroundColor: COLORS.bg.primary,
   },
   scrollContent: {
-    paddingHorizontal: KYC_SPACING.screenPadding,
-    paddingBottom: 24,
-  },
-
-  // Hero Section
-  heroSection: {
+    paddingHorizontal: SPACING.screenPadding,
     alignItems: 'center',
-    paddingTop: 32,
-    paddingBottom: 40,
+    paddingBottom: SPACING['3xl'],
   },
-  heroIcon: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    alignItems: 'center',
+  iconContainer: {
+    width: 160,
+    height: 160,
     justifyContent: 'center',
-    marginBottom: 24,
-    position: 'relative',
+    alignItems: 'center',
+    marginBottom: SPACING['3xl'],
   },
-  heroIconGradient: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 48,
-    opacity: 0.15,
+  glowCircleOuter: {
+    position: 'absolute',
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: COLORS.primary,
   },
-  heroIconInner: {
+  glowCircleInner: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: COLORS.primaryLight,
+  },
+  iconWrapper: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: KYC_COLORS.glass.background,
-    borderWidth: 1,
-    borderColor: KYC_COLORS.glass.borderActive,
-    alignItems: 'center',
+    backgroundColor: COLORS.surface.base,
     justifyContent: 'center',
-    ...Platform.select({
-      ios: {
-        shadowColor: KYC_COLORS.neon.lime,
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.3,
-        shadowRadius: 16,
-      },
-      android: {},
-    }),
+    alignItems: 'center',
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  textGroup: {
+    alignItems: 'center',
+    marginBottom: SPACING['3xl'],
+  },
+  overline: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: COLORS.primary,
+    letterSpacing: 2,
+    marginBottom: SPACING.md,
   },
   title: {
-    ...KYC_TYPOGRAPHY.pageTitle,
-    color: KYC_COLORS.text.primary,
+    ...TYPOGRAPHY.h1,
+    fontWeight: '800',
+    color: COLORS.text.primary,
     textAlign: 'center',
-    marginBottom: 12,
+    lineHeight: 38,
+    letterSpacing: -0.5,
   },
-  description: {
-    ...KYC_TYPOGRAPHY.body,
-    color: KYC_COLORS.text.secondary,
+  subtitle: {
+    ...TYPOGRAPHY.bodyLarge,
+    color: COLORS.text.secondary,
     textAlign: 'center',
-    paddingHorizontal: 16,
+    marginTop: SPACING.base,
+    lineHeight: 24,
+    paddingHorizontal: SPACING.md,
   },
-
-  // Requirements Section
-  requirementsSection: {
-    marginBottom: 24,
+  benefitsContainer: {
+    width: '100%',
+    gap: SPACING.base,
+    marginBottom: SPACING['2xl'],
   },
-  sectionTitle: {
-    ...KYC_TYPOGRAPHY.sectionTitle,
-    color: KYC_COLORS.text.secondary,
-    marginBottom: 16,
+  benefitCard: {
+    overflow: 'hidden',
   },
-  requirementsCard: {
-    borderColor: KYC_COLORS.glass.border,
-  },
-  requirementItem: {
+  benefitCardInner: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    gap: 16,
+    padding: SPACING.lg,
+    position: 'relative',
   },
-  requirementBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: KYC_COLORS.glass.border,
-  },
-  requirementIcon: {
+  benefitIcon: {
     width: 48,
     height: 48,
-    borderRadius: 16,
-    backgroundColor: `${KYC_COLORS.neon.lime}10`,
-    alignItems: 'center',
+    borderRadius: RADIUS.base,
     justifyContent: 'center',
-  },
-  requirementLabel: {
-    flex: 1,
-    ...KYC_TYPOGRAPHY.body,
-    color: KYC_COLORS.text.primary,
-    fontWeight: '500',
-  },
-
-  // Trust Section
-  trustSection: {
-    marginBottom: 24,
-  },
-  trustCard: {
-    borderColor: KYC_COLORS.glass.border,
-  },
-  trustContent: {
-    flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    marginRight: SPACING.base,
   },
-  trustText: {
-    ...KYC_TYPOGRAPHY.caption,
-    color: KYC_COLORS.text.secondary,
+  benefitText: {
     flex: 1,
   },
-
-  // Footer
-  footer: {
-    paddingHorizontal: KYC_SPACING.screenPadding,
-    paddingBottom: 24,
-    paddingTop: 16,
-    gap: 16,
-  },
-  primaryButton: {
-    borderRadius: 28,
-    overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: KYC_COLORS.neon.lime,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
-  },
-  buttonGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 18,
-    gap: 8,
-  },
-  primaryButtonText: {
-    fontSize: 17,
+  benefitTitle: {
+    ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
-    color: KYC_COLORS.background.primary,
-    letterSpacing: 0.3,
+    color: COLORS.text.primary,
+    marginBottom: 2,
   },
-  securityNote: {
+  benefitDesc: {
+    ...TYPOGRAPHY.bodySmall,
+    color: COLORS.text.secondary,
+    lineHeight: 18,
+  },
+  accentLine: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 3,
+    borderTopLeftRadius: RADIUS.xl,
+    borderBottomLeftRadius: RADIUS.xl,
+  },
+  privacyContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
+    gap: SPACING.xs,
+    marginBottom: SPACING.lg,
   },
-  securityNoteText: {
-    ...KYC_TYPOGRAPHY.caption,
-    color: KYC_COLORS.text.tertiary,
+  privacyNote: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.text.tertiary,
+    textAlign: 'center',
+  },
+  footer: {
+    paddingHorizontal: SPACING.screenPadding,
+    paddingTop: SPACING.base,
+    backgroundColor: COLORS.bg.primary,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border.light,
+  },
+  startButton: {
+    height: 56,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  laterButton: {
+    marginTop: SPACING.base,
+    alignItems: 'center',
+    paddingVertical: SPACING.sm,
+  },
+  laterText: {
+    ...TYPOGRAPHY.bodySmall,
+    fontWeight: '600',
+    color: COLORS.text.secondary,
   },
 });
 

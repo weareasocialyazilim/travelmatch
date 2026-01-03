@@ -1,267 +1,317 @@
-/**
- * KYCProgressBar Component
- *
- * Ceremony-focused silky progress bar with neon highlights.
- * Part of the Awwwards-standard KYC verification flow.
- *
- * Features:
- * - Glass-textured track
- * - Neon glow on active steps
- * - Mono font for step labels
- * - Animated transitions
- */
+// KYC Ceremony Progress Bar - Awwwards standard animated progress
+// Features neon glow, step indicators, and silky animations
 import React, { useEffect } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, {
-  useAnimatedStyle,
   useSharedValue,
+  useAnimatedStyle,
   withTiming,
-  withSpring,
+  withRepeat,
+  withSequence,
+  interpolate,
+  Easing,
 } from 'react-native-reanimated';
 import { COLORS } from '@/constants/colors';
-import { FONTS } from '@/constants/typography';
+import { TYPOGRAPHY } from '@/theme/typography';
+import { SPACING, RADIUS } from '@/constants/spacing';
 import { getStepProgress } from './constants';
 
-// Step labels for the ceremony progress bar
-const STEPS = ['BELGE', 'TARAMA', 'LIVENESS', 'ONAY'];
+// Step configuration with icons
+const CEREMONY_STEPS = [
+  { id: 'document', icon: 'card-account-details-outline', label: 'Belge' },
+  { id: 'upload', icon: 'cloud-upload-outline', label: 'Yükle' },
+  { id: 'selfie', icon: 'camera-outline', label: 'Selfie' },
+  { id: 'review', icon: 'check-circle-outline', label: 'Onay' },
+];
 
 interface KYCProgressBarProps {
-  /** Current step identifier (from constants) */
   currentStep: string;
+  /** Show step icons instead of simple bar */
+  variant?: 'simple' | 'ceremony';
 }
 
-/**
- * Single step dot with neon glow animation
- */
-const StepDot: React.FC<{
-  isActive: boolean;
-  isCurrent: boolean;
-  label: string;
-}> = ({ isActive, isCurrent, label }) => {
-  const scale = useSharedValue(isCurrent ? 1 : 0.6);
-  const glowOpacity = useSharedValue(isCurrent ? 1 : 0);
-
-  useEffect(() => {
-    scale.value = withSpring(isCurrent ? 1 : 0.6, { damping: 15 });
-    glowOpacity.value = withTiming(isCurrent ? 1 : 0, { duration: 300 });
-  }, [isCurrent, scale, glowOpacity]);
-
-  const dotStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  const glowStyle = useAnimatedStyle(() => ({
-    opacity: glowOpacity.value,
-  }));
-
-  return (
-    <View style={styles.stepItem}>
-      {/* Neon glow layer */}
-      <Animated.View style={[styles.dotGlow, glowStyle]} />
-
-      {/* Dot */}
-      <Animated.View
-        style={[
-          styles.dot,
-          isActive && styles.activeDot,
-          isCurrent && styles.currentDot,
-          dotStyle,
-        ]}
-      >
-        {isCurrent && <View style={styles.dotInner} />}
-      </Animated.View>
-
-      {/* Label */}
-      <Text
-        style={[
-          styles.label,
-          isActive && styles.activeLabel,
-          isCurrent && styles.currentLabel,
-        ]}
-      >
-        {label}
-      </Text>
-    </View>
-  );
-};
-
-/**
- * Animated connecting line between steps
- */
-const ConnectingLine: React.FC<{
-  isActive: boolean;
-}> = ({ isActive }) => {
-  const fillWidth = useSharedValue(isActive ? 100 : 0);
-
-  useEffect(() => {
-    fillWidth.value = withTiming(isActive ? 100 : 0, { duration: 400 });
-  }, [isActive, fillWidth]);
-
-  const fillStyle = useAnimatedStyle(() => ({
-    width: `${fillWidth.value}%`,
-  }));
-
-  return (
-    <View style={styles.lineContainer}>
-      <View style={styles.line} />
-      <Animated.View style={[styles.lineFill, fillStyle]} />
-    </View>
-  );
-};
-
-/**
- * Ceremony-focused silky progress bar with neon highlights.
- * Displays steps as dots with connecting lines and mono-font labels.
- */
 export const KYCProgressBar: React.FC<KYCProgressBarProps> = ({
   currentStep,
+  variant = 'ceremony',
 }) => {
-  // Map step index to STEPS array index
-  // intro=0, document=1, upload=2, selfie=3, review=4
-  const stepMapping: Record<string, number> = {
-    intro: -1, // Before first step
-    document: 0, // BELGE
-    upload: 1, // TARAMA
-    selfie: 2, // LIVENESS
-    review: 3, // ONAY
-    pending: 4, // Complete
-  };
+  const { current, total, percentage } = getStepProgress(currentStep);
 
-  const currentStepIndex = stepMapping[currentStep] ?? 0;
+  // Animated progress value
+  const progressAnim = useSharedValue(0);
+  const glowPulse = useSharedValue(0);
 
+  useEffect(() => {
+    progressAnim.value = withTiming(percentage, {
+      duration: 600,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [percentage, progressAnim]);
+
+  // Glow pulse animation for active step
+  useEffect(() => {
+    glowPulse.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0, { duration: 1500, easing: Easing.inOut(Easing.ease) })
+      ),
+      -1,
+      false
+    );
+  }, [glowPulse]);
+
+  // Animated progress bar style
+  const progressBarStyle = useAnimatedStyle(() => ({
+    width: `${progressAnim.value}%`,
+  }));
+
+  // Animated glow style
+  const glowStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(glowPulse.value, [0, 1], [0.3, 0.8]),
+    transform: [{ scale: interpolate(glowPulse.value, [0, 1], [1, 1.1]) }],
+  }));
+
+  if (variant === 'simple') {
+    return (
+      <View style={styles.simpleContainer}>
+        <Text style={styles.progressText}>
+          Adım {current} / {total}
+        </Text>
+        <View style={styles.progressBarTrack}>
+          <Animated.View style={[styles.progressBarFill, progressBarStyle]}>
+            {/* Neon glow overlay */}
+            <View style={styles.progressGlow} />
+          </Animated.View>
+        </View>
+      </View>
+    );
+  }
+
+  // Ceremony variant with step indicators
   return (
-    <View style={styles.container}>
-      {/* Glass background */}
-      <View style={styles.glassBackground} />
+    <View style={styles.ceremonyContainer}>
+      {/* Step label */}
+      <Text style={styles.ceremonyLabel}>Seremoni İlerlemesi</Text>
 
-      {/* Track with steps */}
-      <View style={styles.track}>
-        {STEPS.map((step, index) => {
-          const isActive = index <= currentStepIndex;
-          const isCurrent = index === currentStepIndex;
+      {/* Step indicators */}
+      <View style={styles.stepsContainer}>
+        {CEREMONY_STEPS.map((step, index) => {
+          const stepNumber = index + 1;
+          const isCompleted = current > stepNumber;
+          const isActive = current === stepNumber;
+          const isPending = current < stepNumber;
 
           return (
-            <React.Fragment key={step}>
-              <StepDot isActive={isActive} isCurrent={isCurrent} label={step} />
-              {index < STEPS.length - 1 && (
-                <ConnectingLine isActive={index < currentStepIndex} />
+            <React.Fragment key={step.id}>
+              {/* Step Circle */}
+              <View style={styles.stepWrapper}>
+                {/* Active glow ring */}
+                {isActive && (
+                  <Animated.View style={[styles.activeGlow, glowStyle]} />
+                )}
+
+                <View
+                  style={[
+                    styles.stepCircle,
+                    isCompleted && styles.stepCircleCompleted,
+                    isActive && styles.stepCircleActive,
+                    isPending && styles.stepCirclePending,
+                  ]}
+                >
+                  {isCompleted ? (
+                    <MaterialCommunityIcons
+                      name="check"
+                      size={16}
+                      color={COLORS.white}
+                    />
+                  ) : (
+                    <MaterialCommunityIcons
+                      name={step.icon}
+                      size={16}
+                      color={
+                        isActive
+                          ? COLORS.primary
+                          : isPending
+                            ? COLORS.text.tertiary
+                            : COLORS.white
+                      }
+                    />
+                  )}
+                </View>
+
+                {/* Step label */}
+                <Text
+                  style={[
+                    styles.stepLabel,
+                    isCompleted && styles.stepLabelCompleted,
+                    isActive && styles.stepLabelActive,
+                  ]}
+                >
+                  {step.label}
+                </Text>
+              </View>
+
+              {/* Connector line */}
+              {index < CEREMONY_STEPS.length - 1 && (
+                <View style={styles.connectorWrapper}>
+                  <View
+                    style={[
+                      styles.connectorLine,
+                      isCompleted && styles.connectorLineCompleted,
+                    ]}
+                  />
+                </View>
               )}
             </React.Fragment>
           );
         })}
+      </View>
+
+      {/* Progress percentage */}
+      <View style={styles.percentageContainer}>
+        <Animated.Text style={styles.percentageText}>
+          {Math.round(percentage)}%
+        </Animated.Text>
+        <Text style={styles.percentageLabel}>tamamlandı</Text>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 24,
-    paddingVertical: 20,
-    position: 'relative',
+  // Simple variant styles
+  simpleContainer: {
+    paddingHorizontal: SPACING.screenPadding,
+    paddingVertical: SPACING.base,
   },
-  glassBackground: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
-  },
-  track: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-  },
-  stepItem: {
-    alignItems: 'center',
-    gap: 10,
-    position: 'relative',
-  },
-  // Neon glow behind the dot
-  dotGlow: {
-    position: 'absolute',
-    top: -4,
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: COLORS.primary,
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  // Base dot style
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: COLORS.text.muted,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  activeDot: {
-    backgroundColor: COLORS.primary,
-  },
-  currentDot: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: COLORS.primary,
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
-    shadowRadius: 6,
-    elevation: 6,
-  },
-  dotInner: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: COLORS.white,
-  },
-  // Label styles
-  label: {
-    fontSize: 9,
-    fontFamily: FONTS.mono.regular,
-    color: COLORS.text.muted,
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-  },
-  activeLabel: {
+  progressText: {
+    ...TYPOGRAPHY.caption,
     color: COLORS.text.secondary,
+    marginBottom: SPACING.sm,
   },
-  currentLabel: {
-    color: COLORS.primary,
-    fontFamily: FONTS.mono.medium,
-    fontWeight: '700',
-    textShadowColor: COLORS.primary,
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 4,
+  progressBarTrack: {
+    height: 6,
+    backgroundColor: COLORS.border.default,
+    borderRadius: RADIUS.full,
+    overflow: 'hidden',
   },
-  // Connecting line
-  lineContainer: {
-    flex: 1,
-    height: 2,
-    marginTop: 4,
-    marginHorizontal: 8,
-    position: 'relative',
-  },
-  line: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 1,
-  },
-  lineFill: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
+  progressBarFill: {
     height: '100%',
     backgroundColor: COLORS.primary,
-    borderRadius: 1,
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
+    borderRadius: RADIUS.full,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  progressGlow: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: 20,
+    backgroundColor: COLORS.primaryLight,
+    opacity: 0.6,
+  },
+
+  // Ceremony variant styles
+  ceremonyContainer: {
+    paddingHorizontal: SPACING.screenPadding,
+    paddingVertical: SPACING.lg,
+    backgroundColor: COLORS.surface.muted,
+    marginHorizontal: SPACING.base,
+    borderRadius: RADIUS.xl,
+    marginBottom: SPACING.lg,
+  },
+  ceremonyLabel: {
+    ...TYPOGRAPHY.labelSmall,
+    color: COLORS.text.tertiary,
+    textAlign: 'center',
+    marginBottom: SPACING.lg,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+  stepsContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+  },
+  stepWrapper: {
+    alignItems: 'center',
+    position: 'relative',
+  },
+  activeGlow: {
+    position: 'absolute',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: COLORS.primary,
+    top: -8,
+  },
+  stepCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.surface.base,
+    borderWidth: 2,
+    borderColor: COLORS.border.default,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  stepCircleCompleted: {
+    backgroundColor: COLORS.trust.primary,
+    borderColor: COLORS.trust.primary,
+  },
+  stepCircleActive: {
+    backgroundColor: COLORS.surface.base,
+    borderColor: COLORS.primary,
+    borderWidth: 3,
+  },
+  stepCirclePending: {
+    backgroundColor: COLORS.surface.muted,
+    borderColor: COLORS.border.light,
+  },
+  stepLabel: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.text.tertiary,
+    marginTop: SPACING.xs,
+    textAlign: 'center',
+  },
+  stepLabelCompleted: {
+    color: COLORS.trust.primary,
+  },
+  stepLabelActive: {
+    color: COLORS.primary,
+    fontWeight: '600',
+  },
+  connectorWrapper: {
+    flex: 1,
+    alignItems: 'center',
+    paddingTop: 14, // Align with center of circles
+  },
+  connectorLine: {
+    height: 2,
+    width: '100%',
+    backgroundColor: COLORS.border.default,
+    marginHorizontal: SPACING.xs,
+  },
+  connectorLineCompleted: {
+    backgroundColor: COLORS.trust.primary,
+  },
+  percentageContainer: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'center',
+    marginTop: SPACING.lg,
+    gap: SPACING.xs,
+  },
+  percentageText: {
+    ...TYPOGRAPHY.h2,
+    color: COLORS.primary,
+    fontWeight: '700',
+  },
+  percentageLabel: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.text.tertiary,
   },
 });
 
