@@ -1,9 +1,13 @@
 /**
  * DiscoverHeader Component
  *
- * iOS 26.3 redesigned header for the Discover/Wishes screen.
- * Features scroll-responsive animations with glass effect, location picker, and search.
- * Part of iOS 26.3 design system for TravelMatch.
+ * Awwwards standardında Discover Header.
+ * Minimalist hiyerarşi ve premium boşluk kullanımı.
+ *
+ * 40+ yaş: Yüksek okunabilirlik, net hiyerarşi
+ * GenZ: Estetik derinlik, modern tipografi
+ *
+ * Part of TravelMatch "Cinematic Trust Jewelry" Design System.
  */
 import React from 'react';
 import {
@@ -14,7 +18,7 @@ import {
   Platform,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   useAnimatedStyle,
@@ -23,6 +27,8 @@ import Animated, {
   SharedValue,
 } from 'react-native-reanimated';
 import { COLORS } from '../../constants/colors';
+import { TYPOGRAPHY_SYSTEM } from '../../constants/typography';
+import { TMAvatar } from '../ui/TMAvatar';
 import type { DiscoverHeaderProps } from './types';
 
 // Enhanced props interface for animated header
@@ -155,6 +161,175 @@ export const AnimatedDiscoverHeader: React.FC<AnimatedDiscoverHeaderProps> = ({
     </Animated.View>
   );
 };
+
+// ═══════════════════════════════════════════════════════════════════
+// AWWWARDS STYLE HEADER - Premium Discover Experience
+// ═══════════════════════════════════════════════════════════════════
+
+interface AwwwardsDiscoverHeaderProps {
+  /** User's name for greeting */
+  userName?: string;
+  /** User's avatar URL */
+  userAvatar?: string;
+  /** Greeting text (auto-detected by time if not provided) */
+  greeting?: string;
+  /** Notification count (shows dot if > 0) */
+  notificationCount?: number;
+  /** Callback when search is pressed */
+  onSearchPress?: () => void;
+  /** Callback when notifications are pressed */
+  onNotificationsPress?: () => void;
+  /** Callback when avatar is pressed */
+  onAvatarPress?: () => void;
+}
+
+/**
+ * Get time-based greeting in Turkish
+ */
+const getGreeting = (): string => {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Günaydın';
+  if (hour < 18) return 'İyi günler';
+  return 'İyi akşamlar';
+};
+
+/**
+ * AwwwardsDiscoverHeader - Awwwards standardında premium header
+ *
+ * Minimalist hiyerarşi ve premium boşluk kullanımı.
+ * 40+ yaş için okunabilirlik, GenZ için estetik derinlik.
+ */
+export const AwwwardsDiscoverHeader: React.FC<AwwwardsDiscoverHeaderProps> = ({
+  userName,
+  userAvatar,
+  greeting,
+  notificationCount = 0,
+  onSearchPress,
+  onNotificationsPress,
+  onAvatarPress,
+}) => {
+  const insets = useSafeAreaInsets();
+  const displayGreeting = greeting || getGreeting();
+
+  return (
+    <View style={[awwwardsStyles.container, { paddingTop: insets.top + 8 }]}>
+      {/* Left Section - Greeting & Brand */}
+      <View style={awwwardsStyles.leftSection}>
+        <Text style={awwwardsStyles.greeting}>{displayGreeting},</Text>
+        <Text style={awwwardsStyles.brandName}>TravelMatch</Text>
+      </View>
+
+      {/* Right Section - Actions & Avatar */}
+      <View style={awwwardsStyles.rightSection}>
+        {/* Search Button */}
+        <TouchableOpacity
+          style={awwwardsStyles.iconButton}
+          onPress={onSearchPress}
+          activeOpacity={0.7}
+          accessibilityLabel="Ara"
+          accessibilityRole="button"
+        >
+          <Ionicons
+            name="search-outline"
+            size={24}
+            color={COLORS.text.primary}
+          />
+        </TouchableOpacity>
+
+        {/* Notifications Button */}
+        <TouchableOpacity
+          style={awwwardsStyles.iconButton}
+          onPress={onNotificationsPress}
+          activeOpacity={0.7}
+          accessibilityLabel={`Bildirimler${notificationCount > 0 ? `, ${notificationCount} yeni` : ''}`}
+          accessibilityRole="button"
+        >
+          <Ionicons
+            name="notifications-outline"
+            size={24}
+            color={COLORS.text.primary}
+          />
+          {notificationCount > 0 && <View style={awwwardsStyles.notificationDot} />}
+        </TouchableOpacity>
+
+        {/* User Avatar */}
+        <TouchableOpacity
+          onPress={onAvatarPress}
+          activeOpacity={0.8}
+          accessibilityLabel="Profil"
+          accessibilityRole="button"
+        >
+          <TMAvatar
+            source={userAvatar}
+            name={userName}
+            size="sm"
+            showBorder
+            borderColor={COLORS.border.light}
+          />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
+const awwwardsStyles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+    backgroundColor: COLORS.bg.primary,
+  },
+  leftSection: {
+    flex: 1,
+  },
+  greeting: {
+    fontSize: TYPOGRAPHY_SYSTEM.sizes.bodyS,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.body,
+    color: COLORS.text.secondary,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  brandName: {
+    fontSize: TYPOGRAPHY_SYSTEM.sizes.h2,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.heading,
+    fontWeight: TYPOGRAPHY_SYSTEM.weights.bold,
+    color: COLORS.text.primary,
+    marginTop: -2,
+    letterSpacing: TYPOGRAPHY_SYSTEM.letterSpacing.tight,
+  },
+  rightSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  iconButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: COLORS.surface.base,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.border.light,
+  },
+  notificationDot: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLORS.primary,
+    borderWidth: 2,
+    borderColor: COLORS.surface.base,
+  },
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// LEGACY HEADERS - Backward Compatibility
+// ═══════════════════════════════════════════════════════════════════
 
 /**
  * DiscoverHeader - Legacy header for backward compatibility

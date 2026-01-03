@@ -4,7 +4,9 @@
  */
 
 export { default as PhotoSection } from './PhotoSection';
+export { AwwwardsPhotoSection } from './PhotoSection';
 export { default as TitleInput } from './TitleInput';
+export { AwwwardsTitleInput } from './TitleInput';
 export {
   default as CategorySelector,
   CATEGORIES,
