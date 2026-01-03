@@ -1,4 +1,7 @@
 export { Button } from './ui/Button';
+// TMButton - Consolidated master button component
+export { TMButton } from './ui/TMButton';
+export type { TMButtonProps, ButtonVariant, ButtonSize, AnimationMode, HapticType } from './ui/TMButton';
 export { SocialButton } from './SocialButton';
 export type { SocialButtonProps } from './SocialButton';
 export {
