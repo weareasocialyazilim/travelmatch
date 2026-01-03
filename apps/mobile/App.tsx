@@ -7,6 +7,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { FeedbackModal } from './src/components/FeedbackModal';
 import { InitializationScreen } from './src/components/InitializationScreen';
+import { ProviderComposer } from './src/components/ProviderComposer';
 import { AuthProvider } from './src/context/AuthContext';
 import { BiometricAuthProvider } from './src/context/BiometricAuthContext';
 import { ConfirmationProvider } from './src/context/ConfirmationContext';
@@ -243,45 +244,43 @@ function App() {
     );
   }
 
-  // Main app content
+  // App providers in order (first wraps outermost)
+  const appProviders = [
+    SafeAreaProvider,
+    NetworkProvider,
+    AuthProvider,
+    CurrencyProvider,
+    BiometricAuthProvider,
+    RealtimeProvider,
+    ToastProvider,
+    ConfirmationProvider,
+  ];
+
+  // Main app content - Provider Hell eliminated via ProviderComposer
   return (
     <GestureHandlerRootView
       style={styles.container}
       onLayout={onLayoutRootView}
     >
       <ErrorBoundary level="app">
-        <SafeAreaProvider>
-          <NetworkProvider>
-            <AuthProvider>
-              <CurrencyProvider>
-                <BiometricAuthProvider>
-                <RealtimeProvider>
-                  <ToastProvider>
-                    <ConfirmationProvider>
-                      <StatusBar style="auto" />
-                      <AppNavigator />
-                      <FeedbackModal
-                        visible={showFeedback}
-                        onClose={dismissFeedback}
-                      />
-                      <PendingTransactionsModal
-                        visible={showPendingModal}
-                        payments={pendingPayments}
-                        uploads={pendingUploads}
-                        onResumePayment={handleResumePayment}
-                        onResumeUpload={handleResumeUpload}
-                        onDismissPayment={handleDismissPayment}
-                        onDismissUpload={handleDismissUpload}
-                        onClose={handleClosePendingModal}
-                      />
-                    </ConfirmationProvider>
-                  </ToastProvider>
-                </RealtimeProvider>
-                </BiometricAuthProvider>
-              </CurrencyProvider>
-            </AuthProvider>
-          </NetworkProvider>
-        </SafeAreaProvider>
+        <ProviderComposer providers={appProviders}>
+          <StatusBar style="auto" />
+          <AppNavigator />
+          <FeedbackModal
+            visible={showFeedback}
+            onClose={dismissFeedback}
+          />
+          <PendingTransactionsModal
+            visible={showPendingModal}
+            payments={pendingPayments}
+            uploads={pendingUploads}
+            onResumePayment={handleResumePayment}
+            onResumeUpload={handleResumeUpload}
+            onDismissPayment={handleDismissPayment}
+            onDismissUpload={handleDismissUpload}
+            onClose={handleClosePendingModal}
+          />
+        </ProviderComposer>
       </ErrorBoundary>
     </GestureHandlerRootView>
   );

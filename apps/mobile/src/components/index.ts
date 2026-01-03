@@ -1,4 +1,7 @@
 export { Button } from './ui/Button';
+// TMButton - Consolidated master button component
+export { TMButton } from './ui/TMButton';
+export type { TMButtonProps, ButtonVariant, ButtonSize, AnimationMode, HapticType } from './ui/TMButton';
 export { SocialButton } from './SocialButton';
 export type { SocialButtonProps } from './SocialButton';
 export {
@@ -84,11 +87,18 @@ export {
 // Layout Components (TravelMatch: The Rebirth)
 export { FloatingDock } from './layout';
 
-// Trust Badge
+// Trust Badge & Ring
 export { TrustBadge } from './ui/TrustBadge';
+export { TrustRing } from './TrustRing';
 
-// Gift Components
-export { GiftButton } from './GiftButton';
+// Loading State
+export { LoadingState } from './LoadingState';
+
+// Dialogs
+export { DeleteMomentDialog } from './DeleteMomentDialog';
+
+// Autocomplete
+export { CityAutocomplete } from './CityAutocomplete';
 
 // KYC Components
 export { KYCBadge, getKYCLabel, getNextKYCLevel } from './KYCBadge';
@@ -96,3 +106,6 @@ export type { KYCLevel } from './KYCBadge';
 
 // App Bootstrap
 export { InitializationScreen } from './InitializationScreen';
+
+// Provider Utilities
+export { ProviderComposer } from './ProviderComposer';

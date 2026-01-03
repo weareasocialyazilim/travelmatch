@@ -19,6 +19,7 @@ export { WaitingForCodeScreen } from './screens/WaitingForCodeScreen';
 export { ForgotPasswordScreen } from './screens/ForgotPasswordScreen';
 export { ChangePasswordScreen } from './screens/ChangePasswordScreen';
 export { AuthSuccessScreen } from './screens/AuthSuccessScreen';
+export { BiometricSetupScreen } from './screens/BiometricSetupScreen';
 
 // Services
 export { authApi } from './services/authApi';
