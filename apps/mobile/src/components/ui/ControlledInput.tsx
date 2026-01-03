@@ -1,15 +1,15 @@
 /**
  * Controlled Input for React Hook Form
- * React Hook Form ile entegre input component
+ * React Hook Form ile entegre input component - Uses LiquidInput (Master Design)
  */
 
-import React, { useState, useEffect } from 'react';
-import type { TextInputProps } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import type { TextInputProps, ViewStyle } from 'react-native';
 import { Controller } from 'react-hook-form';
 import Animated, { FadeIn } from 'react-native-reanimated';
-import { Input } from './Input';
-import { PasswordInput } from './PasswordInput';
+import { LiquidInput } from './LiquidInput';
 import type { Control, FieldValues, Path } from 'react-hook-form';
+import type { Ionicons } from '@expo/vector-icons';
 
 interface ControlledInputProps<T extends FieldValues> extends Omit<
   TextInputProps,
@@ -18,104 +18,28 @@ interface ControlledInputProps<T extends FieldValues> extends Omit<
   name: Path<T>;
   control: Control<T>;
   label?: string;
-  hint?: string;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
-  onRightIconPress?: () => void;
-  required?: boolean;
-  showSuccess?: boolean;
+  icon?: keyof typeof Ionicons.glyphMap;
+  containerStyle?: ViewStyle;
   isPassword?: boolean;
-}
-
-interface InputWithValidationProps {
-  InputComponent: React.ComponentType<any>;
-  onChange: (text: string) => void;
-  onBlur: () => void;
-  error?: { message?: string };
-  showSuccess?: boolean;
-  value: string;
-  touched?: boolean;
-  label?: string;
-  hint?: string;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
-  onRightIconPress?: () => void;
-  required?: boolean;
-  placeholder?: string;
-  keyboardType?: TextInputProps['keyboardType'];
-  autoCapitalize?: TextInputProps['autoCapitalize'];
-  autoComplete?: TextInputProps['autoComplete'];
-  secureTextEntry?: boolean;
-  multiline?: boolean;
-  numberOfLines?: number;
-  maxLength?: number;
-  editable?: boolean;
-  testID?: string;
-}
-
-// Internal component to handle validation state
-function InputWithValidation({
-  InputComponent,
-  onChange,
-  onBlur,
-  error,
-  showSuccess,
-  value,
-  touched: initialTouched,
-  ...props
-}: InputWithValidationProps) {
-  const [touched, setTouched] = useState(initialTouched || false);
-  const [showError, setShowError] = useState(false);
-
-  // Progressive error reveal
-  useEffect(() => {
-    if (touched && error) {
-      const timer = setTimeout(() => setShowError(true), 300);
-      return () => clearTimeout(timer);
-    }
-    setShowError(false);
-    return undefined;
-  }, [touched, error]);
-
-  const handleBlur = () => {
-    setTouched(true);
-    onBlur();
-  };
-
-  const handleChange = (text: string) => {
-    if (showError) {
-      setShowError(false);
-    }
-    onChange(text);
-  };
-
-  return (
-    <Animated.View entering={showError ? FadeIn.duration(300) : undefined}>
-      <InputComponent
-        value={value}
-        onChangeText={handleChange}
-        onBlur={handleBlur}
-        error={showError ? error?.message : undefined}
-        showSuccess={showSuccess && !error && value && touched}
-        {...props}
-      />
-    </Animated.View>
-  );
 }
 
 export function ControlledInput<T extends FieldValues>({
   name,
   control,
   label,
-  hint,
-  leftIcon,
-  rightIcon,
-  onRightIconPress,
-  required,
-  showSuccess,
+  icon,
+  containerStyle,
   isPassword,
   ...inputProps
 }: ControlledInputProps<T>) {
+  const [showPassword, setShowPassword] = useState(false);
+  const [touched, setTouched] = useState(false);
+  const [showError, setShowError] = useState(false);
+
+  const togglePasswordVisibility = useCallback(() => {
+    setShowPassword((prev) => !prev);
+  }, []);
+
   return (
     <Controller
       control={control}
@@ -124,24 +48,44 @@ export function ControlledInput<T extends FieldValues>({
         field: { onChange, onBlur, value },
         fieldState: { error },
       }) => {
-        const InputComponent = isPassword ? PasswordInput : Input;
+        // Progressive error reveal
+        useEffect(() => {
+          if (touched && error) {
+            const timer = setTimeout(() => setShowError(true), 300);
+            return () => clearTimeout(timer);
+          }
+          setShowError(false);
+          return undefined;
+        }, [touched, error]);
+
+        const handleBlur = () => {
+          setTouched(true);
+          onBlur();
+        };
+
+        const handleChange = (text: string) => {
+          if (showError) {
+            setShowError(false);
+          }
+          onChange(text);
+        };
 
         return (
-          <InputWithValidation
-            InputComponent={InputComponent}
-            label={label}
-            value={(value as string) ?? ''}
-            onChange={(text: string) => onChange(text)}
-            onBlur={() => onBlur()}
-            error={error}
-            hint={hint}
-            leftIcon={leftIcon}
-            rightIcon={rightIcon}
-            onRightIconPress={onRightIconPress}
-            required={required}
-            showSuccess={showSuccess}
-            {...inputProps}
-          />
+          <Animated.View entering={showError ? FadeIn.duration(300) : undefined}>
+            <LiquidInput
+              value={(value as string) ?? ''}
+              onChangeText={handleChange}
+              onBlur={handleBlur}
+              label={label}
+              icon={isPassword ? 'lock-closed-outline' : icon}
+              error={showError ? error?.message : undefined}
+              containerStyle={containerStyle}
+              secureTextEntry={isPassword && !showPassword}
+              autoCapitalize={isPassword ? 'none' : inputProps.autoCapitalize}
+              autoCorrect={isPassword ? false : inputProps.autoCorrect}
+              {...inputProps}
+            />
+          </Animated.View>
         );
       }}
     />
