@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -14,7 +13,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import { useAuth } from '@/context/AuthContext';
 import { useBiometric } from '@/context/BiometricAuthContext';
@@ -24,11 +23,18 @@ import { loginSchema, type LoginInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 import type { MinimalFormState } from '@/utils/forms/helpers';
 import { useToast } from '@/context/ToastContext';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { TMButton } from '@/components/ui/TMButton';
 import { COLORS } from '@/constants/colors';
-import { TYPE_SCALE } from '@/constants/typography';
-import { RADIUS } from '@/constants/spacing';
+import { TYPE_SCALE, FONTS } from '@/constants/typography';
 
+/**
+ * Awwwards standardında Giriş Ekranı.
+ * Odak: Minimalist form yapısı, ipeksi geçişler ve neon aksiyon vurgusu.
+ * Liquid Glass design with silky transitions.
+ */
 export const LoginScreen: React.FC = () => {
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -161,186 +167,207 @@ export const LoginScreen: React.FC = () => {
     }
   };
 
+  const canSubmit = canSubmitForm({ formState } as { formState: MinimalFormState });
+
   return (
     <ScreenErrorBoundary>
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-            accessible={true}
-            accessibilityLabel="Geri dön"
-            accessibilityRole="button"
-            accessibilityHint="Önceki ekrana döner"
-          >
-            <MaterialCommunityIcons
-              name="arrow-left"
-              size={24}
-              color={COLORS.text.primary}
-            />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Giriş Yap</Text>
-          <View style={styles.placeholder} />
-        </View>
+      <View style={styles.container}>
+        {/* Back Button */}
+        <TouchableOpacity
+          style={[styles.backButton, { top: insets.top + 16 }]}
+          onPress={() => navigation.goBack()}
+          accessible={true}
+          accessibilityLabel="Geri dön"
+          accessibilityRole="button"
+          accessibilityHint="Önceki ekrana döner"
+        >
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={COLORS.text.primary}
+          />
+        </TouchableOpacity>
 
         <KeyboardAvoidingView
           style={styles.keyboardView}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
           <ScrollView
-            contentContainerStyle={styles.container}
+            contentContainerStyle={[
+              styles.scrollContent,
+              { paddingTop: insets.top + 60 },
+            ]}
+            bounces={false}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <Text style={styles.title} {...a11y.header('Tekrar Hoşgeldiniz')}>
-              Tekrar Hoşgeldiniz
-            </Text>
-            <Text
-              style={styles.subtitle}
-              accessible={true}
-              accessibilityLabel="Devam etmek için giriş yapın"
-            >
-              Devam etmek için giriş yapın
-            </Text>
-
-            <Controller
-              control={control}
-              name="email"
-              render={({
-                field: { onChange, onBlur, value },
-                fieldState: { error },
-              }) => (
-                <View style={styles.inputContainer}>
-                  <TextInput
-                    testID="email-input"
-                    style={[styles.input, error && styles.inputError]}
-                    placeholder="E-posta"
-                    placeholderTextColor={COLORS.text.secondary}
-                    value={value}
-                    onChangeText={(text) => onChange(text.toLowerCase())}
-                    onBlur={onBlur}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    editable={!isLoading}
-                    accessible={true}
-                    accessibilityLabel="E-posta adresi"
-                    accessibilityHint="Giriş yapmak için e-posta adresinizi girin"
-                    accessibilityValue={{ text: value }}
-                  />
-                  {error && (
-                    <Text
-                      style={styles.errorText}
-                      {...a11y.alert(error.message || 'Validation error')}
-                    >
-                      {error.message}
-                    </Text>
-                  )}
-                </View>
-              )}
-            />
-
-            <Controller
-              control={control}
-              name="password"
-              render={({
-                field: { onChange, onBlur, value },
-                fieldState: { error },
-              }) => (
-                <View style={styles.inputContainer}>
-                  <TextInput
-                    testID="password-input"
-                    style={[styles.input, error && styles.inputError]}
-                    placeholder="Şifre"
-                    placeholderTextColor={COLORS.text.secondary}
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    secureTextEntry
-                    editable={!isLoading}
-                    accessible={true}
-                    accessibilityLabel="Şifre"
-                    accessibilityHint="Giriş yapmak için şifrenizi girin"
-                  />
-                  {error && (
-                    <Text
-                      style={styles.errorText}
-                      {...a11y.alert(error.message || 'Validation error')}
-                    >
-                      {error.message}
-                    </Text>
-                  )}
-                </View>
-              )}
-            />
-
-            {/* Forgot Password Link */}
-            <TouchableOpacity
-              style={styles.forgotPasswordContainer}
-              onPress={() => navigation.navigate('ForgotPassword')}
-              accessible={true}
-              accessibilityLabel="Şifremi unuttum"
-              accessibilityRole="link"
-              accessibilityHint="Şifre sıfırlama sayfasına yönlendirir"
-            >
-              <Text style={styles.forgotPasswordText}>Şifremi Unuttum</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              testID="login-button"
-              style={[
-                styles.button,
-                (isLoading ||
-                  !canSubmitForm({ formState } as {
-                    formState: MinimalFormState;
-                  })) &&
-                  styles.buttonDisabled,
-              ]}
-              onPress={handleSubmit(onSubmit)}
-              disabled={
-                isLoading ||
-                !canSubmitForm({ formState } as { formState: MinimalFormState })
-              }
-              {...a11y.button(
-                isLoading ? 'Giriş yapılıyor' : 'Giriş Yap',
-                'E-posta ve şifrenizle giriş yapın',
-                isLoading ||
-                  !canSubmitForm({ formState } as {
-                    formState: MinimalFormState;
-                  }),
-              )}
-            >
-              <Text style={styles.buttonText}>
-                {isLoading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+            {/* Header Section */}
+            <View style={styles.headerSection}>
+              <Text
+                style={styles.title}
+                {...a11y.header('Tekrar Hoş Geldin')}
+              >
+                Tekrar Hoş Geldin
               </Text>
-            </TouchableOpacity>
+              <Text
+                style={styles.subtitle}
+                accessible={true}
+                accessibilityLabel="İpeksi anlara kaldığın yerden devam et"
+              >
+                İpeksi anlara kaldığın yerden devam et.
+              </Text>
+            </View>
 
-            {biometricAvailable && biometricEnabled && hasCredentials && (
-              <>
-                <View style={styles.divider}>
-                  <View style={styles.dividerLine} />
-                  <Text style={styles.dividerText}>veya</Text>
-                  <View style={styles.dividerLine} />
-                </View>
+            {/* Form Section */}
+            <View style={styles.formSection}>
+              {/* Email Input */}
+              <Text style={styles.label}>E-POSTA ADRESİ</Text>
+              <Controller
+                control={control}
+                name="email"
+                render={({
+                  field: { onChange, onBlur, value },
+                  fieldState: { error },
+                }) => (
+                  <View>
+                    <GlassCard
+                      intensity={10}
+                      style={[
+                        styles.inputWrapper,
+                        error && styles.inputWrapperError,
+                      ]}
+                      padding={0}
+                      showBorder={true}
+                    >
+                      <TextInput
+                        testID="email-input"
+                        style={styles.input}
+                        placeholder="ornek@email.com"
+                        placeholderTextColor={COLORS.text.muted}
+                        value={value}
+                        onChangeText={(text) => onChange(text.toLowerCase())}
+                        onBlur={onBlur}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        editable={!isLoading}
+                        accessible={true}
+                        accessibilityLabel="E-posta adresi"
+                        accessibilityHint="Giriş yapmak için e-posta adresinizi girin"
+                        accessibilityValue={{ text: value }}
+                      />
+                    </GlassCard>
+                    {error && (
+                      <Text
+                        style={styles.errorText}
+                        {...a11y.alert(error.message || 'Validation error')}
+                      >
+                        {error.message}
+                      </Text>
+                    )}
+                  </View>
+                )}
+              />
 
-                <TouchableOpacity
-                  testID="biometric-login-button"
-                  style={styles.biometricButton}
-                  onPress={handleBiometricLogin}
-                  disabled={isBiometricLoading || isLoading}
-                  {...a11y.button(
-                    `${biometricTypeName} ile giriş yap`,
-                    `Hızlı giriş için ${biometricTypeName} kullanın`,
-                    isBiometricLoading || isLoading,
-                  )}
-                >
-                  {isBiometricLoading ? (
-                    <ActivityIndicator
-                      size="small"
-                      color={COLORS.brand.primary}
-                    />
-                  ) : (
-                    <>
+              {/* Password Input */}
+              <Text style={[styles.label, { marginTop: 24 }]}>ŞİFRE</Text>
+              <Controller
+                control={control}
+                name="password"
+                render={({
+                  field: { onChange, onBlur, value },
+                  fieldState: { error },
+                }) => (
+                  <View>
+                    <GlassCard
+                      intensity={10}
+                      style={[
+                        styles.inputWrapper,
+                        error && styles.inputWrapperError,
+                      ]}
+                      padding={0}
+                      showBorder={true}
+                    >
+                      <TextInput
+                        testID="password-input"
+                        style={styles.input}
+                        placeholder="••••••••"
+                        placeholderTextColor={COLORS.text.muted}
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        secureTextEntry
+                        editable={!isLoading}
+                        accessible={true}
+                        accessibilityLabel="Şifre"
+                        accessibilityHint="Giriş yapmak için şifrenizi girin"
+                      />
+                    </GlassCard>
+                    {error && (
+                      <Text
+                        style={styles.errorText}
+                        {...a11y.alert(error.message || 'Validation error')}
+                      >
+                        {error.message}
+                      </Text>
+                    )}
+                  </View>
+                )}
+              />
+
+              {/* Forgot Password Link */}
+              <TouchableOpacity
+                style={styles.forgotButton}
+                onPress={() => navigation.navigate('ForgotPassword')}
+                accessible={true}
+                accessibilityLabel="Şifremi unuttum"
+                accessibilityRole="link"
+                accessibilityHint="Şifre sıfırlama sayfasına yönlendirir"
+              >
+                <Text style={styles.forgotText}>Şifremi Unuttum</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Action Section */}
+            <View style={styles.actionSection}>
+              {/* Login Button */}
+              <TMButton
+                variant="primary"
+                size="xl"
+                onPress={handleSubmit(onSubmit)}
+                loading={isLoading}
+                disabled={!canSubmit}
+                fullWidth
+                testID="login-button"
+              >
+                {isLoading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+              </TMButton>
+
+              {/* Biometric Login */}
+              {biometricAvailable && biometricEnabled && hasCredentials && (
+                <>
+                  <View style={styles.divider}>
+                    <View style={styles.dividerLine} />
+                    <Text style={styles.dividerText}>veya</Text>
+                    <View style={styles.dividerLine} />
+                  </View>
+
+                  <TouchableOpacity
+                    testID="biometric-login-button"
+                    style={styles.biometricButton}
+                    onPress={handleBiometricLogin}
+                    disabled={isBiometricLoading || isLoading}
+                    {...a11y.button(
+                      `${biometricTypeName} ile giriş yap`,
+                      `Hızlı giriş için ${biometricTypeName} kullanın`,
+                      isBiometricLoading || isLoading,
+                    )}
+                  >
+                    <GlassCard
+                      intensity={20}
+                      style={styles.biometricButtonInner}
+                      padding={16}
+                      showBorder={true}
+                    >
                       <MaterialCommunityIcons
                         name="fingerprint"
                         size={32}
@@ -348,171 +375,164 @@ export const LoginScreen: React.FC = () => {
                         accessible={false}
                       />
                       <Text style={styles.biometricButtonText}>
-                        {biometricTypeName} ile giriş yap
+                        {isBiometricLoading
+                          ? 'Doğrulanıyor...'
+                          : `${biometricTypeName} ile giriş yap`}
                       </Text>
-                    </>
-                  )}
-                </TouchableOpacity>
-              </>
-            )}
+                    </GlassCard>
+                  </TouchableOpacity>
+                </>
+              )}
 
-            {/* Sign Up Link */}
-            <View style={styles.signUpContainer}>
-              <Text style={styles.signUpText}>Hesabın yok mu? </Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('Register')}
-                accessible={true}
-                accessibilityLabel="Kayıt ol"
-                accessibilityRole="link"
-                accessibilityHint="Yeni hesap oluşturma sayfasına yönlendirir"
-              >
-                <Text style={styles.signUpLink}>Kayıt Ol</Text>
-              </TouchableOpacity>
+              {/* Sign Up Link */}
+              <View style={styles.footerRow}>
+                <Text style={styles.footerText}>Henüz hesabın yok mu?</Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('Register')}
+                  accessible={true}
+                  accessibilityLabel="Kayıt ol"
+                  accessibilityRole="link"
+                  accessibilityHint="Yeni hesap oluşturma sayfasına yönlendirir"
+                >
+                  <Text style={styles.signupText}>Kayıt Ol</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </View>
     </ScreenErrorBoundary>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
+  container: {
     flex: 1,
     backgroundColor: COLORS.bg.primary,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border.default,
-  },
   backButton: {
+    position: 'absolute',
+    left: 24,
+    zIndex: 10,
     padding: 8,
-  },
-  headerTitle: {
-    ...TYPE_SCALE.display.h4,
-    color: COLORS.text.primary,
-  },
-  placeholder: {
-    width: 40,
   },
   keyboardView: {
     flex: 1,
-    backgroundColor: COLORS.bg.primary,
   },
-  container: {
+  scrollContent: {
+    paddingHorizontal: 24,
     flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+    paddingBottom: 40,
+  },
+  headerSection: {
+    marginBottom: 48,
   },
   title: {
-    ...TYPE_SCALE.display.h1,
-    marginBottom: 10,
+    fontSize: 40,
+    fontFamily: FONTS.display.black,
+    fontWeight: '900',
     color: COLORS.text.primary,
+    letterSpacing: -1.5,
   },
   subtitle: {
-    ...TYPE_SCALE.body.base,
+    fontSize: 18,
+    fontFamily: FONTS.body.regular,
     color: COLORS.text.secondary,
-    marginBottom: 30,
+    marginTop: 12,
+    lineHeight: 26,
   },
-  inputContainer: {
-    width: '100%',
-    marginBottom: 16,
+  formSection: {
+    marginBottom: 40,
+  },
+  label: {
+    fontSize: 10,
+    fontFamily: FONTS.mono.medium,
+    color: COLORS.text.muted,
+    letterSpacing: 1.5,
+    marginBottom: 12,
+    marginLeft: 4,
+    textTransform: 'uppercase',
+  },
+  inputWrapper: {
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: COLORS.border.light,
+  },
+  inputWrapperError: {
+    borderColor: COLORS.feedback.error,
   },
   input: {
-    width: '100%',
-    height: 50,
-    borderWidth: 1,
-    borderColor: COLORS.border.default,
-    borderRadius: RADIUS.sm,
-    paddingHorizontal: 16,
-    ...TYPE_SCALE.body.base,
     color: COLORS.text.primary,
-    backgroundColor: COLORS.surface.base,
-  },
-  inputError: {
-    borderColor: COLORS.feedback.error,
+    fontSize: 16,
+    fontFamily: FONTS.body.regular,
+    padding: 16,
   },
   errorText: {
     ...TYPE_SCALE.body.caption,
     color: COLORS.feedback.error,
-    marginTop: 4,
+    marginTop: 8,
     marginLeft: 4,
   },
-  button: {
-    width: '100%',
-    height: 50,
-    backgroundColor: COLORS.brand.primary,
-    borderRadius: RADIUS.sm,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 8,
+  forgotButton: {
+    alignSelf: 'flex-end',
+    marginTop: 16,
+    padding: 4,
   },
-  buttonDisabled: {
-    opacity: 0.6,
+  forgotText: {
+    color: COLORS.text.muted,
+    fontSize: 14,
+    fontFamily: FONTS.body.semibold,
+    fontWeight: '600',
   },
-  buttonText: {
-    ...TYPE_SCALE.button.base,
-    color: COLORS.utility.white,
+  actionSection: {
+    marginTop: 'auto',
   },
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 24,
-    width: '100%',
   },
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: COLORS.border.default,
+    backgroundColor: COLORS.border.light,
   },
   dividerText: {
     ...TYPE_SCALE.body.small,
     marginHorizontal: 16,
-    color: COLORS.text.secondary,
+    color: COLORS.text.muted,
   },
   biometricButton: {
     width: '100%',
-    height: 60,
+  },
+  biometricButtonInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    borderRadius: 20,
     borderWidth: 1.5,
     borderColor: COLORS.brand.primary,
-    borderRadius: RADIUS.sm,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 12,
   },
   biometricButtonText: {
     ...TYPE_SCALE.button.base,
     color: COLORS.brand.primary,
   },
-  forgotPasswordContainer: {
-    alignSelf: 'flex-end',
-    marginBottom: 16,
-    marginTop: -8,
-  },
-  forgotPasswordText: {
-    ...TYPE_SCALE.body.small,
-    color: COLORS.brand.primary,
-    fontWeight: '500',
-  },
-  signUpContainer: {
+  footerRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     marginTop: 24,
+    gap: 8,
   },
-  signUpText: {
-    ...TYPE_SCALE.body.small,
+  footerText: {
     color: COLORS.text.secondary,
+    fontSize: 14,
+    fontFamily: FONTS.body.regular,
   },
-  signUpLink: {
-    ...TYPE_SCALE.body.small,
+  signupText: {
     color: COLORS.brand.primary,
-    fontWeight: '600',
+    fontSize: 14,
+    fontFamily: FONTS.body.bold,
+    fontWeight: '700',
   },
 });

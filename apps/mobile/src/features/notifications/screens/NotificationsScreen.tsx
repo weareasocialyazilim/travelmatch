@@ -10,46 +10,73 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, { FadeInDown, Layout } from 'react-native-reanimated';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { COLORS } from '@/constants/colors';
+import { TYPE_SCALE, FONTS } from '@/constants/typography';
 
-const NOTIFICATIONS = [
+/**
+ * Awwwards standardında Bildirim Merkezi.
+ * Ipeksi liste yapısı ve neon durum göstergeleri.
+ * Her bildirim bir "aktivite kartı" olarak tasarlandı.
+ */
+
+type NotificationType = 'gift' | 'trust' | 'comment' | 'social' | 'system' | 'offer';
+
+interface NotificationItem {
+  id: string;
+  type: NotificationType;
+  user: string;
+  title?: string;
+  msg: string;
+  time: string;
+  read: boolean;
+}
+
+const NOTIFICATIONS: NotificationItem[] = [
   {
     id: '1',
-    type: 'offer',
-    title: 'New Offer Received! 🎁',
-    body: 'Marc B. wants to gift you "Sunset Dinner". Check the details.',
-    time: '2m ago',
+    type: 'gift',
+    user: 'Caner Öz',
+    msg: 'sana bir Moment hediye etti!',
+    time: '2dk önce',
     read: false,
   },
   {
     id: '2',
-    type: 'social',
-    title: 'New Connection',
-    body: 'Selin Y. started following your adventures.',
-    time: '1h ago',
-    read: true,
+    type: 'trust',
+    user: 'Sistem',
+    msg: "Güven puanın 94'e yükseldi! 🎉",
+    time: '1sa önce',
+    read: false,
   },
   {
     id: '3',
-    type: 'system',
-    title: 'Verification Approved',
-    body: 'You are now a verified traveler! 🛡️ Enjoy the blue tick.',
-    time: '5h ago',
+    type: 'comment',
+    user: 'Melis Yılmaz',
+    msg: 'Momentine bir Trust Note bıraktı.',
+    time: '3sa önce',
     read: true,
   },
   {
     id: '4',
-    type: 'offer',
-    title: 'Moment Expiring Soon',
-    body: 'Your "Coffee at Petra" request will expire in 2 hours.',
-    time: '1d ago',
+    type: 'social',
+    user: 'Selin Y.',
+    msg: 'maceralarını takip etmeye başladı.',
+    time: '5sa önce',
+    read: true,
+  },
+  {
+    id: '5',
+    type: 'system',
+    user: 'Sistem',
+    msg: 'Doğrulanmış gezgin oldun! 🛡️',
+    time: '1g önce',
     read: true,
   },
 ];
 
-type NotificationItem = typeof NOTIFICATIONS[0];
-
-export const NotificationsScreen = ({ navigation: _navigation }: any) => {
+export const NotificationsScreen = ({ navigation }: any) => {
   const insets = useSafeAreaInsets();
   const [notifications, setNotifications] = useState(NOTIFICATIONS);
 
@@ -57,68 +84,153 @@ export const NotificationsScreen = ({ navigation: _navigation }: any) => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   };
 
-  const getIcon = (type: string) => {
+  const getIconData = (type: NotificationType, isUnread: boolean) => {
+    const baseColor = isUnread ? COLORS.brand.primary : COLORS.text.muted;
+
     switch (type) {
-      case 'offer': return { name: 'gift', color: COLORS.brand.primary, bg: 'rgba(245, 158, 11, 0.1)' };
-      case 'social': return { name: 'heart', color: COLORS.brand.secondary, bg: 'rgba(236, 72, 153, 0.1)' };
-      case 'system': return { name: 'shield-check', color: '#00D4FF', bg: 'rgba(0, 212, 255, 0.1)' };
-      default: return { name: 'bell', color: 'white', bg: 'rgba(255,255,255,0.1)' };
+      case 'gift':
+      case 'offer':
+        return {
+          name: 'gift' as const,
+          color: isUnread ? COLORS.brand.primary : COLORS.text.muted,
+          bg: isUnread ? 'rgba(245, 158, 11, 0.15)' : 'rgba(168, 162, 158, 0.1)',
+        };
+      case 'trust':
+      case 'system':
+        return {
+          name: 'shield-check' as const,
+          color: isUnread ? COLORS.trust.primary : COLORS.text.muted,
+          bg: isUnread ? 'rgba(16, 185, 129, 0.15)' : 'rgba(168, 162, 158, 0.1)',
+        };
+      case 'comment':
+        return {
+          name: 'message-text' as const,
+          color: isUnread ? COLORS.accent : COLORS.text.muted,
+          bg: isUnread ? 'rgba(20, 184, 166, 0.15)' : 'rgba(168, 162, 158, 0.1)',
+        };
+      case 'social':
+        return {
+          name: 'heart' as const,
+          color: isUnread ? COLORS.brand.secondary : COLORS.text.muted,
+          bg: isUnread ? 'rgba(236, 72, 153, 0.15)' : 'rgba(168, 162, 158, 0.1)',
+        };
+      default:
+        return {
+          name: 'bell' as const,
+          color: baseColor,
+          bg: 'rgba(168, 162, 158, 0.1)',
+        };
     }
   };
 
-  const renderItem = ({ item, index }: { item: NotificationItem, index: number }) => {
-    const iconData = getIcon(item.type);
+  const renderItem = ({
+    item,
+    index,
+  }: {
+    item: NotificationItem;
+    index: number;
+  }) => {
+    const iconData = getIconData(item.type, !item.read);
 
     return (
       <Animated.View
-        entering={FadeInDown.delay(index * 100)}
+        entering={FadeInDown.delay(index * 80).springify()}
         layout={Layout.springify()}
-        style={[styles.notificationCard, !item.read && styles.unreadCard]}
+        style={styles.notifWrapper}
       >
-        <View style={[styles.iconContainer, { backgroundColor: iconData.bg }]}>
-          <MaterialCommunityIcons name={iconData.name as any} size={24} color={iconData.color} />
-        </View>
+        <TouchableOpacity activeOpacity={0.8}>
+          <GlassCard
+            intensity={item.read ? 5 : 15}
+            style={[styles.card, !item.read && styles.unreadCard]}
+            padding={16}
+            borderRadius={20}
+            showBorder={true}
+          >
+            {/* Icon Container */}
+            <View style={[styles.iconContainer, { backgroundColor: iconData.bg }]}>
+              <MaterialCommunityIcons
+                name={iconData.name}
+                size={22}
+                color={iconData.color}
+              />
+            </View>
 
-        <View style={styles.content}>
-          <View style={styles.rowTop}>
-             <Text style={[styles.title, !item.read && styles.unreadTitle]}>{item.title}</Text>
-             {!item.read && <View style={styles.dot} />}
-          </View>
-          <Text style={styles.body} numberOfLines={2}>{item.body}</Text>
-          <Text style={styles.time}>{item.time}</Text>
-        </View>
+            {/* Content */}
+            <View style={styles.content}>
+              <Text style={styles.message} numberOfLines={2}>
+                <Text style={[styles.userName, !item.read && styles.userNameUnread]}>
+                  {item.user}
+                </Text>{' '}
+                {item.msg}
+              </Text>
+              <Text style={styles.time}>{item.time}</Text>
+            </View>
+
+            {/* Unread Dot */}
+            {!item.read && <View style={styles.unreadDot} />}
+          </GlassCard>
+        </TouchableOpacity>
       </Animated.View>
     );
   };
 
+  const unreadCount = notifications.filter(n => !n.read).length;
+
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
 
-      {/* HEADER */}
-      <View style={[styles.header, { paddingTop: insets.top }]}>
-        <View style={styles.headerTop}>
-          <Text style={styles.pageTitle}>Notifications</Text>
-          <TouchableOpacity onPress={handleMarkAllRead}>
-            <Text style={styles.markReadText}>Mark all read</Text>
-          </TouchableOpacity>
+      {/* Header */}
+      <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+          accessibilityLabel="Geri dön"
+          accessibilityRole="button"
+        >
+          <MaterialCommunityIcons
+            name="chevron-left"
+            size={28}
+            color={COLORS.text.primary}
+          />
+        </TouchableOpacity>
+
+        <View style={styles.headerCenter}>
+          <Text style={styles.headerTitle}>Bildirimler</Text>
+          {unreadCount > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{unreadCount}</Text>
+            </View>
+          )}
         </View>
+
+        <TouchableOpacity
+          onPress={handleMarkAllRead}
+          style={styles.markReadButton}
+          accessibilityLabel="Tümünü okundu olarak işaretle"
+          accessibilityRole="button"
+        >
+          <Text style={styles.markReadText}>Tümünü Oku</Text>
+        </TouchableOpacity>
       </View>
 
-      {/* LIST */}
-      <FlatList
-        data={notifications}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-        ListEmptyComponent={
-          <View style={styles.emptyState}>
-             <MaterialCommunityIcons name="bell-sleep" size={64} color="rgba(255,255,255,0.2)" />
-             <Text style={styles.emptyText}>All caught up!</Text>
-          </View>
-        }
-      />
+      {/* Notification List */}
+      {notifications.length > 0 ? (
+        <FlatList
+          data={notifications}
+          keyExtractor={item => item.id}
+          renderItem={renderItem}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+        />
+      ) : (
+        <EmptyState
+          icon="bell-sleep-outline"
+          title="Henüz Bildirim Yok"
+          description="Harika bir şeyler olduğunda seni buradan haberdar edeceğiz."
+        />
+      )}
     </View>
   );
 };
@@ -126,104 +238,113 @@ export const NotificationsScreen = ({ navigation: _navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.backgroundDark,
+    backgroundColor: COLORS.bg.primary,
   },
   header: {
-    paddingHorizontal: 24,
-    paddingBottom: 20,
-    backgroundColor: COLORS.backgroundDark,
-    zIndex: 10,
-  },
-  headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'baseline',
-    marginBottom: 10,
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border.light,
   },
-  pageTitle: {
-    fontSize: 34,
-    fontWeight: '900',
-    color: 'white',
-    letterSpacing: -1,
+  backButton: {
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  headerCenter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontFamily: FONTS.display.bold,
+    fontWeight: '700',
+    color: COLORS.text.primary,
+  },
+  badge: {
+    backgroundColor: COLORS.brand.primary,
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    minWidth: 20,
+    alignItems: 'center',
+  },
+  badgeText: {
+    fontSize: 11,
+    fontFamily: FONTS.mono.medium,
+    fontWeight: '600',
+    color: COLORS.white,
+  },
+  markReadButton: {
+    padding: 4,
   },
   markReadText: {
     color: COLORS.brand.primary,
+    fontSize: 12,
+    fontFamily: FONTS.body.semibold,
     fontWeight: '600',
-    fontSize: 14,
   },
-
-  // List
   listContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 120, // Bottom space
-  },
-  notificationCard: {
-    flexDirection: 'row',
     padding: 16,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: 'transparent',
+    paddingBottom: 100,
+  },
+  separator: {
+    height: 12,
+  },
+  notifWrapper: {
+    width: '100%',
+  },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderColor: COLORS.border.light,
   },
   unreadCard: {
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: 'rgba(245, 158, 11, 0.25)',
+    borderWidth: 1,
   },
   iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
-    alignItems: 'center',
+    width: 44,
+    height: 44,
+    borderRadius: 14,
     justifyContent: 'center',
-    marginRight: 16,
+    alignItems: 'center',
+    marginRight: 14,
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
   },
-  rowTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 4,
+  userName: {
+    fontFamily: FONTS.body.bold,
+    fontWeight: '700',
+    color: COLORS.text.primary,
   },
-  title: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+  userNameUnread: {
+    fontWeight: '800',
   },
-  unreadTitle: {
-    color: 'white',
-    fontWeight: 'bold',
+  message: {
+    ...TYPE_SCALE.body.small,
+    color: COLORS.text.secondary,
+    lineHeight: 20,
   },
-  dot: {
+  time: {
+    fontSize: 11,
+    fontFamily: FONTS.mono.regular,
+    color: COLORS.text.muted,
+    marginTop: 6,
+    letterSpacing: 0.3,
+  },
+  unreadDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
     backgroundColor: COLORS.brand.primary,
-  },
-  body: {
-    fontSize: 14,
-    color: COLORS.text.secondary,
-    lineHeight: 20,
-    marginBottom: 6,
-  },
-  time: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
-  },
-
-  // Empty
-  emptyState: {
-    alignItems: 'center',
-    marginTop: 100,
-  },
-  emptyText: {
-    color: COLORS.text.secondary,
-    fontSize: 18,
-    fontWeight: '600',
-    marginTop: 16,
+    marginLeft: 12,
   },
 });
 
