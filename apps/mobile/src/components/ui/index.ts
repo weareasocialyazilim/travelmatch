@@ -5,7 +5,8 @@
 
 // Core UI Components
 export { Button } from './Button';
-export { Card } from './Card';
+export { Card, GlassCard, GlassView, GlassButton } from './Card';
+export type { CardVariant, CardPadding, GlassTint } from './Card';
 export { Avatar } from './Avatar';
 export { Input } from './Input';
 export { Badge, NotificationBadge } from './Badge';

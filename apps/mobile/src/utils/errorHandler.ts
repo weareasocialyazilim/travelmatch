@@ -1,8 +1,21 @@
 /**
  * Standardized API Error Handling
  * Centralized error management for consistent error handling across the app
+ *
+ * This is the consolidated error handler that includes:
+ * - Error standardization and classification
+ * - User-friendly messages with i18n support
+ * - Recovery suggestions
+ * - Sentry integration for critical errors
+ * - React hooks for component integration
+ * - Alert helpers for user notifications
+ *
+ * @see appErrors.ts for base error classes
+ * @see errorRecovery.ts for retry and offline queue utilities
  */
 import { useState, useCallback } from 'react';
+import { Alert } from 'react-native';
+import { TFunction } from 'i18next';
 import { ErrorCode, getErrorMessage, getErrorCode } from './appErrors';
 import { logger } from './logger';
 
@@ -334,6 +347,122 @@ export const retryWithErrorHandling = async <T>(
   }
 
   throw lastError;
+};
+
+/**
+ * Show user-friendly error alert with i18n support
+ * Consolidated from friendlyErrorHandler.ts
+ */
+export function showErrorAlert(
+  error: unknown,
+  t: TFunction,
+  options?: {
+    onRetry?: () => void;
+    onDismiss?: () => void;
+    customTitle?: string;
+    customMessage?: string;
+  },
+): void {
+  const standardizedError = standardizeError(error, 'UserAlert');
+
+  // Get localized title based on error code
+  let title = options?.customTitle || t('errors.titles.error', 'Error');
+  if (standardizedError.code === ErrorCode.NETWORK_ERROR || standardizedError.code === ErrorCode.TIMEOUT_ERROR) {
+    title = t('errors.titles.network', 'Connection Error');
+  } else if (standardizedError.code === ErrorCode.UNAUTHORIZED) {
+    title = t('errors.titles.authentication', 'Authentication Error');
+  } else if (standardizedError.code === ErrorCode.VALIDATION_ERROR) {
+    title = t('errors.titles.validation', 'Validation Error');
+  } else if (standardizedError.code === ErrorCode.FORBIDDEN) {
+    title = t('errors.titles.permission', 'Permission Error');
+  }
+
+  // Get localized message
+  const message = options?.customMessage || standardizedError.userMessage;
+
+  // Build alert buttons
+  const buttons: Array<{
+    text: string;
+    style?: 'default' | 'cancel' | 'destructive';
+    onPress?: () => void;
+  }> = [];
+
+  if (standardizedError.recoverable && options?.onRetry) {
+    buttons.push({
+      text: t('common.retry', 'Retry'),
+      onPress: options.onRetry,
+    });
+    buttons.push({
+      text: t('common.cancel', 'Cancel'),
+      style: 'cancel',
+      onPress: options?.onDismiss,
+    });
+  } else {
+    buttons.push({
+      text: t('common.close', 'Close'),
+      onPress: options?.onDismiss,
+    });
+  }
+
+  Alert.alert(title, message, buttons, { cancelable: true });
+}
+
+/**
+ * Async wrapper with automatic error handling and alert
+ */
+export async function withErrorAlert<T>(
+  fn: () => Promise<T>,
+  t: TFunction,
+  options?: {
+    context?: string;
+    onError?: (error: StandardizedError) => void;
+    showAlert?: boolean;
+    onRetry?: () => void;
+    customErrorMessage?: string;
+  },
+): Promise<T | null> {
+  try {
+    return await fn();
+  } catch (error) {
+    const standardizedError = ErrorHandler.handle(error, options?.context);
+
+    if (options?.onError) {
+      options.onError(standardizedError);
+    }
+
+    if (options?.showAlert !== false) {
+      showErrorAlert(error, t, {
+        onRetry: options?.onRetry,
+        customMessage: options?.customErrorMessage,
+      });
+    }
+
+    return null;
+  }
+}
+
+/**
+ * Check if error is recoverable/retryable
+ */
+export const isRetryableError = (error: unknown): boolean => {
+  const standardizedError = standardizeError(error);
+  return standardizedError.recoverable;
+};
+
+/**
+ * Check if error is authentication-related
+ */
+export const isAuthError = (error: unknown): boolean => {
+  const standardizedError = standardizeError(error);
+  return [ErrorCode.UNAUTHORIZED, ErrorCode.FORBIDDEN].includes(standardizedError.code);
+};
+
+/**
+ * Check if error is network-related
+ */
+export const isNetworkRelatedError = (error: unknown): boolean => {
+  const standardizedError = standardizeError(error);
+  return [ErrorCode.NETWORK_ERROR, ErrorCode.TIMEOUT_ERROR].includes(standardizedError.code);
 };
 
 export default ErrorHandler;
