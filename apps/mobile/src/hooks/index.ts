@@ -73,13 +73,6 @@ export {
   useDeepCompare,
 } from './usePrevious';
 
-// Performance hooks
-export {
-  usePerformanceMonitor,
-  useInteractionManager,
-  useWhyDidYouUpdate,
-} from './usePerformanceMonitor';
-
 // Animation hooks (Awwwards Design System)
 export {
   // Spring & timing configurations
@@ -117,9 +110,3 @@ export {
   usePressAnimation as useLegacyPressAnimation,
   useBounceAnimation,
 } from './usePressAnimation';
-export {
-  useEnterAnimation,
-  useStaggeredAnimation,
-  useFadeAnimation,
-  useSlideAnimation,
-} from './useEnterAnimation';

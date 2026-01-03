@@ -7,7 +7,6 @@ export { NotificationsScreen } from './screens/NotificationsScreen';
 
 // Hooks
 export { useNotifications } from '@/hooks/useNotifications';
-export { usePushNotifications } from '@/hooks/usePushNotifications';
 
 // Services
 export {
