@@ -1,6 +1,6 @@
 import { supabase } from '@/config/supabase';
 
-export interface TripFilters {
+export interface MomentFilters {
   destination?: string;
   startDate?: Date;
   endDate?: Date;
@@ -10,7 +10,7 @@ export interface TripFilters {
   tags?: string[];
 }
 
-export interface CreateTripDto {
+export interface CreateMomentDto {
   title: string;
   description?: string;
   destination: string;
@@ -25,7 +25,7 @@ export interface CreateTripDto {
   tags?: string[];
 }
 
-export interface UpdateTripDto {
+export interface UpdateMomentDto {
   title?: string;
   description?: string;
   destination?: string;
@@ -42,17 +42,17 @@ export interface UpdateTripDto {
 }
 
 /**
- * Trips API Service
- * 
- * Trip yönetimi için tüm API çağrıları
+ * Moments API Service
+ *
+ * Moment yönetimi için tüm API çağrıları
  */
-export const tripsApi = {
+export const momentsApi = {
   /**
-   * Tüm trip'leri getir (filtreleme ile)
+   * Tüm moment'ları getir (filtreleme ile)
    */
-  getAll: async (filters?: TripFilters) => {
+  getAll: async (filters?: MomentFilters) => {
     let query = supabase
-      .from('trips')
+      .from('trips') // DB table name unchanged
       .select('*, profiles(*)')
       .eq('is_published', true)
       .is('deleted_at', null);
@@ -84,7 +84,7 @@ export const tripsApi = {
   },
 
   /**
-   * ID ile trip getir
+   * ID ile moment getir
    */
   getById: async (id: string) => {
     const { data, error } = await supabase
@@ -99,16 +99,18 @@ export const tripsApi = {
   },
 
   /**
-   * Yeni trip oluştur
+   * Yeni moment oluştur
    */
-  create: async (trip: CreateTripDto) => {
-    const { data: { user } } = await supabase.auth.getUser();
+  create: async (moment: CreateMomentDto) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await supabase
       .from('trips')
       .insert({
-        ...trip,
+        ...moment,
         user_id: user.id,
       })
       .select()
@@ -119,9 +121,9 @@ export const tripsApi = {
   },
 
   /**
-   * Trip güncelle
+   * Moment güncelle
    */
-  update: async (id: string, updates: UpdateTripDto) => {
+  update: async (id: string, updates: UpdateMomentDto) => {
     const { data, error } = await supabase
       .from('trips')
       .update(updates)
@@ -134,7 +136,7 @@ export const tripsApi = {
   },
 
   /**
-   * Trip sil (soft delete)
+   * Moment sil (soft delete)
    */
   delete: async (id: string) => {
     const { error } = await supabase
@@ -146,13 +148,14 @@ export const tripsApi = {
   },
 
   /**
-   * Kullanıcının trip'lerini getir
+   * Kullanıcının moment'larını getir
    */
-  getMyTrips: async (userId: string) => {
+  getMyMoments: async (userId: string) => {
     // SECURITY: Explicit column selection - never use select('*')
     const { data, error } = await supabase
       .from('trips')
-      .select(`
+      .select(
+        `
         id,
         user_id,
         title,
@@ -167,7 +170,8 @@ export const tripsApi = {
         image_url,
         created_at,
         updated_at
-      `)
+      `,
+      )
       .eq('user_id', userId)
       .is('deleted_at', null)
       .order('created_at', { ascending: false });
@@ -191,16 +195,18 @@ export const tripsApi = {
   },
 
   /**
-   * Trip'e katılım isteği gönder
+   * Moment'a katılım isteği gönder
    */
-  requestJoin: async (tripId: string, message?: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
+  requestJoin: async (momentId: string, message?: string) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await supabase
-      .from('trip_requests')
+      .from('trip_requests') // DB table name unchanged
       .insert({
-        trip_id: tripId,
+        trip_id: momentId,
         user_id: user.id,
         message,
         status: 'pending',
@@ -227,3 +233,13 @@ export const tripsApi = {
     return data;
   },
 };
+
+// Legacy exports for backward compatibility
+/** @deprecated Use MomentFilters */
+export type TripFilters = MomentFilters;
+/** @deprecated Use CreateMomentDto */
+export type CreateTripDto = CreateMomentDto;
+/** @deprecated Use UpdateMomentDto */
+export type UpdateTripDto = UpdateMomentDto;
+/** @deprecated Use momentsApi */
+export const tripsApi = momentsApi;
