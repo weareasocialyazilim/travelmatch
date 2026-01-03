@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -6,11 +6,14 @@ import {
   Text,
   ViewStyle,
   TextInputProps,
+  NativeSyntheticEvent,
+  TextInputFocusEventData,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
 import { FONT_FAMILIES } from '../../theme/typography';
 import { GlassCard } from './GlassCard';
+import { HapticManager } from '../../services/HapticManager';
 
 interface LiquidInputProps extends TextInputProps {
   label?: string;
@@ -29,9 +32,46 @@ export const LiquidInput: React.FC<LiquidInputProps> = ({
   error,
   containerStyle,
   style,
+  onFocus,
+  onBlur,
+  onChangeText,
   ...props
 }) => {
   const [isFocused, setIsFocused] = useState(false);
+  const hasTypedRef = useRef(false);
+
+  // Haptic feedback on focus - subtle selection change
+  const handleFocus = useCallback(
+    (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+      setIsFocused(true);
+      HapticManager.selectionChange();
+      hasTypedRef.current = false;
+      onFocus?.(e);
+    },
+    [onFocus],
+  );
+
+  // Reset typing state on blur
+  const handleBlur = useCallback(
+    (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+      setIsFocused(false);
+      hasTypedRef.current = false;
+      onBlur?.(e);
+    },
+    [onBlur],
+  );
+
+  // Haptic feedback on first character typed
+  const handleChangeText = useCallback(
+    (text: string) => {
+      if (!hasTypedRef.current && text.length > 0) {
+        HapticManager.selectionChange();
+        hasTypedRef.current = true;
+      }
+      onChangeText?.(text);
+    },
+    [onChangeText],
+  );
 
   return (
     <View style={[styles.wrapper, containerStyle]}>
@@ -61,8 +101,9 @@ export const LiquidInput: React.FC<LiquidInputProps> = ({
           <TextInput
             style={styles.input}
             placeholderTextColor={COLORS.textMuted}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onChangeText={handleChangeText}
             selectionColor={COLORS.brand.primary}
             {...props}
           />
