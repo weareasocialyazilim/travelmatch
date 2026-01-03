@@ -1,5 +1,8 @@
 // Profile Feature Exports
 export { default as ProfileScreen } from './screens/ProfileScreen';
+
+// Components
+export { AchievementCard } from './components/AchievementCard';
 export { ProfileDetailScreen } from './screens/ProfileDetailScreen';
 export { default as EditProfileScreen } from './screens/EditProfileScreen';
 export { UserProfileScreen } from './screens/UserProfileScreen';
