@@ -11,7 +11,6 @@ export { UserProfileScreen } from './screens/UserProfileScreen';
 export { default as ReputationScreen } from './screens/ReputationScreen';
 export { default as TrustGardenDetailScreen } from './screens/TrustGardenDetailScreen';
 export { TrustNotesScreen } from './screens/TrustNotesScreen';
-export { default as VerificationScreen } from './screens/VerificationScreen';
 
 // Proof System
 export { ProofFlowScreen } from './screens/ProofFlowScreen';
@@ -50,8 +49,10 @@ export {
 } from './hooks/useProfile';
 
 // Services
-export { profileApi } from './services/profileApi';
-export type { UpdateProfileDto } from './services/profileApi';
+export { profileApi as profileService } from './services/profileService';
+/** @deprecated Use profileService instead */
+export { profileApi } from './services/profileService';
+export type { UpdateProfileDto } from './services/profileService';
 
 // Types
 export type {

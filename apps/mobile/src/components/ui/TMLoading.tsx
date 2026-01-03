@@ -1,11 +1,31 @@
-// components/ui/LiquidLoading.tsx
-// TravelMatch Ultimate Design System 2026
-// "Global Liquid Loading Ceremony" - Twilight Zinc & Neon Genetiği
-// Awwwards-standard immersive loading experience
+/**
+ * TMLoading - TravelMatch Ultimate Design System 2026
+ * Consolidated loading component for all loading types
+ *
+ * Replaces:
+ * - Spinner.tsx (basic loading with message)
+ * - LoadingSpinner.tsx (minimal loading)
+ * - LiquidLoading.tsx (premium immersive loading)
+ *
+ * @example
+ * ```tsx
+ * // Simple inline spinner
+ * <TMLoading type="simple" />
+ *
+ * // Standard spinner with message
+ * <TMLoading type="standard" message="Loading..." />
+ *
+ * // Full screen loading
+ * <TMLoading type="standard" fullScreen message="Please wait..." />
+ *
+ * // Premium liquid loading (cinematic)
+ * <TMLoading type="liquid" message="İpeksi detaylar hazırlanıyor..." />
+ * ```
+ */
 
 import React, { useEffect, useMemo } from 'react';
 import type { ViewStyle } from 'react-native';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -14,22 +34,194 @@ import Animated, {
   withSequence,
   withDelay,
   withSpring,
-  interpolate,
   Easing,
   FadeIn,
   FadeOut,
 } from 'react-native-reanimated';
-import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
-import { COLORS, GRADIENTS, primitives } from '../../constants/colors';
-import { SPACING } from '../../constants/spacing';
-import { TYPOGRAPHY } from '../../theme/typography';
+import { COLORS, GRADIENTS, primitives } from '@/constants/colors';
+import { SPACING } from '@/constants/spacing';
+import { TYPOGRAPHY } from '@/constants/typography';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // ═══════════════════════════════════════════════════════════════════
+// Types
+// ═══════════════════════════════════════════════════════════════════
+
+export type TMLoadingType = 'simple' | 'standard' | 'liquid';
+
+export type LoadingSize = 'sm' | 'md' | 'lg';
+
+export type LoadingVariant = 'primary' | 'secondary' | 'trust';
+
+export interface TMLoadingProps {
+  /** Loading type determines rendering style */
+  type?: TMLoadingType;
+
+  // Common props
+  /** Loading message */
+  message?: string;
+  /** Custom style */
+  style?: ViewStyle;
+  /** Test ID */
+  testID?: string;
+
+  // Simple/Standard props
+  /** ActivityIndicator size for simple/standard */
+  size?: 'small' | 'large' | LoadingSize;
+  /** Spinner color */
+  color?: string;
+  /** Full screen mode (standard type only) */
+  fullScreen?: boolean;
+
+  // Liquid props
+  /** Show or hide the loading (liquid type) */
+  visible?: boolean;
+  /** Show backdrop blur (liquid type) */
+  blur?: boolean;
+  /** Intensity of blur 1-100 (liquid type) */
+  blurIntensity?: number;
+  /** Color variant (liquid type) */
+  variant?: LoadingVariant;
+  /** Custom messages array for rotation (liquid type) */
+  messages?: string[];
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Main Component
+// ═══════════════════════════════════════════════════════════════════
+
+export const TMLoading: React.FC<TMLoadingProps> = ({
+  type = 'standard',
+  message,
+  style,
+  testID,
+  size = 'large',
+  color = COLORS.brand.primary,
+  fullScreen = false,
+  visible = true,
+  blur = true,
+  blurIntensity = 20,
+  variant = 'primary',
+  messages,
+}) => {
+  // Map LoadingSize to ActivityIndicator size
+  const activityIndicatorSize = size === 'sm' || size === 'small' ? 'small' : 'large';
+
+  switch (type) {
+    case 'simple':
+      return (
+        <SimpleLoading
+          size={activityIndicatorSize}
+          color={color}
+          style={style}
+          testID={testID}
+        />
+      );
+
+    case 'liquid':
+      return (
+        <LiquidLoading
+          message={message}
+          messages={messages}
+          blur={blur}
+          blurIntensity={blurIntensity}
+          style={style}
+          visible={visible}
+          size={size as LoadingSize}
+          variant={variant}
+          testID={testID}
+        />
+      );
+
+    case 'standard':
+    default:
+      return (
+        <StandardLoading
+          size={activityIndicatorSize}
+          color={color}
+          message={message}
+          fullScreen={fullScreen}
+          style={style}
+          testID={testID}
+        />
+      );
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// Simple Loading (replaces LoadingSpinner)
+// ═══════════════════════════════════════════════════════════════════
+
+interface SimpleLoadingProps {
+  size: 'small' | 'large';
+  color: string;
+  style?: ViewStyle;
+  testID?: string;
+}
+
+const SimpleLoading: React.FC<SimpleLoadingProps> = ({
+  size,
+  color,
+  style,
+  testID,
+}) => (
+  <View style={[styles.simpleContainer, style]} testID={testID}>
+    <ActivityIndicator size={size} color={color} />
+  </View>
+);
+
+// ═══════════════════════════════════════════════════════════════════
+// Standard Loading (replaces Spinner)
+// ═══════════════════════════════════════════════════════════════════
+
+interface StandardLoadingProps {
+  size: 'small' | 'large';
+  color: string;
+  message?: string;
+  fullScreen: boolean;
+  style?: ViewStyle;
+  testID?: string;
+}
+
+const StandardLoading: React.FC<StandardLoadingProps> = ({
+  size,
+  color,
+  message,
+  fullScreen,
+  style,
+  testID,
+}) => {
+  const containerStyle = fullScreen
+    ? styles.fullScreenContainer
+    : styles.standardContainer;
+
+  return (
+    <View style={[containerStyle, style]} testID={testID}>
+      <ActivityIndicator size={size} color={color} />
+      {message && <Text style={styles.standardMessage}>{message}</Text>}
+    </View>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// Liquid Loading (Premium Cinematic)
+// ═══════════════════════════════════════════════════════════════════
+
+interface LiquidLoadingProps {
+  message?: string;
+  messages?: string[];
+  blur?: boolean;
+  blurIntensity?: number;
+  style?: ViewStyle;
+  visible?: boolean;
+  size?: LoadingSize;
+  variant?: LoadingVariant;
+  testID?: string;
+}
+
 // Orbiting Particle Component
-// ═══════════════════════════════════════════════════════════════════
 interface OrbitingParticleProps {
   delay: number;
   radius: number;
@@ -51,7 +243,6 @@ const OrbitingParticle: React.FC<OrbitingParticleProps> = ({
   const opacity = useSharedValue(0);
 
   useEffect(() => {
-    // Start rotation after delay
     rotation.value = withDelay(
       delay,
       withRepeat(
@@ -63,11 +254,7 @@ const OrbitingParticle: React.FC<OrbitingParticleProps> = ({
         false
       )
     );
-    // Fade in
-    opacity.value = withDelay(
-      delay,
-      withTiming(1, { duration: 500 })
-    );
+    opacity.value = withDelay(delay, withTiming(1, { duration: 500 }));
   }, [delay, duration, clockwise, rotation, opacity]);
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -76,10 +263,7 @@ const OrbitingParticle: React.FC<OrbitingParticleProps> = ({
     const y = Math.sin(angle) * radius;
 
     return {
-      transform: [
-        { translateX: x },
-        { translateY: y },
-      ],
+      transform: [{ translateX: x }, { translateY: y }],
       opacity: opacity.value,
     };
   });
@@ -104,9 +288,7 @@ const OrbitingParticle: React.FC<OrbitingParticleProps> = ({
   );
 };
 
-// ═══════════════════════════════════════════════════════════════════
 // Neon Ring Component
-// ═══════════════════════════════════════════════════════════════════
 interface NeonRingProps {
   size: number;
   borderWidth: number;
@@ -126,7 +308,6 @@ const NeonRing: React.FC<NeonRingProps> = ({
   const scale = useSharedValue(0.8);
 
   useEffect(() => {
-    // Rotate ring
     rotation.value = withDelay(
       delay,
       withRepeat(
@@ -138,7 +319,6 @@ const NeonRing: React.FC<NeonRingProps> = ({
         false
       )
     );
-    // Scale in with spring
     scale.value = withDelay(
       delay,
       withSpring(1, { damping: 12, stiffness: 100 })
@@ -146,10 +326,7 @@ const NeonRing: React.FC<NeonRingProps> = ({
   }, [delay, duration, rotation, scale]);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { rotate: `${rotation.value}deg` },
-      { scale: scale.value },
-    ],
+    transform: [{ rotate: `${rotation.value}deg` }, { scale: scale.value }],
   }));
 
   return (
@@ -182,40 +359,40 @@ const NeonRing: React.FC<NeonRingProps> = ({
   );
 };
 
-// ═══════════════════════════════════════════════════════════════════
-// Main LiquidLoading Component
-// ═══════════════════════════════════════════════════════════════════
-interface LiquidLoadingProps {
-  /** Loading message */
-  message?: string;
-  /** Custom messages array for rotation */
-  messages?: string[];
-  /** Show backdrop blur */
-  blur?: boolean;
-  /** Intensity of blur (1-100) */
-  blurIntensity?: number;
-  /** Custom style */
-  style?: ViewStyle;
-  /** Show or hide the loading */
-  visible?: boolean;
-  /** Size variant */
-  size?: 'sm' | 'md' | 'lg';
-  /** Color variant */
-  variant?: 'primary' | 'secondary' | 'trust';
-}
+// Progress Dot Component
+const ProgressDot: React.FC<{ delay: number; color: string }> = ({
+  delay,
+  color,
+}) => {
+  const opacity = useSharedValue(0.3);
 
-/**
- * Awwwards-Standard Immersive Loading Screen
- * "Global Liquid Loading Ceremony"
- *
- * Features:
- * - Multi-layered neon rings with gradient rotation
- * - Orbiting particles with glow trails
- * - Breathing center dot with inner glow
- * - Backdrop blur with darkened overlay
- * - Animated message with letter spacing
- */
-export const LiquidLoading: React.FC<LiquidLoadingProps> = ({
+  useEffect(() => {
+    opacity.value = withDelay(
+      delay,
+      withRepeat(
+        withSequence(
+          withTiming(1, { duration: 400 }),
+          withTiming(0.3, { duration: 400 })
+        ),
+        -1,
+        false
+      )
+    );
+  }, [delay, opacity]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
+
+  return (
+    <Animated.View
+      style={[styles.progressDot, { backgroundColor: color }, animatedStyle]}
+    />
+  );
+};
+
+// Main Liquid Loading Component
+const LiquidLoading: React.FC<LiquidLoadingProps> = ({
   message = 'İpeksi detaylar hazırlanıyor...',
   messages,
   blur = true,
@@ -224,16 +401,12 @@ export const LiquidLoading: React.FC<LiquidLoadingProps> = ({
   visible = true,
   size = 'md',
   variant = 'primary',
+  testID,
 }) => {
-  // Breathing animation for center dot
   const breathingScale = useSharedValue(1);
   const glowOpacity = useSharedValue(0.4);
-
-  // Message animation
   const messageOpacity = useSharedValue(0);
-  const messageIndex = useSharedValue(0);
 
-  // Get colors based on variant
   const variantColors = useMemo(() => {
     switch (variant) {
       case 'secondary':
@@ -260,7 +433,6 @@ export const LiquidLoading: React.FC<LiquidLoadingProps> = ({
     }
   }, [variant]);
 
-  // Size configurations
   const sizeConfig = useMemo(() => {
     switch (size) {
       case 'sm':
@@ -293,7 +465,6 @@ export const LiquidLoading: React.FC<LiquidLoadingProps> = ({
     }
   }, [size]);
 
-  // Generate orbiting particles
   const particles = useMemo(() => {
     const particleColors = [
       variantColors.primary,
@@ -315,7 +486,6 @@ export const LiquidLoading: React.FC<LiquidLoadingProps> = ({
   useEffect(() => {
     if (!visible) return;
 
-    // Breathing animation
     breathingScale.value = withRepeat(
       withSequence(
         withTiming(1.3, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
@@ -325,7 +495,6 @@ export const LiquidLoading: React.FC<LiquidLoadingProps> = ({
       false
     );
 
-    // Glow pulsing
     glowOpacity.value = withRepeat(
       withSequence(
         withTiming(0.6, { duration: 1000 }),
@@ -335,11 +504,7 @@ export const LiquidLoading: React.FC<LiquidLoadingProps> = ({
       false
     );
 
-    // Message fade in
-    messageOpacity.value = withDelay(
-      500,
-      withTiming(1, { duration: 600 })
-    );
+    messageOpacity.value = withDelay(500, withTiming(1, { duration: 600 }));
   }, [visible, breathingScale, glowOpacity, messageOpacity]);
 
   const breathingStyle = useAnimatedStyle(() => ({
@@ -362,25 +527,18 @@ export const LiquidLoading: React.FC<LiquidLoadingProps> = ({
     <Animated.View
       entering={FadeIn.duration(300)}
       exiting={FadeOut.duration(200)}
-      style={[styles.container, style]}
+      style={[styles.liquidContainer, style]}
+      testID={testID}
     >
-      {/* Backdrop */}
       {blur ? (
-        <BlurView
-          intensity={blurIntensity}
-          tint="dark"
-          style={styles.backdrop}
-        />
+        <BlurView intensity={blurIntensity} tint="dark" style={styles.backdrop} />
       ) : (
         <View style={styles.backdrop} />
       )}
 
-      {/* Darkened Overlay */}
       <View style={styles.overlay} />
 
-      {/* Loading Content */}
       <View style={styles.content}>
-        {/* Loader Wrapper */}
         <View
           style={[
             styles.loaderWrapper,
@@ -390,7 +548,6 @@ export const LiquidLoading: React.FC<LiquidLoadingProps> = ({
             },
           ]}
         >
-          {/* Outer Glow */}
           <Animated.View
             style={[
               styles.glow,
@@ -405,7 +562,6 @@ export const LiquidLoading: React.FC<LiquidLoadingProps> = ({
             ]}
           />
 
-          {/* Outer Neon Ring */}
           <NeonRing
             size={sizeConfig.outerRing}
             borderWidth={3}
@@ -413,7 +569,6 @@ export const LiquidLoading: React.FC<LiquidLoadingProps> = ({
             colors={[variantColors.primary, variantColors.secondary]}
           />
 
-          {/* Inner Neon Ring (counter-rotating) */}
           <View style={styles.innerRingWrapper}>
             <NeonRing
               size={sizeConfig.innerRing}
@@ -424,7 +579,6 @@ export const LiquidLoading: React.FC<LiquidLoadingProps> = ({
             />
           </View>
 
-          {/* Orbiting Particles */}
           {particles.map((particle) => (
             <OrbitingParticle
               key={particle.id}
@@ -437,7 +591,6 @@ export const LiquidLoading: React.FC<LiquidLoadingProps> = ({
             />
           ))}
 
-          {/* Center Dot */}
           <View
             style={[
               styles.centerDot,
@@ -463,12 +616,10 @@ export const LiquidLoading: React.FC<LiquidLoadingProps> = ({
           </View>
         </View>
 
-        {/* Message */}
-        <Animated.Text style={[styles.message, messageStyle]}>
+        <Animated.Text style={[styles.liquidMessage, messageStyle]}>
           {currentMessage.toUpperCase()}
         </Animated.Text>
 
-        {/* Subtle Progress Dots */}
         <View style={styles.dotsContainer}>
           {[0, 1, 2].map((i) => (
             <ProgressDot key={i} delay={i * 200} color={variantColors.primary} />
@@ -480,48 +631,37 @@ export const LiquidLoading: React.FC<LiquidLoadingProps> = ({
 };
 
 // ═══════════════════════════════════════════════════════════════════
-// Progress Dot Component
-// ═══════════════════════════════════════════════════════════════════
-const ProgressDot: React.FC<{ delay: number; color: string }> = ({
-  delay,
-  color,
-}) => {
-  const opacity = useSharedValue(0.3);
-
-  useEffect(() => {
-    opacity.value = withDelay(
-      delay,
-      withRepeat(
-        withSequence(
-          withTiming(1, { duration: 400 }),
-          withTiming(0.3, { duration: 400 })
-        ),
-        -1,
-        false
-      )
-    );
-  }, [delay, opacity]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-  }));
-
-  return (
-    <Animated.View
-      style={[
-        styles.progressDot,
-        { backgroundColor: color },
-        animatedStyle,
-      ]}
-    />
-  );
-};
-
-// ═══════════════════════════════════════════════════════════════════
 // Styles
 // ═══════════════════════════════════════════════════════════════════
+
 const styles = StyleSheet.create({
-  container: {
+  // Simple loading
+  simpleContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  // Standard loading
+  standardContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: SPACING.lg,
+  },
+  fullScreenContainer: {
+    alignItems: 'center',
+    backgroundColor: COLORS.bg.primary,
+    flex: 1,
+    justifyContent: 'center',
+  },
+  standardMessage: {
+    ...TYPOGRAPHY.body,
+    color: COLORS.text.secondary,
+    marginTop: SPACING.md,
+    textAlign: 'center',
+  },
+
+  // Liquid loading
+  liquidContainer: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
@@ -532,7 +672,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(12, 10, 9, 0.92)', // Twilight Zinc
+    backgroundColor: 'rgba(12, 10, 9, 0.92)',
   },
   content: {
     alignItems: 'center',
@@ -574,7 +714,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  message: {
+  liquidMessage: {
     marginTop: SPACING['2xl'],
     fontSize: 10,
     fontWeight: '700',
@@ -595,4 +735,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LiquidLoading;
+export default TMLoading;

@@ -1,379 +1,134 @@
 /**
- * User-Friendly Error Handler with i18n Support
- * 
- * Bridges the gap between technical errors and user-facing messages
- * Provides React Native Alert integration with translation support
+ * @deprecated This file is deprecated. Use errorHandler.ts instead.
+ *
+ * Migration Guide:
+ * ================
+ *
+ * BEFORE:
+ * ```tsx
+ * import { showErrorAlert, parseError, FriendlyAppError } from '@/utils/friendlyErrorHandler';
+ * ```
+ *
+ * AFTER:
+ * ```tsx
+ * import { showErrorAlert, standardizeError, StandardizedError } from '@/utils/errorHandler';
+ * import { AppError, toAppError } from '@/utils/appErrors';
+ * ```
+ *
+ * Key changes:
+ * - FriendlyAppError → Use StandardizedError or AppError from appErrors.ts
+ * - parseError → Use standardizeError from errorHandler.ts
+ * - showErrorAlert → Now in errorHandler.ts with same signature
+ * - withErrorHandling → Use withErrorAlert from errorHandler.ts
+ * - AppErrorCode enum → Use ErrorCode from appErrors.ts
+ *
+ * This file re-exports from errorHandler.ts for backward compatibility.
+ * Will be removed in a future major version.
  */
 
-import { Alert } from 'react-native';
-import { TFunction } from 'i18next';
-import { logger } from './logger';
+// Re-export from the main error handler
+export {
+  showErrorAlert,
+  withErrorAlert as withErrorHandling,
+  standardizeError as parseError,
+  isRetryableError as isRetryable,
+  isAuthError,
+  isNetworkRelatedError as isNetworkError,
+  StandardizedError,
+} from './errorHandler';
 
-/**
- * Error codes matching locale translation keys
- */
-export enum AppErrorCode {
-  // Network
-  NETWORK_ERROR = 'NETWORK_ERROR',
-  TIMEOUT = 'TIMEOUT',
-  NO_INTERNET = 'NO_INTERNET',
-  
-  // Authentication
-  AUTH_INVALID_CREDENTIALS = 'AUTH_INVALID_CREDENTIALS',
-  AUTH_SESSION_EXPIRED = 'AUTH_SESSION_EXPIRED',
-  AUTH_EMAIL_NOT_VERIFIED = 'AUTH_EMAIL_NOT_VERIFIED',
-  AUTH_ACCOUNT_DISABLED = 'AUTH_ACCOUNT_DISABLED',
-  AUTH_TOO_MANY_ATTEMPTS = 'AUTH_TOO_MANY_ATTEMPTS',
-  
-  // Validation
-  VALIDATION_REQUIRED_FIELD = 'VALIDATION_REQUIRED_FIELD',
-  VALIDATION_INVALID_EMAIL = 'VALIDATION_INVALID_EMAIL',
-  VALIDATION_INVALID_PHONE = 'VALIDATION_INVALID_PHONE',
-  VALIDATION_PASSWORD_TOO_SHORT = 'VALIDATION_PASSWORD_TOO_SHORT',
-  VALIDATION_PASSWORDS_DONT_MATCH = 'VALIDATION_PASSWORDS_DONT_MATCH',
-  
-  // Payment
-  PAYMENT_FAILED = 'PAYMENT_FAILED',
-  PAYMENT_CARD_DECLINED = 'PAYMENT_CARD_DECLINED',
-  PAYMENT_INSUFFICIENT_FUNDS = 'PAYMENT_INSUFFICIENT_FUNDS',
-  PAYMENT_INVALID_CARD = 'PAYMENT_INVALID_CARD',
-  PAYMENT_PROCESSING_ERROR = 'PAYMENT_PROCESSING_ERROR',
-  
-  // Upload
-  UPLOAD_FILE_TOO_LARGE = 'UPLOAD_FILE_TOO_LARGE',
-  UPLOAD_INVALID_FORMAT = 'UPLOAD_INVALID_FORMAT',
-  UPLOAD_FAILED = 'UPLOAD_FAILED',
-  UPLOAD_QUOTA_EXCEEDED = 'UPLOAD_QUOTA_EXCEEDED',
-  
-  // Permissions
-  PERMISSION_CAMERA_DENIED = 'PERMISSION_CAMERA_DENIED',
-  PERMISSION_LOCATION_DENIED = 'PERMISSION_LOCATION_DENIED',
-  PERMISSION_STORAGE_DENIED = 'PERMISSION_STORAGE_DENIED',
-  PERMISSION_NOTIFICATIONS_DENIED = 'PERMISSION_NOTIFICATIONS_DENIED',
-  
-  // Resources
-  RESOURCE_NOT_FOUND = 'RESOURCE_NOT_FOUND',
-  RESOURCE_ALREADY_EXISTS = 'RESOURCE_ALREADY_EXISTS',
-  RESOURCE_DELETED = 'RESOURCE_DELETED',
-  
-  // Rate limiting
-  RATE_LIMIT_EXCEEDED = 'RATE_LIMIT_EXCEEDED',
-  
-  // Server
-  SERVER_ERROR = 'SERVER_ERROR',
-  SERVICE_UNAVAILABLE = 'SERVICE_UNAVAILABLE',
-  MAINTENANCE_MODE = 'MAINTENANCE_MODE',
-  
-  // Unknown
-  UNKNOWN_ERROR = 'UNKNOWN_ERROR',
-}
+// Re-export error codes and classes from appErrors
+export { ErrorCode as AppErrorCode, AppError as FriendlyAppError, toAppError } from './appErrors';
 
-/**
- * User-friendly application error with i18n support
- * Note: This is separate from the base AppError in appErrors.ts
- * Use this for user-facing errors that need localization
- */
-export class FriendlyAppError extends Error {
-  code: AppErrorCode;
-  details?: Record<string, unknown>;
-  retryable: boolean;
-  userMessage?: string;
+// Validation helpers - re-exported for backward compatibility
+// These should be moved to a validation module in the future
+import { AppError } from './appErrors';
 
-  constructor(
-    code: AppErrorCode,
-    message?: string,
-    details?: Record<string, unknown>,
-    retryable = false,
-  ) {
-    super(message || code);
-    this.name = 'FriendlyAppError';
-    this.code = code;
-    this.details = details;
-    this.retryable = retryable;
-  }
-}
-
-/**
- * Parse unknown error into FriendlyAppError
- */
-export function parseError(error: unknown): FriendlyAppError {
-  if (error instanceof FriendlyAppError) {
-    return error;
-  }
-
-  if (error instanceof Error) {
-    // Network errors
-    if (error.message.includes('Network request failed') ||
-        error.message.includes('Failed to fetch')) {
-      return new FriendlyAppError(AppErrorCode.NETWORK_ERROR, error.message, {}, true);
-    }
-
-    // Timeout errors
-    if (error.message.toLowerCase().includes('timeout')) {
-      return new FriendlyAppError(AppErrorCode.TIMEOUT, error.message, {}, true);
-    }
-
-    return new FriendlyAppError(AppErrorCode.UNKNOWN_ERROR, error.message);
-  }
-
-  // Supabase/API errors
-  if (typeof error === 'object' && error !== null) {
-    const err = error as Record<string, unknown>;
-
-    if ('code' in err && 'message' in err) {
-      const code = String(err.code);
-      const message = String(err.message);
-
-      // Map specific error codes
-      if (code === 'PGRST116' || code === '404') {
-        return new FriendlyAppError(AppErrorCode.RESOURCE_NOT_FOUND, message);
-      }
-      if (code === '23505') {
-        return new FriendlyAppError(AppErrorCode.RESOURCE_ALREADY_EXISTS, message);
-      }
-      if (code === '401') {
-        return new FriendlyAppError(AppErrorCode.AUTH_SESSION_EXPIRED, message);
-      }
-      if (code === '429') {
-        return new FriendlyAppError(AppErrorCode.RATE_LIMIT_EXCEEDED, message, {}, true);
-      }
-      if (code.startsWith('5')) {
-        return new FriendlyAppError(AppErrorCode.SERVER_ERROR, message, {}, true);
-      }
-    }
-
-    if ('status' in err) {
-      const status = Number(err.status);
-      if (status === 404) {
-        return new FriendlyAppError(AppErrorCode.RESOURCE_NOT_FOUND, String(err.message || 'Not found'));
-      }
-      if (status === 401 || status === 403) {
-        return new FriendlyAppError(AppErrorCode.AUTH_SESSION_EXPIRED, String(err.message || 'Session expired'));
-      }
-      if (status >= 500) {
-        return new FriendlyAppError(AppErrorCode.SERVER_ERROR, String(err.message || 'Server error'), {}, true);
-      }
-    }
-  }
-
-  return new FriendlyAppError(AppErrorCode.UNKNOWN_ERROR, String(error));
-}
-
-/**
- * Show user-friendly error alert with i18n
- */
-export function showErrorAlert(
-  error: unknown,
-  t: TFunction,
-  options?: {
-    onRetry?: () => void;
-    onDismiss?: () => void;
-    customTitle?: string;
-    customMessage?: string;
-  },
-): void {
-  const appError = parseError(error);
-  
-  // Get localized title
-  const title = options?.customTitle || getErrorTitle(appError, t);
-  
-  // Get localized message
-  const message = options?.customMessage || getErrorMessage(appError, t);
-  
-  // Log for debugging
-  logger.error('Error shown to user:', {
-    code: appError.code,
-    message: appError.message,
-    details: appError.details,
-  });
-
-  // Build alert buttons
-  const buttons: Array<{ text: string; style?: 'default' | 'cancel' | 'destructive'; onPress?: () => void }> = [];
-
-  if (appError.retryable && options?.onRetry) {
-    buttons.push({
-      text: t('common.retry'),
-      onPress: options.onRetry,
-    });
-    buttons.push({
-      text: t('common.cancel'),
-      style: 'cancel',
-      onPress: options?.onDismiss,
-    });
-  } else {
-    buttons.push({
-      text: t('common.close'),
-      onPress: options?.onDismiss,
-    });
-  }
-
-  Alert.alert(title, message, buttons, { cancelable: true });
-}
-
-/**
- * Get error title based on error code
- */
-export function getErrorTitle(error: FriendlyAppError, t: TFunction): string {
-  if (error.code.startsWith('AUTH_')) {
-    return t('errors.titles.authentication');
-  }
-  if (error.code.startsWith('PAYMENT_')) {
-    return t('errors.titles.payment');
-  }
-  if (error.code.startsWith('VALIDATION_')) {
-    return t('errors.titles.validation');
-  }
-  if (error.code.startsWith('PERMISSION_')) {
-    return t('errors.titles.permission');
-  }
-  if (error.code.startsWith('UPLOAD_')) {
-    return t('errors.titles.upload');
-  }
-  if (['NETWORK_ERROR', 'TIMEOUT', 'NO_INTERNET'].includes(error.code)) {
-    return t('errors.titles.network');
-  }
-  
-  return t('errors.titles.error');
-}
-
-/**
- * Get localized error message
- */
-export function getErrorMessage(error: FriendlyAppError, t: TFunction): string {
-  const key = `errors.${error.code}`;
-  const translated = t(key, error.details || {});
-  
-  // If translation exists, use it
-  if (translated !== key) {
-    return translated;
-  }
-  
-  // Fallback to error message or generic
-  return error.message || t('errors.UNKNOWN_ERROR');
-}
-
-/**
- * Async wrapper with automatic error handling
- */
-export async function withErrorHandling<T>(
-  fn: () => Promise<T>,
-  t: TFunction,
-  options?: {
-    onError?: (error: FriendlyAppError) => void;
-    showAlert?: boolean;
-    onRetry?: () => void;
-    customErrorMessage?: string;
-  },
-): Promise<T | null> {
-  try {
-    return await fn();
-  } catch (error) {
-    const appError = parseError(error);
-    
-    logger.error('Async operation failed:', {
-      code: appError.code,
-      message: appError.message,
-    });
-
-    if (options?.onError) {
-      options.onError(appError);
-    }
-
-    if (options?.showAlert !== false) {
-      showErrorAlert(error, t, {
-        onRetry: options?.onRetry,
-        customMessage: options?.customErrorMessage,
-      });
-    }
-
-    return null;
-  }
-}
-
-/**
- * Validation helpers that throw FriendlyAppError
- */
-export function validateRequired(value: string | null | undefined, fieldName?: string): asserts value is string {
+export function validateRequired(
+  value: string | null | undefined,
+  fieldName?: string,
+): asserts value is string {
   if (!value || value.trim() === '') {
-    throw new FriendlyAppError(
-      AppErrorCode.VALIDATION_REQUIRED_FIELD,
-      `${fieldName || 'Field'} is required`,
-      { field: fieldName },
-    );
+    throw new AppError(`${fieldName || 'Field'} is required`, {
+      code: 'VALIDATION_REQUIRED_FIELD',
+      context: { field: fieldName },
+    });
   }
 }
 
 export function validateEmail(email: string): asserts email is string {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    throw new FriendlyAppError(AppErrorCode.VALIDATION_INVALID_EMAIL, 'Invalid email address');
+    throw new AppError('Invalid email address', {
+      code: 'VALIDATION_INVALID_EMAIL',
+    });
   }
 }
 
 export function validatePassword(password: string): asserts password is string {
   if (password.length < 8) {
-    throw new FriendlyAppError(
-      AppErrorCode.VALIDATION_PASSWORD_TOO_SHORT,
-      'Password must be at least 8 characters',
-    );
+    throw new AppError('Password must be at least 8 characters', {
+      code: 'VALIDATION_PASSWORD_TOO_SHORT',
+    });
   }
 }
 
 export function validatePhone(phone: string): asserts phone is string {
   const phoneRegex = /^\+?[1-9]\d{1,14}$/;
   if (!phoneRegex.test(phone.replace(/[\s-]/g, ''))) {
-    throw new FriendlyAppError(AppErrorCode.VALIDATION_INVALID_PHONE, 'Invalid phone number');
+    throw new AppError('Invalid phone number', {
+      code: 'VALIDATION_INVALID_PHONE',
+    });
   }
 }
 
-/**
- * Create specific error types
- */
+// Error factory - deprecated, use AppError directly
 export const createError = {
-  network: (message?: string) =>
-    new FriendlyAppError(AppErrorCode.NETWORK_ERROR, message, {}, true),
-
-  timeout: (message?: string) =>
-    new FriendlyAppError(AppErrorCode.TIMEOUT, message, {}, true),
-
-  auth: (message?: string) =>
-    new FriendlyAppError(AppErrorCode.AUTH_INVALID_CREDENTIALS, message),
-
-  sessionExpired: () =>
-    new FriendlyAppError(AppErrorCode.AUTH_SESSION_EXPIRED, 'Session expired'),
-
-  notFound: (resource?: string) =>
-    new FriendlyAppError(AppErrorCode.RESOURCE_NOT_FOUND, `${resource || 'Resource'} not found`),
-
-  validation: (field: string) =>
-    new FriendlyAppError(AppErrorCode.VALIDATION_REQUIRED_FIELD, `${field} is required`, { field }),
-
-  payment: (message?: string) =>
-    new FriendlyAppError(AppErrorCode.PAYMENT_FAILED, message),
-
-  server: (message?: string) =>
-    new FriendlyAppError(AppErrorCode.SERVER_ERROR, message, {}, true),
+  network: (message?: string) => new AppError(message || 'Network error', { code: 'NETWORK_ERROR' }),
+  timeout: (message?: string) => new AppError(message || 'Timeout', { code: 'TIMEOUT' }),
+  auth: (message?: string) => new AppError(message || 'Authentication failed', { code: 'AUTH_ERROR' }),
+  sessionExpired: () => new AppError('Session expired', { code: 'AUTH_SESSION_EXPIRED' }),
+  notFound: (resource?: string) => new AppError(`${resource || 'Resource'} not found`, { code: 'NOT_FOUND' }),
+  validation: (field: string) => new AppError(`${field} is required`, { code: 'VALIDATION_ERROR', context: { field } }),
+  payment: (message?: string) => new AppError(message || 'Payment failed', { code: 'PAYMENT_FAILED' }),
+  server: (message?: string) => new AppError(message || 'Server error', { code: 'SERVER_ERROR' }),
 };
 
-/**
- * Check error type
- */
-export const isNetworkError = (error: unknown): boolean => {
-  const appError = parseError(error);
-  return ['NETWORK_ERROR', 'TIMEOUT', 'NO_INTERNET'].includes(appError.code);
-};
-
-export const isAuthError = (error: unknown): boolean => {
-  const appError = parseError(error);
-  return appError.code.startsWith('AUTH_');
-};
-
+// Deprecated: Use isValidationError from appErrors.ts
 export const isValidationError = (error: unknown): boolean => {
-  const appError = parseError(error);
-  return appError.code.startsWith('VALIDATION_');
+  if (error instanceof AppError) {
+    return error.code.startsWith('VALIDATION_');
+  }
+  return false;
 };
 
-export const isRetryable = (error: unknown): boolean => {
-  const appError = parseError(error);
-  return appError.retryable;
-};
+// Error title helper - use showErrorAlert which handles this internally
+import { TFunction } from 'i18next';
+
+export function getErrorTitle(error: AppError, t: TFunction): string {
+  if (error.code.startsWith('AUTH_')) {
+    return t('errors.titles.authentication', 'Authentication Error');
+  }
+  if (error.code.startsWith('PAYMENT_')) {
+    return t('errors.titles.payment', 'Payment Error');
+  }
+  if (error.code.startsWith('VALIDATION_')) {
+    return t('errors.titles.validation', 'Validation Error');
+  }
+  if (error.code.startsWith('PERMISSION_')) {
+    return t('errors.titles.permission', 'Permission Error');
+  }
+  if (['NETWORK_ERROR', 'TIMEOUT'].includes(error.code)) {
+    return t('errors.titles.network', 'Connection Error');
+  }
+  return t('errors.titles.error', 'Error');
+}
+
+export function getErrorMessage(error: AppError, t: TFunction): string {
+  const key = `errors.${error.code}`;
+  const translated = t(key, error.context || {});
+  if (translated !== key) {
+    return translated;
+  }
+  return error.message || t('errors.UNKNOWN_ERROR', 'An unexpected error occurred');
+}

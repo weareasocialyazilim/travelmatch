@@ -649,16 +649,6 @@ const AppNavigator = () => {
             <Stack.Screen name="Withdraw" component={WithdrawScreen} />
             <Stack.Screen name="WithdrawSuccess" component={WithdrawSuccessScreen} />
 
-            {/* Moment Publishing */}
-            {/* <Stack.Screen
-              name="MomentPreview"
-              component={MomentPreviewScreen}
-            />
-            <Stack.Screen
-              name="MomentPublished"
-              component={MomentPublishedScreen}
-            /> */}
-
             {/* Payment Methods */}
             <Stack.Screen
               name="PaymentMethods"
@@ -675,9 +665,6 @@ const AppNavigator = () => {
               component={NotificationDetailScreen}
             />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-
-            {/* Place Selection */}
-            {/* <Stack.Screen name="SelectPlace" component={SelectPlaceScreen} /> */}
 
             {/* Profile Sub-screens */}
             <Stack.Screen name="MyMoments" component={MyMomentsScreen} />
@@ -715,8 +702,6 @@ const AppNavigator = () => {
             <Stack.Screen name="PayTRWebView" component={PayTRWebViewScreen} />
 
             {/* Footer Pages */}
-            {/* <Stack.Screen name="Contact" component={ContactScreen} />
-            <Stack.Screen name="Help" component={HelpScreen} /> */}
             <Stack.Screen name="Safety" component={SafetyScreen} />
             <Stack.Screen name="Emergency" component={EmergencyScreen} />
 
