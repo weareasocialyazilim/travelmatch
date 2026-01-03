@@ -123,3 +123,7 @@ export {
   LiquidSegmentedControl,
   LiquidSegmentedControlAnimated,
 } from './LiquidSegmentedControl';
+export {
+  LiquidBottomSheet,
+  LiquidBottomSheetStatic,
+} from './LiquidBottomSheet';
