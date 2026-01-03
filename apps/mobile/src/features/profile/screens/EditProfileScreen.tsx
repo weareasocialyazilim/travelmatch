@@ -20,7 +20,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import * as Haptics from 'expo-haptics';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Animated, {
   useSharedValue,
@@ -36,6 +36,7 @@ import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { SPACING, RADIUS } from '@/constants/spacing';
 import { GlassCard } from '@/components/ui/GlassCard';
+import { ControlledInput } from '@/components/ui/ControlledInput';
 import { useAuth } from '@/context/AuthContext';
 import { userService } from '@/services/userService';
 import { CityAutocomplete } from '@/components/CityAutocomplete';
@@ -69,10 +70,10 @@ const EditProfileScreen = () => {
     avatarGlow.value = withRepeat(
       withSequence(
         withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0, { duration: 2000, easing: Easing.inOut(Easing.ease) })
+        withTiming(0, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
       ),
       -1,
-      false
+      false,
     );
   }, [avatarGlow]);
 
@@ -96,7 +97,7 @@ const EditProfileScreen = () => {
   }, [user]);
 
   // Form state with RHF + Zod
-  const { control, handleSubmit, formState, watch, reset } =
+  const { control, handleSubmit, formState, watch, reset, setValue } =
     useForm<EditProfileInput>({
       resolver: zodResolver(editProfileSchema),
       mode: 'onChange',
@@ -111,6 +112,7 @@ const EditProfileScreen = () => {
   // Watch fields for real-time updates
   const username = watch('username');
   const bio = watch('bio');
+  const watchedLocation = watch('location');
 
   // Update form when user data loads
   useEffect(() => {
@@ -125,7 +127,7 @@ const EditProfileScreen = () => {
   // UI state
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(
-    null
+    null,
   );
   const [checkingUsername, setCheckingUsername] = useState(false);
 
@@ -169,8 +171,8 @@ const EditProfileScreen = () => {
         if (status !== 'granted') {
           Alert.alert(
             'İzin Gerekli',
-            'Fotoğraf çekmek için kamera izni gereklidir. Lütfen Ayarlar\'dan etkinleştirin.',
-            [{ text: 'Tamam' }]
+            "Fotoğraf çekmek için kamera izni gereklidir. Lütfen Ayarlar'dan etkinleştirin.",
+            [{ text: 'Tamam' }],
           );
           return;
         }
@@ -192,8 +194,8 @@ const EditProfileScreen = () => {
         if (status !== 'granted') {
           Alert.alert(
             'İzin Gerekli',
-            'Fotoğraf seçmek için galeri izni gereklidir. Lütfen Ayarlar\'dan etkinleştirin.',
-            [{ text: 'Tamam' }]
+            "Fotoğraf seçmek için galeri izni gereklidir. Lütfen Ayarlar'dan etkinleştirin.",
+            [{ text: 'Tamam' }],
           );
           return;
         }
@@ -259,7 +261,7 @@ const EditProfileScreen = () => {
       {
         requireDirty: false,
         requireValid: true,
-      }
+      },
     ) || usernameAvailable === false;
 
   const handleChangeAvatar = () => {
@@ -280,7 +282,7 @@ const EditProfileScreen = () => {
           if (buttonIndex === 1) pickImage(true);
           if (buttonIndex === 2) pickImage(false);
           if (buttonIndex === 3 && avatarUri) setAvatarUri(null);
-        }
+        },
       );
     } else {
       const alertOptions: {
@@ -316,7 +318,7 @@ const EditProfileScreen = () => {
             style: 'destructive',
             onPress: () => navigation.goBack(),
           },
-        ]
+        ],
       );
     } else {
       navigation.goBack();
@@ -406,98 +408,59 @@ const EditProfileScreen = () => {
                 tint="light"
                 style={styles.inputCard}
                 borderRadius={RADIUS.xl}
-                padding={0}
+                padding={SPACING.md}
               >
                 {/* Name */}
-                <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>Ad Soyad</Text>
-                  <Controller
-                    control={control}
-                    name="fullName"
-                    render={({
-                      field: { onChange, onBlur, value },
-                      fieldState: { error },
-                    }) => (
-                      <>
-                        <TextInput
-                          style={styles.textInput}
-                          value={value}
-                          onChangeText={onChange}
-                          onBlur={onBlur}
-                          placeholder="Adını gir"
-                          placeholderTextColor={COLORS.text.tertiary}
-                          maxLength={50}
-                        />
-                        {error && (
-                          <Text style={styles.errorText}>{error.message}</Text>
-                        )}
-                      </>
-                    )}
-                  />
-                </View>
+                <ControlledInput<EditProfileInput>
+                  name="fullName"
+                  control={control}
+                  label="Ad Soyad"
+                  placeholder="Adını gir"
+                  maxLength={50}
+                  showSuccess={true}
+                />
 
                 <View style={styles.inputDivider} />
 
                 {/* Username */}
                 <View style={styles.inputGroup}>
                   <Text style={styles.inputLabel}>Kullanıcı Adı</Text>
-                  <Controller
-                    control={control}
-                    name="username"
-                    render={({
-                      field: { onChange, onBlur, value },
-                      fieldState: { error },
-                    }) => (
-                      <>
-                        <View style={styles.usernameInputContainer}>
-                          <Text style={styles.usernamePrefix}>@</Text>
-                          <TextInput
-                            style={[styles.textInput, styles.usernameInput]}
-                            value={value}
-                            onChangeText={(text) =>
-                              onChange(
-                                text.toLowerCase().replace(/[^a-z0-9_]/g, '')
-                              )
-                            }
-                            onBlur={onBlur}
-                            placeholder="kullaniciadi"
-                            placeholderTextColor={COLORS.text.tertiary}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            maxLength={30}
-                          />
-                          {checkingUsername && (
-                            <ActivityIndicator
-                              size="small"
-                              color={COLORS.text.secondary}
-                            />
-                          )}
-                          {!checkingUsername && usernameAvailable === true && (
-                            <MaterialCommunityIcons
-                              name="check-circle"
-                              size={20}
-                              color={COLORS.trust.primary}
-                            />
-                          )}
-                          {!checkingUsername && usernameAvailable === false && (
-                            <MaterialCommunityIcons
-                              name="close-circle"
-                              size={20}
-                              color={COLORS.error}
-                            />
-                          )}
-                        </View>
-                        {usernameAvailable === false && (
-                          <Text style={styles.usernameError}>
-                            Bu kullanıcı adı zaten alınmış
-                          </Text>
-                        )}
-                        {error && (
-                          <Text style={styles.errorText}>{error.message}</Text>
-                        )}
-                      </>
+                  <View style={styles.usernameInputContainer}>
+                    <Text style={styles.usernamePrefix}>@</Text>
+                    <ControlledInput<EditProfileInput>
+                      name="username"
+                      control={control}
+                      placeholder="kullaniciadi"
+                      autoCapitalize="none"
+                      maxLength={30}
+                      showSuccess={usernameAvailable === true}
+                    />
+                    {checkingUsername && (
+                      <ActivityIndicator
+                        size="small"
+                        color={COLORS.text.secondary}
+                      />
                     )}
-                  />
+                    {!checkingUsername && usernameAvailable === true && (
+                      <MaterialCommunityIcons
+                        name="check-circle"
+                        size={20}
+                        color={COLORS.trust.primary}
+                      />
+                    )}
+                    {!checkingUsername && usernameAvailable === false && (
+                      <MaterialCommunityIcons
+                        name="close-circle"
+                        size={20}
+                        color={COLORS.error}
+                      />
+                    )}
+                  </View>
+                  {usernameAvailable === false && (
+                    <Text style={styles.usernameError}>
+                      Bu kullanıcı adı zaten alınmış
+                    </Text>
+                  )}
                 </View>
               </GlassCard>
             </View>
@@ -513,51 +476,31 @@ const EditProfileScreen = () => {
                 tint="light"
                 style={styles.inputCard}
                 borderRadius={RADIUS.xl}
-                padding={0}
+                padding={SPACING.md}
               >
-                <View style={styles.inputGroup}>
-                  <View style={styles.bioLabelRow}>
-                    <Text style={styles.inputLabel}>Kendini Tanıt</Text>
-                    <Text
-                      style={[
-                        styles.charCount,
-                        (bio?.length ?? 0) > BIO_MAX_LENGTH * 0.9 &&
-                          styles.charCountWarning,
-                        (bio?.length ?? 0) >= BIO_MAX_LENGTH &&
-                          styles.charCountError,
-                      ]}
-                    >
-                      {bio?.length ?? 0}/{BIO_MAX_LENGTH}
-                    </Text>
-                  </View>
-                  <Controller
-                    control={control}
-                    name="bio"
-                    render={({
-                      field: { onChange, onBlur, value },
-                      fieldState: { error },
-                    }) => (
-                      <>
-                        <TextInput
-                          style={[styles.textInput, styles.bioInput]}
-                          value={value}
-                          onChangeText={(text) =>
-                            onChange(text.slice(0, BIO_MAX_LENGTH))
-                          }
-                          onBlur={onBlur}
-                          placeholder="Dünyayı keşfetmek, anıları biriktirmek..."
-                          placeholderTextColor={COLORS.text.tertiary}
-                          multiline
-                          numberOfLines={4}
-                          maxLength={BIO_MAX_LENGTH}
-                        />
-                        {error && (
-                          <Text style={styles.errorText}>{error.message}</Text>
-                        )}
-                      </>
-                    )}
-                  />
+                <View style={styles.bioLabelRow}>
+                  <Text style={styles.inputLabel}>Kendini Tanıt</Text>
+                  <Text
+                    style={[
+                      styles.charCount,
+                      (bio?.length ?? 0) > BIO_MAX_LENGTH * 0.9 &&
+                        styles.charCountWarning,
+                      (bio?.length ?? 0) >= BIO_MAX_LENGTH &&
+                        styles.charCountError,
+                    ]}
+                  >
+                    {bio?.length ?? 0}/{BIO_MAX_LENGTH}
+                  </Text>
                 </View>
+                <ControlledInput<EditProfileInput>
+                  name="bio"
+                  control={control}
+                  placeholder="Dünyayı keşfetmek, anıları biriktirmek..."
+                  multiline
+                  numberOfLines={4}
+                  maxLength={BIO_MAX_LENGTH}
+                  showSuccess={true}
+                />
               </GlassCard>
             </View>
           </Animated.View>
@@ -572,28 +515,15 @@ const EditProfileScreen = () => {
                 tint="light"
                 style={styles.inputCard}
                 borderRadius={RADIUS.xl}
-                padding={0}
+                padding={SPACING.md}
               >
-                <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>Şehir</Text>
-                  <Controller
-                    control={control}
-                    name="location"
-                    render={({
-                      field: { onChange, value },
-                      fieldState: { error },
-                    }) => (
-                      <>
-                        <CityAutocomplete
-                          value={value || ''}
-                          onSelect={onChange}
-                          placeholder="Şehir ara..."
-                          error={error?.message}
-                        />
-                      </>
-                    )}
-                  />
-                </View>
+                <Text style={styles.inputLabel}>Şehir</Text>
+                <CityAutocomplete
+                  value={watchedLocation || ''}
+                  onSelect={(value: string) => setValue('location', value)}
+                  placeholder="Şehir ara..."
+                  error={formState.errors.location?.message}
+                />
               </GlassCard>
             </View>
           </Animated.View>

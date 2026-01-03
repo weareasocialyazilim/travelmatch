@@ -3,15 +3,14 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
 } from 'react-native';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { RootStackParamList } from '@/navigation/routeParams';
@@ -23,7 +22,7 @@ import { loginSchema, type LoginInput } from '@/utils/forms';
 import { canSubmitForm } from '@/utils/forms/helpers';
 import type { MinimalFormState } from '@/utils/forms/helpers';
 import { useToast } from '@/context/ToastContext';
-import { GlassCard } from '@/components/ui/GlassCard';
+import { ControlledInput } from '@/components/ui/ControlledInput';
 import { TMButton } from '@/components/ui/TMButton';
 import { COLORS } from '@/constants/colors';
 import { TYPE_SCALE, FONTS } from '@/constants/typography';
@@ -108,10 +107,7 @@ export const LoginScreen: React.FC = () => {
 
       // Check if we have saved credentials
       if (!hasCredentials) {
-        showToast(
-          'Biyometrik giriş için önce şifrenizle giriş yapın',
-          'info',
-        );
+        showToast('Biyometrik giriş için önce şifrenizle giriş yapın', 'info');
         return;
       }
 
@@ -167,7 +163,9 @@ export const LoginScreen: React.FC = () => {
     }
   };
 
-  const canSubmit = canSubmitForm({ formState } as { formState: MinimalFormState });
+  const canSubmit = canSubmitForm({ formState } as {
+    formState: MinimalFormState;
+  });
 
   return (
     <ScreenErrorBoundary>
@@ -203,10 +201,7 @@ export const LoginScreen: React.FC = () => {
           >
             {/* Header Section */}
             <View style={styles.headerSection}>
-              <Text
-                style={styles.title}
-                {...a11y.header('Tekrar Hoş Geldin')}
-              >
+              <Text style={styles.title} {...a11y.header('Tekrar Hoş Geldin')}>
                 Tekrar Hoş Geldin
               </Text>
               <Text
@@ -221,98 +216,31 @@ export const LoginScreen: React.FC = () => {
             {/* Form Section */}
             <View style={styles.formSection}>
               {/* Email Input */}
-              <Text style={styles.label}>E-POSTA ADRESİ</Text>
-              <Controller
-                control={control}
+              <ControlledInput<LoginInput>
                 name="email"
-                render={({
-                  field: { onChange, onBlur, value },
-                  fieldState: { error },
-                }) => (
-                  <View>
-                    <GlassCard
-                      intensity={10}
-                      style={[
-                        styles.inputWrapper,
-                        error && styles.inputWrapperError,
-                      ]}
-                      padding={0}
-                      showBorder={true}
-                    >
-                      <TextInput
-                        testID="email-input"
-                        style={styles.input}
-                        placeholder="ornek@email.com"
-                        placeholderTextColor={COLORS.text.muted}
-                        value={value}
-                        onChangeText={(text) => onChange(text.toLowerCase())}
-                        onBlur={onBlur}
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                        editable={!isLoading}
-                        accessible={true}
-                        accessibilityLabel="E-posta adresi"
-                        accessibilityHint="Giriş yapmak için e-posta adresinizi girin"
-                        accessibilityValue={{ text: value }}
-                      />
-                    </GlassCard>
-                    {error && (
-                      <Text
-                        style={styles.errorText}
-                        {...a11y.alert(error.message || 'Validation error')}
-                      >
-                        {error.message}
-                      </Text>
-                    )}
-                  </View>
-                )}
+                control={control}
+                label="E-POSTA ADRESİ"
+                placeholder="ornek@email.com"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                editable={!isLoading}
+                testID="email-input"
+                showSuccess={true}
               />
 
               {/* Password Input */}
-              <Text style={[styles.label, { marginTop: 24 }]}>ŞİFRE</Text>
-              <Controller
-                control={control}
-                name="password"
-                render={({
-                  field: { onChange, onBlur, value },
-                  fieldState: { error },
-                }) => (
-                  <View>
-                    <GlassCard
-                      intensity={10}
-                      style={[
-                        styles.inputWrapper,
-                        error && styles.inputWrapperError,
-                      ]}
-                      padding={0}
-                      showBorder={true}
-                    >
-                      <TextInput
-                        testID="password-input"
-                        style={styles.input}
-                        placeholder="••••••••"
-                        placeholderTextColor={COLORS.text.muted}
-                        value={value}
-                        onChangeText={onChange}
-                        onBlur={onBlur}
-                        secureTextEntry
-                        editable={!isLoading}
-                        accessible={true}
-                        accessibilityLabel="Şifre"
-                        accessibilityHint="Giriş yapmak için şifrenizi girin"
-                      />
-                    </GlassCard>
-                    {error && (
-                      <Text
-                        style={styles.errorText}
-                        {...a11y.alert(error.message || 'Validation error')}
-                      >
-                        {error.message}
-                      </Text>
-                    )}
-                  </View>
-                )}
-              />
+              <View style={{ marginTop: 24 }}>
+                <ControlledInput<LoginInput>
+                  name="password"
+                  control={control}
+                  label="ŞİFRE"
+                  placeholder="••••••••"
+                  isPassword={true}
+                  editable={!isLoading}
+                  testID="password-input"
+                  showSuccess={true}
+                />
+              </View>
 
               {/* Forgot Password Link */}
               <TouchableOpacity
