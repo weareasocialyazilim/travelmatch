@@ -14,6 +14,8 @@
  * @see https://www.w3.org/TR/trace-context/
  */
 
+import { createLogger, Logger } from './logger.ts';
+
 // =============================================================================
 // TYPES
 // =============================================================================
@@ -137,9 +139,11 @@ export class Tracer {
   private spans: Map<string, Span> = new Map();
   private currentSpanId: string;
   private serviceName: string;
+  private logger: Logger;
 
   constructor(serviceName: string, request?: Request) {
     this.serviceName = serviceName;
+    this.logger = createLogger(`tracer-${serviceName}`);
 
     // Extract or create trace context
     if (request) {
@@ -382,9 +386,9 @@ export class Tracer {
       }
     }
 
-    // Log trace summary in production-friendly format
+    // Log trace summary using structured logger (not console.log)
     const summary = this.getSummary();
-    console.log(JSON.stringify({
+    this.logger.info('Trace completed', {
       type: 'trace',
       ...summary,
       spans: this.getSpans().map(s => ({
@@ -393,7 +397,7 @@ export class Tracer {
         status: s.status,
         events: s.events.length,
       })),
-    }));
+    });
   }
 }
 
