@@ -5,7 +5,7 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import { COLORS } from '@/constants/colors';
-import { useI18n } from '@/context/I18nContext';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface PasswordStrengthMeterProps {
   password: string;
@@ -83,7 +83,7 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({
   password,
   showRequirements = true,
 }) => {
-  const { t } = useI18n();
+  const { t } = useTranslation();
   const strength = useMemo(() => getPasswordStrength(password), [password]);
   const requirements = useMemo(() => getRequirements(password), [password]);
 

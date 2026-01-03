@@ -4,6 +4,7 @@
  */
 
 import { useTranslation as useI18nTranslation } from 'react-i18next';
+import i18n from '../config/i18n';
 import type { SupportedLanguage } from '../config/i18n';
 
 /**
@@ -39,7 +40,5 @@ export function translate(
   key: string,
   options?: Record<string, unknown>,
 ): string {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const { t } = useI18nTranslation();
-  return t(key, options);
+  return i18n.t(key, options);
 }
