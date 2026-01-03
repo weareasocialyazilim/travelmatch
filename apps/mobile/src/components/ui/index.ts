@@ -65,12 +65,8 @@ export type { MomentData, MomentBadgeType } from './TMCard';
 // TMPill - Chip/pill components
 export { TMPill, TMCategoryChip } from './TMPill';
 
-// TMInput - Enhanced input with floating label and validation
-// @deprecated Use LiquidInput for new implementations - TMInput is legacy
-export { TMInput } from './TMInput';
-export type { TMInputProps } from './TMInput';
-
-// LiquidInput - Awwwards-quality glass input with neon glow
+// LiquidInput - Awwwards-quality glass input with neon glow (Master Component)
+// All form inputs should use LiquidInput directly
 export { LiquidInput } from './LiquidInput';
 // ControlledLiquidInput - React Hook Form integrated Liquid Input
 export { ControlledLiquidInput } from './ControlledLiquidInput';

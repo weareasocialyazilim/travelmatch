@@ -12,7 +12,7 @@
  * Target: 6 scenarios
  */
 
-import { paymentService } from '@/services/paymentService';
+import { securePaymentService as paymentService } from '@/services/securePaymentService';
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
 import { transactionsService } from '@/services/supabaseDbService';

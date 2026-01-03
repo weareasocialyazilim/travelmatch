@@ -8,7 +8,7 @@
  * - Cleanup on cancellation
  */
 
-import { paymentService } from '../paymentService';
+import { securePaymentService as paymentService } from '../securePaymentService';
 import { supabase } from '../../config/supabase';
 import { transactionsService } from '../supabaseDbService';
 import { logger } from '../../utils/logger';

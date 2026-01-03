@@ -8,7 +8,7 @@
  * - Timeout error handling and recovery
  */
 
-import { paymentService } from '../paymentService';
+import { securePaymentService as paymentService } from '../securePaymentService';
 import { supabase } from '../../config/supabase';
 import { transactionsService } from '../supabaseDbService';
 
