@@ -119,3 +119,8 @@ export type { GlassModalProps } from './GlassModal';
 // Success Ceremony
 // ═══════════════════════════════════════════════════════════════════
 export { SuccessCeremony } from './SuccessCeremony';
+
+// ═══════════════════════════════════════════════════════════════════
+// Screen Wrappers
+// ═══════════════════════════════════════════════════════════════════
+export { LiquidScreenWrapper } from './LiquidScreenWrapper';
