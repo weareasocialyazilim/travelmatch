@@ -84,11 +84,18 @@ export {
 // Layout Components (TravelMatch: The Rebirth)
 export { FloatingDock } from './layout';
 
-// Trust Badge
+// Trust Badge & Ring
 export { TrustBadge } from './ui/TrustBadge';
+export { TrustRing } from './TrustRing';
 
-// Gift Components
-export { GiftButton } from './GiftButton';
+// Loading State
+export { LoadingState } from './LoadingState';
+
+// Dialogs
+export { DeleteMomentDialog } from './DeleteMomentDialog';
+
+// Autocomplete
+export { CityAutocomplete } from './CityAutocomplete';
 
 // KYC Components
 export { KYCBadge, getKYCLabel, getNextKYCLevel } from './KYCBadge';

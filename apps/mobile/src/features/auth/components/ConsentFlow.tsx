@@ -27,7 +27,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/constants/typography';
 import { supabase } from '@/config/supabase';
-import { logger } from '@/utils/production-logger';
+import { logger } from '@/utils/logger';
 
 // =============================================================================
 // TYPES

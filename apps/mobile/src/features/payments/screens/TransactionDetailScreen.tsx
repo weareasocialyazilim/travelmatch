@@ -4,7 +4,7 @@ import { COLORS } from '@/constants/colors';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { logger } from '@/utils/production-logger';
+import { logger } from '@/utils/logger';
 
 export const TransactionDetailScreen = () => {
   const navigation = useNavigation();
