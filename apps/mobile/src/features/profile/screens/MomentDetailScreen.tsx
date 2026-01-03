@@ -1,10 +1,35 @@
+/**
+ * MomentDetailScreen
+ *
+ * Immersive moment detail view with full-screen hero image.
+ *
+ * Also includes AwwwardsMomentDetailScreen variant:
+ * - Awwwards "WOW" factor immersive design
+ * - Liquid Glass navigation buttons
+ * - Category badge with mono font
+ * - Premium action bar with gift CTA
+ * - Turkish labels and "Cinematic Trust Jewelry" aesthetic
+ */
+
 import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+  ImageBackground,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
+import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { TMButton } from '@/components/ui/TMButton';
 
 const { width: _width, height } = Dimensions.get('window');
 
@@ -137,6 +162,421 @@ const styles = StyleSheet.create({
   perPerson: { fontSize: 14, fontWeight: 'normal', color: '#888' },
   bookBtn: { backgroundColor: COLORS.brand.primary, paddingHorizontal: 24, paddingVertical: 14, borderRadius: 16 },
   bookText: { color: 'black', fontWeight: 'bold', fontSize: 16 },
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// AwwwardsMomentDetailScreen - Immersive "WOW" Experience
+// Full-screen hero, Liquid Glass navigation, Premium action bar
+// ═══════════════════════════════════════════════════════════════════════════
+
+interface AwwwardsMomentDetailParams {
+  title?: string;
+  location?: string;
+  price?: string;
+  imageUrl?: string;
+  category?: string;
+  hostName?: string;
+  hostTrustScore?: number;
+  duration?: string;
+  description?: string;
+}
+
+interface AwwwardsMomentDetailScreenProps {
+  navigation: any;
+  route: {
+    params?: AwwwardsMomentDetailParams;
+  };
+}
+
+/**
+ * AwwwardsMomentDetailScreen - Immersive Moment Detail
+ *
+ * Awwwards "WOW" factor screen with:
+ * - Full-screen hero image (65% height)
+ * - Gradient overlay from dark to transparent to background
+ * - Liquid Glass circle navigation buttons
+ * - Category badge with mono font
+ * - Host info row with follow button
+ * - Info cards for duration and trust
+ * - Floating blur action bar with gift CTA
+ */
+export const AwwwardsMomentDetailScreen: React.FC<AwwwardsMomentDetailScreenProps> = ({
+  navigation,
+  route,
+}) => {
+  const insets = useSafeAreaInsets();
+  const {
+    title = 'Bali Sunset Sanctuary',
+    location = 'Uluwatu, Bali',
+    price = '$45',
+    imageUrl = 'https://images.unsplash.com/photo-1537996194471-e657df975ab4',
+    category = 'DENEYİM • DOĞA',
+    hostName = 'Caner Öz',
+    hostTrustScore = 94,
+    duration = '2-3 Saat',
+    description = 'Uluwatu\'nun gizli kayalıklarında, kalabalıktan uzak bir gün batımı deneyimi. Burada sadece dalgaların sesini ve rüzgarın fısıltısını duyacaksınız. Doğrulanmış rotamla bu anı sen de yaşayabilirsin.',
+  } = route.params || {};
+
+  return (
+    <View style={awwwardsStyles.container}>
+      <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
+        {/* Hero Image with Gradient Overlay */}
+        <ImageBackground
+          source={{ uri: imageUrl }}
+          style={awwwardsStyles.heroImage}
+        >
+          <LinearGradient
+            colors={[
+              'rgba(0,0,0,0.6)',
+              'transparent',
+              COLORS.bg.primary,
+            ]}
+            style={awwwardsStyles.gradientOverlay}
+          >
+            {/* Top Navigation */}
+            <View
+              style={[
+                awwwardsStyles.topNav,
+                { marginTop: insets.top + 10 },
+              ]}
+            >
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={awwwardsStyles.circleButton}
+              >
+                <Ionicons
+                  name="chevron-down"
+                  size={24}
+                  color={COLORS.text.primary}
+                />
+              </TouchableOpacity>
+              <View style={awwwardsStyles.topNavRight}>
+                <TouchableOpacity style={awwwardsStyles.circleButton}>
+                  <Ionicons
+                    name="heart-outline"
+                    size={24}
+                    color={COLORS.text.primary}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity style={awwwardsStyles.circleButton}>
+                  <Ionicons
+                    name="share-social-outline"
+                    size={24}
+                    color={COLORS.text.primary}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Hero Content */}
+            <View style={awwwardsStyles.heroContent}>
+              {/* Category Badge */}
+              <View style={awwwardsStyles.categoryBadge}>
+                <Text style={awwwardsStyles.categoryText}>{category}</Text>
+              </View>
+
+              {/* Title */}
+              <Text style={awwwardsStyles.title}>{title}</Text>
+
+              {/* Location Row */}
+              <View style={awwwardsStyles.locationRow}>
+                <Ionicons
+                  name="location-sharp"
+                  size={16}
+                  color={COLORS.brand.primary}
+                />
+                <Text style={awwwardsStyles.locationText}>{location}</Text>
+              </View>
+            </View>
+          </LinearGradient>
+        </ImageBackground>
+
+        {/* Detail Panel */}
+        <View style={awwwardsStyles.detailPanel}>
+          {/* Host Row */}
+          <View style={awwwardsStyles.hostRow}>
+            <View style={awwwardsStyles.hostInfo}>
+              <View style={awwwardsStyles.hostAvatar} />
+              <View>
+                <Text style={awwwardsStyles.hostName}>
+                  {hostName} tarafından paylaşıldı
+                </Text>
+                <Text style={awwwardsStyles.hostStatus}>
+                  Pro Verici • {hostTrustScore} Güven Puanı
+                </Text>
+              </View>
+            </View>
+            <TouchableOpacity style={awwwardsStyles.followButton}>
+              <Text style={awwwardsStyles.followText}>Takip Et</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Description */}
+          <Text style={awwwardsStyles.description}>{description}</Text>
+
+          {/* Info Cards Grid */}
+          <View style={awwwardsStyles.infoGrid}>
+            <GlassCard intensity={10} style={awwwardsStyles.infoCard}>
+              <Ionicons
+                name="time-outline"
+                size={20}
+                color={COLORS.brand.primary}
+              />
+              <Text style={awwwardsStyles.infoLabel}>Süre</Text>
+              <Text style={awwwardsStyles.infoValue}>{duration}</Text>
+            </GlassCard>
+            <GlassCard intensity={10} style={awwwardsStyles.infoCard}>
+              <Ionicons
+                name="shield-checkmark-outline"
+                size={20}
+                color={COLORS.success}
+              />
+              <Text style={awwwardsStyles.infoLabel}>Güven</Text>
+              <Text style={awwwardsStyles.infoValue}>Doğrulanmış</Text>
+            </GlassCard>
+          </View>
+        </View>
+      </ScrollView>
+
+      {/* Floating Action Bar */}
+      <BlurView
+        intensity={80}
+        tint="dark"
+        style={[
+          awwwardsStyles.actionBar,
+          { paddingBottom: insets.bottom + 20 },
+        ]}
+      >
+        <View style={awwwardsStyles.priceContainer}>
+          <Text style={awwwardsStyles.actionBarPrice}>{price}</Text>
+          <Text style={awwwardsStyles.actionBarUnit}>tek seferlik</Text>
+        </View>
+        <TMButton
+          title="Şimdi Hediye Et"
+          variant="primary"
+          onPress={() =>
+            navigation.navigate('Checkout', {
+              amount: parseInt(price.replace(/\D/g, ''), 10) || 45,
+              title,
+            })
+          }
+          style={awwwardsStyles.giftButton}
+        />
+      </BlurView>
+    </View>
+  );
+};
+
+const awwwardsStyles = StyleSheet.create({
+  // Container
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.bg.primary,
+  },
+
+  // Hero Image (65% of screen)
+  heroImage: {
+    width: '100%',
+    height: height * 0.65,
+  },
+
+  // Gradient overlay
+  gradientOverlay: {
+    flex: 1,
+    justifyContent: 'space-between',
+    padding: 20,
+  },
+
+  // Top Navigation
+  topNav: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  topNavRight: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+
+  // Glass circle button
+  circleButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(18, 18, 20, 0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+
+  // Hero content
+  heroContent: {
+    marginBottom: 20,
+  },
+
+  // Category badge
+  categoryBadge: {
+    backgroundColor: 'rgba(223, 255, 0, 0.2)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+    marginBottom: 12,
+  },
+  categoryText: {
+    color: COLORS.brand.primary,
+    fontSize: 10,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.mono,
+    fontWeight: '800',
+    letterSpacing: 1,
+  },
+
+  // Title
+  title: {
+    fontSize: 36,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.heading,
+    fontWeight: '900',
+    color: COLORS.text.primary,
+    lineHeight: 42,
+  },
+
+  // Location row
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    gap: 6,
+  },
+  locationText: {
+    fontSize: TYPOGRAPHY_SYSTEM.sizes.bodyM,
+    color: COLORS.text.secondary,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.body,
+  },
+
+  // Detail panel
+  detailPanel: {
+    padding: 24,
+    marginTop: -20,
+    backgroundColor: COLORS.bg.primary,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+  },
+
+  // Host row
+  hostRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  hostInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  hostAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: COLORS.surface.base,
+    borderWidth: 2,
+    borderColor: COLORS.brand.primary,
+  },
+  hostName: {
+    color: COLORS.text.primary,
+    fontSize: TYPOGRAPHY_SYSTEM.sizes.bodyS,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.body,
+    fontWeight: '700',
+  },
+  hostStatus: {
+    color: COLORS.text.secondary,
+    fontSize: 10,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.body,
+    marginTop: 2,
+  },
+
+  // Follow button
+  followButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.brand.primary,
+  },
+  followText: {
+    color: COLORS.brand.primary,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+
+  // Description
+  description: {
+    color: COLORS.text.secondary,
+    fontSize: TYPOGRAPHY_SYSTEM.sizes.bodyM,
+    lineHeight: TYPOGRAPHY_SYSTEM.sizes.bodyM * TYPOGRAPHY_SYSTEM.lineHeights.relaxed,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.body,
+    marginBottom: 32,
+  },
+
+  // Info grid
+  infoGrid: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  infoCard: {
+    flex: 1,
+    padding: 16,
+    borderRadius: 24,
+    alignItems: 'center',
+  },
+  infoLabel: {
+    color: COLORS.text.tertiary,
+    fontSize: 10,
+    marginTop: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  infoValue: {
+    color: COLORS.text.primary,
+    fontSize: TYPOGRAPHY_SYSTEM.sizes.bodyS,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.body,
+    fontWeight: '700',
+    marginTop: 2,
+  },
+
+  // Action bar
+  actionBar: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border.subtle,
+  },
+  priceContainer: {
+    flex: 1,
+  },
+  actionBarPrice: {
+    fontSize: 24,
+    color: COLORS.text.primary,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.mono,
+    fontWeight: '900',
+  },
+  actionBarUnit: {
+    fontSize: 10,
+    color: COLORS.text.tertiary,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.body,
+  },
+  giftButton: {
+    width: 180,
+    height: 52,
+    borderRadius: 26,
+  },
 });
 
 export default MomentDetailScreen;

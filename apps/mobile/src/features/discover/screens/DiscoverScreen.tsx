@@ -1,11 +1,15 @@
 /**
  * DiscoverScreen - TravelMatch: The Rebirth
  *
- * TikTok-style immersive vertical feed with:
- * - Full-screen moment cards
- * - Snap-to-page scrolling
- * - Anti-Cheapskate counter-offer logic
+ * Awwwards standardında keşfet ekranı.
+ * "Soft Minimalist & Premium" tasarım diliyle güncellendi.
+ *
+ * Features:
+ * - AwwwardsDiscoverHeader with greeting & brand
+ * - StoriesRow for user moments
+ * - Immersive moment cards feed
  * - FloatingDock navigation
+ * - Anti-Cheapskate counter-offer logic
  */
 
 import React, { useRef, useCallback, useMemo } from 'react';
@@ -19,17 +23,20 @@ import {
   ActivityIndicator,
   Text,
 } from 'react-native';
-// SafeAreaView imported but not currently used - reserved for future layout changes
-// import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
-import { ImmersiveMomentCard } from '@/components/discover/ImmersiveMomentCard';
+import {
+  ImmersiveMomentCard,
+  AwwwardsDiscoverHeader,
+} from '@/components/discover';
+import StoriesRow from '@/components/discover/StoriesRow';
 import { FloatingDock } from '@/components/layout/FloatingDock';
 import { useMoments, type Moment } from '@/hooks/useMoments';
 import { COLORS } from '@/constants/colors';
 import { withErrorBoundary } from '../../../components/withErrorBoundary';
 import type { NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/routeParams';
+import type { UserStory } from '@/components/discover/types';
 
 const { height } = Dimensions.get('window');
 
@@ -82,6 +89,42 @@ const getTierFromPrice = (price: number, category: string): number => {
   return 4;
 };
 
+// Mock stories data - In production, this comes from a hook
+const MOCK_STORIES: UserStory[] = [
+  {
+    id: '1',
+    name: 'Ayşe',
+    avatar: 'https://i.pravatar.cc/150?img=1',
+    hasStory: true,
+    isNew: true,
+    stories: [],
+  },
+  {
+    id: '2',
+    name: 'Mehmet',
+    avatar: 'https://i.pravatar.cc/150?img=2',
+    hasStory: true,
+    isNew: true,
+    stories: [],
+  },
+  {
+    id: '3',
+    name: 'Zeynep',
+    avatar: 'https://i.pravatar.cc/150?img=3',
+    hasStory: true,
+    isNew: false,
+    stories: [],
+  },
+  {
+    id: '4',
+    name: 'Can',
+    avatar: 'https://i.pravatar.cc/150?img=4',
+    hasStory: true,
+    isNew: false,
+    stories: [],
+  },
+];
+
 const DiscoverScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const flatListRef = useRef<FlatList>(null);
@@ -92,6 +135,37 @@ const DiscoverScreen = () => {
     () => moments.filter((m) => m.status === 'active'),
     [moments],
   );
+
+  // Header actions
+  const handleSearchPress = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    navigation.navigate('SearchMap' as any);
+  }, [navigation]);
+
+  const handleNotificationsPress = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    navigation.navigate('Notifications' as any);
+  }, [navigation]);
+
+  const handleAvatarPress = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    navigation.navigate('Profile' as any);
+  }, [navigation]);
+
+  // Stories actions
+  const handleStoryPress = useCallback(
+    (story: UserStory, _index: number) => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      // Navigate to story viewer
+      navigation.navigate('ProfileDetail' as any, { userId: story.id });
+    },
+    [navigation],
+  );
+
+  const handleCreateStoryPress = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    navigation.navigate('CreateMoment' as any);
+  }, [navigation]);
 
   // Handle Counter-Offer with Anti-Cheapskate Logic
   const handleCounterOffer = useCallback((moment: Moment) => {
@@ -267,34 +341,55 @@ const DiscoverScreen = () => {
     );
   }
 
+  // Render header component for FlatList
+  const renderHeader = useCallback(
+    () => (
+      <View style={styles.headerSection}>
+        {/* Stories Section */}
+        <StoriesRow
+          stories={MOCK_STORIES}
+          onStoryPress={handleStoryPress}
+          onCreatePress={handleCreateStoryPress}
+        />
+      </View>
+    ),
+    [handleStoryPress, handleCreateStoryPress],
+  );
+
   return (
     <View style={styles.container}>
       <StatusBar
-        barStyle="light-content"
-        backgroundColor="transparent"
-        translucent
+        barStyle="dark-content"
+        backgroundColor={COLORS.bg.primary}
+        translucent={false}
       />
 
-      {/* Immersive Vertical Feed */}
+      {/* Awwwards-style Header */}
+      <AwwwardsDiscoverHeader
+        userName="Traveler"
+        notificationCount={3}
+        onSearchPress={handleSearchPress}
+        onNotificationsPress={handleNotificationsPress}
+        onAvatarPress={handleAvatarPress}
+      />
+
+      {/* Immersive Vertical Feed with Stories Header */}
       <FlatList
         ref={flatListRef}
         data={activeMoments}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
-        pagingEnabled
-        decelerationRate="fast"
-        snapToInterval={height}
-        snapToAlignment="start"
+        ListHeaderComponent={renderHeader}
         showsVerticalScrollIndicator={false}
         onRefresh={handleRefresh}
         refreshing={loading}
         onEndReached={handleEndReached}
         onEndReachedThreshold={0.5}
-        getItemLayout={getItemLayout}
         removeClippedSubviews
         maxToRenderPerBatch={3}
         windowSize={5}
         initialNumToRender={2}
+        contentContainerStyle={styles.feedContent}
       />
 
       {/* Loading more indicator */}
@@ -311,15 +406,26 @@ const DiscoverScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  // Main Container - "Soft Minimalist" background
   container: {
     flex: 1,
-    backgroundColor: COLORS.background.primary,
+    backgroundColor: COLORS.bg.primary,
+  },
+
+  // Header Section with Stories
+  headerSection: {
+    marginVertical: 12,
+  },
+
+  // Feed Content - Premium spacing
+  feedContent: {
+    paddingBottom: 100, // Space for FloatingDock
   },
 
   // Loading State
   loadingContainer: {
     flex: 1,
-    backgroundColor: COLORS.background.primary,
+    backgroundColor: COLORS.bg.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -332,7 +438,7 @@ const styles = StyleSheet.create({
   // Error State
   errorContainer: {
     flex: 1,
-    backgroundColor: COLORS.background.primary,
+    backgroundColor: COLORS.bg.primary,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
@@ -352,7 +458,7 @@ const styles = StyleSheet.create({
   // Empty State
   emptyContainer: {
     flex: 1,
-    backgroundColor: COLORS.background.primary,
+    backgroundColor: COLORS.bg.primary,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,

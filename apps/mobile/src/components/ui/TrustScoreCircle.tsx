@@ -11,6 +11,11 @@
  * - Floating stat cards below
  * - Premium "jewelry" aesthetic with soft shadows
  *
+ * Awwwards Style Variant (AwwwardsTrustScoreCircle):
+ * - Neon glow ring effect
+ * - Turkish "GÜVEN PUANI" label
+ * - Simplified interface
+ *
  * Following 60-30-10 color rule:
  * - 60% Background (stone[50])
  * - 30% Text/Secondary (stone[900], stone[500])
@@ -30,7 +35,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Circle, G, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { primitives, SHADOWS } from '../../constants/colors';
+import { primitives, SHADOWS, COLORS } from '../../constants/colors';
+import { TYPOGRAPHY_SYSTEM } from '../../constants/typography';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -518,6 +524,177 @@ const stylesCompact = StyleSheet.create({
   scoreText: {
     fontSize: 22,
     fontWeight: '800',
+  },
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// AWWWARDS STYLE TRUST SCORE CIRCLE - Premium Neon Ring
+// ═══════════════════════════════════════════════════════════════════
+
+interface AwwwardsTrustScoreCircleProps {
+  /** Trust score (0-100) */
+  score: number;
+  /** Size of the circle (default: 120) */
+  size?: number;
+  /** Show animation on mount */
+  animated?: boolean;
+  /** Custom label (default: "GÜVEN PUANI") */
+  label?: string;
+}
+
+/**
+ * AwwwardsTrustScoreCircle - Awwwards kalitesinde neon halka
+ *
+ * Kullanıcının Trust Score'unu temsil eden premium SVG ring.
+ * Neon glow efekti ve minimalist tasarım.
+ */
+export const AwwwardsTrustScoreCircle: React.FC<AwwwardsTrustScoreCircleProps> = ({
+  score,
+  size = 120,
+  animated = true,
+  label = 'GÜVEN PUANI',
+}) => {
+  const progress = useSharedValue(0);
+
+  const strokeWidth = size * 0.08;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const center = size / 2;
+
+  // Animate on mount
+  useEffect(() => {
+    if (animated) {
+      progress.value = withTiming(score / 100, {
+        duration: 1200,
+        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+      });
+    } else {
+      progress.value = score / 100;
+    }
+  }, [score, animated, progress]);
+
+  // Get ring color based on score
+  const ringColor = useMemo(() => {
+    if (score >= 90) return primitives.purple[500];
+    if (score >= 70) return primitives.emerald[500];
+    if (score >= 50) return primitives.amber[500];
+    return primitives.magenta[500];
+  }, [score]);
+
+  // Glow color (slightly lighter)
+  const glowColor = useMemo(() => {
+    if (score >= 90) return primitives.purple[400];
+    if (score >= 70) return primitives.emerald[400];
+    if (score >= 50) return primitives.amber[400];
+    return primitives.magenta[400];
+  }, [score]);
+
+  // Animated progress
+  const animatedProps = useAnimatedProps(() => ({
+    strokeDasharray: `${progress.value * circumference} ${circumference}`,
+  }));
+
+  return (
+    <View style={[awwwardsCircleStyles.container, { width: size, height: size }]}>
+      {/* Neon Glow Ring (Background) */}
+      <View
+        style={[
+          awwwardsCircleStyles.glowRing,
+          {
+            width: size + 4,
+            height: size + 4,
+            borderRadius: (size + 4) / 2,
+            borderColor: glowColor,
+            borderWidth: 2,
+          },
+        ]}
+      />
+
+      {/* SVG Circle */}
+      <Svg width={size} height={size} style={awwwardsCircleStyles.svg}>
+        <Defs>
+          <LinearGradient id="awwwardsGradient" x1="0" y1="0" x2="1" y2="1">
+            <Stop offset="0%" stopColor={primitives.amber[500]} />
+            <Stop offset="100%" stopColor={primitives.magenta[500]} />
+          </LinearGradient>
+        </Defs>
+
+        {/* Background Track */}
+        <Circle
+          cx={center}
+          cy={center}
+          r={radius}
+          stroke={primitives.stone[200]}
+          strokeWidth={strokeWidth}
+          fill="none"
+        />
+
+        {/* Progress Arc (Neon) */}
+        <G rotation={-90} origin={`${center}, ${center}`}>
+          <AnimatedCircle
+            cx={center}
+            cy={center}
+            r={radius}
+            stroke={ringColor}
+            strokeWidth={strokeWidth}
+            animatedProps={animatedProps}
+            strokeLinecap="round"
+            fill="none"
+          />
+        </G>
+      </Svg>
+
+      {/* Center Content */}
+      <View style={awwwardsCircleStyles.innerContent}>
+        <Text
+          style={[
+            awwwardsCircleStyles.scoreText,
+            { fontSize: size * 0.25, color: COLORS.text.primary },
+          ]}
+        >
+          {score}
+        </Text>
+        <Text
+          style={[
+            awwwardsCircleStyles.label,
+            { fontSize: size * 0.08 },
+          ]}
+        >
+          {label}
+        </Text>
+      </View>
+    </View>
+  );
+};
+
+const awwwardsCircleStyles = StyleSheet.create({
+  container: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  svg: {
+    position: 'absolute',
+  },
+  innerContent: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scoreText: {
+    fontFamily: TYPOGRAPHY_SYSTEM.families.mono,
+    fontWeight: TYPOGRAPHY_SYSTEM.weights.black,
+    letterSpacing: -1,
+  },
+  label: {
+    color: COLORS.text.secondary,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.body,
+    letterSpacing: 1,
+    marginTop: -4,
+    textTransform: 'uppercase',
+  },
+  glowRing: {
+    position: 'absolute',
+    opacity: 0.5,
   },
 });
 

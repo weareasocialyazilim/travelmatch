@@ -8,7 +8,11 @@ export { StoryItem } from './StoryItem';
 export { SingleMomentCard } from './SingleMomentCard';
 export { GridMomentCard } from './GridMomentCard';
 export { CategoryFilter } from './CategoryFilter';
-export { DiscoverHeader, AnimatedDiscoverHeader } from './DiscoverHeader';
+export {
+  DiscoverHeader,
+  AnimatedDiscoverHeader,
+  AwwwardsDiscoverHeader,
+} from './DiscoverHeader';
 export { StoryViewer } from './StoryViewer';
 export { FilterModal } from './FilterModal';
 export { LocationModal } from './LocationModal';

@@ -2,7 +2,7 @@
 // Core screens
 export { SplashScreen } from './screens/SplashScreen';
 export { WelcomeScreen } from './screens/WelcomeScreen';
-export { OnboardingScreen } from './screens/OnboardingScreen';
+export { OnboardingScreen, AwwwardsOnboardingScreen } from './screens/OnboardingScreen';
 export { CompleteProfileScreen } from './screens/CompleteProfileScreen';
 export { VerifyPhoneScreen } from './screens/VerifyPhoneScreen';
 

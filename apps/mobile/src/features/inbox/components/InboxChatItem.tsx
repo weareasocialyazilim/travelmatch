@@ -1,16 +1,29 @@
 /**
- * TravelMatch Inbox Chat Item - Awwwards Edition
+ * TravelMatch Vibe Room - Inbox Chat Item
  *
- * Premium list item with:
+ * Smart list item with:
  * - Left: Moment context strip (photo with gradient overlay)
  * - Center: User info and last message
- * - Right: Time and status badge with neon accents
+ * - Right: Time and status badge
  *
  * "Context is King" - Every chat shows the connected Moment.
+ *
+ * Also includes AwwwardsInboxChatItem variant:
+ * - Minimalist hierarchy design
+ * - Neon notification glow effect
+ * - TYPOGRAPHY_SYSTEM integration
+ * - Premium "Soft Glass" aesthetic
  */
 
 import React, { memo, useCallback } from 'react';
-import { View, Text, Image, Pressable, StyleSheet, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, {
@@ -26,8 +39,9 @@ import {
   VIBE_ROOM_COLORS,
   INBOX_SPACING,
   INBOX_SPRINGS,
-  INBOX_TYPOGRAPHY,
 } from '../constants/theme';
+import { COLORS } from '../../../constants/colors';
+import { TYPOGRAPHY_SYSTEM } from '../../../constants/typography';
 import StatusBadge from './StatusBadge';
 import type { InboxChat } from '../types/inbox.types';
 
@@ -44,7 +58,7 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
     const scale = useSharedValue(1);
 
     const handlePressIn = useCallback(() => {
-      scale.value = withSpring(0.97, INBOX_SPRINGS.snappy);
+      scale.value = withSpring(0.98, INBOX_SPRINGS.snappy);
     }, [scale]);
 
     const handlePressOut = useCallback(() => {
@@ -60,7 +74,7 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
       transform: [{ scale: scale.value }],
     }));
 
-    // Format relative time (Turkish)
+    // Format relative time
     const formatTime = (dateString: string): string => {
       const date = new Date(dateString);
       const now = new Date();
@@ -69,14 +83,14 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
       const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
       const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-      if (diffMins < 1) return 'şimdi';
-      if (diffMins < 60) return `${diffMins}dk`;
-      if (diffHours < 24) return `${diffHours}sa`;
-      if (diffDays === 1) return 'dün';
-      if (diffDays < 7) return `${diffDays}g`;
-      return date.toLocaleDateString('tr-TR', {
-        day: 'numeric',
+      if (diffMins < 1) return 'now';
+      if (diffMins < 60) return `${diffMins}m`;
+      if (diffHours < 24) return `${diffHours}h`;
+      if (diffDays === 1) return '1d';
+      if (diffDays < 7) return `${diffDays}d`;
+      return date.toLocaleDateString('en-US', {
         month: 'short',
+        day: 'numeric',
       });
     };
 
@@ -85,7 +99,7 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
 
     return (
       <Animated.View
-        entering={FadeInRight.delay(index * 60).springify()}
+        entering={FadeInRight.delay(index * 80).springify()}
         layout={Layout.springify()}
       >
         <AnimatedPressable
@@ -94,7 +108,7 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
           accessibilityRole="button"
-          accessibilityLabel={`${chat.user.name} ile sohbet${chat.moment ? `, ${chat.moment.title}` : ''}`}
+          accessibilityLabel={`Chat with ${chat.user.name}${chat.moment ? ` about ${chat.moment.title}` : ''}`}
         >
           {/* Left: Moment Context Strip */}
           <View style={styles.momentStrip}>
@@ -109,11 +123,11 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
               colors={VIBE_ROOM_COLORS.gradients.momentStrip}
               style={StyleSheet.absoluteFill}
             />
-            {/* Moment icon overlay */}
+            {/* Moment icon/emoji overlay */}
             <View style={styles.momentOverlay}>
               <MaterialCommunityIcons
                 name="image-filter-hdr"
-                size={12}
+                size={14}
                 color="white"
               />
             </View>
@@ -130,18 +144,16 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
                     {chat.user.name}
                   </Text>
                   {chat.user.isVerified && (
-                    <View style={styles.verifiedBadge}>
-                      <MaterialCommunityIcons
-                        name="check-decagram"
-                        size={14}
-                        color={VIBE_ROOM_COLORS.neon.cyan}
-                      />
-                    </View>
+                    <MaterialCommunityIcons
+                      name="check-decagram"
+                      size={14}
+                      color={VIBE_ROOM_COLORS.neon.amber}
+                    />
                   )}
                   {chat.user.isOnline && <View style={styles.onlineDot} />}
                 </View>
                 <Text style={styles.momentTitle} numberOfLines={1}>
-                  {chat.moment?.emoji || '✨'} {chat.moment?.title || 'Sohbet'}
+                  {chat.moment?.emoji || '✨'} {chat.moment?.title || 'Chat'}
                 </Text>
               </View>
             </View>
@@ -149,7 +161,7 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
             {/* Last Message */}
             {isTyping ? (
               <View style={styles.typingRow}>
-                <Text style={styles.typingText}>yazıyor</Text>
+                <Text style={styles.typingText}>typing</Text>
                 <View style={styles.typingDots}>
                   <View style={[styles.typingDot, styles.dot1]} />
                   <View style={[styles.typingDot, styles.dot2]} />
@@ -203,7 +215,7 @@ const styles = StyleSheet.create({
     backgroundColor: VIBE_ROOM_COLORS.glass.backgroundLight,
     borderRadius: 20,
     marginBottom: INBOX_SPACING.cardGap,
-    height: 92,
+    height: 88,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: VIBE_ROOM_COLORS.glass.border,
@@ -214,7 +226,6 @@ const styles = StyleSheet.create({
     width: INBOX_SPACING.momentStripWidth,
     height: '100%',
     position: 'relative',
-    backgroundColor: VIBE_ROOM_COLORS.background.tertiary,
   },
   momentImage: {
     width: '100%',
@@ -224,10 +235,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 8,
     left: 8,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -235,8 +246,8 @@ const styles = StyleSheet.create({
   // Content (Center)
   content: {
     flex: 1,
-    paddingVertical: 14,
-    paddingHorizontal: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
     justifyContent: 'center',
   },
   userRow: {
@@ -249,7 +260,7 @@ const styles = StyleSheet.create({
     width: INBOX_SPACING.avatarSize,
     height: INBOX_SPACING.avatarSize,
     borderRadius: INBOX_SPACING.avatarSize / 2,
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: VIBE_ROOM_COLORS.glass.borderActive,
   },
   userInfo: {
@@ -258,48 +269,31 @@ const styles = StyleSheet.create({
   nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: 4,
   },
   userName: {
-    ...INBOX_TYPOGRAPHY.cardTitle,
     color: VIBE_ROOM_COLORS.text.primary,
-    maxWidth: 140,
-  },
-  verifiedBadge: {
-    ...Platform.select({
-      ios: {
-        shadowColor: VIBE_ROOM_COLORS.neon.cyan,
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.5,
-        shadowRadius: 4,
-      },
-      android: {},
-    }),
+    fontSize: 15,
+    fontWeight: '700',
+    letterSpacing: -0.3,
   },
   onlineDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     backgroundColor: VIBE_ROOM_COLORS.neon.emerald,
     marginLeft: 2,
-    ...Platform.select({
-      ios: {
-        shadowColor: VIBE_ROOM_COLORS.neon.emerald,
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.6,
-        shadowRadius: 4,
-      },
-      android: {},
-    }),
   },
   momentTitle: {
-    ...INBOX_TYPOGRAPHY.caption,
     color: VIBE_ROOM_COLORS.text.tertiary,
-    marginTop: 2,
+    fontSize: 12,
+    fontStyle: 'italic',
+    marginTop: 1,
   },
   lastMessage: {
-    ...INBOX_TYPOGRAPHY.cardSubtitle,
     color: VIBE_ROOM_COLORS.text.secondary,
+    fontSize: 13,
+    lineHeight: 18,
   },
   lastMessageUnread: {
     color: VIBE_ROOM_COLORS.text.primary,
@@ -310,22 +304,22 @@ const styles = StyleSheet.create({
   typingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
   },
   typingText: {
-    ...INBOX_TYPOGRAPHY.cardSubtitle,
-    color: VIBE_ROOM_COLORS.neon.lime,
+    color: VIBE_ROOM_COLORS.neon.amber,
+    fontSize: 13,
     fontStyle: 'italic',
   },
   typingDots: {
     flexDirection: 'row',
-    gap: 3,
+    gap: 2,
   },
   typingDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 2.5,
-    backgroundColor: VIBE_ROOM_COLORS.neon.lime,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: VIBE_ROOM_COLORS.neon.amber,
   },
   dot1: { opacity: 0.4 },
   dot2: { opacity: 0.6 },
@@ -336,40 +330,251 @@ const styles = StyleSheet.create({
     width: 72,
     alignItems: 'flex-end',
     justifyContent: 'space-between',
-    paddingVertical: 14,
-    paddingRight: 14,
+    paddingVertical: 12,
+    paddingRight: 12,
   },
   timeText: {
-    ...INBOX_TYPOGRAPHY.badge,
     color: VIBE_ROOM_COLORS.text.muted,
+    fontSize: 11,
+    fontWeight: '600',
   },
   unreadBadge: {
-    minWidth: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: VIBE_ROOM_COLORS.neon.lime,
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: VIBE_ROOM_COLORS.neon.magenta,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 6,
-    ...Platform.select({
-      ios: {
-        shadowColor: VIBE_ROOM_COLORS.neon.lime,
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.5,
-        shadowRadius: 6,
-      },
-      android: {
-        elevation: 3,
-      },
-    }),
   },
   unreadText: {
-    color: VIBE_ROOM_COLORS.text.inverse,
-    fontSize: 11,
+    color: VIBE_ROOM_COLORS.text.primary,
+    fontSize: 10,
     fontWeight: '800',
   },
 });
 
 InboxChatItem.displayName = 'InboxChatItem';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// AwwwardsInboxChatItem - Minimalist Design Variant
+// "Soft Glass" aesthetic with neon notification glow
+// ═══════════════════════════════════════════════════════════════════════════
+
+interface AwwwardsInboxChatItemProps {
+  chat: {
+    id: string;
+    name: string;
+    avatar: string;
+    lastMessage: string;
+    time: string;
+    unread: number;
+    isOnline?: boolean;
+    isVerified?: boolean;
+  };
+  onPress: () => void;
+}
+
+/**
+ * Awwwards-style Inbox Chat Item
+ *
+ * Minimalist hierarchy with:
+ * - Neon glow for unread notifications
+ * - Premium typography from TYPOGRAPHY_SYSTEM
+ * - "Soft Glass" card aesthetic
+ * - Haptic feedback on press
+ */
+export const AwwwardsInboxChatItem: React.FC<AwwwardsInboxChatItemProps> = memo(
+  ({ chat, onPress }) => {
+    const handlePress = useCallback(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      onPress();
+    }, [onPress]);
+
+    const hasUnread = chat.unread > 0;
+
+    return (
+      <TouchableOpacity
+        style={awwwardsStyles.container}
+        onPress={handlePress}
+        activeOpacity={0.7}
+        accessibilityRole="button"
+        accessibilityLabel={`Chat with ${chat.name}`}
+      >
+        {/* Avatar with Neon Glow */}
+        <View style={awwwardsStyles.avatarContainer}>
+          <Image source={{ uri: chat.avatar }} style={awwwardsStyles.avatar} />
+          {hasUnread && <View style={awwwardsStyles.onlineGlow} />}
+          {chat.isOnline && <View style={awwwardsStyles.onlineDot} />}
+        </View>
+
+        {/* Content */}
+        <View style={awwwardsStyles.content}>
+          {/* Name Row */}
+          <View style={awwwardsStyles.nameRow}>
+            <Text style={awwwardsStyles.name} numberOfLines={1}>
+              {chat.name}
+            </Text>
+            {chat.isVerified && (
+              <MaterialCommunityIcons
+                name="check-decagram"
+                size={14}
+                color={COLORS.brand.primary}
+              />
+            )}
+            <Text style={awwwardsStyles.time}>{chat.time}</Text>
+          </View>
+
+          {/* Last Message Row */}
+          <View style={awwwardsStyles.messageRow}>
+            <Text
+              style={[
+                awwwardsStyles.lastMessage,
+                hasUnread && awwwardsStyles.lastMessageUnread,
+              ]}
+              numberOfLines={1}
+            >
+              {chat.lastMessage}
+            </Text>
+            {hasUnread && (
+              <View style={awwwardsStyles.unreadBadge}>
+                <Text style={awwwardsStyles.unreadText}>
+                  {chat.unread > 99 ? '99+' : chat.unread}
+                </Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  },
+);
+
+AwwwardsInboxChatItem.displayName = 'AwwwardsInboxChatItem';
+
+const awwwardsStyles = StyleSheet.create({
+  // Container - Soft Glass card
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.surface.base,
+    borderRadius: 16,
+    padding: 12,
+    marginHorizontal: 20,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: COLORS.border.default,
+  },
+
+  // Avatar with neon glow container
+  avatarContainer: {
+    position: 'relative',
+    marginRight: 12,
+  },
+  avatar: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: COLORS.bg.secondary,
+  },
+
+  // Neon glow effect for unread
+  onlineGlow: {
+    position: 'absolute',
+    top: -3,
+    left: -3,
+    right: -3,
+    bottom: -3,
+    borderRadius: 30,
+    borderWidth: 2,
+    borderColor: COLORS.brand.primary,
+    // Glow effect via shadow
+    shadowColor: COLORS.brand.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+
+  // Online status dot
+  onlineDot: {
+    position: 'absolute',
+    bottom: 2,
+    right: 2,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: COLORS.success,
+    borderWidth: 2,
+    borderColor: COLORS.surface.base,
+  },
+
+  // Content area
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+
+  // Name row with time
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
+  },
+  name: {
+    flex: 1,
+    fontSize: TYPOGRAPHY_SYSTEM.sizes.bodyM,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.heading,
+    fontWeight: '600',
+    color: COLORS.text.primary,
+    letterSpacing: TYPOGRAPHY_SYSTEM.letterSpacing.tight,
+  },
+  time: {
+    fontSize: TYPOGRAPHY_SYSTEM.sizes.caption,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.body,
+    color: COLORS.text.tertiary,
+  },
+
+  // Message row with badge
+  messageRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  lastMessage: {
+    flex: 1,
+    fontSize: TYPOGRAPHY_SYSTEM.sizes.bodyS,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.body,
+    color: COLORS.text.secondary,
+    lineHeight: TYPOGRAPHY_SYSTEM.sizes.bodyS * TYPOGRAPHY_SYSTEM.lineHeights.normal,
+  },
+  lastMessageUnread: {
+    color: COLORS.text.primary,
+    fontWeight: '500',
+  },
+
+  // Unread badge - Neon magenta
+  unreadBadge: {
+    minWidth: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: COLORS.brand.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 6,
+    // Neon glow
+    shadowColor: COLORS.brand.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  unreadText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+});
 
 export default InboxChatItem;

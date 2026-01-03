@@ -12,8 +12,12 @@
 
 // Screens - with default exports
 export { default as WalletScreen } from './screens/WalletScreen';
+<<<<<<< HEAD
 export { default as WithdrawScreen } from './screens/WithdrawScreen';
 export { WithdrawSuccessScreen } from './screens/WithdrawSuccessScreen';
+=======
+export { default as WithdrawScreen, AwwwardsWithdrawScreen } from './screens/WithdrawScreen';
+>>>>>>> origin/claude/typography-system-P9b6t
 export { default as PaymentMethodsScreen } from './screens/PaymentMethodsScreen';
 export { default as AddCardScreen } from './screens/AddCardScreen';
 export { default as TransactionDetailScreen } from './screens/TransactionDetailScreen';
@@ -36,6 +40,8 @@ export { ProofReviewScreen } from './screens/ProofReviewScreen';
 export { PayTRWebViewScreen } from './screens/PayTRWebViewScreen';
 export { PayoutSettingsScreen } from './screens/PayoutSettingsScreen';
 export { default as PromoCodeScreen } from './screens/PromoCodeScreen';
+export { GiftUnboxingScreen, AwwwardsGiftUnboxingScreen } from './screens/GiftUnboxingScreen';
+export { EarningsScreen } from './screens/EarningsScreen';
 
 // KYC Screens
 export { default as KYCIntroScreen } from './kyc/KYCIntroScreen';
