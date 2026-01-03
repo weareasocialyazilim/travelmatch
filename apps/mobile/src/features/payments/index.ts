@@ -62,11 +62,9 @@ export {
   useCancelSubscription,
 } from './hooks/usePayments';
 
-// Services
-export { paymentsApi as paymentsService } from './services/paymentsService';
-/** @deprecated Use paymentsService instead */
-export { paymentsApi } from './services/paymentsService';
-export type { CreatePaymentIntentDto } from './services/paymentsService';
+// Services - consolidated into securePaymentService
+// All payment operations now go through securePaymentService
+// Import from '@/services/securePaymentService' for new code
 
 // Types
 export type {
