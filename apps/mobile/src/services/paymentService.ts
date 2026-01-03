@@ -1,6 +1,14 @@
 /**
  * Payment Service
  * Payment processing, transactions, and wallet operations
+ *
+ * @deprecated This service is being consolidated. For new code, use:
+ * - securePaymentService: PayTR payment processing (Edge Function based)
+ * - walletService: Wallet balance operations
+ * - transactionService: Transaction history queries
+ *
+ * This legacy service will be removed in a future release.
+ * Escrow functionality will be migrated to a dedicated escrowService.
  */
 
 import { supabase } from '../config/supabase';
