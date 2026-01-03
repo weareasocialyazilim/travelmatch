@@ -313,9 +313,6 @@ export type RootStackParamList = {
     isTestMode?: boolean;
   };
 
-  // Currency Selection
-  CurrencySelection: undefined;
-
   // Data Privacy & Deleted Moments
   DataPrivacy: undefined;
   DeletedMoments: undefined;

@@ -4,7 +4,6 @@
 export { default as MessagesScreen } from './screens/MessagesScreen';
 export { default as ChatScreen } from './screens/ChatScreen';
 export { default as ArchivedChatsScreen } from './screens/ArchivedChatsScreen';
-export { ChatCameraScreen } from './screens/ChatCameraScreen';
 export { default as ChatDetailScreen } from './screens/ChatDetailScreen';
 
 // Hooks
@@ -19,4 +18,6 @@ export {
 } from './hooks/useMessages';
 
 // Services
-export { messagesApi } from './services/messagesApi';
+export { messagesApi as messagesService } from './services/messagesService';
+/** @deprecated Use messagesService instead */
+export { messagesApi } from './services/messagesService';

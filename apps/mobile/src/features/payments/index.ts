@@ -34,10 +34,7 @@ export { MyGiftsScreen } from './screens/MyGiftsScreen';
 export { GiftCardMarketScreen } from './screens/GiftCardMarketScreen';
 export { ProofReviewScreen } from './screens/ProofReviewScreen';
 export { PayTRWebViewScreen } from './screens/PayTRWebViewScreen';
-export { PayoutSettingsScreen } from './screens/PayoutSettingsScreen';
 export { default as PromoCodeScreen } from './screens/PromoCodeScreen';
-export { GiftUnboxingScreen, AwwwardsGiftUnboxingScreen } from './screens/GiftUnboxingScreen';
-export { EarningsScreen } from './screens/EarningsScreen';
 
 // KYC Screens
 export { default as KYCIntroScreen } from './kyc/KYCIntroScreen';
@@ -46,6 +43,9 @@ export { default as KYCDocumentCaptureScreen } from './kyc/KYCDocumentCaptureScr
 export { default as KYCSelfieScreen } from './kyc/KYCSelfieScreen';
 export { default as KYCReviewScreen } from './kyc/KYCReviewScreen';
 export { default as KYCPendingScreen } from './kyc/KYCPendingScreen';
+
+// Components
+export { PaymentSecurityBadge } from './components/PaymentSecurityBadge';
 
 // Hooks
 export {
@@ -63,8 +63,10 @@ export {
 } from './hooks/usePayments';
 
 // Services
-export { paymentsApi } from './services/paymentsApi';
-export type { CreatePaymentIntentDto } from './services/paymentsApi';
+export { paymentsApi as paymentsService } from './services/paymentsService';
+/** @deprecated Use paymentsService instead */
+export { paymentsApi } from './services/paymentsService';
+export type { CreatePaymentIntentDto } from './services/paymentsService';
 
 // Types
 export type {

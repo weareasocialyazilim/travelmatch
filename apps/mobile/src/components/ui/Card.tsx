@@ -2,25 +2,40 @@
  * Card Component
  * A flexible container component with multiple visual variants
  * and built-in press handling for interactive cards.
+ *
+ * Includes glass variant for frosted glass effect (consolidates GlassCard).
+ *
+ * @example
+ * ```tsx
+ * // Glass effect card
+ * <Card variant="glass" intensity={40}>
+ *   <Text>Frosted glass content</Text>
+ * </Card>
+ * ```
  */
 
 import React, { memo, useMemo } from 'react';
 import type { ViewStyle } from 'react-native';
-import { View, StyleSheet, Pressable } from 'react-native';
+import { View, StyleSheet, Pressable, Platform } from 'react-native';
+import { BlurView } from 'expo-blur';
 import { COLORS, primitives } from '../../constants/colors';
+import { RADII } from '../../constants/radii';
 
 /** Card visual style variant */
-type CardVariant = 'elevated' | 'outlined' | 'filled';
+export type CardVariant = 'elevated' | 'outlined' | 'filled' | 'glass';
 
 /** Card internal padding size */
-type CardPadding = 'none' | 'sm' | 'md' | 'lg';
+export type CardPadding = 'none' | 'sm' | 'md' | 'lg';
+
+/** Blur tint for glass variant */
+export type GlassTint = 'light' | 'dark' | 'default';
 
 interface CardProps {
   /** Card content */
   children: React.ReactNode;
-  /** Visual variant - 'elevated' (shadow), 'outlined' (border), 'filled' (background) */
+  /** Visual variant - 'elevated' (shadow), 'outlined' (border), 'filled' (background), 'glass' (blur) */
   variant?: CardVariant;
-  /** Internal padding - 'none' (0), 'sm' (8), 'md' (16), 'lg' (24) */
+  /** Internal padding - 'none' (0), 'sm' (12), 'md' (16), 'lg' (24) */
   padding?: CardPadding;
   /** Press handler - makes card interactive when provided */
   onPress?: () => void;
@@ -32,6 +47,12 @@ interface CardProps {
   accessibilityLabel?: string;
   /** Test ID for testing */
   testID?: string;
+  /** Blur intensity for glass variant (0-100, default 40) */
+  intensity?: number;
+  /** Blur tint for glass variant */
+  tint?: GlassTint;
+  /** Show border on glass variant */
+  hasBorder?: boolean;
 }
 
 /**
@@ -65,6 +86,9 @@ export const Card: React.FC<CardProps> = memo(
     disabled,
     accessibilityLabel,
     testID,
+    intensity = 40,
+    tint = 'dark',
+    hasBorder = true,
   }) => {
     // Memoize variant styles calculation
     const variantStyles = useMemo((): ViewStyle => {
@@ -88,6 +112,9 @@ export const Card: React.FC<CardProps> = memo(
           return {
             backgroundColor: primitives.stone[50],
           };
+        case 'glass':
+          // Glass styles handled separately for platform-specific rendering
+          return {};
         default:
           return {};
       }
@@ -109,7 +136,44 @@ export const Card: React.FC<CardProps> = memo(
       }
     }, [padding]);
 
-    const cardContent = (
+    // Glass variant rendering (platform-specific)
+    const renderGlassContent = () => {
+      const glassContentStyle = [
+        styles.base,
+        styles.glass,
+        hasBorder && styles.glassBorder,
+        paddingStyles,
+        style,
+        disabled && styles.disabled,
+      ];
+
+      // On Android, BlurView doesn't work well, use semi-transparent fallback
+      if (Platform.OS === 'android') {
+        return (
+          <View
+            testID={!onPress ? testID : undefined}
+            style={[...glassContentStyle, styles.glassAndroid]}
+          >
+            {children}
+          </View>
+        );
+      }
+
+      // iOS with BlurView
+      return (
+        <BlurView
+          intensity={intensity}
+          tint={tint}
+          testID={!onPress ? testID : undefined}
+          style={glassContentStyle}
+        >
+          {children}
+        </BlurView>
+      );
+    };
+
+    // Standard variant rendering
+    const renderStandardContent = () => (
       <View
         testID={!onPress ? testID : undefined}
         style={[
@@ -123,6 +187,8 @@ export const Card: React.FC<CardProps> = memo(
         {children}
       </View>
     );
+
+    const cardContent = variant === 'glass' ? renderGlassContent() : renderStandardContent();
 
     if (onPress) {
       const handlePress = () => {
@@ -160,6 +226,120 @@ const styles = StyleSheet.create({
   },
   disabled: {
     opacity: 0.5,
+  },
+  // Glass variant styles
+  glass: {
+    borderRadius: RADII.xl, // Apple-style xl radii (24)
+    backgroundColor: COLORS.background.glass,
+  },
+  glassBorder: {
+    borderWidth: 1,
+    borderColor: COLORS.border.light,
+  },
+  glassAndroid: {
+    backgroundColor: COLORS.surface.glassBackground,
+  },
+});
+
+/**
+ * GlassCard - Backward-compatible alias for Card with glass variant
+ * @deprecated Use <Card variant="glass" /> instead
+ */
+export const GlassCard: React.FC<Omit<CardProps, 'variant'>> = (props) => (
+  <Card {...props} variant="glass" />
+);
+
+/**
+ * GlassView - Simple glass effect container without card styling
+ */
+interface GlassViewProps {
+  children: React.ReactNode;
+  style?: ViewStyle;
+  intensity?: number;
+  tint?: GlassTint;
+}
+
+export const GlassView: React.FC<GlassViewProps> = ({
+  children,
+  style,
+  intensity = 60,
+  tint = 'light',
+}) => {
+  if (Platform.OS === 'android') {
+    return (
+      <View style={[{ backgroundColor: COLORS.surface.glassBackground }, style]}>
+        {children}
+      </View>
+    );
+  }
+
+  return (
+    <View style={[glassViewStyles.container, style]}>
+      <BlurView
+        intensity={intensity}
+        tint={tint}
+        style={StyleSheet.absoluteFillObject}
+      />
+      {children}
+    </View>
+  );
+};
+
+/**
+ * GlassButton - Button with glass effect background
+ */
+interface GlassButtonProps {
+  children: React.ReactNode;
+  style?: ViewStyle;
+  intensity?: number;
+  tint?: GlassTint;
+  borderRadius?: number;
+}
+
+export const GlassButton: React.FC<GlassButtonProps> = ({
+  children,
+  style,
+  intensity = 60,
+  tint = 'light',
+  borderRadius = RADII.lg,
+}) => {
+  if (Platform.OS === 'android') {
+    return (
+      <View
+        style={[
+          glassButtonStyles.container,
+          { borderRadius, backgroundColor: COLORS.surface.glassBackground },
+          style,
+        ]}
+      >
+        {children}
+      </View>
+    );
+  }
+
+  return (
+    <View style={[glassButtonStyles.container, { borderRadius }, style]}>
+      <BlurView
+        intensity={intensity}
+        tint={tint}
+        style={[StyleSheet.absoluteFillObject, { borderRadius }]}
+      />
+      {children}
+    </View>
+  );
+};
+
+const glassViewStyles = StyleSheet.create({
+  container: {
+    overflow: 'hidden',
+  },
+});
+
+const glassButtonStyles = StyleSheet.create({
+  container: {
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

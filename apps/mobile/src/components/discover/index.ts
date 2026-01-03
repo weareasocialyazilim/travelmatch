@@ -1,33 +1,57 @@
 /**
- * Discover Screen Components - Barrel exports
- * iOS 26.3 Design System
+ * @deprecated Import from '@/features/discover/components' instead.
+ *
+ * Migration Guide:
+ * ================
+ *
+ * BEFORE:
+ * ```tsx
+ * import { DiscoverHeader, StoryViewer } from '@/components/discover';
+ * ```
+ *
+ * AFTER:
+ * ```tsx
+ * import { DiscoverHeader, StoryViewer } from '@/features/discover/components';
+ * ```
+ *
+ * This file re-exports for backward compatibility.
  */
 
-// Core components
-export { StoryItem } from './StoryItem';
-export { SingleMomentCard } from './SingleMomentCard';
-export { GridMomentCard } from './GridMomentCard';
-export { CategoryFilter } from './CategoryFilter';
+// Re-export all from new location
 export {
+  // Map Components
+  NeonPulseMarker,
+  // Category Components
+  CategoryChips,
+  CategoryFilter,
+  GlassCategorySelector,
+  // Header & Search
   DiscoverHeader,
-  AnimatedDiscoverHeader,
-  AwwwardsDiscoverHeader,
-} from './DiscoverHeader';
-export { StoryViewer } from './StoryViewer';
-export { FilterModal } from './FilterModal';
-export { LocationModal } from './LocationModal';
-export { HomeWelcomeCard } from './HomeWelcomeCard';
+  EnhancedSearchBar,
+  // Filters & Modals
+  FilterModal,
+  LocationModal,
+  // Moment Cards
+  GridMomentCard,
+  ImmersiveMomentCard,
+  LiquidMomentCard,
+  SingleMomentCard,
+  // Welcome Card
+  HomeWelcomeCard,
+  // Stories
+  StoriesRow,
+  StoryActionBar,
+  StoryItem,
+  StoryViewer,
+} from '@/features/discover/components';
 
-// New iOS 26.3 components
-export { CategoryChips, TabChips } from './CategoryChips';
-export { GlassCategorySelector } from './GlassCategorySelector';
-export type { GlassCategory } from './GlassCategorySelector';
-export { EnhancedSearchBar } from './EnhancedSearchBar';
+// Re-export constants
+export * from '@/features/discover/components/constants';
 
-// TravelMatch: The Rebirth - Immersive components
-export { ImmersiveMomentCard } from './ImmersiveMomentCard';
-export { LiquidMomentCard } from './LiquidMomentCard';
-
-// Re-export types and constants
+// Local types (kept here as they may be specific to legacy usage)
 export * from './types';
-export * from './constants';
+
+// Legacy aliases - these named exports may be used in existing code
+export { DiscoverHeader as AnimatedDiscoverHeader } from '@/features/discover/components';
+export { DiscoverHeader as AwwwardsDiscoverHeader } from '@/features/discover/components';
+export { CategoryChips as TabChips } from '@/features/discover/components';
