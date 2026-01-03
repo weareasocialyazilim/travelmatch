@@ -15,8 +15,23 @@ export const VALUES = {
     DEFAULT_MOMENT: undefined as string | undefined,
   },
 
-  // Escrow thresholds
+  // Escrow thresholds - Titan Plan v2.0
+  // $0-$30: Direct payment (no escrow)
+  // $30-$100: Optional escrow (user chooses)
+  // $100+: Mandatory escrow (forced protection)
+  ESCROW_THRESHOLDS: {
+    /** Max amount for direct payment without escrow */
+    DIRECT_MAX: 30,
+    /** Max amount for optional escrow (above this is mandatory) */
+    OPTIONAL_MAX: 100,
+    /** Currency for threshold values */
+    CURRENCY: 'USD',
+  } as const,
+
+  // Legacy aliases for backward compatibility
+  /** @deprecated Use ESCROW_THRESHOLDS.DIRECT_MAX */
   ESCROW_DIRECT_MAX: 30,
+  /** @deprecated Use ESCROW_THRESHOLDS.OPTIONAL_MAX */
   ESCROW_OPTIONAL_MAX: 100,
 
   // Input limits

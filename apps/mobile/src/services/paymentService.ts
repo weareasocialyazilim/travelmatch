@@ -5,11 +5,24 @@
  * All payment logic has been consolidated into securePaymentService.ts
  *
  * @deprecated Import directly from securePaymentService.ts for new code
+ * @deprecationDate 2026-01-10 (Remove after this date)
  *
  * Migration:
  * - OLD: import { paymentService } from './paymentService';
  * - NEW: import { securePaymentService } from './securePaymentService';
  */
+
+// Deprecation warning - will show once per session in dev mode
+let hasWarnedPaymentService = false;
+const warnPaymentServiceDeprecation = () => {
+  if (!hasWarnedPaymentService && __DEV__) {
+    console.warn(
+      '[DEPRECATION] paymentService.ts will be removed on 2026-01-10.\n' +
+        'Please migrate to: import { securePaymentService } from "./securePaymentService"',
+    );
+    hasWarnedPaymentService = true;
+  }
+};
 
 import {
   securePaymentService,
@@ -56,7 +69,10 @@ export const getEscrowExplanation = _getEscrowExplanation;
  */
 export const paymentService = {
   // Wallet operations
-  getBalance: () => securePaymentService.getBalance(),
+  getBalance: () => {
+    warnPaymentServiceDeprecation();
+    return securePaymentService.getBalance();
+  },
   getWalletBalance: () => securePaymentService.getBalance(),
 
   // Transaction operations
