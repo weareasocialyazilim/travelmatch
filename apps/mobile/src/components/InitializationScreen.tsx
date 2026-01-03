@@ -1,16 +1,16 @@
 /**
  * InitializationScreen
  *
- * A proper loading screen shown during app bootstrap.
+ * A premium loading screen shown during app bootstrap.
+ * Uses the Liquid Loading Ceremony for immersive experience.
  * Shows:
- * - App logo with animation
+ * - Neon ring animations with orbiting particles
  * - Loading progress with service names
  * - Error states with retry option
  * - Graceful transition to main app
- * Uses react-native-reanimated for native-thread animations.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { View, StyleSheet, Image, TouchableOpacity, Text } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -22,17 +22,176 @@ import Animated, {
   withSequence,
   Easing,
   cancelAnimation,
+  FadeIn,
+  FadeInUp,
+  FadeOut,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import { StatusBar } from 'expo-status-bar';
-import { COLORS } from '../constants/colors';
+import { COLORS, GRADIENTS, primitives } from '../constants/colors';
+import { SPACING } from '../constants/spacing';
 import { TYPOGRAPHY } from '../theme/typography';
 import type { BootstrapProgress, ServiceName } from '../services/appBootstrap';
 
-// Asset imports - using require is necessary for local image assets
-
+// Asset imports
 const appIcon = require('../../assets/icon.png') as number;
 
+// ═══════════════════════════════════════════════════════════════════
+// Orbiting Particle Component
+// ═══════════════════════════════════════════════════════════════════
+interface OrbitingParticleProps {
+  delay: number;
+  radius: number;
+  size: number;
+  color: string;
+  duration: number;
+  clockwise?: boolean;
+}
+
+const OrbitingParticle: React.FC<OrbitingParticleProps> = ({
+  delay,
+  radius,
+  size,
+  color,
+  duration,
+  clockwise = true,
+}) => {
+  const rotation = useSharedValue(0);
+  const opacity = useSharedValue(0);
+
+  useEffect(() => {
+    rotation.value = withDelay(
+      delay,
+      withRepeat(
+        withTiming(clockwise ? 360 : -360, {
+          duration,
+          easing: Easing.linear,
+        }),
+        -1,
+        false
+      )
+    );
+    opacity.value = withDelay(delay, withTiming(1, { duration: 500 }));
+
+    return () => {
+      cancelAnimation(rotation);
+      cancelAnimation(opacity);
+    };
+  }, [delay, duration, clockwise, rotation, opacity]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const angle = (rotation.value * Math.PI) / 180;
+    const x = Math.cos(angle) * radius;
+    const y = Math.sin(angle) * radius;
+
+    return {
+      transform: [{ translateX: x }, { translateY: y }],
+      opacity: opacity.value,
+    };
+  });
+
+  return (
+    <Animated.View
+      style={[
+        styles.orbitingParticle,
+        {
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          backgroundColor: color,
+          shadowColor: color,
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: 0.8,
+          shadowRadius: size * 2,
+        },
+        animatedStyle,
+      ]}
+    />
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// Neon Ring Component
+// ═══════════════════════════════════════════════════════════════════
+interface NeonRingProps {
+  size: number;
+  borderWidth: number;
+  duration: number;
+  delay?: number;
+  colors: readonly [string, string];
+}
+
+const NeonRing: React.FC<NeonRingProps> = ({
+  size,
+  borderWidth,
+  duration,
+  delay = 0,
+  colors,
+}) => {
+  const rotation = useSharedValue(0);
+  const scale = useSharedValue(0.8);
+
+  useEffect(() => {
+    rotation.value = withDelay(
+      delay,
+      withRepeat(
+        withTiming(360, {
+          duration,
+          easing: Easing.bezier(0.4, 0, 0.2, 1),
+        }),
+        -1,
+        false
+      )
+    );
+    scale.value = withDelay(
+      delay,
+      withSpring(1, { damping: 12, stiffness: 100 })
+    );
+
+    return () => {
+      cancelAnimation(rotation);
+      cancelAnimation(scale);
+    };
+  }, [delay, duration, rotation, scale]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }, { scale: scale.value }],
+  }));
+
+  return (
+    <Animated.View
+      style={[
+        styles.ringContainer,
+        {
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+        },
+        animatedStyle,
+      ]}
+    >
+      <View
+        style={[
+          styles.ring,
+          {
+            width: size,
+            height: size,
+            borderRadius: size / 2,
+            borderWidth,
+            borderColor: 'transparent',
+            borderTopColor: colors[0],
+            borderRightColor: colors[1],
+          },
+        ]}
+      />
+    </Animated.View>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// Main InitializationScreen Component
+// ═══════════════════════════════════════════════════════════════════
 interface InitializationScreenProps {
   progress: BootstrapProgress;
   onRetry?: (serviceName: ServiceName) => void;
@@ -42,35 +201,79 @@ export const InitializationScreen: React.FC<InitializationScreenProps> = ({
   progress,
   onRetry,
 }) => {
+  // Animation values
   const logoScale = useSharedValue(0.8);
   const logoOpacity = useSharedValue(0);
-  const progressOpacity = useSharedValue(0);
+  const breathingScale = useSharedValue(1);
+  const glowOpacity = useSharedValue(0.4);
+
   const [showDetails, setShowDetails] = useState(false);
 
-  // Animate logo on mount
+  // Particle configuration
+  const particles = useMemo(() => {
+    const particleColors = [
+      COLORS.primary,
+      primitives.amber[400],
+      primitives.amber[300],
+    ];
+
+    return Array.from({ length: 6 }, (_, i) => ({
+      id: i,
+      delay: i * 200,
+      radius: 50 + (i % 2) * 8,
+      size: 4 + (i % 3),
+      color: particleColors[i % particleColors.length],
+      duration: 3000 + i * 500,
+      clockwise: i % 2 === 0,
+    }));
+  }, []);
+
+  // Animate logo and breathing on mount
   useEffect(() => {
     logoOpacity.value = withTiming(1, { duration: 600 });
     logoScale.value = withSpring(1, { damping: 15, stiffness: 120 });
 
-    // Show progress after logo animation
-    progressOpacity.value = withDelay(400, withTiming(1, { duration: 300 }));
-  }, [logoOpacity, logoScale, progressOpacity]);
+    // Breathing animation
+    breathingScale.value = withRepeat(
+      withSequence(
+        withTiming(1.2, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) })
+      ),
+      -1,
+      false
+    );
+
+    // Glow pulsing
+    glowOpacity.value = withRepeat(
+      withSequence(
+        withTiming(0.5, { duration: 1000 }),
+        withTiming(0.25, { duration: 1000 })
+      ),
+      -1,
+      false
+    );
+
+    return () => {
+      cancelAnimation(breathingScale);
+      cancelAnimation(glowOpacity);
+    };
+  }, [logoOpacity, logoScale, breathingScale, glowOpacity]);
 
   const logoContainerStyle = useAnimatedStyle(() => ({
     opacity: logoOpacity.value,
     transform: [{ scale: logoScale.value }],
   }));
 
-  const logoTextStyle = useAnimatedStyle(() => ({
-    opacity: logoOpacity.value,
+  const breathingStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: breathingScale.value }],
   }));
 
-  const progressSectionStyle = useAnimatedStyle(() => ({
-    opacity: progressOpacity.value,
+  const glowStyle = useAnimatedStyle(() => ({
+    opacity: glowOpacity.value,
   }));
 
   const failedServices = Array.from(progress.services.values()).filter(
-    (s) => s.status === 'failed',
+    (s) => s.status === 'failed'
   );
 
   const currentService = progress.currentService
@@ -78,44 +281,98 @@ export const InitializationScreen: React.FC<InitializationScreenProps> = ({
     : null;
 
   const progressPercent = (progress.currentStep / progress.totalSteps) * 100;
+  const hasError = failedServices.length > 0 && !progress.canContinue;
 
   return (
-    <LinearGradient
-      colors={[COLORS.bg.primary, COLORS.surface.base]}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-    >
-      <StatusBar style="dark" backgroundColor={COLORS.bg.primary} />
+    <View style={styles.container}>
+      {/* Twilight Zinc Background */}
+      <LinearGradient
+        colors={['#0C0A09', '#1C1917', '#0C0A09']}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      />
 
+      <StatusBar style="light" backgroundColor="transparent" translucent />
+
+      {/* Content */}
       <View style={styles.content}>
-        {/* Logo */}
-        <Animated.View style={[styles.logoContainer, logoContainerStyle]}>
-          <Image source={appIcon} style={styles.logo} resizeMode="contain" />
-        </Animated.View>
+        {/* Liquid Loading Ceremony */}
+        <View style={styles.loaderWrapper}>
+          {/* Outer Glow */}
+          <Animated.View
+            style={[
+              styles.glow,
+              { backgroundColor: primitives.amber[300] },
+              breathingStyle,
+              glowStyle,
+            ]}
+          />
+
+          {/* Outer Neon Ring */}
+          <NeonRing
+            size={100}
+            borderWidth={3}
+            duration={2000}
+            colors={[COLORS.primary, primitives.amber[400]]}
+          />
+
+          {/* Inner Neon Ring (counter-rotating) */}
+          <View style={styles.innerRingWrapper}>
+            <NeonRing
+              size={80}
+              borderWidth={2}
+              duration={2500}
+              delay={300}
+              colors={[primitives.amber[400], COLORS.primary]}
+            />
+          </View>
+
+          {/* Orbiting Particles */}
+          {particles.map((particle) => (
+            <OrbitingParticle
+              key={particle.id}
+              delay={particle.delay}
+              radius={particle.radius}
+              size={particle.size}
+              color={particle.color}
+              duration={particle.duration}
+              clockwise={particle.clockwise}
+            />
+          ))}
+
+          {/* Center Logo */}
+          <Animated.View style={[styles.logoContainer, logoContainerStyle]}>
+            <Image source={appIcon} style={styles.logo} resizeMode="contain" />
+          </Animated.View>
+        </View>
 
         {/* App Name */}
-        <Animated.View style={logoTextStyle}>
+        <Animated.View entering={FadeInUp.delay(400).duration(500)}>
           <Text style={styles.appName}>TravelMatch</Text>
-          <Text style={styles.tagline}>
-            Connect with locals. Share experiences.
-          </Text>
+          <Text style={styles.tagline}>Give a moment. See it happen.</Text>
         </Animated.View>
       </View>
 
       {/* Progress Section */}
-      <Animated.View style={[styles.progressSection, progressSectionStyle]}>
+      <Animated.View
+        entering={FadeIn.delay(600).duration(400)}
+        style={styles.progressSection}
+      >
         {/* Progress Bar */}
         <View style={styles.progressBarContainer}>
           <View style={styles.progressBarBackground}>
-            <Animated.View
+            <LinearGradient
+              colors={GRADIENTS.primary}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
               style={[styles.progressBarFill, { width: `${progressPercent}%` }]}
             />
           </View>
         </View>
 
         {/* Status Text */}
-        {currentService && (
+        {currentService && !hasError && (
           <View style={styles.statusContainer}>
             <LoadingDots />
             <Text style={styles.statusText}>
@@ -125,8 +382,11 @@ export const InitializationScreen: React.FC<InitializationScreenProps> = ({
         )}
 
         {/* Error State */}
-        {failedServices.length > 0 && !progress.canContinue && (
-          <View style={styles.errorContainer}>
+        {hasError && (
+          <Animated.View
+            entering={FadeInUp.duration(300)}
+            style={styles.errorContainer}
+          >
             <Text style={styles.errorTitle}>⚠️ Kritik hata oluştu</Text>
             {failedServices.map((service) => (
               <View key={service.name} style={styles.errorItem}>
@@ -143,10 +403,10 @@ export const InitializationScreen: React.FC<InitializationScreenProps> = ({
                 )}
               </View>
             ))}
-          </View>
+          </Animated.View>
         )}
 
-        {/* Non-critical failures (tap to see details) */}
+        {/* Non-critical failures */}
         {failedServices.length > 0 && progress.canContinue && (
           <TouchableOpacity
             style={styles.warningContainer}
@@ -172,25 +432,26 @@ export const InitializationScreen: React.FC<InitializationScreenProps> = ({
       <View style={styles.footer}>
         <Text style={styles.version}>v1.0.0</Text>
       </View>
-    </LinearGradient>
+    </View>
   );
 };
 
-// Animated loading dots
+// ═══════════════════════════════════════════════════════════════════
+// Loading Dots Component
+// ═══════════════════════════════════════════════════════════════════
 const LoadingDots: React.FC = () => {
   const dot1Opacity = useSharedValue(0.3);
   const dot2Opacity = useSharedValue(0.3);
   const dot3Opacity = useSharedValue(0.3);
 
   useEffect(() => {
-    // Staggered dot animations
     dot1Opacity.value = withRepeat(
       withSequence(
         withTiming(1, { duration: 400, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0.3, { duration: 400, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0.3, { duration: 400, easing: Easing.inOut(Easing.ease) })
       ),
       -1,
-      false,
+      false
     );
 
     dot2Opacity.value = withDelay(
@@ -198,11 +459,11 @@ const LoadingDots: React.FC = () => {
       withRepeat(
         withSequence(
           withTiming(1, { duration: 400, easing: Easing.inOut(Easing.ease) }),
-          withTiming(0.3, { duration: 400, easing: Easing.inOut(Easing.ease) }),
+          withTiming(0.3, { duration: 400, easing: Easing.inOut(Easing.ease) })
         ),
         -1,
-        false,
-      ),
+        false
+      )
     );
 
     dot3Opacity.value = withDelay(
@@ -210,11 +471,11 @@ const LoadingDots: React.FC = () => {
       withRepeat(
         withSequence(
           withTiming(1, { duration: 400, easing: Easing.inOut(Easing.ease) }),
-          withTiming(0.3, { duration: 400, easing: Easing.inOut(Easing.ease) }),
+          withTiming(0.3, { duration: 400, easing: Easing.inOut(Easing.ease) })
         ),
         -1,
-        false,
-      ),
+        false
+      )
     );
 
     return () => {
@@ -237,51 +498,91 @@ const LoadingDots: React.FC = () => {
   );
 };
 
+// ═══════════════════════════════════════════════════════════════════
+// Styles
+// ═══════════════════════════════════════════════════════════════════
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#0C0A09',
   },
   content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 40,
+    paddingHorizontal: SPACING['2xl'],
+  },
+  loaderWrapper: {
+    width: 140,
+    height: 140,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SPACING['2xl'],
+  },
+  glow: {
+    position: 'absolute',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+  },
+  ringContainer: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  ring: {
+    position: 'absolute',
+  },
+  innerRingWrapper: {
+    position: 'absolute',
+  },
+  orbitingParticle: {
+    position: 'absolute',
+    elevation: 6,
   },
   logoContainer: {
-    width: 120,
-    height: 120,
-    marginBottom: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: primitives.stone[900],
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    overflow: 'hidden',
   },
   logo: {
-    width: '100%',
-    height: '100%',
+    width: 40,
+    height: 40,
   },
   appName: {
-    ...TYPOGRAPHY.h1,
+    fontSize: 32,
+    fontWeight: '800',
+    color: COLORS.white,
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: SPACING.xs,
+    letterSpacing: -0.5,
   },
   tagline: {
     ...TYPOGRAPHY.bodySmall,
     textAlign: 'center',
-    color: COLORS.text.secondary,
+    color: COLORS.textOnDarkSecondary,
   },
   progressSection: {
-    paddingHorizontal: 40,
-    paddingBottom: 60,
+    paddingHorizontal: SPACING['2xl'],
+    paddingBottom: SPACING['4xl'],
   },
   progressBarContainer: {
-    marginBottom: 16,
+    marginBottom: SPACING.base,
   },
   progressBarBackground: {
-    height: 4,
-    backgroundColor: COLORS.border.default,
+    height: 3,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 2,
     overflow: 'hidden',
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: COLORS.brand.primary,
     borderRadius: 2,
   },
   statusContainer: {
@@ -290,89 +591,96 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   statusText: {
-    ...TYPOGRAPHY.bodySmall,
-    color: COLORS.text.secondary,
-    marginLeft: 8,
+    ...TYPOGRAPHY.caption,
+    color: COLORS.textOnDarkSecondary,
+    marginLeft: SPACING.sm,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   dotsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: COLORS.brand.primary,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: COLORS.primary,
     marginHorizontal: 2,
   },
   errorContainer: {
-    marginTop: 16,
-    padding: 16,
-    backgroundColor: COLORS.errorLight || '#FEE2E2',
+    marginTop: SPACING.base,
+    padding: SPACING.base,
+    backgroundColor: 'rgba(239, 68, 68, 0.15)',
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(239, 68, 68, 0.3)',
   },
   errorTitle: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.feedback.error,
+    color: primitives.red[400],
     fontWeight: '600',
-    marginBottom: 8,
+    marginBottom: SPACING.sm,
     textAlign: 'center',
   },
   errorItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 4,
+    marginTop: SPACING.xs,
   },
   errorText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.feedback.error,
+    color: primitives.red[300],
     flex: 1,
   },
   retryButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: COLORS.feedback.error,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs,
+    backgroundColor: primitives.red[500],
     borderRadius: 6,
-    marginLeft: 8,
+    marginLeft: SPACING.sm,
   },
   retryText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.utility.white,
+    color: COLORS.white,
     fontWeight: '600',
   },
   warningContainer: {
-    marginTop: 16,
-    padding: 12,
-    backgroundColor: COLORS.warningLight || '#FEF3C7',
+    marginTop: SPACING.base,
+    padding: SPACING.md,
+    backgroundColor: 'rgba(245, 158, 11, 0.15)',
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.3)',
   },
   warningText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.feedback.warning || '#D97706',
+    color: primitives.amber[400],
     textAlign: 'center',
   },
   detailsContainer: {
-    marginTop: 8,
-    paddingTop: 8,
+    marginTop: SPACING.sm,
+    paddingTop: SPACING.sm,
     borderTopWidth: 1,
-    borderTopColor: COLORS.feedback.warning || '#D97706',
+    borderTopColor: 'rgba(245, 158, 11, 0.3)',
   },
   detailText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.feedback.warning || '#D97706',
-    marginTop: 4,
+    color: primitives.amber[300],
+    marginTop: SPACING.xs,
   },
   footer: {
     position: 'absolute',
-    bottom: 40,
+    bottom: SPACING['2xl'],
     left: 0,
     right: 0,
     alignItems: 'center',
   },
   version: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.text.tertiary,
+    color: COLORS.textOnDarkMuted,
+    letterSpacing: 1,
   },
 });
 
