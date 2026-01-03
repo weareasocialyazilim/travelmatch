@@ -19,11 +19,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { LoadingState } from '@/components/LoadingState';
 import { COLORS } from '@/constants/colors';
-import {
-  showErrorAlert,
-  FriendlyAppError,
-  AppErrorCode,
-} from '@/utils/friendlyErrorHandler';
+import { showErrorAlert } from '@/utils/errorHandler';
+import { AppError, ErrorCode } from '@/utils/appErrors';
 import {
   completeProfileSchema,
   type CompleteProfileInput,
@@ -83,10 +80,10 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
       if (useCamera) {
         const { status } = await ImagePicker.requestCameraPermissionsAsync();
         if (status !== 'granted') {
-          throw new FriendlyAppError(
-            AppErrorCode.PERMISSION_CAMERA_DENIED,
-            'Camera permission denied',
-          );
+          throw new AppError('Camera permission denied', {
+            code: ErrorCode.PERMISSION_DENIED,
+            context: { permission: 'camera' },
+          });
         }
         const result = await ImagePicker.launchCameraAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -101,10 +98,10 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
         const { status } =
           await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
-          throw new FriendlyAppError(
-            AppErrorCode.PERMISSION_STORAGE_DENIED,
-            'Storage permission denied',
-          );
+          throw new AppError('Storage permission denied', {
+            code: ErrorCode.PERMISSION_DENIED,
+            context: { permission: 'storage' },
+          });
         }
         const result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
