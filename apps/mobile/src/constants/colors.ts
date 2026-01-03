@@ -133,8 +133,22 @@ const primitives = {
     800: '#292524',
     900: '#1C1917',
   },
+  fuchsia: {
+    50: '#FDF4FF',
+    100: '#FAE8FF',
+    200: '#F5D0FE',
+    300: '#F0ABFC',
+    400: '#E879F9',
+    500: '#D946EF',
+    600: '#C026D3',
+    700: '#A21CAF',
+    800: '#86198F',
+    900: '#701A75',
+  },
   white: '#FFFFFF',
   black: '#000000',
+  magenta: '#D946EF',
+  seafoam: '#20B2AA',
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════
@@ -148,6 +162,22 @@ export const GRADIENTS = {
   glass: ['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.03)'] as const,
   cardOverlay: ['transparent', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.85)'] as const,
   shimmer: ['transparent', 'rgba(255, 255, 255, 0.2)', 'transparent'] as const,
+  // Additional gradients
+  gift: ['#FFD700', '#FFA500'] as const,
+  giftButton: ['#FFD700', '#FFA500'] as const,
+  trust: ['#06B6D4', '#0891B2'] as const,
+  sunset: ['#F43F5E', '#FB923C', '#FCD34D'] as const,
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// CARD SHADOW
+// ═══════════════════════════════════════════════════════════════════
+export const CARD_SHADOW = {
+  shadowColor: '#000000',
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.15,
+  shadowRadius: 12,
+  elevation: 8,
 };
 
 // ═══════════════════════════════════════════════════════════════════
@@ -239,6 +269,7 @@ export const COLORS = {
     secondary: '#A855F7',
     secondaryLight: '#C084FC',
     secondaryDark: '#9333EA',
+    secondaryTransparent: 'rgba(168, 85, 247, 0.15)',
     accent: '#06B6D4',
   },
 
@@ -253,10 +284,13 @@ export const COLORS = {
     onDark: '#FFFFFF',
     onDarkSecondary: 'rgba(255, 255, 255, 0.72)',
     onDarkMuted: 'rgba(255, 255, 255, 0.48)',
+    inverse: '#121214',
+    primaryMuted: 'rgba(248, 250, 252, 0.6)',
   },
 
   bg: {
     primary: '#121214',
+    primaryLight: '#1E1E20',
     secondary: '#1E1E20',
     tertiary: '#27272A',
     elevated: '#27272A',
@@ -291,17 +325,205 @@ export const COLORS = {
   },
 
   surface: {
+    base: '#121214',
+    baseLight: '#1E1E20',
     card: '#1E1E20',
     cardSolid: '#1E1E20',
     modal: 'rgba(18, 18, 20, 0.95)',
     overlay: 'rgba(0, 0, 0, 0.6)',
+    overlayLight: 'rgba(0, 0, 0, 0.3)',
+    overlayMedium: 'rgba(0, 0, 0, 0.5)',
+    overlayHeavy: 'rgba(0, 0, 0, 0.85)',
+    overlayBackdrop: 'rgba(0, 0, 0, 0.7)',
     overlay30: 'rgba(0, 0, 0, 0.3)',
     overlay40: 'rgba(0, 0, 0, 0.4)',
-    overlayHeavy: 'rgba(0, 0, 0, 0.85)',
     glass: 'rgba(255, 255, 255, 0.03)',
     glassBorder: 'rgba(255, 255, 255, 0.08)',
     glassBackground: 'rgba(30, 30, 32, 0.85)',
+    muted: '#27272A',
   },
+
+  // Trust nested structure
+  trust: {
+    primary: '#06B6D4',
+    light: '#22D3EE',
+    dark: '#0891B2',
+    transparent: 'rgba(6, 182, 212, 0.15)',
+  },
+
+  // Background nested structure (for COLORS.background.primary)
+  background: {
+    primary: '#121214',
+    secondary: '#1E1E20',
+    tertiary: '#27272A',
+    elevated: '#27272A',
+    glass: 'rgba(255, 255, 255, 0.03)',
+  },
+
+  // ═══════════════════════════════════════════════════════════════════
+  // LEGACY FLAT ALIASES - For backward compatibility
+  // ═══════════════════════════════════════════════════════════════════
+  textOnDark: '#FFFFFF',
+  textOnDarkSecondary: 'rgba(255, 255, 255, 0.72)',
+  textOnDarkMuted: 'rgba(255, 255, 255, 0.48)',
+  textInverse: '#121214',
+
+  backgroundDark: '#121214',
+  surfaceDark: '#1E1E20',
+
+  // Soft colors
+  softGray: '#94A3B8',
+  softOrange: '#F59E0B',
+  softOrangeTransparent: 'rgba(245, 158, 11, 0.15)',
+
+  // Transparent variants
+  mintTransparent: 'rgba(16, 185, 129, 0.15)',
+  mintTransparentLight: 'rgba(16, 185, 129, 0.08)',
+  secondaryTransparent: 'rgba(168, 85, 247, 0.15)',
+
+  // Additional semantic colors
+  successLight: 'rgba(16, 185, 129, 0.15)',
+  warningLight: 'rgba(245, 158, 11, 0.15)',
+  errorLight: 'rgba(244, 63, 94, 0.15)',
+
+  // Overlay colors
+  whiteOverlay20: 'rgba(255, 255, 255, 0.20)',
+  whiteOverlay10: 'rgba(255, 255, 255, 0.10)',
+  blackOverlay60: 'rgba(0, 0, 0, 0.6)',
+
+  // Subtitle/muted
+  subtitle: '#94A3B8',
+  lightGray: 'rgba(255, 255, 255, 0.12)',
+
+  // ═══════════════════════════════════════════════════════════════════
+  // MORE LEGACY ALIASES - For additional backward compatibility
+  // ═══════════════════════════════════════════════════════════════════
+  // Text aliases
+  textPrimary: '#F8FAFC',
+  textMuted: '#475569',
+  textLight: '#94A3B8',
+
+  // Background aliases
+  backgroundPrimary: '#121214',
+  backgroundSecondary: '#1E1E20',
+
+  // Surface aliases
+  surfaceMuted: '#27272A',
+  surfaceSubtle: 'rgba(255, 255, 255, 0.03)',
+  surfaceCard: '#1E1E20',
+  cardBackground: '#1E1E20',
+  inputBackground: '#1E1E20',
+
+  // Overlay aliases
+  overlay: 'rgba(0, 0, 0, 0.6)',
+  overlay30: 'rgba(0, 0, 0, 0.3)',
+  overlay40: 'rgba(0, 0, 0, 0.4)',
+  darkOverlay: 'rgba(0, 0, 0, 0.85)',
+
+  // Border aliases
+  borderDefault: 'rgba(255, 255, 255, 0.08)',
+  borderLight: 'rgba(255, 255, 255, 0.05)',
+
+  // Shadow
+  shadowColor: 'rgba(0, 0, 0, 0.3)',
+
+  // Primary muted
+  primaryMuted: 'rgba(223, 255, 0, 0.15)',
+  primaryTransparent: 'rgba(223, 255, 0, 0.08)',
+
+  // Trust colors
+  trustGold: '#FFD700',
+
+  // Special colors
+  brown: '#8B4513',
+  beige: '#F5F5DC',
+  beigeLight: '#FAF8F5',
+  teal: '#14B8A6',
+  blue: '#3B82F6',
+  magenta: '#D946EF',
+
+  // Status colors
+  greenSuccess: '#10B981',
+  softRed: '#F87171',
+
+  // Button colors
+  buttonDark: '#1E1E20',
+  disabled: '#52525B',
+
+  // Modal/Overlay
+  modalBackdrop: 'rgba(0, 0, 0, 0.7)',
+  overlay60: 'rgba(0, 0, 0, 0.6)',
+  blackTransparent: 'rgba(0, 0, 0, 0.5)',
+
+  // Filter pills
+  filterPillActive: 'rgba(223, 255, 0, 0.15)',
+  filterPillActiveBorder: '#DFFF00',
+
+  // Success muted
+  successMuted: 'rgba(16, 185, 129, 0.15)',
+
+  // Error/Background variants
+  errorBackground: 'rgba(244, 63, 94, 0.15)',
+
+  // Shadow
+  shadow: 'rgba(0, 0, 0, 0.25)',
+
+  // Gray variants
+  grayLight: '#E4E4E7',
+
+  // White transparent
+  whiteTransparentLight: 'rgba(255, 255, 255, 0.15)',
+
+  // KYC colors
+  kycBronze: '#CD7F32',
+  kycSilver: '#C0C0C0',
+  kycGold: '#FFD700',
+  kycPlatinum: '#E5E4E2',
+
+  // Additional muted colors
+  secondaryMuted: 'rgba(168, 85, 247, 0.15)',
+  trustMuted: 'rgba(6, 182, 212, 0.15)',
+  accentMuted: 'rgba(6, 182, 212, 0.15)',
+  purpleTransparent: 'rgba(168, 85, 247, 0.15)',
+  primarySurface: 'rgba(223, 255, 0, 0.1)',
+
+  // Trust level colors
+  trustLow: '#F87171',
+  trustMedium: '#F59E0B',
+  trustHigh: '#10B981',
+  trustPlatinum: '#E5E4E2',
+
+  // Error variants
+  errorRedLight: 'rgba(244, 63, 94, 0.15)',
+
+  // White variants
+  whiteTransparent: 'rgba(255, 255, 255, 0.5)',
+  whiteOverlay80: 'rgba(255, 255, 255, 0.8)',
+
+  // Social media colors
+  whatsapp: '#25D366',
+  whatsappTransparent20: 'rgba(37, 211, 102, 0.2)',
+  instagram: '#E4405F',
+  instagramTransparent20: 'rgba(228, 64, 95, 0.2)',
+  twitter: '#1DA1F2',
+  facebook: '#1877F2',
+
+  // Glass color
+  glass: 'rgba(255, 255, 255, 0.03)',
+  glassBorder: 'rgba(255, 255, 255, 0.08)',
+
+  // Gray variants
+  gray: '#71717A',
+  grayDark: '#52525B',
+
+  // Mint background
+  mintBackground: 'rgba(16, 185, 129, 0.1)',
+
+  // Black transparent variants
+  blackTransparentDark: 'rgba(0, 0, 0, 0.7)',
+
+  // Seafoam
+  seafoam: '#20B2AA',
 } as const;
 
 export type ColorKey = keyof typeof COLORS;
@@ -309,6 +531,19 @@ export type ColorValue = (typeof COLORS)[ColorKey];
 
 // Export primitives for advanced use
 export { primitives };
+
+// ═══════════════════════════════════════════════════════════════════
+// HELPER FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════
+export const getTrustRingColors = (score: number) => {
+  if (score >= 90)
+    return { ring: COLORS.trustPlatinum, glow: 'rgba(229, 228, 226, 0.4)' };
+  if (score >= 70)
+    return { ring: COLORS.trustHigh, glow: 'rgba(16, 185, 129, 0.4)' };
+  if (score >= 40)
+    return { ring: COLORS.trustMedium, glow: 'rgba(245, 158, 11, 0.4)' };
+  return { ring: COLORS.trustLow, glow: 'rgba(248, 113, 113, 0.4)' };
+};
 
 // Re-export theme colors for components that need full nested structure
 export { COLORS as THEME_COLORS } from '../theme/colors';
