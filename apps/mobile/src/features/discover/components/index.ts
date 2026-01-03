@@ -1,4 +1,40 @@
 /**
  * Discover Feature Components - Barrel exports
+ *
+ * All Discover-specific components are now located here following
+ * feature-based architecture for better encapsulation.
  */
-export { NeonPulseMarker } from "./NeonPulseMarker";
+
+// Map Components
+export { NeonPulseMarker } from './NeonPulseMarker';
+
+// Category Components
+export { CategoryChips } from './CategoryChips';
+export { CategoryFilter } from './CategoryFilter';
+export { GlassCategorySelector } from './GlassCategorySelector';
+
+// Header & Search
+export { DiscoverHeader } from './DiscoverHeader';
+export { EnhancedSearchBar } from './EnhancedSearchBar';
+
+// Filters & Modals
+export { FilterModal } from './FilterModal';
+export { LocationModal } from './LocationModal';
+
+// Moment Cards
+export { GridMomentCard } from './GridMomentCard';
+export { ImmersiveMomentCard } from './ImmersiveMomentCard';
+export { LiquidMomentCard } from './LiquidMomentCard';
+export { SingleMomentCard } from './SingleMomentCard';
+
+// Welcome Card
+export { HomeWelcomeCard } from './HomeWelcomeCard';
+
+// Stories
+export { StoriesRow } from './StoriesRow';
+export { StoryActionBar } from './StoryActionBar';
+export { StoryItem } from './StoryItem';
+export { StoryViewer } from './StoryViewer';
+
+// Constants
+export * from './constants';
