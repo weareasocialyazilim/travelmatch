@@ -16,7 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useToast } from '@/context/ToastContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { COLORS } from '@/constants/colors';
-import { updatePassword } from '@/services/supabaseAuthService';
+import { updatePassword } from '../services/authService';
 
 interface PasswordRequirement {
   label: string;

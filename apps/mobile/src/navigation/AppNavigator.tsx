@@ -54,7 +54,10 @@ import { ImageViewerScreen } from '../screens/ImageViewerScreen';
 import { DateTimePickerScreen } from '../screens/DateTimePickerScreen';
 import { NotFoundScreen } from '../screens/NotFoundScreen';
 import { PickLocationScreen } from '../screens/PickLocationScreen';
-import { DevMenuScreen } from '../screens/dev/DevMenuScreen';
+// Dev Menu - only loaded in development
+const DevMenuScreen = __DEV__
+  ? require('../screens/dev/DevMenuScreen').DevMenuScreen
+  : () => null;
 
 // ===================================
 // DISCOVER FEATURE SCREENS

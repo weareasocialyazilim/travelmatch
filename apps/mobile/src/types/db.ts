@@ -214,6 +214,54 @@ export type TableUpdate<T extends TableName> = Tables[T]['Update'];
 export type { Json };
 
 // ============================================
+// JSONB FIELD TYPES
+// ============================================
+
+/**
+ * Notification preferences JSONB type
+ * Used in users.notification_preferences
+ */
+export interface NotificationPreferences {
+  email?: boolean;
+  push?: boolean;
+  marketing?: boolean;
+  [key: string]: boolean | undefined;
+}
+
+/**
+ * Privacy settings JSONB type
+ * Used in users.privacy_settings
+ */
+export interface PrivacySettings {
+  showLocation?: boolean;
+  showLastSeen?: boolean;
+  allowMessages?: 'everyone' | 'followers' | 'none';
+  timezone?: string;
+  autoAcceptRequests?: boolean;
+  instantBooking?: boolean;
+  [key: string]: string | boolean | undefined;
+}
+
+/**
+ * Profile update payload
+ * Used for userService.updateProfile()
+ */
+export interface UpdateProfilePayload {
+  avatar?: string;
+  coverImage?: string;
+  cover_image?: string;
+  full_name?: string;
+  bio?: string;
+  location?: unknown;
+  languages?: string[];
+  interests?: string[];
+  instagram?: string;
+  twitter?: string;
+  notification_preferences?: NotificationPreferences;
+  privacy_settings?: PrivacySettings;
+}
+
+// ============================================
 // TYPE GUARDS
 // ============================================
 

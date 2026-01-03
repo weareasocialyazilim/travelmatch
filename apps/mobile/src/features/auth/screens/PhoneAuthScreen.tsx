@@ -16,7 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   signInWithPhone,
   verifyPhoneOtp,
-} from '@/services/supabaseAuthService';
+} from '../services/authService';
 import { useToast } from '@/context/ToastContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { COLORS } from '@/constants/colors';

@@ -7,16 +7,38 @@
 export { Button } from './Button';
 export { Card, GlassCard, GlassView, GlassButton } from './Card';
 export type { CardVariant, CardPadding, GlassTint } from './Card';
-export { Input } from './Input';
 export { Divider } from './Divider';
 export { EmptyState } from './EmptyState';
 export { FlashMessage } from './FlashMessage';
 
+// ═══════════════════════════════════════════════════════════════════
+// Input Components - LiquidInput is the master component
+// ═══════════════════════════════════════════════════════════════════
+export { LiquidInput } from './LiquidInput';
+export { ControlledLiquidInput } from './ControlledLiquidInput';
+// @deprecated aliases - use LiquidInput instead
+export { LiquidInput as Input } from './LiquidInput';
+
 // TMBadge - Consolidated badge component (replaces Badge, StatusBadge, TrustBadge)
-export { TMBadge, LiveStatusBadge, VerifiedBadge, PremiumBadge } from './TMBadge';
-export type { TMBadgeType, LabelVariant, StatusVariant, BadgeSize, TMBadgeProps } from './TMBadge';
+export {
+  TMBadge,
+  LiveStatusBadge,
+  VerifiedBadge,
+  PremiumBadge,
+} from './TMBadge';
+export type {
+  TMBadgeType,
+  LabelVariant,
+  StatusVariant,
+  BadgeSize,
+  TMBadgeProps,
+} from './TMBadge';
 // @deprecated aliases for backward compatibility
-export { TMBadge as Badge, TMBadge as StatusBadge, TMBadge as TrustBadge } from './TMBadge';
+export {
+  TMBadge as Badge,
+  TMBadge as StatusBadge,
+  TMBadge as TrustBadge,
+} from './TMBadge';
 
 // ═══════════════════════════════════════════════════════════════════
 // TravelMatch Design System Components (TM* prefix)
@@ -25,7 +47,13 @@ export { TMBadge as Badge, TMBadge as StatusBadge, TMBadge as TrustBadge } from 
 // TMButton - Primary button with gradient, animation, haptics
 // Consolidated master component - replaces Button, HapticButton, AnimatedButton
 export { TMButton } from './TMButton';
-export type { TMButtonProps, ButtonVariant, ButtonSize, AnimationMode, HapticType } from './TMButton';
+export type {
+  TMButtonProps,
+  ButtonVariant,
+  ButtonSize,
+  AnimationMode,
+  HapticType,
+} from './TMButton';
 
 // TMTrustRing - Trust score visualization with "Jewelry" aesthetic
 export { TMTrustRing } from './TMTrustRing';
@@ -49,15 +77,41 @@ export { ControlledLiquidInput } from './ControlledLiquidInput';
 
 // TMLoading - Consolidated loading component (replaces Spinner, LoadingSpinner, LiquidLoading)
 export { TMLoading } from './TMLoading';
-export type { TMLoadingType, LoadingSize, LoadingVariant, TMLoadingProps } from './TMLoading';
+export type {
+  TMLoadingType,
+  LoadingSize,
+  LoadingVariant,
+  TMLoadingProps,
+} from './TMLoading';
 // @deprecated aliases for backward compatibility
-export { TMLoading as Spinner, TMLoading as LoadingSpinner, TMLoading as LiquidLoading } from './TMLoading';
+export {
+  TMLoading as Spinner,
+  TMLoading as LoadingSpinner,
+  TMLoading as LiquidLoading,
+} from './TMLoading';
 
 // TMSkeleton - Consolidated skeleton component (replaces Skeleton, SkeletonList, NavigationSkeleton)
-export { TMSkeleton, Skeleton, SkeletonAvatar, SkeletonText, SkeletonCard, SkeletonMessage } from './TMSkeleton';
-export type { TMSkeletonType, SkeletonListType, SkeletonScreenType, SkeletonVariant, TMSkeletonProps } from './TMSkeleton';
+export {
+  TMSkeleton,
+  Skeleton,
+  SkeletonAvatar,
+  SkeletonText,
+  SkeletonCard,
+  SkeletonMessage,
+} from './TMSkeleton';
+export type {
+  TMSkeletonType,
+  SkeletonListType,
+  SkeletonScreenType,
+  SkeletonVariant,
+  TMSkeletonProps,
+} from './TMSkeleton';
 // @deprecated aliases for backward compatibility - use TMSkeleton with type prop instead
-export { TMSkeleton as SkeletonList, TMSkeleton as FeedSkeleton, TMSkeleton as ScreenSkeleton } from './TMSkeleton';
+export {
+  TMSkeleton as SkeletonList,
+  TMSkeleton as FeedSkeleton,
+  TMSkeleton as ScreenSkeleton,
+} from './TMSkeleton';
 
 // TMSheet - Bottom sheet with gestures and blur
 export { TMSheet } from './TMSheet';
@@ -108,7 +162,11 @@ export { OptimizedImage } from './OptimizedImage';
 // ═══════════════════════════════════════════════════════════════════
 export { DashboardStatCard } from './DashboardStatCard';
 export { AlertCard, AlertBadge } from './AlertCard';
-export { ProgressBar, SegmentedProgress, CircularProgress } from './ProgressBar';
+export {
+  ProgressBar,
+  SegmentedProgress,
+  CircularProgress,
+} from './ProgressBar';
 export { FilterPanel, FilterChips } from './FilterPanel';
 
 // ═══════════════════════════════════════════════════════════════════
