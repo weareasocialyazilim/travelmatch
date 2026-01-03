@@ -17,7 +17,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Alert } from 'react-native';
 import { supabase } from '@/services/supabase';
 import { useAnalytics } from './useAnalytics';
-import { logger } from '@/utils/production-logger';
+import { logger } from '@/utils/logger';
 
 // Types
 export interface IdenfyVerificationResult {

@@ -167,6 +167,10 @@ export const GRADIENTS = {
   giftButton: ['#FFD700', '#FFA500'] as const,
   trust: ['#06B6D4', '#0891B2'] as const,
   sunset: ['#F43F5E', '#FB923C', '#FCD34D'] as const,
+  // Aurora effect
+  aurora: ['#00F5D4', '#00BBF9', '#9B5DE5', '#F15BB5'] as const,
+  // Disabled state
+  disabled: ['#52525B', '#3F3F46'] as const,
 };
 
 // ═══════════════════════════════════════════════════════════════════

@@ -2,8 +2,11 @@
 // TravelMatch Ultimate Design System 2026
 // Awwwards standardında Buton Sistemi
 // Neon parlaması, haptik geri bildirim ve ipeksi geçişler içerir.
+//
+// CONSOLIDATED: Replaces Button.tsx, HapticButton.tsx, AnimatedButton.tsx
+// All button variants now unified in this single master component.
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   Pressable,
   Text,
@@ -13,22 +16,32 @@ import {
   ViewStyle,
   TextStyle,
   StyleProp,
+  Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
+  withRepeat,
+  withSequence,
+  withTiming,
+  Easing,
   runOnJS,
+  cancelAnimation,
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, GRADIENTS, SHADOWS } from '@/constants/colors';
+import { COLORS, GRADIENTS, PALETTE } from '@/constants/colors';
+import { SHADOWS } from '@/constants/shadows';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { RADIUS, SIZES, SPACING } from '@/constants/spacing';
 import { SPRING, HAPTIC } from '@/hooks/useMotion';
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'outline' | 'danger' | 'neon';
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'outline' | 'danger' | 'neon' | 'glass';
 type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+type AnimationMode = 'none' | 'pulse' | 'shimmer';
+type HapticType = 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error' | 'none';
 
 interface TMButtonProps {
   /** Button text - use either children or title */
@@ -48,9 +61,47 @@ interface TMButtonProps {
   style?: StyleProp<ViewStyle>;
   textStyle?: TextStyle;
   testID?: string;
+  /** Enable/disable haptic feedback (default: true) */
+  hapticEnabled?: boolean;
+  /** Type of haptic feedback (default: 'light') */
+  hapticType?: HapticType;
+  /** Animation mode for attention-grabbing buttons */
+  animationMode?: AnimationMode;
+  /** Accessibility label override */
+  accessibilityLabel?: string;
+  /** Accessibility hint */
+  accessibilityHint?: string;
 }
 
+export type { TMButtonProps, ButtonVariant, ButtonSize, AnimationMode, HapticType };
+
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+// Haptic helper function
+const triggerHaptic = (type: HapticType) => {
+  if (type === 'none') return;
+
+  switch (type) {
+    case 'light':
+      HAPTIC.light();
+      break;
+    case 'medium':
+      HAPTIC.medium();
+      break;
+    case 'heavy':
+      HAPTIC.heavy();
+      break;
+    case 'success':
+      HAPTIC.success();
+      break;
+    case 'warning':
+      HAPTIC.warning();
+      break;
+    case 'error':
+      HAPTIC.error();
+      break;
+  }
+};
 
 export const TMButton: React.FC<TMButtonProps> = ({
   children,
@@ -67,23 +118,78 @@ export const TMButton: React.FC<TMButtonProps> = ({
   style,
   textStyle,
   testID,
+  hapticEnabled = true,
+  hapticType = 'light',
+  animationMode = 'none',
+  accessibilityLabel,
+  accessibilityHint,
 }) => {
   const scale = useSharedValue(1);
+  const pulseScale = useSharedValue(1);
+  const shimmerTranslateX = useSharedValue(-100);
 
   // Support both children and title props
   const buttonText = children || title || '';
 
+  // Pulse animation effect
+  useEffect(() => {
+    if (animationMode === 'pulse' && !disabled) {
+      pulseScale.value = withRepeat(
+        withSequence(
+          withTiming(1.05, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
+          withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
+        ),
+        -1,
+        false,
+      );
+    } else {
+      cancelAnimation(pulseScale);
+      pulseScale.value = 1;
+    }
+
+    return () => {
+      cancelAnimation(pulseScale);
+    };
+  }, [animationMode, disabled, pulseScale]);
+
+  // Shimmer animation effect
+  useEffect(() => {
+    if (animationMode === 'shimmer' && !disabled) {
+      shimmerTranslateX.value = withRepeat(
+        withTiming(200, { duration: 2000, easing: Easing.linear }),
+        -1,
+        false,
+      );
+    } else {
+      cancelAnimation(shimmerTranslateX);
+      shimmerTranslateX.value = -100;
+    }
+
+    return () => {
+      cancelAnimation(shimmerTranslateX);
+    };
+  }, [animationMode, disabled, shimmerTranslateX]);
+
   const handlePressIn = useCallback(() => {
     scale.value = withSpring(0.96, SPRING.snappy);
-    runOnJS(HAPTIC.light)();
-  }, []);
+    if (hapticEnabled) {
+      runOnJS(triggerHaptic)(hapticType);
+    }
+  }, [hapticEnabled, hapticType]);
 
   const handlePressOut = useCallback(() => {
     scale.value = withSpring(1, SPRING.default);
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
+    transform: [
+      { scale: scale.value },
+      { scale: pulseScale.value },
+    ],
+  }));
+
+  const shimmerStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: shimmerTranslateX.value }],
   }));
 
   const sizeStyles: Record<ButtonSize, ViewStyle> = {
@@ -118,13 +224,14 @@ export const TMButton: React.FC<TMButtonProps> = ({
       case 'primary':
       case 'neon':
       case 'danger':
-        return COLORS.white;
+      case 'glass':
+        return PALETTE.white;
       case 'secondary':
       case 'outline':
       case 'ghost':
         return COLORS.primary;
       default:
-        return COLORS.white;
+        return PALETTE.white;
     }
   };
 
@@ -134,17 +241,32 @@ export const TMButton: React.FC<TMButtonProps> = ({
       case 'primary':
       case 'neon':
       case 'danger':
-        return COLORS.white;
+      case 'glass':
+        return PALETTE.white;
       default:
         return COLORS.primary;
     }
   };
 
+  // Accessibility props computed
+  const a11yProps = {
+    accessible: true,
+    accessibilityRole: 'button' as const,
+    accessibilityLabel: accessibilityLabel || buttonText,
+    accessibilityHint,
+    accessibilityState: { disabled: disabled || loading },
+  };
+
   const renderContent = () => (
     <>
+      {/* Shimmer overlay for shimmer animation mode */}
+      {animationMode === 'shimmer' && !disabled && (
+        <Animated.View style={[styles.shimmerOverlay, shimmerStyle]} />
+      )}
+
       {loading ? (
         <ActivityIndicator
-          color={variant === 'primary' || variant === 'neon' || variant === 'danger' ? '#FFF' : COLORS.primary}
+          color={variant === 'primary' || variant === 'neon' || variant === 'danger' || variant === 'glass' ? '#FFF' : COLORS.primary}
           size="small"
         />
       ) : (
@@ -199,6 +321,7 @@ export const TMButton: React.FC<TMButtonProps> = ({
           onPressOut={handlePressOut}
           disabled={disabled || loading}
           testID={testID}
+          {...a11yProps}
           style={[
             styles.button,
             sizeStyles[size],
@@ -213,7 +336,7 @@ export const TMButton: React.FC<TMButtonProps> = ({
             style={[
               styles.gradient,
               { borderRadius: radiusBySize[size] },
-              !disabled && SHADOWS.button,
+              !disabled && SHADOWS.md,
             ]}
           >
             {renderContent()}
@@ -235,6 +358,7 @@ export const TMButton: React.FC<TMButtonProps> = ({
           onPressOut={handlePressOut}
           disabled={disabled || loading}
           testID={testID}
+          {...a11yProps}
           style={[
             styles.button,
             sizeStyles[size],
@@ -273,6 +397,7 @@ export const TMButton: React.FC<TMButtonProps> = ({
           onPressOut={handlePressOut}
           disabled={disabled || loading}
           testID={testID}
+          {...a11yProps}
           style={[
             styles.button,
             sizeStyles[size],
@@ -282,6 +407,41 @@ export const TMButton: React.FC<TMButtonProps> = ({
           ]}
         >
           {renderContent()}
+        </Pressable>
+      </Animated.View>
+    );
+  }
+
+  // Glass variant with blur effect
+  if (variant === 'glass') {
+    return (
+      <Animated.View
+        style={[fullWidth && styles.fullWidth, animatedStyle, style]}
+      >
+        <Pressable
+          onPress={onPress}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          disabled={disabled || loading}
+          testID={testID}
+          {...a11yProps}
+          style={[
+            styles.button,
+            sizeStyles[size],
+            { borderRadius: radiusBySize[size] },
+            disabled && styles.disabled,
+          ]}
+        >
+          <BlurView
+            intensity={Platform.OS === 'ios' ? 20 : 80}
+            tint="light"
+            style={[
+              styles.glassFill,
+              { borderRadius: radiusBySize[size] },
+            ]}
+          >
+            {renderContent()}
+          </BlurView>
         </Pressable>
       </Animated.View>
     );
@@ -298,6 +458,7 @@ export const TMButton: React.FC<TMButtonProps> = ({
         onPressOut={handlePressOut}
         disabled={disabled || loading}
         testID={testID}
+        {...a11yProps}
         style={[
           styles.button,
           sizeStyles[size],
@@ -382,6 +543,27 @@ const styles = StyleSheet.create({
   },
   disabled: {
     opacity: 0.5,
+  },
+  glassFill: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+    overflow: 'hidden',
+  },
+  shimmerOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    width: 50,
+    zIndex: 10,
   },
 });
 

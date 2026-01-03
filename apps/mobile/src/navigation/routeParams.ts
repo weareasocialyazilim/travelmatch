@@ -207,7 +207,6 @@ export type RootStackParamList = {
 
   // Identity Verification (modular KYC flow)
   IdentityVerification: undefined;
-  GetVerified: undefined;
   KYCDocumentType: { data: KYCVerificationData };
   KYCDocumentCapture: { data: KYCVerificationData };
   KYCSelfie: { data: KYCVerificationData };

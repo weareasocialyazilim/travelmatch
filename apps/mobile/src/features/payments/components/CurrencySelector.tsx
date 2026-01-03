@@ -18,7 +18,7 @@ import {
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '@/constants/colors';
 import { supabase } from '@/services/supabase';
-import { logger } from '@/utils/production-logger';
+import { logger } from '@/utils/logger';
 import type { CurrencyCode } from '@/constants/currencies';
 
 // Supported currencies

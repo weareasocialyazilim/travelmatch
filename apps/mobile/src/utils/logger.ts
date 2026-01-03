@@ -666,6 +666,49 @@ class Logger {
     }
     void this.flushRemoteLogs();
   }
+
+  /**
+   * Performance logging - measure async operations
+   * @param operationName Name of the operation
+   * @param operation Async function to measure
+   * @param context Additional context
+   * @returns Result of the operation
+   */
+  async measure<T>(
+    operationName: string,
+    operation: () => Promise<T>,
+    context?: Record<string, unknown>,
+  ): Promise<T> {
+    const startTime = performance.now();
+
+    try {
+      const result = await operation();
+      const duration = Math.round(performance.now() - startTime);
+
+      this.info(`${operationName} completed`, {
+        ...context,
+        duration: `${duration}ms`,
+      });
+
+      return result;
+    } catch (error) {
+      const duration = Math.round(performance.now() - startTime);
+
+      this.error(`${operationName} failed`, error, {
+        ...context,
+        duration: `${duration}ms`,
+      });
+
+      throw error;
+    }
+  }
+
+  /**
+   * Track user action (for analytics + Sentry breadcrumbs)
+   */
+  trackAction(action: string, properties?: Record<string, unknown>): void {
+    this.info(`User action: ${action}`, properties);
+  }
 }
 
 // Export singleton instance
