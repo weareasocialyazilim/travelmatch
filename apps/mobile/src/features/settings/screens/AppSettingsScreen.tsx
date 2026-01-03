@@ -16,7 +16,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LanguageSelectionBottomSheet } from '@/components/LanguageSelectionBottomSheet';
-import { useI18n } from '@/context/I18nContext';
+import { useTranslation } from '@/hooks/useTranslation';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { logger } from '@/utils/logger';
@@ -43,7 +43,12 @@ const AppSettingsScreen: React.FC = () => {
   const { user, logout } = useAuth();
   const { isConnected, refresh: refreshNetwork } = useNetworkStatus();
   const { showToast } = useToast();
-  const { language, setLanguage, t, supportedLanguages } = useI18n();
+  const { language, changeLanguage, t, languages } = useTranslation();
+  // Map languages to supported format for LanguageSelectionBottomSheet
+  const supportedLanguages = useMemo(() => [
+    { code: 'en', name: 'English', nativeName: 'English' },
+    { code: 'tr', name: 'Turkish', nativeName: 'Türkçe' },
+  ], []);
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -522,7 +527,7 @@ const AppSettingsScreen: React.FC = () => {
         onClose={() => setIsLanguageSheetVisible(false)}
         currentLanguage={language}
         onLanguageChange={async (lang: string) => {
-          await setLanguage(lang as 'en' | 'tr');
+          await changeLanguage(lang as 'en' | 'tr');
           setIsLanguageSheetVisible(false);
           showToast(
             lang === 'tr' ? 'Dil Türkçe olarak değiştirildi' : 'Language changed to English',

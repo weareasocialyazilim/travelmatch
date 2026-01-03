@@ -29,15 +29,15 @@ import * as Haptics from 'expo-haptics';
 import {
   ImmersiveMomentCard,
   AwwwardsDiscoverHeader,
-} from '@/components/discover';
-import StoriesRow from '@/components/discover/StoriesRow';
+  StoriesRow,
+  type UserStory,
+} from '../components';
 // Note: FloatingDock is now rendered by MainTabNavigator
 import { useMoments, type Moment } from '@/hooks/useMoments';
 import { COLORS } from '@/constants/colors';
 import { withErrorBoundary } from '../../../components/withErrorBoundary';
 import type { NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/routeParams';
-import type { UserStory } from '@/components/discover/types';
 
 const { height } = Dimensions.get('window');
 
