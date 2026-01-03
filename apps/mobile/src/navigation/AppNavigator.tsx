@@ -336,20 +336,39 @@ const AppNavigator = () => {
             initialRouteName={initialRoute}
             screenOptions={{
               headerShown: false,
-              animation: 'slide_from_right',
-              contentStyle: { backgroundColor: '#050505' },
+              // Awwwards kalitesinde ipeksi fade gecis efekti
+              animation: 'fade_from_bottom',
+              animationDuration: 350,
+              contentStyle: { backgroundColor: COLORS.background.primary },
+              gestureEnabled: true,
             }}
           >
-            {/* Splash & Onboarding */}
+            {/* Giris Akisi - Ipeksi fade gecisler */}
             <Stack.Screen
               name="Splash"
               component={SplashScreen}
-              options={{ gestureEnabled: false }}
+              options={{ gestureEnabled: false, animation: 'fade' }}
             />
-            <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-            <Stack.Screen name="Welcome" component={WelcomeScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
-            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen
+              name="Onboarding"
+              component={OnboardingScreen}
+              options={{ animation: 'fade' }}
+            />
+            <Stack.Screen
+              name="Welcome"
+              component={WelcomeScreen}
+              options={{ animation: 'fade' }}
+            />
+            <Stack.Screen
+              name="Register"
+              component={RegisterScreen}
+              options={{ animation: 'fade' }}
+            />
+            <Stack.Screen
+              name="Login"
+              component={LoginScreen}
+              options={{ animation: 'fade' }}
+            />
             <Stack.Screen
               name="SessionExpired"
               component={SessionExpiredScreen}
@@ -373,9 +392,11 @@ const AppNavigator = () => {
               name="WaitingForCode"
               component={WaitingForCodeScreen}
             />
+            {/* Auth Success - Premium fade for celebration */}
             <Stack.Screen
               name="SuccessConfirmation"
               component={SuccessConfirmationScreen}
+              options={{ animation: 'fade', gestureEnabled: false }}
             />
             <Stack.Screen name="Maintenance" component={MaintenanceScreen} />
             <Stack.Screen name="About" component={AboutScreen} />
@@ -397,8 +418,12 @@ const AppNavigator = () => {
               component={CompleteProfileScreen}
             />
 
-            {/* Unified Success Screen */}
-            <Stack.Screen name="Success" component={SuccessScreen} />
+            {/* Unified Success Screen - Premium celebration fade */}
+            <Stack.Screen
+              name="Success"
+              component={SuccessScreen}
+              options={{ animation: 'fade', gestureEnabled: false }}
+            />
 
             {/* Main App - Tab Navigator */}
             <Stack.Screen
@@ -436,7 +461,16 @@ const AppNavigator = () => {
               options={{ presentation: 'modal' }}
             />
             <Stack.Screen name="EditMoment" component={EditMomentScreen} />
-            <Stack.Screen name="MomentDetail" component={MomentDetailScreen} />
+            {/* Seremoni ve Detay Ekranlari - Premium modal presentation */}
+            <Stack.Screen
+              name="MomentDetail"
+              component={MomentDetailScreen}
+              options={{
+                presentation: 'modal',
+                animation: 'slide_from_bottom',
+                gestureDirection: 'vertical',
+              }}
+            />
             <Stack.Screen
               name="MomentComments"
               component={MomentCommentsScreen}
@@ -459,10 +493,15 @@ const AppNavigator = () => {
             <Stack.Screen name="ProofDetail" component={ProofDetailScreen} />
             <Stack.Screen name="ProofReview" component={ProofReviewScreen} />
 
-            {/* Approval & Matching */}
+            {/* Approval & Matching - Vetting Ceremony with vertical slide */}
             <Stack.Screen
               name="ReceiverApproval"
               component={ReceiverApprovalScreen}
+              options={{
+                animation: 'slide_from_bottom',
+                gestureDirection: 'vertical',
+                gestureEnabled: true,
+              }}
             />
             <Stack.Screen
               name="MatchConfirmation"
