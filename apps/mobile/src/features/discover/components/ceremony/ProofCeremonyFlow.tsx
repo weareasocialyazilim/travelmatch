@@ -14,7 +14,7 @@
  * ```
  */
 
-import React, { useState, useCallback, memo } from 'react';
+import React, { useState, useCallback, memo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -24,7 +24,6 @@ import {
   StatusBar,
   ScrollView,
   Alert,
-  ActivityIndicator,
 } from 'react-native';
 import { Image } from 'expo-image';
 import Animated, {
@@ -33,6 +32,9 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
   withSpring,
+  withRepeat,
+  interpolate,
+  Extrapolation,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -58,6 +60,82 @@ import {
 import { COLORS, GRADIENTS } from '@/constants/colors';
 import { SPACING } from '@/constants/spacing';
 import { logger } from '@/utils/logger';
+
+// Skeleton loader with shimmer effect for premium loading states
+const SkeletonLoader = memo<{ size?: 'small' | 'large' }>(({ size = 'large' }) => {
+  const shimmerValue = useSharedValue(0);
+
+  useEffect(() => {
+    shimmerValue.value = withRepeat(
+      withTiming(1, { duration: 1200 }),
+      -1,
+      false,
+    );
+  }, [shimmerValue]);
+
+  const shimmerStyle = useAnimatedStyle(() => {
+    const translateX = interpolate(
+      shimmerValue.value,
+      [0, 1],
+      [-100, 100],
+      Extrapolation.CLAMP,
+    );
+    return {
+      transform: [{ translateX }],
+    };
+  });
+
+  const containerSize = size === 'large' ? 100 : 24;
+  const iconSize = size === 'large' ? 40 : 16;
+
+  return (
+    <View
+      style={[
+        skeletonStyles.container,
+        { width: containerSize, height: containerSize },
+      ]}
+    >
+      <Animated.View style={[skeletonStyles.shimmer, shimmerStyle]}>
+        <LinearGradient
+          colors={['transparent', 'rgba(255,255,255,0.4)', 'transparent']}
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
+          style={skeletonStyles.gradient}
+        />
+      </Animated.View>
+      <MaterialCommunityIcons
+        name="camera"
+        size={iconSize}
+        color={COLORS.textSecondary}
+        style={skeletonStyles.icon}
+      />
+    </View>
+  );
+});
+
+SkeletonLoader.displayName = 'SkeletonLoader';
+
+const skeletonStyles = StyleSheet.create({
+  container: {
+    backgroundColor: COLORS.surfaceMuted,
+    borderRadius: 12,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  shimmer: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+  },
+  gradient: {
+    width: 100,
+    height: '100%',
+  },
+  icon: {
+    opacity: 0.5,
+  },
+});
 
 interface Gift {
   id: string;
@@ -527,15 +605,18 @@ const CaptureStep = memo<CaptureStepProps>(
               style={styles.addPhotoButton}
               onPress={capturePhoto}
               disabled={isCapturing}
+              accessibilityLabel={photos.length === 0 ? 'Fotoğraf çek' : 'Fotoğraf ekle'}
+              accessibilityRole="button"
             >
               {isCapturing ? (
-                <ActivityIndicator color={COLORS.primary} />
+                <SkeletonLoader size="large" />
               ) : (
                 <>
                   <MaterialCommunityIcons
                     name="camera-plus"
                     size={32}
                     color={COLORS.primary}
+                    accessibilityLabel="Kamera ikonu"
                   />
                   <Text style={styles.addPhotoText}>
                     {photos.length === 0 ? 'Fotoğraf Çek' : 'Ekle'}
@@ -565,14 +646,17 @@ const CaptureStep = memo<CaptureStepProps>(
           style={styles.locationButton}
           onPress={getLocation}
           disabled={isGettingLocation}
+          accessibilityLabel={location ? `Konum: ${location.name}` : 'Konum ekle'}
+          accessibilityRole="button"
         >
           {isGettingLocation ? (
-            <ActivityIndicator size="small" color={COLORS.primary} />
+            <SkeletonLoader size="small" />
           ) : (
             <MaterialCommunityIcons
               name={location ? 'map-marker-check' : 'map-marker-plus'}
               size={24}
               color={location ? COLORS.success : COLORS.textSecondary}
+              accessibilityLabel={location ? 'Konum eklendi' : 'Konum ekle'}
             />
           )}
           <Text style={[styles.locationText, location && styles.locationSet]}>
