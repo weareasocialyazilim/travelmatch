@@ -232,6 +232,10 @@ export type RootStackParamList = {
 
   // Withdraw
   Withdraw: undefined;
+  WithdrawSuccess: {
+    transactionCode?: string;
+    amount?: number;
+  } | undefined;
 
   // Payment Methods
   PaymentMethods: undefined;
