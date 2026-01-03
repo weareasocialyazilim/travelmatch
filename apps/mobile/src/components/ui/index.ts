@@ -114,3 +114,12 @@ export { BlurFilterModal } from './BlurFilterModal';
 // ═══════════════════════════════════════════════════════════════════
 export { GlassModal } from './GlassModal';
 export type { GlassModalProps } from './GlassModal';
+
+// ═══════════════════════════════════════════════════════════════════
+// Glass Effects & Liquid Components
+// ═══════════════════════════════════════════════════════════════════
+export { GlassCard, GlassView, GlassButton } from './GlassCard';
+export {
+  LiquidSegmentedControl,
+  LiquidSegmentedControlAnimated,
+} from './LiquidSegmentedControl';
