@@ -176,12 +176,36 @@ class ChaosMonkey {
 
   /**
    * Maybe disrupt a function call
+   *
+   * CRITICAL SAFETY: This function contains a hardcoded production check
+   * that cannot be bypassed by environment variables. This is the "deepest"
+   * protection layer against accidental chaos in production.
    */
   async maybeDisrupt<T>(
     fn: () => Promise<T>,
     context: ChaosContext = {}
   ): Promise<T> {
     this.requestCount++;
+
+    // ==========================================================================
+    // HARDCODED PRODUCTION SAFETY CHECK - DO NOT REMOVE OR MODIFY
+    // This is the "Ghost Failures" prevention layer. Even if ENABLE_CHAOS
+    // is mistakenly set, this hardcoded check prevents any disruption.
+    // ==========================================================================
+    const supabaseEnv = Deno.env.get('SUPABASE_ENV');
+    const denoEnv = Deno.env.get('DENO_ENV');
+    const nodeEnv = Deno.env.get('NODE_ENV');
+
+    const isProduction =
+      supabaseEnv === 'production' ||
+      denoEnv === 'production' ||
+      nodeEnv === 'production';
+
+    if (isProduction) {
+      // ABSOLUTE PROTECTION: Never disrupt in production, regardless of config
+      return fn();
+    }
+    // ==========================================================================
 
     if (!this.isEnabled()) {
       return fn();
