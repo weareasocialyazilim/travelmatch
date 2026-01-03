@@ -1,47 +1,129 @@
 import React, { memo, useMemo } from 'react';
 import type { ViewStyle } from 'react-native';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { View, Text, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
+import { FONTS, TYPE_SCALE } from '../constants/typography';
+import { TMButton } from './ui/TMButton';
+
+type ErrorType = 'network' | 'generic' | 'security' | 'notFound' | 'permission';
 
 interface ErrorStateProps {
+  /** Error type determines icon and default messaging */
+  errorType?: ErrorType;
+  /** Custom error message (overrides default) */
   message?: string;
+  /** Custom title (overrides default) */
+  title?: string;
+  /** Retry callback */
   onRetry?: () => void;
+  /** Custom retry button text */
   retryText?: string;
-  icon?: keyof typeof MaterialCommunityIcons.glyphMap;
+  /** Custom icon name */
+  icon?: keyof typeof Ionicons.glyphMap;
+  /** Container style */
   style?: ViewStyle;
 }
 
 /**
- * Error state with retry button
+ * Awwwards standardında Hata Durum Ekranı - "Premium Error State"
+ * Kriz Yönetimi: Hata anlarını bir hayal kırıklığı olmaktan çıkarıp,
+ * estetik bir geri dönüş yoluna dönüştürüyoruz.
+ *
+ * Neon aksanlar ve net çözüm önerileri ile güven tazeler.
  */
 export const ErrorState: React.FC<ErrorStateProps> = memo(
   ({
-    message = 'Something went wrong',
+    errorType = 'generic',
+    message,
+    title,
     onRetry,
-    retryText = 'Try Again',
-    icon = 'alert-circle-outline',
+    retryText = 'Tekrar Dene',
+    icon,
     style,
   }) => {
+    // Error type configurations
+    const errorConfig: Record<ErrorType, { icon: keyof typeof Ionicons.glyphMap; title: string; desc: string }> = {
+      network: {
+        icon: 'wifi-outline',
+        title: 'Bağlantı Kesildi',
+        desc: 'İnternet dünyasıyla bağın koptu gibi görünüyor. Sinyalleri kontrol edelim.',
+      },
+      security: {
+        icon: 'lock-closed-outline',
+        title: 'Erişim Kısıtlı',
+        desc: 'Bu alana girmek için yetkin yetersiz veya oturumun sona ermiş.',
+      },
+      notFound: {
+        icon: 'search-outline',
+        title: 'Bulunamadı',
+        desc: 'Aradığın içerik şu an mevcut değil veya taşınmış olabilir.',
+      },
+      permission: {
+        icon: 'hand-left-outline',
+        title: 'İzin Gerekli',
+        desc: 'Bu özelliği kullanmak için gerekli izinleri vermelisin.',
+      },
+      generic: {
+        icon: 'alert-circle-outline',
+        title: 'Bir Sorun Var',
+        desc: 'Sistemlerimizde ipeksi olmayan bir şeyler oldu. Lütfen tekrar dene.',
+      },
+    };
+
+    const config = errorConfig[errorType];
+    const displayIcon = icon || config.icon;
+    const displayTitle = title || config.title;
+    const displayMessage = message || config.desc;
+
     // Memoize container style
     const containerStyle = useMemo(() => [styles.container, style], [style]);
 
     return (
       <View style={containerStyle}>
-        <MaterialCommunityIcons name={icon} size={64} color={COLORS.feedback.error} />
-        <Text style={styles.errorTitle}>Oops!</Text>
-        <Text style={styles.errorMessage}>{message}</Text>
+        <View style={styles.iconCircle}>
+          <Ionicons
+            name={displayIcon}
+            size={50}
+            color={COLORS.feedback.error}
+            accessible={false}
+          />
+        </View>
+
+        <Text
+          style={styles.title}
+          accessible={true}
+          accessibilityRole="header"
+        >
+          {displayTitle}
+        </Text>
+
+        <Text
+          style={styles.description}
+          accessible={true}
+          accessibilityLabel={displayMessage}
+        >
+          {displayMessage}
+        </Text>
+
         {onRetry && (
-          <TouchableOpacity style={styles.retryButton} onPress={onRetry}>
-            <MaterialCommunityIcons name="refresh" size={18} color={COLORS.utility.white} />
-            <Text style={styles.retryButtonText}>{retryText}</Text>
-          </TouchableOpacity>
+          <TMButton
+            variant="primary"
+            size="lg"
+            onPress={onRetry}
+            fullWidth
+            style={styles.button}
+          >
+            {retryText}
+          </TMButton>
         )}
       </View>
     );
   },
   (prevProps, nextProps) =>
+    prevProps.errorType === nextProps.errorType &&
     prevProps.message === nextProps.message &&
+    prevProps.title === nextProps.title &&
     prevProps.retryText === nextProps.retryText &&
     prevProps.icon === nextProps.icon,
 );
@@ -51,36 +133,38 @@ ErrorState.displayName = 'ErrorState';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
+    backgroundColor: COLORS.background.primary,
+  },
+  iconCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: COLORS.feedback.errorLight,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
+    marginBottom: 32,
   },
-  errorTitle: {
+  title: {
+    fontSize: 24,
+    fontFamily: FONTS.display.bold,
+    fontWeight: '800',
     color: COLORS.text.primary,
-    fontSize: 20,
-    fontWeight: '600',
-    marginTop: 16,
-  },
-  errorMessage: {
-    color: COLORS.text.secondary,
-    fontSize: 15,
     textAlign: 'center',
-    marginTop: 8,
-    lineHeight: 22,
   },
-  retryButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: COLORS.brand.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 12,
-    marginTop: 24,
+  description: {
+    ...TYPE_SCALE.body.base,
+    color: COLORS.text.secondary,
+    textAlign: 'center',
+    marginTop: 12,
+    lineHeight: 24,
+    marginBottom: 40,
   },
-  retryButtonText: {
-    color: COLORS.utility.white,
-    fontSize: 15,
-    fontWeight: '600',
+  button: {
+    width: '100%',
+    height: 60,
+    borderRadius: 30,
   },
 });
