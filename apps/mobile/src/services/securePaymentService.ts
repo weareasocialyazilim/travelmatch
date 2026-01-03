@@ -176,9 +176,11 @@ interface EscrowOperationResponse {
  * - $100+: Mandatory escrow (forced protection)
  */
 export function determineEscrowMode(amount: number): EscrowMode {
-  if (amount < VALUES.ESCROW_DIRECT_MAX) {
+  const { DIRECT_MAX, OPTIONAL_MAX } = VALUES.ESCROW_THRESHOLDS;
+
+  if (amount < DIRECT_MAX) {
     return 'direct'; // < $30: Direct pay
-  } else if (amount < VALUES.ESCROW_OPTIONAL_MAX) {
+  } else if (amount < OPTIONAL_MAX) {
     return 'optional'; // $30-$100: User chooses
   } else {
     return 'mandatory'; // >= $100: Must escrow
@@ -189,15 +191,17 @@ export function determineEscrowMode(amount: number): EscrowMode {
  * Get user-friendly escrow explanation
  */
 export function getEscrowExplanation(mode: EscrowMode, amount: number): string {
+  const { DIRECT_MAX, OPTIONAL_MAX } = VALUES.ESCROW_THRESHOLDS;
+
   switch (mode) {
     case 'direct':
       return `Payment of $${amount} will be sent directly to the recipient immediately.`;
 
     case 'optional':
-      return `For payments between $${VALUES.ESCROW_DIRECT_MAX}-$${VALUES.ESCROW_OPTIONAL_MAX}, you can choose escrow protection. Funds are held until proof is verified.`;
+      return `For payments between $${DIRECT_MAX}-$${OPTIONAL_MAX}, you can choose escrow protection. Funds are held until proof is verified.`;
 
     case 'mandatory':
-      return `Payments over $${VALUES.ESCROW_OPTIONAL_MAX} must use escrow protection for your safety. Funds will be released when proof is verified.`;
+      return `Payments over $${OPTIONAL_MAX} must use escrow protection for your safety. Funds will be released when proof is verified.`;
   }
 }
 

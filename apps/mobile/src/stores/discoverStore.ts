@@ -9,6 +9,17 @@
  * - Reduces re-renders by separating state domains
  * - Eliminates prop drilling
  * - Provides fine-grained subscriptions
+ *
+ * ⚠️ GHOST STORE AUDIT (2026-01-03):
+ * This store is currently NOT USED in production code.
+ * All 15 state variables are "ghost states" - written but never read.
+ *
+ * Current app patterns use:
+ * - useMoments() hook for data fetching
+ * - Props-based state for StoryViewer/FilterModal
+ *
+ * TODO: Either integrate this store into the app or remove it.
+ * @see apps/mobile/src/hooks/useMoments.ts (current pattern)
  */
 
 import { create } from 'zustand';
