@@ -10,7 +10,7 @@
  * Designed for Awwwards Best UI nomination
  */
 
-import React, { useCallback, useEffect, memo } from 'react';
+import React, { useCallback, useEffect, memo, useState, ErrorInfo } from 'react';
 import {
   View,
   Text,
@@ -33,12 +33,29 @@ import Reanimated, {
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import Svg, { Circle, Defs, LinearGradient as SvgGradient, Stop } from 'react-native-svg';
 
 import { COLORS, GRADIENTS, PALETTE, getTrustRingColors } from '../../constants/colors';
 import { useTranslation } from '../../hooks/useTranslation';
 import { TYPE_SCALE } from '../../theme/typography';
 import { SPRINGS } from '../../hooks/useAnimations';
+
+// Lazy load SVG to handle potential native module issues
+let Svg: typeof import('react-native-svg').default | null = null;
+let Circle: typeof import('react-native-svg').Circle | null = null;
+let Defs: typeof import('react-native-svg').Defs | null = null;
+let SvgGradient: typeof import('react-native-svg').LinearGradient | null = null;
+let Stop: typeof import('react-native-svg').Stop | null = null;
+
+try {
+  const svg = require('react-native-svg');
+  Svg = svg.default || svg.Svg;
+  Circle = svg.Circle;
+  Defs = svg.Defs;
+  SvgGradient = svg.LinearGradient;
+  Stop = svg.Stop;
+} catch {
+  // SVG not available, will use fallback
+}
 
 // ============================================
 // TYPES
@@ -72,6 +89,53 @@ interface ProfileHeaderSectionProps {
 }
 
 // ============================================
+// FALLBACK TRUST RING (No SVG)
+// ============================================
+interface FallbackTrustRingProps {
+  score: number;
+  size: number;
+  colors: readonly [string, string];
+  children: React.ReactNode;
+}
+
+const FallbackTrustRing: React.FC<FallbackTrustRingProps> = ({
+  score,
+  size,
+  colors,
+  children,
+}) => {
+  const safeScore = Number.isFinite(score) ? Math.max(0, Math.min(100, score)) : 0;
+
+  return (
+    <View style={[styles.trustRingContainer, { width: size, height: size }]}>
+      {/* Simple border-based ring fallback */}
+      <View
+        style={[
+          styles.fallbackRing,
+          {
+            width: size,
+            height: size,
+            borderRadius: size / 2,
+            borderWidth: 4,
+            borderColor: colors[0],
+          },
+        ]}
+      />
+
+      {/* Avatar Container */}
+      <View style={[styles.avatarWrapper, { width: size - 16, height: size - 16 }]}>
+        {children}
+      </View>
+
+      {/* Trust Badge */}
+      <View style={[styles.trustBadge, { backgroundColor: colors[0] }]}>
+        <Text style={styles.trustBadgeText}>{safeScore}</Text>
+      </View>
+    </View>
+  );
+};
+
+// ============================================
 // ANIMATED TRUST RING COMPONENT
 // ============================================
 interface AnimatedTrustRingProps {
@@ -87,18 +151,26 @@ const AnimatedTrustRing: React.FC<AnimatedTrustRingProps> = ({
   strokeWidth = 4,
   children,
 }) => {
+  const [svgError, setSvgError] = useState(false);
   const progress = useSharedValue(0);
   const rotation = useSharedValue(0);
 
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const center = size / 2;
+  // Ensure score is a valid number
+  const safeScore = Number.isFinite(score) ? Math.max(0, Math.min(100, score)) : 0;
 
-  const colors = getTrustRingColors(score);
+  // Ensure size and strokeWidth are valid
+  const safeSize = Number.isFinite(size) && size > 0 ? size : 120;
+  const safeStrokeWidth = Number.isFinite(strokeWidth) && strokeWidth > 0 ? strokeWidth : 4;
+
+  const radius = (safeSize - safeStrokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const center = safeSize / 2;
+
+  const colors = getTrustRingColors(safeScore);
 
   useEffect(() => {
     // Animate progress
-    progress.value = withTiming(score / 100, {
+    progress.value = withTiming(safeScore / 100, {
       duration: 1500,
       easing: Easing.out(Easing.ease),
     });
@@ -111,67 +183,90 @@ const AnimatedTrustRing: React.FC<AnimatedTrustRingProps> = ({
       -1,
       false
     );
-  }, [score]);
+  }, [safeScore, progress, rotation]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${rotation.value}deg` }],
   }));
 
-  const strokeDashoffset = circumference * (1 - score / 100);
+  const strokeDashoffset = circumference * (1 - safeScore / 100);
 
-  return (
-    <View style={[styles.trustRingContainer, { width: size, height: size }]}>
-      {/* Background Circle */}
-      <Svg
-        width={size}
-        height={size}
-        style={StyleSheet.absoluteFill}
-      >
-        <Circle
-          cx={center}
-          cy={center}
-          r={radius}
-          stroke="rgba(255,255,255,0.2)"
-          strokeWidth={strokeWidth}
-          fill="transparent"
-        />
-      </Svg>
+  // Check if SVG components are available
+  const svgAvailable = Svg && Circle && Defs && SvgGradient && Stop && !svgError;
 
-      {/* Animated Progress Ring */}
-      <Reanimated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
-        <Svg width={size} height={size}>
-          <Defs>
-            <SvgGradient id="trustGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <Stop offset="0%" stopColor={colors[0]} />
-              <Stop offset="100%" stopColor={colors[1]} />
-            </SvgGradient>
-          </Defs>
+  // Use fallback if SVG is not available
+  if (!svgAvailable) {
+    return (
+      <FallbackTrustRing score={safeScore} size={safeSize} colors={colors}>
+        {children}
+      </FallbackTrustRing>
+    );
+  }
+
+  // Wrap SVG rendering in error boundary logic
+  try {
+    return (
+      <View style={[styles.trustRingContainer, { width: safeSize, height: safeSize }]}>
+        {/* Background Circle */}
+        <Svg
+          width={safeSize}
+          height={safeSize}
+          style={StyleSheet.absoluteFill}
+        >
           <Circle
             cx={center}
             cy={center}
             r={radius}
-            stroke="url(#trustGradient)"
-            strokeWidth={strokeWidth}
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={strokeDashoffset}
+            stroke="rgba(255,255,255,0.2)"
+            strokeWidth={safeStrokeWidth}
             fill="transparent"
-            transform={`rotate(-90 ${center} ${center})`}
           />
         </Svg>
-      </Reanimated.View>
 
-      {/* Avatar Container */}
-      <View style={[styles.avatarWrapper, { width: size - 16, height: size - 16 }]}>
+        {/* Animated Progress Ring */}
+        <Reanimated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
+          <Svg width={safeSize} height={safeSize}>
+            <Defs>
+              <SvgGradient id="trustGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <Stop offset="0%" stopColor={colors[0]} />
+                <Stop offset="100%" stopColor={colors[1]} />
+              </SvgGradient>
+            </Defs>
+            <Circle
+              cx={center}
+              cy={center}
+              r={radius}
+              stroke="url(#trustGradient)"
+              strokeWidth={safeStrokeWidth}
+              strokeLinecap="round"
+              strokeDasharray={`${circumference}`}
+              strokeDashoffset={strokeDashoffset}
+              fill="transparent"
+              transform={`rotate(-90 ${center} ${center})`}
+            />
+          </Svg>
+        </Reanimated.View>
+
+        {/* Avatar Container */}
+        <View style={[styles.avatarWrapper, { width: safeSize - 16, height: safeSize - 16 }]}>
+          {children}
+        </View>
+
+        {/* Trust Badge */}
+        <View style={[styles.trustBadge, { backgroundColor: colors[0] }]}>
+          <Text style={styles.trustBadgeText}>{safeScore}</Text>
+        </View>
+      </View>
+    );
+  } catch {
+    // If SVG rendering fails, use fallback
+    setSvgError(true);
+    return (
+      <FallbackTrustRing score={safeScore} size={safeSize} colors={colors}>
         {children}
-      </View>
-
-      {/* Trust Badge */}
-      <View style={[styles.trustBadge, { backgroundColor: colors[0] }]}>
-        <Text style={styles.trustBadgeText}>{score}</Text>
-      </View>
-    </View>
-  );
+      </FallbackTrustRing>
+    );
+  }
 };
 
 // ============================================
@@ -472,6 +567,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
+  },
+  fallbackRing: {
+    position: 'absolute',
+    backgroundColor: 'transparent',
   },
   avatarWrapper: {
     position: 'absolute',
