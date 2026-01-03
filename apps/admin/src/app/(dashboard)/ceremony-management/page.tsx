@@ -104,18 +104,18 @@ export default function CeremonyManagementPage() {
   const [activeTab, setActiveTab] = useState('overview');
 
   const handleApprove = () => {
-    console.log('Approved:', selectedProof.id);
-    // In production: Call API to approve
+    // TODO: Implement API call to approve proof
+    void selectedProof.id;
   };
 
-  const handleReject = (reason: string) => {
-    console.log('Rejected:', selectedProof.id, reason);
-    // In production: Call API to reject
+  const handleReject = (_reason: string) => {
+    // TODO: Implement API call to reject proof with reason
+    void selectedProof.id;
   };
 
-  const handleRequestInfo = (message: string) => {
-    console.log('Request info:', selectedProof.id, message);
-    // In production: Call API to request more info
+  const handleRequestInfo = (_message: string) => {
+    // TODO: Implement API call to request more info
+    void selectedProof.id;
   };
 
   return (
