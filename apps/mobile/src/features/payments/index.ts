@@ -12,12 +12,8 @@
 
 // Screens - with default exports
 export { default as WalletScreen } from './screens/WalletScreen';
-<<<<<<< HEAD
-export { default as WithdrawScreen } from './screens/WithdrawScreen';
-export { WithdrawSuccessScreen } from './screens/WithdrawSuccessScreen';
-=======
 export { default as WithdrawScreen, AwwwardsWithdrawScreen } from './screens/WithdrawScreen';
->>>>>>> origin/claude/typography-system-P9b6t
+export { WithdrawSuccessScreen } from './screens/WithdrawSuccessScreen';
 export { default as PaymentMethodsScreen } from './screens/PaymentMethodsScreen';
 export { default as AddCardScreen } from './screens/AddCardScreen';
 export { default as TransactionDetailScreen } from './screens/TransactionDetailScreen';

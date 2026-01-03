@@ -121,9 +121,39 @@ const primitives = {
     800: '#1E40AF',
     900: '#1E3A8A',
   },
+  stone: {
+    50: '#FAFAF9',
+    100: '#F5F5F4',
+    200: '#E7E5E4',
+    300: '#D6D3D1',
+    400: '#A8A29E',
+    500: '#78716C',
+    600: '#57534E',
+    700: '#44403C',
+    800: '#292524',
+    900: '#1C1917',
+  },
   white: '#FFFFFF',
   black: '#000000',
 } as const;
+
+// ═══════════════════════════════════════════════════════════════════
+// GRADIENTS
+// ═══════════════════════════════════════════════════════════════════
+export const GRADIENTS = {
+  primary: ['#DFFF00', '#C8E600'] as const,
+  secondary: ['#A855F7', '#9333EA'] as const,
+  warm: ['#DFFF00', '#F43F5E'] as const,
+  dark: ['transparent', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.95)'] as const,
+  glass: ['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.03)'] as const,
+  cardOverlay: ['transparent', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.85)'] as const,
+  shimmer: ['transparent', 'rgba(255, 255, 255, 0.2)', 'transparent'] as const,
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// PALETTE (alias for primitives)
+// ═══════════════════════════════════════════════════════════════════
+export const PALETTE = primitives;
 
 // ═══════════════════════════════════════════════════════════════════
 // SEMANTIC COLORS - Twilight Zinc & Neon Energy
@@ -202,6 +232,45 @@ export const COLORS = {
   // ═══════════════════════════════════════════════════════════════════
   // NESTED STRUCTURES - For components using nested access
   // ═══════════════════════════════════════════════════════════════════
+  brand: {
+    primary: '#DFFF00',
+    primaryLight: '#E8FF4D',
+    primaryDark: '#C8E600',
+    secondary: '#A855F7',
+    secondaryLight: '#C084FC',
+    secondaryDark: '#9333EA',
+    accent: '#06B6D4',
+  },
+
+  text: {
+    primary: '#F8FAFC',
+    secondary: '#94A3B8',
+    tertiary: '#64748B',
+    muted: '#475569',
+    link: '#DFFF00',
+    onLight: '#121214',
+    onLightSecondary: '#475569',
+    onDark: '#FFFFFF',
+    onDarkSecondary: 'rgba(255, 255, 255, 0.72)',
+    onDarkMuted: 'rgba(255, 255, 255, 0.48)',
+  },
+
+  bg: {
+    primary: '#121214',
+    secondary: '#1E1E20',
+    tertiary: '#27272A',
+    elevated: '#27272A',
+    glass: 'rgba(255, 255, 255, 0.03)',
+  },
+
+  border: {
+    default: 'rgba(255, 255, 255, 0.08)',
+    light: 'rgba(255, 255, 255, 0.05)',
+    dark: 'rgba(255, 255, 255, 0.15)',
+    focus: '#DFFF00',
+    glow: 'rgba(223, 255, 0, 0.3)',
+  },
+
   feedback: {
     success: '#10B981',
     successLight: 'rgba(16, 185, 129, 0.15)',
@@ -226,6 +295,8 @@ export const COLORS = {
     cardSolid: '#1E1E20',
     modal: 'rgba(18, 18, 20, 0.95)',
     overlay: 'rgba(0, 0, 0, 0.6)',
+    overlay30: 'rgba(0, 0, 0, 0.3)',
+    overlay40: 'rgba(0, 0, 0, 0.4)',
     overlayHeavy: 'rgba(0, 0, 0, 0.85)',
     glass: 'rgba(255, 255, 255, 0.03)',
     glassBorder: 'rgba(255, 255, 255, 0.08)',
