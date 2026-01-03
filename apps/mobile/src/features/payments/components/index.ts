@@ -23,6 +23,9 @@ export { FilterSortBar } from './FilterSortBar';
 export { TopPicksSection } from './TopPicksSection';
 export { PaymentPriorityNotice } from './PaymentPriorityNotice';
 
+// Transaction list
+export { TransactionListItem } from './TransactionListItem';
+
 // Proof requirement components
 export {
   getProofTier,
