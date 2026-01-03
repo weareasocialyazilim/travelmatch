@@ -248,3 +248,39 @@ Bu hiyerarşi doğru ve korunmalı.
 SSL Pinning ve Device Integrity implementasyonları zaten mevcut:
 - `src/utils/sslPinning.ts` - Certificate pinning for Supabase, Stripe, Cloudflare
 - `src/utils/deviceIntegrity.ts` - Jailbreak/root detection, debugger detection
+
+---
+
+## 📋 Zod Schema Durumu
+
+**Analiz Sonucu:** Schemas farklı amaçlara hizmet ediyor, doğrudan duplicate değil.
+
+### Shared Package (`packages/shared/src/schemas/`)
+```
+auth.ts    → API auth request validation
+user.ts    → updateProfileSchema (API request)
+payment.ts → createPaymentSchema, confirmPaymentSchema (API request)
+moment.ts  → Moment creation/update validation
+common.ts  → Reusable validators (phone, coordinates)
+```
+
+### Mobile App (`apps/mobile/src/schemas/`)
+```
+user.schema.ts    → NotificationPreferencesSchema, PrivacySettingsSchema (app state)
+payment.schema.ts → PaymentMetadataSchema, WalletSchema (transaction display)
+```
+
+### Önerilen Strateji
+1. API request validation için shared schemas kullan
+2. App-internal state için mobile schemas kullan
+3. Yeni schemas eklerken önce shared paketi kontrol et
+4. Ortak şemalarda değişiklik shared'da yapılmalı
+
+### Import Önerisi
+```typescript
+// API calls - use shared
+import { createPaymentSchema } from '@travelmatch/shared/schemas';
+
+// App state - use local
+import { WalletSchema } from '@/schemas/payment.schema';
+```
