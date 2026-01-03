@@ -10,12 +10,18 @@ export type { CardVariant, CardPadding, GlassTint } from './Card';
 export { Avatar } from './Avatar';
 export { Input } from './Input';
 export { Badge, NotificationBadge } from './Badge';
+export { TMBadge, LiveStatusBadge, VerifiedBadge, PremiumBadge } from './TMBadge';
+export type { TMBadgeType, LabelVariant, StatusVariant, BadgeSize, TMBadgeProps } from './TMBadge';
 export { Divider } from './Divider';
 export { EmptyState } from './EmptyState';
 export { FlashMessage } from './FlashMessage';
 export { LoadingSpinner } from './LoadingSpinner';
+export { Spinner } from './Spinner';
+export { LiquidLoading } from './LiquidLoading';
 export { SkeletonList } from './SkeletonList';
 export type { SkeletonItemType } from './SkeletonList';
+export { ScreenSkeleton, HeaderSkeleton, TabBarSkeleton, ListSkeleton, GridSkeleton, DetailSkeleton, FormSkeleton, ProfileSkeleton, ChatSkeleton } from './NavigationSkeleton';
+export { FeedSkeleton, SkeletonListItem, SkeletonLoader } from './Skeleton';
 
 // ═══════════════════════════════════════════════════════════════════
 // TravelMatch Design System Components (TM* prefix)
@@ -39,6 +45,14 @@ export { TMPill, TMCategoryChip } from './TMPill';
 // TMInput - Enhanced input with floating label and validation
 export { TMInput } from './TMInput';
 export type { TMInputProps } from './TMInput';
+
+// TMLoading - Consolidated loading component
+export { TMLoading } from './TMLoading';
+export type { TMLoadingType, LoadingSize, LoadingVariant, TMLoadingProps } from './TMLoading';
+
+// TMSkeleton - Consolidated skeleton component
+export { TMSkeleton, Skeleton, SkeletonAvatar, SkeletonText, SkeletonCard, SkeletonMessage } from './TMSkeleton';
+export type { TMSkeletonType, SkeletonListType, SkeletonScreenType, SkeletonVariant, TMSkeletonProps } from './TMSkeleton';
 
 // TMSheet - Bottom sheet with gestures and blur
 export { TMSheet } from './TMSheet';
