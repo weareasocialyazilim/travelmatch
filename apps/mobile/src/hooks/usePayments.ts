@@ -25,19 +25,20 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { paymentService } from '../services/paymentService';
+import { securePaymentService } from '../services/securePaymentService';
+import { walletService } from '../services/walletService';
+import { transactionService, type Transaction } from '../services/transactionService';
 import { logger } from '../utils/logger';
 import { ErrorHandler, retryWithErrorHandling } from '../utils/errorHandler';
 import type {
   PaymentCard,
   BankAccount,
-  Transaction,
   WalletBalance,
   TransactionType,
   PaymentStatus,
   PaymentIntent,
   WithdrawalLimits,
-} from '../services/paymentService';
+} from '../services/securePaymentService';
 
 // Bank account data - defined below with JSDoc comments
 
@@ -171,7 +172,7 @@ export const usePayments = (): UsePaymentsReturn => {
     try {
       setBalanceLoading(true);
       const response = await retryWithErrorHandling(
-        () => paymentService.getWalletBalance(),
+        () => walletService.getBalance(),
         { context: 'refreshBalance', maxRetries: 2 },
       );
       setBalance({
@@ -197,18 +198,18 @@ export const usePayments = (): UsePaymentsReturn => {
       setCurrentFilters(filters || {});
       setTransactionPage(1);
 
-      const response = await retryWithErrorHandling(
+      const transactions = await retryWithErrorHandling(
         () =>
-          paymentService.getTransactions({
-            ...filters,
-            page: 1,
-            pageSize: PAGE_SIZE,
+          transactionService.getTransactions({
+            type: filters?.type,
+            status: filters?.status,
+            limit: PAGE_SIZE,
           }),
         { context: 'loadTransactions', maxRetries: 2 },
       );
 
-      setTransactions(response.transactions);
-      setHasMoreTransactions(response.transactions.length === PAGE_SIZE);
+      setTransactions(transactions as Transaction[]);
+      setHasMoreTransactions(transactions.length === PAGE_SIZE);
     } catch (error) {
       const standardizedError = ErrorHandler.handle(error, 'loadTransactions');
       setTransactionsError(standardizedError.userMessage);
@@ -225,15 +226,15 @@ export const usePayments = (): UsePaymentsReturn => {
 
     try {
       const nextPage = transactionPage + 1;
-      const response = await paymentService.getTransactions({
-        ...currentFilters,
-        page: nextPage,
-        pageSize: PAGE_SIZE,
+      const newTransactions = await transactionService.getTransactions({
+        type: currentFilters?.type,
+        status: currentFilters?.status,
+        limit: PAGE_SIZE,
       });
 
-      setTransactions((prev) => [...prev, ...response.transactions]);
+      setTransactions((prev) => [...prev, ...(newTransactions as Transaction[])]);
       setTransactionPage(nextPage);
-      setHasMoreTransactions(response.transactions.length === PAGE_SIZE);
+      setHasMoreTransactions(newTransactions.length === PAGE_SIZE);
     } catch (error) {
       logger.error('Failed to load more transactions:', error);
     }
@@ -250,7 +251,7 @@ export const usePayments = (): UsePaymentsReturn => {
   const refreshPaymentMethods = useCallback(async (): Promise<void> => {
     try {
       setPaymentMethodsLoading(true);
-      const response = await paymentService.getPaymentMethods();
+      const response = await securePaymentService.getPaymentMethods();
       setCards(response.cards);
       setBankAccounts(response.bankAccounts);
     } catch (error) {
@@ -266,7 +267,7 @@ export const usePayments = (): UsePaymentsReturn => {
   const addCard = useCallback(
     async (tokenId: string): Promise<PaymentCard | null> => {
       try {
-        const response = await paymentService.addCard(tokenId);
+        const response = await securePaymentService.addCard(tokenId);
         setCards((prev) => [...prev, response.card]);
         return response.card;
       } catch (error) {
@@ -282,7 +283,7 @@ export const usePayments = (): UsePaymentsReturn => {
    */
   const removeCard = useCallback(async (cardId: string): Promise<boolean> => {
     try {
-      await paymentService.removeCard(cardId);
+      await securePaymentService.removeCard(cardId);
       setCards((prev) => prev.filter((c) => c.id !== cardId));
       return true;
     } catch (error) {
@@ -297,7 +298,7 @@ export const usePayments = (): UsePaymentsReturn => {
   const setDefaultCard = useCallback(
     async (cardId: string): Promise<boolean> => {
       try {
-        await paymentService.setDefaultCard(cardId);
+        await securePaymentService.setDefaultCard(cardId);
         setCards((prev) =>
           prev.map((c) => ({ ...c, isDefault: c.id === cardId })),
         );
@@ -316,7 +317,7 @@ export const usePayments = (): UsePaymentsReturn => {
   const addBankAccount = useCallback(
     async (data: BankAccountData): Promise<BankAccount | null> => {
       try {
-        const response = await paymentService.addBankAccount({
+        const response = await securePaymentService.addBankAccount({
           routingNumber: data.routingNumber,
           accountNumber: data.accountNumber,
           accountType: data.accountType,
@@ -337,7 +338,7 @@ export const usePayments = (): UsePaymentsReturn => {
   const removeBankAccount = useCallback(
     async (accountId: string): Promise<boolean> => {
       try {
-        await paymentService.removeBankAccount(accountId);
+        await securePaymentService.removeBankAccount(accountId);
         setBankAccounts((prev) => prev.filter((a) => a.id !== accountId));
         return true;
       } catch (error) {
@@ -357,10 +358,10 @@ export const usePayments = (): UsePaymentsReturn => {
       bankAccountId: string,
     ): Promise<Transaction | null> => {
       try {
-        const response = await paymentService.requestWithdrawal(
+        const result = await walletService.requestWithdrawal({
           amount,
           bankAccountId,
-        );
+        });
 
         // Update balance (fire and forget with error logging)
         refreshBalance().catch((err) => {
@@ -369,10 +370,20 @@ export const usePayments = (): UsePaymentsReturn => {
           });
         });
 
-        // Add to transactions
-        setTransactions((prev) => [response.transaction, ...prev]);
+        // Create transaction record for UI
+        const balance = await walletService.getBalance();
+        const transaction: Transaction = {
+          id: result.transactionId,
+          type: 'withdrawal',
+          amount: -amount,
+          currency: balance.currency,
+          status: result.status,
+          description: 'Withdrawal to bank account',
+          createdAt: new Date().toISOString(),
+        };
 
-        return response.transaction;
+        setTransactions((prev) => [transaction, ...prev]);
+        return transaction;
       } catch (error) {
         logger.error('Failed to request withdrawal:', error);
         return null;
@@ -387,7 +398,7 @@ export const usePayments = (): UsePaymentsReturn => {
   const createPaymentIntent = useCallback(
     async (momentId: string, amount: number): Promise<PaymentIntent | null> => {
       try {
-        const paymentIntent = await paymentService.createPaymentIntent(
+        const paymentIntent = await securePaymentService.createPaymentIntent(
           momentId,
           amount,
         );
@@ -409,7 +420,7 @@ export const usePayments = (): UsePaymentsReturn => {
       paymentMethodId?: string,
     ): Promise<boolean> => {
       try {
-        const response = await paymentService.confirmPayment(
+        const response = await securePaymentService.confirmPayment(
           paymentIntentId,
           paymentMethodId,
         );
@@ -437,7 +448,7 @@ export const usePayments = (): UsePaymentsReturn => {
    */
   const fetchWithdrawalLimits = useCallback(async () => {
     try {
-      const response = await paymentService.getWithdrawalLimits();
+      const response = await securePaymentService.getWithdrawalLimits();
       setWithdrawalLimits(response);
     } catch (error) {
       logger.error('Failed to fetch withdrawal limits:', error);

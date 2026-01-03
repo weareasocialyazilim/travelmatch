@@ -14,7 +14,7 @@ import { useToast } from '@/context/ToastContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { COLORS } from '@/constants/colors';
 import { LoadingState } from '@/components/LoadingState';
-import { verifyOtp, resendOtp } from '@/services/supabaseAuthService';
+import { verifyPhoneOtp as verifyOtp, resendVerificationEmail as resendOtp } from '../services/authService';
 
 const CODE_LENGTH = 6;
 const RESEND_COOLDOWN = 60;

@@ -12,11 +12,11 @@ import type { Database } from '../types/database.types';
 import { uploadFile } from './supabaseStorageService';
 import { isNotNull } from '../types/guards';
 import type {
-  UserRow,
+  DbUser as UserRow,
   UpdateProfilePayload,
   NotificationPreferences,
   PrivacySettings,
-} from '../types/database-manual.types';
+} from '../types/db';
 
 // Types
 export interface UserProfile {

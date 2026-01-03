@@ -7,8 +7,8 @@
 export { supabase, isSupabaseConfigured } from '../config/supabase';
 export type { Database } from '@/types/database.types';
 
-// Authentication Service
-export { default as supabaseAuth } from './supabaseAuthService';
+// Authentication Service (from features/auth)
+export { default as supabaseAuth } from '../features/auth/services/authService';
 export {
   signUpWithEmail,
   signInWithEmail,
@@ -21,7 +21,7 @@ export {
   updateProfile,
   deleteAccount,
   onAuthStateChange,
-} from './supabaseAuthService';
+} from '../features/auth/services/authService';
 
 // Database Services
 export { default as supabaseDb } from './supabaseDbService';
