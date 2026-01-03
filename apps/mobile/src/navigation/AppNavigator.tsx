@@ -44,12 +44,17 @@ import {
   ForgotPasswordScreen,
   ChangePasswordScreen,
   AuthSuccessScreen,
+  BiometricSetupScreen,
 } from '../features/auth';
 import { SessionExpiredScreen } from '../screens/SessionExpiredScreen';
 import LinkNotFoundScreen from '../screens/LinkNotFoundScreen';
 import { LinkExpiredScreen } from '../screens/LinkExpiredScreen';
 import LinkInvalidScreen from '../screens/LinkInvalidScreen';
 import { ImageViewerScreen } from '../screens/ImageViewerScreen';
+import { DateTimePickerScreen } from '../screens/DateTimePickerScreen';
+import { NotFoundScreen } from '../screens/NotFoundScreen';
+import { PickLocationScreen } from '../screens/PickLocationScreen';
+import { DevMenuScreen } from '../screens/dev/DevMenuScreen';
 
 // ===================================
 // DISCOVER FEATURE SCREENS
@@ -110,6 +115,7 @@ import {
   TrustNotesScreen,
   ProfileDetailScreen,
   UserProfileScreen,
+  AchievementsScreen,
 } from '../features/profile';
 
 // Proof system screens
@@ -193,6 +199,7 @@ import {
   GiftInboxDetailScreen,
   UnifiedGiftFlowScreen,
   MyGiftsScreen,
+  GiftCardMarketScreen,
   RefundRequestScreen,
   SuccessScreen,
   SuccessConfirmationScreen,
@@ -241,8 +248,11 @@ import {
   InviteContactsScreen,
   MaintenanceScreen,
   DataPrivacyScreen,
-  DietaryPreferencesScreen as _DietaryPreferencesScreen,
+  DietaryPreferencesScreen,
   DataSettingsScreen,
+  CommunityGuidelinesScreen,
+  ReferralScreen,
+  SafetyTipsScreen,
 } from '../features/settings';
 import { ReportUserScreen } from '../features/moderation';
 
@@ -734,6 +744,43 @@ const AppNavigator = () => {
                 headerShown: false,
               }}
             />
+
+            {/* Missing Screens - Now Registered */}
+            <Stack.Screen name="Achievements" component={AchievementsScreen} />
+            <Stack.Screen
+              name="BiometricSetup"
+              component={BiometricSetupScreen}
+            />
+            <Stack.Screen
+              name="CommunityGuidelines"
+              component={CommunityGuidelinesScreen}
+            />
+            <Stack.Screen
+              name="DateTimePicker"
+              component={DateTimePickerScreen}
+              options={{ presentation: 'modal' }}
+            />
+            <Stack.Screen
+              name="DietaryPreferences"
+              component={DietaryPreferencesScreen}
+            />
+            <Stack.Screen
+              name="GiftCardMarket"
+              component={GiftCardMarketScreen}
+            />
+            <Stack.Screen name="NotFound" component={NotFoundScreen} />
+            <Stack.Screen
+              name="PickLocation"
+              component={PickLocationScreen}
+              options={{ presentation: 'modal' }}
+            />
+            <Stack.Screen name="Referral" component={ReferralScreen} />
+            <Stack.Screen name="SafetyTips" component={SafetyTipsScreen} />
+
+            {/* Dev Menu (Development Only) */}
+            {__DEV__ && (
+              <Stack.Screen name="DevMenu" component={DevMenuScreen} />
+            )}
           </Stack.Navigator>
         </Suspense>
       </NavigationContainer>
