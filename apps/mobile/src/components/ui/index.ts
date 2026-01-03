@@ -21,7 +21,9 @@ export type { SkeletonItemType } from './SkeletonList';
 // ═══════════════════════════════════════════════════════════════════
 
 // TMButton - Primary button with gradient, animation, haptics
+// Consolidated master component - replaces Button, HapticButton, AnimatedButton
 export { TMButton } from './TMButton';
+export type { TMButtonProps, ButtonVariant, ButtonSize, AnimationMode, HapticType } from './TMButton';
 
 // TMTrustRing - Trust score visualization with "Jewelry" aesthetic
 export { TMTrustRing } from './TMTrustRing';

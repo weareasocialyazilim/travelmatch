@@ -1,14 +1,24 @@
 /**
- * TravelMatch Awwwards Design System 2026 - Button Component
+ * TravelMatch Design System - Button Component
  *
- * Premium button with:
- * - Gradient fills for primary variant
- * - Glassmorphism for secondary
- * - Spring animations on press
- * - Haptic feedback
+ * @deprecated This component is deprecated. Use TMButton instead.
+ * TMButton is the consolidated master button with all features:
+ * - All variants: primary, secondary, ghost, outline, danger, neon, glass
+ * - All sizes: xs, sm, md, lg, xl
+ * - Animation modes: none, pulse, shimmer
+ * - Haptic feedback with configurable types
  * - Full accessibility support
  *
- * Designed for Awwwards Best UI nomination
+ * Migration:
+ * - Replace: import { Button } from '@/components/ui/Button'
+ * - With: import { TMButton } from '@/components/ui/TMButton'
+ *
+ * @example
+ * // Old usage:
+ * <Button title="Click" onPress={fn} variant="primary" />
+ *
+ * // New usage:
+ * <TMButton title="Click" onPress={fn} variant="primary" />
  */
 
 import React, { memo, useMemo, useCallback } from 'react';
@@ -35,6 +45,10 @@ import { COLORS, GRADIENTS, PALETTE } from '../../constants/colors';
 import { TYPE_SCALE } from '../../theme/typography';
 import { SPRINGS } from '../../hooks/useAnimations';
 import { a11yProps } from '../../utils/accessibility';
+
+// Re-export TMButton for easier migration
+export { TMButton } from './TMButton';
+export type { TMButtonProps, ButtonVariant as TMButtonVariant, ButtonSize as TMButtonSize } from './TMButton';
 
 // ============================================
 // TYPES
