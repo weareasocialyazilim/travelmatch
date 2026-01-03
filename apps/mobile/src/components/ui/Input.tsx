@@ -5,13 +5,14 @@
  * All new code should use LiquidInput directly.
  *
  * @deprecated Import LiquidInput directly for new code
+ * @deprecationDate 2026-01-10 (Remove after this date)
  *
  * Migration:
  * - OLD: import { Input } from '@/components/ui/Input';
  * - NEW: import { LiquidInput } from '@/components/ui/LiquidInput';
  */
 
-import React, { memo } from 'react';
+import React, { memo, useEffect, useRef } from 'react';
 import type { ViewStyle, TextInputProps } from 'react-native';
 import { LiquidInput } from './LiquidInput';
 import type { Ionicons } from '@expo/vector-icons';
@@ -81,6 +82,18 @@ export const Input: React.FC<InputProps> = memo(
     onClear,
     ...rest
   }) => {
+    // Deprecation warning - shows once per component mount in dev mode
+    const hasWarned = useRef(false);
+    useEffect(() => {
+      if (!hasWarned.current && __DEV__) {
+        console.warn(
+          '[DEPRECATION] Input will be removed on 2026-01-10.\n' +
+            'Please migrate to: import { LiquidInput } from "@/components/ui/LiquidInput"',
+        );
+        hasWarned.current = true;
+      }
+    }, []);
+
     // Map MaterialCommunityIcons to Ionicons
     const mappedIcon = leftIcon
       ? (iconMap[leftIcon] || 'ellipse-outline')
