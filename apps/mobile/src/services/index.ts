@@ -113,9 +113,6 @@ export type {
   FollowUser,
 } from './userService';
 
-export { personalization } from './personalization';
-export type { UserProfile as PersonalizationProfile } from './personalization';
-
 export { cacheService, cache, CACHE_KEYS } from './cacheService';
 export { offlineSyncQueue } from './offlineSyncQueue';
 export type { OfflineAction, OfflineActionType } from './offlineSyncQueue';

@@ -35,8 +35,7 @@ import { COLORS } from '@/constants/colors';
 import { FONT_SIZES_V2, FONTS } from '@/constants/typography';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { EnhancedSearchBar } from '@/components/discover/EnhancedSearchBar';
-import { NeonPulseMarker } from '../components/NeonPulseMarker';
+import { EnhancedSearchBar, NeonPulseMarker } from '../components';
 import BottomNav from '@/components/BottomNav';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
