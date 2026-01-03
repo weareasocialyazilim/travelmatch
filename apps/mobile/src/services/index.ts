@@ -117,3 +117,6 @@ export type {
 export { navigationRef, navigate, resetNavigation, goBack } from './navigationService';
 export { apiClient, apiV1Service } from './apiV1Service';
 export type { ApiResponse } from './apiV1Service';
+
+export { HapticManager } from './HapticManager';
+export type { HapticIntensity, HapticNotification, HapticPattern } from './HapticManager';
