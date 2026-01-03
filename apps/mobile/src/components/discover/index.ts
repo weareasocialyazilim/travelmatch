@@ -23,6 +23,7 @@ export { CategoryChips, TabChips } from './CategoryChips';
 
 // TravelMatch: The Rebirth - Immersive components
 export { ImmersiveMomentCard } from './ImmersiveMomentCard';
+export { LiquidMomentCard } from './LiquidMomentCard';
 
 // Re-export types and constants
 export * from './types';

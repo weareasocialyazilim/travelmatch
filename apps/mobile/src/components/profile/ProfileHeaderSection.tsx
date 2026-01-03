@@ -10,7 +10,7 @@
  * Designed for Awwwards Best UI nomination
  */
 
-import React, { useCallback, useEffect, memo, useState, ErrorInfo } from 'react';
+import React, { useCallback, useEffect, memo } from 'react';
 import {
   View,
   Text,
@@ -33,29 +33,12 @@ import Reanimated, {
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import Svg, { Circle, Defs, LinearGradient as SvgGradient, Stop } from 'react-native-svg';
 
 import { COLORS, GRADIENTS, PALETTE, getTrustRingColors } from '../../constants/colors';
 import { useTranslation } from '../../hooks/useTranslation';
 import { TYPE_SCALE } from '../../theme/typography';
 import { SPRINGS } from '../../hooks/useAnimations';
-
-// Lazy load SVG to handle potential native module issues
-let Svg: typeof import('react-native-svg').default | null = null;
-let Circle: typeof import('react-native-svg').Circle | null = null;
-let Defs: typeof import('react-native-svg').Defs | null = null;
-let SvgGradient: typeof import('react-native-svg').LinearGradient | null = null;
-let Stop: typeof import('react-native-svg').Stop | null = null;
-
-try {
-  const svg = require('react-native-svg');
-  Svg = svg.default || svg.Svg;
-  Circle = svg.Circle;
-  Defs = svg.Defs;
-  SvgGradient = svg.LinearGradient;
-  Stop = svg.Stop;
-} catch {
-  // SVG not available, will use fallback
-}
 
 // ============================================
 // TYPES
@@ -63,6 +46,8 @@ try {
 interface UserShape {
   id?: string;
   name?: string;
+  username?: string;
+  bio?: string;
   avatar?: string;
   location?: { city?: string; country?: string } | string;
   kyc?: boolean;
@@ -77,6 +62,8 @@ interface ProfileHeaderSectionProps {
   user?: UserShape;
   avatarUrl?: string;
   userName?: string;
+  username?: string;
+  bio?: string;
   location?: string | { city?: string; country?: string };
   isVerified?: boolean;
   trustScore?: number;
@@ -87,53 +74,6 @@ interface ProfileHeaderSectionProps {
   onTrustGardenPress?: () => void;
   onSettingsPress?: () => void;
 }
-
-// ============================================
-// FALLBACK TRUST RING (No SVG)
-// ============================================
-interface FallbackTrustRingProps {
-  score: number;
-  size: number;
-  colors: readonly [string, string];
-  children: React.ReactNode;
-}
-
-const FallbackTrustRing: React.FC<FallbackTrustRingProps> = ({
-  score,
-  size,
-  colors,
-  children,
-}) => {
-  const safeScore = Number.isFinite(score) ? Math.max(0, Math.min(100, score)) : 0;
-
-  return (
-    <View style={[styles.trustRingContainer, { width: size, height: size }]}>
-      {/* Simple border-based ring fallback */}
-      <View
-        style={[
-          styles.fallbackRing,
-          {
-            width: size,
-            height: size,
-            borderRadius: size / 2,
-            borderWidth: 4,
-            borderColor: colors[0],
-          },
-        ]}
-      />
-
-      {/* Avatar Container */}
-      <View style={[styles.avatarWrapper, { width: size - 16, height: size - 16 }]}>
-        {children}
-      </View>
-
-      {/* Trust Badge */}
-      <View style={[styles.trustBadge, { backgroundColor: colors[0] }]}>
-        <Text style={styles.trustBadgeText}>{safeScore}</Text>
-      </View>
-    </View>
-  );
-};
 
 // ============================================
 // ANIMATED TRUST RING COMPONENT
@@ -151,26 +91,18 @@ const AnimatedTrustRing: React.FC<AnimatedTrustRingProps> = ({
   strokeWidth = 4,
   children,
 }) => {
-  const [svgError, setSvgError] = useState(false);
   const progress = useSharedValue(0);
   const rotation = useSharedValue(0);
 
-  // Ensure score is a valid number
-  const safeScore = Number.isFinite(score) ? Math.max(0, Math.min(100, score)) : 0;
-
-  // Ensure size and strokeWidth are valid
-  const safeSize = Number.isFinite(size) && size > 0 ? size : 120;
-  const safeStrokeWidth = Number.isFinite(strokeWidth) && strokeWidth > 0 ? strokeWidth : 4;
-
-  const radius = (safeSize - safeStrokeWidth) / 2;
+  const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-  const center = safeSize / 2;
+  const center = size / 2;
 
-  const colors = getTrustRingColors(safeScore);
+  const colors = getTrustRingColors(score);
 
   useEffect(() => {
     // Animate progress
-    progress.value = withTiming(safeScore / 100, {
+    progress.value = withTiming(score / 100, {
       duration: 1500,
       easing: Easing.out(Easing.ease),
     });
@@ -183,90 +115,80 @@ const AnimatedTrustRing: React.FC<AnimatedTrustRingProps> = ({
       -1,
       false
     );
-  }, [safeScore, progress, rotation]);
+  }, [score]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${rotation.value}deg` }],
   }));
 
-  const strokeDashoffset = circumference * (1 - safeScore / 100);
+  const strokeDashoffset = circumference * (1 - score / 100);
 
-  // Check if SVG components are available
-  const svgAvailable = Svg && Circle && Defs && SvgGradient && Stop && !svgError;
+  return (
+    <View style={[styles.trustRingContainer, { width: size, height: size }]}>
+      {/* Neon Glow Effect - Outer */}
+      <View
+        style={[
+          styles.avatarGlow,
+          {
+            width: size + 20,
+            height: size + 20,
+            borderRadius: (size + 20) / 2,
+            backgroundColor: colors[0],
+          },
+        ]}
+      />
 
-  // Use fallback if SVG is not available
-  if (!svgAvailable) {
-    return (
-      <FallbackTrustRing score={safeScore} size={safeSize} colors={colors}>
-        {children}
-      </FallbackTrustRing>
-    );
-  }
+      {/* Background Circle */}
+      <Svg
+        width={size}
+        height={size}
+        style={StyleSheet.absoluteFill}
+      >
+        <Circle
+          cx={center}
+          cy={center}
+          r={radius}
+          stroke="rgba(255,255,255,0.2)"
+          strokeWidth={strokeWidth}
+          fill="transparent"
+        />
+      </Svg>
 
-  // Wrap SVG rendering in error boundary logic
-  try {
-    return (
-      <View style={[styles.trustRingContainer, { width: safeSize, height: safeSize }]}>
-        {/* Background Circle */}
-        <Svg
-          width={safeSize}
-          height={safeSize}
-          style={StyleSheet.absoluteFill}
-        >
+      {/* Animated Progress Ring */}
+      <Reanimated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
+        <Svg width={size} height={size}>
+          <Defs>
+            <SvgGradient id="trustGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <Stop offset="0%" stopColor={colors[0]} />
+              <Stop offset="100%" stopColor={colors[1]} />
+            </SvgGradient>
+          </Defs>
           <Circle
             cx={center}
             cy={center}
             r={radius}
-            stroke="rgba(255,255,255,0.2)"
-            strokeWidth={safeStrokeWidth}
+            stroke="url(#trustGradient)"
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
             fill="transparent"
+            transform={`rotate(-90 ${center} ${center})`}
           />
         </Svg>
+      </Reanimated.View>
 
-        {/* Animated Progress Ring */}
-        <Reanimated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
-          <Svg width={safeSize} height={safeSize}>
-            <Defs>
-              <SvgGradient id="trustGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <Stop offset="0%" stopColor={colors[0]} />
-                <Stop offset="100%" stopColor={colors[1]} />
-              </SvgGradient>
-            </Defs>
-            <Circle
-              cx={center}
-              cy={center}
-              r={radius}
-              stroke="url(#trustGradient)"
-              strokeWidth={safeStrokeWidth}
-              strokeLinecap="round"
-              strokeDasharray={`${circumference}`}
-              strokeDashoffset={strokeDashoffset}
-              fill="transparent"
-              transform={`rotate(-90 ${center} ${center})`}
-            />
-          </Svg>
-        </Reanimated.View>
-
-        {/* Avatar Container */}
-        <View style={[styles.avatarWrapper, { width: safeSize - 16, height: safeSize - 16 }]}>
-          {children}
-        </View>
-
-        {/* Trust Badge */}
-        <View style={[styles.trustBadge, { backgroundColor: colors[0] }]}>
-          <Text style={styles.trustBadgeText}>{safeScore}</Text>
-        </View>
-      </View>
-    );
-  } catch {
-    // If SVG rendering fails, use fallback
-    setSvgError(true);
-    return (
-      <FallbackTrustRing score={safeScore} size={safeSize} colors={colors}>
+      {/* Avatar Container */}
+      <View style={[styles.avatarWrapper, { width: size - 16, height: size - 16 }]}>
         {children}
-      </FallbackTrustRing>
-    );
-  }
+      </View>
+
+      {/* Trust Badge with Neon Glow */}
+      <View style={[styles.trustBadge, styles.trustBadgeGlow, { backgroundColor: colors[0] }]}>
+        <Text style={styles.trustBadgeText}>{score}</Text>
+      </View>
+    </View>
+  );
 };
 
 // ============================================
@@ -331,6 +253,8 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
     user,
     avatarUrl,
     userName,
+    username,
+    bio,
     location,
     isVerified,
     trustScore,
@@ -348,6 +272,8 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
     // Normalize values to support both `user` shape and individual props
     const resolvedAvatar = avatarUrl || user?.avatar || '';
     const resolvedName = userName || user?.name || '';
+    const resolvedUsername = username || user?.username || '';
+    const resolvedBio = bio || user?.bio || '';
     const resolvedLocation =
       typeof location === 'string'
         ? location
@@ -443,13 +369,23 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
           <View style={styles.nameRow}>
             <Text style={styles.userName}>{resolvedName}</Text>
             {resolvedVerified && (
-              <MaterialCommunityIcons
-                name="check-decagram"
-                size={22}
-                color={COLORS.trust.primary}
-              />
+              <View style={styles.verifiedBadgeContainer}>
+                <MaterialCommunityIcons
+                  name="check-decagram"
+                  size={24}
+                  color={COLORS.primary}
+                />
+              </View>
             )}
           </View>
+
+          {resolvedUsername && (
+            <Text style={styles.usernameText}>{resolvedUsername}</Text>
+          )}
+
+          {resolvedBio && (
+            <Text style={styles.bioText}>{resolvedBio}</Text>
+          )}
 
           {resolvedLocation && (
             <View style={styles.locationRow}>
@@ -568,9 +504,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
   },
-  fallbackRing: {
+  avatarGlow: {
     position: 'absolute',
-    backgroundColor: 'transparent',
+    opacity: 0.25,
+    // Neon glow effect
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 20,
   },
   avatarWrapper: {
     position: 'absolute',
@@ -596,6 +537,14 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: PALETTE.white,
   },
+  trustBadgeGlow: {
+    // Neon glow on badge
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 8,
+    elevation: 4,
+  },
   trustBadgeText: {
     ...TYPE_SCALE.label.small,
     color: PALETTE.white,
@@ -615,6 +564,27 @@ const styles = StyleSheet.create({
   userName: {
     ...TYPE_SCALE.display.h2,
     color: PALETTE.white,
+  },
+  verifiedBadgeContainer: {
+    // Neon glow on verified badge
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
+  },
+  usernameText: {
+    ...TYPE_SCALE.body.base,
+    color: COLORS.primary,
+    marginTop: 4,
+    fontWeight: '600',
+  },
+  bioText: {
+    ...TYPE_SCALE.body.small,
+    color: 'rgba(255,255,255,0.8)',
+    textAlign: 'center',
+    marginTop: 12,
+    lineHeight: 20,
+    paddingHorizontal: 20,
   },
   locationRow: {
     flexDirection: 'row',
