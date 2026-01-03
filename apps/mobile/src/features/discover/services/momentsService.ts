@@ -234,12 +234,3 @@ export const momentsApi = {
   },
 };
 
-// Legacy exports for backward compatibility
-/** @deprecated Use MomentFilters */
-export type TripFilters = MomentFilters;
-/** @deprecated Use CreateMomentDto */
-export type CreateTripDto = CreateMomentDto;
-/** @deprecated Use UpdateMomentDto */
-export type UpdateTripDto = UpdateMomentDto;
-/** @deprecated Use momentsApi */
-export const tripsApi = momentsApi;

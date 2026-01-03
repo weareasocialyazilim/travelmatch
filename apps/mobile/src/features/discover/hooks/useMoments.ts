@@ -174,16 +174,3 @@ export function useBooking(bookingId: string) {
   });
 }
 
-// Legacy exports for backward compatibility
-/** @deprecated Use useMoments */
-export const useTrips = useMoments;
-/** @deprecated Use useMoment */
-export const useTrip = useMoment;
-/** @deprecated Use useCreateMoment */
-export { useCreateMoment as useCreateTrip };
-/** @deprecated Use useUpdateMoment */
-export { useUpdateMoment as useUpdateTrip };
-/** @deprecated Use useDeleteMoment */
-export { useDeleteMoment as useDeleteTrip };
-/** @deprecated Use useMyMoments */
-export { useMyMoments as useMyTrips };
