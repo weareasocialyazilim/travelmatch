@@ -116,6 +116,14 @@ export { GlassModal } from './GlassModal';
 export type { GlassModalProps } from './GlassModal';
 
 // ═══════════════════════════════════════════════════════════════════
-// Glass Components (iOS 26 Liquid Glass)
+// Glass Effects & Liquid Components (iOS 26 Liquid Glass)
 // ═══════════════════════════════════════════════════════════════════
 export { GlassCard, GlassView, GlassButton } from './GlassCard';
+export {
+  LiquidSegmentedControl,
+  LiquidSegmentedControlAnimated,
+} from './LiquidSegmentedControl';
+export {
+  LiquidBottomSheet,
+  LiquidBottomSheetStatic,
+} from './LiquidBottomSheet';
