@@ -49,8 +49,10 @@ export {
 } from './hooks/useProfile';
 
 // Services
-export { profileApi } from './services/profileApi';
-export type { UpdateProfileDto } from './services/profileApi';
+export { profileApi as profileService } from './services/profileService';
+/** @deprecated Use profileService instead */
+export { profileApi } from './services/profileService';
+export type { UpdateProfileDto } from './services/profileService';
 
 // Types
 export type {
