@@ -79,6 +79,7 @@ supabase/.temp/
 # ============================================
 # CLEANUP: Temporary and backup files
 # ============================================
+cookies.txt
 *.backup
 *.backup.*
 *.old

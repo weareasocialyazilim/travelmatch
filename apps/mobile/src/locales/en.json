@@ -305,11 +305,11 @@
   "onboarding": {
     "page1": {
       "title": "Welcome to TravelMatch",
-      "description": "Connect and support travelers on their unique journeys through verified, heartfelt gifts."
+      "description": "Connect with people nearby through verified, heartfelt gifts."
     },
     "page2": {
       "title": "Share Your Journey",
-      "description": "Create moments from your travels and receive gifts from supporters around the world."
+      "description": "Create moments and receive gifts from people around you."
     },
     "page3": {
       "title": "Build Trust Together",
@@ -317,7 +317,7 @@
     },
     "page4": {
       "title": "Start Your Adventure",
-      "description": "Join thousands of travelers connecting through meaningful gifts and authentic experiences."
+      "description": "Join thousands of people connecting through meaningful gifts and authentic experiences."
     },
     "slides": {
       "1": {
@@ -357,7 +357,7 @@
   },
   "welcome": {
     "title": "Welcome to TravelMatch",
-    "subtitle": "Connect with locals. Share experiences.\nMake every trip meaningful.",
+    "subtitle": "Share moments. Gift experiences.\nMake every connection meaningful.",
     "continueWithApple": "Continue with Apple",
     "continueWithGoogle": "Continue with Google",
     "continueWithFacebook": "Continue with Facebook",
@@ -448,9 +448,9 @@
   },
   "store": {
     "appName": "TravelMatch",
-    "subtitle": "Connect Through Travel Moments",
-    "shortDescription": "Connect with travelers. Share moments. Gift experiences. Travel differently.",
-    "keywords": "travel,experiences,local guide,tourism,gifts,moments,discover,adventure,trip,vacation,explore"
+    "subtitle": "Share Moments, Make Connections",
+    "shortDescription": "Meet people nearby. Share moments. Gift experiences. Connect differently.",
+    "keywords": "dating,experiences,gifts,moments,discover,connection,coffee,food,meetup,social"
   },
   "discover": {
     "title": "Discover",
@@ -588,7 +588,7 @@
     "cached": "Showing last loaded messages",
     "empty": {
       "title": "No Messages Yet",
-      "description": "When you connect with travelers or hosts, your conversations will appear here."
+      "description": "When you connect with someone, your conversations will appear here."
     },
     "search": {
       "placeholder": "Search conversations..."

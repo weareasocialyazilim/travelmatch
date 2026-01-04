@@ -30,7 +30,7 @@ import Animated, {
   FadeInDown,
 } from 'react-native-reanimated';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { SkeletonList } from '@/components/ui/SkeletonList';
+import { SkeletonList } from '@/components/ui';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { PROFILE_DEFAULTS } from '@/constants/defaultValues';
 import BottomNav from '@/components/BottomNav';
@@ -407,15 +407,30 @@ const ProfileScreen: React.FC = () => {
               </View>
               <View style={styles.trustLegend}>
                 <View style={styles.legendItem}>
-                  <View style={[styles.legendDot, { backgroundColor: PROFILE_COLORS.neon.lime }]} />
+                  <View
+                    style={[
+                      styles.legendDot,
+                      { backgroundColor: PROFILE_COLORS.neon.lime },
+                    ]}
+                  />
                   <Text style={styles.legendText}>Yüksek</Text>
                 </View>
                 <View style={styles.legendItem}>
-                  <View style={[styles.legendDot, { backgroundColor: PROFILE_COLORS.neon.cyan }]} />
+                  <View
+                    style={[
+                      styles.legendDot,
+                      { backgroundColor: PROFILE_COLORS.neon.cyan },
+                    ]}
+                  />
                   <Text style={styles.legendText}>Orta</Text>
                 </View>
                 <View style={styles.legendItem}>
-                  <View style={[styles.legendDot, { backgroundColor: PROFILE_COLORS.neon.rose }]} />
+                  <View
+                    style={[
+                      styles.legendDot,
+                      { backgroundColor: PROFILE_COLORS.neon.rose },
+                    ]}
+                  />
                   <Text style={styles.legendText}>Düşük</Text>
                 </View>
               </View>
@@ -424,7 +439,10 @@ const ProfileScreen: React.FC = () => {
 
           {/* Wallet Card */}
           <Animated.View entering={FadeInDown.delay(300).springify()}>
-            <WalletCard balance={userData.walletBalance} onPress={handleWallet} />
+            <WalletCard
+              balance={userData.walletBalance}
+              onPress={handleWallet}
+            />
           </Animated.View>
 
           {/* Quick Links */}

@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { fireEvent } from '@testing-library/react-native';
-import { render, mockUser } from '../../../__tests__/testUtilsRender.helper';
+import { render, mockUser } from '../../../../__tests__/testUtilsRender.helper';
 import { ProfileHeaderSection } from '../ProfileHeaderSection';
 
 describe('ProfileHeaderSection Component', () => {
@@ -18,17 +18,17 @@ describe('ProfileHeaderSection Component', () => {
     it('renders user name', () => {
       const user = mockUser({ name: 'John Doe' });
       const { getByText } = render(
-        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />
+        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />,
       );
       expect(getByText('John Doe')).toBeTruthy();
     });
 
     it('renders user location', () => {
-      const user = mockUser({ 
-        location: { city: 'New York', country: 'USA' } 
+      const user = mockUser({
+        location: { city: 'New York', country: 'USA' },
       });
       const { getByText } = render(
-        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />
+        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />,
       );
       expect(getByText(/New York/)).toBeTruthy();
     });
@@ -36,7 +36,7 @@ describe('ProfileHeaderSection Component', () => {
     it('renders trust score', () => {
       const user = mockUser({ trust_score: 85 });
       const { getByText } = render(
-        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />
+        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />,
       );
       expect(getByText(/85/)).toBeTruthy();
     });
@@ -44,7 +44,7 @@ describe('ProfileHeaderSection Component', () => {
     it('displays user avatar', () => {
       const user = mockUser({ avatar: 'avatar.jpg' });
       const { getByTestId } = render(
-        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />
+        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />,
       );
       // Check for avatar component
     });
@@ -52,7 +52,7 @@ describe('ProfileHeaderSection Component', () => {
     it('shows KYC verification badge for verified users', () => {
       const user = mockUser({ kyc: true });
       const { getByTestId } = render(
-        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />
+        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />,
       );
       // Check for verification badge
     });
@@ -60,7 +60,7 @@ describe('ProfileHeaderSection Component', () => {
     it('hides KYC badge for unverified users', () => {
       const user = mockUser({ kyc: false });
       const { queryByTestId } = render(
-        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />
+        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />,
       );
       // No verification badge
     });
@@ -70,7 +70,7 @@ describe('ProfileHeaderSection Component', () => {
     it('shows edit button when onEditPress is provided', () => {
       const user = mockUser();
       const { getByTestId } = render(
-        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />
+        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />,
       );
       // Check for edit button
     });
@@ -78,21 +78,19 @@ describe('ProfileHeaderSection Component', () => {
     it('calls onEditPress when edit button is clicked', () => {
       const user = mockUser();
       const { getByTestId } = render(
-        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />
+        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />,
       );
-      
+
       const editButton = getByTestId('edit-button');
       fireEvent.press(editButton);
-      
+
       expect(mockOnEditPress).toHaveBeenCalledTimes(1);
     });
 
     it('hides edit button when onEditPress is not provided', () => {
       const user = mockUser();
-      const { queryByTestId } = render(
-        <ProfileHeaderSection user={user} />
-      );
-      
+      const { queryByTestId } = render(<ProfileHeaderSection user={user} />);
+
       expect(queryByTestId('edit-button')).toBeNull();
     });
   });
@@ -101,7 +99,7 @@ describe('ProfileHeaderSection Component', () => {
     it('shows green color for high trust score (>= 85)', () => {
       const user = mockUser({ trust_score: 90 });
       const { getByText } = render(
-        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />
+        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />,
       );
       // Check color styling
     });
@@ -109,7 +107,7 @@ describe('ProfileHeaderSection Component', () => {
     it('shows yellow color for medium trust score (50-84)', () => {
       const user = mockUser({ trust_score: 70 });
       const { getByText } = render(
-        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />
+        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />,
       );
       // Check color styling
     });
@@ -117,7 +115,7 @@ describe('ProfileHeaderSection Component', () => {
     it('shows red color for low trust score (< 50)', () => {
       const user = mockUser({ trust_score: 30 });
       const { getByText } = render(
-        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />
+        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />,
       );
       // Check color styling
     });
@@ -146,7 +144,7 @@ describe('ProfileHeaderSection Component', () => {
       const initial = renderCount;
 
       fireEvent.press(getByText('Update'));
-      
+
       // Component should be memoized
       expect(renderCount).toBe(initial + 1);
     });
@@ -156,13 +154,13 @@ describe('ProfileHeaderSection Component', () => {
       const user2 = mockUser({ name: 'John', trust_score: 90 });
 
       const { rerender, getByText } = render(
-        <ProfileHeaderSection user={user1} onEditPress={mockOnEditPress} />
+        <ProfileHeaderSection user={user1} onEditPress={mockOnEditPress} />,
       );
 
       expect(getByText(/80/)).toBeTruthy();
 
       rerender(
-        <ProfileHeaderSection user={user2} onEditPress={mockOnEditPress} />
+        <ProfileHeaderSection user={user2} onEditPress={mockOnEditPress} />,
       );
 
       expect(getByText(/90/)).toBeTruthy();
@@ -173,7 +171,7 @@ describe('ProfileHeaderSection Component', () => {
     it('matches snapshot for verified user', () => {
       const user = mockUser({ kyc: true, trust_score: 90 });
       const { toJSON } = render(
-        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />
+        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />,
       );
       expect(toJSON()).toMatchSnapshot();
     });
@@ -181,7 +179,7 @@ describe('ProfileHeaderSection Component', () => {
     it('matches snapshot for unverified user', () => {
       const user = mockUser({ kyc: false, trust_score: 60 });
       const { toJSON } = render(
-        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />
+        <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />,
       );
       expect(toJSON()).toMatchSnapshot();
     });

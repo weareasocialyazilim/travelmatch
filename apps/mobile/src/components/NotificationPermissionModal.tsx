@@ -59,27 +59,33 @@ export const NotificationPermissionModal: React.FC<
           </View>
 
           {/* Title */}
-          <Text style={styles.title}>Stay Updated</Text>
+          <Text style={styles.title}>Bu Heyecanı Kaçırma! 💝</Text>
 
           {/* Description */}
           <Text style={styles.description}>
-            Get notified about new gestures, matches, and important updates to
-            make the most of your kindness journey.
+            Sana gelen ipeksi hediyeleri, yeni bağlantıları ve özel anları
+            anında öğrenmek için bildirimlere izin ver.
           </Text>
 
           {/* Benefits */}
           <View style={styles.benefitsContainer}>
             <View style={styles.benefit}>
-              <Icon name="hand-heart" size={20} color={COLORS.brand.primary} />
-              <Text style={styles.benefitText}>New gesture matches</Text>
+              <Icon name="gift" size={20} color={COLORS.brand.primary} />
+              <Text style={styles.benefitText}>Yeni hediye teklifleri</Text>
             </View>
             <View style={styles.benefit}>
-              <Icon name="message-text" size={20} color={COLORS.brand.primary} />
-              <Text style={styles.benefitText}>Chat messages</Text>
+              <Icon name="heart" size={20} color={COLORS.brand.primary} />
+              <Text style={styles.benefitText}>Bağlantı istekleri</Text>
             </View>
             <View style={styles.benefit}>
-              <Icon name="check-decagram" size={20} color={COLORS.brand.primary} />
-              <Text style={styles.benefitText}>Proof verification updates</Text>
+              <Icon
+                name="camera-outline"
+                size={20}
+                color={COLORS.brand.primary}
+              />
+              <Text style={styles.benefitText}>
+                Kanıt doğrulama güncellemeleri
+              </Text>
             </View>
           </View>
 
@@ -95,12 +101,12 @@ export const NotificationPermissionModal: React.FC<
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
             >
-              <Text style={styles.allowButtonText}>Allow Notifications</Text>
+              <Text style={styles.allowButtonText}>Bildirimleri Aç</Text>
             </LinearGradient>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.skipButton} onPress={onClose}>
-            <Text style={styles.skipButtonText}>Not Now</Text>
+            <Text style={styles.skipButtonText}>Şimdi Değil</Text>
           </TouchableOpacity>
         </View>
       </View>

@@ -36,7 +36,7 @@ import Animated, {
   runOnJS,
   Easing,
 } from 'react-native-reanimated';
-import { COLORS } from '../../constants/colors';
+import { COLORS } from '@/constants/colors';
 import { STORY_DURATION } from './constants';
 import type { UserStory, Story } from './types';
 
@@ -97,7 +97,7 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
         if (finished) {
           runOnJS(onNextStory)();
         }
-      }
+      },
     );
   }, [user, onNextStory, progress]);
 
@@ -124,7 +124,7 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
         if (finished) {
           runOnJS(onNextStory)();
         }
-      }
+      },
     );
   }, [onNextStory, progress, pausedProgress, setIsPaused]);
 
@@ -140,7 +140,7 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
         onNextStory();
       }
     },
-    [onPreviousStory, onNextStory]
+    [onPreviousStory, onNextStory],
   );
 
   // Effect: start timer on story change
@@ -166,7 +166,11 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
       presentationStyle="overFullScreen"
     >
       <View style={styles.container}>
-        <StatusBar barStyle="light-content" backgroundColor="black" translucent />
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="black"
+          translucent
+        />
 
         {/* Background Image & Touch Handler */}
         <TouchableWithoutFeedback
@@ -208,7 +212,9 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
                   {index < currentStoryIndex ? (
                     <View style={[styles.progressBarFill, styles.fullWidth]} />
                   ) : index === currentStoryIndex ? (
-                    <Animated.View style={[styles.progressBarFill, progressStyle]} />
+                    <Animated.View
+                      style={[styles.progressBarFill, progressStyle]}
+                    />
                   ) : null}
                 </View>
               ))}
@@ -236,7 +242,11 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
                 onPress={onClose}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
-                <MaterialCommunityIcons name="close" size={24} color={COLORS.utility.white} />
+                <MaterialCommunityIcons
+                  name="close"
+                  size={24}
+                  color={COLORS.utility.white}
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -254,13 +264,23 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
                 </Text>
                 <View style={styles.momentMeta}>
                   <View style={styles.metaItem}>
-                    <MaterialCommunityIcons name="map-marker" size={14} color={COLORS.utility.white} />
+                    <MaterialCommunityIcons
+                      name="map-marker"
+                      size={14}
+                      color={COLORS.utility.white}
+                    />
                     <Text style={styles.metaText}>{currentStory.distance}</Text>
                   </View>
                   <View style={styles.metaItem}>
-                    <MaterialCommunityIcons name="tag" size={14} color={COLORS.utility.white} />
+                    <MaterialCommunityIcons
+                      name="tag"
+                      size={14}
+                      color={COLORS.utility.white}
+                    />
                     <Text style={styles.metaText}>
-                      {currentStory.price === 0 ? 'Ücretsiz' : `₺${currentStory.price}`}
+                      {currentStory.price === 0
+                        ? 'Ücretsiz'
+                        : `₺${currentStory.price}`}
                     </Text>
                   </View>
                 </View>
@@ -273,7 +293,11 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
                 activeOpacity={0.8}
               >
                 <Text style={styles.viewButtonText}>Görüntüle</Text>
-                <MaterialCommunityIcons name="chevron-right" size={18} color={COLORS.utility.white} />
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={18}
+                  color={COLORS.utility.white}
+                />
               </TouchableOpacity>
             </View>
 
@@ -284,8 +308,14 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
                 onPress={() => onGift(currentStory)}
                 activeOpacity={0.8}
               >
-                <MaterialCommunityIcons name="gift" size={20} color={COLORS.utility.white} />
-                <Text style={styles.giftButtonText}>Hediye Gönder</Text>
+                <MaterialCommunityIcons
+                  name="gift"
+                  size={20}
+                  color={COLORS.utility.white}
+                />
+                <Text style={styles.giftButtonText}>
+                  Hediye Teklifi ile Yanıtla
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -293,7 +323,11 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
                 onPress={() => onShare(currentStory)}
                 activeOpacity={0.8}
               >
-                <MaterialCommunityIcons name="share-variant" size={20} color={COLORS.utility.white} />
+                <MaterialCommunityIcons
+                  name="share-variant"
+                  size={20}
+                  color={COLORS.utility.white}
+                />
               </TouchableOpacity>
             </View>
           </View>

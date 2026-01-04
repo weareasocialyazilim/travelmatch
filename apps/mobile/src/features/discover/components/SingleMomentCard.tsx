@@ -2,8 +2,8 @@
 import React, { memo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../../constants/colors';
-import { OptimizedImage } from '../ui/OptimizedImage';
+import { COLORS } from '@/constants/colors';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import type { MomentCardProps } from './types';
 
 export const SingleMomentCard: React.FC<MomentCardProps> = memo(
@@ -79,7 +79,9 @@ export const SingleMomentCard: React.FC<MomentCardProps> = memo(
             />
             <Text style={styles.locationText}>{locationName}</Text>
             <Text style={styles.dotSeparator}>•</Text>
-            <Text style={styles.distanceText}>{item.distance || '?'} km uzakta</Text>
+            <Text style={styles.distanceText}>
+              {item.distance || '?'} km uzakta
+            </Text>
           </View>
 
           {/* Price */}

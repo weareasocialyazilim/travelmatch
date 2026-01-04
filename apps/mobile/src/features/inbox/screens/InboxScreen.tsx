@@ -86,7 +86,7 @@ const InboxScreen: React.FC = () => {
           name: chat.user.name,
           avatar: chat.user.avatar,
           isVerified: chat.user.isVerified,
-          role: 'Traveler',
+          role: 'Host',
           kyc: chat.user.isVerified ? 'Verified' : 'Pending',
           location: '',
         },
@@ -116,7 +116,9 @@ const InboxScreen: React.FC = () => {
       <Animated.View entering={FadeIn.delay(300)} style={styles.emptyContainer}>
         <View style={styles.emptyIcon}>
           <MaterialCommunityIcons
-            name={activeTab === 'active' ? 'chat-sleep-outline' : 'gift-off-outline'}
+            name={
+              activeTab === 'active' ? 'chat-sleep-outline' : 'gift-off-outline'
+            }
             size={56}
             color={VIBE_ROOM_COLORS.text.tertiary}
           />

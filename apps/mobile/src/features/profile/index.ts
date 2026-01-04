@@ -2,30 +2,39 @@
 export { default as ProfileScreen } from './screens/ProfileScreen';
 
 // Components
-export { AchievementCard } from './components/AchievementCard';
+// AchievementCard moved to @/features/gamification
 export { ProfileDetailScreen } from './screens/ProfileDetailScreen';
 export { default as EditProfileScreen } from './screens/EditProfileScreen';
 export { UserProfileScreen } from './screens/UserProfileScreen';
 
 // Reputation & Trust
-export { default as ReputationScreen } from './screens/ReputationScreen';
+// ReputationScreen removed - use TrustGardenDetailScreen instead
 export { default as TrustGardenDetailScreen } from './screens/TrustGardenDetailScreen';
 export { TrustNotesScreen } from './screens/TrustNotesScreen';
 
-// Proof System
+// Proof System - now in features/verifications
+// Re-exported for backward compatibility
 export { ProofFlowScreen } from './screens/ProofFlowScreen';
 export { ProofDetailScreen } from './screens/ProofDetailScreen';
 export { ProofHistoryScreen } from './screens/ProofHistoryScreen';
 
 // Note: ReviewScreen is in features/reviews
 
-// Achievements
-export { AchievementsScreen } from './screens/AchievementsScreen';
+// ===================================
+// ACHIEVEMENTS - ELEVATED TO features/gamification
+// ===================================
+// AchievementsScreen moved to @/features/gamification
+// AchievementCard moved to @/features/gamification/components
 
-// Moments
+// ===================================
+// MOMENTS - ELEVATED TO features/moments
+// ===================================
+// CreateMomentScreen moved to @/features/moments
+// momentsService moved to @/features/moments/services
+
+// Re-export for backward compatibility (will be deprecated)
 export { default as MyMomentsScreen } from './screens/MyMomentsScreen';
 export { MyHostedMomentsScreen } from './screens/MyHostedMomentsScreen';
-export { default as CreateMomentScreen } from './screens/CreateMomentScreen';
 export { EditMomentScreen } from './screens/EditMomentScreen';
 export { default as MomentDetailScreen } from './screens/MomentDetailScreen';
 export { MomentGalleryScreen } from './screens/MomentGalleryScreen';

@@ -5,8 +5,8 @@
  * feature-based architecture for better encapsulation.
  */
 
-// Map Components
-export { NeonPulseMarker } from './NeonPulseMarker';
+// Map Components - NeonPulseMarker is now in @/components/ui
+export { NeonPulseMarker } from '@/components/ui/NeonPulseMarker';
 
 // Category Components
 export { CategoryChips } from './CategoryChips';

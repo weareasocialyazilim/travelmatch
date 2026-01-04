@@ -26,9 +26,9 @@ import Animated, {
   Extrapolate,
   SharedValue,
 } from 'react-native-reanimated';
-import { COLORS } from '../../constants/colors';
-import { TYPOGRAPHY_SYSTEM } from '../../constants/typography';
-import { TMAvatar } from '../ui/TMAvatar';
+import { COLORS } from '@/constants/colors';
+import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
+import { TMAvatar } from '@/components/ui/TMAvatar';
 import type { DiscoverHeaderProps } from './types';
 
 // Enhanced props interface for animated header
@@ -249,7 +249,9 @@ export const AwwwardsDiscoverHeader: React.FC<AwwwardsDiscoverHeaderProps> = ({
             size={24}
             color={COLORS.text.primary}
           />
-          {notificationCount > 0 && <View style={awwwardsStyles.notificationDot} />}
+          {notificationCount > 0 && (
+            <View style={awwwardsStyles.notificationDot} />
+          )}
         </TouchableOpacity>
 
         {/* User Avatar */}

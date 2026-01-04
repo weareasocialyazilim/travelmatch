@@ -1,7 +1,13 @@
 export { Button } from './ui/Button';
 // TMButton - Consolidated master button component
 export { TMButton } from './ui/TMButton';
-export type { TMButtonProps, ButtonVariant, ButtonSize, AnimationMode, HapticType } from './ui/TMButton';
+export type {
+  TMButtonProps,
+  ButtonVariant,
+  ButtonSize,
+  AnimationMode,
+  HapticType,
+} from './ui/TMButton';
 export { SocialButton } from './SocialButton';
 export type { SocialButtonProps } from './SocialButton';
 export {
@@ -21,45 +27,89 @@ export {
 export { NetworkGuard, type NetworkGuardProps } from './NetworkGuard';
 export { OfflineState, type OfflineStateProps } from './OfflineState';
 export { FilterPill } from './FilterPill';
-export { default as MomentCard } from './MomentCard';
-export { GiftMomentBottomSheet } from './GiftMomentBottomSheet';
-export { GiftSuccessModal } from './GiftSuccessModal';
-export { ConfirmGiftModal } from './ConfirmGiftModal';
-export { ShareProofModal } from './ShareProofModal';
-export { ThankYouModal } from './ThankYouModal';
+
+// Gift Components - Taşındı: features/gifts/components
+// Legacy re-exports for backward compatibility
+export {
+  GiftMomentBottomSheet,
+  GiftSuccessModal,
+  ConfirmGiftModal,
+  ThankYouModal,
+  CompleteGiftBottomSheet,
+  GiftCelebration,
+} from '@/features/gifts/components';
+
+// ShareProofModal removed - ghost code, functionality is in ProofCeremonyFlow
 export { NotificationPermissionModal } from './NotificationPermissionModal';
-export { ChatAttachmentBottomSheet } from './ChatAttachmentBottomSheet';
-export { ShareMomentBottomSheet } from './ShareMomentBottomSheet';
-export { LanguageSelectionBottomSheet } from './LanguageSelectionBottomSheet';
-export { CurrencySelectionBottomSheet } from './CurrencySelectionBottomSheet';
+
+// Messages Components - Taşındı: features/messages/components
+export { ChatAttachmentBottomSheet } from '@/features/messages/components';
+
+// Settings Components - Taşındı: features/settings/components
+export { LanguageSelectionBottomSheet } from '@/features/settings/components';
+
+// Payments Components - Taşındı: features/payments/components
+export { CurrencySelectionBottomSheet } from '@/features/payments/components';
+
 export { ClearCacheDialog } from './ClearCacheDialog';
-export { AddBankAccountBottomSheet } from './AddBankAccountBottomSheet';
-export { WithdrawConfirmationModal } from './WithdrawConfirmationModal';
+
+// Wallet Components - Taşındı: features/wallet/components
+export {
+  AddBankAccountBottomSheet,
+  AddCardBottomSheet,
+  RemoveCardModal,
+  WithdrawConfirmationModal,
+  PendingTransactionsModal,
+} from '@/features/wallet/components';
+
 export { LimitReachedModal } from './LimitReachedModal';
-export { RetakeProofBottomSheet } from './RetakeProofBottomSheet';
-export { DeleteProofModal } from './DeleteProofModal';
-export { RequestAdditionalProofBottomSheet } from './RequestAdditionalProofBottomSheet';
-export { AddCardBottomSheet } from './AddCardBottomSheet';
-export { RemoveCardModal } from './RemoveCardModal';
-export { LocationPickerBottomSheet } from './LocationPickerBottomSheet';
-export { LazyLocationPicker } from './LazyLocationPicker'; // Lazy-loaded version (-3-5 MB)
-export type { Location } from './LazyLocationPicker';
-export { SetPriceBottomSheet } from './SetPriceBottomSheet';
-export { ChooseCategoryBottomSheet } from './ChooseCategoryBottomSheet';
-export { LeaveTrustNoteBottomSheet } from './LeaveTrustNoteBottomSheet';
+
+// Moments Components - Taşındı: features/moments/components
+export {
+  RetakeProofBottomSheet,
+  DeleteProofModal,
+  RequestAdditionalProofBottomSheet,
+  LocationPickerBottomSheet,
+  LazyLocationPicker,
+  ChooseCategoryBottomSheet,
+  ShareMomentBottomSheet,
+  DeleteMomentDialog,
+} from '@/features/moments/components';
+export type { Location } from '@/features/moments/components/LazyLocationPicker';
+
+// SetPriceBottomSheet - Taşındı: features/moments/components
+export { SetPriceBottomSheet } from '@/features/moments/components/SetPriceBottomSheet';
+
+// Profile Components - Taşındı: features/profile/components
+export {
+  LeaveTrustNoteBottomSheet,
+  UnblockUserBottomSheet,
+  KYCBadge,
+} from '@/features/profile/components';
+export type { KYCLevel } from '@/features/profile/components/KYCBadge';
+
 export { FilterBottomSheet } from './FilterBottomSheet';
-export { UnblockUserBottomSheet } from './UnblockUserBottomSheet';
-export { CompleteGiftBottomSheet } from './CompleteGiftBottomSheet';
 export { FeedbackModal } from './FeedbackModal';
-export { EmailVerificationModal } from './EmailVerificationModal';
+
+// Auth Components - Taşındı: features/auth/components
+export { EmailVerificationModal } from '@/features/auth/components';
+
+export { LoginPromptModal } from './LoginPromptModal';
 export { EmptyStateIllustration } from './ui/EmptyStateIllustration';
 export { EmptyState } from './ui/EmptyState';
-export { Spinner } from './ui/Spinner';
 
-// Loading States & Skeletons
-export { Skeleton, SkeletonLoader, FeedSkeleton } from './ui/Skeleton';
-export { SkeletonList } from './ui/SkeletonList';
-export type { SkeletonItemType } from './ui/SkeletonList';
+// Loading States & Skeletons - All from TMSkeleton.tsx
+export {
+  TMSkeleton,
+  Skeleton,
+  SkeletonAvatar,
+  SkeletonText,
+  SkeletonCard,
+  SkeletonMessage,
+  SkeletonList,
+  ScreenSkeleton,
+} from './ui/TMSkeleton';
+export type { SkeletonListType } from './ui/TMSkeleton';
 
 export { ErrorState } from './ErrorState';
 
@@ -88,22 +138,20 @@ export {
 // FloatingDock is exported from navigation for proper React Navigation integration
 export { FloatingDock } from './navigation';
 
-// Trust Badge & Ring
-export { TrustBadge } from './ui/TrustBadge';
-export { TrustRing } from './TrustRing';
+// Trust Badge & Ring - TMTrustRing is the consolidated component
+export { TMTrustRing } from './ui/TMTrustRing';
+// TrustRing silindi - TMTrustRing kullanılmalı
 
 // Loading State
 export { LoadingState } from './LoadingState';
 
-// Dialogs
-export { DeleteMomentDialog } from './DeleteMomentDialog';
+// DeleteMomentDialog taşındı - features/moments/components (yukarıda re-export ediliyor)
 
 // Autocomplete
 export { CityAutocomplete } from './CityAutocomplete';
 
-// KYC Components
-export { KYCBadge, getKYCLabel, getNextKYCLevel } from './KYCBadge';
-export type { KYCLevel } from './KYCBadge';
+// KYC Components taşındı - features/profile/components (yukarıda re-export ediliyor)
+// getKYCLabel, getNextKYCLevel artık KYCBadge içinden değil, ayrı utility'den export edilmeli
 
 // App Bootstrap
 export { InitializationScreen } from './InitializationScreen';

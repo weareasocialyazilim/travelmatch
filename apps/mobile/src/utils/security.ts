@@ -395,22 +395,9 @@ export const isValidUrl = (url: string, requireHttps = true): boolean => {
   }
 };
 
-/**
- * Mask sensitive data (e.g., email, phone)
- */
-export const maskEmail = (email: string): string => {
-  const [localPart, domain] = email.split('@');
-  if (!localPart || !domain) return email;
-
-  const maskedLocal =
-    localPart.length > 2
-      ? localPart[0] +
-        '*'.repeat(localPart.length - 2) +
-        localPart[localPart.length - 1]
-      : localPart;
-
-  return `${maskedLocal}@${domain}`;
-};
+// ═══════════════════════════════════════════════════════════════════
+// PHONE MASKING (kept from legacy, enhanced version below)
+// ═══════════════════════════════════════════════════════════════════
 
 export const maskPhone = (phone: string): string => {
   const cleaned = phone.replace(/\D/g, '');
@@ -515,4 +502,200 @@ export const generateTotpSecret = (length = 20): string => {
   }
 
   return result;
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// LOCATION PRIVACY - Coordinate Jitter & Masking
+// ═══════════════════════════════════════════════════════════════════
+
+/**
+ * Location jitter configuration for privacy protection
+ * Different levels based on user preferences and context
+ */
+export type LocationJitterLevel = 'none' | 'light' | 'medium' | 'heavy';
+
+interface JitterConfig {
+  /** Maximum offset in meters */
+  maxOffsetMeters: number;
+  /** Description for users */
+  description: string;
+}
+
+const JITTER_CONFIGS: Record<LocationJitterLevel, JitterConfig> = {
+  none: { maxOffsetMeters: 0, description: 'Tam konum' },
+  light: { maxOffsetMeters: 100, description: '~100m belirsizlik' },
+  medium: { maxOffsetMeters: 500, description: '~500m belirsizlik' },
+  heavy: { maxOffsetMeters: 1500, description: '~1.5km belirsizlik' },
+};
+
+/**
+ * Apply random jitter to coordinates for privacy protection
+ * Uses cryptographically secure random values for unpredictable offsets
+ *
+ * @param latitude - Original latitude
+ * @param longitude - Original longitude
+ * @param level - Jitter level (light/medium/heavy)
+ * @returns Coordinates with random offset applied
+ *
+ * @example
+ * const { latitude, longitude } = applyLocationJitter(41.0082, 28.9784, 'medium');
+ * // Returns coordinates offset by up to ~500m in random direction
+ */
+export const applyLocationJitter = (
+  latitude: number,
+  longitude: number,
+  level: LocationJitterLevel = 'medium',
+): { latitude: number; longitude: number } => {
+  if (level === 'none') {
+    return { latitude, longitude };
+  }
+
+  const config = JITTER_CONFIGS[level];
+
+  // Generate cryptographically random values for offset
+  const randomValues = new Uint8Array(4);
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    crypto.getRandomValues(randomValues);
+  } else {
+    // Fallback to Math.random (less secure but functional)
+    for (let i = 0; i < 4; i++) {
+      randomValues[i] = Math.floor(Math.random() * 256);
+    }
+  }
+
+  // Convert to random angle (0-360°) and distance (0-maxOffset)
+  const angle = (randomValues[0] / 255) * 2 * Math.PI;
+  const distance = (randomValues[1] / 255) * config.maxOffsetMeters;
+
+  // Earth's radius in meters
+  const EARTH_RADIUS = 6371000;
+
+  // Calculate offset in degrees
+  const latOffset =
+    ((distance * Math.cos(angle)) / EARTH_RADIUS) * (180 / Math.PI);
+  const lngOffset =
+    ((distance * Math.sin(angle)) /
+      (EARTH_RADIUS * Math.cos((latitude * Math.PI) / 180))) *
+    (180 / Math.PI);
+
+  return {
+    latitude: latitude + latOffset,
+    longitude: longitude + lngOffset,
+  };
+};
+
+/**
+ * Get jitter configuration info for display
+ */
+export const getJitterInfo = (level: LocationJitterLevel): JitterConfig => {
+  return JITTER_CONFIGS[level];
+};
+
+/**
+ * Mask IBAN for display - shows only last 4 digits
+ * Follows TCMB security guidelines for financial data display
+ *
+ * @param iban - Full IBAN string
+ * @returns Masked IBAN showing only last 4 characters
+ *
+ * @example
+ * maskIBAN('TR320006100519786457841326')
+ * // Returns: 'TR** **** **** **** **** 1326'
+ */
+export const maskIBAN = (iban: string): string => {
+  if (!iban) return '';
+
+  // Remove spaces and standardize
+  const clean = iban.replace(/\s/g, '').toUpperCase();
+
+  if (clean.length < 4) {
+    return '*'.repeat(clean.length);
+  }
+
+  // Turkish IBANs are 26 characters: TR + 24 digits
+  // Show country code and last 4 digits only
+  const countryCode = clean.substring(0, 2);
+  const last4 = clean.slice(-4);
+
+  // Format: TR** **** **** **** **** 1326
+  return `${countryCode}** **** **** **** **** ${last4}`;
+};
+
+/**
+ * Mask credit card number for display
+ * PCI-DSS compliant - shows only last 4 digits
+ *
+ * @param cardNumber - Full card number
+ * @returns Masked card number
+ *
+ * @example
+ * maskCardNumber('4111111111111111')
+ * // Returns: '**** **** **** 1111'
+ */
+export const maskCardNumber = (cardNumber: string): string => {
+  if (!cardNumber) return '';
+
+  const clean = cardNumber.replace(/\D/g, '');
+
+  if (clean.length < 4) {
+    return '*'.repeat(clean.length);
+  }
+
+  const last4 = clean.slice(-4);
+  return `**** **** **** ${last4}`;
+};
+
+/**
+ * Mask phone number for display
+ * Shows only last 4 digits
+ *
+ * @param phone - Full phone number
+ * @returns Masked phone number
+ *
+ * @example
+ * maskPhoneNumber('+905551234567')
+ * // Returns: '+90 *** *** 4567'
+ */
+export const maskPhoneNumber = (phone: string): string => {
+  if (!phone) return '';
+
+  const clean = phone.replace(/\s/g, '');
+
+  if (clean.length < 4) {
+    return '*'.repeat(clean.length);
+  }
+
+  // Handle Turkish numbers specifically
+  if (clean.startsWith('+90')) {
+    const last4 = clean.slice(-4);
+    return `+90 *** *** ${last4}`;
+  }
+
+  // Generic masking for other formats
+  const last4 = clean.slice(-4);
+  const prefix = clean.startsWith('+') ? clean.substring(0, 3) : '';
+  return prefix ? `${prefix} *** *** ${last4}` : `*** *** ${last4}`;
+};
+
+/**
+ * Mask email address for display
+ * Shows first 2 characters and domain
+ *
+ * @param email - Full email address
+ * @returns Masked email
+ *
+ * @example
+ * maskEmail('ahmet.yilmaz@gmail.com')
+ * // Returns: 'ah***@gmail.com'
+ */
+export const maskEmail = (email: string): string => {
+  if (!email || !email.includes('@')) return email;
+
+  const [local, domain] = email.split('@');
+
+  if (local.length <= 2) {
+    return `${local[0]}***@${domain}`;
+  }
+
+  return `${local.substring(0, 2)}***@${domain}`;
 };

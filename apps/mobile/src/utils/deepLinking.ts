@@ -39,16 +39,12 @@ export const DEEP_LINK_CONFIG = {
       Profile: 'profile/:userId',
       EditProfile: 'edit-profile',
 
-      // Booking
-      BookingRequest: 'booking/:momentId',
-      BookingDetail: 'booking/:bookingId',
-
       // Chat
       Messages: 'messages',
       Chat: 'chat/:conversationId',
 
       // Payment
-      Payment: 'payment/:bookingId',
+      Payment: 'payment/:momentId',
 
       // Settings
       Settings: 'settings',
@@ -90,7 +86,6 @@ export function parseDeepLink(url: string): {
   const screenMap: Record<string, keyof RootStackParamList> = {
     moment: 'MomentDetail',
     profile: 'Profile',
-    booking: 'BookingDetail',
     chat: 'Chat',
     // Add more mappings
   };
@@ -104,8 +99,6 @@ export function parseDeepLink(url: string): {
     params.momentId = pathParts[0];
   } else if (screen === 'profile' && pathParts[0]) {
     params.userId = pathParts[0];
-  } else if (screen === 'booking' && pathParts[0]) {
-    params.bookingId = pathParts[0];
   } else if (screen === 'chat' && pathParts[0]) {
     params.conversationId = pathParts[0];
   }
@@ -184,8 +177,6 @@ export function generateDeepLink(
       return `${baseUrl}/moment/${String(params?.momentId ?? '')}`;
     case 'Profile':
       return `${baseUrl}/profile/${String(params?.userId ?? '')}`;
-    case 'BookingDetail':
-      return `${baseUrl}/booking/${String(params?.bookingId ?? '')}`;
     case 'Chat':
       return `${baseUrl}/chat/${String(params?.conversationId ?? '')}`;
     default:

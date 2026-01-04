@@ -57,7 +57,7 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
           id: moment.hostId,
           name: moment.hostName,
           avatar: moment.hostAvatar,
-          type: 'traveler',
+          type: 'host',
           isVerified: true,
           location: '',
           travelDays: 0,
@@ -78,10 +78,7 @@ export const SavedMomentsScreen: React.FC<SavedMomentsScreenProps> = ({
       onPress={() => handleMomentPress(item)}
       activeOpacity={0.8}
     >
-      <Image
-        source={{ uri: item.images?.[0] || '' }}
-        style={styles.image}
-      />
+      <Image source={{ uri: item.images?.[0] || '' }} style={styles.image} />
       <View style={styles.overlay}>
         <Text style={styles.itemTitle} numberOfLines={1}>
           {item.title}

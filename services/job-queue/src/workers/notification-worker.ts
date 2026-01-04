@@ -1,6 +1,10 @@
-import { Worker, Job } from 'bullmq';
+import { Worker, Job, Queue } from 'bullmq';
 import { createClient } from '@supabase/supabase-js';
-import { NotificationJobData, NotificationJobSchema, QueueNames } from '../jobs/index.js';
+import {
+  NotificationJobData,
+  NotificationJobSchema,
+  QueueNames,
+} from '../jobs/index.js';
 import Redis from 'ioredis';
 
 // Initialize Supabase client with service role key
@@ -12,13 +16,38 @@ const supabase = createClient(
       autoRefreshToken: false,
       persistSession: false,
     },
-  }
+  },
 );
+
+/**
+ * Notification Priority Levels
+ * Critical notifications from Platinum subscribers are processed first
+ */
+type NotificationPriority = 'critical' | 'high' | 'normal' | 'low';
 
 interface PushResult {
   success: boolean;
   messageId?: string;
   error?: string;
+}
+
+/**
+ * Map priority to BullMQ job priority (lower = higher priority)
+ * Critical (Platinum offers) = 1, processed immediately
+ */
+function getPriorityWeight(priority: NotificationPriority): number {
+  switch (priority) {
+    case 'critical':
+      return 1; // Queue front - Platinum subscriber offers
+    case 'high':
+      return 5; // Near front - Pro subscriber offers
+    case 'normal':
+      return 10; // Standard
+    case 'low':
+      return 20; // Back of queue
+    default:
+      return 10;
+  }
 }
 
 /**
@@ -44,7 +73,7 @@ async function getUserPushTokens(userId: string): Promise<string[]> {
  */
 async function sendWithExpoPush(
   tokens: string[],
-  data: NotificationJobData
+  data: NotificationJobData,
 ): Promise<PushResult> {
   if (tokens.length === 0) {
     return { success: false, error: 'No push tokens found' };
@@ -74,7 +103,9 @@ async function sendWithExpoPush(
     throw new Error(`Expo Push error: ${error}`);
   }
 
-  const result = (await response.json()) as { data: Array<{ id: string; status: string }> };
+  const result = (await response.json()) as {
+    data: Array<{ id: string; status: string }>;
+  };
   const successCount = result.data.filter((r) => r.status === 'ok').length;
 
   return {
@@ -89,7 +120,7 @@ async function sendWithExpoPush(
  */
 async function sendWithFCM(
   tokens: string[],
-  data: NotificationJobData
+  data: NotificationJobData,
 ): Promise<PushResult> {
   const serverKey = process.env.FCM_SERVER_KEY;
   if (!serverKey) {
@@ -125,7 +156,11 @@ async function sendWithFCM(
     throw new Error(`FCM error: ${error}`);
   }
 
-  const result = (await response.json()) as { success: number; failure: number; results: Array<{ message_id?: string }> };
+  const result = (await response.json()) as {
+    success: number;
+    failure: number;
+    results: Array<{ message_id?: string }>;
+  };
   return {
     success: result.success > 0,
     messageId: result.results[0]?.message_id,
@@ -136,7 +171,10 @@ async function sendWithFCM(
 /**
  * Send SMS notification via Twilio
  */
-async function sendSMS(userId: string, data: NotificationJobData): Promise<PushResult> {
+async function sendSMS(
+  userId: string,
+  data: NotificationJobData,
+): Promise<PushResult> {
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   const fromNumber = process.env.TWILIO_PHONE_NUMBER;
@@ -169,7 +207,7 @@ async function sendSMS(userId: string, data: NotificationJobData): Promise<PushR
         From: fromNumber,
         Body: `${data.title}\n${data.body}`,
       }),
-    }
+    },
   );
 
   if (!response.ok) {
@@ -186,7 +224,7 @@ async function sendSMS(userId: string, data: NotificationJobData): Promise<PushR
  */
 async function storeInAppNotification(
   userId: string,
-  data: NotificationJobData
+  data: NotificationJobData,
 ): Promise<PushResult> {
   const { error, data: inserted } = await supabase
     .from('notifications')
@@ -216,7 +254,7 @@ async function storeInAppNotification(
 async function logNotification(
   userId: string,
   data: NotificationJobData,
-  result: PushResult
+  result: PushResult,
 ): Promise<void> {
   try {
     await supabase.from('notification_logs').insert({
@@ -237,12 +275,21 @@ async function logNotification(
 /**
  * Notification Worker
  * Processes notification jobs from the queue
+ *
+ * Priority System (Reddedilemez Teklif Algorithm):
+ * - Critical: Platinum subscriber high-value offers (processed first, Liquid Shine sound)
+ * - High: Pro subscriber offers, payment confirmations
+ * - Normal: Standard notifications
+ * - Low: Marketing, promotional
  */
 export function createNotificationWorker(connection: Redis) {
   const worker = new Worker<NotificationJobData, PushResult>(
     QueueNames.NOTIFICATION,
     async (job: Job<NotificationJobData>) => {
-      console.log(`[Notification Worker] Processing job ${job.id} for user ${job.data.userId}`);
+      const priority = (job.data as any).priority || 'normal';
+      console.log(
+        `[Notification Worker] Processing job ${job.id} (priority: ${priority}) for user ${job.data.userId}`,
+      );
 
       try {
         // 1. Validate job data
@@ -257,7 +304,17 @@ export function createNotificationWorker(connection: Redis) {
             const tokens = await getUserPushTokens(validatedData.userId);
             await job.updateProgress(30);
 
-            if (process.env.NODE_ENV === 'development' && !process.env.FCM_SERVER_KEY) {
+            // Use custom sound for critical notifications (Liquid Shine)
+            if (priority === 'critical') {
+              validatedData.sound = 'liquid_shine';
+            } else if (priority === 'high') {
+              validatedData.sound = 'premium_offer';
+            }
+
+            if (
+              process.env.NODE_ENV === 'development' &&
+              !process.env.FCM_SERVER_KEY
+            ) {
               // Use Expo Push in development
               result = await sendWithExpoPush(tokens, validatedData);
             } else {
@@ -272,12 +329,17 @@ export function createNotificationWorker(connection: Redis) {
           }
 
           case 'in_app': {
-            result = await storeInAppNotification(validatedData.userId, validatedData);
+            result = await storeInAppNotification(
+              validatedData.userId,
+              validatedData,
+            );
             break;
           }
 
           default: {
-            throw new Error(`Unsupported notification type: ${validatedData.type}`);
+            throw new Error(
+              `Unsupported notification type: ${validatedData.type}`,
+            );
           }
         }
 
@@ -287,7 +349,9 @@ export function createNotificationWorker(connection: Redis) {
         await logNotification(validatedData.userId, validatedData, result);
         await job.updateProgress(100);
 
-        console.log(`[Notification Worker] Job ${job.id} completed - type: ${validatedData.type}`);
+        console.log(
+          `[Notification Worker] Job ${job.id} completed - type: ${validatedData.type}`,
+        );
         return result;
       } catch (error) {
         console.error(`[Notification Worker] Job ${job.id} failed:`, error);
@@ -308,7 +372,7 @@ export function createNotificationWorker(connection: Redis) {
         max: 500, // Max 500 notifications per interval
         duration: 60000, // 1 minute
       },
-    }
+    },
   );
 
   // Event handlers
@@ -317,7 +381,10 @@ export function createNotificationWorker(connection: Redis) {
   });
 
   worker.on('failed', (job, error) => {
-    console.error(`[Notification Worker] ✗ Job ${job?.id} failed:`, error.message);
+    console.error(
+      `[Notification Worker] ✗ Job ${job?.id} failed:`,
+      error.message,
+    );
   });
 
   worker.on('stalled', (jobId) => {
@@ -330,7 +397,9 @@ export function createNotificationWorker(connection: Redis) {
 
   // Graceful shutdown
   process.on('SIGTERM', async () => {
-    console.log('[Notification Worker] Received SIGTERM, shutting down gracefully...');
+    console.log(
+      '[Notification Worker] Received SIGTERM, shutting down gracefully...',
+    );
     await worker.close();
   });
 

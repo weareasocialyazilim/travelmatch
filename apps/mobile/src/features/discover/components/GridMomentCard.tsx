@@ -2,8 +2,8 @@
 import React, { memo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../../constants/colors';
-import { OptimizedImage } from '../ui/OptimizedImage';
+import { COLORS } from '@/constants/colors';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import type { GridCardProps } from './types';
 
 export const GridMomentCard: React.FC<GridCardProps> = memo(
@@ -11,7 +11,9 @@ export const GridMomentCard: React.FC<GridCardProps> = memo(
     const creatorName = item.user?.name?.split(' ')[0] || 'Anonim';
 
     return (
-      <View style={index % 2 === 0 ? styles.gridItemLeft : styles.gridItemRight}>
+      <View
+        style={index % 2 === 0 ? styles.gridItemLeft : styles.gridItemRight}
+      >
         <TouchableOpacity
           style={styles.gridCard}
           onPress={() => onPress(item)}
@@ -76,7 +78,9 @@ export const GridMomentCard: React.FC<GridCardProps> = memo(
                   size={10}
                   color={COLORS.text.secondary}
                 />
-                <Text style={styles.gridDistance}>{item.distance || '?'} km</Text>
+                <Text style={styles.gridDistance}>
+                  {item.distance || '?'} km
+                </Text>
               </View>
               <Text style={styles.gridPrice}>${item.price}</Text>
             </View>

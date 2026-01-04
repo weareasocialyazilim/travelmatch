@@ -9,6 +9,12 @@ export { AchievementCard } from './AchievementCard';
 export type { default as AchievementCardProps } from './AchievementCard';
 export { TrustConstellation } from './TrustConstellation';
 
+// Migrated components from components/ folder
+export { LeaveTrustNoteBottomSheet } from './LeaveTrustNoteBottomSheet';
+export { UnblockUserBottomSheet } from './UnblockUserBottomSheet';
+export { KYCBadge, getKYCLabel, getNextKYCLevel } from './KYCBadge';
+export type { KYCLevel } from './KYCBadge';
+
 // Migrated components
 export { MomentsTabs } from './MomentsTabs';
 export { ProfileHeaderSection } from './ProfileHeaderSection';

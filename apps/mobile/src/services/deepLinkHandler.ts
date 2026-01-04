@@ -10,7 +10,6 @@
  * Supported paths:
  * - profile/:userId
  * - moment/:momentId
- * - trip/:tripId
  * - gift/:giftId
  * - chat/:conversationId
  * - request/:requestId
@@ -31,7 +30,6 @@ import { sessionManager } from '../services/sessionManager';
 export enum DeepLinkType {
   PROFILE = 'profile',
   MOMENT = 'moment',
-  TRIP = 'trip',
   GIFT = 'gift',
   CHAT = 'chat',
   REQUEST = 'request',
@@ -50,9 +48,6 @@ const DeepLinkSchemas = {
   }),
   moment: z.object({
     momentId: UUIDSchema,
-  }),
-  trip: z.object({
-    tripId: UUIDSchema,
   }),
   gift: z.object({
     giftId: UUIDSchema,
@@ -159,8 +154,6 @@ class DeepLinkHandler {
         p: DeepLinkType.PROFILE,
         moment: DeepLinkType.MOMENT,
         m: DeepLinkType.MOMENT,
-        trip: DeepLinkType.TRIP,
-        t: DeepLinkType.TRIP,
         gift: DeepLinkType.GIFT,
         g: DeepLinkType.GIFT,
         chat: DeepLinkType.CHAT,
@@ -185,9 +178,6 @@ class DeepLinkHandler {
             break;
           case DeepLinkType.MOMENT:
             if (pathSegments[1]) params.momentId = pathSegments[1];
-            break;
-          case DeepLinkType.TRIP:
-            if (pathSegments[1]) params.tripId = pathSegments[1];
             break;
           case DeepLinkType.GIFT:
             if (pathSegments[1]) params.giftId = pathSegments[1];
@@ -281,7 +271,6 @@ class DeepLinkHandler {
       const endpointMap: Record<DeepLinkType, string> = {
         [DeepLinkType.PROFILE]: `/users/${id}`,
         [DeepLinkType.MOMENT]: `/moments/${id}`,
-        [DeepLinkType.TRIP]: `/trips/${id}`,
         [DeepLinkType.GIFT]: `/gifts/${id}`,
         [DeepLinkType.CHAT]: `/conversations/${id}`,
         [DeepLinkType.REQUEST]: `/requests/${id}`,
@@ -467,11 +456,6 @@ class DeepLinkHandler {
     > = {
       [DeepLinkType.PROFILE]: { screen: 'ProfileDetail', paramKey: 'userId' },
       [DeepLinkType.MOMENT]: { screen: 'MomentDetail', paramKey: 'momentId' },
-      [DeepLinkType.TRIP]: {
-        screen: 'BookingDetail',
-        paramKey: 'tripId',
-        targetKey: 'bookingId',
-      },
       [DeepLinkType.GIFT]: { screen: 'GiftInboxDetail', paramKey: 'giftId' },
       [DeepLinkType.CHAT]: { screen: 'Chat', paramKey: 'conversationId' },
       [DeepLinkType.REQUEST]: {
@@ -530,7 +514,6 @@ class DeepLinkHandler {
     const pathMap: Record<DeepLinkType, string> = {
       [DeepLinkType.PROFILE]: 'profile',
       [DeepLinkType.MOMENT]: 'moment',
-      [DeepLinkType.TRIP]: 'trip',
       [DeepLinkType.GIFT]: 'gift',
       [DeepLinkType.CHAT]: 'chat',
       [DeepLinkType.REQUEST]: 'request',

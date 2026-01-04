@@ -35,7 +35,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import Svg, { Circle, Defs, LinearGradient as SvgGradient, Stop } from 'react-native-svg';
 
-import { COLORS, GRADIENTS, PALETTE, getTrustRingColors } from '../../constants/colors';
+import { COLORS, GRADIENTS, PALETTE, getTrustRingColors } from '@/constants/colors';
 import { useTranslation } from '../../hooks/useTranslation';
 import { TYPE_SCALE } from '../../theme/typography';
 import { SPRINGS } from '../../hooks/useAnimations';

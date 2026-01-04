@@ -3,12 +3,15 @@
  *
  * Premium card combining:
  * - High-resolution visuals with silky gradients
- * - Neon badges for GenZ aesthetic appeal
+ * - Subscription tier badges (Platinum, Pro glow effects)
  * - Glass info panel for 40+ demographic clarity
  * - Liquid glass effects for depth perception
+ * - Creator-set price with currency display (Wanted Gift)
+ *
+ * Ghost Logic Cleanup: Replaced VIP badge with subscription_tier system
  */
 
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import {
   StyleSheet,
   View,
@@ -17,29 +20,108 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../../constants/colors';
-import { FONTS, FONT_SIZES_V2, TYPE_SCALE } from '../../constants/typography';
-import { GlassCard } from '../ui/GlassCard';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { COLORS } from '@/constants/colors';
+import { FONTS, FONT_SIZES_V2, TYPE_SCALE } from '@/constants/typography';
+import { GlassCard } from '@/components/ui/GlassCard';
+import type { SubscriptionTier } from '../services/momentsService';
+
+// Currency symbols for display
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  USD: '$',
+  EUR: '€',
+  TRY: '₺',
+  GBP: '£',
+  JPY: '¥',
+  CAD: 'C$',
+};
+
+// Subscription tier styling configuration
+const TIER_CONFIG: Record<
+  SubscriptionTier,
+  {
+    label: string;
+    icon: string;
+    borderColor: string;
+    glowColor: string;
+    showBadge: boolean;
+  }
+> = {
+  free: {
+    label: '',
+    icon: '',
+    borderColor: 'transparent',
+    glowColor: 'transparent',
+    showBadge: false,
+  },
+  premium: {
+    label: 'PREMIUM',
+    icon: 'star',
+    borderColor: '#7B61FF',
+    glowColor: 'rgba(123, 97, 255, 0.4)',
+    showBadge: true,
+  },
+  platinum: {
+    label: 'PLATINUM',
+    icon: 'crown',
+    borderColor: '#FFB800',
+    glowColor: 'rgba(255, 184, 0, 0.4)',
+    showBadge: true,
+  },
+};
 
 export interface LiquidMomentCardProps {
   title: string;
   location: string;
-  price: string;
+  price: number;
+  currency?: string;
   imageUrl?: string;
-  isInstant?: boolean;
+  hostSubscriptionTier?: SubscriptionTier;
+  isSubscriberOnly?: boolean;
   onPress?: () => void;
+  onGiftPress?: () => void;
 }
 
 /**
  * Awwwards standardında Liquid Moment Card.
  * Görsel derinlik ve ipeksi glass paneller içerir.
+ * Creator-set price ile "🎁 X ile Destekle" butonu gösterir.
+ * Subscription tier badge ile premium host gösterimi.
  */
 export const LiquidMomentCard: React.FC<LiquidMomentCardProps> = memo(
-  ({ title, location, price, imageUrl, isInstant = true, onPress }) => {
+  ({
+    title,
+    location,
+    price,
+    currency = 'TRY',
+    imageUrl,
+    hostSubscriptionTier = 'free',
+    isSubscriberOnly = false,
+    onPress,
+    onGiftPress,
+  }) => {
+    // Format price with currency symbol
+    const formattedPrice = useMemo(() => {
+      const symbol = CURRENCY_SYMBOLS[currency] || currency;
+      return `${symbol}${price.toLocaleString()}`;
+    }, [price, currency]);
+
+    // Get tier styling
+    const tierConfig = TIER_CONFIG[hostSubscriptionTier];
+    const hasPremiumBorder = tierConfig.showBadge;
+
     return (
       <TouchableOpacity
-        style={styles.container}
+        style={[
+          styles.container,
+          hasPremiumBorder && {
+            borderWidth: 2,
+            borderColor: tierConfig.borderColor,
+            shadowColor: tierConfig.borderColor,
+            shadowOpacity: 0.6,
+            shadowRadius: 12,
+          },
+        ]}
         activeOpacity={0.9}
         onPress={onPress}
       >
@@ -52,17 +134,41 @@ export const LiquidMomentCard: React.FC<LiquidMomentCardProps> = memo(
           style={styles.backgroundImage}
           imageStyle={styles.imageStyle}
         >
-          {/* Top Scrim with Neon Badge */}
+          {/* Top Scrim with Subscription Badge */}
           <LinearGradient
             colors={['rgba(0,0,0,0.4)', 'transparent']}
             style={styles.topScrim}
           >
-            {isInstant && (
-              <View style={styles.instantBadge}>
-                <View style={styles.neonDot} />
-                <Text style={styles.instantText}>INSTANT</Text>
-              </View>
-            )}
+            <View style={styles.badgeRow}>
+              {/* Subscription Tier Badge */}
+              {tierConfig.showBadge && (
+                <View
+                  style={[
+                    styles.tierBadge,
+                    { backgroundColor: tierConfig.borderColor },
+                  ]}
+                >
+                  <MaterialCommunityIcons
+                    name={tierConfig.icon as any}
+                    size={10}
+                    color="#FFFFFF"
+                  />
+                  <Text style={styles.tierBadgeText}>{tierConfig.label}</Text>
+                </View>
+              )}
+
+              {/* Subscriber Only Badge */}
+              {isSubscriberOnly && (
+                <View style={styles.subscriberOnlyBadge}>
+                  <MaterialCommunityIcons
+                    name="lock"
+                    size={10}
+                    color="#FFFFFF"
+                  />
+                  <Text style={styles.subscriberOnlyText}>ABONE ÖZEL</Text>
+                </View>
+              )}
+            </View>
           </LinearGradient>
 
           {/* Bottom Section with Liquid Glass Info Panel */}
@@ -83,9 +189,19 @@ export const LiquidMomentCard: React.FC<LiquidMomentCardProps> = memo(
                   </View>
                 </View>
 
-                <View style={styles.priceBadge}>
-                  <Text style={styles.priceText}>{price}</Text>
-                </View>
+                {/* Wanted Gift Button with Creator-Set Price */}
+                <TouchableOpacity
+                  style={styles.giftButton}
+                  onPress={onGiftPress}
+                  activeOpacity={0.8}
+                >
+                  <MaterialCommunityIcons
+                    name="gift-outline"
+                    size={16}
+                    color={COLORS.text.primary}
+                  />
+                  <Text style={styles.giftButtonText}>{formattedPrice}</Text>
+                </TouchableOpacity>
               </View>
             </GlassCard>
           </View>
@@ -122,6 +238,43 @@ const styles = StyleSheet.create({
     height: 80,
     padding: 20,
   },
+  badgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  tierBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+    gap: 4,
+  },
+  tierBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontFamily: FONTS.mono.medium,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  subscriberOnlyBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(123, 97, 255, 0.8)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+    gap: 4,
+  },
+  subscriberOnlyText: {
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontFamily: FONTS.mono.medium,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  // Legacy: keeping for backward compatibility
   instantBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -184,19 +337,23 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES_V2.bodySmall,
     fontFamily: FONTS.body.regular,
   },
-  priceBadge: {
+  // Gift Button with Creator-Set Price
+  giftButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     backgroundColor: COLORS.primary,
     paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingVertical: 10,
     borderRadius: 16,
-    // Neon glow for price
+    // Neon glow for gift button
     shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 4,
   },
-  priceText: {
+  giftButtonText: {
     color: COLORS.text.primary,
     fontSize: FONT_SIZES_V2.body,
     fontWeight: '900',

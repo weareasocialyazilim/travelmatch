@@ -1,0 +1,66 @@
+/**
+ * Moments Feature - Barrel Exports
+ *
+ * ELEVATED: Moments are the core of TravelMatch, not just a profile feature.
+ * This is the single source of truth for ALL moment-related functionality:
+ * - Discovery (browse moments)
+ * - Creation (the drop)
+ * - Detail viewing
+ * - Gift flow
+ */
+
+// ===================================
+// SCREENS
+// ===================================
+export { default as DiscoverScreen } from './screens/DiscoverScreen';
+export { default as MomentDetailScreen } from './screens/MomentDetailScreen';
+export { default as CreateMomentScreen } from './screens/CreateMomentScreen';
+
+// ===================================
+// COMPONENTS
+// ===================================
+// SetPriceBottomSheet - For setting moment prices
+export { SetPriceBottomSheet } from './components/SetPriceBottomSheet';
+
+// CreateMoment sub-components
+export {
+  PhotoSection,
+  AwwwardsPhotoSection,
+  TitleInput,
+  AwwwardsTitleInput,
+  CategorySelector,
+  CATEGORIES,
+  getCategoryEmoji,
+  DetailsSection,
+  StorySection,
+  MomentPreview,
+} from './components/createMoment';
+export type { Category } from './components/createMoment';
+export type { Place } from './components/createMoment';
+
+// ===================================
+// SERVICES - Single Truth for Moments API
+// ===================================
+export {
+  momentsApi,
+  momentsApi as momentsService,
+  getUserSubscriptionTier,
+  canMakeSubscriberOffer,
+} from './services/momentsService';
+export type {
+  SubscriptionTier,
+  ProfileWithSubscription,
+  MomentFilters,
+  CreateMomentDto,
+  UpdateMomentDto,
+} from './services/momentsService';
+
+// ===================================
+// TYPES - Re-export from discover for backward compatibility
+// ===================================
+export type {
+  Moment,
+  MomentData,
+  MomentUser,
+  MomentLocation,
+} from '@/features/discover/types';

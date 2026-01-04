@@ -3,12 +3,41 @@
  *
  * All form validation schemas using Zod
  * Consistent patterns across the entire app
+ *
+ * NOTE: Auth schemas are re-exported from @travelmatch/shared
+ * to ensure single source of truth across all platforms.
  */
 
 import { z } from 'zod';
 
+// Re-export auth schemas from shared package (Single Source of Truth)
+export {
+  loginSchema,
+  registerSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  changePasswordSchema,
+  verifyEmailSchema,
+  verifyOtpSchema,
+  type LoginInput,
+  type RegisterInput,
+  type ForgotPasswordInput,
+  type ResetPasswordInput,
+  type ChangePasswordInput,
+  type VerifyEmailInput,
+  type VerifyOtpInput,
+} from '@travelmatch/shared/schemas';
+
+// Re-export common schemas from shared
+export {
+  emailSchema,
+  passwordSchema,
+  phoneSchema,
+  usernameSchema,
+} from '@travelmatch/shared/schemas';
+
 // ============================================================================
-// COMMON VALIDATION RULES
+// MOBILE-SPECIFIC COMMON VALIDATION RULES
 // ============================================================================
 
 export const emailValidation = z
@@ -98,65 +127,10 @@ export const dateOfBirthValidation = z.date().refine(
 export type Gender = z.infer<typeof genderValidation>;
 
 // ============================================================================
-// AUTH SCHEMAS
+// MOBILE-SPECIFIC AUTH SCHEMAS (Extended for mobile UI)
+// Note: Core auth schemas (loginSchema, registerSchema, etc.) are imported
+// from @travelmatch/shared above. These are mobile-specific extensions.
 // ============================================================================
-
-export const loginSchema = z.object({
-  email: emailValidation,
-  password: z.string().min(1, 'forms.validation.password.required'),
-});
-
-export const registerSchema = z
-  .object({
-    email: emailValidation,
-    password: passwordValidation,
-    confirmPassword: z
-      .string()
-      .min(1, 'forms.validation.confirmPassword.required'),
-    fullName: nameValidation,
-    phone: phoneInputValidation,
-    gender: genderValidation,
-    dateOfBirth: dateOfBirthValidation,
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'forms.validation.confirmPassword.mismatch',
-    path: ['confirmPassword'],
-  });
-
-export const forgotPasswordSchema = z.object({
-  email: emailValidation,
-});
-
-export const resetPasswordSchema = z
-  .object({
-    password: passwordValidation,
-    confirmPassword: z
-      .string()
-      .min(1, 'forms.validation.confirmPassword.required'),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'forms.validation.confirmPassword.mismatch',
-    path: ['confirmPassword'],
-  });
-
-export const changePasswordSchema = z
-  .object({
-    currentPassword: z
-      .string()
-      .min(1, 'forms.validation.currentPassword.required'),
-    newPassword: passwordValidation,
-    confirmPassword: z
-      .string()
-      .min(1, 'forms.validation.confirmPassword.required'),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: 'forms.validation.confirmPassword.mismatch',
-    path: ['confirmPassword'],
-  })
-  .refine((data) => data.currentPassword !== data.newPassword, {
-    message: 'forms.validation.newPassword.different',
-    path: ['newPassword'],
-  });
 
 export const phoneAuthSchema = z.object({
   phone: phoneValidation,

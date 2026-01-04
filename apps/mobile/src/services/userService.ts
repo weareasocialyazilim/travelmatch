@@ -925,6 +925,97 @@ export const userService = {
 
     return { users };
   },
+
+  /**
+   * Get detailed trust stats from database
+   * Single source of truth - never calculate client-side
+   */
+  getDetailedTrustStats: async (
+    userId?: string,
+  ): Promise<{
+    totalScore: number;
+    trustLevel: string;
+    levelProgress: number;
+    breakdown: {
+      payment: { score: number; max: number };
+      proof: { score: number; max: number };
+      trustNotes: { score: number; max: number };
+      kyc: { score: number; max: number };
+      social: { score: number; max: number };
+    };
+    counts: {
+      successfulPayments: number;
+      verifiedProofs: number;
+      trustNotesReceived: number;
+    };
+    status: {
+      hasInstagram: boolean;
+      hasTwitter: boolean;
+      hasWebsite: boolean;
+      kycStatus: string;
+    };
+  }> => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const targetUserId = userId || user?.id;
+
+    if (!targetUserId) {
+      throw new Error('Not authenticated');
+    }
+
+    // Call the database function
+    const { data, error } = await supabase.rpc('get_detailed_trust_stats', {
+      p_user_id: targetUserId,
+    });
+
+    if (error) {
+      logger.error('Error fetching trust stats:', error);
+      throw error;
+    }
+
+    // Map the database response to our interface
+    const stats = Array.isArray(data) ? data[0] : data;
+
+    return {
+      totalScore: stats?.total_score ?? 0,
+      trustLevel: stats?.trust_level ?? 'Sprout',
+      levelProgress: stats?.level_progress ?? 0,
+      breakdown: {
+        payment: {
+          score: stats?.payment_score ?? 0,
+          max: stats?.payment_max ?? 30,
+        },
+        proof: {
+          score: stats?.proof_score ?? 0,
+          max: stats?.proof_max ?? 30,
+        },
+        trustNotes: {
+          score: stats?.trust_notes_score ?? 0,
+          max: stats?.trust_notes_max ?? 15,
+        },
+        kyc: {
+          score: stats?.kyc_score ?? 0,
+          max: stats?.kyc_max ?? 15,
+        },
+        social: {
+          score: stats?.social_score ?? 0,
+          max: stats?.social_max ?? 10,
+        },
+      },
+      counts: {
+        successfulPayments: stats?.successful_payments ?? 0,
+        verifiedProofs: stats?.verified_proofs ?? 0,
+        trustNotesReceived: stats?.trust_notes_received ?? 0,
+      },
+      status: {
+        hasInstagram: stats?.has_instagram ?? false,
+        hasTwitter: stats?.has_twitter ?? false,
+        hasWebsite: stats?.has_website ?? false,
+        kycStatus: stats?.kyc_status ?? 'unverified',
+      },
+    };
+  },
 };
 
 // Helper functions

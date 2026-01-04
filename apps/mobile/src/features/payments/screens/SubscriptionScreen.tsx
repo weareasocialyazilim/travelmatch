@@ -90,7 +90,11 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         )}
 
         <View style={[styles.planIcon, { backgroundColor: planColor }]}>
-          <Icon name={plan.icon as IconName} size={32} color={COLORS.utility.white} />
+          <Icon
+            name={plan.icon as IconName}
+            size={32}
+            color={COLORS.utility.white}
+          />
         </View>
 
         <Text style={styles.planName}>{plan.name}</Text>
@@ -175,7 +179,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       {/* Subtitle */}
       <View style={styles.subtitleContainer}>
         <Text style={styles.subtitle}>
-          Choose the plan that fits your travel style
+          Daha fazla bağlantı, daha fazla hediye, daha fazla an 💝
         </Text>
       </View>
 
@@ -199,32 +203,139 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
         {/* Benefits Summary */}
         <View style={styles.benefitsCard}>
-          <Text style={styles.benefitsTitle}>Why Upgrade?</Text>
+          <Text style={styles.benefitsTitle}>Neden Yükselt? 💎</Text>
           <View style={styles.benefitsList}>
             <View style={styles.benefitItem}>
-              <Icon name="compass" size={20} color={COLORS.feedback.success} />
+              <Icon name="crown" size={20} color={COLORS.feedback.success} />
               <Text style={styles.benefitText}>
-                Create more moments & share experiences
+                Platinum üyeler listelerde gümüş parıltılı görünür ✨
               </Text>
             </View>
             <View style={styles.benefitItem}>
-              <Icon name="message-text" size={20} color={COLORS.feedback.success} />
+              <Icon
+                name="map-marker-radius"
+                size={20}
+                color={COLORS.feedback.success}
+              />
               <Text style={styles.benefitText}>
-                Unlimited messaging with travelers
+                Mesafe limitini 500km'ye kadar aç
               </Text>
             </View>
             <View style={styles.benefitItem}>
               <Icon name="gift" size={20} color={COLORS.feedback.success} />
               <Text style={styles.benefitText}>
-                Send more gifts & show appreciation
+                Sınırsız hediye gönder ve al
               </Text>
             </View>
             <View style={styles.benefitItem}>
-              <Icon name="shield-check" size={20} color={COLORS.feedback.success} />
+              <Icon
+                name="shield-check"
+                size={20}
+                color={COLORS.feedback.success}
+              />
               <Text style={styles.benefitText}>
-                Get verified badge & build trust
+                Öncelikli Escrow koruması ve hızlı ödeme
               </Text>
             </View>
+          </View>
+        </View>
+
+        {/* Plan Comparison Table */}
+        <View style={styles.comparisonCard}>
+          <Text style={styles.comparisonTitle}>Plan Comparison</Text>
+
+          {/* Table Header */}
+          <View style={styles.comparisonRow}>
+            <Text style={[styles.comparisonCell, styles.comparisonFeature]}>
+              Feature
+            </Text>
+            <Text style={[styles.comparisonCell, styles.comparisonHeader]}>
+              Momentum
+            </Text>
+            <Text style={[styles.comparisonCell, styles.comparisonHeader]}>
+              Premium
+            </Text>
+            <Text
+              style={[
+                styles.comparisonCell,
+                styles.comparisonHeader,
+                styles.comparisonPlatinum,
+              ]}
+            >
+              Platinum
+            </Text>
+          </View>
+
+          {/* Moments per month */}
+          <View style={styles.comparisonRow}>
+            <Text style={[styles.comparisonCell, styles.comparisonFeature]}>
+              Moments/month
+            </Text>
+            <Text style={styles.comparisonCell}>3</Text>
+            <Text style={styles.comparisonCell}>10</Text>
+            <Text style={[styles.comparisonCell, styles.comparisonPlatinum]}>
+              ∞
+            </Text>
+          </View>
+
+          {/* Gifts per month */}
+          <View style={styles.comparisonRow}>
+            <Text style={[styles.comparisonCell, styles.comparisonFeature]}>
+              Gifts/month
+            </Text>
+            <Text style={styles.comparisonCell}>5</Text>
+            <Text style={styles.comparisonCell}>25</Text>
+            <Text style={[styles.comparisonCell, styles.comparisonPlatinum]}>
+              ∞
+            </Text>
+          </View>
+
+          {/* Verified badge */}
+          <View style={styles.comparisonRow}>
+            <Text style={[styles.comparisonCell, styles.comparisonFeature]}>
+              Verified badge
+            </Text>
+            <Text style={styles.comparisonCell}>—</Text>
+            <Text style={styles.comparisonCell}>✓</Text>
+            <Text style={[styles.comparisonCell, styles.comparisonPlatinum]}>
+              ✓
+            </Text>
+          </View>
+
+          {/* Priority support */}
+          <View style={styles.comparisonRow}>
+            <Text style={[styles.comparisonCell, styles.comparisonFeature]}>
+              Priority support
+            </Text>
+            <Text style={styles.comparisonCell}>—</Text>
+            <Text style={styles.comparisonCell}>✓</Text>
+            <Text style={[styles.comparisonCell, styles.comparisonPlatinum]}>
+              ✓
+            </Text>
+          </View>
+
+          {/* Offer above price */}
+          <View style={styles.comparisonRow}>
+            <Text style={[styles.comparisonCell, styles.comparisonFeature]}>
+              Offer above price
+            </Text>
+            <Text style={styles.comparisonCell}>—</Text>
+            <Text style={styles.comparisonCell}>—</Text>
+            <Text style={[styles.comparisonCell, styles.comparisonPlatinum]}>
+              ✓
+            </Text>
+          </View>
+
+          {/* Silver shimmer */}
+          <View style={[styles.comparisonRow, styles.comparisonLastRow]}>
+            <Text style={[styles.comparisonCell, styles.comparisonFeature]}>
+              Silver shimmer
+            </Text>
+            <Text style={styles.comparisonCell}>—</Text>
+            <Text style={styles.comparisonCell}>—</Text>
+            <Text style={[styles.comparisonCell, styles.comparisonPlatinum]}>
+              ✓
+            </Text>
           </View>
         </View>
 
@@ -314,6 +425,49 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.body,
     color: COLORS.text.primary,
     flex: 1,
+  },
+  comparisonCard: {
+    backgroundColor: COLORS.utility.white,
+    borderRadius: VALUES.borderRadius,
+    padding: LAYOUT.padding * 1.5,
+    marginBottom: LAYOUT.padding * 2,
+    borderWidth: 1,
+    borderColor: COLORS.border.default,
+  },
+  comparisonTitle: {
+    ...TYPOGRAPHY.h4,
+    fontWeight: '700',
+    color: COLORS.text.primary,
+    marginBottom: LAYOUT.padding * 1.5,
+    textAlign: 'center',
+  },
+  comparisonRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border.default,
+    paddingVertical: LAYOUT.padding,
+  },
+  comparisonLastRow: {
+    borderBottomWidth: 0,
+  },
+  comparisonCell: {
+    flex: 1,
+    textAlign: 'center',
+    ...TYPOGRAPHY.caption,
+    color: COLORS.text.primary,
+  },
+  comparisonFeature: {
+    flex: 1.5,
+    textAlign: 'left',
+    fontWeight: '500',
+  },
+  comparisonHeader: {
+    fontWeight: '700',
+    color: COLORS.text.secondary,
+  },
+  comparisonPlatinum: {
+    color: COLORS.brand.primary,
+    fontWeight: '600',
   },
   biometricHint: {
     flexDirection: 'row',

@@ -12,7 +12,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import QRCode from 'react-native-qrcode-svg';
 import { COLORS } from '@/constants/colors';
-import { Skeleton } from '@/components/ui/Skeleton';
+import { Skeleton } from '@/components/ui';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp, RouteProp } from '@react-navigation/native';
@@ -35,8 +35,8 @@ interface TicketData {
 }
 
 // Mock ticket data - in production this would come from API
-const getMockTicket = (bookingId: string): TicketData => ({
-  id: bookingId,
+const getMockTicket = (momentId: string): TicketData => ({
+  id: momentId,
   momentTitle: 'Dinner at Hotel Costes',
   momentImage:
     'https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=500',
@@ -45,14 +45,14 @@ const getMockTicket = (bookingId: string): TicketData => ({
   hostName: 'Selin Y.',
   guestName: 'Kemal A.',
   status: 'paid',
-  confirmationCode: 'TM-' + bookingId.toUpperCase().slice(0, 4) + '-XK',
-  qrValue: `travelmatch-ticket-${bookingId}`,
+  confirmationCode: 'TM-' + momentId.toUpperCase().slice(0, 4) + '-XK',
+  qrValue: `travelmatch-ticket-${momentId}`,
 });
 
 export const TicketScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<TicketScreenRouteProp>();
-  const { bookingId } = route.params;
+  const { momentId, ticketId } = route.params;
 
   const [ticket, setTicket] = useState<TicketData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -60,10 +60,10 @@ export const TicketScreen: React.FC = () => {
   useEffect(() => {
     // Simulate API call
     setTimeout(() => {
-      setTicket(getMockTicket(bookingId));
+      setTicket(getMockTicket(ticketId || momentId));
       setLoading(false);
     }, 500);
-  }, [bookingId]);
+  }, [momentId, ticketId]);
 
   const getStatusColor = (status: TicketData['status']) => {
     switch (status) {
@@ -115,7 +115,11 @@ export const TicketScreen: React.FC = () => {
             <Skeleton width="100%" height={200} borderRadius={0} />
             <View style={styles.ticketBottom}>
               <Skeleton width={150} height={150} borderRadius={8} />
-              <Skeleton width={120} height={24} style={styles.skeletonMarginTop} />
+              <Skeleton
+                width={120}
+                height={24}
+                style={styles.skeletonMarginTop}
+              />
             </View>
           </View>
         </View>

@@ -18,7 +18,8 @@ const isDev = typeof __DEV__ !== 'undefined' ? __DEV__ : true;
 // SECURITY: DSN must be set via environment variable, no hardcoded fallback
 const SENTRY_DSN =
   (Constants.expoConfig?.extra?.sentryDsn as string | undefined) ||
-  process.env.EXPO_PUBLIC_SENTRY_DSN || '';
+  process.env.EXPO_PUBLIC_SENTRY_DSN ||
+  '';
 
 // Track if Sentry has been initialized
 let isInitialized = false;
@@ -40,7 +41,10 @@ export function initSentry() {
 
   // Skip if DSN is not configured
   if (!SENTRY_DSN) {
-    logger.warn('Sentry', 'Sentry DSN not configured. Set EXPO_PUBLIC_SENTRY_DSN environment variable.');
+    logger.warn(
+      'Sentry',
+      'Sentry DSN not configured. Set EXPO_PUBLIC_SENTRY_DSN environment variable.',
+    );
     return;
   }
 
@@ -171,6 +175,90 @@ export function addBreadcrumb(
     level,
     data: filteredData,
     timestamp: Date.now() / 1000,
+  });
+}
+
+// ============================================
+// Payment Error Tracking (PayTR Integration)
+// ============================================
+
+export type PaymentErrorType =
+  | 'PAYTR_TIMEOUT'
+  | 'PAYTR_DECLINED'
+  | 'PAYTR_NETWORK_ERROR'
+  | 'PAYTR_INVALID_RESPONSE'
+  | 'ESCROW_FAILURE'
+  | 'GIFT_OFFER_FAILURE'
+  | 'REFUND_FAILURE';
+
+/**
+ * Log payment error with detailed breadcrumb for PayTR tracking
+ * Master tracking for all payment-related errors
+ */
+export function logPaymentError(
+  errorType: PaymentErrorType,
+  details: {
+    transactionId?: string;
+    amount?: number;
+    currency?: string;
+    errorMessage?: string;
+    errorCode?: string;
+    momentId?: string;
+    giftId?: string;
+  },
+) {
+  // Add payment-specific breadcrumb
+  addBreadcrumb(`Payment Error: ${errorType}`, 'payment', 'error', {
+    error_type: errorType,
+    transaction_id: details.transactionId,
+    amount: details.amount,
+    currency: details.currency,
+    error_message: details.errorMessage,
+    error_code: details.errorCode,
+    moment_id: details.momentId,
+    gift_id: details.giftId,
+    timestamp: new Date().toISOString(),
+  });
+
+  // Set payment context for this session
+  Sentry.withScope((scope) => {
+    scope.setTag('transaction_type', 'payment');
+    scope.setTag('payment_error_type', errorType);
+    scope.setTag('payment_provider', 'paytr');
+
+    if (details.transactionId) {
+      scope.setTag('transaction_id', details.transactionId);
+    }
+    if (details.momentId) {
+      scope.setTag('moment_id', details.momentId);
+    }
+    if (details.giftId) {
+      scope.setTag('gift_id', details.giftId);
+    }
+
+    scope.setLevel('error');
+
+    Sentry.captureMessage(`PayTR Error: ${errorType}`, 'error');
+  });
+}
+
+/**
+ * Log successful payment for analytics
+ */
+export function logPaymentSuccess(details: {
+  transactionId: string;
+  amount: number;
+  currency: string;
+  momentId?: string;
+  giftId?: string;
+}) {
+  addBreadcrumb('Payment Success', 'payment', 'info', {
+    transaction_id: details.transactionId,
+    amount: details.amount,
+    currency: details.currency,
+    moment_id: details.momentId,
+    gift_id: details.giftId,
+    timestamp: new Date().toISOString(),
   });
 }
 

@@ -1,3 +1,11 @@
+/**
+ * ArchivedChatsScreen - Archived Conversations List
+ *
+ * UPDATED: Replaced Trip terminology with Moment terminology
+ * - type: 'traveler' → type: 'moment_host' (Alıcı)
+ * - role: 'Traveler' → role: 'Anı Sahibi'
+ */
+
 import React, { useState } from 'react';
 import {
   View,
@@ -11,6 +19,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
@@ -26,6 +35,11 @@ interface ArchivedChat {
   lastMessage: string;
   archivedAt: string;
   isVerified: boolean;
+  /** Linked moment info for context */
+  linkedMoment?: {
+    id: string;
+    title: string;
+  };
 }
 
 export const ArchivedChatsScreen: React.FC = () => {
@@ -39,31 +53,36 @@ export const ArchivedChatsScreen: React.FC = () => {
       name: 'Michael',
       avatar:
         'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
-      lastMessage: 'It was nice meeting you!',
-      archivedAt: '3 days ago',
+      lastMessage: 'Harika bir anıydı!',
+      archivedAt: '3 gün önce',
       isVerified: true,
+      linkedMoment: {
+        id: 'm1',
+        title: 'Kapadokya Balon Turu',
+      },
     },
     {
       id: '2',
       name: 'Sophie',
       avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400',
-      lastMessage: 'Thanks for the recommendation!',
-      archivedAt: '1 week ago',
+      lastMessage: 'Öneri için teşekkürler!',
+      archivedAt: '1 hafta önce',
       isVerified: false,
     },
   ]);
 
   const handleUnarchive = (id: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     Alert.alert(
-      'Unarchive Chat',
-      'This chat will be restored to your chats list.',
+      'Sohbeti Geri Al',
+      'Bu sohbet mesajlar listenize geri yüklenecek.',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'İptal', style: 'cancel' },
         {
-          text: 'Unarchive',
+          text: 'Geri Al',
           onPress: () => {
             setArchivedChats((prev) => prev.filter((chat) => chat.id !== id));
-            showToast('Chat has been restored to your chats.', 'success');
+            showToast('Sohbet listenize geri yüklendi.', 'success');
           },
         },
       ],
@@ -71,17 +90,18 @@ export const ArchivedChatsScreen: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     Alert.alert(
-      'Delete Chat?',
-      'This will permanently delete this conversation. This action cannot be undone.',
+      'Sohbeti Sil?',
+      'Bu konuşma kalıcı olarak silinecek. Bu işlem geri alınamaz.',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'İptal', style: 'cancel' },
         {
-          text: 'Delete',
+          text: 'Sil',
           style: 'destructive',
           onPress: () => {
             setArchivedChats((prev) => prev.filter((chat) => chat.id !== id));
-            showToast('Chat has been permanently deleted.', 'info');
+            showToast('Sohbet kalıcı olarak silindi.', 'info');
           },
         },
       ],
@@ -89,16 +109,17 @@ export const ArchivedChatsScreen: React.FC = () => {
   };
 
   const handleOpenChat = (chat: ArchivedChat) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     navigation.navigate('Chat', {
       otherUser: {
         id: chat.id,
         name: chat.name,
         avatar: chat.avatar,
         isVerified: chat.isVerified,
-        type: 'traveler',
-        role: 'Traveler',
-        kyc: chat.isVerified ? 'Verified' : 'Unverified',
-        location: 'Unknown',
+        type: 'moment_host', // Updated from 'traveler'
+        role: 'Anı Sahibi', // Updated from 'Traveler'
+        kyc: chat.isVerified ? 'Doğrulanmış' : 'Doğrulanmamış',
+        location: 'Bilinmiyor',
       },
     });
   };
@@ -126,7 +147,20 @@ export const ArchivedChatsScreen: React.FC = () => {
         <Text style={styles.chatMessage} numberOfLines={1}>
           {chat.lastMessage}
         </Text>
-        <Text style={styles.chatDate}>Archived {chat.archivedAt}</Text>
+        {/* Show linked moment if exists */}
+        {chat.linkedMoment && (
+          <View style={styles.momentTag}>
+            <MaterialCommunityIcons
+              name="star-circle-outline"
+              size={12}
+              color={COLORS.brand?.accent || COLORS.primary}
+            />
+            <Text style={styles.momentTagText} numberOfLines={1}>
+              {chat.linkedMoment.title}
+            </Text>
+          </View>
+        )}
+        <Text style={styles.chatDate}>Arşivlendi {chat.archivedAt}</Text>
       </View>
       <View style={styles.actionButtons}>
         <TouchableOpacity
@@ -166,7 +200,7 @@ export const ArchivedChatsScreen: React.FC = () => {
             color={COLORS.text.primary}
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Archived Chats</Text>
+        <Text style={styles.headerTitle}>Arşivlenmiş Sohbetler</Text>
         <View style={styles.backButton} />
       </View>
 
@@ -178,17 +212,17 @@ export const ArchivedChatsScreen: React.FC = () => {
         {archivedChats.length > 0 ? (
           <>
             <Text style={styles.sectionInfo}>
-              Archived chats are hidden from your main chats list. You can still
-              access them here.
+              Arşivlenmiş sohbetler ana mesaj listenizden gizlenir. Onlara
+              buradan erişebilirsiniz.
             </Text>
             {archivedChats.map(renderChat)}
           </>
         ) : (
           <EmptyState
             icon="archive-off-outline"
-            title="No archived chats"
-            description="Chats you archive will appear here. Long press on a chat to archive it."
-            actionLabel="Go to Messages"
+            title="Arşivlenmiş sohbet yok"
+            description="Arşivlediğiniz sohbetler burada görünecek. Bir sohbeti arşivlemek için üzerine uzun basın."
+            actionLabel="Mesajlara Git"
             onAction={() => navigation.navigate('Messages')}
           />
         )}
@@ -274,6 +308,23 @@ const styles = StyleSheet.create({
   chatDate: {
     ...TYPOGRAPHY.caption,
     color: COLORS.text.tertiary,
+  },
+  momentTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  momentTagText: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.brand?.accent || COLORS.primary,
+    fontWeight: '500',
+    maxWidth: 120,
   },
   actionButtons: {
     flexDirection: 'row',

@@ -110,3 +110,6 @@ export {
   usePressAnimation as useLegacyPressAnimation,
   useBounceAnimation,
 } from './usePressAnimation';
+
+// Feedback prompt hook
+export { useFeedbackPrompt } from './useFeedbackPrompt';

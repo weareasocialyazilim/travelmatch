@@ -45,7 +45,9 @@ const generateOAuthState = (): string => {
       array[i] = Math.floor(Math.random() * 256);
     }
   }
-  return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('');
+  return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join(
+    '',
+  );
 };
 
 // ============================================
@@ -243,14 +245,20 @@ export const handleOAuthCallback = async (
     const queryParams = urlObj.searchParams;
 
     const receivedState = hashParams.get('state') || queryParams.get('state');
-    const storedState = await secureStorage.getItem(StorageKeys.SECURE.OAUTH_STATE);
+    const storedState = await secureStorage.getItem(
+      StorageKeys.SECURE.OAUTH_STATE,
+    );
     await secureStorage.deleteItem(StorageKeys.SECURE.OAUTH_STATE);
 
     if (!receivedState || !storedState || receivedState !== storedState) {
-      logger.error('[Auth] OAuth state validation failed - potential CSRF attack');
+      logger.error(
+        '[Auth] OAuth state validation failed - potential CSRF attack',
+      );
       return {
         session: null,
-        error: { message: 'OAuth state validation failed. Please try again.' } as AuthError,
+        error: {
+          message: 'OAuth state validation failed. Please try again.',
+        } as AuthError,
       };
     }
 
@@ -289,16 +297,27 @@ export const handleOAuthCallback = async (
 
 /**
  * Sign in with phone number (OTP)
+ * Includes captcha token for bot protection
  */
 export const signInWithPhone = async (
   phone: string,
+  captchaToken?: string,
 ): Promise<{ error: AuthError | null }> => {
   if (!isSupabaseConfigured()) {
     return { error: { message: 'Supabase not configured' } as AuthError };
   }
 
   try {
-    const { error } = await auth.signInWithOtp({ phone });
+    const options: { phone: string; options?: { captchaToken?: string } } = {
+      phone,
+    };
+
+    // Add captcha token if provided for bot protection
+    if (captchaToken) {
+      options.options = { captchaToken };
+    }
+
+    const { error } = await auth.signInWithOtp(options);
     if (error) {
       logger.error('[Auth] Send OTP error:', error);
       return { error };
@@ -315,24 +334,34 @@ export const signInWithPhone = async (
  * Verify phone OTP code
  */
 export const verifyPhoneOtp = async (
-  phone: string,
   token: string,
-): Promise<{ error: AuthError | null }> => {
+  phone?: string,
+): Promise<AuthResult> => {
   if (!isSupabaseConfigured()) {
-    return { error: { message: 'Supabase not configured' } as AuthError };
+    return {
+      user: null,
+      session: null,
+      error: { message: 'Supabase not configured' } as AuthError,
+    };
   }
 
   try {
-    const { error } = await auth.verifyOtp({ phone, token, type: 'sms' });
+    // If phone is provided, verify with phone number
+    // Otherwise, use email OTP verification
+    const verifyOptions = phone
+      ? { phone, token, type: 'sms' as const }
+      : { email: '', token, type: 'email' as const };
+
+    const { data, error } = await auth.verifyOtp(verifyOptions);
     if (error) {
       logger.error('[Auth] Verify OTP error:', error);
-      return { error };
+      return { user: null, session: null, error };
     }
-    logger.info('[Auth] Phone verified successfully');
-    return { error: null };
+    logger.info('[Auth] OTP verified successfully');
+    return { user: data.user, session: data.session, error: null };
   } catch (error) {
     logger.error('[Auth] Verify OTP exception:', error);
-    return { error: error as AuthError };
+    return { user: null, session: null, error: error as AuthError };
   }
 };
 
@@ -522,45 +551,8 @@ export const onAuthStateChange = (
 };
 
 // ============================================
-// Legacy API (backward compatibility)
+// Default Export - Clean API
 // ============================================
-
-export const authApi = {
-  login: async (email: string, password: string) => {
-    const result = await signInWithEmail(email, password);
-    if (result.error) throw result.error;
-    return { user: result.user, session: result.session };
-  },
-  signup: async (email: string, password: string, metadata?: Record<string, unknown>) => {
-    const result = await signUpWithEmail(email, password, metadata as SignUpMetadata);
-    if (result.error) throw result.error;
-    return { user: result.user, session: result.session };
-  },
-  logout: async () => {
-    const result = await signOut();
-    if (result.error) throw result.error;
-  },
-  sendPasswordResetEmail: async (email: string) => {
-    const result = await resetPassword(email);
-    if (result.error) throw result.error;
-  },
-  updatePassword: async (newPassword: string) => {
-    const result = await updatePassword(newPassword);
-    if (result.error) throw result.error;
-  },
-  resendVerificationEmail: async (email: string) => {
-    const result = await resendVerificationEmail(email);
-    if (result.error) throw result.error;
-  },
-  getSession: async () => {
-    const { session, error } = await getSession();
-    if (error) throw error;
-    return session;
-  },
-  refreshSession: async () => {
-    return refreshSession();
-  },
-};
 
 export default {
   signUpWithEmail,

@@ -17,7 +17,7 @@ import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { useToast } from '@/context/ToastContext';
 import { useConfirmation } from '@/context/ConfirmationContext';
-import { profileApi } from '@/features/profile/services/profileApi';
+import { profileApi } from '@/features/profile/services/profileService';
 import { logger } from '@/utils/logger';
 
 interface HiddenItem {
@@ -112,7 +112,11 @@ export const HiddenItemsScreen: React.FC = () => {
           style={styles.unhideButton}
           onPress={() => handleUnhide(item.id)}
         >
-          <MaterialCommunityIcons name="eye" size={20} color={COLORS.brand.primary} />
+          <MaterialCommunityIcons
+            name="eye"
+            size={20}
+            color={COLORS.brand.primary}
+          />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.deleteButton}
@@ -150,36 +154,36 @@ export const HiddenItemsScreen: React.FC = () => {
           <ActivityIndicator size="large" color={COLORS.brand.primary} />
         </View>
       ) : (
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        {hiddenItems.length > 0 ? (
-          <>
-            <Text style={styles.sectionInfo}>
-              Items you&apos;ve hidden will appear here. You can unhide them or
-              delete them permanently.
-            </Text>
-            {hiddenItems.map(renderItem)}
-          </>
-        ) : (
-          <View style={styles.emptyState}>
-            <MaterialCommunityIcons
-              name="eye-off-outline"
-              size={64}
-              color={COLORS.text.tertiary}
-            />
-            <Text style={styles.emptyTitle}>No hidden items</Text>
-            <Text style={styles.emptySubtitle}>
-              Items you hide from your inbox will appear here.
-            </Text>
-          </View>
-        )}
-      </ScrollView>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          {hiddenItems.length > 0 ? (
+            <>
+              <Text style={styles.sectionInfo}>
+                Items you&apos;ve hidden will appear here. You can unhide them
+                or delete them permanently.
+              </Text>
+              {hiddenItems.map(renderItem)}
+            </>
+          ) : (
+            <View style={styles.emptyState}>
+              <MaterialCommunityIcons
+                name="eye-off-outline"
+                size={64}
+                color={COLORS.text.tertiary}
+              />
+              <Text style={styles.emptyTitle}>No hidden items</Text>
+              <Text style={styles.emptySubtitle}>
+                Items you hide from your inbox will appear here.
+              </Text>
+            </View>
+          )}
+        </ScrollView>
       )}
     </SafeAreaView>
   );

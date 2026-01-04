@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { COLORS, GRADIENTS } from '../../constants/colors';
+import { COLORS, GRADIENTS } from '@/constants/colors';
 
 interface Category {
   id: string;

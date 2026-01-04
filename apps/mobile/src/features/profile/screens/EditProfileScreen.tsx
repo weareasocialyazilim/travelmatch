@@ -531,7 +531,67 @@ const EditProfileScreen = () => {
           {/* Private Information Section */}
           <Animated.View entering={FadeInDown.delay(500).duration(500)}>
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>GİZLİ BİLGİLER</Text>
+              <Text style={styles.sectionTitle}>GİZLİLİK & GÖRÜNÜRLÜK</Text>
+
+              <GlassCard
+                intensity={15}
+                tint="light"
+                style={styles.inputCard}
+                borderRadius={RADIUS.xl}
+                padding={SPACING.md}
+              >
+                {/* Discovery Toggle */}
+                <View style={styles.toggleRow}>
+                  <View style={styles.toggleInfo}>
+                    <MaterialCommunityIcons
+                      name="compass-outline"
+                      size={22}
+                      color={COLORS.brand?.primary || COLORS.primary}
+                    />
+                    <View style={styles.toggleTextContainer}>
+                      <Text style={styles.toggleLabel}>Keşfet'te Görün</Text>
+                      <Text style={styles.toggleDesc}>
+                        Kapatırsan anların haritada ve feedde görünmez
+                      </Text>
+                    </View>
+                  </View>
+                  <TouchableOpacity
+                    style={[styles.toggleSwitch, styles.toggleSwitchActive]}
+                    activeOpacity={0.8}
+                  >
+                    <View
+                      style={[styles.toggleKnob, styles.toggleKnobActive]}
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.inputDivider} />
+
+                {/* Distance Preference */}
+                <View style={styles.toggleRow}>
+                  <View style={styles.toggleInfo}>
+                    <MaterialCommunityIcons
+                      name="map-marker-radius-outline"
+                      size={22}
+                      color={COLORS.brand?.primary || COLORS.primary}
+                    />
+                    <View style={styles.toggleTextContainer}>
+                      <Text style={styles.toggleLabel}>Mesafe Tercihi</Text>
+                      <Text style={styles.toggleDesc}>
+                        Maksimum 50km (Premium: 500km)
+                      </Text>
+                    </View>
+                  </View>
+                  <Text style={styles.distanceValue}>50 km</Text>
+                </View>
+              </GlassCard>
+            </View>
+          </Animated.View>
+
+          {/* Contact Information Section */}
+          <Animated.View entering={FadeInDown.delay(600).duration(500)}>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>İLETİŞİM BİLGİLERİ</Text>
 
               <GlassCard
                 intensity={15}
@@ -834,6 +894,58 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.caption,
     color: COLORS.text.tertiary,
     flex: 1,
+  },
+
+  // Toggle Styles
+  toggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: SPACING.sm,
+  },
+  toggleInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.md,
+    flex: 1,
+  },
+  toggleTextContainer: {
+    flex: 1,
+  },
+  toggleLabel: {
+    ...TYPOGRAPHY.body,
+    fontWeight: '600',
+    color: COLORS.text.primary,
+    marginBottom: 2,
+  },
+  toggleDesc: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.text.tertiary,
+  },
+  toggleSwitch: {
+    width: 52,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.border.default,
+    padding: 2,
+    justifyContent: 'center',
+  },
+  toggleSwitchActive: {
+    backgroundColor: COLORS.brand?.primary || COLORS.primary,
+  },
+  toggleKnob: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: COLORS.utility?.white || '#FFFFFF',
+  },
+  toggleKnobActive: {
+    alignSelf: 'flex-end',
+  },
+  distanceValue: {
+    ...TYPOGRAPHY.body,
+    fontWeight: '600',
+    color: COLORS.brand?.primary || COLORS.primary,
   },
 
   // Verification

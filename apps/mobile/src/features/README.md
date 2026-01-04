@@ -1,6 +1,7 @@
 # Feature-Based Architecture
 
-Bu klasör, uygulamanın feature-based (özellik tabanlı) mimarisini içerir. Her feature kendi klasöründe bağımsız olarak organize edilmiştir.
+Bu klasör, uygulamanın feature-based (özellik tabanlı) mimarisini içerir. Her feature kendi
+klasöründe bağımsız olarak organize edilmiştir.
 
 ## Klasör Yapısı
 
@@ -43,32 +44,38 @@ features/
 Mevcut `screens/` klasöründeki dosyalar aşamalı olarak feature klasörlerine taşınacaktır:
 
 ### 1. Auth Feature
+
 - WelcomeScreen.tsx
-- OnboardingScreen.tsx  
+- OnboardingScreen.tsx
 - CompleteProfileScreen.tsx
 - (Email/Phone auth screens gelecekte)
 
-### 2. Trips Feature
+### 2. Discover Feature
+
 - DiscoverScreen.tsx
-- BookingDetailScreen.tsx
-- (Trip creation/search screens)
+- MomentDetailScreen.tsx
+- CreateMomentScreen.tsx
 
 ### 3. Profile Feature
+
 - ProfileScreen.tsx
 - ProfileDetailScreen.tsx
 - EditProfileScreen.tsx
 - ReputationScreen.tsx
 
 ### 4. Messages Feature
+
 - MessagesScreen.tsx
 - ChatScreen.tsx
 - ArchivedChatsScreen.tsx
 
 ### 5. Notifications Feature
+
 - NotificationDetailScreen.tsx
 - NotificationSettingsScreen.tsx
 
 ### 6. Settings Feature
+
 - AppSettingsScreen.tsx
 - SecurityScreen.tsx
 - PrivacyPolicyScreen.tsx
@@ -79,6 +86,7 @@ Mevcut `screens/` klasöründeki dosyalar aşamalı olarak feature klasörlerine
 ## Kullanım
 
 Her feature bağımsız olarak çalışabilmeli ve kendi içinde:
+
 - Ekranları (screens)
 - UI componentlerini (components)
 - İş mantığını (hooks, services)
@@ -87,6 +95,7 @@ Her feature bağımsız olarak çalışabilmeli ve kendi içinde:
 barındırmalıdır.
 
 Örnek import:
+
 ```typescript
 // screens/ kullanımı (eski)
 import ProfileScreen from '@/screens/ProfileScreen';

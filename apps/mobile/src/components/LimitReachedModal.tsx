@@ -1,21 +1,64 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../constants/colors';
+import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS, GRADIENTS } from '../constants/colors';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
+
+type LimitType = 'gift' | 'distance' | 'moment' | 'message' | 'general';
 
 interface LimitReachedModalProps {
   visible: boolean;
   onClose: () => void;
-  limitAmount: number;
+  onUpgrade?: () => void;
+  limitAmount?: number;
+  limitType?: LimitType;
 }
+
+const LIMIT_MESSAGES: Record<
+  LimitType,
+  { title: string; message: string; icon: IconName }
+> = {
+  gift: {
+    title: 'Hediye Limitine Ulaştın 🎁',
+    message:
+      'Bu ay için hediye gönderme limitine ulaştın. Premium ile sınırsız hediye gönder!',
+    icon: 'gift-outline',
+  },
+  distance: {
+    title: 'Mesafe Sınırına Ulaştın 📍',
+    message:
+      "Daha uzaktaki anları keşfetmek için Premium ile 500km'ye kadar ara!",
+    icon: 'map-marker-radius-outline',
+  },
+  moment: {
+    title: 'An Limitine Ulaştın ✨',
+    message:
+      'Bu ay için moment oluşturma limitine ulaştın. Premium ile sınırsız an paylaş!',
+    icon: 'camera-outline',
+  },
+  message: {
+    title: 'Mesaj Limitine Ulaştın 💬',
+    message: "Daha fazla bağlantı kurmak için Premium'a geç!",
+    icon: 'message-outline',
+  },
+  general: {
+    title: 'Limite Ulaştın',
+    message: 'Bu özellik için günlük limitine ulaştın.',
+    icon: 'alert-circle-outline',
+  },
+};
 
 export const LimitReachedModal: React.FC<LimitReachedModalProps> = ({
   visible,
   onClose,
+  onUpgrade,
   limitAmount,
+  limitType = 'general',
 }) => {
+  const config = LIMIT_MESSAGES[limitType];
+
   return (
     <Modal
       visible={visible}
@@ -29,30 +72,62 @@ export const LimitReachedModal: React.FC<LimitReachedModalProps> = ({
 
         {/* Modal Content */}
         <View style={styles.modalContent}>
-          {/* Icon */}
-          <View style={styles.iconContainer}>
+          {/* Neon Icon */}
+          <LinearGradient
+            colors={GRADIENTS.primary}
+            style={styles.iconContainer}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          >
             <MaterialCommunityIcons
-              name={'alert-circle' as IconName}
+              name={config.icon}
               size={40}
-              color={COLORS.brand.primary}
+              color={COLORS.utility.black}
             />
-          </View>
+          </LinearGradient>
 
           {/* Headline */}
-          <Text style={styles.headline}>Limit reached</Text>
+          <Text style={styles.headline}>{config.title}</Text>
 
           {/* Body Text */}
           <Text style={styles.bodyText}>
-            This amount exceeds your daily gift limit of ${limitAmount}.
+            {limitAmount
+              ? `Bu tutar günlük $${limitAmount} limitini aşıyor.`
+              : config.message}
           </Text>
 
-          {/* Button */}
+          {/* Upgrade Button - Neon CTA */}
+          {onUpgrade && (
+            <TouchableOpacity
+              style={styles.upgradeButton}
+              onPress={onUpgrade}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={GRADIENTS.primary}
+                style={styles.upgradeGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
+                <MaterialCommunityIcons
+                  name="crown"
+                  size={20}
+                  color={COLORS.utility.black}
+                />
+                <Text style={styles.upgradeText}>
+                  Limitlerini İpeksi Bir Dokunuşla Kaldır 💎
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          )}
+
+          {/* Close Button */}
           <TouchableOpacity
             style={styles.button}
             onPress={onClose}
             activeOpacity={0.8}
           >
-            <Text style={styles.buttonText}>Okay</Text>
+            <Text style={styles.buttonText}>Şimdilik Tamam</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -78,8 +153,8 @@ const styles = StyleSheet.create({
   modalContent: {
     width: '100%',
     maxWidth: 384,
-    backgroundColor: COLORS.utility.white,
-    borderRadius: 12,
+    backgroundColor: COLORS.bg.primary,
+    borderRadius: 20,
     padding: 24,
     alignItems: 'center',
     shadowColor: COLORS.shadow,
@@ -87,18 +162,19 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
+    borderWidth: 1,
+    borderColor: COLORS.border.default,
   },
   iconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: `${COLORS.brand.primary}33`,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
   },
   headline: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '700',
     color: COLORS.text.primary,
     textAlign: 'center',
@@ -112,19 +188,39 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 24,
     paddingTop: 4,
+    lineHeight: 24,
+  },
+  upgradeButton: {
+    width: '100%',
+    marginBottom: 12,
+    borderRadius: 28,
+    overflow: 'hidden',
+  },
+  upgradeGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    gap: 8,
+  },
+  upgradeText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: COLORS.utility.black,
   },
   button: {
     width: '100%',
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.brand.primary,
+    backgroundColor: COLORS.border.default,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,
   },
   buttonText: {
     fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.bg.primary,
+    fontWeight: '600',
+    color: COLORS.text.secondary,
   },
 });

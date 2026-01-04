@@ -20,6 +20,15 @@ import { RADIUS, SPACING, BORDER } from '@/constants/spacing';
 
 type MarkerSize = 'sm' | 'md' | 'lg';
 
+// Sunset Proof Palette
+const SUNSET_PALETTE = {
+  amber: '#F59E0B',
+  magenta: '#EC4899',
+  emerald: '#10B981',
+  platinum: '#E5E7EB',
+  platinumShimmer: '#F3F4F6',
+};
+
 interface NeonPulseMarkerProps {
   /** Price or label to display */
   price: string;
@@ -31,6 +40,10 @@ interface NeonPulseMarkerProps {
   accentColor?: string;
   /** Disable breathing animation */
   animated?: boolean;
+  /** Enable Platinum shimmer effect (for VIP/high-value offers) */
+  isPlatinumShimmer?: boolean;
+  /** Show popular indicator */
+  isPopular?: boolean;
   /** Test ID for testing */
   testID?: string;
 }
@@ -55,10 +68,14 @@ export const NeonPulseMarker: React.FC<NeonPulseMarkerProps> = ({
   size = 'md',
   accentColor,
   animated = true,
+  isPlatinumShimmer = false,
+  isPopular = false,
   testID,
 }) => {
   // Breathing animation value (0 to 1)
   const breathe = useSharedValue(0);
+  // Platinum shimmer animation
+  const shimmer = useSharedValue(0);
 
   // Start breathing animation
   useEffect(() => {
@@ -77,12 +94,24 @@ export const NeonPulseMarker: React.FC<NeonPulseMarkerProps> = ({
         withTiming(0, {
           duration: 2000,
           easing: Easing.inOut(Easing.ease),
-        })
+        }),
       ),
       -1, // Infinite repeat
-      false // Don't reverse
+      false, // Don't reverse
     );
-  }, [animated, breathe]);
+
+    // Platinum shimmer effect - faster, more luxurious
+    if (isPlatinumShimmer) {
+      shimmer.value = withRepeat(
+        withTiming(1, {
+          duration: 1500,
+          easing: Easing.linear,
+        }),
+        -1,
+        false,
+      );
+    }
+  }, [animated, breathe, isPlatinumShimmer, shimmer]);
 
   // Animated style for pulse ring
   const pulseRingStyle = useAnimatedStyle(() => {
@@ -115,6 +144,19 @@ export const NeonPulseMarker: React.FC<NeonPulseMarkerProps> = ({
     };
   });
 
+  // Platinum shimmer gradient animation
+  const platinumShimmerStyle = useAnimatedStyle(() => {
+    if (!isPlatinumShimmer) return {};
+
+    const translateX = interpolate(shimmer.value, [0, 1], [-50, 50]);
+    const opacity = interpolate(shimmer.value, [0, 0.5, 1], [0.3, 0.8, 0.3]);
+
+    return {
+      transform: [{ translateX }],
+      opacity,
+    };
+  });
+
   // Size configurations
   const sizeConfig = {
     sm: {
@@ -142,11 +184,30 @@ export const NeonPulseMarker: React.FC<NeonPulseMarkerProps> = ({
 
   const config = sizeConfig[size];
 
-  // Determine colors based on selection state
-  const primaryColor = accentColor || (isSelected ? COLORS.secondary : COLORS.primary);
-  const bodyBg = isSelected ? COLORS.secondary : COLORS.surface.base;
-  const borderColor = isSelected ? COLORS.textOnDark : primaryColor;
-  const textColor = isSelected ? COLORS.textOnDark : COLORS.text.primary;
+  // Determine colors based on selection state and Platinum status
+  const primaryColor = isPlatinumShimmer
+    ? SUNSET_PALETTE.platinum
+    : isPopular
+      ? SUNSET_PALETTE.magenta
+      : accentColor || (isSelected ? COLORS.secondary : COLORS.primary);
+
+  const bodyBg = isPlatinumShimmer
+    ? 'rgba(229, 231, 235, 0.95)' // Platinum silver
+    : isSelected
+      ? COLORS.secondary
+      : COLORS.surface.base;
+
+  const borderColor = isPlatinumShimmer
+    ? SUNSET_PALETTE.platinumShimmer
+    : isSelected
+      ? COLORS.textOnDark
+      : primaryColor;
+
+  const textColor = isPlatinumShimmer
+    ? '#1F2937' // Dark text on platinum
+    : isSelected
+      ? COLORS.textOnDark
+      : COLORS.text.primary;
 
   return (
     <View style={[styles.container, config.container]} testID={testID}>
@@ -188,12 +249,22 @@ export const NeonPulseMarker: React.FC<NeonPulseMarkerProps> = ({
           glowStyle,
         ]}
       >
+        {/* Platinum Shimmer Overlay */}
+        {isPlatinumShimmer && (
+          <Animated.View
+            style={[styles.shimmerOverlay, platinumShimmerStyle]}
+          />
+        )}
+
+        {/* Popular indicator */}
+        {isPopular && !isPlatinumShimmer && (
+          <View style={styles.popularBadge}>
+            <Text style={styles.popularIcon}>🔥</Text>
+          </View>
+        )}
+
         <Text
-          style={[
-            styles.priceText,
-            config.fontSize,
-            { color: textColor },
-          ]}
+          style={[styles.priceText, config.fontSize, { color: textColor }]}
           numberOfLines={1}
         >
           {price}
@@ -241,10 +312,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 5,
+    overflow: 'hidden', // For shimmer effect
+    position: 'relative',
   },
   priceText: {
     fontWeight: '800',
     textAlign: 'center',
+    zIndex: 1,
   },
   arrow: {
     width: 0,
@@ -255,6 +329,26 @@ const styles = StyleSheet.create({
     borderRightColor: 'transparent',
     transform: [{ rotate: '180deg' }],
     marginTop: -1,
+  },
+  // Platinum shimmer overlay
+  shimmerOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+    zIndex: 0,
+  },
+  // Popular badge
+  popularBadge: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    zIndex: 2,
+  },
+  popularIcon: {
+    fontSize: 12,
   },
 });
 

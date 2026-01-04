@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import { COLORS } from '../../constants/colors';
+import { COLORS } from '@/constants/colors';
 import type { CategoryFilterProps } from './types';
 
 export const CategoryFilter: React.FC<CategoryFilterProps> = ({

@@ -24,6 +24,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { COLORS } from '@/constants/colors';
+import { VALUES } from '@/constants/values';
 import type { Moment } from '@/hooks/useMoments';
 
 const { width, height } = Dimensions.get('window');
@@ -48,6 +49,37 @@ const formatCount = (count: number): string => {
     return `${(count / 1000).toFixed(1)}k`;
   }
   return count.toString();
+};
+
+// Chat Lock tier based on escrow thresholds
+type ChatLockTier = 'none' | 'candidate' | 'premium';
+
+const getChatLockTier = (amount: number): ChatLockTier => {
+  const { DIRECT_MAX, OPTIONAL_MAX } = VALUES.ESCROW_THRESHOLDS;
+  if (amount < DIRECT_MAX) return 'none';
+  if (amount < OPTIONAL_MAX) return 'candidate';
+  return 'premium';
+};
+
+const CHAT_LOCK_CONFIG = {
+  none: {
+    label: 'Direct',
+    icon: 'shield-outline' as const,
+    color: COLORS.feedback.success,
+    bgColor: 'rgba(16, 185, 129, 0.2)',
+  },
+  candidate: {
+    label: 'Protected',
+    icon: 'shield-checkmark' as const,
+    color: '#F59E0B',
+    bgColor: 'rgba(245, 158, 11, 0.2)',
+  },
+  premium: {
+    label: 'Premium Lock',
+    icon: 'lock-closed' as const,
+    color: '#8B5CF6',
+    bgColor: 'rgba(139, 92, 246, 0.2)',
+  },
 };
 
 // Sidebar Action Button Component
@@ -99,10 +131,18 @@ export const ImmersiveMomentCard = memo(
     // Get price
     const price = item.price || item.pricePerGuest || 0;
 
+    // Determine Chat Lock tier based on price
+    const chatLockTier = getChatLockTier(price);
+    const lockConfig = CHAT_LOCK_CONFIG[chatLockTier];
+
     return (
       <View style={styles.container}>
         {/* 1. Full Screen Visual */}
-        <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="cover" />
+        <Image
+          source={{ uri: imageUrl }}
+          style={styles.image}
+          resizeMode="cover"
+        />
 
         {/* 2. Gradient Overlay (for readability) */}
         <LinearGradient
@@ -151,10 +191,29 @@ export const ImmersiveMomentCard = memo(
 
             {/* Price Tag */}
             <View style={styles.priceTag}>
-              <Text style={styles.priceLabel}>Estimated Cost</Text>
+              <Text style={styles.priceLabel}>Requested Gift</Text>
               <Text style={styles.priceValue}>
                 ${price}
-                {item.currency && item.currency !== 'USD' && ` ${item.currency}`}
+                {item.currency &&
+                  item.currency !== 'USD' &&
+                  ` ${item.currency}`}
+              </Text>
+            </View>
+
+            {/* Chat Lock Badge */}
+            <View
+              style={[
+                styles.chatLockBadge,
+                { backgroundColor: lockConfig.bgColor },
+              ]}
+            >
+              <Ionicons
+                name={lockConfig.icon}
+                size={14}
+                color={lockConfig.color}
+              />
+              <Text style={[styles.chatLockText, { color: lockConfig.color }]}>
+                {lockConfig.label}
               </Text>
             </View>
           </View>
@@ -174,12 +233,16 @@ export const ImmersiveMomentCard = memo(
               onPress={onCommentPress}
             />
 
-            <SidebarButton icon="share-social" count="Share" onPress={onSharePress} />
+            <SidebarButton
+              icon="share-social"
+              count="Share"
+              onPress={onSharePress}
+            />
           </View>
 
           {/* 5. Main Actions (Gift vs Counter-Offer) */}
           <View style={styles.bottomActions}>
-            {/* Counter-Offer / Suggest Swap Button */}
+            {/* Counter-Offer / Subscriber Offer Button */}
             <TouchableOpacity
               style={styles.recommendButton}
               onPress={onCounterOfferPress}
@@ -192,7 +255,7 @@ export const ImmersiveMomentCard = memo(
                     size={24}
                     color="white"
                   />
-                  <Text style={styles.recommendText}>Suggest Swap</Text>
+                  <Text style={styles.recommendText}>Subscriber Offer</Text>
                 </BlurView>
               ) : (
                 <View style={[styles.glassInner, styles.androidGlass]}>
@@ -201,7 +264,7 @@ export const ImmersiveMomentCard = memo(
                     size={24}
                     color="white"
                   />
-                  <Text style={styles.recommendText}>Suggest Swap</Text>
+                  <Text style={styles.recommendText}>Subscriber Offer</Text>
                 </View>
               )}
             </TouchableOpacity>
@@ -312,6 +375,22 @@ const styles = StyleSheet.create({
     color: COLORS.brand.primary, // Neon Lime
     fontSize: 20,
     fontWeight: '900',
+  },
+
+  // Chat Lock Badge
+  chatLockBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    marginTop: 8,
+    gap: 6,
+  },
+  chatLockText: {
+    fontSize: 12,
+    fontWeight: '700',
   },
 
   // Sidebar

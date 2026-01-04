@@ -11,12 +11,7 @@
  */
 
 import React, { useEffect, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-} from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Reanimated, {
@@ -31,7 +26,7 @@ import Reanimated, {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
-import { COLORS, GRADIENTS, PALETTE } from '../../../constants/colors';
+import { COLORS, GRADIENTS, PALETTE } from '@/constants/colors';
 import { TYPE_SCALE } from '../../../theme/typography';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAuth } from '../../../context/AuthContext';
@@ -59,30 +54,30 @@ const AnimatedLogo: React.FC = () => {
     breathScale.value = withRepeat(
       withSequence(
         withTiming(1.05, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) })
+        withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
       ),
       -1,
-      false
+      false,
     );
 
     // Glow pulse
     glowOpacity.value = withRepeat(
       withSequence(
         withTiming(0.8, { duration: 1500 }),
-        withTiming(0.4, { duration: 1500 })
+        withTiming(0.4, { duration: 1500 }),
       ),
       -1,
-      false
+      false,
     );
 
     // Subtle rotation
     rotation.value = withRepeat(
       withSequence(
         withTiming(3, { duration: 4000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(-3, { duration: 4000, easing: Easing.inOut(Easing.ease) })
+        withTiming(-3, { duration: 4000, easing: Easing.inOut(Easing.ease) }),
       ),
       -1,
-      false
+      false,
     );
   }, []);
 
@@ -145,16 +140,13 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
     opacity.value = withDelay(delay, withTiming(1, { duration: 500 }));
     translateY.value = withDelay(
       delay,
-      withTiming(0, { duration: 500, easing: Easing.out(Easing.back(1.5)) })
+      withTiming(0, { duration: 500, easing: Easing.out(Easing.back(1.5)) }),
     );
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
-    transform: [
-      { translateY: translateY.value },
-      { scale: scale.value },
-    ],
+    transform: [{ translateY: translateY.value }, { scale: scale.value }],
   }));
 
   const handlePressIn = () => {
@@ -252,11 +244,11 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
   }, [socialAuth]);
 
   const handleCreateAccount = useCallback(() => {
-    navigation.navigate('Register');
+    navigation.navigate('UnifiedAuth');
   }, [navigation]);
 
   const handleLogin = useCallback(() => {
-    navigation.navigate('Login');
+    navigation.navigate('UnifiedAuth');
   }, [navigation]);
 
   return (
@@ -312,8 +304,14 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
             accessibilityLabel="Apple ile devam et"
             accessibilityHint="Apple hesabınızla giriş yaparsınız"
           >
-            <MaterialCommunityIcons name="apple" size={22} color={PALETTE.white} />
-            <Text style={styles.socialButtonText}>{t('welcome.continueWithApple')}</Text>
+            <MaterialCommunityIcons
+              name="apple"
+              size={22}
+              color={PALETTE.white}
+            />
+            <Text style={styles.socialButtonText}>
+              {t('welcome.continueWithApple')}
+            </Text>
           </AnimatedButton>
 
           <AnimatedButton
@@ -323,8 +321,14 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
             accessibilityLabel="Google ile devam et"
             accessibilityHint="Google hesabınızla giriş yaparsınız"
           >
-            <MaterialCommunityIcons name="google" size={22} color={PALETTE.white} />
-            <Text style={styles.socialButtonText}>{t('welcome.continueWithGoogle')}</Text>
+            <MaterialCommunityIcons
+              name="google"
+              size={22}
+              color={PALETTE.white}
+            />
+            <Text style={styles.socialButtonText}>
+              {t('welcome.continueWithGoogle')}
+            </Text>
           </AnimatedButton>
 
           {/* Divider */}
@@ -348,7 +352,9 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
               end={{ x: 1, y: 0 }}
               style={styles.gradientFill}
             >
-              <Text style={styles.primaryButtonText}>{t('welcome.createAccount')}</Text>
+              <Text style={styles.primaryButtonText}>
+                {t('welcome.createAccount')}
+              </Text>
             </LinearGradient>
           </AnimatedButton>
 
@@ -366,7 +372,8 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
         {/* Footer */}
         <Text style={styles.footer}>
           {t('welcome.termsPrefix')}{' '}
-          <Text style={styles.footerLink}>{t('welcome.terms')}</Text> {t('welcome.and')}{' '}
+          <Text style={styles.footerLink}>{t('welcome.terms')}</Text>{' '}
+          {t('welcome.and')}{' '}
           <Text style={styles.footerLink}>{t('welcome.privacy')}</Text>
         </Text>
       </View>

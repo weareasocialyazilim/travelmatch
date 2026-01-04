@@ -241,7 +241,7 @@ export const TrustConstellation: React.FC<TrustConstellationProps> = ({
         />
       ))}
 
-      {/* Trusted Traveler Badge */}
+      {/* Trusted Host Badge */}
       {showBadge && allVerified && (
         <Animated.View
           style={[styles.badge, badgeAnimatedStyle]}
@@ -259,7 +259,7 @@ export const TrustConstellation: React.FC<TrustConstellationProps> = ({
               size === 'sm' && styles.badgeTextSmall,
             ]}
           >
-            Trusted Traveler
+            Trusted Host
           </Text>
         </Animated.View>
       )}

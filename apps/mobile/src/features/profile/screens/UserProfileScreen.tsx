@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -17,10 +17,21 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   interpolate,
+  withSpring,
+  withSequence,
+  withRepeat,
 } from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
 import { COLORS } from '@/constants/colors';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '@/navigation/routeParams';
+
+// Neon colors for gift button
+const NEON = {
+  lime: '#DFFF00',
+  violet: '#A855F7',
+  glow: 'rgba(168, 85, 247, 0.4)',
+};
 
 const { width } = Dimensions.get('window');
 const HEADER_HEIGHT = 350;
@@ -87,6 +98,41 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({
 }) => {
   const insets = useSafeAreaInsets();
   const scrollY = useSharedValue(0);
+  const giftButtonScale = useSharedValue(1);
+  const giftPulse = useSharedValue(1);
+  const [showGiftSent, setShowGiftSent] = useState(false);
+
+  // Gift button pulse animation
+  React.useEffect(() => {
+    giftPulse.value = withRepeat(
+      withSequence(
+        withSpring(1.05, { damping: 10 }),
+        withSpring(1, { damping: 10 }),
+      ),
+      -1,
+      true,
+    );
+  }, [giftPulse]);
+
+  const handleGiftPress = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    giftButtonScale.value = withSequence(
+      withSpring(0.9, { damping: 15 }),
+      withSpring(1, { damping: 8 }),
+    );
+
+    // Navigate to gift flow with user's top moment
+    navigation.navigate('GiftSelection', {
+      recipientId: USER.id,
+      recipientName: USER.name,
+      recipientAvatar: USER.avatar,
+      topMomentId: USER.moments[0]?.id,
+    });
+  }, [navigation, giftButtonScale]);
+
+  const giftButtonStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: giftButtonScale.value * giftPulse.value }],
+  }));
 
   const scrollHandler = useAnimatedScrollHandler((event) => {
     scrollY.value = event.contentOffset.y;
@@ -165,9 +211,29 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({
                 <Text style={styles.trustScore}>{USER.trustScore}</Text>
               </View>
             </View>
-            <TouchableOpacity style={styles.followButton}>
-              <Text style={styles.followText}>Connect</Text>
-            </TouchableOpacity>
+            <View style={styles.actionButtons}>
+              {/* Hediye Et Button - Neon Violet */}
+              <Animated.View style={giftButtonStyle}>
+                <TouchableOpacity
+                  style={styles.giftButton}
+                  onPress={handleGiftPress}
+                  activeOpacity={0.8}
+                  accessibilityLabel="Hediye gönder"
+                  accessibilityRole="button"
+                >
+                  <MaterialCommunityIcons
+                    name="gift-outline"
+                    size={20}
+                    color={NEON.violet}
+                  />
+                  <Text style={styles.giftText}>Hediye Et</Text>
+                </TouchableOpacity>
+              </Animated.View>
+              {/* Connect Button */}
+              <TouchableOpacity style={styles.followButton}>
+                <Text style={styles.followText}>Connect</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Info */}
@@ -304,6 +370,32 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: COLORS.black,
   },
+  actionButtons: {
+    flexDirection: 'column',
+    gap: 8,
+    marginBottom: 10,
+  },
+  giftButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(168, 85, 247, 0.15)',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(168, 85, 247, 0.4)',
+    // Subtle glow effect
+    shadowColor: '#A855F7',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  giftText: {
+    color: '#A855F7',
+    fontWeight: '600',
+    fontSize: 14,
+  },
   followButton: {
     backgroundColor: DARK_THEME.buttonBg,
     paddingHorizontal: 24,
@@ -311,7 +403,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: DARK_THEME.buttonBorder,
-    marginBottom: 10,
   },
   followText: {
     color: DARK_THEME.text,

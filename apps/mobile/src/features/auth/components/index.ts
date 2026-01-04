@@ -5,3 +5,6 @@
  */
 
 export { ConsentFlow, PaymentConsent } from './ConsentFlow';
+
+// Email verification - Taşındı: components/ -> features/auth/components
+export { EmailVerificationModal } from './EmailVerificationModal';

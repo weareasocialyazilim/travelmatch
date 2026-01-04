@@ -44,19 +44,22 @@ interface FeedbackModalProps {
 }
 
 const DEFAULT_CATEGORIES = [
-  'Bug Report',
-  'Feature Request',
-  'General Feedback',
-  'Performance Issue',
-  'UI/UX Suggestion',
+  'Şüpheli İşlem 🚨',
+  'Sahte Profil',
+  'Uygunsuz İçerik',
+  'Dolandırıcılık Şüphesi',
+  'Hediye Sorunu',
+  'Genel Geri Bildirim',
+  'Hata Bildirimi',
+  'Özellik İsteği',
 ];
 
 export const FeedbackModal: React.FC<FeedbackModalProps> = ({
   visible,
   onClose,
   onSubmit,
-  title = 'Share Your Feedback',
-  subtitle = 'Help us improve your experience',
+  title = 'Geri Bildirim Paylaş',
+  subtitle = 'Deneyimini geliştirmemize yardım et',
   categories = DEFAULT_CATEGORIES,
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);

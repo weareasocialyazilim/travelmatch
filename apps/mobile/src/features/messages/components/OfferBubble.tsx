@@ -1,19 +1,54 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+/**
+ * OfferBubble - Gift Offer Card with PayTR Integration
+ *
+ * ELEVATED: Accept button triggers PayTR Pre-authorization WebView
+ * Legal: Turkey regulations require escrow before funds release
+ *
+ * Features:
+ * - Liquid Platinum styling for high-value offers
+ * - PayTR WebView flow on acceptance
+ * - Haptic feedback on interactions
+ * - Confetti animation on successful payment
+ */
+
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Modal,
+  ActivityIndicator,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { FadeInUp } from 'react-native-reanimated';
-import { COLORS } from '@/constants/colors';
+import Animated, { FadeInUp, ZoomIn } from 'react-native-reanimated';
+import { WebView } from 'react-native-webview';
+import * as Haptics from 'expo-haptics';
+import { COLORS, GRADIENTS } from '@/constants/colors';
 import type { OfferStatus } from '@/types/message.types';
+
+/** Threshold for "Liquid Platinum" high-value offers (TRY) */
+const PLATINUM_THRESHOLD = 5000;
 
 interface OfferBubbleProps {
   amount: number;
   currency?: string;
   status: OfferStatus;
   momentTitle?: string;
+  momentId?: string;
+  giftOfferId?: string;
+  /** PayTR iframe token for pre-authorization */
+  paytrToken?: string;
   onAccept?: () => void;
   onDecline?: () => void;
+  /** Called when PayTR WebView completes successfully */
+  onPaymentSuccess?: () => void;
+  /** Called when PayTR WebView fails or is cancelled */
+  onPaymentFailure?: (error?: string) => void;
   isOwn?: boolean;
+  /** Is user a high-value subscriber (Platinum styling) */
+  isPlatinumUser?: boolean;
 }
 
 export const OfferBubble: React.FC<OfferBubbleProps> = ({
@@ -21,11 +56,69 @@ export const OfferBubble: React.FC<OfferBubbleProps> = ({
   currency = 'USD',
   status,
   momentTitle,
+  momentId,
+  giftOfferId,
+  paytrToken,
   onAccept,
   onDecline,
+  onPaymentSuccess,
+  onPaymentFailure,
   isOwn = false,
+  isPlatinumUser = false,
 }) => {
-  const currencySymbol = currency === 'TRY' ? '₺' : currency === 'EUR' ? '€' : '$';
+  const [showPayTRWebView, setShowPayTRWebView] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const currencySymbol =
+    currency === 'TRY' ? '₺' : currency === 'EUR' ? '€' : '$';
+  const isPlatinumOffer = amount >= PLATINUM_THRESHOLD || isPlatinumUser;
+
+  /**
+   * Handle Accept - Trigger PayTR Pre-authorization
+   * Legal requirement: Funds held in escrow until moment completion
+   */
+  const handleAccept = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+    if (paytrToken) {
+      // Open PayTR WebView for pre-authorization
+      setShowPayTRWebView(true);
+    } else {
+      // Legacy flow - direct accept
+      onAccept?.();
+    }
+  };
+
+  const handleDecline = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onDecline?.();
+  };
+
+  /**
+   * Handle PayTR WebView navigation
+   * Success: https://www.paytr.com/odeme/basarili
+   * Failure: https://www.paytr.com/odeme/hata
+   */
+  const handlePayTRNavigation = (navState: { url: string }) => {
+    if (
+      navState.url.includes('/odeme/basarili') ||
+      navState.url.includes('success')
+    ) {
+      setShowPayTRWebView(false);
+      setIsProcessing(false);
+      // Trigger success celebration
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      onPaymentSuccess?.();
+    } else if (
+      navState.url.includes('/odeme/hata') ||
+      navState.url.includes('error')
+    ) {
+      setShowPayTRWebView(false);
+      setIsProcessing(false);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      onPaymentFailure?.('Ödeme işlemi başarısız');
+    }
+  };
 
   const getStatusConfig = () => {
     switch (status) {
@@ -68,7 +161,8 @@ export const OfferBubble: React.FC<OfferBubbleProps> = ({
             <Text style={styles.ownOfferTitle}>Gift Offer Sent</Text>
           </View>
           <Text style={styles.ownOfferAmount}>
-            {currencySymbol}{amount.toLocaleString()}
+            {currencySymbol}
+            {amount.toLocaleString()}
           </Text>
           {momentTitle && (
             <Text style={styles.ownOfferMoment} numberOfLines={1}>
@@ -92,33 +186,55 @@ export const OfferBubble: React.FC<OfferBubbleProps> = ({
     );
   }
 
-  // Received offer - with actions
+  // Received offer - with actions and PayTR integration
   return (
     <Animated.View entering={FadeInUp} style={styles.offerContainer}>
       <LinearGradient
-        colors={[COLORS.brand.secondary, '#3AAFA7']}
+        colors={
+          isPlatinumOffer
+            ? ['#2C3E50', '#34495E', '#4A5568']
+            : [COLORS.brand.secondary, '#3AAFA7']
+        }
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={styles.offerCard}
+        style={[styles.offerCard, isPlatinumOffer && styles.platinumCard]}
       >
+        {isPlatinumOffer && (
+          <View style={styles.platinumBadge}>
+            <MaterialCommunityIcons
+              name="diamond-stone"
+              size={12}
+              color={COLORS.brand.accent}
+            />
+            <Text style={styles.platinumBadgeText}>Premium Hediye</Text>
+          </View>
+        )}
+
         <View style={styles.offerHeader}>
-          <MaterialCommunityIcons name="handshake" size={24} color="white" />
-          <Text style={styles.offerTitle}>Gift Offer Received</Text>
+          <MaterialCommunityIcons
+            name={isPlatinumOffer ? 'diamond' : 'handshake'}
+            size={24}
+            color={isPlatinumOffer ? COLORS.brand.accent : 'white'}
+          />
+          <Text style={styles.offerTitle}>Hediye Teklifi Alındı</Text>
         </View>
 
-        <Text style={styles.offerAmount}>
-          {currencySymbol}{amount.toLocaleString()}
+        <Text
+          style={[styles.offerAmount, isPlatinumOffer && styles.platinumAmount]}
+        >
+          {currencySymbol}
+          {amount.toLocaleString()}
         </Text>
 
         {momentTitle && (
           <Text style={styles.offerMoment} numberOfLines={2}>
-            for "{momentTitle}"
+            "{momentTitle}" için
           </Text>
         )}
 
         <Text style={styles.offerDesc}>
           {status === 'pending'
-            ? 'Someone wants to gift you this moment!'
+            ? 'Birisi size bu anı hediye etmek istiyor!'
             : statusConfig?.text}
         </Text>
 
@@ -126,20 +242,34 @@ export const OfferBubble: React.FC<OfferBubbleProps> = ({
           <View style={styles.offerActions}>
             <TouchableOpacity
               style={styles.offerButtonReject}
-              onPress={onDecline}
+              onPress={handleDecline}
               activeOpacity={0.8}
             >
               <MaterialCommunityIcons name="close" size={18} color="white" />
-              <Text style={styles.offerButtonTextSmall}>Decline</Text>
+              <Text style={styles.offerButtonTextSmall}>Reddet</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.offerButtonAccept}
-              onPress={onAccept}
+              style={[
+                styles.offerButtonAccept,
+                isPlatinumOffer && styles.platinumAcceptButton,
+              ]}
+              onPress={handleAccept}
               activeOpacity={0.8}
+              disabled={isProcessing}
             >
-              <MaterialCommunityIcons name="check" size={18} color="black" />
-              <Text style={styles.offerButtonText}>Accept</Text>
+              {isProcessing ? (
+                <ActivityIndicator size="small" color="black" />
+              ) : (
+                <>
+                  <MaterialCommunityIcons
+                    name="check"
+                    size={18}
+                    color="black"
+                  />
+                  <Text style={styles.offerButtonText}>Kabul Et</Text>
+                </>
+              )}
             </TouchableOpacity>
           </View>
         )}
@@ -155,6 +285,61 @@ export const OfferBubble: React.FC<OfferBubbleProps> = ({
           </View>
         )}
       </LinearGradient>
+
+      {/* PayTR Pre-authorization WebView Modal */}
+      <Modal
+        visible={showPayTRWebView}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => {
+          setShowPayTRWebView(false);
+          onPaymentFailure?.('Ödeme iptal edildi');
+        }}
+      >
+        <View style={styles.webViewContainer}>
+          <View style={styles.webViewHeader}>
+            <TouchableOpacity
+              onPress={() => {
+                setShowPayTRWebView(false);
+                onPaymentFailure?.('Ödeme iptal edildi');
+              }}
+            >
+              <MaterialCommunityIcons
+                name="close"
+                size={24}
+                color={COLORS.text.primary}
+              />
+            </TouchableOpacity>
+            <Text style={styles.webViewTitle}>Güvenli Ödeme</Text>
+            <MaterialCommunityIcons
+              name="lock"
+              size={20}
+              color={COLORS.feedback.success}
+            />
+          </View>
+          {paytrToken && (
+            <WebView
+              source={{
+                uri: `https://www.paytr.com/odeme/guvenli/${paytrToken}`,
+              }}
+              onNavigationStateChange={handlePayTRNavigation}
+              style={styles.webView}
+              startInLoadingState
+              renderLoading={() => (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator
+                    size="large"
+                    color={COLORS.brand.primary}
+                  />
+                  <Text style={styles.loadingText}>
+                    PayTR'a bağlanılıyor...
+                  </Text>
+                </View>
+              )}
+            />
+          )}
+        </View>
+      </Modal>
     </Animated.View>
   );
 };
@@ -173,6 +358,32 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
   },
+  platinumCard: {
+    borderWidth: 1,
+    borderColor: 'rgba(255,215,0,0.3)',
+    shadowColor: COLORS.brand.accent,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  platinumBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(255,215,0,0.15)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  platinumBadgeText: {
+    color: COLORS.brand.accent,
+    fontSize: 10,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
   offerHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -189,6 +400,12 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: 'white',
     marginVertical: 4,
+  },
+  platinumAmount: {
+    color: COLORS.brand.accent,
+    textShadowColor: 'rgba(255,215,0,0.5)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
   },
   offerMoment: {
     color: 'rgba(255,255,255,0.9)',
@@ -227,6 +444,14 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 12,
     backgroundColor: COLORS.brand.accent,
+  },
+  platinumAcceptButton: {
+    backgroundColor: COLORS.brand.accent,
+    shadowColor: COLORS.brand.accent,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 4,
   },
   offerButtonText: {
     fontWeight: 'bold',
@@ -301,6 +526,45 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 12,
     fontWeight: '600',
+  },
+
+  // PayTR WebView styles
+  webViewContainer: {
+    flex: 1,
+    backgroundColor: COLORS.background.primary,
+  },
+  webViewHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border.light,
+    backgroundColor: COLORS.background.secondary,
+  },
+  webViewTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.text.primary,
+  },
+  webView: {
+    flex: 1,
+  },
+  loadingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.background.primary,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: COLORS.text.secondary,
   },
 });
 

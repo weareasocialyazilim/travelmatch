@@ -37,12 +37,12 @@ const STEPS: Step[] = [
     icon: 'arrow-up-circle',
     title: 'You send a gift',
     description:
-      'Your money goes into a secure escrow balance, not directly to the traveler.',
+      'Your money goes into a secure escrow balance, not directly to the host.',
   },
   {
     id: '2',
     icon: 'cloud-upload',
-    title: 'Traveler uploads proof',
+    title: 'Host uploads proof',
     description:
       'They provide a receipt, photo, or location check-in to verify the moment.',
   },
@@ -128,7 +128,7 @@ export const HowEscrowWorksScreen: React.FC<HowEscrowWorksScreenProps> = ({
           <View style={styles.faqCard}>
             <Text style={styles.faqTitle}>What if proof looks wrong?</Text>
             <Text style={styles.faqDescription}>
-              You&apos;re in control. You can ask the traveler for more proof or
+              You&apos;re in control. You can ask the host for more proof or
               clarification. If you&apos;re still not satisfied, you can open a
               dispute and our support team will help mediate.
             </Text>

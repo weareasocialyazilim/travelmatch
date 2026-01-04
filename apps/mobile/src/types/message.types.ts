@@ -5,7 +5,12 @@
 
 export type MessageType = 'text' | 'image' | 'location' | 'system' | 'offer';
 
-export type MessageStatus = 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
+export type MessageStatus =
+  | 'sending'
+  | 'sent'
+  | 'delivered'
+  | 'read'
+  | 'failed';
 
 export interface MessageLocation {
   latitude: number;
@@ -49,7 +54,13 @@ export interface LocationMessage extends BaseMessage {
 
 export interface SystemMessage extends BaseMessage {
   type: 'system';
-  system_type: 'user_joined' | 'user_left' | 'trip_created' | 'trip_cancelled';
+  system_type:
+    | 'user_joined'
+    | 'user_left'
+    | 'moment_created'
+    | 'moment_completed'
+    | 'gift_sent'
+    | 'gift_received';
   metadata?: Record<string, unknown>;
 }
 
@@ -60,15 +71,25 @@ export interface OfferMessage extends BaseMessage {
   amount: number;
   currency?: string;
   offer_status: OfferStatus;
-  moment_id?: string;
+  /** Reference to the moment this offer is for */
+  moment_id: string;
   moment_title?: string;
+  /** PayTR gift transaction ID */
+  gift_offer_id?: string;
+  /** PayTR pre-auth token for payment processing */
+  paytr_token?: string;
   expires_at?: string;
 }
 
 /**
  * Discriminated Union - TypeScript will narrow the type based on 'type' field
  */
-export type Message = TextMessage | ImageMessage | LocationMessage | SystemMessage | OfferMessage;
+export type Message =
+  | TextMessage
+  | ImageMessage
+  | LocationMessage
+  | SystemMessage
+  | OfferMessage;
 
 /**
  * Type Guards for runtime type checking
