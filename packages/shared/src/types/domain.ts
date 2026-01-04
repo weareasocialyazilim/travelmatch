@@ -3,6 +3,8 @@
  * Business domain specific types (Messages, Proofs, Transactions, etc.)
  */
 
+import type { TransactionStatus, TransactionType } from './enums';
+
 export interface Message {
   id: string;
   conversation_id: string;
@@ -50,13 +52,8 @@ export interface Proof {
   updated_at: string;
 }
 
-export type TransactionType = 'gift' | 'withdrawal' | 'refund' | 'deposit';
-export type TransactionStatus =
-  | 'pending'
-  | 'processing'
-  | 'completed'
-  | 'failed'
-  | 'cancelled';
+// Note: TransactionType and TransactionStatus are defined in schemas/payment.ts
+// and re-exported from schemas/index.ts to avoid duplicate exports
 
 export interface TransactionParticipant {
   id: string;

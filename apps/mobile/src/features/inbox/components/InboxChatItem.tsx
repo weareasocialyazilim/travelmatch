@@ -40,8 +40,8 @@ import {
   INBOX_SPACING,
   INBOX_SPRINGS,
 } from '../constants/theme';
-import { COLORS } from '../../../constants/colors';
-import { TYPOGRAPHY_SYSTEM } from '../../../constants/typography';
+import { COLORS } from '@/constants/colors';
+import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
 import StatusBadge from './StatusBadge';
 import type { InboxChat } from '../types/inbox.types';
 

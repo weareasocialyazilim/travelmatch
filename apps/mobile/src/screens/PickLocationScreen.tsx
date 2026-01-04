@@ -6,13 +6,16 @@ import {
   Text,
   Dimensions,
 } from 'react-native';
-import MapView, { Region } from 'react-native-maps';
+import Mapbox, { MapView, Camera } from '@rnmapbox/maps';
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { COLORS } from '@/constants/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import type { RootStackParamList } from '@/navigation/routeParams';
+
+// Initialize Mapbox
+Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN || '');
 
 const { width, height } = Dimensions.get('window');
 
@@ -30,19 +33,31 @@ export const PickLocationScreen = ({ navigation }: Props) => {
     navigation.goBack();
   };
 
+  const handleRegionChange = (feature: GeoJSON.Feature) => {
+    if (feature.geometry.type === 'Point') {
+      const [longitude, latitude] = feature.geometry.coordinates;
+      setSelectedLocation({ latitude, longitude });
+    }
+  };
+
   return (
     <View style={styles.container}>
       <MapView
         style={styles.map}
-        initialRegion={{
-          latitude: 41.0082,
-          longitude: 28.9784,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
+        styleURL={Mapbox.StyleURL.Street}
+        onCameraChanged={(state) => {
+          setSelectedLocation({
+            latitude: state.properties.center[1],
+            longitude: state.properties.center[0],
+          });
         }}
-        onRegionChangeComplete={(region: Region) => setSelectedLocation(region)}
       >
-        {/* Center Marker is static in UI, map moves underneath */}
+        <Camera
+          defaultSettings={{
+            centerCoordinate: [28.9784, 41.0082],
+            zoomLevel: 14,
+          }}
+        />
       </MapView>
 
       <View style={styles.centerMarker}>

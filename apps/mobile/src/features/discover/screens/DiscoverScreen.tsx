@@ -13,7 +13,13 @@
  * Note: FloatingDock navigation is handled by MainTabNavigator
  */
 
-import React, { useRef, useCallback, useMemo } from 'react';
+import React, {
+  useRef,
+  useCallback,
+  useMemo,
+  useEffect,
+  useState,
+} from 'react';
 import {
   View,
   StyleSheet,
@@ -23,9 +29,12 @@ import {
   StatusBar,
   ActivityIndicator,
   Text,
+  TouchableOpacity,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import {
   ImmersiveMomentCard,
   AwwwardsDiscoverHeader,
@@ -34,8 +43,11 @@ import {
 } from '../components';
 // Note: FloatingDock is now rendered by MainTabNavigator
 import { useMoments, type Moment } from '@/hooks/useMoments';
+import { useStories } from '@/hooks/useStories';
+import { useAuth } from '@/hooks/useAuth';
 import { COLORS } from '@/constants/colors';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
+import { LoginPromptModal } from '@/components/LoginPromptModal';
 import type { NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
@@ -90,52 +102,47 @@ const getTierFromPrice = (price: number, category: string): number => {
   return 4;
 };
 
-// Mock stories data - In production, this comes from a hook
-const MOCK_STORIES: UserStory[] = [
-  {
-    id: '1',
-    name: 'Ayşe',
-    avatar: 'https://i.pravatar.cc/150?img=1',
-    hasStory: true,
-    isNew: true,
-    stories: [],
-  },
-  {
-    id: '2',
-    name: 'Mehmet',
-    avatar: 'https://i.pravatar.cc/150?img=2',
-    hasStory: true,
-    isNew: true,
-    stories: [],
-  },
-  {
-    id: '3',
-    name: 'Zeynep',
-    avatar: 'https://i.pravatar.cc/150?img=3',
-    hasStory: true,
-    isNew: false,
-    stories: [],
-  },
-  {
-    id: '4',
-    name: 'Can',
-    avatar: 'https://i.pravatar.cc/150?img=4',
-    hasStory: true,
-    isNew: false,
-    stories: [],
-  },
-];
-
 const DiscoverScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const flatListRef = useRef<FlatList>(null);
   const { moments, loading, error, refresh, loadMore, hasMore } = useMoments();
+  const { user, isGuest } = useAuth();
+
+  // Login prompt modal state
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [loginPromptAction, setLoginPromptAction] = useState<
+    'gift' | 'chat' | 'save' | 'default'
+  >('default');
+  const [pendingMoment, setPendingMoment] = useState<Moment | null>(null);
+
+  // Use real stories data from hook instead of mock data
+  const {
+    stories: userStories,
+    loading: storiesLoading,
+    refresh: refreshStories,
+  } = useStories();
 
   // Filter only active moments
   const activeMoments = useMemo(
     () => moments.filter((m) => m.status === 'active'),
     [moments],
   );
+
+  // Convert stories to UserStory format
+  const stories: UserStory[] = useMemo(() => {
+    if (!userStories || userStories.length === 0) {
+      // Return empty array - no mock data in production
+      return [];
+    }
+    return userStories.map((story) => ({
+      id: story.userId,
+      name: story.userName,
+      avatar: story.userAvatar,
+      hasStory: true,
+      isNew: story.isNew ?? false,
+      stories: story.items || [],
+    }));
+  }, [userStories]);
 
   // Header actions
   const handleSearchPress = useCallback(() => {
@@ -222,6 +229,15 @@ const DiscoverScreen = () => {
   const handleGiftPress = useCallback(
     (moment: Moment) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+      // Guest kullanıcı kontrolü - LoginPromptModal göster
+      if (isGuest || !user) {
+        setPendingMoment(moment);
+        setLoginPromptAction('gift');
+        setShowLoginPrompt(true);
+        return;
+      }
+
       // Navigate to gift flow
       navigation.navigate('UnifiedGiftFlow', {
         recipientId: moment.hostId,
@@ -229,14 +245,42 @@ const DiscoverScreen = () => {
         momentId: moment.id,
       });
     },
-    [navigation],
+    [navigation, isGuest, user],
   );
 
-  // Handle Like Press
-  const handleLikePress = useCallback((_moment: Moment) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    // TODO: Implement save/unsave logic using _moment.id
+  // Handle Like Press (Save)
+  const handleLikePress = useCallback(
+    (moment: Moment) => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+      // Guest kullanıcı kontrolü
+      if (isGuest || !user) {
+        setPendingMoment(moment);
+        setLoginPromptAction('save');
+        setShowLoginPrompt(true);
+        return;
+      }
+
+      // TODO: Implement save/unsave logic using moment.id
+    },
+    [isGuest, user],
+  );
+
+  // Login Modal Handlers
+  const handleLoginModalClose = useCallback(() => {
+    setShowLoginPrompt(false);
+    setPendingMoment(null);
   }, []);
+
+  const handleLoginPress = useCallback(() => {
+    setShowLoginPrompt(false);
+    navigation.navigate('Login' as any);
+  }, [navigation]);
+
+  const handleRegisterPress = useCallback(() => {
+    setShowLoginPrompt(false);
+    navigation.navigate('Register' as any);
+  }, [navigation]);
 
   // Handle User Press
   const handleUserPress = useCallback(
@@ -325,15 +369,35 @@ const DiscoverScreen = () => {
     );
   }
 
-  // Empty state
+  // Empty state - Premium Turkish UX
   if (!loading && activeMoments.length === 0) {
     return (
       <View style={styles.emptyContainer}>
         <StatusBar barStyle="light-content" backgroundColor="black" />
-        <Text style={styles.emptyTitle}>No moments yet</Text>
+        <Ionicons
+          name="compass-outline"
+          size={64}
+          color={COLORS.text.muted}
+          style={styles.emptyIcon}
+        />
+        <Text style={styles.emptyTitle}>Bu civarda henüz an yok 🗺️</Text>
         <Text style={styles.emptySubtitle}>
-          Be the first to create a moment!
+          Mesafe filtreni artırmayı dene veya{'\n'}yeni bir an başlatan ilk sen
+          ol!
         </Text>
+        <TouchableOpacity
+          style={styles.emptyCTAButton}
+          onPress={() => navigation.navigate('CreateMoment' as any)}
+        >
+          <LinearGradient
+            colors={[COLORS.primary, '#22C55E']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.emptyCTAGradient}
+          >
+            <Text style={styles.emptyCTAText}>An Oluştur</Text>
+          </LinearGradient>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -344,13 +408,13 @@ const DiscoverScreen = () => {
       <View style={styles.headerSection}>
         {/* Stories Section */}
         <StoriesRow
-          stories={MOCK_STORIES}
+          stories={stories}
           onStoryPress={handleStoryPress}
           onCreatePress={handleCreateStoryPress}
         />
       </View>
     ),
-    [handleStoryPress, handleCreateStoryPress],
+    [stories, handleStoryPress, handleCreateStoryPress],
   );
 
   return (
@@ -363,7 +427,7 @@ const DiscoverScreen = () => {
 
       {/* Awwwards-style Header */}
       <AwwwardsDiscoverHeader
-        userName="Traveler"
+        userName="Explorer"
         notificationCount={3}
         onSearchPress={handleSearchPress}
         onNotificationsPress={handleNotificationsPress}
@@ -395,6 +459,15 @@ const DiscoverScreen = () => {
           <ActivityIndicator size="small" color={COLORS.brand.primary} />
         </View>
       )}
+
+      {/* Guest Login Prompt Modal */}
+      <LoginPromptModal
+        visible={showLoginPrompt}
+        onClose={handleLoginModalClose}
+        onLogin={handleLoginPress}
+        onRegister={handleRegisterPress}
+        action={loginPromptAction}
+      />
 
       {/* FloatingDock is rendered by MainTabNavigator */}
     </View>
@@ -459,6 +532,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
   },
+  emptyIcon: {
+    marginBottom: 16,
+  },
   emptyTitle: {
     color: COLORS.text.primary,
     fontSize: 24,
@@ -469,6 +545,22 @@ const styles = StyleSheet.create({
     color: COLORS.text.secondary,
     fontSize: 16,
     textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 24,
+  },
+  emptyCTAButton: {
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  emptyCTAGradient: {
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 16,
+  },
+  emptyCTAText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
   },
 
   // Load More

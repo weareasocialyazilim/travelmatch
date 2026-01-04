@@ -15,8 +15,8 @@
 
 import React, { memo } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
-import { COLORS } from '../../../constants/colors';
-import { TYPOGRAPHY_SYSTEM } from '../../../constants/typography';
+import { COLORS } from '@/constants/colors';
+import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
 
 interface MessageBubbleProps {
   message: {

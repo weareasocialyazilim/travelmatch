@@ -1,13 +1,17 @@
 /**
  * Production Monitoring Service
- * 
+ *
  * Integrates Datadog RUM for real-time user monitoring, performance tracking,
  * and error reporting in production.
- * 
+ *
  * @see https://docs.datadoghq.com/real_user_monitoring/reactnative/
  */
 
-import { DdRum, RumActionType, ErrorSource } from '@datadog/mobile-react-native';
+import {
+  DdRum,
+  RumActionType,
+  ErrorSource,
+} from '@datadog/mobile-react-native';
 import { Platform } from 'react-native';
 
 interface MonitoringConfig {
@@ -25,7 +29,7 @@ class MonitoringService {
 
   /**
    * Initialize Datadog RUM
-   * 
+   *
    * @example
    * ```typescript
    * await monitoringService.initialize({
@@ -64,7 +68,7 @@ class MonitoringService {
 
   /**
    * Set user information for tracking
-   * 
+   *
    * @example
    * ```typescript
    * monitoringService.setUser({
@@ -74,7 +78,12 @@ class MonitoringService {
    * });
    * ```
    */
-  setUser(user: { id: string; email?: string; name?: string; [key: string]: any }): void {
+  setUser(user: {
+    id: string;
+    email?: string;
+    name?: string;
+    [key: string]: any;
+  }): void {
     if (!this.enabled) return;
 
     const { id, email, name, ...extraInfo } = user;
@@ -91,7 +100,7 @@ class MonitoringService {
 
   /**
    * Track a custom action
-   * 
+   *
    * @example
    * ```typescript
    * monitoringService.trackAction('moment_created', {
@@ -109,7 +118,7 @@ class MonitoringService {
 
   /**
    * Track an error
-   * 
+   *
    * @example
    * ```typescript
    * try {
@@ -125,20 +134,15 @@ class MonitoringService {
   trackError(error: Error, context?: Record<string, any>): void {
     if (!this.enabled) return;
 
-    DdRum.addError(
-      error.message,
-      ErrorSource.SOURCE,
-      error.stack || '',
-      {
-        ...context,
-        timestamp: Date.now(),
-      }
-    );
+    DdRum.addError(error.message, ErrorSource.SOURCE, error.stack || '', {
+      ...context,
+      timestamp: Date.now(),
+    });
   }
 
   /**
    * Add custom timing
-   * 
+   *
    * @example
    * ```typescript
    * const start = Date.now();
@@ -146,7 +150,11 @@ class MonitoringService {
    * monitoringService.addTiming('moments_load_time', Date.now() - start);
    * ```
    */
-  addTiming(name: string, durationMs: number, attributes?: Record<string, any>): void {
+  addTiming(
+    name: string,
+    durationMs: number,
+    attributes?: Record<string, any>,
+  ): void {
     if (!this.enabled) return;
 
     DdRum.addTiming(name);
@@ -158,7 +166,7 @@ class MonitoringService {
 
   /**
    * Start a custom view
-   * 
+   *
    * @example
    * ```typescript
    * monitoringService.startView('MomentDetail', { momentId: '123' });
@@ -183,7 +191,7 @@ class MonitoringService {
 
   /**
    * Track a resource (API call, image load, etc.)
-   * 
+   *
    * @example
    * ```typescript
    * const resourceId = monitoringService.startResource('GET', '/api/moments');
@@ -195,7 +203,11 @@ class MonitoringService {
    * }
    * ```
    */
-  startResource(method: string, url: string, attributes?: Record<string, any>): string {
+  startResource(
+    method: string,
+    url: string,
+    attributes?: Record<string, any>,
+  ): string {
     if (!this.enabled) return '';
 
     const resourceId = `${method}_${url}_${Date.now()}`;
@@ -218,7 +230,7 @@ class MonitoringService {
       `Resource error: ${error.message}`,
       ErrorSource.NETWORK,
       error.stack || '',
-      { resourceId }
+      { resourceId },
     );
   }
 
@@ -263,6 +275,102 @@ class MonitoringService {
    */
   isEnabled(): boolean {
     return this.enabled;
+  }
+
+  // ============================================
+  // Moment Detail TTR Tracking (Time To Render)
+  // ============================================
+
+  private ttrThresholds = {
+    momentDetail: 300, // 300ms threshold for Moment Detail screen
+    discoverScreen: 500,
+    profileScreen: 400,
+  };
+
+  private ttrAlertCallbacks: Map<
+    string,
+    (screenName: string, ttr: number) => void
+  > = new Map();
+
+  /**
+   * Register TTR alert callback
+   * Called when screen render time exceeds threshold
+   */
+  onTTRAlert(callback: (screenName: string, ttr: number) => void): () => void {
+    const id = Date.now().toString();
+    this.ttrAlertCallbacks.set(id, callback);
+    return () => this.ttrAlertCallbacks.delete(id);
+  }
+
+  /**
+   * Track Time To Render for a screen
+   * Master tracking: Alerts if TTR exceeds threshold
+   *
+   * @example
+   * ```typescript
+   * // In MomentDetailScreen
+   * const ttrStart = Date.now();
+   * useEffect(() => {
+   *   monitoringService.trackScreenTTR('momentDetail', Date.now() - ttrStart, {
+   *     momentId: moment.id,
+   *     hasImages: moment.images?.length > 0,
+   *   });
+   * }, []);
+   * ```
+   */
+  trackScreenTTR(
+    screenName: 'momentDetail' | 'discoverScreen' | 'profileScreen',
+    ttrMs: number,
+    attributes?: Record<string, any>,
+  ): void {
+    if (!this.enabled) return;
+
+    // Track timing
+    this.addTiming(`${screenName}_ttr`, ttrMs, {
+      screen: screenName,
+      ...attributes,
+    });
+
+    // Check threshold and alert if exceeded
+    const threshold = this.ttrThresholds[screenName];
+    if (ttrMs > threshold) {
+      console.warn(
+        `[Monitoring] ${screenName} TTR (${ttrMs}ms) exceeded threshold (${threshold}ms)`,
+      );
+
+      // Track as performance issue
+      DdRum.addAction(RumActionType.CUSTOM, 'ttr_threshold_exceeded', {
+        screen: screenName,
+        ttr_ms: ttrMs,
+        threshold_ms: threshold,
+        exceeded_by_ms: ttrMs - threshold,
+        ...attributes,
+      });
+
+      // Notify callbacks (for admin alerts)
+      this.ttrAlertCallbacks.forEach((callback) => {
+        try {
+          callback(screenName, ttrMs);
+        } catch (e) {
+          console.error('[Monitoring] TTR alert callback error:', e);
+        }
+      });
+    }
+  }
+
+  /**
+   * Start TTR measurement for a screen
+   * Returns a function to call when render is complete
+   */
+  startTTRMeasurement(
+    screenName: 'momentDetail' | 'discoverScreen' | 'profileScreen',
+  ): (attributes?: Record<string, any>) => void {
+    const startTime = Date.now();
+
+    return (attributes?: Record<string, any>) => {
+      const ttr = Date.now() - startTime;
+      this.trackScreenTTR(screenName, ttr, attributes);
+    };
   }
 }
 

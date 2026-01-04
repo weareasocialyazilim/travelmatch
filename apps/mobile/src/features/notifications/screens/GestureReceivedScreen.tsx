@@ -12,7 +12,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
 import { LeaveTrustNoteBottomSheet } from '@/components/LeaveTrustNoteBottomSheet';
-import { ThankYouModal } from '@/components/ThankYouModal';
+import { ThankYouModal } from '@/features/gifts/components';
 import {
   createTrustNote,
   hasWrittenNoteForGift,
@@ -173,8 +173,8 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
           name: senderName || 'Anonymous',
           avatar: senderAvatar || '',
           isVerified: true,
-          type: 'traveler',
-          role: 'Traveler',
+          type: 'member',
+          role: 'Üye',
           kyc: 'Verified',
           location: '',
         },

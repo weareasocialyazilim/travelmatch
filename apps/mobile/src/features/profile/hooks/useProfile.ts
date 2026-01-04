@@ -1,9 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { profileApi, UpdateProfileDto } from '../services/profileApi';
+import { profileApi, UpdateProfileDto } from '../services/profileService';
 
 /**
  * useProfile Hook
- * 
+ *
  * Kullanıcı profili yönetimi
  */
 export function useProfile(userId: string) {
@@ -16,7 +16,7 @@ export function useProfile(userId: string) {
 
 /**
  * useMyProfile Hook
- * 
+ *
  * Giriş yapmış kullanıcının profili
  */
 export function useMyProfile() {
@@ -28,7 +28,7 @@ export function useMyProfile() {
 
 /**
  * useUpdateProfile Hook
- * 
+ *
  * Profil güncelleme mutation
  */
 export function useUpdateProfile() {
@@ -44,7 +44,7 @@ export function useUpdateProfile() {
 
 /**
  * useReputation Hook
- * 
+ *
  * Kullanıcı reputation bilgisi
  */
 export function useReputation(userId: string) {
@@ -57,7 +57,7 @@ export function useReputation(userId: string) {
 
 /**
  * useTrustScore Hook
- * 
+ *
  * Trust score detayları
  */
 export function useTrustScore(userId: string) {
@@ -70,7 +70,7 @@ export function useTrustScore(userId: string) {
 
 /**
  * useProofHistory Hook
- * 
+ *
  * Kullanıcının proof geçmişi
  */
 export function useProofHistory(userId: string) {
@@ -83,7 +83,7 @@ export function useProofHistory(userId: string) {
 
 /**
  * useMyMoments Hook
- * 
+ *
  * Kullanıcının paylaştığı moment'lar
  */
 export function useMyMoments(userId: string) {
@@ -96,7 +96,7 @@ export function useMyMoments(userId: string) {
 
 /**
  * useCreateMoment Hook
- * 
+ *
  * Yeni moment oluşturma
  */
 export function useCreateMoment() {
@@ -112,7 +112,7 @@ export function useCreateMoment() {
 
 /**
  * useDeleteMoment Hook
- * 
+ *
  * Moment silme
  */
 export function useDeleteMoment() {

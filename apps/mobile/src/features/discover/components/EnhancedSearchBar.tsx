@@ -23,9 +23,9 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { COLORS } from '../../constants/colors';
-import { TYPOGRAPHY, FONT_SIZES_V2 } from '../../constants/typography';
-import { GlassCard } from '../ui/GlassCard';
+import { COLORS } from '@/constants/colors';
+import { TYPOGRAPHY, FONT_SIZES_V2 } from '@/constants/typography';
+import { GlassCard } from '@/components/ui/GlassCard';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -45,7 +45,10 @@ interface EnhancedSearchBarProps {
   /** Auto-focus the input */
   autoFocus?: boolean;
   /** Additional TextInput props */
-  inputProps?: Omit<TextInputProps, 'style' | 'placeholder' | 'placeholderTextColor'>;
+  inputProps?: Omit<
+    TextInputProps,
+    'style' | 'placeholder' | 'placeholderTextColor'
+  >;
 }
 
 /**
@@ -111,11 +114,10 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
 
   // Animated styles
   const containerStyle = useAnimatedStyle(() => ({
-    borderColor: interpolate(
-      focusAnimation.value,
-      [0, 1],
-      [0, 1],
-    ) === 1 ? COLORS.primary : COLORS.surface.glassBorder,
+    borderColor:
+      interpolate(focusAnimation.value, [0, 1], [0, 1]) === 1
+        ? COLORS.primary
+        : COLORS.surface.glassBorder,
   }));
 
   const filterButtonStyle = useAnimatedStyle(() => ({
@@ -170,7 +172,9 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
                 <Ionicons
                   name="options-outline"
                   size={20}
-                  color={hasActiveFilters ? COLORS.primary : COLORS.text.secondary}
+                  color={
+                    hasActiveFilters ? COLORS.primary : COLORS.text.secondary
+                  }
                 />
                 {/* Active filter indicator */}
                 {hasActiveFilters && <View style={styles.filterBadge} />}

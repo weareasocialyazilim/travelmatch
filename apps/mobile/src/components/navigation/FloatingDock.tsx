@@ -1,10 +1,11 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   StyleSheet,
   View,
   TouchableOpacity,
   Dimensions,
   Platform,
+  Text,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -16,9 +17,18 @@ import Animated, {
   withTiming,
   interpolate,
   Extrapolation,
+  withRepeat,
+  withSequence,
 } from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { COLORS } from '@/theme/colors';
+
+// Neon colors for gift badge
+const NEON = {
+  violet: '#A855F7',
+  violetGlow: 'rgba(168, 85, 247, 0.6)',
+};
 
 const { width } = Dimensions.get('window');
 const DOCK_HORIZONTAL_PADDING = 20;
@@ -35,6 +45,19 @@ const SPRING_CONFIG = {
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 /**
+ * Get pending gift offers count from app state
+ * TODO: Replace with actual store/context in production
+ * This shows on Profile tab when user has unread gift offers
+ */
+const getPendingGiftCount = (): number => {
+  // In production, this would read from:
+  // - Zustand store: useGiftStore.getState().pendingCount
+  // - MMKV cache: storage.getNumber('pendingGiftCount')
+  // - Or a context provider
+  return 0; // Default to 0, will be populated by real data
+};
+
+/**
  * FloatingDock - Liquid Glass Navigation Bar
  *
  * Awwwards-quality floating navigation dock with:
@@ -42,6 +65,7 @@ const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
  * - Neon glow on active state
  * - Silky smooth spring animations
  * - Elevated center action button
+ * - Gift badge with neon violet pulse on Profile tab
  */
 export const FloatingDock: React.FC<BottomTabBarProps> = ({
   state,
@@ -53,7 +77,10 @@ export const FloatingDock: React.FC<BottomTabBarProps> = ({
 
   // Get icon for each tab
   const getTabIcon = useCallback(
-    (routeName: string, focused: boolean): { name: string; type: 'ionicon' | 'material' } => {
+    (
+      routeName: string,
+      focused: boolean,
+    ): { name: string; type: 'ionicon' | 'material' } => {
       switch (routeName) {
         case 'Home':
           return {
@@ -87,7 +114,7 @@ export const FloatingDock: React.FC<BottomTabBarProps> = ({
           };
       }
     },
-    []
+    [],
   );
 
   return (
@@ -141,6 +168,7 @@ export const FloatingDock: React.FC<BottomTabBarProps> = ({
                 onLongPress={onLongPress}
                 getTabIcon={getTabIcon}
                 showBadge={route.name === 'Inbox'}
+                giftCount={route.name === 'Profile' ? getPendingGiftCount() : 0}
               />
             );
           })}
@@ -158,8 +186,12 @@ interface TabItemProps {
   isFocused: boolean;
   onPress: () => void;
   onLongPress: () => void;
-  getTabIcon: (name: string, focused: boolean) => { name: string; type: 'ionicon' | 'material' };
+  getTabIcon: (
+    name: string,
+    focused: boolean,
+  ) => { name: string; type: 'ionicon' | 'material' };
   showBadge?: boolean;
+  giftCount?: number; // Pending gift offers count
 }
 
 const TabItem: React.FC<TabItemProps> = ({
@@ -169,12 +201,34 @@ const TabItem: React.FC<TabItemProps> = ({
   onLongPress,
   getTabIcon,
   showBadge,
+  giftCount = 0,
 }) => {
   const scale = useSharedValue(1);
+  const giftPulse = useSharedValue(1);
   const { name: iconName, type: iconType } = getTabIcon(routeName, isFocused);
+
+  // Pulse animation for gift badge
+  useEffect(() => {
+    if (giftCount > 0) {
+      giftPulse.value = withRepeat(
+        withSequence(
+          withSpring(1.15, { damping: 8 }),
+          withSpring(1, { damping: 8 }),
+        ),
+        -1,
+        true,
+      );
+    } else {
+      giftPulse.value = 1;
+    }
+  }, [giftCount, giftPulse]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
+  }));
+
+  const giftBadgeStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: giftPulse.value }],
   }));
 
   const handlePressIn = () => {
@@ -185,15 +239,19 @@ const TabItem: React.FC<TabItemProps> = ({
     scale.value = withSpring(1, SPRING_CONFIG);
   };
 
-  const iconColor = isFocused
-    ? COLORS.brand.primary
-    : COLORS.text.muted;
+  const handlePress = () => {
+    // Haptic feedback on tab transition
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onPress();
+  };
+
+  const iconColor = isFocused ? COLORS.brand.primary : COLORS.text.muted;
 
   return (
     <AnimatedTouchable
       accessibilityRole="button"
       accessibilityState={isFocused ? { selected: true } : {}}
-      onPress={onPress}
+      onPress={handlePress}
       onLongPress={onLongPress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
@@ -204,19 +262,30 @@ const TabItem: React.FC<TabItemProps> = ({
         {iconType === 'ionicon' ? (
           <Ionicons name={iconName as any} size={26} color={iconColor} />
         ) : (
-          <MaterialCommunityIcons name={iconName as any} size={28} color={iconColor} />
+          <MaterialCommunityIcons
+            name={iconName as any}
+            size={28}
+            color={iconColor}
+          />
         )}
 
         {/* Active Indicator Dot */}
-        {isFocused && (
-          <Animated.View style={styles.activeDot} />
-        )}
+        {isFocused && <Animated.View style={styles.activeDot} />}
 
         {/* Notification Badge */}
         {showBadge && (
           <View style={styles.badge}>
             <View style={styles.badgeInner} />
           </View>
+        )}
+
+        {/* Gift Badge - Neon Violet with count */}
+        {giftCount > 0 && (
+          <Animated.View style={[styles.giftBadge, giftBadgeStyle]}>
+            <Text style={styles.giftBadgeText}>
+              {giftCount > 9 ? '9+' : giftCount}
+            </Text>
+          </Animated.View>
         )}
       </View>
     </AnimatedTouchable>
@@ -231,7 +300,10 @@ interface CenterButtonProps {
   onLongPress: () => void;
 }
 
-const CenterButton: React.FC<CenterButtonProps> = ({ onPress, onLongPress }) => {
+const CenterButton: React.FC<CenterButtonProps> = ({
+  onPress,
+  onLongPress,
+}) => {
   const scale = useSharedValue(1);
   const glowOpacity = useSharedValue(0.4);
 
@@ -253,6 +325,12 @@ const CenterButton: React.FC<CenterButtonProps> = ({ onPress, onLongPress }) => 
     glowOpacity.value = withTiming(0.4, { duration: 150 });
   };
 
+  const handlePress = () => {
+    // Medium haptic for center action (create moment)
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    onPress();
+  };
+
   return (
     <View style={styles.centerButtonWrapper}>
       {/* Glow Effect */}
@@ -262,7 +340,7 @@ const CenterButton: React.FC<CenterButtonProps> = ({ onPress, onLongPress }) => 
       <AnimatedTouchable
         accessibilityRole="button"
         accessibilityLabel="Create new moment"
-        onPress={onPress}
+        onPress={handlePress}
         onLongPress={onLongPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
@@ -375,6 +453,39 @@ const styles = StyleSheet.create({
       },
       android: {},
     }),
+  },
+  // Gift Badge - Neon Violet with pulse animation
+  giftBadge: {
+    position: 'absolute',
+    top: -6,
+    right: -10,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: NEON.violet,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+    borderWidth: 2,
+    borderColor: 'rgba(30, 30, 32, 0.9)',
+    // Neon glow for gift badge
+    ...Platform.select({
+      ios: {
+        shadowColor: NEON.violet,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.8,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
+  giftBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '700',
+    textAlign: 'center',
   },
   centerButtonWrapper: {
     alignItems: 'center',

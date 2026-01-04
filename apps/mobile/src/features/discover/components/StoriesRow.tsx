@@ -22,8 +22,8 @@ import {
   StyleSheet,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../../constants/colors';
-import { TYPOGRAPHY_SYSTEM } from '../../constants/typography';
+import { COLORS } from '@/constants/colors';
+import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
 import type { UserStory } from './types';
 
 interface StoriesRowProps {

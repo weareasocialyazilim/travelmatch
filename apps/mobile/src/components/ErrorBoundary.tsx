@@ -254,6 +254,20 @@ export class ErrorBoundary extends Component<
               <Text style={styles.title}>{content.title}</Text>
               <Text style={styles.message}>{content.message}</Text>
 
+              {/* Sentry notification - Always show in production */}
+              {!__DEV__ && (
+                <View style={styles.reportedBanner}>
+                  <MaterialCommunityIcons
+                    name="check-circle-outline"
+                    size={18}
+                    color={COLORS.feedback.success}
+                  />
+                  <Text style={styles.reportedText}>
+                    Teknik ekibimize bildirdik, ipeksi bir dönüş yapacağız 💝
+                  </Text>
+                </View>
+              )}
+
               {__DEV__ && error && (
                 <View style={styles.debugContainer}>
                   <Text style={styles.debugTitle}>Debug Info:</Text>
@@ -400,6 +414,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     textAlign: 'center',
+  },
+  reportedBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: `${COLORS.feedback.success}15`,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: radii.md,
+    marginBottom: SPACING.lg,
+    gap: SPACING.sm,
+  },
+  reportedText: {
+    ...TYPOGRAPHY.bodySmall,
+    color: COLORS.feedback.success,
+    flex: 1,
   },
 });
 

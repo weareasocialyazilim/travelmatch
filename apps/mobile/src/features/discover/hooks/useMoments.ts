@@ -35,7 +35,9 @@ export function useMoments(filters?: MomentFilters) {
 
       if (momentsWithImages.length > 0) {
         imagePreloader.prefetchMomentsImages(momentsWithImages);
-        logger.debug('[useMoments] Prefetched images', { count: momentsWithImages.length });
+        logger.debug('[useMoments] Prefetched images', {
+          count: momentsWithImages.length,
+        });
       }
     }
   }, [query.data]);
@@ -160,17 +162,3 @@ export function useMyMoments(userId: string) {
     enabled: !!userId,
   });
 }
-
-/**
- * useBooking Hook
- *
- * Booking detayları
- */
-export function useBooking(bookingId: string) {
-  return useQuery({
-    queryKey: ['booking', bookingId],
-    queryFn: () => momentsApi.getBooking(bookingId),
-    enabled: !!bookingId,
-  });
-}
-

@@ -66,7 +66,7 @@
     "settings": "Ayarlar",
     "notifications": "Bildirimler",
     "favorites": "Favoriler",
-    "bookings": "Rezervasyonlar",
+    "bookings": "Hediyelerim",
     "wallet": "Cüzdan",
     "createMoment": "Yeni an oluştur",
     "discoverTab": "Anlar sekmesi",
@@ -448,9 +448,9 @@
   },
   "store": {
     "appName": "TravelMatch",
-    "subtitle": "Seyahat Anlarıyla Bağlan",
-    "shortDescription": "Gezginlerle tanış. Anları paylaş. Deneyimleri hediye et. Farklı seyahat et.",
-    "keywords": "seyahat,deneyim,yerel rehber,turizm,hediye,anlar,keşfet,macera,gezi,tatil,gezinti"
+    "subtitle": "Anları Paylaş, Bağlantı Kur",
+    "shortDescription": "Yakınındaki insanlarla tanış. Anları paylaş. Deneyimleri hediye et. Farklı bağlan.",
+    "keywords": "buluşma,deneyim,hediye,tanışma,anlar,keşfet,bağlantı,kahve,yemek,çıkma"
   },
   "discover": {
     "title": "Keşfet",
@@ -588,7 +588,7 @@
     "cached": "Son yüklenen mesajları gösteriyorsunuz",
     "empty": {
       "title": "Henüz Mesaj Yok",
-      "description": "Gezginlerle veya ev sahipleriyle bağlantı kurduğunuzda, konuşmalarınız burada görünecek."
+      "description": "Biriyle bağlantı kurduğunuzda, mesajlarınız burada görünecek. İlk adımı sen at! 💝"
     },
     "search": {
       "placeholder": "Konuşmaları ara..."

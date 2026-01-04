@@ -40,10 +40,10 @@ type KVKKAydinlatmaScreenProps = StackScreenProps<
 // =============================================================================
 
 const COMPANY_INFO = {
-  name: 'TravelMatch Teknoloji A.Ş.',
+  name: 'Moment Teknoloji A.Ş.',
   address: 'İstanbul, Türkiye',
-  email: 'kvkk@travelmatch.app',
-  kep: 'travelmatch@hs01.kep.tr',
+  email: 'kvkk@moment.app',
+  kep: 'moment@hs01.kep.tr',
   mersis: '0123456789012345',
 };
 
@@ -63,11 +63,12 @@ MERSİS No: ${COMPANY_INFO.mersis}`,
     title: '2. İşlenen Kişisel Veriler',
     content: `Platformumuz aracılığıyla aşağıdaki kategorilerdeki kişisel verilerinizi işlemekteyiz:
 
-• Kimlik Bilgileri: Ad, soyad, doğum tarihi
+• Kimlik Bilgileri: Ad, soyad, doğum tarihi, T.C. Kimlik Numarası (KYC için)
 • İletişim Bilgileri: E-posta adresi, telefon numarası
 • Finansal Bilgiler: IBAN (maskelenmiş), ödeme geçmişi
-• Konum Bilgileri: Deneyim doğrulama için GPS konumu
-• Görsel Veriler: Profil fotoğrafı, deneyim kanıt fotoğrafları
+• KYC Bilgileri: Kimlik belgesi görüntüsü, yüz doğrulama (PayTR KYC için)
+• Konum Bilgileri: Anı doğrulama için GPS konumu
+• Görsel Veriler: Profil fotoğrafı, anı kanıt fotoğrafları
 • Cihaz Bilgileri: IP adresi, cihaz kimliği, tarayıcı bilgileri
 • İşlem Bilgileri: Hediye geçmişi, escrow işlemleri
 • Çerez Bilgileri: Oturum çerezleri, analitik çerezleri`,
@@ -80,9 +81,10 @@ MERSİS No: ${COMPANY_INFO.mersis}`,
 • Üyelik ve hesap oluşturma işlemlerinin yürütülmesi
 • Kimlik doğrulama ve güvenlik kontrollerinin sağlanması
 • Hediye ve escrow işlemlerinin gerçekleştirilmesi
-• Deneyim kanıtlarının doğrulanması
+• Anı kanıtlarının doğrulanması
 • Ödeme işlemlerinin güvenli şekilde tamamlanması
-• Yasal yükümlülüklerin yerine getirilmesi
+• Yasal Ödeme Yükümlülükleri: PayTR KYC (Müşterini Tanı) prosedürleri kapsamında kimlik doğrulama
+• Yasal yükümlülüklerin yerine getirilmesi (5549 sayılı MASAK Kanunu dahil)
 • Müşteri memnuniyeti ve destek hizmetlerinin sunulması
 • Fraud (dolandırıcılık) tespiti ve önlenmesi
 • Hizmetlerimizin iyileştirilmesi ve analizi`,
@@ -93,7 +95,7 @@ MERSİS No: ${COMPANY_INFO.mersis}`,
     content: `Kişisel verileriniz KVKK'nın 5. ve 6. maddelerinde belirtilen aşağıdaki hukuki sebeplere dayanılarak işlenmektedir:
 
 • Sözleşmenin kurulması veya ifası (Md. 5/2-c): Platform üyelik sözleşmesi, hediye işlemleri
-• Kanuni yükümlülük (Md. 5/2-ç): Vergi mevzuatı, e-ticaret düzenlemeleri
+• Kanuni yükümlülük (Md. 5/2-ç): Vergi mevzuatı, e-ticaret düzenlemeleri, 5549 sayılı MASAK Kanunu, PayTR KYC yükümlülükleri
 • Meşru menfaat (Md. 5/2-f): Hizmet kalitesi, güvenlik önlemleri
 • Açık rıza (Md. 5/1): Pazarlama iletileri, kişiselleştirme
 
@@ -105,7 +107,9 @@ MERSİS No: ${COMPANY_INFO.mersis}`,
     content: `Kişisel verileriniz, yukarıda belirtilen amaçlarla sınırlı olmak üzere aşağıdaki taraflara aktarılabilmektedir:
 
 Yurt İçi Aktarımlar:
-• PayTR Ödeme Hizmetleri A.Ş. (ödeme işlemleri)
+• PayTR Ödeme ve Elektronik Para Kuruluşu A.Ş. (ödeme işlemleri ve KYC doğrulama)
+  - Aktarılan veriler: Kimlik bilgileri, T.C. Kimlik No, kimlik belgesi görüntüsü
+  - Aktarım amacı: Yasal Ödeme Yükümlülükleri, MASAK uyumu, KYC prosedürleri
 • Yetkili kamu kurum ve kuruluşları (yasal zorunluluk halinde)
 
 Yurt Dışı Aktarımlar (KVKK Md. 9 uyarınca):
@@ -124,6 +128,7 @@ Yurt dışı aktarımlarında KVKK'nın 9. maddesi kapsamında gerekli güvenlik
 • Web sitesi formları
 • API entegrasyonları
 • Çerezler ve benzeri teknolojiler
+• PayTR KYC doğrulama süreci (kimlik belgesi tarama)
 • Ödeme hizmeti sağlayıcıları aracılığıyla
 
 Veriler otomatik ve yarı otomatik yollarla işlenmektedir.`,
@@ -134,6 +139,7 @@ Veriler otomatik ve yarı otomatik yollarla işlenmektedir.`,
     content: `Kişisel verileriniz, işlenme amaçlarının gerektirdiği süre boyunca ve ilgili mevzuatta öngörülen zamanaşımı süreleri kadar saklanmaktadır:
 
 • Üyelik bilgileri: Hesap aktif olduğu sürece
+• KYC/Kimlik bilgileri: 10 yıl (MASAK mevzuatı)
 • İşlem kayıtları: 10 yıl (Türk Ticaret Kanunu)
 • Fatura bilgileri: 10 yıl (Vergi mevzuatı)
 • Güvenlik logları: 2 yıl
@@ -203,12 +209,18 @@ export default function KVKKAydinlatmaScreen({
       >
         {/* Version & Date */}
         <View style={styles.versionBox}>
-          <Text style={styles.versionText}>Versiyon 1.0 | Son Güncelleme: 29 Aralık 2024</Text>
+          <Text style={styles.versionText}>
+            Versiyon 1.0 | Son Güncelleme: 29 Aralık 2024
+          </Text>
         </View>
 
         {/* KVKK Badge */}
         <View style={styles.kvkkBadge}>
-          <MaterialCommunityIcons name="shield-check" size={24} color="#1976D2" />
+          <MaterialCommunityIcons
+            name="shield-check"
+            size={24}
+            color="#1976D2"
+          />
           <Text style={styles.kvkkBadgeText}>
             6698 Sayılı KVKK Md. 10 Kapsamında Aydınlatma Metni
           </Text>
@@ -225,9 +237,10 @@ export default function KVKKAydinlatmaScreen({
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            Bu aydınlatma metni, 6698 sayılı Kişisel Verilerin Korunması Kanunu'nun
-            10. maddesi ve Aydınlatma Yükümlülüğünün Yerine Getirilmesinde Uyulacak
-            Usul ve Esaslar Hakkında Tebliğ uyarınca hazırlanmıştır.
+            Bu aydınlatma metni, 6698 sayılı Kişisel Verilerin Korunması
+            Kanunu'nun 10. maddesi ve Aydınlatma Yükümlülüğünün Yerine
+            Getirilmesinde Uyulacak Usul ve Esaslar Hakkında Tebliğ uyarınca
+            hazırlanmıştır.
           </Text>
           <Text style={styles.footerCompany}>{COMPANY_INFO.name}</Text>
         </View>

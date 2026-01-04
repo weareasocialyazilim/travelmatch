@@ -1,9 +1,14 @@
 /**
  * FilterModal Component
- * Category, sort, distance, and price filters
+ * Dating & Gifting Platform Filters
+ *
+ * MASTER Revizyonu:
+ * - Seyahat filtreleri (Otel, Uçuş) kaldırıldı
+ * - Dating filtreleri eklendi (Yaş, Cinsiyet, Mesafe)
+ * - searchStore ile Single Source of Truth entegrasyonu
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,9 +18,81 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, primitives } from '../../constants/colors';
-import { CATEGORIES, SORT_OPTIONS } from './constants';
+import * as Haptics from 'expo-haptics';
+import { COLORS, primitives } from '@/constants/colors';
 import type { PriceRange } from './types';
+
+// Moment-specific categories (no travel filters)
+const MOMENT_CATEGORIES = [
+  { id: 'all', label: 'Tümü', emoji: '✨', icon: 'star-outline' },
+  {
+    id: 'gastronomy',
+    label: 'Gastronomi',
+    emoji: '🍽️',
+    icon: 'food-fork-drink',
+  },
+  { id: 'art', label: 'Sanat', emoji: '🎨', icon: 'palette' },
+  { id: 'music', label: 'Müzik', emoji: '🎵', icon: 'music-note' },
+  { id: 'nature', label: 'Doğa', emoji: '🌿', icon: 'tree' },
+  {
+    id: 'nightlife',
+    label: 'Gece Hayatı',
+    emoji: '🌙',
+    icon: 'moon-waning-crescent',
+  },
+  { id: 'culture', label: 'Kültür', emoji: '🏛️', icon: 'bank' },
+  { id: 'adventure', label: 'Macera', emoji: '🧗', icon: 'hiking' },
+  { id: 'wellness', label: 'Wellness', emoji: '🧘', icon: 'meditation' },
+];
+
+// Gift range options aligned with Chat Lock tiers (0-30-100)
+const GIFT_RANGE_OPTIONS = [
+  { min: 0, max: 30, label: '₺0-30', tier: 'support', description: 'Destek' },
+  {
+    min: 30,
+    max: 100,
+    label: '₺30-100',
+    tier: 'candidate',
+    description: 'Chat Adayı',
+  },
+  {
+    min: 100,
+    max: 999999,
+    label: '₺100+',
+    tier: 'premium',
+    description: 'Premium',
+  },
+  {
+    min: 0,
+    max: 999999,
+    label: 'Tümü',
+    tier: 'all',
+    description: 'Tüm Hediyeler',
+  },
+];
+
+// Gender options for dating
+const GENDER_OPTIONS = [
+  { id: 'all', label: 'Herkes', icon: 'account-group' },
+  { id: 'female', label: 'Kadın', icon: 'gender-female' },
+  { id: 'male', label: 'Erkek', icon: 'gender-male' },
+  { id: 'non-binary', label: 'Diğer', icon: 'gender-non-binary' },
+];
+
+const SORT_OPTIONS = [
+  { id: 'nearest', label: 'En Yakın', icon: 'map-marker' },
+  { id: 'newest', label: 'En Yeni', icon: 'clock-outline' },
+  { id: 'gift_low', label: 'Hediye ↑', icon: 'arrow-up' },
+  { id: 'gift_high', label: 'Hediye ↓', icon: 'arrow-down' },
+  { id: 'popular', label: 'Popüler', icon: 'fire' },
+];
+
+// Distance options with Global
+const DISTANCE_OPTIONS = [5, 10, 25, 50, 100, 500];
+
+// Age range limits
+const AGE_MIN = 18;
+const AGE_MAX = 99;
 
 interface FilterModalProps {
   visible: boolean;
@@ -30,22 +107,9 @@ interface FilterModalProps {
   setPriceRange: (range: PriceRange) => void;
   selectedGender?: string;
   setSelectedGender?: (gender: string) => void;
+  ageRange?: [number, number];
+  setAgeRange?: (range: [number, number]) => void;
 }
-
-const DISTANCE_OPTIONS = [5, 10, 25, 50, 100];
-
-const PRICE_OPTIONS = [
-  { min: 0, max: 50, label: '$0-50' },
-  { min: 50, max: 100, label: '$50-100' },
-  { min: 100, max: 250, label: '$100-250' },
-  { min: 0, max: 500, label: 'All' },
-];
-
-const GENDER_OPTIONS = [
-  { id: 'all', label: 'All', icon: 'account-group' },
-  { id: 'female', label: 'Women', icon: 'human-female' },
-  { id: 'male', label: 'Men', icon: 'human-male' },
-];
 
 export const FilterModal: React.FC<FilterModalProps> = ({
   visible,
@@ -60,13 +124,47 @@ export const FilterModal: React.FC<FilterModalProps> = ({
   setPriceRange,
   selectedGender = 'all',
   setSelectedGender,
+  ageRange = [18, 99],
+  setAgeRange,
 }) => {
+  // Local state for age slider
+  const [localAgeMin, setLocalAgeMin] = useState(ageRange[0]);
+  const [localAgeMax, setLocalAgeMax] = useState(ageRange[1]);
+
+  useEffect(() => {
+    setLocalAgeMin(ageRange[0]);
+    setLocalAgeMax(ageRange[1]);
+  }, [ageRange]);
+
   const handleReset = () => {
     setSelectedCategory('all');
     setSortBy('nearest');
-    setMaxDistance(50);
-    setPriceRange({ min: 0, max: 500 });
+    setMaxDistance(500); // Global by default
+    setPriceRange({ min: 0, max: 999999 }); // Default: all gift ranges
     setSelectedGender?.('all');
+    setAgeRange?.([18, 99]);
+    setLocalAgeMin(18);
+    setLocalAgeMax(99);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
+  const handleApply = () => {
+    // Apply age range
+    if (setAgeRange) {
+      setAgeRange([localAgeMin, localAgeMax]);
+    }
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    onClose();
+  };
+
+  const handleGenderSelect = (gender: string) => {
+    setSelectedGender?.(gender);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
+  const handleDistanceSelect = (distance: number) => {
+    setMaxDistance(distance);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
   return (
@@ -80,7 +178,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
         <View style={styles.modal}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>Filters</Text>
+            <Text style={styles.title}>Filtreler</Text>
             <TouchableOpacity onPress={onClose}>
               <MaterialCommunityIcons
                 name="close"
@@ -91,11 +189,157 @@ export const FilterModal: React.FC<FilterModalProps> = ({
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false}>
-            {/* Category */}
+            {/* Gender Selection - Dating Filter */}
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Category</Text>
+              <Text style={styles.sectionTitle}>
+                Kimlerle Tanışmak İstiyorsun?
+              </Text>
+              <View style={styles.genderOptions}>
+                {GENDER_OPTIONS.map((option) => (
+                  <TouchableOpacity
+                    key={option.id}
+                    style={[
+                      styles.genderChip,
+                      selectedGender === option.id && styles.genderChipActive,
+                    ]}
+                    onPress={() => handleGenderSelect(option.id)}
+                  >
+                    <MaterialCommunityIcons
+                      name={option.icon as any}
+                      size={18}
+                      color={
+                        selectedGender === option.id
+                          ? COLORS.utility.white
+                          : COLORS.text.primary
+                      }
+                    />
+                    <Text
+                      style={[
+                        styles.genderChipText,
+                        selectedGender === option.id &&
+                          styles.genderChipTextActive,
+                      ]}
+                    >
+                      {option.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Age Range */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>
+                Yaş Aralığı: {localAgeMin} -{' '}
+                {localAgeMax === 99 ? '99+' : localAgeMax}
+              </Text>
+              <View style={styles.ageInputRow}>
+                <View style={styles.ageInputContainer}>
+                  <Text style={styles.ageInputLabel}>Min</Text>
+                  <TouchableOpacity
+                    style={styles.ageButton}
+                    onPress={() => {
+                      const newMin = Math.max(AGE_MIN, localAgeMin - 1);
+                      setLocalAgeMin(newMin);
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                  >
+                    <MaterialCommunityIcons
+                      name="minus"
+                      size={20}
+                      color={COLORS.text.primary}
+                    />
+                  </TouchableOpacity>
+                  <Text style={styles.ageValue}>{localAgeMin}</Text>
+                  <TouchableOpacity
+                    style={styles.ageButton}
+                    onPress={() => {
+                      const newMin = Math.min(localAgeMax - 1, localAgeMin + 1);
+                      setLocalAgeMin(newMin);
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                  >
+                    <MaterialCommunityIcons
+                      name="plus"
+                      size={20}
+                      color={COLORS.text.primary}
+                    />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.ageSeparator}>
+                  <Text style={styles.ageSeparatorText}>—</Text>
+                </View>
+                <View style={styles.ageInputContainer}>
+                  <Text style={styles.ageInputLabel}>Max</Text>
+                  <TouchableOpacity
+                    style={styles.ageButton}
+                    onPress={() => {
+                      const newMax = Math.max(localAgeMin + 1, localAgeMax - 1);
+                      setLocalAgeMax(newMax);
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                  >
+                    <MaterialCommunityIcons
+                      name="minus"
+                      size={20}
+                      color={COLORS.text.primary}
+                    />
+                  </TouchableOpacity>
+                  <Text style={styles.ageValue}>
+                    {localAgeMax === 99 ? '99+' : localAgeMax}
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.ageButton}
+                    onPress={() => {
+                      const newMax = Math.min(AGE_MAX, localAgeMax + 1);
+                      setLocalAgeMax(newMax);
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                  >
+                    <MaterialCommunityIcons
+                      name="plus"
+                      size={20}
+                      color={COLORS.text.primary}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+
+            {/* Distance */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>
+                Maksimum Mesafe:{' '}
+                {maxDistance >= 500 ? 'Global' : `${maxDistance} km`}
+              </Text>
+              <View style={styles.distanceOptions}>
+                {DISTANCE_OPTIONS.map((d) => (
+                  <TouchableOpacity
+                    key={d}
+                    style={[
+                      styles.distanceChip,
+                      maxDistance === d && styles.distanceChipActive,
+                    ]}
+                    onPress={() => handleDistanceSelect(d)}
+                  >
+                    <Text
+                      style={[
+                        styles.distanceChipText,
+                        maxDistance === d && styles.distanceChipTextActive,
+                      ]}
+                    >
+                      {d >= 500 ? 'Global' : `${d} km`}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Moment Category */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Anı Kategorisi</Text>
               <View style={styles.categoryGrid}>
-                {CATEGORIES.map((category) => (
+                {MOMENT_CATEGORIES.map((category) => (
                   <TouchableOpacity
                     key={category.id}
                     style={[
@@ -103,7 +347,10 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                       selectedCategory === category.id &&
                         styles.categoryChipActive,
                     ]}
-                    onPress={() => setSelectedCategory(category.id)}
+                    onPress={() => {
+                      setSelectedCategory(category.id);
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
                   >
                     <Text style={styles.categoryChipEmoji}>
                       {category.emoji}
@@ -122,9 +369,57 @@ export const FilterModal: React.FC<FilterModalProps> = ({
               </View>
             </View>
 
+            {/* Gift Range - Aligned with Chat Lock tiers */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>
+                Hediye Aralığı:{' '}
+                {priceRange.min === 0 && priceRange.max === 999999
+                  ? 'Tümü'
+                  : `₺${priceRange.min} - ${priceRange.max >= 999999 ? '∞' : `₺${priceRange.max}`}`}
+              </Text>
+              <View style={styles.priceOptions}>
+                {GIFT_RANGE_OPTIONS.map((range) => (
+                  <TouchableOpacity
+                    key={range.label}
+                    style={[
+                      styles.priceChip,
+                      priceRange.min === range.min &&
+                        priceRange.max === range.max &&
+                        styles.priceChipActive,
+                    ]}
+                    onPress={() => {
+                      setPriceRange({ min: range.min, max: range.max });
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                  >
+                    <Text
+                      style={[
+                        styles.priceChipText,
+                        priceRange.min === range.min &&
+                          priceRange.max === range.max &&
+                          styles.priceChipTextActive,
+                      ]}
+                    >
+                      {range.label}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.priceChipDescription,
+                        priceRange.min === range.min &&
+                          priceRange.max === range.max &&
+                          styles.priceChipDescriptionActive,
+                      ]}
+                    >
+                      {range.description}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
             {/* Sort By */}
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Sort by</Text>
+              <Text style={styles.sectionTitle}>Sıralama</Text>
               <View style={styles.sortOptions}>
                 {SORT_OPTIONS.map((option) => (
                   <TouchableOpacity
@@ -133,10 +428,13 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                       styles.sortOption,
                       sortBy === option.id && styles.sortOptionActive,
                     ]}
-                    onPress={() => setSortBy(option.id)}
+                    onPress={() => {
+                      setSortBy(option.id);
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
                   >
                     <MaterialCommunityIcons
-                      name={option.icon}
+                      name={option.icon as any}
                       size={16}
                       color={
                         sortBy === option.id
@@ -156,111 +454,15 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                 ))}
               </View>
             </View>
-
-            {/* Distance */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>
-                Max Distance: {maxDistance} km
-              </Text>
-              <View style={styles.distanceOptions}>
-                {DISTANCE_OPTIONS.map((d) => (
-                  <TouchableOpacity
-                    key={d}
-                    style={[
-                      styles.distanceChip,
-                      maxDistance === d && styles.distanceChipActive,
-                    ]}
-                    onPress={() => setMaxDistance(d)}
-                  >
-                    <Text
-                      style={[
-                        styles.distanceChipText,
-                        maxDistance === d && styles.distanceChipTextActive,
-                      ]}
-                    >
-                      {d} km
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-
-            {/* Gender */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Show me</Text>
-              <View style={styles.sortOptions}>
-                {GENDER_OPTIONS.map((option) => (
-                  <TouchableOpacity
-                    key={option.id}
-                    style={[
-                      styles.sortOption,
-                      selectedGender === option.id && styles.sortOptionActive,
-                    ]}
-                    onPress={() => setSelectedGender?.(option.id)}
-                  >
-                    <MaterialCommunityIcons
-                      name={option.icon as any}
-                      size={16}
-                      color={
-                        selectedGender === option.id
-                          ? COLORS.utility.white
-                          : COLORS.text.primary
-                      }
-                    />
-                    <Text
-                      style={[
-                        styles.sortOptionText,
-                        selectedGender === option.id &&
-                          styles.sortOptionTextActive,
-                      ]}
-                    >
-                      {option.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-
-            {/* Price Range */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>
-                Price Range: ${priceRange.min} - ${priceRange.max}
-              </Text>
-              <View style={styles.priceOptions}>
-                {PRICE_OPTIONS.map((range) => (
-                  <TouchableOpacity
-                    key={range.label}
-                    style={[
-                      styles.priceChip,
-                      priceRange.min === range.min &&
-                        priceRange.max === range.max &&
-                        styles.priceChipActive,
-                    ]}
-                    onPress={() => setPriceRange(range)}
-                  >
-                    <Text
-                      style={[
-                        styles.priceChipText,
-                        priceRange.min === range.min &&
-                          priceRange.max === range.max &&
-                          styles.priceChipTextActive,
-                      ]}
-                    >
-                      {range.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
           </ScrollView>
 
           {/* Actions */}
           <View style={styles.actions}>
             <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
-              <Text style={styles.resetButtonText}>Reset</Text>
+              <Text style={styles.resetButtonText}>Sıfırla</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.applyButton} onPress={onClose}>
-              <Text style={styles.applyButtonText}>Apply Filters</Text>
+            <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
+              <Text style={styles.applyButtonText}>Uygula</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -380,6 +582,73 @@ const styles = StyleSheet.create({
   distanceChipTextActive: {
     color: COLORS.utility.white,
   },
+  // Gender Selection Styles
+  genderOptions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  genderChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 24,
+    backgroundColor: COLORS.grayLight,
+    gap: 8,
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  genderChipActive: {
+    backgroundColor: COLORS.mint,
+    borderColor: primitives.mint[600],
+  },
+  genderChipText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.text.primary,
+  },
+  genderChipTextActive: {
+    color: COLORS.utility.white,
+  },
+  // Age Range Styles
+  ageInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  ageInputContainer: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  ageInputLabel: {
+    fontSize: 12,
+    color: COLORS.text.tertiary,
+    fontWeight: '500',
+  },
+  ageButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.grayLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ageValue: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: COLORS.text.primary,
+    minWidth: 36,
+    textAlign: 'center',
+  },
+  ageSeparator: {
+    paddingHorizontal: 16,
+  },
+  ageSeparatorText: {
+    fontSize: 18,
+    color: COLORS.text.tertiary,
+  },
   priceOptions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -387,9 +656,11 @@ const styles = StyleSheet.create({
   },
   priceChip: {
     paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
+    paddingVertical: 12,
+    borderRadius: 16,
     backgroundColor: COLORS.grayLight,
+    minWidth: 100,
+    alignItems: 'center',
   },
   priceChipActive: {
     backgroundColor: COLORS.mint,
@@ -397,10 +668,18 @@ const styles = StyleSheet.create({
   priceChipText: {
     fontSize: 14,
     color: COLORS.text.primary,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   priceChipTextActive: {
     color: COLORS.utility.white,
+  },
+  priceChipDescription: {
+    fontSize: 11,
+    color: COLORS.text.tertiary,
+    marginTop: 2,
+  },
+  priceChipDescriptionActive: {
+    color: 'rgba(255, 255, 255, 0.8)',
   },
   actions: {
     flexDirection: 'row',

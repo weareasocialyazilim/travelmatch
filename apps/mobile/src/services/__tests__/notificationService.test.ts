@@ -124,7 +124,10 @@ describe('notificationService', () => {
         select: mockSelectUnread,
       });
 
-      const result = await notificationService.getNotifications({ page: 1, pageSize: 20 });
+      const result = await notificationService.getNotifications({
+        page: 1,
+        pageSize: 20,
+      });
 
       expect(result.notifications).toHaveLength(1);
       expect(result.notifications[0]).toMatchObject({
@@ -147,7 +150,10 @@ describe('notificationService', () => {
       expect(result.notifications).toEqual([]);
       expect(result.total).toBe(0);
       expect(result.unreadCount).toBe(0);
-      expect(logger.error).toHaveBeenCalledWith('Get notifications error:', expect.any(Error));
+      expect(logger.error).toHaveBeenCalledWith(
+        'Get notifications error:',
+        expect.any(Error),
+      );
     });
 
     it('should handle database error', async () => {
@@ -160,7 +166,10 @@ describe('notificationService', () => {
       const result = await notificationService.getNotifications();
 
       expect(result.notifications).toEqual([]);
-      expect(logger.error).toHaveBeenCalledWith('Get notifications error:', expect.any(Error));
+      expect(logger.error).toHaveBeenCalledWith(
+        'Get notifications error:',
+        expect.any(Error),
+      );
     });
 
     it('should handle missing notification type', async () => {
@@ -198,7 +207,9 @@ describe('notificationService', () => {
       const result = await notificationService.markAsRead('notif-1');
 
       expect(result.success).toBe(true);
-      expect(dbNotificationsService.markAsRead).toHaveBeenCalledWith(['notif-1']);
+      expect(dbNotificationsService.markAsRead).toHaveBeenCalledWith([
+        'notif-1',
+      ]);
     });
 
     it('should return false on error', async () => {
@@ -209,7 +220,10 @@ describe('notificationService', () => {
       const result = await notificationService.markAsRead('notif-1');
 
       expect(result.success).toBe(false);
-      expect(logger.error).toHaveBeenCalledWith('Mark notification read error:', expect.any(Error));
+      expect(logger.error).toHaveBeenCalledWith(
+        'Mark notification read error:',
+        expect.any(Error),
+      );
     });
   });
 
@@ -225,7 +239,9 @@ describe('notificationService', () => {
       const result = await notificationService.markAllAsRead();
 
       expect(result.success).toBe(true);
-      expect(dbNotificationsService.markAllAsRead).toHaveBeenCalledWith(mockUser.id);
+      expect(dbNotificationsService.markAllAsRead).toHaveBeenCalledWith(
+        mockUser.id,
+      );
     });
 
     it('should return false when not authenticated', async () => {
@@ -237,7 +253,10 @@ describe('notificationService', () => {
       const result = await notificationService.markAllAsRead();
 
       expect(result.success).toBe(false);
-      expect(logger.error).toHaveBeenCalledWith('Mark all notifications read error:', expect.any(Error));
+      expect(logger.error).toHaveBeenCalledWith(
+        'Mark all notifications read error:',
+        expect.any(Error),
+      );
     });
 
     it('should return false on database error', async () => {
@@ -280,7 +299,10 @@ describe('notificationService', () => {
       const result = await notificationService.deleteNotification('notif-1');
 
       expect(result.success).toBe(false);
-      expect(logger.error).toHaveBeenCalledWith('Delete notification error:', expect.any(Error));
+      expect(logger.error).toHaveBeenCalledWith(
+        'Delete notification error:',
+        expect.any(Error),
+      );
     });
   });
 
@@ -311,7 +333,10 @@ describe('notificationService', () => {
       const result = await notificationService.clearAll();
 
       expect(result.success).toBe(false);
-      expect(logger.error).toHaveBeenCalledWith('Clear all notifications error:', expect.any(Error));
+      expect(logger.error).toHaveBeenCalledWith(
+        'Clear all notifications error:',
+        expect.any(Error),
+      );
     });
 
     it('should return false on database error', async () => {
@@ -366,7 +391,10 @@ describe('notificationService', () => {
 
       expect(result.preferences.pushEnabled).toBe(true);
       expect(result.preferences.marketing).toBe(false);
-      expect(logger.error).toHaveBeenCalledWith('Get notification preferences error:', expect.any(Error));
+      expect(logger.error).toHaveBeenCalledWith(
+        'Get notification preferences error:',
+        expect.any(Error),
+      );
     });
 
     it('should return default preferences on database error', async () => {
@@ -430,7 +458,9 @@ describe('notificationService', () => {
         .mockReturnValueOnce({ update: mockUpdate });
       (toRecord as jest.Mock).mockReturnValue(mockPreferences);
 
-      const result = await notificationService.updatePreferences({ marketing: true });
+      const result = await notificationService.updatePreferences({
+        marketing: true,
+      });
 
       expect(result.success).toBe(true);
     });
@@ -441,10 +471,15 @@ describe('notificationService', () => {
         error: null,
       });
 
-      const result = await notificationService.updatePreferences({ marketing: true });
+      const result = await notificationService.updatePreferences({
+        marketing: true,
+      });
 
       expect(result.success).toBe(false);
-      expect(logger.error).toHaveBeenCalledWith('Update notification preferences error:', expect.any(Error));
+      expect(logger.error).toHaveBeenCalledWith(
+        'Update notification preferences error:',
+        expect.any(Error),
+      );
     });
 
     it('should merge with existing preferences', async () => {
@@ -493,7 +528,9 @@ describe('notificationService', () => {
         .mockReturnValueOnce({ update: mockUpdate });
       (toRecord as jest.Mock).mockReturnValue({});
 
-      const result = await notificationService.updatePreferences({ marketing: true });
+      const result = await notificationService.updatePreferences({
+        marketing: true,
+      });
 
       expect(result.success).toBe(false);
     });
@@ -512,11 +549,15 @@ describe('notificationService', () => {
     });
 
     it('should return correct icon for request_accepted type', () => {
-      expect(getNotificationIcon('request_accepted')).toBe('checkmark-circle-outline');
+      expect(getNotificationIcon('request_accepted')).toBe(
+        'checkmark-circle-outline',
+      );
     });
 
     it('should return correct icon for request_declined type', () => {
-      expect(getNotificationIcon('request_declined')).toBe('close-circle-outline');
+      expect(getNotificationIcon('request_declined')).toBe(
+        'close-circle-outline',
+      );
     });
 
     it('should return correct icon for review_received type', () => {
@@ -536,8 +577,12 @@ describe('notificationService', () => {
     });
 
     it('should return default icon for unknown type', () => {
-      expect(getNotificationIcon('system' as NotificationType)).toBe('notifications-outline');
-      expect(getNotificationIcon('promo' as NotificationType)).toBe('notifications-outline');
+      expect(getNotificationIcon('system' as NotificationType)).toBe(
+        'notifications-outline',
+      );
+      expect(getNotificationIcon('promo' as NotificationType)).toBe(
+        'notifications-outline',
+      );
     });
   });
 
@@ -566,7 +611,9 @@ describe('notificationService', () => {
     });
 
     it('should return grey for default types', () => {
-      expect(getNotificationColor('system' as NotificationType)).toBe('#757575');
+      expect(getNotificationColor('system' as NotificationType)).toBe(
+        '#757575',
+      );
       expect(getNotificationColor('promo' as NotificationType)).toBe('#757575');
     });
   });
@@ -587,7 +634,7 @@ describe('notificationService', () => {
       });
     });
 
-    it('should return RequestDetails route for request types', () => {
+    it('should return GiftInbox route for request types', () => {
       const notification: Notification = {
         ...mockNotification,
         type: 'request_received',
@@ -597,8 +644,8 @@ describe('notificationService', () => {
       const route = getNotificationRoute(notification);
 
       expect(route).toEqual({
-        name: 'RequestDetails',
-        params: { requestId: 'req-123' },
+        name: 'GiftInbox',
+        params: { giftId: 'req-123' },
       });
     });
 
@@ -632,7 +679,7 @@ describe('notificationService', () => {
       });
     });
 
-    it('should return MomentDetails route for moment_liked', () => {
+    it('should return MomentDetail route for moment_liked', () => {
       const notification: Notification = {
         ...mockNotification,
         type: 'moment_liked',
@@ -642,12 +689,12 @@ describe('notificationService', () => {
       const route = getNotificationRoute(notification);
 
       expect(route).toEqual({
-        name: 'MomentDetails',
+        name: 'MomentDetail',
         params: { momentId: 'moment-123' },
       });
     });
 
-    it('should return MomentDetails route for moment_comment', () => {
+    it('should return MomentDetail route for moment_comment', () => {
       const notification: Notification = {
         ...mockNotification,
         type: 'moment_comment',
@@ -657,7 +704,7 @@ describe('notificationService', () => {
       const route = getNotificationRoute(notification);
 
       expect(route).toEqual({
-        name: 'MomentDetails',
+        name: 'MomentDetail',
         params: { momentId: 'moment-456' },
       });
     });

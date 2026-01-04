@@ -13,6 +13,18 @@
  * - Responsive image variants
  * - No crashes, no empty spaces
  *
+ * PERFORMANCE OPTIMIZATIONS (Master UX):
+ * - Uses imageCacheManager for efficient caching
+ * - Preloads images when prefetch=true
+ * - Automatic variant selection for responsive images
+ * - Memory-efficient with cleanup on unmount
+ *
+ * NOTE: For FastImage integration (40% faster loads):
+ * 1. Install: pnpm add react-native-fast-image
+ * 2. Rebuild iOS: cd ios && pod install
+ * 3. Replace Image import with FastImage
+ * 4. Change resizeMode prop to FastImage.resizeMode.cover
+ *
  * @example
  * <CachedImage
  *   source={{ uri: 'https://example.com/image.jpg' }}

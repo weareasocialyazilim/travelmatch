@@ -42,17 +42,13 @@ module.exports = {
     '^@/services/paymentService$': '<rootDir>/src/services/paymentService',
     '^@/services/supabaseAuthService$': '<rootDir>/src/services/supabaseAuthService',
     '^@/services/uploadService$': '<rootDir>/src/services/uploadService',
-    '^@/stores/favoritesStore$': '<rootDir>/src/stores/favoritesStore',
     '^@/stores/searchStore$': '<rootDir>/src/stores/searchStore',
-    '^@/stores/uiStore$': '<rootDir>/src/stores/uiStore',
     '^@/constants/colors$': '<rootDir>/src/constants/colors',
     '^@/components/ui/OptimizedImage$': '<rootDir>/src/components/ui/OptimizedImage',
     '^@/components/ui/ControlledInput$': '<rootDir>/src/components/ui/ControlledInput',
     '^@/components/ui/GenericBottomSheet$': '<rootDir>/src/components/ui/GenericBottomSheet',
     '^@/components/ui/OptimizedFlatList$': '<rootDir>/src/components/ui/OptimizedFlatList',
-    '^@/features/trips/components/RequestCard$': '<rootDir>/src/features/trips/components/RequestCard',
     '^@/features/payments/components/WalletListItem$': '<rootDir>/src/features/payments/components/WalletListItem',
-    '^@/screens/TransactionHistoryScreen$': '<rootDir>/src/screens/TransactionHistoryScreen',
     // General path alias (must be last)
     '^@/(.*)$': '<rootDir>/src/$1',
     // Expo and React Native mocks

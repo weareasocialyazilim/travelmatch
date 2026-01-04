@@ -20,13 +20,13 @@ export type RootStackParamList = {
   Splash: undefined;
   Welcome: undefined;
   Onboarding: undefined;
-  Login: undefined;
+  // UnifiedAuth - Master 2026 Liquid Auth Flow (replaces Login)
+  UnifiedAuth: { initialMode?: 'login' | 'register' } | undefined;
   Register: undefined;
   PhoneAuth: undefined;
   EmailAuth: undefined;
   ForgotPassword: undefined;
-  VerifyCode: undefined;
-  WaitingForCode: undefined;
+  VerifyCode: { phone?: string; email?: string } | undefined;
   SuccessConfirmation: undefined;
   AuthSuccess: undefined;
   SetPassword: undefined;
@@ -79,13 +79,7 @@ export type RootStackParamList = {
   MomentComments: { momentId: string; commentCount?: number };
   Profile: undefined;
   ProfileDetail: { userId: string };
-  Review: {
-    userId: string;
-    userName: string;
-    userAvatar: string;
-    momentId?: string;
-    momentTitle?: string;
-  };
+  // ZOMBIE CLEANUP: Review route removed - Trust Notes replaced this
   UserProfile: { userId: string };
   MyGifts: undefined;
   GiftCardMarket: undefined;
@@ -157,30 +151,51 @@ export type RootStackParamList = {
     status: 'pending_proof' | 'pending_verification' | 'verified';
   };
 
+  // Gift Selection - Start gift flow from user profile
+  GiftSelection: {
+    recipientId: string;
+    recipientName: string;
+    recipientAvatar: string;
+    topMomentId?: string; // Optional - pre-select user's top moment
+  };
+
   // Gift Inbox
   GiftInbox: undefined;
   GiftInboxDetail: {
     senderId: string;
     senderName: string;
     senderAvatar: string;
-    senderAge: number;
-    senderRating: number;
+    // Trust-based metrics (replacing legacy trip count)
+    senderTrustScore: number; // 0-100 Trust Garden score
+    senderSubscriptionTier: 'free' | 'premium' | 'platinum';
+    senderMomentCount: number; // Number of moments created
     senderVerified: boolean;
-    senderTripCount: number;
     senderCity: string;
     gifts: Array<{
       id: string;
       momentTitle: string;
       momentEmoji: string;
+      momentCategory: string; // For proof flow camera mode
       amount: number;
       message: string;
       paymentType: 'direct' | 'half_escrow' | 'full_escrow';
       status:
+        | 'pending' // Subscriber offer waiting for acceptance
         | 'received'
         | 'pending_proof'
         | 'verifying'
         | 'verified'
         | 'failed';
+      createdAt: string;
+      isSubscriberOffer?: boolean;
+      isHighValueOffer?: boolean; // For premium treatment
+    }>;
+    // Pending subscriber offers (not yet accepted)
+    pendingOffers?: Array<{
+      id: string;
+      amount: number;
+      currency: string;
+      message: string;
       createdAt: string;
     }>;
     totalAmount: number;
@@ -232,10 +247,12 @@ export type RootStackParamList = {
 
   // Withdraw
   Withdraw: undefined;
-  WithdrawSuccess: {
-    transactionCode?: string;
-    amount?: number;
-  } | undefined;
+  WithdrawSuccess:
+    | {
+        transactionCode?: string;
+        amount?: number;
+      }
+    | undefined;
 
   // Payment Methods
   PaymentMethods: undefined;
@@ -261,8 +278,7 @@ export type RootStackParamList = {
   NotificationDetail: { notificationId: string };
   EditProfile: undefined;
 
-  // Calendar
-  MyCalendar: undefined;
+  // ZOMBIE CLEANUP: MyCalendar removed - legacy hotel/flight booking UI
 
   // New Profile sub-screens
   MyMoments: undefined;
@@ -274,17 +290,29 @@ export type RootStackParamList = {
   TrustGardenDetail: undefined;
   ChangePassword: undefined;
 
-  // Trips
-  TripDetails: { tripId: string };
-  MyTrips: undefined;
-
-  // Missing routes
-  BookingDetail: { bookingId: string };
-  Ticket: { bookingId: string };
+  // Moment Confirmation Ticket
+  Ticket: { momentId: string; ticketId?: string };
   UnifiedGiftFlow: {
     recipientId: string;
     recipientName: string;
-    momentId?: string;
+    momentId: string;
+    momentTitle: string;
+    momentImageUrl?: string;
+    requestedAmount: number;
+    requestedCurrency: 'TRY' | 'EUR' | 'USD' | 'GBP' | 'JPY' | 'CAD';
+    // Subscriber offer params (optional)
+    isSubscriberOffer?: boolean;
+    offerDescription?: string;
+  };
+  // Subscriber Offer Modal for Pro/Platinum users
+  SubscriberOfferModal: {
+    momentId: string;
+    momentTitle: string;
+    momentCategory: string;
+    targetValue: number;
+    targetCurrency: string;
+    hostId: string;
+    hostName: string;
   };
   ShareMoment: { momentId: string };
 
@@ -316,6 +344,42 @@ export type RootStackParamList = {
   // Data Privacy & Deleted Moments
   DataPrivacy: undefined;
   DeletedMoments: undefined;
+
+  // NEW: Gift Success Screen (PayTR Güvenceli)
+  GiftSuccess: {
+    giftId: string;
+    momentId: string;
+    momentTitle: string;
+    momentCategory: string;
+    amount: number;
+    currency: string;
+    recipientId: string;
+    recipientName: string;
+    recipientAvatar?: string;
+    escrowId?: string;
+    paymentType: 'direct' | 'half_escrow' | 'full_escrow';
+    isAnonymous?: boolean;
+    conversationId?: string;
+  };
+
+  // NEW: Moment Proof Ceremony (Anı Mühürleme)
+  MomentProofCeremony: {
+    giftId: string;
+    escrowId: string;
+    momentId: string;
+    momentTitle: string;
+    momentCategory: string;
+    senderId: string;
+    senderName: string;
+    amount: number;
+    currency: string;
+  };
+
+  // NEW: Gift Legacy Screen (Hediye Mirası)
+  GiftLegacy: undefined;
+
+  // NEW: Visibility Settings (Görünürlük Ayarları)
+  VisibilitySettings: undefined;
 
   // Dev Menu (development only)
   DevMenu: undefined;

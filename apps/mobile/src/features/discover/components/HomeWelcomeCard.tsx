@@ -19,7 +19,7 @@ interface HomeWelcomeCardProps {
  * - Personalized information and quick access to main features
  */
 export const HomeWelcomeCard: React.FC<HomeWelcomeCardProps> = ({
-  userName = 'Traveler',
+  userName = 'Explorer',
   onSetupProfile,
   onExplore,
 }) => {
@@ -37,15 +37,15 @@ export const HomeWelcomeCard: React.FC<HomeWelcomeCardProps> = ({
         <View style={styles.welcomeContent}>
           <View style={styles.iconContainer}>
             <MaterialCommunityIcons
-              name="airplane-takeoff"
+              name="gift-outline"
               size={32}
               color={COLORS.utility.white}
             />
           </View>
           <Text style={styles.welcomeTitle}>Welcome, {firstName}!</Text>
           <Text style={styles.welcomeSubtitle}>
-            Your journey begins here. Connect with locals and discover authentic
-            experiences.
+            İpeksi anları keşfetmeye hazır mısın? Unique moments and gifts await
+            you.
           </Text>
         </View>
 
@@ -79,7 +79,7 @@ export const HomeWelcomeCard: React.FC<HomeWelcomeCardProps> = ({
           <View style={styles.actionContent}>
             <Text style={styles.actionTitle}>Complete Your Profile</Text>
             <Text style={styles.actionDescription}>
-              Add a photo and bio to connect with travelers
+              Add a photo and bio to connect with hosts
             </Text>
           </View>
           <MaterialCommunityIcons
@@ -127,21 +127,21 @@ export const HomeWelcomeCard: React.FC<HomeWelcomeCardProps> = ({
         <View style={styles.tipsGrid}>
           <View style={styles.tipCard}>
             <MaterialCommunityIcons
-              name="shield-check"
+              name="gift-outline"
               size={20}
               color={COLORS.feedback.success}
             />
             <Text style={styles.tipText}>
-              Verify your profile to build trust
+              Hediye göndermeden önce anıyı incele
             </Text>
           </View>
           <View style={styles.tipCard}>
             <MaterialCommunityIcons
-              name="message-text-outline"
+              name="card-text-outline"
               size={20}
               color={COLORS.feedback.info}
             />
-            <Text style={styles.tipText}>Message hosts before booking</Text>
+            <Text style={styles.tipText}>İpeksi teşekkür kartları oluştur</Text>
           </View>
         </View>
       </View>

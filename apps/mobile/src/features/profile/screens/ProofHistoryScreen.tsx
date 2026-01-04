@@ -16,7 +16,7 @@ import { COLORS } from '@/constants/colors';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import { profileApi } from '@/features/profile/services/profileApi';
+import { profileApi } from '@/features/profile/services/profileService';
 import { logger } from '@/utils/logger';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];

@@ -1,8 +1,8 @@
 /**
  * OfflineState Component
- * Space-themed offline UI for TravelMatch
+ * Dating-themed offline UI for TravelMatch
  *
- * Shows a creative "drifting in space" metaphor when offline
+ * Shows a heartfelt "connection lost" metaphor when offline
  */
 
 import React, { useCallback, useState } from 'react';
@@ -22,7 +22,7 @@ import type { ViewStyle } from 'react-native';
 export interface OfflineStateProps {
   /**
    * Custom message to display
-   * @default "It seems you've lost connection to the TravelMatch network. Check your signal."
+   * @default "Merak etme, anıların güvende! İnternet bağlantını kontrol et ve tekrar dene."
    */
   message?: string;
 
@@ -33,7 +33,7 @@ export interface OfflineStateProps {
 
   /**
    * Custom retry button text
-   * @default "Reconnect Mission"
+   * @default "Tekrar Bağlan 💗"
    */
   retryText?: string;
 
@@ -55,7 +55,7 @@ export interface OfflineStateProps {
 }
 
 /**
- * OfflineState - Space-themed offline UI
+ * OfflineState - Dating-themed offline UI
  *
  * @example
  * // Full screen
@@ -68,7 +68,7 @@ export interface OfflineStateProps {
 export const OfflineState: React.FC<OfflineStateProps> = ({
   message,
   onRetry,
-  retryText = 'Reconnect Mission',
+  retryText = 'Tekrar Bağlan 💗',
   compact = false,
   style,
   testID = 'offline-state',
@@ -86,7 +86,7 @@ export const OfflineState: React.FC<OfflineStateProps> = ({
     }
   }, [onRetry]);
 
-  // Compact banner mode
+  // Compact banner mode - Dating themed
   if (compact) {
     return (
       <TouchableOpacity
@@ -99,30 +99,34 @@ export const OfflineState: React.FC<OfflineStateProps> = ({
         {isRetrying ? (
           <ActivityIndicator size="small" color={COLORS.white} />
         ) : (
-          <MaterialCommunityIcons name="wifi-off" size={16} color={COLORS.white} />
+          <MaterialCommunityIcons
+            name="heart-broken-outline"
+            size={16}
+            color={COLORS.white}
+          />
         )}
         <Text style={styles.compactText}>
-          {message || 'No connection. Tap to retry.'}
+          {message || 'Bağlantın koptu ama anıların bizde 💔'}
         </Text>
       </TouchableOpacity>
     );
   }
 
-  // Full screen mode - Space themed
+  // Full screen mode - Dating/Connection themed
   return (
     <View style={[styles.container, style]} testID={testID}>
       <View style={styles.iconCircle}>
         <MaterialCommunityIcons
-          name="rocket-launch-outline"
+          name="heart-pulse"
           size={60}
           color={COLORS.brand.primary}
         />
       </View>
 
-      <Text style={styles.title}>You're drifting in space</Text>
+      <Text style={styles.title}>Bağlantın Koptu 💔</Text>
       <Text style={styles.desc}>
         {message ||
-          "It seems you've lost connection to the TravelMatch network. Check your signal."}
+          'Merak etme, anıların güvende! İnternet bağlantını kontrol et ve tekrar dene.'}
       </Text>
 
       {onRetry && (
@@ -145,7 +149,7 @@ export const OfflineState: React.FC<OfflineStateProps> = ({
 };
 
 const styles = StyleSheet.create({
-  // Full screen styles - Space themed
+  // Full screen styles - Dating themed
   container: {
     flex: 1,
     alignItems: 'center',

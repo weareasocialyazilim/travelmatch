@@ -36,11 +36,10 @@ import {
   PhoneAuthScreen,
   EmailAuthScreen,
   RegisterScreen,
-  LoginScreen,
+  UnifiedAuthScreen,
   SetPasswordScreen,
   TwoFactorSetupScreen,
   VerifyCodeScreen,
-  WaitingForCodeScreen,
   ForgotPasswordScreen,
   ChangePasswordScreen,
   AuthSuccessScreen,
@@ -63,8 +62,6 @@ const DevMenuScreen = __DEV__
 // DISCOVER FEATURE SCREENS
 // ===================================
 import {
-  DiscoverScreen,
-  BookingDetailScreen,
   EscrowStatusScreen,
   HowEscrowWorksScreen,
   MatchConfirmationScreen,
@@ -72,9 +69,11 @@ import {
   DisputeFlowScreen,
   RequestsScreen,
   TicketScreen,
-  TripDetailsScreen,
-  MyTripsScreen,
 } from '../features/discover';
+// Updated: Use the new subscription-aware DiscoverScreen from moments
+import { DiscoverScreen } from '../features/moments';
+// SubscriberOfferBottomSheet moved to features/gifts
+import { SubscriberOfferBottomSheet } from '../features/gifts/components';
 
 // ===================================
 // MESSAGES FEATURE SCREENS
@@ -94,7 +93,7 @@ import { InboxScreen } from '../features/inbox';
 // import { WalletScreen as WalletFeatureScreen } from '../features/wallet';
 import { NotificationsScreen } from '../features/notifications';
 import { CheckoutScreen } from '../features/payments';
-import { ReviewScreen } from '../features/reviews';
+// ZOMBIE CLEANUP: ReviewScreen removed - Trust Notes replaced this
 import { ChatDetailScreen } from '../features/messages';
 
 // ===================================
@@ -106,9 +105,7 @@ const ProfileScreen = lazyLoad(() =>
 const EditProfileScreen = lazyLoad(() =>
   import('../features/profile').then((m) => ({ default: m.EditProfileScreen })),
 );
-const ReputationScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({ default: m.ReputationScreen })),
-);
+// ReputationScreen removed - using TrustGardenDetailScreen for Reputation route
 const TrustGardenDetailScreen = lazyLoad(() =>
   import('../features/profile').then((m) => ({
     default: m.TrustGardenDetailScreen,
@@ -118,34 +115,47 @@ import {
   TrustNotesScreen,
   ProfileDetailScreen,
   UserProfileScreen,
-  AchievementsScreen,
 } from '../features/profile';
 
-// Proof system screens
+// Gamification feature (elevated from profile)
+import { AchievementsScreen } from '../features/gamification';
+
+// Proof system screens (from verifications feature)
 const ProofHistoryScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({
+  import('../features/verifications').then((m) => ({
     default: m.ProofHistoryScreen,
   })),
 );
 const ProofFlowScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({ default: m.ProofFlowScreen })),
+  import('../features/verifications').then((m) => ({
+    default: m.ProofFlowScreen,
+  })),
 );
 const ProofDetailScreen = lazyLoad(() =>
   import('../features/profile').then((m) => ({ default: m.ProofDetailScreen })),
 );
+// NEW: MomentProofCeremony (Anı Mühürleme)
+const MomentProofCeremony = lazyLoad(() =>
+  import('../features/verifications/screens/MomentProofCeremony').then((m) => ({
+    default: m.MomentProofCeremony,
+  })),
+);
 
-// Moments screens
+// ===================================
+// MOMENTS FEATURE SCREENS (ELEVATED)
+// ===================================
+// CreateMomentScreen moved to moments feature - the core of the app
+const CreateMomentScreen = lazyLoad(() =>
+  import('../features/moments').then((m) => ({
+    default: m.CreateMomentScreen,
+  })),
+);
 const MyMomentsScreen = lazyLoad(() =>
   import('../features/profile').then((m) => ({ default: m.MyMomentsScreen })),
 );
 const MyHostedMomentsScreen = lazyLoad(() =>
   import('../features/profile').then((m) => ({
     default: m.MyHostedMomentsScreen,
-  })),
-);
-const CreateMomentScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({
-    default: m.CreateMomentScreen,
   })),
 );
 const MomentDetailScreen = lazyLoad(() =>
@@ -189,20 +199,12 @@ const MomentCommentsScreen = lazyLoad(() =>
 // PAYMENTS FEATURE SCREENS
 // ===================================
 import {
-  WalletScreen,
-  WithdrawScreen,
-  WithdrawSuccessScreen,
   PaymentMethodsScreen,
   AddCardScreen,
   TransactionDetailScreen,
   TransactionHistoryScreen,
   PaymentsKYCScreen,
   SubscriptionScreen,
-  GiftInboxScreen,
-  GiftInboxDetailScreen,
-  UnifiedGiftFlowScreen,
-  MyGiftsScreen,
-  GiftCardMarketScreen,
   RefundRequestScreen,
   SuccessScreen,
   SuccessConfirmationScreen,
@@ -218,6 +220,38 @@ import {
   KYCReviewScreen,
   KYCPendingScreen,
 } from '../features/payments';
+
+// ===================================
+// WALLET FEATURE SCREENS
+// ===================================
+import {
+  WalletScreen,
+  WithdrawScreen,
+  WithdrawSuccessScreen,
+} from '../features/wallet';
+
+// ===================================
+// GIFTS FEATURE SCREENS
+// ZOMBIE CLEANUP: GiftCardMarketScreen removed - legacy gift card system
+// ===================================
+import {
+  GiftInboxScreen,
+  GiftInboxDetailScreen,
+  UnifiedGiftFlowScreen,
+  MyGiftsScreen,
+} from '../features/gifts';
+
+// GiftSuccessScreen and GiftLegacyScreen - import from gifts feature
+const GiftSuccessScreen = lazyLoad(() =>
+  import('../features/gifts/screens/GiftSuccessScreen').then((m) => ({
+    default: m.GiftSuccessScreen,
+  })),
+);
+const GiftLegacyScreen = lazyLoad(() =>
+  import('../features/gifts/screens/GiftLegacyScreen').then((m) => ({
+    default: m.GiftLegacyScreen,
+  })),
+);
 
 // ===================================
 // NOTIFICATIONS FEATURE SCREENS
@@ -257,6 +291,13 @@ import {
   ReferralScreen,
   SafetyTipsScreen,
 } from '../features/settings';
+
+// NEW: VisibilitySettingsScreen
+const VisibilitySettingsScreen = lazyLoad(() =>
+  import('../features/settings/screens/VisibilitySettingsScreen').then((m) => ({
+    default: m.VisibilitySettingsScreen,
+  })),
+);
 import { ReportUserScreen } from '../features/moderation';
 
 // Legal screens - Turkish compliance
@@ -266,9 +307,9 @@ import {
 } from '../features/settings/screens/legal';
 
 // ===================================
-// CALENDAR FEATURE SCREENS
+// ZOMBIE CLEANUP: Calendar feature removed
+// MyCalendarScreen was legacy hotel/flight booking UI
 // ===================================
-import { MyCalendarScreen } from '../features/calendar';
 
 // ===================================
 // TYPE IMPORTS
@@ -282,20 +323,36 @@ export type { SuccessDetails } from './routeParams';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const ONBOARDING_KEY = '@has_seen_onboarding';
+const GUEST_MODE_KEY = '@allow_guest_browse';
 
 const AppNavigator = () => {
   // Check if user has seen onboarding - determines where Splash navigates to
+  // Guest Mode: Users can browse Discover feed without logging in
   const [initialRoute, setInitialRoute] = useState<
-    'Splash' | 'Onboarding' | 'Welcome' | null
+    'Splash' | 'Onboarding' | 'Welcome' | 'MainTabs' | null
   >(null);
 
   useEffect(() => {
     const checkOnboarding = async () => {
       try {
         const hasSeenOnboarding = await AsyncStorage.getItem(ONBOARDING_KEY);
-        // Always start with Splash, which will navigate to appropriate screen
-        // Pass the next destination via AsyncStorage or state
-        setInitialRoute(hasSeenOnboarding === 'true' ? 'Welcome' : 'Splash');
+        const allowGuestBrowse = await AsyncStorage.getItem(GUEST_MODE_KEY);
+
+        // Guest Mode Strategy:
+        // - If user has seen onboarding and guest browsing is enabled, go to MainTabs (Discover)
+        // - This allows users to "taste the product" before signing up
+        // - Login is required only for actions like Gift, Chat, Save
+        if (hasSeenOnboarding === 'true') {
+          // Enable guest browsing by default after onboarding
+          if (allowGuestBrowse !== 'false') {
+            await AsyncStorage.setItem(GUEST_MODE_KEY, 'true');
+            setInitialRoute('MainTabs');
+          } else {
+            setInitialRoute('Welcome');
+          }
+        } else {
+          setInitialRoute('Splash');
+        }
       } catch {
         setInitialRoute('Splash');
       }
@@ -379,9 +436,10 @@ const AppNavigator = () => {
               component={RegisterScreen}
               options={{ animation: 'fade' }}
             />
+            {/* UnifiedAuth - Master 2026 Liquid Auth Flow */}
             <Stack.Screen
-              name="Login"
-              component={LoginScreen}
+              name="UnifiedAuth"
+              component={UnifiedAuthScreen}
               options={{ animation: 'fade' }}
             />
             <Stack.Screen
@@ -403,10 +461,6 @@ const AppNavigator = () => {
               component={TwoFactorSetupScreen}
             />
             <Stack.Screen name="VerifyCode" component={VerifyCodeScreen} />
-            <Stack.Screen
-              name="WaitingForCode"
-              component={WaitingForCodeScreen}
-            />
             {/* Auth Success - Premium fade for celebration */}
             <Stack.Screen
               name="SuccessConfirmation"
@@ -541,11 +595,7 @@ const AppNavigator = () => {
               component={CheckoutScreen}
               options={{ presentation: 'modal' }}
             />
-            <Stack.Screen
-              name="Review"
-              component={ReviewScreen}
-              options={{ presentation: 'modal' }}
-            />
+            {/* ZOMBIE CLEANUP: Review screen removed - replaced by Trust Notes */}
 
             {/* Transactions */}
             <Stack.Screen
@@ -626,8 +676,11 @@ const AppNavigator = () => {
               component={InviteContactsScreen}
             />
 
-            {/* Reputation */}
-            <Stack.Screen name="Reputation" component={ReputationScreen} />
+            {/* Reputation - Now using TrustGardenDetailScreen */}
+            <Stack.Screen
+              name="Reputation"
+              component={TrustGardenDetailScreen}
+            />
 
             {/* Legal & Policy */}
             <Stack.Screen
@@ -650,7 +703,10 @@ const AppNavigator = () => {
 
             {/* Withdraw */}
             <Stack.Screen name="Withdraw" component={WithdrawScreen} />
-            <Stack.Screen name="WithdrawSuccess" component={WithdrawSuccessScreen} />
+            <Stack.Screen
+              name="WithdrawSuccess"
+              component={WithdrawSuccessScreen}
+            />
 
             {/* Payment Methods */}
             <Stack.Screen
@@ -691,16 +747,21 @@ const AppNavigator = () => {
               component={TrustGardenDetailScreen}
             />
 
-            {/* New Screens */}
-            <Stack.Screen
-              name="BookingDetail"
-              component={BookingDetailScreen}
-            />
+            {/* Ticket */}
             <Stack.Screen name="Ticket" component={TicketScreen} />
             <Stack.Screen name="ShareMoment" component={ShareMomentScreen} />
             <Stack.Screen
               name="UnifiedGiftFlow"
               component={UnifiedGiftFlowScreen}
+            />
+            <Stack.Screen
+              name="SubscriberOfferModal"
+              component={SubscriberOfferBottomSheet}
+              options={{
+                presentation: 'transparentModal',
+                animation: 'slide_from_bottom',
+                headerShown: false,
+              }}
             />
             <Stack.Screen name="PayTRWebView" component={PayTRWebViewScreen} />
 
@@ -715,12 +776,43 @@ const AppNavigator = () => {
               component={DeletedMomentsScreen}
             />
 
-            {/* Calendar */}
-            <Stack.Screen name="MyCalendar" component={MyCalendarScreen} />
+            {/* NEW: Gift Success Screen - PayTR Güvenceli */}
+            <Stack.Screen
+              name="GiftSuccess"
+              component={GiftSuccessScreen}
+              options={{
+                animation: 'fade',
+                gestureEnabled: false,
+                presentation: 'fullScreenModal',
+              }}
+            />
 
-            {/* Trips */}
-            <Stack.Screen name="TripDetails" component={TripDetailsScreen} />
-            <Stack.Screen name="MyTrips" component={MyTripsScreen} />
+            {/* NEW: Moment Proof Ceremony - Anı Mühürleme */}
+            <Stack.Screen
+              name="MomentProofCeremony"
+              component={MomentProofCeremony}
+              options={{
+                animation: 'slide_from_bottom',
+                gestureDirection: 'vertical',
+                presentation: 'modal',
+              }}
+            />
+
+            {/* NEW: Gift Legacy Screen - Hediye Mirası */}
+            <Stack.Screen
+              name="GiftLegacy"
+              component={GiftLegacyScreen}
+              options={{ animation: 'fade' }}
+            />
+
+            {/* NEW: Visibility Settings - Görünürlük Ayarları */}
+            <Stack.Screen
+              name="VisibilitySettings"
+              component={VisibilitySettingsScreen}
+              options={{ animation: 'slide_from_right' }}
+            />
+
+            {/* ZOMBIE CLEANUP: MyCalendar removed - legacy hotel/flight booking UI */}
 
             {/* Image Viewer */}
             <Stack.Screen
@@ -752,10 +844,7 @@ const AppNavigator = () => {
               name="DietaryPreferences"
               component={DietaryPreferencesScreen}
             />
-            <Stack.Screen
-              name="GiftCardMarket"
-              component={GiftCardMarketScreen}
-            />
+            {/* ZOMBIE CLEANUP: GiftCardMarket removed - legacy gift card system */}
             <Stack.Screen name="NotFound" component={NotFoundScreen} />
             <Stack.Screen
               name="PickLocation"

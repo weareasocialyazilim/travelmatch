@@ -7,7 +7,7 @@ import {
   Image,
   Dimensions,
 } from 'react-native';
-import { COLORS } from '../../constants/colors';
+import { COLORS } from '@/constants/colors';
 import type { Moment } from '../../hooks/useMoments';
 
 interface ProfileMomentCardProps {

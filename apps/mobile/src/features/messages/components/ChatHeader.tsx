@@ -5,13 +5,31 @@
  * - BlurView glass effect for immersive feel
  * - Neon status indicator
  * - Linked moment card with glass styling
+ * - Real-time typing and read status via Supabase channels
  */
 
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Platform } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Platform,
+} from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, {
+  FadeIn,
+  FadeOut,
+  useAnimatedStyle,
+  withRepeat,
+  withSequence,
+  withTiming,
+  useSharedValue,
+} from 'react-native-reanimated';
+import { supabase } from '@/lib/supabase';
 import { COLORS } from '@/constants/colors';
 import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
 
@@ -19,13 +37,15 @@ export interface LinkedMoment {
   id: string;
   title: string;
   image?: string;
-  price?: number;
+  /** Requested amount (Alıcı sets this) */
+  requested_amount?: number;
   currency?: string;
   status?: 'negotiating' | 'accepted' | 'paid' | 'completed';
   isGiftedByMe?: boolean;
 }
 
 interface ChatHeaderProps {
+  conversationId: string;
   otherUser: {
     id: string;
     name: string;
@@ -42,6 +62,7 @@ interface ChatHeaderProps {
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
+  conversationId,
   otherUser,
   linkedMoment,
   isOnline = true,
@@ -51,14 +72,121 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   onMorePress,
 }) => {
   const insets = useSafeAreaInsets();
+  const [isTyping, setIsTyping] = useState(false);
+  const [lastReadAt, setLastReadAt] = useState<Date | null>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Typing dots animation
+  const typingDot1 = useSharedValue(0);
+  const typingDot2 = useSharedValue(0);
+  const typingDot3 = useSharedValue(0);
+
+  /**
+   * Subscribe to Supabase presence channel for typing/read status
+   */
+  useEffect(() => {
+    if (!conversationId) return;
+
+    const channel = supabase.channel(`chat:${conversationId}`, {
+      config: {
+        presence: {
+          key: otherUser.id,
+        },
+      },
+    });
+
+    // Listen for typing events
+    channel.on('broadcast', { event: 'typing' }, (payload) => {
+      if (payload.payload?.user_id === otherUser.id) {
+        setIsTyping(true);
+
+        // Clear previous timeout
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current);
+        }
+
+        // Auto-clear typing after 3 seconds
+        typingTimeoutRef.current = setTimeout(() => {
+          setIsTyping(false);
+        }, 3000);
+      }
+    });
+
+    // Listen for read receipts
+    channel.on('broadcast', { event: 'read' }, (payload) => {
+      if (payload.payload?.user_id === otherUser.id) {
+        setLastReadAt(new Date(payload.payload.read_at));
+      }
+    });
+
+    channel.subscribe();
+
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      supabase.removeChannel(channel);
+    };
+  }, [conversationId, otherUser.id]);
+
+  // Animate typing dots
+  useEffect(() => {
+    if (isTyping) {
+      typingDot1.value = withRepeat(
+        withSequence(
+          withTiming(1, { duration: 300 }),
+          withTiming(0, { duration: 300 }),
+        ),
+        -1,
+        true,
+      );
+      typingDot2.value = withRepeat(
+        withSequence(
+          withTiming(0, { duration: 150 }),
+          withTiming(1, { duration: 300 }),
+          withTiming(0, { duration: 300 }),
+        ),
+        -1,
+        true,
+      );
+      typingDot3.value = withRepeat(
+        withSequence(
+          withTiming(0, { duration: 300 }),
+          withTiming(1, { duration: 300 }),
+          withTiming(0, { duration: 300 }),
+        ),
+        -1,
+        true,
+      );
+    } else {
+      typingDot1.value = 0;
+      typingDot2.value = 0;
+      typingDot3.value = 0;
+    }
+  }, [isTyping]);
+
+  const dot1Style = useAnimatedStyle(() => ({
+    opacity: 0.4 + typingDot1.value * 0.6,
+    transform: [{ scale: 0.8 + typingDot1.value * 0.4 }],
+  }));
+
+  const dot2Style = useAnimatedStyle(() => ({
+    opacity: 0.4 + typingDot2.value * 0.6,
+    transform: [{ scale: 0.8 + typingDot2.value * 0.4 }],
+  }));
+
+  const dot3Style = useAnimatedStyle(() => ({
+    opacity: 0.4 + typingDot3.value * 0.6,
+    transform: [{ scale: 0.8 + typingDot3.value * 0.4 }],
+  }));
 
   const getMomentSubtitle = () => {
     if (!linkedMoment) return '';
     if (linkedMoment.status === 'paid' || linkedMoment.status === 'completed') {
-      return linkedMoment.isGiftedByMe ? 'Gifted by you' : 'Gift received';
+      return linkedMoment.isGiftedByMe ? 'Hediye sizden' : 'Hediye alındı';
     }
     if (linkedMoment.status === 'accepted') {
-      return 'Offer accepted';
+      return 'Teklif kabul edildi';
     }
     const currencySymbol =
       linkedMoment.currency === 'TRY'
@@ -66,7 +194,14 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         : linkedMoment.currency === 'EUR'
           ? '€'
           : '$';
-    return linkedMoment.price ? `${currencySymbol}${linkedMoment.price}` : 'Negotiating';
+    return linkedMoment.requested_amount
+      ? `${currencySymbol}${linkedMoment.requested_amount}`
+      : 'Müzakere edilyor';
+  };
+
+  const getStatusText = () => {
+    if (isTyping) return null; // Will show typing indicator instead
+    return isOnline ? 'Şu an aktif' : 'Çevrimdışı';
   };
 
   const HeaderContent = () => (
@@ -119,12 +254,29 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
               <View
                 style={[
                   styles.statusDot,
-                  { backgroundColor: isOnline ? COLORS.success : COLORS.text.muted },
+                  {
+                    backgroundColor: isOnline
+                      ? COLORS.success
+                      : COLORS.text.muted,
+                  },
                 ]}
               />
-              <Text style={styles.statusText}>
-                {isOnline ? 'Şu an aktif' : 'Çevrimdışı'}
-              </Text>
+              {isTyping ? (
+                <Animated.View
+                  entering={FadeIn.duration(200)}
+                  exiting={FadeOut.duration(200)}
+                  style={styles.typingIndicator}
+                >
+                  <Text style={styles.typingText}>yazıyor</Text>
+                  <View style={styles.typingDots}>
+                    <Animated.View style={[styles.typingDot, dot1Style]} />
+                    <Animated.View style={[styles.typingDot, dot2Style]} />
+                    <Animated.View style={[styles.typingDot, dot3Style]} />
+                  </View>
+                </Animated.View>
+              ) : (
+                <Text style={styles.statusText}>{getStatusText()}</Text>
+              )}
             </View>
           </View>
         </TouchableOpacity>
@@ -137,7 +289,11 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           accessibilityLabel="More chat options"
           accessibilityRole="button"
         >
-          <Ionicons name="ellipsis-horizontal" size={24} color={COLORS.text.primary} />
+          <Ionicons
+            name="ellipsis-horizontal"
+            size={24}
+            color={COLORS.text.primary}
+          />
         </TouchableOpacity>
       </View>
 
@@ -273,6 +429,28 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES_V2.tiny,
     color: COLORS.text.secondary,
     fontFamily: FONTS.body.regular,
+  },
+  typingIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  typingText: {
+    fontSize: FONT_SIZES_V2.tiny,
+    color: COLORS.brand?.primary || COLORS.primary,
+    fontFamily: FONTS.body.medium || FONTS.body.regular,
+    fontWeight: '500',
+  },
+  typingDots: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  typingDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: COLORS.brand?.primary || COLORS.primary,
   },
   moreButton: {
     width: 40,

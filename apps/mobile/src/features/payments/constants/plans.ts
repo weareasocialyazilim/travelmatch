@@ -1,12 +1,12 @@
 /**
  * Payment Plans Constants
  *
- * TravelMatch Subscription Tiers:
- * - Passport ($0): Free tier for casual explorers
- * - First Class ($10): Enhanced features for serious travelers
- * - Concierge ($25): Premium experience with all features unlocked
+ * Moment Subscription Tiers:
+ * - Basic ($0): Free tier for starters
+ * - Premium ($10): Enhanced features for active users
+ * - Platinum ($25): Unlimited experience with all features unlocked
  *
- * TravelMatch is a peer-to-peer travel experience marketplace.
+ * Moment is a peer-to-peer experience sharing and gifting marketplace.
  * Core features: Moments (experiences), Messaging, Gifts, Trust/Verification
  */
 
@@ -42,13 +42,13 @@ export type Plan = SubscriptionPlan;
 
 export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
   {
-    id: 'passport',
-    name: 'Passport',
-    tagline: 'Start your journey',
+    id: 'basic',
+    name: 'Momentum',
+    tagline: 'Start sharing moments',
     price: 0,
     currency: 'USD',
     interval: 'month',
-    icon: 'passport',
+    icon: 'sparkles',
     color: '#6B7280', // gray
     limits: {
       momentsPerMonth: 3,
@@ -70,14 +70,14 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     ],
   },
   {
-    id: 'first_class',
-    name: 'First Class',
-    tagline: 'Travel in style',
+    id: 'premium',
+    name: 'Premium',
+    tagline: 'More moments, more magic',
     price: 10,
     currency: 'USD',
     interval: 'month',
     popular: true,
-    icon: 'airplane-takeoff',
+    icon: 'star',
     color: '#3B82F6', // blue
     limits: {
       momentsPerMonth: 15,
@@ -98,8 +98,8 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     ],
   },
   {
-    id: 'concierge',
-    name: 'Concierge',
+    id: 'platinum',
+    name: 'Platinum',
     tagline: 'The ultimate experience',
     price: 25,
     currency: 'USD',
@@ -123,6 +123,8 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
       { text: 'Verified badge', included: true },
       { text: 'Incognito mode', included: true },
       { text: 'Early access to features', included: true },
+      { text: 'Offer above requested price', included: true },
+      { text: 'Silver shimmer on offers', included: true },
     ],
   },
 ];

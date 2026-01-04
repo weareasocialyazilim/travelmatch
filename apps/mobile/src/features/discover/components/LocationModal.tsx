@@ -8,7 +8,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../../constants/colors';
+import { COLORS } from '@/constants/colors';
 
 interface City {
   id: string;

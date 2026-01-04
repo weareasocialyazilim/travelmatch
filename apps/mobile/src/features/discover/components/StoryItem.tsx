@@ -3,13 +3,13 @@
 import React, { memo, useCallback, useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { OptimizedImage } from '../ui/OptimizedImage';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import {
   getAvatarImageProps,
   IMAGE_VARIANTS_BY_CONTEXT,
 } from '../../utils/cloudflareImageHelpers';
-import { COLORS } from '../../constants/colors';
-import { FONTS, FONT_SIZES_V2 } from '../../constants/typography';
+import { COLORS } from '@/constants/colors';
+import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
 import type { StoryItemProps } from './types';
 
 /**
@@ -60,10 +60,7 @@ export const StoryItem: React.FC<StoryItemProps> = memo(
             colors={gradientColors}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={[
-              styles.gradientRing,
-              item.isNew && styles.gradientRingGlow,
-            ]}
+            style={[styles.gradientRing, item.isNew && styles.gradientRingGlow]}
           >
             <View style={styles.innerGap}>
               <OptimizedImage

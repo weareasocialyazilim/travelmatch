@@ -40,11 +40,11 @@ type MesafeliSatisScreenProps = StackScreenProps<
 // =============================================================================
 
 const COMPANY_INFO = {
-  name: 'TravelMatch Teknoloji A.Ş.',
+  name: 'Moment Teknoloji A.Ş.',
   address: 'İstanbul, Türkiye',
   phone: '+90 850 XXX XX XX',
-  email: 'destek@travelmatch.app',
-  kep: 'travelmatch@hs01.kep.tr',
+  email: 'destek@moment.app',
+  kep: 'moment@hs01.kep.tr',
   mersis: '0123456789012345',
   vergiDairesi: 'Kadıköy Vergi Dairesi',
   vergiNo: '1234567890',
@@ -69,19 +69,21 @@ Ad Soyad, adres ve iletişim bilgileri sipariş sırasında alınmaktadır.`,
   {
     id: 'konu',
     title: 'MADDE 2 – SÖZLEŞMENİN KONUSU',
-    content: `İşbu sözleşmenin konusu, ALICI'nın SATICI'ya ait TravelMatch platformu üzerinden elektronik ortamda siparişini verdiği, aşağıda nitelikleri ve satış fiyatı belirtilen hizmetin satışı ve teslimi ile ilgili olarak 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği hükümleri gereğince tarafların hak ve yükümlülüklerinin belirlenmesidir.
+    content: `İşbu sözleşmenin konusu, ALICI'nın SATICI'ya ait Moment platformu üzerinden elektronik ortamda siparişini verdiği, aşağıda nitelikleri ve satış fiyatı belirtilen hizmetin satışı ve teslimi ile ilgili olarak 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği hükümleri gereğince tarafların hak ve yükümlülüklerinin belirlenmesidir.
 
-Platform, kullanıcıların birbirlerine deneyim bazlı hediyeler göndermesini sağlayan bir aracı hizmet sunmaktadır. Hediye tutarı, alıcının deneyimi gerçekleştirip kanıt yüklemesine kadar güvenli şekilde (escrow) tutulmaktadır.`,
+HİZMET TANIMI: Anı Paylaşımı ve Dijital Hediye Aracılığı
+
+Platform, kullanıcıların birbirlerine anı bazlı hediyeler göndermesini sağlayan bir dijital aracı hizmet sunmaktadır. Hediye tutarı, PayTR ödeme altyapısı üzerinden alıcının deneyimi gerçekleştirip kanıt yüklemesine kadar güvenli şekilde (escrow) tutulmaktadır.`,
   },
   {
     id: 'hizmet_bilgileri',
     title: 'MADDE 3 – HİZMET BİLGİLERİ',
-    content: `3.1. Hizmet Tanımı: Deneyim bazlı hediye gönderme hizmeti
+    content: `3.1. Hizmet Tanımı: Anı Paylaşımı ve Dijital Hediye Aracılığı Hizmeti
 
 3.2. Hizmet Özellikleri:
-- Hediye tutarı escrow sisteminde güvenle tutulur
+- Hediye tutarı PayTR escrow sisteminde güvenle tutulur
 - Alıcı deneyimi gerçekleştirip fotoğraflı kanıt yükler
-- Kanıt onaylandıktan sonra tutar alıcıya aktarılır
+- Kanıt onaylandıktan sonra tutar PayTR üzerinden alıcıya aktarılır
 - 7 gün içinde kanıt yüklenmezse tutar iade edilir
 
 3.3. Fiyat Bilgisi:
@@ -90,18 +92,20 @@ Platform, kullanıcıların birbirlerine deneyim bazlı hediyeler göndermesini 
 - KDV: Komisyona dahildir
 - Toplam ödeme: Sipariş özetinde gösterilir
 
-3.4. Ödeme Şekli: Kredi kartı / Banka kartı (3D Secure)`,
+3.4. Ödeme Şekli: PayTR altyapısı ile Kredi kartı / Banka kartı (3D Secure)
+
+3.5. Ödeme Hizmet Sağlayıcısı: PayTR Ödeme ve Elektronik Para Kuruluşu A.Ş.`,
   },
   {
     id: 'teslimat',
     title: 'MADDE 4 – TESLİMAT',
     content: `4.1. Dijital Hizmet Teslimatı:
-Hediye bildirimi, ödeme onaylandıktan hemen sonra alıcıya iletilir.
+Hediye bildirimi, PayTR üzerinden ödeme onaylandıktan hemen sonra alıcıya iletilir.
 
 4.2. Para Transferi Süreci:
 - Escrow süresi: 7 gün (kullanıcı güven puanına göre değişebilir)
 - Kanıt onay süresi: 24-72 saat
-- Banka transferi: 1-2 iş günü
+- PayTR banka transferi: 1-2 iş günü
 
 4.3. Teslimat Adresi:
 Dijital hizmet olduğundan fiziksel teslimat adresi gerekmemektedir.`,
@@ -114,7 +118,7 @@ Dijital hizmet olduğundan fiziksel teslimat adresi gerekmemektedir.`,
 5.2. Cayma Hakkının Kullanılamayacağı Durumlar:
 - Hediye alıcısı deneyimi gerçekleştirmeye başlamışsa
 - Kanıt yüklenmiş ve onaylanmışsa
-- Escrow süresi dolmuş ve transfer gerçekleşmişse
+- Escrow süresi dolmuş ve PayTR transferi gerçekleşmişse
 
 5.3. Cayma Hakkı Kullanımı:
 Cayma hakkını kullanmak için:
@@ -124,7 +128,7 @@ c) KEP: ${COMPANY_INFO.kep}
 yollarından biriyle bildirimde bulunabilirsiniz.
 
 5.4. İade Süreci:
-Cayma hakkı kullanıldığında, ödeme aynı yöntemle 14 gün içinde iade edilir.`,
+Cayma hakkı kullanıldığında, PayTR üzerinden aynı ödeme yöntemiyle 14 gün içinde iade edilir.`,
   },
   {
     id: 'garanti',
@@ -132,7 +136,7 @@ Cayma hakkı kullanıldığında, ödeme aynı yöntemle 14 gün içinde iade ed
     content: `6.1. Dijital hizmetlerde yasal garanti süresi yoktur.
 
 6.2. Platform Güvenceleri:
-- Escrow sistemi ile ödeme güvenliği
+- PayTR escrow sistemi ile ödeme güvenliği
 - 7 gün içinde kanıt yüklenmezse tam iade
 - İtiraz ve şikayet mekanizması
 - Müşteri destek hizmeti
@@ -214,7 +218,11 @@ export default function MesafeliSatisScreen({
 
         {/* Legal Badge */}
         <View style={styles.legalBadge}>
-          <MaterialCommunityIcons name="file-document-outline" size={24} color="#4CAF50" />
+          <MaterialCommunityIcons
+            name="file-document-outline"
+            size={24}
+            color="#4CAF50"
+          />
           <Text style={styles.legalBadgeText}>
             6502 Sayılı Tüketici Kanunu ve Mesafeli Sözleşmeler Yönetmeliği
             Kapsamında Hazırlanmıştır

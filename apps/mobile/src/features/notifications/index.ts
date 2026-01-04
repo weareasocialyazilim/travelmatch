@@ -24,7 +24,10 @@ export type {
   NotificationPreferences,
 } from '@/services/notificationService';
 
-// Components (re-export from components folder)
-export { NotificationCard } from '@/components/NotificationCard';
-export type { NotificationCardProps } from '@/components/NotificationCard';
+// Components - NotificationCard artık features/notifications/components altında
+export { NotificationCard } from './components/NotificationCard';
+export type {
+  NotificationType as NotificationCardType,
+  NotificationPriority,
+} from './components/NotificationCard';
 export { NotificationPermissionModal } from '@/components/NotificationPermissionModal';

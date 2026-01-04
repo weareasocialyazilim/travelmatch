@@ -9,7 +9,7 @@
  */
 
 import { supabase } from './supabase';
-import { logger } from '../utils/production-logger';
+import { logger } from '../utils/logger';
 import type { CurrencyCode } from '../constants/currencies';
 
 // ============================================
@@ -72,7 +72,7 @@ export interface ComplianceCheckResult {
  * @param currency - Currency code (default: TRY)
  *
  * Calls the check_user_limits RPC function in the database which checks:
- * - Plan-based limits (passport/first_class/concierge)
+ * - Plan-based limits (free/gold/platinum)
  * - User type limits (new/standard/verified)
  * - KYC thresholds
  */
@@ -90,7 +90,7 @@ export const checkUserLimits = async (
   if (!userId) {
     return {
       allowed: false,
-      plan_id: 'passport',
+      plan_id: 'free',
       user_type: 'new',
       kyc_status: 'none',
       kyc_required: false,
@@ -102,19 +102,19 @@ export const checkUserLimits = async (
   }
 
   try {
-    const { data, error } = await (supabase.rpc as any)('check_user_limits', {
+    const { data, error } = (await (supabase.rpc as any)('check_user_limits', {
       p_user_id: userId,
       p_category: category,
       p_amount: amount ?? null,
       p_currency: currency,
-    }) as { data: LimitCheckResult | null; error: Error | null };
+    })) as { data: LimitCheckResult | null; error: Error | null };
 
     if (error) {
       logger.error('check_user_limits RPC error', error);
       // Return permissive fallback on error to not block transactions
       return {
         allowed: true,
-        plan_id: 'passport',
+        plan_id: 'free',
         user_type: 'standard',
         kyc_status: 'none',
         kyc_required: false,
@@ -127,7 +127,7 @@ export const checkUserLimits = async (
 
     return {
       allowed: data?.allowed ?? true,
-      plan_id: data?.plan_id ?? 'passport',
+      plan_id: data?.plan_id ?? 'free',
       user_type: data?.user_type ?? 'standard',
       kyc_status: data?.kyc_status ?? 'none',
       kyc_required: data?.kyc_required ?? false,
@@ -140,7 +140,7 @@ export const checkUserLimits = async (
     logger.error('check_user_limits unexpected error', err as Error);
     return {
       allowed: true,
-      plan_id: 'passport',
+      plan_id: 'free',
       user_type: 'standard',
       kyc_status: 'none',
       kyc_required: false,
@@ -160,7 +160,7 @@ export const checkUserLimits = async (
  * Calls check_moment_contribution_limit RPC function which checks:
  * - Per-user contribution count to this moment
  * - Per-user total contribution amount to this moment
- * - Plan-based limits (passport/first_class/concierge)
+ * - Plan-based limits (free/gold/platinum)
  */
 export const checkMomentContributionLimit = async (
   momentId: string,
@@ -177,11 +177,14 @@ export const checkMomentContributionLimit = async (
   }
 
   try {
-    const { data, error } = await (supabase.rpc as any)('check_moment_contribution_limit', {
-      p_moment_id: momentId,
-      p_user_id: userId,
-      p_amount: amount,
-    }) as { data: ContributionLimitResult | null; error: Error | null };
+    const { data, error } = (await (supabase.rpc as any)(
+      'check_moment_contribution_limit',
+      {
+        p_moment_id: momentId,
+        p_user_id: userId,
+        p_amount: amount,
+      },
+    )) as { data: ContributionLimitResult | null; error: Error | null };
 
     if (error) {
       logger.error('check_moment_contribution_limit RPC error', error);
@@ -204,7 +207,10 @@ export const checkMomentContributionLimit = async (
       remaining_amount: data?.remaining_amount,
     };
   } catch (err) {
-    logger.error('check_moment_contribution_limit unexpected error', err as Error);
+    logger.error(
+      'check_moment_contribution_limit unexpected error',
+      err as Error,
+    );
     return {
       allowed: true,
       current_count: 0,
@@ -219,7 +225,7 @@ export const checkMomentContributionLimit = async (
  * Calls check_moment_creation_limit RPC function which checks:
  * - Daily moment creation count
  * - Monthly moment creation count
- * - Plan-based limits (passport: 3/month, first_class: 15/month, concierge: unlimited)
+ * - Plan-based limits (free: 3/month, gold: 15/month, platinum: unlimited)
  */
 export const checkMomentCreationLimit =
   async (): Promise<MomentCreationLimitResult> => {
@@ -232,14 +238,17 @@ export const checkMomentCreationLimit =
         daily_limit: 0,
         monthly_count: 0,
         monthly_limit: 0,
-        plan_id: 'passport',
+        plan_id: 'free',
       };
     }
 
     try {
-      const { data, error } = await (supabase.rpc as any)('check_moment_creation_limit', {
-        p_user_id: userId,
-      }) as { data: MomentCreationLimitResult | null; error: Error | null };
+      const { data, error } = (await (supabase.rpc as any)(
+        'check_moment_creation_limit',
+        {
+          p_user_id: userId,
+        },
+      )) as { data: MomentCreationLimitResult | null; error: Error | null };
 
       if (error) {
         logger.error('check_moment_creation_limit RPC error', error);
@@ -250,7 +259,7 @@ export const checkMomentCreationLimit =
           daily_limit: 10,
           monthly_count: 0,
           monthly_limit: 100,
-          plan_id: 'passport',
+          plan_id: 'free',
         };
       }
 
@@ -261,17 +270,20 @@ export const checkMomentCreationLimit =
         daily_limit: data?.daily_limit ?? null,
         monthly_count: data?.monthly_count ?? 0,
         monthly_limit: data?.monthly_limit ?? null,
-        plan_id: data?.plan_id ?? 'passport',
+        plan_id: data?.plan_id ?? 'free',
       };
     } catch (err) {
-      logger.error('check_moment_creation_limit unexpected error', err as Error);
+      logger.error(
+        'check_moment_creation_limit unexpected error',
+        err as Error,
+      );
       return {
         allowed: true,
         daily_count: 0,
         daily_limit: 10,
         monthly_count: 0,
         monthly_limit: 100,
-        plan_id: 'passport',
+        plan_id: 'free',
       };
     }
   };
@@ -457,4 +469,128 @@ export const shouldPromptKyc = (result: LimitCheckResult): boolean => {
   return (
     result.kyc_required || result.warnings.some((w) => w.type === 'kyc_prompt')
   );
+};
+
+// ============================================
+// Contract Approval Checks
+// ============================================
+
+export interface ContractApprovalResult {
+  approved: boolean;
+  missingContracts: string[];
+  message?: string;
+}
+
+/**
+ * Check if user has approved required contracts before Moment creation
+ * LEGAL REQUIREMENT: Must be called before any Moment creation
+ *
+ * Required contracts:
+ * - Mesafeli Satış Sözleşmesi (Distance Sales Contract)
+ * - KVKK Aydınlatma Metni (KVKK Clarification)
+ * - Kullanım Koşulları (Terms of Service)
+ */
+export const checkContractApproval =
+  async (): Promise<ContractApprovalResult> => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) {
+      return {
+        approved: false,
+        missingContracts: ['all'],
+        message: 'Kullanıcı doğrulanamadı',
+      };
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('user_contract_approvals')
+        .select('contract_type, approved_at')
+        .eq('user_id', userId)
+        .eq('is_active', true);
+
+      if (error) {
+        logger.error('Error checking contract approvals', error);
+        // Allow on error to not block moment creation
+        return {
+          approved: true,
+          missingContracts: [],
+        };
+      }
+
+      const requiredContracts = [
+        'mesafeli_satis',
+        'kvkk_aydinlatma',
+        'terms_of_service',
+      ];
+      // Cast data to proper type - Supabase typing issue with relationships
+      const contractData = data as Array<{
+        contract_type: string;
+        approved_at: string;
+      }> | null;
+      const approvedContracts = (contractData || []).map(
+        (c) => c.contract_type,
+      );
+      const missingContracts = requiredContracts.filter(
+        (c) => !approvedContracts.includes(c),
+      );
+
+      if (missingContracts.length > 0) {
+        return {
+          approved: false,
+          missingContracts,
+          message:
+            'Anı oluşturmak için yasal sözleşmeleri onaylamanız gerekmektedir.',
+        };
+      }
+
+      return {
+        approved: true,
+        missingContracts: [],
+      };
+    } catch (err) {
+      logger.error(
+        'Unexpected error checking contract approvals',
+        err as Error,
+      );
+      return {
+        approved: true,
+        missingContracts: [],
+      };
+    }
+  };
+
+/**
+ * Combined check for Moment creation
+ * Checks both creation limits AND contract approvals
+ *
+ * @returns Combined result with allowed status and any blockers
+ */
+export const checkMomentCreationEligibility = async (): Promise<{
+  allowed: boolean;
+  limitResult: MomentCreationLimitResult;
+  contractResult: ContractApprovalResult;
+  blockReason?: string;
+}> => {
+  // Check limits
+  const limitResult = await checkMomentCreationLimit();
+
+  // Check contract approvals
+  const contractResult = await checkContractApproval();
+
+  // Determine overall allowed status
+  const allowed = limitResult.allowed && contractResult.approved;
+
+  let blockReason: string | undefined;
+  if (!contractResult.approved) {
+    blockReason = contractResult.message;
+  } else if (!limitResult.allowed) {
+    blockReason = limitResult.reason;
+  }
+
+  return {
+    allowed,
+    limitResult,
+    contractResult,
+    blockReason,
+  };
 };

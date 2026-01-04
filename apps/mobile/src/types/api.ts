@@ -78,22 +78,6 @@ export type MomentsResponse = PaginatedResponse<Moment>;
 export type MomentResponse = ApiResponse<Moment>;
 
 /**
- * Trip-related response types
- */
-export interface Trip {
-  id: string;
-  momentId: string;
-  userId: string;
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
-  bookingDate: string;
-  amount: number;
-  createdAt: string;
-}
-
-export type TripsResponse = PaginatedResponse<Trip>;
-export type TripResponse = ApiResponse<Trip>;
-
-/**
  * User-related response types
  */
 export interface User {

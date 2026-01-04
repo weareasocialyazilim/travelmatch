@@ -26,8 +26,8 @@ import Animated, {
   interpolate,
   useSharedValue,
 } from 'react-native-reanimated';
-import { COLORS } from '../../constants/colors';
-import { TYPOGRAPHY } from '../../constants/typography';
+import { COLORS } from '@/constants/colors';
+import { TYPOGRAPHY } from '@/constants/typography';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 

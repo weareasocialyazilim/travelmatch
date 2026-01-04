@@ -10,13 +10,7 @@
  */
 
 import React, { useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  ViewStyle,
-} from 'react-native';
+import { View, Text, StyleSheet, Pressable, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, GRADIENTS, primitives } from '@/constants/colors';
@@ -66,35 +60,35 @@ const FEATURE_CONFIG: Record<
     icon: 'image-multiple',
     title: 'Moment Limit Reached',
     description:
-      'You\'ve used all your moments this month. Upgrade to create more travel experiences.',
+      "You've used all your moments this month. Upgrade to create more travel experiences.",
     requiredPlan: 'first_class',
   },
   messages: {
     icon: 'chat-processing',
     title: 'Message Limit Reached',
     description:
-      'You\'ve reached your daily message limit. Upgrade for unlimited messaging.',
+      "You've reached your daily message limit. Upgrade for unlimited messaging.",
     requiredPlan: 'first_class',
   },
   gifts: {
     icon: 'gift',
     title: 'Gift Limit Reached',
     description:
-      'You\'ve sent all your gifts this month. Upgrade to send more gifts.',
+      "You've sent all your gifts this month. Upgrade to send more gifts.",
     requiredPlan: 'first_class',
   },
   saved: {
     icon: 'bookmark-multiple',
     title: 'Saved Moments Full',
     description:
-      'You\'ve reached your saved moments limit. Upgrade to save more experiences.',
+      "You've reached your saved moments limit. Upgrade to save more experiences.",
     requiredPlan: 'first_class',
   },
   filters: {
     icon: 'filter-variant',
     title: 'Premium Filters',
     description:
-      'Unlock advanced filters to find exactly what you\'re looking for.',
+      "Unlock advanced filters to find exactly what you're looking for.",
     requiredPlan: 'first_class',
   },
   verified: {
@@ -107,12 +101,13 @@ const FEATURE_CONFIG: Record<
 };
 
 /**
- * Plan display names
+ * Plan display names - TravelMatch 3-Tier System
  */
 const PLAN_NAMES: Record<string, string> = {
-  passport: 'Passport (Free)',
-  first_class: 'First Class',
-  concierge: 'Concierge',
+  basic: 'Momentum (Free)',
+  free: 'Momentum (Free)',
+  premium: 'Premium',
+  platinum: 'Platinum',
 };
 
 export const Paywall: React.FC<PaywallProps> = ({
@@ -125,7 +120,8 @@ export const Paywall: React.FC<PaywallProps> = ({
   testID,
 }) => {
   const config = FEATURE_CONFIG[feature];
-  const requiredPlanName = PLAN_NAMES[config.requiredPlan] || config.requiredPlan;
+  const requiredPlanName =
+    PLAN_NAMES[config.requiredPlan] || config.requiredPlan;
   const currentPlanName = PLAN_NAMES[currentPlan] || currentPlan;
 
   const handleUpgrade = useCallback(() => {
@@ -183,7 +179,9 @@ export const Paywall: React.FC<PaywallProps> = ({
             color={COLORS.primary}
           />
           <Text style={styles.requiredPlanText}>
-            Upgrade to <Text style={styles.planHighlight}>{requiredPlanName}</Text> to unlock
+            Upgrade to{' '}
+            <Text style={styles.planHighlight}>{requiredPlanName}</Text> to
+            unlock
           </Text>
         </View>
 

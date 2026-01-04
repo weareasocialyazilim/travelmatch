@@ -2,7 +2,7 @@
  * TravelMatch Awwwards Edition - Requests Screen
  * Gelen teklifleri ve giden istekleri ipeksi bir hiyerarşiyle listeler.
  */
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
@@ -19,12 +19,13 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
 import { TMAvatar } from '@/components/ui/TMAvatar';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { NotificationCard } from '@/components/NotificationCard';
+import { NotificationCard } from '@/features/notifications/components';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { useRequestsScreen } from '@/hooks/useRequestsScreen';
+import { navigateFromNotification } from '@/services/notificationNavigator';
 import type { RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/routeParams';
-import type { NotificationType } from '@/components/NotificationCard';
+import type { NotificationType } from '@/features/notifications/components';
 
 type RequestsRouteProp = RouteProp<RootStackParamList, 'Requests'>;
 
@@ -58,16 +59,36 @@ const RequestsScreen = ({ navigation }: any) => {
     markNotificationAsRead,
   } = useRequestsScreen(route.params?.initialTab || 'pending');
 
-  const handleNotificationPress = async (item: (typeof notifications)[0]) => {
-    if (!item.isRead) {
-      await markNotificationAsRead(item.id);
-    }
-  };
+  const handleNotificationPress = useCallback(
+    async (item: (typeof notifications)[0]) => {
+      // Mark as read first
+      if (!item.isRead) {
+        await markNotificationAsRead(item.id);
+      }
+
+      // Navigate to appropriate screen based on notification type
+      navigateFromNotification({
+        id: item.id,
+        type: item.type as any, // Map internal type to NotificationType
+        momentId: item.metadata?.momentId,
+        userId: item.metadata?.userId,
+        conversationId: item.metadata?.conversationId,
+        giftId: item.metadata?.giftId,
+        escrowId: item.metadata?.escrowId,
+        transactionId: item.metadata?.transactionId,
+        proofId: item.metadata?.proofId,
+        metadata: item.metadata,
+      });
+    },
+    [markNotificationAsRead],
+  );
 
   const renderRequestItem = ({ item }: { item: (typeof requests)[0] }) => (
     <TouchableOpacity
       activeOpacity={0.8}
-      onPress={() => navigation.navigate('ReceiverApproval', { requestId: item.id })}
+      onPress={() =>
+        navigation.navigate('ReceiverApproval', { requestId: item.id })
+      }
     >
       <GlassCard intensity={15} style={styles.requestCard}>
         <View style={styles.cardHeader}>
@@ -78,7 +99,9 @@ const RequestsScreen = ({ navigation }: any) => {
               name={item.person?.name || 'User'}
             />
             <View style={styles.userDetails}>
-              <Text style={styles.userName}>{item.person?.name || 'Unknown'}</Text>
+              <Text style={styles.userName}>
+                {item.person?.name || 'Unknown'}
+              </Text>
               <Text style={styles.momentTitle}>{item.momentTitle}</Text>
             </View>
           </View>
@@ -147,7 +170,9 @@ const RequestsScreen = ({ navigation }: any) => {
           </Text>
           {unreadNotificationsCount > 0 && (
             <View style={styles.tabBadge}>
-              <Text style={styles.tabBadgeText}>{unreadNotificationsCount}</Text>
+              <Text style={styles.tabBadgeText}>
+                {unreadNotificationsCount}
+              </Text>
             </View>
           )}
         </TouchableOpacity>

@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import { SkeletonList } from '../SkeletonList';
+import { SkeletonList } from '../TMSkeleton';
 
 describe('SkeletonList', () => {
   describe('Basic Rendering', () => {
@@ -24,13 +24,12 @@ describe('SkeletonList', () => {
     });
 
     it('should not render when show prop is false initially', () => {
-      const { toJSON } = render(
-        <SkeletonList type="gift" show={false} />,
-      );
+      const { toJSON } = render(<SkeletonList type="gift" show={false} />);
       // Component returns null, but render may wrap in container
       // Check that no skeleton items are rendered
       const json = toJSON();
-      const hasChildren = json && typeof json === 'object' && 'children' in json && json.children;
+      const hasChildren =
+        json && typeof json === 'object' && 'children' in json && json.children;
       expect(hasChildren).toBeFalsy();
     });
   });
@@ -82,7 +81,8 @@ describe('SkeletonList', () => {
       jest.advanceTimersByTime(250);
       const json = toJSON();
       // Component returns null, but render may wrap in container
-      const hasChildren = json && typeof json === 'object' && 'children' in json && json.children;
+      const hasChildren =
+        json && typeof json === 'object' && 'children' in json && json.children;
       expect(hasChildren).toBeFalsy();
     });
   });

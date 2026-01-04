@@ -157,7 +157,7 @@ export const DEFAULT_MILESTONES: TrustMilestone[] = [
     id: 'email',
     type: 'email',
     verified: false,
-    label: 'Email Doğrulandı',
+    label: 'İletişim Doğrulandı',
     icon: 'email-check',
     position: { x: 0.5, y: 0.1 },
     connections: ['phone', 'id'],
@@ -166,7 +166,7 @@ export const DEFAULT_MILESTONES: TrustMilestone[] = [
     id: 'phone',
     type: 'phone',
     verified: false,
-    label: 'Telefon Doğrulandı',
+    label: 'Hesap Güvenliği',
     icon: 'phone-check',
     position: { x: 0.25, y: 0.3 },
     connections: ['email', 'bank'],
@@ -175,7 +175,7 @@ export const DEFAULT_MILESTONES: TrustMilestone[] = [
     id: 'id',
     type: 'id',
     verified: false,
-    label: 'Kimlik Onaylandı',
+    label: 'Kimlik Doğrulaması',
     icon: 'card-account-details',
     position: { x: 0.75, y: 0.3 },
     connections: ['email', 'bank'],
@@ -184,7 +184,7 @@ export const DEFAULT_MILESTONES: TrustMilestone[] = [
     id: 'bank',
     type: 'bank',
     verified: false,
-    label: 'Banka Bağlandı',
+    label: 'Ödeme Güvenilirliği',
     icon: 'bank-check',
     position: { x: 0.5, y: 0.5 },
     connections: ['phone', 'id', 'firstGift'],
@@ -193,7 +193,7 @@ export const DEFAULT_MILESTONES: TrustMilestone[] = [
     id: 'firstGift',
     type: 'firstGift',
     verified: false,
-    label: 'İlk Hediye',
+    label: 'İlk Anı Hediyesi',
     icon: 'gift',
     position: { x: 0.3, y: 0.7 },
     connections: ['bank', 'fiveGifts'],
@@ -202,7 +202,7 @@ export const DEFAULT_MILESTONES: TrustMilestone[] = [
     id: 'fiveGifts',
     type: 'fiveGifts',
     verified: false,
-    label: '5 Hediye',
+    label: 'Hediye Tutarlılığı',
     icon: 'gift-open',
     position: { x: 0.5, y: 0.75 },
     connections: ['firstGift', 'tenGifts', 'firstProof'],
@@ -211,7 +211,7 @@ export const DEFAULT_MILESTONES: TrustMilestone[] = [
     id: 'tenGifts',
     type: 'tenGifts',
     verified: false,
-    label: '10 Hediye',
+    label: 'Anı Ustası',
     icon: 'star',
     position: { x: 0.7, y: 0.7 },
     connections: ['fiveGifts'],
@@ -220,7 +220,7 @@ export const DEFAULT_MILESTONES: TrustMilestone[] = [
     id: 'firstProof',
     type: 'firstProof',
     verified: false,
-    label: 'İlk Kanıt',
+    label: 'Anı Doğrulaması',
     icon: 'camera-check',
     position: { x: 0.5, y: 0.9 },
     connections: ['fiveGifts'],
@@ -303,7 +303,11 @@ export const AUTH_CHECKLIST_ITEMS = [
   { id: 'location', label: 'Konum kontrol ediliyor', icon: 'map-marker-check' },
   { id: 'date', label: 'Tarih doğrulanıyor', icon: 'calendar-check' },
   { id: 'scene', label: 'Sahnelik analiz ediliyor', icon: 'image-search' },
-  { id: 'authenticity', label: 'Özgünlük kontrol ediliyor', icon: 'shield-check' },
+  {
+    id: 'authenticity',
+    label: 'Özgünlük kontrol ediliyor',
+    icon: 'shield-check',
+  },
 ] as const;
 
 // ═══════════════════════════════════════════════════
@@ -453,4 +457,5 @@ export const CEREMONY_HAPTICS = {
   celebration: 'success', // Kutlama
 } as const;
 
-export type HapticType = (typeof CEREMONY_HAPTICS)[keyof typeof CEREMONY_HAPTICS];
+export type HapticType =
+  (typeof CEREMONY_HAPTICS)[keyof typeof CEREMONY_HAPTICS];

@@ -5,37 +5,124 @@
  * - BlurView glass effect for floating feel
  * - Neon send button with glow
  * - Smooth attach button interaction
+ * - Gift flow preset from linked moment (Alıcı Fiyat Belirler)
+ * - Broadcast typing status via Supabase channel
  */
 
-import React from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
+import React, { useEffect, useRef, useCallback } from 'react';
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  Platform,
+} from 'react-native';
 import { BlurView } from 'expo-blur';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
+import { supabase } from '@/lib/supabase';
 import { COLORS } from '@/constants/colors';
 import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
 import { logger } from '@/utils/logger';
 import { useNetworkStatus } from '../../../context/NetworkContext';
 
+/** Linked moment context for gift flow preset */
+interface LinkedMomentContext {
+  id: string;
+  title: string;
+  requested_amount?: number;
+  currency?: string;
+}
+
 interface ChatInputBarProps {
+  conversationId: string;
+  currentUserId: string;
   messageText: string;
   onTextChange: (text: string) => void;
   onSend: () => void;
   onAttachPress: () => void;
+  /** Open gift flow with preset amount from moment */
+  onGiftPress?: (momentContext: LinkedMomentContext) => void;
+  /** Linked moment for gift flow preset */
+  linkedMoment?: LinkedMomentContext;
   isTyping: boolean;
   isSending?: boolean;
 }
 
 export const ChatInputBar: React.FC<ChatInputBarProps> = ({
+  conversationId,
+  currentUserId,
   messageText,
   onTextChange,
   onSend,
   onAttachPress,
+  onGiftPress,
+  linkedMoment,
   isTyping,
   isSending = false,
 }) => {
   const insets = useSafeAreaInsets();
   const { isConnected } = useNetworkStatus();
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastTypingBroadcastRef = useRef<number>(0);
+
+  /**
+   * Broadcast typing status via Supabase channel
+   * Throttled to max once per 2 seconds
+   */
+  const broadcastTyping = useCallback(async () => {
+    if (!conversationId || !currentUserId) return;
+
+    const now = Date.now();
+    if (now - lastTypingBroadcastRef.current < 2000) return;
+
+    lastTypingBroadcastRef.current = now;
+
+    try {
+      const channel = supabase.channel(`chat:${conversationId}`);
+      await channel.send({
+        type: 'broadcast',
+        event: 'typing',
+        payload: {
+          user_id: currentUserId,
+          timestamp: new Date().toISOString(),
+        },
+      });
+    } catch (error) {
+      logger.warn('Failed to broadcast typing status', { error });
+    }
+  }, [conversationId, currentUserId]);
+
+  /**
+   * Handle text change with typing broadcast
+   */
+  const handleTextChange = (text: string) => {
+    onTextChange(text);
+
+    if (text.length > 0 && isConnected) {
+      broadcastTyping();
+    }
+  };
+
+  /**
+   * Handle gift button press - preset moment's requested amount
+   */
+  const handleGiftPress = () => {
+    if (!linkedMoment) {
+      logger.warn('No linked moment for gift flow');
+      return;
+    }
+
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    logger.debug('Gift button pressed', {
+      momentId: linkedMoment.id,
+      requestedAmount: linkedMoment.requested_amount,
+    });
+
+    onGiftPress?.(linkedMoment);
+  };
 
   const InputContent = () => (
     <View style={[styles.inputWrapper, { paddingBottom: insets.bottom + 12 }]}>
@@ -43,6 +130,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
         <TouchableOpacity
           style={styles.attachButton}
           onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             logger.debug('Attach button pressed - opening attachment sheet');
             onAttachPress();
           }}
@@ -59,12 +147,37 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
           />
         </TouchableOpacity>
 
+        {/* Gift Button - Preset from linked moment */}
+        {linkedMoment && onGiftPress && (
+          <TouchableOpacity
+            style={styles.giftButton}
+            onPress={handleGiftPress}
+            disabled={!isConnected}
+            activeOpacity={0.6}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            accessibilityLabel={`Send gift of ${linkedMoment.requested_amount} ${linkedMoment.currency || 'TRY'}`}
+            accessibilityRole="button"
+          >
+            <MaterialCommunityIcons
+              name="gift-outline"
+              size={22}
+              color={
+                isConnected
+                  ? COLORS.brand?.accent || COLORS.primary
+                  : COLORS.text.muted
+              }
+            />
+          </TouchableOpacity>
+        )}
+
         <TextInput
           style={styles.input}
-          placeholder={isConnected ? 'Bir mesaj yaz...' : 'Çevrimdışı - Gönderilemiyor'}
+          placeholder={
+            isConnected ? 'Bir mesaj yaz...' : 'Çevrimdışı - Gönderilemiyor'
+          }
           placeholderTextColor={COLORS.text.muted}
           value={messageText}
-          onChangeText={onTextChange}
+          onChangeText={handleTextChange}
           multiline
           maxLength={1000}
           returnKeyType="default"
@@ -87,8 +200,13 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
             messageText.trim().length > 0 && styles.sendButtonActive,
             (!isConnected || isSending) && styles.sendButtonDisabled,
           ]}
-          onPress={onSend}
-          disabled={!isConnected || isSending || messageText.trim().length === 0}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            onSend();
+          }}
+          disabled={
+            !isConnected || isSending || messageText.trim().length === 0
+          }
           accessibilityLabel={isSending ? 'Sending message' : 'Send message'}
           accessibilityRole="button"
         >
@@ -96,7 +214,9 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
             name="paper-plane"
             size={20}
             color={
-              messageText.trim().length > 0 ? COLORS.text.inverse : COLORS.text.muted
+              messageText.trim().length > 0
+                ? COLORS.text.inverse
+                : COLORS.text.muted
             }
           />
         </TouchableOpacity>
@@ -149,6 +269,15 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  giftButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    marginRight: 4,
   },
   input: {
     flex: 1,

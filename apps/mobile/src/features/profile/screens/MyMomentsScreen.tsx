@@ -12,7 +12,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { SkeletonList } from '@/components/ui/SkeletonList';
+import { SkeletonList } from '@/components/ui';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { COLORS } from '@/constants/colors';
 import { useMoments } from '@/hooks/useMoments';
@@ -72,7 +72,7 @@ const MyMomentsScreen: React.FC = () => {
         id: moment.hostId,
         name: moment.hostName,
         avatar: moment.hostAvatar,
-        type: 'traveler',
+        type: 'host',
         isVerified: true,
         location: locationStr,
         travelDays: 0,
@@ -86,14 +86,14 @@ const MyMomentsScreen: React.FC = () => {
     };
   };
 
-  const getStatusBadge = (status: string, requestCount?: number) => {
+  const getStatusBadge = (status: string, giftOfferCount?: number) => {
     switch (status) {
       case 'active':
         return (
           <View style={[styles.statusBadge, styles.activeBadge]}>
             <Text style={styles.activeBadgeText}>
-              {requestCount && requestCount > 0
-                ? `${requestCount} requests`
+              {giftOfferCount && giftOfferCount > 0
+                ? `${giftOfferCount} gift offers`
                 : 'Live'}
             </Text>
           </View>

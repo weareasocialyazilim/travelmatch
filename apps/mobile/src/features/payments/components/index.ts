@@ -29,8 +29,9 @@ export { FilterSortBar } from './FilterSortBar';
 export { TopPicksSection } from './TopPicksSection';
 export { PaymentPriorityNotice } from './PaymentPriorityNotice';
 
-// Transaction list
-export { TransactionListItem } from './TransactionListItem';
+// Currency selection - Taşındı: components/ -> features/payments/components
+export { CurrencySelectionBottomSheet } from './CurrencySelectionBottomSheet';
+export { CurrencySelector } from './CurrencySelector';
 
 // Proof requirement components
 export {

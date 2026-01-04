@@ -65,12 +65,6 @@ export type { MomentData, MomentBadgeType } from './TMCard';
 // TMPill - Chip/pill components
 export { TMPill, TMCategoryChip } from './TMPill';
 
-// LiquidInput - Awwwards-quality glass input with neon glow (Master Component)
-// All form inputs should use LiquidInput directly
-export { LiquidInput } from './LiquidInput';
-// ControlledLiquidInput - React Hook Form integrated Liquid Input
-export { ControlledLiquidInput } from './ControlledLiquidInput';
-
 // TMLoading - Consolidated loading component (replaces Spinner, LoadingSpinner, LiquidLoading)
 export { TMLoading } from './TMLoading';
 export type {
@@ -94,6 +88,8 @@ export {
   SkeletonText,
   SkeletonCard,
   SkeletonMessage,
+  SkeletonList,
+  ScreenSkeleton,
 } from './TMSkeleton';
 export type {
   TMSkeletonType,
@@ -103,11 +99,7 @@ export type {
   TMSkeletonProps,
 } from './TMSkeleton';
 // @deprecated aliases for backward compatibility - use TMSkeleton with type prop instead
-export {
-  TMSkeleton as SkeletonList,
-  TMSkeleton as FeedSkeleton,
-  TMSkeleton as ScreenSkeleton,
-} from './TMSkeleton';
+export { TMSkeleton as FeedSkeleton } from './TMSkeleton';
 
 // TMSheet - Bottom sheet with gestures and blur
 export { TMSheet } from './TMSheet';

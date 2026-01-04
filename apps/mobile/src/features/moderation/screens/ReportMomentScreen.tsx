@@ -1,7 +1,21 @@
+/**
+ * ReportMomentScreen - Moment/Proof Report Flow
+ *
+ * Updated for Moment platform:
+ * - Removed travel-related report options (e.g., "Bilet sahte")
+ * - Added gift/proof specific options
+ * - Liquid Reporting UX - non-threatening feedback flow
+ */
+
 import React, { useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { logger } from '@/utils/logger';
-import { BaseReportScreen, ReportSummaryCard, type ReportOption } from '../components';
+import {
+  BaseReportScreen,
+  ReportSummaryCard,
+  type ReportOption,
+} from '../components';
 import { COLORS } from '@/constants/colors';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { RouteProp } from '@react-navigation/native';
@@ -22,14 +36,52 @@ interface ReportMomentScreenProps {
   route: ReportMomentScreenRouteProp;
 }
 
-type ReportReason = 'scam' | 'inappropriate' | 'hate' | 'spam' | 'other';
+// Updated report reasons for Moment/Gift platform
+type ReportReason =
+  | 'misleading_moment' // Anı yanıltıcı
+  | 'insufficient_proof' // Kanıt yetersiz
+  | 'fake_content' // Sahte içerik
+  | 'inappropriate' // Uygunsuz içerik
+  | 'harassment' // Taciz
+  | 'spam' // Spam
+  | 'other'; // Diğer
 
 const REPORT_OPTIONS: ReportOption<ReportReason>[] = [
-  { id: 'scam', label: 'Scam or fake story' },
-  { id: 'inappropriate', label: 'Inappropriate content' },
-  { id: 'hate', label: 'Hate or harassment' },
-  { id: 'spam', label: 'Spam or misleading' },
-  { id: 'other', label: 'Other' },
+  {
+    id: 'misleading_moment',
+    label: 'Anı yanıltıcı',
+    description: 'İçerik gerçeği yansıtmıyor veya abartılı',
+  },
+  {
+    id: 'insufficient_proof',
+    label: 'Kanıt yetersiz',
+    description: 'Sunulan kanıt anıyı doğrulamıyor',
+  },
+  {
+    id: 'fake_content',
+    label: 'Sahte içerik',
+    description: 'Fotoğraf veya video manipüle edilmiş',
+  },
+  {
+    id: 'inappropriate',
+    label: 'Uygunsuz içerik',
+    description: 'Topluluk kurallarına aykırı',
+  },
+  {
+    id: 'harassment',
+    label: 'Taciz veya zorbalık',
+    description: 'Rahatsız edici veya tehditkâr davranış',
+  },
+  {
+    id: 'spam',
+    label: 'Spam veya aldatıcı',
+    description: 'Tekrarlayan veya aldatıcı içerik',
+  },
+  {
+    id: 'other',
+    label: 'Diğer',
+    description: 'Yukarıdakilerden farklı bir neden',
+  },
 ];
 
 /**
@@ -41,10 +93,10 @@ function MomentSummaryCard(): React.JSX.Element {
       <View style={styles.momentImage} />
       <View style={styles.momentInfo}>
         <Text style={styles.momentTitle} numberOfLines={1}>
-          Sunrise over the Andes
+          Kapadokya Balon Turu
         </Text>
         <Text style={styles.momentDetails} numberOfLines={1}>
-          Cusco, Peru • $50 • Adventure
+          Kapadokya, Türkiye • ₺2,500 • Macera
         </Text>
       </View>
     </ReportSummaryCard>
@@ -59,10 +111,14 @@ export const ReportMomentScreen: React.FC<ReportMomentScreenProps> = ({
 
   const handleSubmit = useCallback(
     (reason: ReportReason, details: string) => {
-      logger.info('Report submitted', {
+      // Haptic feedback for submission
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+      logger.info('Moment report submitted', {
         momentId,
         selectedReason: reason,
         additionalDetails: details,
+        category: 'gift_proof_dispute', // Updated category
       });
       navigation.goBack();
     },
@@ -75,14 +131,14 @@ export const ReportMomentScreen: React.FC<ReportMomentScreenProps> = ({
 
   return (
     <BaseReportScreen
-      title="Report Moment"
-      sectionTitle="Why are you reporting?"
+      title="Anı Bildir"
+      sectionTitle="Neden bildiriyorsunuz?"
       options={REPORT_OPTIONS}
       onSubmit={handleSubmit}
       onCancel={handleCancel}
-      submitButtonText="Submit Report"
-      detailsLabel="Anything we should know?"
-      detailsPlaceholder="Provide additional details (optional)"
+      submitButtonText="Raporu Gönder"
+      detailsLabel="Ek bilgi vermek ister misiniz?"
+      detailsPlaceholder="Detayları buraya yazın (isteğe bağlı)"
       summaryCard={<MomentSummaryCard />}
       radioPosition="left"
       testID="report-moment-screen"
