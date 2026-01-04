@@ -79,7 +79,6 @@ export type RootStackParamList = {
   MomentComments: { momentId: string; commentCount?: number };
   Profile: undefined;
   ProfileDetail: { userId: string };
-  // ZOMBIE CLEANUP: Review route removed - Trust Notes replaced this
   UserProfile: { userId: string };
   MyGifts: undefined;
   GiftCardMarket: undefined;
@@ -277,8 +276,6 @@ export type RootStackParamList = {
   Settings: undefined;
   NotificationDetail: { notificationId: string };
   EditProfile: undefined;
-
-  // ZOMBIE CLEANUP: MyCalendar removed - legacy hotel/flight booking UI
 
   // New Profile sub-screens
   MyMoments: undefined;
