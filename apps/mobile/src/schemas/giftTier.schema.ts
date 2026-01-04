@@ -56,10 +56,11 @@ export const GiftAmountSchema = z.object({
   amount: z
     .number()
     .positive('Hediye miktarı pozitif olmalı')
-    .min(1, 'Minimum hediye: $1'),
+    .min(0.01, 'Minimum hediye: $0.01')
+    .max(999999, 'Maksimum hediye: $999,999'),
 
   /** Original requested amount (for bonus calculation) */
-  requestedAmount: z.number().positive().optional(),
+  requestedAmount: z.number().nonnegative().max(999999).optional(),
 
   /** Currency code */
   currency: z.enum(['USD', 'TRY', 'EUR', 'GBP']).default('USD'),
@@ -102,13 +103,16 @@ export type ChatEligibility = z.infer<typeof ChatEligibilitySchema>;
  */
 export const GiftTierRequestSchema = z.object({
   /** Gift amount in USD */
-  amountUSD: z.number().nonnegative(),
+  amountUSD: z
+    .number()
+    .nonnegative('Amount cannot be negative')
+    .max(999999, 'Maximum amount is $999,999'),
 
   /** Sender's subscription tier */
   senderTier: z.enum(['free', 'premium', 'platinum']).optional(),
 
   /** Original requested amount for bonus check */
-  requestedAmount: z.number().nonnegative().optional(),
+  requestedAmount: z.number().nonnegative().max(999999).optional(),
 });
 
 export type GiftTierRequest = z.infer<typeof GiftTierRequestSchema>;

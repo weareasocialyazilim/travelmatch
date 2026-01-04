@@ -132,7 +132,11 @@ export type PaymentMethod = z.infer<typeof PaymentMethodSchema>;
 
 export const PaymentIntentSchema = z.object({
   id: z.string(),
-  amount: z.number().positive(),
+  amount: z
+    .number()
+    .positive('Amount must be positive')
+    .min(0.01, 'Minimum amount is $0.01')
+    .max(999999, 'Maximum amount is $999,999'),
   currency: z.string().default('TRY'),
   status: PayTRStatusSchema,
   metadata: PaymentMetadataSchema.optional(),

@@ -325,6 +325,17 @@ export const BulkThankYouScreen: React.FC = () => {
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
+      // MASTER: Clean up compressed video from device cache
+      if (videoUri) {
+        try {
+          await videoService.cleanupTempFiles(videoUri);
+          logger.info('[BulkThankYou] Video cache cleaned up successfully');
+        } catch (cleanupError) {
+          // Log but don't throw - cleanup failure shouldn't block success
+          logger.warn('[BulkThankYou] Cache cleanup failed:', cleanupError);
+        }
+      }
+
       Alert.alert(
         'Gönderildi! 🎉',
         `${selectedDonors.size} bağışçıya teşekkür mesajınız gönderildi.`,
@@ -586,7 +597,8 @@ export const BulkThankYouScreen: React.FC = () => {
               />
             </View>
             <Text style={styles.uploadProgressText}>
-              Şu an {selectedDonors.size} destekçine gönderiyoruz 💜
+              Şu an {selectedDonors.size} destekçine ipeksi bir teşekkür
+              gönderiliyor ✨
             </Text>
           </View>
         )}
