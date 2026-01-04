@@ -1410,6 +1410,52 @@ class SecurePaymentService {
       throw error;
     }
   }
+
+  // ============================================
+  // LEGACY ALIASES (for test backward compatibility)
+  // ============================================
+
+  /**
+   * getWalletBalance - ALIAS FOR getBalance
+   * Tests expect this name
+   */
+  async getWalletBalance() {
+    return this.getBalance();
+  }
+
+  /**
+   * getTransactions - Map LegacyTransactions to new name
+   * Tests expect this name
+   */
+  async getTransactions(params?: {
+    type?: TransactionType;
+    status?: PaymentStatus;
+    page?: number;
+    pageSize?: number;
+    startDate?: string;
+    endDate?: string;
+  }) {
+    return this.getLegacyTransactions(params);
+  }
+
+  /**
+   * getTransaction - Map LegacyTransaction to new name
+   */
+  async getTransaction(transactionId: string) {
+    return this.getLegacyTransaction(transactionId);
+  }
+
+  /**
+   * requestWithdrawal - Map withdrawFunds to legacy test interface
+   * Tests call this with (amount, bankAccountId)
+   */
+  async requestWithdrawal(amount: number, bankAccountId: string) {
+    return this.withdrawFunds({
+      amount,
+      currency: 'USD', // Default for legacy tests
+      bankAccountId,
+    });
+  }
 }
 
 export const securePaymentService = new SecurePaymentService();

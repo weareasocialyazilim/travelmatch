@@ -114,13 +114,13 @@ module.exports = {
     'Input\\.enhanced\\.test\\.tsx$',
     'SortSelector\\.test\\.tsx$',
     'RequestCard\\.test\\.tsx$',
-    // Temporarily skip payment tests with timer/async issues
+    // Temporarily skip payment tests with timer/async issues (re-enabled after fix)
+    // paymentService.complete.test.ts - ENABLED
+    'paymentService\\.test\\.ts$', // Uses old mock structure - needs update
     'paymentService\\.retry\\.test\\.ts$',
     'paymentService\\.timeout\\.test\\.ts$',
     'paymentService\\.concurrency\\.test\\.ts$',
     'paymentService\\.cancellation\\.test\\.ts$',
-    'paymentService\\.complete\\.test\\.ts$',
-    'paymentService\\.test\\.ts$',
     'paymentFlow\\.test\\.ts$',
     'TransactionHistoryScreen\\.test\\.tsx$',
     // Skip ceremony tests with animation mock issues

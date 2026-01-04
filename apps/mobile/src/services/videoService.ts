@@ -403,9 +403,24 @@ class VideoServiceClass {
 
   /**
    * Clean up temporary video files
+   * @param specificFile - Optional: Clean only a specific file URI
    */
-  async cleanupTempFiles(): Promise<void> {
+  async cleanupTempFiles(specificFile?: string): Promise<void> {
     try {
+      // If specific file provided, delete only that file
+      if (specificFile) {
+        const fileInfo = await getInfoAsync(specificFile);
+        if (fileInfo.exists) {
+          await deleteAsync(specificFile, { idempotent: true });
+          logger.info(
+            '[VideoService] Specific temp video file cleaned:',
+            specificFile,
+          );
+        }
+        return;
+      }
+
+      // Otherwise, clean entire video cache directory
       if (!cacheDirectory) return;
 
       const videoCacheDir = `${cacheDirectory}videos/`;

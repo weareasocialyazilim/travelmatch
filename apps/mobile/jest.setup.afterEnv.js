@@ -1416,6 +1416,9 @@ jest.mock('react-native-reanimated', () => {
     __esModule: true,
     default: {
       View,
+      Text: require('react-native').Text,
+      Image: require('react-native').Image,
+      ScrollView: require('react-native').ScrollView,
       createAnimatedComponent: (Component) => Component,
     },
     View,
@@ -1454,23 +1457,46 @@ jest.mock('react-native-reanimated', () => {
     useAnimatedScrollHandler: () => ({}),
     useAnimatedRef: () => ({ current: null }),
     createAnimatedComponent: (Component) => Component,
-    // Layout animations with chainable methods
-    FadeIn: { duration: () => ({ delay: () => ({}) }) },
-    FadeOut: { duration: () => ({ delay: () => ({}) }) },
-    FadeInUp: { duration: () => ({ delay: () => ({}) }) },
-    FadeOutDown: { duration: () => ({ delay: () => ({}) }) },
-    SlideInRight: { duration: () => ({ delay: () => ({}) }) },
-    SlideOutLeft: { duration: () => ({ delay: () => ({}) }) },
-    SlideInLeft: { duration: () => ({ delay: () => ({}) }) },
-    SlideOutRight: { duration: () => ({ delay: () => ({}) }) },
-    SlideInUp: { duration: () => ({ delay: () => ({}) }) },
-    SlideOutUp: { duration: () => ({ delay: () => ({}) }) },
-    SlideInDown: { duration: () => ({ delay: () => ({}) }) },
-    SlideOutDown: { duration: () => ({ delay: () => ({}) }) },
-    ZoomIn: { duration: () => ({ delay: () => ({}) }) },
-    ZoomOut: { duration: () => ({ delay: () => ({}) }) },
-    Layout: { duration: () => ({ delay: () => ({}) }) },
+    // Layout animations with chainable methods (supports any order of chaining)
+    FadeIn: createChainableAnimation(),
+    FadeOut: createChainableAnimation(),
+    FadeInUp: createChainableAnimation(),
+    FadeOutDown: createChainableAnimation(),
+    SlideInRight: createChainableAnimation(),
+    SlideOutLeft: createChainableAnimation(),
+    SlideInLeft: createChainableAnimation(),
+    SlideOutRight: createChainableAnimation(),
+    SlideInUp: createChainableAnimation(),
+    SlideOutUp: createChainableAnimation(),
+    SlideInDown: createChainableAnimation(),
+    SlideOutDown: createChainableAnimation(),
+    ZoomIn: createChainableAnimation(),
+    ZoomOut: createChainableAnimation(),
+    Layout: createChainableAnimation(),
   };
+
+  // Helper to create fully chainable animation mock
+  function createChainableAnimation() {
+    const chainable = {};
+    const methods = [
+      'duration',
+      'delay',
+      'easing',
+      'springify',
+      'damping',
+      'stiffness',
+      'mass',
+      'overshootClamping',
+      'restDisplacementThreshold',
+      'restSpeedThreshold',
+      'withInitialValues',
+      'withCallback',
+    ];
+    methods.forEach((method) => {
+      chainable[method] = () => chainable;
+    });
+    return chainable;
+  }
 });
 
 // Mock console.time and console.timeEnd for logger tests

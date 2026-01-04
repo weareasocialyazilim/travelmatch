@@ -88,6 +88,26 @@ export const messagesApi = {
     } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
+    // MASTER RULE: First check gift amount meets $30 minimum for chat unlock
+    const { data: gift, error: fetchError } = await supabase
+      .from('gifts')
+      .select('id, amount, currency, status')
+      .eq('id', giftId)
+      .eq('receiver_id', user.id)
+      .single();
+
+    if (fetchError || !gift) {
+      throw new Error('Gift not found or you are not the recipient');
+    }
+
+    // CRITICAL: Enforce $30 minimum for chat unlock (Tier 2+)
+    const chatEligibility = determineChatTier(gift.amount || 0);
+    if (chatEligibility.tier === 'none') {
+      throw new Error(
+        `Chat cannot be unlocked for gifts under $30. ${chatEligibility.messageTR}`,
+      );
+    }
+
     // Update gift to mark chat as approved by host
     const { error: giftError } = await supabase
       .from('gifts')

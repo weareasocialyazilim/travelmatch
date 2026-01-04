@@ -144,6 +144,20 @@ class EscrowService {
             );
           }
 
+          // MASTER: Mark transaction as pending thank you for BulkThankYouScreen
+          // This triggers the thank you flow for Tier 1 ($0-30) direct transfers
+          if (momentId) {
+            await supabase
+              .from('gifts')
+              .update({ thank_you_pending: true })
+              .eq('moment_id', momentId)
+              .eq('sender_id', user.id)
+              .eq('status', 'completed');
+            logger.info(
+              '[Escrow] Marked gift as thank_you_pending for bulk flow',
+            );
+          }
+
           return {
             success: true,
             transactionId: directData.senderTxnId,
