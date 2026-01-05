@@ -6,7 +6,7 @@ import { COLORS } from '@/constants/colors';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { biometricAuthService, BiometricType } from '@/services/biometricAuth';
+import { biometricAuth, BiometricType } from '@/services/biometricAuth';
 import { logger } from '@/utils/logger';
 
 const BIOMETRIC_REMINDER_KEY = '@biometric_remind_later';
@@ -21,7 +21,7 @@ export const BiometricSetupScreen = () => {
   useEffect(() => {
     const checkBiometrics = async () => {
       try {
-        const capabilities = await biometricAuthService.initialize();
+        const capabilities = await biometricAuth.initialize();
         setIsAvailable(capabilities.isAvailable);
         if (capabilities.supportedTypes.length > 0) {
           setBiometricType(capabilities.supportedTypes[0]);
@@ -48,14 +48,14 @@ export const BiometricSetupScreen = () => {
 
     try {
       // Authenticate to confirm user's biometric
-      const authResult = await biometricAuthService.authenticate({
+      const authResult = await biometricAuth.authenticate({
         promptMessage: 'Biyometriği etkinleştirmek için doğrula',
         cancelLabel: 'İptal',
       });
 
       if (authResult.success) {
         // Enable biometric auth
-        await biometricAuthService.enableBiometricAuth();
+        await biometricAuth.enable();
 
         // Clear any remind later flag
         await AsyncStorage.removeItem(BIOMETRIC_REMINDER_KEY);

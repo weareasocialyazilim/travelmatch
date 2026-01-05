@@ -24,8 +24,8 @@ import { RADII } from '../../constants/radii';
 /** Card visual style variant */
 export type CardVariant = 'elevated' | 'outlined' | 'filled' | 'glass';
 
-/** Card internal padding size */
-export type CardPadding = 'none' | 'sm' | 'md' | 'lg';
+/** Card internal padding size - can be preset string or custom number */
+export type CardPadding = 'none' | 'sm' | 'md' | 'lg' | number;
 
 /** Blur tint for glass variant */
 export type GlassTint = 'light' | 'dark' | 'default';

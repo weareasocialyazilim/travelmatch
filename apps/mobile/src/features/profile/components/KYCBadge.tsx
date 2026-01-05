@@ -20,7 +20,7 @@ import Animated, {
   withTiming,
   useSharedValue,
 } from 'react-native-reanimated';
-import { COLORS } from '../constants/colors';
+import { COLORS } from '@/constants/colors';
 
 export type KYCLevel = 'none' | 'bronze' | 'silver' | 'gold' | 'platinum';
 

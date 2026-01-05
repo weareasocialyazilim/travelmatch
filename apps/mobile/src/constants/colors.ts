@@ -149,6 +149,19 @@ const primitives = {
   black: '#000000',
   magenta: '#D946EF',
   seafoam: '#20B2AA',
+  // Alias for violet (some components use purple)
+  purple: {
+    50: '#FAF5FF',
+    100: '#F3E8FF',
+    200: '#E9D5FF',
+    300: '#D8B4FE',
+    400: '#C084FC',
+    500: '#A855F7',
+    600: '#9333EA',
+    700: '#7C3AED',
+    800: '#6B21A8',
+    900: '#581C87',
+  },
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════
@@ -185,6 +198,79 @@ export const CARD_SHADOW = {
 };
 
 // ═══════════════════════════════════════════════════════════════════
+// SHADOWS - Reusable shadow presets
+// ═══════════════════════════════════════════════════════════════════
+export const SHADOWS = {
+  sm: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  md: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  lg: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  xl: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.25,
+    shadowRadius: 24,
+    elevation: 12,
+  },
+  card: CARD_SHADOW,
+  none: {
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
+  },
+  subtle: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  trustGlow: {
+    shadowColor: '#06B6D4',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+};
+
+// Additional shadow exports
+export const CARD_SHADOW_LIGHT = {
+  shadowColor: '#000000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+  elevation: 3,
+};
+
+export const CARD_SHADOW_HEAVY = {
+  shadowColor: '#000000',
+  shadowOffset: { width: 0, height: 8 },
+  shadowOpacity: 0.25,
+  shadowRadius: 20,
+  elevation: 12,
+};
+
+// ═══════════════════════════════════════════════════════════════════
 // PALETTE (alias for primitives)
 // ═══════════════════════════════════════════════════════════════════
 export const PALETTE = primitives;
@@ -214,15 +300,15 @@ export const COLORS = {
   error: primitives.rose[500],
   info: primitives.cyan[500],
 
-  // Text
-  text: '#F8FAFC',
+  // Text (flat aliases - use text.xxx for nested access)
+  textColor: '#F8FAFC',
   textSecondary: '#94A3B8',
   textDisabled: '#334155',
 
-  // Background
+  // Background (flat aliases - use background.xxx for nested access)
   white: '#FFFFFF',
   black: '#000000',
-  background: '#121214',
+  backgroundColor: '#121214',
   border: 'rgba(255, 255, 255, 0.08)',
 
   // Grayscale
@@ -244,8 +330,8 @@ export const COLORS = {
   sky: primitives.cyan[400],
   peach: primitives.amber[300],
 
-  // Trust colors
-  trust: primitives.cyan[500],
+  // Trust colors (flat aliases - use trust.xxx for nested access)
+  trustColor: primitives.cyan[500],
   trustLight: primitives.cyan[400],
   trustDark: primitives.cyan[600],
 
@@ -418,8 +504,8 @@ export const COLORS = {
   cardBackground: '#1E1E20',
   inputBackground: '#1E1E20',
 
-  // Overlay aliases
-  overlay: 'rgba(0, 0, 0, 0.6)',
+  // Overlay aliases (use overlay.xxx for nested access)
+  overlayColor: 'rgba(0, 0, 0, 0.6)',
   overlay30: 'rgba(0, 0, 0, 0.3)',
   overlay40: 'rgba(0, 0, 0, 0.4)',
   darkOverlay: 'rgba(0, 0, 0, 0.85)',
@@ -528,6 +614,33 @@ export const COLORS = {
 
   // Seafoam
   seafoam: '#20B2AA',
+
+  // Additional missing colors
+  orangeDark: '#B45309',
+  darkGray: '#27272A',
+  infoLight: 'rgba(6, 182, 212, 0.15)',
+
+  // ═══════════════════════════════════════════════════════════════════
+  // OVERLAY - For components using COLORS.overlay.xxx access
+  // ═══════════════════════════════════════════════════════════════════
+  overlay: {
+    light: 'rgba(0, 0, 0, 0.3)',
+    medium: 'rgba(0, 0, 0, 0.5)',
+    heavy: 'rgba(0, 0, 0, 0.85)',
+    backdrop: 'rgba(0, 0, 0, 0.7)',
+  },
+
+  // ═══════════════════════════════════════════════════════════════════
+  // PALETTE - For components using COLORS.palette.xxx access
+  // ═══════════════════════════════════════════════════════════════════
+  palette: primitives,
+
+  // ═══════════════════════════════════════════════════════════════════
+  // ADDITIONAL ALIASES
+  // ═══════════════════════════════════════════════════════════════════
+  hairline: 'rgba(255, 255, 255, 0.08)',
+  textTertiary: '#64748B',
+  destructive: '#F43F5E',
 } as const;
 
 export type ColorKey = keyof typeof COLORS;
