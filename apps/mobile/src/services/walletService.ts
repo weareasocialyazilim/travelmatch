@@ -366,7 +366,16 @@ class WalletService {
 
       if (error) throw error;
 
-      return (data || []).map((item: any) => ({
+      interface BankAccountRow {
+        id: string;
+        bank_name: string | null;
+        iban: string;
+        account_holder_name: string;
+        is_verified: boolean | null;
+        is_default: boolean | null;
+      }
+
+      return (data || []).map((item: BankAccountRow) => ({
         id: item.id,
         bank_name: item.bank_name || 'Banka',
         iban: item.iban,
@@ -416,7 +425,15 @@ class WalletService {
 
       if (error) throw error;
 
-      return (data || []).map((item: any) => ({
+      interface PendingProofRow {
+        id: string;
+        amount: number;
+        created_at: string;
+        giver: { name: string } | null;
+        moment: { title: string } | null;
+      }
+
+      return (data || []).map((item: PendingProofRow) => ({
         id: item.id,
         amount: item.amount,
         senderName: item.giver?.name || 'Bilinmeyen',

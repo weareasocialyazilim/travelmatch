@@ -1,23 +1,59 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { biometricAuth, BiometricType } from '@/services/biometricAuth';
+import { useToast } from '@/context/ToastContext';
 
 const BIOMETRIC_REMINDER_KEY = '@biometric_remind_later';
 
 export const BiometricSetupScreen = () => {
   const navigation = useNavigation();
+  const { showToast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [biometricType, setBiometricType] = useState<string>('Face ID');
+
+  useEffect(() => {
+    // Get biometric type name for display
+    const initBiometric = async () => {
+      await biometricAuth.initialize();
+      setBiometricType(biometricAuth.getBiometricTypeName());
+    };
+    initBiometric();
+  }, []);
 
   const handleEnable = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    // Clear any remind later flag
-    await AsyncStorage.removeItem(BIOMETRIC_REMINDER_KEY);
-    // TODO: Actual biometric setup logic
-    navigation.reset({ index: 0, routes: [{ name: 'MainTabs' as never }] });
+    setIsLoading(true);
+
+    try {
+      // Clear any remind later flag
+      await AsyncStorage.removeItem(BIOMETRIC_REMINDER_KEY);
+
+      // Enable biometric authentication (this will prompt for verification)
+      const enabled = await biometricAuth.enable();
+
+      if (enabled) {
+        showToast(`${biometricType} başarıyla etkinleştirildi`, 'success');
+        navigation.reset({ index: 0, routes: [{ name: 'MainTabs' as never }] });
+      } else {
+        showToast(`${biometricType} doğrulaması başarısız`, 'error');
+      }
+    } catch (error) {
+      showToast('Biyometrik kurulumu başarısız oldu', 'error');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSkip = () => {
@@ -52,7 +88,7 @@ export const BiometricSetupScreen = () => {
         <Text style={styles.title}>Cüzdanını Güvence Altına Al</Text>
         <Text style={styles.desc}>
           Daha hızlı giriş yapmak ve ödemelerini güvenle onaylamak için
-          FaceID'yi etkinleştir.
+          {biometricType}'yi etkinleştir.
         </Text>
 
         <View style={styles.benefitsContainer}>
@@ -84,18 +120,30 @@ export const BiometricSetupScreen = () => {
 
         <View style={styles.spacer} />
 
-        <TouchableOpacity style={styles.enableBtn} onPress={handleEnable}>
+        <TouchableOpacity
+          style={[styles.enableBtn, isLoading && styles.disabledBtn]}
+          onPress={handleEnable}
+          disabled={isLoading}
+        >
           <LinearGradient
             colors={[COLORS.brand.primary, '#A2FF00']}
             style={styles.gradient}
           >
-            <MaterialCommunityIcons
-              name="fingerprint"
-              size={24}
-              color="black"
-              style={styles.fingerprintIcon}
-            />
-            <Text style={styles.btnText}>Biyometriği Etkinleştir</Text>
+            {isLoading ? (
+              <ActivityIndicator size="small" color="black" />
+            ) : (
+              <>
+                <MaterialCommunityIcons
+                  name="fingerprint"
+                  size={24}
+                  color="black"
+                  style={styles.fingerprintIcon}
+                />
+                <Text style={styles.btnText}>
+                  {biometricType}'yi Etkinleştir
+                </Text>
+              </>
+            )}
           </LinearGradient>
         </TouchableOpacity>
 
@@ -175,6 +223,9 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 16,
+  },
+  disabledBtn: {
+    opacity: 0.7,
   },
   gradient: {
     paddingVertical: 18,

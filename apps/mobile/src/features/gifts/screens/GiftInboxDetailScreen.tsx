@@ -22,6 +22,7 @@ import { logger } from '@/utils/logger';
 import {
   determineChatTier,
   type ChatTier,
+  messagesApi,
 } from '@/features/messages/services/messagesService';
 import {
   ChatUnlockButton,
@@ -193,10 +194,20 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
       return;
     }
 
+    // Find the eligible gift for chat unlock (highest amount)
+    const eligibleGift = gifts
+      .filter((g) => g.amount >= 30)
+      .sort((a, b) => b.amount - a.amount)[0];
+
+    if (!eligibleGift?.id) {
+      Alert.alert('Hata', 'Uygun hediye bulunamadı.');
+      return;
+    }
+
     setIsApproving(true);
     try {
-      // TODO: API call to unlock conversation - update is_chat_approved_by_host flag
-      // await giftApi.unlockConversation(senderId);
+      // API call to unlock conversation - update is_chat_approved_by_host flag
+      await messagesApi.unlockConversation(eligibleGift.id, senderId);
 
       setChatApproved(true);
       // Notification: "Seni beğendi" → "[Kullanıcı] seninle bir sohbet başlattı!"
@@ -214,9 +225,18 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
    * OnlyFans tarzı "bireysel teşekkür" - toplu değil
    */
   const handleSendGratitude = async (message: string): Promise<void> => {
+    // Find any gift from this sender for gratitude note
+    const targetGift = gifts[0];
+
+    if (!targetGift?.id) {
+      logger.error('No gift found for gratitude note');
+      Alert.alert('Hata', 'Hediye bulunamadı.');
+      throw new Error('No gift found');
+    }
+
     try {
-      // TODO: API call to send gratitude note
-      // await giftApi.sendGratitudeNote(senderId, message);
+      // API call to send gratitude note
+      await messagesApi.sendGratitudeNote(targetGift.id, senderId, message);
 
       setGratitudeSent(true);
       logger.info('Gratitude sent', { senderId, message });

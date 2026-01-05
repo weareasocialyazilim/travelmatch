@@ -12,6 +12,7 @@ export { useRequireEmailVerification } from './useRequireEmailVerification';
 export { useNotifications } from './useNotifications';
 export { useMoments } from './useMoments';
 export type { Moment, MomentFilters, CreateMomentData } from './useMoments';
+export { useDiscoverMoments } from './useDiscoverMoments';
 export { useRequests } from './useRequests';
 export { usePayments } from './usePayments';
 export { useReviews } from './useReviews';

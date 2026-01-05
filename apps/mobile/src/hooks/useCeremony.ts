@@ -294,11 +294,13 @@ export function useCeremony(): UseCeremonyReturn {
       }
 
       return status === 'verified';
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Proof submission failed';
       setState((prev) => ({
         ...prev,
         isLoading: false,
-        error: error.message || 'Proof submission failed',
+        error: errorMessage,
       }));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       return false;

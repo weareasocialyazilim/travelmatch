@@ -1,7 +1,7 @@
 /**
  * Network State Provider
  * Monitors network connectivity and provides offline status
- * 
+ *
  * FINALIZED - Clean API for network status
  */
 
@@ -32,10 +32,10 @@ export interface NetworkStatus {
 export interface NetworkContextValue {
   // Primary API - simple boolean
   isConnected: boolean;
-  
+
   // Detailed network info
   status: NetworkStatus;
-  
+
   // Actions
   refresh: () => Promise<void>;
 }
@@ -77,18 +77,39 @@ export const NetworkProvider: React.FC<NetworkProviderProps> = ({
   const [networkState, setNetworkState] = useState<NetInfoState | null>(null);
 
   useEffect(() => {
-    // Get initial state
-    void NetInfo.fetch().then(setNetworkState);
+    // Get initial state with error handling
+    const initNetwork = async () => {
+      try {
+        const state = await NetInfo.fetch();
+        setNetworkState(state);
+      } catch (error) {
+        // Silently handle network check failures - assume connected
+        console.warn('[NetworkContext] Failed to fetch initial state:', error);
+        setNetworkState(null);
+      }
+    };
+    void initNetwork();
 
-    // Subscribe to network changes
-    const unsubscribe = NetInfo.addEventListener(setNetworkState);
+    // Subscribe to network changes with error boundary
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      try {
+        setNetworkState(state);
+      } catch (error) {
+        console.warn('[NetworkContext] State update failed:', error);
+      }
+    });
 
     return () => unsubscribe();
   }, []);
 
   const refresh = useCallback(async () => {
-    const state = await NetInfo.refresh();
-    setNetworkState(state);
+    try {
+      const state = await NetInfo.refresh();
+      setNetworkState(state);
+    } catch (error) {
+      console.warn('[NetworkContext] Refresh failed:', error);
+      // Don't update state on error - keep last known state
+    }
   }, []);
 
   // Build status object - memoized to prevent unnecessary re-renders
@@ -114,9 +135,7 @@ export const NetworkProvider: React.FC<NetworkProviderProps> = ({
   );
 
   return (
-    <NetworkContext.Provider value={value}>
-      {children}
-    </NetworkContext.Provider>
+    <NetworkContext.Provider value={value}>{children}</NetworkContext.Provider>
   );
 };
 

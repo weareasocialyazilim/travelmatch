@@ -42,6 +42,8 @@ import {
   type UserStory,
 } from '../components';
 // Note: FloatingDock is now rendered by MainTabNavigator
+// Using useDiscoverMoments for PostGIS-based location discovery
+import { useDiscoverMoments } from '@/hooks/useDiscoverMoments';
 import { useMoments, type Moment } from '@/hooks/useMoments';
 import { useStories } from '@/hooks/useStories';
 import { useAuth } from '@/hooks/useAuth';
@@ -105,7 +107,22 @@ const getTierFromPrice = (price: number, category: string): number => {
 const DiscoverScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const flatListRef = useRef<FlatList>(null);
-  const { moments, loading, error, refresh, loadMore, hasMore } = useMoments();
+
+  // Use PostGIS-based discovery for location-aware moments
+  const {
+    moments: discoveryMoments,
+    loading,
+    error,
+    refresh,
+    loadMore,
+    hasMore,
+    userLocation,
+    locationPermission,
+  } = useDiscoverMoments();
+
+  // Cast discovery moments to Moment type for compatibility
+  const moments = discoveryMoments as unknown as Moment[];
+
   const { user, isGuest } = useAuth();
 
   // Login prompt modal state

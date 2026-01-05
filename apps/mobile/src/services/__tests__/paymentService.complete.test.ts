@@ -482,6 +482,22 @@ describe('PaymentService', () => {
             }),
           };
         }
+        if (tableName === 'gifts') {
+          // Mock for thank_you_pending check - no pending thank yous
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                eq: jest.fn().mockReturnValue({
+                  eq: jest.fn().mockReturnValue({
+                    limit: jest
+                      .fn()
+                      .mockResolvedValue({ data: [], error: null }),
+                  }),
+                }),
+              }),
+            }),
+          };
+        }
         if (tableName === 'escrow_transactions') {
           return {
             select: jest.fn().mockReturnValue({
@@ -569,6 +585,22 @@ describe('PaymentService', () => {
                 single: jest.fn().mockResolvedValue({
                   data: { balance: 500, currency: 'USD', status: 'active' },
                   error: null,
+                }),
+              }),
+            }),
+          };
+        }
+        if (tableName === 'gifts') {
+          // Mock for thank_you_pending check - no pending thank yous
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                eq: jest.fn().mockReturnValue({
+                  eq: jest.fn().mockReturnValue({
+                    limit: jest
+                      .fn()
+                      .mockResolvedValue({ data: [], error: null }),
+                  }),
                 }),
               }),
             }),

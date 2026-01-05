@@ -49,6 +49,8 @@ import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { EnhancedSearchBar, NeonPulseMarker } from '../components';
 import BottomNav from '@/components/BottomNav';
+// Using useDiscoverMoments for PostGIS-based location discovery
+import { useDiscoverMoments } from '@/hooks/useDiscoverMoments';
 import { useMoments } from '@/hooks/useMoments';
 import { useSubscription } from '@/features/payments/hooks/usePayments';
 import { supabase } from '@/config/supabase';
@@ -140,7 +142,13 @@ const SearchMapScreen: React.FC = () => {
   const cameraRef = useRef<any>(null);
 
   // Hooks - Real data & subscription
-  const { moments, isLoading: momentsLoading } = useMoments();
+  // Using PostGIS-based discovery for location-aware moments
+  const {
+    moments: discoveryMoments,
+    loading: momentsLoading,
+    userLocation: discoveryLocation,
+  } = useDiscoverMoments();
+  const moments = discoveryMoments;
   const { subscription } = useSubscription();
   const userTier = subscription?.tier || 'free';
 

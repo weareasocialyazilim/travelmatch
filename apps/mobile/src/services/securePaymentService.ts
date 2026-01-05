@@ -932,6 +932,9 @@ class SecurePaymentService {
 
   /**
    * Withdraw funds
+   *
+   * Master Rule: Host MUST upload thank_you video before withdrawal
+   * This protects the social loop where gratitude is mandatory.
    */
   async withdrawFunds(data: {
     amount: number;
@@ -946,6 +949,29 @@ class SecurePaymentService {
 
       if (data.amount <= 0) {
         throw new Error('Withdrawal amount must be greater than zero');
+      }
+
+      // MASTER RULE: Check for pending thank you videos
+      // Host cannot withdraw if they have unreceived thank you obligations
+      const { data: pendingThankYou, error: thankYouError } = await supabase
+        .from('gifts')
+        .select('id')
+        .eq('recipient_id', user.id)
+        .eq('thank_you_pending', true)
+        .eq('status', 'completed')
+        .limit(1);
+
+      if (thankYouError) {
+        logger.error(
+          'Failed to check pending thank you status:',
+          thankYouError,
+        );
+      }
+
+      if (pendingThankYou && pendingThankYou.length > 0) {
+        throw new Error(
+          'Para çekebilmeniz için önce bekleyen şükran videolarınızı yüklemeniz gerekiyor. Hediye gönderenlere teşekkür edin.',
+        );
       }
 
       const { available } = await this.getBalance();
