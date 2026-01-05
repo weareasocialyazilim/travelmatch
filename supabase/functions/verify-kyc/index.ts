@@ -8,12 +8,7 @@ import { z } from 'https://deno.land/x/zod@v3.21.4/mod.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { createRateLimiter, RateLimitPresets } from '../_shared/rateLimit.ts';
 import { crypto } from 'https://deno.land/std@0.208.0/crypto/mod.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
-};
+import { getCorsHeaders } from '../_shared/cors.ts';
 
 const KycSchema = z.object({
   documentType: z.enum(['passport', 'id_card', 'driving_license']),
@@ -33,11 +28,16 @@ async function hashDocumentNumber(documentNumber: string): Promise<string> {
   const data = encoder.encode(documentNumber);
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  const hashHex = hashArray
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
   return hashHex.substring(0, 16); // First 16 chars
 }
 
 serve(async (req) => {
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -47,7 +47,7 @@ serve(async (req) => {
     const rateLimitResult = await kycLimiter.check(req);
     if (!rateLimitResult.ok) {
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           error: 'Too many requests',
           retryAfter: rateLimitResult.retryAfter,
         }),
@@ -109,23 +109,28 @@ serve(async (req) => {
     }
 
     // Create a Stripe Identity verification session
-    const verificationResponse = await fetch('https://api.stripe.com/v1/identity/verification_sessions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${STRIPE_SECRET_KEY}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
+    const verificationResponse = await fetch(
+      'https://api.stripe.com/v1/identity/verification_sessions',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          type: 'document',
+          'metadata[user_id]': user.id,
+          'metadata[document_type]': data.documentType,
+          'options[document][require_matching_selfie]': 'true',
+        }).toString(),
       },
-      body: new URLSearchParams({
-        'type': 'document',
-        'metadata[user_id]': user.id,
-        'metadata[document_type]': data.documentType,
-        'options[document][require_matching_selfie]': 'true',
-      }).toString(),
-    });
+    );
 
     if (!verificationResponse.ok) {
       const errorData = await verificationResponse.json();
-      throw new Error(errorData.error?.message || 'Failed to create verification session');
+      throw new Error(
+        errorData.error?.message || 'Failed to create verification session',
+      );
     }
 
     const verificationSession = await verificationResponse.json();
@@ -156,7 +161,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         status: 'pending',
-        message: 'Verification session created. Please complete document verification.',
+        message:
+          'Verification session created. Please complete document verification.',
         sessionId: verificationSession.id,
         clientSecret: verificationSession.client_secret,
         url: verificationSession.url,

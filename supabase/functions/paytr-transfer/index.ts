@@ -18,6 +18,7 @@ import {
   toKurus,
   generateMerchantOid,
 } from '../_shared/paytr.ts';
+import { getCorsHeaders } from '../_shared/cors.ts';
 
 // =============================================================================
 // TYPES
@@ -35,20 +36,13 @@ interface TransferResponse {
 }
 
 // =============================================================================
-// CORS HEADERS
-// =============================================================================
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
-};
-
-// =============================================================================
 // MAIN HANDLER
 // =============================================================================
 
 serve(async (req: Request) => {
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -68,7 +62,7 @@ serve(async (req: Request) => {
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -84,7 +78,7 @@ serve(async (req: Request) => {
           paytr_merchant_oid,
           status
         )
-      `
+      `,
       )
       .eq('id', body.escrowId)
       .single();
@@ -98,7 +92,7 @@ serve(async (req: Request) => {
         {
           status: 404,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -112,7 +106,7 @@ serve(async (req: Request) => {
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -144,7 +138,7 @@ serve(async (req: Request) => {
           {
             status: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
+          },
         );
       }
     }
@@ -160,7 +154,7 @@ serve(async (req: Request) => {
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -169,7 +163,7 @@ serve(async (req: Request) => {
       'validate_turkish_iban',
       {
         p_iban: targetBankAccount.iban,
-      }
+      },
     );
 
     if (!ibanValidation?.is_valid) {
@@ -181,7 +175,7 @@ serve(async (req: Request) => {
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -199,7 +193,7 @@ serve(async (req: Request) => {
         {
           status: 404,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -239,7 +233,7 @@ serve(async (req: Request) => {
         {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -304,7 +298,7 @@ serve(async (req: Request) => {
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      },
     );
   }
 });

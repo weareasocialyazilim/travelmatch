@@ -13,8 +13,8 @@ import {
   ActionSheetIOS,
   KeyboardAvoidingView,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
+import { showAlert } from '@/stores/modalStore';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -169,7 +169,7 @@ const EditProfileScreen = () => {
       if (useCamera) {
         const { status } = await ImagePicker.requestCameraPermissionsAsync();
         if (status !== 'granted') {
-          Alert.alert(
+          showAlert(
             'İzin Gerekli',
             "Fotoğraf çekmek için kamera izni gereklidir. Lütfen Ayarlar'dan etkinleştirin.",
             [{ text: 'Tamam' }],
@@ -192,7 +192,7 @@ const EditProfileScreen = () => {
         const { status } =
           await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
-          Alert.alert(
+          showAlert(
             'İzin Gerekli',
             "Fotoğraf seçmek için galeri izni gereklidir. Lütfen Ayarlar'dan etkinleştirin.",
             [{ text: 'Tamam' }],
@@ -247,7 +247,7 @@ const EditProfileScreen = () => {
       await refreshUser();
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert('Başarılı', 'Profil güncellendi', [
+      showAlert('Başarılı', 'Profil güncellendi', [
         { text: 'Tamam', onPress: () => navigation.goBack() },
       ]);
     } catch {
@@ -302,13 +302,13 @@ const EditProfileScreen = () => {
       }
       alertOptions.push({ text: 'İptal', style: 'cancel' });
 
-      Alert.alert('Profil Fotoğrafı', 'Bir seçenek belirle', alertOptions);
+      showAlert('Profil Fotoğrafı', 'Bir seçenek belirle', alertOptions);
     }
   };
 
   const handleCancel = () => {
     if (hasChanges()) {
-      Alert.alert(
+      showAlert(
         'Değişiklikleri İptal Et?',
         'Kaydedilmemiş değişiklikler var. İptal etmek istediğine emin misin?',
         [

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   ScrollView,
   Dimensions,
   Keyboard,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -16,6 +18,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FlipInYRight } from 'react-native-reanimated';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '@/navigation/routeParams';
+import { securePaymentService } from '@/services/securePaymentService';
+import { showError, showSuccess } from '@/stores/modalStore';
+import { logger } from '@/utils/logger';
 
 const { width: _width } = Dimensions.get('window');
 
@@ -27,6 +32,7 @@ export const AddCardScreen = ({ navigation }: Props) => {
   const [cardNumber, setCardNumber] = useState('');
   const [expiry, setExpiry] = useState('');
   const [cvc, setCvc] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   // Format card number (**** **** **** ****)
   const formatCardNumber = (text: string) => {
@@ -44,6 +50,48 @@ export const AddCardScreen = ({ navigation }: Props) => {
     return cleaned;
   };
 
+  // Validate card details
+  const validateCard = useCallback(() => {
+    const cleanedNumber = cardNumber.replace(/\s/g, '');
+
+    if (cleanedNumber.length < 13 || cleanedNumber.length > 19) {
+      showError('Invalid Card', 'Please enter a valid card number');
+      return false;
+    }
+
+    if (!cardName.trim() || cardName.trim().length < 3) {
+      showError('Invalid Name', 'Please enter the cardholder name');
+      return false;
+    }
+
+    const [month, year] = expiry.split('/');
+    const expMonth = parseInt(month, 10);
+    const expYear = parseInt(year, 10);
+
+    if (!expMonth || expMonth < 1 || expMonth > 12) {
+      showError('Invalid Expiry', 'Please enter a valid expiry month (01-12)');
+      return false;
+    }
+
+    const currentYear = new Date().getFullYear() % 100;
+    const currentMonth = new Date().getMonth() + 1;
+
+    if (
+      expYear < currentYear ||
+      (expYear === currentYear && expMonth < currentMonth)
+    ) {
+      showError('Card Expired', 'This card has expired');
+      return false;
+    }
+
+    if (cvc.length < 3) {
+      showError('Invalid CVV', 'Please enter a valid CVV code');
+      return false;
+    }
+
+    return true;
+  }, [cardNumber, cardName, expiry, cvc]);
+
   const handleNumberChange = (text: string) => {
     setCardNumber(formatCardNumber(text));
   };
@@ -54,10 +102,41 @@ export const AddCardScreen = ({ navigation }: Props) => {
     setExpiry(formatExpiry(cleaned));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     Keyboard.dismiss();
-    // TODO: Implement card saving logic
-    navigation.goBack();
+
+    if (!validateCard()) {
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      // For PCI-DSS compliance, we tokenize the card via PayTR
+      // The card data is sent directly to PayTR, never stored on our servers
+      const [month, year] = expiry.split('/');
+
+      await securePaymentService.tokenizeAndSaveCard({
+        cardNumber: cardNumber.replace(/\s/g, ''),
+        cardHolderName: cardName.trim(),
+        expireMonth: month,
+        expireYear: `20${year}`,
+        cvv: cvc,
+      });
+
+      showSuccess('Card Saved', 'Your card has been securely saved');
+      navigation.goBack();
+    } catch (error) {
+      logger.error('Card save error:', error);
+      showError(
+        'Save Failed',
+        error instanceof Error
+          ? error.message
+          : 'Failed to save card. Please try again.',
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -69,13 +148,23 @@ export const AddCardScreen = ({ navigation }: Props) => {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Add New Card</Text>
         <TouchableOpacity>
-          <Ionicons name="scan-outline" size={24} color={COLORS.brand.primary} />
+          <Ionicons
+            name="scan-outline"
+            size={24}
+            color={COLORS.brand.primary}
+          />
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* LIVE CARD PREVIEW */}
-        <Animated.View entering={FlipInYRight.duration(600)} style={styles.cardContainer}>
+        <Animated.View
+          entering={FlipInYRight.duration(600)}
+          style={styles.cardContainer}
+        >
           <LinearGradient
             colors={['#4c669f', '#3b5998', '#192f6a']}
             start={{ x: 0, y: 0 }}
@@ -115,11 +204,19 @@ export const AddCardScreen = ({ navigation }: Props) => {
         </Animated.View>
 
         {/* FORM */}
-        <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.form}>
+        <Animated.View
+          entering={FadeInDown.delay(200).duration(400)}
+          style={styles.form}
+        >
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Card Number</Text>
             <View style={styles.inputWrapper}>
-              <Ionicons name="card-outline" size={20} color="#666" style={styles.icon} />
+              <Ionicons
+                name="card-outline"
+                size={20}
+                color="#666"
+                style={styles.icon}
+              />
               <TextInput
                 style={styles.input}
                 placeholder="0000 0000 0000 0000"
@@ -135,7 +232,12 @@ export const AddCardScreen = ({ navigation }: Props) => {
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Cardholder Name</Text>
             <View style={styles.inputWrapper}>
-              <Ionicons name="person-outline" size={20} color="#666" style={styles.icon} />
+              <Ionicons
+                name="person-outline"
+                size={20}
+                color="#666"
+                style={styles.icon}
+              />
               <TextInput
                 style={styles.input}
                 placeholder="Selin Yilmaz"
@@ -192,8 +294,16 @@ export const AddCardScreen = ({ navigation }: Props) => {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-            <Text style={styles.saveText}>Save Card</Text>
+          <TouchableOpacity
+            style={[styles.saveBtn, isSaving && styles.saveBtnDisabled]}
+            onPress={handleSave}
+            disabled={isSaving}
+          >
+            {isSaving ? (
+              <ActivityIndicator color="black" />
+            ) : (
+              <Text style={styles.saveText}>Save Card</Text>
+            )}
           </TouchableOpacity>
         </Animated.View>
       </ScrollView>
@@ -331,6 +441,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 20,
+  },
+  saveBtnDisabled: {
+    opacity: 0.7,
   },
   saveText: {
     fontSize: 16,

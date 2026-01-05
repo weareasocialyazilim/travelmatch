@@ -351,6 +351,53 @@ class SecurePaymentService {
   }
 
   /**
+   * Tokenize and save a card via PayTR
+   *
+   * PCI-DSS Compliance: Card data is sent directly to PayTR Edge Function
+   * which forwards to PayTR API. Card data is NEVER stored on our servers.
+   *
+   * @param cardDetails - Card information to tokenize
+   */
+  async tokenizeAndSaveCard(cardDetails: {
+    cardNumber: string;
+    cardHolderName: string;
+    expireMonth: string;
+    expireYear: string;
+    cvv: string;
+  }): Promise<{ cardToken: string; last4: string; brand: string }> {
+    try {
+      const headers = await this.getAuthHeaders();
+
+      const response = await fetch(
+        `${this.EDGE_FUNCTION_BASE}/paytr-tokenize-card`,
+        {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            cardNumber: cardDetails.cardNumber,
+            cardHolderName: cardDetails.cardHolderName,
+            expireMonth: cardDetails.expireMonth,
+            expireYear: cardDetails.expireYear,
+            cvv: cardDetails.cvv,
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to save card');
+      }
+
+      const result = await response.json();
+      logger.info('Card tokenized and saved successfully');
+      return result;
+    } catch (error) {
+      logger.error('Tokenize card error:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Delete a saved card
    */
   async deleteSavedCard(cardToken: string): Promise<void> {

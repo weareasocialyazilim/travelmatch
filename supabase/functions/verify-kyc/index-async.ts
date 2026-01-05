@@ -3,14 +3,9 @@ import { z } from 'zod';
 import { createClient } from '@supabase/supabase-js';
 import { createRateLimiter, RateLimitPresets } from '../_shared/rateLimit.ts';
 import { Logger } from '../_shared/logger.ts';
+import { getCorsHeaders } from '../_shared/cors.ts';
 
 const logger = new Logger('verify-kyc-async');
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
-};
 
 const KycSchema = z.object({
   documentType: z.enum(['passport', 'id_card', 'driving_license']),
@@ -27,6 +22,9 @@ const kycLimiter = createRateLimiter(RateLimitPresets.auth);
 const JOB_QUEUE_URL = Deno.env.get('JOB_QUEUE_URL') || 'http://localhost:3002';
 
 serve(async (req: Request) => {
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }

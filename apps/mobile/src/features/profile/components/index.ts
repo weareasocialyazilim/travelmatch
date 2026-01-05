@@ -21,7 +21,7 @@ export { AchievementCard } from './AchievementCard';
 export type { default as AchievementCardProps } from './AchievementCard';
 
 // Migrated components from components/ folder
-export { LeaveTrustNoteBottomSheet } from './LeaveTrustNoteBottomSheet';
+// LeaveTrustNoteBottomSheet artık @/components/ui altında (tek kaynak)
 export { UnblockUserBottomSheet } from './UnblockUserBottomSheet';
 export { KYCBadge, getKYCLabel, getNextKYCLevel } from './KYCBadge';
 export type { KYCLevel } from './KYCBadge';

@@ -6,12 +6,12 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  Alert,
 } from 'react-native';
+import { showAlert } from '@/stores/modalStore';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
-import { LeaveTrustNoteBottomSheet } from '@/components/LeaveTrustNoteBottomSheet';
+import { LeaveTrustNoteBottomSheet } from '@/components';
 import { ThankYouModal } from '@/features/gifts/components';
 import {
   createTrustNote,
@@ -147,7 +147,7 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
         // Show thank you modal
         setShowThankYouModal(true);
       } else {
-        Alert.alert('Hata', result.error || 'Not gönderilemedi');
+        showAlert('Hata', result.error || 'Not gönderilemedi');
       }
     } finally {
       setIsSubmittingNote(false);
@@ -446,9 +446,10 @@ export const GestureReceivedScreen: React.FC<GestureReceivedScreenProps> = ({
       <LeaveTrustNoteBottomSheet
         visible={showTrustNoteSheet}
         onClose={handleSkipTrustNote}
-        onSubmit={handleSubmitTrustNote}
+        onSubmitSimple={handleSubmitTrustNote}
         recipientName={senderName || 'Destekçi'}
         momentTitle={momentTitle}
+        simpleMode
       />
 
       {/* Thank You Modal */}

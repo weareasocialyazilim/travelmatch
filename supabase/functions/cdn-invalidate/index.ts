@@ -5,15 +5,12 @@ const logger = new Logger();
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { z } from 'https://deno.land/x/zod@v3.21.4/mod.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { getCorsHeaders } from '../_shared/cors.ts';
 
 const CLOUDFLARE_ZONE_ID = Deno.env.get('CLOUDFLARE_ZONE_ID');
 const CLOUDFLARE_API_TOKEN = Deno.env.get('CLOUDFLARE_API_TOKEN');
-const CDN_BASE_URL = Deno.env.get('CDN_BASE_URL') || 'https://cdn.travelmatch.com';
+const CDN_BASE_URL =
+  Deno.env.get('CDN_BASE_URL') || 'https://cdn.travelmatch.com';
 
 const InvalidateRequestSchema = z.object({
   type: z.enum(['profile', 'moment', 'image', 'custom']),
@@ -46,7 +43,7 @@ async function purgeCloudflare(payload: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
-    }
+    },
   );
 
   if (!response.ok) {
@@ -95,6 +92,9 @@ function generateUrls(type: string, ids: string[]): string[] {
 }
 
 serve(async (req) => {
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -103,7 +103,9 @@ serve(async (req) => {
 
   try {
     // Parse and validate request body
-    const body: InvalidateRequest = InvalidateRequestSchema.parse(await req.json());
+    const body: InvalidateRequest = InvalidateRequestSchema.parse(
+      await req.json(),
+    );
 
     let urls: string[] = [];
     let tags: string[] = [];
@@ -138,7 +140,7 @@ serve(async (req) => {
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -175,7 +177,7 @@ serve(async (req) => {
       {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      },
     );
   } catch (error) {
     logger.error('CDN invalidation error:', error);
@@ -189,7 +191,7 @@ serve(async (req) => {
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -201,7 +203,7 @@ serve(async (req) => {
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      },
     );
   }
 });

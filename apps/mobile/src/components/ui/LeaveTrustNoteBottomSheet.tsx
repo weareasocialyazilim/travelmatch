@@ -35,17 +35,37 @@ interface TrustNoteUser {
   avatarUrl?: string;
 }
 
+// Detailed note output (for gifts flow)
+interface DetailedNoteOutput {
+  rating: number;
+  tags: string[];
+  comment?: string;
+  isAnonymous: boolean;
+}
+
+// Simple note output (for legacy/simple flows)
+type SimpleNoteOutput = string;
+
 interface LeaveTrustNoteBottomSheetProps {
   visible: boolean;
-  user: TrustNoteUser;
-  giftTitle?: string;
-  onSubmit: (note: {
-    rating: number;
-    tags: string[];
-    comment?: string;
-    isAnonymous: boolean;
-  }) => void;
   onClose: () => void;
+
+  // New API (detailed)
+  user?: TrustNoteUser;
+  giftTitle?: string;
+  onSubmit?: (note: DetailedNoteOutput) => void;
+
+  // Legacy API (simple text-only mode)
+  /** @deprecated Use `user.name` instead */
+  recipientName?: string;
+  /** @deprecated Use `giftTitle` instead */
+  momentTitle?: string;
+  /** @deprecated Use `onSubmit` with DetailedNoteOutput instead */
+  onSubmitSimple?: (note: SimpleNoteOutput) => void;
+
+  // Mode control
+  /** Use simple text-only mode (legacy behavior) */
+  simpleMode?: boolean;
 }
 
 const POSITIVE_TAGS = [
@@ -70,7 +90,24 @@ const NEGATIVE_TAGS = [
 
 export const LeaveTrustNoteBottomSheet: React.FC<
   LeaveTrustNoteBottomSheetProps
-> = ({ visible, user, giftTitle, onSubmit, onClose }) => {
+> = ({
+  visible,
+  user,
+  giftTitle,
+  onSubmit,
+  onClose,
+  // Legacy props
+  recipientName,
+  momentTitle,
+  onSubmitSimple,
+  simpleMode = false,
+}) => {
+  // Resolve props (legacy fallbacks)
+  const displayName = user?.name || recipientName || 'Kullanıcı';
+  const displayTitle = giftTitle || momentTitle || '';
+  const isSimpleMode =
+    simpleMode || (!user && (recipientName || momentTitle || onSubmitSimple));
+
   const [rating, setRating] = useState(0);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [comment, setComment] = useState('');
@@ -89,16 +126,30 @@ export const LeaveTrustNoteBottomSheet: React.FC<
   }, []);
 
   const handleSubmit = useCallback(() => {
-    if (rating === 0) return;
-
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    onSubmit({
-      rating,
-      tags: selectedTags,
-      comment: comment.trim() || undefined,
-      isAnonymous,
-    });
-  }, [rating, selectedTags, comment, isAnonymous, onSubmit]);
+
+    if (isSimpleMode) {
+      // Simple mode: just send the comment text
+      onSubmitSimple?.(comment.trim());
+    } else {
+      // Detailed mode: send full rating data
+      if (rating === 0) return;
+      onSubmit?.({
+        rating,
+        tags: selectedTags,
+        comment: comment.trim() || undefined,
+        isAnonymous,
+      });
+    }
+  }, [
+    isSimpleMode,
+    rating,
+    selectedTags,
+    comment,
+    isAnonymous,
+    onSubmit,
+    onSubmitSimple,
+  ]);
 
   const isPositiveRating = rating >= 4;
   const displayTags = isPositiveRating
@@ -130,13 +181,13 @@ export const LeaveTrustNoteBottomSheet: React.FC<
             <View style={styles.header}>
               <Text style={styles.title}>Güven Notu Bırak 💝</Text>
               <Text style={styles.subtitle}>
-                Bu not, {user.name} için güven rozetlerini oluşturur
+                Bu not, {displayName} için güven rozetlerini oluşturur
               </Text>
             </View>
 
             {/* User Card */}
             <View style={styles.userCard}>
-              {user.avatarUrl ? (
+              {user?.avatarUrl ? (
                 <Image source={{ uri: user.avatarUrl }} style={styles.avatar} />
               ) : (
                 <View style={styles.avatarPlaceholder}>
@@ -148,10 +199,10 @@ export const LeaveTrustNoteBottomSheet: React.FC<
                 </View>
               )}
               <View style={styles.userInfo}>
-                <Text style={styles.userName}>{user.name}</Text>
-                {giftTitle && (
+                <Text style={styles.userName}>{displayName}</Text>
+                {displayTitle && (
                   <Text style={styles.giftTitle} numberOfLines={1}>
-                    {giftTitle}
+                    {displayTitle}
                   </Text>
                 )}
               </View>

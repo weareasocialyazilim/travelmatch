@@ -5,12 +5,12 @@ const logger = new Logger();
 
 /**
  * Audit Logging Edge Function
- * 
+ *
  * Handles SOC 2 compliant audit logging with service role access
- * 
+ *
  * SECURITY: This function runs server-side with service_role access
  * Client calls this via authenticated HTTP request
- * 
+ *
  * Features:
  * - Immutable audit log entries
  * - User action tracking
@@ -20,12 +20,7 @@ const logger = new Logger();
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
-
-// CORS headers
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { getCorsHeaders } from '../_shared/cors.ts';
 
 // Audit event categories
 const AUDIT_CATEGORIES = [
@@ -39,6 +34,9 @@ const AUDIT_CATEGORIES = [
 ] as const;
 
 serve(async (req: Request) => {
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -50,7 +48,10 @@ serve(async (req: Request) => {
     if (!authHeader) {
       return new Response(
         JSON.stringify({ error: 'Missing authorization header' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        },
       );
     }
 
@@ -60,22 +61,28 @@ serve(async (req: Request) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
         global: { headers: { Authorization: authHeader } },
-      }
+      },
     );
 
     // Verify user is authenticated
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabaseClient.auth.getUser();
     if (authError || !user) {
       return new Response(
         JSON.stringify({ error: 'Invalid or expired token' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        },
       );
     }
 
     // Create admin client for service operations (bypasses RLS)
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
     // Parse request
@@ -90,17 +97,17 @@ serve(async (req: Request) => {
       case 'export':
         return await handleExportLogs(req, user, supabaseAdmin);
       default:
-        return new Response(
-          JSON.stringify({ error: 'Invalid action' }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        return new Response(JSON.stringify({ error: 'Invalid action' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
     }
   } catch (error) {
     logger.error('Audit logging error:', error);
-    return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });
 
@@ -110,71 +117,71 @@ serve(async (req: Request) => {
 async function handleLogEvent(
   req: Request,
   user: { id: string; email?: string },
-  supabase: ReturnType<typeof createClient>
+  supabase: ReturnType<typeof createClient>,
 ): Promise<Response> {
   const body = await req.json();
-  const {
-    event,
-    category,
-    resource,
-    action,
-    result,
-    metadata,
-  } = body;
+  const { event, category, resource, action, result, metadata } = body;
 
   // Validate required fields
   if (!event || !category || !resource || !action || !result) {
-    return new Response(
-      JSON.stringify({ error: 'Missing required fields' }),
-      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ error: 'Missing required fields' }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   // Validate category
   if (!AUDIT_CATEGORIES.includes(category)) {
     return new Response(
-      JSON.stringify({ error: `Invalid category. Must be one of: ${AUDIT_CATEGORIES.join(', ')}` }),
-      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({
+        error: `Invalid category. Must be one of: ${AUDIT_CATEGORIES.join(', ')}`,
+      }),
+      {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      },
     );
   }
 
   // Get client info
-  const ipAddress = req.headers.get('x-forwarded-for') || 
-                    req.headers.get('x-real-ip') || 
-                    'unknown';
+  const ipAddress =
+    req.headers.get('x-forwarded-for') ||
+    req.headers.get('x-real-ip') ||
+    'unknown';
   const userAgent = req.headers.get('user-agent') || 'unknown';
 
   // Insert audit log entry
-  const { error: insertError } = await supabase
-    .from('audit_logs')
-    .insert({
-      id: crypto.randomUUID(),
-      timestamp: new Date().toISOString(),
-      user_id: user.id,
-      user_email: user.email || 'unknown',
-      event,
-      category,
-      resource,
-      action,
-      result,
-      ip_address: ipAddress,
-      user_agent: userAgent,
-      metadata: metadata || {},
-    });
+  const { error: insertError } = await supabase.from('audit_logs').insert({
+    id: crypto.randomUUID(),
+    timestamp: new Date().toISOString(),
+    user_id: user.id,
+    user_email: user.email || 'unknown',
+    event,
+    category,
+    resource,
+    action,
+    result,
+    ip_address: ipAddress,
+    user_agent: userAgent,
+    metadata: metadata || {},
+  });
 
   if (insertError) {
     logger.error('Failed to insert audit log:', insertError);
     // Don't fail the request - audit logging shouldn't break the app
     return new Response(
       JSON.stringify({ success: false, warning: 'Audit log insert failed' }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      },
     );
   }
 
-  return new Response(
-    JSON.stringify({ success: true }),
-    { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-  );
+  return new Response(JSON.stringify({ success: true }), {
+    status: 200,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
 }
 
 /**
@@ -183,7 +190,7 @@ async function handleLogEvent(
 async function handleQueryLogs(
   req: Request,
   user: { id: string },
-  supabase: ReturnType<typeof createClient>
+  supabase: ReturnType<typeof createClient>,
 ): Promise<Response> {
   // Check if user is admin
   const { data: profile, error: profileError } = await supabase
@@ -193,10 +200,10 @@ async function handleQueryLogs(
     .single();
 
   if (profileError || profile?.role !== 'admin') {
-    return new Response(
-      JSON.stringify({ error: 'Admin access required' }),
-      { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ error: 'Admin access required' }), {
+      status: 403,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   const url = new URL(req.url);
@@ -212,7 +219,8 @@ async function handleQueryLogs(
   // SECURITY: Even in Edge Functions, prefer explicit column selection
   let query = supabase
     .from('audit_logs')
-    .select(`
+    .select(
+      `
       id,
       timestamp,
       user_id,
@@ -225,7 +233,8 @@ async function handleQueryLogs(
       ip_address,
       user_agent,
       metadata
-    `)
+    `,
+    )
     .order('timestamp', { ascending: false })
     .limit(filters.limit);
 
@@ -240,14 +249,17 @@ async function handleQueryLogs(
   if (error) {
     return new Response(
       JSON.stringify({ error: 'Failed to query audit logs' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      },
     );
   }
 
-  return new Response(
-    JSON.stringify({ success: true, data }),
-    { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-  );
+  return new Response(JSON.stringify({ success: true, data }), {
+    status: 200,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
 }
 
 /**
@@ -256,7 +268,7 @@ async function handleQueryLogs(
 async function handleExportLogs(
   req: Request,
   user: { id: string },
-  supabase: ReturnType<typeof createClient>
+  supabase: ReturnType<typeof createClient>,
 ): Promise<Response> {
   // Check if user is admin
   const { data: profile, error: profileError } = await supabase
@@ -266,10 +278,10 @@ async function handleExportLogs(
     .single();
 
   if (profileError || profile?.role !== 'admin') {
-    return new Response(
-      JSON.stringify({ error: 'Admin access required' }),
-      { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ error: 'Admin access required' }), {
+      status: 403,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   const body = await req.json();
@@ -278,14 +290,18 @@ async function handleExportLogs(
   if (!startDate || !endDate) {
     return new Response(
       JSON.stringify({ error: 'startDate and endDate required' }),
-      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      },
     );
   }
 
   // SECURITY: Even in Edge Functions, prefer explicit column selection
   const { data, error } = await supabase
     .from('audit_logs')
-    .select(`
+    .select(
+      `
       id,
       timestamp,
       user_id,
@@ -298,7 +314,8 @@ async function handleExportLogs(
       ip_address,
       user_agent,
       metadata
-    `)
+    `,
+    )
     .gte('timestamp', startDate)
     .lte('timestamp', endDate)
     .order('timestamp', { ascending: true });
@@ -306,7 +323,10 @@ async function handleExportLogs(
   if (error) {
     return new Response(
       JSON.stringify({ error: 'Failed to export audit logs' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      },
     );
   }
 
@@ -328,14 +348,22 @@ async function handleExportLogs(
   if (format === 'csv') {
     // Convert to CSV
     const headers = [
-      'id', 'timestamp', 'user_id', 'user_email', 'event', 
-      'category', 'resource', 'action', 'result', 'ip_address'
+      'id',
+      'timestamp',
+      'user_id',
+      'user_email',
+      'event',
+      'category',
+      'resource',
+      'action',
+      'result',
+      'ip_address',
     ];
     const csv = [
       headers.join(','),
-      ...(data || []).map(row => 
-        headers.map(h => JSON.stringify(row[h] || '')).join(',')
-      )
+      ...(data || []).map((row) =>
+        headers.map((h) => JSON.stringify(row[h] || '')).join(','),
+      ),
     ].join('\n');
 
     return new Response(csv, {
@@ -348,8 +376,8 @@ async function handleExportLogs(
     });
   }
 
-  return new Response(
-    JSON.stringify({ success: true, data }),
-    { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-  );
+  return new Response(JSON.stringify({ success: true, data }), {
+    status: 200,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
 }

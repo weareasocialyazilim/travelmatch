@@ -1,8 +1,8 @@
 /**
  * API Router with Versioning Support
- * 
+ *
  * Central router for all API endpoints with version management
- * 
+ *
  * Usage:
  *   GET  /api/v1/moments
  *   POST /api/v1/auth/login
@@ -15,13 +15,7 @@ import {
   createErrorResponse,
   toHttpResponse,
 } from '../../_shared/errorHandler.ts';
-
-// CORS headers
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-};
+import { getCorsHeaders } from '../../_shared/cors.ts';
 
 // Route handler type
 export type RouteHandler = (
@@ -44,18 +38,18 @@ function matchRoute(
   route: Route,
 ): { match: boolean; params: Record<string, string> } {
   const match = pathname.match(route.path);
-  
+
   if (!match) {
     return { match: false, params: {} };
   }
-  
+
   const params: Record<string, string> = {};
   if (route.paramNames && match.groups) {
     route.paramNames.forEach((name) => {
       params[name] = match.groups![name];
     });
   }
-  
+
   return { match: true, params };
 }
 
@@ -70,11 +64,7 @@ export class APIRouter {
   /**
    * Register a route
    */
-  route(
-    method: Route['method'],
-    path: string,
-    handler: RouteHandler,
-  ): this {
+  route(method: Route['method'], path: string, handler: RouteHandler): this {
     // Convert path string to regex with named capture groups
     const paramNames: string[] = [];
     const regexPath = path
@@ -83,14 +73,14 @@ export class APIRouter {
         return `(?<${name}>[^/]+)`;
       })
       .replace(/\*/g, '.*');
-    
+
     this.routes.push({
       method,
       path: new RegExp(`^${regexPath}$`),
       handler,
       paramNames,
     });
-    
+
     return this;
   }
 
@@ -137,6 +127,9 @@ export class APIRouter {
    * Handle incoming request
    */
   async handle(req: Request): Promise<Response> {
+    const origin = req.headers.get('origin');
+    const corsHeaders = getCorsHeaders(origin);
+
     // Handle CORS preflight
     if (req.method === 'OPTIONS') {
       return new Response('ok', { headers: corsHeaders });
@@ -153,13 +146,13 @@ export class APIRouter {
         const { match, params } = matchRoute(pathname, route);
         if (match) {
           const response = await route.handler(req, params);
-          
+
           // Add CORS headers to response
           const headers = new Headers(response.headers);
           Object.entries(corsHeaders).forEach(([key, value]) => {
             headers.set(key, value);
           });
-          
+
           return new Response(response.body, {
             status: response.status,
             statusText: response.statusText,
