@@ -71,7 +71,7 @@ export type RootStackParamList = {
   Inbox: { initialTab?: 'active' | 'requests' } | undefined;
   Requests: { initialTab?: 'pending' | 'notifications' } | undefined;
   Messages: undefined;
-  SearchMap: undefined;
+  // REMOVED: SearchMap - consolidated into Search route
 
   CreateMoment: undefined;
   EditMoment: { momentId: string };
@@ -82,7 +82,7 @@ export type RootStackParamList = {
   // ZOMBIE CLEANUP: Review route removed - Trust Notes replaced this
   UserProfile: { userId: string };
   MyGifts: undefined;
-  GiftCardMarket: undefined;
+  // REMOVED: GiftCardMarket - legacy gift card system (zombie cleanup)
   TrustNotes: undefined;
   MomentGallery: { momentId: string };
   ProofHistory: { momentId: string };
@@ -151,13 +151,8 @@ export type RootStackParamList = {
     status: 'pending_proof' | 'pending_verification' | 'verified';
   };
 
-  // Gift Selection - Start gift flow from user profile
-  GiftSelection: {
-    recipientId: string;
-    recipientName: string;
-    recipientAvatar: string;
-    topMomentId?: string; // Optional - pre-select user's top moment
-  };
+  // REMOVED: GiftSelection - consolidated into UnifiedGiftFlow
+  // Use UnifiedGiftFlow for all gift initiation flows
 
   // Gift Inbox
   GiftInbox: undefined;
