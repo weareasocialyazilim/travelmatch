@@ -281,19 +281,19 @@ const AWWWARDS_SLIDES = [
     id: '1',
     title: 'Eşsiz Anları\nKeşfet',
     desc: 'Dünyanın dört bir yanından doğrulanmış ve ipeksi deneyimlere tanıklık et.',
-    color: COLORS.primary.main,
+    color: COLORS.primary,
   },
   {
     id: '2',
     title: 'Güvenle\nPaylaş',
     desc: 'Trust Score sistemimizle sadece en güvenilir kullanıcılarla bağ kur.',
-    color: COLORS.secondary?.main || '#A855F7',
+    color: COLORS.secondary,
   },
   {
     id: '3',
     title: 'Hediye Et,\nİz Bırak',
     desc: 'Sevdiklerine unutulmaz anlar hediye ederek sosyal ağını genişlet.',
-    color: COLORS.accent?.cyan || '#00D9FF',
+    color: COLORS.accent,
   },
 ];
 
@@ -529,7 +529,7 @@ const awwwardsStyles = StyleSheet.create({
     height: 64,
     borderRadius: 32,
     // Neon glow shadow
-    shadowColor: COLORS.primary.main,
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 0 },
     shadowRadius: 15,
     shadowOpacity: 0.3,

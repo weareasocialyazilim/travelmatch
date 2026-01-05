@@ -8,7 +8,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../constants/colors';
+import { COLORS } from '@/constants/colors';
 import { GenericBottomSheet } from './ui/GenericBottomSheet';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];

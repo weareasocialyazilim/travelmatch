@@ -9,7 +9,7 @@
 
 import React, { Suspense, lazy } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Modal } from 'react-native';
-import { COLORS } from '../constants/colors';
+import { COLORS } from '@/constants/colors';
 
 // Lazy load the actual map component (3-5 MB)
 const LocationPickerBottomSheet = lazy(() =>

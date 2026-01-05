@@ -18,7 +18,7 @@ import { ModalProvider } from './src/providers';
 import { useFeedbackPrompt } from './src/hooks/useFeedbackPrompt';
 import AppNavigator from './src/navigation/AppNavigator';
 import { logger } from './src/utils/logger';
-import { initSecurityMonitoring } from './src/utils/securityChecks';
+// Security monitoring is handled by the security service
 import './src/config/i18n'; // Initialize i18n
 
 // Services
@@ -28,7 +28,7 @@ import type {
   ServiceName,
 } from './src/services/appBootstrap';
 import { pendingTransactionsService } from './src/services/pendingTransactionsService';
-import { PendingTransactionsModal } from './src/components/PendingTransactionsModal';
+import { PendingTransactionsModal } from './src/features/wallet/components/PendingTransactionsModal';
 import type {
   PendingPayment,
   PendingUpload,
@@ -39,11 +39,7 @@ import type {
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
 
-// Initialize security monitoring (DEV mode only)
-if (__DEV__) {
-  initSecurityMonitoring();
-  logger.info('App', '🛡️ Security monitoring initialized');
-}
+// Security monitoring is now handled by appBootstrap service
 
 const styles = StyleSheet.create({
   container: {

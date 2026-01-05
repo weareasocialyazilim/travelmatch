@@ -54,7 +54,7 @@ export type { TMButtonProps, ButtonVariant as TMButtonVariant, ButtonSize as TMB
 // TYPES
 // ============================================
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'glass';
-type ButtonSize = 'sm' | 'md' | 'lg';
+type ButtonSize = 'sm' | 'md' | 'lg' | 'small' | 'medium' | 'large';
 
 interface ButtonProps {
   title: string;

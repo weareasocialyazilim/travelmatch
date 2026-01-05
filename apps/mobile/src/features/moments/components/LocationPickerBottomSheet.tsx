@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Mapbox, { Camera, MapView, PointAnnotation } from '@rnmapbox/maps';
-import { COLORS } from '../constants/colors';
+import { COLORS } from '@/constants/colors';
 
 // Initialize Mapbox - access token should be set in env
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN || '');
