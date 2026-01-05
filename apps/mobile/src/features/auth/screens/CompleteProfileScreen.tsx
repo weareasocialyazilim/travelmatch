@@ -9,8 +9,8 @@ import {
   View,
   Platform,
   ActionSheetIOS,
-  Alert,
 } from 'react-native';
+import { showAlert } from '@/stores/modalStore';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
@@ -131,11 +131,15 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
         },
       );
     } else {
-      Alert.alert('Add Profile Photo', 'Choose an option', [
-        { text: 'Take Photo', onPress: () => pickImage(true) },
-        { text: 'Choose from Library', onPress: () => pickImage(false) },
-        { text: 'Cancel', style: 'cancel' },
-      ]);
+      showAlert({
+        title: 'Add Profile Photo',
+        message: 'Choose an option',
+        buttons: [
+          { text: 'Take Photo', onPress: () => pickImage(true) },
+          { text: 'Choose from Library', onPress: () => pickImage(false) },
+          { text: 'Cancel', style: 'cancel' },
+        ],
+      });
     }
   };
 

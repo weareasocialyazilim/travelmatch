@@ -19,8 +19,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Modal,
-  Alert,
 } from 'react-native';
+import { showAlert } from '@/stores/modalStore';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -147,10 +147,11 @@ export const ConsentFlow: React.FC<ConsentFlowProps> = ({
 
   const handleSubmit = async () => {
     if (!canProceed) {
-      Alert.alert(
-        'Zorunlu Alanlar',
-        'Devam edebilmek için zorunlu metinleri okuduğunuzu onaylamanız gerekmektedir.',
-      );
+      showAlert({
+        title: 'Zorunlu Alanlar',
+        message:
+          'Devam edebilmek için zorunlu metinleri okuduğunuzu onaylamanız gerekmektedir.',
+      });
       return;
     }
 
@@ -204,7 +205,10 @@ export const ConsentFlow: React.FC<ConsentFlowProps> = ({
 
         if (error) {
           logger.error('Error saving consents', error);
-          Alert.alert('Hata', 'Onaylar kaydedilirken bir hata oluştu.');
+          showAlert({
+            title: 'Hata',
+            message: 'Onaylar kaydedilirken bir hata oluştu.',
+          });
           return;
         }
       }
@@ -215,7 +219,10 @@ export const ConsentFlow: React.FC<ConsentFlowProps> = ({
         'Error in consent flow',
         error instanceof Error ? error : new Error(String(error)),
       );
-      Alert.alert('Hata', 'Bir hata oluştu. Lütfen tekrar deneyin.');
+      showAlert({
+        title: 'Hata',
+        message: 'Bir hata oluştu. Lütfen tekrar deneyin.',
+      });
     } finally {
       setLoading(false);
     }

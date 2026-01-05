@@ -18,12 +18,18 @@ import { SIZES, SPACING } from '@/constants/spacing';
 import { TYPOGRAPHY } from '@/theme/typography';
 
 // Lazy load SVG to handle potential native module issues
-let Svg: typeof import('react-native-svg').default | null = null;
-let Circle: typeof import('react-native-svg').Circle | null = null;
-let Defs: typeof import('react-native-svg').Defs | null = null;
-let SvgGradient: typeof import('react-native-svg').LinearGradient | null = null;
-let Stop: typeof import('react-native-svg').Stop | null = null;
-let AnimatedCircle: ReturnType<typeof Animated.createAnimatedComponent> | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let Svg: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let Circle: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let Defs: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let SvgGradient: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let Stop: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let AnimatedCircle: any = null;
 
 try {
   const svg = require('react-native-svg');
@@ -102,7 +108,9 @@ const FallbackTMTrustRing: React.FC<TMTrustRingProps> = ({
   showLabel = false,
   testID,
 }) => {
-  const safeScore = Number.isFinite(score) ? Math.max(0, Math.min(100, score)) : 0;
+  const safeScore = Number.isFinite(score)
+    ? Math.max(0, Math.min(100, score))
+    : 0;
   const level = getTrustLevel(safeScore);
   const colors = getTrustColors(level);
   const label = getTrustLabel(level);
@@ -196,7 +204,9 @@ export const TMTrustRing: React.FC<TMTrustRingProps> = ({
   const [svgError, setSvgError] = useState(false);
 
   // Ensure score is valid
-  const safeScore = Number.isFinite(score) ? Math.max(0, Math.min(100, score)) : 0;
+  const safeScore = Number.isFinite(score)
+    ? Math.max(0, Math.min(100, score))
+    : 0;
 
   const level = getTrustLevel(safeScore);
   const colors = getTrustColors(level);
@@ -221,10 +231,10 @@ export const TMTrustRing: React.FC<TMTrustRingProps> = ({
       shimmerOpacity.value = withRepeat(
         withSequence(
           withTiming(1, { duration: 800 }),
-          withTiming(0.5, { duration: 800 })
+          withTiming(0.5, { duration: 800 }),
         ),
         -1,
-        true
+        true,
       );
     }
   }, [safeScore, showShimmer, ringProgress, shimmerOpacity]);
@@ -238,7 +248,8 @@ export const TMTrustRing: React.FC<TMTrustRingProps> = ({
   }));
 
   // Check if SVG components are available
-  const svgAvailable = Svg && Circle && Defs && SvgGradient && Stop && AnimatedCircle && !svgError;
+  const svgAvailable =
+    Svg && Circle && Defs && SvgGradient && Stop && AnimatedCircle && !svgError;
 
   // Use fallback if SVG is not available
   if (!svgAvailable) {
@@ -270,7 +281,13 @@ export const TMTrustRing: React.FC<TMTrustRingProps> = ({
             style={styles.svg}
           >
             <Defs>
-              <SvgGradient id="trustGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <SvgGradient
+                id="trustGradient"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="100%"
+              >
                 <Stop offset="0%" stopColor={colors[0]} />
                 <Stop offset="100%" stopColor={colors[1]} />
               </SvgGradient>

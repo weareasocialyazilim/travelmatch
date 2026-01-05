@@ -33,12 +33,22 @@ import Reanimated, {
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import Svg, { Circle, Defs, LinearGradient as SvgGradient, Stop } from 'react-native-svg';
+import Svg, {
+  Circle,
+  Defs,
+  LinearGradient as SvgGradient,
+  Stop,
+} from 'react-native-svg';
 
-import { COLORS, GRADIENTS, PALETTE, getTrustRingColors } from '@/constants/colors';
-import { useTranslation } from '../../hooks/useTranslation';
-import { TYPE_SCALE } from '../../theme/typography';
-import { SPRINGS } from '../../hooks/useAnimations';
+import {
+  COLORS,
+  GRADIENTS,
+  PALETTE,
+  getTrustRingColors,
+} from '@/constants/colors';
+import { useTranslation } from '@/hooks/useTranslation';
+import { TYPE_SCALE } from '@/theme/typography';
+import { SPRINGS } from '@/hooks/useAnimations';
 
 // ============================================
 // TYPES
@@ -109,11 +119,9 @@ const AnimatedTrustRing: React.FC<AnimatedTrustRingProps> = ({
 
     // Subtle rotation animation
     rotation.value = withRepeat(
-      withSequence(
-        withTiming(360, { duration: 20000, easing: Easing.linear })
-      ),
+      withSequence(withTiming(360, { duration: 20000, easing: Easing.linear })),
       -1,
-      false
+      false,
     );
   }, [score]);
 
@@ -139,11 +147,7 @@ const AnimatedTrustRing: React.FC<AnimatedTrustRingProps> = ({
       />
 
       {/* Background Circle */}
-      <Svg
-        width={size}
-        height={size}
-        style={StyleSheet.absoluteFill}
-      >
+      <Svg width={size} height={size} style={StyleSheet.absoluteFill}>
         <Circle
           cx={center}
           cy={center}
@@ -179,12 +183,20 @@ const AnimatedTrustRing: React.FC<AnimatedTrustRingProps> = ({
       </Reanimated.View>
 
       {/* Avatar Container */}
-      <View style={[styles.avatarWrapper, { width: size - 16, height: size - 16 }]}>
+      <View
+        style={[styles.avatarWrapper, { width: size - 16, height: size - 16 }]}
+      >
         {children}
       </View>
 
       {/* Trust Badge with Neon Glow */}
-      <View style={[styles.trustBadge, styles.trustBadgeGlow, { backgroundColor: colors[0] }]}>
+      <View
+        style={[
+          styles.trustBadge,
+          styles.trustBadgeGlow,
+          { backgroundColor: colors[0] },
+        ]}
+      >
         <Text style={styles.trustBadgeText}>{score}</Text>
       </View>
     </View>
@@ -205,16 +217,16 @@ const StatCard: React.FC<StatCardProps> = memo(({ value, label }) => {
   const scale = useSharedValue(1);
 
   useEffect(() => {
-    opacity.value = withTiming(1, { duration: 500, easing: Easing.out(Easing.ease) });
+    opacity.value = withTiming(1, {
+      duration: 500,
+      easing: Easing.out(Easing.ease),
+    });
     translateY.value = withSpring(0, SPRINGS.gentle);
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
-    transform: [
-      { translateY: translateY.value },
-      { scale: scale.value },
-    ],
+    transform: [{ translateY: translateY.value }, { scale: scale.value }],
   }));
 
   const handlePressIn = () => {
@@ -283,11 +295,11 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
             : (user?.location as any)?.city) ||
           '';
     const resolvedVerified =
-      typeof isVerified === 'boolean' ? isVerified : !!user?.kyc || !!user?.isVerified;
+      typeof isVerified === 'boolean'
+        ? isVerified
+        : !!user?.kyc || !!user?.isVerified;
     const resolvedTrust =
-      typeof trustScore === 'number'
-        ? trustScore
-        : (user?.trust_score ?? 0);
+      typeof trustScore === 'number' ? trustScore : (user?.trust_score ?? 0);
     const resolvedMoments = momentsCount ?? user?.momentsCount ?? 0;
     const resolvedExchanges = exchangesCount ?? user?.exchangesCount ?? 0;
     const resolvedResponse = responseRate ?? user?.responseRate ?? 0;
@@ -383,9 +395,7 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
             <Text style={styles.usernameText}>{resolvedUsername}</Text>
           )}
 
-          {resolvedBio && (
-            <Text style={styles.bioText}>{resolvedBio}</Text>
-          )}
+          {resolvedBio && <Text style={styles.bioText}>{resolvedBio}</Text>}
 
           {resolvedLocation && (
             <View style={styles.locationRow}>
@@ -403,12 +413,17 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
         <View style={styles.statsRow}>
           <StatCard value={resolvedMoments} label={t('trust.stats.moments')} />
           <StatCard value={resolvedExchanges} label={t('trust.stats.gifts')} />
-          <StatCard value={`${resolvedResponse}%`} label={t('trust.stats.response')} />
+          <StatCard
+            value={`${resolvedResponse}%`}
+            label={t('trust.stats.response')}
+          />
         </View>
 
         {/* Edit Button - Floating */}
         {onEditPress && (
-          <Reanimated.View style={[styles.editButtonContainer, editButtonAnimatedStyle]}>
+          <Reanimated.View
+            style={[styles.editButtonContainer, editButtonAnimatedStyle]}
+          >
             <Pressable
               testID="edit-button"
               onPress={handleEditPress}

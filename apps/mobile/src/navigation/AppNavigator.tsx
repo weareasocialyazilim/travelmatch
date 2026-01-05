@@ -282,7 +282,6 @@ import {
   InviteContactsScreen,
   MaintenanceScreen,
   DataPrivacyScreen,
-  DietaryPreferencesScreen,
   DataSettingsScreen,
   CommunityGuidelinesScreen,
   ReferralScreen,

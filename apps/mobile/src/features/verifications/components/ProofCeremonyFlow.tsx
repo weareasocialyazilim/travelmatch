@@ -23,8 +23,8 @@ import {
   SafeAreaView,
   StatusBar,
   ScrollView,
-  Alert,
 } from 'react-native';
+import { showAlert } from '@/stores/modalStore';
 import { Image } from 'expo-image';
 import Animated, {
   FadeIn,
@@ -567,7 +567,10 @@ const CaptureStep = memo<CaptureStepProps>(
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
-          Alert.alert('Konum İzni', 'Konum izni verilmedi');
+          showAlert({
+            title: 'Konum İzni',
+            message: 'Konum izni verilmedi',
+          });
           return;
         }
 
@@ -587,7 +590,10 @@ const CaptureStep = memo<CaptureStepProps>(
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       } catch (error) {
         logger.error('Location error:', error);
-        Alert.alert('Hata', 'Konum alınamadı');
+        showAlert({
+          title: 'Hata',
+          message: 'Konum alınamadı',
+        });
       } finally {
         setIsGettingLocation(false);
       }
@@ -595,7 +601,10 @@ const CaptureStep = memo<CaptureStepProps>(
 
     const handleSubmit = async () => {
       if (photos.length === 0) {
-        Alert.alert('Fotoğraf Gerekli', 'En az bir fotoğraf ekleyin');
+        showAlert({
+          title: 'Fotoğraf Gerekli',
+          message: 'En az bir fotoğraf ekleyin',
+        });
         return;
       }
 

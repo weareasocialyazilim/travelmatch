@@ -13,6 +13,11 @@
  * - Format: MP4 (H.264) - Universal iOS/Android compatibility
  * - Frame Rate: 30 FPS - Natural human motion
  *
+ * COMPRESSION:
+ * - Uses react-native-compressor when available
+ * - Falls back to no-op passthrough if not installed
+ * - Install: npx expo install react-native-compressor
+ *
  * @module services/videoService
  */
 
@@ -24,6 +29,40 @@ import {
   FileSystemUploadType,
 } from 'expo-file-system/legacy';
 import { logger } from '@/utils/logger';
+
+// =============================================================================
+// OPTIONAL COMPRESSOR IMPORT
+// =============================================================================
+
+/**
+ * Dynamically import react-native-compressor if available
+ * This allows the app to work without the package installed
+ */
+let Compressor: {
+  Video: {
+    compress: (
+      uri: string,
+      options?: {
+        compressionMethod?: 'auto' | 'manual';
+        maxSize?: number;
+        minimumFileSizeForCompress?: number;
+      },
+    ) => Promise<string>;
+  };
+} | null = null;
+
+try {
+   
+  Compressor = require('react-native-compressor');
+  logger.info('[VideoService] react-native-compressor loaded');
+} catch {
+  logger.warn(
+    '[VideoService] react-native-compressor not installed. Video compression disabled.',
+  );
+  logger.warn(
+    '[VideoService] Install with: npx expo install react-native-compressor',
+  );
+}
 
 // =============================================================================
 // CONSTANTS
@@ -199,14 +238,10 @@ class VideoServiceClass {
   /**
    * Compress video with Master parameters
    *
-   * NOTE: Full compression requires react-native-video-processing or
-   * FFmpeg kit. This is a placeholder that returns the original video
-   * with thumbnail generation.
+   * Uses react-native-compressor when available for real compression.
+   * Falls back to passthrough mode if not installed.
    *
-   * For production, integrate with:
-   * - react-native-video-helper
-   * - ffmpeg-kit-react-native
-   * - react-native-compressor
+   * Install compressor: npx expo install react-native-compressor
    */
   async compressVideo(
     inputUri: string,
@@ -248,9 +283,41 @@ class VideoServiceClass {
         estimatedTimeRemaining: 8,
       });
 
-      // NOTE: Actual compression would happen here
-      // For now, we simulate progress and return original
-      await this.simulateProgress(onProgress, 30, 70, 'compressing');
+      let compressedUri = inputUri;
+
+      // Use real compression if react-native-compressor is available
+      if (Compressor?.Video) {
+        logger.info(
+          '[VideoService] Using react-native-compressor for real compression',
+        );
+        try {
+          compressedUri = await Compressor.Video.compress(inputUri, {
+            compressionMethod: 'auto',
+            maxSize: VIDEO_COMPRESSION_CONFIG.width, // Target 720p
+            minimumFileSizeForCompress: 5 * 1024 * 1024, // Only compress if > 5MB
+          });
+          logger.info(
+            '[VideoService] Real compression complete:',
+            compressedUri,
+          );
+        } catch (compressionError) {
+          logger.warn(
+            '[VideoService] Compression failed, using original:',
+            compressionError,
+          );
+          compressedUri = inputUri;
+        }
+      } else {
+        logger.info(
+          '[VideoService] No compressor available, using original video',
+        );
+      }
+
+      onProgress?.({
+        progress: 70,
+        stage: 'compressing',
+        estimatedTimeRemaining: 3,
+      });
 
       // Stage 3: Generate thumbnail
       onProgress?.({
@@ -259,7 +326,7 @@ class VideoServiceClass {
         estimatedTimeRemaining: 3,
       });
 
-      const thumbnailUri = await this.generateThumbnail(inputUri);
+      const thumbnailUri = await this.generateThumbnail(compressedUri);
 
       // Stage 4: Finalizing
       onProgress?.({
@@ -269,7 +336,7 @@ class VideoServiceClass {
       });
 
       // Get final file info
-      const finalMetadata = await this.getVideoMetadata(inputUri);
+      const finalMetadata = await this.getVideoMetadata(compressedUri);
       const compressedSize = finalMetadata?.fileSize || originalSize;
 
       onProgress?.({
@@ -282,11 +349,12 @@ class VideoServiceClass {
         originalSize,
         compressedSize,
         ratio: originalSize > 0 ? compressedSize / originalSize : 1,
+        usedRealCompression: !!Compressor?.Video,
       });
 
       return {
         success: true,
-        uri: inputUri,
+        uri: compressedUri,
         originalSize,
         compressedSize,
         compressionRatio: originalSize > 0 ? compressedSize / originalSize : 1,
@@ -306,28 +374,6 @@ class VideoServiceClass {
       };
     } finally {
       this.isCompressing = false;
-    }
-  }
-
-  /**
-   * Simulate compression progress for demo
-   */
-  private async simulateProgress(
-    onProgress: CompressionProgressCallback | undefined,
-    start: number,
-    end: number,
-    stage: CompressionProgress['stage'],
-  ): Promise<void> {
-    const steps = 5;
-    const stepSize = (end - start) / steps;
-
-    for (let i = 1; i <= steps; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      onProgress?.({
-        progress: start + stepSize * i,
-        stage,
-        estimatedTimeRemaining: Math.max(0, (steps - i) * 2),
-      });
     }
   }
 

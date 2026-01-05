@@ -29,7 +29,7 @@ import Animated, {
   withTiming,
   useSharedValue,
 } from 'react-native-reanimated';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/config/supabase';
 import { COLORS } from '@/constants/colors';
 import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
 

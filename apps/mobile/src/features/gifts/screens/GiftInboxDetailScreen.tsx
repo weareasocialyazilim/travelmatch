@@ -6,10 +6,10 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  Alert,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { showAlert } from '@/stores/modalStore';
 import { ReportBlockBottomSheet } from '@/features/moderation';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
@@ -143,7 +143,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
   const handleStartChat = () => {
     // Chat Lock Tier kontrolü - 0-30$ arası chat yok
     if (chatLockInfo.tier === 'none') {
-      Alert.alert(
+      showAlert(
         'Sohbet Açılamaz',
         '30$ altındaki hediyeler için sohbet özelliği kullanılamaz. Bu gönderici toplu teşekkür mesajı alacak.',
         [{ text: 'Tamam' }],
@@ -153,7 +153,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
 
     // Host henüz onay vermediyse
     if (!chatApproved && !canStartChatEarly) {
-      Alert.alert(
+      showAlert(
         'Onay Gerekli',
         'Bu gönderici ile sohbet başlatmak için önce "Like" butonuna basarak onay vermelisiniz.',
         [{ text: 'Tamam' }],
@@ -186,7 +186,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
    */
   const handleUnlockConversation = async (): Promise<void> => {
     if (chatLockInfo.tier === 'none') {
-      Alert.alert(
+      showAlert(
         'Sohbet Açılamaz',
         '30$ altındaki hediyeler için sohbet açılamaz. Bu kullanıcı toplu teşekkür mesajı alacak.',
         [{ text: 'Tamam' }],
@@ -200,7 +200,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
       .sort((a, b) => b.amount - a.amount)[0];
 
     if (!eligibleGift?.id) {
-      Alert.alert('Hata', 'Uygun hediye bulunamadı.');
+      showAlert('Hata', 'Uygun hediye bulunamadı.');
       return;
     }
 
@@ -213,7 +213,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
       // Notification: "Seni beğendi" → "[Kullanıcı] seninle bir sohbet başlattı!"
     } catch (error) {
       logger.error('Failed to unlock conversation', error);
-      Alert.alert('Hata', 'Sohbet açılamadı. Lütfen tekrar deneyin.');
+      showAlert('Hata', 'Sohbet açılamadı. Lütfen tekrar deneyin.');
       throw error; // Re-throw for ChatUnlockButton to handle
     } finally {
       setIsApproving(false);
@@ -230,7 +230,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
 
     if (!targetGift?.id) {
       logger.error('No gift found for gratitude note');
-      Alert.alert('Hata', 'Hediye bulunamadı.');
+      showAlert('Hata', 'Hediye bulunamadı.');
       throw new Error('No gift found');
     }
 
@@ -242,13 +242,13 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
       logger.info('Gratitude sent', { senderId, message });
     } catch (error) {
       logger.error('Failed to send gratitude', error);
-      Alert.alert('Hata', 'Teşekkür gönderilemedi. Lütfen tekrar deneyin.');
+      showAlert('Hata', 'Teşekkür gönderilemedi. Lütfen tekrar deneyin.');
       throw error;
     }
   };
 
   const handleHide = () => {
-    Alert.alert(
+    showAlert(
       'Hediyeleri Gizle',
       `${senderName} kullanıcısından gelen tüm hediyeler gizlensin mi? Bu, alınan paranızı etkilemez.`,
       [
@@ -267,7 +267,7 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
               navigation.goBack();
             } catch (error) {
               logger.error('Failed to hide gifts', error);
-              Alert.alert(
+              showAlert(
                 'Hata',
                 'Hediyeler gizlenemedi. Lütfen tekrar deneyin.',
               );
@@ -290,9 +290,9 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
     _details?: string,
   ) => {
     if (action === 'block') {
-      Alert.alert('Kullanıcı Engellendi', `${senderName} engellendi.`);
+      showAlert('Kullanıcı Engellendi', `${senderName} engellendi.`);
     } else if (action === 'report') {
-      Alert.alert(
+      showAlert(
         'Rapor Gönderildi',
         'Raporunuz için teşekkürler. 24 saat içinde inceleyeceğiz.',
       );

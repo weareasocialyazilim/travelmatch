@@ -1,14 +1,8 @@
 import React, { useCallback, useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  StyleSheet,
-  Alert,
-} from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
+import { showAlert } from '@/stores/modalStore';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { ESCROW_THRESHOLDS } from '@/constants/values';
 import type { GiftInboxItem } from '@/hooks/useGiftInbox';
@@ -63,10 +57,11 @@ export const GiftInboxCard: React.FC<GiftInboxCardProps> = ({
 
   const handleAcceptOnly = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    Alert.alert(
-      '💰 Sadece Parayı Al',
-      'Hediyeyi kabul edip ödemeyi alacaksınız. Chat açılmayacak ve gönderici toplu teşekkür mesajı alacak.',
-      [
+    showAlert({
+      title: '💰 Sadece Parayı Al',
+      message:
+        'Hediyeyi kabul edip ödemeyi alacaksınız. Chat açılmayacak ve gönderici toplu teşekkür mesajı alacak.',
+      buttons: [
         { text: 'İptal', style: 'cancel' },
         {
           text: 'Onayla',
@@ -77,15 +72,15 @@ export const GiftInboxCard: React.FC<GiftInboxCardProps> = ({
           },
         },
       ],
-    );
+    });
   }, [item, onAcceptOnly]);
 
   const handleAcceptAndLike = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    Alert.alert(
-      '💬 Parayı Al + Chat Aç',
-      `${item.sender.name} ile chat başlatmak istiyor musunuz? Hediyeyi kabul edip chat\'i açacaksınız.`,
-      [
+    showAlert({
+      title: '💬 Parayı Al + Chat Aç',
+      message: `${item.sender.name} ile chat başlatmak istiyor musunuz? Hediyeyi kabul edip chat\'i açacaksınız.`,
+      buttons: [
         { text: 'İptal', style: 'cancel' },
         {
           text: 'Like & Chat Aç',
@@ -96,7 +91,7 @@ export const GiftInboxCard: React.FC<GiftInboxCardProps> = ({
           },
         },
       ],
-    );
+    });
   }, [item, onAcceptAndLike]);
 
   return (

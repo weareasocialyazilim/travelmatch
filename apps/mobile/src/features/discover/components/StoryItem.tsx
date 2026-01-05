@@ -7,10 +7,10 @@ import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import {
   getAvatarImageProps,
   IMAGE_VARIANTS_BY_CONTEXT,
-} from '../../utils/cloudflareImageHelpers';
+} from '@/utils/cloudflareImageHelpers';
 import { COLORS } from '@/constants/colors';
 import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
-import type { StoryItemProps } from './types';
+import type { StoryItemProps, UserStory } from './types';
 
 /**
  * Neon Glow etkili Story bileşeni.

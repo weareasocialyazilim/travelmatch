@@ -6,10 +6,10 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  Alert,
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
+import { showAlert } from '@/stores/modalStore';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -61,42 +61,50 @@ export const HiddenItemsScreen: React.FC = () => {
   }, [fetchHiddenItems]);
 
   const handleUnhide = (id: string) => {
-    Alert.alert('Unhide Item', 'This item will be restored to your inbox.', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Unhide',
-        onPress: async () => {
-          try {
-            await profileApi.unhideItem(id);
-            setHiddenItems((prev) => prev.filter((item) => item.id !== id));
-            showToast('Item has been restored to your inbox.', 'success');
-          } catch (error) {
-            logger.error('Failed to unhide item', error);
-            showToast('Failed to unhide item', 'error');
-          }
+    showAlert({
+      title: 'Unhide Item',
+      message: 'This item will be restored to your inbox.',
+      buttons: [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Unhide',
+          onPress: async () => {
+            try {
+              await profileApi.unhideItem(id);
+              setHiddenItems((prev) => prev.filter((item) => item.id !== id));
+              showToast('Item has been restored to your inbox.', 'success');
+            } catch (error) {
+              logger.error('Failed to unhide item', error);
+              showToast('Failed to unhide item', 'error');
+            }
+          },
         },
-      },
-    ]);
+      ],
+    });
   };
 
   const handleDelete = (id: string) => {
-    Alert.alert('Delete Permanently?', 'This action cannot be undone.', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await profileApi.deleteHiddenItem(id);
-            setHiddenItems((prev) => prev.filter((item) => item.id !== id));
-            showToast('Item has been permanently deleted.', 'info');
-          } catch (error) {
-            logger.error('Failed to delete hidden item', error);
-            showToast('Failed to delete item', 'error');
-          }
+    showAlert({
+      title: 'Delete Permanently?',
+      message: 'This action cannot be undone.',
+      buttons: [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await profileApi.deleteHiddenItem(id);
+              setHiddenItems((prev) => prev.filter((item) => item.id !== id));
+              showToast('Item has been permanently deleted.', 'info');
+            } catch (error) {
+              logger.error('Failed to delete hidden item', error);
+              showToast('Failed to delete item', 'error');
+            }
+          },
         },
-      },
-    ]);
+      ],
+    });
   };
 
   const renderItem = (item: HiddenItem) => (

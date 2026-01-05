@@ -11,9 +11,16 @@ export {
   type SubscriptionTier,
   type ProfileWithSubscription,
   type ExperienceCategory,
-  type MomentStatus,
   type MomentFilters,
-  type MomentResult,
   type CreateMomentDto,
   type UpdateMomentDto,
 } from '@/features/moments/services/momentsService';
+
+// Re-export missing types with local definitions
+export type MomentStatus =
+  | 'active'
+  | 'paused'
+  | 'draft'
+  | 'deleted'
+  | 'completed';
+export type MomentResult<T> = { data: T | null; error: Error | null };

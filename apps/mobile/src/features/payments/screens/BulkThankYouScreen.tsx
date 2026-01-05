@@ -22,10 +22,10 @@ import {
   TouchableOpacity,
   TextInput,
   Image,
-  Alert,
   ActivityIndicator,
   Animated,
 } from 'react-native';
+import { showAlert } from '@/stores/modalStore';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -165,7 +165,10 @@ export const BulkThankYouScreen: React.FC = () => {
     try {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('İzin Gerekli', 'Video çekmek için kamera izni gerekli.');
+        showAlert({
+          title: 'İzin Gerekli',
+          message: 'Video çekmek için kamera izni gerekli.',
+        });
         return;
       }
 
@@ -208,7 +211,10 @@ export const BulkThankYouScreen: React.FC = () => {
           setVideoThumbnail(compressed.thumbnailUri || null);
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         } else {
-          Alert.alert('Hata', 'Video sıkıştırılamadı. Lütfen tekrar deneyin.');
+          showAlert({
+            title: 'Hata',
+            message: 'Video sıkıştırılamadı. Lütfen tekrar deneyin.',
+          });
         }
 
         setIsCompressing(false);
@@ -216,7 +222,10 @@ export const BulkThankYouScreen: React.FC = () => {
     } catch (error) {
       logger.error('[BulkThankYou] Video recording error:', error);
       setIsCompressing(false);
-      Alert.alert('Hata', 'Video çekilemedi.');
+      showAlert({
+        title: 'Hata',
+        message: 'Video çekilemedi.',
+      });
     }
   }, [progressAnimation]);
 
@@ -230,15 +239,18 @@ export const BulkThankYouScreen: React.FC = () => {
   // Send bulk thank you
   const handleSend = useCallback(async () => {
     if (!finalMessage.trim() && !videoUri) {
-      Alert.alert(
-        'İçerik Gerekli',
-        'Lütfen bir teşekkür mesajı yazın veya video çekin.',
-      );
+      showAlert({
+        title: 'İçerik Gerekli',
+        message: 'Lütfen bir teşekkür mesajı yazın veya video çekin.',
+      });
       return;
     }
 
     if (selectedDonors.size === 0) {
-      Alert.alert('Alıcı Seçin', 'Lütfen en az bir bağışçı seçin.');
+      showAlert({
+        title: 'Alıcı Seçin',
+        message: 'Lütfen en az bir bağışçı seçin.',
+      });
       return;
     }
 
@@ -336,20 +348,23 @@ export const BulkThankYouScreen: React.FC = () => {
         }
       }
 
-      Alert.alert(
-        'Gönderildi! 🎉',
-        `${selectedDonors.size} bağışçıya teşekkür mesajınız gönderildi.`,
-        [
+      showAlert({
+        title: 'Gönderildi! 🎉',
+        message: `${selectedDonors.size} bağışçıya teşekkür mesajınız gönderildi.`,
+        buttons: [
           {
             text: 'Tamam',
             onPress: () => navigation.goBack(),
           },
         ],
-      );
+      });
     } catch (error) {
       logger.error('[BulkThankYou] Send error:', error);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert('Hata', 'Mesajlar gönderilemedi. Lütfen tekrar deneyin.');
+      showAlert({
+        title: 'Hata',
+        message: 'Mesajlar gönderilemedi. Lütfen tekrar deneyin.',
+      });
     } finally {
       setIsSending(false);
     }

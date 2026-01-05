@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
-import { GenericBottomSheet } from './ui/GenericBottomSheet';
+import { GenericBottomSheet } from '@/components/ui/GenericBottomSheet';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 

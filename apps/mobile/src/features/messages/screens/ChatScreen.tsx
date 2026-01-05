@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChatHeader, type LinkedMoment } from '../components/ChatHeader';
 import { MessageBubble } from '../components/MessageBubble';
 import { ChatInputBar } from '../components/ChatInputBar';
-import { ChatAttachmentBottomSheet } from '@/components/ChatAttachmentBottomSheet';
+import { ChatAttachmentBottomSheet } from '../components/ChatAttachmentBottomSheet';
 import { ReportBlockBottomSheet } from '@/features/moderation';
 import { COLORS } from '@/constants/colors';
 import { useChatScreen, type Message } from '../hooks/useChatScreen';
@@ -67,7 +67,7 @@ const ChatScreen: React.FC = () => {
         onDeclineOffer={handleDeclineOffer}
       />
     ),
-    [proofStatus, handleAcceptOffer, handleDeclineOffer]
+    [proofStatus, handleAcceptOffer, handleDeclineOffer],
   );
 
   // Get linked moment from messages (if there's an offer) or conversation context
@@ -81,7 +81,8 @@ const ChatScreen: React.FC = () => {
         title: offerMessage.momentTitle || 'Moment',
         price: offerMessage.amount,
         currency: offerMessage.currency,
-        status: offerMessage.offerStatus === 'accepted' ? 'accepted' : 'negotiating',
+        status:
+          offerMessage.offerStatus === 'accepted' ? 'accepted' : 'negotiating',
         isGiftedByMe: offerMessage.user === 'me',
       };
     }
@@ -90,7 +91,8 @@ const ChatScreen: React.FC = () => {
     return {
       id: 'moment-123',
       title: 'Coffee at a Parisian Café',
-      image: 'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=200',
+      image:
+        'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=200',
       price: 15,
       status: 'negotiating',
       isGiftedByMe: isSender,
@@ -108,7 +110,8 @@ const ChatScreen: React.FC = () => {
         story:
           'Enjoy coffee with a view of the Eiffel Tower. Experience authentic Parisian café culture while enjoying breathtaking views of the iconic Eiffel Tower.',
         imageUrl:
-          linkedMoment.image || 'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=800',
+          linkedMoment.image ||
+          'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=800',
         price: linkedMoment.price || 15,
         availability: 'Dec 5-10',
         category: {

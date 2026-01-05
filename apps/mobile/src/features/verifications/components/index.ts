@@ -14,7 +14,6 @@ export type {
   TrustConstellationProps,
 } from './TrustMilestones';
 export { SunsetClock } from './SunsetClock';
-export { PassportBook } from './PassportBook';
 export { MomentAuthenticator } from './MomentAuthenticator';
 export { SacredMoments } from './SacredMoments';
 export { GiftVault } from './GiftVault';

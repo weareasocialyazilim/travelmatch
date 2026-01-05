@@ -17,39 +17,24 @@ import { ErrorHandler } from '../utils/errorHandler';
 import { usePagination, type PaginatedResponse } from './usePagination';
 import type { Database } from '../types/database.types';
 
-// MomentRow type from the database - includes joined data from momentsService
-interface MomentRow {
-  id: string;
-  title: string;
-  description: string | null;
-  category: string | null;
-  location: string | null;
-  location_point?: { lat: number; lng: number } | null;
-  images: string[] | null;
-  price: number | null;
-  currency: string | null;
-  max_guests: number | null;
-  duration: number | null;
-  availability: string[] | null;
-  host_id: string;
-  saves_count: number | null;
-  is_saved?: boolean;
-  rating?: number | null;
-  distance?: number | null;
-  created_at: string | null;
-  updated_at?: string | null;
-  status?: string | null;
-  // Joined host data
-  host?: {
-    id: string;
-    name: string | null;
-    avatar_url: string | null;
-  } | null;
+// Use actual database type
+type DbMomentRow = Database['public']['Tables']['moments']['Row'];
+
+// Extended MomentRow with joined user data
+interface MomentRow extends DbMomentRow {
+  // Joined host data from foreign key relationship
   users?: {
     id: string;
-    name: string | null;
+    full_name: string | null;
     avatar_url: string | null;
+    rating?: number | null;
+    trust_score?: number | null;
+    review_count?: number | null;
   } | null;
+  // Computed fields
+  saves_count?: number | null;
+  is_saved?: boolean;
+  distance?: number | null;
 }
 
 // Types
@@ -177,30 +162,30 @@ const DEFAULT_PAGE_SIZE = 20;
 
 const mapToMoment = (row: MomentRow): Moment => {
   // Extract user data from the optimized join
-  const userData = row.users || row.user || {};
+  const userData = row.users || null;
 
   return {
     id: row.id,
     title: row.title,
-    description: row.description,
+    description: row.description || '',
     category: row.category,
     location: row.location,
     images: row.images || [],
-    pricePerGuest: row.price,
-    currency: row.currency,
-    maxGuests: row.max_guests,
-    duration: row.duration,
-    availability: row.availability || [],
+    pricePerGuest: row.price || 0,
+    currency: row.currency || 'TRY',
+    maxGuests: row.max_participants || 1,
+    duration: row.duration_hours ? `${row.duration_hours}h` : '1h',
+    availability: row.tags || [],
     hostId: row.user_id,
-    hostName: userData.name || 'Unknown',
-    hostAvatar: userData.avatar || '',
-    hostRating: userData.rating || userData.trust_score || 0,
-    hostReviewCount: userData.review_count || 0,
-    saves: row.favorites_count || 0,
-    isSaved: false,
-    status: row.status,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
+    hostName: userData?.full_name || 'Unknown',
+    hostAvatar: userData?.avatar_url || '',
+    hostRating: userData?.rating || userData?.trust_score || 0,
+    hostReviewCount: userData?.review_count || 0,
+    saves: row.saves_count || 0,
+    isSaved: row.is_saved || false,
+    status: (row.status as Moment['status']) || 'active',
+    createdAt: row.created_at || new Date().toISOString(),
+    updatedAt: row.updated_at || undefined,
   };
 };
 

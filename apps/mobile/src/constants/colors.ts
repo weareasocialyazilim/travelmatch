@@ -149,7 +149,7 @@ const primitives = {
   black: '#000000',
   magenta: '#D946EF',
   seafoam: '#20B2AA',
-  // Alias for violet (some components use purple)
+  // Purple alias for primitives.purple access
   purple: {
     50: '#FAF5FF',
     100: '#F3E8FF',
@@ -161,6 +161,19 @@ const primitives = {
     700: '#7C3AED',
     800: '#6B21A8',
     900: '#581C87',
+  },
+  // Mint color scale (alias for emerald)
+  mint: {
+    50: '#ECFDF5',
+    100: '#D1FAE5',
+    200: '#A7F3D0',
+    300: '#6EE7B7',
+    400: '#34D399',
+    500: '#10B981',
+    600: '#059669',
+    700: '#047857',
+    800: '#065F46',
+    900: '#064E3B',
   },
 } as const;
 
@@ -197,39 +210,26 @@ export const CARD_SHADOW = {
   elevation: 8,
 };
 
+export const CARD_SHADOW_LIGHT = {
+  shadowColor: '#000000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.08,
+  shadowRadius: 6,
+  elevation: 4,
+};
+
+export const CARD_SHADOW_HEAVY = {
+  shadowColor: '#000000',
+  shadowOffset: { width: 0, height: 8 },
+  shadowOpacity: 0.25,
+  shadowRadius: 16,
+  elevation: 12,
+};
+
 // ═══════════════════════════════════════════════════════════════════
-// SHADOWS - Reusable shadow presets
+// SHADOWS - Shadow presets for various elevations
 // ═══════════════════════════════════════════════════════════════════
 export const SHADOWS = {
-  sm: {
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  md: {
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  lg: {
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  xl: {
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.25,
-    shadowRadius: 24,
-    elevation: 12,
-  },
-  card: CARD_SHADOW,
   none: {
     shadowColor: 'transparent',
     shadowOffset: { width: 0, height: 0 },
@@ -237,37 +237,50 @@ export const SHADOWS = {
     shadowRadius: 0,
     elevation: 0,
   },
-  subtle: {
+  sm: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  md: {
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 3,
   },
+  lg: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  xl: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 10,
+  },
+  card: CARD_SHADOW,
+  subtle: CARD_SHADOW_LIGHT,
   trustGlow: {
     shadowColor: '#06B6D4',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 6,
+    shadowRadius: 16,
+    elevation: 8,
   },
-};
-
-// Additional shadow exports
-export const CARD_SHADOW_LIGHT = {
-  shadowColor: '#000000',
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.1,
-  shadowRadius: 4,
-  elevation: 3,
-};
-
-export const CARD_SHADOW_HEAVY = {
-  shadowColor: '#000000',
-  shadowOffset: { width: 0, height: 8 },
-  shadowOpacity: 0.25,
-  shadowRadius: 20,
-  elevation: 12,
+  glow: (color: string, intensity = 0.4) => ({
+    shadowColor: color,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: intensity,
+    shadowRadius: 16,
+    elevation: 8,
+  }),
 };
 
 // ═══════════════════════════════════════════════════════════════════
@@ -289,8 +302,13 @@ export const COLORS = {
   secondaryDark: primitives.violet[600],
   secondaryLight: primitives.violet[400],
 
-  // Accent (Cyan)
-  accent: primitives.cyan[500],
+  // Accent (Cyan) - Nested structure for COLORS.accent.primary
+  accent: {
+    primary: primitives.cyan[500],
+    dark: primitives.cyan[600],
+    light: primitives.cyan[400],
+  },
+  // Flat aliases for backward compatibility
   accentDark: primitives.cyan[600],
   accentLight: primitives.cyan[400],
 
@@ -300,16 +318,16 @@ export const COLORS = {
   error: primitives.rose[500],
   info: primitives.cyan[500],
 
-  // Text (flat aliases - use text.xxx for nested access)
+  // Text (flat alias - for nested, use COLORS.text.primary etc.)
   textColor: '#F8FAFC',
   textSecondary: '#94A3B8',
   textDisabled: '#334155',
 
-  // Background (flat aliases - use background.xxx for nested access)
+  // Background (flat aliases)
   white: '#FFFFFF',
   black: '#000000',
   backgroundColor: '#121214',
-  border: 'rgba(255, 255, 255, 0.08)',
+  borderColor: 'rgba(255, 255, 255, 0.08)',
 
   // Grayscale
   gray50: primitives.zinc[50],
@@ -330,18 +348,23 @@ export const COLORS = {
   sky: primitives.cyan[400],
   peach: primitives.amber[300],
 
-  // Trust colors (flat aliases - use trust.xxx for nested access)
+  // Trust colors (flat aliases - for nested use COLORS.trust.primary etc.)
   trustColor: primitives.cyan[500],
   trustLight: primitives.cyan[400],
   trustDark: primitives.cyan[600],
 
   // Additional colors
   orange: primitives.amber[500],
+  orangeDark: primitives.amber[700],
   rose: primitives.rose[500],
   violet: primitives.violet[500],
   emerald: primitives.emerald[500],
   lime: '#DFFF00',
   cyan: primitives.cyan[500],
+  darkGray: '#1E1E20',
+  infoLight: 'rgba(6, 182, 212, 0.15)',
+  greenBright: primitives.emerald[400],
+  green: primitives.emerald[500],
 
   // Metallic
   gold: '#FFD700',
@@ -381,6 +404,7 @@ export const COLORS = {
   bg: {
     primary: '#121214',
     primaryLight: '#1E1E20',
+    primaryDark: '#0A0A0B',
     secondary: '#1E1E20',
     tertiary: '#27272A',
     elevated: '#27272A',
@@ -393,6 +417,7 @@ export const COLORS = {
     dark: 'rgba(255, 255, 255, 0.15)',
     focus: '#DFFF00',
     glow: 'rgba(223, 255, 0, 0.3)',
+    primary: 'rgba(255, 255, 255, 0.08)',
   },
 
   feedback: {
@@ -404,6 +429,14 @@ export const COLORS = {
     errorLight: 'rgba(244, 63, 94, 0.15)',
     info: '#06B6D4',
     infoLight: 'rgba(6, 182, 212, 0.15)',
+  },
+
+  // Status colors (alias for feedback)
+  status: {
+    success: '#10B981',
+    warning: '#F59E0B',
+    error: '#F43F5E',
+    info: '#06B6D4',
   },
 
   utility: {
@@ -431,6 +464,9 @@ export const COLORS = {
     glassBorder: 'rgba(255, 255, 255, 0.08)',
     glassBackground: 'rgba(30, 30, 32, 0.85)',
     muted: '#27272A',
+    elevated: '#27272A',
+    primary: '#121214',
+    secondary: '#1E1E20',
   },
 
   // Trust nested structure
@@ -439,6 +475,8 @@ export const COLORS = {
     light: '#22D3EE',
     dark: '#0891B2',
     transparent: 'rgba(6, 182, 212, 0.15)',
+    surface: 'rgba(6, 182, 212, 0.08)',
+    muted: 'rgba(6, 182, 212, 0.15)',
   },
 
   // Background nested structure (for COLORS.background.primary)
@@ -504,11 +542,29 @@ export const COLORS = {
   cardBackground: '#1E1E20',
   inputBackground: '#1E1E20',
 
-  // Overlay aliases (use overlay.xxx for nested access)
-  overlayColor: 'rgba(0, 0, 0, 0.6)',
+  // Overlay aliases (flat) - Keep for backward compatibility
+  // overlay: 'rgba(0, 0, 0, 0.6)' is now nested, see below
   overlay30: 'rgba(0, 0, 0, 0.3)',
   overlay40: 'rgba(0, 0, 0, 0.4)',
   darkOverlay: 'rgba(0, 0, 0, 0.85)',
+
+  // Overlay nested structure (for COLORS.overlay.heavy, etc.)
+  overlay: {
+    light: 'rgba(0, 0, 0, 0.3)',
+    medium: 'rgba(0, 0, 0, 0.5)',
+    heavy: 'rgba(0, 0, 0, 0.85)',
+    backdrop: 'rgba(0, 0, 0, 0.7)',
+    default: 'rgba(0, 0, 0, 0.6)',
+  },
+
+  // Overlays alias for compatibility
+  overlays: {
+    light: 'rgba(0, 0, 0, 0.3)',
+    medium: 'rgba(0, 0, 0, 0.5)',
+    heavy: 'rgba(0, 0, 0, 0.85)',
+    backdrop: 'rgba(0, 0, 0, 0.7)',
+    default: 'rgba(0, 0, 0, 0.6)',
+  },
 
   // Border aliases
   borderDefault: 'rgba(255, 255, 255, 0.08)',
@@ -577,6 +633,12 @@ export const COLORS = {
   purpleTransparent: 'rgba(168, 85, 247, 0.15)',
   primarySurface: 'rgba(223, 255, 0, 0.1)',
 
+  // Transparent variants (20% opacity)
+  tealTransparent20: 'rgba(20, 184, 166, 0.2)',
+  warningTransparent20: 'rgba(245, 158, 11, 0.2)',
+  successTransparent20: 'rgba(16, 185, 129, 0.2)',
+  errorTransparent20: 'rgba(244, 63, 94, 0.2)',
+
   // Trust level colors
   trustLow: '#F87171',
   trustMedium: '#F59E0B',
@@ -597,6 +659,7 @@ export const COLORS = {
   instagramTransparent20: 'rgba(228, 64, 95, 0.2)',
   twitter: '#1DA1F2',
   facebook: '#1877F2',
+  google: '#EA4335',
 
   // Glass color
   glass: 'rgba(255, 255, 255, 0.03)',
@@ -608,6 +671,12 @@ export const COLORS = {
 
   // Mint background
   mintBackground: 'rgba(16, 185, 129, 0.1)',
+  mintDark: primitives.emerald[700],
+  mintBorder: 'rgba(16, 185, 129, 0.3)',
+
+  // Danger color
+  danger: primitives.rose[500],
+  dangerLight: 'rgba(244, 63, 94, 0.15)',
 
   // Black transparent variants
   blackTransparentDark: 'rgba(0, 0, 0, 0.7)',
@@ -615,32 +684,41 @@ export const COLORS = {
   // Seafoam
   seafoam: '#20B2AA',
 
-  // Additional missing colors
-  orangeDark: '#B45309',
-  darkGray: '#27272A',
-  infoLight: 'rgba(6, 182, 212, 0.15)',
+  // ═══════════════════════════════════════════════════════════════════
+  // ADDITIONAL MISSING PROPERTIES
+  // ═══════════════════════════════════════════════════════════════════
+  // Hairline border
+  hairline: 'rgba(255, 255, 255, 0.08)',
+  hairlineLight: 'rgba(255, 255, 255, 0.12)',
+  hairlineDark: 'rgba(255, 255, 255, 0.04)',
 
-  // ═══════════════════════════════════════════════════════════════════
-  // OVERLAY - For components using COLORS.overlay.xxx access
-  // ═══════════════════════════════════════════════════════════════════
-  overlay: {
-    light: 'rgba(0, 0, 0, 0.3)',
-    medium: 'rgba(0, 0, 0, 0.5)',
-    heavy: 'rgba(0, 0, 0, 0.85)',
-    backdrop: 'rgba(0, 0, 0, 0.7)',
+  // Text tertiary alias (flat)
+  textTertiary: '#64748B',
+
+  // Purple color
+  purple: primitives.violet[500],
+
+  // Cyan/accent nested structure (for COLORS.accent.primary)
+  accentColors: {
+    primary: '#06B6D4',
+    light: '#22D3EE',
+    dark: '#0891B2',
   },
 
-  // ═══════════════════════════════════════════════════════════════════
-  // PALETTE - For components using COLORS.palette.xxx access
-  // ═══════════════════════════════════════════════════════════════════
-  palette: primitives,
+  // Card brand colors
+  visa: '#1A1F71',
+  mastercard: '#EB001B',
+  amex: '#006FCF',
+  discover: '#FF6000',
 
-  // ═══════════════════════════════════════════════════════════════════
-  // ADDITIONAL ALIASES
-  // ═══════════════════════════════════════════════════════════════════
-  hairline: 'rgba(255, 255, 255, 0.08)',
-  textTertiary: '#64748B',
-  destructive: '#F43F5E',
+  // Destructive action color
+  destructive: primitives.rose[500],
+  destructiveLight: 'rgba(244, 63, 94, 0.15)',
+
+  // Amber colors (from primitives)
+  amber: primitives.amber[500],
+  amberLight: primitives.amber[400],
+  amberDark: primitives.amber[600],
 } as const;
 
 export type ColorKey = keyof typeof COLORS;

@@ -9,9 +9,11 @@
  */
 
 // Components - Ceremony UI Elements
-export { TrustConstellation } from './components/TrustConstellation';
+export {
+  TrustMilestones,
+  TrustConstellation,
+} from './components/TrustMilestones';
 export { SunsetClock } from './components/SunsetClock';
-export { PassportBook } from './components/PassportBook';
 export { MomentAuthenticator } from './components/MomentAuthenticator';
 export { SacredMoments } from './components/SacredMoments';
 export { GiftVault } from './components/GiftVault';

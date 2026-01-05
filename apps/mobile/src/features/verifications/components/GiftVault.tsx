@@ -28,8 +28,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
+import { showAlert } from '@/stores/modalStore';
 import { FlashList } from '@shopify/flash-list';
 import { Image } from 'expo-image';
 import Animated, {
@@ -188,14 +188,14 @@ export const GiftVault: React.FC<GiftVaultProps> = ({
       if (onPremiumUpsell) {
         onPremiumUpsell();
       } else {
-        Alert.alert(
-          'Premium Özellik',
-          'Anı Kasası Premium üyelere özeldir. Şimdi yükseltin!',
-          [
+        showAlert({
+          title: 'Premium Özellik',
+          message: 'Anı Kasası Premium üyelere özeldir. Şimdi yükseltin!',
+          buttons: [
             { text: 'Vazgeç', style: 'cancel' },
             { text: "Premium'a Geç", onPress: onPremiumUpsell },
           ],
-        );
+        });
       }
       return;
     }

@@ -10,7 +10,6 @@ import {
   Modal,
   Platform,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -28,6 +27,7 @@ import { useScreenSecurity } from '@/hooks/useScreenSecurity';
 import { useComplianceCheck } from '@/hooks/useComplianceCheck';
 import { formatCurrency } from '@/utils/currencyFormatter';
 import { logger } from '@/utils/logger';
+import { showAlert } from '@/stores/modalStore';
 import type { CurrencyCode } from '@/constants/currencies';
 import type { MomentData } from '@/types';
 
@@ -175,7 +175,7 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
 
       if (!limitResult.allowed) {
         if (limitResult.promptKyc) {
-          Alert.alert('Kimlik Doğrulama Gerekli', limitResult.message, [
+          showAlert('Kimlik Doğrulama Gerekli', limitResult.message, [
             { text: 'İptal', style: 'cancel' },
             {
               text: 'Doğrula',
@@ -190,7 +190,7 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
         }
 
         if (limitResult.promptUpgrade) {
-          Alert.alert(
+          showAlert(
             'Limit Aşıldı',
             `${limitResult.message}\n\nLimitlerinizi artırmak için planınızı yükseltin.`,
             [
@@ -207,7 +207,7 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
           return;
         }
 
-        Alert.alert('İşlem Yapılamıyor', limitResult.message);
+        showAlert('İşlem Yapılamıyor', limitResult.message);
         return;
       }
 
@@ -215,7 +215,7 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
       const contributionResult = await checkContribution(moment.id, amount);
 
       if (!contributionResult.allowed) {
-        Alert.alert('Katkı Limiti', contributionResult.message, [
+        showAlert('Katkı Limiti', contributionResult.message, [
           { text: 'Tamam' },
         ]);
         return;
@@ -230,7 +230,7 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
 
       if (!complianceResult.allowed) {
         const reason = complianceResult.blockReasons.join('\n');
-        Alert.alert('İşlem Engelllendi', reason);
+        showAlert('İşlem Engelllendi', reason);
         return;
       }
 
@@ -246,7 +246,7 @@ export const GiftMomentBottomSheet: React.FC<Props> = ({
         'Compliance check failed',
         error instanceof Error ? error : new Error(String(error)),
       );
-      Alert.alert(
+      showAlert(
         'Hata',
         'İşlem kontrolü yapılırken bir hata oluştu. Lütfen tekrar deneyin.',
       );

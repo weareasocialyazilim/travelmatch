@@ -4,7 +4,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 // Screens
 import { DiscoverScreen, SearchMapScreen } from '@/features/discover';
 import { InboxScreen } from '@/features/inbox';
-import { ProfileScreen, CreateMomentScreen } from '@/features/profile';
+import { ProfileScreen } from '@/features/profile';
+import { CreateMomentScreen } from '@/features/moments';
 
 // Custom Navigation Components
 import { FloatingDock } from '@/components/navigation';
@@ -25,15 +26,9 @@ export const MainTabNavigator = () => {
         headerShown: false,
       }}
     >
-      <Tab.Screen
-        name="Home"
-        component={DiscoverScreen}
-      />
+      <Tab.Screen name="Home" component={DiscoverScreen} />
 
-      <Tab.Screen
-        name="Search"
-        component={SearchMapScreen}
-      />
+      <Tab.Screen name="Search" component={SearchMapScreen} />
 
       {/* Create Moment - Opens as modal */}
       <Tab.Screen
@@ -47,15 +42,9 @@ export const MainTabNavigator = () => {
         })}
       />
 
-      <Tab.Screen
-        name="Inbox"
-        component={InboxScreen}
-      />
+      <Tab.Screen name="Inbox" component={InboxScreen} />
 
-      <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-      />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
 };

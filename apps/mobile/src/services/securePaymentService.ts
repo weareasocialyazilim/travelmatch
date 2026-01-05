@@ -2,35 +2,32 @@
  * Secure Payment Service (Client-Side)
  *
  * Master Payment Service for TravelMatch - consolidates all payment operations.
- * Handles PayTR payment operations for PCI-compliant payment processing.
- * Delegates wallet and transaction queries to specialized services.
+ * Delegates to specialized services for single-responsibility:
  *
- * Includes Titan Plan v2.0 Escrow System:
- * - $0-$30: Direct payment (no escrow)
- * - $30-$100: Optional escrow (user chooses)
- * - $100+: Mandatory escrow (forced protection)
+ * - PayTRProvider: PayTR API operations (tokenize, create payment, saved cards)
+ * - walletService: Balance queries, withdrawals
+ * - escrowService: Titan Plan v2.0 escrow logic
+ * - transactionService: Transaction history
  *
+ * @see services/payment/PayTRProvider.ts for PayTR operations
  * @see walletService.ts for wallet balance operations
  * @see transactionService.ts for transaction history queries
  * @see escrowService.ts for escrow operations
- *
- * PayTR Edge Functions:
- * - paytr-create-payment: Create payment and get iframeToken
- * - paytr-webhook: Handle PayTR callbacks
- * - paytr-saved-cards: Manage saved cards
  */
 
-import { supabase, SUPABASE_EDGE_URL } from '../config/supabase';
+import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { callRpc } from './supabaseRpc';
 import { transactionsService as dbTransactionsService } from './supabaseDbService';
-import {
-  invalidateWallet,
-  invalidateTransactions,
-  invalidateAllPaymentCache,
-} from './cacheInvalidationService';
+import { invalidateAllPaymentCache } from './cacheInvalidationService';
 import { walletService, type WalletBalance } from './walletService';
 import { transactionService, type Transaction } from './transactionService';
+import {
+  paytrProvider,
+  type PayTRPaymentResponse,
+  type CreatePaymentParams,
+  type SavedCard,
+} from './payment/PayTRProvider';
 import { ErrorHandler } from '../utils/errorHandler';
 import type { Database, Json } from '../types/database.types';
 import {
@@ -42,6 +39,11 @@ import { VALUES } from '../constants/values';
 // Re-export types for backward compatibility
 export type { WalletBalance } from './walletService';
 export type { Transaction, TransactionFilters } from './transactionService';
+export type {
+  PayTRPaymentResponse,
+  CreatePaymentParams,
+  SavedCard,
+} from './payment/PayTRProvider';
 
 // ============================================
 // PAYMENT TYPES (Consolidated from paymentService.ts)
@@ -221,142 +223,35 @@ export interface Subscription {
 }
 
 // ============================================
-// PAYTR TYPES
+// SECURE PAYMENT SERVICE CLASS
 // ============================================
 
-export interface PayTRPaymentResponse {
-  iframeToken: string;
-  merchantOid: string;
-  transactionId?: string;
-  amount: number;
-  currency: string;
-}
-
-export interface CreatePaymentParams {
-  momentId: string;
-  amount: number;
-  currency?: 'TRY' | 'EUR' | 'USD' | 'GBP';
-  description?: string;
-  metadata?: Record<string, unknown>;
-  saveCard?: boolean;
-  cardToken?: string;
-}
-
-export interface SavedCard {
-  cardToken: string;
-  last4: string;
-  cardBrand: string;
-  isDefault: boolean;
-}
-
 class SecurePaymentService {
-  private readonly EDGE_FUNCTION_BASE = `${SUPABASE_EDGE_URL}/functions/v1`;
-
-  /**
-   * Get authorization header for Edge Function calls
-   */
-  private async getAuthHeaders(): Promise<HeadersInit> {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (!session) {
-      throw new Error('Not authenticated');
-    }
-
-    return {
-      Authorization: `Bearer ${session.access_token}`,
-      'Content-Type': 'application/json',
-    };
-  }
+  // ============================================
+  // PAYTR OPERATIONS (Delegated to PayTRProvider)
+  // ============================================
 
   /**
    * Create a payment via PayTR
-   *
-   * Returns an iframeToken to be used in PayTR WebView
-   * The actual payment is completed in the WebView
+   * @see PayTRProvider.createPayment
    */
   async createPayment(
     params: CreatePaymentParams,
   ): Promise<PayTRPaymentResponse> {
-    try {
-      const headers = await this.getAuthHeaders();
-
-      const response = await fetch(
-        `${this.EDGE_FUNCTION_BASE}/paytr-create-payment`,
-        {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({
-            momentId: params.momentId,
-            amount: params.amount,
-            currency: params.currency || 'TRY',
-            description: params.description,
-            metadata: params.metadata,
-            saveCard: params.saveCard,
-            cardToken: params.cardToken,
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to create payment');
-      }
-
-      const paymentResponse: PayTRPaymentResponse = await response.json();
-
-      // Invalidate relevant caches
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        await invalidateWallet(user.id);
-        await invalidateTransactions(user.id);
-      }
-
-      logger.info('PayTR payment created:', paymentResponse.merchantOid);
-      return paymentResponse;
-    } catch (error) {
-      logger.error('Create payment error:', error);
-      throw error;
-    }
+    return paytrProvider.createPayment(params);
   }
 
   /**
    * Get saved cards for the user
+   * @see PayTRProvider.getSavedCards
    */
   async getSavedCards(): Promise<SavedCard[]> {
-    try {
-      const headers = await this.getAuthHeaders();
-
-      const response = await fetch(
-        `${this.EDGE_FUNCTION_BASE}/paytr-saved-cards`,
-        {
-          method: 'GET',
-          headers,
-        },
-      );
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to get saved cards');
-      }
-
-      return await response.json();
-    } catch (error) {
-      logger.error('Get saved cards error:', error);
-      throw error;
-    }
+    return paytrProvider.getSavedCards();
   }
 
   /**
    * Tokenize and save a card via PayTR
-   *
-   * PCI-DSS Compliance: Card data is sent directly to PayTR Edge Function
-   * which forwards to PayTR API. Card data is NEVER stored on our servers.
-   *
-   * @param cardDetails - Card information to tokenize
+   * @see PayTRProvider.tokenizeAndSaveCard
    */
   async tokenizeAndSaveCard(cardDetails: {
     cardNumber: string;
@@ -365,64 +260,15 @@ class SecurePaymentService {
     expireYear: string;
     cvv: string;
   }): Promise<{ cardToken: string; last4: string; brand: string }> {
-    try {
-      const headers = await this.getAuthHeaders();
-
-      const response = await fetch(
-        `${this.EDGE_FUNCTION_BASE}/paytr-tokenize-card`,
-        {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({
-            cardNumber: cardDetails.cardNumber,
-            cardHolderName: cardDetails.cardHolderName,
-            expireMonth: cardDetails.expireMonth,
-            expireYear: cardDetails.expireYear,
-            cvv: cardDetails.cvv,
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to save card');
-      }
-
-      const result = await response.json();
-      logger.info('Card tokenized and saved successfully');
-      return result;
-    } catch (error) {
-      logger.error('Tokenize card error:', error);
-      throw error;
-    }
+    return paytrProvider.tokenizeAndSaveCard(cardDetails);
   }
 
   /**
    * Delete a saved card
+   * @see PayTRProvider.deleteSavedCard
    */
   async deleteSavedCard(cardToken: string): Promise<void> {
-    try {
-      const headers = await this.getAuthHeaders();
-
-      const response = await fetch(
-        `${this.EDGE_FUNCTION_BASE}/paytr-saved-cards`,
-        {
-          method: 'DELETE',
-          headers,
-          body: JSON.stringify({ cardToken }),
-        },
-      );
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to delete card');
-      }
-
-      logger.info('Card deleted successfully');
-    } catch (error) {
-      logger.error('Delete card error:', error);
-      throw error;
-    }
+    return paytrProvider.deleteSavedCard(cardToken);
   }
 
   /**

@@ -6,8 +6,8 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { Alert } from 'react-native';
 import type { UseFormReturn, FieldValues, Path } from 'react-hook-form';
+import { showAlert } from '../../stores/modalStore';
 import { useToast } from '../../context/ToastContext';
 import { logger } from '../logger';
 
@@ -299,8 +299,10 @@ export function useUnsavedChanges<T extends FieldValues>(
   const confirmLeave = useCallback(
     (message = 'You have unsaved changes. Are you sure you want to leave?') => {
       if (hasUnsavedChanges) {
-        // React Native Alert - returns void, use Promise wrapper if needed
-        Alert.alert('Unsaved Changes', message);
+        showAlert({
+          title: 'Unsaved Changes',
+          message,
+        });
         return false; // Conservative approach - don't leave
       }
       return true;

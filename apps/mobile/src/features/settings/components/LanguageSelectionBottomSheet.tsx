@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
-import { GenericBottomSheet } from './ui/GenericBottomSheet';
+import { GenericBottomSheet } from '@/components/ui/GenericBottomSheet';
 
 interface LanguageSelectionBottomSheetProps {
   visible: boolean;
@@ -38,7 +38,12 @@ export const LanguageSelectionBottomSheet: React.FC<
               onPress={() => onLanguageChange(lang.code)}
             >
               <Text style={styles.flagText}>{lang.flag}</Text>
-              <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
+              <Text
+                style={[
+                  styles.optionText,
+                  isSelected && styles.optionTextSelected,
+                ]}
+              >
                 {lang.name}
               </Text>
               {isSelected && (

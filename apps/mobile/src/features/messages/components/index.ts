@@ -2,7 +2,7 @@
  * Messages Feature Components
  */
 
-export { default as ChatAttachmentBottomSheet } from './ChatAttachmentBottomSheet';
+export { ChatAttachmentBottomSheet } from './ChatAttachmentBottomSheet';
 export { ChatHeader } from './ChatHeader';
 export { ChatInputBar } from './ChatInputBar';
 export { MessageBubble } from './MessageBubble';

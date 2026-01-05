@@ -4,7 +4,7 @@
  * when screens need to import navigation types.
  */
 
-import type { VerificationData as KYCVerificationData } from '../features/payments/kyc/types';
+import type { VerificationData as KYCVerificationData } from '../features/verifications/kyc/types';
 import type { SuccessType } from '../features/payments/types/success.types';
 import type { Moment, User, SelectedGiver } from '../types';
 

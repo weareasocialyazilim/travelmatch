@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,18 +13,20 @@ import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { logger } from '@/utils/logger';
 import { NetworkGuard } from '@/components/NetworkGuard';
-import { AddCardBottomSheet } from '@/components/AddCardBottomSheet';
+import { AddCardBottomSheet } from '@/features/wallet/components/AddCardBottomSheet';
 import BottomNav from '@/components/BottomNav';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
-import { RemoveCardModal } from '@/components/RemoveCardModal';
-import { WalletListItem } from '../components/WalletListItem';
+import { RemoveCardModal } from '@/features/wallet/components/RemoveCardModal';
 import { CardListItem } from '../components/CardListItem';
 import { PaymentPriorityNotice } from '../components/PaymentPriorityNotice';
-import { WalletConnectButton } from '../components/WalletConnectButton';
 import { CardOptionsModal } from '../components/CardOptionsModal';
-import { WalletOptionsModal } from '../components/WalletOptionsModal';
 import { EditCardModal } from '../components/EditCardModal';
-import { WalletConfigModal } from '../components/WalletConfigModal';
+import {
+  WalletListItem,
+  WalletConnectButton,
+  WalletOptionsModal,
+  WalletConfigModal,
+} from '../components/WalletComponents';
 import { usePaymentMethods } from '@/hooks/usePaymentMethods';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
@@ -105,81 +113,89 @@ const PaymentMethodsScreen = () => {
         <NetworkGuard offlineMessage="İnternet bağlantısı gerekli. Ödeme yöntemlerini yönetmek için lütfen bağlanın.">
           {/* Header */}
           <View style={styles.header}>
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-              <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text.primary} />
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <MaterialCommunityIcons
+                name="arrow-left"
+                size={24}
+                color={COLORS.text.primary}
+              />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Ödeme Yöntemleri</Text>
             <View style={styles.backButton} />
           </View>
 
           <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          scrollEnabled={true}
-        >
-          {/* Wallets Section */}
-          <Text style={styles.sectionTitle}>
-            {isWalletConnected ? 'Cüzdanlar' : 'Dijital Cüzdanlar'}
-          </Text>
-          <View style={styles.section}>
-            {isWalletConnected ? (
-              wallets.map((wallet) => (
-                <WalletListItem
-                  key={wallet.id}
-                  wallet={wallet}
-                  isDefault={walletSettings.isDefaultPayment}
-                  onPress={handleWalletPress}
-                />
-              ))
-            ) : (
-              <WalletConnectButton onPress={connectWallet} />
-            )}
-          </View>
-
-          {/* Cards Section */}
-          <Text style={styles.sectionTitle}>Kartlar</Text>
-          <View style={styles.section}>
-            {savedCards.map((card) => (
-              <CardListItem
-                key={card.id}
-                card={card}
-                showDefault={!walletSettings.isDefaultPayment}
-                onPress={handleCardPress}
-              />
-            ))}
-          </View>
-
-          {/* Payment Priority Notice */}
-          <PaymentPriorityNotice
-            wallets={wallets}
-            savedCards={savedCards}
-            walletSettings={walletSettings}
-            isWalletConnected={isWalletConnected}
-          />
-
-          {/* Security Notice */}
-          <View style={styles.securityNotice}>
-            <MaterialCommunityIcons
-              name="shield-check"
-              size={20}
-              color={COLORS.text.secondary}
-            />
-            <Text style={styles.securityText}>
-              Tüm ödeme verileri şifreli ve{'\n'}güvenli bir şekilde saklanır. Tam kart numaralarını asla saklamayız.
-            </Text>
-          </View>
-
-          {/* Add Card Button */}
-          <TouchableOpacity
-            testID="add-card-button"
-            style={styles.addCardButton}
-            onPress={handleAddCard}
-            activeOpacity={0.7}
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            scrollEnabled={true}
           >
-            <Text style={styles.addCardButtonText}>Yeni Kart Ekle</Text>
-          </TouchableOpacity>
-        </ScrollView>
+            {/* Wallets Section */}
+            <Text style={styles.sectionTitle}>
+              {isWalletConnected ? 'Cüzdanlar' : 'Dijital Cüzdanlar'}
+            </Text>
+            <View style={styles.section}>
+              {isWalletConnected ? (
+                wallets.map((wallet) => (
+                  <WalletListItem
+                    key={wallet.id}
+                    wallet={wallet}
+                    isDefault={walletSettings.isDefaultPayment}
+                    onPress={handleWalletPress}
+                  />
+                ))
+              ) : (
+                <WalletConnectButton onPress={connectWallet} />
+              )}
+            </View>
+
+            {/* Cards Section */}
+            <Text style={styles.sectionTitle}>Kartlar</Text>
+            <View style={styles.section}>
+              {savedCards.map((card) => (
+                <CardListItem
+                  key={card.id}
+                  card={card}
+                  showDefault={!walletSettings.isDefaultPayment}
+                  onPress={handleCardPress}
+                />
+              ))}
+            </View>
+
+            {/* Payment Priority Notice */}
+            <PaymentPriorityNotice
+              wallets={wallets}
+              savedCards={savedCards}
+              walletSettings={walletSettings}
+              isWalletConnected={isWalletConnected}
+            />
+
+            {/* Security Notice */}
+            <View style={styles.securityNotice}>
+              <MaterialCommunityIcons
+                name="shield-check"
+                size={20}
+                color={COLORS.text.secondary}
+              />
+              <Text style={styles.securityText}>
+                Tüm ödeme verileri şifreli ve{'\n'}güvenli bir şekilde saklanır.
+                Tam kart numaralarını asla saklamayız.
+              </Text>
+            </View>
+
+            {/* Add Card Button */}
+            <TouchableOpacity
+              testID="add-card-button"
+              style={styles.addCardButton}
+              onPress={handleAddCard}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.addCardButtonText}>Yeni Kart Ekle</Text>
+            </TouchableOpacity>
+          </ScrollView>
         </NetworkGuard>
       </SafeAreaView>
 

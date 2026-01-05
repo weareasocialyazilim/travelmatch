@@ -19,7 +19,6 @@ import {
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
-  Alert,
   BackHandler,
 } from 'react-native';
 import { WebView, WebViewNavigation } from 'react-native-webview';
@@ -30,6 +29,7 @@ import type { RootStackParamList } from '@/navigation/routeParams';
 import { COLORS } from '@/constants/colors';
 import { useScreenSecurity } from '@/hooks/useScreenSecurity';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { showAlert } from '@/stores/modalStore';
 
 // PayTR iFrame URLs
 const PAYTR_IFRAME_URL = 'https://www.paytr.com/odeme/guvenli';
@@ -97,10 +97,10 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
       }
 
       // Show confirmation before closing payment
-      Alert.alert(
-        'Ödemeyi İptal Et',
-        'Ödeme işleminden çıkmak istediğinizden emin misiniz?',
-        [
+      showAlert({
+        title: 'Ödemeyi İptal Et',
+        message: 'Ödeme işleminden çıkmak istediğinizden emin misiniz?',
+        buttons: [
           { text: 'Hayır', style: 'cancel' },
           {
             text: 'Evet, İptal Et',
@@ -114,7 +114,7 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
             },
           },
         ],
-      );
+      });
       return true;
     };
 
@@ -218,10 +218,10 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
 
   // Handle close button
   const handleClose = useCallback(() => {
-    Alert.alert(
-      'Ödemeyi İptal Et',
-      'Ödeme işleminden çıkmak istediğinizden emin misiniz?',
-      [
+    showAlert({
+      title: 'Ödemeyi İptal Et',
+      message: 'Ödeme işleminden çıkmak istediğinizden emin misiniz?',
+      buttons: [
         { text: 'Hayır', style: 'cancel' },
         {
           text: 'Evet, İptal Et',
@@ -232,7 +232,7 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
           },
         },
       ],
-    );
+    });
   }, [merchantOid, navigation, trackEvent]);
 
   // Handle retry
@@ -358,7 +358,11 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
           thirdPartyCookiesEnabled={false}
           sharedCookiesEnabled={false}
           // Security: Restrict to trusted PayTR domains only
-          originWhitelist={['https://www.paytr.com', 'https://sandbox-paytr.com', 'https://*.paytr.com']}
+          originWhitelist={[
+            'https://www.paytr.com',
+            'https://sandbox-paytr.com',
+            'https://*.paytr.com',
+          ]}
           // Security: Never allow mixed content in payment context
           mixedContentMode="never"
           allowsInlineMediaPlayback={true}

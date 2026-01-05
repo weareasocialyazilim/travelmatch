@@ -8,7 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { COLORS } from '@/constants/colors';
-import type { Moment } from '../../hooks/useMoments';
+import type { Moment } from '@/hooks/useMoments';
 
 interface ProfileMomentCardProps {
   moment: Moment;
@@ -19,7 +19,8 @@ const ProfileMomentCard: React.FC<ProfileMomentCardProps> = memo(
   ({ moment, onPress }) => {
     // Support both price and pricePerGuest properties
     const price = moment.pricePerGuest ?? moment.price ?? 0;
-    const imageUrl = moment.images?.[0] ?? 'https://ui-avatars.com/api/?name=Moment';
+    const imageUrl =
+      moment.images?.[0] ?? 'https://ui-avatars.com/api/?name=Moment';
 
     return (
       <TouchableOpacity
@@ -30,10 +31,7 @@ const ProfileMomentCard: React.FC<ProfileMomentCardProps> = memo(
         accessibilityHint="Opens moment details"
         onPress={onPress}
       >
-        <Image
-          source={{ uri: imageUrl }}
-          style={styles.momentImage}
-        />
+        <Image source={{ uri: imageUrl }} style={styles.momentImage} />
         <View style={styles.momentInfo}>
           <Text style={styles.momentTitle} numberOfLines={1}>
             {moment.title}
@@ -46,7 +44,9 @@ const ProfileMomentCard: React.FC<ProfileMomentCardProps> = memo(
   (prevProps, nextProps) => {
     const prevPrice = prevProps.moment.pricePerGuest ?? prevProps.moment.price;
     const nextPrice = nextProps.moment.pricePerGuest ?? nextProps.moment.price;
-    return prevProps.moment.id === nextProps.moment.id && prevPrice === nextPrice;
+    return (
+      prevProps.moment.id === nextProps.moment.id && prevPrice === nextPrice
+    );
   },
 );
 

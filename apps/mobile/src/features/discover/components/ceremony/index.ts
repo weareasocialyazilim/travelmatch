@@ -12,7 +12,6 @@
 export {
   TrustConstellation,
   SunsetClock,
-  PassportBook,
   MomentAuthenticator,
   SacredMoments,
   GiftVault,

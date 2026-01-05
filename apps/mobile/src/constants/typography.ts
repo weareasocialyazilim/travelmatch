@@ -58,6 +58,11 @@ export const FONTS = {
       android: 'Satoshi-Medium',
       default: 'System',
     }),
+    medium: Platform.select({
+      ios: 'Satoshi-Medium',
+      android: 'Satoshi-Medium',
+      default: 'System',
+    }),
     regular: Platform.select({
       ios: 'Satoshi-Regular',
       android: 'Satoshi-Regular',

@@ -2,4 +2,4 @@
  * Settings Feature Components
  */
 
-export { default as LanguageSelectionBottomSheet } from './LanguageSelectionBottomSheet';
+export { LanguageSelectionBottomSheet } from './LanguageSelectionBottomSheet';

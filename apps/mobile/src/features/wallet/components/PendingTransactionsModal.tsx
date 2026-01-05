@@ -16,11 +16,11 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
-import { TYPOGRAPHY } from '../theme/typography';
+import { TYPOGRAPHY } from '@/theme/typography';
 import type {
   PendingPayment,
   PendingUpload,
-} from '../services/pendingTransactionsService';
+} from '@/services/pendingTransactionsService';
 
 interface PendingTransactionsModalProps {
   visible: boolean;

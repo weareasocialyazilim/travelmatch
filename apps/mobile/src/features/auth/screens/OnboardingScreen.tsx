@@ -50,19 +50,22 @@ const { width, height } = Dimensions.get('window');
 const SLIDES = [
   {
     id: '1',
-    image: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=1200',
+    image:
+      'https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=1200',
     title: 'Discover Local Vibes',
     desc: 'Find exclusive moments curated by locals. From hidden bars to sunset dinners.',
   },
   {
     id: '2',
-    image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1200',
+    image:
+      'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1200',
     title: 'Connect & Experience',
     desc: "Don't just travel. Meet people who share your taste and gift them a moment.",
   },
   {
     id: '3',
-    image: 'https://images.unsplash.com/photo-1551632436-cbf8dd354ca8?q=80&w=1200',
+    image:
+      'https://images.unsplash.com/photo-1551632436-cbf8dd354ca8?q=80&w=1200',
     title: 'Secure & Cashless',
     desc: 'Pay safely via the app. No cash, no awkward moments. Just pure vibes.',
   },
@@ -79,7 +82,8 @@ type OnboardingScreenProps = StackScreenProps<RootStackParamList, 'Onboarding'>;
 export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   navigation: navProp,
 }) => {
-  const defaultNavigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const defaultNavigation =
+    useNavigation<StackNavigationProp<RootStackParamList>>();
   const navigation = navProp || defaultNavigation;
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
@@ -116,7 +120,11 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
 
   const renderItem = ({ item }: { item: (typeof SLIDES)[0] }) => (
     <View style={styles.slide}>
-      <ImageBackground source={{ uri: item.image }} style={styles.image} resizeMode="cover">
+      <ImageBackground
+        source={{ uri: item.image }}
+        style={styles.image}
+        resizeMode="cover"
+      >
         <LinearGradient
           colors={['transparent', 'rgba(0,0,0,0.6)', 'black']}
           style={styles.gradient}
@@ -178,7 +186,9 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
             style={styles.button}
             onPress={handleNext}
             accessible={true}
-            accessibilityLabel={activeIndex === SLIDES.length - 1 ? 'Get Started' : 'Next'}
+            accessibilityLabel={
+              activeIndex === SLIDES.length - 1 ? 'Get Started' : 'Next'
+            }
             accessibilityRole="button"
           >
             <LinearGradient
@@ -293,7 +303,7 @@ const AWWWARDS_SLIDES = [
     id: '3',
     title: 'Hediye Et,\nİz Bırak',
     desc: 'Sevdiklerine unutulmaz anlar hediye ederek sosyal ağını genişlet.',
-    color: COLORS.accent,
+    color: COLORS.accent.primary,
   },
 ];
 
@@ -314,9 +324,9 @@ interface AwwwardsOnboardingScreenProps {
  * - TYPOGRAPHY_SYSTEM integration throughout
  * - Turkish labels
  */
-export const AwwwardsOnboardingScreen: React.FC<AwwwardsOnboardingScreenProps> = ({
-  navigation,
-}) => {
+export const AwwwardsOnboardingScreen: React.FC<
+  AwwwardsOnboardingScreenProps
+> = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const scrollX = useRef(new RNAnimated.Value(0)).current;
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -368,10 +378,7 @@ export const AwwwardsOnboardingScreen: React.FC<AwwwardsOnboardingScreenProps> =
         ]}
       >
         <View
-          style={[
-            awwwardsStyles.glowBall,
-            { backgroundColor: currentColor },
-          ]}
+          style={[awwwardsStyles.glowBall, { backgroundColor: currentColor }]}
         />
       </RNAnimated.View>
 
@@ -385,7 +392,7 @@ export const AwwwardsOnboardingScreen: React.FC<AwwwardsOnboardingScreenProps> =
         showsHorizontalScrollIndicator={false}
         onScroll={RNAnimated.event(
           [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-          { useNativeDriver: false }
+          { useNativeDriver: false },
         )}
         onMomentumScrollEnd={(e) => {
           const newIndex = Math.round(e.nativeEvent.contentOffset.x / width);
@@ -396,7 +403,9 @@ export const AwwwardsOnboardingScreen: React.FC<AwwwardsOnboardingScreenProps> =
       />
 
       {/* Footer Controls */}
-      <View style={[awwwardsStyles.footer, { paddingBottom: insets.bottom + 40 }]}>
+      <View
+        style={[awwwardsStyles.footer, { paddingBottom: insets.bottom + 40 }]}
+      >
         {/* Animated Pagination Dots */}
         <View style={awwwardsStyles.pagination}>
           {AWWWARDS_SLIDES.map((_, i) => {
@@ -446,7 +455,10 @@ export const AwwwardsOnboardingScreen: React.FC<AwwwardsOnboardingScreenProps> =
         />
 
         {/* Skip Button */}
-        <TouchableOpacity style={awwwardsStyles.skipButton} onPress={handleSkip}>
+        <TouchableOpacity
+          style={awwwardsStyles.skipButton}
+          onPress={handleSkip}
+        >
           <Text style={awwwardsStyles.skipText}>Atla</Text>
         </TouchableOpacity>
       </View>
@@ -502,7 +514,8 @@ const awwwardsStyles = StyleSheet.create({
     fontSize: TYPOGRAPHY_SYSTEM.sizes.bodyL,
     color: COLORS.text.secondary,
     marginTop: 24,
-    lineHeight: TYPOGRAPHY_SYSTEM.sizes.bodyL * TYPOGRAPHY_SYSTEM.lineHeights.relaxed,
+    lineHeight:
+      TYPOGRAPHY_SYSTEM.sizes.bodyL * TYPOGRAPHY_SYSTEM.lineHeights.relaxed,
   },
 
   // ─────────────────────────────────────────────────────────────────

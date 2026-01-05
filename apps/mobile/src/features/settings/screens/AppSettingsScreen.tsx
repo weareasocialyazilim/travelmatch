@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Switch,
-  Alert,
   LayoutAnimation,
   Platform,
   UIManager,
@@ -15,7 +14,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LanguageSelectionBottomSheet } from '@/components/LanguageSelectionBottomSheet';
+import { LanguageSelectionBottomSheet } from '../components/LanguageSelectionBottomSheet';
 import { useTranslation } from '@/hooks/useTranslation';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
@@ -27,6 +26,7 @@ import { withErrorBoundary } from '../../../components/withErrorBoundary';
 import { useNetworkStatus } from '../../../context/NetworkContext';
 import { OfflineState } from '../../../components/OfflineState';
 import { useToast } from '@/context/ToastContext';
+import { showAlert } from '@/stores/modalStore';
 
 // Enable LayoutAnimation on Android
 if (
@@ -45,10 +45,13 @@ const AppSettingsScreen: React.FC = () => {
   const { showToast } = useToast();
   const { language, changeLanguage, t, languages } = useTranslation();
   // Map languages to supported format for LanguageSelectionBottomSheet
-  const supportedLanguages = useMemo(() => [
-    { code: 'en', name: 'English', nativeName: 'English' },
-    { code: 'tr', name: 'Turkish', nativeName: 'Türkçe' },
-  ], []);
+  const supportedLanguages = useMemo(
+    () => [
+      { code: 'en', name: 'English', nativeName: 'English' },
+      { code: 'tr', name: 'Turkish', nativeName: 'Türkçe' },
+    ],
+    [],
+  );
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -75,7 +78,9 @@ const AppSettingsScreen: React.FC = () => {
   const [isLanguageSheetVisible, setIsLanguageSheetVisible] = useState(false);
 
   // Get display name for current language
-  const currentLanguageDisplay = supportedLanguages.find(l => l.code === language)?.nativeName || 'English';
+  const currentLanguageDisplay =
+    supportedLanguages.find((l) => l.code === language)?.nativeName ||
+    'English';
 
   const toggleNotifications = useCallback(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -83,7 +88,7 @@ const AppSettingsScreen: React.FC = () => {
   }, [notificationsExpanded]);
 
   const handleSignOut = () => {
-    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+    showAlert('Sign Out', 'Are you sure you want to sign out?', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Sign Out',
@@ -289,7 +294,10 @@ const AppSettingsScreen: React.FC = () => {
                       setMarketingNotifications(false);
                     }
                   }}
-                  trackColor={{ false: COLORS.border.default, true: COLORS.mint }}
+                  trackColor={{
+                    false: COLORS.border.default,
+                    true: COLORS.mint,
+                  }}
                   thumbColor={COLORS.utility.white}
                 />
                 <MaterialCommunityIcons
@@ -309,7 +317,10 @@ const AppSettingsScreen: React.FC = () => {
                     <Switch
                       value={chatNotifications}
                       onValueChange={setChatNotifications}
-                      trackColor={{ false: COLORS.border.default, true: COLORS.mint }}
+                      trackColor={{
+                        false: COLORS.border.default,
+                        true: COLORS.mint,
+                      }}
                       thumbColor={COLORS.utility.white}
                     />
                   </View>
@@ -318,7 +329,10 @@ const AppSettingsScreen: React.FC = () => {
                     <Switch
                       value={requestNotifications}
                       onValueChange={setRequestNotifications}
-                      trackColor={{ false: COLORS.border.default, true: COLORS.mint }}
+                      trackColor={{
+                        false: COLORS.border.default,
+                        true: COLORS.mint,
+                      }}
                       thumbColor={COLORS.utility.white}
                     />
                   </View>
@@ -327,7 +341,10 @@ const AppSettingsScreen: React.FC = () => {
                     <Switch
                       value={marketingNotifications}
                       onValueChange={setMarketingNotifications}
-                      trackColor={{ false: COLORS.border.default, true: COLORS.mint }}
+                      trackColor={{
+                        false: COLORS.border.default,
+                        true: COLORS.mint,
+                      }}
                       thumbColor={COLORS.utility.white}
                     />
                   </View>
@@ -363,7 +380,10 @@ const AppSettingsScreen: React.FC = () => {
                 <Switch
                   value={profileVisible}
                   onValueChange={setProfileVisible}
-                  trackColor={{ false: COLORS.border.default, true: COLORS.mint }}
+                  trackColor={{
+                    false: COLORS.border.default,
+                    true: COLORS.mint,
+                  }}
                   thumbColor={COLORS.utility.white}
                 />
               </View>
@@ -392,8 +412,12 @@ const AppSettingsScreen: React.FC = () => {
                   />
                 </View>
                 <View style={styles.settingContent}>
-                  <Text style={styles.settingLabel}>{t('settings.language')}</Text>
-                  <Text style={styles.settingDesc}>{currentLanguageDisplay}</Text>
+                  <Text style={styles.settingLabel}>
+                    {t('settings.language')}
+                  </Text>
+                  <Text style={styles.settingDesc}>
+                    {currentLanguageDisplay}
+                  </Text>
                 </View>
                 <MaterialCommunityIcons
                   name="chevron-right"
@@ -530,8 +554,10 @@ const AppSettingsScreen: React.FC = () => {
           await changeLanguage(lang as 'en' | 'tr');
           setIsLanguageSheetVisible(false);
           showToast(
-            lang === 'tr' ? 'Dil Türkçe olarak değiştirildi' : 'Language changed to English',
-            'success'
+            lang === 'tr'
+              ? 'Dil Türkçe olarak değiştirildi'
+              : 'Language changed to English',
+            'success',
           );
         }}
       />

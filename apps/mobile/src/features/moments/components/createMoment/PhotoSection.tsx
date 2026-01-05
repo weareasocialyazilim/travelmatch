@@ -18,16 +18,16 @@ import {
   Image,
   StyleSheet,
   Platform,
-  Alert,
   ActionSheetIOS,
 } from 'react-native';
+import { showAlert } from '@/stores/modalStore';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
 import { STRINGS } from '@/constants/strings';
 import { useToast } from '@/context/ToastContext';
 import { launchCamera, launchGallery } from '@/utils/cameraConfig';
-import { GlassCard } from '../ui/GlassCard';
+import { GlassCard } from '@/components/ui/GlassCard';
 
 interface PhotoSectionProps {
   photo: string;
@@ -81,11 +81,18 @@ const PhotoSection: React.FC<PhotoSectionProps> = memo(
           },
         );
       } else {
-        Alert.alert('Add Photo', 'Choose an option', [
-          { text: 'Take Photo', onPress: () => void handleCameraCapture() },
-          { text: 'Choose from Gallery', onPress: () => void handleGallerySelect() },
-          { text: 'Cancel', style: 'cancel' },
-        ]);
+        showAlert({
+          title: 'Add Photo',
+          message: 'Choose an option',
+          buttons: [
+            { text: 'Take Photo', onPress: () => void handleCameraCapture() },
+            {
+              text: 'Choose from Gallery',
+              onPress: () => void handleGallerySelect(),
+            },
+            { text: 'Cancel', style: 'cancel' },
+          ],
+        });
       }
     }, [handleCameraCapture, handleGallerySelect]);
 
@@ -219,11 +226,7 @@ export const AwwwardsPhotoSection: React.FC<AwwwardsPhotoSectionProps> = memo(
           >
             {/* Camera Icon with Plus Badge */}
             <View style={awwwardsStyles.iconCircle}>
-              <Ionicons
-                name="camera"
-                size={32}
-                color={COLORS.brand.primary}
-              />
+              <Ionicons name="camera" size={32} color={COLORS.brand.primary} />
               <View style={awwwardsStyles.plusBadge}>
                 <Ionicons name="add" size={12} color={COLORS.text.inverse} />
               </View>
