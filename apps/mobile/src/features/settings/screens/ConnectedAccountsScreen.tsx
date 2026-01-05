@@ -5,8 +5,8 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
+import { showAlert } from '@/stores/modalStore';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -62,10 +62,10 @@ const ConnectedAccountsScreen: React.FC = () => {
 
   const handleConnect = (account: SocialAccount) => {
     if (account.connected) {
-      Alert.alert(
-        'Disconnect Account',
-        `Are you sure you want to disconnect ${account.name}?`,
-        [
+      showAlert({
+        title: 'Disconnect Account',
+        message: `Are you sure you want to disconnect ${account.name}?`,
+        buttons: [
           { text: 'Cancel', style: 'cancel' },
           {
             text: 'Disconnect',
@@ -86,13 +86,13 @@ const ConnectedAccountsScreen: React.FC = () => {
             },
           },
         ],
-      );
+      });
     } else {
       // Simulate connecting
-      Alert.alert(
-        'Connect Account',
-        `This will redirect you to ${account.name} to authorize TravelMatch.`,
-        [
+      showAlert({
+        title: 'Connect Account',
+        message: `This will redirect you to ${account.name} to authorize TravelMatch.`,
+        buttons: [
           { text: 'Cancel', style: 'cancel' },
           {
             text: 'Continue',
@@ -113,7 +113,7 @@ const ConnectedAccountsScreen: React.FC = () => {
             },
           },
         ],
-      );
+      });
     }
   };
 

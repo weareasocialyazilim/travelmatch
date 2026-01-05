@@ -344,30 +344,61 @@ export interface AlertButton {
  *   { text: 'Cancel', style: 'cancel' },
  *   { text: 'Delete', style: 'destructive', onPress: () => handleDelete() }
  * ]);
+ *
+ * // Object syntax (alternative)
+ * showAlert({ title: 'Title', message: 'Message', buttons: [...] });
  */
-export const showAlert = (
+
+interface AlertOptions {
+  title: string;
+  message?: string;
+  buttons?: AlertButton[];
+}
+
+export function showAlert(options: AlertOptions): void;
+export function showAlert(
   title: string,
   message?: string,
   buttons?: AlertButton[],
-): void => {
+): void;
+export function showAlert(
+  titleOrOptions: string | AlertOptions,
+  message?: string,
+  buttons?: AlertButton[],
+): void {
+  // Handle object syntax
+  let title: string;
+  let msg: string | undefined;
+  let btns: AlertButton[] | undefined;
+
+  if (typeof titleOrOptions === 'object') {
+    title = titleOrOptions.title;
+    msg = titleOrOptions.message;
+    btns = titleOrOptions.buttons;
+  } else {
+    title = titleOrOptions;
+    msg = message;
+    btns = buttons;
+  }
+
   const store = useModalStore.getState();
 
   // No buttons or single OK button → Info modal
-  if (!buttons || buttons.length === 0) {
+  if (!btns || btns.length === 0) {
     store.openModal('info', {
       title,
-      message: message || '',
+      message: msg || '',
       buttonText: 'OK',
     });
     return;
   }
 
   // Single button → Info modal with custom button text
-  if (buttons.length === 1) {
-    const btn = buttons[0];
+  if (btns.length === 1) {
+    const btn = btns[0];
     store.openModal('info', {
       title,
-      message: message || '',
+      message: msg || '',
       buttonText: btn?.text || 'OK',
       onDismiss: btn?.onPress,
     });
@@ -375,13 +406,13 @@ export const showAlert = (
   }
 
   // Two buttons → Confirmation modal
-  if (buttons.length === 2) {
-    const cancelBtn = buttons.find((b) => b.style === 'cancel') || buttons[0];
-    const confirmBtn = buttons.find((b) => b.style !== 'cancel') || buttons[1];
+  if (btns.length === 2) {
+    const cancelBtn = btns.find((b) => b.style === 'cancel') || btns[0];
+    const confirmBtn = btns.find((b) => b.style !== 'cancel') || btns[1];
 
     store.openModal('confirmation', {
       title,
-      message: message || '',
+      message: msg || '',
       confirmText: confirmBtn?.text || 'OK',
       cancelText: cancelBtn?.text || 'Cancel',
       destructive: confirmBtn?.style === 'destructive',
@@ -398,17 +429,17 @@ export const showAlert = (
   // More than 2 buttons → Selection modal
   store.openModal('selection', {
     title,
-    options: buttons.map((btn, index) => ({
+    options: btns.map((btn, index) => ({
       id: `btn-${index}`,
       label: btn.text || 'Option',
-      description: index === 0 && message ? message : undefined,
+      description: index === 0 && msg ? msg : undefined,
     })),
     onSelect: (id) => {
       const index = parseInt(id.replace('btn-', ''), 10);
-      buttons[index]?.onPress?.();
+      btns[index]?.onPress?.();
     },
   });
-};
+}
 
 /**
  * Quick error alert (convenience wrapper)

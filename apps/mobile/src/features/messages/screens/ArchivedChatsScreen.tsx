@@ -14,8 +14,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  Alert,
 } from 'react-native';
+import { showAlert } from '@/stores/modalStore';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -73,10 +73,10 @@ export const ArchivedChatsScreen: React.FC = () => {
 
   const handleUnarchive = (id: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Alert.alert(
-      'Sohbeti Geri Al',
-      'Bu sohbet mesajlar listenize geri yüklenecek.',
-      [
+    showAlert({
+      title: 'Sohbeti Geri Al',
+      message: 'Bu sohbet mesajlar listenize geri yüklenecek.',
+      buttons: [
         { text: 'İptal', style: 'cancel' },
         {
           text: 'Geri Al',
@@ -86,15 +86,15 @@ export const ArchivedChatsScreen: React.FC = () => {
           },
         },
       ],
-    );
+    });
   };
 
   const handleDelete = (id: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    Alert.alert(
-      'Sohbeti Sil?',
-      'Bu konuşma kalıcı olarak silinecek. Bu işlem geri alınamaz.',
-      [
+    showAlert({
+      title: 'Sohbeti Sil?',
+      message: 'Bu konuşma kalıcı olarak silinecek. Bu işlem geri alınamaz.',
+      buttons: [
         { text: 'İptal', style: 'cancel' },
         {
           text: 'Sil',
@@ -105,7 +105,7 @@ export const ArchivedChatsScreen: React.FC = () => {
           },
         },
       ],
-    );
+    });
   };
 
   const handleOpenChat = (chat: ArchivedChat) => {

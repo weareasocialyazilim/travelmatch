@@ -48,10 +48,8 @@ export { PaymentSecurityBadge } from './components/PaymentSecurityBadge';
 
 // Hooks
 export {
-  useWallet,
-  useTransactions,
-  useTransaction,
-  usePaymentMethods,
+  useWalletBalance,
+  useSavedCards,
   useCreatePaymentIntent,
   useWithdraw,
   useKYCStatus,
@@ -60,6 +58,24 @@ export {
   useCreateSubscription,
   useCancelSubscription,
 } from './hooks/usePayments';
+
+// Alias exports for backward compatibility
+export { useWalletBalance as useWallet } from './hooks/usePayments';
+export { useSavedCards as usePaymentMethods } from './hooks/usePayments';
+
+// Placeholder hooks for future implementation
+export const useTransactions = () => ({
+  transactions: [],
+  loading: false,
+  error: null,
+  refresh: async () => {},
+});
+
+export const useTransaction = (_transactionId: string) => ({
+  transaction: null,
+  loading: false,
+  error: null,
+});
 
 // Services - consolidated into securePaymentService
 // All payment operations now go through securePaymentService

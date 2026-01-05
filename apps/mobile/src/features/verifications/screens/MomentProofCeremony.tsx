@@ -20,10 +20,10 @@ import {
   TouchableOpacity,
   Platform,
   Dimensions,
-  Alert,
   Image,
   ScrollView,
 } from 'react-native';
+import { showAlert } from '@/stores/modalStore';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
@@ -280,11 +280,11 @@ export const MomentProofCeremony: React.FC = () => {
       }
     } catch (error) {
       if (error instanceof Error && error.message.includes('permission')) {
-        Alert.alert(
-          'Kamera İzni Gerekli',
-          'Kanıt fotoğrafı çekmek için kamera iznine ihtiyacımız var.',
-          [{ text: 'Tamam' }],
-        );
+        showAlert({
+          title: 'Kamera İzni Gerekli',
+          message: 'Kanıt fotoğrafı çekmek için kamera iznine ihtiyacımız var.',
+          buttons: [{ text: 'Tamam' }],
+        });
       } else {
         showToast('Fotoğraf çekilemedi', 'error');
       }

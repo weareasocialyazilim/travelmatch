@@ -13,8 +13,8 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, primitives } from '@/constants/colors';
-import { logger } from '../utils/logger';
-import { useToast } from '../context/ToastContext';
+import { logger } from '@/utils/logger';
+import { useToast } from '@/context/ToastContext';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 

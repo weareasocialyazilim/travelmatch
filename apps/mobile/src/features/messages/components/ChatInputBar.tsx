@@ -22,7 +22,7 @@ import { BlurView } from 'expo-blur';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/config/supabase';
 import { COLORS } from '@/constants/colors';
 import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
 import { logger } from '@/utils/logger';

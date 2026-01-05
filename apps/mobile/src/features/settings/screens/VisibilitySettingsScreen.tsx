@@ -20,9 +20,9 @@ import {
   TouchableOpacity,
   ScrollView,
   Switch,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
+import { showAlert } from '@/stores/modalStore';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
@@ -469,17 +469,17 @@ export const VisibilitySettingsScreen: React.FC = () => {
           : subscriptionTier === 'platinum';
 
       if (!hasAccess) {
-        Alert.alert(
-          'Abonelik Gerekli',
-          `Bu özellik ${requiredTier === 'platinum' ? 'Platinum' : 'Gold'} üyelik gerektirir.`,
-          [
+        showAlert({
+          title: 'Abonelik Gerekli',
+          message: `Bu özellik ${requiredTier === 'platinum' ? 'Platinum' : 'Gold'} üyelik gerektirir.`,
+          buttons: [
             { text: 'İptal', style: 'cancel' },
             {
               text: 'Yükselt',
               onPress: () => navigation.navigate('Subscription' as never),
             },
           ],
-        );
+        });
         return;
       }
     }
@@ -495,17 +495,17 @@ export const VisibilitySettingsScreen: React.FC = () => {
       option?.requiresSubscription === 'platinum' &&
       subscriptionTier !== 'platinum'
     ) {
-      Alert.alert(
-        'Platinum Gerekli',
-        'Bu özellik Platinum üyelik gerektirir.',
-        [
+      showAlert({
+        title: 'Platinum Gerekli',
+        message: 'Bu özellik Platinum üyelik gerektirir.',
+        buttons: [
           { text: 'İptal', style: 'cancel' },
           {
             text: 'Yükselt',
             onPress: () => navigation.navigate('Subscription' as never),
           },
         ],
-      );
+      });
       return;
     }
     saveSettings({ profileDiscoverability: value });

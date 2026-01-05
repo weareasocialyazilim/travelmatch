@@ -5,11 +5,12 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Switch,  ActivityIndicator,
-  Alert,
+  Switch,
+  ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { showAlert } from '@/stores/modalStore';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
@@ -44,10 +45,10 @@ const SecurityScreen: React.FC = () => {
 
   const handleBiometricToggle = async (newValue: boolean) => {
     if (!biometricAvailable) {
-      Alert.alert(
+      showAlert(
         'Not Available',
         'Biometric authentication is not available on this device. Please ensure you have Face ID, Touch ID, or fingerprint authentication set up in your device settings.',
-        [{ text: 'OK' }]
+        [{ text: 'OK' }],
       );
       return;
     }
@@ -56,23 +57,23 @@ const SecurityScreen: React.FC = () => {
       if (newValue) {
         // Enable biometric
         const success = await enableBiometric();
-        
+
         if (success) {
-          Alert.alert(
+          showAlert(
             'Enabled',
             `${biometricTypeName} authentication has been enabled. You can now use it to unlock the app and verify sensitive actions.`,
-            [{ text: 'OK' }]
+            [{ text: 'OK' }],
           );
         } else {
-          Alert.alert(
+          showAlert(
             'Authentication Failed',
             `Could not verify your ${biometricTypeName.toLowerCase()}. Please try again.`,
-            [{ text: 'OK' }]
+            [{ text: 'OK' }],
           );
         }
       } else {
         // Disable biometric
-        Alert.alert(
+        showAlert(
           `Disable ${biometricTypeName}`,
           `Are you sure you want to disable ${biometricTypeName} authentication? You will need to enter your password for future logins.`,
           [
@@ -84,15 +85,15 @@ const SecurityScreen: React.FC = () => {
                 await disableBiometric();
               },
             },
-          ]
+          ],
         );
       }
     } catch (error) {
       logger.error('SecurityScreen', 'Biometric toggle failed', error);
-      Alert.alert(
+      showAlert(
         'Error',
         'Failed to update biometric settings. Please try again.',
-        [{ text: 'OK' }]
+        [{ text: 'OK' }],
       );
     }
   };
@@ -131,7 +132,7 @@ const SecurityScreen: React.FC = () => {
 
   const handleTwoFactorSetup = () => {
     if (twoFactorEnabled) {
-      Alert.alert(
+      showAlert(
         'Disable 2FA',
         'Are you sure you want to disable two-factor authentication? This will make your account less secure.',
         [
@@ -158,7 +159,7 @@ const SecurityScreen: React.FC = () => {
       return;
     }
 
-    Alert.alert(
+    showAlert(
       'Revoke Session',
       `Are you sure you want to sign out from ${session.device}?`,
       [
@@ -175,7 +176,7 @@ const SecurityScreen: React.FC = () => {
   };
 
   const handleRevokeAll = () => {
-    Alert.alert(
+    showAlert(
       'Sign Out All Devices',
       'This will sign you out from all devices except this one. You will need to sign in again on those devices.',
       [
@@ -336,9 +337,7 @@ const SecurityScreen: React.FC = () => {
                 />
               </View>
               <View style={styles.menuContent}>
-                <Text style={styles.menuLabel}>
-                  {biometricTypeName} Login
-                </Text>
+                <Text style={styles.menuLabel}>{biometricTypeName} Login</Text>
                 <Text style={styles.menuDesc}>
                   {biometricAvailable
                     ? `Use ${biometricTypeName.toLowerCase()} to sign in and verify actions`
@@ -352,7 +351,10 @@ const SecurityScreen: React.FC = () => {
                   value={biometricEnabled}
                   onValueChange={handleBiometricToggle}
                   disabled={!biometricAvailable}
-                  trackColor={{ false: COLORS.border.default, true: COLORS.mint }}
+                  trackColor={{
+                    false: COLORS.border.default,
+                    true: COLORS.mint,
+                  }}
                   thumbColor={COLORS.utility.white}
                 />
               )}
@@ -453,7 +455,9 @@ const SecurityScreen: React.FC = () => {
                         >['name']
                       }
                       size={20}
-                      color={session.isCurrent ? COLORS.mint : COLORS.text.primary}
+                      color={
+                        session.isCurrent ? COLORS.mint : COLORS.text.primary
+                      }
                     />
                   </View>
                   <View style={styles.sessionInfo}>

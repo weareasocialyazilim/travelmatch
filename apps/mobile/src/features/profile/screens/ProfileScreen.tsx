@@ -41,7 +41,7 @@ import {
   QuickLinks,
   ProfileMomentCard,
   MomentsTabs,
-} from '@/components/profile';
+} from '../components';
 import { COLORS } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useMoments, type Moment } from '@/hooks/useMoments';
@@ -53,7 +53,7 @@ import type { NavigationProp } from '@react-navigation/native';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { useNetworkStatus } from '../../../context/NetworkContext';
 import { OfflineState } from '../../../components/OfflineState';
-import { TrustConstellation } from '../components';
+import { TrustConstellation } from '@/features/verifications/components';
 import {
   PROFILE_COLORS,
   PROFILE_SPACING,

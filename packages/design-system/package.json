@@ -4,6 +4,23 @@
   "description": "TravelMatch Design System - Personalization-first component library",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./native": {
+      "types": "./dist/native/index.d.ts",
+      "import": "./dist/native/index.js",
+      "require": "./dist/native/index.js"
+    },
+    "./tokens": {
+      "types": "./dist/tokens/index.d.ts",
+      "import": "./dist/tokens/index.js",
+      "require": "./dist/tokens/index.js"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
@@ -54,7 +71,7 @@
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
     "playwright": "^1.57.0",
-    "react": "19.2.0",
+    "react": "19.1.0",
     "react-native": "0.83.0",
     "react-native-gesture-handler": "~2.29.1",
     "react-native-reanimated": "~4.2.0",

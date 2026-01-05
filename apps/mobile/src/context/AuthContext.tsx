@@ -134,6 +134,8 @@ interface AuthContextType {
   isAuthenticated: boolean;
   /** Whether auth state is loading */
   isLoading: boolean;
+  /** Whether user is in guest mode (not logged in but browsing) */
+  isGuest: boolean;
 
   // Actions
   /** Login with email/password */
@@ -684,6 +686,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       authState,
       isAuthenticated,
       isLoading,
+      isGuest: !isAuthenticated && !isLoading,
 
       // Actions
       login,

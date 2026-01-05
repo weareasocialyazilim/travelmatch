@@ -54,7 +54,7 @@ import { useDiscoverMoments } from '@/hooks/useDiscoverMoments';
 import { useMoments } from '@/hooks/useMoments';
 import { useSubscription } from '@/features/payments/hooks/usePayments';
 import { supabase } from '@/config/supabase';
-import { TrustBadge } from '@/components/ui/TMBadge';
+import TrustBadge from '@/components/ui/TMBadge';
 import {
   applyLocationJitter,
   type LocationJitterLevel,
@@ -136,9 +136,9 @@ interface PointFeature {
 const SearchMapScreen: React.FC = () => {
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   const mapRef = useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   const cameraRef = useRef<any>(null);
 
   // Hooks - Real data & subscription

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Alert } from 'react-native';
+import { showAlert } from '@/stores/modalStore';
 import { useAuth } from '@/context/AuthContext';
 import { useTypingIndicator } from '@/context/RealtimeContext';
 import { useMessages } from '@/hooks/useMessages';
@@ -229,11 +229,15 @@ export const useChatScreen = ({
   // Handle attachment sheet actions
   const handlePhotoVideo = useCallback(() => {
     setShowAttachmentSheet(false);
-    Alert.alert('Photo/Video', 'Select media to send', [
-      { text: 'Camera', onPress: () => logger.debug('Open camera') },
-      { text: 'Gallery', onPress: () => logger.debug('Open gallery') },
-      { text: 'Cancel', style: 'cancel' },
-    ]);
+    showAlert({
+      title: 'Photo/Video',
+      message: 'Select media to send',
+      buttons: [
+        { text: 'Camera', onPress: () => logger.debug('Open camera') },
+        { text: 'Gallery', onPress: () => logger.debug('Open gallery') },
+        { text: 'Cancel', style: 'cancel' },
+      ],
+    });
   }, []);
 
   const handleGift = useCallback(
@@ -252,18 +256,21 @@ export const useChatScreen = ({
     (action: string, reason: string, details: string, navigation: any) => {
       logger.debug('Chat action:', action, reason, details);
       if (action === 'block') {
-        Alert.alert('User Blocked', `You have blocked ${otherUserName}`);
+        showAlert({
+          title: 'User Blocked',
+          message: `You have blocked ${otherUserName}`,
+        });
         navigation.goBack();
       } else if (action === 'report') {
-        Alert.alert(
-          'Report Submitted',
-          'Thank you for reporting. We will review this.',
-        );
+        showAlert({
+          title: 'Report Submitted',
+          message: 'Thank you for reporting. We will review this.',
+        });
       } else if (action === 'mute') {
-        Alert.alert(
-          'Notifications Muted',
-          `You won't receive notifications from ${otherUserName}`,
-        );
+        showAlert({
+          title: 'Notifications Muted',
+          message: `You won't receive notifications from ${otherUserName}`,
+        });
       }
       setShowChatOptions(false);
     },
@@ -284,13 +291,19 @@ export const useChatScreen = ({
       }
 
       try {
-        trackInteraction('offer_accepted', { messageId, giftId, otherUser: otherUserName });
+        trackInteraction('offer_accepted', {
+          messageId,
+          giftId,
+          otherUser: otherUserName,
+        });
 
         // Update message status optimistically
         setMessages((prev) =>
           prev.map((msg) =>
-            msg.id === messageId ? { ...msg, offerStatus: 'accepted' as const } : msg
-          )
+            msg.id === messageId
+              ? { ...msg, offerStatus: 'accepted' as const }
+              : msg,
+          ),
         );
 
         // Call API to accept offer
@@ -318,12 +331,14 @@ export const useChatScreen = ({
         // Rollback
         setMessages((prev) =>
           prev.map((msg) =>
-            msg.id === messageId ? { ...msg, offerStatus: 'pending' as const } : msg
-          )
+            msg.id === messageId
+              ? { ...msg, offerStatus: 'pending' as const }
+              : msg,
+          ),
         );
       }
     },
-    [messages, otherUserName, trackInteraction, showToast]
+    [messages, otherUserName, trackInteraction, showToast],
   );
 
   // Handle declining an offer
@@ -340,13 +355,19 @@ export const useChatScreen = ({
       }
 
       try {
-        trackInteraction('offer_declined', { messageId, giftId, otherUser: otherUserName });
+        trackInteraction('offer_declined', {
+          messageId,
+          giftId,
+          otherUser: otherUserName,
+        });
 
         // Update message status optimistically
         setMessages((prev) =>
           prev.map((msg) =>
-            msg.id === messageId ? { ...msg, offerStatus: 'declined' as const } : msg
-          )
+            msg.id === messageId
+              ? { ...msg, offerStatus: 'declined' as const }
+              : msg,
+          ),
         );
 
         // Call API to decline offer
@@ -374,12 +395,14 @@ export const useChatScreen = ({
         // Rollback
         setMessages((prev) =>
           prev.map((msg) =>
-            msg.id === messageId ? { ...msg, offerStatus: 'pending' as const } : msg
-          )
+            msg.id === messageId
+              ? { ...msg, offerStatus: 'pending' as const }
+              : msg,
+          ),
         );
       }
     },
-    [messages, otherUserName, trackInteraction, showToast]
+    [messages, otherUserName, trackInteraction, showToast],
   );
 
   return {

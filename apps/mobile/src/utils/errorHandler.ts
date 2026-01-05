@@ -14,8 +14,8 @@
  * @see errorRecovery.ts for retry and offline queue utilities
  */
 import { useState, useCallback } from 'react';
-import { Alert } from 'react-native';
 import { TFunction } from 'i18next';
+import { showAlert } from '@/stores/modalStore';
 import { ErrorCode, getErrorMessage, getErrorCode } from './appErrors';
 import { logger } from './logger';
 
@@ -367,7 +367,10 @@ export function showErrorAlert(
 
   // Get localized title based on error code
   let title = options?.customTitle || t('errors.titles.error', 'Error');
-  if (standardizedError.code === ErrorCode.NETWORK_ERROR || standardizedError.code === ErrorCode.TIMEOUT_ERROR) {
+  if (
+    standardizedError.code === ErrorCode.NETWORK_ERROR ||
+    standardizedError.code === ErrorCode.TIMEOUT_ERROR
+  ) {
     title = t('errors.titles.network', 'Connection Error');
   } else if (standardizedError.code === ErrorCode.UNAUTHORIZED) {
     title = t('errors.titles.authentication', 'Authentication Error');
@@ -404,7 +407,7 @@ export function showErrorAlert(
     });
   }
 
-  Alert.alert(title, message, buttons, { cancelable: true });
+  showAlert(title, message, buttons);
 }
 
 /**
@@ -454,7 +457,9 @@ export const isRetryableError = (error: unknown): boolean => {
  */
 export const isAuthError = (error: unknown): boolean => {
   const standardizedError = standardizeError(error);
-  return [ErrorCode.UNAUTHORIZED, ErrorCode.FORBIDDEN].includes(standardizedError.code);
+  return [ErrorCode.UNAUTHORIZED, ErrorCode.FORBIDDEN].includes(
+    standardizedError.code,
+  );
 };
 
 /**
@@ -462,7 +467,9 @@ export const isAuthError = (error: unknown): boolean => {
  */
 export const isNetworkRelatedError = (error: unknown): boolean => {
   const standardizedError = standardizeError(error);
-  return [ErrorCode.NETWORK_ERROR, ErrorCode.TIMEOUT_ERROR].includes(standardizedError.code);
+  return [ErrorCode.NETWORK_ERROR, ErrorCode.TIMEOUT_ERROR].includes(
+    standardizedError.code,
+  );
 };
 
 export default ErrorHandler;

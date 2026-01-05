@@ -44,7 +44,8 @@ function isOriginAllowed(origin: string | null): boolean {
   if (!isProduction && DEV_ORIGINS.includes(origin)) return true;
 
   // Allow Supabase Studio (for testing)
-  if (origin.includes('supabase.co') || origin.includes('supabase.com')) return true;
+  if (origin.includes('supabase.co') || origin.includes('supabase.com'))
+    return true;
 
   // Mobile apps may send null or empty origin
   // We rely on apikey validation for mobile security
@@ -57,7 +58,9 @@ function isOriginAllowed(origin: string | null): boolean {
  * Get CORS headers with proper origin validation
  */
 export function getCorsHeaders(origin: string | null): Record<string, string> {
-  const allowedOrigin = isOriginAllowed(origin) ? (origin || '*') : '';
+  // SECURITY: Never return wildcard - if origin not allowed, return empty
+  // This blocks unauthorized cross-origin requests
+  const allowedOrigin = isOriginAllowed(origin) ? origin || '' : '';
 
   return {
     'Access-Control-Allow-Origin': allowedOrigin,
@@ -69,11 +72,13 @@ export function getCorsHeaders(origin: string | null): Record<string, string> {
 }
 
 /**
- * Legacy corsHeaders for backward compatibility
- * @deprecated Use getCorsHeaders(req.headers.get('origin')) instead
+ * Legacy corsHeaders - DEPRECATED
+ * @deprecated DO NOT USE - Wildcard CORS is a security vulnerability.
+ *             Use getCorsHeaders(req.headers.get('origin')) instead.
+ * @security This export will be removed in the next major version.
  */
 export const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://travelmatch.app', // Locked to production
   'Access-Control-Allow-Headers':
     'authorization, x-client-info, apikey, content-type, x-supabase-auth',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
@@ -96,7 +101,7 @@ export function handleCors(req: Request): Response | null {
 export function jsonResponse(
   data: unknown,
   status: number = 200,
-  req?: Request
+  req?: Request,
 ): Response {
   const origin = req?.headers.get('origin') ?? null;
   return new Response(JSON.stringify(data), {
@@ -114,7 +119,7 @@ export function jsonResponse(
 export function errorResponse(
   message: string,
   status: number = 400,
-  req?: Request
+  req?: Request,
 ): Response {
   const origin = req?.headers.get('origin') ?? null;
   return new Response(JSON.stringify({ error: message }), {

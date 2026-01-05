@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { LayoutAnimation, Platform, UIManager, Alert } from 'react-native';
+import { LayoutAnimation, Platform, UIManager } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { logger } from '@/utils/logger';
+import { showAlert } from '@/stores/modalStore';
 import { useRequests as useRequestsAPI } from '@/hooks/useRequests';
 import { useNotifications as useNotificationsAPI } from '@/hooks/useNotifications';
 import { formatTimeAgo } from '../utils/timeFormat';
@@ -153,14 +154,15 @@ export const useRequestsScreen = (initialTab: TabType = 'pending') => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     if (item.proofRequired && !item.proofUploaded) {
-      Alert.alert(
-        'Proof Required',
-        'This request requires proof before accepting. Would you like to upload proof now?',
-        [
+      showAlert({
+        title: 'Proof Required',
+        message:
+          'This request requires proof before accepting. Would you like to upload proof now?',
+        buttons: [
           { text: 'Cancel', style: 'cancel' },
           { text: 'Upload Proof', onPress: () => handleUploadProof(item) },
         ],
-      );
+      });
       return;
     }
 
@@ -173,10 +175,10 @@ export const useRequestsScreen = (initialTab: TabType = 'pending') => {
   };
 
   const handleDecline = async (item: RequestItem) => {
-    Alert.alert(
-      'Decline Request',
-      'Are you sure you want to decline this request?',
-      [
+    showAlert({
+      title: 'Decline Request',
+      message: 'Are you sure you want to decline this request?',
+      buttons: [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Decline',
@@ -195,7 +197,7 @@ export const useRequestsScreen = (initialTab: TabType = 'pending') => {
           },
         },
       ],
-    );
+    });
   };
 
   const handleUploadProof = (

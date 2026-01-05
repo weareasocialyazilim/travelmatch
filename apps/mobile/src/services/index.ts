@@ -155,4 +155,4 @@ export {
   discoverNearbyMoments,
   discoverMomentsFallback,
 } from './discoveryService';
-export type { DiscoveryMoment, DiscoveryOptions } from './discoveryService';
+export type { DiscoveryMoment } from './discoveryService';

@@ -35,7 +35,7 @@ export { SingleMomentCard } from './SingleMomentCard';
 export { HomeWelcomeCard } from './HomeWelcomeCard';
 
 // Stories
-export { StoriesRow } from './StoriesRow';
+export { default as StoriesRow } from './StoriesRow';
 export { StoryActionBar } from './StoryActionBar';
 export { StoryItem } from './StoryItem';
 export { StoryViewer } from './StoryViewer';

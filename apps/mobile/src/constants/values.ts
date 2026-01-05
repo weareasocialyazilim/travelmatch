@@ -65,3 +65,5 @@ export const VALUES = {
     longitude: 0.0421,
   },
 } as const;
+// Export ESCROW_THRESHOLDS for direct import
+export const ESCROW_THRESHOLDS = VALUES.ESCROW_THRESHOLDS;

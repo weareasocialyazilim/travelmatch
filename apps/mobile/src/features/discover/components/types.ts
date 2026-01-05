@@ -18,6 +18,7 @@ export interface Story {
   distance?: string;
   price?: number;
   timestamp?: number;
+  time?: string; // Display time like "2 saat önce"
 }
 
 export interface UserStory {
@@ -63,4 +64,84 @@ export interface DiscoverHeaderProps {
   notificationCount?: number;
   userName?: string;
   userAvatar?: string;
+  location?: string;
+  activeFiltersCount?: number;
+  onLocationPress?: () => void;
+  onFilterPress?: () => void;
+}
+
+// =============================================================================
+// CARD TYPES
+// =============================================================================
+
+export interface MomentUser {
+  id: string;
+  name: string;
+  avatar?: string;
+  verified?: boolean;
+  tier?: string;
+}
+
+export interface MomentStory {
+  excerpt?: string;
+  fullText?: string;
+}
+
+export interface MomentCardProps {
+  id: string;
+  imageUrl: string;
+  title: string;
+  price?: number;
+  currency?: string;
+  location?: string;
+  distance?: string;
+  onPress?: (item?: MomentCardProps) => void;
+  onGiftPress?: () => void;
+  style?: object;
+  // For FlatList rendering
+  item?: MomentCardProps;
+  index?: number;
+  // User and story info
+  user?: MomentUser;
+  story?: MomentStory;
+}
+
+export interface GridCardProps extends MomentCardProps {
+  columns?: number;
+  item?: MomentCardProps;
+  index?: number;
+}
+
+// =============================================================================
+// FILTER TYPES
+// =============================================================================
+
+export interface PriceRange {
+  min: number;
+  max: number;
+}
+
+export interface CategoryFilterProps {
+  categories: Category[];
+  selectedId?: string;
+  selectedCategory?: string; // Alias for selectedId
+  onSelect: (id: string) => void;
+}
+
+// =============================================================================
+// STORY VIEWER TYPES
+// =============================================================================
+
+export interface StoryViewerState {
+  isVisible: boolean;
+  currentStoryIndex: number;
+  currentUserIndex: number;
+  stories: UserStory[];
+}
+
+export interface StoryItemProps {
+  story?: UserStory;
+  item: UserStory; // Required for StoryItem component
+  isActive?: boolean;
+  onPress: (story: UserStory) => void;
 }

@@ -501,9 +501,9 @@ export const userService = {
     const allFollowers = ((data as unknown as UserRow[]) || []).map(
       (follower) => ({
         id: follower.id,
-        name: follower.full_name || follower.name || 'Unknown',
+        name: follower.full_name || 'Unknown',
         username: follower.email ? follower.email.split('@')[0] : '',
-        avatar: follower.avatar_url || follower.avatar || '',
+        avatar: follower.avatar_url || '',
         isVerified: follower.verified || false,
         isFollowing: myFollowingIds.has(follower.id),
         isFollowedBy: myFollowerIds.has(follower.id),
@@ -517,7 +517,6 @@ export const userService = {
 
     return { followers: paginatedFollowers, total: count || 0 };
   },
-
   /**
    * Get following list
    */
@@ -541,9 +540,9 @@ export const userService = {
     const allFollowing = ((data as unknown as UserRow[]) || []).map(
       (followingUser) => ({
         id: followingUser.id,
-        name: followingUser.full_name || followingUser.name || 'Unknown',
+        name: followingUser.full_name || 'Unknown',
         username: followingUser.email ? followingUser.email.split('@')[0] : '',
-        avatar: followingUser.avatar_url || followingUser.avatar || '',
+        avatar: followingUser.avatar_url || '',
         isVerified: followingUser.verified || false,
         isFollowing: myFollowingIds.has(followingUser.id),
         isFollowedBy: myFollowerIds.has(followingUser.id),

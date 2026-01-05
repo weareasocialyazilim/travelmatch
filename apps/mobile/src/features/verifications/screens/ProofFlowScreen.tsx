@@ -11,6 +11,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
+import { showAlert } from '@/stores/modalStore';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { proofSchema, type ProofInput } from '../../../utils/forms/schemas';
@@ -143,10 +144,10 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
       }
     } catch (error) {
       if (error instanceof Error && error.message.includes('permission')) {
-        Alert.alert(
-          'Permission Required',
-          'Camera permission is needed to take photos',
-        );
+        showAlert({
+          title: 'Permission Required',
+          message: 'Camera permission is needed to take photos',
+        });
       } else {
         showToast('Failed to capture photo', 'error');
       }
@@ -162,14 +163,15 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
 
     // Show security explanation on first use
     if (photos.length === 0) {
-      Alert.alert(
-        '📸 Anlık Fotoğraf Gerekli',
-        'Güvenlik nedeniyle kanıt fotoğrafları sadece kamera ile çekilebilir. Galeriden seçim yapılamaz.',
-        [
+      showAlert({
+        title: '📸 Anlık Fotoğraf Gerekli',
+        message:
+          'Güvenlik nedeniyle kanıt fotoğrafları sadece kamera ile çekilebilir. Galeriden seçim yapılamaz.',
+        buttons: [
           { text: 'Anladım', onPress: () => void handleCameraCapture() },
           { text: 'Vazgeç', style: 'cancel' },
         ],
-      );
+      });
     } else {
       // Direct camera launch for subsequent photos
       void handleCameraCapture();
@@ -221,7 +223,10 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
           name: locationName,
         });
 
-        Alert.alert('Location Set', locationName);
+        showAlert({
+          title: 'Location Set',
+          message: locationName,
+        });
       } catch {
         showToast('Could not get current location', 'error');
       }
@@ -245,10 +250,14 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
         },
       );
     } else {
-      Alert.alert('Select Location', 'Choose location option', [
-        { text: 'Use Current Location', onPress: getCurrentLocation },
-        { text: 'Cancel', style: 'cancel' },
-      ]);
+      showAlert({
+        title: 'Select Location',
+        message: 'Choose location option',
+        buttons: [
+          { text: 'Use Current Location', onPress: getCurrentLocation },
+          { text: 'Cancel', style: 'cancel' },
+        ],
+      });
     }
   };
 

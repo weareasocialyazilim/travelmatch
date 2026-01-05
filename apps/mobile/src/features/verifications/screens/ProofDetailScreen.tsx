@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { logger } from '@/utils/logger';
 import { COLORS, primitives } from '@/constants/colors';
 import type { RootStackParamList } from '@/navigation/routeParams';
-import type { Proof } from '../types';
+import type { Proof } from '@/types/domain';
 import type { StackScreenProps } from '@react-navigation/stack';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');

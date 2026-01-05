@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
   TextInput,
   Linking,
-  Alert,
 } from 'react-native';
+import { showAlert } from '@/stores/modalStore';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -54,11 +54,12 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      Alert.alert(
-        'Success',
-        'Your support request has been submitted. We will get back to you within 24 hours.',
-        [{ text: 'OK', onPress: () => navigation.goBack() }],
-      );
+      showAlert({
+        title: 'Success',
+        message:
+          'Your support request has been submitted. We will get back to you within 24 hours.',
+        buttons: [{ text: 'OK', onPress: () => navigation.goBack() }],
+      });
     }, 1500);
   };
 

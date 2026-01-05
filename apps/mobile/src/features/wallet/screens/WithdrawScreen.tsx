@@ -28,7 +28,6 @@ import {
   TextInput,
   ScrollView,
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -40,6 +39,7 @@ import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { walletService, type WalletBalance } from '@/services/walletService';
 import { useAuth } from '@/hooks/useAuth';
+import { showAlert } from '@/stores/modalStore';
 
 // ═══════════════════════════════════════════════════════════════════
 // KYC LEVELS & REQUIREMENTS
@@ -514,7 +514,7 @@ const WithdrawScreen: React.FC = () => {
 
     const numAmount = parseFloat(amount);
 
-    Alert.alert(
+    showAlert(
       'Çekim Onayı',
       `₺${numAmount.toLocaleString('tr-TR')} tutarındaki çekim talebinizi onaylıyor musunuz?\n\nTutar, PayTR tarafından doğrulandıktan sonra banka hesabınıza 1-3 iş günü içinde aktarılacaktır.`,
       [
@@ -538,7 +538,7 @@ const WithdrawScreen: React.FC = () => {
                 Haptics.NotificationFeedbackType.Success,
               );
 
-              Alert.alert(
+              showAlert(
                 'Talep Oluşturuldu ✓',
                 `Çekim talebiniz PayTR'ye iletildi.\n\nTakip No: ${result.settlementId}\n\nİşlem durumunu Cüzdan > İşlem Geçmişi bölümünden takip edebilirsiniz.`,
                 [
@@ -657,7 +657,7 @@ const WithdrawScreen: React.FC = () => {
                       style={styles.addBankButton}
                       onPress={() => {
                         // Navigate to bank account settings
-                        Alert.alert(
+                        showAlert(
                           'Bilgi',
                           'Banka hesabı eklemek için Profil > Ödeme Ayarları bölümüne gidin.',
                         );

@@ -11,10 +11,9 @@ import {
   TextInput,
   StyleSheet,
   Platform,
-  Alert,
-   
   ActionSheetIOS,
 } from 'react-native';
+import { showAlert } from '@/stores/modalStore';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { COLORS, CARD_SHADOW } from '@/constants/colors';
@@ -105,7 +104,10 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
             });
           }
         } catch {
-          showToast('Konumunuz alınamadı. Lütfen konum servislerinizin açık olduğundan emin olun', 'error');
+          showToast(
+            'Konumunuz alınamadı. Lütfen konum servislerinizin açık olduğundan emin olun',
+            'error',
+          );
         }
       };
 
@@ -121,21 +123,29 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
           },
         );
       } else {
-        Alert.alert('Select Location', 'Choose an option', [
-          {
-            text: 'Use Current Location',
-            onPress: () => void getCurrentLocation(),
-          },
-          { text: 'Search Place', onPress: () => onNavigateToPlaceSearch?.() },
-          { text: 'Cancel', style: 'cancel' },
-        ]);
+        showAlert({
+          title: 'Select Location',
+          message: 'Choose an option',
+          buttons: [
+            {
+              text: 'Use Current Location',
+              onPress: () => void getCurrentLocation(),
+            },
+            {
+              text: 'Search Place',
+              onPress: () => onNavigateToPlaceSearch?.(),
+            },
+            { text: 'Cancel', style: 'cancel' },
+          ],
+        });
       }
     };
 
     const showEscrowInfo = () => {
-      Alert.alert(
-        '💰 Gift Protection Levels',
-        'TravelMatch protects both givers and receivers:\n\n' +
+      showAlert({
+        title: '💰 Gift Protection Levels',
+        message:
+          'TravelMatch protects both givers and receivers:\n\n' +
           '✅ $0-30: Direct Payment\n' +
           'Money goes directly to the creator. No proof needed.\n\n' +
           '⚡ $30-100: Optional Escrow\n' +
@@ -143,8 +153,8 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
           '🔒 $100+: Escrow Protected\n' +
           'Money is held in escrow. The creator must upload proof to receive funds.\n\n' +
           'This ensures authentic travel experiences and protects your gifts.',
-        [{ text: 'Got it', style: 'default' }],
-      );
+        buttons: [{ text: 'Got it', style: 'default' }],
+      });
     };
 
     return (

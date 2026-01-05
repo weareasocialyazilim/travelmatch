@@ -423,15 +423,12 @@ export const proofUploadSchema = z.object({
 });
 
 // ============================================================================
-// TYPE EXPORTS
+// TYPE EXPORTS (Mobile-specific schemas only)
+// Note: Auth types (LoginInput, RegisterInput, etc.) are already exported
+// from @travelmatch/shared/schemas above
 // ============================================================================
 
-export type LoginInput = z.infer<typeof loginSchema>;
-export type RegisterInput = z.infer<typeof registerSchema>;
 export type ProofInput = z.infer<typeof proofSchema>;
-export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
-export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
-export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 export type PhoneAuthInput = z.infer<typeof phoneAuthSchema>;
 export type EmailAuthInput = z.infer<typeof emailAuthSchema>;
 export type VerifyCodeInput = z.infer<typeof verifyCodeSchema>;

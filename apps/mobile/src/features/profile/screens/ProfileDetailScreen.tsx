@@ -7,9 +7,9 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
+import { showAlert } from '@/stores/modalStore';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -120,9 +120,10 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
 
   const handleMomentPress = (moment: any) => {
     // Navigate to MomentDetail with full moment data
-    const locationStr = typeof moment.location === 'string'
-      ? moment.location
-      : moment.location?.city || 'Unknown';
+    const locationStr =
+      typeof moment.location === 'string'
+        ? moment.location
+        : moment.location?.city || 'Unknown';
 
     navigation.navigate('MomentDetail', {
       moment: {
@@ -134,15 +135,22 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
         availability: moment.status === 'active' ? 'Available' : 'Completed',
         location: {
           name: locationStr,
-          city: typeof moment.location === 'object' ? moment.location?.city : locationStr.split(', ')[0],
-          country: typeof moment.location === 'object' ? moment.location?.country : locationStr.split(', ')[1] || '',
+          city:
+            typeof moment.location === 'object'
+              ? moment.location?.city
+              : locationStr.split(', ')[0],
+          country:
+            typeof moment.location === 'object'
+              ? moment.location?.country
+              : locationStr.split(', ')[1] || '',
         },
         user: {
           id: user?.id || 'unknown',
           name: user?.name || 'Anonymous',
           avatar: user?.avatar || '',
         },
-        status: (moment.status as 'active' | 'pending' | 'completed') || 'active',
+        status:
+          (moment.status as 'active' | 'pending' | 'completed') || 'active',
       },
     });
   };
@@ -157,24 +165,24 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
     details?: string,
   ) => {
     if (action === 'report') {
-      Alert.alert(
-        'Report Submitted',
-        `Thank you for reporting. We'll review this profile.\n\nReason: ${
+      showAlert({
+        title: 'Report Submitted',
+        message: `Thank you for reporting. We'll review this profile.\n\nReason: ${
           reason ?? 'Not specified'
         }${details ? `\nDetails: ${details}` : ''}`,
-        [{ text: 'OK' }],
-      );
+        buttons: [{ text: 'OK' }],
+      });
     } else if (action === 'block') {
-      Alert.alert(
-        'User Blocked',
-        `You have blocked ${user?.name ?? 'this user'}. You won't see their content anymore.`,
-        [
+      showAlert({
+        title: 'User Blocked',
+        message: `You have blocked ${user?.name ?? 'this user'}. You won't see their content anymore.`,
+        buttons: [
           {
             text: 'OK',
             onPress: () => navigation.goBack(),
           },
         ],
-      );
+      });
     }
   };
 
@@ -183,8 +191,15 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text.primary} />
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={24}
+              color={COLORS.text.primary}
+            />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Profil</Text>
           <View style={styles.moreButton} />
@@ -202,16 +217,32 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text.primary} />
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={24}
+              color={COLORS.text.primary}
+            />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Profil</Text>
           <View style={styles.moreButton} />
         </View>
         <View style={styles.errorContainer}>
-          <MaterialCommunityIcons name="account-alert" size={64} color={COLORS.text.tertiary} />
-          <Text style={styles.errorText}>{userError || 'Kullanıcı bulunamadı'}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={() => navigation.goBack()}>
+          <MaterialCommunityIcons
+            name="account-alert"
+            size={64}
+            color={COLORS.text.tertiary}
+          />
+          <Text style={styles.errorText}>
+            {userError || 'Kullanıcı bulunamadı'}
+          </Text>
+          <TouchableOpacity
+            style={styles.retryButton}
+            onPress={() => navigation.goBack()}
+          >
             <Text style={styles.retryButtonText}>Geri Dön</Text>
           </TouchableOpacity>
         </View>
@@ -261,7 +292,12 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
         {/* Header Image - Use avatar as fallback */}
         <View style={styles.headerImageContainer}>
           <Image
-            source={{ uri: user.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name) }}
+            source={{
+              uri:
+                user.avatar ||
+                'https://ui-avatars.com/api/?name=' +
+                  encodeURIComponent(user.name),
+            }}
             style={styles.headerImage}
             resizeMode="cover"
           />
@@ -270,7 +306,12 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
         {/* Profile Header */}
         <View style={styles.profileHeader}>
           <Image
-            source={{ uri: user.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name) }}
+            source={{
+              uri:
+                user.avatar ||
+                'https://ui-avatars.com/api/?name=' +
+                  encodeURIComponent(user.name),
+            }}
             style={styles.avatar}
           />
           <View style={styles.profileInfo}>
@@ -426,92 +467,110 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
         )}
 
         {/* Active Moments */}
-        {!momentsLoading && activeTab === 'active' && activeMomentsList.length > 0 && (
-          <View style={styles.momentsGrid}>
-            {activeMomentsList.map((moment) => {
-              const momentLocation = typeof moment.location === 'string'
-                ? moment.location
-                : moment.location?.city || '';
-              return (
-                <TouchableOpacity
-                  key={moment.id}
-                  style={styles.momentCard}
-                  onPress={() => handleMomentPress(moment)}
-                >
-                  <Image
-                    source={{ uri: moment.images?.[0] || 'https://ui-avatars.com/api/?name=M' }}
-                    style={styles.momentImage}
-                    resizeMode="cover"
-                  />
-                  <View style={styles.momentOverlay}>
-                    <Text style={styles.momentTitle} numberOfLines={1}>
-                      {moment.title}
-                    </Text>
-                    <Text style={styles.momentLocation} numberOfLines={1}>
-                      {momentLocation}
-                    </Text>
-                    <Text style={styles.momentPrice}>
-                      ${moment.price || moment.pricePerGuest || 0}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        )}
+        {!momentsLoading &&
+          activeTab === 'active' &&
+          activeMomentsList.length > 0 && (
+            <View style={styles.momentsGrid}>
+              {activeMomentsList.map((moment) => {
+                const momentLocation =
+                  typeof moment.location === 'string'
+                    ? moment.location
+                    : moment.location?.city || '';
+                return (
+                  <TouchableOpacity
+                    key={moment.id}
+                    style={styles.momentCard}
+                    onPress={() => handleMomentPress(moment)}
+                  >
+                    <Image
+                      source={{
+                        uri:
+                          moment.images?.[0] ||
+                          'https://ui-avatars.com/api/?name=M',
+                      }}
+                      style={styles.momentImage}
+                      resizeMode="cover"
+                    />
+                    <View style={styles.momentOverlay}>
+                      <Text style={styles.momentTitle} numberOfLines={1}>
+                        {moment.title}
+                      </Text>
+                      <Text style={styles.momentLocation} numberOfLines={1}>
+                        {momentLocation}
+                      </Text>
+                      <Text style={styles.momentPrice}>
+                        ${moment.price || moment.pricePerGuest || 0}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
 
         {/* Empty State for Active */}
-        {!momentsLoading && activeTab === 'active' && activeMomentsList.length === 0 && (
-          <EmptyState
-            icon="compass-outline"
-            title="Henüz aktif moment yok"
-            description={`${user.name.split(' ')[0]} henüz moment oluşturmamış`}
-          />
-        )}
+        {!momentsLoading &&
+          activeTab === 'active' &&
+          activeMomentsList.length === 0 && (
+            <EmptyState
+              icon="compass-outline"
+              title="Henüz aktif moment yok"
+              description={`${user.name.split(' ')[0]} henüz moment oluşturmamış`}
+            />
+          )}
 
         {/* Past Moments */}
-        {!momentsLoading && activeTab === 'past' && pastMomentsList.length > 0 && (
-          <View style={styles.momentsGrid}>
-            {pastMomentsList.map((moment) => {
-              const momentLocation = typeof moment.location === 'string'
-                ? moment.location
-                : moment.location?.city || '';
-              return (
-                <TouchableOpacity
-                  key={moment.id}
-                  style={styles.momentCard}
-                  onPress={() => handleMomentPress(moment)}
-                >
-                  <Image
-                    source={{ uri: moment.images?.[0] || 'https://ui-avatars.com/api/?name=M' }}
-                    style={styles.momentImage}
-                    resizeMode="cover"
-                  />
-                  <View style={styles.momentOverlay}>
-                    <Text style={styles.momentTitle} numberOfLines={1}>
-                      {moment.title}
-                    </Text>
-                    <Text style={styles.momentLocation} numberOfLines={1}>
-                      {momentLocation}
-                    </Text>
-                    <View style={styles.completedBadge}>
-                      <Text style={styles.completedText}>Tamamlandı</Text>
+        {!momentsLoading &&
+          activeTab === 'past' &&
+          pastMomentsList.length > 0 && (
+            <View style={styles.momentsGrid}>
+              {pastMomentsList.map((moment) => {
+                const momentLocation =
+                  typeof moment.location === 'string'
+                    ? moment.location
+                    : moment.location?.city || '';
+                return (
+                  <TouchableOpacity
+                    key={moment.id}
+                    style={styles.momentCard}
+                    onPress={() => handleMomentPress(moment)}
+                  >
+                    <Image
+                      source={{
+                        uri:
+                          moment.images?.[0] ||
+                          'https://ui-avatars.com/api/?name=M',
+                      }}
+                      style={styles.momentImage}
+                      resizeMode="cover"
+                    />
+                    <View style={styles.momentOverlay}>
+                      <Text style={styles.momentTitle} numberOfLines={1}>
+                        {moment.title}
+                      </Text>
+                      <Text style={styles.momentLocation} numberOfLines={1}>
+                        {momentLocation}
+                      </Text>
+                      <View style={styles.completedBadge}>
+                        <Text style={styles.completedText}>Tamamlandı</Text>
+                      </View>
                     </View>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
 
         {/* Empty State for Past */}
-        {!momentsLoading && activeTab === 'past' && pastMomentsList.length === 0 && (
-          <EmptyState
-            icon="history"
-            title="Geçmiş moment yok"
-            description="Tamamlanan momentler burada görünecek"
-          />
-        )}
+        {!momentsLoading &&
+          activeTab === 'past' &&
+          pastMomentsList.length === 0 && (
+            <EmptyState
+              icon="history"
+              title="Geçmiş moment yok"
+              description="Tamamlanan momentler burada görünecek"
+            />
+          )}
 
         {/* Bottom padding for sticky bar */}
         <View style={styles.bottomPadding} />

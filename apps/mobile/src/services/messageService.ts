@@ -24,12 +24,19 @@ export interface Conversation {
   id: string;
   participantIds: string[];
   participants: ConversationParticipant[];
-  lastMessage: Message | null;
+  lastMessage: Message | string | null;
+  lastMessageAt?: string;
   unreadCount: number;
   updatedAt: string;
   createdAt: string;
   momentId: string | null;
+  momentTitle?: string;
   isArchived: boolean;
+  // Convenience properties for single-participant conversations
+  participantId?: string;
+  participantName?: string;
+  participantAvatar?: string;
+  participantVerified?: boolean;
 }
 
 export interface ConversationParticipant {
@@ -53,6 +60,10 @@ export interface Message {
   readAt: string | null;
   createdAt: string;
   sender?: MessageSender;
+  // Optional fields for optimistic updates
+  status?: 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
+  imageUrl?: string;
+  location?: { lat: number; lng: number };
 }
 
 export interface MessageSender {
@@ -87,6 +98,8 @@ export interface SendMessageRequest {
   content: string;
   type?: MessageType;
   metadata?: MessageMetadata;
+  imageUrl?: string;
+  location?: { lat: number; lng: number };
 }
 
 // Response types

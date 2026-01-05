@@ -7,8 +7,8 @@ export { WalletListItem } from './WalletListItem';
 export { WalletConnectButton } from './WalletConnectButton';
 
 // Migrated from components/
-export { default as AddBankAccountBottomSheet } from './AddBankAccountBottomSheet';
-export { default as AddCardBottomSheet } from './AddCardBottomSheet';
-export { default as RemoveCardModal } from './RemoveCardModal';
-export { default as WithdrawConfirmationModal } from './WithdrawConfirmationModal';
-export { default as PendingTransactionsModal } from './PendingTransactionsModal';
+export { AddBankAccountBottomSheet } from './AddBankAccountBottomSheet';
+export { AddCardBottomSheet } from './AddCardBottomSheet';
+export { RemoveCardModal } from './RemoveCardModal';
+export { WithdrawConfirmationModal } from './WithdrawConfirmationModal';
+export { PendingTransactionsModal } from './PendingTransactionsModal';

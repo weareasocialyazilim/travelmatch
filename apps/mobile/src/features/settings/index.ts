@@ -21,9 +21,6 @@ export { default as InviteContactsScreen } from './screens/InviteContactsScreen'
 export { MaintenanceScreen } from './screens/MaintenanceScreen';
 export { default as DataPrivacyScreen } from './screens/DataPrivacyScreen';
 export { CommunityGuidelinesScreen } from './screens/CommunityGuidelinesScreen';
-export { DietaryPreferencesScreen } from './screens/DietaryPreferencesScreen';
+export { default as ReferralScreen } from './screens/ReferralScreen';
 export { default as DataSettingsScreen } from './screens/DataSettingsScreen';
-export { ReferralScreen } from './screens/ReferralScreen';
-export { SafetyTipsScreen } from './screens/SafetyTipsScreen';
-
-// TODO: Add settings hooks, components, and services exports
+export { default as SafetyTipsScreen } from './screens/SafetyTipsScreen';

@@ -10,8 +10,8 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
-import { RADII as radii } from '../constants/radii';
-import { SPACING as spacing } from '../constants/spacing';
+import { RADII as radii } from '@/constants/radii';
+import { SPACING as spacing } from '@/constants/spacing';
 import { TYPOGRAPHY } from '@/theme/typography';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';

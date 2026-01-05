@@ -8,8 +8,8 @@
 // ===================================
 // SCREENS
 // ===================================
-export { WalletScreen } from './screens/WalletScreen';
-export { WithdrawScreen } from './screens/WithdrawScreen';
+export { default as WalletScreen } from './screens/WalletScreen';
+export { default as WithdrawScreen } from './screens/WithdrawScreen';
 export { WithdrawSuccessScreen } from './screens/WithdrawSuccessScreen';
 
 // ===================================

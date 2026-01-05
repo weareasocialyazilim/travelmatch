@@ -25,7 +25,6 @@ import {
   StyleSheet,
   Dimensions,
   FlatList,
-  Alert,
   StatusBar,
   ActivityIndicator,
   Text,
@@ -49,7 +48,7 @@ import { useStories } from '@/hooks/useStories';
 import { useAuth } from '@/hooks/useAuth';
 import { COLORS } from '@/constants/colors';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
-import { showLoginPrompt } from '@/stores/modalStore';
+import { showLoginPrompt, showAlert } from '@/stores/modalStore';
 import type { NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
@@ -220,22 +219,23 @@ const DiscoverScreen = () => {
 
     if (!validation.valid) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-      Alert.alert(
-        'Whoops! 📉',
-        validation.message ||
+      showAlert({
+        title: 'Whoops! 📉',
+        message:
+          validation.message ||
           "This doesn't match the moment's standards. Suggest something similar or better!",
-        [{ text: "Got it, I'll upgrade", style: 'default' }],
-      );
+        buttons: [{ text: "Got it, I'll upgrade", style: 'default' }],
+      });
       return;
     }
 
     // If valid, proceed with counter-offer flow
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    Alert.alert(
-      'Offer Sent! 🚀',
-      'Great alternative suggestion! The host will review it.',
-      [{ text: 'Awesome', style: 'default' }],
-    );
+    showAlert({
+      title: 'Offer Sent! 🚀',
+      message: 'Great alternative suggestion! The host will review it.',
+      buttons: [{ text: 'Awesome', style: 'default' }],
+    });
   }, []);
 
   // Handle Gift Press

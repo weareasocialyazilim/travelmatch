@@ -52,7 +52,7 @@ const AnimatedLine = Animated.createAnimatedComponent(Line);
 
 type ConstellationSize = 'sm' | 'md' | 'lg';
 
-interface TrustMilestonesProps {
+export interface TrustMilestonesProps {
   /** User's milestones */
   milestones: TrustMilestone[];
   /** Total trust score (0-100) - legacy compatibility */

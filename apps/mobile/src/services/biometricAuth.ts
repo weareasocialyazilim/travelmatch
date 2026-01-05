@@ -1,16 +1,16 @@
 /**
  * Biometric Authentication Service
- * 
+ *
  * Provides a unified interface for biometric authentication across platforms:
  * - iOS: Face ID / Touch ID
  * - Android: Fingerprint / Face / Iris
- * 
+ *
  * Features:
  * - Check biometric availability
  * - Authenticate user
  * - Manage biometric settings
  * - Secure storage integration
- * 
+ *
  * Usage Scenarios:
  * 1. App launch - Quick biometric login
  * 2. Sensitive actions - Verify before withdraw/payment
@@ -54,6 +54,11 @@ export interface BiometricAuthOptions {
   fallbackLabel?: string;
 }
 
+export interface BiometricAuthResult {
+  success: boolean;
+  error?: string;
+}
+
 class BiometricAuthService {
   private isInitialized = false;
   private capabilities: BiometricCapabilities | null = null;
@@ -65,12 +70,13 @@ class BiometricAuthService {
     try {
       // Check if hardware is available
       const hasHardware = await LocalAuthentication.hasHardwareAsync();
-      
+
       // Check if biometrics are enrolled
       const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-      
+
       // Get supported authentication types
-      const supportedTypesRaw = await LocalAuthentication.supportedAuthenticationTypesAsync();
+      const supportedTypesRaw =
+        await LocalAuthentication.supportedAuthenticationTypesAsync();
       const supportedTypes = this.mapAuthenticationTypes(supportedTypesRaw);
 
       this.capabilities = {
@@ -81,20 +87,20 @@ class BiometricAuthService {
       };
 
       this.isInitialized = true;
-      
+
       logger.info('BiometricAuth', 'Initialized', this.capabilities);
-      
+
       return this.capabilities;
     } catch (error) {
       logger.error('BiometricAuth', 'Initialization failed', error);
-      
+
       this.capabilities = {
         isAvailable: false,
         isEnrolled: false,
         supportedTypes: [BiometricType.NONE],
         hasHardware: false,
       };
-      
+
       return this.capabilities;
     }
   }
@@ -103,7 +109,7 @@ class BiometricAuthService {
    * Map LocalAuthentication types to our BiometricType enum
    */
   private mapAuthenticationTypes(
-    types: LocalAuthentication.AuthenticationType[]
+    types: LocalAuthentication.AuthenticationType[],
   ): BiometricType[] {
     const mapped: BiometricType[] = [];
 
@@ -164,23 +170,26 @@ class BiometricAuthService {
 
   /**
    * Authenticate user with biometrics
-   * 
+   *
    * @param options - Authentication options
-   * @returns Promise<boolean> - true if authenticated, false otherwise
+   * @returns Promise<BiometricAuthResult> - Result object with success and optional error
    */
-  async authenticate(options?: BiometricAuthOptions): Promise<boolean> {
+  async authenticate(
+    options?: BiometricAuthOptions,
+  ): Promise<BiometricAuthResult> {
     try {
       const capabilities = await this.getCapabilities();
 
       if (!capabilities.isAvailable) {
         logger.warn('BiometricAuth', 'Biometric not available');
-        return false;
+        return { success: false, error: 'Biometric not available' };
       }
 
       const biometricName = this.getBiometricTypeName();
-      
+
       const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: options?.promptMessage || `Authenticate with ${biometricName}`,
+        promptMessage:
+          options?.promptMessage || `Authenticate with ${biometricName}`,
         cancelLabel: options?.cancelLabel || 'Cancel',
         disableDeviceFallback: options?.disableDeviceFallback ?? false,
         fallbackLabel: options?.fallbackLabel || 'Use Passcode',
@@ -188,14 +197,17 @@ class BiometricAuthService {
 
       if (result.success) {
         logger.info('BiometricAuth', 'Authentication successful');
-        return true;
+        return { success: true };
       } else {
         logger.warn('BiometricAuth', 'Authentication failed', result.error);
-        return false;
+        return { success: false, error: result.error };
       }
     } catch (error) {
       logger.error('BiometricAuth', 'Authentication error', error);
-      return false;
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
     }
   }
 
@@ -221,7 +233,9 @@ class BiometricAuthService {
       const capabilities = await this.getCapabilities();
 
       if (!capabilities.isAvailable) {
-        throw new Error('Biometric authentication is not available on this device');
+        throw new Error(
+          'Biometric authentication is not available on this device',
+        );
       }
 
       // Verify with biometric before enabling
@@ -235,7 +249,7 @@ class BiometricAuthService {
 
       // Save enabled state
       await secureStorage.setItem(BIOMETRIC_ENABLED_KEY, 'true');
-      
+
       // Save biometric type for reference
       const primaryType = capabilities.supportedTypes[0];
       if (primaryType) {
@@ -273,9 +287,14 @@ class BiometricAuthService {
   async saveCredentials(credentials: BiometricCredentials): Promise<void> {
     try {
       // Encrypt credentials before storing for defense in depth
-      const encryptedData = await encryptCredentials(JSON.stringify(credentials));
+      const encryptedData = await encryptCredentials(
+        JSON.stringify(credentials),
+      );
       await secureStorage.setItem(BIOMETRIC_CREDENTIALS_KEY, encryptedData);
-      logger.info('BiometricAuth', 'Encrypted credentials saved for biometric login');
+      logger.info(
+        'BiometricAuth',
+        'Encrypted credentials saved for biometric login',
+      );
     } catch (error) {
       logger.error('BiometricAuth', 'Failed to save credentials', error);
       throw error;
@@ -289,7 +308,9 @@ class BiometricAuthService {
    */
   async getCredentials(): Promise<BiometricCredentials | null> {
     try {
-      const encryptedData = await secureStorage.getItem(BIOMETRIC_CREDENTIALS_KEY);
+      const encryptedData = await secureStorage.getItem(
+        BIOMETRIC_CREDENTIALS_KEY,
+      );
       if (!encryptedData) return null;
 
       // Try to decrypt - handles both encrypted and legacy unencrypted formats
@@ -300,13 +321,21 @@ class BiometricAuthService {
         // Fallback: try parsing as legacy unencrypted JSON
         // This handles migration from old unencrypted storage
         try {
-          const legacyCredentials = JSON.parse(encryptedData) as BiometricCredentials;
+          const legacyCredentials = JSON.parse(
+            encryptedData,
+          ) as BiometricCredentials;
           // Re-save with encryption for future use
           await this.saveCredentials(legacyCredentials);
-          logger.info('BiometricAuth', 'Migrated legacy credentials to encrypted format');
+          logger.info(
+            'BiometricAuth',
+            'Migrated legacy credentials to encrypted format',
+          );
           return legacyCredentials;
         } catch {
-          logger.error('BiometricAuth', 'Failed to parse credentials in any format');
+          logger.error(
+            'BiometricAuth',
+            'Failed to parse credentials in any format',
+          );
           return null;
         }
       }
@@ -342,7 +371,7 @@ class BiometricAuthService {
    */
   async authenticateForAppLaunch(): Promise<boolean> {
     const isEnabled = await this.isEnabled();
-    
+
     if (!isEnabled) {
       return false;
     }

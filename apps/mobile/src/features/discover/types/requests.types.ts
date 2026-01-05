@@ -40,6 +40,16 @@ export interface NotificationItem {
     reviewerName?: string;
     reviewRating?: number;
   };
+  metadata?: {
+    momentId?: string;
+    guestName?: string;
+    momentTitle?: string;
+    guestId?: string;
+    rating?: number;
+    message?: string;
+    amount?: number;
+    avatar?: string;
+  };
 }
 
 export type TabType = 'pending' | 'notifications';

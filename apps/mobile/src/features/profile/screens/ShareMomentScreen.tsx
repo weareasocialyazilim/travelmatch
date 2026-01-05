@@ -8,8 +8,8 @@ import {
   Image,
   Clipboard,
   Linking,
-  Alert,
 } from 'react-native';
+import { showAlert } from '@/stores/modalStore';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -111,10 +111,10 @@ export const ShareMomentScreen: React.FC = () => {
       if (supported) {
         Linking.openURL(whatsappUrl);
       } else {
-        Alert.alert(
-          'WhatsApp not installed',
-          'Please install WhatsApp to share.',
-        );
+        showAlert({
+          title: 'WhatsApp not installed',
+          message: 'Please install WhatsApp to share.',
+        });
       }
     });
   }, [shareMessage]);

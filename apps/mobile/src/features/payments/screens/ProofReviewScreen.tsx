@@ -14,7 +14,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  Alert,
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -27,6 +26,7 @@ import { TYPOGRAPHY } from '@/theme/typography';
 import { supabase } from '@/config/supabase';
 import { useToast } from '@/context/ToastContext';
 import { logger } from '@/utils/logger';
+import { showAlert } from '@/stores/modalStore';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -59,10 +59,10 @@ export const ProofReviewScreen: React.FC<ProofReviewScreenProps> = ({
   const [selectedPhoto, setSelectedPhoto] = useState(0);
 
   const handleApprove = async () => {
-    Alert.alert(
-      'Kanıtı Onayla',
-      `${receiverName}'in kanıtını onaylamak istediğinize emin misiniz? Onayladığınızda ${amount} ₺ alıcıya aktarılacaktır.`,
-      [
+    showAlert({
+      title: 'Kanıtı Onayla',
+      message: `${receiverName}'in kanıtını onaylamak istediğinize emin misiniz? Onayladığınızda ${amount} ₺ alıcıya aktarılacaktır.`,
+      buttons: [
         { text: 'İptal', style: 'cancel' },
         {
           text: 'Onayla',
@@ -112,14 +112,14 @@ export const ProofReviewScreen: React.FC<ProofReviewScreenProps> = ({
           },
         },
       ],
-    );
+    });
   };
 
   const handleReject = async () => {
-    Alert.alert(
-      'Kanıtı Reddet',
-      `${receiverName}'in kanıtını reddetmek istediğinize emin misiniz? Reddettiğinizde ${amount} ₺ size iade edilecektir.`,
-      [
+    showAlert({
+      title: 'Kanıtı Reddet',
+      message: `${receiverName}'in kanıtını reddetmek istediğinize emin misiniz? Reddettiğinizde ${amount} ₺ size iade edilecektir.`,
+      buttons: [
         { text: 'İptal', style: 'cancel' },
         {
           text: 'Reddet',
@@ -166,34 +166,38 @@ export const ProofReviewScreen: React.FC<ProofReviewScreenProps> = ({
           },
         },
       ],
-    );
+    });
   };
 
   const handleExtendTime = async () => {
-    Alert.alert('Süre Uzat', 'Alıcıya 7 gün daha süre vermek ister misiniz?', [
-      { text: 'İptal', style: 'cancel' },
-      {
-        text: 'Uzat',
-        onPress: async () => {
-          try {
-            const { error } = await supabase
-              .from('escrow_transactions')
-              .update({
-                expires_at: new Date(
-                  Date.now() + 7 * 24 * 60 * 60 * 1000,
-                ).toISOString(),
-              })
-              .eq('id', escrowId);
+    showAlert({
+      title: 'Süre Uzat',
+      message: 'Alıcıya 7 gün daha süre vermek ister misiniz?',
+      buttons: [
+        { text: 'İptal', style: 'cancel' },
+        {
+          text: 'Uzat',
+          onPress: async () => {
+            try {
+              const { error } = await supabase
+                .from('escrow_transactions')
+                .update({
+                  expires_at: new Date(
+                    Date.now() + 7 * 24 * 60 * 60 * 1000,
+                  ).toISOString(),
+                })
+                .eq('id', escrowId);
 
-            if (error) throw error;
+              if (error) throw error;
 
-            showToast('Süre 7 gün uzatıldı', 'success');
-          } catch {
-            showToast('Süre uzatılamadı', 'error');
-          }
+              showToast('Süre 7 gün uzatıldı', 'success');
+            } catch {
+              showToast('Süre uzatılamadı', 'error');
+            }
+          },
         },
-      },
-    ]);
+      ],
+    });
   };
 
   const formatDate = (dateString: string) => {

@@ -10,10 +10,10 @@ import {
   ActivityIndicator,
   Share as _Share,
   Platform,
-  Alert,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { showAlert } from '@/stores/modalStore';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as FileSystem from 'expo-file-system';
 import { documentDirectory, EncodingType } from 'expo-file-system/legacy';
@@ -113,7 +113,7 @@ const DataPrivacyScreen = () => {
   };
 
   const handleExportData = async () => {
-    Alert.alert(
+    showAlert(
       'Export Your Data',
       'We will prepare a comprehensive copy of all your data (profile, moments, messages, transactions, etc.) in JSON format. This process is GDPR-compliant and includes all your personal data.',
       [
@@ -164,7 +164,7 @@ const DataPrivacyScreen = () => {
                   });
                 } else {
                   // Fallback: Show file location
-                  Alert.alert(
+                  showAlert(
                     'Export Saved',
                     `Your data has been saved to:\n${fileUri}`,
                     [{ text: 'OK' }],
@@ -173,7 +173,7 @@ const DataPrivacyScreen = () => {
               }
 
               // Log successful export for compliance
-              Alert.alert(
+              showAlert(
                 'Export Completed',
                 `Your data export includes:\n\n` +
                   `• Profile information\n` +
@@ -187,7 +187,7 @@ const DataPrivacyScreen = () => {
               );
             } catch (error) {
               logger.error('[DataPrivacy] Error exporting data:', error);
-              Alert.alert(
+              showAlert(
                 'Export Failed',
                 error instanceof Error
                   ? error.message
@@ -204,7 +204,7 @@ const DataPrivacyScreen = () => {
   };
 
   const handleDeleteAccount = async () => {
-    Alert.alert(
+    showAlert(
       'Delete Account',
       'Are you sure you want to delete your account? This action will:\n\n' +
         '• Schedule your account for deletion in 30 days\n' +
@@ -230,7 +230,7 @@ const DataPrivacyScreen = () => {
 
               if (error) throw error as Error;
 
-              Alert.alert(
+              showAlert(
                 'Account Deletion Scheduled',
                 'Your account will be deleted in 30 days. You can cancel this request anytime before then.',
                 [
@@ -276,7 +276,7 @@ const DataPrivacyScreen = () => {
       if (error) throw error;
 
       // Navigate to consent history screen or show modal
-      Alert.alert(
+      showAlert(
         'Consent History',
         `You have ${data.length} consent records. View them in the app.`,
       );
@@ -357,7 +357,10 @@ const DataPrivacyScreen = () => {
             <Switch
               value={consents.marketingConsent}
               onValueChange={(value) => updateConsent('marketing', value)}
-              trackColor={{ false: COLORS.disabled, true: COLORS.brand.primary }}
+              trackColor={{
+                false: COLORS.disabled,
+                true: COLORS.brand.primary,
+              }}
             />
           </View>
 
@@ -371,7 +374,10 @@ const DataPrivacyScreen = () => {
             <Switch
               value={consents.analyticsConsent}
               onValueChange={(value) => updateConsent('analytics', value)}
-              trackColor={{ false: COLORS.disabled, true: COLORS.brand.primary }}
+              trackColor={{
+                false: COLORS.disabled,
+                true: COLORS.brand.primary,
+              }}
             />
           </View>
         </View>

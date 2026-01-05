@@ -28,8 +28,8 @@ import {
   Dimensions,
   KeyboardAvoidingView,
   Platform,
-  Alert,
 } from 'react-native';
+import { showAlert } from '@/stores/modalStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -53,8 +53,8 @@ import {
   type FormStep,
 } from '@/components/ui/FormStepIndicator';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { CurrencySelectionBottomSheet } from '@/components/CurrencySelectionBottomSheet';
-import { LazyLocationPicker } from '@/components/LazyLocationPicker';
+import { CurrencySelectionBottomSheet } from '@/features/payments/components/CurrencySelectionBottomSheet';
+import { LazyLocationPicker } from '../components/LazyLocationPicker';
 import { useMoments } from '@/hooks/useMoments';
 import { useToast } from '@/context/ToastContext';
 
@@ -170,10 +170,10 @@ const CreateMomentScreen: React.FC = () => {
   const handleDrop = useCallback(async () => {
     if (!title || !selectedCategory || !imageUri || !locationName) {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(
-        t('screens.createMoment.missingInfoTitle'),
-        t('screens.createMoment.missingInfoMessage'),
-      );
+      showAlert({
+        title: t('screens.createMoment.missingInfoTitle'),
+        message: t('screens.createMoment.missingInfoMessage'),
+      });
       return;
     }
 
@@ -181,7 +181,10 @@ const CreateMomentScreen: React.FC = () => {
     const amount = parseFloat(requestedAmount);
     if (!amount || amount < 1) {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert('Geçersiz Miktar', 'Hediye beklentisi en az 1 olmalıdır.');
+      showAlert({
+        title: 'Geçersiz Miktar',
+        message: 'Hediye beklentisi en az 1 olmalıdır.',
+      });
       return;
     }
 
@@ -214,16 +217,16 @@ const CreateMomentScreen: React.FC = () => {
         await Haptics.notificationAsync(
           Haptics.NotificationFeedbackType.Success,
         );
-        Alert.alert(
-          t('screens.createMoment.successTitle'),
-          t('screens.createMoment.successMessage'),
-          [
+        showAlert({
+          title: t('screens.createMoment.successTitle'),
+          message: t('screens.createMoment.successMessage'),
+          buttons: [
             {
               text: t('screens.createMoment.successButton'),
               onPress: () => navigation.navigate('Discover'),
             },
           ],
-        );
+        });
       } else {
         await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         showToast('Could not create moment. Please try again.', 'error');
