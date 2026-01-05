@@ -132,7 +132,9 @@ const ProofFlowScreen = lazyLoad(() =>
   })),
 );
 const ProofDetailScreen = lazyLoad(() =>
-  import('../features/profile').then((m) => ({ default: m.ProofDetailScreen })),
+  import('../features/verifications').then((m) => ({
+    default: m.ProofDetailScreen,
+  })),
 );
 // NEW: MomentProofCeremony (Anı Mühürleme)
 const MomentProofCeremony = lazyLoad(() =>
