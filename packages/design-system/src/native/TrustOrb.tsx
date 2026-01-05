@@ -1,5 +1,5 @@
 /**
- * TrustConstellation - Awwwards Edition
+ * TrustOrb - Design System Native Component
  *
  * Premium visual representation of user trust metrics.
  * Features:
@@ -7,9 +7,26 @@
  * - Connecting lines between trust factors
  * - Gradient fills with neon accents
  * - Interactive touch feedback
+ *
+ * Note: Renamed from TrustConstellation to avoid naming collision
+ * with verifications/TrustConstellation (milestone-based).
+ *
+ * @example
+ * ```tsx
+ * import { TrustOrb } from '@travelmatch/design-system/native';
+ *
+ * <TrustOrb
+ *   trustScore={85}
+ *   size={280}
+ *   factors={[
+ *     { id: 'identity', label: 'Kimlik', value: 85, icon: '🪪' },
+ *     { id: 'social', label: 'Sosyal', value: 72, icon: '👥' },
+ *   ]}
+ * />
+ * ```
  */
 import React, { useEffect, useMemo } from 'react';
-import { View, StyleSheet, Text, Platform } from 'react-native';
+import { View, StyleSheet, Text, Platform, type ViewStyle } from 'react-native';
 import Svg, {
   Circle,
   Line,
@@ -29,27 +46,81 @@ import Animated, {
   Easing,
   interpolate,
 } from 'react-native-reanimated';
-import { PROFILE_COLORS, getTrustLevel, getTrustColors } from '../constants/theme';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-interface TrustFactor {
+// =============================================================================
+// THEME COLORS - Design System Native Palette
+// =============================================================================
+const CONSTELLATION_COLORS = {
+  // Background layers (Twilight Zinc)
+  background: {
+    primary: '#121214',
+    secondary: '#1E1E20',
+    tertiary: '#27272A',
+    elevated: '#3F3F46',
+  },
+
+  // Glass effects (Liquid Glass)
+  glass: {
+    background: 'rgba(30, 30, 32, 0.85)',
+    border: 'rgba(255, 255, 255, 0.08)',
+    borderActive: 'rgba(255, 255, 255, 0.15)',
+  },
+
+  // Text on dark (High Legibility)
+  text: {
+    primary: '#F8FAFC',
+    secondary: '#94A3B8',
+    tertiary: '#64748B',
+  },
+
+  // Neon accent colors (Neon Energy)
+  neon: {
+    lime: '#DFFF00',
+    violet: '#A855F7',
+    cyan: '#06B6D4',
+    rose: '#F43F5E',
+    amber: '#F59E0B',
+    emerald: '#10B981',
+  },
+
+  // Trust levels
+  trust: {
+    platinum: '#E5E4E2',
+    gold: '#FFD700',
+    silver: '#C0C0C0',
+    bronze: '#CD7F32',
+    basic: '#71717A',
+  },
+};
+
+// =============================================================================
+// TYPES
+// =============================================================================
+export interface TrustFactor {
   id: string;
   label: string;
   value: number; // 0-100
   icon: string;
 }
 
-interface TrustConstellationProps {
+export interface TrustOrbProps {
   /** Overall trust score 0-100 */
   trustScore?: number;
   /** Size of the constellation canvas */
   size?: number;
   /** Individual trust factors */
   factors?: TrustFactor[];
+  /** Custom style for container */
+  style?: ViewStyle;
+  /** Disable animations for performance */
+  disableAnimations?: boolean;
 }
 
-// Default trust factors if not provided
+// =============================================================================
+// DEFAULT DATA
+// =============================================================================
 const DEFAULT_FACTORS: TrustFactor[] = [
   { id: 'identity', label: 'Kimlik', value: 85, icon: '🪪' },
   { id: 'social', label: 'Sosyal', value: 72, icon: '👥' },
@@ -58,12 +129,10 @@ const DEFAULT_FACTORS: TrustFactor[] = [
   { id: 'activity', label: 'Aktivite', value: 68, icon: '📍' },
 ];
 
-// Calculate node positions in a circular pattern
-const calculateNodePositions = (
-  count: number,
-  size: number,
-  centerOffset: number = 0
-) => {
+// =============================================================================
+// HELPERS
+// =============================================================================
+const calculateNodePositions = (count: number, size: number) => {
   const center = size / 2;
   const radius = (size / 2) * 0.7;
   const positions: { x: number; y: number }[] = [];
@@ -71,41 +140,89 @@ const calculateNodePositions = (
   for (let i = 0; i < count; i++) {
     const angle = (i * 2 * Math.PI) / count - Math.PI / 2;
     positions.push({
-      x: center + radius * Math.cos(angle) + centerOffset,
-      y: center + radius * Math.sin(angle) + centerOffset,
+      x: center + radius * Math.cos(angle),
+      y: center + radius * Math.sin(angle),
     });
   }
 
   return positions;
 };
 
-// Individual star node component
+const getTrustLevel = (score: number): string => {
+  if (score >= 90) return 'platinum';
+  if (score >= 75) return 'gold';
+  if (score >= 50) return 'silver';
+  if (score >= 25) return 'bronze';
+  return 'basic';
+};
+
+const getTrustColors = (score: number): [string, string] => {
+  if (score >= 90)
+    return [
+      CONSTELLATION_COLORS.trust.platinum,
+      CONSTELLATION_COLORS.neon.cyan,
+    ];
+  if (score >= 75)
+    return [CONSTELLATION_COLORS.trust.gold, CONSTELLATION_COLORS.neon.lime];
+  if (score >= 50)
+    return [
+      CONSTELLATION_COLORS.trust.silver,
+      CONSTELLATION_COLORS.neon.violet,
+    ];
+  if (score >= 25)
+    return [CONSTELLATION_COLORS.trust.bronze, CONSTELLATION_COLORS.neon.amber];
+  return [CONSTELLATION_COLORS.trust.basic, CONSTELLATION_COLORS.neon.rose];
+};
+
+const getNodeColor = (value: number): string => {
+  if (value >= 80) return CONSTELLATION_COLORS.neon.lime;
+  if (value >= 60) return CONSTELLATION_COLORS.neon.cyan;
+  if (value >= 40) return CONSTELLATION_COLORS.neon.amber;
+  return CONSTELLATION_COLORS.neon.rose;
+};
+
+// =============================================================================
+// STAR NODE COMPONENT
+// =============================================================================
 interface StarNodeProps {
   x: number;
   y: number;
   value: number;
   delay: number;
   color: string;
+  disableAnimations?: boolean;
 }
 
-const StarNode: React.FC<StarNodeProps> = ({ x, y, value, delay, color }) => {
+const StarNode: React.FC<StarNodeProps> = ({
+  x,
+  y,
+  value,
+  delay,
+  color,
+  disableAnimations,
+}) => {
   const pulse = useSharedValue(0);
   const nodeSize = interpolate(value, [0, 100], [6, 14]);
   const glowSize = nodeSize * 2.5;
 
   useEffect(() => {
+    if (disableAnimations) {
+      pulse.value = 0.5;
+      return;
+    }
+
     pulse.value = withDelay(
       delay,
       withRepeat(
         withSequence(
           withTiming(1, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
-          withTiming(0, { duration: 1500, easing: Easing.inOut(Easing.ease) })
+          withTiming(0, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
         ),
         -1,
-        false
-      )
+        false,
+      ),
     );
-  }, [delay, pulse]);
+  }, [delay, pulse, disableAnimations]);
 
   const animatedGlowProps = useAnimatedProps(() => ({
     opacity: interpolate(pulse.value, [0, 1], [0.2, 0.5]),
@@ -114,21 +231,13 @@ const StarNode: React.FC<StarNodeProps> = ({ x, y, value, delay, color }) => {
 
   return (
     <G>
-      {/* Glow effect */}
       <AnimatedCircle
         cx={x}
         cy={y}
         fill={color}
         animatedProps={animatedGlowProps}
       />
-      {/* Core node */}
-      <Circle
-        cx={x}
-        cy={y}
-        r={nodeSize}
-        fill={color}
-      />
-      {/* Inner bright spot */}
+      <Circle cx={x} cy={y} r={nodeSize} fill={color} />
       <Circle
         cx={x - nodeSize * 0.2}
         cy={y - nodeSize * 0.2}
@@ -139,35 +248,49 @@ const StarNode: React.FC<StarNodeProps> = ({ x, y, value, delay, color }) => {
   );
 };
 
-export const TrustConstellation: React.FC<TrustConstellationProps> = ({
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
+export const TrustOrb: React.FC<TrustOrbProps> = ({
   trustScore = 80,
   size = 280,
   factors = DEFAULT_FACTORS,
+  style,
+  disableAnimations = false,
 }) => {
   const fadeIn = useSharedValue(0);
   const centerPulse = useSharedValue(0);
 
-  const [primaryColor, secondaryColor] = getTrustColors(trustScore);
+  const [primaryColor] = getTrustColors(trustScore);
   const trustLevel = getTrustLevel(trustScore);
 
   const positions = useMemo(
     () => calculateNodePositions(factors.length, size),
-    [factors.length, size]
+    [factors.length, size],
   );
 
   const center = size / 2;
 
   useEffect(() => {
-    fadeIn.value = withTiming(1, { duration: 800, easing: Easing.out(Easing.ease) });
+    if (disableAnimations) {
+      fadeIn.value = 1;
+      centerPulse.value = 0.5;
+      return;
+    }
+
+    fadeIn.value = withTiming(1, {
+      duration: 800,
+      easing: Easing.out(Easing.ease),
+    });
     centerPulse.value = withRepeat(
       withSequence(
         withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0, { duration: 2000, easing: Easing.inOut(Easing.ease) })
+        withTiming(0, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
       ),
       -1,
-      false
+      false,
     );
-  }, [fadeIn, centerPulse]);
+  }, [fadeIn, centerPulse, disableAnimations]);
 
   const containerAnimatedStyle = useAnimatedStyle(() => ({
     opacity: fadeIn.value,
@@ -176,21 +299,11 @@ export const TrustConstellation: React.FC<TrustConstellationProps> = ({
 
   const centerGlowAnimatedStyle = useAnimatedStyle(() => ({
     opacity: interpolate(centerPulse.value, [0, 1], [0.3, 0.6]),
-    transform: [
-      { scale: interpolate(centerPulse.value, [0, 1], [1, 1.2]) },
-    ],
+    transform: [{ scale: interpolate(centerPulse.value, [0, 1], [1, 1.2]) }],
   }));
 
-  // Get color based on factor value
-  const getNodeColor = (value: number): string => {
-    if (value >= 80) return PROFILE_COLORS.neon.lime;
-    if (value >= 60) return PROFILE_COLORS.neon.cyan;
-    if (value >= 40) return PROFILE_COLORS.neon.amber;
-    return PROFILE_COLORS.neon.rose;
-  };
-
   return (
-    <View style={[styles.container, { width: size, height: size }]}>
+    <View style={[styles.container, { width: size, height: size }, style]}>
       <Animated.View style={[styles.svgContainer, containerAnimatedStyle]}>
         <Svg width={size} height={size}>
           <Defs>
@@ -211,23 +324,21 @@ export const TrustConstellation: React.FC<TrustConstellationProps> = ({
           {/* Connection lines */}
           {positions.map((pos, index) => (
             <G key={`line-${index}`}>
-              {/* Line to center */}
               <Line
                 x1={center}
                 y1={center}
                 x2={pos.x}
                 y2={pos.y}
-                stroke={PROFILE_COLORS.glass.border}
+                stroke={CONSTELLATION_COLORS.glass.border}
                 strokeWidth={1}
                 strokeDasharray="4,4"
               />
-              {/* Line to next node */}
               <Line
                 x1={pos.x}
                 y1={pos.y}
-                x2={positions[(index + 1) % positions.length].x}
-                y2={positions[(index + 1) % positions.length].y}
-                stroke={PROFILE_COLORS.glass.borderActive}
+                x2={positions[(index + 1) % positions.length]?.x ?? center}
+                y2={positions[(index + 1) % positions.length]?.y ?? center}
+                stroke={CONSTELLATION_COLORS.glass.borderActive}
                 strokeWidth={1.5}
               />
             </G>
@@ -242,6 +353,7 @@ export const TrustConstellation: React.FC<TrustConstellationProps> = ({
               value={factors[index]?.value ?? 50}
               delay={index * 200}
               color={getNodeColor(factors[index]?.value ?? 50)}
+              disableAnimations={disableAnimations}
             />
           ))}
 
@@ -250,16 +362,11 @@ export const TrustConstellation: React.FC<TrustConstellationProps> = ({
             cx={center}
             cy={center}
             r={28}
-            fill={PROFILE_COLORS.background.secondary}
+            fill={CONSTELLATION_COLORS.background.secondary}
             stroke={primaryColor}
             strokeWidth={3}
           />
-          <Circle
-            cx={center}
-            cy={center}
-            r={20}
-            fill={`${primaryColor}30`}
-          />
+          <Circle cx={center} cy={center} r={20} fill={`${primaryColor}30`} />
         </Svg>
 
         {/* Center glow animation */}
@@ -272,7 +379,9 @@ export const TrustConstellation: React.FC<TrustConstellationProps> = ({
         />
 
         {/* Center trust score text */}
-        <View style={[styles.centerText, { top: center - 16, left: center - 20 }]}>
+        <View
+          style={[styles.centerText, { top: center - 16, left: center - 20 }]}
+        >
           <Text style={[styles.trustScoreValue, { color: primaryColor }]}>
             {trustScore}
           </Text>
@@ -315,6 +424,9 @@ export const TrustConstellation: React.FC<TrustConstellationProps> = ({
   );
 };
 
+// =============================================================================
+// STYLES
+// =============================================================================
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
@@ -333,10 +445,10 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: PROFILE_COLORS.neon.lime,
+    backgroundColor: CONSTELLATION_COLORS.neon.lime,
     ...Platform.select({
       ios: {
-        shadowColor: PROFILE_COLORS.neon.lime,
+        shadowColor: CONSTELLATION_COLORS.neon.lime,
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.5,
         shadowRadius: 20,
@@ -367,7 +479,7 @@ const styles = StyleSheet.create({
   factorText: {
     fontSize: 10,
     fontWeight: '600',
-    color: PROFILE_COLORS.text.secondary,
+    color: CONSTELLATION_COLORS.text.secondary,
     letterSpacing: 0.3,
   },
   levelBadge: {
@@ -377,7 +489,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 12,
     borderWidth: 1,
-    backgroundColor: PROFILE_COLORS.background.secondary,
+    backgroundColor: CONSTELLATION_COLORS.background.secondary,
   },
   levelText: {
     fontSize: 10,
@@ -386,4 +498,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TrustConstellation;
+// Backward compatibility alias
+export { TrustOrb as TrustConstellation };
+export type { TrustOrbProps as TrustConstellationProps };
+
+export default TrustOrb;

@@ -1,12 +1,15 @@
 /**
- * TrustConstellation Component
+ * TrustMilestones Component
  *
  * Visual star map representation of trust milestones.
  * Each verification milestone is a star, connections between them show trust level.
  *
+ * Note: Renamed from TrustConstellation to avoid naming collision
+ * with design-system TrustOrb (score-based visualization).
+ *
  * @example
  * ```tsx
- * <TrustConstellation
+ * <TrustMilestones
  *   milestones={user.verificationMilestones}
  *   score={user.trustScore}
  *   size="lg"
@@ -49,7 +52,7 @@ const AnimatedLine = Animated.createAnimatedComponent(Line);
 
 type ConstellationSize = 'sm' | 'md' | 'lg';
 
-interface TrustConstellationProps {
+interface TrustMilestonesProps {
   /** User's milestones */
   milestones: TrustMilestone[];
   /** Total trust score (0-100) - legacy compatibility */
@@ -72,7 +75,7 @@ const getSizeValue = (size: ConstellationSize): number => {
   return CEREMONY_SIZES.constellation[size];
 };
 
-export const TrustConstellation: React.FC<TrustConstellationProps> = ({
+export const TrustMilestones: React.FC<TrustMilestonesProps> = ({
   milestones = DEFAULT_MILESTONES,
   score: _score = 0,
   size = 'md',
@@ -496,4 +499,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TrustConstellation;
+// Backward compatibility alias
+export { TrustMilestones as TrustConstellation };
+export type { TrustMilestonesProps as TrustConstellationProps };
+
+export default TrustMilestones;

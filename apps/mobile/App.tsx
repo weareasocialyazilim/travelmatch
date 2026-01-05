@@ -14,6 +14,7 @@ import { ConfirmationProvider } from './src/context/ConfirmationContext';
 import { NetworkProvider } from './src/context/NetworkContext';
 import { RealtimeProvider } from './src/context/RealtimeContext';
 import { ToastProvider } from './src/context/ToastContext';
+import { ModalProvider } from './src/providers';
 import { useFeedbackPrompt } from './src/hooks/useFeedbackPrompt';
 import AppNavigator from './src/navigation/AppNavigator';
 import { logger } from './src/utils/logger';
@@ -262,22 +263,21 @@ function App() {
     >
       <ErrorBoundary level="app">
         <ProviderComposer providers={appProviders}>
-          <StatusBar style="auto" />
-          <AppNavigator />
-          <FeedbackModal
-            visible={showFeedback}
-            onClose={dismissFeedback}
-          />
-          <PendingTransactionsModal
-            visible={showPendingModal}
-            payments={pendingPayments}
-            uploads={pendingUploads}
-            onResumePayment={handleResumePayment}
-            onResumeUpload={handleResumeUpload}
-            onDismissPayment={handleDismissPayment}
-            onDismissUpload={handleDismissUpload}
-            onClose={handleClosePendingModal}
-          />
+          <ModalProvider>
+            <StatusBar style="auto" />
+            <AppNavigator />
+            <FeedbackModal visible={showFeedback} onClose={dismissFeedback} />
+            <PendingTransactionsModal
+              visible={showPendingModal}
+              payments={pendingPayments}
+              uploads={pendingUploads}
+              onResumePayment={handleResumePayment}
+              onResumeUpload={handleResumeUpload}
+              onDismissPayment={handleDismissPayment}
+              onDismissUpload={handleDismissUpload}
+              onClose={handleClosePendingModal}
+            />
+          </ModalProvider>
         </ProviderComposer>
       </ErrorBoundary>
     </GestureHandlerRootView>

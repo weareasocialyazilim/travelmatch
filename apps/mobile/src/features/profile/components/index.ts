@@ -4,10 +4,21 @@
  * All Profile-specific components following feature-based architecture.
  */
 
+// Design System Components (migrated)
+// TrustOrb - Premium trust score visualization
+export {
+  TrustOrb,
+  TrustConstellation,
+} from '@travelmatch/design-system/native';
+export type {
+  TrustOrbProps,
+  TrustConstellationProps,
+  TrustFactor,
+} from '@travelmatch/design-system/native';
+
 // Existing components
 export { AchievementCard } from './AchievementCard';
 export type { default as AchievementCardProps } from './AchievementCard';
-export { TrustConstellation } from './TrustConstellation';
 
 // Migrated components from components/ folder
 export { LeaveTrustNoteBottomSheet } from './LeaveTrustNoteBottomSheet';
