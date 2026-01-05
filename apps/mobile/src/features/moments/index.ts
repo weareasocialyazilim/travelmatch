@@ -12,7 +12,7 @@
 // ===================================
 // SCREENS
 // ===================================
-export { default as DiscoverScreen } from './screens/DiscoverScreen';
+// NOTE: DiscoverScreen is exported from @/features/discover - single source of truth
 export { default as MomentDetailScreen } from './screens/MomentDetailScreen';
 export { default as CreateMomentScreen } from './screens/CreateMomentScreen';
 

@@ -1,0 +1,12 @@
+-- ============================================================================
+-- TravelMatch Functions and Triggers v2.0
+-- 
+-- All functions consolidated. SECURITY DEFINER functions have:
+--   - SET search_path = public, pg_temp
+--   - Internal auth.uid() verification
+-- ============================================================================
+
+-- TODO: Extract functions using:
+-- \df+ in psql
+-- or
+-- SELECT pg_get_functiondef(oid) FROM pg_proc WHERE pronamespace = 'public'::regnamespace;

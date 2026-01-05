@@ -7,7 +7,12 @@
  */
 
 // Core ceremony components
-export { TrustConstellation } from './TrustConstellation';
+// TrustMilestones - Milestone-based trust visualization (renamed from TrustConstellation)
+export { TrustMilestones, TrustConstellation } from './TrustMilestones';
+export type {
+  TrustMilestonesProps,
+  TrustConstellationProps,
+} from './TrustMilestones';
 export { SunsetClock } from './SunsetClock';
 export { PassportBook } from './PassportBook';
 export { MomentAuthenticator } from './MomentAuthenticator';

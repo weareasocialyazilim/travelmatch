@@ -49,7 +49,7 @@ import { useStories } from '@/hooks/useStories';
 import { useAuth } from '@/hooks/useAuth';
 import { COLORS } from '@/constants/colors';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
-import { LoginPromptModal } from '@/components/LoginPromptModal';
+import { showLoginPrompt } from '@/stores/modalStore';
 import type { NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
@@ -125,11 +125,7 @@ const DiscoverScreen = () => {
 
   const { user, isGuest } = useAuth();
 
-  // Login prompt modal state
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-  const [loginPromptAction, setLoginPromptAction] = useState<
-    'gift' | 'chat' | 'save' | 'default'
-  >('default');
+  // Pending moment for post-login action
   const [pendingMoment, setPendingMoment] = useState<Moment | null>(null);
 
   // Use real stories data from hook instead of mock data
@@ -247,11 +243,10 @@ const DiscoverScreen = () => {
     (moment: Moment) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-      // Guest kullanıcı kontrolü - LoginPromptModal göster
+      // Guest kullanıcı kontrolü - showLoginPrompt via modalStore
       if (isGuest || !user) {
         setPendingMoment(moment);
-        setLoginPromptAction('gift');
-        setShowLoginPrompt(true);
+        showLoginPrompt({ action: 'gift' });
         return;
       }
 
@@ -270,11 +265,10 @@ const DiscoverScreen = () => {
     (moment: Moment) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
-      // Guest kullanıcı kontrolü
+      // Guest kullanıcı kontrolü - showLoginPrompt via modalStore
       if (isGuest || !user) {
         setPendingMoment(moment);
-        setLoginPromptAction('save');
-        setShowLoginPrompt(true);
+        showLoginPrompt({ action: 'save' });
         return;
       }
 
@@ -283,21 +277,10 @@ const DiscoverScreen = () => {
     [isGuest, user],
   );
 
-  // Login Modal Handlers
+  // Login Modal Handlers - Now using centralized modalStore
   const handleLoginModalClose = useCallback(() => {
-    setShowLoginPrompt(false);
     setPendingMoment(null);
   }, []);
-
-  const handleLoginPress = useCallback(() => {
-    setShowLoginPrompt(false);
-    navigation.navigate('Login' as any);
-  }, [navigation]);
-
-  const handleRegisterPress = useCallback(() => {
-    setShowLoginPrompt(false);
-    navigation.navigate('Register' as any);
-  }, [navigation]);
 
   // Handle User Press
   const handleUserPress = useCallback(
@@ -477,15 +460,7 @@ const DiscoverScreen = () => {
         </View>
       )}
 
-      {/* Guest Login Prompt Modal */}
-      <LoginPromptModal
-        visible={showLoginPrompt}
-        onClose={handleLoginModalClose}
-        onLogin={handleLoginPress}
-        onRegister={handleRegisterPress}
-        action={loginPromptAction}
-      />
-
+      {/* Guest Login Prompt Modal - Now rendered by ModalProvider */}
       {/* FloatingDock is rendered by MainTabNavigator */}
     </View>
   );

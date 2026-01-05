@@ -70,6 +70,15 @@ export const defaultNativeConfig: NativeComponentsConfig = {
 // COMPONENT EXPORTS (Placeholders - will be actual components after migration)
 // =============================================================================
 
+// ✅ MIGRATED COMPONENTS
+// TrustOrb - Premium trust visualization (renamed from TrustConstellation to avoid collision)
+export { TrustOrb, TrustConstellation } from './TrustOrb';
+export type {
+  TrustOrbProps,
+  TrustConstellationProps,
+  TrustFactor,
+} from './TrustOrb';
+
 // Placeholder exports - these will be replaced as components are migrated
 export const MIGRATION_STATUS = {
   TMButton: 'pending',
@@ -81,7 +90,7 @@ export const MIGRATION_STATUS = {
   LiquidSegmentedControl: 'pending',
   LiquidSelection: 'pending',
   TMTrustRing: 'pending',
-  TrustConstellation: 'pending',
+  TrustOrb: 'done', // ✅ Migrated (formerly TrustConstellation)
   TrustScoreCircle: 'pending',
   SuccessCeremony: 'pending',
   TMLoading: 'pending',
