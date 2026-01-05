@@ -12,11 +12,13 @@ export { UserProfileScreen } from './screens/UserProfileScreen';
 export { default as TrustGardenDetailScreen } from './screens/TrustGardenDetailScreen';
 export { TrustNotesScreen } from './screens/TrustNotesScreen';
 
-// Proof System - now in features/verifications
-// Re-exported for backward compatibility
-export { ProofFlowScreen } from './screens/ProofFlowScreen';
-export { ProofDetailScreen } from './screens/ProofDetailScreen';
-export { ProofHistoryScreen } from './screens/ProofHistoryScreen';
+// Proof System - canonical source is features/verifications
+// Re-exported here for backward compatibility only
+export {
+  ProofFlowScreen,
+  ProofDetailScreen,
+  ProofHistoryScreen,
+} from '@/features/verifications';
 
 // Note: ReviewScreen is in features/reviews
 

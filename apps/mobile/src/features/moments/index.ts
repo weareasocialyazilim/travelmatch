@@ -12,9 +12,11 @@
 // ===================================
 // SCREENS
 // ===================================
-// NOTE: DiscoverScreen is exported from @/features/discover - single source of truth
-export { default as MomentDetailScreen } from './screens/MomentDetailScreen';
+// DiscoverScreen - canonical source is features/discover
+export { default as DiscoverScreen } from '@/features/discover/screens/DiscoverScreen';
 export { default as CreateMomentScreen } from './screens/CreateMomentScreen';
+// MomentDetailScreen - canonical source is features/profile
+export { default as MomentDetailScreen } from '@/features/profile/screens/MomentDetailScreen';
 
 // ===================================
 // COMPONENTS
