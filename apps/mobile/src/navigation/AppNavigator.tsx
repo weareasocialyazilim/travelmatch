@@ -89,11 +89,8 @@ import {
 // ===================================
 import { SearchMapScreen } from '../features/discover';
 import { InboxScreen } from '../features/inbox';
-// WalletScreen is imported from payments feature, not wallet feature
-// import { WalletScreen as WalletFeatureScreen } from '../features/wallet';
 import { NotificationsScreen } from '../features/notifications';
 import { CheckoutScreen } from '../features/payments';
-// ZOMBIE CLEANUP: ReviewScreen removed - Trust Notes replaced this
 import { ChatDetailScreen } from '../features/messages';
 
 // ===================================
@@ -232,7 +229,6 @@ import {
 
 // ===================================
 // GIFTS FEATURE SCREENS
-// ZOMBIE CLEANUP: GiftCardMarketScreen removed - legacy gift card system
 // ===================================
 import {
   GiftInboxScreen,
@@ -305,11 +301,6 @@ import {
   KVKKAydinlatmaScreen,
   MesafeliSatisScreen,
 } from '../features/settings/screens/legal';
-
-// ===================================
-// ZOMBIE CLEANUP: Calendar feature removed
-// MyCalendarScreen was legacy hotel/flight booking UI
-// ===================================
 
 // ===================================
 // TYPE IMPORTS
@@ -595,8 +586,6 @@ const AppNavigator = () => {
               component={CheckoutScreen}
               options={{ presentation: 'modal' }}
             />
-            {/* ZOMBIE CLEANUP: Review screen removed - replaced by Trust Notes */}
-
             {/* Transactions */}
             <Stack.Screen
               name="TransactionDetail"
@@ -812,8 +801,6 @@ const AppNavigator = () => {
               options={{ animation: 'slide_from_right' }}
             />
 
-            {/* ZOMBIE CLEANUP: MyCalendar removed - legacy hotel/flight booking UI */}
-
             {/* Image Viewer */}
             <Stack.Screen
               name="ImageViewer"
@@ -844,7 +831,6 @@ const AppNavigator = () => {
               name="DietaryPreferences"
               component={DietaryPreferencesScreen}
             />
-            {/* ZOMBIE CLEANUP: GiftCardMarket removed - legacy gift card system */}
             <Stack.Screen name="NotFound" component={NotFoundScreen} />
             <Stack.Screen
               name="PickLocation"
