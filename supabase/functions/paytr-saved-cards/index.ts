@@ -14,6 +14,7 @@ const logger = new Logger();
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import { createSupabaseClients, requireAuth } from '../_shared/supabase.ts';
+import { getCorsHeaders } from '../_shared/cors.ts';
 
 // =============================================================================
 // TYPES
@@ -32,21 +33,13 @@ interface SavedCard {
 }
 
 // =============================================================================
-// CORS HEADERS
-// =============================================================================
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-};
-
-// =============================================================================
 // MAIN HANDLER
 // =============================================================================
 
 serve(async (req: Request) => {
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -78,7 +71,7 @@ serve(async (req: Request) => {
             {
               status: 400,
               headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            }
+            },
           );
         }
         return handleDeleteCard(adminClient, userId, cardId);
@@ -96,7 +89,7 @@ serve(async (req: Request) => {
           {
             status: 405,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
+          },
         );
     }
   } catch (error) {
@@ -111,7 +104,7 @@ serve(async (req: Request) => {
         {
           status: 401,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -123,7 +116,7 @@ serve(async (req: Request) => {
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      },
     );
   }
 });
@@ -149,7 +142,7 @@ async function handleListCards(adminClient: any, userId: string) {
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      },
     );
   }
 
@@ -174,14 +167,14 @@ async function handleListCards(adminClient: any, userId: string) {
     {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    }
+    },
   );
 }
 
 async function handleDeleteCard(
   adminClient: any,
   userId: string,
-  cardId: string
+  cardId: string,
 ) {
   // Verify card belongs to user
   const { data: card, error: fetchError } = await adminClient
@@ -199,7 +192,7 @@ async function handleDeleteCard(
       {
         status: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      },
     );
   }
 
@@ -212,7 +205,7 @@ async function handleDeleteCard(
       {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      },
     );
   }
 
@@ -231,7 +224,7 @@ async function handleDeleteCard(
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      },
     );
   }
 
@@ -250,14 +243,14 @@ async function handleDeleteCard(
     {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    }
+    },
   );
 }
 
 async function handleSetDefault(
   adminClient: any,
   userId: string,
-  cardId: string
+  cardId: string,
 ) {
   if (!cardId) {
     return new Response(
@@ -268,7 +261,7 @@ async function handleSetDefault(
       {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      },
     );
   }
 
@@ -288,7 +281,7 @@ async function handleSetDefault(
       {
         status: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      },
     );
   }
 
@@ -301,7 +294,7 @@ async function handleSetDefault(
       {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      },
     );
   }
 
@@ -320,7 +313,7 @@ async function handleSetDefault(
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      },
     );
   }
 
@@ -331,6 +324,6 @@ async function handleSetDefault(
     {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    }
+    },
   );
 }

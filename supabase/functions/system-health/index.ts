@@ -26,24 +26,23 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { createLogger } from '../_shared/logger.ts';
 import { resilience, CircuitState } from '../_shared/resilience.ts';
 import { healthChecker } from '../_shared/observability.ts';
+import { getCorsHeaders } from '../_shared/cors.ts';
 
 const logger = createLogger('system-health');
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-};
 
 // Register health checks for core services
 healthChecker.register('database', async () => {
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
   );
 
   const start = performance.now();
-  const { error } = await supabase.from('users').select('count').limit(1).single();
+  const { error } = await supabase
+    .from('users')
+    .select('count')
+    .limit(1)
+    .single();
   const latencyMs = performance.now() - start;
 
   return {
@@ -56,7 +55,7 @@ healthChecker.register('database', async () => {
 healthChecker.register('auth', async () => {
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
   );
 
   const start = performance.now();
@@ -78,6 +77,9 @@ healthChecker.register('auth', async () => {
 });
 
 serve(async (req) => {
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   // CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -96,7 +98,10 @@ serve(async (req) => {
       if (!isAdmin) {
         return new Response(
           JSON.stringify({ error: 'Admin access required' }),
-          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          {
+            status: 403,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          },
         );
       }
 
@@ -105,8 +110,13 @@ serve(async (req) => {
 
       if (!service || typeof enabled !== 'boolean') {
         return new Response(
-          JSON.stringify({ error: 'Invalid request. Provide service and enabled fields.' }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          JSON.stringify({
+            error: 'Invalid request. Provide service and enabled fields.',
+          }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          },
         );
       }
 
@@ -117,7 +127,7 @@ serve(async (req) => {
           success: true,
           message: `Service ${service} maintenance mode: ${enabled ? 'enabled' : 'disabled'}`,
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
       );
     }
 
@@ -151,7 +161,7 @@ serve(async (req) => {
               'Content-Type': 'application/json',
               'Cache-Control': 'no-cache, no-store, must-revalidate',
             },
-          }
+          },
         );
       }
 
@@ -193,7 +203,7 @@ serve(async (req) => {
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      },
     );
   }
 });
@@ -209,16 +219,18 @@ async function checkAdminAuth(authHeader: string | null): Promise<boolean> {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: `Bearer ${token}` } } }
+      { global: { headers: { Authorization: `Bearer ${token}` } } },
     );
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return false;
 
     // Check admin role
     const adminClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
     const { data: profile } = await adminClient

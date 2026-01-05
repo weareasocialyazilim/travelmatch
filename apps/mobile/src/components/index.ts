@@ -82,11 +82,13 @@ export { SetPriceBottomSheet } from '@/features/moments/components/SetPriceBotto
 
 // Profile Components - Taşındı: features/profile/components
 export {
-  LeaveTrustNoteBottomSheet,
   UnblockUserBottomSheet,
   KYCBadge,
 } from '@/features/profile/components';
 export type { KYCLevel } from '@/features/profile/components/KYCBadge';
+
+// LeaveTrustNoteBottomSheet - Artık ui/ altında (tek kaynak)
+export { LeaveTrustNoteBottomSheet } from './ui/LeaveTrustNoteBottomSheet';
 
 export { FilterBottomSheet } from './FilterBottomSheet';
 export { FeedbackModal } from './FeedbackModal';

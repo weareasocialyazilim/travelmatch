@@ -22,8 +22,8 @@ import {
   Dimensions,
   StatusBar,
   FlatList,
-  Alert,
 } from 'react-native';
+import { showAlert } from '@/stores/modalStore';
 import * as Haptics from 'expo-haptics';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -207,7 +207,7 @@ const WalletScreen = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     if (pendingProofItems.length === 0) {
-      Alert.alert(
+      showAlert(
         'Bekleyen Bakiye',
         'Bekleyen bakiyeniz PayTR tarafından işleniyor. 1-3 iş günü içinde çekilebilir hale gelecektir.',
         [{ text: 'Tamam' }],
@@ -225,7 +225,7 @@ const WalletScreen = () => {
       .map((item) => `• ${item.senderName}: ${formatCurrency(item.amount)}`)
       .join('\n');
 
-    Alert.alert(
+    showAlert(
       '📸 Kanıt Yükleyin',
       `${formatCurrency(totalPending)} tutarında bekleyen hediyeniz var.\n\nKanıt yükledikten sonra çekilebilir hale gelecektir:\n\n${itemsList}${pendingProofItems.length > 3 ? `\n...ve ${pendingProofItems.length - 3} daha` : ''}`,
       [

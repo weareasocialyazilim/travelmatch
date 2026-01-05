@@ -19,6 +19,7 @@ import {
   generateMerchantOid,
   createBasketItem,
 } from '../_shared/paytr.ts';
+import { getCorsHeaders } from '../_shared/cors.ts';
 
 // =============================================================================
 // TYPES
@@ -47,20 +48,13 @@ interface CreatePaymentResponse {
 }
 
 // =============================================================================
-// CORS HEADERS
-// =============================================================================
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
-};
-
-// =============================================================================
 // MAIN HANDLER
 // =============================================================================
 
 serve(async (req: Request) => {
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -80,7 +74,7 @@ serve(async (req: Request) => {
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -94,7 +88,7 @@ serve(async (req: Request) => {
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -123,7 +117,7 @@ serve(async (req: Request) => {
         {
           status: 404,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -143,7 +137,7 @@ serve(async (req: Request) => {
         {
           status: 404,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -157,7 +151,7 @@ serve(async (req: Request) => {
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -172,12 +166,11 @@ serve(async (req: Request) => {
     // ==========================================================================
     // COMPLIANCE CHECK: User limits + AML + Fraud (all-in-one)
     // ==========================================================================
-    const currency = body.currency === 'USD' ? 'USD' :
-                     body.currency === 'EUR' ? 'EUR' : 'TRY';
+    const currency =
+      body.currency === 'USD' ? 'USD' : body.currency === 'EUR' ? 'EUR' : 'TRY';
 
-    const { data: complianceCheck, error: complianceError } = await adminClient.rpc(
-      'check_transaction_compliance',
-      {
+    const { data: complianceCheck, error: complianceError } =
+      await adminClient.rpc('check_transaction_compliance', {
         p_user_id: giverId,
         p_amount: body.baseAmount,
         p_currency: currency,
@@ -189,8 +182,7 @@ serve(async (req: Request) => {
           device_id: deviceId,
           user_agent: userAgent,
         },
-      }
-    );
+      });
 
     if (complianceError) {
       logger.error('Compliance check error:', complianceError);
@@ -202,13 +194,15 @@ serve(async (req: Request) => {
         {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
     // Block if compliance check fails
     if (!complianceCheck?.allowed) {
-      const blockReasons = complianceCheck?.block_reasons || ['Transaction not allowed'];
+      const blockReasons = complianceCheck?.block_reasons || [
+        'Transaction not allowed',
+      ];
 
       // Log security event
       await adminClient.from('security_logs').insert({
@@ -234,7 +228,7 @@ serve(async (req: Request) => {
         {
           status: complianceCheck?.requires_kyc ? 403 : 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -267,7 +261,7 @@ serve(async (req: Request) => {
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -298,7 +292,7 @@ serve(async (req: Request) => {
         {
           status: 403,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -318,7 +312,7 @@ serve(async (req: Request) => {
         {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -346,7 +340,7 @@ serve(async (req: Request) => {
         p_base_amount: body.baseAmount,
         p_currency: body.currency || 'TRY',
         p_giver_requests_proof: body.requestProof || false,
-      }
+      },
     );
 
     if (giftError || !giftResult?.success) {
@@ -358,7 +352,7 @@ serve(async (req: Request) => {
         {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -376,7 +370,7 @@ serve(async (req: Request) => {
       createBasketItem(
         `TravelMatch Hediye: ${moment.title.substring(0, 50)}`,
         commissionData.giver_pays,
-        1
+        1,
       ),
     ];
 
@@ -409,7 +403,7 @@ serve(async (req: Request) => {
         {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        },
       );
     }
 
@@ -453,7 +447,7 @@ serve(async (req: Request) => {
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      },
     );
   }
 });
