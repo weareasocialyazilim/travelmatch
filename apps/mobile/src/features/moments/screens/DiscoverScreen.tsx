@@ -466,10 +466,18 @@ const DiscoverScreen = () => {
     return (
       <View style={styles.emptyContainer}>
         <StatusBar barStyle="light-content" backgroundColor="black" />
-        <Text style={styles.emptyTitle}>No moments yet</Text>
+        <Text style={styles.emptyEmoji}>✨</Text>
+        <Text style={styles.emptyTitle}>Henüz Anı Yok</Text>
         <Text style={styles.emptySubtitle}>
-          Be the first to create a moment!
+          İpeksi bir anı yakalamak için mesafeni artır veya filtrelerini
+          değiştir
         </Text>
+        <TouchableOpacity
+          style={styles.emptyButton}
+          onPress={handleSearchPress}
+        >
+          <Text style={styles.emptyButtonText}>Arama Yap</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -577,6 +585,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
   },
+  emptyEmoji: {
+    fontSize: 64,
+    marginBottom: 16,
+  },
   emptyTitle: {
     color: COLORS.text.primary,
     fontSize: 24,
@@ -587,6 +599,20 @@ const styles = StyleSheet.create({
     color: COLORS.text.secondary,
     fontSize: 16,
     textAlign: 'center',
+    paddingHorizontal: 32,
+    lineHeight: 24,
+  },
+  emptyButton: {
+    marginTop: 24,
+    backgroundColor: COLORS.brand.primary,
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 24,
+  },
+  emptyButtonText: {
+    color: COLORS.utility.white,
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

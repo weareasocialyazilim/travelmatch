@@ -1,715 +1,937 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
-<RCTView
+<View
   ref={null}
 >
-  <RCTView
+  <View
     ref={null}
   >
-    <RCTView
+    <View
       ref={null}
       style={
-        {
-          "marginBottom": 16,
-          "transform": [
-            {
-              "translateX": 0,
-            },
-          ],
-        }
+        [
+          {
+            "marginBottom": 20,
+            "width": "100%",
+          },
+          undefined,
+        ]
       }
     >
-      <RCTText
+      <Text
         ref={null}
         style={
           {
-            "color": "#1C1917",
-            "fontSize": 14,
-            "fontWeight": "600",
+            "color": "#475569",
+            "fontFamily": "Courier New",
+            "fontSize": 10,
+            "fontWeight": "800",
+            "letterSpacing": 1.5,
             "marginBottom": 8,
+            "marginLeft": 4,
           }
         }
-        testID="RCTText"
       >
-        Email
-      </RCTText>
-      <RCTView
+        EMAIL
+      </Text>
+      <View
+        data-intensity={10}
+        data-tint="dark"
         ref={null}
         style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E7E5E4",
-            "borderRadius": 12,
-            "borderWidth": 1,
-            "flexDirection": "row",
-            "height": 52,
-            "paddingHorizontal": 16,
-          }
-        }
-      >
-        <RCTTextInput
-          accessibilityLabel="Email"
-          accessibilityRole="none"
-          onBlur={[Function]}
-          onChange={[Function]}
-          onFocus={[Function]}
-          placeholder="Enter email"
-          placeholderTextColor="#A8A29E"
-          ref={null}
-          secureTextEntry={false}
-          style={
-            [
-              {
-                "color": "#1C1917",
-                "flex": 1,
-                "fontSize": 16,
-                "paddingVertical": 0,
-              },
-              undefined,
-              undefined,
-            ]
-          }
-          testID="email-input"
-          value=""
-        />
-      </RCTView>
-    </RCTView>
-  </RCTView>
-  <RCTView
-    ref={null}
-  >
-    <RCTView
-      ref={null}
-      style={
-        {
-          "marginBottom": 16,
-          "transform": [
+          [
             {
-              "translateX": 0,
+              "backgroundColor": "rgba(255, 255, 255, 0.8)",
             },
-          ],
-        }
-      }
-    >
-      <RCTText
-        ref={null}
-        style={
-          {
-            "color": "#1C1917",
-            "fontSize": 14,
-            "fontWeight": "600",
-            "marginBottom": 8,
-          }
-        }
-        testID="RCTText"
-      >
-        Password
-      </RCTText>
-      <RCTView
-        ref={null}
-        style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E7E5E4",
-            "borderRadius": 12,
-            "borderWidth": 1,
-            "flexDirection": "row",
-            "height": 52,
-            "paddingHorizontal": 16,
-          }
-        }
-      >
-        <RCTText
-          color="#A8A29E"
-          name="lock-outline"
-          ref={null}
-          size={20}
-          style={
-            {
-              "marginRight": 12,
-            }
-          }
-          testID="RCTText"
-        >
-          lock-outline
-        </RCTText>
-        <RCTTextInput
-          accessibilityLabel="Password"
-          accessibilityRole="none"
-          autoCapitalize="none"
-          autoCorrect={false}
-          onBlur={[Function]}
-          onChange={[Function]}
-          onFocus={[Function]}
-          placeholder="Enter password"
-          placeholderTextColor="#A8A29E"
-          ref={null}
-          secureTextEntry={true}
-          style={
             [
               {
-                "color": "#1C1917",
-                "flex": 1,
-                "fontSize": 16,
-                "paddingVertical": 0,
+                "borderRadius": 16,
+                "overflow": "hidden",
               },
               {
-                "paddingLeft": 0,
+                "backgroundColor": "rgba(255, 255, 255, 0.03)",
+                "borderRadius": 16,
               },
               {
-                "paddingRight": 0,
+                "borderColor": "rgba(255, 255, 255, 0.05)",
+                "borderWidth": 1,
               },
-            ]
-          }
-          testID="password-input"
-          value=""
-        />
-        <RCTTouchableOpacity
-          accessibilityLabel="Show password"
-          accessibilityState={
-            {
-              "disabled": false,
-            }
-          }
-          accessible={true}
-          aria-label="Show password"
-          hitSlop={
-            {
-              "bottom": 10,
-              "left": 10,
-              "right": 10,
-              "top": 10,
-            }
-          }
-          onPress={[Function]}
+              {
+                "padding": 16,
+              },
+              [
+                {
+                  "backgroundColor": "rgba(255, 255, 255, 0.03)",
+                  "borderColor": "transparent",
+                  "borderRadius": 18,
+                  "borderWidth": 1,
+                  "height": 58,
+                  "justifyContent": "center",
+                  "padding": 0,
+                },
+                false,
+                null,
+                undefined,
+              ],
+              undefined,
+            ],
+          ]
+        }
+      >
+        <View
           ref={null}
           style={
             {
-              "marginLeft": 12,
-              "padding": 4,
+              "alignItems": "center",
+              "flexDirection": "row",
+              "paddingHorizontal": 18,
             }
           }
         >
-          <RCTText
-            color="#A8A29E"
-            name="eye"
+          <TextInput
+            onBlur={[Function]}
+            onChangeText={[Function]}
+            onFocus={[Function]}
+            placeholder="Enter email"
+            placeholderTextColor="#475569"
             ref={null}
-            size={20}
-            testID="RCTText"
-          >
-            eye
-          </RCTText>
-        </RCTTouchableOpacity>
-      </RCTView>
-    </RCTView>
-  </RCTView>
-  <RCTView
+            selectionColor="#DFFF00"
+            style={
+              {
+                "color": "#F8FAFC",
+                "flex": 1,
+                "fontFamily": "System",
+                "fontSize": 16,
+                "fontWeight": "500",
+                "height": "100%",
+              }
+            }
+            testID="email-input"
+            value=""
+          />
+        </View>
+      </View>
+    </View>
+  </View>
+  <View
     ref={null}
   >
-    <RCTView
+    <View
       ref={null}
       style={
-        {
-          "marginBottom": 16,
-          "transform": [
-            {
-              "translateX": 0,
-            },
-          ],
-        }
+        [
+          {
+            "marginBottom": 20,
+            "width": "100%",
+          },
+          undefined,
+        ]
       }
     >
-      <RCTText
+      <Text
         ref={null}
         style={
           {
-            "color": "#1C1917",
-            "fontSize": 14,
-            "fontWeight": "600",
+            "color": "#475569",
+            "fontFamily": "Courier New",
+            "fontSize": 10,
+            "fontWeight": "800",
+            "letterSpacing": 1.5,
             "marginBottom": 8,
+            "marginLeft": 4,
           }
         }
-        testID="RCTText"
       >
-        Username
-      </RCTText>
-      <RCTView
+        PASSWORD
+      </Text>
+      <View
+        data-intensity={10}
+        data-tint="dark"
         ref={null}
         style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E7E5E4",
-            "borderRadius": 12,
-            "borderWidth": 1,
-            "flexDirection": "row",
-            "height": 52,
-            "paddingHorizontal": 16,
-          }
-        }
-      >
-        <RCTTextInput
-          accessibilityLabel="Username"
-          accessibilityRole="none"
-          onBlur={[Function]}
-          onChange={[Function]}
-          onFocus={[Function]}
-          placeholder="Enter username"
-          placeholderTextColor="#A8A29E"
-          ref={null}
-          secureTextEntry={false}
-          style={
+          [
+            {
+              "backgroundColor": "rgba(255, 255, 255, 0.8)",
+            },
             [
               {
-                "color": "#1C1917",
-                "flex": 1,
-                "fontSize": 16,
-                "paddingVertical": 0,
+                "borderRadius": 16,
+                "overflow": "hidden",
               },
+              {
+                "backgroundColor": "rgba(255, 255, 255, 0.03)",
+                "borderRadius": 16,
+              },
+              {
+                "borderColor": "rgba(255, 255, 255, 0.05)",
+                "borderWidth": 1,
+              },
+              {
+                "padding": 16,
+              },
+              [
+                {
+                  "backgroundColor": "rgba(255, 255, 255, 0.03)",
+                  "borderColor": "transparent",
+                  "borderRadius": 18,
+                  "borderWidth": 1,
+                  "height": 58,
+                  "justifyContent": "center",
+                  "padding": 0,
+                },
+                false,
+                null,
+                undefined,
+              ],
               undefined,
-              undefined,
-            ]
+            ],
+          ]
+        }
+      >
+        <View
+          ref={null}
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "paddingHorizontal": 18,
+            }
           }
-          testID="username-input"
-          value=""
-        />
-      </RCTView>
-    </RCTView>
-  </RCTView>
-  <RCTView
+        >
+          <RCTIconView
+            accessibilityLabel="lock-closed-outline"
+            iconName="lock-closed-outline"
+            style={
+              [
+                {
+                  "height": 20,
+                  "width": 20,
+                },
+                {
+                  "marginRight": 14,
+                },
+              ]
+            }
+            testID="Ionicons-icon"
+          />
+          <TextInput
+            autoCapitalize="none"
+            autoCorrect={false}
+            onBlur={[Function]}
+            onChangeText={[Function]}
+            onFocus={[Function]}
+            placeholder="Enter password"
+            placeholderTextColor="#475569"
+            ref={null}
+            secureTextEntry={true}
+            selectionColor="#DFFF00"
+            style={
+              {
+                "color": "#F8FAFC",
+                "flex": 1,
+                "fontFamily": "System",
+                "fontSize": 16,
+                "fontWeight": "500",
+                "height": "100%",
+              }
+            }
+            testID="password-input"
+            value=""
+          />
+        </View>
+      </View>
+    </View>
+  </View>
+  <View
     ref={null}
   >
-    <RCTView
+    <View
       ref={null}
       style={
-        {
-          "marginBottom": 16,
-          "transform": [
-            {
-              "translateX": 0,
-            },
-          ],
-        }
+        [
+          {
+            "marginBottom": 20,
+            "width": "100%",
+          },
+          undefined,
+        ]
       }
     >
-      <RCTText
+      <Text
         ref={null}
         style={
           {
-            "color": "#1C1917",
-            "fontSize": 14,
-            "fontWeight": "600",
+            "color": "#475569",
+            "fontFamily": "Courier New",
+            "fontSize": 10,
+            "fontWeight": "800",
+            "letterSpacing": 1.5,
             "marginBottom": 8,
+            "marginLeft": 4,
           }
         }
-        testID="RCTText"
       >
-        Bio
-      </RCTText>
-      <RCTView
+        USERNAME
+      </Text>
+      <View
+        data-intensity={10}
+        data-tint="dark"
         ref={null}
         style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E7E5E4",
-            "borderRadius": 12,
-            "borderWidth": 1,
-            "flexDirection": "row",
-            "height": 52,
-            "paddingHorizontal": 16,
-          }
-        }
-      >
-        <RCTTextInput
-          accessibilityLabel="Bio"
-          accessibilityRole="none"
-          multiline={true}
-          numberOfLines={4}
-          onBlur={[Function]}
-          onChange={[Function]}
-          onFocus={[Function]}
-          placeholder="Tell us about yourself"
-          placeholderTextColor="#A8A29E"
-          ref={null}
-          secureTextEntry={false}
-          style={
+          [
+            {
+              "backgroundColor": "rgba(255, 255, 255, 0.8)",
+            },
             [
               {
-                "color": "#1C1917",
-                "flex": 1,
-                "fontSize": 16,
-                "paddingVertical": 0,
+                "borderRadius": 16,
+                "overflow": "hidden",
               },
+              {
+                "backgroundColor": "rgba(255, 255, 255, 0.03)",
+                "borderRadius": 16,
+              },
+              {
+                "borderColor": "rgba(255, 255, 255, 0.05)",
+                "borderWidth": 1,
+              },
+              {
+                "padding": 16,
+              },
+              [
+                {
+                  "backgroundColor": "rgba(255, 255, 255, 0.03)",
+                  "borderColor": "transparent",
+                  "borderRadius": 18,
+                  "borderWidth": 1,
+                  "height": 58,
+                  "justifyContent": "center",
+                  "padding": 0,
+                },
+                false,
+                null,
+                undefined,
+              ],
               undefined,
-              undefined,
-            ]
+            ],
+          ]
+        }
+      >
+        <View
+          ref={null}
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "paddingHorizontal": 18,
+            }
           }
-          testID="bio-input"
-          value=""
-        />
-      </RCTView>
-    </RCTView>
-  </RCTView>
-</RCTView>
+        >
+          <TextInput
+            onBlur={[Function]}
+            onChangeText={[Function]}
+            onFocus={[Function]}
+            placeholder="Enter username"
+            placeholderTextColor="#475569"
+            ref={null}
+            selectionColor="#DFFF00"
+            style={
+              {
+                "color": "#F8FAFC",
+                "flex": 1,
+                "fontFamily": "System",
+                "fontSize": 16,
+                "fontWeight": "500",
+                "height": "100%",
+              }
+            }
+            testID="username-input"
+            value=""
+          />
+        </View>
+      </View>
+    </View>
+  </View>
+  <View
+    ref={null}
+  >
+    <View
+      ref={null}
+      style={
+        [
+          {
+            "marginBottom": 20,
+            "width": "100%",
+          },
+          undefined,
+        ]
+      }
+    >
+      <Text
+        ref={null}
+        style={
+          {
+            "color": "#475569",
+            "fontFamily": "Courier New",
+            "fontSize": 10,
+            "fontWeight": "800",
+            "letterSpacing": 1.5,
+            "marginBottom": 8,
+            "marginLeft": 4,
+          }
+        }
+      >
+        BIO
+      </Text>
+      <View
+        data-intensity={10}
+        data-tint="dark"
+        ref={null}
+        style={
+          [
+            {
+              "backgroundColor": "rgba(255, 255, 255, 0.8)",
+            },
+            [
+              {
+                "borderRadius": 16,
+                "overflow": "hidden",
+              },
+              {
+                "backgroundColor": "rgba(255, 255, 255, 0.03)",
+                "borderRadius": 16,
+              },
+              {
+                "borderColor": "rgba(255, 255, 255, 0.05)",
+                "borderWidth": 1,
+              },
+              {
+                "padding": 16,
+              },
+              [
+                {
+                  "backgroundColor": "rgba(255, 255, 255, 0.03)",
+                  "borderColor": "transparent",
+                  "borderRadius": 18,
+                  "borderWidth": 1,
+                  "height": 58,
+                  "justifyContent": "center",
+                  "padding": 0,
+                },
+                false,
+                null,
+                undefined,
+              ],
+              undefined,
+            ],
+          ]
+        }
+      >
+        <View
+          ref={null}
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "paddingHorizontal": 18,
+            }
+          }
+        >
+          <TextInput
+            multiline={true}
+            numberOfLines={4}
+            onBlur={[Function]}
+            onChangeText={[Function]}
+            onFocus={[Function]}
+            placeholder="Tell us about yourself"
+            placeholderTextColor="#475569"
+            ref={null}
+            selectionColor="#DFFF00"
+            style={
+              {
+                "color": "#F8FAFC",
+                "flex": 1,
+                "fontFamily": "System",
+                "fontSize": 16,
+                "fontWeight": "500",
+                "height": "100%",
+              }
+            }
+            testID="bio-input"
+            value=""
+          />
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
 `;
 
 exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
-<RCTView
+<View
   ref={null}
 >
-  <RCTView
+  <View
     ref={null}
   >
-    <RCTView
+    <View
       ref={null}
       style={
-        {
-          "marginBottom": 16,
-          "transform": [
-            {
-              "translateX": 0,
-            },
-          ],
-        }
+        [
+          {
+            "marginBottom": 20,
+            "width": "100%",
+          },
+          undefined,
+        ]
       }
     >
-      <RCTText
+      <Text
         ref={null}
         style={
           {
-            "color": "#1C1917",
-            "fontSize": 14,
-            "fontWeight": "600",
+            "color": "#475569",
+            "fontFamily": "Courier New",
+            "fontSize": 10,
+            "fontWeight": "800",
+            "letterSpacing": 1.5,
             "marginBottom": 8,
+            "marginLeft": 4,
           }
         }
-        testID="RCTText"
       >
-        Email
-      </RCTText>
-      <RCTView
+        EMAIL
+      </Text>
+      <View
+        data-intensity={10}
+        data-tint="dark"
         ref={null}
         style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E7E5E4",
-            "borderRadius": 12,
-            "borderWidth": 1,
-            "flexDirection": "row",
-            "height": 52,
-            "paddingHorizontal": 16,
-          }
-        }
-      >
-        <RCTTextInput
-          accessibilityLabel="Email"
-          accessibilityRole="none"
-          onBlur={[Function]}
-          onChange={[Function]}
-          onFocus={[Function]}
-          placeholder="Enter email"
-          placeholderTextColor="#A8A29E"
-          ref={null}
-          secureTextEntry={false}
-          style={
-            [
-              {
-                "color": "#1C1917",
-                "flex": 1,
-                "fontSize": 16,
-                "paddingVertical": 0,
-              },
-              undefined,
-              undefined,
-            ]
-          }
-          testID="email-input"
-          value="test@example.com"
-        />
-      </RCTView>
-    </RCTView>
-  </RCTView>
-  <RCTView
-    ref={null}
-  >
-    <RCTView
-      ref={null}
-      style={
-        {
-          "marginBottom": 16,
-          "transform": [
+          [
             {
-              "translateX": 0,
+              "backgroundColor": "rgba(255, 255, 255, 0.8)",
             },
-          ],
-        }
-      }
-    >
-      <RCTText
-        ref={null}
-        style={
-          {
-            "color": "#1C1917",
-            "fontSize": 14,
-            "fontWeight": "600",
-            "marginBottom": 8,
-          }
-        }
-        testID="RCTText"
-      >
-        Password
-      </RCTText>
-      <RCTView
-        ref={null}
-        style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E7E5E4",
-            "borderRadius": 12,
-            "borderWidth": 1,
-            "flexDirection": "row",
-            "height": 52,
-            "paddingHorizontal": 16,
-          }
-        }
-      >
-        <RCTText
-          color="#A8A29E"
-          name="lock-outline"
-          ref={null}
-          size={20}
-          style={
-            {
-              "marginRight": 12,
-            }
-          }
-          testID="RCTText"
-        >
-          lock-outline
-        </RCTText>
-        <RCTTextInput
-          accessibilityLabel="Password"
-          accessibilityRole="none"
-          autoCapitalize="none"
-          autoCorrect={false}
-          onBlur={[Function]}
-          onChange={[Function]}
-          onFocus={[Function]}
-          placeholder="Enter password"
-          placeholderTextColor="#A8A29E"
-          ref={null}
-          secureTextEntry={true}
-          style={
             [
               {
-                "color": "#1C1917",
-                "flex": 1,
-                "fontSize": 16,
-                "paddingVertical": 0,
+                "borderRadius": 16,
+                "overflow": "hidden",
               },
               {
-                "paddingLeft": 0,
+                "backgroundColor": "rgba(255, 255, 255, 0.03)",
+                "borderRadius": 16,
               },
               {
-                "paddingRight": 0,
+                "borderColor": "rgba(255, 255, 255, 0.05)",
+                "borderWidth": 1,
               },
-            ]
-          }
-          testID="password-input"
-          value=""
-        />
-        <RCTTouchableOpacity
-          accessibilityLabel="Show password"
-          accessibilityState={
-            {
-              "disabled": false,
-            }
-          }
-          accessible={true}
-          aria-label="Show password"
-          hitSlop={
-            {
-              "bottom": 10,
-              "left": 10,
-              "right": 10,
-              "top": 10,
-            }
-          }
-          onPress={[Function]}
+              {
+                "padding": 16,
+              },
+              [
+                {
+                  "backgroundColor": "rgba(255, 255, 255, 0.03)",
+                  "borderColor": "transparent",
+                  "borderRadius": 18,
+                  "borderWidth": 1,
+                  "height": 58,
+                  "justifyContent": "center",
+                  "padding": 0,
+                },
+                false,
+                null,
+                undefined,
+              ],
+              undefined,
+            ],
+          ]
+        }
+      >
+        <View
           ref={null}
           style={
             {
-              "marginLeft": 12,
-              "padding": 4,
+              "alignItems": "center",
+              "flexDirection": "row",
+              "paddingHorizontal": 18,
             }
           }
         >
-          <RCTText
-            color="#A8A29E"
-            name="eye"
+          <TextInput
+            onBlur={[Function]}
+            onChangeText={[Function]}
+            onFocus={[Function]}
+            placeholder="Enter email"
+            placeholderTextColor="#475569"
             ref={null}
-            size={20}
-            testID="RCTText"
-          >
-            eye
-          </RCTText>
-        </RCTTouchableOpacity>
-      </RCTView>
-    </RCTView>
-  </RCTView>
-  <RCTView
+            selectionColor="#DFFF00"
+            style={
+              {
+                "color": "#F8FAFC",
+                "flex": 1,
+                "fontFamily": "System",
+                "fontSize": 16,
+                "fontWeight": "500",
+                "height": "100%",
+              }
+            }
+            testID="email-input"
+            value="test@example.com"
+          />
+        </View>
+      </View>
+    </View>
+  </View>
+  <View
     ref={null}
   >
-    <RCTView
+    <View
       ref={null}
       style={
-        {
-          "marginBottom": 16,
-          "transform": [
-            {
-              "translateX": 0,
-            },
-          ],
-        }
+        [
+          {
+            "marginBottom": 20,
+            "width": "100%",
+          },
+          undefined,
+        ]
       }
     >
-      <RCTText
+      <Text
         ref={null}
         style={
           {
-            "color": "#1C1917",
-            "fontSize": 14,
-            "fontWeight": "600",
+            "color": "#475569",
+            "fontFamily": "Courier New",
+            "fontSize": 10,
+            "fontWeight": "800",
+            "letterSpacing": 1.5,
             "marginBottom": 8,
+            "marginLeft": 4,
           }
         }
-        testID="RCTText"
       >
-        Username
-      </RCTText>
-      <RCTView
+        PASSWORD
+      </Text>
+      <View
+        data-intensity={10}
+        data-tint="dark"
         ref={null}
         style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E7E5E4",
-            "borderRadius": 12,
-            "borderWidth": 1,
-            "flexDirection": "row",
-            "height": 52,
-            "paddingHorizontal": 16,
-          }
-        }
-      >
-        <RCTTextInput
-          accessibilityLabel="Username"
-          accessibilityRole="none"
-          onBlur={[Function]}
-          onChange={[Function]}
-          onFocus={[Function]}
-          placeholder="Enter username"
-          placeholderTextColor="#A8A29E"
-          ref={null}
-          secureTextEntry={false}
-          style={
+          [
+            {
+              "backgroundColor": "rgba(255, 255, 255, 0.8)",
+            },
             [
               {
-                "color": "#1C1917",
-                "flex": 1,
-                "fontSize": 16,
-                "paddingVertical": 0,
+                "borderRadius": 16,
+                "overflow": "hidden",
               },
+              {
+                "backgroundColor": "rgba(255, 255, 255, 0.03)",
+                "borderRadius": 16,
+              },
+              {
+                "borderColor": "rgba(255, 255, 255, 0.05)",
+                "borderWidth": 1,
+              },
+              {
+                "padding": 16,
+              },
+              [
+                {
+                  "backgroundColor": "rgba(255, 255, 255, 0.03)",
+                  "borderColor": "transparent",
+                  "borderRadius": 18,
+                  "borderWidth": 1,
+                  "height": 58,
+                  "justifyContent": "center",
+                  "padding": 0,
+                },
+                false,
+                null,
+                undefined,
+              ],
               undefined,
-              undefined,
-            ]
+            ],
+          ]
+        }
+      >
+        <View
+          ref={null}
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "paddingHorizontal": 18,
+            }
           }
-          testID="username-input"
-          value="testuser"
-        />
-      </RCTView>
-    </RCTView>
-  </RCTView>
-  <RCTView
+        >
+          <RCTIconView
+            accessibilityLabel="lock-closed-outline"
+            iconName="lock-closed-outline"
+            style={
+              [
+                {
+                  "height": 20,
+                  "width": 20,
+                },
+                {
+                  "marginRight": 14,
+                },
+              ]
+            }
+            testID="Ionicons-icon"
+          />
+          <TextInput
+            autoCapitalize="none"
+            autoCorrect={false}
+            onBlur={[Function]}
+            onChangeText={[Function]}
+            onFocus={[Function]}
+            placeholder="Enter password"
+            placeholderTextColor="#475569"
+            ref={null}
+            secureTextEntry={true}
+            selectionColor="#DFFF00"
+            style={
+              {
+                "color": "#F8FAFC",
+                "flex": 1,
+                "fontFamily": "System",
+                "fontSize": 16,
+                "fontWeight": "500",
+                "height": "100%",
+              }
+            }
+            testID="password-input"
+            value=""
+          />
+        </View>
+      </View>
+    </View>
+  </View>
+  <View
     ref={null}
   >
-    <RCTView
+    <View
       ref={null}
       style={
-        {
-          "marginBottom": 16,
-          "transform": [
-            {
-              "translateX": 0,
-            },
-          ],
-        }
+        [
+          {
+            "marginBottom": 20,
+            "width": "100%",
+          },
+          undefined,
+        ]
       }
     >
-      <RCTText
+      <Text
         ref={null}
         style={
           {
-            "color": "#1C1917",
-            "fontSize": 14,
-            "fontWeight": "600",
+            "color": "#475569",
+            "fontFamily": "Courier New",
+            "fontSize": 10,
+            "fontWeight": "800",
+            "letterSpacing": 1.5,
             "marginBottom": 8,
+            "marginLeft": 4,
           }
         }
-        testID="RCTText"
       >
-        Bio
-      </RCTText>
-      <RCTView
+        USERNAME
+      </Text>
+      <View
+        data-intensity={10}
+        data-tint="dark"
         ref={null}
         style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E7E5E4",
-            "borderRadius": 12,
-            "borderWidth": 1,
-            "flexDirection": "row",
-            "height": 52,
-            "paddingHorizontal": 16,
-          }
-        }
-      >
-        <RCTTextInput
-          accessibilityLabel="Bio"
-          accessibilityRole="none"
-          multiline={true}
-          numberOfLines={4}
-          onBlur={[Function]}
-          onChange={[Function]}
-          onFocus={[Function]}
-          placeholder="Tell us about yourself"
-          placeholderTextColor="#A8A29E"
-          ref={null}
-          secureTextEntry={false}
-          style={
+          [
+            {
+              "backgroundColor": "rgba(255, 255, 255, 0.8)",
+            },
             [
               {
-                "color": "#1C1917",
-                "flex": 1,
-                "fontSize": 16,
-                "paddingVertical": 0,
+                "borderRadius": 16,
+                "overflow": "hidden",
               },
+              {
+                "backgroundColor": "rgba(255, 255, 255, 0.03)",
+                "borderRadius": 16,
+              },
+              {
+                "borderColor": "rgba(255, 255, 255, 0.05)",
+                "borderWidth": 1,
+              },
+              {
+                "padding": 16,
+              },
+              [
+                {
+                  "backgroundColor": "rgba(255, 255, 255, 0.03)",
+                  "borderColor": "transparent",
+                  "borderRadius": 18,
+                  "borderWidth": 1,
+                  "height": 58,
+                  "justifyContent": "center",
+                  "padding": 0,
+                },
+                false,
+                null,
+                undefined,
+              ],
               undefined,
-              undefined,
-            ]
+            ],
+          ]
+        }
+      >
+        <View
+          ref={null}
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "paddingHorizontal": 18,
+            }
           }
-          testID="bio-input"
-          value="Hello world"
-        />
-      </RCTView>
-    </RCTView>
-  </RCTView>
-</RCTView>
+        >
+          <TextInput
+            onBlur={[Function]}
+            onChangeText={[Function]}
+            onFocus={[Function]}
+            placeholder="Enter username"
+            placeholderTextColor="#475569"
+            ref={null}
+            selectionColor="#DFFF00"
+            style={
+              {
+                "color": "#F8FAFC",
+                "flex": 1,
+                "fontFamily": "System",
+                "fontSize": 16,
+                "fontWeight": "500",
+                "height": "100%",
+              }
+            }
+            testID="username-input"
+            value="testuser"
+          />
+        </View>
+      </View>
+    </View>
+  </View>
+  <View
+    ref={null}
+  >
+    <View
+      ref={null}
+      style={
+        [
+          {
+            "marginBottom": 20,
+            "width": "100%",
+          },
+          undefined,
+        ]
+      }
+    >
+      <Text
+        ref={null}
+        style={
+          {
+            "color": "#475569",
+            "fontFamily": "Courier New",
+            "fontSize": 10,
+            "fontWeight": "800",
+            "letterSpacing": 1.5,
+            "marginBottom": 8,
+            "marginLeft": 4,
+          }
+        }
+      >
+        BIO
+      </Text>
+      <View
+        data-intensity={10}
+        data-tint="dark"
+        ref={null}
+        style={
+          [
+            {
+              "backgroundColor": "rgba(255, 255, 255, 0.8)",
+            },
+            [
+              {
+                "borderRadius": 16,
+                "overflow": "hidden",
+              },
+              {
+                "backgroundColor": "rgba(255, 255, 255, 0.03)",
+                "borderRadius": 16,
+              },
+              {
+                "borderColor": "rgba(255, 255, 255, 0.05)",
+                "borderWidth": 1,
+              },
+              {
+                "padding": 16,
+              },
+              [
+                {
+                  "backgroundColor": "rgba(255, 255, 255, 0.03)",
+                  "borderColor": "transparent",
+                  "borderRadius": 18,
+                  "borderWidth": 1,
+                  "height": 58,
+                  "justifyContent": "center",
+                  "padding": 0,
+                },
+                false,
+                null,
+                undefined,
+              ],
+              undefined,
+            ],
+          ]
+        }
+      >
+        <View
+          ref={null}
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "paddingHorizontal": 18,
+            }
+          }
+        >
+          <TextInput
+            multiline={true}
+            numberOfLines={4}
+            onBlur={[Function]}
+            onChangeText={[Function]}
+            onFocus={[Function]}
+            placeholder="Tell us about yourself"
+            placeholderTextColor="#475569"
+            ref={null}
+            selectionColor="#DFFF00"
+            style={
+              {
+                "color": "#F8FAFC",
+                "flex": 1,
+                "fontFamily": "System",
+                "fontSize": 16,
+                "fontWeight": "500",
+                "height": "100%",
+              }
+            }
+            testID="bio-input"
+            value="Hello world"
+          />
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
 `;

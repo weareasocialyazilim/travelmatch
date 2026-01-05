@@ -60,7 +60,11 @@ export type {
 export { securePaymentService } from './securePaymentService';
 export { walletService } from './walletService';
 export { transactionService } from './transactionService';
-export { escrowService, determineEscrowMode, getEscrowExplanation } from './escrowService';
+export {
+  escrowService,
+  determineEscrowMode,
+  getEscrowExplanation,
+} from './escrowService';
 export type {
   PaymentCard,
   BankAccount,
@@ -74,7 +78,11 @@ export type {
   Subscription,
 } from './securePaymentService';
 export type { Transaction, TransactionFilters } from './transactionService';
-export type { EscrowMode, EscrowDecision, EscrowTransaction } from './escrowService';
+export type {
+  EscrowMode,
+  EscrowDecision,
+  EscrowTransaction,
+} from './escrowService';
 
 // Backward compatibility alias
 export { securePaymentService as paymentService } from './securePaymentService';
@@ -126,9 +134,25 @@ export type {
   SessionEventListener,
 } from './sessionManager';
 
-export { navigationRef, navigate, resetNavigation, goBack } from './navigationService';
+export {
+  navigationRef,
+  navigate,
+  resetNavigation,
+  goBack,
+} from './navigationService';
 export { apiClient, apiV1Service } from './apiV1Service';
 export type { ApiResponse } from './apiV1Service';
 
 export { HapticManager } from './HapticManager';
-export type { HapticIntensity, HapticNotification, HapticPattern } from './HapticManager';
+export type {
+  HapticIntensity,
+  HapticNotification,
+  HapticPattern,
+} from './HapticManager';
+
+// Discovery Service - Dating & Gifting platform discovery
+export {
+  discoverNearbyMoments,
+  discoverMomentsFallback,
+} from './discoveryService';
+export type { DiscoveryMoment, DiscoveryOptions } from './discoveryService';

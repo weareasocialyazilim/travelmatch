@@ -18,8 +18,39 @@ import { usePagination, type PaginatedResponse } from './usePagination';
 import type { Database } from '../types/database.types';
 
 // MomentRow type from the database - includes joined data from momentsService
-
-type MomentRow = any; // Using any as the service returns dynamic joins
+interface MomentRow {
+  id: string;
+  title: string;
+  description: string | null;
+  category: string | null;
+  location: string | null;
+  location_point?: { lat: number; lng: number } | null;
+  images: string[] | null;
+  price: number | null;
+  currency: string | null;
+  max_guests: number | null;
+  duration: number | null;
+  availability: string[] | null;
+  host_id: string;
+  saves_count: number | null;
+  is_saved?: boolean;
+  rating?: number | null;
+  distance?: number | null;
+  created_at: string | null;
+  updated_at?: string | null;
+  status?: string | null;
+  // Joined host data
+  host?: {
+    id: string;
+    name: string | null;
+    avatar_url: string | null;
+  } | null;
+  users?: {
+    id: string;
+    name: string | null;
+    avatar_url: string | null;
+  } | null;
+}
 
 // Types
 export interface Moment {
@@ -389,7 +420,18 @@ export const useMoments = (): UseMomentsReturn => {
         } = await supabase.auth.getUser();
         if (!user) throw new Error('Not authenticated');
 
-        const updates: any = {};
+        const updates: Partial<{
+          title: string;
+          description: string;
+          category: string;
+          location: string;
+          price: number;
+          currency: string;
+          max_guests: number;
+          duration: number;
+          availability: string[];
+          images: string[];
+        }> = {};
         if (data.title) updates.title = data.title;
         if (data.description) updates.description = data.description;
         if (data.category) updates.category = data.category;
@@ -654,7 +696,7 @@ export const useMoments = (): UseMomentsReturn => {
 
       if (!mountedRef.current) return;
 
-      const mappedMoments: Moment[] = data.map((row: any) => ({
+      const mappedMoments: Moment[] = data.map((row: MomentRow) => ({
         ...mapToMoment(row),
         isSaved: true,
       }));

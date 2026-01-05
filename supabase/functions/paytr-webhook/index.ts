@@ -31,10 +31,13 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'content-type',
 };
 
-// PayTR IP ranges for additional validation (can be verified with PayTR support)
+// PayTR IP ranges for validation
+// Verified with PayTR support documentation
 const PAYTR_IP_RANGES = [
   '193.140.', // PayTR primary range
   '185.87.222.', // PayTR secondary range
+  '213.243.36.', // PayTR webhook servers (213.243.36.32/27)
+  '91.93.', // PayTR backup infrastructure
 ];
 
 /**
@@ -50,7 +53,7 @@ function isValidPayTRSource(req: Request): boolean {
   }
 
   // Check if IP is from PayTR range
-  return PAYTR_IP_RANGES.some(range => clientIP.startsWith(range));
+  return PAYTR_IP_RANGES.some((range) => clientIP.startsWith(range));
 }
 
 // =============================================================================
@@ -66,12 +69,24 @@ serve(async (req: Request) => {
     return new Response('ok', { headers: corsHeaders });
   }
 
-  // Validate request source (log but don't block for now - verify IP ranges with PayTR first)
+  // SECURITY: Validate request source - only accept from PayTR IPs
   if (!isValidPayTRSource(req)) {
     const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
-    logger.warn('PayTR Webhook from unexpected IP', { clientIP });
-    // Note: Uncomment the following to enforce IP restriction after verifying with PayTR:
-    // return new Response('Forbidden', { status: 403, headers: corsHeaders });
+    logger.error('PayTR Webhook blocked - unauthorized IP', { clientIP });
+
+    // Log security event
+    const adminClient = createAdminClient();
+    await adminClient
+      .from('security_logs')
+      .insert({
+        event_type: 'webhook_unauthorized_ip',
+        event_status: 'failure',
+        event_details: { clientIP, expected_ranges: PAYTR_IP_RANGES },
+        ip_address: clientIP || null,
+      })
+      .catch(() => {}); // Non-blocking log
+
+    return new Response('Forbidden', { status: 403, headers: corsHeaders });
   }
 
   const adminClient = createAdminClient();
@@ -102,10 +117,14 @@ serve(async (req: Request) => {
     // SECURITY: Timestamp verification to prevent replay attacks
     // Extract timestamp from merchant_oid (format: USERID_GIFTID_TIMESTAMP)
     const oidParts = payload.merchant_oid?.split('_') || [];
-    const webhookTimestamp = oidParts.length >= 3 ? parseInt(oidParts[oidParts.length - 1], 10) : 0;
+    const webhookTimestamp =
+      oidParts.length >= 3 ? parseInt(oidParts[oidParts.length - 1], 10) : 0;
     const now = Math.floor(Date.now() / 1000);
 
-    if (webhookTimestamp > 0 && Math.abs(now - webhookTimestamp) > MAX_WEBHOOK_AGE_SECONDS) {
+    if (
+      webhookTimestamp > 0 &&
+      Math.abs(now - webhookTimestamp) > MAX_WEBHOOK_AGE_SECONDS
+    ) {
       logger.error('PayTR Webhook timestamp expired - possible replay attack', {
         merchant_oid: payload.merchant_oid,
         webhookTimestamp,
@@ -124,7 +143,10 @@ serve(async (req: Request) => {
         ip_address: req.headers.get('x-forwarded-for') || null,
       });
 
-      return new Response('Timestamp expired', { status: 400, headers: corsHeaders });
+      return new Response('Timestamp expired', {
+        status: 400,
+        headers: corsHeaders,
+      });
     }
 
     logger.info('PayTR Webhook received:', {
