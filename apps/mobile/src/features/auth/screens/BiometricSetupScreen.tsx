@@ -1,23 +1,80 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { biometricAuthService, BiometricType } from '@/services/biometricAuth';
+import { logger } from '@/utils/logger';
 
 const BIOMETRIC_REMINDER_KEY = '@biometric_remind_later';
 
 export const BiometricSetupScreen = () => {
   const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(false);
+  const [biometricType, setBiometricType] = useState<BiometricType>(BiometricType.NONE);
+  const [isAvailable, setIsAvailable] = useState(false);
+
+  // Check biometric availability on mount
+  useEffect(() => {
+    const checkBiometrics = async () => {
+      try {
+        const capabilities = await biometricAuthService.initialize();
+        setIsAvailable(capabilities.isAvailable);
+        if (capabilities.supportedTypes.length > 0) {
+          setBiometricType(capabilities.supportedTypes[0]);
+        }
+      } catch (error) {
+        logger.error('[BiometricSetup] Failed to check capabilities:', error);
+      }
+    };
+    checkBiometrics();
+  }, []);
 
   const handleEnable = async () => {
+    if (!isAvailable) {
+      Alert.alert(
+        'Biyometri Kullanılamıyor',
+        'Cihazınızda biyometrik kimlik doğrulama ayarlanmamış. Lütfen önce cihaz ayarlarından Face ID veya parmak izinizi kaydedin.',
+        [{ text: 'Tamam' }]
+      );
+      return;
+    }
+
+    setIsLoading(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    // Clear any remind later flag
-    await AsyncStorage.removeItem(BIOMETRIC_REMINDER_KEY);
-    // TODO: Actual biometric setup logic
-    navigation.reset({ index: 0, routes: [{ name: 'MainTabs' as never }] });
+
+    try {
+      // Authenticate to confirm user's biometric
+      const authResult = await biometricAuthService.authenticate({
+        promptMessage: 'Biyometriği etkinleştirmek için doğrula',
+        cancelLabel: 'İptal',
+      });
+
+      if (authResult.success) {
+        // Enable biometric auth
+        await biometricAuthService.enableBiometricAuth();
+
+        // Clear any remind later flag
+        await AsyncStorage.removeItem(BIOMETRIC_REMINDER_KEY);
+
+        logger.info('[BiometricSetup] Biometric authentication enabled');
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+        navigation.reset({ index: 0, routes: [{ name: 'MainTabs' as never }] });
+      } else {
+        // User cancelled or failed authentication
+        logger.warn('[BiometricSetup] Authentication failed:', authResult.error);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      }
+    } catch (error) {
+      logger.error('[BiometricSetup] Setup failed:', error);
+      Alert.alert('Hata', 'Biyometrik kurulum başarısız oldu. Lütfen tekrar deneyin.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSkip = () => {
@@ -84,18 +141,28 @@ export const BiometricSetupScreen = () => {
 
         <View style={styles.spacer} />
 
-        <TouchableOpacity style={styles.enableBtn} onPress={handleEnable}>
+        <TouchableOpacity
+          style={[styles.enableBtn, isLoading && styles.enableBtnDisabled]}
+          onPress={handleEnable}
+          disabled={isLoading}
+        >
           <LinearGradient
             colors={[COLORS.brand.primary, '#A2FF00']}
             style={styles.gradient}
           >
-            <MaterialCommunityIcons
-              name="fingerprint"
-              size={24}
-              color="black"
-              style={styles.fingerprintIcon}
-            />
-            <Text style={styles.btnText}>Biyometriği Etkinleştir</Text>
+            {isLoading ? (
+              <ActivityIndicator size="small" color="black" style={styles.fingerprintIcon} />
+            ) : (
+              <MaterialCommunityIcons
+                name={biometricType === BiometricType.FACIAL_RECOGNITION ? 'face-recognition' : 'fingerprint'}
+                size={24}
+                color="black"
+                style={styles.fingerprintIcon}
+              />
+            )}
+            <Text style={styles.btnText}>
+              {isLoading ? 'Etkinleştiriliyor...' : 'Biyometriği Etkinleştir'}
+            </Text>
           </LinearGradient>
         </TouchableOpacity>
 
@@ -175,6 +242,9 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 16,
+  },
+  enableBtnDisabled: {
+    opacity: 0.7,
   },
   gradient: {
     paddingVertical: 18,

@@ -51,6 +51,7 @@ import { useHaptics } from '@/hooks/useHaptics';
 import { useScreenPerformance } from '@/hooks/useScreenPerformance';
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
+import { securePaymentService } from '@/services/securePaymentService';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { Moment } from '@/features/payments/types';
 import type { StackScreenProps } from '@react-navigation/stack';
@@ -303,23 +304,23 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
       });
 
       try {
-        // TODO: Replace with actual PayTR API call
-        // const { transactionId } = await paytrService.initiatePayment({
-        //   momentId: moment.id,
-        //   amount: moment.price,
-        //   currency: moment.currency,
-        //   recipientId,
-        //   message: data.message,
-        // });
+        // Create PayTR payment via secure service
+        const paymentResponse = await securePaymentService.createPayment({
+          amount: moment.price,
+          currency: moment.currency || 'TRY',
+          momentId: moment.id,
+          recipientId,
+          message: data.message,
+          paymentMethodId: selectedPayment,
+        });
 
-        // Mock transaction ID for realtime subscription
-        const mockTransactionId = `txn_${Date.now()}`;
-        setPendingTransactionId(mockTransactionId);
+        // Set transaction ID for realtime webhook subscription
+        setPendingTransactionId(paymentResponse.merchantOid);
 
         logger.info(
-          '[UnifiedGiftFlow] Payment initiated, waiting for webhook',
+          '[UnifiedGiftFlow] PayTR payment created, waiting for webhook',
           {
-            transactionId: mockTransactionId,
+            merchantOid: paymentResponse.merchantOid,
             momentId: moment.id,
           },
         );
