@@ -69,9 +69,8 @@ import {
   DisputeFlowScreen,
   RequestsScreen,
   TicketScreen,
+  DiscoverScreen,
 } from '../features/discover';
-// Updated: Use the new subscription-aware DiscoverScreen from moments
-import { DiscoverScreen } from '../features/moments';
 // SubscriberOfferBottomSheet moved to features/gifts
 import { SubscriberOfferBottomSheet } from '../features/gifts/components';
 
