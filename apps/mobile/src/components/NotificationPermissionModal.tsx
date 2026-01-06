@@ -94,6 +94,9 @@ export const NotificationPermissionModal: React.FC<
             style={styles.allowButton}
             onPress={handleAllow}
             activeOpacity={0.8}
+            accessibilityLabel="Bildirimleri aç"
+            accessibilityRole="button"
+            accessibilityHint="Uygulama bildirimlerini etkinleştirir"
           >
             <LinearGradient
               colors={[COLORS.brand.primary, COLORS.brand.accent]}
@@ -105,7 +108,13 @@ export const NotificationPermissionModal: React.FC<
             </LinearGradient>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.skipButton} onPress={onClose}>
+          <TouchableOpacity
+            style={styles.skipButton}
+            onPress={onClose}
+            accessibilityLabel="Şimdi değil"
+            accessibilityRole="button"
+            accessibilityHint="Bildirimleri şimdilik atlar"
+          >
             <Text style={styles.skipButtonText}>Şimdi Değil</Text>
           </TouchableOpacity>
         </View>

@@ -4,9 +4,16 @@
  * All Profile-specific components following feature-based architecture.
  */
 
-// Design System Components (migrated) - commented out until package is ready
-// export { TrustOrb, TrustConstellation } from '@travelmatch/design-system/native';
-// export type { TrustOrbProps, TrustConstellationProps, TrustFactor } from '@travelmatch/design-system/native';
+// Design System Components (migrated) - now active
+export {
+  TrustOrb,
+  TrustConstellation,
+} from '@travelmatch/design-system/native';
+export type {
+  TrustOrbProps,
+  TrustConstellationProps,
+  TrustFactor,
+} from '@travelmatch/design-system/native';
 
 // Existing components - AchievementCard moved to another location
 // export { AchievementCard } from './AchievementCard';
