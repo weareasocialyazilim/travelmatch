@@ -366,9 +366,6 @@ export type RootStackParamList = {
     currency: string;
   };
 
-  // NEW: Gift Legacy Screen (Hediye Mirası)
-  GiftLegacy: undefined;
-
   // NEW: Visibility Settings (Görünürlük Ayarları)
   VisibilitySettings: undefined;
 
