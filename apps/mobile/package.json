@@ -20,8 +20,8 @@
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
     "type-check": "tsc --noEmit",
-    "storybook": "sb-rn-get-stories && expo start",
-    "storybook:generate": "sb-rn-get-stories",
+    "sb:start": "sb-rn-get-stories && expo start",
+    "sb:generate": "sb-rn-get-stories",
     "check:nav": "ts-node scripts/check-navigation-sync.ts",
     "validate": "pnpm run type-check && pnpm run lint && pnpm run check:nav && pnpm run test:ci",
     "clean": "rm -rf node_modules .expo dist coverage",
@@ -140,7 +140,11 @@
   "expo": {
     "install": {
       "exclude": [
-        "@shopify/flash-list"
+        "@shopify/flash-list",
+        "@react-native-community/datetimepicker",
+        "@sentry/react-native",
+        "react-native-svg",
+        "react-native-webview"
       ]
     }
   }
