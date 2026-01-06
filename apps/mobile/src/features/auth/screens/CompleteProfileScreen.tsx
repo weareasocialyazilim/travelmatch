@@ -29,6 +29,7 @@ import { canSubmitForm } from '@/utils/forms/helpers';
 import type { MinimalFormState } from '@/utils/forms/helpers';
 import { useToast } from '@/context/ToastContext';
 import { useConfirmation } from '@/context/ConfirmationContext';
+import { useAuth } from '@/context/AuthContext';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
@@ -58,6 +59,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
   const { t } = useTranslation();
   const { showToast } = useToast();
   const { showConfirmation } = useConfirmation();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const { control, handleSubmit, formState, setValue, watch } =
@@ -70,6 +72,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
         bio: '',
         avatar: '',
         interests: [],
+        phone: '',
       },
     });
 
@@ -158,12 +161,23 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
     }
   };
 
-  const handleComplete = (_data: CompleteProfileInput) => {
+  const handleComplete = (data: CompleteProfileInput) => {
     setLoading(true);
-    // Simulate API call
+    // Simulate API call for profile save
     setTimeout(() => {
       setLoading(false);
-      navigation.replace('Discover');
+
+      // If phone number is provided, navigate to phone verification
+      if (data.phone && data.phone.trim() !== '') {
+        navigation.navigate('VerifyPhone', {
+          email: user?.email || '',
+          phone: data.phone.trim(),
+          fullName: data.fullName,
+        });
+      } else {
+        // No phone provided, go directly to main app
+        navigation.replace('Discover');
+      }
     }, 1500);
   };
 
@@ -320,6 +334,39 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
                 />
               </View>
               <Text style={styles.charCount}>{value?.length || 0}/150</Text>
+              {error && <Text style={styles.errorText}>{error.message}</Text>}
+            </View>
+          )}
+        />
+
+        {/* Phone Input */}
+        <Controller
+          control={control}
+          name="phone"
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => (
+            <View style={styles.inputSection}>
+              <Text style={styles.inputLabel}>Phone Number (Recommended)</Text>
+              <View
+                style={[styles.inputWrapper, error && styles.inputWrapperError]}
+              >
+                <Icon name="phone" size={20} color={COLORS.text.secondary} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="+90 5XX XXX XXXX"
+                  placeholderTextColor={COLORS.text.secondary}
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  keyboardType="phone-pad"
+                  autoCapitalize="none"
+                />
+              </View>
+              <Text style={styles.phoneHint}>
+                We'll send an SMS to verify your number
+              </Text>
               {error && <Text style={styles.errorText}>{error.message}</Text>}
             </View>
           )}
@@ -527,6 +574,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 4,
     textAlign: 'right',
+  },
+  phoneHint: {
+    color: COLORS.text.secondary,
+    fontSize: 12,
+    marginTop: 4,
   },
   errorText: {
     color: COLORS.feedback.error,
