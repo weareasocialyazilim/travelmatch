@@ -1,4 +1,40 @@
-# Ignore development and test files
+# ═══════════════════════════════════════════════════════════════════
+# TravelMatch Mobile - EAS Build Ignore List
+# Optimized for monorepo structure (667MB → ~20MB)
+# ═══════════════════════════════════════════════════════════════════
+
+# node_modules (EAS installs fresh dependencies)
+node_modules/
+**/node_modules/
+
+# Native build folders (recreated in cloud)
+ios/
+android/
+
+# ═══════════════════════════════════════════════════════════════════
+# Monorepo - Other Apps & Services (not needed for mobile build)
+# ═══════════════════════════════════════════════════════════════════
+../../apps/admin/
+../../apps/web/
+../../services/
+../../supabase/
+../../docs/
+../../docker/
+../../tests/
+../../scripts/
+../../packages/
+
+# ═══════════════════════════════════════════════════════════════════
+# Expo & Metro Cache
+# ═══════════════════════════════════════════════════════════════════
+.expo/
+dist/
+web-build/
+.turbo/
+
+# ═══════════════════════════════════════════════════════════════════
+# Development & Test Files
+# ═══════════════════════════════════════════════════════════════════
 __mocks__/
 __tests__/
 **/*.test.ts
@@ -9,10 +45,28 @@ __tests__/
 scripts/
 .storybook/
 coverage/
-docs/
+
+# ═══════════════════════════════════════════════════════════════════
+# IDE & System Files
+# ═══════════════════════════════════════════════════════════════════
 .github/
 .husky/
 .vscode/
+.DS_Store
+*.log
+.git/
+
+# ═══════════════════════════════════════════════════════════════════
+# Config Files (not needed at runtime)
+# ═══════════════════════════════════════════════════════════════════
 *.config.js
 *.setup.js
 tsconfig.test.json
+webpack.performance.config.js
+jest.config.js
+jest.setup.js
+babel.config.js
+metro.config.js
+eslint.config.mjs
+.eslintcache
+.prettierrc
