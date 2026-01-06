@@ -36,6 +36,7 @@ import { usePayments } from '@/hooks/usePayments';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { PaymentSecurityBadge } from '../components/PaymentSecurityBadge';
+import { logger } from '@/utils/logger';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 
@@ -127,7 +128,12 @@ const CheckoutScreen: React.FC = () => {
         title: 'Ödeme Başarılı',
         subtitle: `${formatCurrency(amount || 0)} tutarında hediye gönderildi`,
       });
-    } catch (_paymentError) {
+    } catch (paymentError) {
+      logger.error('[Checkout] Payment failed', {
+        error: paymentError,
+        momentId,
+        amount,
+      });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       navigation.navigate('PaymentFailed', {
         error: 'Ödeme başarısız oldu. Lütfen tekrar deneyin.',

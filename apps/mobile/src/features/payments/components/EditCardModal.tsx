@@ -17,6 +17,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
+import { logger } from '@/utils/logger';
 import type { SavedCard } from '../types/payment-methods.types';
 
 interface EditCardModalProps {
@@ -90,7 +91,11 @@ export const EditCardModal = ({
     try {
       await onSave(card.id, expiry);
       onClose();
-    } catch (_saveCardError) {
+    } catch (saveCardError) {
+      logger.error('[EditCardModal] Failed to update card', {
+        error: saveCardError,
+        cardId: card.id,
+      });
       setError('Kart güncellenemedi. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);

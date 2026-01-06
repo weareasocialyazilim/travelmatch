@@ -17,6 +17,7 @@ import { useToast } from '@/context/ToastContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { COLORS } from '@/constants/colors';
 import { generateTotpSecret } from '@/utils/security';
+import { logger } from '@/utils/logger';
 
 type SetupStep = 'intro' | 'setup' | 'verify' | 'backup';
 
@@ -85,7 +86,10 @@ export const TwoFactorSetupScreen: React.FC = () => {
       setBackupCodes(codes);
       setStep('backup');
       showToast('2FA enabled successfully!', 'success');
-    } catch (_twoFactorError) {
+    } catch (twoFactorError) {
+      logger.error('[TwoFactorSetup] Verification failed', {
+        error: twoFactorError,
+      });
       showToast('Verification failed. Please try again.', 'error');
     } finally {
       setIsLoading(false);

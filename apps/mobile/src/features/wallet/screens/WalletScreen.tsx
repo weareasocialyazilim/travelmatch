@@ -39,6 +39,7 @@ import BottomNav from '@/components/BottomNav';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
 import { NetworkGuard } from '@/components/NetworkGuard';
 import { useToast } from '@/context/ToastContext';
+import { logger } from '@/utils/logger';
 import {
   COLORS as _COLORS,
   primitives,
@@ -180,7 +181,10 @@ const WalletScreen = () => {
       const proofItems = await walletService.getPendingProofItems();
       setPendingProofItems(proofItems);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch (_refreshError) {
+    } catch (refreshError) {
+      logger.error('[Wallet] Failed to refresh balance', {
+        error: refreshError,
+      });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       toast.error('Cüzdan bilgileri yüklenemedi. Lütfen tekrar deneyin.');
     }

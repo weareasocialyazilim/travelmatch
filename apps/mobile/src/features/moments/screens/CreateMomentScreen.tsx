@@ -56,6 +56,7 @@ import { CurrencySelectionBottomSheet } from '@/features/payments/components/Cur
 import { LazyLocationPicker } from '../components/LazyLocationPicker';
 import { useMoments } from '@/hooks/useMoments';
 import { useToast } from '@/context/ToastContext';
+import { logger } from '@/utils/logger';
 
 // Currency symbols for display
 const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -230,7 +231,10 @@ const CreateMomentScreen: React.FC = () => {
         await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         showToast('Could not create moment. Please try again.', 'error');
       }
-    } catch (_createMomentError) {
+    } catch (createMomentError) {
+      logger.error('[CreateMoment] Failed to create moment', {
+        error: createMomentError,
+      });
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       showToast('Something went wrong. Please try again.', 'error');
     } finally {

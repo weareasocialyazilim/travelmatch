@@ -15,6 +15,7 @@ import { useNavigation } from '@/hooks/useNavigationHelpers';
 import { COLORS } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { showError, showSuccess } from '@/stores/modalStore';
+import { logger } from '@/utils/logger';
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -68,7 +69,10 @@ export const ChangePasswordScreen = () => {
           message: result.error || 'Failed to update password',
         });
       }
-    } catch (_changePasswordError) {
+    } catch (changePasswordError) {
+      logger.error('[ChangePassword] Failed to change password', {
+        error: changePasswordError,
+      });
       showError({
         title: 'Error',
         message: 'An unexpected error occurred. Please try again.',

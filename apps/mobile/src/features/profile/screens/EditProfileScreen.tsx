@@ -22,6 +22,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as Haptics from 'expo-haptics';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { logger } from '@/utils/logger';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -154,8 +155,12 @@ const EditProfileScreen = () => {
         const isAvailable =
           await userService.checkUsernameAvailability(username);
         setUsernameAvailable(isAvailable);
-      } catch (_usernameCheckError) {
-        // Ignore error - keep username availability null
+      } catch (usernameCheckError) {
+        logger.debug('[EditProfile] Username check failed', {
+          error: usernameCheckError,
+          username,
+        });
+        // Keep username availability null on error
       } finally {
         setCheckingUsername(false);
       }
@@ -212,7 +217,10 @@ const EditProfileScreen = () => {
           setAvatarUri(result.assets[0].uri);
         }
       }
-    } catch (_pickImageError) {
+    } catch (pickImageError) {
+      logger.error('[EditProfile] Failed to pick image', {
+        error: pickImageError,
+      });
       showToast('Fotoğraf seçilemedi', 'error');
     }
   };
@@ -250,7 +258,10 @@ const EditProfileScreen = () => {
       showAlert('Başarılı', 'Profil güncellendi', [
         { text: 'Tamam', onPress: () => navigation.goBack() },
       ]);
-    } catch (_updateProfileError) {
+    } catch (updateProfileError) {
+      logger.error('[EditProfile] Failed to update profile', {
+        error: updateProfileError,
+      });
       showToast('Profil güncellenemedi', 'error');
     }
   };

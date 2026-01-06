@@ -227,7 +227,10 @@ export const ProofFlowScreen: React.FC<ProofFlowScreenProps> = ({
           title: 'Location Set',
           message: locationName,
         });
-      } catch (_locationError) {
+      } catch (locationError) {
+        logger.warn('[ProofFlow] Could not get current location', {
+          error: locationError,
+        });
         showToast('Could not get current location', 'error');
       }
     };

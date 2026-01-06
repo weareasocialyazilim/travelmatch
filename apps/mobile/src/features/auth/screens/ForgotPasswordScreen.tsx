@@ -15,6 +15,7 @@ import { useNavigation } from '@/hooks/useNavigationHelpers';
 import { COLORS } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { showError, showSuccess } from '@/stores/modalStore';
+import { logger } from '@/utils/logger';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -55,7 +56,10 @@ export const ForgotPasswordScreen = () => {
             result.error || 'Failed to send reset link. Please try again.',
         });
       }
-    } catch (_forgotPasswordError) {
+    } catch (forgotPasswordError) {
+      logger.error('[ForgotPassword] Failed to send reset link', {
+        error: forgotPasswordError,
+      });
       showError({
         title: 'Error',
         message: 'An unexpected error occurred. Please try again.',
