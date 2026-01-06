@@ -18,6 +18,7 @@ export const ClearCacheDialog: React.FC<ClearCacheDialogProps> = ({
 }) => {
   return (
     <Modal
+      testID="clear-cache-modal"
       visible={visible}
       transparent
       animationType="fade"
