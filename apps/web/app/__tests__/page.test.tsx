@@ -2,30 +2,44 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import Home from '../page';
 
-// Mock Link component for testing
-jest.mock('next/link', () => {
-  const MockLink = ({
-    children,
-    href,
+// Mock Next.js Image component
+jest.mock('next/image', () => {
+  const MockImage = ({
+    src,
+    alt,
+    ...props
   }: {
-    children: React.ReactNode;
-    href: string;
-  }) => <a href={href}>{children}</a>;
-  MockLink.displayName = 'MockLink';
-  return MockLink;
+    src: string;
+    alt: string;
+    [key: string]: unknown;
+  }) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={src} alt={alt} {...props} />
+  );
+  MockImage.displayName = 'MockImage';
+  return MockImage;
 });
 
-// Mock Navbar component
-jest.mock('@/components/shared/Navbar', () => ({
-  Navbar: () => <nav data-testid="navbar">Navbar</nav>,
-}));
+// Mock window.scrollTo
+Object.defineProperty(window, 'scrollTo', {
+  value: jest.fn(),
+  writable: true,
+});
 
-// Mock TrustRing component
-jest.mock('@/components/ui/TrustRing', () => ({
-  TrustRing: ({ score }: { score: number }) => (
-    <div data-testid="trust-ring">{score}</div>
-  ),
-}));
+// Mock window.location
+const originalLocation = window.location;
+beforeAll(() => {
+  Object.defineProperty(window, 'location', {
+    configurable: true,
+    value: { href: '', assign: jest.fn() },
+  });
+});
+afterAll(() => {
+  Object.defineProperty(window, 'location', {
+    configurable: true,
+    value: originalLocation,
+  });
+});
 
 describe('Home Page', () => {
   beforeEach(() => {
@@ -33,158 +47,123 @@ describe('Home Page', () => {
   });
 
   describe('Hero Section', () => {
-    it('renders the main heading with brand motto', () => {
-      expect(screen.getByText('Give a moment.')).toBeInTheDocument();
-      expect(screen.getByText('See it happen.')).toBeInTheDocument();
+    it('renders the hero title words', () => {
+      expect(screen.getByText('SEND')).toBeInTheDocument();
+      expect(screen.getByText('REAL')).toBeInTheDocument();
+      expect(screen.getByText('MOMENTS')).toBeInTheDocument();
     });
 
-    it('renders the TravelMatch brand name', () => {
-      const elements = screen.getAllByText('TravelMatch');
-      expect(elements.length).toBeGreaterThan(0);
+    it('renders the beta badge', () => {
+      expect(screen.getByText(/LIVE BETA/i)).toBeInTheDocument();
     });
 
-    it('renders the description', () => {
+    it('renders the brand name', () => {
+      expect(screen.getByText('travelmatch.')).toBeInTheDocument();
+    });
+
+    it('renders the START NOW button', () => {
+      expect(screen.getByText('START NOW')).toBeInTheDocument();
+    });
+
+    it('renders the WATCH DEMO button', () => {
+      expect(screen.getByText('WATCH DEMO')).toBeInTheDocument();
+    });
+  });
+
+  describe('Stash Section', () => {
+    it('renders THE STASH title', () => {
+      expect(screen.getByText('THE')).toBeInTheDocument();
+      expect(screen.getByText('STASH')).toBeInTheDocument();
+    });
+
+    it('renders curated drops subtitle', () => {
+      expect(screen.getByText('/// CURATED DROPS')).toBeInTheDocument();
+    });
+
+    it('renders VIEW ALL DROPS button', () => {
+      expect(screen.getByText('VIEW ALL DROPS')).toBeInTheDocument();
+    });
+
+    it('renders gift items', () => {
+      expect(screen.getByText('Frappé')).toBeInTheDocument();
+      expect(screen.getByText('Croissant')).toBeInTheDocument();
+      expect(screen.getByText('Gold Latte')).toBeInTheDocument();
+    });
+  });
+
+  describe('Manifesto Section', () => {
+    it('renders manifesto subtitle', () => {
+      expect(screen.getByText('/// THE MANIFESTO')).toBeInTheDocument();
+    });
+
+    it('renders the manifesto title', () => {
+      expect(screen.getByText(/We reject the/i)).toBeInTheDocument();
+      expect(screen.getByText('Metaverse.')).toBeInTheDocument();
+    });
+
+    it('renders JOIN THE RESISTANCE button', () => {
+      expect(screen.getByText('JOIN THE RESISTANCE')).toBeInTheDocument();
+    });
+
+    it('renders WATCH FILM button', () => {
+      expect(screen.getByText('WATCH FILM')).toBeInTheDocument();
+    });
+  });
+
+  describe('Footer Section', () => {
+    it('renders SPOTS LIMITED badge', () => {
+      expect(screen.getByText('SPOTS LIMITED')).toBeInTheDocument();
+    });
+
+    it('renders SOON heading', () => {
+      // Multiple SOON texts (hero + footer)
+      expect(screen.getAllByText('SOON').length).toBeGreaterThan(0);
+    });
+
+    it('renders email input placeholder', () => {
       expect(
-        screen.getByText(
-          /The first platform where you can gift real travel experiences/i,
-        ),
+        screen.getByPlaceholderText('ENTER YOUR EMAIL...'),
       ).toBeInTheDocument();
     });
 
-    it('renders iOS download link', () => {
-      expect(screen.getByText('Download for iOS')).toBeInTheDocument();
+    it('renders JOIN button', () => {
+      expect(screen.getByText('JOIN')).toBeInTheDocument();
     });
 
-    it('renders Android download link', () => {
-      expect(screen.getByText('Get on Android')).toBeInTheDocument();
+    it('renders app store buttons', () => {
+      expect(screen.getByText('APP STORE')).toBeInTheDocument();
+      expect(screen.getByText('PLAY STORE')).toBeInTheDocument();
     });
 
-    it('renders social proof', () => {
-      expect(screen.getByText(/trusted travelers/i)).toBeInTheDocument();
-    });
-  });
-
-  describe('Features Section', () => {
-    it('renders Gift Experiences feature', () => {
-      expect(screen.getByText('Gift Experiences')).toBeInTheDocument();
+    it('renders social links', () => {
+      expect(screen.getByText('Instagram')).toBeInTheDocument();
+      expect(screen.getByText('TikTok')).toBeInTheDocument();
+      expect(screen.getByText('Twitter')).toBeInTheDocument();
     });
 
-    it('renders See the Proof feature', () => {
-      expect(screen.getByText('See the Proof')).toBeInTheDocument();
-    });
-
-    it('renders Build Trust feature', () => {
-      expect(screen.getByText('Build Trust')).toBeInTheDocument();
-    });
-
-    it('renders section heading', () => {
-      expect(screen.getByText(/Why/i)).toBeInTheDocument();
+    it('renders company info', () => {
+      expect(screen.getByText('TravelMatch Inc.')).toBeInTheDocument();
+      expect(screen.getByText('Est. 2025 // Istanbul')).toBeInTheDocument();
     });
   });
 
-  describe('How It Works Section', () => {
-    it('renders section heading', () => {
-      expect(screen.getByText(/How It/i)).toBeInTheDocument();
-      expect(screen.getByText('Works')).toBeInTheDocument();
+  describe('Navigation', () => {
+    it('renders GET THE APP button', () => {
+      expect(screen.getByText('GET THE APP')).toBeInTheDocument();
     });
 
-    it('renders Discover step', () => {
-      // Multiple "Discover" texts may exist in the page
-      expect(screen.getAllByText('Discover').length).toBeGreaterThan(0);
-    });
-
-    it('renders Gift step', () => {
-      expect(screen.getByText('Gift')).toBeInTheDocument();
-    });
-
-    it('renders Experience step', () => {
-      expect(screen.getByText('Experience')).toBeInTheDocument();
-    });
-
-    it('renders Prove step', () => {
-      expect(screen.getByText('Prove')).toBeInTheDocument();
+    it('renders language switcher', () => {
+      expect(screen.getByText('EN')).toBeInTheDocument();
+      expect(screen.getByText('TR')).toBeInTheDocument();
     });
   });
 
-  describe('Trust Section', () => {
-    it('renders Trust System badge', () => {
-      expect(screen.getByText('Trust System')).toBeInTheDocument();
-    });
-
-    it('renders trust score verification features', () => {
-      expect(screen.getByText('Verified identity')).toBeInTheDocument();
-      expect(screen.getByText('AI proof verification')).toBeInTheDocument();
-      expect(screen.getByText('Community ratings')).toBeInTheDocument();
-    });
-  });
-
-  describe('Partner Section', () => {
-    it('renders partner CTA', () => {
-      expect(screen.getByText('Are you a business?')).toBeInTheDocument();
-    });
-
-    it('renders partner description', () => {
-      expect(
-        screen.getByText(
-          /Partner with TravelMatch and reach engaged travelers/i,
-        ),
-      ).toBeInTheDocument();
-    });
-
-    it('renders Partner with Us button', () => {
-      expect(screen.getByText('Partner with Us')).toBeInTheDocument();
-    });
-  });
-
-  describe('Footer', () => {
-    it('renders Terms link', () => {
-      expect(screen.getByText('Terms')).toBeInTheDocument();
-    });
-
-    it('renders Privacy link', () => {
-      expect(screen.getByText('Privacy')).toBeInTheDocument();
-    });
-
-    it('renders Safety link', () => {
-      expect(screen.getByText('Safety')).toBeInTheDocument();
-    });
-
-    it('renders Contact link', () => {
-      expect(screen.getByText('Contact')).toBeInTheDocument();
-    });
-
-    it('renders copyright notice with current year', () => {
-      const currentYear = new Date().getFullYear();
-      expect(
-        screen.getByText(
-          new RegExp(`© ${currentYear} TravelMatch Inc. All rights reserved.`),
-        ),
-      ).toBeInTheDocument();
-    });
-  });
-
-  describe('Links', () => {
-    it('has correct href for terms link', () => {
-      const termsLink = screen.getByText('Terms').closest('a');
-      expect(termsLink).toHaveAttribute('href', '/terms');
-    });
-
-    it('has correct href for privacy link', () => {
-      const privacyLink = screen.getByText('Privacy').closest('a');
-      expect(privacyLink).toHaveAttribute('href', '/privacy');
-    });
-
-    it('has correct href for partner link', () => {
-      const partnerLink = screen.getByText('Partner with Us').closest('a');
-      expect(partnerLink).toHaveAttribute('href', '/partner');
-    });
-  });
-
-  describe('No Testimonials', () => {
-    it('does not render testimonials section', () => {
-      // Verify testimonials section is not present
-      expect(screen.queryByText(/Loved by travelers/i)).not.toBeInTheDocument();
-      expect(screen.queryByText(/testimonial/i)).not.toBeInTheDocument();
+  describe('City Marquee', () => {
+    it('renders city names', () => {
+      // Multiple instances due to marquee animation
+      expect(screen.getAllByText(/ISTANBUL/i).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/PARIS/i).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/TOKYO/i).length).toBeGreaterThan(0);
     });
   });
 });
