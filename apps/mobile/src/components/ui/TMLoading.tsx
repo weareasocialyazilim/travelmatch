@@ -25,7 +25,13 @@
 
 import React, { useEffect, useMemo } from 'react';
 import type { ViewStyle } from 'react-native';
-import { View, Text, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  ActivityIndicator,
+} from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -107,7 +113,8 @@ export const TMLoading: React.FC<TMLoadingProps> = ({
   messages,
 }) => {
   // Map LoadingSize to ActivityIndicator size
-  const activityIndicatorSize = size === 'sm' || size === 'small' ? 'small' : 'large';
+  const activityIndicatorSize =
+    size === 'sm' || size === 'small' ? 'small' : 'large';
 
   switch (type) {
     case 'simple':
@@ -242,6 +249,20 @@ const OrbitingParticle: React.FC<OrbitingParticleProps> = ({
   const rotation = useSharedValue(0);
   const opacity = useSharedValue(0);
 
+  const particleStyle = useMemo(
+    () => ({
+      width: size,
+      height: size,
+      borderRadius: size / 2,
+      backgroundColor: color,
+      shadowColor: color,
+      shadowOffset: { width: 0, height: 0 } as const,
+      shadowOpacity: 0.8,
+      shadowRadius: size * 2,
+    }),
+    [size, color],
+  );
+
   useEffect(() => {
     rotation.value = withDelay(
       delay,
@@ -251,8 +272,8 @@ const OrbitingParticle: React.FC<OrbitingParticleProps> = ({
           easing: Easing.linear,
         }),
         -1,
-        false
-      )
+        false,
+      ),
     );
     opacity.value = withDelay(delay, withTiming(1, { duration: 500 }));
   }, [delay, duration, clockwise, rotation, opacity]);
@@ -270,20 +291,7 @@ const OrbitingParticle: React.FC<OrbitingParticleProps> = ({
 
   return (
     <Animated.View
-      style={[
-        styles.orbitingParticle,
-        {
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          backgroundColor: color,
-          shadowColor: color,
-          shadowOffset: { width: 0, height: 0 },
-          shadowOpacity: 0.8,
-          shadowRadius: size * 2,
-        },
-        animatedStyle,
-      ]}
+      style={[styles.orbitingParticle, particleStyle, animatedStyle]}
     />
   );
 };
@@ -307,6 +315,28 @@ const NeonRing: React.FC<NeonRingProps> = ({
   const rotation = useSharedValue(0);
   const scale = useSharedValue(0.8);
 
+  const containerStyle = useMemo(
+    () => ({
+      width: size,
+      height: size,
+      borderRadius: size / 2,
+    }),
+    [size],
+  );
+
+  const ringStyle = useMemo(
+    () => ({
+      width: size,
+      height: size,
+      borderRadius: size / 2,
+      borderWidth,
+      borderColor: 'transparent' as const,
+      borderTopColor: colors[0],
+      borderRightColor: colors[1],
+    }),
+    [size, borderWidth, colors],
+  );
+
   useEffect(() => {
     rotation.value = withDelay(
       delay,
@@ -316,12 +346,12 @@ const NeonRing: React.FC<NeonRingProps> = ({
           easing: Easing.bezier(0.4, 0, 0.2, 1),
         }),
         -1,
-        false
-      )
+        false,
+      ),
     );
     scale.value = withDelay(
       delay,
-      withSpring(1, { damping: 12, stiffness: 100 })
+      withSpring(1, { damping: 12, stiffness: 100 }),
     );
   }, [delay, duration, rotation, scale]);
 
@@ -331,30 +361,9 @@ const NeonRing: React.FC<NeonRingProps> = ({
 
   return (
     <Animated.View
-      style={[
-        styles.ringContainer,
-        {
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-        },
-        animatedStyle,
-      ]}
+      style={[styles.ringContainer, containerStyle, animatedStyle]}
     >
-      <View
-        style={[
-          styles.ring,
-          {
-            width: size,
-            height: size,
-            borderRadius: size / 2,
-            borderWidth,
-            borderColor: 'transparent',
-            borderTopColor: colors[0],
-            borderRightColor: colors[1],
-          },
-        ]}
-      />
+      <View style={[styles.ring, ringStyle]} />
     </Animated.View>
   );
 };
@@ -372,11 +381,11 @@ const ProgressDot: React.FC<{ delay: number; color: string }> = ({
       withRepeat(
         withSequence(
           withTiming(1, { duration: 400 }),
-          withTiming(0.3, { duration: 400 })
+          withTiming(0.3, { duration: 400 }),
         ),
         -1,
-        false
-      )
+        false,
+      ),
     );
   }, [delay, opacity]);
 
@@ -489,19 +498,19 @@ const LiquidLoading: React.FC<LiquidLoadingProps> = ({
     breathingScale.value = withRepeat(
       withSequence(
         withTiming(1.3, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) })
+        withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
       ),
       -1,
-      false
+      false,
     );
 
     glowOpacity.value = withRepeat(
       withSequence(
         withTiming(0.6, { duration: 1000 }),
-        withTiming(0.3, { duration: 1000 })
+        withTiming(0.3, { duration: 1000 }),
       ),
       -1,
-      false
+      false,
     );
 
     messageOpacity.value = withDelay(500, withTiming(1, { duration: 600 }));
@@ -531,7 +540,11 @@ const LiquidLoading: React.FC<LiquidLoadingProps> = ({
       testID={testID}
     >
       {blur ? (
-        <BlurView intensity={blurIntensity} tint="dark" style={styles.backdrop} />
+        <BlurView
+          intensity={blurIntensity}
+          tint="dark"
+          style={styles.backdrop}
+        />
       ) : (
         <View style={styles.backdrop} />
       )}
@@ -622,7 +635,11 @@ const LiquidLoading: React.FC<LiquidLoadingProps> = ({
 
         <View style={styles.dotsContainer}>
           {[0, 1, 2].map((i) => (
-            <ProgressDot key={i} delay={i * 200} color={variantColors.primary} />
+            <ProgressDot
+              key={i}
+              delay={i * 200}
+              color={variantColors.primary}
+            />
           ))}
         </View>
       </View>

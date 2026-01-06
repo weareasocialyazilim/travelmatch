@@ -58,6 +58,20 @@ const OrbitingParticle: React.FC<OrbitingParticleProps> = ({
   const rotation = useSharedValue(0);
   const opacity = useSharedValue(0);
 
+  const particleStyle = useMemo(
+    () => ({
+      width: size,
+      height: size,
+      borderRadius: size / 2,
+      backgroundColor: color,
+      shadowColor: color,
+      shadowOffset: { width: 0, height: 0 } as const,
+      shadowOpacity: 0.8,
+      shadowRadius: size * 2,
+    }),
+    [size, color],
+  );
+
   useEffect(() => {
     rotation.value = withDelay(
       delay,
@@ -91,20 +105,7 @@ const OrbitingParticle: React.FC<OrbitingParticleProps> = ({
 
   return (
     <Animated.View
-      style={[
-        styles.orbitingParticle,
-        {
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          backgroundColor: color,
-          shadowColor: color,
-          shadowOffset: { width: 0, height: 0 },
-          shadowOpacity: 0.8,
-          shadowRadius: size * 2,
-        },
-        animatedStyle,
-      ]}
+      style={[styles.orbitingParticle, particleStyle, animatedStyle]}
     />
   );
 };
@@ -129,6 +130,28 @@ const NeonRing: React.FC<NeonRingProps> = ({
 }) => {
   const rotation = useSharedValue(0);
   const scale = useSharedValue(0.8);
+
+  const containerStyle = useMemo(
+    () => ({
+      width: size,
+      height: size,
+      borderRadius: size / 2,
+    }),
+    [size],
+  );
+
+  const ringStyle = useMemo(
+    () => ({
+      width: size,
+      height: size,
+      borderRadius: size / 2,
+      borderWidth,
+      borderColor: 'transparent' as const,
+      borderTopColor: colors[0],
+      borderRightColor: colors[1],
+    }),
+    [size, borderWidth, colors],
+  );
 
   useEffect(() => {
     rotation.value = withDelay(
@@ -159,30 +182,9 @@ const NeonRing: React.FC<NeonRingProps> = ({
 
   return (
     <Animated.View
-      style={[
-        styles.ringContainer,
-        {
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-        },
-        animatedStyle,
-      ]}
+      style={[styles.ringContainer, containerStyle, animatedStyle]}
     >
-      <View
-        style={[
-          styles.ring,
-          {
-            width: size,
-            height: size,
-            borderRadius: size / 2,
-            borderWidth,
-            borderColor: 'transparent',
-            borderTopColor: colors[0],
-            borderRightColor: colors[1],
-          },
-        ]}
-      />
+      <View style={[styles.ring, ringStyle]} />
     </Animated.View>
   );
 };
