@@ -32,11 +32,12 @@ echo ""
 case $ENV in
   local)
     echo -e "${GREEN}Using local Supabase instance...${NC}"
-    DB_URL=$(supabase status | grep "DB URL" | awk '{print $3}')
+    # Parse DB URL from new supabase status format
+    DB_URL=$(supabase status 2>/dev/null | grep -E "postgresql://.*@.*:.*/" | sed 's/.*│ //' | sed 's/ │.*//' | tr -d '│ ' | head -1)
     if [ -z "$DB_URL" ]; then
-      echo -e "${RED}Error: Local Supabase not running${NC}"
-      echo -e "${YELLOW}Start with: supabase start${NC}"
-      exit 1
+      # Fallback to default local URL
+      DB_URL="postgresql://postgres:postgres@127.0.0.1:54322/postgres"
+      echo -e "${YELLOW}Using default local DB URL: ${DB_URL}${NC}"
     fi
     ;;
   staging)

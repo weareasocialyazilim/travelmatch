@@ -89,20 +89,9 @@ ON notifications(user_id, created_at DESC)
 WHERE read = false;
 
 -- ===========================================
--- BOOKINGS & REQUESTS OPTIMIZATION
+-- BOOKINGS & REQUESTS OPTIMIZATION (REMOVED - tables no longer exist)
+-- See: 20260103000001_remove_bookings_trip_requests.sql
 -- ===========================================
-
--- Optimize booking status lookups
-CREATE INDEX IF NOT EXISTS idx_bookings_user_status
-ON bookings(user_id, status, created_at DESC);
-
--- Optimize trip bookings lookup
-CREATE INDEX IF NOT EXISTS idx_bookings_trip_status
-ON bookings(trip_id, status);
-
--- Optimize trip request queries
-CREATE INDEX IF NOT EXISTS idx_trip_requests_user_status
-ON trip_requests(user_id, status, created_at DESC);
 
 -- ===========================================
 -- REVIEWS & TRUST OPTIMIZATION
@@ -134,4 +123,4 @@ ANALYZE moments;
 ANALYZE transactions;
 ANALYZE users;
 ANALYZE notifications;
-ANALYZE bookings;
+-- ANALYZE bookings; -- REMOVED - table no longer exists
