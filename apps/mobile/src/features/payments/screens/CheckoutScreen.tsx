@@ -31,7 +31,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { COLORS, GRADIENTS } from '@/constants/colors';
-import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
+import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { usePayments } from '@/hooks/usePayments';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   headerTitle: {
-    fontSize: FONT_SIZES_V2.bodyLarge,
+    fontSize: FONT_SIZES.bodyLarge,
     fontFamily: FONTS.display.bold,
     fontWeight: '700',
     color: COLORS.text.primary,
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
   },
   summaryTitle: {
-    fontSize: FONT_SIZES_V2.h3,
+    fontSize: FONT_SIZES.h3,
     color: COLORS.text.primary,
     fontFamily: FONTS.display.bold,
     marginTop: 4,
@@ -410,12 +410,12 @@ const styles = StyleSheet.create({
   methodText: {
     color: COLORS.text.primary,
     fontFamily: FONTS.body.semibold,
-    fontSize: FONT_SIZES_V2.body,
+    fontSize: FONT_SIZES.body,
   },
   methodSubtext: {
     color: COLORS.text.muted,
     fontFamily: FONTS.mono.regular,
-    fontSize: FONT_SIZES_V2.caption,
+    fontSize: FONT_SIZES.caption,
     marginTop: 2,
   },
 
@@ -450,12 +450,12 @@ const styles = StyleSheet.create({
   addMethodText: {
     color: COLORS.primary,
     fontFamily: FONTS.body.semibold,
-    fontSize: FONT_SIZES_V2.bodySmall,
+    fontSize: FONT_SIZES.bodySmall,
   },
 
   // Legal Note
   legalNote: {
-    fontSize: FONT_SIZES_V2.caption,
+    fontSize: FONT_SIZES.caption,
     color: COLORS.text.muted,
     textAlign: 'center',
     lineHeight: 18,
@@ -492,13 +492,13 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   payButtonText: {
-    fontSize: FONT_SIZES_V2.bodyLarge,
+    fontSize: FONT_SIZES.bodyLarge,
     fontWeight: '800',
     color: COLORS.white,
     fontFamily: FONTS.body.bold,
   },
   securityText: {
-    fontSize: FONT_SIZES_V2.caption,
+    fontSize: FONT_SIZES.caption,
     color: COLORS.text.muted,
     textAlign: 'center',
     marginTop: 12,

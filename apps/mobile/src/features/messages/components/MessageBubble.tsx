@@ -12,7 +12,7 @@ import { View, Text, Image, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, GRADIENTS } from '@/constants/colors';
-import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
+import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { OfferBubble } from './OfferBubble';
 import type { Message } from '../hooks/useChatScreen';
 import type { OfferStatus } from '@/types/message.types';
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   systemMessageText: {
-    fontSize: FONT_SIZES_V2.caption,
+    fontSize: FONT_SIZES.caption,
     fontFamily: FONTS.body.regular,
     color: COLORS.text.secondary,
     textAlign: 'center',
@@ -247,13 +247,13 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   otherMessageText: {
-    fontSize: FONT_SIZES_V2.body,
+    fontSize: FONT_SIZES.body,
     fontFamily: FONTS.body.regular,
     color: COLORS.text.primary,
     lineHeight: 22,
   },
   otherMessageTime: {
-    fontSize: FONT_SIZES_V2.tiny,
+    fontSize: FONT_SIZES.tiny,
     fontFamily: FONTS.body.regular,
     color: COLORS.text.muted,
     marginTop: 4,
@@ -275,13 +275,13 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   myMessageText: {
-    fontSize: FONT_SIZES_V2.body,
+    fontSize: FONT_SIZES.body,
     fontFamily: FONTS.body.regular,
     color: COLORS.white,
     lineHeight: 22,
   },
   myMessageTime: {
-    fontSize: FONT_SIZES_V2.tiny,
+    fontSize: FONT_SIZES.tiny,
     fontFamily: FONTS.body.regular,
     color: 'rgba(255, 255, 255, 0.7)',
     marginTop: 4,
@@ -321,14 +321,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   proofHeaderText: {
-    fontSize: FONT_SIZES_V2.bodySmall,
+    fontSize: FONT_SIZES.bodySmall,
     fontFamily: FONTS.body.semibold,
     fontWeight: '600',
     color: COLORS.trust.primary,
     flex: 1,
   },
   proofFilename: {
-    fontSize: FONT_SIZES_V2.caption,
+    fontSize: FONT_SIZES.caption,
     fontFamily: FONTS.mono.regular,
     color: COLORS.trust.dark,
   },
@@ -361,17 +361,17 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.error,
   },
   proofStatusTextPending: {
-    fontSize: FONT_SIZES_V2.caption,
+    fontSize: FONT_SIZES.caption,
     fontFamily: FONTS.body.semibold,
     color: COLORS.warning,
   },
   proofStatusTextVerified: {
-    fontSize: FONT_SIZES_V2.caption,
+    fontSize: FONT_SIZES.caption,
     fontFamily: FONTS.body.semibold,
     color: COLORS.success,
   },
   proofStatusTextRejected: {
-    fontSize: FONT_SIZES_V2.caption,
+    fontSize: FONT_SIZES.caption,
     fontFamily: FONTS.body.semibold,
     color: COLORS.error,
   },

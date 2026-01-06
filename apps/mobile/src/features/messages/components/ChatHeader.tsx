@@ -31,7 +31,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { supabase } from '@/config/supabase';
 import { COLORS } from '@/constants/colors';
-import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
+import { FONTS, FONT_SIZES } from '@/constants/typography';
 
 export interface LinkedMoment {
   id: string;
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   headerName: {
-    fontSize: FONT_SIZES_V2.bodyLarge,
+    fontSize: FONT_SIZES.bodyLarge,
     fontFamily: FONTS.display.bold,
     fontWeight: '700',
     color: COLORS.text.primary,
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   statusText: {
-    fontSize: FONT_SIZES_V2.tiny,
+    fontSize: FONT_SIZES.tiny,
     color: COLORS.text.secondary,
     fontFamily: FONTS.body.regular,
   },
@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   typingText: {
-    fontSize: FONT_SIZES_V2.tiny,
+    fontSize: FONT_SIZES.tiny,
     color: COLORS.brand?.primary || COLORS.primary,
     fontFamily: FONTS.body.medium || FONTS.body.regular,
     fontWeight: '500',
@@ -486,14 +486,14 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   momentTitle: {
-    fontSize: FONT_SIZES_V2.bodySmall,
+    fontSize: FONT_SIZES.bodySmall,
     fontFamily: FONTS.body.semibold,
     fontWeight: '600',
     color: COLORS.text.primary,
     marginBottom: 2,
   },
   momentSubtitle: {
-    fontSize: FONT_SIZES_V2.caption,
+    fontSize: FONT_SIZES.caption,
     fontFamily: FONTS.body.regular,
     color: COLORS.text.secondary,
   },
@@ -504,7 +504,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   viewButtonText: {
-    fontSize: FONT_SIZES_V2.caption,
+    fontSize: FONT_SIZES.caption,
     fontFamily: FONTS.body.semibold,
     fontWeight: '600',
     color: COLORS.primary,
