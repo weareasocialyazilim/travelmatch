@@ -42,6 +42,7 @@ import { useStories } from '@/hooks/useStories';
 import { useAuth } from '@/hooks/useAuth';
 import { COLORS } from '@/constants/colors';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
+import { LiquidScreenWrapper } from '@/components/layout';
 import { showLoginPrompt, showAlert } from '@/stores/modalStore';
 import type { NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/routeParams';
@@ -367,68 +368,65 @@ const DiscoverScreen = () => {
   // Loading state
   if (loading && activeMoments.length === 0) {
     return (
-      <View style={styles.loadingContainer}>
-        <StatusBar barStyle="light-content" backgroundColor="black" />
-        <ActivityIndicator size="large" color={COLORS.brand.primary} />
-        <Text style={styles.loadingText}>Discovering moments...</Text>
-      </View>
+      <LiquidScreenWrapper variant="twilight" safeAreaTop>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.brand.primary} />
+          <Text style={styles.loadingText}>Discovering moments...</Text>
+        </View>
+      </LiquidScreenWrapper>
     );
   }
 
   // Error state
   if (error && activeMoments.length === 0) {
     return (
-      <View style={styles.errorContainer}>
-        <StatusBar barStyle="light-content" backgroundColor="black" />
-        <Text style={styles.errorText}>{String(error)}</Text>
-        <Text style={styles.retryText} onPress={handleRefresh}>
-          Tap to retry
-        </Text>
-      </View>
+      <LiquidScreenWrapper variant="twilight" safeAreaTop>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{String(error)}</Text>
+          <Text style={styles.retryText} onPress={handleRefresh}>
+            Tap to retry
+          </Text>
+        </View>
+      </LiquidScreenWrapper>
     );
   }
 
   // Empty state - Premium Turkish UX
   if (!loading && activeMoments.length === 0) {
     return (
-      <View style={styles.emptyContainer}>
-        <StatusBar barStyle="light-content" backgroundColor="black" />
-        <Ionicons
-          name="compass-outline"
-          size={64}
-          color={COLORS.text.muted}
-          style={styles.emptyIcon}
-        />
-        <Text style={styles.emptyTitle}>Bu civarda henüz an yok 🗺️</Text>
-        <Text style={styles.emptySubtitle}>
-          Mesafe filtreni artırmayı dene veya{'\n'}yeni bir an başlatan ilk sen
-          ol!
-        </Text>
-        <TouchableOpacity
-          style={styles.emptyCTAButton}
-          onPress={() => navigation.navigate('CreateMoment' as any)}
-        >
-          <LinearGradient
-            colors={[COLORS.primary, '#22C55E']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.emptyCTAGradient}
+      <LiquidScreenWrapper variant="twilight" safeAreaTop>
+        <View style={styles.emptyContainer}>
+          <Ionicons
+            name="compass-outline"
+            size={64}
+            color={COLORS.text.muted}
+            style={styles.emptyIcon}
+          />
+          <Text style={styles.emptyTitle}>Bu civarda henüz an yok 🗺️</Text>
+          <Text style={styles.emptySubtitle}>
+            Mesafe filtreni artırmayı dene veya{'\n'}yeni bir an başlatan ilk
+            sen ol!
+          </Text>
+          <TouchableOpacity
+            style={styles.emptyCTAButton}
+            onPress={() => navigation.navigate('CreateMoment' as any)}
           >
-            <Text style={styles.emptyCTAText}>An Oluştur</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
+            <LinearGradient
+              colors={[COLORS.primary, '#22C55E']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.emptyCTAGradient}
+            >
+              <Text style={styles.emptyCTAText}>An Oluştur</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+      </LiquidScreenWrapper>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={COLORS.bg.primary}
-        translucent={false}
-      />
-
+    <LiquidScreenWrapper variant="twilight" safeAreaTop animated={false}>
       {/* Awwwards-style Header */}
       <AwwwardsDiscoverHeader
         userName="Explorer"
@@ -466,7 +464,7 @@ const DiscoverScreen = () => {
 
       {/* Guest Login Prompt Modal - Now rendered by ModalProvider */}
       {/* FloatingDock is rendered by MainTabNavigator */}
-    </View>
+    </LiquidScreenWrapper>
   );
 };
 
