@@ -25,8 +25,9 @@ apps/web
 
 # ═══════════════════════════════════════════════════════════════════
 # BACKEND SERVICES (Not needed for mobile build)
+# Use /services to only match root level, not src/services!
 # ═══════════════════════════════════════════════════════════════════
-services
+/services
 
 # ═══════════════════════════════════════════════════════════════════
 # SUPABASE (Edge functions, migrations - not needed)
