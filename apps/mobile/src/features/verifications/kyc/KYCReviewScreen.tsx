@@ -39,6 +39,7 @@ import type { VerificationData } from './types';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useToast } from '@/context/ToastContext';
 import { supabase } from '@/config/supabase';
+import { logger } from '@/utils/logger';
 
 // AI Analysis States
 type AnalysisState = 'idle' | 'analyzing' | 'success' | 'error';
@@ -208,7 +209,8 @@ const KYCReviewScreen: React.FC = () => {
       setTimeout(() => {
         navigation.navigate('KYCPending');
       }, 500);
-    } catch (_analysisError) {
+    } catch (analysisError) {
+      logger.error('[KYCReview] AI analysis failed', { error: analysisError });
       setAnalysisState('error');
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       showToast('AI analizi başarısız oldu. Lütfen tekrar deneyin.', 'error');

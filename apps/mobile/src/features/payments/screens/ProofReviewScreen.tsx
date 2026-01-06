@@ -191,7 +191,11 @@ export const ProofReviewScreen: React.FC<ProofReviewScreenProps> = ({
               if (error) throw error;
 
               showToast('Süre 7 gün uzatıldı', 'success');
-            } catch (_extendError) {
+            } catch (extendError) {
+              logger.error('[ProofReview] Failed to extend deadline', {
+                error: extendError,
+                escrowId,
+              });
               showToast('Süre uzatılamadı', 'error');
             }
           },

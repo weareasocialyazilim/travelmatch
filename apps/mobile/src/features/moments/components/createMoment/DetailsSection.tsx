@@ -20,6 +20,7 @@ import { COLORS, CARD_SHADOW } from '@/constants/colors';
 import { LAYOUT } from '@/constants/layout';
 import { VALUES } from '@/constants/values';
 import { useToast } from '@/context/ToastContext';
+import { logger } from '@/utils/logger';
 
 export interface Place {
   name: string;
@@ -103,7 +104,10 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
               address: `${address.city || ''}, ${address.country || ''}`.trim(),
             });
           }
-        } catch (_locationError) {
+        } catch (locationError) {
+          logger.warn('[DetailsSection] Could not get current location', {
+            error: locationError,
+          });
           showToast(
             'Konumunuz alınamadı. Lütfen konum servislerinizin açık olduğundan emin olun',
             'error',

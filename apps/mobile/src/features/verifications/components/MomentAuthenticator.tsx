@@ -33,6 +33,7 @@ import Animated, {
   ZoomIn,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
+import { logger } from '@/utils/logger';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import * as Haptics from 'expo-haptics';
@@ -214,7 +215,10 @@ export const MomentAuthenticator = memo<MomentAuthenticatorProps>(
 
         try {
           apiResult = await callVerificationAPI();
-        } catch (_apiError) {
+        } catch (apiError) {
+          logger.error('[MomentAuthenticator] Verification API failed', {
+            error: apiError,
+          });
           // If API fails, reject
           onResult({
             status: 'rejected',
@@ -263,7 +267,10 @@ export const MomentAuthenticator = memo<MomentAuthenticatorProps>(
 
         setResult(finalResult);
         onResult(finalResult);
-      } catch (_authError) {
+      } catch (authError) {
+        logger.error('[MomentAuthenticator] Authentication failed', {
+          error: authError,
+        });
         const errorResult: AuthenticationResult = {
           status: 'rejected',
           reasons: ['Bir hata oluştu'],

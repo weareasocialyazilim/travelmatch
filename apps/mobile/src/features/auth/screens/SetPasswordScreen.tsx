@@ -17,6 +17,7 @@ import { useToast } from '@/context/ToastContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { COLORS } from '@/constants/colors';
 import { updatePassword } from '../services/authService';
+import { logger } from '@/utils/logger';
 
 interface PasswordRequirement {
   label: string;
@@ -66,7 +67,10 @@ export const SetPasswordScreen: React.FC = () => {
         showToast('Password set successfully!', 'success');
         navigation.navigate('SuccessConfirmation');
       }
-    } catch (_setPasswordError) {
+    } catch (setPasswordError) {
+      logger.error('[SetPassword] Failed to set password', {
+        error: setPasswordError,
+      });
       showToast('An error occurred. Please try again.', 'error');
     } finally {
       setIsLoading(false);

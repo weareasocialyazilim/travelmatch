@@ -15,6 +15,7 @@ import { useToast } from '@/context/ToastContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { COLORS } from '@/constants/colors';
 import { LoadingState } from '@/components/LoadingState';
+import { logger } from '@/utils/logger';
 import {
   verifyPhoneOtp as verifyOtp,
   resendVerificationEmail as resendOtp,
@@ -102,7 +103,8 @@ export const VerifyCodeScreen: React.FC = () => {
         showToast('Code verified successfully!', 'success');
         navigation.navigate('SetPassword');
       }
-    } catch (_verifyError) {
+    } catch (verifyError) {
+      logger.error('[VerifyCode] Verification failed', { error: verifyError });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       showToast('Verification failed. Please try again.', 'error');
     } finally {
@@ -133,7 +135,10 @@ export const VerifyCodeScreen: React.FC = () => {
         setCode(Array(CODE_LENGTH).fill(''));
         inputRefs.current[0]?.focus();
       }
-    } catch (_resendError) {
+    } catch (resendError) {
+      logger.error('[VerifyCode] Failed to resend code', {
+        error: resendError,
+      });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       showToast('Failed to resend code. Please try again.', 'error');
     } finally {

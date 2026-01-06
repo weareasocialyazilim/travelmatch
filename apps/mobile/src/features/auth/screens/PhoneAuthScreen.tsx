@@ -15,6 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { signInWithPhone, verifyPhoneOtp } from '../services/authService';
 import { useToast } from '@/context/ToastContext';
+import { logger } from '@/utils/logger';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { COLORS } from '@/constants/colors';
 
@@ -76,7 +77,8 @@ export const PhoneAuthScreen: React.FC = () => {
         setCountdown(60);
         showToast('Doğrulama kodu gönderildi!', 'success');
       }
-    } catch (_sendOtpError) {
+    } catch (sendOtpError) {
+      logger.error('[PhoneAuth] Send OTP failed', { error: sendOtpError });
       showToast('Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
     } finally {
       setIsLoading(false);
@@ -130,7 +132,8 @@ export const PhoneAuthScreen: React.FC = () => {
         showToast('Telefon başarıyla doğrulandı!', 'success');
         // Navigation handled by auth state change
       }
-    } catch (_verifyOtpError) {
+    } catch (verifyOtpError) {
+      logger.error('[PhoneAuth] Verify OTP failed', { error: verifyOtpError });
       showToast('Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
     } finally {
       setIsLoading(false);
