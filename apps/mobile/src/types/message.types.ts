@@ -3,7 +3,13 @@
  * Discriminated Union Pattern for type-safe message handling
  */
 
-export type MessageType = 'text' | 'image' | 'location' | 'system' | 'offer';
+export type MessageType =
+  | 'text'
+  | 'image'
+  | 'location'
+  | 'system'
+  | 'offer'
+  | 'gift_offer';
 
 export type MessageStatus =
   | 'sending'

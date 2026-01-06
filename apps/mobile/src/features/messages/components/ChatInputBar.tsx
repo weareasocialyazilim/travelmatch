@@ -9,7 +9,7 @@
  * - Broadcast typing status via Supabase channel
  */
 
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useRef, useCallback } from 'react';
 import {
   View,
   TextInput,
@@ -65,7 +65,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
 }) => {
   const insets = useSafeAreaInsets();
   const { isConnected } = useNetworkStatus();
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const _typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastTypingBroadcastRef = useRef<number>(0);
 
   /**

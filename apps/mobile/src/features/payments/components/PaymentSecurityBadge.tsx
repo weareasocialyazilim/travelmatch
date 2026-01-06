@@ -1,5 +1,12 @@
 import React from 'react';
-import { StyleSheet, View, Text, Platform } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  Platform,
+  StyleProp,
+  ViewStyle,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, {
   useAnimatedStyle,
@@ -9,7 +16,7 @@ import Animated, {
   withSequence,
   Easing,
 } from 'react-native-reanimated';
-import { COLORS } from '@/theme/colors';
+import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
 
@@ -27,7 +34,9 @@ interface PaymentSecurityBadgeProps {
  * - Animated shield icon for ESCROW mode
  * - Clear, concise security messaging
  */
-export const PaymentSecurityBadge: React.FC<PaymentSecurityBadgeProps> = ({ mode }) => {
+export const PaymentSecurityBadge: React.FC<PaymentSecurityBadgeProps> = ({
+  mode,
+}) => {
   const isEscrow = mode === 'ESCROW';
   const pulseScale = useSharedValue(1);
 
@@ -36,11 +45,14 @@ export const PaymentSecurityBadge: React.FC<PaymentSecurityBadgeProps> = ({ mode
     if (isEscrow) {
       pulseScale.value = withRepeat(
         withSequence(
-          withTiming(1.05, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
-          withTiming(1, { duration: 1500, easing: Easing.inOut(Easing.ease) })
+          withTiming(1.05, {
+            duration: 1500,
+            easing: Easing.inOut(Easing.ease),
+          }),
+          withTiming(1, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
         ),
         -1,
-        false
+        false,
       );
     }
   }, [isEscrow, pulseScale]);
@@ -50,14 +62,16 @@ export const PaymentSecurityBadge: React.FC<PaymentSecurityBadgeProps> = ({ mode
   }));
 
   const iconColor = isEscrow ? COLORS.brand.primary : COLORS.brand.secondary;
-  const glowColor = isEscrow ? COLORS.brand.primary : COLORS.brand.secondary;
 
   return (
     <GlassCard
       intensity={30}
-      style={[styles.container, isEscrow && styles.escrowGlow]}
-      showGlow={isEscrow}
-      glowColor={glowColor}
+      style={
+        [
+          styles.container,
+          isEscrow && styles.escrowGlow,
+        ] as StyleProp<ViewStyle>
+      }
       borderRadius={16}
       padding={0}
     >
@@ -78,12 +92,7 @@ export const PaymentSecurityBadge: React.FC<PaymentSecurityBadgeProps> = ({ mode
           </View>
           {/* Glow ring for ESCROW */}
           {isEscrow && (
-            <View
-              style={[
-                styles.iconGlow,
-                { backgroundColor: iconColor },
-              ]}
-            />
+            <View style={[styles.iconGlow, { backgroundColor: iconColor }]} />
           )}
         </Animated.View>
 

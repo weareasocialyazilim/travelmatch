@@ -86,7 +86,7 @@ const InboxScreen: React.FC = () => {
           name: chat.user.name,
           avatar: chat.user.avatar,
           isVerified: chat.user.isVerified,
-          role: 'Host',
+          role: 'Local' as const,
           kyc: chat.user.isVerified ? 'Verified' : 'Pending',
           location: '',
         },

@@ -21,6 +21,7 @@ type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 export interface ReportOption<T extends string = string> {
   id: T;
   label: string;
+  description?: string;
 }
 
 export interface ReportSummaryCardProps {

@@ -15,11 +15,13 @@ type BadgeVariant =
   | 'warning'
   | 'error'
   | 'info';
-type BadgeSize = 'small' | 'medium' | 'large';
+type BadgeSize = 'small' | 'medium' | 'large' | 'sm' | 'md' | 'lg';
 
 interface BadgeProps {
   /** Content to display in badge */
   children?: React.ReactNode;
+  /** Label text (alias for children) */
+  label?: string;
   /** Numeric count to display */
   count?: number;
   /** Maximum count before showing + */
@@ -28,6 +30,8 @@ interface BadgeProps {
   variant?: BadgeVariant;
   /** Badge size */
   size?: BadgeSize;
+  /** Icon name (MaterialCommunityIcons) */
+  icon?: string;
   /** Show as dot without content */
   dot?: boolean;
   /** Custom container style */
@@ -45,8 +49,22 @@ const variantColors: Record<BadgeVariant, { bg: string; text: string }> = {
   info: { bg: '#2196F3', text: '#FFFFFF' },
 };
 
+// Size map to normalize short and long size names
+const normalizeSize = (size: BadgeSize): 'small' | 'medium' | 'large' => {
+  switch (size) {
+    case 'sm':
+      return 'small';
+    case 'md':
+      return 'medium';
+    case 'lg':
+      return 'large';
+    default:
+      return size as 'small' | 'medium' | 'large';
+  }
+};
+
 const sizeStyles: Record<
-  BadgeSize,
+  'small' | 'medium' | 'large',
   { paddingH: number; paddingV: number; fontSize: number; minWidth: number }
 > = {
   small: { paddingH: 6, paddingV: 2, fontSize: 10, minWidth: 16 },
@@ -56,25 +74,28 @@ const sizeStyles: Record<
 
 export const Badge: React.FC<BadgeProps> = ({
   children,
+  label,
   count,
   maxCount = 99,
   variant = 'default',
   size = 'medium',
+  icon: _icon,
   dot = false,
   style,
   textStyle,
 }) => {
   const colors = variantColors[variant];
-  const sizing = sizeStyles[size];
+  const normalizedSize = normalizeSize(size);
+  const sizing = sizeStyles[normalizedSize];
 
-  // Determine display content
+  // Determine display content (label takes precedence over children)
   let displayContent: React.ReactNode;
   if (dot) {
     displayContent = null;
   } else if (count !== undefined) {
     displayContent = count > maxCount ? `${maxCount}+` : count.toString();
   } else {
-    displayContent = children;
+    displayContent = label || children;
   }
 
   // Dot style
@@ -127,5 +148,36 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
 });
+
+/**
+ * NotificationBadge - Convenience wrapper for notification count badges
+ * Shows count with optional max limit (defaults to 99+)
+ */
+interface NotificationBadgeProps {
+  count: number;
+  max?: number;
+  style?: ViewStyle;
+}
+
+export const NotificationBadge: React.FC<NotificationBadgeProps> = ({
+  count,
+  max = 99,
+  style,
+}) => {
+  // Don't render for 0 or negative counts
+  if (count <= 0) {
+    return null;
+  }
+
+  return (
+    <Badge
+      count={count}
+      maxCount={max}
+      variant="error"
+      size="small"
+      style={style}
+    />
+  );
+};
 
 export default Badge;

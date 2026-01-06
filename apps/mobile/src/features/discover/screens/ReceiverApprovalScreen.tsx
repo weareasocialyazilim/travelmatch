@@ -23,8 +23,6 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  withTiming,
-  interpolate,
   FadeIn,
   FadeInDown,
   SlideInUp,
@@ -77,7 +75,7 @@ export const ReceiverApprovalScreen: React.FC<
   const momentId = route.params?.momentId;
 
   // Animation values
-  const cardScale = useSharedValue(1);
+  const _cardScale = useSharedValue(1);
   const declineScale = useSharedValue(1);
   const approveScale = useSharedValue(1);
 
@@ -265,7 +263,9 @@ export const ReceiverApprovalScreen: React.FC<
     );
   }
 
-  const membershipBadge = getMembershipBadge(currentCandidate.giver.membershipTier);
+  const membershipBadge = getMembershipBadge(
+    currentCandidate.giver.membershipTier,
+  );
 
   return (
     <View style={styles.container}>
@@ -307,9 +307,9 @@ export const ReceiverApprovalScreen: React.FC<
             {/* Candidate Info */}
             <View style={styles.candidateInfo}>
               <TMAvatar
-                size="xlarge"
+                size="hero"
                 name={currentCandidate.giver.name}
-                imageUrl={currentCandidate.giver.avatar}
+                source={currentCandidate.giver.avatar}
               />
               <Text style={styles.candidateName}>
                 {currentCandidate.giver.name}
@@ -340,6 +340,7 @@ export const ReceiverApprovalScreen: React.FC<
             <View style={styles.trustMetric}>
               <TrustScoreCircle
                 score={currentCandidate.giver.trustScore || 85}
+                level="Güvenilir"
                 size={100}
               />
               <Text style={styles.trustNote}>Güvenli Etkileşim Skoru</Text>

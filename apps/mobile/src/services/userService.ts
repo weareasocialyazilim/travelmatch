@@ -588,10 +588,10 @@ export const userService = {
     if (!userData) throw new Error('User not found');
 
     const typedUserData = userData as UserRow;
-    const notifPrefs: NotificationPreferences =
-      typedUserData.notification_preferences || {};
-    const privacySettings: PrivacySettings =
-      typedUserData.privacy_settings || {};
+    const notifPrefs = (typedUserData.notification_preferences ||
+      {}) as NotificationPreferences;
+    const privacySettings = (typedUserData.privacy_settings ||
+      {}) as PrivacySettings;
 
     const preferences: UserPreferences = {
       emailNotifications: notifPrefs.email ?? true,
@@ -627,10 +627,10 @@ export const userService = {
     // Fetch current to merge
     const { data: currentUser } = await dbUsersService.getById(user.id);
     const typedCurrentUser = currentUser as UserRow | null;
-    const currentNotif: NotificationPreferences =
-      typedCurrentUser?.notification_preferences || {};
-    const currentPrivacy: PrivacySettings =
-      typedCurrentUser?.privacy_settings || {};
+    const currentNotif = (typedCurrentUser?.notification_preferences ||
+      {}) as NotificationPreferences;
+    const currentPrivacy = (typedCurrentUser?.privacy_settings ||
+      {}) as PrivacySettings;
 
     const updates: Partial<UserRow> = {};
 
@@ -669,10 +669,10 @@ export const userService = {
     if (error) throw error;
 
     const typedUpdatedUser = updatedUser as UserRow | null;
-    const newNotif: NotificationPreferences =
-      typedUpdatedUser?.notification_preferences || {};
-    const newPrivacy: PrivacySettings =
-      typedUpdatedUser?.privacy_settings || {};
+    const newNotif = (typedUpdatedUser?.notification_preferences ||
+      {}) as NotificationPreferences;
+    const newPrivacy = (typedUpdatedUser?.privacy_settings ||
+      {}) as PrivacySettings;
 
     const preferences: UserPreferences = {
       emailNotifications: newNotif.email ?? true,
@@ -964,7 +964,12 @@ export const userService = {
     }
 
     // Call the database function
-    const { data, error } = await supabase.rpc('get_detailed_trust_stats', {
+    const { data, error } = await (
+      supabase.rpc as (
+        fn: string,
+        params: { p_user_id: string },
+      ) => ReturnType<typeof supabase.rpc>
+    )('get_detailed_trust_stats', {
       p_user_id: targetUserId,
     });
 

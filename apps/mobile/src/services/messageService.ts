@@ -14,7 +14,6 @@ import type { Database } from '../types/database.types';
 // Database types
 type Tables = Database['public']['Tables'];
 type MessageRow = Tables['messages']['Row'];
-type ConversationRow = Tables['conversations']['Row'];
 type UserRow = Tables['users']['Row'];
 
 /**
@@ -77,7 +76,8 @@ export type MessageType =
   | 'image'
   | 'gift_offer'
   | 'system'
-  | 'location';
+  | 'location'
+  | 'offer';
 
 export interface MessageMetadata {
   imageUrl?: string;
@@ -128,7 +128,7 @@ function transformMessage(raw: MessageRow & { sender?: UserRow }): Message {
     sender: raw.sender
       ? {
           id: raw.sender.id,
-          displayName: raw.sender.display_name || 'Unknown User',
+          displayName: raw.sender.full_name || 'Unknown User',
           avatarUrl: raw.sender.avatar_url,
         }
       : undefined,
@@ -172,14 +172,14 @@ class MessageService {
           if (otherParticipantIds.length > 0) {
             const { data: users } = await supabase
               .from('users')
-              .select('id, display_name, avatar_url, is_verified')
+              .select('id, full_name, avatar_url, verified')
               .in('id', otherParticipantIds);
 
-            participants = (users || []).map((u: UserRow) => ({
+            participants = (users || []).map((u) => ({
               id: u.id,
-              displayName: u.display_name || 'Unknown User',
+              displayName: u.full_name || 'Unknown User',
               avatarUrl: u.avatar_url,
-              isVerified: u.is_verified || false,
+              isVerified: u.verified || false,
               isOnline: false, // TODO: Implement online status
             }));
           }

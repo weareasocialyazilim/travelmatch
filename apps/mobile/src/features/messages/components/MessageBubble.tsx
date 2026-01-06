@@ -86,13 +86,17 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
           {/* Status messages based on proof verification */}
           {proofStatus === 'pending' && (
             <View style={styles.proofStatusContainer}>
-              <View style={[styles.proofStatusDot, styles.proofStatusPending]} />
+              <View
+                style={[styles.proofStatusDot, styles.proofStatusPending]}
+              />
               <Text style={styles.proofStatusTextPending}>Doğrulanıyor...</Text>
             </View>
           )}
           {proofStatus === 'verified' && (
             <View style={styles.proofStatusContainer}>
-              <View style={[styles.proofStatusDot, styles.proofStatusVerified]} />
+              <View
+                style={[styles.proofStatusDot, styles.proofStatusVerified]}
+              />
               <Text style={styles.proofStatusTextVerified}>
                 Doğrulandı - Fonlar serbest bırakıldı
               </Text>
@@ -100,7 +104,9 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
           )}
           {proofStatus === 'rejected' && (
             <View style={styles.proofStatusContainer}>
-              <View style={[styles.proofStatusDot, styles.proofStatusRejected]} />
+              <View
+                style={[styles.proofStatusDot, styles.proofStatusRejected]}
+              />
               <Text style={styles.proofStatusTextRejected}>
                 Doğrulama başarısız
               </Text>
@@ -139,7 +145,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
     return (
       <View style={styles.myMessageRow}>
         <LinearGradient
-          colors={GRADIENTS.gift as unknown as string[]}
+          colors={GRADIENTS.gift as readonly [string, string, ...string[]]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.myMessageBubble}

@@ -837,15 +837,7 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.bodyLarge,
     color: COLORS.text.secondary,
   },
-  usernameInput: {
-    flex: 1,
-  },
   usernameError: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.error,
-    marginTop: SPACING.xs,
-  },
-  errorText: {
     ...TYPOGRAPHY.caption,
     color: COLORS.error,
     marginTop: SPACING.xs,
@@ -857,10 +849,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: SPACING.xs,
-  },
-  bioInput: {
-    minHeight: 100,
-    textAlignVertical: 'top',
   },
   charCount: {
     ...TYPOGRAPHY.caption,

@@ -1,13 +1,7 @@
 // KYC Document Type Selection Screen - Awwwards standard glass cards
 // Featuring silky glass effects and neon selection highlights
 import React, { useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  Pressable,
-} from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   useNavigation,
@@ -63,7 +57,7 @@ const DOCUMENT_OPTIONS = [
     label: 'Ehliyet',
     description: 'Fotoğraflı sürücü belgesi',
     icon: 'car' as const,
-    accentColor: COLORS.accent,
+    accentColor: COLORS.accent.primary,
   },
 ];
 
@@ -201,7 +195,7 @@ const KYCDocumentTypeScreen: React.FC = () => {
   const { data } = route.params;
 
   const [selectedType, setSelectedType] = useState<DocumentType | null>(
-    data.documentType
+    data.documentType,
   );
 
   const handleContinue = () => {
@@ -260,12 +254,14 @@ const KYCDocumentTypeScreen: React.FC = () => {
       </ScrollView>
 
       {/* Footer */}
-      <View style={[styles.footer, { paddingBottom: insets.bottom + SPACING.lg }]}>
+      <View
+        style={[styles.footer, { paddingBottom: insets.bottom + SPACING.lg }]}
+      >
         <TMButton
           title="Devam Et"
           variant="primary"
           onPress={handleContinue}
-          size="large"
+          size="lg"
           disabled={!selectedType}
           style={styles.continueButton}
         />

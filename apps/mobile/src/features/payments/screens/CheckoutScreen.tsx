@@ -21,7 +21,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import {
   useNavigation,
   useRoute,
@@ -61,7 +61,7 @@ const CheckoutScreen: React.FC = () => {
     amount,
     recipientId: _recipientId,
     recipientName,
-    momentTitle,
+    title: momentTitle,
   } = route.params || {};
 
   const { cards, createPaymentIntent, confirmPayment } = usePayments();
@@ -215,7 +215,9 @@ const CheckoutScreen: React.FC = () => {
                 <View>
                   <Text style={styles.methodText}>{method.name}</Text>
                   {method.last4 && (
-                    <Text style={styles.methodSubtext}>•••• {method.last4}</Text>
+                    <Text style={styles.methodSubtext}>
+                      •••• {method.last4}
+                    </Text>
                   )}
                 </View>
               </View>
@@ -239,15 +241,19 @@ const CheckoutScreen: React.FC = () => {
             style={styles.addMethodButton}
             onPress={() => navigation.navigate('PaymentMethods')}
           >
-            <Ionicons name="add-circle-outline" size={20} color={COLORS.primary} />
+            <Ionicons
+              name="add-circle-outline"
+              size={20}
+              color={COLORS.primary}
+            />
             <Text style={styles.addMethodText}>Yeni Yöntem Ekle</Text>
           </TouchableOpacity>
         </View>
 
         {/* Legal Note */}
         <Text style={styles.legalNote}>
-          "Öde" butonuna basarak Kullanım Koşullarını ve İptal Politikasını kabul
-          etmiş sayılırsınız.
+          "Öde" butonuna basarak Kullanım Koşullarını ve İptal Politikasını
+          kabul etmiş sayılırsınız.
         </Text>
       </ScrollView>
 
@@ -260,7 +266,7 @@ const CheckoutScreen: React.FC = () => {
           activeOpacity={0.9}
         >
           <LinearGradient
-            colors={GRADIENTS.gift as unknown as string[]}
+            colors={GRADIENTS.gift as readonly [string, string, ...string[]]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.payButtonGradient}
@@ -279,7 +285,11 @@ const CheckoutScreen: React.FC = () => {
         </TouchableOpacity>
 
         <Text style={styles.securityText}>
-          <Ionicons name="shield-checkmark" size={12} color={COLORS.trust.primary} />{' '}
+          <Ionicons
+            name="shield-checkmark"
+            size={12}
+            color={COLORS.trust.primary}
+          />{' '}
           256-bit SSL ile şifrelenmiş güvenli ödeme
         </Text>
       </View>

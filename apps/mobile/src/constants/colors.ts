@@ -399,6 +399,7 @@ export const COLORS = {
     onDarkMuted: 'rgba(255, 255, 255, 0.48)',
     inverse: '#121214',
     primaryMuted: 'rgba(248, 250, 252, 0.6)',
+    primaryWhite80: 'rgba(255, 255, 255, 0.8)',
   },
 
   bg: {
@@ -418,6 +419,7 @@ export const COLORS = {
     focus: '#DFFF00',
     glow: 'rgba(223, 255, 0, 0.3)',
     primary: 'rgba(255, 255, 255, 0.08)',
+    subtle: 'rgba(255, 255, 255, 0.06)',
   },
 
   feedback: {
@@ -638,6 +640,10 @@ export const COLORS = {
   warningTransparent20: 'rgba(245, 158, 11, 0.2)',
   successTransparent20: 'rgba(16, 185, 129, 0.2)',
   errorTransparent20: 'rgba(244, 63, 94, 0.2)',
+  trustTransparent20: 'rgba(6, 182, 212, 0.2)',
+
+  // Success variants
+  successDark: primitives.emerald[700],
 
   // Trust level colors
   trustLow: '#F87171',
@@ -660,6 +666,8 @@ export const COLORS = {
   twitter: '#1DA1F2',
   facebook: '#1877F2',
   google: '#EA4335',
+  telegram: '#0088CC',
+  linkedin: '#0A66C2',
 
   // Glass color
   glass: 'rgba(255, 255, 255, 0.03)',
@@ -683,6 +691,26 @@ export const COLORS = {
 
   // Seafoam
   seafoam: '#20B2AA',
+
+  // Brown variants
+  brownDark: '#5D4037',
+  brownGray: '#8B7355',
+
+  // Orange variants
+  orangeBright: '#FF6B00',
+
+  // White transparent variants
+  whiteTransparentDarker: 'rgba(255, 255, 255, 0.08)',
+  whiteTransparentDarkest: 'rgba(255, 255, 255, 0.04)',
+
+  // Background variants
+  backgroundDarkSecondary: '#1C1C1E',
+
+  // Warning muted
+  warningMuted: 'rgba(245, 158, 11, 0.15)',
+
+  // Primary white opacity variant
+  primaryWhite80: 'rgba(255, 255, 255, 0.8)',
 
   // ═══════════════════════════════════════════════════════════════════
   // ADDITIONAL MISSING PROPERTIES
@@ -740,5 +768,5 @@ export const getTrustRingColors = (score: number) => {
   return { ring: COLORS.trustLow, glow: 'rgba(248, 113, 113, 0.4)' };
 };
 
-// Re-export theme colors for components that need full nested structure
-export { COLORS as THEME_COLORS } from '../theme/colors';
+// THEME_COLORS is now deprecated - use COLORS directly
+export const THEME_COLORS = COLORS;

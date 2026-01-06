@@ -377,7 +377,7 @@ export const DiscoverHeader: React.FC<DiscoverHeaderProps> = ({
           size={22}
           color={COLORS.text.primary}
         />
-        {activeFiltersCount > 0 && (
+        {(activeFiltersCount ?? 0) > 0 && (
           <View style={styles.filterBadge}>
             <Text style={styles.filterBadgeText}>{activeFiltersCount}</Text>
           </View>

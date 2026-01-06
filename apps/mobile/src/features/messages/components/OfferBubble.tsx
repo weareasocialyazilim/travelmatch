@@ -22,10 +22,10 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { FadeInUp, ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 import { WebView } from 'react-native-webview';
 import * as Haptics from 'expo-haptics';
-import { COLORS, GRADIENTS } from '@/constants/colors';
+import { COLORS } from '@/constants/colors';
 import type { OfferStatus } from '@/types/message.types';
 
 /** Threshold for "Liquid Platinum" high-value offers (TRY) */
@@ -56,8 +56,8 @@ export const OfferBubble: React.FC<OfferBubbleProps> = ({
   currency = 'USD',
   status,
   momentTitle,
-  momentId,
-  giftOfferId,
+  momentId: _momentId,
+  giftOfferId: _giftOfferId,
   paytrToken,
   onAccept,
   onDecline,

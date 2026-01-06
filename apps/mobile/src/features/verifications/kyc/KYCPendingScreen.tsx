@@ -209,7 +209,7 @@ const KYCPendingScreen: React.FC = () => {
           title="Keşfet'e Dön"
           variant="secondary"
           onPress={handleDone}
-          size="large"
+          size="lg"
         />
       </View>
     </View>

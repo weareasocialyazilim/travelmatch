@@ -13,7 +13,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { COLORS, GRADIENTS } from '@/constants/colors';
+import { COLORS } from '@/constants/colors';
 
 export interface MomentContext {
   id: string;

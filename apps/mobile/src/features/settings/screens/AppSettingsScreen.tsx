@@ -43,7 +43,12 @@ const AppSettingsScreen: React.FC = () => {
   const { user, logout } = useAuth();
   const { isConnected, refresh: refreshNetwork } = useNetworkStatus();
   const { showToast } = useToast();
-  const { language, changeLanguage, t, languages } = useTranslation();
+  const {
+    language,
+    changeLanguage,
+    t,
+    languages: _languages,
+  } = useTranslation();
   // Map languages to supported format for LanguageSelectionBottomSheet
   const supportedLanguages = useMemo(
     () => [

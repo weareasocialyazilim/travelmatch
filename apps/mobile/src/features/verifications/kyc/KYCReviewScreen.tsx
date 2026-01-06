@@ -21,7 +21,6 @@ import Animated, {
   withRepeat,
   withSequence,
   withTiming,
-  withSpring,
   Easing,
   interpolate,
   FadeIn,
@@ -51,6 +50,7 @@ interface AIAnalysisOverlayProps {
   currentStep: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AIAnalysisOverlay: React.FC<AIAnalysisOverlayProps> = ({
   isVisible,
   progress,
@@ -158,9 +158,9 @@ const KYCReviewScreen: React.FC = () => {
 
   const [confirmed, setConfirmed] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [analysisState, setAnalysisState] = useState<AnalysisState>('idle');
-  const [analysisProgress, setAnalysisProgress] = useState(0);
-  const [analysisStep, setAnalysisStep] = useState('');
+  const [_analysisState, setAnalysisState] = useState<AnalysisState>('idle');
+  const [_analysisProgress, setAnalysisProgress] = useState(0);
+  const [_analysisStep, setAnalysisStep] = useState('');
 
   // AI Analysis simulation with real edge function call
   const runAIAnalysis = useCallback(async () => {
@@ -182,7 +182,7 @@ const KYCReviewScreen: React.FC = () => {
 
     // Call the actual verify-kyc edge function
     try {
-      const { data: result, error } = await supabase.functions.invoke(
+      const { data: _result, error } = await supabase.functions.invoke(
         'verify-kyc',
         {
           body: {
@@ -208,7 +208,7 @@ const KYCReviewScreen: React.FC = () => {
       setTimeout(() => {
         navigation.navigate('KYCPending');
       }, 500);
-    } catch (error) {
+    } catch {
       setAnalysisState('error');
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       showToast('AI analizi başarısız oldu. Lütfen tekrar deneyin.', 'error');

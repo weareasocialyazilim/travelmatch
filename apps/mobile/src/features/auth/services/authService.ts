@@ -573,3 +573,97 @@ export default {
   resendVerificationEmail,
   onAuthStateChange,
 };
+
+// ============================================
+// Backward Compatible API (for legacy tests)
+// ============================================
+
+/**
+ * Legacy authApi interface for backward compatibility
+ * These wrappers throw errors instead of returning them (legacy behavior)
+ */
+const throwingLogin = async (email: string, password: string) => {
+  const result = await signInWithEmail(email, password);
+  if (result.error) {
+    throw result.error;
+  }
+  return result;
+};
+
+const throwingSignup = async (
+  email: string,
+  password: string,
+  metadata?: SignUpMetadata,
+) => {
+  const result = await signUpWithEmail(email, password, metadata);
+  if (result.error) {
+    throw result.error;
+  }
+  return result;
+};
+
+const throwingLogout = async () => {
+  const result = await signOut();
+  if (result.error) {
+    throw result.error;
+  }
+  return result;
+};
+
+const throwingResetPassword = async (email: string) => {
+  const result = await resetPassword(email);
+  if (result.error) {
+    throw result.error;
+  }
+  return result;
+};
+
+const throwingUpdatePassword = async (newPassword: string) => {
+  const result = await updatePassword(newPassword);
+  if (result.error) {
+    throw result.error;
+  }
+  return result;
+};
+
+const throwingGetSession = async () => {
+  const result = await getSession();
+  if (result.error) {
+    throw result.error;
+  }
+  return result;
+};
+
+const throwingRefreshSession = async () => {
+  const result = await refreshSession();
+  if (!result) {
+    throw { message: 'Session refresh failed', code: 'refresh_failed' };
+  }
+  return result;
+};
+
+const throwingResendVerification = async (email: string) => {
+  const result = await resendVerificationEmail(email);
+  if (result.error) {
+    throw result.error;
+  }
+  return result;
+};
+
+export const authApi = {
+  login: throwingLogin,
+  register: throwingSignup,
+  signup: throwingSignup,
+  logout: throwingLogout,
+  getSession: throwingGetSession,
+  getCurrentUser,
+  refreshSession: throwingRefreshSession,
+  resetPassword: throwingResetPassword,
+  updatePassword: throwingUpdatePassword,
+  updateProfile,
+  deleteAccount,
+  signInWithPhone,
+  verifyPhoneOtp,
+  resendVerificationEmail: throwingResendVerification,
+  onAuthStateChange,
+};

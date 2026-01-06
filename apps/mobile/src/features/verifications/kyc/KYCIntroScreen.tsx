@@ -1,7 +1,13 @@
 // KYC Intro Screen - Awwwards standard "Güven Seremonisi" experience
 // Featuring silky glass effects and neon accents
 import React, { useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -64,10 +70,10 @@ const KYCIntroScreen: React.FC = () => {
     glowPulse.value = withRepeat(
       withSequence(
         withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0, { duration: 2000, easing: Easing.inOut(Easing.ease) })
+        withTiming(0, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
       ),
       -1,
-      false
+      false,
     );
   }, [glowPulse]);
 
@@ -156,7 +162,9 @@ const KYCIntroScreen: React.FC = () => {
                   </View>
                   <View style={styles.benefitText}>
                     <Text style={styles.benefitTitle}>{benefit.title}</Text>
-                    <Text style={styles.benefitDesc}>{benefit.description}</Text>
+                    <Text style={styles.benefitDesc}>
+                      {benefit.description}
+                    </Text>
                   </View>
                   {/* Subtle neon accent line */}
                   <View
@@ -178,18 +186,21 @@ const KYCIntroScreen: React.FC = () => {
               color={COLORS.text.tertiary}
             />
             <Text style={styles.privacyNote}>
-              Verilerin uçtan uca şifrelenir ve sadece doğrulama amacıyla kullanılır.
+              Verilerin uçtan uca şifrelenir ve sadece doğrulama amacıyla
+              kullanılır.
             </Text>
           </View>
         </ScrollView>
 
         {/* Footer Actions */}
-        <View style={[styles.footer, { paddingBottom: insets.bottom + SPACING.lg }]}>
+        <View
+          style={[styles.footer, { paddingBottom: insets.bottom + SPACING.lg }]}
+        >
           <TMButton
             title="Seremoniyi Başlat"
             variant="primary"
             onPress={handleStart}
-            size="large"
+            size="lg"
             style={styles.startButton}
           />
           <TouchableOpacity

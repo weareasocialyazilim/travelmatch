@@ -18,7 +18,6 @@ import { initializeFeatureFlags } from '../config/featureFlags';
 
 // Services
 import { analytics } from './analytics';
-import { messageService } from './messageService';
 import { cacheService } from './cacheService';
 import { sessionManager } from './sessionManager';
 import { pendingTransactionsService } from './pendingTransactionsService';
@@ -317,9 +316,9 @@ class AppBootstrapService {
     // 7. Messaging Service (non-critical, sync init)
     try {
       this.updateServiceStatus('messaging', 'loading');
-      messageService.init();
+      // MessageService is ready to use, no explicit init needed
       this.updateServiceStatus('messaging', 'success');
-      logger.info('AppBootstrap', '✅ Messaging service initialized');
+      logger.info('AppBootstrap', '✅ Messaging service ready');
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';

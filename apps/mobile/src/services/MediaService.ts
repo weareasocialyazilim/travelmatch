@@ -75,7 +75,6 @@ import {
   viewportObserver,
   useImagePreload,
   useViewportTracking,
-  ViewportObserver,
 } from './imagePreloader';
 
 // ═══════════════════════════════════════════════════════════════════

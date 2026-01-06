@@ -48,7 +48,7 @@ export const GridMomentCard: React.FC<GridCardProps> = memo(
               <Text style={styles.gridCreatorName} numberOfLines={1}>
                 {creatorName}
               </Text>
-              {item.user?.isVerified && (
+              {item.user?.verified && (
                 <MaterialCommunityIcons
                   name="check-decagram"
                   size={10}
@@ -64,9 +64,9 @@ export const GridMomentCard: React.FC<GridCardProps> = memo(
             </Text>
 
             {/* Story */}
-            {item.story && (
+            {item.story?.excerpt && (
               <Text style={styles.gridStory} numberOfLines={1}>
-                {item.story}
+                {item.story.excerpt}
               </Text>
             )}
 

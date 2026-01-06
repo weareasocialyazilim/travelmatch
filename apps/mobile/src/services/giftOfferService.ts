@@ -81,9 +81,9 @@ export interface OfferValidationResult {
   valid: boolean;
   error?: OfferValidationError;
   message?: string;
-  momentCategory?: string;
-  momentPrice?: number;
-  momentCurrency?: string;
+  momentCategory?: string | null;
+  momentPrice?: number | null;
+  momentCurrency?: string | null;
 }
 
 // PayTR session response type
@@ -133,11 +133,12 @@ const validateSubscriberOffer = async (
 
   // Rule 2: Amount must be >= requested (The Upgrade Rule)
   // CRITICAL: This check happens BEFORE any PayTR call
-  if (offerAmount < moment.price) {
+  const momentPrice = moment.price ?? 0;
+  if (offerAmount < momentPrice) {
     return {
       valid: false,
       error: 'AMOUNT_TOO_LOW',
-      message: `Aboneler sadece ${moment.price} ${moment.currency} veya üzerinde teklif sunabilir.`,
+      message: `Aboneler sadece ${momentPrice} ${moment.currency || 'TRY'} veya üzerinde teklif sunabilir.`,
       momentCategory: moment.category,
       momentPrice: moment.price,
       momentCurrency: moment.currency,
@@ -196,7 +197,7 @@ export const giftOfferService = {
 
         // Lock currency to moment's currency (host determines currency)
         currency = validation.momentCurrency || 'TRY';
-        category = validation.momentCategory;
+        category = validation.momentCategory ?? undefined;
         momentPrice = validation.momentPrice || 0;
       }
 

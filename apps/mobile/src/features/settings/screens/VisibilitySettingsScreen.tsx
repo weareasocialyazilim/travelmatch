@@ -28,7 +28,6 @@ import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
-import { COLORS } from '@/constants/colors';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { supabase } from '@/config/supabase';
 import { useAuth } from '@/context/AuthContext';
@@ -381,18 +380,27 @@ export const VisibilitySettingsScreen: React.FC = () => {
 
         if (error) throw error;
 
-        if (data) {
+        if (data && typeof data === 'object' && !('error' in data)) {
+          const profileData = data as Record<string, unknown>;
           setSettings({
-            giftVisibility: data.gift_visibility || 'public',
-            profileDiscoverability: data.profile_discoverability || 'everyone',
-            showTrustScore: data.show_trust_score ?? true,
-            showGiftHistory: data.show_gift_history ?? true,
-            platinumVitrin: data.platinum_vitrin ?? false,
-            showOnlineStatus: data.show_online_status ?? true,
-            allowMessageRequests: data.allow_message_requests ?? true,
-            showLocation: data.show_location ?? true,
+            giftVisibility:
+              (profileData.gift_visibility as GiftVisibility) || 'public',
+            profileDiscoverability:
+              (profileData.profile_discoverability as ProfileDiscoverability) ||
+              'everyone',
+            showTrustScore: (profileData.show_trust_score as boolean) ?? true,
+            showGiftHistory: (profileData.show_gift_history as boolean) ?? true,
+            platinumVitrin: (profileData.platinum_vitrin as boolean) ?? false,
+            showOnlineStatus:
+              (profileData.show_online_status as boolean) ?? true,
+            allowMessageRequests:
+              (profileData.allow_message_requests as boolean) ?? true,
+            showLocation: (profileData.show_location as boolean) ?? true,
           });
-          setSubscriptionTier(data.subscription_tier || 'free');
+          setSubscriptionTier(
+            (profileData.subscription_tier as 'free' | 'gold' | 'platinum') ||
+              'free',
+          );
         }
       } catch (error) {
         logger.error('[VisibilitySettings] Fetch error:', error);

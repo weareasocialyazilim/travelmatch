@@ -10,7 +10,7 @@ import {
 } from '@/utils/cloudflareImageHelpers';
 import { COLORS } from '@/constants/colors';
 import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
-import type { StoryItemProps, UserStory } from './types';
+import type { StoryItemProps } from './types';
 
 /**
  * Neon Glow etkili Story bileşeni.

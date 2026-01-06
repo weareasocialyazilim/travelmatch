@@ -79,7 +79,7 @@ const ChatScreen: React.FC = () => {
       return {
         id: offerMessage.momentId,
         title: offerMessage.momentTitle || 'Moment',
-        price: offerMessage.amount,
+        requested_amount: offerMessage.amount,
         currency: offerMessage.currency,
         status:
           offerMessage.offerStatus === 'accepted' ? 'accepted' : 'negotiating',
@@ -93,7 +93,7 @@ const ChatScreen: React.FC = () => {
       title: 'Coffee at a Parisian Café',
       image:
         'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=200',
-      price: 15,
+      requested_amount: 15,
       status: 'negotiating',
       isGiftedByMe: isSender,
     };
@@ -112,7 +112,7 @@ const ChatScreen: React.FC = () => {
         imageUrl:
           linkedMoment.image ||
           'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=800',
-        price: linkedMoment.price || 15,
+        price: linkedMoment.requested_amount || 15,
         availability: 'Dec 5-10',
         category: {
           id: 'food',
@@ -140,6 +140,7 @@ const ChatScreen: React.FC = () => {
     <NetworkGuard>
       <SafeAreaView style={styles.container} edges={['top']}>
         <ChatHeader
+          conversationId={conversationId || ''}
           otherUser={otherUser}
           linkedMoment={linkedMoment}
           onBack={() => navigation.goBack()}
@@ -166,6 +167,8 @@ const ChatScreen: React.FC = () => {
           />
 
           <ChatInputBar
+            conversationId={conversationId || ''}
+            currentUserId={otherUser.id}
             messageText={messageText}
             onTextChange={setMessageText}
             onSend={handleSend}

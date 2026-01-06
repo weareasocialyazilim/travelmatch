@@ -83,7 +83,9 @@ const MessagesScreen: React.FC = () => {
   );
 
   // Track typing timeouts for cleanup
-  const typingTimeoutsRef = React.useRef<Map<string, NodeJS.Timeout>>(new Map());
+  const typingTimeoutsRef = React.useRef<Map<string, NodeJS.Timeout>>(
+    new Map(),
+  );
 
   // Listen for typing indicators
   useRealtimeEvent<{
@@ -99,7 +101,9 @@ const MessagesScreen: React.FC = () => {
         );
 
         // Clear existing timeout for this conversation
-        const existingTimeout = typingTimeoutsRef.current.get(data.conversationId);
+        const existingTimeout = typingTimeoutsRef.current.get(
+          data.conversationId,
+        );
         if (existingTimeout) {
           clearTimeout(existingTimeout);
         }
@@ -117,7 +121,9 @@ const MessagesScreen: React.FC = () => {
         typingTimeoutsRef.current.set(data.conversationId, timeout);
       } else {
         // Clear timeout when user stops typing
-        const existingTimeout = typingTimeoutsRef.current.get(data.conversationId);
+        const existingTimeout = typingTimeoutsRef.current.get(
+          data.conversationId,
+        );
         if (existingTimeout) {
           clearTimeout(existingTimeout);
           typingTimeoutsRef.current.delete(data.conversationId);
@@ -179,7 +185,7 @@ const MessagesScreen: React.FC = () => {
         conversationId: conversation.id,
       });
     },
-    [navigation]
+    [navigation],
   );
 
   const renderChatItem = useCallback(
@@ -189,83 +195,85 @@ const MessagesScreen: React.FC = () => {
         : false;
       const isTyping = typingConversations.has(item.id);
 
-    return (
-      <TouchableOpacity
-        style={styles.chatItem}
-        onPress={() => handleChatPress(item)}
-        activeOpacity={0.7}
-        accessibilityLabel={`Chat with ${item.participantName || 'User'}${
-          item.unreadCount ? `, ${item.unreadCount} unread messages` : ''
-        }`}
-        accessibilityRole="button"
-        accessibilityHint="Opens conversation"
-      >
-        {/* Avatar */}
-        <View style={styles.avatarContainer}>
-          <Image
-            source={{
-              uri: item.participantAvatar || '',
-            }}
-            style={styles.avatar}
-            accessibilityLabel={`${item.participantName || 'User'}'s avatar`}
-          />
-          {isOnline && <View style={styles.onlineIndicator} />}
-        </View>
-
-        {/* Content */}
-        <View style={styles.chatContent}>
-          <View style={styles.chatHeader}>
-            <View style={styles.nameContainer}>
-              <Text style={styles.personName}>
-                {item.participantName || 'User'}
-              </Text>
-              {item.participantVerified && (
-                <MaterialCommunityIcons
-                  name="check-decagram"
-                  size={14}
-                  color={COLORS.brand.primary}
-                />
-              )}
-            </View>
-            <Text style={styles.timeText}>
-              {item.lastMessageAt ? formatTimeAgo(item.lastMessageAt) : ''}
-            </Text>
+      return (
+        <TouchableOpacity
+          style={styles.chatItem}
+          onPress={() => handleChatPress(item)}
+          activeOpacity={0.7}
+          accessibilityLabel={`Chat with ${item.participantName || 'User'}${
+            item.unreadCount ? `, ${item.unreadCount} unread messages` : ''
+          }`}
+          accessibilityRole="button"
+          accessibilityHint="Opens conversation"
+        >
+          {/* Avatar */}
+          <View style={styles.avatarContainer}>
+            <Image
+              source={{
+                uri: item.participantAvatar || '',
+              }}
+              style={styles.avatar}
+              accessibilityLabel={`${item.participantName || 'User'}'s avatar`}
+            />
+            {isOnline && <View style={styles.onlineIndicator} />}
           </View>
 
-          {/* Moment Badge */}
-          {item.momentId && (
-            <View style={styles.momentBadge}>
-              <Text style={styles.momentEmoji}>✨</Text>
-              <Text style={styles.momentTitle}>{item.momentTitle}</Text>
-            </View>
-          )}
-
-          {/* Last Message */}
-          <View style={styles.messageRow}>
-            {isTyping ? (
-              <Text style={styles.typingText}>typing...</Text>
-            ) : (
-              <Text
-                style={[
-                  styles.lastMessage,
-                  (item.unreadCount || 0) > 0 && styles.lastMessageUnread,
-                ]}
-                numberOfLines={1}
-              >
-                {item.lastMessage || 'Start a conversation'}
+          {/* Content */}
+          <View style={styles.chatContent}>
+            <View style={styles.chatHeader}>
+              <View style={styles.nameContainer}>
+                <Text style={styles.personName}>
+                  {item.participantName || 'User'}
+                </Text>
+                {item.participantVerified && (
+                  <MaterialCommunityIcons
+                    name="check-decagram"
+                    size={14}
+                    color={COLORS.brand.primary}
+                  />
+                )}
+              </View>
+              <Text style={styles.timeText}>
+                {item.lastMessageAt ? formatTimeAgo(item.lastMessageAt) : ''}
               </Text>
-            )}
-            {(item.unreadCount || 0) > 0 && (
-              <View style={styles.unreadBadge}>
-                <Text style={styles.unreadText}>{item.unreadCount}</Text>
+            </View>
+
+            {/* Moment Badge */}
+            {item.momentId && (
+              <View style={styles.momentBadge}>
+                <Text style={styles.momentEmoji}>✨</Text>
+                <Text style={styles.momentTitle}>{item.momentTitle}</Text>
               </View>
             )}
+
+            {/* Last Message */}
+            <View style={styles.messageRow}>
+              {isTyping ? (
+                <Text style={styles.typingText}>typing...</Text>
+              ) : (
+                <Text
+                  style={[
+                    styles.lastMessage,
+                    (item.unreadCount || 0) > 0 && styles.lastMessageUnread,
+                  ]}
+                  numberOfLines={1}
+                >
+                  {typeof item.lastMessage === 'string'
+                    ? item.lastMessage
+                    : item.lastMessage?.content || 'Start a conversation'}
+                </Text>
+              )}
+              {(item.unreadCount || 0) > 0 && (
+                <View style={styles.unreadBadge}>
+                  <Text style={styles.unreadText}>{item.unreadCount}</Text>
+                </View>
+              )}
+            </View>
           </View>
-        </View>
-      </TouchableOpacity>
-    );
+        </TouchableOpacity>
+      );
     },
-    [handleChatPress, isUserOnline, typingConversations]
+    [handleChatPress, isUserOnline, typingConversations],
   );
 
   const renderEmptyState = useCallback(
@@ -279,7 +287,7 @@ const MessagesScreen: React.FC = () => {
         style={styles.emptyStateContainer}
       />
     ),
-    [navigation, t]
+    [navigation, t],
   );
 
   // Loading state - show skeleton
@@ -319,7 +327,8 @@ const MessagesScreen: React.FC = () => {
         <ErrorState
           message={error}
           onRetry={refreshConversations}
-          icon="chat-alert-outline"
+          useMaterialIcon={true}
+          materialIcon="chat-alert-outline"
         />
         <BottomNav activeTab="Messages" messagesBadge={0} />
       </SafeAreaView>

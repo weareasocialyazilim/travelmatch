@@ -185,7 +185,7 @@ const mapToMoment = (row: MomentRow): Moment => {
     isSaved: row.is_saved || false,
     status: (row.status as Moment['status']) || 'active',
     createdAt: row.created_at || new Date().toISOString(),
-    updatedAt: row.updated_at || undefined,
+    updatedAt: row.updated_at || new Date().toISOString(),
   };
 };
 
@@ -420,11 +420,12 @@ export const useMoments = (): UseMomentsReturn => {
         if (data.title) updates.title = data.title;
         if (data.description) updates.description = data.description;
         if (data.category) updates.category = data.category;
-        if (data.location) updates.location = data.location;
+        if (data.location)
+          updates.location = `${data.location.city}, ${data.location.country}`;
         if (data.pricePerGuest) updates.price = data.pricePerGuest;
         if (data.currency) updates.currency = data.currency;
         if (data.maxGuests) updates.max_guests = data.maxGuests;
-        if (data.duration) updates.duration = data.duration;
+        if (data.duration) updates.duration = parseInt(data.duration, 10) || 0;
         if (data.availability) updates.availability = data.availability;
 
         // Handle images - upload new local files, keep existing URLs

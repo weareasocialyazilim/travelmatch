@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore - design-system exports preset but types aren't built
 import designSystemPreset from '../../packages/design-system/src/tailwind.preset';
 

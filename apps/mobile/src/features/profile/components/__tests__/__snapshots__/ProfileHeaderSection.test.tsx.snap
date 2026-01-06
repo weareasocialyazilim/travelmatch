@@ -12,7 +12,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
   }
 >
   <View
-    data-colors="["#F59E0B","#EC4899"]"
+    data-colors="["#FFD700","#FFA500"]"
     data-end="{"x":1,"y":1}"
     data-start="{"x":0,"y":0}"
     ref={null}
@@ -80,6 +80,26 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
       }
     >
       <RCTView
+        ref={null}
+        style={
+          {
+            "backgroundColor": "#F59E0B",
+            "borderRadius": 70,
+            "height": 140,
+            "opacity": 0.25,
+            "position": "absolute",
+            "shadowColor": "#DFFF00",
+            "shadowOffset": {
+              "height": 0,
+              "width": 0,
+            },
+            "shadowOpacity": 0.6,
+            "shadowRadius": 20,
+            "width": 140,
+          }
+        }
+      />
+      <RCTView
         height={120}
         ref={null}
         style={
@@ -139,12 +159,12 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
               <RCTView
                 offset="0%"
                 ref={null}
-                stopColor="#FBBF24"
+                stopColor="#F59E0B"
               />
               <RCTView
                 offset="100%"
                 ref={null}
-                stopColor="#F59E0B"
+                stopColor="rgba(245, 158, 11, 0.4)"
               />
             </RCTView>
           </RCTView>
@@ -195,15 +215,23 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FBBF24",
+            "backgroundColor": "#F59E0B",
             "borderColor": "#FFFFFF",
             "borderRadius": 16,
             "borderWidth": 3,
             "bottom": 4,
+            "elevation": 4,
             "height": 32,
             "justifyContent": "center",
             "position": "absolute",
             "right": 4,
+            "shadowColor": "#DFFF00",
+            "shadowOffset": {
+              "height": 0,
+              "width": 0,
+            },
+            "shadowOpacity": 0.8,
+            "shadowRadius": 8,
             "width": 32,
           }
         }
@@ -398,7 +426,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
             }
             testID="RCTText"
           >
-            trust.stats.moments
+            Anlar
           </RCTText>
         </RCTView>
       </RCTPressable>
@@ -485,7 +513,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
             }
             testID="RCTText"
           >
-            trust.stats.gifts
+            Hediyeler
           </RCTText>
         </RCTView>
       </RCTPressable>
@@ -572,7 +600,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
             }
             testID="RCTText"
           >
-            trust.stats.response
+            Yanıt
           </RCTText>
         </RCTView>
       </RCTPressable>
@@ -667,7 +695,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
   }
 >
   <View
-    data-colors="["#F59E0B","#EC4899"]"
+    data-colors="["#FFD700","#FFA500"]"
     data-end="{"x":1,"y":1}"
     data-start="{"x":0,"y":0}"
     ref={null}
@@ -735,6 +763,26 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
       }
     >
       <RCTView
+        ref={null}
+        style={
+          {
+            "backgroundColor": "#E5E4E2",
+            "borderRadius": 70,
+            "height": 140,
+            "opacity": 0.25,
+            "position": "absolute",
+            "shadowColor": "#DFFF00",
+            "shadowOffset": {
+              "height": 0,
+              "width": 0,
+            },
+            "shadowOpacity": 0.6,
+            "shadowRadius": 20,
+            "width": 140,
+          }
+        }
+      />
+      <RCTView
         height={120}
         ref={null}
         style={
@@ -799,7 +847,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
               <RCTView
                 offset="100%"
                 ref={null}
-                stopColor="#FFD700"
+                stopColor="rgba(229, 228, 226, 0.4)"
               />
             </RCTView>
           </RCTView>
@@ -855,10 +903,18 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
             "borderRadius": 16,
             "borderWidth": 3,
             "bottom": 4,
+            "elevation": 4,
             "height": 32,
             "justifyContent": "center",
             "position": "absolute",
             "right": 4,
+            "shadowColor": "#DFFF00",
+            "shadowOffset": {
+              "height": 0,
+              "width": 0,
+            },
+            "shadowOpacity": 0.8,
+            "shadowRadius": 8,
             "width": 32,
           }
         }
@@ -920,15 +976,30 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
       >
         Test User
       </RCTText>
-      <RCTText
-        color="#10B981"
-        name="check-decagram"
+      <RCTView
         ref={null}
-        size={22}
-        testID="RCTText"
+        style={
+          {
+            "shadowColor": "#DFFF00",
+            "shadowOffset": {
+              "height": 0,
+              "width": 0,
+            },
+            "shadowOpacity": 0.6,
+            "shadowRadius": 6,
+          }
+        }
       >
-        check-decagram
-      </RCTText>
+        <RCTText
+          color="#DFFF00"
+          name="check-decagram"
+          ref={null}
+          size={24}
+          testID="RCTText"
+        >
+          check-decagram
+        </RCTText>
+      </RCTView>
     </RCTView>
     <RCTView
       ref={null}
@@ -1062,7 +1133,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
             }
             testID="RCTText"
           >
-            trust.stats.moments
+            Anlar
           </RCTText>
         </RCTView>
       </RCTPressable>
@@ -1149,7 +1220,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
             }
             testID="RCTText"
           >
-            trust.stats.gifts
+            Hediyeler
           </RCTText>
         </RCTView>
       </RCTPressable>
@@ -1236,7 +1307,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
             }
             testID="RCTText"
           >
-            trust.stats.response
+            Yanıt
           </RCTText>
         </RCTView>
       </RCTPressable>

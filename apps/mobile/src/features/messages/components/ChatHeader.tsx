@@ -73,7 +73,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
 }) => {
   const insets = useSafeAreaInsets();
   const [isTyping, setIsTyping] = useState(false);
-  const [lastReadAt, setLastReadAt] = useState<Date | null>(null);
+  const [_lastReadAt, setLastReadAt] = useState<Date | null>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Typing dots animation

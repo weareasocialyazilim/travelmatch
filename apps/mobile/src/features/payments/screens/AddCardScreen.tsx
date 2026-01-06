@@ -54,12 +54,18 @@ export const AddCardScreen = ({ navigation }: Props) => {
     const cleanedNumber = cardNumber.replace(/\s/g, '');
 
     if (cleanedNumber.length < 13 || cleanedNumber.length > 19) {
-      showError('Invalid Card', 'Please enter a valid card number');
+      showError({
+        title: 'Invalid Card',
+        message: 'Please enter a valid card number',
+      });
       return false;
     }
 
     if (!cardName.trim() || cardName.trim().length < 3) {
-      showError('Invalid Name', 'Please enter the cardholder name');
+      showError({
+        title: 'Invalid Name',
+        message: 'Please enter the cardholder name',
+      });
       return false;
     }
 
@@ -68,7 +74,10 @@ export const AddCardScreen = ({ navigation }: Props) => {
     const expYear = parseInt(year, 10);
 
     if (!expMonth || expMonth < 1 || expMonth > 12) {
-      showError('Invalid Expiry', 'Please enter a valid expiry month (01-12)');
+      showError({
+        title: 'Invalid Expiry',
+        message: 'Please enter a valid expiry month (01-12)',
+      });
       return false;
     }
 
@@ -79,12 +88,15 @@ export const AddCardScreen = ({ navigation }: Props) => {
       expYear < currentYear ||
       (expYear === currentYear && expMonth < currentMonth)
     ) {
-      showError('Card Expired', 'This card has expired');
+      showError({ title: 'Card Expired', message: 'This card has expired' });
       return false;
     }
 
     if (cvc.length < 3) {
-      showError('Invalid CVV', 'Please enter a valid CVV code');
+      showError({
+        title: 'Invalid CVV',
+        message: 'Please enter a valid CVV code',
+      });
       return false;
     }
 
@@ -123,16 +135,20 @@ export const AddCardScreen = ({ navigation }: Props) => {
         cvv: cvc,
       });
 
-      showSuccess('Card Saved', 'Your card has been securely saved');
+      showSuccess({
+        title: 'Card Saved',
+        message: 'Your card has been securely saved',
+      });
       navigation.goBack();
     } catch (error) {
       logger.error('Card save error:', error);
-      showError(
-        'Save Failed',
-        error instanceof Error
-          ? error.message
-          : 'Failed to save card. Please try again.',
-      );
+      showError({
+        title: 'Save Failed',
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Failed to save card. Please try again.',
+      });
     } finally {
       setIsSaving(false);
     }

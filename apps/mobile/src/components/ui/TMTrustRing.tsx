@@ -18,17 +18,17 @@ import { SIZES, SPACING } from '@/constants/spacing';
 import { TYPOGRAPHY } from '@/theme/typography';
 
 // Lazy load SVG to handle potential native module issues
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 let Svg: any = null;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 let Circle: any = null;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 let Defs: any = null;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 let SvgGradient: any = null;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 let Stop: any = null;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 let AnimatedCircle: any = null;
 
 try {

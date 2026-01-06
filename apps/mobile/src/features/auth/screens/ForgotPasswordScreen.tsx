@@ -14,7 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@/hooks/useNavigationHelpers';
 import { COLORS } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
-import { showAlert, showError, showSuccess } from '@/stores/modalStore';
+import { showError, showSuccess } from '@/stores/modalStore';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

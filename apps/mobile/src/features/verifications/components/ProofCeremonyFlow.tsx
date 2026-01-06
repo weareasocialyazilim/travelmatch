@@ -474,7 +474,7 @@ const IntroStep = memo<IntroStepProps>(({ gift, onStart, onCancel }) => (
           <MaterialCommunityIcons
             name="map-marker"
             size={14}
-            color={COLORS.accent}
+            color={COLORS.accent.primary}
           />
           <Text style={styles.locationText}>{gift.location}</Text>
         </View>

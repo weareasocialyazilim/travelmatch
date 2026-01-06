@@ -208,7 +208,7 @@ export const TrustMilestones: React.FC<TrustMilestonesProps> = ({
       <Svg
         width={containerSize}
         height={containerSize}
-        style={StyleSheet.absoluteFill}
+        style={StyleSheet.absoluteFill as object}
       >
         <Defs>
           <RadialGradient id="starGlow" cx="50%" cy="50%" r="50%">

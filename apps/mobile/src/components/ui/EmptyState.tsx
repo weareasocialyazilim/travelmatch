@@ -21,7 +21,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, GRADIENTS, primitives } from '../../constants/colors';
-import { SPACING, RADIUS } from '../../constants/spacing';
+import { SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../theme/typography';
 import { TMButton } from './TMButton';
 import { EmptyStateIllustration } from './EmptyStateIllustration';
@@ -59,8 +59,8 @@ const NeonParticle: React.FC<NeonParticleProps> = ({
       withRepeat(
         withTiming(1, { duration, easing: Easing.inOut(Easing.ease) }),
         -1,
-        false
-      )
+        false,
+      ),
     );
     // Fade in and out
     opacity.value = withDelay(
@@ -69,11 +69,11 @@ const NeonParticle: React.FC<NeonParticleProps> = ({
         withSequence(
           withTiming(0.8, { duration: duration * 0.3 }),
           withTiming(0.8, { duration: duration * 0.4 }),
-          withTiming(0, { duration: duration * 0.3 })
+          withTiming(0, { duration: duration * 0.3 }),
         ),
         -1,
-        false
-      )
+        false,
+      ),
     );
   }, [delay, duration, progress, opacity]);
 
@@ -82,20 +82,12 @@ const NeonParticle: React.FC<NeonParticleProps> = ({
     const translateX = interpolate(
       progress.value,
       [0, 0.25, 0.5, 0.75, 1],
-      [0, 8, 0, -8, 0]
+      [0, 8, 0, -8, 0],
     );
-    const scale = interpolate(
-      progress.value,
-      [0, 0.5, 1],
-      [0.5, 1, 0.5]
-    );
+    const scale = interpolate(progress.value, [0, 0.5, 1], [0.5, 1, 0.5]);
 
     return {
-      transform: [
-        { translateY },
-        { translateX },
-        { scale },
-      ],
+      transform: [{ translateY }, { translateX }, { scale }],
       opacity: opacity.value,
     };
   });
@@ -134,18 +126,18 @@ const GlowRing: React.FC<{ color: string }> = ({ color }) => {
     scale.value = withRepeat(
       withSequence(
         withTiming(1.3, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) })
+        withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
       ),
       -1,
-      false
+      false,
     );
     opacity.value = withRepeat(
       withSequence(
         withTiming(0.15, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0.3, { duration: 2000, easing: Easing.inOut(Easing.ease) })
+        withTiming(0.3, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
       ),
       -1,
-      false
+      false,
     );
   }, [scale, opacity]);
 
@@ -254,11 +246,14 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
     if (animated && !isMinimal) {
       iconScale.value = withRepeat(
         withSequence(
-          withTiming(1.05, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-          withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) })
+          withTiming(1.05, {
+            duration: 2000,
+            easing: Easing.inOut(Easing.ease),
+          }),
+          withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
         ),
         -1,
-        false
+        false,
       );
     }
   }, [animated, isMinimal, iconScale]);
@@ -300,6 +295,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             variant="primary"
             size="md"
             style={styles.button}
+            testID="empty-state-action-primary"
           >
             {actionLabel}
           </TMButton>
@@ -310,6 +306,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             variant="ghost"
             size="md"
             style={styles.secondaryButton}
+            testID="empty-state-action-secondary"
           >
             {secondaryActionLabel}
           </TMButton>
@@ -326,17 +323,18 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         style={styles.iconOuterWrapper}
       >
         {/* Neon Particles */}
-        {animated && particles.map((particle) => (
-          <NeonParticle
-            key={particle.id}
-            delay={particle.delay}
-            startX={particle.startX}
-            startY={particle.startY}
-            size={particle.size}
-            color={particle.color}
-            duration={particle.duration}
-          />
-        ))}
+        {animated &&
+          particles.map((particle) => (
+            <NeonParticle
+              key={particle.id}
+              delay={particle.delay}
+              startX={particle.startX}
+              startY={particle.startY}
+              size={particle.size}
+              color={particle.color}
+              duration={particle.duration}
+            />
+          ))}
 
         {/* Pulsing Glow Ring */}
         {animated && !isMinimal && <GlowRing color={glowColor} />}
@@ -359,12 +357,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           ) : (
             <>
               {/* Inner glow */}
-              <View
-                style={[
-                  styles.iconGlow,
-                  { backgroundColor: glowColor },
-                ]}
-              />
+              <View style={[styles.iconGlow, { backgroundColor: glowColor }]} />
               <MaterialCommunityIcons
                 name={icon}
                 size={48}

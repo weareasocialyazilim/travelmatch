@@ -63,28 +63,32 @@ const GiftInboxScreen: React.FC = () => {
       senderId: item.sender.id,
       senderName: item.sender.name,
       senderAvatar: item.sender.avatar,
-      senderAge: item.sender.age ?? 0,
-      senderRating: item.sender.rating ?? 0,
+      senderTrustScore: item.sender.rating ?? 50,
+      senderSubscriptionTier: 'free' as const,
+      senderMomentCount: item.sender.tripCount ?? 0,
       senderVerified: item.sender.isVerified,
-      senderTripCount: item.sender.tripCount ?? 0,
       senderCity: item.sender.city ?? '',
       gifts: item.gifts.map((g) => ({
         id: g.id,
         momentTitle: g.momentTitle ?? '',
         momentEmoji: g.momentEmoji ?? '🎁',
+        momentCategory: 'experience',
         amount: g.amount,
         message: g.message ?? '',
         paymentType: (g.paymentType ?? 'direct') as
           | 'direct'
           | 'half_escrow'
           | 'full_escrow',
-        status: (g.status ?? 'received') as
+        status: (g.status ?? 'received') as string as
+          | 'pending'
           | 'received'
           | 'pending_proof'
           | 'verifying'
           | 'verified'
           | 'failed',
         createdAt: g.createdAt,
+        isSubscriberOffer: false,
+        isHighValueOffer: false,
       })),
       totalAmount: item.totalAmount,
       canStartChat: item.canStartChat ?? false,

@@ -3,11 +3,10 @@
 // Premium screen wrapper with Twilight Zinc background and safe area
 
 import React from 'react';
-import { View, StyleSheet, ViewStyle, StatusBar, Platform } from 'react-native';
+import { View, StyleSheet, ViewStyle, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn } from 'react-native-reanimated';
-import { COLORS, primitives } from '../../constants/colors';
 import { SPACING } from '../../constants/spacing';
 
 type BackgroundVariant = 'light' | 'dark' | 'twilight' | 'cream';

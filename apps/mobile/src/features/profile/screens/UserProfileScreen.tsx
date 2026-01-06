@@ -100,7 +100,7 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({
   const scrollY = useSharedValue(0);
   const giftButtonScale = useSharedValue(1);
   const giftPulse = useSharedValue(1);
-  const [showGiftSent, setShowGiftSent] = useState(false);
+  const [_showGiftSent, _setShowGiftSent] = useState(false);
 
   // Gift button pulse animation
   React.useEffect(() => {

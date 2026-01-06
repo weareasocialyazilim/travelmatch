@@ -167,7 +167,7 @@ const KYCGateScreen: React.FC<{
 
           {/* Requirements List */}
           <View style={styles.requirementsList}>
-            {KYC_REQUIREMENTS.map((req, index) => {
+            {KYC_REQUIREMENTS.map((req, _index) => {
               const reqLevelIndex = Object.keys(KYC_LEVELS).indexOf(req.level);
               const isCompleted = currentLevelIndex > reqLevelIndex;
               const isCurrent = currentLevelIndex === reqLevelIndex;
@@ -416,32 +416,11 @@ const WithdrawScreen: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   // ─────────────────────────────────────────────────────────────────
-  // KYC Gate - Show verification screen if user doesn't meet requirements
-  // ─────────────────────────────────────────────────────────────────
-
-  const handleVerifyKYC = () => {
-    // Navigate to KYC verification flow
-    // @ts-ignore - navigation typing
-    navigation.navigate('KYCVerification' as never);
-  };
-
-  // If user doesn't meet KYC requirements, show gate screen
-  if (!canWithdraw) {
-    return (
-      <KYCGateScreen
-        currentLevel={userKYCLevel}
-        onVerify={handleVerifyKYC}
-        onBack={() => navigation.goBack()}
-      />
-    );
-  }
-
-  // ─────────────────────────────────────────────────────────────────
-  // Data Fetching
+  // Data Fetching - MOVED BEFORE EARLY RETURN (Rules of Hooks)
   // ─────────────────────────────────────────────────────────────────
 
   const fetchData = useCallback(async () => {
-    if (!user?.id) return;
+    if (!user?.id || !canWithdraw) return;
 
     setIsLoading(true);
     setError(null);
@@ -468,14 +447,14 @@ const WithdrawScreen: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [user?.id]);
+  }, [user?.id, canWithdraw]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   // ─────────────────────────────────────────────────────────────────
-  // Validation
+  // Validation - MOVED BEFORE EARLY RETURN (Rules of Hooks)
   // ─────────────────────────────────────────────────────────────────
 
   const validateAmount = useCallback((): string | null => {
@@ -499,6 +478,27 @@ const WithdrawScreen: React.FC = () => {
 
     return null;
   }, [amount, balance, selectedAccount]);
+
+  // ─────────────────────────────────────────────────────────────────
+  // KYC Gate - Show verification screen if user doesn't meet requirements
+  // ─────────────────────────────────────────────────────────────────
+
+  const handleVerifyKYC = () => {
+    // Navigate to KYC verification flow
+    // @ts-ignore - navigation typing
+    navigation.navigate('KYCVerification' as never);
+  };
+
+  // If user doesn't meet KYC requirements, show gate screen
+  if (!canWithdraw) {
+    return (
+      <KYCGateScreen
+        currentLevel={userKYCLevel}
+        onVerify={handleVerifyKYC}
+        onBack={() => navigation.goBack()}
+      />
+    );
+  }
 
   // ─────────────────────────────────────────────────────────────────
   // Submission

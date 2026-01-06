@@ -12,7 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS, GRADIENTS } from '@/constants/colors';
+import { COLORS } from '@/constants/colors';
 
 /**
  * RefundRequestScreen - PayTR Escrow İtiraz Akışı

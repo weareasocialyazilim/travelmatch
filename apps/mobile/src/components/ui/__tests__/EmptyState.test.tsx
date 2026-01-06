@@ -218,7 +218,7 @@ describe('EmptyState Component', () => {
       const { getByTestId } = render(
         <EmptyState title="Empty" actionLabel="Action" onAction={onAction} />,
       );
-      expect(getByTestId('button-variant-primary')).toBeTruthy();
+      expect(getByTestId('empty-state-action-primary')).toBeTruthy();
     });
   });
 
@@ -260,7 +260,7 @@ describe('EmptyState Component', () => {
       expect(queryByText('Cancel')).toBeNull();
     });
 
-    it('renders secondary button with secondary variant', () => {
+    it('renders secondary button with ghost variant', () => {
       const onSecondary = jest.fn() as jest.Mock;
       const { getByTestId } = render(
         <EmptyState
@@ -269,7 +269,7 @@ describe('EmptyState Component', () => {
           onSecondaryAction={onSecondary}
         />,
       );
-      expect(getByTestId('button-variant-secondary')).toBeTruthy();
+      expect(getByTestId('empty-state-action-secondary')).toBeTruthy();
     });
 
     it('renders both primary and secondary buttons', () => {

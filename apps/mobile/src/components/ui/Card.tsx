@@ -15,11 +15,11 @@
  */
 
 import React, { memo, useMemo } from 'react';
-import type { ViewStyle } from 'react-native';
+import type { ViewStyle, StyleProp } from 'react-native';
 import { View, StyleSheet, Pressable, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { COLORS, primitives } from '../../constants/colors';
-import { RADII } from '../../constants/radii';
+import { RADII, RADIUS } from '../../constants/radii';
 
 /** Card visual style variant */
 export type CardVariant = 'elevated' | 'outlined' | 'filled' | 'glass';
@@ -40,7 +40,7 @@ interface CardProps {
   /** Press handler - makes card interactive when provided */
   onPress?: () => void;
   /** Additional container styles */
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   /** Disable card interaction */
   disabled?: boolean;
   /** Accessibility label for the card */
@@ -53,6 +53,10 @@ interface CardProps {
   tint?: GlassTint;
   /** Show border on glass variant */
   hasBorder?: boolean;
+  /** Show border (alias for hasBorder) */
+  showBorder?: boolean;
+  /** Custom border radius override */
+  borderRadius?: number;
 }
 
 /**
@@ -89,7 +93,14 @@ export const Card: React.FC<CardProps> = memo(
     intensity = 40,
     tint = 'dark',
     hasBorder = true,
+    showBorder,
+    borderRadius,
   }) => {
+    // Use showBorder as alias for hasBorder
+    const shouldShowBorder = showBorder ?? hasBorder;
+
+    // Custom border radius or default
+    const resolvedBorderRadius = borderRadius ?? RADIUS.lg;
     // Memoize variant styles calculation
     const variantStyles = useMemo((): ViewStyle => {
       switch (variant) {
@@ -141,7 +152,8 @@ export const Card: React.FC<CardProps> = memo(
       const glassContentStyle = [
         styles.base,
         styles.glass,
-        hasBorder && styles.glassBorder,
+        { borderRadius: resolvedBorderRadius },
+        shouldShowBorder && styles.glassBorder,
         paddingStyles,
         style,
         disabled && styles.disabled,
@@ -178,6 +190,7 @@ export const Card: React.FC<CardProps> = memo(
         testID={!onPress ? testID : undefined}
         style={[
           styles.base,
+          { borderRadius: resolvedBorderRadius },
           variantStyles,
           paddingStyles,
           style,
@@ -188,7 +201,8 @@ export const Card: React.FC<CardProps> = memo(
       </View>
     );
 
-    const cardContent = variant === 'glass' ? renderGlassContent() : renderStandardContent();
+    const cardContent =
+      variant === 'glass' ? renderGlassContent() : renderStandardContent();
 
     if (onPress) {
       const handlePress = () => {
@@ -267,7 +281,9 @@ export const GlassView: React.FC<GlassViewProps> = ({
 }) => {
   if (Platform.OS === 'android') {
     return (
-      <View style={[{ backgroundColor: COLORS.surface.glassBackground }, style]}>
+      <View
+        style={[{ backgroundColor: COLORS.surface.glassBackground }, style]}
+      >
         {children}
       </View>
     );

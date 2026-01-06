@@ -65,7 +65,9 @@ export const useInbox = (options: UseInboxOptions = {}): UseInboxReturn => {
       setError(null);
 
       // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
         if (isMountedRef.current) {
           setIsLoading(false);
@@ -86,22 +88,37 @@ export const useInbox = (options: UseInboxOptions = {}): UseInboxReturn => {
       const requestChats: InboxChat[] = [];
 
       for (const conv of conversations) {
+        // Extract lastMessage as string
+        let lastMessageStr: string = '';
+        if (conv.lastMessage) {
+          if (typeof conv.lastMessage === 'string') {
+            lastMessageStr = conv.lastMessage;
+          } else if (
+            typeof conv.lastMessage === 'object' &&
+            'content' in conv.lastMessage
+          ) {
+            lastMessageStr = (conv.lastMessage as { content: string }).content;
+          }
+        }
+
         const inboxChat: InboxChat = {
           id: conv.id,
           user: {
-            id: conv.participantId,
+            id: conv.participantId || conv.participantIds?.[0] || '',
             name: conv.participantName || 'Unknown',
             avatar: conv.participantAvatar || '',
             isVerified: conv.participantVerified || false,
             isOnline: false, // Will be updated by realtime
           },
-          moment: conv.momentId ? {
-            id: conv.momentId,
-            title: conv.momentTitle || '',
-            image: '',
-            emoji: '✨',
-          } : undefined,
-          lastMessage: conv.lastMessage,
+          moment: conv.momentId
+            ? {
+                id: conv.momentId,
+                title: conv.momentTitle || '',
+                image: '',
+                emoji: '✨',
+              }
+            : undefined,
+          lastMessage: lastMessageStr,
           lastMessageAt: conv.lastMessageAt || new Date().toISOString(),
           status: 'matched', // Default status, should come from API
           unreadCount: conv.unreadCount,
@@ -188,7 +205,9 @@ export const useInbox = (options: UseInboxOptions = {}): UseInboxReturn => {
         setTypingUsers((prev) => new Set([...prev, data.conversationId]));
 
         // Clear existing timeout for this conversation
-        const existingTimeout = typingTimeoutsRef.current.get(data.conversationId);
+        const existingTimeout = typingTimeoutsRef.current.get(
+          data.conversationId,
+        );
         if (existingTimeout) {
           clearTimeout(existingTimeout);
         }
@@ -208,7 +227,9 @@ export const useInbox = (options: UseInboxOptions = {}): UseInboxReturn => {
         typingTimeoutsRef.current.set(data.conversationId, timeout);
       } else {
         // Clear timeout if user stopped typing
-        const existingTimeout = typingTimeoutsRef.current.get(data.conversationId);
+        const existingTimeout = typingTimeoutsRef.current.get(
+          data.conversationId,
+        );
         if (existingTimeout) {
           clearTimeout(existingTimeout);
           typingTimeoutsRef.current.delete(data.conversationId);

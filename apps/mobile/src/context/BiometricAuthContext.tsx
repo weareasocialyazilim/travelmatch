@@ -24,9 +24,20 @@
  * ```
  */
 
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  ReactNode,
+} from 'react';
 import { biometricAuth } from '../services/biometricAuth';
-import type { BiometricType, BiometricCredentials } from '../services/biometricAuth';
+import type {
+  BiometricType,
+  BiometricCredentials,
+} from '../services/biometricAuth';
 import { logger } from '../utils/logger';
 
 /**
@@ -65,7 +76,9 @@ interface BiometricAuthContextValue {
   refresh: () => Promise<void>;
 }
 
-const BiometricAuthContext = createContext<BiometricAuthContextValue | undefined>(undefined);
+const BiometricAuthContext = createContext<
+  BiometricAuthContextValue | undefined
+>(undefined);
 
 /**
  * BiometricAuthProvider props
@@ -78,11 +91,15 @@ interface BiometricAuthProviderProps {
  * BiometricAuthProvider component
  * Wraps the app to provide biometric authentication state
  */
-export const BiometricAuthProvider: React.FC<BiometricAuthProviderProps> = ({ children }) => {
+export const BiometricAuthProvider: React.FC<BiometricAuthProviderProps> = ({
+  children,
+}) => {
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [hasCredentials, setHasCredentials] = useState(false);
-  const [biometricType, setBiometricType] = useState<BiometricType | null>(null);
+  const [biometricType, setBiometricType] = useState<BiometricType | null>(
+    null,
+  );
   const [biometricTypeName, setBiometricTypeName] = useState('Biometric');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -170,15 +187,17 @@ export const BiometricAuthProvider: React.FC<BiometricAuthProviderProps> = ({ ch
   const authenticate = useCallback(
     async (promptMessage?: string): Promise<boolean> => {
       try {
-        return await biometricAuth.authenticate({
-          promptMessage: promptMessage || `Authenticate with ${biometricTypeName}`,
+        const result = await biometricAuth.authenticate({
+          promptMessage:
+            promptMessage || `Authenticate with ${biometricTypeName}`,
         });
+        return result.success;
       } catch (error) {
         logger.error('BiometricAuthContext', 'Authentication failed', error);
         return false;
       }
     },
-    [biometricTypeName]
+    [biometricTypeName],
   );
 
   /**
@@ -188,7 +207,11 @@ export const BiometricAuthProvider: React.FC<BiometricAuthProviderProps> = ({ ch
     try {
       return await biometricAuth.authenticateForAppLaunch();
     } catch (error) {
-      logger.error('BiometricAuthContext', 'App launch authentication failed', error);
+      logger.error(
+        'BiometricAuthContext',
+        'App launch authentication failed',
+        error,
+      );
       return false;
     }
   }, []);
@@ -196,39 +219,58 @@ export const BiometricAuthProvider: React.FC<BiometricAuthProviderProps> = ({ ch
   /**
    * Authenticate for sensitive action
    */
-  const authenticateForAction = useCallback(async (actionName: string): Promise<boolean> => {
-    try {
-      return await biometricAuth.authenticateForSensitiveAction(actionName);
-    } catch (error) {
-      logger.error('BiometricAuthContext', 'Action authentication failed', error);
-      return false;
-    }
-  }, []);
+  const authenticateForAction = useCallback(
+    async (actionName: string): Promise<boolean> => {
+      try {
+        return await biometricAuth.authenticateForSensitiveAction(actionName);
+      } catch (error) {
+        logger.error(
+          'BiometricAuthContext',
+          'Action authentication failed',
+          error,
+        );
+        return false;
+      }
+    },
+    [],
+  );
 
   /**
    * Save credentials for biometric login
    */
-  const saveCredentials = useCallback(async (credentials: BiometricCredentials): Promise<void> => {
-    try {
-      await biometricAuth.saveCredentials(credentials);
-      setHasCredentials(true);
-    } catch (error) {
-      logger.error('BiometricAuthContext', 'Failed to save credentials', error);
-      throw error;
-    }
-  }, []);
+  const saveCredentials = useCallback(
+    async (credentials: BiometricCredentials): Promise<void> => {
+      try {
+        await biometricAuth.saveCredentials(credentials);
+        setHasCredentials(true);
+      } catch (error) {
+        logger.error(
+          'BiometricAuthContext',
+          'Failed to save credentials',
+          error,
+        );
+        throw error;
+      }
+    },
+    [],
+  );
 
   /**
    * Get saved credentials
    */
-  const getCredentials = useCallback(async (): Promise<BiometricCredentials | null> => {
-    try {
-      return await biometricAuth.getCredentials();
-    } catch (error) {
-      logger.error('BiometricAuthContext', 'Failed to get credentials', error);
-      return null;
-    }
-  }, []);
+  const getCredentials =
+    useCallback(async (): Promise<BiometricCredentials | null> => {
+      try {
+        return await biometricAuth.getCredentials();
+      } catch (error) {
+        logger.error(
+          'BiometricAuthContext',
+          'Failed to get credentials',
+          error,
+        );
+        return null;
+      }
+    }, []);
 
   /**
    * Clear saved credentials
@@ -238,7 +280,11 @@ export const BiometricAuthProvider: React.FC<BiometricAuthProviderProps> = ({ ch
       await biometricAuth.clearCredentials();
       setHasCredentials(false);
     } catch (error) {
-      logger.error('BiometricAuthContext', 'Failed to clear credentials', error);
+      logger.error(
+        'BiometricAuthContext',
+        'Failed to clear credentials',
+        error,
+      );
     }
   }, []);
 

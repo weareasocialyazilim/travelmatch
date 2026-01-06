@@ -3,7 +3,7 @@
  * React Hook Form ile entegre input component - Uses LiquidInput (Master Design)
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import type { TextInputProps, ViewStyle } from 'react-native';
 import { Controller } from 'react-hook-form';
 import Animated, { FadeIn } from 'react-native-reanimated';
@@ -21,6 +21,7 @@ interface ControlledInputProps<T extends FieldValues> extends Omit<
   icon?: keyof typeof Ionicons.glyphMap;
   containerStyle?: ViewStyle;
   isPassword?: boolean;
+  showSuccess?: boolean;
 }
 
 export function ControlledInput<T extends FieldValues>({
@@ -36,9 +37,23 @@ export function ControlledInput<T extends FieldValues>({
   const [touched, setTouched] = useState(false);
   const [showError, setShowError] = useState(false);
 
-  const togglePasswordVisibility = useCallback(() => {
+  // Track error state for progressive reveal
+  const errorRef = useRef<string | undefined>(undefined);
+  const touchedRef = useRef(false);
+
+  const _togglePasswordVisibility = useCallback(() => {
     setShowPassword((prev) => !prev);
   }, []);
+
+  // Progressive error reveal - MOVED OUTSIDE RENDER CALLBACK (Rules of Hooks)
+  useEffect(() => {
+    if (touchedRef.current && errorRef.current) {
+      const timer = setTimeout(() => setShowError(true), 300);
+      return () => clearTimeout(timer);
+    }
+    setShowError(false);
+    return undefined;
+  }, [touched]); // Re-run when touched changes
 
   return (
     <Controller
@@ -48,15 +63,9 @@ export function ControlledInput<T extends FieldValues>({
         field: { onChange, onBlur, value },
         fieldState: { error },
       }) => {
-        // Progressive error reveal
-        useEffect(() => {
-          if (touched && error) {
-            const timer = setTimeout(() => setShowError(true), 300);
-            return () => clearTimeout(timer);
-          }
-          setShowError(false);
-          return undefined;
-        }, [touched, error]);
+        // Update refs for the useEffect above
+        errorRef.current = error?.message;
+        touchedRef.current = touched;
 
         const handleBlur = () => {
           setTouched(true);
@@ -71,7 +80,9 @@ export function ControlledInput<T extends FieldValues>({
         };
 
         return (
-          <Animated.View entering={showError ? FadeIn.duration(300) : undefined}>
+          <Animated.View
+            entering={showError ? FadeIn.duration(300) : undefined}
+          >
             <LiquidInput
               value={(value as string) ?? ''}
               onChangeText={handleChange}

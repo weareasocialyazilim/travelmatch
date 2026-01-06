@@ -13,13 +13,7 @@
  * Note: FloatingDock navigation is handled by MainTabNavigator
  */
 
-import React, {
-  useRef,
-  useCallback,
-  useMemo,
-  useEffect,
-  useState,
-} from 'react';
+import React, { useRef, useCallback, useMemo, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -43,7 +37,7 @@ import {
 // Note: FloatingDock is now rendered by MainTabNavigator
 // Using useDiscoverMoments for PostGIS-based location discovery
 import { useDiscoverMoments } from '@/hooks/useDiscoverMoments';
-import { useMoments, type Moment } from '@/hooks/useMoments';
+import { type Moment } from '@/hooks/useMoments';
 import { useStories } from '@/hooks/useStories';
 import { useAuth } from '@/hooks/useAuth';
 import { COLORS } from '@/constants/colors';
@@ -115,8 +109,8 @@ const DiscoverScreen = () => {
     refresh,
     loadMore,
     hasMore,
-    userLocation,
-    locationPermission,
+    userLocation: _userLocation,
+    locationPermission: _locationPermission,
   } = useDiscoverMoments();
 
   // Cast discovery moments to Moment type for compatibility
@@ -125,13 +119,13 @@ const DiscoverScreen = () => {
   const { user, isGuest } = useAuth();
 
   // Pending moment for post-login action
-  const [pendingMoment, setPendingMoment] = useState<Moment | null>(null);
+  const [_pendingMoment, setPendingMoment] = useState<Moment | null>(null);
 
   // Use real stories data from hook instead of mock data
   const {
     stories: userStories,
-    loading: storiesLoading,
-    refresh: refreshStories,
+    loading: _storiesLoading,
+    refresh: _refreshStories,
   } = useStories();
 
   // Filter only active moments
@@ -250,11 +244,21 @@ const DiscoverScreen = () => {
         return;
       }
 
-      // Navigate to gift flow
+      // Navigate to gift flow with all required params
       navigation.navigate('UnifiedGiftFlow', {
         recipientId: moment.hostId,
         recipientName: moment.hostName || 'Host',
         momentId: moment.id,
+        momentTitle: moment.title || 'Moment',
+        momentImageUrl: moment.images?.[0] || moment.image,
+        requestedAmount: moment.price || moment.pricePerGuest || 0,
+        requestedCurrency: (moment.currency || 'TRY') as
+          | 'TRY'
+          | 'EUR'
+          | 'USD'
+          | 'GBP'
+          | 'JPY'
+          | 'CAD',
       });
     },
     [navigation, isGuest, user],
@@ -278,7 +282,7 @@ const DiscoverScreen = () => {
   );
 
   // Login Modal Handlers - Now using centralized modalStore
-  const handleLoginModalClose = useCallback(() => {
+  const _handleLoginModalClose = useCallback(() => {
     setPendingMoment(null);
   }, []);
 
@@ -336,13 +340,28 @@ const DiscoverScreen = () => {
   const keyExtractor = useCallback((item: Moment) => item.id, []);
 
   // Get item layout for performance optimization
-  const getItemLayout = useCallback(
+  const _getItemLayout = useCallback(
     (_: any, index: number) => ({
       length: height,
       offset: height * index,
       index,
     }),
     [],
+  );
+
+  // Render header component for FlatList - MOVED BEFORE EARLY RETURNS (Rules of Hooks)
+  const renderHeader = useCallback(
+    () => (
+      <View style={styles.headerSection}>
+        {/* Stories Section */}
+        <StoriesRow
+          stories={stories}
+          onStoryPress={handleStoryPress}
+          onCreatePress={handleCreateStoryPress}
+        />
+      </View>
+    ),
+    [stories, handleStoryPress, handleCreateStoryPress],
   );
 
   // Loading state
@@ -361,7 +380,7 @@ const DiscoverScreen = () => {
     return (
       <View style={styles.errorContainer}>
         <StatusBar barStyle="light-content" backgroundColor="black" />
-        <Text style={styles.errorText}>{error}</Text>
+        <Text style={styles.errorText}>{String(error)}</Text>
         <Text style={styles.retryText} onPress={handleRefresh}>
           Tap to retry
         </Text>
@@ -401,21 +420,6 @@ const DiscoverScreen = () => {
       </View>
     );
   }
-
-  // Render header component for FlatList
-  const renderHeader = useCallback(
-    () => (
-      <View style={styles.headerSection}>
-        {/* Stories Section */}
-        <StoriesRow
-          stories={stories}
-          onStoryPress={handleStoryPress}
-          onCreatePress={handleCreateStoryPress}
-        />
-      </View>
-    ),
-    [stories, handleStoryPress, handleCreateStoryPress],
-  );
 
   return (
     <View style={styles.container}>
