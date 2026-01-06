@@ -584,11 +584,7 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
               >
                 <Icon name="crown" size={20} color="#FFB800" />
                 <View style={styles.chatEligibilityContent}>
-                  <Text
-                    style={[styles.chatEligibilityTitle, { color: '#996B00' }]}
-                  >
-                    Premium Bağlantı
-                  </Text>
+                  <Text style={styles.premiumChatTitle}>Premium Bağlantı</Text>
                   <Text style={styles.chatEligibilityText}>
                     Premium hediyeniz öne çıkarılacak ve sohbet isteğiniz yüksek
                     öncelikle iletilecek.
@@ -931,6 +927,12 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '600',
     color: '#7B61FF',
+    marginBottom: SPACING.xs,
+  },
+  premiumChatTitle: {
+    ...TYPOGRAPHY.bodyLarge,
+    fontWeight: '600',
+    color: '#996B00',
     marginBottom: SPACING.xs,
   },
   chatEligibilityText: {

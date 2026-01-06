@@ -7,7 +7,7 @@
  * Migration guide: Replace `from '../theme/typography'` with `from '../constants/typography'`
  */
 
-import { TextStyle, ColorValue } from 'react-native';
+import type { TextStyle } from 'react-native';
 import { COLORS } from '../constants/colors';
 
 // ============================================
@@ -35,7 +35,6 @@ export {
 
 // Font families alias for legacy imports (flat structure for backward compatibility)
 import { FONTS as FontsSource } from '../constants/typography';
-import { Platform } from 'react-native';
 
 // Legacy FONT_FAMILIES format (flat strings)
 export const FONT_FAMILIES = {

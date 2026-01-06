@@ -58,12 +58,11 @@ exports[`Button Component Snapshots matches snapshot for disabled state 1`] = `
       style={
         [
           {
-            "accessibilityRole": "text",
-            "color": "#F8FAFC",
-            "fontSize": 15,
+            "fontFamily": "Satoshi-Medium",
+            "fontSize": 16,
             "fontWeight": "600",
-            "lineHeight": 22.5,
-            "minContrastRatio": 4.5,
+            "letterSpacing": 0.5,
+            "lineHeight": 18,
           },
           {
             "color": "#475569",
@@ -224,12 +223,11 @@ exports[`Button Component Snapshots matches snapshot for primary variant 1`] = `
         style={
           [
             {
-              "accessibilityRole": "text",
-              "color": "#F8FAFC",
-              "fontSize": 15,
+              "fontFamily": "Satoshi-Medium",
+              "fontSize": 16,
               "fontWeight": "600",
-              "lineHeight": 22.5,
-              "minContrastRatio": 4.5,
+              "letterSpacing": 0.5,
+              "lineHeight": 18,
             },
             {
               "color": "#FFFFFF",

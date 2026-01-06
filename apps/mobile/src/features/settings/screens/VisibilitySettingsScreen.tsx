@@ -142,15 +142,11 @@ const RadioOption: React.FC<{
           </Text>
           {option.requiresSubscription && (
             <View
-              style={[
-                styles.subscriptionBadge,
-                {
-                  backgroundColor:
-                    option.requiresSubscription === 'platinum'
-                      ? '#A855F7'
-                      : '#F59E0B',
-                },
-              ]}
+              style={
+                option.requiresSubscription === 'platinum'
+                  ? styles.subscriptionBadgePlatinum
+                  : styles.subscriptionBadgeGold
+              }
             >
               <Text style={styles.subscriptionBadgeText}>
                 {option.requiresSubscription === 'platinum' ? '💎' : '⭐'}
@@ -210,13 +206,11 @@ const ToggleRow: React.FC<{
           </Text>
           {requiresSubscription && (
             <View
-              style={[
-                styles.subscriptionBadge,
-                {
-                  backgroundColor:
-                    requiresSubscription === 'platinum' ? '#A855F7' : '#F59E0B',
-                },
-              ]}
+              style={
+                requiresSubscription === 'platinum'
+                  ? styles.subscriptionBadgePlatinum
+                  : styles.subscriptionBadgeGold
+              }
             >
               <Text style={styles.subscriptionBadgeText}>
                 {requiresSubscription === 'platinum' ? '💎' : '⭐'}
@@ -868,6 +862,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 6,
+  },
+  subscriptionBadgePlatinum: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    backgroundColor: '#A855F7',
+  },
+  subscriptionBadgeGold: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    backgroundColor: '#F59E0B',
   },
   subscriptionBadgeText: {
     fontSize: 10,

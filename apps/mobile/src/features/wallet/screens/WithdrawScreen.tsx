@@ -124,15 +124,12 @@ const KYCGateScreen: React.FC<{
             <Ionicons name="chevron-back" size={24} color={THEME.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Kimlik Doğrulama Gerekli</Text>
-          <View style={{ width: 40 }} />
+          <View style={styles.headerSpacer} />
         </View>
 
         <ScrollView
           style={styles.scrollView}
-          contentContainerStyle={[
-            styles.scrollContent,
-            { alignItems: 'center' },
-          ]}
+          contentContainerStyle={styles.scrollContentCentered}
         >
           {/* KYC Gate Icon */}
           <View style={styles.kycGateIcon}>
@@ -812,6 +809,14 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
     paddingBottom: 32,
+  },
+  scrollContentCentered: {
+    padding: 16,
+    paddingBottom: 32,
+    alignItems: 'center',
+  },
+  headerSpacer: {
+    width: 40,
   },
 
   // Glass Card
