@@ -9,7 +9,7 @@
  */
 
 import React from 'react';
-import { render, waitFor, fireEvent } from '@testing-library/react-native';
+import { render, waitFor, fireEvent, act } from '@testing-library/react-native';
 import { CachedImage } from '../CachedImage';
 import imageCacheManager from '../../services/imageCacheManager';
 
@@ -330,16 +330,12 @@ describe('CachedImage - Network Scenarios', () => {
       });
     });
 
-    // Skip: This test times out due to async retry logic issues with fake timers
-    it.skip('should reset retry count on successful load', async () => {
-      let attemptCount = 0;
-      mockImageCacheManager.getImage.mockImplementation(() => {
-        attemptCount++;
-        if (attemptCount === 1) {
-          return Promise.reject(new Error('First attempt failed'));
-        }
-        return Promise.resolve('file:///cache/image.jpg');
-      });
+    // Test reset retry count on successful load
+    it('should reset retry count on successful load', async () => {
+      // First call fails, subsequent calls succeed
+      mockImageCacheManager.getImage
+        .mockRejectedValueOnce(new Error('First attempt failed'))
+        .mockResolvedValue('file:///cache/image.jpg');
 
       const { getByText, queryByText } = render(
         <CachedImage
@@ -350,15 +346,19 @@ describe('CachedImage - Network Scenarios', () => {
         />,
       );
 
-      // First attempt fails
+      // First attempt fails - wait for retry button
       await waitFor(() => {
         expect(getByText(/Tekrar Dene/)).toBeTruthy();
       });
 
-      // Retry succeeds
+      // Press retry button and advance timer
       fireEvent.press(getByText(/Tekrar Dene/));
-      jest.advanceTimersByTime(100);
+      await act(async () => {
+        jest.advanceTimersByTime(100);
+        await Promise.resolve();
+      });
 
+      // After successful retry, retry button should be gone
       await waitFor(() => {
         expect(queryByText(/Tekrar Dene/)).toBeNull();
       });
