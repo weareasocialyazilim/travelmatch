@@ -133,7 +133,7 @@ export const RegisterScreen: React.FC = () => {
               />
             </GlassCard>
 
-            <Text style={[styles.label, { marginTop: 24 }]}>E-POSTA</Text>
+            <Text style={styles.labelWithMargin}>E-POSTA</Text>
             <GlassCard
               intensity={10}
               style={styles.inputWrapper}
@@ -156,7 +156,7 @@ export const RegisterScreen: React.FC = () => {
               />
             </GlassCard>
 
-            <Text style={[styles.label, { marginTop: 24 }]}>ŞİFRE BELİRLE</Text>
+            <Text style={styles.labelWithMargin}>ŞİFRE BELİRLE</Text>
             <GlassCard
               intensity={10}
               style={styles.inputWrapper}
@@ -272,6 +272,15 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
     marginBottom: 12,
     marginLeft: 4,
+  },
+  labelWithMargin: {
+    fontSize: 10,
+    fontFamily: FONTS.mono.regular,
+    color: COLORS.text.muted,
+    letterSpacing: 1.5,
+    marginBottom: 12,
+    marginLeft: 4,
+    marginTop: 24,
   },
   inputWrapper: {
     borderRadius: 20,

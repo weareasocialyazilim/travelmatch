@@ -283,9 +283,7 @@ const StatsCard: React.FC<{
       <View style={styles.statDivider} />
       <View style={styles.statItem}>
         <MaterialCommunityIcons name="shield-star" size={20} color="#DFFF00" />
-        <Text style={[styles.statValue, { color: '#DFFF00' }]}>
-          +{trustScoreGain}
-        </Text>
+        <Text style={styles.statValueNeon}>+{trustScoreGain}</Text>
         <Text style={styles.statLabel}>Güven Puanı</Text>
       </View>
     </LinearGradient>
@@ -659,6 +657,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '800',
     color: '#FFFFFF',
+  },
+  statValueNeon: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#DFFF00',
   },
   statLabel: {
     fontSize: 11,

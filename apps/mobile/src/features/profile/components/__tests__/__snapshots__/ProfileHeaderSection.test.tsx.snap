@@ -240,13 +240,13 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
           ref={null}
           style={
             {
-              "accessibilityRole": "text",
               "color": "#FFFFFF",
+              "fontFamily": "Satoshi-Medium",
               "fontSize": 11,
               "fontWeight": "700",
-              "letterSpacing": 0.3,
-              "lineHeight": 19.5,
-              "minContrastRatio": 4.5,
+              "letterSpacing": 1,
+              "lineHeight": 13,
+              "textTransform": "uppercase",
             }
           }
           testID="RCTText"
@@ -280,13 +280,12 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
         ref={null}
         style={
           {
-            "accessibilityRole": "header",
             "color": "#FFFFFF",
-            "fontSize": 32,
-            "fontWeight": "800",
+            "fontFamily": "ClashDisplay-Semibold",
+            "fontSize": 28,
+            "fontWeight": "600",
             "letterSpacing": -0.5,
-            "lineHeight": 40,
-            "minContrastRatio": 7,
+            "lineHeight": 35,
           }
         }
         testID="RCTText"
@@ -318,12 +317,12 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
         ref={null}
         style={
           {
-            "accessibilityRole": "text",
             "color": "rgba(255,255,255,0.8)",
-            "fontSize": 15,
+            "fontFamily": "Satoshi-Regular",
+            "fontSize": 16,
             "fontWeight": "400",
-            "lineHeight": 26.25,
-            "minContrastRatio": 4.5,
+            "letterSpacing": 0,
+            "lineHeight": 24,
           }
         }
         testID="RCTText"
@@ -399,12 +398,12 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
             ref={null}
             style={
               {
-                "accessibilityRole": "text",
                 "color": "#FFFFFF",
+                "fontFamily": "JetBrainsMono-Medium",
                 "fontSize": 20,
-                "fontWeight": "600",
+                "fontWeight": "500",
+                "letterSpacing": -0.5,
                 "lineHeight": 20,
-                "minContrastRatio": 4.5,
               }
             }
             testID="RCTText"
@@ -415,13 +414,13 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
             ref={null}
             style={
               {
-                "accessibilityRole": "text",
                 "color": "rgba(255,255,255,0.7)",
+                "fontFamily": "Satoshi-Regular",
                 "fontSize": 12,
                 "fontWeight": "400",
-                "lineHeight": 21,
+                "letterSpacing": 0.3,
+                "lineHeight": 18,
                 "marginTop": 2,
-                "minContrastRatio": 4.5,
               }
             }
             testID="RCTText"
@@ -486,12 +485,12 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
             ref={null}
             style={
               {
-                "accessibilityRole": "text",
                 "color": "#FFFFFF",
+                "fontFamily": "JetBrainsMono-Medium",
                 "fontSize": 20,
-                "fontWeight": "600",
+                "fontWeight": "500",
+                "letterSpacing": -0.5,
                 "lineHeight": 20,
-                "minContrastRatio": 4.5,
               }
             }
             testID="RCTText"
@@ -502,13 +501,13 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
             ref={null}
             style={
               {
-                "accessibilityRole": "text",
                 "color": "rgba(255,255,255,0.7)",
+                "fontFamily": "Satoshi-Regular",
                 "fontSize": 12,
                 "fontWeight": "400",
-                "lineHeight": 21,
+                "letterSpacing": 0.3,
+                "lineHeight": 18,
                 "marginTop": 2,
-                "minContrastRatio": 4.5,
               }
             }
             testID="RCTText"
@@ -573,12 +572,12 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
             ref={null}
             style={
               {
-                "accessibilityRole": "text",
                 "color": "#FFFFFF",
+                "fontFamily": "JetBrainsMono-Medium",
                 "fontSize": 20,
-                "fontWeight": "600",
+                "fontWeight": "500",
+                "letterSpacing": -0.5,
                 "lineHeight": 20,
-                "minContrastRatio": 4.5,
               }
             }
             testID="RCTText"
@@ -589,13 +588,13 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
             ref={null}
             style={
               {
-                "accessibilityRole": "text",
                 "color": "rgba(255,255,255,0.7)",
+                "fontFamily": "Satoshi-Regular",
                 "fontSize": 12,
                 "fontWeight": "400",
-                "lineHeight": 21,
+                "letterSpacing": 0.3,
+                "lineHeight": 18,
                 "marginTop": 2,
-                "minContrastRatio": 4.5,
               }
             }
             testID="RCTText"
@@ -923,13 +922,13 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
           ref={null}
           style={
             {
-              "accessibilityRole": "text",
               "color": "#FFFFFF",
+              "fontFamily": "Satoshi-Medium",
               "fontSize": 11,
               "fontWeight": "700",
-              "letterSpacing": 0.3,
-              "lineHeight": 19.5,
-              "minContrastRatio": 4.5,
+              "letterSpacing": 1,
+              "lineHeight": 13,
+              "textTransform": "uppercase",
             }
           }
           testID="RCTText"
@@ -963,13 +962,12 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
         ref={null}
         style={
           {
-            "accessibilityRole": "header",
             "color": "#FFFFFF",
-            "fontSize": 32,
-            "fontWeight": "800",
+            "fontFamily": "ClashDisplay-Semibold",
+            "fontSize": 28,
+            "fontWeight": "600",
             "letterSpacing": -0.5,
-            "lineHeight": 40,
-            "minContrastRatio": 7,
+            "lineHeight": 35,
           }
         }
         testID="RCTText"
@@ -1025,12 +1023,12 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
         ref={null}
         style={
           {
-            "accessibilityRole": "text",
             "color": "rgba(255,255,255,0.8)",
-            "fontSize": 15,
+            "fontFamily": "Satoshi-Regular",
+            "fontSize": 16,
             "fontWeight": "400",
-            "lineHeight": 26.25,
-            "minContrastRatio": 4.5,
+            "letterSpacing": 0,
+            "lineHeight": 24,
           }
         }
         testID="RCTText"
@@ -1106,12 +1104,12 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
             ref={null}
             style={
               {
-                "accessibilityRole": "text",
                 "color": "#FFFFFF",
+                "fontFamily": "JetBrainsMono-Medium",
                 "fontSize": 20,
-                "fontWeight": "600",
+                "fontWeight": "500",
+                "letterSpacing": -0.5,
                 "lineHeight": 20,
-                "minContrastRatio": 4.5,
               }
             }
             testID="RCTText"
@@ -1122,13 +1120,13 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
             ref={null}
             style={
               {
-                "accessibilityRole": "text",
                 "color": "rgba(255,255,255,0.7)",
+                "fontFamily": "Satoshi-Regular",
                 "fontSize": 12,
                 "fontWeight": "400",
-                "lineHeight": 21,
+                "letterSpacing": 0.3,
+                "lineHeight": 18,
                 "marginTop": 2,
-                "minContrastRatio": 4.5,
               }
             }
             testID="RCTText"
@@ -1193,12 +1191,12 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
             ref={null}
             style={
               {
-                "accessibilityRole": "text",
                 "color": "#FFFFFF",
+                "fontFamily": "JetBrainsMono-Medium",
                 "fontSize": 20,
-                "fontWeight": "600",
+                "fontWeight": "500",
+                "letterSpacing": -0.5,
                 "lineHeight": 20,
-                "minContrastRatio": 4.5,
               }
             }
             testID="RCTText"
@@ -1209,13 +1207,13 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
             ref={null}
             style={
               {
-                "accessibilityRole": "text",
                 "color": "rgba(255,255,255,0.7)",
+                "fontFamily": "Satoshi-Regular",
                 "fontSize": 12,
                 "fontWeight": "400",
-                "lineHeight": 21,
+                "letterSpacing": 0.3,
+                "lineHeight": 18,
                 "marginTop": 2,
-                "minContrastRatio": 4.5,
               }
             }
             testID="RCTText"
@@ -1280,12 +1278,12 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
             ref={null}
             style={
               {
-                "accessibilityRole": "text",
                 "color": "#FFFFFF",
+                "fontFamily": "JetBrainsMono-Medium",
                 "fontSize": 20,
-                "fontWeight": "600",
+                "fontWeight": "500",
+                "letterSpacing": -0.5,
                 "lineHeight": 20,
-                "minContrastRatio": 4.5,
               }
             }
             testID="RCTText"
@@ -1296,13 +1294,13 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
             ref={null}
             style={
               {
-                "accessibilityRole": "text",
                 "color": "rgba(255,255,255,0.7)",
+                "fontFamily": "Satoshi-Regular",
                 "fontSize": 12,
                 "fontWeight": "400",
-                "lineHeight": 21,
+                "letterSpacing": 0.3,
+                "lineHeight": 18,
                 "marginTop": 2,
-                "minContrastRatio": 4.5,
               }
             }
             testID="RCTText"
