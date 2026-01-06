@@ -251,7 +251,7 @@ export const useModalStore = create<ModalState>()(
     }),
     {
       name: 'modal-store',
-      enabled: __DEV__,
+      enabled: typeof __DEV__ !== 'undefined' ? __DEV__ : false,
     },
   ),
 );
