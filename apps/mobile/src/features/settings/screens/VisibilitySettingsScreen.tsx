@@ -858,11 +858,6 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: '#DFFF00',
   },
-  subscriptionBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
-  },
   subscriptionBadgePlatinum: {
     paddingHorizontal: 6,
     paddingVertical: 2,
