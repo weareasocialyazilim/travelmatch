@@ -115,3 +115,4 @@ apps/**/pnpm-lock.yaml
 # Snyk Security Extension - AI Rules (auto-generated)
 .github/instructions/snyk_rules.instructions.md
 package-lock.json
+package-lock.json
