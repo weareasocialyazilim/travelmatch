@@ -21,7 +21,7 @@ import {
 import { FlashList } from '@shopify/flash-list';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { LiquidScreenWrapper } from '@/components/layout';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -302,8 +302,8 @@ const ProfileScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.wrapper}>
-      <SafeAreaView style={styles.container} edges={['top']}>
+    <LiquidScreenWrapper variant="twilight" safeAreaTop>
+      <View style={styles.container}>
         {/* Offline Banner */}
         {!isConnected && (
           <OfflineState
@@ -508,10 +508,10 @@ const ProfileScreen: React.FC = () => {
 
           <View style={styles.bottomSpacer} />
         </ScrollView>
-      </SafeAreaView>
+      </View>
 
       <BottomNav activeTab="Profile" />
-    </View>
+    </LiquidScreenWrapper>
   );
 };
 

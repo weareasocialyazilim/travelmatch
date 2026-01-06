@@ -28,6 +28,7 @@ import * as Haptics from 'expo-haptics';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LiquidScreenWrapper } from '@/components/layout';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import Animated, {
@@ -361,163 +362,168 @@ const WalletScreen = () => {
   ];
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
-      <NetworkGuard
-        offlineMessage="Cüzdan bilgilerinizi görmek için internet bağlantısı gerekli."
-        onRetry={onRefresh}
-      >
-        {/* 1. HEADER & BALANCE CARD */}
-        <View style={styles.headerSection}>
-          <LinearGradient
-            colors={[DARK_THEME.backgroundSecondary, DARK_THEME.background]}
-            style={[styles.headerGradient, { paddingTop: insets.top + 10 }]}
-          >
-            <View style={styles.topBar}>
-              <TouchableOpacity
-                onPress={() => navigation.goBack()}
-                style={styles.backButton}
-                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-                accessible={true}
-                accessibilityLabel="Geri dön"
-                accessibilityRole="button"
-              >
-                <Ionicons name="arrow-back" size={24} color="white" />
-              </TouchableOpacity>
-              <Text style={styles.headerTitle}>Cüzdan</Text>
-              <TouchableOpacity
-                style={styles.historyButton}
-                onPress={() => navigation.navigate('TransactionHistory')}
-                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-                accessible={true}
-                accessibilityLabel="İşlem geçmişi"
-                accessibilityRole="button"
-              >
-                <MaterialCommunityIcons
-                  name="history"
-                  size={24}
-                  color="white"
-                />
-              </TouchableOpacity>
-            </View>
-
-            {/* GLASS BALANCE CARD */}
-            <Animated.View
-              entering={FadeInDown.delay(200).duration(600).springify()}
-              style={styles.balanceCardContainer}
+    <LiquidScreenWrapper
+      variant="dark"
+      safeAreaTop={false}
+      showGradient={false}
+    >
+      <View style={styles.container}>
+        <NetworkGuard
+          offlineMessage="Cüzdan bilgilerinizi görmek için internet bağlantısı gerekli."
+          onRetry={onRefresh}
+        >
+          {/* 1. HEADER & BALANCE CARD */}
+          <View style={styles.headerSection}>
+            <LinearGradient
+              colors={[DARK_THEME.backgroundSecondary, DARK_THEME.background]}
+              style={[styles.headerGradient, { paddingTop: insets.top + 10 }]}
             >
-              <BlurView intensity={40} tint="dark" style={styles.balanceCard}>
-                <LinearGradient
-                  colors={['rgba(255,255,255,0.05)', 'transparent']}
-                  style={StyleSheet.absoluteFill}
-                />
-                <View style={styles.cardTop}>
-                  <Text style={styles.balanceLabel}>Toplam Bakiye</Text>
-                  <View style={styles.currencyBadge}>
-                    <Text style={styles.currencyText}>TRY</Text>
-                  </View>
-                </View>
+              <View style={styles.topBar}>
+                <TouchableOpacity
+                  onPress={() => navigation.goBack()}
+                  style={styles.backButton}
+                  hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                  accessible={true}
+                  accessibilityLabel="Geri dön"
+                  accessibilityRole="button"
+                >
+                  <Ionicons name="arrow-back" size={24} color="white" />
+                </TouchableOpacity>
+                <Text style={styles.headerTitle}>Cüzdan</Text>
+                <TouchableOpacity
+                  style={styles.historyButton}
+                  onPress={() => navigation.navigate('TransactionHistory')}
+                  hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                  accessible={true}
+                  accessibilityLabel="İşlem geçmişi"
+                  accessibilityRole="button"
+                >
+                  <MaterialCommunityIcons
+                    name="history"
+                    size={24}
+                    color="white"
+                  />
+                </TouchableOpacity>
+              </View>
 
-                <Text style={styles.balanceValue}>
-                  {formatCurrency(balance?.available || 0)}
-                </Text>
-
-                {/* Pending Balance - Tappable for ProofReminder */}
-                {(balance?.pending || 0) > 0 && (
-                  <TouchableOpacity
-                    onPress={handlePendingTap}
-                    style={styles.pendingBadge}
-                    activeOpacity={0.7}
-                  >
-                    <MaterialCommunityIcons
-                      name="clock-outline"
-                      size={14}
-                      color={DARK_THEME.accentAmber}
-                    />
-                    <Text style={styles.pendingBalance}>
-                      +{formatCurrency(balance?.pending || 0)} beklemede
-                    </Text>
-                    <MaterialCommunityIcons
-                      name="chevron-right"
-                      size={16}
-                      color={DARK_THEME.accentAmber}
-                    />
-                  </TouchableOpacity>
-                )}
-
-                <View style={styles.cardActions}>
-                  <TouchableOpacity
-                    style={styles.actionBtnPrimary}
-                    onPress={() => navigation.navigate('Withdraw')}
-                    accessible={true}
-                    accessibilityLabel="Para çek"
-                    accessibilityRole="button"
-                  >
-                    <Text style={styles.actionBtnTextPrimary}>Para Çek</Text>
-                  </TouchableOpacity>
-                </View>
-              </BlurView>
-            </Animated.View>
-          </LinearGradient>
-        </View>
-
-        {/* 2. TRANSACTIONS */}
-        <View style={styles.contentSection}>
-          <Text style={styles.sectionTitle}>Son İşlemler</Text>
-
-          {/* Filter Pills */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.filterScroll}
-            contentContainerStyle={styles.filterScrollContent}
-          >
-            {filters.map((filter, index) => (
-              <TouchableOpacity
-                key={filter.key}
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  setActiveFilter(filter.key);
-                }}
-                style={[
-                  styles.filterPill,
-                  activeFilter === filter.key && styles.filterPillActive,
-                  index === 0 && styles.filterPillFirst,
-                ]}
+              {/* GLASS BALANCE CARD */}
+              <Animated.View
+                entering={FadeInDown.delay(200).duration(600).springify()}
+                style={styles.balanceCardContainer}
               >
-                <Text
+                <BlurView intensity={40} tint="dark" style={styles.balanceCard}>
+                  <LinearGradient
+                    colors={['rgba(255,255,255,0.05)', 'transparent']}
+                    style={StyleSheet.absoluteFill}
+                  />
+                  <View style={styles.cardTop}>
+                    <Text style={styles.balanceLabel}>Toplam Bakiye</Text>
+                    <View style={styles.currencyBadge}>
+                      <Text style={styles.currencyText}>TRY</Text>
+                    </View>
+                  </View>
+
+                  <Text style={styles.balanceValue}>
+                    {formatCurrency(balance?.available || 0)}
+                  </Text>
+
+                  {/* Pending Balance - Tappable for ProofReminder */}
+                  {(balance?.pending || 0) > 0 && (
+                    <TouchableOpacity
+                      onPress={handlePendingTap}
+                      style={styles.pendingBadge}
+                      activeOpacity={0.7}
+                    >
+                      <MaterialCommunityIcons
+                        name="clock-outline"
+                        size={14}
+                        color={DARK_THEME.accentAmber}
+                      />
+                      <Text style={styles.pendingBalance}>
+                        +{formatCurrency(balance?.pending || 0)} beklemede
+                      </Text>
+                      <MaterialCommunityIcons
+                        name="chevron-right"
+                        size={16}
+                        color={DARK_THEME.accentAmber}
+                      />
+                    </TouchableOpacity>
+                  )}
+
+                  <View style={styles.cardActions}>
+                    <TouchableOpacity
+                      style={styles.actionBtnPrimary}
+                      onPress={() => navigation.navigate('Withdraw')}
+                      accessible={true}
+                      accessibilityLabel="Para çek"
+                      accessibilityRole="button"
+                    >
+                      <Text style={styles.actionBtnTextPrimary}>Para Çek</Text>
+                    </TouchableOpacity>
+                  </View>
+                </BlurView>
+              </Animated.View>
+            </LinearGradient>
+          </View>
+
+          {/* 2. TRANSACTIONS */}
+          <View style={styles.contentSection}>
+            <Text style={styles.sectionTitle}>Son İşlemler</Text>
+
+            {/* Filter Pills */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.filterScroll}
+              contentContainerStyle={styles.filterScrollContent}
+            >
+              {filters.map((filter, index) => (
+                <TouchableOpacity
+                  key={filter.key}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setActiveFilter(filter.key);
+                  }}
                   style={[
-                    styles.filterText,
-                    activeFilter === filter.key && styles.filterTextActive,
+                    styles.filterPill,
+                    activeFilter === filter.key && styles.filterPillActive,
+                    index === 0 && styles.filterPillFirst,
                   ]}
                 >
-                  {filter.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+                  <Text
+                    style={[
+                      styles.filterText,
+                      activeFilter === filter.key && styles.filterTextActive,
+                    ]}
+                  >
+                    {filter.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
 
-          <FlatList
-            data={filteredTransactions}
-            renderItem={renderTransaction}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.listContent}
-            showsVerticalScrollIndicator={false}
-            ListEmptyComponent={renderEmptyState}
-            refreshControl={
-              <RefreshControl
-                refreshing={isLoading}
-                onRefresh={onRefresh}
-                tintColor={DARK_THEME.accent}
-              />
-            }
-          />
-        </View>
+            <FlatList
+              data={filteredTransactions}
+              renderItem={renderTransaction}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={styles.listContent}
+              showsVerticalScrollIndicator={false}
+              ListEmptyComponent={renderEmptyState}
+              refreshControl={
+                <RefreshControl
+                  refreshing={isLoading}
+                  onRefresh={onRefresh}
+                  tintColor={DARK_THEME.accent}
+                />
+              }
+            />
+          </View>
 
-        {/* Bottom Navigation */}
-        <BottomNav activeTab="Profile" />
-      </NetworkGuard>
-    </View>
+          {/* Bottom Navigation */}
+          <BottomNav activeTab="Profile" />
+        </NetworkGuard>
+      </View>
+    </LiquidScreenWrapper>
   );
 };
 
