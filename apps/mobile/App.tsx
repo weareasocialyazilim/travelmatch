@@ -8,6 +8,11 @@ import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { FeedbackModal } from './src/components/FeedbackModal';
 import { InitializationScreen } from './src/components/InitializationScreen';
 import { ProviderComposer } from './src/components/ProviderComposer';
+import {
+  PrivacyConsentModal,
+  checkConsentStatus,
+  type ConsentPreferences,
+} from './src/components/PrivacyConsentModal';
 import { AuthProvider } from './src/context/AuthContext';
 import { BiometricAuthProvider } from './src/context/BiometricAuthContext';
 import { ConfirmationProvider } from './src/context/ConfirmationContext';
@@ -66,6 +71,11 @@ function App() {
   const [pendingPayments, setPendingPayments] = useState<PendingPayment[]>([]);
   const [pendingUploads, setPendingUploads] = useState<PendingUpload[]>([]);
 
+  // Privacy consent modal (GDPR/KVKK compliance)
+  const [showPrivacyConsent, setShowPrivacyConsent] = useState(false);
+  const [consentPreferences, setConsentPreferences] =
+    useState<ConsentPreferences | null>(null);
+
   // Feedback prompt
   const { showFeedback, dismissFeedback, incrementSessionCount } =
     useFeedbackPrompt();
@@ -118,6 +128,15 @@ function App() {
         // Mark app as ready
         setAppInitState('ready');
         logger.info('App', '✅ App initialization complete');
+
+        // Check privacy consent status (GDPR/KVKK compliance)
+        const consentStatus = await checkConsentStatus();
+        if (!consentStatus.hasConsented) {
+          // Show consent modal after a brief delay for UX
+          setTimeout(() => setShowPrivacyConsent(true), 500);
+        } else {
+          setConsentPreferences(consentStatus.preferences);
+        }
       } catch (error) {
         logger.error('App', 'Fatal error during initialization', error);
         setAppInitState('error');
@@ -163,6 +182,22 @@ function App() {
       }
     }
   }, []);
+
+  // Privacy consent handler (GDPR/KVKK compliance)
+  const handlePrivacyConsentGiven = useCallback(
+    (preferences: ConsentPreferences) => {
+      setConsentPreferences(preferences);
+      setShowPrivacyConsent(false);
+      logger.info('App', 'Privacy consent given:', preferences);
+
+      // Configure analytics based on consent
+      if (!preferences.analytics) {
+        // Disable analytics if user declined
+        logger.info('App', 'Analytics disabled by user preference');
+      }
+    },
+    [],
+  );
 
   // Pending transactions handlers
   const handleResumePayment = useCallback(async (payment: PendingPayment) => {
@@ -272,6 +307,11 @@ function App() {
               onDismissPayment={handleDismissPayment}
               onDismissUpload={handleDismissUpload}
               onClose={handleClosePendingModal}
+            />
+            {/* GDPR/KVKK Privacy Consent Modal - shows on first launch */}
+            <PrivacyConsentModal
+              visible={showPrivacyConsent}
+              onConsentGiven={handlePrivacyConsentGiven}
             />
           </ModalProvider>
         </ProviderComposer>

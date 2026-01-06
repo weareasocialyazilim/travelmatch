@@ -245,10 +245,26 @@ const TabItem: React.FC<TabItemProps> = ({
 
   const iconColor = isFocused ? COLORS.brand.primary : COLORS.text.muted;
 
+  // Get accessible label for tab
+  const getAccessibleLabel = (name: string): string => {
+    const labels: Record<string, string> = {
+      Home: 'Ana sayfa sekmesi',
+      Search: 'Keşfet sekmesi',
+      Create: 'Yeni an oluştur',
+      Inbox: 'Mesajlar sekmesi',
+      Profile: 'Profil sekmesi',
+    };
+    return labels[name] || `${name} sekmesi`;
+  };
+
   return (
     <AnimatedTouchable
-      accessibilityRole="button"
-      accessibilityState={isFocused ? { selected: true } : {}}
+      accessibilityRole="tab"
+      accessibilityLabel={getAccessibleLabel(routeName)}
+      accessibilityState={{ selected: isFocused }}
+      accessibilityHint={
+        isFocused ? undefined : `${getAccessibleLabel(routeName)}ne git`
+      }
       onPress={handlePress}
       onLongPress={onLongPress}
       onPressIn={handlePressIn}
@@ -337,7 +353,8 @@ const CenterButton: React.FC<CenterButtonProps> = ({
       {/* Button */}
       <AnimatedTouchable
         accessibilityRole="button"
-        accessibilityLabel="Create new moment"
+        accessibilityLabel="Yeni an oluştur"
+        accessibilityHint="Yeni bir deneyim paylaşmak için dokunun"
         onPress={handlePress}
         onLongPress={onLongPress}
         onPressIn={handlePressIn}

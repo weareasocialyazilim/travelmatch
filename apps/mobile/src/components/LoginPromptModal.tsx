@@ -105,6 +105,8 @@ export const LoginPromptModal: React.FC<LoginPromptModalProps> = ({
         style={styles.backdrop}
         activeOpacity={1}
         onPress={handleClose}
+        accessibilityLabel="Pencereyi kapat"
+        accessibilityRole="button"
       />
 
       <Animated.View
@@ -155,6 +157,9 @@ const ModalContent: React.FC<ModalContentProps> = ({
       style={styles.closeButton}
       onPress={onClose}
       hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+      accessibilityLabel="Kapat"
+      accessibilityRole="button"
+      accessibilityHint="Giriş yap penceresini kapatır"
     >
       <MaterialCommunityIcons
         name="close"
@@ -220,6 +225,9 @@ const ModalContent: React.FC<ModalContentProps> = ({
         style={styles.registerButton}
         onPress={onRegister}
         activeOpacity={0.8}
+        accessibilityLabel="Ücretsiz üye ol"
+        accessibilityRole="button"
+        accessibilityHint="Yeni hesap oluşturma sayfasına gider"
       >
         <LinearGradient
           colors={[COLORS.brand.primary, COLORS.brand.accent]}
@@ -236,6 +244,9 @@ const ModalContent: React.FC<ModalContentProps> = ({
         style={styles.loginButton}
         onPress={onLogin}
         activeOpacity={0.7}
+        accessibilityLabel="Giriş yap"
+        accessibilityRole="button"
+        accessibilityHint="Mevcut hesabınla giriş yap"
       >
         <Text style={styles.loginText}>Zaten üye misin? Giriş yap</Text>
       </TouchableOpacity>

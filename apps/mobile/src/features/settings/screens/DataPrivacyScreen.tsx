@@ -300,6 +300,8 @@ const DataPrivacyScreen = () => {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
+          accessibilityLabel="Geri dön"
+          accessibilityRole="button"
         >
           <MaterialCommunityIcons
             name="arrow-left"
@@ -323,6 +325,10 @@ const DataPrivacyScreen = () => {
             style={styles.actionButton}
             onPress={handleExportData}
             disabled={exportLoading}
+            accessibilityLabel="Verilerimi dışa aktar"
+            accessibilityRole="button"
+            accessibilityHint="Tüm kişisel verilerinizi JSON formatında indirir"
+            accessibilityState={{ disabled: exportLoading }}
           >
             {exportLoading ? (
               <ActivityIndicator size="small" color={COLORS.utility.white} />
@@ -335,6 +341,10 @@ const DataPrivacyScreen = () => {
             style={[styles.actionButton, styles.dangerButton]}
             onPress={handleDeleteAccount}
             disabled={deleteLoading}
+            accessibilityLabel="Hesabımı sil"
+            accessibilityRole="button"
+            accessibilityHint="Hesabınızı silmek için onay isteyecek"
+            accessibilityState={{ disabled: deleteLoading }}
           >
             {deleteLoading ? (
               <ActivityIndicator size="small" color={COLORS.utility.white} />

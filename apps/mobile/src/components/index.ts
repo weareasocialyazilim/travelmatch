@@ -160,3 +160,10 @@ export { InitializationScreen } from './InitializationScreen';
 
 // Provider Utilities
 export { ProviderComposer } from './ProviderComposer';
+// Privacy & Consent
+export {
+  PrivacyConsentModal,
+  checkConsentStatus,
+  saveConsentPreferences,
+} from './PrivacyConsentModal';
+export type { ConsentPreferences } from './PrivacyConsentModal';
