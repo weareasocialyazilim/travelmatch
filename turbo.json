@@ -5,39 +5,15 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [
-        "dist/**",
-        ".next/**",
-        "!.next/cache/**"
-      ],
-      "inputs": [
-        "src/**",
-        "public/**",
-        "package.json"
-      ],
-      "env": [
-        "VITE_SUPABASE_URL",
-        "VITE_SUPABASE_ANON_KEY"
-      ]
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
+      "inputs": ["src/**", "public/**", "package.json"],
+      "env": ["VITE_SUPABASE_URL", "VITE_SUPABASE_ANON_KEY"]
     },
     "mobile#build": {
       "dependsOn": ["^build"],
-      "outputs": [
-        "android/app/build/**",
-        "ios/build/**",
-        ".expo/**"
-      ],
-      "inputs": [
-        "src/**",
-        "app.config.ts",
-        "babel.config.js",
-        "metro.config.js",
-        "package.json"
-      ],
-      "env": [
-        "EXPO_PUBLIC_SUPABASE_URL",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY"
-      ]
+      "outputs": ["android/app/build/**", "ios/build/**", ".expo/**"],
+      "inputs": ["src/**", "app.config.ts", "babel.config.js", "metro.config.js", "package.json"],
+      "env": ["EXPO_PUBLIC_SUPABASE_URL", "EXPO_PUBLIC_SUPABASE_ANON_KEY"]
     },
     "mobile#dev": {
       "cache": false,
@@ -45,13 +21,8 @@
       "dependsOn": ["^build"]
     },
     "mobile#test": {
-      "dependsOn": ["^build"],
-      "outputs": ["coverage/**"],
-      "inputs": [
-        "src/**/*.tsx",
-        "src/**/*.ts",
-        "**/__tests__/**"
-      ]
+      "cache": false,
+      "dependsOn": ["^build"]
     },
     "mobile#test:e2e": {
       "cache": false,
@@ -70,19 +41,9 @@
     },
     "admin#build": {
       "dependsOn": ["^build"],
-      "outputs": [
-        "dist/**"
-      ],
-      "inputs": [
-        "src/**",
-        "index.html",
-        "vite.config.ts",
-        "package.json"
-      ],
-      "env": [
-        "VITE_SUPABASE_URL",
-        "VITE_SUPABASE_ANON_KEY"
-      ]
+      "outputs": ["dist/**"],
+      "inputs": ["src/**", "index.html", "vite.config.ts", "package.json"],
+      "env": ["VITE_SUPABASE_URL", "VITE_SUPABASE_ANON_KEY"]
     },
     "admin#lint": {
       "outputs": []
@@ -97,20 +58,9 @@
     },
     "web#build": {
       "dependsOn": ["^build"],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**"
-      ],
-      "inputs": [
-        "app/**",
-        "public/**",
-        "next.config.ts",
-        "package.json"
-      ],
-      "env": [
-        "NEXT_PUBLIC_SUPABASE_URL",
-        "NEXT_PUBLIC_SUPABASE_ANON_KEY"
-      ]
+      "outputs": [".next/**", "!.next/cache/**"],
+      "inputs": ["app/**", "public/**", "next.config.ts", "package.json"],
+      "env": ["NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_ANON_KEY"]
     },
     "web#lint": {
       "outputs": []
@@ -129,14 +79,8 @@
       "outputs": []
     },
     "test": {
-      "dependsOn": ["^build"],
-      "outputs": ["coverage/**"],
-      "inputs": [
-        "src/**/*.tsx",
-        "src/**/*.ts",
-        "test/**/*.ts",
-        "**/__tests__/**"
-      ]
+      "cache": false,
+      "dependsOn": ["^build"]
     },
     "test:watch": {
       "cache": false,

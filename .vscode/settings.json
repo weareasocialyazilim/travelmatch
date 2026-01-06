@@ -70,5 +70,10 @@
       "**/scripts/ux-research/**",
       "**/packages/design-system/scripts/**"
     ]
-  }
+  },
+
+  // Jest Configuration - run from apps/mobile for proper config
+  "jest.rootPath": "apps/mobile",
+  "jest.jestCommandLine": "npx jest",
+  "jest.autoRevealOutput": "on-exec-error"
 }
