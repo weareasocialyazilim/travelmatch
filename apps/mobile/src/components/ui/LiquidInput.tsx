@@ -23,6 +23,8 @@ interface LiquidInputProps extends Omit<TextInputProps, 'style'> {
   containerStyle?: ViewStyle;
   /** Card container style override */
   style?: StyleProp<ViewStyle>;
+  /** Accessibility hint for screen readers */
+  accessibilityHint?: string;
 }
 
 /**
@@ -38,6 +40,8 @@ export const LiquidInput: React.FC<LiquidInputProps> = ({
   onFocus,
   onBlur,
   onChangeText,
+  accessibilityHint,
+  placeholder,
   ...props
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -110,6 +114,15 @@ export const LiquidInput: React.FC<LiquidInputProps> = ({
             onBlur={handleBlur as TextInputProps['onBlur']}
             onChangeText={handleChangeText}
             selectionColor={COLORS.brand.primary}
+            placeholder={placeholder}
+            // Accessibility for screen readers
+            accessible={true}
+            accessibilityLabel={label || placeholder}
+            accessibilityHint={accessibilityHint || placeholder}
+            accessibilityRole="text"
+            accessibilityState={{
+              disabled: props.editable === false,
+            }}
             {...props}
           />
         </View>

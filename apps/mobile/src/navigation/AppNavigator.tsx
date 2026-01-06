@@ -238,15 +238,10 @@ import {
   MyGiftsScreen,
 } from '../features/gifts';
 
-// GiftSuccessScreen and GiftLegacyScreen - import from gifts feature
+// GiftSuccessScreen - import from gifts feature
 const GiftSuccessScreen = lazyLoad(() =>
   import('../features/gifts/screens/GiftSuccessScreen').then((m) => ({
     default: m.GiftSuccessScreen,
-  })),
-);
-const GiftLegacyScreen = lazyLoad(() =>
-  import('../features/gifts/screens/GiftLegacyScreen').then((m) => ({
-    default: m.GiftLegacyScreen,
   })),
 );
 
@@ -785,13 +780,6 @@ const AppNavigator = () => {
                 gestureDirection: 'vertical',
                 presentation: 'modal',
               }}
-            />
-
-            {/* NEW: Gift Legacy Screen - Hediye Mirası */}
-            <Stack.Screen
-              name="GiftLegacy"
-              component={GiftLegacyScreen}
-              options={{ animation: 'fade' }}
             />
 
             {/* NEW: Visibility Settings - Görünürlük Ayarları */}

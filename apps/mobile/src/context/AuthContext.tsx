@@ -230,8 +230,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       ]);
       // Access token is kept in memory only (not persisted)
       setTokens(newTokens);
-    } catch {
-      // Silent fail - tokens will be re-fetched on next login
+    } catch (error) {
+      logger.warn(
+        '[Auth] Failed to save tokens - will re-fetch on next login:',
+        error,
+      );
     }
   };
 
@@ -242,8 +245,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     try {
       await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
       setUser(userData);
-    } catch {
-      // Silent fail
+    } catch (error) {
+      logger.warn('[Auth] Failed to save user to storage:', error);
     }
   };
 
@@ -263,7 +266,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       setUser(null);
       setTokens(null);
       setAuthState('unauthenticated');
-    } catch {
+    } catch (error) {
+      logger.error(
+        '[Auth] Failed to clear storage, forcing state clear:',
+        error,
+      );
       // Force clear state even if storage fails
       setUser(null);
       setTokens(null);
@@ -301,7 +308,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       await saveTokens(newTokens);
       return newTokens.accessToken;
-    } catch {
+    } catch (error) {
+      logger.error('[Auth] Token refresh failed, clearing auth:', error);
       await clearAuthData();
       return null;
     }
@@ -352,9 +360,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
               logger.info('[Auth] Session invalid, clearing auth data');
               await clearAuthData();
             }
-          } catch {
+          } catch (error) {
             // If refresh fails but we have a valid expiry, try to continue
             // This handles offline scenarios
+            logger.warn('[Auth] Session refresh failed:', error);
             if (expiresAt > Date.now()) {
               logger.warn('[Auth] Token refresh failed, using cached session');
               // Create minimal tokens for offline use
@@ -376,7 +385,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         } else {
           setAuthState('unauthenticated');
         }
-      } catch {
+      } catch (error) {
+        logger.error('[Auth] Failed to load auth state:', error);
         setAuthState('unauthenticated');
       }
     };
@@ -526,8 +536,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const logout = async (): Promise<void> => {
     try {
       await authService.signOut();
-    } catch {
-      // Server logout failed, but continue with local cleanup
+    } catch (error) {
+      logger.warn(
+        '[Auth] Server logout failed, continuing with local cleanup:',
+        error,
+      );
     } finally {
       // Clear local data regardless of server response
       await clearAuthData();
@@ -597,8 +610,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         });
         await saveUser(refreshedUser);
       }
-    } catch {
-      // Silent fail - user data will be refreshed on next successful request
+    } catch (error) {
+      logger.warn('[Auth] Failed to refresh user data:', error);
     }
   };
 

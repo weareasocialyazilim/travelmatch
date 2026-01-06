@@ -5,6 +5,5 @@
 export { default as GiftInboxScreen } from './GiftInboxScreen';
 export { GiftInboxDetailScreen } from './GiftInboxDetailScreen';
 export { GiftSuccessScreen } from './GiftSuccessScreen';
-export { GiftLegacyScreen } from './GiftLegacyScreen';
 export { UnifiedGiftFlowScreen } from './UnifiedGiftFlowScreen';
 export { MyGiftsScreen } from './MyGiftsScreen';

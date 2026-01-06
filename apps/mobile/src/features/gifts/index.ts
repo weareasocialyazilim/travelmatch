@@ -25,7 +25,6 @@ export {
   GiftInboxScreen,
   GiftInboxDetailScreen,
   GiftSuccessScreen,
-  GiftLegacyScreen,
   UnifiedGiftFlowScreen,
   MyGiftsScreen,
 } from './screens';
