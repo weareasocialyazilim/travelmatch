@@ -61,18 +61,7 @@ export {
   useDebouncedCallback,
   useDebounceState,
 } from './useDebounce';
-export {
-  useThrottle,
-  useThrottledCallback,
-  useThrottleState,
-} from './useThrottle';
 export { useAsync, useAsyncCallback } from './useAsync';
-export {
-  usePrevious,
-  usePreviousWithInitial,
-  useValueChange,
-  useDeepCompare,
-} from './usePrevious';
 
 // Animation hooks (Awwwards Design System)
 export {
@@ -105,12 +94,6 @@ export {
   getTimingConfig,
 } from './useAnimations';
 export type { SpringConfig, TimingConfig } from './useAnimations';
-
-// Legacy animation hooks (backwards compatibility)
-export {
-  usePressAnimation as useLegacyPressAnimation,
-  useBounceAnimation,
-} from './usePressAnimation';
 
 // Feedback prompt hook
 export { useFeedbackPrompt } from './useFeedbackPrompt';

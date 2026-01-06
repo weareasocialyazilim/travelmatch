@@ -51,8 +51,6 @@ export { LanguageSelectionBottomSheet } from '@/features/settings/components';
 // Payments Components - Taşındı: features/payments/components
 export { CurrencySelectionBottomSheet } from '@/features/payments/components';
 
-export { ClearCacheDialog } from './ClearCacheDialog';
-
 // Wallet Components - Taşındı: features/wallet/components
 export {
   AddBankAccountBottomSheet,

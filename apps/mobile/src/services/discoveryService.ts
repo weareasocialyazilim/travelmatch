@@ -7,7 +7,7 @@
 
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
-import type { User } from '@/types/adapters';
+import type { User } from '@/types/core';
 
 // ============================================
 // TYPES
