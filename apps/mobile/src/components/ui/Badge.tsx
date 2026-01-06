@@ -103,8 +103,16 @@ export const Badge: React.FC<BadgeProps> = ({
     return <View style={[styles.dot, { backgroundColor: colors.bg }, style]} />;
   }
 
+  const accessibilityLabel =
+    count !== undefined
+      ? `${count > maxCount ? `${maxCount}+` : count} ${label || 'items'}`
+      : String(displayContent || '');
+
   return (
     <View
+      accessible={true}
+      accessibilityRole="text"
+      accessibilityLabel={accessibilityLabel}
       style={[
         styles.badge,
         {

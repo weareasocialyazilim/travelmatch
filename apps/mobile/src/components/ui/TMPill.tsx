@@ -143,11 +143,7 @@ export const TMPill: React.FC<TMPillProps> = ({
         />
       )}
       <Text
-        style={[
-          styles.text,
-          textSizeStyles[size],
-          { color: getTextColor() },
-        ]}
+        style={[styles.text, textSizeStyles[size], { color: getTextColor() }]}
         numberOfLines={1}
       >
         {children}
@@ -172,10 +168,15 @@ export const TMPill: React.FC<TMPillProps> = ({
   if (!onPress && !onRemove) {
     return (
       <Animated.View
+        accessible={true}
+        accessibilityRole="text"
+        accessibilityLabel={`${emoji ? `${emoji} ` : ''}${children}${selected ? ', selected' : ''}`}
         style={[
           styles.pill,
           sizeStyles[size],
-          effectiveVariant === 'outlined' ? styles.pillOutlined : styles.pillNotOutlined,
+          effectiveVariant === 'outlined'
+            ? styles.pillOutlined
+            : styles.pillNotOutlined,
           {
             backgroundColor: getBackgroundColor(),
             borderColor: getBorderColor(),
@@ -198,10 +199,21 @@ export const TMPill: React.FC<TMPillProps> = ({
       onPressOut={handlePressOut}
       disabled={disabled}
       testID={testID}
+      accessible={true}
+      accessibilityRole="button"
+      accessibilityLabel={`${emoji ? `${emoji} ` : ''}${children}${selected ? ', selected' : ''}`}
+      accessibilityState={{ selected, disabled }}
+      accessibilityHint={
+        onRemove
+          ? 'Double tap to select, swipe to remove'
+          : 'Double tap to select'
+      }
       style={[
         styles.pill,
         sizeStyles[size],
-        effectiveVariant === 'outlined' ? styles.pillOutlined : styles.pillNotOutlined,
+        effectiveVariant === 'outlined'
+          ? styles.pillOutlined
+          : styles.pillNotOutlined,
         {
           backgroundColor: getBackgroundColor(),
           borderColor: getBorderColor(),
@@ -232,12 +244,7 @@ export const TMCategoryChip: React.FC<TMCategoryChipProps> = ({
   onPress,
   testID,
 }) => (
-  <TMPill
-    emoji={emoji}
-    selected={selected}
-    onPress={onPress}
-    testID={testID}
-  >
+  <TMPill emoji={emoji} selected={selected} onPress={onPress} testID={testID}>
     {category}
   </TMPill>
 );
