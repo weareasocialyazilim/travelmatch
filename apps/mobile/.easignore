@@ -1,72 +1,76 @@
 # ═══════════════════════════════════════════════════════════════════
 # TravelMatch Mobile - EAS Build Ignore List
-# Optimized for monorepo structure (667MB → ~20MB)
+# NOTE: EAS uploads from monorepo ROOT, not from apps/mobile!
+# All paths must be relative to monorepo root
+# Target: 628MB → ~25MB
 # ═══════════════════════════════════════════════════════════════════
 
-# node_modules (EAS installs fresh dependencies)
-node_modules/
-**/node_modules/
-
-# Native build folders (recreated in cloud)
-ios/
-android/
+# node_modules - BIGGEST CULPRIT (~500MB+)
+# EAS installs fresh dependencies during build
+node_modules
+**/node_modules
 
 # ═══════════════════════════════════════════════════════════════════
-# Monorepo - Other Apps & Services (not needed for mobile build)
+# OTHER APPS (Not needed for mobile build)
+# Paths from monorepo root
 # ═══════════════════════════════════════════════════════════════════
-../../apps/admin/
-../../apps/web/
-../../services/
-../../supabase/
-../../docs/
-../../docker/
-../../tests/
-../../scripts/
-../../packages/
+apps/admin
+apps/web
 
 # ═══════════════════════════════════════════════════════════════════
-# Expo & Metro Cache
+# BACKEND SERVICES (Not needed for mobile build)
 # ═══════════════════════════════════════════════════════════════════
-.expo/
-dist/
-web-build/
-.turbo/
+services
 
 # ═══════════════════════════════════════════════════════════════════
-# Development & Test Files
+# SUPABASE (Edge functions, migrations - not needed)
 # ═══════════════════════════════════════════════════════════════════
-__mocks__/
-__tests__/
+supabase
+
+# ═══════════════════════════════════════════════════════════════════
+# INFRASTRUCTURE
+# ═══════════════════════════════════════════════════════════════════
+docker
+tests
+scripts
+docs
+
+# ═══════════════════════════════════════════════════════════════════
+# IOS FOLDER - CocoaPods (~100MB+)
+# Recreated in cloud build
+# ═══════════════════════════════════════════════════════════════════
+ios
+apps/mobile/ios
+
+# ═══════════════════════════════════════════════════════════════════
+# CACHE & BUILD ARTIFACTS
+# ═══════════════════════════════════════════════════════════════════
+.turbo
+.expo
+.next
+dist
+build
+coverage
+.git
+
+# ═══════════════════════════════════════════════════════════════════
+# TEST FILES
+# ═══════════════════════════════════════════════════════════════════
+__mocks__
+__tests__
 **/*.test.ts
 **/*.test.tsx
 **/*.spec.ts
 **/*.spec.tsx
-.maestro/
-scripts/
-.storybook/
-coverage/
+.maestro
+.storybook
 
 # ═══════════════════════════════════════════════════════════════════
-# IDE & System Files
+# IDE & SYSTEM
 # ═══════════════════════════════════════════════════════════════════
-.github/
-.husky/
-.vscode/
+.github
+.husky
+.vscode
 .DS_Store
 *.log
-.git/
-
-# ═══════════════════════════════════════════════════════════════════
-# Config Files (not needed at runtime)
-# ═══════════════════════════════════════════════════════════════════
-*.config.js
-*.setup.js
-tsconfig.test.json
-webpack.performance.config.js
-jest.config.js
-jest.setup.js
-babel.config.js
-metro.config.js
-eslint.config.mjs
 .eslintcache
-.prettierrc

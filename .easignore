@@ -2,80 +2,81 @@
 # TravelMatch Monorepo - EAS Build Ignore List
 # Root level ignore for monorepo builds
 # Target: 667MB → ~25MB
+# NOTE: NO trailing slashes - EAS compatibility
 # ═══════════════════════════════════════════════════════════════════
 
 # ═══════════════════════════════════════════════════════════════════
 # NODE MODULES - Biggest culprit (~2.2GB)
 # EAS installs fresh dependencies during build
 # ═══════════════════════════════════════════════════════════════════
-node_modules/
-**/node_modules/
+node_modules
+**/node_modules
 
 # ═══════════════════════════════════════════════════════════════════
 # OTHER APPS (Not needed for mobile build)
 # ═══════════════════════════════════════════════════════════════════
-apps/admin/
-apps/web/
+apps/admin
+apps/web
 
 # ═══════════════════════════════════════════════════════════════════
 # BACKEND SERVICES (Not needed for mobile build)
 # ═══════════════════════════════════════════════════════════════════
-services/
+services
 
 # ═══════════════════════════════════════════════════════════════════
 # SUPABASE (Edge functions, migrations - not needed)
 # ═══════════════════════════════════════════════════════════════════
-supabase/
+supabase
 
 # ═══════════════════════════════════════════════════════════════════
 # PACKAGES (EAS resolves these from package.json)
 # ═══════════════════════════════════════════════════════════════════
-packages/design-system/node_modules/
-packages/shared/node_modules/
-packages/monitoring/node_modules/
-packages/test-utils/
+packages/design-system/node_modules
+packages/shared/node_modules
+packages/monitoring/node_modules
+packages/test-utils
 
 # ═══════════════════════════════════════════════════════════════════
 # NATIVE BUILD FOLDERS (Recreated in cloud)
 # ═══════════════════════════════════════════════════════════════════
-ios/
-android/
-apps/mobile/ios/
-apps/mobile/android/
+ios
+android
+apps/mobile/ios
+apps/mobile/android
 
 # ═══════════════════════════════════════════════════════════════════
 # DOCUMENTATION & CONFIG
 # ═══════════════════════════════════════════════════════════════════
-docs/
-docker/
-tests/
-scripts/
-.github/
-.husky/
-.vscode/
+docs
+docker
+tests
+scripts
+.github
+.husky
+.vscode
 
 # ═══════════════════════════════════════════════════════════════════
 # CACHE & BUILD ARTIFACTS
 # ═══════════════════════════════════════════════════════════════════
-.turbo/
-.expo/
-dist/
-build/
-coverage/
-.next/
-.git/
+.turbo
+.expo
+dist
+build
+coverage
+.next
+.git
 
 # ═══════════════════════════════════════════════════════════════════
 # TEST FILES
 # ═══════════════════════════════════════════════════════════════════
-__mocks__/
-__tests__/
+__mocks__
+__tests__
 **/*.test.ts
 **/*.test.tsx
 **/*.spec.ts
 **/*.spec.tsx
-.maestro/
-.storybook/
+.maestro
+.storybook
 
 # ═══════════════════════════════════════════════════════════════════
 # SYSTEM & IDE FILES
@@ -83,4 +84,3 @@ __tests__/
 .DS_Store
 *.log
 .eslintcache
-.prettierrc
