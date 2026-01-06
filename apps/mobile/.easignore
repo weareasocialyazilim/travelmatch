@@ -5,6 +5,12 @@
 # Target: 628MB → ~25MB
 # ═══════════════════════════════════════════════════════════════════
 
+# PYTHON VIRTUAL ENV - 2.4GB!!!
+.venv
+venv
+__pycache__
+.zap
+
 # node_modules - BIGGEST CULPRIT (~500MB+)
 # EAS installs fresh dependencies during build
 node_modules
