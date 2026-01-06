@@ -111,10 +111,6 @@ export type { TMAvatarProps, AvatarSize, AvatarStatus } from './TMAvatar';
 // @deprecated alias for backward compatibility
 export { TMAvatar as Avatar } from './TMAvatar';
 
-// TMGiftCard - Gift message card for chat
-export { TMGiftCard } from './TMGiftCard';
-export type { TMGiftCardProps, GiftStatus } from './TMGiftCard';
-
 // TMProofCard - Proof submission card for chat
 export { TMProofCard } from './TMProofCard';
 export type { TMProofCardProps, ProofStatus, MediaType } from './TMProofCard';
