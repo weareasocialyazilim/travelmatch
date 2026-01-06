@@ -96,10 +96,29 @@
       "react": "19.1.0",
       "react-dom": "19.1.0",
       "react-test-renderer": "19.1.0",
+      "react-native": "0.81.5",
+      "react-native-safe-area-context": "5.6.2",
       "fast-xml-parser": "^4.5.0",
       "glob": "^9.0.0",
       "qs": ">=6.14.1",
-      "zod": "^4.2.1"
+      "zod": "^4.2.1",
+      "react-native-qrcode-svg>react": "19.1.0",
+      "react-native-qrcode-svg>react-native": "0.81.5",
+      "react-native-svg>react": "19.1.0",
+      "react-native-svg>react-native": "0.81.5",
+      "@react-native/virtualized-lists>react": "19.1.0",
+      "@react-native/virtualized-lists>react-native": "0.81.5",
+      "@react-native-async-storage/async-storage>react-native": "0.81.5"
+    },
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "react",
+        "react-native"
+      ],
+      "allowAny": [
+        "react",
+        "react-native"
+      ]
     }
   },
   "dependencies": {
