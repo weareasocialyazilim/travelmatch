@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS public.proof_submissions (
   gift_id UUID NOT NULL REFERENCES gifts(id) ON DELETE CASCADE,
 
   -- Who submitted (must be recipient)
-  submitter_id UUID NOT NULL REFERENCES profiles(id),
+  submitter_id UUID NOT NULL REFERENCES users(id),
 
   -- Proof content
   photo_urls JSONB NOT NULL DEFAULT '[]'::jsonb,
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS public.proof_submissions (
   -- Timestamps
   submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   reviewed_at TIMESTAMPTZ,
-  reviewer_id UUID REFERENCES profiles(id)
+  reviewer_id UUID REFERENCES users(id)
 );
 
 -- ============================================
@@ -69,7 +69,7 @@ CREATE POLICY "proof_submissions_recipient_insert"
     EXISTS (
       SELECT 1 FROM gifts g
       WHERE g.id = proof_submissions.gift_id
-      AND g.recipient_id = auth.uid()
+      AND g.receiver_id = auth.uid()
       -- Gift must be in a state that allows proof submission
       AND g.status IN ('pending', 'pending_proof', 'proof_requested')
     )
@@ -87,7 +87,7 @@ CREATE POLICY "proof_submissions_participant_select"
     EXISTS (
       SELECT 1 FROM gifts g
       WHERE g.id = proof_submissions.gift_id
-      AND (g.sender_id = auth.uid() OR g.recipient_id = auth.uid())
+      AND (g.giver_id = auth.uid() OR g.receiver_id = auth.uid())
     )
   );
 
@@ -145,7 +145,7 @@ CREATE POLICY "proof_upload_recipient_only"
     AND EXISTS (
       SELECT 1 FROM gifts g
       WHERE g.id::TEXT = (string_to_array(name, '/'))[1]
-      AND g.recipient_id = auth.uid()
+      AND g.receiver_id = auth.uid()
     )
   );
 
@@ -158,7 +158,7 @@ CREATE POLICY "proof_view_participants"
     AND EXISTS (
       SELECT 1 FROM gifts g
       WHERE g.id::TEXT = (string_to_array(name, '/'))[1]
-      AND (g.sender_id = auth.uid() OR g.recipient_id = auth.uid())
+      AND (g.giver_id = auth.uid() OR g.receiver_id = auth.uid())
     )
   );
 
@@ -186,9 +186,9 @@ BEGIN
   END IF;
 
   -- Verify submitter is recipient
-  IF v_gift.recipient_id != NEW.submitter_id THEN
+  IF v_gift.receiver_id != NEW.submitter_id THEN
     RAISE EXCEPTION 'Only gift recipient can submit proof. Expected: %, Got: %',
-      v_gift.recipient_id, NEW.submitter_id;
+      v_gift.receiver_id, NEW.submitter_id;
   END IF;
 
   -- Verify gift status allows proof
@@ -241,7 +241,7 @@ COMMENT ON POLICY "proof_submissions_recipient_insert" ON public.proof_submissio
   'MASTER Requirement: Only gift recipient (recipient_id == auth.uid()) can upload proof';
 
 COMMENT ON COLUMN public.proof_submissions.submitter_id IS
-  'Must equal auth.uid() and must match gifts.recipient_id for the gift_id';
+  'Must equal auth.uid() and must match gifts.receiver_id for the gift_id';
 
 -- ============================================
 -- Migration Verification

@@ -66,78 +66,14 @@ CREATE POLICY "Users can delete own videos" ON videos
   USING ((SELECT auth.uid()) = user_id);
 
 -- ============================================================================
--- BOOKINGS TABLE (5 policies)
+-- BOOKINGS TABLE (REMOVED - table no longer exists)
+-- See: 20260103000001_remove_bookings_trip_requests.sql
 -- ============================================================================
 
-DROP POLICY IF EXISTS "Users can create bookings" ON bookings;
-CREATE POLICY "Users can create bookings" ON bookings
-  FOR INSERT TO public
-  WITH CHECK ((SELECT auth.uid()) = user_id);
-
-DROP POLICY IF EXISTS "Users can view own bookings" ON bookings;
-CREATE POLICY "Users can view own bookings" ON bookings
-  FOR SELECT TO public
-  USING ((SELECT auth.uid()) = user_id);
-
-DROP POLICY IF EXISTS "Users can update own bookings" ON bookings;
-CREATE POLICY "Users can update own bookings" ON bookings
-  FOR UPDATE TO public
-  USING ((SELECT auth.uid()) = user_id);
-
-DROP POLICY IF EXISTS "Trip owners can view bookings" ON bookings;
-CREATE POLICY "Trip owners can view bookings" ON bookings
-  FOR SELECT TO public
-  USING (EXISTS (
-    SELECT 1 FROM trips 
-    WHERE trips.id = bookings.trip_id 
-    AND trips.user_id = (SELECT auth.uid())
-  ));
-
-DROP POLICY IF EXISTS "Trip owners can manage bookings" ON bookings;
-CREATE POLICY "Trip owners can manage bookings" ON bookings
-  FOR ALL TO public
-  USING (EXISTS (
-    SELECT 1 FROM trips 
-    WHERE trips.id = bookings.trip_id 
-    AND trips.user_id = (SELECT auth.uid())
-  ));
-
 -- ============================================================================
--- TRIP_REQUESTS TABLE (5 policies)
+-- TRIP_REQUESTS TABLE (REMOVED - table no longer exists)
+-- See: 20260103000001_remove_bookings_trip_requests.sql
 -- ============================================================================
-
-DROP POLICY IF EXISTS "Users can create requests" ON trip_requests;
-CREATE POLICY "Users can create requests" ON trip_requests
-  FOR INSERT TO public
-  WITH CHECK ((SELECT auth.uid()) = user_id);
-
-DROP POLICY IF EXISTS "Users can view own requests" ON trip_requests;
-CREATE POLICY "Users can view own requests" ON trip_requests
-  FOR SELECT TO public
-  USING ((SELECT auth.uid()) = user_id);
-
-DROP POLICY IF EXISTS "Users can update own requests" ON trip_requests;
-CREATE POLICY "Users can update own requests" ON trip_requests
-  FOR UPDATE TO public
-  USING ((SELECT auth.uid()) = user_id);
-
-DROP POLICY IF EXISTS "Trip owners can view requests" ON trip_requests;
-CREATE POLICY "Trip owners can view requests" ON trip_requests
-  FOR SELECT TO public
-  USING (EXISTS (
-    SELECT 1 FROM trips 
-    WHERE trips.id = trip_requests.trip_id 
-    AND trips.user_id = (SELECT auth.uid())
-  ));
-
-DROP POLICY IF EXISTS "Trip owners can respond to requests" ON trip_requests;
-CREATE POLICY "Trip owners can respond to requests" ON trip_requests
-  FOR UPDATE TO public
-  USING (EXISTS (
-    SELECT 1 FROM trips 
-    WHERE trips.id = trip_requests.trip_id 
-    AND trips.user_id = (SELECT auth.uid())
-  ));
 
 -- ============================================================================
 -- TRIP_PARTICIPANTS TABLE (3 policies)

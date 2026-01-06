@@ -188,41 +188,11 @@ DROP POLICY IF EXISTS "Users can view own export requests" ON public.data_export
 CREATE POLICY "Users can view own export requests" ON public.data_export_requests
 FOR SELECT USING ((select auth.uid()) = user_id);
 
--- 2.11 bookings
-DROP POLICY IF EXISTS "Users can create bookings" ON public.bookings;
-CREATE POLICY "Users can create bookings" ON public.bookings
-FOR INSERT WITH CHECK ((select auth.uid()) = user_id);
+-- 2.11 bookings (REMOVED - table no longer exists)
+-- See: 20260103000001_remove_bookings_trip_requests.sql
 
-DROP POLICY IF EXISTS "Users can update own bookings" ON public.bookings;
-CREATE POLICY "Users can update own bookings" ON public.bookings
-FOR UPDATE USING ((select auth.uid()) = user_id);
-
-DROP POLICY IF EXISTS "Users can view own bookings" ON public.bookings;
-CREATE POLICY "Users can view own bookings" ON public.bookings
-FOR SELECT USING (
-  (select auth.uid()) = user_id 
-  OR EXISTS (
-    SELECT 1 FROM trips t 
-    WHERE t.id = bookings.trip_id 
-    AND t.user_id = (select auth.uid())
-  )
-);
-
--- 2.12 trip_requests
-DROP POLICY IF EXISTS "Users can create trip requests" ON public.trip_requests;
-CREATE POLICY "Users can create trip requests" ON public.trip_requests
-FOR INSERT WITH CHECK ((select auth.uid()) = user_id);
-
-DROP POLICY IF EXISTS "Users can view own trip requests" ON public.trip_requests;
-CREATE POLICY "Users can view own trip requests" ON public.trip_requests
-FOR SELECT USING (
-  (select auth.uid()) = user_id 
-  OR EXISTS (
-    SELECT 1 FROM trips t 
-    WHERE t.id = trip_requests.trip_id 
-    AND t.user_id = (select auth.uid())
-  )
-);
+-- 2.12 trip_requests (REMOVED - table no longer exists)
+-- See: 20260103000001_remove_bookings_trip_requests.sql
 
 -- 2.13 videos
 DROP POLICY IF EXISTS "Users can delete own videos" ON public.videos;
@@ -272,9 +242,9 @@ ON public.requests(host_id);
 CREATE INDEX IF NOT EXISTS idx_tasks_completed_by 
 ON public.tasks(completed_by);
 
--- 4.6 trip_requests.responded_by
-CREATE INDEX IF NOT EXISTS idx_trip_requests_responded_by 
-ON public.trip_requests(responded_by);
+-- 4.6 trip_requests.responded_by (REMOVED - table no longer exists)
+-- CREATE INDEX IF NOT EXISTS idx_trip_requests_responded_by 
+-- ON public.trip_requests(responded_by);
 
 -- ============================================================
 -- 5. PostGIS: spatial_ref_sys - FALSE POSITIVE (see SECURITY_ARCHITECTURE.md)
@@ -313,8 +283,8 @@ BEGIN
     'idx_disputes_resolved_by',
     'idx_disputes_transaction_id',
     'idx_requests_host_id',
-    'idx_tasks_completed_by',
-    'idx_trip_requests_responded_by'
+    'idx_tasks_completed_by'
+    -- 'idx_trip_requests_responded_by' -- REMOVED - table no longer exists
   );
 
   RAISE NOTICE '============================================';

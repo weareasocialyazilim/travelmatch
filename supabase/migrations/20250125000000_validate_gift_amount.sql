@@ -217,11 +217,5 @@ EXCEPTION
 END;
 $$;
 
--- Grant execute permission
-GRANT EXECUTE ON FUNCTION public.atomic_transfer TO authenticated;
-
--- Add comment for documentation
-COMMENT ON FUNCTION public.atomic_transfer IS 
-'Atomic fund transfer with moment price validation. 
-When moment_id is provided, the transfer amount must match the moment''s price field exactly.
-This prevents client-side manipulation where attackers try to send less than the requested amount.';
+-- NOTE: GRANT and COMMENT moved to separate migration to avoid multi-statement issues
+-- See: 20251219200001_atomic_transfer_grants.sql

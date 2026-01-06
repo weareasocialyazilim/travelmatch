@@ -3,29 +3,11 @@
 -- The platform is now focused on Moments & Gifting
 
 -- ============================================================================
--- DROP TRIGGERS
+-- NOTE: bookings and trip_requests tables were already removed in earlier migrations
+-- This migration is now a no-op to maintain migration history
 -- ============================================================================
-DROP TRIGGER IF EXISTS update_bookings_updated_at ON bookings;
-DROP TRIGGER IF EXISTS update_trip_requests_updated_at ON trip_requests;
 
--- ============================================================================
--- DROP POLICIES
--- ============================================================================
-DROP POLICY IF EXISTS "Users can view own bookings" ON bookings;
-DROP POLICY IF EXISTS "Trip owners can view bookings" ON bookings;
-DROP POLICY IF EXISTS "Users can create bookings" ON bookings;
-DROP POLICY IF EXISTS "Users can update own bookings" ON bookings;
-DROP POLICY IF EXISTS "Trip owners can manage bookings" ON bookings;
-
-DROP POLICY IF EXISTS "Users can view own requests" ON trip_requests;
-DROP POLICY IF EXISTS "Trip owners can view requests" ON trip_requests;
-DROP POLICY IF EXISTS "Users can create requests" ON trip_requests;
-DROP POLICY IF EXISTS "Users can update own requests" ON trip_requests;
-DROP POLICY IF EXISTS "Trip owners can respond to requests" ON trip_requests;
-
--- ============================================================================
--- DROP TABLES
--- ============================================================================
+-- Tables already removed - these DROP statements are safe no-ops
 DROP TABLE IF EXISTS bookings CASCADE;
 DROP TABLE IF EXISTS trip_requests CASCADE;
 
