@@ -167,26 +167,33 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
     setTimeout(() => {
       setLoading(false);
 
-      // If phone number is provided, navigate to phone verification
-      if (data.phone && data.phone.trim() !== '') {
-        navigation.navigate('VerifyPhone', {
-          email: user?.email || '',
-          phone: data.phone.trim(),
-          fullName: data.fullName,
-        });
-      } else {
-        // No phone provided, go directly to main app
-        navigation.replace('Discover');
-      }
+      // Phone is required - navigate to verification
+      navigation.navigate('VerifyPhone', {
+        email: user?.email || '',
+        phone: data.phone.trim(),
+        fullName: data.fullName,
+      });
     }, 1500);
   };
 
   const handleSkip = () => {
     showConfirmation({
-      title: 'Skip Profile Setup?',
-      message: 'You can complete your profile later from Settings.',
+      title: 'Phone Verification Required',
+      message:
+        'Phone verification is required to use TravelMatch. You can skip other profile details, but phone number is mandatory for your security.',
       type: 'warning',
-      onConfirm: () => navigation.replace('Discover'),
+      onConfirm: () => {
+        // Only skip if phone is already filled
+        const phoneValue = watch('phone');
+        if (phoneValue && phoneValue.trim() !== '') {
+          navigation.navigate('VerifyPhone', {
+            email: user?.email || '',
+            phone: phoneValue.trim(),
+            fullName: watch('fullName') || 'User',
+          });
+        }
+        // Otherwise do nothing - user must fill phone
+      },
     });
   };
 
@@ -339,7 +346,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
           )}
         />
 
-        {/* Phone Input */}
+        {/* Phone Input - Required for verification */}
         <Controller
           control={control}
           name="phone"
@@ -348,7 +355,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
             fieldState: { error },
           }) => (
             <View style={styles.inputSection}>
-              <Text style={styles.inputLabel}>Phone Number (Recommended)</Text>
+              <Text style={styles.inputLabel}>Phone Number *</Text>
               <View
                 style={[styles.inputWrapper, error && styles.inputWrapperError]}
               >
@@ -365,7 +372,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
                 />
               </View>
               <Text style={styles.phoneHint}>
-                We'll send an SMS to verify your number
+                Required for account verification via SMS
               </Text>
               {error && <Text style={styles.errorText}>{error.message}</Text>}
             </View>
