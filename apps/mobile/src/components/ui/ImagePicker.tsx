@@ -21,7 +21,11 @@ import { SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../constants/typography';
 import { useImageUpload } from '../../hooks/useImageUpload';
 import { validateImageFile, formatBytes } from '../../utils/imageHandling';
-import { launchCamera, launchGallery, CAMERA_QUALITY } from '../../utils/cameraConfig';
+import {
+  launchCamera,
+  launchGallery,
+  CAMERA_QUALITY,
+} from '../../utils/cameraConfig';
 import { useToast } from '@/context/ToastContext';
 import type { ImageAsset } from '../../utils/imageHandling';
 
@@ -144,7 +148,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
 
       // Clear after successful upload
       setSelectedImages([]);
-    } catch {
+    } catch (_uploadError) {
       // Error handled by hook
     }
   };

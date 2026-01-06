@@ -85,7 +85,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
       setBackupCodes(codes);
       setStep('backup');
       showToast('2FA enabled successfully!', 'success');
-    } catch {
+    } catch (_twoFactorError) {
       showToast('Verification failed. Please try again.', 'error');
     } finally {
       setIsLoading(false);

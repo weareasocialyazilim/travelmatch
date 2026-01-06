@@ -107,7 +107,7 @@ export class UpstashRateLimiter {
         if (payload.sub) {
           return `user:${payload.sub}`;
         }
-      } catch {
+      } catch (tokenError) {
         // Fall through to IP-based limiting
       }
     }

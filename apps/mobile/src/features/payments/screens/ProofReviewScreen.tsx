@@ -191,7 +191,7 @@ export const ProofReviewScreen: React.FC<ProofReviewScreenProps> = ({
               if (error) throw error;
 
               showToast('Süre 7 gün uzatıldı', 'success');
-            } catch {
+            } catch (_extendError) {
               showToast('Süre uzatılamadı', 'error');
             }
           },

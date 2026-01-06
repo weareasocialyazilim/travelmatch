@@ -28,7 +28,10 @@ const PASSWORD_REQUIREMENTS: PasswordRequirement[] = [
   { label: 'One uppercase letter', test: (p) => /[A-Z]/.test(p) },
   { label: 'One lowercase letter', test: (p) => /[a-z]/.test(p) },
   { label: 'One number', test: (p) => /[0-9]/.test(p) },
-  { label: 'One special character', test: (p) => /[!@#$%^&*(),.?":{}|<>]/.test(p) },
+  {
+    label: 'One special character',
+    test: (p) => /[!@#$%^&*(),.?":{}|<>]/.test(p),
+  },
 ];
 
 export const SetPasswordScreen: React.FC = () => {
@@ -42,7 +45,9 @@ export const SetPasswordScreen: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const passesAllRequirements = PASSWORD_REQUIREMENTS.every((req) => req.test(password));
+  const passesAllRequirements = PASSWORD_REQUIREMENTS.every((req) =>
+    req.test(password),
+  );
   const passwordsMatch = password === confirmPassword && password.length > 0;
   const isFormValid = passesAllRequirements && passwordsMatch;
 
@@ -61,7 +66,7 @@ export const SetPasswordScreen: React.FC = () => {
         showToast('Password set successfully!', 'success');
         navigation.navigate('SuccessConfirmation');
       }
-    } catch {
+    } catch (_setPasswordError) {
       showToast('An error occurred. Please try again.', 'error');
     } finally {
       setIsLoading(false);
@@ -84,12 +89,20 @@ export const SetPasswordScreen: React.FC = () => {
             onPress={() => navigation.goBack()}
             {...a11y.button('Back button')}
           >
-            <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text.primary} />
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={24}
+              color={COLORS.text.primary}
+            />
           </TouchableOpacity>
 
           <View style={styles.header}>
             <View style={styles.iconContainer}>
-              <MaterialCommunityIcons name="lock-plus-outline" size={48} color={COLORS.brand.primary} />
+              <MaterialCommunityIcons
+                name="lock-plus-outline"
+                size={48}
+                color={COLORS.brand.primary}
+              />
             </View>
             <Text style={styles.title}>Create Password</Text>
             <Text style={styles.subtitle}>
@@ -123,7 +136,9 @@ export const SetPasswordScreen: React.FC = () => {
                 <TouchableOpacity
                   style={styles.eyeButton}
                   onPress={() => setShowPassword(!showPassword)}
-                  {...a11y.button(showPassword ? 'Hide password' : 'Show password')}
+                  {...a11y.button(
+                    showPassword ? 'Hide password' : 'Show password',
+                  )}
                 >
                   <MaterialCommunityIcons
                     name={showPassword ? 'eye-off-outline' : 'eye-outline'}
@@ -143,9 +158,16 @@ export const SetPasswordScreen: React.FC = () => {
                     <MaterialCommunityIcons
                       name={passed ? 'check-circle' : 'circle-outline'}
                       size={16}
-                      color={passed ? COLORS.feedback.success : COLORS.text.secondary}
+                      color={
+                        passed ? COLORS.feedback.success : COLORS.text.secondary
+                      }
                     />
-                    <Text style={[styles.requirementText, passed && styles.requirementPassed]}>
+                    <Text
+                      style={[
+                        styles.requirementText,
+                        passed && styles.requirementPassed,
+                      ]}
+                    >
                       {req.label}
                     </Text>
                   </View>
@@ -178,10 +200,14 @@ export const SetPasswordScreen: React.FC = () => {
                 <TouchableOpacity
                   style={styles.eyeButton}
                   onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                  {...a11y.button(showConfirmPassword ? 'Hide password' : 'Show password')}
+                  {...a11y.button(
+                    showConfirmPassword ? 'Hide password' : 'Show password',
+                  )}
                 >
                   <MaterialCommunityIcons
-                    name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'}
+                    name={
+                      showConfirmPassword ? 'eye-off-outline' : 'eye-outline'
+                    }
                     size={20}
                     color={COLORS.text.secondary}
                   />
@@ -192,7 +218,11 @@ export const SetPasswordScreen: React.FC = () => {
               )}
               {passwordsMatch && (
                 <View style={styles.matchIndicator}>
-                  <MaterialCommunityIcons name="check-circle" size={16} color={COLORS.feedback.success} />
+                  <MaterialCommunityIcons
+                    name="check-circle"
+                    size={16}
+                    color={COLORS.feedback.success}
+                  />
                   <Text style={styles.matchText}>Passwords match</Text>
                 </View>
               )}
@@ -200,10 +230,17 @@ export const SetPasswordScreen: React.FC = () => {
 
             {/* Submit Button */}
             <TouchableOpacity
-              style={[styles.button, (!isFormValid || isLoading) && styles.buttonDisabled]}
+              style={[
+                styles.button,
+                (!isFormValid || isLoading) && styles.buttonDisabled,
+              ]}
               onPress={handleSetPassword}
               disabled={!isFormValid || isLoading}
-              {...a11y.button('Set password', undefined, !isFormValid || isLoading)}
+              {...a11y.button(
+                'Set password',
+                undefined,
+                !isFormValid || isLoading,
+              )}
             >
               {isLoading ? (
                 <ActivityIndicator color={COLORS.utility.white} />

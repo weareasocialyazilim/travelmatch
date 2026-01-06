@@ -22,6 +22,10 @@ interface ControlledInputProps<T extends FieldValues> extends Omit<
   containerStyle?: ViewStyle;
   isPassword?: boolean;
   showSuccess?: boolean;
+  /** Accessibility label for screen readers (defaults to label prop) */
+  accessibilityLabel?: string;
+  /** Accessibility hint for screen readers */
+  accessibilityHint?: string;
 }
 
 export function ControlledInput<T extends FieldValues>({
@@ -31,6 +35,8 @@ export function ControlledInput<T extends FieldValues>({
   icon,
   containerStyle,
   isPassword,
+  accessibilityLabel,
+  accessibilityHint,
   ...inputProps
 }: ControlledInputProps<T>) {
   const [showPassword, setShowPassword] = useState(false);
@@ -94,6 +100,8 @@ export function ControlledInput<T extends FieldValues>({
               secureTextEntry={isPassword && !showPassword}
               autoCapitalize={isPassword ? 'none' : inputProps.autoCapitalize}
               autoCorrect={isPassword ? false : inputProps.autoCorrect}
+              accessibilityLabel={accessibilityLabel || label}
+              accessibilityHint={accessibilityHint}
               {...inputProps}
             />
           </Animated.View>

@@ -187,7 +187,7 @@ export function useOfflineAwareSubmit() {
         unsubscribe = NetInfo.default.addEventListener((state) => {
           setIsOnline(state.isConnected ?? true);
         });
-      } catch {
+      } catch (_netInfoError) {
         // NetInfo not available - assume online
         logger.debug('NetInfo not available, assuming online');
       }

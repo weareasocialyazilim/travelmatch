@@ -317,9 +317,14 @@ class BiometricAuthService {
       try {
         const decryptedData = await decryptCredentials(encryptedData);
         return JSON.parse(decryptedData) as BiometricCredentials;
-      } catch {
+      } catch (decryptError) {
         // Fallback: try parsing as legacy unencrypted JSON
         // This handles migration from old unencrypted storage
+        logger.debug(
+          'BiometricAuth',
+          'Decryption failed, trying legacy format:',
+          decryptError,
+        );
         try {
           const legacyCredentials = JSON.parse(
             encryptedData,
@@ -331,10 +336,11 @@ class BiometricAuthService {
             'Migrated legacy credentials to encrypted format',
           );
           return legacyCredentials;
-        } catch {
+        } catch (legacyError) {
           logger.error(
             'BiometricAuth',
-            'Failed to parse credentials in any format',
+            'Failed to parse credentials in any format:',
+            legacyError,
           );
           return null;
         }

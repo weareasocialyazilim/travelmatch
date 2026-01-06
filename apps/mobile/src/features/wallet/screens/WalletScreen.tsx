@@ -180,7 +180,7 @@ const WalletScreen = () => {
       const proofItems = await walletService.getPendingProofItems();
       setPendingProofItems(proofItems);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch {
+    } catch (_refreshError) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       toast.error('Cüzdan bilgileri yüklenemedi. Lütfen tekrar deneyin.');
     }

@@ -30,13 +30,13 @@ export async function generateEncryptionKey(): Promise<string> {
     // For Android
     const androidId = await Application.getAndroidId();
     if (androidId) deviceId = androidId;
-  } catch {
+  } catch (_androidError) {
     try {
       // For iOS
       const iosId = await Application.getIosIdForVendorAsync();
       if (iosId) deviceId = iosId;
-    } catch {
-      // Fallback
+    } catch (_iosError) {
+      // Fallback - platform-specific ID not available
       deviceId = 'default-device';
     }
   }

@@ -68,7 +68,7 @@ export const ChangePasswordScreen = () => {
           message: result.error || 'Failed to update password',
         });
       }
-    } catch {
+    } catch (_changePasswordError) {
       showError({
         title: 'Error',
         message: 'An unexpected error occurred. Please try again.',

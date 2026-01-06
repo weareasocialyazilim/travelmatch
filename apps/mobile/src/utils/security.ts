@@ -38,7 +38,7 @@ const getDeviceEncryptionKey = async (): Promise<string> => {
     }
 
     return key;
-  } catch {
+  } catch (_keyGenError) {
     // Fallback to a deterministic key based on timestamp (less secure, but better than nothing)
     return await Crypto.digestStringAsync(
       Crypto.CryptoDigestAlgorithm.SHA256,
@@ -390,7 +390,7 @@ export const isValidUrl = (url: string, requireHttps = true): boolean => {
       return false;
     }
     return true;
-  } catch {
+  } catch (_urlError) {
     return false;
   }
 };

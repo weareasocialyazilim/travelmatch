@@ -230,7 +230,7 @@ const CreateMomentScreen: React.FC = () => {
         await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         showToast('Could not create moment. Please try again.', 'error');
       }
-    } catch {
+    } catch (_createMomentError) {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       showToast('Something went wrong. Please try again.', 'error');
     } finally {

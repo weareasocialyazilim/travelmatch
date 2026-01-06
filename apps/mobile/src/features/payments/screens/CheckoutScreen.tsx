@@ -127,7 +127,7 @@ const CheckoutScreen: React.FC = () => {
         title: 'Ödeme Başarılı',
         subtitle: `${formatCurrency(amount || 0)} tutarında hediye gönderildi`,
       });
-    } catch {
+    } catch (_paymentError) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       navigation.navigate('PaymentFailed', {
         error: 'Ödeme başarısız oldu. Lütfen tekrar deneyin.',

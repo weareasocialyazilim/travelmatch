@@ -214,7 +214,7 @@ export const MomentAuthenticator = memo<MomentAuthenticatorProps>(
 
         try {
           apiResult = await callVerificationAPI();
-        } catch {
+        } catch (_apiError) {
           // If API fails, reject
           onResult({
             status: 'rejected',
@@ -263,7 +263,7 @@ export const MomentAuthenticator = memo<MomentAuthenticatorProps>(
 
         setResult(finalResult);
         onResult(finalResult);
-      } catch {
+      } catch (_authError) {
         const errorResult: AuthenticationResult = {
           status: 'rejected',
           reasons: ['Bir hata oluştu'],

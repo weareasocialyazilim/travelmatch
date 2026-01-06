@@ -3,7 +3,13 @@
  * Runtime type checking functions for type narrowing
  */
 
-import { Message, TextMessage, ImageMessage, LocationMessage, SystemMessage } from './message.types';
+import {
+  Message,
+  TextMessage,
+  ImageMessage,
+  LocationMessage,
+  SystemMessage,
+} from './message.types';
 
 /**
  * Message Type Guards
@@ -59,8 +65,9 @@ export function isNotNull<T>(value: T | null | undefined): value is T {
  */
 export function isUUID(value: unknown): value is string {
   if (!isString(value)) return false;
-  
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return uuidRegex.test(value);
 }
 
@@ -69,7 +76,7 @@ export function isUUID(value: unknown): value is string {
  */
 export function isEmail(value: unknown): value is string {
   if (!isString(value)) return false;
-  
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(value);
 }
@@ -79,11 +86,11 @@ export function isEmail(value: unknown): value is string {
  */
 export function isURL(value: unknown): value is string {
   if (!isString(value)) return false;
-  
+
   try {
     new URL(value);
     return true;
-  } catch {
+  } catch (_urlError) {
     return false;
   }
 }
@@ -93,7 +100,7 @@ export function isURL(value: unknown): value is string {
  */
 export function isDateString(value: unknown): value is string {
   if (!isString(value)) return false;
-  
+
   const date = new Date(value);
   return !isNaN(date.getTime());
 }
@@ -103,7 +110,7 @@ export function isDateString(value: unknown): value is string {
  */
 export function hasProperty<K extends string>(
   obj: unknown,
-  key: K
+  key: K,
 ): obj is Record<K, unknown> {
   return isObject(obj) && key in obj;
 }
@@ -113,7 +120,7 @@ export function hasProperty<K extends string>(
  */
 export function isArrayOf<T>(
   value: unknown,
-  guard: (item: unknown) => item is T
+  guard: (item: unknown) => item is T,
 ): value is T[] {
   return isArray(value) && value.every(guard);
 }

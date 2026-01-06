@@ -154,8 +154,8 @@ const EditProfileScreen = () => {
         const isAvailable =
           await userService.checkUsernameAvailability(username);
         setUsernameAvailable(isAvailable);
-      } catch {
-        // Ignore error
+      } catch (_usernameCheckError) {
+        // Ignore error - keep username availability null
       } finally {
         setCheckingUsername(false);
       }
@@ -212,7 +212,7 @@ const EditProfileScreen = () => {
           setAvatarUri(result.assets[0].uri);
         }
       }
-    } catch {
+    } catch (_pickImageError) {
       showToast('Fotoğraf seçilemedi', 'error');
     }
   };
@@ -250,7 +250,7 @@ const EditProfileScreen = () => {
       showAlert('Başarılı', 'Profil güncellendi', [
         { text: 'Tamam', onPress: () => navigation.goBack() },
       ]);
-    } catch {
+    } catch (_updateProfileError) {
       showToast('Profil güncellenemedi', 'error');
     }
   };

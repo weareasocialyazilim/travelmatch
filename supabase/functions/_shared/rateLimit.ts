@@ -62,7 +62,7 @@ export class RateLimiter {
         const token = authHeader.substring(7);
         const payload = JSON.parse(atob(token.split('.')[1]));
         if (payload.sub) return `user:${payload.sub}`;
-      } catch {
+      } catch (jwtError) {
         // Fall through to IP-based limiting
       }
     }

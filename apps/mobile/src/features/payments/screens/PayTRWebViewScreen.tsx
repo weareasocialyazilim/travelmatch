@@ -199,7 +199,7 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
             });
           }
         }
-      } catch {
+      } catch (_parseError) {
         // Not a JSON message, ignore
       }
     },

@@ -1,6 +1,6 @@
 /**
  * Response Helpers for Edge Functions
- * 
+ *
  * Standardized response formatting for consistent API responses.
  */
 
@@ -20,7 +20,7 @@ export function jsonResponse<T>(
     status?: number;
     origin?: string | null;
     headers?: Record<string, string>;
-  } = {}
+  } = {},
 ): Response {
   const { status = 200, origin = null, headers = {} } = options;
 
@@ -45,10 +45,7 @@ export function jsonResponse<T>(
 /**
  * Create a created (201) response
  */
-export function createdResponse<T>(
-  data: T,
-  origin?: string | null
-): Response {
+export function createdResponse<T>(data: T, origin?: string | null): Response {
   return jsonResponse(data, { status: HTTP_STATUS.CREATED, origin });
 }
 
@@ -74,13 +71,14 @@ export function errorResponse(
   options: {
     status?: number;
     origin?: string | null;
-  } = {}
+  } = {},
 ): Response {
   const { status = 400, origin = null } = options;
 
-  const apiError: ApiError = typeof error === 'string'
-    ? { code: ERROR_CODES.INTERNAL_ERROR, message: error }
-    : error;
+  const apiError: ApiError =
+    typeof error === 'string'
+      ? { code: ERROR_CODES.INTERNAL_ERROR, message: error }
+      : error;
 
   const body: ApiResponse = {
     success: false,
@@ -105,7 +103,7 @@ export function errorResponse(
 export function badRequestResponse(
   message: string,
   details?: Record<string, unknown>,
-  origin?: string | null
+  origin?: string | null,
 ): Response {
   return errorResponse(
     {
@@ -113,7 +111,7 @@ export function badRequestResponse(
       message,
       details,
     },
-    { status: HTTP_STATUS.BAD_REQUEST, origin }
+    { status: HTTP_STATUS.BAD_REQUEST, origin },
   );
 }
 
@@ -122,14 +120,14 @@ export function badRequestResponse(
  */
 export function unauthorizedResponse(
   message = 'Authentication required',
-  origin?: string | null
+  origin?: string | null,
 ): Response {
   return errorResponse(
     {
       code: ERROR_CODES.UNAUTHORIZED,
       message,
     },
-    { status: HTTP_STATUS.UNAUTHORIZED, origin }
+    { status: HTTP_STATUS.UNAUTHORIZED, origin },
   );
 }
 
@@ -138,14 +136,14 @@ export function unauthorizedResponse(
  */
 export function forbiddenResponse(
   message = 'Access denied',
-  origin?: string | null
+  origin?: string | null,
 ): Response {
   return errorResponse(
     {
       code: ERROR_CODES.FORBIDDEN,
       message,
     },
-    { status: HTTP_STATUS.FORBIDDEN, origin }
+    { status: HTTP_STATUS.FORBIDDEN, origin },
   );
 }
 
@@ -154,14 +152,14 @@ export function forbiddenResponse(
  */
 export function notFoundResponse(
   resource = 'Resource',
-  origin?: string | null
+  origin?: string | null,
 ): Response {
   return errorResponse(
     {
       code: ERROR_CODES.NOT_FOUND,
       message: `${resource} not found`,
     },
-    { status: HTTP_STATUS.NOT_FOUND, origin }
+    { status: HTTP_STATUS.NOT_FOUND, origin },
   );
 }
 
@@ -170,14 +168,14 @@ export function notFoundResponse(
  */
 export function conflictResponse(
   message: string,
-  origin?: string | null
+  origin?: string | null,
 ): Response {
   return errorResponse(
     {
       code: ERROR_CODES.CONFLICT,
       message,
     },
-    { status: HTTP_STATUS.CONFLICT, origin }
+    { status: HTTP_STATUS.CONFLICT, origin },
   );
 }
 
@@ -186,7 +184,7 @@ export function conflictResponse(
  */
 export function rateLimitedResponse(
   retryAfter: number,
-  origin?: string | null
+  origin?: string | null,
 ): Response {
   return new Response(
     JSON.stringify({
@@ -207,7 +205,7 @@ export function rateLimitedResponse(
         'Retry-After': String(retryAfter),
         ...getCorsHeaders(origin),
       },
-    }
+    },
   );
 }
 
@@ -216,14 +214,14 @@ export function rateLimitedResponse(
  */
 export function internalErrorResponse(
   message = 'Internal server error',
-  origin?: string | null
+  origin?: string | null,
 ): Response {
   return errorResponse(
     {
       code: ERROR_CODES.INTERNAL_ERROR,
       message,
     },
-    { status: HTTP_STATUS.INTERNAL_SERVER_ERROR, origin }
+    { status: HTTP_STATUS.INTERNAL_SERVER_ERROR, origin },
   );
 }
 
@@ -232,14 +230,14 @@ export function internalErrorResponse(
  */
 export function serviceUnavailableResponse(
   message = 'Service temporarily unavailable',
-  origin?: string | null
+  origin?: string | null,
 ): Response {
   return errorResponse(
     {
       code: ERROR_CODES.SERVICE_UNAVAILABLE,
       message,
     },
-    { status: HTTP_STATUS.SERVICE_UNAVAILABLE, origin }
+    { status: HTTP_STATUS.SERVICE_UNAVAILABLE, origin },
   );
 }
 
@@ -264,16 +262,14 @@ export function corsPreflightResponse(origin?: string | null): Response {
 /**
  * Parse JSON body with error handling
  */
-export async function parseJsonBody<T = unknown>(
-  request: Request
-): Promise<T> {
+export async function parseJsonBody<T = unknown>(request: Request): Promise<T> {
   try {
     const text = await request.text();
     if (!text) {
       throw new Error('Empty request body');
     }
     return JSON.parse(text) as T;
-  } catch {
+  } catch (parseError) {
     throw new Error('Invalid JSON in request body');
   }
 }

@@ -148,7 +148,7 @@ function parseQueryParams(url: URL): Record<string, unknown> {
       else {
         params[key] = value;
       }
-    } catch {
+    } catch (parseParamError) {
       params[key] = value;
     }
   }

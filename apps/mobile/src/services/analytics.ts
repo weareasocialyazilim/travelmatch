@@ -11,7 +11,7 @@ async function getSentry(): Promise<SentryType | null> {
   try {
     _sentry = await import('@sentry/react-native');
     return _sentry;
-  } catch {
+  } catch (_sentryImportError) {
     return null;
   }
 }

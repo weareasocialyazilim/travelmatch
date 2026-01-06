@@ -77,7 +77,11 @@ const inMemoryStore: RateLimitStore = {
  */
 export function createRedisStore(redisClient: {
   get: (key: string) => Promise<string | null>;
-  set: (key: string, value: string, options?: { PX?: number }) => Promise<unknown>;
+  set: (
+    key: string,
+    value: string,
+    options?: { PX?: number },
+  ) => Promise<unknown>;
   incr: (key: string) => Promise<number>;
   expire: (key: string, seconds: number) => Promise<unknown>;
 }): RateLimitStore {
@@ -89,12 +93,16 @@ export function createRedisStore(redisClient: {
       if (!data) return null;
       try {
         return JSON.parse(data) as RateLimitEntry;
-      } catch {
+      } catch (parseError) {
         return null;
       }
     },
 
-    async set(key: string, entry: RateLimitEntry, ttlMs: number): Promise<void> {
+    async set(
+      key: string,
+      entry: RateLimitEntry,
+      ttlMs: number,
+    ): Promise<void> {
       await redisClient.set(prefix + key, JSON.stringify(entry), { PX: ttlMs });
     },
 
@@ -129,7 +137,11 @@ export function createRedisStore(redisClient: {
  */
 export function createUpstashStore(upstashClient: {
   get: <T>(key: string) => Promise<T | null>;
-  set: (key: string, value: unknown, options?: { px?: number }) => Promise<unknown>;
+  set: (
+    key: string,
+    value: unknown,
+    options?: { px?: number },
+  ) => Promise<unknown>;
   incr: (key: string) => Promise<number>;
 }): RateLimitStore {
   const prefix = 'ratelimit:';
@@ -140,7 +152,11 @@ export function createUpstashStore(upstashClient: {
       return data;
     },
 
-    async set(key: string, entry: RateLimitEntry, ttlMs: number): Promise<void> {
+    async set(
+      key: string,
+      entry: RateLimitEntry,
+      ttlMs: number,
+    ): Promise<void> {
       await upstashClient.set(prefix + key, entry, { px: ttlMs });
     },
 
@@ -203,7 +219,7 @@ export interface RateLimitResult {
  */
 export async function checkRateLimit(
   identifier: string,
-  config: RateLimitConfig
+  config: RateLimitConfig,
 ): Promise<RateLimitResult> {
   const { limit, windowMs, keyGenerator } = config;
   const key = keyGenerator ? keyGenerator(identifier) : identifier;
@@ -252,7 +268,7 @@ export async function checkRateLimit(
  */
 export function checkRateLimitSync(
   identifier: string,
-  config: RateLimitConfig
+  config: RateLimitConfig,
 ): RateLimitResult {
   const { limit, windowMs, keyGenerator } = config;
   const key = keyGenerator ? keyGenerator(identifier) : identifier;
@@ -328,7 +344,9 @@ export const rateLimits = {
 /**
  * Create rate limit headers for response
  */
-export function createRateLimitHeaders(result: RateLimitResult): Record<string, string> {
+export function createRateLimitHeaders(
+  result: RateLimitResult,
+): Record<string, string> {
   const headers: Record<string, string> = {
     'X-RateLimit-Remaining': result.remaining.toString(),
     'X-RateLimit-Reset': result.resetTime.toString(),
@@ -345,18 +363,18 @@ export function createRateLimitHeaders(result: RateLimitResult): Record<string, 
  * Higher-order function to wrap API route handlers with rate limiting
  * Now supports async Redis-backed rate limiting
  */
-export function withRateLimit<T extends (...args: unknown[]) => Promise<Response>>(
-  handler: T,
-  config: RateLimitConfig = rateLimits.api
-): T {
+export function withRateLimit<
+  T extends (...args: unknown[]) => Promise<Response>,
+>(handler: T, config: RateLimitConfig = rateLimits.api): T {
   return (async (...args: Parameters<T>) => {
     // Extract request from args (assuming first arg is Request)
     const request = args[0] as Request;
 
     // Get identifier from IP or auth header
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
-               request.headers.get('x-real-ip') ||
-               'unknown';
+    const ip =
+      request.headers.get('x-forwarded-for')?.split(',')[0] ||
+      request.headers.get('x-real-ip') ||
+      'unknown';
 
     const result = await checkRateLimit(ip, config);
 
@@ -364,7 +382,7 @@ export function withRateLimit<T extends (...args: unknown[]) => Promise<Response
       return new Response(
         JSON.stringify({
           error: 'Too many requests',
-          retryAfter: result.retryAfter
+          retryAfter: result.retryAfter,
         }),
         {
           status: 429,
@@ -372,7 +390,7 @@ export function withRateLimit<T extends (...args: unknown[]) => Promise<Response
             'Content-Type': 'application/json',
             ...createRateLimitHeaders(result),
           },
-        }
+        },
       );
     }
 

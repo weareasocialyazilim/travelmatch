@@ -208,7 +208,7 @@ const KYCReviewScreen: React.FC = () => {
       setTimeout(() => {
         navigation.navigate('KYCPending');
       }, 500);
-    } catch {
+    } catch (_analysisError) {
       setAnalysisState('error');
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       showToast('AI analizi başarısız oldu. Lütfen tekrar deneyin.', 'error');

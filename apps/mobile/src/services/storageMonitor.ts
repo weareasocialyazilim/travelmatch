@@ -331,7 +331,7 @@ Storage Status:
 - Can Upload: ${info.canUpload ? 'Yes' : 'No'}
 - Est. Uploads: ~${info.estimatedUploadsRemaining} files
       `.trim();
-    } catch {
+    } catch (_statsError) {
       return 'Failed to get storage stats';
     }
   }

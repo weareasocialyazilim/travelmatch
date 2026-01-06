@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Share,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Share } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
@@ -29,7 +23,7 @@ export default function ReferralScreen({ navigation }: ReferralScreenProps) {
       await Share.share({
         message: `TravelMatch'e katıl! Referans kodum: ${REFERRAL_CODE} - Her ikiniz de $20 kredi kazanın!`,
       });
-    } catch {
+    } catch (_shareError) {
       // Share cancelled or failed
     }
   };

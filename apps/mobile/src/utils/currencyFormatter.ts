@@ -68,7 +68,7 @@ export const formatCurrency = (
     }
 
     return formatted;
-  } catch {
+  } catch (_formatError) {
     // Fallback for older JS engines
     const symbol = showSymbol ? currency.symbol : '';
     const code = showCode ? ` ${currency.code}` : '';
@@ -92,7 +92,7 @@ export const formatAmount = (
       maximumFractionDigits: currency.decimalPlaces,
     });
     return formatter.format(amount);
-  } catch {
+  } catch (_formatError) {
     return amount.toFixed(currency.decimalPlaces);
   }
 };

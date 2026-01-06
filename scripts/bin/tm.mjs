@@ -2,9 +2,9 @@
 
 /**
  * TravelMatch Developer CLI (tm)
- * 
+ *
  * A unified command-line interface for all development tasks
- * 
+ *
  * Usage:
  *   tm dev          - Start development environment
  *   tm db           - Database commands
@@ -138,12 +138,12 @@ const commands = {
             input: process.stdin,
             output: process.stdout,
           });
-          
+
           const answer = await new Promise((resolve) => {
             rl.question('Are you sure? (yes/no): ', resolve);
           });
           rl.close();
-          
+
           if (answer.toLowerCase() === 'yes') {
             log('🔄 Resetting database...', 'cyan');
             await runCommand('supabase', ['db', 'reset']);
@@ -299,15 +299,19 @@ const commands = {
             input: process.stdin,
             output: process.stdout,
           });
-          
+
           const answer = await new Promise((resolve) => {
             rl.question('Are you sure? (yes/no): ', resolve);
           });
           rl.close();
-          
+
           if (answer.toLowerCase() === 'yes') {
             log('🧹 Cleaning Docker...', 'cyan');
-            await runCommand('docker-compose', ['down', '-v', '--remove-orphans']);
+            await runCommand('docker-compose', [
+              'down',
+              '-v',
+              '--remove-orphans',
+            ]);
             log('✅ Docker cleaned', 'green');
           } else {
             log('❌ Clean cancelled', 'yellow');
@@ -332,7 +336,11 @@ const commands = {
         description: 'Build mobile app',
         run: async () => {
           log('📱 Building mobile app...', 'cyan');
-          await runCommand('pnpm', ['--filter', '@travelmatch/mobile', 'build']);
+          await runCommand('pnpm', [
+            '--filter',
+            '@travelmatch/mobile',
+            'build',
+          ]);
         },
       },
       admin: {
@@ -360,21 +368,24 @@ const commands = {
         description: 'Setup Docker environment',
         run: async () => {
           log('🐳 Setting up Docker environment...', 'cyan');
-          
+
           // Check if Docker is running
           try {
             execSync('docker ps', { stdio: 'ignore' });
-          } catch {
-            log('❌ Docker is not running. Please start Docker Desktop.', 'red');
+          } catch (dockerError) {
+            log(
+              '❌ Docker is not running. Please start Docker Desktop.',
+              'red',
+            );
             process.exit(1);
           }
-          
+
           // Create .env.local if it doesn't exist
           if (!fs.existsSync('.env.local')) {
             log('📝 Creating .env.local from template...', 'cyan');
             fs.copyFileSync('.env.docker', '.env.local');
           }
-          
+
           log('✅ Docker environment ready', 'green');
           log('\nNext steps:', 'cyan');
           log('  1. Review .env.local and customize if needed', 'dim');
@@ -385,23 +396,26 @@ const commands = {
         description: 'Complete setup (env + dependencies)',
         run: async () => {
           log('🚀 Running complete setup...', 'cyan');
-          
+
           // Install dependencies
           log('\n📦 Installing dependencies...', 'cyan');
           await runCommand('pnpm', ['install']);
-          
+
           // Setup env
           log('\n🔧 Setting up environment...', 'cyan');
           await runCommand('pnpm', ['setup:env']);
-          
+
           // Generate types
           log('\n🔧 Generating types...', 'cyan');
           try {
             await runCommand('pnpm', ['db:generate-types']);
-          } catch {
-            log('⚠️  Skipping type generation (Supabase not running)', 'yellow');
+          } catch (typeGenError) {
+            log(
+              '⚠️  Skipping type generation (Supabase not running)',
+              'yellow',
+            );
           }
-          
+
           log('\n✅ Setup complete!', 'green');
         },
       },
@@ -460,11 +474,20 @@ function showHelp() {
 
   for (const [name, command] of Object.entries(commands)) {
     if (command.run) {
-      log(`  ${colors.green}${name.padEnd(15)}${colors.reset} ${command.description}`, 'reset');
+      log(
+        `  ${colors.green}${name.padEnd(15)}${colors.reset} ${command.description}`,
+        'reset',
+      );
     } else if (command.subcommands) {
-      log(`  ${colors.green}${name.padEnd(15)}${colors.reset} ${command.description}`, 'reset');
+      log(
+        `  ${colors.green}${name.padEnd(15)}${colors.reset} ${command.description}`,
+        'reset',
+      );
       for (const [subName, subCommand] of Object.entries(command.subcommands)) {
-        log(`    ${colors.dim}${subName.padEnd(13)}${colors.reset} ${subCommand.description}`, 'reset');
+        log(
+          `    ${colors.dim}${subName.padEnd(13)}${colors.reset} ${subCommand.description}`,
+          'reset',
+        );
       }
     }
   }

@@ -6,7 +6,14 @@ import { toast } from 'sonner';
 import { Loader2, ShieldCheck, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
 import Image from 'next/image';
 
@@ -63,13 +70,13 @@ export default function TwoFactorSetupPage() {
 
   const copySecret = async () => {
     if (!setupData) return;
-    
+
     try {
       await navigator.clipboard.writeText(setupData.secret);
       setCopied(true);
       toast.success('Secret kopyalandı');
       setTimeout(() => setCopied(false), 2000);
-    } catch {
+    } catch (copyError) {
       toast.error('Kopyalama başarısız');
     }
   };
@@ -86,7 +93,10 @@ export default function TwoFactorSetupPage() {
     }
   };
 
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (
+    index: number,
+    e: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
     if (e.key === 'Backspace' && !code[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
@@ -94,7 +104,10 @@ export default function TwoFactorSetupPage() {
 
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    const pastedData = e.clipboardData
+      .getData('text')
+      .replace(/\D/g, '')
+      .slice(0, 6);
     const newCode = [...code];
     for (let i = 0; i < pastedData.length; i++) {
       const char = pastedData[i];
@@ -133,7 +146,9 @@ export default function TwoFactorSetupPage() {
       toast.success('2FA başarıyla aktifleştirildi!');
       router.push('/queue');
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Doğrulama başarısız');
+      toast.error(
+        error instanceof Error ? error.message : 'Doğrulama başarısız',
+      );
       setCode(['', '', '', '', '', '']);
       inputRefs.current[0]?.focus();
     } finally {
@@ -147,7 +162,9 @@ export default function TwoFactorSetupPage() {
         <Card className="w-full max-w-md">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="mt-4 text-muted-foreground">2FA kurulumu hazırlanıyor...</p>
+            <p className="mt-4 text-muted-foreground">
+              2FA kurulumu hazırlanıyor...
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -163,10 +180,9 @@ export default function TwoFactorSetupPage() {
           </div>
           <CardTitle className="text-2xl">2FA Kurulumu</CardTitle>
           <CardDescription>
-            {step === 'scan' 
+            {step === 'scan'
               ? 'Authenticator uygulamanızla QR kodu tarayın'
-              : 'Uygulamadaki 6 haneli kodu girin'
-            }
+              : 'Uygulamadaki 6 haneli kodu girin'}
           </CardDescription>
         </CardHeader>
 
@@ -210,7 +226,7 @@ export default function TwoFactorSetupPage() {
                 </div>
               </div>
 
-              <Button 
+              <Button
                 onClick={() => {
                   setStep('verify');
                   setTimeout(() => inputRefs.current[0]?.focus(), 100);

@@ -103,7 +103,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
               address: `${address.city || ''}, ${address.country || ''}`.trim(),
             });
           }
-        } catch {
+        } catch (_locationError) {
           showToast(
             'Konumunuz alınamadı. Lütfen konum servislerinizin açık olduğundan emin olun',
             'error',

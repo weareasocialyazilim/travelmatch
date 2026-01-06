@@ -88,7 +88,7 @@ export const ShareMomentScreen: React.FC = () => {
         url: shareUrl,
         title: displayMoment.title,
       });
-    } catch {
+    } catch (_shareError) {
       showToast('Could not share this moment', 'error');
     }
   }, [shareMessage, shareUrl, displayMoment.title]);

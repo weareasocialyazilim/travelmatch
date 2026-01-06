@@ -170,8 +170,8 @@ class CacheInvalidationService {
               keysToRemove.push(key);
             }
           }
-        } catch {
-          // Skip invalid entries
+        } catch (_parseError) {
+          // Skip invalid cache entries - JSON parse failed
         }
       }
 
@@ -255,8 +255,8 @@ class CacheInvalidationService {
         ? new Date(data.invalidated_at).getTime()
         : 0;
       return invalidatedAt > entry.timestamp;
-    } catch {
-      // Don't fail if invalidation check fails
+    } catch (_checkError) {
+      // Don't fail if invalidation check fails - continue with cached data
       return false;
     }
   }
