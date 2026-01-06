@@ -20,12 +20,17 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import { COLORS } from '@/constants/colors';
-import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
+import { FONTS, FONT_SIZES } from '@/constants/typography';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 export type TransactionStatus = 'completed' | 'pending' | 'failed';
-export type TransactionType = 'sale' | 'gift_sent' | 'gift_received' | 'withdrawal' | 'deposit';
+export type TransactionType =
+  | 'sale'
+  | 'gift_sent'
+  | 'gift_received'
+  | 'withdrawal'
+  | 'deposit';
 
 export interface Transaction {
   id: string;
@@ -49,16 +54,28 @@ const getTransactionIcon = (
   title: string,
   amount: string,
 ): keyof typeof Ionicons.glyphMap => {
-  if (title.toLowerCase().includes('satış') || title.toLowerCase().includes('sale')) {
+  if (
+    title.toLowerCase().includes('satış') ||
+    title.toLowerCase().includes('sale')
+  ) {
     return 'arrow-down-circle';
   }
-  if (title.toLowerCase().includes('hediye') || title.toLowerCase().includes('gift')) {
+  if (
+    title.toLowerCase().includes('hediye') ||
+    title.toLowerCase().includes('gift')
+  ) {
     return 'gift';
   }
-  if (title.toLowerCase().includes('çekme') || title.toLowerCase().includes('withdraw')) {
+  if (
+    title.toLowerCase().includes('çekme') ||
+    title.toLowerCase().includes('withdraw')
+  ) {
     return 'arrow-up-circle';
   }
-  if (title.toLowerCase().includes('yükle') || title.toLowerCase().includes('deposit')) {
+  if (
+    title.toLowerCase().includes('yükle') ||
+    title.toLowerCase().includes('deposit')
+  ) {
     return 'wallet';
   }
   // Fallback: positive amount = incoming, negative = outgoing
@@ -138,7 +155,9 @@ export const TransactionListItem: React.FC<TransactionListItemProps> = ({
       <View
         style={[
           styles.iconContainer,
-          isPositive ? styles.iconContainerPositive : styles.iconContainerNegative,
+          isPositive
+            ? styles.iconContainerPositive
+            : styles.iconContainerNegative,
         ]}
       >
         <Ionicons
@@ -214,14 +233,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: FONT_SIZES_V2.body,
+    fontSize: FONT_SIZES.body,
     fontFamily: FONTS.body.semibold,
     color: COLORS.text.onDark,
     fontWeight: '600',
     marginBottom: 2,
   },
   desc: {
-    fontSize: FONT_SIZES_V2.caption,
+    fontSize: FONT_SIZES.caption,
     fontFamily: FONTS.body.regular,
     color: COLORS.textOnDarkSecondary,
     marginBottom: 6,
@@ -232,7 +251,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   time: {
-    fontSize: FONT_SIZES_V2.tiny,
+    fontSize: FONT_SIZES.tiny,
     fontFamily: FONTS.mono.regular,
     color: COLORS.textOnDarkMuted,
   },
@@ -247,7 +266,7 @@ const styles = StyleSheet.create({
     borderRadius: 2.5,
   },
   statusText: {
-    fontSize: FONT_SIZES_V2.tiny,
+    fontSize: FONT_SIZES.tiny,
     fontFamily: FONTS.body.regular,
     fontWeight: '500',
   },
@@ -257,7 +276,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   amount: {
-    fontSize: FONT_SIZES_V2.body,
+    fontSize: FONT_SIZES.body,
     fontFamily: FONTS.mono.medium,
     fontWeight: '700',
   },

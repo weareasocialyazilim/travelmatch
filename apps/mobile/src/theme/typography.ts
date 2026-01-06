@@ -15,22 +15,15 @@ import { COLORS } from '../constants/colors';
 // ============================================
 export {
   FONTS,
-  FONT_SIZES_V2 as FONT_SIZES,
-  LINE_HEIGHTS_V2 as LINE_HEIGHTS,
-  LETTER_SPACING_V2 as LETTER_SPACING,
+  FONT_SIZES,
+  LINE_HEIGHTS,
+  LETTER_SPACING,
   TYPE_SCALE,
   typography,
   TYPOGRAPHY,
   getAccessibleFontSize,
-  TEXT_VARIANTS_V2 as TEXT_VARIANTS_SOURCE,
+  TEXT_VARIANTS as TEXT_VARIANTS_SOURCE,
   TYPOGRAPHY_SYSTEM,
-} from '../constants/typography';
-
-// Also export with original names for backward compatibility
-export {
-  FONT_SIZES_V2,
-  LINE_HEIGHTS_V2,
-  LETTER_SPACING_V2,
 } from '../constants/typography';
 
 // Font families alias for legacy imports (flat structure for backward compatibility)

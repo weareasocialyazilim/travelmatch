@@ -25,7 +25,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { COLORS } from '@/constants/colors';
-import { TYPOGRAPHY, FONT_SIZES_V2 } from '@/constants/typography';
+import { TYPOGRAPHY, FONT_SIZES } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     color: COLORS.text.primary,
-    fontSize: FONT_SIZES_V2.body,
+    fontSize: FONT_SIZES.body,
     fontFamily: TYPOGRAPHY.body?.fontFamily ?? 'System',
     paddingVertical: 0,
   },

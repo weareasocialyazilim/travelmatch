@@ -22,7 +22,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
-import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
+import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
 import type { SubscriptionTier } from '../services/momentsService';
 
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: COLORS.text.inverse,
-    fontSize: FONT_SIZES_V2.h3,
+    fontSize: FONT_SIZES.h3,
     fontFamily: FONTS.display.bold,
     fontWeight: '700',
   },
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
   },
   locationText: {
     color: COLORS.text.onDarkSecondary,
-    fontSize: FONT_SIZES_V2.bodySmall,
+    fontSize: FONT_SIZES.bodySmall,
     fontFamily: FONTS.body.regular,
   },
   // Gift Button with Creator-Set Price
@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
   },
   giftButtonText: {
     color: COLORS.text.primary,
-    fontSize: FONT_SIZES_V2.body,
+    fontSize: FONT_SIZES.body,
     fontWeight: '900',
     fontFamily: FONTS.mono.medium,
   },

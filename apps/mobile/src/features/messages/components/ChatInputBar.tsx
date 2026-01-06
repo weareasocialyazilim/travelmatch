@@ -24,7 +24,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import { supabase } from '@/config/supabase';
 import { COLORS } from '@/constants/colors';
-import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
+import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { logger } from '@/utils/logger';
 import { useNetworkStatus } from '../../../context/NetworkContext';
 
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: COLORS.text.primary,
     fontFamily: FONTS.body.regular,
-    fontSize: FONT_SIZES_V2.body,
+    fontSize: FONT_SIZES.body,
     paddingHorizontal: 8,
     paddingVertical: 8,
     maxHeight: 100,
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
     paddingRight: 8,
   },
   typingText: {
-    fontSize: FONT_SIZES_V2.caption,
+    fontSize: FONT_SIZES.caption,
     color: COLORS.primary,
     fontFamily: FONTS.body.regular,
     fontStyle: 'italic',

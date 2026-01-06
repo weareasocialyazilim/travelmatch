@@ -30,7 +30,7 @@ import Animated, {
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import { COLORS } from '@/constants/colors';
-import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
+import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { TMAvatar } from '@/components/ui/TMAvatar';
 import { TrustScoreCircle } from '@/components/ui/TrustScoreCircle';
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   headerTitle: {
-    fontSize: FONT_SIZES_V2.bodyLarge,
+    fontSize: FONT_SIZES.bodyLarge,
     fontFamily: FONTS.display.bold,
     color: COLORS.text.onDark,
     fontWeight: '700',
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   candidateName: {
-    fontSize: FONT_SIZES_V2.h3,
+    fontSize: FONT_SIZES.h3,
     fontFamily: FONTS.display.bold,
     fontWeight: '800',
     color: COLORS.text.onDark,
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
   },
   locationText: {
     color: COLORS.textOnDarkSecondary,
-    fontSize: FONT_SIZES_V2.caption,
+    fontSize: FONT_SIZES.caption,
     fontFamily: FONTS.body.regular,
   },
   // Trust Metric
@@ -525,7 +525,7 @@ const styles = StyleSheet.create({
   },
   momentName: {
     color: COLORS.text.onDark,
-    fontSize: FONT_SIZES_V2.body,
+    fontSize: FONT_SIZES.body,
     fontFamily: FONTS.body.semibold,
     fontWeight: '600',
     marginTop: 6,
@@ -533,7 +533,7 @@ const styles = StyleSheet.create({
   },
   offerAmount: {
     color: COLORS.primary,
-    fontSize: FONT_SIZES_V2.h4,
+    fontSize: FONT_SIZES.h4,
     fontFamily: FONTS.mono.medium,
     fontWeight: '700',
     marginTop: 8,
@@ -574,14 +574,14 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   declineLabel: {
-    fontSize: FONT_SIZES_V2.caption,
+    fontSize: FONT_SIZES.caption,
     fontFamily: FONTS.body.semibold,
     fontWeight: '700',
     color: COLORS.textOnDarkSecondary,
     marginTop: 12,
   },
   approveLabel: {
-    fontSize: FONT_SIZES_V2.caption,
+    fontSize: FONT_SIZES.caption,
     fontFamily: FONTS.body.semibold,
     fontWeight: '700',
     color: COLORS.primary,
@@ -590,7 +590,7 @@ const styles = StyleSheet.create({
   // Remaining text
   remainingText: {
     marginTop: 20,
-    fontSize: FONT_SIZES_V2.caption,
+    fontSize: FONT_SIZES.caption,
     fontFamily: FONTS.mono.regular,
     color: COLORS.textOnDarkMuted,
   },
@@ -599,7 +599,7 @@ const styles = StyleSheet.create({
     marginTop: 'auto',
     textAlign: 'center',
     color: COLORS.textOnDarkMuted,
-    fontSize: FONT_SIZES_V2.caption,
+    fontSize: FONT_SIZES.caption,
     fontFamily: FONTS.body.regular,
     lineHeight: 20,
     paddingHorizontal: 40,
@@ -613,13 +613,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   emptyTitle: {
-    fontSize: FONT_SIZES_V2.h4,
+    fontSize: FONT_SIZES.h4,
     fontFamily: FONTS.display.bold,
     color: COLORS.text.onDark,
     marginTop: 20,
   },
   emptyText: {
-    fontSize: FONT_SIZES_V2.body,
+    fontSize: FONT_SIZES.body,
     fontFamily: FONTS.body.regular,
     color: COLORS.textOnDarkSecondary,
     textAlign: 'center',

@@ -24,7 +24,7 @@ import Animated, {
   interpolate,
 } from 'react-native-reanimated';
 import { COLORS } from '@/constants/colors';
-import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
+import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { TMButton } from '@/components/ui/TMButton';
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
   },
   // Text styles
   title: {
-    fontSize: FONT_SIZES_V2.h2,
+    fontSize: FONT_SIZES.h2,
     fontFamily: FONTS.display.bold,
     fontWeight: '800',
     color: COLORS.text.onDark,
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   subtitle: {
-    fontSize: FONT_SIZES_V2.body,
+    fontSize: FONT_SIZES.body,
     fontFamily: FONTS.body.regular,
     color: COLORS.textOnDarkSecondary,
     textAlign: 'center',
@@ -343,13 +343,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   infoLabel: {
-    fontSize: FONT_SIZES_V2.caption,
+    fontSize: FONT_SIZES.caption,
     fontFamily: FONTS.body.regular,
     color: COLORS.textOnDarkMuted,
     marginBottom: 2,
   },
   infoValue: {
-    fontSize: FONT_SIZES_V2.bodySmall,
+    fontSize: FONT_SIZES.bodySmall,
     fontFamily: FONTS.body.semibold,
     color: COLORS.text.onDark,
     fontWeight: '500',

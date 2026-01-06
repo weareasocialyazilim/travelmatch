@@ -97,7 +97,7 @@ export const FONTS = {
 // ============================================
 // 2. FONT SIZES (8pt grid based)
 // ============================================
-export const FONT_SIZES_V2 = {
+export const FONT_SIZES = {
   // Display sizes
   hero: 48, // 6 * 8
   display1: 40, // 5 * 8
@@ -133,7 +133,7 @@ export const FONT_SIZES_V2 = {
 // ============================================
 // 3. LINE HEIGHTS
 // ============================================
-export const LINE_HEIGHTS_V2 = {
+export const LINE_HEIGHTS = {
   tight: 1.1, // For large display text
   snug: 1.25, // For headings
   normal: 1.5, // For body text (WCAG compliant)
@@ -144,7 +144,7 @@ export const LINE_HEIGHTS_V2 = {
 // ============================================
 // 4. LETTER SPACING
 // ============================================
-export const LETTER_SPACING_V2 = {
+export const LETTER_SPACING = {
   tightest: -1.5, // Hero display
   tighter: -1, // Large headings
   tight: -0.5, // Medium headings
@@ -164,41 +164,41 @@ export const TYPE_SCALE = {
   display: {
     hero: {
       fontFamily: FONTS.display.black,
-      fontSize: FONT_SIZES_V2.hero,
-      lineHeight: Math.round(FONT_SIZES_V2.hero * LINE_HEIGHTS_V2.tight),
-      letterSpacing: LETTER_SPACING_V2.tightest,
+      fontSize: FONT_SIZES.hero,
+      lineHeight: Math.round(FONT_SIZES.hero * LINE_HEIGHTS.tight),
+      letterSpacing: LETTER_SPACING.tightest,
       fontWeight: '700',
     } as TextStyle,
 
     h1: {
       fontFamily: FONTS.display.bold,
-      fontSize: FONT_SIZES_V2.display2,
-      lineHeight: Math.round(FONT_SIZES_V2.display2 * LINE_HEIGHTS_V2.snug),
-      letterSpacing: LETTER_SPACING_V2.tighter,
+      fontSize: FONT_SIZES.display2,
+      lineHeight: Math.round(FONT_SIZES.display2 * LINE_HEIGHTS.snug),
+      letterSpacing: LETTER_SPACING.tighter,
       fontWeight: '600',
     } as TextStyle,
 
     h2: {
       fontFamily: FONTS.display.bold,
-      fontSize: FONT_SIZES_V2.h1,
-      lineHeight: Math.round(FONT_SIZES_V2.h1 * LINE_HEIGHTS_V2.snug),
-      letterSpacing: LETTER_SPACING_V2.tight,
+      fontSize: FONT_SIZES.h1,
+      lineHeight: Math.round(FONT_SIZES.h1 * LINE_HEIGHTS.snug),
+      letterSpacing: LETTER_SPACING.tight,
       fontWeight: '600',
     } as TextStyle,
 
     h3: {
       fontFamily: FONTS.display.medium,
-      fontSize: FONT_SIZES_V2.h3,
-      lineHeight: Math.round(FONT_SIZES_V2.h3 * LINE_HEIGHTS_V2.snug),
-      letterSpacing: LETTER_SPACING_V2.tight,
+      fontSize: FONT_SIZES.h3,
+      lineHeight: Math.round(FONT_SIZES.h3 * LINE_HEIGHTS.snug),
+      letterSpacing: LETTER_SPACING.tight,
       fontWeight: '500',
     } as TextStyle,
 
     h4: {
       fontFamily: FONTS.display.medium,
-      fontSize: FONT_SIZES_V2.h4,
-      lineHeight: Math.round(FONT_SIZES_V2.h4 * LINE_HEIGHTS_V2.snug),
-      letterSpacing: LETTER_SPACING_V2.normal,
+      fontSize: FONT_SIZES.h4,
+      lineHeight: Math.round(FONT_SIZES.h4 * LINE_HEIGHTS.snug),
+      letterSpacing: LETTER_SPACING.normal,
       fontWeight: '500',
     } as TextStyle,
   },
@@ -209,49 +209,49 @@ export const TYPE_SCALE = {
   body: {
     large: {
       fontFamily: FONTS.body.regular,
-      fontSize: FONT_SIZES_V2.bodyLarge,
-      lineHeight: Math.round(FONT_SIZES_V2.bodyLarge * LINE_HEIGHTS_V2.relaxed),
-      letterSpacing: LETTER_SPACING_V2.normal,
+      fontSize: FONT_SIZES.bodyLarge,
+      lineHeight: Math.round(FONT_SIZES.bodyLarge * LINE_HEIGHTS.relaxed),
+      letterSpacing: LETTER_SPACING.normal,
       fontWeight: '400',
     } as TextStyle,
 
     base: {
       fontFamily: FONTS.body.regular,
-      fontSize: FONT_SIZES_V2.body,
-      lineHeight: Math.round(FONT_SIZES_V2.body * LINE_HEIGHTS_V2.normal),
-      letterSpacing: LETTER_SPACING_V2.normal,
+      fontSize: FONT_SIZES.body,
+      lineHeight: Math.round(FONT_SIZES.body * LINE_HEIGHTS.normal),
+      letterSpacing: LETTER_SPACING.normal,
       fontWeight: '400',
     } as TextStyle,
 
     medium: {
       fontFamily: FONTS.body.semibold,
-      fontSize: FONT_SIZES_V2.body,
-      lineHeight: Math.round(FONT_SIZES_V2.body * LINE_HEIGHTS_V2.normal),
-      letterSpacing: LETTER_SPACING_V2.normal,
+      fontSize: FONT_SIZES.body,
+      lineHeight: Math.round(FONT_SIZES.body * LINE_HEIGHTS.normal),
+      letterSpacing: LETTER_SPACING.normal,
       fontWeight: '500',
     } as TextStyle,
 
     small: {
       fontFamily: FONTS.body.regular,
-      fontSize: FONT_SIZES_V2.bodySmall,
-      lineHeight: Math.round(FONT_SIZES_V2.bodySmall * LINE_HEIGHTS_V2.normal),
-      letterSpacing: LETTER_SPACING_V2.wide,
+      fontSize: FONT_SIZES.bodySmall,
+      lineHeight: Math.round(FONT_SIZES.bodySmall * LINE_HEIGHTS.normal),
+      letterSpacing: LETTER_SPACING.wide,
       fontWeight: '400',
     } as TextStyle,
 
     caption: {
       fontFamily: FONTS.body.regular,
-      fontSize: FONT_SIZES_V2.caption,
-      lineHeight: Math.round(FONT_SIZES_V2.caption * LINE_HEIGHTS_V2.normal),
-      letterSpacing: LETTER_SPACING_V2.wide,
+      fontSize: FONT_SIZES.caption,
+      lineHeight: Math.round(FONT_SIZES.caption * LINE_HEIGHTS.normal),
+      letterSpacing: LETTER_SPACING.wide,
       fontWeight: '400',
     } as TextStyle,
 
     tiny: {
       fontFamily: FONTS.body.regular,
-      fontSize: FONT_SIZES_V2.tiny,
-      lineHeight: Math.round(FONT_SIZES_V2.tiny * LINE_HEIGHTS_V2.normal),
-      letterSpacing: LETTER_SPACING_V2.wide,
+      fontSize: FONT_SIZES.tiny,
+      lineHeight: Math.round(FONT_SIZES.tiny * LINE_HEIGHTS.normal),
+      letterSpacing: LETTER_SPACING.wide,
       fontWeight: '400',
     } as TextStyle,
   },
@@ -262,25 +262,25 @@ export const TYPE_SCALE = {
   label: {
     large: {
       fontFamily: FONTS.body.semibold,
-      fontSize: FONT_SIZES_V2.labelLarge,
-      lineHeight: Math.round(FONT_SIZES_V2.labelLarge * LINE_HEIGHTS_V2.tight),
-      letterSpacing: LETTER_SPACING_V2.wider,
+      fontSize: FONT_SIZES.labelLarge,
+      lineHeight: Math.round(FONT_SIZES.labelLarge * LINE_HEIGHTS.tight),
+      letterSpacing: LETTER_SPACING.wider,
       fontWeight: '600',
     } as TextStyle,
 
     base: {
       fontFamily: FONTS.body.semibold,
-      fontSize: FONT_SIZES_V2.label,
-      lineHeight: Math.round(FONT_SIZES_V2.label * LINE_HEIGHTS_V2.tight),
-      letterSpacing: LETTER_SPACING_V2.wider,
+      fontSize: FONT_SIZES.label,
+      lineHeight: Math.round(FONT_SIZES.label * LINE_HEIGHTS.tight),
+      letterSpacing: LETTER_SPACING.wider,
       fontWeight: '600',
     } as TextStyle,
 
     small: {
       fontFamily: FONTS.body.semibold,
-      fontSize: FONT_SIZES_V2.labelSmall,
-      lineHeight: Math.round(FONT_SIZES_V2.labelSmall * LINE_HEIGHTS_V2.tight),
-      letterSpacing: LETTER_SPACING_V2.widest,
+      fontSize: FONT_SIZES.labelSmall,
+      lineHeight: Math.round(FONT_SIZES.labelSmall * LINE_HEIGHTS.tight),
+      letterSpacing: LETTER_SPACING.widest,
       fontWeight: '600',
       textTransform: 'uppercase',
     } as TextStyle,
@@ -292,33 +292,33 @@ export const TYPE_SCALE = {
   mono: {
     price: {
       fontFamily: FONTS.mono.medium,
-      fontSize: FONT_SIZES_V2.price,
-      lineHeight: Math.round(FONT_SIZES_V2.price * LINE_HEIGHTS_V2.tight),
-      letterSpacing: LETTER_SPACING_V2.tight,
+      fontSize: FONT_SIZES.price,
+      lineHeight: Math.round(FONT_SIZES.price * LINE_HEIGHTS.tight),
+      letterSpacing: LETTER_SPACING.tight,
       fontWeight: '500',
     } as TextStyle,
 
     priceSmall: {
       fontFamily: FONTS.mono.medium,
-      fontSize: FONT_SIZES_V2.priceSmall,
-      lineHeight: Math.round(FONT_SIZES_V2.priceSmall * LINE_HEIGHTS_V2.tight),
-      letterSpacing: LETTER_SPACING_V2.tight,
+      fontSize: FONT_SIZES.priceSmall,
+      lineHeight: Math.round(FONT_SIZES.priceSmall * LINE_HEIGHTS.tight),
+      letterSpacing: LETTER_SPACING.tight,
       fontWeight: '500',
     } as TextStyle,
 
     stat: {
       fontFamily: FONTS.mono.medium,
-      fontSize: FONT_SIZES_V2.stat,
-      lineHeight: Math.round(FONT_SIZES_V2.stat * LINE_HEIGHTS_V2.tight),
-      letterSpacing: LETTER_SPACING_V2.tighter,
+      fontSize: FONT_SIZES.stat,
+      lineHeight: Math.round(FONT_SIZES.stat * LINE_HEIGHTS.tight),
+      letterSpacing: LETTER_SPACING.tighter,
       fontWeight: '500',
     } as TextStyle,
 
     code: {
       fontFamily: FONTS.mono.regular,
-      fontSize: FONT_SIZES_V2.bodySmall,
-      lineHeight: Math.round(FONT_SIZES_V2.bodySmall * LINE_HEIGHTS_V2.normal),
-      letterSpacing: LETTER_SPACING_V2.normal,
+      fontSize: FONT_SIZES.bodySmall,
+      lineHeight: Math.round(FONT_SIZES.bodySmall * LINE_HEIGHTS.normal),
+      letterSpacing: LETTER_SPACING.normal,
       fontWeight: '400',
     } as TextStyle,
   },
@@ -329,25 +329,25 @@ export const TYPE_SCALE = {
   button: {
     large: {
       fontFamily: FONTS.body.semibold,
-      fontSize: FONT_SIZES_V2.bodyLarge,
-      lineHeight: Math.round(FONT_SIZES_V2.bodyLarge * LINE_HEIGHTS_V2.tight),
-      letterSpacing: LETTER_SPACING_V2.wider,
+      fontSize: FONT_SIZES.bodyLarge,
+      lineHeight: Math.round(FONT_SIZES.bodyLarge * LINE_HEIGHTS.tight),
+      letterSpacing: LETTER_SPACING.wider,
       fontWeight: '600',
     } as TextStyle,
 
     base: {
       fontFamily: FONTS.body.semibold,
-      fontSize: FONT_SIZES_V2.body,
-      lineHeight: Math.round(FONT_SIZES_V2.body * LINE_HEIGHTS_V2.tight),
-      letterSpacing: LETTER_SPACING_V2.wider,
+      fontSize: FONT_SIZES.body,
+      lineHeight: Math.round(FONT_SIZES.body * LINE_HEIGHTS.tight),
+      letterSpacing: LETTER_SPACING.wider,
       fontWeight: '600',
     } as TextStyle,
 
     small: {
       fontFamily: FONTS.body.semibold,
-      fontSize: FONT_SIZES_V2.bodySmall,
-      lineHeight: Math.round(FONT_SIZES_V2.bodySmall * LINE_HEIGHTS_V2.tight),
-      letterSpacing: LETTER_SPACING_V2.wider,
+      fontSize: FONT_SIZES.bodySmall,
+      lineHeight: Math.round(FONT_SIZES.bodySmall * LINE_HEIGHTS.tight),
+      letterSpacing: LETTER_SPACING.wider,
       fontWeight: '600',
     } as TextStyle,
   },
@@ -358,18 +358,18 @@ export const TYPE_SCALE = {
   link: {
     base: {
       fontFamily: FONTS.body.semibold,
-      fontSize: FONT_SIZES_V2.body,
-      lineHeight: Math.round(FONT_SIZES_V2.body * LINE_HEIGHTS_V2.normal),
-      letterSpacing: LETTER_SPACING_V2.normal,
+      fontSize: FONT_SIZES.body,
+      lineHeight: Math.round(FONT_SIZES.body * LINE_HEIGHTS.normal),
+      letterSpacing: LETTER_SPACING.normal,
       fontWeight: '500',
       textDecorationLine: 'underline',
     } as TextStyle,
 
     small: {
       fontFamily: FONTS.body.semibold,
-      fontSize: FONT_SIZES_V2.bodySmall,
-      lineHeight: Math.round(FONT_SIZES_V2.bodySmall * LINE_HEIGHTS_V2.normal),
-      letterSpacing: LETTER_SPACING_V2.normal,
+      fontSize: FONT_SIZES.bodySmall,
+      lineHeight: Math.round(FONT_SIZES.bodySmall * LINE_HEIGHTS.normal),
+      letterSpacing: LETTER_SPACING.normal,
       fontWeight: '500',
       textDecorationLine: 'underline',
     } as TextStyle,
@@ -381,36 +381,36 @@ export const TYPE_SCALE = {
   feedback: {
     error: {
       fontFamily: FONTS.body.semibold,
-      fontSize: FONT_SIZES_V2.bodySmall,
-      lineHeight: Math.round(FONT_SIZES_V2.bodySmall * LINE_HEIGHTS_V2.normal),
-      letterSpacing: LETTER_SPACING_V2.normal,
+      fontSize: FONT_SIZES.bodySmall,
+      lineHeight: Math.round(FONT_SIZES.bodySmall * LINE_HEIGHTS.normal),
+      letterSpacing: LETTER_SPACING.normal,
       fontWeight: '500',
       color: COLORS.feedback.error,
     } as TextStyle,
 
     success: {
       fontFamily: FONTS.body.semibold,
-      fontSize: FONT_SIZES_V2.bodySmall,
-      lineHeight: Math.round(FONT_SIZES_V2.bodySmall * LINE_HEIGHTS_V2.normal),
-      letterSpacing: LETTER_SPACING_V2.normal,
+      fontSize: FONT_SIZES.bodySmall,
+      lineHeight: Math.round(FONT_SIZES.bodySmall * LINE_HEIGHTS.normal),
+      letterSpacing: LETTER_SPACING.normal,
       fontWeight: '500',
       color: COLORS.feedback.success,
     } as TextStyle,
 
     warning: {
       fontFamily: FONTS.body.semibold,
-      fontSize: FONT_SIZES_V2.bodySmall,
-      lineHeight: Math.round(FONT_SIZES_V2.bodySmall * LINE_HEIGHTS_V2.normal),
-      letterSpacing: LETTER_SPACING_V2.normal,
+      fontSize: FONT_SIZES.bodySmall,
+      lineHeight: Math.round(FONT_SIZES.bodySmall * LINE_HEIGHTS.normal),
+      letterSpacing: LETTER_SPACING.normal,
       fontWeight: '500',
       color: COLORS.feedback.warning,
     } as TextStyle,
 
     info: {
       fontFamily: FONTS.body.semibold,
-      fontSize: FONT_SIZES_V2.bodySmall,
-      lineHeight: Math.round(FONT_SIZES_V2.bodySmall * LINE_HEIGHTS_V2.normal),
-      letterSpacing: LETTER_SPACING_V2.normal,
+      fontSize: FONT_SIZES.bodySmall,
+      lineHeight: Math.round(FONT_SIZES.bodySmall * LINE_HEIGHTS.normal),
+      letterSpacing: LETTER_SPACING.normal,
       fontWeight: '500',
       color: COLORS.feedback.info,
     } as TextStyle,
@@ -421,9 +421,9 @@ export const TYPE_SCALE = {
   // ----------------------------------------
   overline: {
     fontFamily: FONTS.body.semibold,
-    fontSize: FONT_SIZES_V2.tiny,
-    lineHeight: Math.round(FONT_SIZES_V2.tiny * LINE_HEIGHTS_V2.normal),
-    letterSpacing: LETTER_SPACING_V2.widest,
+    fontSize: FONT_SIZES.tiny,
+    lineHeight: Math.round(FONT_SIZES.tiny * LINE_HEIGHTS.normal),
+    letterSpacing: LETTER_SPACING.widest,
     fontWeight: '600',
     textTransform: 'uppercase',
   } as TextStyle,
@@ -448,7 +448,7 @@ export const getAccessibleFontSize = (baseSize: number): number => {
  */
 export const getLineHeight = (
   fontSize: number,
-  ratio: number = LINE_HEIGHTS_V2.normal,
+  ratio: number = LINE_HEIGHTS.normal,
 ): number => {
   return Math.round(fontSize * ratio);
 };
@@ -478,7 +478,7 @@ export const createAccessibleTextStyle = (
 // ============================================
 // 7. TEXT VARIANTS (Semantic Aliases)
 // ============================================
-export const TEXT_VARIANTS_V2 = {
+export const TEXT_VARIANTS = {
   // Page titles
   pageTitle: TYPE_SCALE.display.h1,
   sectionTitle: TYPE_SCALE.display.h2,
@@ -526,7 +526,7 @@ export const TOUCH_TARGETS = {
 
 // Export types
 export type FontFamily = keyof typeof FONTS;
-export type FontSize = keyof typeof FONT_SIZES_V2;
+export type FontSize = keyof typeof FONT_SIZES;
 export type TypographyCategory = keyof typeof TYPE_SCALE;
 
 // ============================================
@@ -595,11 +595,11 @@ export const TYPOGRAPHY_SYSTEM = {
 export const typography = {
   // Font sizes (legacy)
   fontSize: {
-    xs: FONT_SIZES_V2.tiny,
-    sm: FONT_SIZES_V2.caption,
-    md: FONT_SIZES_V2.body,
-    lg: FONT_SIZES_V2.bodyLarge,
-    xl: FONT_SIZES_V2.h4,
+    xs: FONT_SIZES.tiny,
+    sm: FONT_SIZES.caption,
+    md: FONT_SIZES.body,
+    lg: FONT_SIZES.bodyLarge,
+    xl: FONT_SIZES.h4,
   },
 
   // Font weights (legacy)

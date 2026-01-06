@@ -44,7 +44,7 @@ import { useNavigation } from '@react-navigation/native';
 import Supercluster from 'supercluster';
 
 import { COLORS } from '@/constants/colors';
-import { FONT_SIZES_V2, FONTS } from '@/constants/typography';
+import { FONT_SIZES, FONTS } from '@/constants/typography';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { EnhancedSearchBar, NeonPulseMarker } from '../components';
@@ -734,14 +734,14 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   previewTitle: {
-    fontSize: FONT_SIZES_V2.h4,
+    fontSize: FONT_SIZES.h4,
     fontFamily: FONTS.display.bold,
     color: COLORS.text.onDark,
     fontWeight: '700',
     marginBottom: 4,
   },
   previewPrice: {
-    fontSize: FONT_SIZES_V2.bodyLarge,
+    fontSize: FONT_SIZES.bodyLarge,
     fontFamily: FONTS.mono.medium,
     color: COLORS.primary,
     fontWeight: '600',
@@ -753,7 +753,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   hostText: {
-    fontSize: FONT_SIZES_V2.bodySmall,
+    fontSize: FONT_SIZES.bodySmall,
     fontFamily: FONTS.body.regular,
     color: COLORS.textOnDarkSecondary,
   },
@@ -772,7 +772,7 @@ const styles = StyleSheet.create({
   },
   detailsText: {
     color: COLORS.primary,
-    fontSize: FONT_SIZES_V2.body,
+    fontSize: FONT_SIZES.body,
     fontFamily: FONTS.body.semibold,
     fontWeight: '600',
   },

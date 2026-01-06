@@ -45,7 +45,7 @@ import type { NavigationProp } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import { COLORS, GRADIENTS } from '@/constants/colors';
-import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
+import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import {
   FormStepIndicator,
@@ -756,7 +756,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   stepTitle: {
-    fontSize: FONT_SIZES_V2.h2,
+    fontSize: FONT_SIZES.h2,
     fontFamily: FONTS.display.bold,
     fontWeight: '800',
     color: COLORS.white,
@@ -764,7 +764,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   stepSubtitle: {
-    fontSize: FONT_SIZES_V2.bodySmall,
+    fontSize: FONT_SIZES.bodySmall,
     fontFamily: FONTS.body.regular,
     color: 'rgba(255,255,255,0.7)',
     textAlign: 'center',
@@ -986,7 +986,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   reviewTitle: {
-    fontSize: FONT_SIZES_V2.h3,
+    fontSize: FONT_SIZES.h3,
     fontFamily: FONTS.display.bold,
     fontWeight: 'bold',
     color: 'white',
@@ -1017,7 +1017,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   reviewMeta: {
-    fontSize: FONT_SIZES_V2.bodySmall,
+    fontSize: FONT_SIZES.bodySmall,
     fontFamily: FONTS.body.semibold,
     color: 'rgba(255,255,255,0.8)',
     fontWeight: '600',
@@ -1065,7 +1065,7 @@ const styles = StyleSheet.create({
   },
   dropButtonText: {
     color: 'white',
-    fontSize: FONT_SIZES_V2.bodyLarge,
+    fontSize: FONT_SIZES.bodyLarge,
     fontFamily: FONTS.body.bold,
     fontWeight: 'bold',
   },

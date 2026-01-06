@@ -9,7 +9,7 @@ import {
   IMAGE_VARIANTS_BY_CONTEXT,
 } from '@/utils/cloudflareImageHelpers';
 import { COLORS } from '@/constants/colors';
-import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
+import { FONTS, FONT_SIZES } from '@/constants/typography';
 import type { StoryItemProps } from './types';
 
 /**
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     color: COLORS.text.inverse,
   },
   username: {
-    fontSize: FONT_SIZES_V2.caption,
+    fontSize: FONT_SIZES.caption,
     fontFamily: FONTS.body.regular,
     color: COLORS.text.secondary,
     textAlign: 'center',

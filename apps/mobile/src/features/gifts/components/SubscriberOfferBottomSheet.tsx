@@ -34,7 +34,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 
 import { COLORS } from '@/constants/colors';
-import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
+import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { TMButton } from '@/components/ui/TMButton';
 import { logger } from '@/utils/logger';
@@ -435,14 +435,14 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: FONT_SIZES_V2.h2,
+    fontSize: FONT_SIZES.h2,
     fontFamily: FONTS.display.bold,
     fontWeight: '700',
     color: COLORS.text.primary,
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: FONT_SIZES_V2.body,
+    fontSize: FONT_SIZES.body,
     fontFamily: FONTS.body.regular,
     color: COLORS.text.secondary,
     marginBottom: 24,
@@ -458,19 +458,19 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   statusLabel: {
-    fontSize: FONT_SIZES_V2.body,
+    fontSize: FONT_SIZES.body,
     fontFamily: FONTS.body.regular,
     color: COLORS.text.secondary,
     flex: 1,
   },
   statusValue: {
-    fontSize: FONT_SIZES_V2.body,
+    fontSize: FONT_SIZES.body,
     fontFamily: FONTS.mono.medium,
     fontWeight: '700',
     color: COLORS.text.primary,
   },
   sectionTitle: {
-    fontSize: FONT_SIZES_V2.bodySmall,
+    fontSize: FONT_SIZES.bodySmall,
     fontFamily: FONTS.body.semibold,
     fontWeight: '600',
     color: COLORS.text.tertiary,
@@ -500,7 +500,7 @@ const styles = StyleSheet.create({
     backgroundColor: `${COLORS.primary}15`,
   },
   typeOptionText: {
-    fontSize: FONT_SIZES_V2.body,
+    fontSize: FONT_SIZES.body,
     fontFamily: FONTS.body.semibold,
     color: COLORS.text.tertiary,
   },
@@ -549,7 +549,7 @@ const styles = StyleSheet.create({
     backgroundColor: `${COLORS.feedback.error}15`,
   },
   validationText: {
-    fontSize: FONT_SIZES_V2.bodySmall,
+    fontSize: FONT_SIZES.bodySmall,
     fontFamily: FONTS.body.regular,
     flex: 1,
   },
@@ -563,7 +563,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surface.card,
     borderRadius: 16,
     padding: 16,
-    fontSize: FONT_SIZES_V2.body,
+    fontSize: FONT_SIZES.body,
     fontFamily: FONTS.body.regular,
     color: COLORS.text.primary,
     minHeight: 100,
