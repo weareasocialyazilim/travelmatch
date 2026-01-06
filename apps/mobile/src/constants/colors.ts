@@ -4,8 +4,22 @@
  * Felsefe: Twilight Zinc (Yumuşak Koyu) zemin üzerinde
  * GenZ enerjisini temsil eden yüksek kontrastlı Neon dokunuşlar.
  *
- * Bu dosya geriye dönük uyumluluk için flat color exports sağlar.
- * Yeni projeler için design-system/tokens/colors.ts kullanın.
+ * ═══════════════════════════════════════════════════════════════════
+ * ARCHITECTURE NOTE:
+ * ═══════════════════════════════════════════════════════════════════
+ * Bu dosya @travelmatch/design-system/tokens ile senkronize tutulmalıdır.
+ * Canonical source: packages/design-system/src/tokens/colors.ts
+ *
+ * Mobile flat exports (COLORS.primary) kullanırken,
+ * Design-system nested + flat aliases (COLORS.primary.main, COLORS.primaryMain) kullanır.
+ *
+ * MIGRATION PLAN (Phase 2 - Post-Launch):
+ * 1. Mobile bileşenlerini design-system tokens'a migrate et
+ * 2. Bu dosyayı design-system re-export'a dönüştür
+ * 3. Flat → Nested geçişi için alias layer ekle
+ *
+ * Şu an için backward compatibility korunuyor.
+ * ═══════════════════════════════════════════════════════════════════
  */
 
 // ═══════════════════════════════════════════════════════════════════

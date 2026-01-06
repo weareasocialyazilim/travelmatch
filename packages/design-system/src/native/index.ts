@@ -11,7 +11,28 @@
  */
 
 // =============================================================================
-// MIGRATION PLAN: Components to be moved from apps/mobile/src/components/ui/
+// MIGRATION STATUS: POST-LAUNCH (Phase 2)
+// =============================================================================
+//
+// DECISION (2026-01-06):
+// Mobile UI bileşenleri şu an apps/mobile/src/components/ui/ içinde kalacak.
+// Sebep: Expo-specific bağımlılıklar (expo-blur, expo-haptics, reanimated)
+//        ve mobile-only hooks (@/hooks/useMotion) nedeniyle tam migration
+//        production öncesi riskli.
+//
+// CURRENT STATE:
+// - TrustOrb: ✅ Migrated (tek bağımsız bileşen)
+// - Diğer bileşenler: apps/mobile/src/components/ui/ içinde
+// - Tokens: packages/design-system/src/tokens/ (canonical source)
+//
+// POST-LAUNCH MIGRATION PLAN:
+// 1. Mobile constants/colors.ts → design-system/tokens re-export
+// 2. Bileşen bağımlılıklarını (hooks, constants) design-system'e taşı
+// 3. Phase 1 bileşenlerini (TMButton, TMBadge, TMCard) migrate et
+// 4. Mobile'dan backward-compat re-export sağla
+//
+// =============================================================================
+// FUTURE PHASES (Post-Launch):
 // =============================================================================
 //
 // Phase 1 (Critical - Shared by multiple screens):
@@ -81,23 +102,32 @@ export type {
 
 // Placeholder exports - these will be replaced as components are migrated
 export const MIGRATION_STATUS = {
-  TMButton: 'pending',
-  TMBadge: 'pending',
-  TMCard: 'pending',
-  LiquidInput: 'pending',
-  TMAvatar: 'pending',
-  LiquidBottomSheet: 'pending',
-  LiquidSegmentedControl: 'pending',
-  LiquidSelection: 'pending',
-  TMTrustRing: 'pending',
-  TrustOrb: 'done', // ✅ Migrated (formerly TrustConstellation)
-  TrustScoreCircle: 'pending',
-  SuccessCeremony: 'pending',
-  TMLoading: 'pending',
-  TMSkeleton: 'pending',
-  OptimizedImage: 'pending',
-  GlassCard: 'pending',
-  GlassModal: 'pending',
+  // ✅ DONE
+  TrustOrb: 'done',
+
+  // 🚀 POST-LAUNCH (Phase 1 - Critical)
+  TMButton: 'post-launch',
+  TMBadge: 'post-launch',
+  TMCard: 'post-launch',
+  LiquidInput: 'post-launch',
+  TMAvatar: 'post-launch',
+
+  // 🚀 POST-LAUNCH (Phase 2 - Liquid)
+  LiquidBottomSheet: 'post-launch',
+  LiquidSegmentedControl: 'post-launch',
+  LiquidSelection: 'post-launch',
+
+  // 🚀 POST-LAUNCH (Phase 3 - Trust)
+  TMTrustRing: 'post-launch',
+  TrustScoreCircle: 'post-launch',
+  SuccessCeremony: 'post-launch',
+
+  // 🚀 POST-LAUNCH (Phase 4 - Utility)
+  TMLoading: 'post-launch',
+  TMSkeleton: 'post-launch',
+  OptimizedImage: 'post-launch',
+  GlassCard: 'post-launch',
+  GlassModal: 'post-launch',
 } as const;
 
 // =============================================================================
