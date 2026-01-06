@@ -606,6 +606,26 @@
   "tagline": {
     "main": "Share moments, gift experiences"
   },
+  "feedback": {
+    "title": "Share Your Feedback",
+    "subtitle": "Help us improve your experience",
+    "ratingQuestion": "How would you rate your experience?",
+    "categoryLabel": "Category (optional)",
+    "commentLabel": "Additional comments (optional)",
+    "commentPlaceholder": "Tell us more about your experience...",
+    "submitButton": "Submit Feedback",
+    "submitting": "Submitting...",
+    "categories": {
+      "suspiciousActivity": "Suspicious Activity 🚨",
+      "fakeProfile": "Fake Profile",
+      "inappropriateContent": "Inappropriate Content",
+      "fraudSuspicion": "Fraud Suspicion",
+      "giftIssue": "Gift Issue",
+      "generalFeedback": "General Feedback",
+      "bugReport": "Bug Report",
+      "featureRequest": "Feature Request"
+    }
+  },
   "screens": {
     "linkInvalid": {
       "title": "Invalid Link",

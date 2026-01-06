@@ -96,7 +96,7 @@ module.exports = {
     'DeleteMomentDialog\\.test\\.tsx$',
     'DeleteProofModal\\.test\\.tsx$',
     'ErrorRecoveryComponents\\.test\\.tsx$',
-    'FeedbackModal\\.test\\.tsx$',
+    // 'FeedbackModal\\.test\\.tsx$', // FIXED: Migrated from UNSAFE_getByType to testID + i18n support
     'FilterBottomSheet\\.test\\.tsx$',
     'FilterPill\\.test\\.tsx$',
     'FormComponents\\.test\\.tsx$',
