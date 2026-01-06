@@ -13,6 +13,7 @@ import {
   TextInput,
   TouchableOpacity,
   TextInputProps,
+  ViewStyle,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, {
@@ -113,7 +114,7 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
   }, [filterScale]);
 
   // Animated styles
-  const containerStyle = useAnimatedStyle(() => ({
+  const _containerStyle = useAnimatedStyle(() => ({
     borderColor:
       interpolate(focusAnimation.value, [0, 1], [0, 1]) === 1
         ? COLORS.primary
@@ -130,7 +131,12 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
         intensity={20}
         padding={0}
         borderRadius={20}
-        style={[styles.searchWrapper, isFocused && styles.searchWrapperFocused]}
+        style={
+          StyleSheet.flatten([
+            styles.searchWrapper,
+            isFocused && styles.searchWrapperFocused,
+          ]) as ViewStyle
+        }
       >
         <View style={styles.innerContainer}>
           {/* Search Icon */}

@@ -11,13 +11,8 @@ import type {
   ListResult,
   FollowerRecord,
   FollowingRecord,
-  okSingle,
-  okList,
 } from './types';
-import { okSingle as _okSingle, okList as _okList } from './types';
-
-const okSingle = _okSingle;
-const okList = _okList;
+import { okSingle, okList } from './types';
 
 /**
  * Users Service - Profile queries

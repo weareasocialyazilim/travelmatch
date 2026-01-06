@@ -11,8 +11,12 @@ describe('ErrorState', () => {
     it('should render with default props', () => {
       const { getByText } = render(<ErrorState />);
 
-      expect(getByText('Oops!')).toBeTruthy();
-      expect(getByText('Something went wrong')).toBeTruthy();
+      expect(getByText('Bir Sorun Var')).toBeTruthy();
+      expect(
+        getByText(
+          'Sistemlerimizde ipeksi olmayan bir şeyler oldu. Lütfen tekrar dene.',
+        ),
+      ).toBeTruthy();
     });
 
     it('should render custom error message', () => {
@@ -20,7 +24,7 @@ describe('ErrorState', () => {
       const { getByText } = render(<ErrorState message={customMessage} />);
 
       expect(getByText(customMessage)).toBeTruthy();
-      expect(getByText('Oops!')).toBeTruthy();
+      expect(getByText('Bir Sorun Var')).toBeTruthy();
     });
 
     it('should render custom retry text', () => {
@@ -35,13 +39,13 @@ describe('ErrorState', () => {
     it('should not render retry button when onRetry is not provided', () => {
       const { queryByText } = render(<ErrorState />);
 
-      expect(queryByText('Try Again')).toBeNull();
+      expect(queryByText('Tekrar Dene')).toBeNull();
     });
 
     it('should render retry button when onRetry is provided', () => {
       const { getByText } = render(<ErrorState onRetry={jest.fn()} />);
 
-      expect(getByText('Try Again')).toBeTruthy();
+      expect(getByText('Tekrar Dene')).toBeTruthy();
     });
   });
 
@@ -50,7 +54,7 @@ describe('ErrorState', () => {
       const mockOnRetry = jest.fn() as jest.Mock;
       const { getByText } = render(<ErrorState onRetry={mockOnRetry} />);
 
-      const retryButton = getByText('Try Again');
+      const retryButton = getByText('Tekrar Dene');
       fireEvent.press(retryButton);
 
       expect(mockOnRetry).toHaveBeenCalledTimes(1);
@@ -60,7 +64,7 @@ describe('ErrorState', () => {
       const mockOnRetry = jest.fn() as jest.Mock;
       const { getByText } = render(<ErrorState onRetry={mockOnRetry} />);
 
-      const retryButton = getByText('Try Again');
+      const retryButton = getByText('Tekrar Dene');
       fireEvent.press(retryButton);
       fireEvent.press(retryButton);
       fireEvent.press(retryButton);
@@ -90,7 +94,7 @@ describe('ErrorState', () => {
     it('should handle empty message', () => {
       const { getByText } = render(<ErrorState message="" />);
 
-      expect(getByText('Oops!')).toBeTruthy();
+      expect(getByText('Bir Sorun Var')).toBeTruthy();
     });
 
     it('should handle long error messages', () => {

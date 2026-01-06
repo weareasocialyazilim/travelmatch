@@ -25,6 +25,7 @@ const RESEND_COOLDOWN = 60;
 
 export const VerifyCodeScreen: React.FC = () => {
   const navigation = useNavigation();
+  const route = useRoute<'VerifyCode'>();
   const { showToast } = useToast();
   const { props: a11y } = useAccessibility();
 
@@ -112,10 +113,16 @@ export const VerifyCodeScreen: React.FC = () => {
   const handleResend = async () => {
     if (resendCooldown > 0) return;
 
+    const email = route.params?.email;
+    if (!email) {
+      showToast('Email not found', 'error');
+      return;
+    }
+
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setIsLoading(true);
     try {
-      const { error } = await resendOtp();
+      const { error } = await resendOtp(email);
       if (error) {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         showToast(error.message || 'Failed to resend code', 'error');

@@ -196,6 +196,8 @@ export const useMessages = (): UseMessagesReturn => {
         senderId: 'current-user', // Will be updated with real sender
         content: data.content || '',
         type: data.type || 'text',
+        metadata: null,
+        readAt: null,
         imageUrl: data.imageUrl,
         location: data.location,
         createdAt: new Date().toISOString(),
@@ -405,6 +407,8 @@ export const useMessages = (): UseMessagesReturn => {
             senderId: String(dbMessage.sender_id || ''),
             content: String(dbMessage.content || ''),
             type: (dbMessage.type as MessageType) || 'text',
+            metadata: null,
+            readAt: dbMessage.read_at ? String(dbMessage.read_at) : null,
             imageUrl: dbMessage.image_url
               ? String(dbMessage.image_url)
               : undefined,
@@ -439,9 +443,7 @@ export const useMessages = (): UseMessagesReturn => {
                 return {
                   ...msg,
                   content: String(dbMessage.content || msg.content),
-                  readAt: dbMessage.read_at
-                    ? String(dbMessage.read_at)
-                    : undefined,
+                  readAt: dbMessage.read_at ? String(dbMessage.read_at) : null,
                 };
               }
               return msg;

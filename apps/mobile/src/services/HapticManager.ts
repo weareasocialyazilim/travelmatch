@@ -37,7 +37,11 @@ import { logger } from '../utils/logger';
 
 export type HapticIntensity = 'light' | 'medium' | 'heavy';
 export type HapticNotification = 'success' | 'warning' | 'error';
-export type HapticPattern = 'impact' | 'notification' | 'selection' | 'sequence';
+export type HapticPattern =
+  | 'impact'
+  | 'notification'
+  | 'selection'
+  | 'sequence';
 
 interface HapticConfig {
   enabled: boolean;
@@ -45,7 +49,7 @@ interface HapticConfig {
   soundEnabled: boolean;
 }
 
-interface HapticEvent {
+interface _HapticEvent {
   type: string;
   timestamp: number;
   intensity?: HapticIntensity;
@@ -232,13 +236,19 @@ class HapticManagerClass {
     try {
       switch (type) {
         case 'success':
-          await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          await Haptics.notificationAsync(
+            Haptics.NotificationFeedbackType.Success,
+          );
           break;
         case 'warning':
-          await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+          await Haptics.notificationAsync(
+            Haptics.NotificationFeedbackType.Warning,
+          );
           break;
         case 'error':
-          await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          await Haptics.notificationAsync(
+            Haptics.NotificationFeedbackType.Error,
+          );
           break;
       }
     } catch (error) {

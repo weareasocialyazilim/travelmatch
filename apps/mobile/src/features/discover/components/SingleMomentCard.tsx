@@ -6,10 +6,15 @@ import { COLORS } from '@/constants/colors';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import type { MomentCardProps } from './types';
 
-export const SingleMomentCard: React.FC<MomentCardProps> = memo(
+interface SingleMomentCardProps {
+  item: MomentCardProps;
+  onPress: (item: MomentCardProps) => void;
+}
+
+export const SingleMomentCard: React.FC<SingleMomentCardProps> = memo(
   ({ item, onPress }) => {
     const creatorName = item.user?.name || 'Anonim';
-    const locationName = item.location?.city || 'Bilinmiyor';
+    const locationName = item.location || 'Bilinmiyor';
 
     return (
       <TouchableOpacity
@@ -46,7 +51,7 @@ export const SingleMomentCard: React.FC<MomentCardProps> = memo(
             <View style={styles.creatorInfo}>
               <View style={styles.creatorNameRow}>
                 <Text style={styles.creatorName}>{creatorName}</Text>
-                {item.user?.isVerified && (
+                {item.user?.verified && (
                   <MaterialCommunityIcons
                     name="check-decagram"
                     size={14}
@@ -64,9 +69,9 @@ export const SingleMomentCard: React.FC<MomentCardProps> = memo(
           </Text>
 
           {/* Story Description */}
-          {item.story && (
+          {item.story?.excerpt && (
             <Text style={styles.storyDescription} numberOfLines={2}>
-              {item.story}
+              {item.story.excerpt}
             </Text>
           )}
 

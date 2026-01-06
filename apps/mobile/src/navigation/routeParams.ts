@@ -313,7 +313,6 @@ export type RootStackParamList = {
   CommunityGuidelines: undefined;
   SafetyTips: undefined;
   Emergency: undefined;
-  DietaryPreferences: undefined;
   Referral: undefined;
 
   // Deep Link Error Screens
@@ -399,4 +398,29 @@ export type RootStackParamList = {
 
   // Promo Code
   PromoCode: undefined;
+
+  // Share Profile Preview
+  SharePreview: undefined;
+
+  // Bulk Thank You (thank donors for a moment)
+  BulkThankYou: {
+    momentId: string;
+    momentTitle: string;
+    donors: Array<{
+      id: string;
+      name: string;
+      avatar: string;
+      totalAmount: number;
+      giftCount: number;
+      hasChatAccess: boolean;
+    }>;
+  };
+
+  // Gift Selection (choose gift for recipient)
+  GiftSelection: {
+    recipientId: string;
+    recipientName: string;
+    recipientAvatar: string;
+    topMomentId?: string;
+  };
 };

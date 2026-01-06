@@ -213,6 +213,9 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
     'UnifiedGiftFlowScreen',
   );
 
+  const { impact } = useHaptics();
+  const { trackEvent } = useAnalytics();
+
   useEffect(() => {
     trackMount();
   }, [trackMount]);
@@ -276,9 +279,6 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
     };
   }, [pendingTransactionId, loading, impact, trackEvent, moment.id]);
 
-  const { impact } = useHaptics();
-  const { trackEvent } = useAnalytics();
-
   // Handle payment method selection
   const handleSelectPayment = useCallback(
     (paymentId: string) => {
@@ -307,11 +307,10 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
         // Create PayTR payment via secure service
         const paymentResponse = await securePaymentService.createPayment({
           amount: moment.price,
-          currency: moment.currency || 'TRY',
+          currency: (moment.currency || 'TRY') as 'TRY' | 'EUR' | 'USD' | 'GBP',
           momentId: moment.id,
-          recipientId,
-          message: data.message,
-          paymentMethodId: selectedPayment,
+          description: data.message,
+          metadata: { recipientId, paymentMethodId: selectedPayment },
         });
 
         // Set transaction ID for realtime webhook subscription
@@ -873,11 +872,6 @@ const styles = StyleSheet.create({
   momentLocation: {
     ...TYPOGRAPHY.bodySmall,
     color: COLORS.text.secondary,
-  },
-  momentPrice: {
-    ...TYPOGRAPHY.h4,
-    fontWeight: '700',
-    color: COLORS.brand.primary,
   },
   // Fixed Price Section (Creator-Set Price)
   fixedPriceSection: {

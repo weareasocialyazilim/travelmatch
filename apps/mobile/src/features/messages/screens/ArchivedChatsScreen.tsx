@@ -116,10 +116,10 @@ export const ArchivedChatsScreen: React.FC = () => {
         name: chat.name,
         avatar: chat.avatar,
         isVerified: chat.isVerified,
-        type: 'moment_host', // Updated from 'traveler'
-        role: 'Anı Sahibi', // Updated from 'Traveler'
-        kyc: chat.isVerified ? 'Doğrulanmış' : 'Doğrulanmamış',
-        location: 'Bilinmiyor',
+        type: 'local' as const,
+        role: 'Local' as const,
+        kyc: chat.isVerified ? 'Verified' : 'Pending',
+        location: 'Unknown',
       },
     });
   };

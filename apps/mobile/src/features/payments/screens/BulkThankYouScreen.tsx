@@ -273,7 +273,7 @@ export const BulkThankYouScreen: React.FC = () => {
 
         // Get signed upload URL from Supabase Storage
         const fileName = `bulk-thank-you/${momentId}/${Date.now()}.mp4`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
+        const { data: _uploadData, error: uploadError } = await supabase.storage
           .from('videos')
           .upload(fileName, {
             uri: videoUri,

@@ -19,10 +19,9 @@ import {
   Platform,
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -42,7 +41,6 @@ import {
   ProfileMomentCard,
   MomentsTabs,
 } from '../components';
-import { COLORS } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useMoments, type Moment } from '@/hooks/useMoments';
 import { userService } from '@/services/userService';
@@ -401,8 +399,9 @@ const ProfileScreen: React.FC = () => {
             <GlassCard intensity={15} style={styles.constellationCard}>
               <View style={styles.constellationContainer}>
                 <TrustConstellation
-                  trustScore={userData.trustScore || 80}
-                  size={280}
+                  score={userData.trustScore || 80}
+                  milestones={[]}
+                  size="lg"
                 />
               </View>
               <View style={styles.trustLegend}>

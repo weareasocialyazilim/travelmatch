@@ -1,13 +1,14 @@
 /**
- * Avatar Component Test Suite
+ * TMAvatar Component Test Suite
  * Tests avatar component with images, initials, badges, and verification
+ * Updated to use TMAvatar (renamed from Avatar)
  */
 
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import { Avatar } from '../Avatar';
+import { TMAvatar as Avatar } from '../TMAvatar';
 
-describe('Avatar Component', () => {
+describe('TMAvatar Component', () => {
   // ============================================
   // Basic Rendering Tests
   // ============================================
@@ -28,12 +29,12 @@ describe('Avatar Component', () => {
 
     it('renders with accessibility label', () => {
       const { getByLabelText } = render(<Avatar name="John Doe" />);
-      expect(getByLabelText('Avatar of John Doe')).toBeTruthy();
+      expect(getByLabelText("John Doe's avatar")).toBeTruthy();
     });
 
     it('renders with default accessibility label when no name', () => {
       const { getByLabelText } = render(<Avatar />);
-      expect(getByLabelText('Avatar')).toBeTruthy();
+      expect(getByLabelText('User avatar')).toBeTruthy();
     });
   });
 
@@ -77,9 +78,9 @@ describe('Avatar Component', () => {
       expect(getByText('JD')).toBeTruthy();
     });
 
-    it('displays single initial for single name', () => {
+    it('displays two chars for single name', () => {
       const { getByText } = render(<Avatar name="John" />);
-      expect(getByText('J')).toBeTruthy();
+      expect(getByText('JO')).toBeTruthy(); // TMAvatar uses first 2 chars
     });
 
     it('displays two initials for full name', () => {
@@ -297,9 +298,9 @@ describe('Avatar Component', () => {
         </>,
       );
 
-      expect(getByText('A')).toBeTruthy();
-      expect(getByText('B')).toBeTruthy();
-      expect(getByText('C')).toBeTruthy();
+      expect(getByText('AL')).toBeTruthy();
+      expect(getByText('BO')).toBeTruthy();
+      expect(getByText('CH')).toBeTruthy();
     });
   });
 
@@ -343,7 +344,7 @@ describe('Avatar Component', () => {
 
     it('handles name with numbers', () => {
       const { getByText } = render(<Avatar name="User123" />);
-      expect(getByText('U')).toBeTruthy();
+      expect(getByText('US')).toBeTruthy();
     });
 
     it('renders with very small badge color', () => {
@@ -415,26 +416,26 @@ describe('Avatar Component', () => {
   describe('Accessibility', () => {
     it('provides accessible label with name', () => {
       const { getByLabelText } = render(<Avatar name="John Doe" />);
-      expect(getByLabelText('Avatar of John Doe')).toBeTruthy();
+      expect(getByLabelText("John Doe's avatar")).toBeTruthy();
     });
 
     it('provides default accessible label without name', () => {
       const { getByLabelText } = render(<Avatar />);
-      expect(getByLabelText('Avatar')).toBeTruthy();
+      expect(getByLabelText('User avatar')).toBeTruthy();
     });
 
     it('maintains accessibility with image', () => {
       const { getByLabelText } = render(
         <Avatar source="https://example.com/avatar.jpg" name="John Doe" />,
       );
-      expect(getByLabelText('Avatar of John Doe')).toBeTruthy();
+      expect(getByLabelText("John Doe's avatar")).toBeTruthy();
     });
 
     it('maintains accessibility with all features', () => {
       const { getByLabelText } = render(
         <Avatar name="Jane Smith" showBadge={true} showVerified={true} />,
       );
-      expect(getByLabelText('Avatar of Jane Smith')).toBeTruthy();
+      expect(getByLabelText("Jane Smith's avatar")).toBeTruthy();
     });
   });
 
@@ -458,7 +459,7 @@ describe('Avatar Component', () => {
         </>,
       );
 
-      expect(getByText('B')).toBeTruthy(); // Bob has no source, shows initials
+      expect(getByText('BO')).toBeTruthy(); // Bob has no source, shows initials
     });
 
     it('handles rapid prop changes', () => {

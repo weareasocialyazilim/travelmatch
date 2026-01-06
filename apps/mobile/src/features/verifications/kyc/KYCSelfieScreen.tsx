@@ -33,9 +33,7 @@ import Animated, {
   withTiming,
   withDelay,
   Easing,
-  interpolate,
   cancelAnimation,
-  runOnJS,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
@@ -285,7 +283,7 @@ const KYCSelfieScreen: React.FC = () => {
   const [livenessProgress, setLivenessProgress] = useState(0);
 
   const buttonScale = useSharedValue(1);
-  const statusOpacity = useSharedValue(0);
+  const _statusOpacity = useSharedValue(0);
 
   const buttonAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: buttonScale.value }],
@@ -610,6 +608,7 @@ const KYCSelfieScreen: React.FC = () => {
 };
 
 // Animated scanning dot
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ScanningDot: React.FC<{ index: number }> = ({ index }) => {
   const opacity = useSharedValue(0.3);
 
@@ -784,10 +783,6 @@ const styles = StyleSheet.create({
   statusText: {
     ...KYC_TYPOGRAPHY.body,
     fontWeight: '600',
-  },
-  scanningDots: {
-    flexDirection: 'row',
-    gap: 4,
   },
   scanDot: {
     width: 6,

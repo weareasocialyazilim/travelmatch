@@ -20,8 +20,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS, primitives, GRADIENTS } from '@/constants/colors';
+import { COLORS } from '@/constants/colors';
 import { useEmailVerification } from '@/hooks/useEmailVerification';
 import { useAuth } from '@/context/AuthContext';
 

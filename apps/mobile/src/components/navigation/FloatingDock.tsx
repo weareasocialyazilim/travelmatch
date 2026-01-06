@@ -15,14 +15,12 @@ import Animated, {
   useSharedValue,
   withSpring,
   withTiming,
-  interpolate,
-  Extrapolation,
   withRepeat,
   withSequence,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { COLORS } from '@/theme/colors';
+import { COLORS } from '@/constants/colors';
 
 // Neon colors for gift badge
 const NEON = {
@@ -126,7 +124,7 @@ export const FloatingDock: React.FC<BottomTabBarProps> = ({
       <BlurView intensity={40} tint="dark" style={styles.blurContainer}>
         <View style={styles.container}>
           {state.routes.map((route, index) => {
-            const { options } = descriptors[route.key];
+            const { options: _options } = descriptors[route.key];
             const isFocused = state.index === index;
             const isCenter = route.name === 'Create';
 

@@ -53,10 +53,10 @@ export const KYCProgressBar: React.FC<KYCProgressBarProps> = ({
     glowPulse.value = withRepeat(
       withSequence(
         withTiming(1, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0, { duration: 1500, easing: Easing.inOut(Easing.ease) })
+        withTiming(0, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
       ),
       -1,
-      false
+      false,
     );
   }, [glowPulse]);
 
@@ -126,7 +126,9 @@ export const KYCProgressBar: React.FC<KYCProgressBarProps> = ({
                     />
                   ) : (
                     <MaterialCommunityIcons
-                      name={step.icon}
+                      name={
+                        step.icon as keyof typeof MaterialCommunityIcons.glyphMap
+                      }
                       size={16}
                       color={
                         isActive

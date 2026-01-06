@@ -51,7 +51,6 @@ import { EnhancedSearchBar, NeonPulseMarker } from '../components';
 import BottomNav from '@/components/BottomNav';
 // Using useDiscoverMoments for PostGIS-based location discovery
 import { useDiscoverMoments } from '@/hooks/useDiscoverMoments';
-import { useMoments } from '@/hooks/useMoments';
 import { useSubscription } from '@/features/payments/hooks/usePayments';
 import { supabase } from '@/config/supabase';
 import TrustBadge from '@/components/ui/TMBadge';
@@ -75,13 +74,15 @@ let MapboxGL: typeof import('@rnmapbox/maps').default | null = null;
 if (isMapboxConfigured) {
   try {
     MapboxGL = require('@rnmapbox/maps').default;
-    MapboxGL.setAccessToken(MAPBOX_TOKEN);
+    if (MapboxGL) {
+      MapboxGL.setAccessToken(MAPBOX_TOKEN);
+    }
   } catch (error) {
     console.warn('[SearchMapScreen] Failed to load Mapbox:', error);
   }
 }
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: _SCREEN_WIDTH } = Dimensions.get('window');
 
 // Sunset Proof Palette - Neon renkleri
 const SUNSET_PALETTE = {
@@ -146,7 +147,7 @@ const SearchMapScreen: React.FC = () => {
   const {
     moments: discoveryMoments,
     loading: momentsLoading,
-    userLocation: discoveryLocation,
+    userLocation: _discoveryLocation,
   } = useDiscoverMoments();
   const moments = discoveryMoments;
   const { subscription } = useSubscription();
@@ -157,16 +158,15 @@ const SearchMapScreen: React.FC = () => {
   const [selectedMoment, setSelectedMoment] = useState<MomentMarker | null>(
     null,
   );
-  const [hasActiveFilters, setHasActiveFilters] = useState(false);
+  const [hasActiveFilters, _setHasActiveFilters] = useState(false);
   const [_mapLoaded, setMapLoaded] = useState(false);
-  const [mapError, setMapError] = useState<string | null>(null);
-  const [currentZoom, setCurrentZoom] = useState(13);
+  const [mapError, _setMapError] = useState<string | null>(null);
+  const [currentZoom, _setCurrentZoom] = useState(13);
 
   // Animations
   const locationButtonScale = useSharedValue(1);
-  const priceAnimations = useRef<Map<string, Animated.SharedValue<number>>>(
-    new Map(),
-  );
+
+  const priceAnimations = useRef<Map<string, any>>(new Map());
 
   // Determine location jitter level based on user tier
   // Privacy protection: non-premium users see approximate locations
@@ -245,7 +245,7 @@ const SearchMapScreen: React.FC = () => {
       },
     }));
 
-    cluster.load(points);
+    cluster.load(points as any);
     return cluster;
   }, [mapMarkers]);
 
@@ -515,7 +515,7 @@ const SearchMapScreen: React.FC = () => {
                 <NeonPulseMarker
                   price={marker?.price || '₺0'}
                   isSelected={selectedMoment?.id === marker?.id}
-                  size="medium"
+                  size="md"
                   accentColor={accentColor}
                   isPlatinumShimmer={isPlatinumShimmer}
                   isPopular={isPopular}

@@ -100,8 +100,16 @@ export const messagesApi = {
       throw new Error('Gift not found or you are not the recipient');
     }
 
+    // Cast to proper type after null check
+    const giftData = gift as {
+      id: string;
+      amount: number;
+      currency: string;
+      status: string;
+    };
+
     // CRITICAL: Enforce $30 minimum for chat unlock (Tier 2+)
-    const chatEligibility = determineChatTier(gift.amount || 0);
+    const chatEligibility = determineChatTier(giftData.amount || 0);
     if (chatEligibility.tier === 'none') {
       throw new Error(
         `Chat cannot be unlocked for gifts under $30. ${chatEligibility.messageTR}`,
@@ -297,8 +305,17 @@ export const messagesApi = {
         throw new Error('Gift not found');
       }
 
+      // Cast to proper type after null check
+      const giftData = gift as {
+        id: string;
+        amount: number;
+        currency: string;
+        host_approved: boolean;
+        status: string;
+      };
+
       // Determine chat tier based on gift amount
-      const chatEligibility = determineChatTier(gift.amount || 0);
+      const chatEligibility = determineChatTier(giftData.amount || 0);
 
       // Tier 1: No chat allowed
       if (chatEligibility.tier === 'none') {
@@ -306,7 +323,7 @@ export const messagesApi = {
       }
 
       // Tier 2 & 3: Requires host approval (Sohbeti Başlat)
-      if (chatEligibility.requiresApproval && !gift.host_approved) {
+      if (chatEligibility.requiresApproval && !giftData.host_approved) {
         throw new Error(
           'Chat requires host approval. Wait for the host to start the conversation.',
         );

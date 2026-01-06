@@ -22,7 +22,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
-import { FONTS, FONT_SIZES_V2, TYPE_SCALE } from '@/constants/typography';
+import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
 import type { SubscriptionTier } from '../services/momentsService';
 

@@ -79,7 +79,7 @@ export const GiftInboxCard: React.FC<GiftInboxCardProps> = ({
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     showAlert({
       title: '💬 Parayı Al + Chat Aç',
-      message: `${item.sender.name} ile chat başlatmak istiyor musunuz? Hediyeyi kabul edip chat\'i açacaksınız.`,
+      message: `${item.sender.name} ile chat başlatmak istiyor musunuz? Hediyeyi kabul edip chati açacaksınız.`,
       buttons: [
         { text: 'İptal', style: 'cancel' },
         {

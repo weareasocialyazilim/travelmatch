@@ -248,10 +248,13 @@ const PaymentMethodsScreen = () => {
       <WalletOptionsModal
         visible={isWalletOptionsVisible}
         wallet={selectedWallet}
-        settings={walletSettings}
         onClose={() => {
           setIsWalletOptionsVisible(false);
           setSelectedWallet(null);
+        }}
+        onSetDefault={() => {
+          // TODO: Implement set default wallet
+          setIsWalletOptionsVisible(false);
         }}
         onConfigure={() => {
           setIsWalletOptionsVisible(false);

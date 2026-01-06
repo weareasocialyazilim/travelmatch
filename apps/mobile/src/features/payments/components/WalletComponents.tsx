@@ -185,7 +185,7 @@ export const WalletConfigModal: React.FC<WalletConfigModalProps> = ({
   wallet,
   settings,
   onClose,
-  onSave,
+  onSave: _onSave,
 }) => {
   if (!visible || !wallet) return null;
 

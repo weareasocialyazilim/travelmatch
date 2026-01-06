@@ -47,7 +47,7 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: _SCREEN_WIDTH } = Dimensions.get('window');
 
 type GiftSuccessParams = {
   GiftSuccess: {
@@ -167,7 +167,7 @@ export const GiftSuccessScreen: React.FC = () => {
   const route = useRoute<RouteProp<GiftSuccessParams, 'GiftSuccess'>>();
   const {
     momentTitle,
-    momentImage,
+    momentImage: _momentImage,
     amount,
     recipientName,
     conversationId,

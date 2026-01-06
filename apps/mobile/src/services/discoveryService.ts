@@ -93,7 +93,12 @@ export async function discoverNearbyMoments(
   } = params;
 
   try {
-    const { data, error } = await supabase.rpc('discover_nearby_moments', {
+    const { data, error } = await (
+      supabase.rpc as (
+        fn: string,
+        params: Record<string, unknown>,
+      ) => ReturnType<typeof supabase.rpc>
+    )('discover_nearby_moments', {
       p_lat: latitude,
       p_lng: longitude,
       p_radius_km: radiusKm,
@@ -111,8 +116,8 @@ export async function discoverNearbyMoments(
       return discoverMomentsFallback(params);
     }
 
-    const moments = (data || []).slice(0, limit) as DiscoveryMoment[];
-    const hasMore = (data?.length || 0) > limit;
+    const moments = ((data || []) as DiscoveryMoment[]).slice(0, limit);
+    const hasMore = ((data as DiscoveryMoment[] | null)?.length || 0) > limit;
     const nextCursor =
       hasMore && moments.length > 0
         ? moments[moments.length - 1].id

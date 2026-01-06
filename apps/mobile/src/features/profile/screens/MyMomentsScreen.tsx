@@ -72,7 +72,7 @@ const MyMomentsScreen: React.FC = () => {
         id: moment.hostId,
         name: moment.hostName,
         avatar: moment.hostAvatar,
-        type: 'host',
+        type: 'local',
         isVerified: true,
         location: locationStr,
         travelDays: 0,

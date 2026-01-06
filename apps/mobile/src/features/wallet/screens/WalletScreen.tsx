@@ -76,6 +76,7 @@ const DARK_THEME = {
   accentLime: '#CCFF00', // Kazanç (income)
   accentPink: '#FF0099', // Harcama (expense)
   accentAmber: '#F59E0B', // Beklemede (pending)
+  accent: '#DFFF00', // Primary accent
   filterActive: primitives.magenta[500],
   filterInactive: 'rgba(255,255,255,0.05)',
 };

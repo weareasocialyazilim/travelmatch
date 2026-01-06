@@ -44,7 +44,7 @@ const RARITY_COLORS: Record<AchievementRarity, string> = {
   common: COLORS.text.secondary,
   rare: COLORS.primary,
   epic: COLORS.secondary,
-  legendary: COLORS.accent,
+  legendary: COLORS.accent.primary,
 };
 
 const RARITY_LABELS: Record<AchievementRarity, string> = {
@@ -57,7 +57,7 @@ const RARITY_LABELS: Record<AchievementRarity, string> = {
 export const AchievementCard: React.FC<AchievementCardProps> = ({
   achievement,
   index = 0,
-  onPress,
+  onPress: _onPress,
 }) => {
   const {
     title,
@@ -80,12 +80,18 @@ export const AchievementCard: React.FC<AchievementCardProps> = ({
         index * 100,
         withRepeat(
           withSequence(
-            withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-            withTiming(0, { duration: 2000, easing: Easing.inOut(Easing.ease) })
+            withTiming(1, {
+              duration: 2000,
+              easing: Easing.inOut(Easing.ease),
+            }),
+            withTiming(0, {
+              duration: 2000,
+              easing: Easing.inOut(Easing.ease),
+            }),
           ),
           -1,
-          false
-        )
+          false,
+        ),
       );
     }
   }, [isEarned, index, glowPulse]);
@@ -96,7 +102,7 @@ export const AchievementCard: React.FC<AchievementCardProps> = ({
       shimmer.value = withRepeat(
         withTiming(1, { duration: 3000, easing: Easing.linear }),
         -1,
-        false
+        false,
       );
     }
   }, [isEarned, progress, shimmer]);
@@ -169,7 +175,9 @@ export const AchievementCard: React.FC<AchievementCardProps> = ({
 
           {/* Earned checkmark */}
           {isEarned && (
-            <View style={[styles.earnedBadge, { backgroundColor: rarityColor }]}>
+            <View
+              style={[styles.earnedBadge, { backgroundColor: rarityColor }]}
+            >
               <MaterialCommunityIcons
                 name="check"
                 size={10}
@@ -183,7 +191,12 @@ export const AchievementCard: React.FC<AchievementCardProps> = ({
         <View style={styles.content}>
           {/* Rarity tag */}
           {isEarned && rarity !== 'common' && (
-            <View style={[styles.rarityTag, { backgroundColor: `${rarityColor}20` }]}>
+            <View
+              style={[
+                styles.rarityTag,
+                { backgroundColor: `${rarityColor}20` },
+              ]}
+            >
               <Text style={[styles.rarityText, { color: rarityColor }]}>
                 {RARITY_LABELS[rarity]}
               </Text>
@@ -209,7 +222,7 @@ export const AchievementCard: React.FC<AchievementCardProps> = ({
               <MaterialCommunityIcons
                 name="star-four-points"
                 size={12}
-                color={COLORS.accent}
+                color={COLORS.accent.primary}
               />
               <Text style={styles.xpText}>+{xp} XP</Text>
             </View>
@@ -339,7 +352,7 @@ const styles = StyleSheet.create({
   xpText: {
     ...TYPOGRAPHY.caption,
     fontWeight: '700',
-    color: COLORS.accent,
+    color: COLORS.accent.primary,
   },
   progressContainer: {
     flexDirection: 'row',

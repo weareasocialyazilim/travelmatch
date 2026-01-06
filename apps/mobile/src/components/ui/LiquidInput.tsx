@@ -8,6 +8,7 @@ import {
   TextInputProps,
   NativeSyntheticEvent,
   TextInputFocusEventData,
+  StyleProp,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
@@ -15,11 +16,13 @@ import { FONT_FAMILIES } from '../../theme/typography';
 import { GlassCard } from './GlassCard';
 import { HapticManager } from '../../services/HapticManager';
 
-interface LiquidInputProps extends TextInputProps {
+interface LiquidInputProps extends Omit<TextInputProps, 'style'> {
   label?: string;
   icon?: keyof typeof Ionicons.glyphMap;
   error?: string;
   containerStyle?: ViewStyle;
+  /** Card container style override */
+  style?: StyleProp<ViewStyle>;
 }
 
 /**
@@ -80,12 +83,14 @@ export const LiquidInput: React.FC<LiquidInputProps> = ({
 
       <GlassCard
         intensity={isFocused ? 30 : 10}
-        style={[
-          styles.inputContainer,
-          isFocused && styles.focusedBorder,
-          error ? styles.errorBorder : null,
-          style,
-        ]}
+        style={
+          StyleSheet.flatten([
+            styles.inputContainer,
+            isFocused && styles.focusedBorder,
+            error ? styles.errorBorder : null,
+            style,
+          ]) as ViewStyle
+        }
       >
         <View style={styles.innerRow}>
           {/* İkon Bölümü */}
@@ -101,8 +106,8 @@ export const LiquidInput: React.FC<LiquidInputProps> = ({
           <TextInput
             style={styles.input}
             placeholderTextColor={COLORS.textMuted}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
+            onFocus={handleFocus as TextInputProps['onFocus']}
+            onBlur={handleBlur as TextInputProps['onBlur']}
             onChangeText={handleChangeText}
             selectionColor={COLORS.brand.primary}
             {...props}

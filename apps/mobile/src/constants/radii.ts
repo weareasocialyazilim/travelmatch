@@ -8,3 +8,6 @@ export const radii = {
 
 // Uppercase alias for backwards compatibility
 export const RADII = radii;
+
+// Singular export alias used by some components
+export const RADIUS = radii;

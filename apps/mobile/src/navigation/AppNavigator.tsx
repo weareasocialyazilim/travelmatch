@@ -827,10 +827,6 @@ const AppNavigator = () => {
               component={DateTimePickerScreen}
               options={{ presentation: 'modal' }}
             />
-            <Stack.Screen
-              name="DietaryPreferences"
-              component={DietaryPreferencesScreen}
-            />
             <Stack.Screen name="NotFound" component={NotFoundScreen} />
             <Stack.Screen
               name="PickLocation"

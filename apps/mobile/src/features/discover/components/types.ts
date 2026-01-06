@@ -106,10 +106,14 @@ export interface MomentCardProps {
   story?: MomentStory;
 }
 
-export interface GridCardProps extends MomentCardProps {
+export interface GridCardProps {
   columns?: number;
-  item?: MomentCardProps;
-  index?: number;
+  /** The moment item - required for grid rendering */
+  item: MomentCardProps;
+  /** The item index in the list - required for grid layout */
+  index: number;
+  /** Press handler for the card */
+  onPress: (item: MomentCardProps) => void;
 }
 
 // =============================================================================

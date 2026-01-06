@@ -20,8 +20,8 @@ import { logger } from '../utils/logger';
 import { callRpc } from './supabaseRpc';
 import { transactionsService as dbTransactionsService } from './supabaseDbService';
 import { invalidateAllPaymentCache } from './cacheInvalidationService';
-import { walletService, type WalletBalance } from './walletService';
-import { transactionService, type Transaction } from './transactionService';
+import { walletService } from './walletService';
+import { transactionService } from './transactionService';
 import {
   paytrProvider,
   type PayTRPaymentResponse,
@@ -1265,9 +1265,7 @@ class SecurePaymentService {
 
       const { data, error } = await supabase
         .from('user_subscriptions')
-        .select(
-          'id, plan_id, status, current_period_start, current_period_end, cancel_at',
-        )
+        .select('id, plan_id, status, current_period_start, current_period_end')
         .eq('user_id', session.session.user.id)
         .eq('status', 'active')
         .order('created_at', { ascending: false })
@@ -1279,7 +1277,13 @@ class SecurePaymentService {
         throw error;
       }
 
-      return data as Subscription;
+      return {
+        id: data.id,
+        plan_id: data.plan_id,
+        status: data.status,
+        current_period_start: data.current_period_start,
+        current_period_end: data.current_period_end,
+      } as Subscription;
     } catch (error) {
       logger.error('Failed to get subscription', { error });
       throw error;

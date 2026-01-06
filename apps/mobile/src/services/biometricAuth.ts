@@ -376,11 +376,12 @@ class BiometricAuthService {
       return false;
     }
 
-    return await this.authenticate({
+    const result = await this.authenticate({
       promptMessage: 'Unlock TravelMatch',
       cancelLabel: 'Use Password',
       disableDeviceFallback: false,
     });
+    return result.success;
   }
 
   /**
@@ -395,12 +396,13 @@ class BiometricAuthService {
       return true;
     }
 
-    return await this.authenticate({
+    const result = await this.authenticate({
       promptMessage: `Verify to ${action}`,
       cancelLabel: 'Cancel',
       disableDeviceFallback: false,
       fallbackLabel: 'Use Password',
     });
+    return result.success;
   }
 
   /**

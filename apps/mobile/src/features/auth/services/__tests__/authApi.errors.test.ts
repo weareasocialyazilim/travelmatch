@@ -4,7 +4,7 @@
  * Target Coverage: Comprehensive error handling
  */
 
-import { authApi } from '../authApi';
+import { authApi } from '../authService';
 
 // Mock dependencies
 jest.mock('@/config/supabase', () => ({
@@ -45,7 +45,9 @@ describe('authApi - Error Scenarios', () => {
         error: authError,
       });
 
-      await expect(authApi.login('test@example.com', 'wrongpassword')).rejects.toMatchObject({
+      await expect(
+        authApi.login('test@example.com', 'wrongpassword'),
+      ).rejects.toMatchObject({
         message: 'Invalid login credentials',
         code: 'invalid_credentials',
       });
@@ -63,7 +65,9 @@ describe('authApi - Error Scenarios', () => {
         error: authError,
       });
 
-      await expect(authApi.login('test@example.com', 'password123')).rejects.toMatchObject({
+      await expect(
+        authApi.login('test@example.com', 'password123'),
+      ).rejects.toMatchObject({
         code: 'email_not_confirmed',
       });
     });
@@ -80,14 +84,17 @@ describe('authApi - Error Scenarios', () => {
         error: authError,
       });
 
-      await expect(authApi.login('banned@example.com', 'password123')).rejects.toMatchObject({
+      await expect(
+        authApi.login('banned@example.com', 'password123'),
+      ).rejects.toMatchObject({
         code: 'user_banned',
       });
     });
 
     it('should throw on rate limiting', async () => {
       const rateLimitError = {
-        message: 'For security purposes, you can only request this after X seconds',
+        message:
+          'For security purposes, you can only request this after X seconds',
         status: 429,
         code: 'over_request_rate_limit',
       };
@@ -97,7 +104,9 @@ describe('authApi - Error Scenarios', () => {
         error: rateLimitError,
       });
 
-      await expect(authApi.login('test@example.com', 'password')).rejects.toMatchObject({
+      await expect(
+        authApi.login('test@example.com', 'password'),
+      ).rejects.toMatchObject({
         status: 429,
         code: 'over_request_rate_limit',
       });
@@ -105,9 +114,13 @@ describe('authApi - Error Scenarios', () => {
 
     it('should throw on network error', async () => {
       const networkError = new Error('Network request failed');
-      (supabase.auth.signInWithPassword as jest.Mock).mockRejectedValue(networkError);
+      (supabase.auth.signInWithPassword as jest.Mock).mockRejectedValue(
+        networkError,
+      );
 
-      await expect(authApi.login('test@example.com', 'password')).rejects.toThrow('Network request failed');
+      await expect(
+        authApi.login('test@example.com', 'password'),
+      ).rejects.toThrow('Network request failed');
     });
 
     it('should throw on server error (500)', async () => {
@@ -121,7 +134,9 @@ describe('authApi - Error Scenarios', () => {
         error: serverError,
       });
 
-      await expect(authApi.login('test@example.com', 'password')).rejects.toMatchObject({
+      await expect(
+        authApi.login('test@example.com', 'password'),
+      ).rejects.toMatchObject({
         status: 500,
       });
     });
@@ -143,7 +158,9 @@ describe('authApi - Error Scenarios', () => {
         error: authError,
       });
 
-      await expect(authApi.signup('existing@example.com', 'password123')).rejects.toMatchObject({
+      await expect(
+        authApi.signup('existing@example.com', 'password123'),
+      ).rejects.toMatchObject({
         code: 'user_already_exists',
       });
     });
@@ -160,7 +177,9 @@ describe('authApi - Error Scenarios', () => {
         error: authError,
       });
 
-      await expect(authApi.signup('test@example.com', '123')).rejects.toMatchObject({
+      await expect(
+        authApi.signup('test@example.com', '123'),
+      ).rejects.toMatchObject({
         code: 'weak_password',
       });
     });
@@ -177,7 +196,9 @@ describe('authApi - Error Scenarios', () => {
         error: authError,
       });
 
-      await expect(authApi.signup('invalid-email', 'password123')).rejects.toMatchObject({
+      await expect(
+        authApi.signup('invalid-email', 'password123'),
+      ).rejects.toMatchObject({
         code: 'validation_failed',
       });
     });
@@ -194,7 +215,9 @@ describe('authApi - Error Scenarios', () => {
         error: authError,
       });
 
-      await expect(authApi.signup('test@example.com', 'password123')).rejects.toMatchObject({
+      await expect(
+        authApi.signup('test@example.com', 'password123'),
+      ).rejects.toMatchObject({
         code: 'signup_disabled',
       });
     });
@@ -211,7 +234,9 @@ describe('authApi - Error Scenarios', () => {
         error: rateLimitError,
       });
 
-      await expect(authApi.signup('test@example.com', 'password123')).rejects.toMatchObject({
+      await expect(
+        authApi.signup('test@example.com', 'password123'),
+      ).rejects.toMatchObject({
         status: 429,
       });
     });
@@ -251,7 +276,8 @@ describe('authApi - Error Scenarios', () => {
   describe('password reset errors', () => {
     it('should throw on email rate limit for password reset', async () => {
       const rateLimitError = {
-        message: 'For security purposes, you can only request this once every 60 seconds',
+        message:
+          'For security purposes, you can only request this once every 60 seconds',
         status: 429,
         code: 'over_email_send_rate_limit',
       };
@@ -261,7 +287,9 @@ describe('authApi - Error Scenarios', () => {
         error: rateLimitError,
       });
 
-      await expect(authApi.sendPasswordResetEmail('test@example.com')).rejects.toMatchObject({
+      await expect(
+        authApi.sendPasswordResetEmail('test@example.com'),
+      ).rejects.toMatchObject({
         status: 429,
       });
     });
@@ -278,7 +306,9 @@ describe('authApi - Error Scenarios', () => {
         error: authError,
       });
 
-      await expect(authApi.sendPasswordResetEmail('nonexistent@example.com')).rejects.toMatchObject({
+      await expect(
+        authApi.sendPasswordResetEmail('nonexistent@example.com'),
+      ).rejects.toMatchObject({
         status: 400,
       });
     });
@@ -300,7 +330,9 @@ describe('authApi - Error Scenarios', () => {
         error: authError,
       });
 
-      await expect(authApi.updatePassword('newPassword123')).rejects.toMatchObject({
+      await expect(
+        authApi.updatePassword('newPassword123'),
+      ).rejects.toMatchObject({
         status: 401,
       });
     });
@@ -317,7 +349,9 @@ describe('authApi - Error Scenarios', () => {
         error: authError,
       });
 
-      await expect(authApi.updatePassword('samePassword123')).rejects.toMatchObject({
+      await expect(
+        authApi.updatePassword('samePassword123'),
+      ).rejects.toMatchObject({
         code: 'same_password',
       });
     });
@@ -346,7 +380,8 @@ describe('authApi - Error Scenarios', () => {
   describe('resend verification errors', () => {
     it('should throw on rate limiting', async () => {
       const rateLimitError = {
-        message: 'For security purposes, you can only request this once every 60 seconds',
+        message:
+          'For security purposes, you can only request this once every 60 seconds',
         status: 429,
         code: 'over_email_send_rate_limit',
       };
@@ -356,7 +391,9 @@ describe('authApi - Error Scenarios', () => {
         error: rateLimitError,
       });
 
-      await expect(authApi.resendVerificationEmail('test@example.com')).rejects.toMatchObject({
+      await expect(
+        authApi.resendVerificationEmail('test@example.com'),
+      ).rejects.toMatchObject({
         status: 429,
       });
     });
@@ -373,7 +410,9 @@ describe('authApi - Error Scenarios', () => {
         error: authError,
       });
 
-      await expect(authApi.resendVerificationEmail('confirmed@example.com')).rejects.toMatchObject({
+      await expect(
+        authApi.resendVerificationEmail('confirmed@example.com'),
+      ).rejects.toMatchObject({
         code: 'email_already_confirmed',
       });
     });
@@ -459,17 +498,25 @@ describe('authApi - Error Scenarios', () => {
       const timeoutError = new Error('Request timed out');
       timeoutError.name = 'TimeoutError';
 
-      (supabase.auth.signInWithPassword as jest.Mock).mockRejectedValue(timeoutError);
+      (supabase.auth.signInWithPassword as jest.Mock).mockRejectedValue(
+        timeoutError,
+      );
 
-      await expect(authApi.login('test@example.com', 'password')).rejects.toThrow('Request timed out');
+      await expect(
+        authApi.login('test@example.com', 'password'),
+      ).rejects.toThrow('Request timed out');
     });
 
     it('should handle DNS resolution error', async () => {
       const dnsError = new Error('getaddrinfo ENOTFOUND auth.supabase.co');
 
-      (supabase.auth.signInWithPassword as jest.Mock).mockRejectedValue(dnsError);
+      (supabase.auth.signInWithPassword as jest.Mock).mockRejectedValue(
+        dnsError,
+      );
 
-      await expect(authApi.login('test@example.com', 'password')).rejects.toThrow('ENOTFOUND');
+      await expect(
+        authApi.login('test@example.com', 'password'),
+      ).rejects.toThrow('ENOTFOUND');
     });
 
     it('should handle connection refused', async () => {
@@ -477,7 +524,9 @@ describe('authApi - Error Scenarios', () => {
 
       (supabase.auth.signUp as jest.Mock).mockRejectedValue(connectionError);
 
-      await expect(authApi.signup('test@example.com', 'password')).rejects.toThrow('ECONNREFUSED');
+      await expect(
+        authApi.signup('test@example.com', 'password'),
+      ).rejects.toThrow('ECONNREFUSED');
     });
 
     it('should handle SSL/TLS errors', async () => {
@@ -522,7 +571,9 @@ describe('authApi - Error Scenarios', () => {
         error: authError,
       });
 
-      await expect(authApi.login('<script>alert(1)</script>@test.com', 'password')).rejects.toMatchObject({
+      await expect(
+        authApi.login('<script>alert(1)</script>@test.com', 'password'),
+      ).rejects.toMatchObject({
         code: 'validation_failed',
       });
     });
@@ -540,7 +591,9 @@ describe('authApi - Error Scenarios', () => {
       });
 
       const longPassword = 'a'.repeat(10000);
-      await expect(authApi.signup('test@example.com', longPassword)).rejects.toMatchObject({
+      await expect(
+        authApi.signup('test@example.com', longPassword),
+      ).rejects.toMatchObject({
         code: 'validation_failed',
       });
     });

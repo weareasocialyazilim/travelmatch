@@ -124,7 +124,7 @@ export const useLowPowerMode = (): LowPowerModeState & LowPowerModeActions => {
     PerformanceSample[]
   >([]);
   const [detectedSlowDevice, setDetectedSlowDevice] = useState(false);
-  const [appState, setAppState] = useState<AppStateStatus>(
+  const [_appState, setAppState] = useState<AppStateStatus>(
     AppState.currentState,
   );
 

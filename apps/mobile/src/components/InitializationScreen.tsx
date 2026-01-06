@@ -24,10 +24,8 @@ import Animated, {
   cancelAnimation,
   FadeIn,
   FadeInUp,
-  FadeOut,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { StatusBar } from 'expo-status-bar';
 import { COLORS, GRADIENTS, primitives } from '../constants/colors';
 import { SPACING } from '../constants/spacing';
@@ -69,8 +67,8 @@ const OrbitingParticle: React.FC<OrbitingParticleProps> = ({
           easing: Easing.linear,
         }),
         -1,
-        false
-      )
+        false,
+      ),
     );
     opacity.value = withDelay(delay, withTiming(1, { duration: 500 }));
 
@@ -141,12 +139,12 @@ const NeonRing: React.FC<NeonRingProps> = ({
           easing: Easing.bezier(0.4, 0, 0.2, 1),
         }),
         -1,
-        false
-      )
+        false,
+      ),
     );
     scale.value = withDelay(
       delay,
-      withSpring(1, { damping: 12, stiffness: 100 })
+      withSpring(1, { damping: 12, stiffness: 100 }),
     );
 
     return () => {
@@ -237,20 +235,20 @@ export const InitializationScreen: React.FC<InitializationScreenProps> = ({
     breathingScale.value = withRepeat(
       withSequence(
         withTiming(1.2, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) })
+        withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
       ),
       -1,
-      false
+      false,
     );
 
     // Glow pulsing
     glowOpacity.value = withRepeat(
       withSequence(
         withTiming(0.5, { duration: 1000 }),
-        withTiming(0.25, { duration: 1000 })
+        withTiming(0.25, { duration: 1000 }),
       ),
       -1,
-      false
+      false,
     );
 
     return () => {
@@ -273,7 +271,7 @@ export const InitializationScreen: React.FC<InitializationScreenProps> = ({
   }));
 
   const failedServices = Array.from(progress.services.values()).filter(
-    (s) => s.status === 'failed'
+    (s) => s.status === 'failed',
   );
 
   const currentService = progress.currentService
@@ -448,10 +446,10 @@ const LoadingDots: React.FC = () => {
     dot1Opacity.value = withRepeat(
       withSequence(
         withTiming(1, { duration: 400, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0.3, { duration: 400, easing: Easing.inOut(Easing.ease) })
+        withTiming(0.3, { duration: 400, easing: Easing.inOut(Easing.ease) }),
       ),
       -1,
-      false
+      false,
     );
 
     dot2Opacity.value = withDelay(
@@ -459,11 +457,11 @@ const LoadingDots: React.FC = () => {
       withRepeat(
         withSequence(
           withTiming(1, { duration: 400, easing: Easing.inOut(Easing.ease) }),
-          withTiming(0.3, { duration: 400, easing: Easing.inOut(Easing.ease) })
+          withTiming(0.3, { duration: 400, easing: Easing.inOut(Easing.ease) }),
         ),
         -1,
-        false
-      )
+        false,
+      ),
     );
 
     dot3Opacity.value = withDelay(
@@ -471,11 +469,11 @@ const LoadingDots: React.FC = () => {
       withRepeat(
         withSequence(
           withTiming(1, { duration: 400, easing: Easing.inOut(Easing.ease) }),
-          withTiming(0.3, { duration: 400, easing: Easing.inOut(Easing.ease) })
+          withTiming(0.3, { duration: 400, easing: Easing.inOut(Easing.ease) }),
         ),
         -1,
-        false
-      )
+        false,
+      ),
     );
 
     return () => {

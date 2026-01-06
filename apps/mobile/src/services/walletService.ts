@@ -254,7 +254,7 @@ class WalletService {
       // Step 2: Get bank account details
       const { data: bankAccount, error: bankError } = await supabase
         .from('bank_accounts')
-        .select('*')
+        .select('id, iban, account_holder_name')
         .eq('id', params.bankAccountId)
         .eq('user_id', user.id)
         .single();
@@ -273,8 +273,9 @@ class WalletService {
           body: JSON.stringify({
             amount: params.amount,
             bank_account_id: params.bankAccountId,
-            iban: bankAccount.iban,
-            account_holder: bankAccount.account_holder_name,
+            iban: (bankAccount as { iban: string }).iban,
+            account_holder: (bankAccount as { account_holder_name: string })
+              .account_holder_name,
           }),
         },
       );
@@ -366,23 +367,24 @@ class WalletService {
 
       if (error) throw error;
 
-      interface BankAccountRow {
-        id: string;
-        bank_name: string | null;
-        iban: string;
-        account_holder_name: string;
-        is_verified: boolean | null;
-        is_default: boolean | null;
-      }
-
-      return (data || []).map((item: BankAccountRow) => ({
-        id: item.id,
-        bank_name: item.bank_name || 'Banka',
-        iban: item.iban,
-        account_holder: item.account_holder_name,
-        is_verified: item.is_verified ?? false,
-        is_default: item.is_default ?? false,
-      }));
+      return (data || []).map((item) => {
+        const acc = item as {
+          id: string;
+          bank_name: string | null;
+          iban: string;
+          account_holder_name: string;
+          is_verified: boolean | null;
+          is_default: boolean | null;
+        };
+        return {
+          id: acc.id,
+          bank_name: acc.bank_name || 'Banka',
+          iban: acc.iban,
+          account_holder: acc.account_holder_name,
+          is_verified: acc.is_verified ?? false,
+          is_default: acc.is_default ?? false,
+        };
+      });
     } catch (error) {
       logger.error('Get bank accounts error:', error);
       return [];
@@ -425,21 +427,22 @@ class WalletService {
 
       if (error) throw error;
 
-      interface PendingProofRow {
-        id: string;
-        amount: number;
-        created_at: string;
-        giver: { name: string } | null;
-        moment: { title: string } | null;
-      }
-
-      return (data || []).map((item: PendingProofRow) => ({
-        id: item.id,
-        amount: item.amount,
-        senderName: item.giver?.name || 'Bilinmeyen',
-        momentTitle: item.moment?.title || 'Hediye',
-        createdAt: item.created_at,
-      }));
+      return (data || []).map((item) => {
+        const gift = item as {
+          id: string;
+          amount: number;
+          created_at: string;
+          giver: { name?: string } | null;
+          moment: { title?: string } | null;
+        };
+        return {
+          id: gift.id,
+          amount: gift.amount,
+          senderName: gift.giver?.name || 'Bilinmeyen',
+          momentTitle: gift.moment?.title || 'Hediye',
+          createdAt: gift.created_at,
+        };
+      });
     } catch (error) {
       logger.error('Get pending proof items error:', error);
       return [];

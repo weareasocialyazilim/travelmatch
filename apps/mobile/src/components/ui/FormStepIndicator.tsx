@@ -235,7 +235,14 @@ interface StepCircleProps {
 }
 
 const StepCircle: React.FC<StepCircleProps> = memo(
-  ({ state, index, icon, compact, darkMode, accentColor = INDICATOR_COLORS.neon.lime }) => {
+  ({
+    state,
+    index,
+    icon,
+    compact,
+    darkMode,
+    accentColor = INDICATOR_COLORS.neon.lime,
+  }) => {
     const scale = useSharedValue(1);
     const colorProgress = useSharedValue(0);
     const glowOpacity = useSharedValue(0);
@@ -248,11 +255,17 @@ const StepCircle: React.FC<StepCircleProps> = memo(
         if (darkMode) {
           glowOpacity.value = withRepeat(
             withSequence(
-              withTiming(0.8, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
-              withTiming(0.3, { duration: 1000, easing: Easing.inOut(Easing.ease) })
+              withTiming(0.8, {
+                duration: 1000,
+                easing: Easing.inOut(Easing.ease),
+              }),
+              withTiming(0.3, {
+                duration: 1000,
+                easing: Easing.inOut(Easing.ease),
+              }),
             ),
             -1,
-            false
+            false,
           );
         }
       } else if (state === 'completed') {
@@ -273,12 +286,20 @@ const StepCircle: React.FC<StepCircleProps> = memo(
           backgroundColor: interpolateColor(
             colorProgress.value,
             [0, 1, 2],
-            [INDICATOR_COLORS.background.muted, accentColor, INDICATOR_COLORS.neon.cyan],
+            [
+              INDICATOR_COLORS.background.muted,
+              accentColor,
+              INDICATOR_COLORS.neon.cyan,
+            ],
           ),
           borderColor: interpolateColor(
             colorProgress.value,
             [0, 1, 2],
-            [INDICATOR_COLORS.glass.border, accentColor, INDICATOR_COLORS.neon.cyan],
+            [
+              INDICATOR_COLORS.glass.border,
+              accentColor,
+              INDICATOR_COLORS.neon.cyan,
+            ],
           ),
         };
       }
@@ -300,7 +321,9 @@ const StepCircle: React.FC<StepCircleProps> = memo(
 
     const glowStyle = useAnimatedStyle(() => ({
       opacity: glowOpacity.value,
-      transform: [{ scale: interpolate(glowOpacity.value, [0.3, 0.8], [1, 1.4]) }],
+      transform: [
+        { scale: interpolate(glowOpacity.value, [0.3, 0.8], [1, 1.4]) },
+      ],
     }));
 
     const size = compact ? 28 : 36;
@@ -313,7 +336,11 @@ const StepCircle: React.FC<StepCircleProps> = memo(
           <AnimatedView
             style={[
               styles.stepGlow,
-              { width: size + 16, height: size + 16, borderRadius: (size + 16) / 2 },
+              {
+                width: size + 16,
+                height: size + 16,
+                borderRadius: (size + 16) / 2,
+              },
               { backgroundColor: accentColor },
               glowStyle,
             ]}
@@ -330,7 +357,9 @@ const StepCircle: React.FC<StepCircleProps> = memo(
             <MaterialCommunityIcons
               name="check"
               size={iconSize}
-              color={darkMode ? INDICATOR_COLORS.background.primary : COLORS.white}
+              color={
+                darkMode ? INDICATOR_COLORS.background.primary : COLORS.white
+              }
             />
           ) : icon ? (
             <MaterialCommunityIcons
@@ -352,7 +381,9 @@ const StepCircle: React.FC<StepCircleProps> = memo(
                 darkMode ? styles.stepNumberDark : styles.stepNumber,
                 compact && styles.stepNumberCompact,
                 state === 'active' &&
-                  (darkMode ? styles.stepNumberActiveDark : styles.stepNumberActive),
+                  (darkMode
+                    ? styles.stepNumberActiveDark
+                    : styles.stepNumberActive),
               ]}
             >
               {index + 1}
@@ -386,75 +417,86 @@ interface LiquidDotProps {
   delay: number;
 }
 
-const LiquidDot: React.FC<LiquidDotProps> = memo(({
-  isActive,
-  isCurrent,
-  accentColor,
-  delay,
-}) => {
-  const scale = useSharedValue(1);
-  const width = useSharedValue(8);
-  const glowOpacity = useSharedValue(0);
-  const colorProgress = useSharedValue(0);
+const LiquidDot: React.FC<LiquidDotProps> = memo(
+  ({ isActive, isCurrent, accentColor, delay: _delay }) => {
+    const scale = useSharedValue(1);
+    const width = useSharedValue(8);
+    const glowOpacity = useSharedValue(0);
+    const colorProgress = useSharedValue(0);
 
-  useEffect(() => {
-    colorProgress.value = withSpring(isActive ? 1 : 0, SPRINGS.gentle);
+    useEffect(() => {
+      colorProgress.value = withSpring(isActive ? 1 : 0, SPRINGS.gentle);
 
-    if (isCurrent) {
-      width.value = withSpring(28, SPRINGS.snappy);
+      if (isCurrent) {
+        width.value = withSpring(28, SPRINGS.snappy);
 
-      glowOpacity.value = withRepeat(
-        withSequence(
-          withTiming(0.8, { duration: 1200, easing: Easing.inOut(Easing.ease) }),
-          withTiming(0.3, { duration: 1200, easing: Easing.inOut(Easing.ease) })
-        ),
-        -1,
-        false
-      );
+        glowOpacity.value = withRepeat(
+          withSequence(
+            withTiming(0.8, {
+              duration: 1200,
+              easing: Easing.inOut(Easing.ease),
+            }),
+            withTiming(0.3, {
+              duration: 1200,
+              easing: Easing.inOut(Easing.ease),
+            }),
+          ),
+          -1,
+          false,
+        );
 
-      scale.value = withRepeat(
-        withSequence(
-          withTiming(1.08, { duration: 1200, easing: Easing.inOut(Easing.ease) }),
-          withTiming(1, { duration: 1200, easing: Easing.inOut(Easing.ease) })
-        ),
-        -1,
-        false
-      );
-    } else {
-      width.value = withSpring(8, SPRINGS.gentle);
-      glowOpacity.value = withTiming(0, { duration: 300 });
-      scale.value = withSpring(1, SPRINGS.gentle);
-    }
-  }, [isActive, isCurrent, width, glowOpacity, scale, colorProgress]);
+        scale.value = withRepeat(
+          withSequence(
+            withTiming(1.08, {
+              duration: 1200,
+              easing: Easing.inOut(Easing.ease),
+            }),
+            withTiming(1, {
+              duration: 1200,
+              easing: Easing.inOut(Easing.ease),
+            }),
+          ),
+          -1,
+          false,
+        );
+      } else {
+        width.value = withSpring(8, SPRINGS.gentle);
+        glowOpacity.value = withTiming(0, { duration: 300 });
+        scale.value = withSpring(1, SPRINGS.gentle);
+      }
+    }, [isActive, isCurrent, width, glowOpacity, scale, colorProgress]);
 
-  const dotStyle = useAnimatedStyle(() => ({
-    width: width.value,
-    transform: [{ scale: scale.value }],
-    backgroundColor: interpolateColor(
-      colorProgress.value,
-      [0, 1],
-      [INDICATOR_COLORS.background.muted, accentColor]
-    ),
-  }));
+    const dotStyle = useAnimatedStyle(() => ({
+      width: width.value,
+      transform: [{ scale: scale.value }],
+      backgroundColor: interpolateColor(
+        colorProgress.value,
+        [0, 1],
+        [INDICATOR_COLORS.background.muted, accentColor],
+      ),
+    }));
 
-  const glowStyle = useAnimatedStyle(() => ({
-    opacity: glowOpacity.value,
-    transform: [{ scale: interpolate(glowOpacity.value, [0.3, 0.8], [1, 1.6]) }],
-  }));
+    const glowStyle = useAnimatedStyle(() => ({
+      opacity: glowOpacity.value,
+      transform: [
+        { scale: interpolate(glowOpacity.value, [0.3, 0.8], [1, 1.6]) },
+      ],
+    }));
 
-  return (
-    <View style={styles.liquidDotContainer}>
-      <AnimatedView
-        style={[
-          styles.liquidGlow,
-          { backgroundColor: accentColor },
-          glowStyle,
-        ]}
-      />
-      <AnimatedView style={[styles.liquidDot, dotStyle]} />
-    </View>
-  );
-});
+    return (
+      <View style={styles.liquidDotContainer}>
+        <AnimatedView
+          style={[
+            styles.liquidGlow,
+            { backgroundColor: accentColor },
+            glowStyle,
+          ]}
+        />
+        <AnimatedView style={[styles.liquidDot, dotStyle]} />
+      </View>
+    );
+  },
+);
 
 LiquidDot.displayName = 'LiquidDot';
 
@@ -463,27 +505,29 @@ interface LiquidLineProps {
   accentColor: string;
 }
 
-const LiquidLine: React.FC<LiquidLineProps> = memo(({ isActive, accentColor }) => {
-  const progress = useSharedValue(0);
+const LiquidLine: React.FC<LiquidLineProps> = memo(
+  ({ isActive, accentColor }) => {
+    const progress = useSharedValue(0);
 
-  useEffect(() => {
-    progress.value = withSpring(isActive ? 1 : 0, SPRINGS.gentle);
-  }, [isActive, progress]);
+    useEffect(() => {
+      progress.value = withSpring(isActive ? 1 : 0, SPRINGS.gentle);
+    }, [isActive, progress]);
 
-  const lineStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(
-      progress.value,
-      [0, 1],
-      [INDICATOR_COLORS.background.muted, accentColor]
-    ),
-  }));
+    const lineStyle = useAnimatedStyle(() => ({
+      backgroundColor: interpolateColor(
+        progress.value,
+        [0, 1],
+        [INDICATOR_COLORS.background.muted, accentColor],
+      ),
+    }));
 
-  return (
-    <View style={styles.liquidLineContainer}>
-      <AnimatedView style={[styles.liquidLine, lineStyle]} />
-    </View>
-  );
-});
+    return (
+      <View style={styles.liquidLineContainer}>
+        <AnimatedView style={[styles.liquidLine, lineStyle]} />
+      </View>
+    );
+  },
+);
 
 LiquidLine.displayName = 'LiquidLine';
 
@@ -491,47 +535,45 @@ LiquidLine.displayName = 'LiquidLine';
  * Awwwards-quality minimalist form progress indicator.
  * Uses neon glow effect on the active step with Liquid Form aesthetic.
  */
-export const LiquidStepIndicator: React.FC<LiquidStepIndicatorProps> = memo(({
-  currentStep,
-  totalSteps,
-  accentColor = INDICATOR_COLORS.neon.lime,
-}) => {
-  return (
-    <View
-      style={styles.liquidContainer}
-      accessibilityRole="progressbar"
-      accessibilityValue={{
-        min: 1,
-        max: totalSteps,
-        now: currentStep,
-        text: `Adım ${currentStep} / ${totalSteps}`,
-      }}
-    >
-      {Array.from({ length: totalSteps }).map((_, index) => {
-        const stepNumber = index + 1;
-        const isActive = stepNumber <= currentStep;
-        const isCurrent = stepNumber === currentStep;
+export const LiquidStepIndicator: React.FC<LiquidStepIndicatorProps> = memo(
+  ({ currentStep, totalSteps, accentColor = INDICATOR_COLORS.neon.lime }) => {
+    return (
+      <View
+        style={styles.liquidContainer}
+        accessibilityRole="progressbar"
+        accessibilityValue={{
+          min: 1,
+          max: totalSteps,
+          now: currentStep,
+          text: `Adım ${currentStep} / ${totalSteps}`,
+        }}
+      >
+        {Array.from({ length: totalSteps }).map((_, index) => {
+          const stepNumber = index + 1;
+          const isActive = stepNumber <= currentStep;
+          const isCurrent = stepNumber === currentStep;
 
-        return (
-          <View key={index} style={styles.liquidStepWrapper}>
-            <LiquidDot
-              isActive={isActive}
-              isCurrent={isCurrent}
-              accentColor={accentColor}
-              delay={index * 100}
-            />
-            {index < totalSteps - 1 && (
-              <LiquidLine
-                isActive={stepNumber < currentStep}
+          return (
+            <View key={index} style={styles.liquidStepWrapper}>
+              <LiquidDot
+                isActive={isActive}
+                isCurrent={isCurrent}
                 accentColor={accentColor}
+                delay={index * 100}
               />
-            )}
-          </View>
-        );
-      })}
-    </View>
-  );
-});
+              {index < totalSteps - 1 && (
+                <LiquidLine
+                  isActive={stepNumber < currentStep}
+                  accentColor={accentColor}
+                />
+              )}
+            </View>
+          );
+        })}
+      </View>
+    );
+  },
+);
 
 LiquidStepIndicator.displayName = 'LiquidStepIndicator';
 
@@ -545,62 +587,61 @@ interface LiquidProgressBarProps {
   accentColor?: string;
 }
 
-export const LiquidProgressBar: React.FC<LiquidProgressBarProps> = memo(({
-  currentStep,
-  totalSteps,
-  accentColor = INDICATOR_COLORS.neon.lime,
-}) => {
-  const progress = useSharedValue(0);
+export const LiquidProgressBar: React.FC<LiquidProgressBarProps> = memo(
+  ({ currentStep, totalSteps, accentColor = INDICATOR_COLORS.neon.lime }) => {
+    const progress = useSharedValue(0);
 
-  useEffect(() => {
-    const targetProgress = totalSteps > 1 ? (currentStep - 1) / (totalSteps - 1) : 0;
-    progress.value = withSpring(targetProgress, SPRINGS.gentle);
-  }, [currentStep, totalSteps, progress]);
+    useEffect(() => {
+      const targetProgress =
+        totalSteps > 1 ? (currentStep - 1) / (totalSteps - 1) : 0;
+      progress.value = withSpring(targetProgress, SPRINGS.gentle);
+    }, [currentStep, totalSteps, progress]);
 
-  const fillStyle = useAnimatedStyle(() => ({
-    width: `${progress.value * 100}%`,
-  }));
+    const fillStyle = useAnimatedStyle(() => ({
+      width: `${progress.value * 100}%`,
+    }));
 
-  const glowStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(progress.value, [0, 0.5, 1], [0.3, 0.6, 0.8]),
-  }));
+    const glowStyle = useAnimatedStyle(() => ({
+      opacity: interpolate(progress.value, [0, 0.5, 1], [0.3, 0.6, 0.8]),
+    }));
 
-  return (
-    <View style={styles.barContainer}>
-      <View style={styles.barTrack}>
-        <AnimatedView
-          style={[
-            styles.barFill,
-            { backgroundColor: accentColor },
-            fillStyle,
-          ]}
-        />
-        <AnimatedView
-          style={[
-            styles.barGlow,
-            { backgroundColor: accentColor },
-            fillStyle,
-            glowStyle,
-          ]}
-        />
+    return (
+      <View style={styles.barContainer}>
+        <View style={styles.barTrack}>
+          <AnimatedView
+            style={[
+              styles.barFill,
+              { backgroundColor: accentColor },
+              fillStyle,
+            ]}
+          />
+          <AnimatedView
+            style={[
+              styles.barGlow,
+              { backgroundColor: accentColor },
+              fillStyle,
+              glowStyle,
+            ]}
+          />
+        </View>
+        <View style={styles.barMarkers}>
+          {Array.from({ length: totalSteps }).map((_, index) => {
+            const isActive = index + 1 <= currentStep;
+            return (
+              <View
+                key={index}
+                style={[
+                  styles.barMarker,
+                  isActive && { backgroundColor: accentColor },
+                ]}
+              />
+            );
+          })}
+        </View>
       </View>
-      <View style={styles.barMarkers}>
-        {Array.from({ length: totalSteps }).map((_, index) => {
-          const isActive = index + 1 <= currentStep;
-          return (
-            <View
-              key={index}
-              style={[
-                styles.barMarker,
-                isActive && { backgroundColor: accentColor },
-              ]}
-            />
-          );
-        })}
-      </View>
-    </View>
-  );
-});
+    );
+  },
+);
 
 LiquidProgressBar.displayName = 'LiquidProgressBar';
 

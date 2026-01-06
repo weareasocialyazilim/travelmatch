@@ -61,7 +61,7 @@ const KYCDocumentCaptureScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const { data: initialData } = route.params;
 
-  const [data, setData] = useState<VerificationData>(initialData);
+  const [_data, setData] = useState<VerificationData>(initialData);
   const [captureSide, setCaptureSide] = useState<'front' | 'back'>('front');
   const [isCapturing, setIsCapturing] = useState(false);
 
@@ -76,10 +76,10 @@ const KYCDocumentCaptureScreen: React.FC = () => {
     scanLineY.value = withRepeat(
       withSequence(
         withTiming(1, { duration: 2500, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0, { duration: 2500, easing: Easing.inOut(Easing.ease) })
+        withTiming(0, { duration: 2500, easing: Easing.inOut(Easing.ease) }),
       ),
       -1,
-      false
+      false,
     );
   }, [scanLineY]);
 
@@ -88,10 +88,10 @@ const KYCDocumentCaptureScreen: React.FC = () => {
     cornerPulse.value = withRepeat(
       withSequence(
         withTiming(1, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0, { duration: 1500, easing: Easing.inOut(Easing.ease) })
+        withTiming(0, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
       ),
       -1,
-      false
+      false,
     );
   }, [cornerPulse]);
 
@@ -99,11 +99,7 @@ const KYCDocumentCaptureScreen: React.FC = () => {
   const scanLineStyle = useAnimatedStyle(() => ({
     transform: [
       {
-        translateY: interpolate(
-          scanLineY.value,
-          [0, 1],
-          [0, FRAME_HEIGHT - 4]
-        ),
+        translateY: interpolate(scanLineY.value, [0, 1], [0, FRAME_HEIGHT - 4]),
       },
     ],
   }));
@@ -130,13 +126,13 @@ const KYCDocumentCaptureScreen: React.FC = () => {
     // Button press animation
     captureScale.value = withSequence(
       withSpring(0.9, { damping: 15, stiffness: 400 }),
-      withSpring(1, { damping: 15, stiffness: 400 })
+      withSpring(1, { damping: 15, stiffness: 400 }),
     );
 
     // Flash effect
     flashOpacity.value = withSequence(
       withTiming(1, { duration: 100 }),
-      withTiming(0, { duration: 200 })
+      withTiming(0, { duration: 200 }),
     );
 
     // Simulate capture delay

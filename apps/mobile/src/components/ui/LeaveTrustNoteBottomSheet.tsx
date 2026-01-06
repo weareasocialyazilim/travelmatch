@@ -27,7 +27,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { COLORS, GRADIENTS } from '@/constants/colors';
-import { SPACING, RADIUS } from '@/constants/spacing';
 
 interface TrustNoteUser {
   id: string;

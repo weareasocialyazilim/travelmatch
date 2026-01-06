@@ -32,7 +32,6 @@ import {
 import { showAlert } from '@/stores/modalStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
 import Animated, {
   FadeIn,
   SlideInDown,
@@ -77,7 +76,7 @@ type Step = 'media' | 'details' | 'location' | 'price' | 'review';
 const FORM_STEPS: FormStep[] = [
   { key: 'media', label: 'Görsel', icon: 'camera' },
   { key: 'details', label: 'Detaylar', icon: 'text' },
-  { key: 'location', label: 'Konum', icon: 'location' },
+  { key: 'location', label: 'Konum', icon: 'map-marker' },
   { key: 'price', label: 'Hediye', icon: 'gift' },
   { key: 'review', label: 'Önizleme', icon: 'eye' },
 ];

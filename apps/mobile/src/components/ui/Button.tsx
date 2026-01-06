@@ -48,12 +48,22 @@ import { a11yProps } from '../../utils/accessibility';
 
 // Re-export TMButton for easier migration
 export { TMButton } from './TMButton';
-export type { TMButtonProps, ButtonVariant as TMButtonVariant, ButtonSize as TMButtonSize } from './TMButton';
+export type {
+  TMButtonProps,
+  ButtonVariant as TMButtonVariant,
+  ButtonSize as TMButtonSize,
+} from './TMButton';
 
 // ============================================
 // TYPES
 // ============================================
-type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'glass';
+type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'outline'
+  | 'ghost'
+  | 'danger'
+  | 'glass';
 type ButtonSize = 'sm' | 'md' | 'lg' | 'small' | 'medium' | 'large';
 
 interface ButtonProps {
@@ -84,6 +94,13 @@ const SIZE_CONFIG = {
     iconSize: 16,
     borderRadius: 20,
   },
+  small: {
+    height: 40,
+    paddingHorizontal: 16,
+    fontSize: 14,
+    iconSize: 16,
+    borderRadius: 20,
+  },
   md: {
     height: 52,
     paddingHorizontal: 24,
@@ -91,7 +108,21 @@ const SIZE_CONFIG = {
     iconSize: 20,
     borderRadius: 26,
   },
+  medium: {
+    height: 52,
+    paddingHorizontal: 24,
+    fontSize: 16,
+    iconSize: 20,
+    borderRadius: 26,
+  },
   lg: {
+    height: 60,
+    paddingHorizontal: 32,
+    fontSize: 18,
+    iconSize: 24,
+    borderRadius: 30,
+  },
+  large: {
     height: 60,
     paddingHorizontal: 32,
     fontSize: 18,

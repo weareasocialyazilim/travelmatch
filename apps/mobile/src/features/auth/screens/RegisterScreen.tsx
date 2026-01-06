@@ -40,7 +40,8 @@ export const RegisterScreen: React.FC = () => {
 
   const isFormValid = () => {
     if (!name.trim() || name.trim().length < 2) return false;
-    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false;
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return false;
     if (!password || password.length < 8) return false;
     return true;
   };
@@ -60,12 +61,17 @@ export const RegisterScreen: React.FC = () => {
         showToast('Hesap oluşturuldu!', 'success');
         navigation.reset({ index: 0, routes: [{ name: 'Discover' }] });
       } else {
-        showToast(result.error || 'Kayıt başarısız. Lütfen tekrar deneyin.', 'error');
+        showToast(
+          result.error || 'Kayıt başarısız. Lütfen tekrar deneyin.',
+          'error',
+        );
       }
     } catch (error) {
       showToast(
-        error instanceof Error ? error.message : 'Kayıt başarısız. Lütfen tekrar deneyin.',
-        'error'
+        error instanceof Error
+          ? error.message
+          : 'Kayıt başarısız. Lütfen tekrar deneyin.',
+        'error',
       );
     } finally {
       setIsLoading(false);
@@ -90,7 +96,10 @@ export const RegisterScreen: React.FC = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView
-          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 80 }]}
+          contentContainerStyle={[
+            styles.scrollContent,
+            { paddingTop: insets.top + 80 },
+          ]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
@@ -103,7 +112,12 @@ export const RegisterScreen: React.FC = () => {
 
           <View style={styles.formSection}>
             <Text style={styles.label}>AD SOYAD</Text>
-            <GlassCard intensity={10} style={styles.inputWrapper} padding={0} showBorder={true}>
+            <GlassCard
+              intensity={10}
+              style={styles.inputWrapper}
+              padding={0}
+              showBorder={true}
+            >
               <TextInput
                 style={styles.input}
                 placeholder="Caner Öz"
@@ -120,7 +134,12 @@ export const RegisterScreen: React.FC = () => {
             </GlassCard>
 
             <Text style={[styles.label, { marginTop: 24 }]}>E-POSTA</Text>
-            <GlassCard intensity={10} style={styles.inputWrapper} padding={0} showBorder={true}>
+            <GlassCard
+              intensity={10}
+              style={styles.inputWrapper}
+              padding={0}
+              showBorder={true}
+            >
               <TextInput
                 style={styles.input}
                 placeholder="caner@travelmatch.io"
@@ -138,7 +157,12 @@ export const RegisterScreen: React.FC = () => {
             </GlassCard>
 
             <Text style={[styles.label, { marginTop: 24 }]}>ŞİFRE BELİRLE</Text>
-            <GlassCard intensity={10} style={styles.inputWrapper} padding={0} showBorder={true}>
+            <GlassCard
+              intensity={10}
+              style={styles.inputWrapper}
+              padding={0}
+              showBorder={true}
+            >
               <TextInput
                 style={styles.input}
                 placeholder="En az 8 karakter"
@@ -157,9 +181,14 @@ export const RegisterScreen: React.FC = () => {
           </View>
 
           <View style={styles.policySection}>
-            <Ionicons name="shield-checkmark-outline" size={16} color={COLORS.brand.accent} />
+            <Ionicons
+              name="shield-checkmark-outline"
+              size={16}
+              color={COLORS.brand.accent}
+            />
             <Text style={styles.policyText}>
-              Hesap oluşturarak Kullanım Koşullarını ve KVKK metnini kabul etmiş olursun.
+              Hesap oluşturarak Kullanım Koşullarını ve KVKK metnini kabul etmiş
+              olursun.
             </Text>
           </View>
 
@@ -180,7 +209,9 @@ export const RegisterScreen: React.FC = () => {
           <View style={styles.loginContainer}>
             <Text style={styles.loginText}>Zaten hesabın var mı? </Text>
             <TouchableOpacity
-              onPress={() => navigation.navigate('Login')}
+              onPress={() =>
+                navigation.navigate('UnifiedAuth', { initialMode: 'login' })
+              }
               accessible={true}
               accessibilityLabel="Giriş yap"
               accessibilityRole="link"

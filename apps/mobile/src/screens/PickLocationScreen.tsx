@@ -33,7 +33,7 @@ export const PickLocationScreen = ({ navigation }: Props) => {
     navigation.goBack();
   };
 
-  const handleRegionChange = (feature: GeoJSON.Feature) => {
+  const _handleRegionChange = (feature: GeoJSON.Feature) => {
     if (feature.geometry.type === 'Point') {
       const [longitude, latitude] = feature.geometry.coordinates;
       setSelectedLocation({ latitude, longitude });

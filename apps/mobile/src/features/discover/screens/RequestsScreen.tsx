@@ -18,7 +18,6 @@ import { COLORS } from '@/constants/colors';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
 import { TMAvatar } from '@/components/ui/TMAvatar';
-import { EmptyState } from '@/components/ui/EmptyState';
 import { NotificationCard } from '@/features/notifications/components';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { useRequestsScreen } from '@/hooks/useRequestsScreen';
@@ -53,8 +52,8 @@ const RequestsScreen = ({ navigation }: any) => {
     newRequestsCount,
     unreadNotificationsCount,
     refreshing,
-    handleAccept,
-    handleDecline,
+    handleAccept: _handleAccept,
+    handleDecline: _handleDecline,
     handleRefresh,
     markNotificationAsRead,
   } = useRequestsScreen(route.params?.initialTab || 'pending');
@@ -67,17 +66,18 @@ const RequestsScreen = ({ navigation }: any) => {
       }
 
       // Navigate to appropriate screen based on notification type
+      const metadata = item.metadata as Record<string, unknown> | undefined;
       navigateFromNotification({
         id: item.id,
         type: item.type as any, // Map internal type to NotificationType
-        momentId: item.metadata?.momentId,
-        userId: item.metadata?.userId,
-        conversationId: item.metadata?.conversationId,
-        giftId: item.metadata?.giftId,
-        escrowId: item.metadata?.escrowId,
-        transactionId: item.metadata?.transactionId,
-        proofId: item.metadata?.proofId,
-        metadata: item.metadata,
+        momentId: metadata?.momentId as string | undefined,
+        userId: metadata?.userId as string | undefined,
+        conversationId: metadata?.conversationId as string | undefined,
+        giftId: metadata?.giftId as string | undefined,
+        escrowId: metadata?.escrowId as string | undefined,
+        transactionId: metadata?.transactionId as string | undefined,
+        proofId: metadata?.proofId as string | undefined,
+        metadata: metadata,
       });
     },
     [markNotificationAsRead],
@@ -95,7 +95,7 @@ const RequestsScreen = ({ navigation }: any) => {
           <View style={styles.userInfo}>
             <TMAvatar
               size="md"
-              imageUrl={item.person?.avatar}
+              source={item.person?.avatar}
               name={item.person?.name || 'User'}
             />
             <View style={styles.userDetails}>
@@ -105,7 +105,9 @@ const RequestsScreen = ({ navigation }: any) => {
               <Text style={styles.momentTitle}>{item.momentTitle}</Text>
             </View>
           </View>
-          <Badge label="Bekliyor" variant="warning" size="sm" />
+          <Badge variant="warning" size="small">
+            Bekliyor
+          </Badge>
         </View>
 
         <View style={styles.cardFooter}>

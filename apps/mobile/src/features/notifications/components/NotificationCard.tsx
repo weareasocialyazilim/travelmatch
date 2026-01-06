@@ -99,7 +99,7 @@ const typeConfig: Record<NotificationType, TypeConfigItem> = {
     hapticPattern: 'heavy',
   },
   subscriber_offer: {
-    icon: 'sparkles',
+    icon: 'star',
     color: COLORS.secondary,
     bgColor: COLORS.secondaryMuted,
     priority: 'high',
@@ -125,7 +125,7 @@ const typeConfig: Record<NotificationType, TypeConfigItem> = {
   },
   new_message: {
     icon: 'message-text',
-    color: COLORS.accent,
+    color: COLORS.accent.primary,
     bgColor: COLORS.accentMuted,
     priority: 'high',
   },

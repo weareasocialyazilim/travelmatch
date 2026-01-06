@@ -30,16 +30,14 @@ import {
 import { BlurView } from 'expo-blur';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 
-import { COLORS, primitives, GRADIENTS } from '@/constants/colors';
+import { COLORS } from '@/constants/colors';
 import { FONTS, FONT_SIZES_V2 } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { TMButton } from '@/components/ui/TMButton';
 import { logger } from '@/utils/logger';
-import { useAuth } from '@/context/AuthContext';
 
 // Currency symbols for display
 const CURRENCY_SYMBOLS: Record<string, string> = {

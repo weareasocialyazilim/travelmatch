@@ -33,7 +33,7 @@ export function useWalletBalance(): UseWalletBalanceReturn {
       setLoading(true);
       setError(null);
       const data = await walletService.getBalance();
-      setBalance(data.availableBalance);
+      setBalance(data.available);
       setCurrency(data.currency);
     } catch (err) {
       setError(
@@ -136,10 +136,10 @@ export function useCreatePaymentIntent(): UseCreatePaymentIntentReturn {
         setError(null);
         const result = await securePaymentService.createPayment({
           amount: params.amount,
-          currency: params.currency || 'TRY',
-          paymentMethod: 'card',
+          currency: (params.currency || 'TRY') as 'TRY' | 'EUR' | 'USD' | 'GBP',
+          momentId: params.momentId || '',
         });
-        return { iframeToken: result.paymentToken || '' };
+        return { iframeToken: result.iframeToken || '' };
       } catch (err) {
         setError(err instanceof Error ? err : new Error('Payment failed'));
         throw err;
@@ -158,7 +158,7 @@ export function useCreatePaymentIntent(): UseCreatePaymentIntentReturn {
 // ============================================
 
 export interface UseWithdrawReturn {
-  withdraw: (amount: number, iban: string) => Promise<void>;
+  withdraw: (amount: number, bankAccountId: string) => Promise<void>;
   loading: boolean;
   error: Error | null;
 }
@@ -167,18 +167,21 @@ export function useWithdraw(): UseWithdrawReturn {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const withdraw = useCallback(async (amount: number, iban: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-      await walletService.withdraw(amount, iban);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Withdrawal failed'));
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const withdraw = useCallback(
+    async (amount: number, bankAccountId: string) => {
+      try {
+        setLoading(true);
+        setError(null);
+        await walletService.requestWithdrawal({ amount, bankAccountId });
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Withdrawal failed'));
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
   return { withdraw, loading, error };
 }
@@ -247,7 +250,7 @@ export function useSubmitKYC() {
 
 export function useSubscription() {
   return {
-    subscription: null,
+    subscription: null as { tier: string; status: string } | null,
     loading: false,
     error: null,
   };

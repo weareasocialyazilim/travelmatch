@@ -11,7 +11,7 @@ describe('OfflineState', () => {
     it('should render with default props', () => {
       const { getByText } = render(<OfflineState />);
 
-      expect(getByText('Bağlantı Yok')).toBeTruthy();
+      expect(getByText('Bağlantın Koptu 💔')).toBeTruthy();
     });
 
     it('should render custom message', () => {
@@ -38,7 +38,7 @@ describe('OfflineState', () => {
     it('should render retry button when onRetry is provided', () => {
       const { getByText } = render(<OfflineState onRetry={jest.fn()} />);
 
-      expect(getByText('Tekrar Dene')).toBeTruthy();
+      expect(getByText('Tekrar Bağlan 💗')).toBeTruthy();
     });
 
     it('should render custom retry text', () => {
@@ -53,15 +53,15 @@ describe('OfflineState', () => {
     it('should not render retry button when onRetry is not provided', () => {
       const { queryByText } = render(<OfflineState />);
 
-      expect(queryByText('Tekrar Dene')).toBeNull();
+      expect(queryByText('Tekrar Bağlan 💗')).toBeNull();
     });
 
     it('should call onRetry when button is pressed', async () => {
       const mockOnRetry = jest.fn().mockResolvedValue(undefined);
-      const { getByText } = render(<OfflineState onRetry={mockOnRetry} />);
+      const { getByTestId } = render(<OfflineState onRetry={mockOnRetry} />);
 
       await act(async () => {
-        const retryButton = getByText('Tekrar Dene');
+        const retryButton = getByTestId('offline-state-retry');
         fireEvent.press(retryButton);
       });
 
@@ -72,10 +72,10 @@ describe('OfflineState', () => {
 
     it('should show loading indicator while retrying', async () => {
       const mockOnRetry = jest.fn().mockResolvedValue(undefined);
-      const { getByText } = render(<OfflineState onRetry={mockOnRetry} />);
+      const { getByTestId } = render(<OfflineState onRetry={mockOnRetry} />);
 
       await act(async () => {
-        const retryButton = getByText('Tekrar Dene');
+        const retryButton = getByTestId('offline-state-retry');
         fireEvent.press(retryButton);
       });
 
@@ -89,10 +89,10 @@ describe('OfflineState', () => {
 
     it('should call onRetry and handle completion', async () => {
       const mockOnRetry = jest.fn().mockResolvedValue(undefined);
-      const { getByText } = render(<OfflineState onRetry={mockOnRetry} />);
+      const { getByTestId } = render(<OfflineState onRetry={mockOnRetry} />);
 
       await act(async () => {
-        const retryButton = getByText('Tekrar Dene');
+        const retryButton = getByTestId('offline-state-retry');
         fireEvent.press(retryButton);
       });
 
@@ -103,10 +103,10 @@ describe('OfflineState', () => {
 
     it('should disable retry button while retrying', async () => {
       const mockOnRetry = jest.fn().mockResolvedValue(undefined);
-      const { getByText } = render(<OfflineState onRetry={mockOnRetry} />);
+      const { getByTestId } = render(<OfflineState onRetry={mockOnRetry} />);
 
       await act(async () => {
-        const retryButton = getByText('Tekrar Dene');
+        const retryButton = getByTestId('offline-state-retry');
         fireEvent.press(retryButton);
       });
 
@@ -163,10 +163,10 @@ describe('OfflineState', () => {
 
     it('should handle single retry attempt', async () => {
       const mockOnRetry = jest.fn().mockResolvedValue(undefined);
-      const { getByText } = render(<OfflineState onRetry={mockOnRetry} />);
+      const { getByTestId } = render(<OfflineState onRetry={mockOnRetry} />);
 
       await act(async () => {
-        const retryButton = getByText('Tekrar Dene');
+        const retryButton = getByTestId('offline-state-retry');
         fireEvent.press(retryButton);
       });
 
@@ -178,10 +178,10 @@ describe('OfflineState', () => {
     it('should handle async onRetry callback', async () => {
       const mockOnRetry = jest.fn().mockResolvedValue('success');
 
-      const { getByText } = render(<OfflineState onRetry={mockOnRetry} />);
+      const { getByTestId } = render(<OfflineState onRetry={mockOnRetry} />);
 
       await act(async () => {
-        const retryButton = getByText('Tekrar Dene');
+        const retryButton = getByTestId('offline-state-retry');
         fireEvent.press(retryButton);
       });
 
@@ -192,10 +192,10 @@ describe('OfflineState', () => {
 
     it('should handle sync onRetry callback', async () => {
       const mockOnRetry = jest.fn() as jest.Mock;
-      const { getByText } = render(<OfflineState onRetry={mockOnRetry} />);
+      const { getByTestId } = render(<OfflineState onRetry={mockOnRetry} />);
 
       await act(async () => {
-        const retryButton = getByText('Tekrar Dene');
+        const retryButton = getByTestId('offline-state-retry');
         fireEvent.press(retryButton);
       });
 

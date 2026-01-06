@@ -21,7 +21,13 @@ import { TYPE_SCALE, FONTS } from '@/constants/typography';
  * Her bildirim bir "aktivite kartı" olarak tasarlandı.
  */
 
-type NotificationType = 'gift' | 'trust' | 'comment' | 'social' | 'system' | 'offer';
+type NotificationType =
+  | 'gift'
+  | 'trust'
+  | 'comment'
+  | 'social'
+  | 'system'
+  | 'offer';
 
 interface NotificationItem {
   id: string;
@@ -81,7 +87,7 @@ export const NotificationsScreen = ({ navigation }: any) => {
   const [notifications, setNotifications] = useState(NOTIFICATIONS);
 
   const handleMarkAllRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
 
   const getIconData = (type: NotificationType, isUnread: boolean) => {
@@ -93,26 +99,34 @@ export const NotificationsScreen = ({ navigation }: any) => {
         return {
           name: 'gift' as const,
           color: isUnread ? COLORS.brand.primary : COLORS.text.muted,
-          bg: isUnread ? 'rgba(245, 158, 11, 0.15)' : 'rgba(168, 162, 158, 0.1)',
+          bg: isUnread
+            ? 'rgba(245, 158, 11, 0.15)'
+            : 'rgba(168, 162, 158, 0.1)',
         };
       case 'trust':
       case 'system':
         return {
           name: 'shield-check' as const,
           color: isUnread ? COLORS.trust.primary : COLORS.text.muted,
-          bg: isUnread ? 'rgba(16, 185, 129, 0.15)' : 'rgba(168, 162, 158, 0.1)',
+          bg: isUnread
+            ? 'rgba(16, 185, 129, 0.15)'
+            : 'rgba(168, 162, 158, 0.1)',
         };
       case 'comment':
         return {
           name: 'message-text' as const,
-          color: isUnread ? COLORS.accent : COLORS.text.muted,
-          bg: isUnread ? 'rgba(20, 184, 166, 0.15)' : 'rgba(168, 162, 158, 0.1)',
+          color: isUnread ? COLORS.accent.primary : COLORS.text.muted,
+          bg: isUnread
+            ? 'rgba(20, 184, 166, 0.15)'
+            : 'rgba(168, 162, 158, 0.1)',
         };
       case 'social':
         return {
           name: 'heart' as const,
           color: isUnread ? COLORS.brand.secondary : COLORS.text.muted,
-          bg: isUnread ? 'rgba(236, 72, 153, 0.15)' : 'rgba(168, 162, 158, 0.1)',
+          bg: isUnread
+            ? 'rgba(236, 72, 153, 0.15)'
+            : 'rgba(168, 162, 158, 0.1)',
         };
       default:
         return {
@@ -147,7 +161,9 @@ export const NotificationsScreen = ({ navigation }: any) => {
             showBorder={true}
           >
             {/* Icon Container */}
-            <View style={[styles.iconContainer, { backgroundColor: iconData.bg }]}>
+            <View
+              style={[styles.iconContainer, { backgroundColor: iconData.bg }]}
+            >
               <MaterialCommunityIcons
                 name={iconData.name}
                 size={22}
@@ -158,7 +174,9 @@ export const NotificationsScreen = ({ navigation }: any) => {
             {/* Content */}
             <View style={styles.content}>
               <Text style={styles.message} numberOfLines={2}>
-                <Text style={[styles.userName, !item.read && styles.userNameUnread]}>
+                <Text
+                  style={[styles.userName, !item.read && styles.userNameUnread]}
+                >
                   {item.user}
                 </Text>{' '}
                 {item.msg}
@@ -174,7 +192,7 @@ export const NotificationsScreen = ({ navigation }: any) => {
     );
   };
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
     <View style={styles.container}>
@@ -218,7 +236,7 @@ export const NotificationsScreen = ({ navigation }: any) => {
       {notifications.length > 0 ? (
         <FlatList
           data={notifications}
-          keyExtractor={item => item.id}
+          keyExtractor={(item) => item.id}
           renderItem={renderItem}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}

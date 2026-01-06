@@ -141,13 +141,13 @@ const AnimatedTrustRing: React.FC<AnimatedTrustRingProps> = ({
             width: size + 20,
             height: size + 20,
             borderRadius: (size + 20) / 2,
-            backgroundColor: colors[0],
+            backgroundColor: colors.ring,
           },
         ]}
       />
 
       {/* Background Circle */}
-      <Svg width={size} height={size} style={StyleSheet.absoluteFill}>
+      <Svg width={size} height={size} style={StyleSheet.absoluteFill as object}>
         <Circle
           cx={center}
           cy={center}
@@ -163,8 +163,8 @@ const AnimatedTrustRing: React.FC<AnimatedTrustRingProps> = ({
         <Svg width={size} height={size}>
           <Defs>
             <SvgGradient id="trustGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <Stop offset="0%" stopColor={colors[0]} />
-              <Stop offset="100%" stopColor={colors[1]} />
+              <Stop offset="0%" stopColor={colors.ring} />
+              <Stop offset="100%" stopColor={colors.glow} />
             </SvgGradient>
           </Defs>
           <Circle
@@ -194,7 +194,7 @@ const AnimatedTrustRing: React.FC<AnimatedTrustRingProps> = ({
         style={[
           styles.trustBadge,
           styles.trustBadgeGlow,
-          { backgroundColor: colors[0] },
+          { backgroundColor: colors.ring },
         ]}
       >
         <Text style={styles.trustBadgeText}>{score}</Text>

@@ -132,10 +132,10 @@ export const AchievementsScreen: React.FC = () => {
     headerGlow.value = withRepeat(
       withSequence(
         withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0, { duration: 2000, easing: Easing.inOut(Easing.ease) })
+        withTiming(0, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
       ),
       -1,
-      false
+      false,
     );
   }, [headerGlow]);
 
@@ -153,7 +153,7 @@ export const AchievementsScreen: React.FC = () => {
   const earnedCount = ACHIEVEMENTS.filter((a) => a.isEarned).length;
   const totalXP = ACHIEVEMENTS.filter((a) => a.isEarned).reduce(
     (sum, a) => sum + a.xp,
-    0
+    0,
   );
 
   return (
@@ -197,7 +197,7 @@ export const AchievementsScreen: React.FC = () => {
                 <MaterialCommunityIcons
                   name="trophy"
                   size={32}
-                  color={COLORS.accent}
+                  color={COLORS.accent.primary}
                 />
               </View>
 
@@ -218,7 +218,9 @@ export const AchievementsScreen: React.FC = () => {
                 <View style={styles.statDivider} />
 
                 <View style={styles.statItem}>
-                  <Text style={[styles.statValue, { color: COLORS.accent }]}>
+                  <Text
+                    style={[styles.statValue, { color: COLORS.accent.primary }]}
+                  >
                     {totalXP}
                   </Text>
                   <Text style={styles.statLabel}>TOPLAM XP</Text>
@@ -228,7 +230,9 @@ export const AchievementsScreen: React.FC = () => {
               {/* Progress bar */}
               <View style={styles.overallProgress}>
                 <View style={styles.progressHeader}>
-                  <Text style={styles.progressLabel}>Koleksiyon İlerlemesi</Text>
+                  <Text style={styles.progressLabel}>
+                    Koleksiyon İlerlemesi
+                  </Text>
                   <Text style={styles.progressPercent}>
                     {Math.round((earnedCount / ACHIEVEMENTS.length) * 100)}%
                   </Text>
@@ -366,7 +370,7 @@ const styles = StyleSheet.create({
     marginLeft: -100,
     width: 200,
     height: 100,
-    backgroundColor: COLORS.accent,
+    backgroundColor: COLORS.accent.primary,
     borderRadius: 100,
   },
   summaryContent: {
@@ -377,7 +381,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: `${COLORS.accent}20`,
+    backgroundColor: `${COLORS.accent.primary}20`,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING.lg,

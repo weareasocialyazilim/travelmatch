@@ -20,7 +20,6 @@ import * as Location from 'expo-location';
 import { useSearchStore } from '@/stores/searchStore';
 import {
   discoverNearbyMoments,
-  discoverMomentsFallback,
   type DiscoveryMoment,
 } from '@/services/discoveryService';
 import { logger } from '@/utils/logger';
@@ -134,44 +133,38 @@ export const useDiscoverMoments = (): UseDiscoverMomentsReturn => {
 
         const currentCursor = reset ? null : cursor;
 
-        // Try PostGIS RPC first
-        let result = await discoverNearbyMoments({
-          userLocation,
-          filters,
+        // Transform searchStore filters to DiscoverMomentsParams format
+        const discoveryFilters = {
+          minAge: filters.ageRange?.[0],
+          maxAge: filters.ageRange?.[1],
+          gender: filters.gender?.includes('all')
+            ? undefined
+            : filters.gender?.[0],
+        };
+
+        // Discover moments (automatically falls back if RPC fails)
+        const result = await discoverNearbyMoments({
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+          radiusKm: filters.maxDistance,
+          filters: discoveryFilters,
           limit: 20,
           cursor: currentCursor || undefined,
         });
 
-        // Fallback if RPC fails
-        if (result.error) {
-          logger.warn(
-            '[useDiscoverMoments] RPC failed, using fallback',
-            result.error,
-          );
-          const fallbackResult = await discoverMomentsFallback({
-            userLocation,
-            filters,
-            limit: 20,
-          });
-          result = {
-            ...fallbackResult,
-            nextCursor: null,
-          };
-        }
-
         if (!mountedRef.current) return;
 
         if (reset) {
-          setMoments(result.data);
+          setMoments(result.moments);
         } else {
-          setMoments((prev) => [...prev, ...result.data]);
+          setMoments((prev) => [...prev, ...result.moments]);
         }
 
         setHasMore(result.hasMore);
-        setCursor(result.nextCursor);
+        setCursor(result.nextCursor ?? null);
 
         logger.debug('[useDiscoverMoments] Moments fetched', {
-          count: result.data.length,
+          count: result.moments.length,
           hasMore: result.hasMore,
           filters: {
             maxDistance: filters.maxDistance,

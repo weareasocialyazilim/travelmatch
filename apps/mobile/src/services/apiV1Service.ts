@@ -13,7 +13,7 @@
 import NetInfo from '@react-native-community/netinfo';
 import { logger } from '../utils/logger';
 import { sessionManager } from './sessionManager';
-import { ErrorHandler, isNetworkRelatedError, isAuthError } from '../utils/errorHandler';
+import { ErrorHandler, isNetworkRelatedError } from '../utils/errorHandler';
 import * as Sentry from '../config/sentry';
 
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
@@ -122,7 +122,10 @@ class ApiClient {
     }
   }
 
-  private async getHeaders(useToken?: string, traceId?: string): Promise<HeadersInit> {
+  private async getHeaders(
+    useToken?: string,
+    traceId?: string,
+  ): Promise<HeadersInit> {
     // Use provided token or get from session manager
     const token = useToken || (await sessionManager.getValidToken());
 
@@ -159,11 +162,16 @@ class ApiClient {
       const isOnline = await this.checkNetwork();
       if (!isOnline) {
         logger.warn(`[API v1] [${traceId}] Request blocked - offline`);
-        Sentry.addBreadcrumb('API request blocked - offline', 'api', 'warning', {
-          traceId,
-          path,
-          method,
-        });
+        Sentry.addBreadcrumb(
+          'API request blocked - offline',
+          'api',
+          'warning',
+          {
+            traceId,
+            path,
+            method,
+          },
+        );
         return {
           success: false,
           error: {
@@ -185,7 +193,9 @@ class ApiClient {
         isRetry,
       });
 
-      logger.info(`[API v1] [${traceId}] ${method} ${path}${isRetry ? ' (retry)' : ''}`);
+      logger.info(
+        `[API v1] [${traceId}] ${method} ${path}${isRetry ? ' (retry)' : ''}`,
+      );
 
       const response = await fetch(url, {
         method,
@@ -199,19 +209,25 @@ class ApiClient {
       // 401 UNAUTHORIZED - Token expired/invalid
       // ============================================
       if (response.status === 401 && !isRetry) {
-        logger.warn(`[API v1] [${traceId}] 401 Unauthorized - attempting token refresh`);
+        logger.warn(
+          `[API v1] [${traceId}] 401 Unauthorized - attempting token refresh`,
+        );
 
         // Try to refresh token
         const newToken = await sessionManager.getValidToken();
 
         if (newToken) {
           // Retry request with new token (preserve trace ID)
-          logger.info(`[API v1] [${traceId}] Token refreshed, retrying request`);
+          logger.info(
+            `[API v1] [${traceId}] Token refreshed, retrying request`,
+          );
           return this.request<T>(method, path, body, true, traceId);
         } else {
           // Refresh failed - session expired
           const latency = Date.now() - startTime;
-          logger.error(`[API v1] [${traceId}] Token refresh failed - session expired (${latency}ms)`);
+          logger.error(
+            `[API v1] [${traceId}] Token refresh failed - session expired (${latency}ms)`,
+          );
 
           // Trigger session expired callback
           if (this.sessionExpiredCallback) {
@@ -231,7 +247,10 @@ class ApiClient {
       const latency = Date.now() - startTime;
 
       if (!response.ok) {
-        logger.error(`[API v1] [${traceId}] Error ${response.status} (${latency}ms):`, data);
+        logger.error(
+          `[API v1] [${traceId}] Error ${response.status} (${latency}ms):`,
+          data,
+        );
         Sentry.addBreadcrumb('API request failed', 'api', 'error', {
           traceId,
           path,
@@ -261,7 +280,10 @@ class ApiClient {
       const latency = Date.now() - startTime;
 
       // Use consolidated error handler
-      const standardizedError = ErrorHandler.handle(error, `API v1 [${traceId}]`);
+      const standardizedError = ErrorHandler.handle(
+        error,
+        `API v1 [${traceId}]`,
+      );
       logger.error(`[API v1] [${traceId}] Request failed (${latency}ms):`, {
         code: standardizedError.code,
         message: standardizedError.message,
@@ -336,7 +358,10 @@ export const apiV1Service = {
   // AUTH
   // ============================================
   async login(email: string, password: string) {
-    return apiClient.post<AuthLoginResponse>('/auth/login', { email, password });
+    return apiClient.post<AuthLoginResponse>('/auth/login', {
+      email,
+      password,
+    });
   },
 
   async logout() {

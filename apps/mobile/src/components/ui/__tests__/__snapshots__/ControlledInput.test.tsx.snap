@@ -1,25 +1,22 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
-<View
+<RCTView
   ref={null}
 >
-  <View
+  <RCTView
     ref={null}
   >
-    <View
+    <RCTView
       ref={null}
       style={
-        [
-          {
-            "marginBottom": 20,
-            "width": "100%",
-          },
-          undefined,
-        ]
+        {
+          "marginBottom": 20,
+          "width": "100%",
+        }
       }
     >
-      <Text
+      <RCTText
         ref={null}
         style={
           {
@@ -32,54 +29,49 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
             "marginLeft": 4,
           }
         }
+        testID="RCTText"
       >
         EMAIL
-      </Text>
-      <View
+      </RCTText>
+      <RCTView
         data-intensity={10}
         data-tint="dark"
         ref={null}
         style={
-          [
-            {
-              "backgroundColor": "rgba(255, 255, 255, 0.8)",
+          {
+            "0": {
+              "borderRadius": 16,
+              "overflow": "hidden",
             },
-            [
-              {
-                "borderRadius": 16,
-                "overflow": "hidden",
-              },
-              {
-                "backgroundColor": "rgba(255, 255, 255, 0.03)",
-                "borderRadius": 16,
-              },
-              {
-                "borderColor": "rgba(255, 255, 255, 0.05)",
-                "borderWidth": 1,
-              },
-              {
-                "padding": 16,
-              },
-              [
-                {
-                  "backgroundColor": "rgba(255, 255, 255, 0.03)",
-                  "borderColor": "transparent",
-                  "borderRadius": 18,
-                  "borderWidth": 1,
-                  "height": 58,
-                  "justifyContent": "center",
-                  "padding": 0,
-                },
-                false,
-                null,
-                undefined,
-              ],
-              undefined,
-            ],
-          ]
+            "1": {
+              "backgroundColor": "rgba(255, 255, 255, 0.03)",
+              "borderRadius": 16,
+            },
+            "2": {
+              "borderRadius": 12,
+            },
+            "3": {
+              "borderColor": "rgba(255, 255, 255, 0.05)",
+              "borderWidth": 1,
+            },
+            "4": {
+              "padding": 16,
+            },
+            "5": {
+              "backgroundColor": "rgba(255, 255, 255, 0.03)",
+              "borderColor": "transparent",
+              "borderRadius": 18,
+              "borderWidth": 1,
+              "height": 58,
+              "justifyContent": "center",
+              "padding": 0,
+            },
+            "6": undefined,
+            "backgroundColor": "rgba(255, 255, 255, 0.8)",
+          }
         }
       >
-        <View
+        <RCTView
           ref={null}
           style={
             {
@@ -89,9 +81,9 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
             }
           }
         >
-          <TextInput
+          <RCTTextInput
             onBlur={[Function]}
-            onChangeText={[Function]}
+            onChange={[Function]}
             onFocus={[Function]}
             placeholder="Enter email"
             placeholderTextColor="#475569"
@@ -110,26 +102,23 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
             testID="email-input"
             value=""
           />
-        </View>
-      </View>
-    </View>
-  </View>
-  <View
+        </RCTView>
+      </RCTView>
+    </RCTView>
+  </RCTView>
+  <RCTView
     ref={null}
   >
-    <View
+    <RCTView
       ref={null}
       style={
-        [
-          {
-            "marginBottom": 20,
-            "width": "100%",
-          },
-          undefined,
-        ]
+        {
+          "marginBottom": 20,
+          "width": "100%",
+        }
       }
     >
-      <Text
+      <RCTText
         ref={null}
         style={
           {
@@ -142,54 +131,49 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
             "marginLeft": 4,
           }
         }
+        testID="RCTText"
       >
         PASSWORD
-      </Text>
-      <View
+      </RCTText>
+      <RCTView
         data-intensity={10}
         data-tint="dark"
         ref={null}
         style={
-          [
-            {
-              "backgroundColor": "rgba(255, 255, 255, 0.8)",
+          {
+            "0": {
+              "borderRadius": 16,
+              "overflow": "hidden",
             },
-            [
-              {
-                "borderRadius": 16,
-                "overflow": "hidden",
-              },
-              {
-                "backgroundColor": "rgba(255, 255, 255, 0.03)",
-                "borderRadius": 16,
-              },
-              {
-                "borderColor": "rgba(255, 255, 255, 0.05)",
-                "borderWidth": 1,
-              },
-              {
-                "padding": 16,
-              },
-              [
-                {
-                  "backgroundColor": "rgba(255, 255, 255, 0.03)",
-                  "borderColor": "transparent",
-                  "borderRadius": 18,
-                  "borderWidth": 1,
-                  "height": 58,
-                  "justifyContent": "center",
-                  "padding": 0,
-                },
-                false,
-                null,
-                undefined,
-              ],
-              undefined,
-            ],
-          ]
+            "1": {
+              "backgroundColor": "rgba(255, 255, 255, 0.03)",
+              "borderRadius": 16,
+            },
+            "2": {
+              "borderRadius": 12,
+            },
+            "3": {
+              "borderColor": "rgba(255, 255, 255, 0.05)",
+              "borderWidth": 1,
+            },
+            "4": {
+              "padding": 16,
+            },
+            "5": {
+              "backgroundColor": "rgba(255, 255, 255, 0.03)",
+              "borderColor": "transparent",
+              "borderRadius": 18,
+              "borderWidth": 1,
+              "height": 58,
+              "justifyContent": "center",
+              "padding": 0,
+            },
+            "6": undefined,
+            "backgroundColor": "rgba(255, 255, 255, 0.8)",
+          }
         }
       >
-        <View
+        <RCTView
           ref={null}
           style={
             {
@@ -199,27 +183,25 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
             }
           }
         >
-          <RCTIconView
-            accessibilityLabel="lock-closed-outline"
-            iconName="lock-closed-outline"
+          <RCTText
+            color="#475569"
+            name="lock-closed-outline"
+            ref={null}
+            size={20}
             style={
-              [
-                {
-                  "height": 20,
-                  "width": 20,
-                },
-                {
-                  "marginRight": 14,
-                },
-              ]
+              {
+                "marginRight": 14,
+              }
             }
-            testID="Ionicons-icon"
-          />
-          <TextInput
+            testID="RCTText"
+          >
+            lock-closed-outline
+          </RCTText>
+          <RCTTextInput
             autoCapitalize="none"
             autoCorrect={false}
             onBlur={[Function]}
-            onChangeText={[Function]}
+            onChange={[Function]}
             onFocus={[Function]}
             placeholder="Enter password"
             placeholderTextColor="#475569"
@@ -239,26 +221,23 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
             testID="password-input"
             value=""
           />
-        </View>
-      </View>
-    </View>
-  </View>
-  <View
+        </RCTView>
+      </RCTView>
+    </RCTView>
+  </RCTView>
+  <RCTView
     ref={null}
   >
-    <View
+    <RCTView
       ref={null}
       style={
-        [
-          {
-            "marginBottom": 20,
-            "width": "100%",
-          },
-          undefined,
-        ]
+        {
+          "marginBottom": 20,
+          "width": "100%",
+        }
       }
     >
-      <Text
+      <RCTText
         ref={null}
         style={
           {
@@ -271,54 +250,49 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
             "marginLeft": 4,
           }
         }
+        testID="RCTText"
       >
         USERNAME
-      </Text>
-      <View
+      </RCTText>
+      <RCTView
         data-intensity={10}
         data-tint="dark"
         ref={null}
         style={
-          [
-            {
-              "backgroundColor": "rgba(255, 255, 255, 0.8)",
+          {
+            "0": {
+              "borderRadius": 16,
+              "overflow": "hidden",
             },
-            [
-              {
-                "borderRadius": 16,
-                "overflow": "hidden",
-              },
-              {
-                "backgroundColor": "rgba(255, 255, 255, 0.03)",
-                "borderRadius": 16,
-              },
-              {
-                "borderColor": "rgba(255, 255, 255, 0.05)",
-                "borderWidth": 1,
-              },
-              {
-                "padding": 16,
-              },
-              [
-                {
-                  "backgroundColor": "rgba(255, 255, 255, 0.03)",
-                  "borderColor": "transparent",
-                  "borderRadius": 18,
-                  "borderWidth": 1,
-                  "height": 58,
-                  "justifyContent": "center",
-                  "padding": 0,
-                },
-                false,
-                null,
-                undefined,
-              ],
-              undefined,
-            ],
-          ]
+            "1": {
+              "backgroundColor": "rgba(255, 255, 255, 0.03)",
+              "borderRadius": 16,
+            },
+            "2": {
+              "borderRadius": 12,
+            },
+            "3": {
+              "borderColor": "rgba(255, 255, 255, 0.05)",
+              "borderWidth": 1,
+            },
+            "4": {
+              "padding": 16,
+            },
+            "5": {
+              "backgroundColor": "rgba(255, 255, 255, 0.03)",
+              "borderColor": "transparent",
+              "borderRadius": 18,
+              "borderWidth": 1,
+              "height": 58,
+              "justifyContent": "center",
+              "padding": 0,
+            },
+            "6": undefined,
+            "backgroundColor": "rgba(255, 255, 255, 0.8)",
+          }
         }
       >
-        <View
+        <RCTView
           ref={null}
           style={
             {
@@ -328,9 +302,9 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
             }
           }
         >
-          <TextInput
+          <RCTTextInput
             onBlur={[Function]}
-            onChangeText={[Function]}
+            onChange={[Function]}
             onFocus={[Function]}
             placeholder="Enter username"
             placeholderTextColor="#475569"
@@ -349,26 +323,23 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
             testID="username-input"
             value=""
           />
-        </View>
-      </View>
-    </View>
-  </View>
-  <View
+        </RCTView>
+      </RCTView>
+    </RCTView>
+  </RCTView>
+  <RCTView
     ref={null}
   >
-    <View
+    <RCTView
       ref={null}
       style={
-        [
-          {
-            "marginBottom": 20,
-            "width": "100%",
-          },
-          undefined,
-        ]
+        {
+          "marginBottom": 20,
+          "width": "100%",
+        }
       }
     >
-      <Text
+      <RCTText
         ref={null}
         style={
           {
@@ -381,54 +352,49 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
             "marginLeft": 4,
           }
         }
+        testID="RCTText"
       >
         BIO
-      </Text>
-      <View
+      </RCTText>
+      <RCTView
         data-intensity={10}
         data-tint="dark"
         ref={null}
         style={
-          [
-            {
-              "backgroundColor": "rgba(255, 255, 255, 0.8)",
+          {
+            "0": {
+              "borderRadius": 16,
+              "overflow": "hidden",
             },
-            [
-              {
-                "borderRadius": 16,
-                "overflow": "hidden",
-              },
-              {
-                "backgroundColor": "rgba(255, 255, 255, 0.03)",
-                "borderRadius": 16,
-              },
-              {
-                "borderColor": "rgba(255, 255, 255, 0.05)",
-                "borderWidth": 1,
-              },
-              {
-                "padding": 16,
-              },
-              [
-                {
-                  "backgroundColor": "rgba(255, 255, 255, 0.03)",
-                  "borderColor": "transparent",
-                  "borderRadius": 18,
-                  "borderWidth": 1,
-                  "height": 58,
-                  "justifyContent": "center",
-                  "padding": 0,
-                },
-                false,
-                null,
-                undefined,
-              ],
-              undefined,
-            ],
-          ]
+            "1": {
+              "backgroundColor": "rgba(255, 255, 255, 0.03)",
+              "borderRadius": 16,
+            },
+            "2": {
+              "borderRadius": 12,
+            },
+            "3": {
+              "borderColor": "rgba(255, 255, 255, 0.05)",
+              "borderWidth": 1,
+            },
+            "4": {
+              "padding": 16,
+            },
+            "5": {
+              "backgroundColor": "rgba(255, 255, 255, 0.03)",
+              "borderColor": "transparent",
+              "borderRadius": 18,
+              "borderWidth": 1,
+              "height": 58,
+              "justifyContent": "center",
+              "padding": 0,
+            },
+            "6": undefined,
+            "backgroundColor": "rgba(255, 255, 255, 0.8)",
+          }
         }
       >
-        <View
+        <RCTView
           ref={null}
           style={
             {
@@ -438,11 +404,11 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
             }
           }
         >
-          <TextInput
+          <RCTTextInput
             multiline={true}
             numberOfLines={4}
             onBlur={[Function]}
-            onChangeText={[Function]}
+            onChange={[Function]}
             onFocus={[Function]}
             placeholder="Tell us about yourself"
             placeholderTextColor="#475569"
@@ -461,33 +427,30 @@ exports[`ControlledInput Snapshots should match snapshot for form 1`] = `
             testID="bio-input"
             value=""
           />
-        </View>
-      </View>
-    </View>
-  </View>
-</View>
+        </RCTView>
+      </RCTView>
+    </RCTView>
+  </RCTView>
+</RCTView>
 `;
 
 exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
-<View
+<RCTView
   ref={null}
 >
-  <View
+  <RCTView
     ref={null}
   >
-    <View
+    <RCTView
       ref={null}
       style={
-        [
-          {
-            "marginBottom": 20,
-            "width": "100%",
-          },
-          undefined,
-        ]
+        {
+          "marginBottom": 20,
+          "width": "100%",
+        }
       }
     >
-      <Text
+      <RCTText
         ref={null}
         style={
           {
@@ -500,54 +463,49 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
             "marginLeft": 4,
           }
         }
+        testID="RCTText"
       >
         EMAIL
-      </Text>
-      <View
+      </RCTText>
+      <RCTView
         data-intensity={10}
         data-tint="dark"
         ref={null}
         style={
-          [
-            {
-              "backgroundColor": "rgba(255, 255, 255, 0.8)",
+          {
+            "0": {
+              "borderRadius": 16,
+              "overflow": "hidden",
             },
-            [
-              {
-                "borderRadius": 16,
-                "overflow": "hidden",
-              },
-              {
-                "backgroundColor": "rgba(255, 255, 255, 0.03)",
-                "borderRadius": 16,
-              },
-              {
-                "borderColor": "rgba(255, 255, 255, 0.05)",
-                "borderWidth": 1,
-              },
-              {
-                "padding": 16,
-              },
-              [
-                {
-                  "backgroundColor": "rgba(255, 255, 255, 0.03)",
-                  "borderColor": "transparent",
-                  "borderRadius": 18,
-                  "borderWidth": 1,
-                  "height": 58,
-                  "justifyContent": "center",
-                  "padding": 0,
-                },
-                false,
-                null,
-                undefined,
-              ],
-              undefined,
-            ],
-          ]
+            "1": {
+              "backgroundColor": "rgba(255, 255, 255, 0.03)",
+              "borderRadius": 16,
+            },
+            "2": {
+              "borderRadius": 12,
+            },
+            "3": {
+              "borderColor": "rgba(255, 255, 255, 0.05)",
+              "borderWidth": 1,
+            },
+            "4": {
+              "padding": 16,
+            },
+            "5": {
+              "backgroundColor": "rgba(255, 255, 255, 0.03)",
+              "borderColor": "transparent",
+              "borderRadius": 18,
+              "borderWidth": 1,
+              "height": 58,
+              "justifyContent": "center",
+              "padding": 0,
+            },
+            "6": undefined,
+            "backgroundColor": "rgba(255, 255, 255, 0.8)",
+          }
         }
       >
-        <View
+        <RCTView
           ref={null}
           style={
             {
@@ -557,9 +515,9 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
             }
           }
         >
-          <TextInput
+          <RCTTextInput
             onBlur={[Function]}
-            onChangeText={[Function]}
+            onChange={[Function]}
             onFocus={[Function]}
             placeholder="Enter email"
             placeholderTextColor="#475569"
@@ -578,26 +536,23 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
             testID="email-input"
             value="test@example.com"
           />
-        </View>
-      </View>
-    </View>
-  </View>
-  <View
+        </RCTView>
+      </RCTView>
+    </RCTView>
+  </RCTView>
+  <RCTView
     ref={null}
   >
-    <View
+    <RCTView
       ref={null}
       style={
-        [
-          {
-            "marginBottom": 20,
-            "width": "100%",
-          },
-          undefined,
-        ]
+        {
+          "marginBottom": 20,
+          "width": "100%",
+        }
       }
     >
-      <Text
+      <RCTText
         ref={null}
         style={
           {
@@ -610,54 +565,49 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
             "marginLeft": 4,
           }
         }
+        testID="RCTText"
       >
         PASSWORD
-      </Text>
-      <View
+      </RCTText>
+      <RCTView
         data-intensity={10}
         data-tint="dark"
         ref={null}
         style={
-          [
-            {
-              "backgroundColor": "rgba(255, 255, 255, 0.8)",
+          {
+            "0": {
+              "borderRadius": 16,
+              "overflow": "hidden",
             },
-            [
-              {
-                "borderRadius": 16,
-                "overflow": "hidden",
-              },
-              {
-                "backgroundColor": "rgba(255, 255, 255, 0.03)",
-                "borderRadius": 16,
-              },
-              {
-                "borderColor": "rgba(255, 255, 255, 0.05)",
-                "borderWidth": 1,
-              },
-              {
-                "padding": 16,
-              },
-              [
-                {
-                  "backgroundColor": "rgba(255, 255, 255, 0.03)",
-                  "borderColor": "transparent",
-                  "borderRadius": 18,
-                  "borderWidth": 1,
-                  "height": 58,
-                  "justifyContent": "center",
-                  "padding": 0,
-                },
-                false,
-                null,
-                undefined,
-              ],
-              undefined,
-            ],
-          ]
+            "1": {
+              "backgroundColor": "rgba(255, 255, 255, 0.03)",
+              "borderRadius": 16,
+            },
+            "2": {
+              "borderRadius": 12,
+            },
+            "3": {
+              "borderColor": "rgba(255, 255, 255, 0.05)",
+              "borderWidth": 1,
+            },
+            "4": {
+              "padding": 16,
+            },
+            "5": {
+              "backgroundColor": "rgba(255, 255, 255, 0.03)",
+              "borderColor": "transparent",
+              "borderRadius": 18,
+              "borderWidth": 1,
+              "height": 58,
+              "justifyContent": "center",
+              "padding": 0,
+            },
+            "6": undefined,
+            "backgroundColor": "rgba(255, 255, 255, 0.8)",
+          }
         }
       >
-        <View
+        <RCTView
           ref={null}
           style={
             {
@@ -667,27 +617,25 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
             }
           }
         >
-          <RCTIconView
-            accessibilityLabel="lock-closed-outline"
-            iconName="lock-closed-outline"
+          <RCTText
+            color="#475569"
+            name="lock-closed-outline"
+            ref={null}
+            size={20}
             style={
-              [
-                {
-                  "height": 20,
-                  "width": 20,
-                },
-                {
-                  "marginRight": 14,
-                },
-              ]
+              {
+                "marginRight": 14,
+              }
             }
-            testID="Ionicons-icon"
-          />
-          <TextInput
+            testID="RCTText"
+          >
+            lock-closed-outline
+          </RCTText>
+          <RCTTextInput
             autoCapitalize="none"
             autoCorrect={false}
             onBlur={[Function]}
-            onChangeText={[Function]}
+            onChange={[Function]}
             onFocus={[Function]}
             placeholder="Enter password"
             placeholderTextColor="#475569"
@@ -707,26 +655,23 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
             testID="password-input"
             value=""
           />
-        </View>
-      </View>
-    </View>
-  </View>
-  <View
+        </RCTView>
+      </RCTView>
+    </RCTView>
+  </RCTView>
+  <RCTView
     ref={null}
   >
-    <View
+    <RCTView
       ref={null}
       style={
-        [
-          {
-            "marginBottom": 20,
-            "width": "100%",
-          },
-          undefined,
-        ]
+        {
+          "marginBottom": 20,
+          "width": "100%",
+        }
       }
     >
-      <Text
+      <RCTText
         ref={null}
         style={
           {
@@ -739,54 +684,49 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
             "marginLeft": 4,
           }
         }
+        testID="RCTText"
       >
         USERNAME
-      </Text>
-      <View
+      </RCTText>
+      <RCTView
         data-intensity={10}
         data-tint="dark"
         ref={null}
         style={
-          [
-            {
-              "backgroundColor": "rgba(255, 255, 255, 0.8)",
+          {
+            "0": {
+              "borderRadius": 16,
+              "overflow": "hidden",
             },
-            [
-              {
-                "borderRadius": 16,
-                "overflow": "hidden",
-              },
-              {
-                "backgroundColor": "rgba(255, 255, 255, 0.03)",
-                "borderRadius": 16,
-              },
-              {
-                "borderColor": "rgba(255, 255, 255, 0.05)",
-                "borderWidth": 1,
-              },
-              {
-                "padding": 16,
-              },
-              [
-                {
-                  "backgroundColor": "rgba(255, 255, 255, 0.03)",
-                  "borderColor": "transparent",
-                  "borderRadius": 18,
-                  "borderWidth": 1,
-                  "height": 58,
-                  "justifyContent": "center",
-                  "padding": 0,
-                },
-                false,
-                null,
-                undefined,
-              ],
-              undefined,
-            ],
-          ]
+            "1": {
+              "backgroundColor": "rgba(255, 255, 255, 0.03)",
+              "borderRadius": 16,
+            },
+            "2": {
+              "borderRadius": 12,
+            },
+            "3": {
+              "borderColor": "rgba(255, 255, 255, 0.05)",
+              "borderWidth": 1,
+            },
+            "4": {
+              "padding": 16,
+            },
+            "5": {
+              "backgroundColor": "rgba(255, 255, 255, 0.03)",
+              "borderColor": "transparent",
+              "borderRadius": 18,
+              "borderWidth": 1,
+              "height": 58,
+              "justifyContent": "center",
+              "padding": 0,
+            },
+            "6": undefined,
+            "backgroundColor": "rgba(255, 255, 255, 0.8)",
+          }
         }
       >
-        <View
+        <RCTView
           ref={null}
           style={
             {
@@ -796,9 +736,9 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
             }
           }
         >
-          <TextInput
+          <RCTTextInput
             onBlur={[Function]}
-            onChangeText={[Function]}
+            onChange={[Function]}
             onFocus={[Function]}
             placeholder="Enter username"
             placeholderTextColor="#475569"
@@ -817,26 +757,23 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
             testID="username-input"
             value="testuser"
           />
-        </View>
-      </View>
-    </View>
-  </View>
-  <View
+        </RCTView>
+      </RCTView>
+    </RCTView>
+  </RCTView>
+  <RCTView
     ref={null}
   >
-    <View
+    <RCTView
       ref={null}
       style={
-        [
-          {
-            "marginBottom": 20,
-            "width": "100%",
-          },
-          undefined,
-        ]
+        {
+          "marginBottom": 20,
+          "width": "100%",
+        }
       }
     >
-      <Text
+      <RCTText
         ref={null}
         style={
           {
@@ -849,54 +786,49 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
             "marginLeft": 4,
           }
         }
+        testID="RCTText"
       >
         BIO
-      </Text>
-      <View
+      </RCTText>
+      <RCTView
         data-intensity={10}
         data-tint="dark"
         ref={null}
         style={
-          [
-            {
-              "backgroundColor": "rgba(255, 255, 255, 0.8)",
+          {
+            "0": {
+              "borderRadius": 16,
+              "overflow": "hidden",
             },
-            [
-              {
-                "borderRadius": 16,
-                "overflow": "hidden",
-              },
-              {
-                "backgroundColor": "rgba(255, 255, 255, 0.03)",
-                "borderRadius": 16,
-              },
-              {
-                "borderColor": "rgba(255, 255, 255, 0.05)",
-                "borderWidth": 1,
-              },
-              {
-                "padding": 16,
-              },
-              [
-                {
-                  "backgroundColor": "rgba(255, 255, 255, 0.03)",
-                  "borderColor": "transparent",
-                  "borderRadius": 18,
-                  "borderWidth": 1,
-                  "height": 58,
-                  "justifyContent": "center",
-                  "padding": 0,
-                },
-                false,
-                null,
-                undefined,
-              ],
-              undefined,
-            ],
-          ]
+            "1": {
+              "backgroundColor": "rgba(255, 255, 255, 0.03)",
+              "borderRadius": 16,
+            },
+            "2": {
+              "borderRadius": 12,
+            },
+            "3": {
+              "borderColor": "rgba(255, 255, 255, 0.05)",
+              "borderWidth": 1,
+            },
+            "4": {
+              "padding": 16,
+            },
+            "5": {
+              "backgroundColor": "rgba(255, 255, 255, 0.03)",
+              "borderColor": "transparent",
+              "borderRadius": 18,
+              "borderWidth": 1,
+              "height": 58,
+              "justifyContent": "center",
+              "padding": 0,
+            },
+            "6": undefined,
+            "backgroundColor": "rgba(255, 255, 255, 0.8)",
+          }
         }
       >
-        <View
+        <RCTView
           ref={null}
           style={
             {
@@ -906,11 +838,11 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
             }
           }
         >
-          <TextInput
+          <RCTTextInput
             multiline={true}
             numberOfLines={4}
             onBlur={[Function]}
-            onChangeText={[Function]}
+            onChange={[Function]}
             onFocus={[Function]}
             placeholder="Tell us about yourself"
             placeholderTextColor="#475569"
@@ -929,9 +861,9 @@ exports[`ControlledInput Snapshots should match snapshot with values 1`] = `
             testID="bio-input"
             value="Hello world"
           />
-        </View>
-      </View>
-    </View>
-  </View>
-</View>
+        </RCTView>
+      </RCTView>
+    </RCTView>
+  </RCTView>
+</RCTView>
 `;

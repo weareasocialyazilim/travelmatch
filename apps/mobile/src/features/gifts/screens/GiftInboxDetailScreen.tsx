@@ -96,10 +96,10 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
 
     // NEW: Check for 20% bonus threshold (generous offer unlocks chat)
     // This is the "Hemen Sohbet Et" unlock rule
-    const hasGenerousOffer = gifts.some((g) => {
-      if (!g.requestedAmount || g.requestedAmount === 0) return false;
-      return g.amount >= g.requestedAmount * 1.2; // 20% above requested
-    });
+    // NOTE: requestedAmount not yet in type, using high-value flag instead
+    const hasGenerousOffer = gifts.some(
+      (g) => g.isHighValueOffer || g.amount >= 500,
+    );
 
     return hasExplicitHighValue || hasGenerousOffer;
   }, [gifts, pendingOffers]);
@@ -167,8 +167,8 @@ export const GiftInboxDetailScreen: React.FC<GiftInboxDetailScreenProps> = ({
         name: senderName,
         avatar: senderAvatar,
         isVerified: senderVerified,
-        type: 'subscriber',
-        role: TIER_CONFIG[senderSubscriptionTier]?.label || 'Üye',
+        type: 'traveler' as const,
+        role: 'Traveler' as const,
         kyc: senderVerified ? 'Verified' : 'Unverified',
         location: senderCity,
       },

@@ -21,7 +21,6 @@ import {
   TouchableOpacity,
   SectionList,
   RefreshControl,
-  Platform,
   Dimensions,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -34,7 +33,6 @@ import Animated, {
   FadeInRight,
   Layout,
 } from 'react-native-reanimated';
-import { COLORS } from '@/constants/colors';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { LoadingState } from '@/components/LoadingState';
@@ -44,7 +42,7 @@ import { logger } from '@/utils/logger';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: _SCREEN_WIDTH } = Dimensions.get('window');
 
 type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
 
@@ -474,10 +472,11 @@ export const GiftLegacyScreen: React.FC = () => {
   // Handle gift item press
   const handleGiftPress = (gift: GiftItem) => {
     navigation.navigate('GiftInboxDetail', {
-      senderId: gift.type === 'sent' ? user?.id || '' : gift.otherUserId,
-      senderName: gift.type === 'sent' ? 'Ben' : gift.otherUserName,
-      senderAvatar: gift.otherUserAvatar,
-      senderTrustScore: gift.otherUserTrustScore,
+      senderId: gift.type === 'sent' ? user?.id || '' : gift.otherUserId || '',
+      senderName:
+        gift.type === 'sent' ? 'Ben' : gift.otherUserName || 'Unknown',
+      senderAvatar: gift.otherUserAvatar || '',
+      senderTrustScore: gift.otherUserTrustScore ?? 50,
       senderSubscriptionTier: 'free',
       senderMomentCount: 0,
       senderVerified: false,
@@ -485,11 +484,26 @@ export const GiftLegacyScreen: React.FC = () => {
       gifts: [
         {
           id: gift.id,
-          momentId: gift.momentId,
-          momentTitle: gift.momentTitle,
+          momentTitle: gift.momentTitle || '',
+          momentEmoji: '🎁',
+          momentCategory: 'experience',
           amount: gift.amount,
-          status: gift.status,
+          message: '',
+          paymentType: 'direct' as const,
+          status: (gift.status === 'refunded'
+            ? 'failed'
+            : gift.status === 'completed'
+              ? 'verified'
+              : 'pending') as
+            | 'pending'
+            | 'received'
+            | 'pending_proof'
+            | 'verifying'
+            | 'verified'
+            | 'failed',
+          createdAt: gift.createdAt || new Date().toISOString(),
           isHighValueOffer: gift.amount >= 500,
+          isSubscriberOffer: false,
         },
       ],
       pendingOffers: [],
@@ -500,7 +514,7 @@ export const GiftLegacyScreen: React.FC = () => {
 
   if (loading) {
     return (
-      <LoadingState type="fullscreen" message="Hediye geçmişi yükleniyor..." />
+      <LoadingState type="skeleton" message="Hediye geçmişi yükleniyor..." />
     );
   }
 
