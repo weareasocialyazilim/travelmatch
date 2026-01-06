@@ -1383,6 +1383,29 @@ jest.mock('@sentry/react-native', () => ({
 jest.mock('react-native-reanimated', () => {
   const View = require('react-native').View;
 
+  // Helper to create fully chainable animation mock - MUST be defined before use
+  function createChainableAnimation() {
+    const chainable = {};
+    const methods = [
+      'duration',
+      'delay',
+      'easing',
+      'springify',
+      'damping',
+      'stiffness',
+      'mass',
+      'overshootClamping',
+      'restDisplacementThreshold',
+      'restSpeedThreshold',
+      'withInitialValues',
+      'withCallback',
+    ];
+    methods.forEach((method) => {
+      chainable[method] = () => chainable;
+    });
+    return chainable;
+  }
+
   // Create a proper shared value mock
   const useSharedValue = (initialValue) => {
     const ref = { current: initialValue };
@@ -1461,7 +1484,9 @@ jest.mock('react-native-reanimated', () => {
     FadeIn: createChainableAnimation(),
     FadeOut: createChainableAnimation(),
     FadeInUp: createChainableAnimation(),
+    FadeInDown: createChainableAnimation(),
     FadeOutDown: createChainableAnimation(),
+    FadeOutUp: createChainableAnimation(),
     SlideInRight: createChainableAnimation(),
     SlideOutLeft: createChainableAnimation(),
     SlideInLeft: createChainableAnimation(),
@@ -1473,30 +1498,8 @@ jest.mock('react-native-reanimated', () => {
     ZoomIn: createChainableAnimation(),
     ZoomOut: createChainableAnimation(),
     Layout: createChainableAnimation(),
+    FadeInRight: createChainableAnimation(),
   };
-
-  // Helper to create fully chainable animation mock
-  function createChainableAnimation() {
-    const chainable = {};
-    const methods = [
-      'duration',
-      'delay',
-      'easing',
-      'springify',
-      'damping',
-      'stiffness',
-      'mass',
-      'overshootClamping',
-      'restDisplacementThreshold',
-      'restSpeedThreshold',
-      'withInitialValues',
-      'withCallback',
-    ];
-    methods.forEach((method) => {
-      chainable[method] = () => chainable;
-    });
-    return chainable;
-  }
 });
 
 // Mock console.time and console.timeEnd for logger tests

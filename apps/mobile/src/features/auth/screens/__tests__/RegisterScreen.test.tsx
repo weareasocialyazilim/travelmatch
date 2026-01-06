@@ -42,7 +42,11 @@ jest.mock('react-hook-form', () => ({
     }) => React.ReactNode;
   }) =>
     renderProp({
-      field: { onChange: jest.fn() as jest.Mock, onBlur: jest.fn() as jest.Mock, value: '' },
+      field: {
+        onChange: jest.fn() as jest.Mock,
+        onBlur: jest.fn() as jest.Mock,
+        value: '',
+      },
       fieldState: { error: null },
     }),
 }));
@@ -163,16 +167,6 @@ jest.mock('react-native-safe-area-context', () => ({
 jest.mock('expo-localization', () => ({
   getLocales: () => [{ languageCode: 'en', languageTag: 'en-US' }],
   locale: 'en-US',
-}));
-
-// Mock I18nContext
-jest.mock('../../../../context/I18nContext', () => ({
-  useI18n: () => ({
-    t: (key: string) => key,
-    language: 'en',
-    setLanguage: jest.fn() as jest.Mock,
-  }),
-  I18nProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 // Import component after all mocks
