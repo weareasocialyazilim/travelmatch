@@ -90,7 +90,7 @@ export const EditCardModal = ({
     try {
       await onSave(card.id, expiry);
       onClose();
-    } catch {
+    } catch (_saveCardError) {
       setError('Kart güncellenemedi. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);
@@ -121,21 +121,34 @@ export const EditCardModal = ({
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.title}>Kartı Güncelle</Text>
-            <TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-              <MaterialCommunityIcons name="close" size={24} color={COLORS.text.primary} />
+            <TouchableOpacity
+              onPress={onClose}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <MaterialCommunityIcons
+                name="close"
+                size={24}
+                color={COLORS.text.primary}
+              />
             </TouchableOpacity>
           </View>
 
           {/* Card Info */}
           <View style={styles.cardInfo}>
             <MaterialCommunityIcons
-              name={card.brand.toLowerCase() === 'visa' ? 'credit-card' : 'credit-card-outline'}
+              name={
+                card.brand.toLowerCase() === 'visa'
+                  ? 'credit-card'
+                  : 'credit-card-outline'
+              }
               size={32}
               color={COLORS.brand.primary}
             />
             <View style={styles.cardDetails}>
               <Text style={styles.cardBrand}>{card.brand}</Text>
-              <Text style={styles.cardNumber}>•••• •••• •••• {card.lastFour}</Text>
+              <Text style={styles.cardNumber}>
+                •••• •••• •••• {card.lastFour}
+              </Text>
             </View>
           </View>
 
@@ -170,7 +183,8 @@ export const EditCardModal = ({
               color={COLORS.brand.primary}
             />
             <Text style={styles.infoText}>
-              Güvenlik nedeniyle kart numarasını değiştiremezsiniz. Farklı bir kartınız varsa yeni kart ekleyin.
+              Güvenlik nedeniyle kart numarasını değiştiremezsiniz. Farklı bir
+              kartınız varsa yeni kart ekleyin.
             </Text>
           </View>
 
@@ -180,7 +194,10 @@ export const EditCardModal = ({
               <Text style={styles.cancelButtonText}>İptal</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.saveButton, (!expiry || isLoading) && styles.saveButtonDisabled]}
+              style={[
+                styles.saveButton,
+                (!expiry || isLoading) && styles.saveButtonDisabled,
+              ]}
               onPress={handleSave}
               disabled={!expiry || isLoading}
             >

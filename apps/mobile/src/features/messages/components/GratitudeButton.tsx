@@ -94,7 +94,7 @@ export const GratitudeButton: React.FC<GratitudeButtonProps> = memo(
         setShowModal(false);
         setCustomMessage('');
         setSelectedQuick(null);
-      } catch {
+      } catch (_sendGratitudeError) {
         // Error handled by parent
       } finally {
         setIsSending(false);

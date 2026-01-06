@@ -238,7 +238,7 @@ export const hasAppStateBackup = async (): Promise<boolean> => {
   try {
     const backup = await Storage.getItem(APP_STATE_BACKUP_KEY);
     return backup !== null;
-  } catch {
+  } catch (_backupError) {
     return false;
   }
 };

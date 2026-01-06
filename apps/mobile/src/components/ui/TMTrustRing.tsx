@@ -41,7 +41,7 @@ try {
   if (Circle) {
     AnimatedCircle = Animated.createAnimatedComponent(Circle);
   }
-} catch {
+} catch (_svgImportError) {
   // SVG not available, will use fallback
 }
 
@@ -383,7 +383,7 @@ export const TMTrustRing: React.FC<TMTrustRingProps> = ({
         )}
       </View>
     );
-  } catch {
+  } catch (_renderError) {
     setSvgError(true);
     return (
       <FallbackTMTrustRing

@@ -85,7 +85,7 @@ function SafeImage({
       if (!ALLOWED_PROTOCOLS.has(parsed.protocol)) return null;
       // Return re-serialized URL (safe)
       return parsed.href;
-    } catch {
+    } catch (urlParseError) {
       return null;
     }
   })();
@@ -107,7 +107,7 @@ function createSafeImageSrc(url: string | null | undefined): string {
     const parsed = new URL(trimmed);
     if (!ALLOWED_PROTOCOLS.has(parsed.protocol)) return '';
     return parsed.href;
-  } catch {
+  } catch (createUrlError) {
     return '';
   }
 }

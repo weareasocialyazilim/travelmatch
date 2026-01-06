@@ -339,7 +339,7 @@ const AppNavigator = () => {
         } else {
           setInitialRoute('Splash');
         }
-      } catch {
+      } catch (_onboardingError) {
         setInitialRoute('Splash');
       }
     };

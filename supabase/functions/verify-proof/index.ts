@@ -191,7 +191,7 @@ Note: If you cannot directly access the URL, base your analysis on the metadata 
 
   try {
     analysis = JSON.parse(content.text);
-  } catch {
+  } catch (parseJsonError) {
     // If parsing fails, try to extract JSON from the response
     const jsonMatch = content.text.match(/\{[\s\S]*\}/);
     if (jsonMatch) {

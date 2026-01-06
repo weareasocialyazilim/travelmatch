@@ -1,6 +1,6 @@
 /**
  * Database Utilities for Edge Functions
- * 
+ *
  * Common database operations, query helpers, and error handling.
  */
 
@@ -36,53 +36,50 @@ export function handleDbError(error: unknown): DatabaseError {
 
   if (typeof error === 'object' && error !== null) {
     const err = error as Record<string, unknown>;
-    
+
     // PostgreSQL error codes
     if (err.code === '23505') {
       return new DatabaseError(
         'A record with this value already exists',
         ERROR_CODES.CONFLICT,
         err.details,
-        err.hint as string
+        err.hint as string,
       );
     }
-    
+
     if (err.code === '23503') {
       return new DatabaseError(
         'Referenced record not found',
         ERROR_CODES.NOT_FOUND,
         err.details,
-        err.hint as string
+        err.hint as string,
       );
     }
-    
+
     if (err.code === '42501') {
       return new DatabaseError(
         'Permission denied',
         ERROR_CODES.FORBIDDEN,
         err.details,
-        err.hint as string
+        err.hint as string,
       );
     }
 
     if (err.code === 'PGRST116') {
-      return new DatabaseError(
-        'Record not found',
-        ERROR_CODES.NOT_FOUND
-      );
+      return new DatabaseError('Record not found', ERROR_CODES.NOT_FOUND);
     }
 
     return new DatabaseError(
       (err.message as string) || 'Database error',
       ERROR_CODES.INTERNAL_ERROR,
       err.details,
-      err.hint as string
+      err.hint as string,
     );
   }
 
   return new DatabaseError(
     'Unknown database error',
-    ERROR_CODES.INTERNAL_ERROR
+    ERROR_CODES.INTERNAL_ERROR,
   );
 }
 
@@ -104,13 +101,13 @@ interface QueryOptions {
  */
 export function buildSelectQuery(
   table: ReturnType<ReturnType<typeof createSupabaseClients>['admin']['from']>,
-  options: QueryOptions = {}
+  options: QueryOptions = {},
 ) {
   let query = table.select(options.select || '*');
 
   if (options.orderBy) {
-    query = query.order(options.orderBy, { 
-      ascending: options.orderDirection !== 'desc' 
+    query = query.order(options.orderBy, {
+      ascending: options.orderDirection !== 'desc',
     });
   }
 
@@ -119,7 +116,10 @@ export function buildSelectQuery(
   }
 
   if (options.offset) {
-    query = query.range(options.offset, options.offset + (options.limit || 20) - 1);
+    query = query.range(
+      options.offset,
+      options.offset + (options.limit || 20) - 1,
+    );
   }
 
   return query;
@@ -150,7 +150,7 @@ export async function paginatedQuery<T>(
     page?: number;
     limit?: number;
     select?: string;
-  } = {}
+  } = {},
 ): Promise<PaginatedResult<T>> {
   const page = Math.max(1, options.page || 1);
   const limit = Math.min(100, Math.max(1, options.limit || 20));
@@ -209,7 +209,10 @@ export interface CursorPaginatedResult<T> {
 /**
  * Encode cursor
  */
-export function encodeCursor(value: string | number | Date, id: string): string {
+export function encodeCursor(
+  value: string | number | Date,
+  id: string,
+): string {
   const timestamp = value instanceof Date ? value.toISOString() : String(value);
   return btoa(JSON.stringify({ ts: timestamp, id }));
 }
@@ -217,14 +220,16 @@ export function encodeCursor(value: string | number | Date, id: string): string 
 /**
  * Decode cursor
  */
-export function decodeCursor(cursor: string): { ts: string; id: string } | null {
+export function decodeCursor(
+  cursor: string,
+): { ts: string; id: string } | null {
   try {
     const decoded = JSON.parse(atob(cursor));
     if (decoded.ts && decoded.id) {
       return decoded;
     }
     return null;
-  } catch {
+  } catch (cursorDecodeError) {
     return null;
   }
 }
@@ -242,7 +247,7 @@ export async function withTransaction<T>(
   request: Request,
   authHeader: string,
   operation: () => Promise<T>,
-  logger?: Logger
+  logger?: Logger,
 ): Promise<T> {
   const log = logger || createLogger('transaction', request);
   const startTime = Date.now();
@@ -253,7 +258,10 @@ export async function withTransaction<T>(
     log.debug('Transaction completed', { durationMs: Date.now() - startTime });
     return result;
   } catch (error) {
-    log.error('Transaction failed', error instanceof Error ? error : new Error(String(error)));
+    log.error(
+      'Transaction failed',
+      error instanceof Error ? error : new Error(String(error)),
+    );
     throw handleDbError(error);
   }
 }
@@ -269,7 +277,7 @@ export async function batchOperation<T, R>(
   items: T[],
   batchSize: number,
   operation: (batch: T[]) => Promise<R[]>,
-  logger?: Logger
+  logger?: Logger,
 ): Promise<R[]> {
   const results: R[] = [];
   const batches = Math.ceil(items.length / batchSize);
@@ -277,11 +285,11 @@ export async function batchOperation<T, R>(
   for (let i = 0; i < batches; i++) {
     const start = i * batchSize;
     const batch = items.slice(start, start + batchSize);
-    
-    logger?.debug(`Processing batch ${i + 1}/${batches}`, { 
-      batchSize: batch.length 
+
+    logger?.debug(`Processing batch ${i + 1}/${batches}`, {
+      batchSize: batch.length,
     });
-    
+
     const batchResults = await operation(batch);
     results.push(...batchResults);
   }
@@ -303,9 +311,9 @@ export function isDeleted(record: { deleted_at?: string | null }): boolean {
 /**
  * Add soft delete filter to query
  */
-export function excludeDeleted<T extends { is: (column: string, value: null) => T }>(
-  query: T
-): T {
+export function excludeDeleted<
+  T extends { is: (column: string, value: null) => T },
+>(query: T): T {
   return query.is('deleted_at', null);
 }
 
@@ -341,7 +349,7 @@ export function haversineDistance(
   lat1: number,
   lng1: number,
   lat2: number,
-  lng2: number
+  lng2: number,
 ): number {
   const R = 6371000; // Earth's radius in meters
   const dLat = ((lat2 - lat1) * Math.PI) / 180;

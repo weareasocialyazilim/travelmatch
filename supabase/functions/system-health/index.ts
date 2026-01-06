@@ -240,7 +240,7 @@ async function checkAdminAuth(authHeader: string | null): Promise<boolean> {
       .single();
 
     return profile?.role === 'admin' || profile?.role === 'super_admin';
-  } catch {
+  } catch (adminCheckError) {
     return false;
   }
 }

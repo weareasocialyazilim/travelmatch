@@ -13,10 +13,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  signInWithPhone,
-  verifyPhoneOtp,
-} from '../services/authService';
+import { signInWithPhone, verifyPhoneOtp } from '../services/authService';
 import { useToast } from '@/context/ToastContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { COLORS } from '@/constants/colors';
@@ -79,7 +76,7 @@ export const PhoneAuthScreen: React.FC = () => {
         setCountdown(60);
         showToast('Doğrulama kodu gönderildi!', 'success');
       }
-    } catch {
+    } catch (_sendOtpError) {
       showToast('Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
     } finally {
       setIsLoading(false);
@@ -133,7 +130,7 @@ export const PhoneAuthScreen: React.FC = () => {
         showToast('Telefon başarıyla doğrulandı!', 'success');
         // Navigation handled by auth state change
       }
-    } catch {
+    } catch (_verifyOtpError) {
       showToast('Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
     } finally {
       setIsLoading(false);

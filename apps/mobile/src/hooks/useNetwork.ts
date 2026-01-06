@@ -42,7 +42,7 @@ export const useNetwork = (): UseNetworkReturn => {
       if (typeof subscriber === 'function') {
         try {
           subscriber();
-        } catch {
+        } catch (_unsubscribeError) {
           // swallow - defensive in case mock throws on double-unsubscribe
         }
       } else if (
@@ -51,7 +51,7 @@ export const useNetwork = (): UseNetworkReturn => {
       ) {
         try {
           (subscriber as any).remove();
-        } catch {
+        } catch (_removeError) {
           // swallow
         }
       }

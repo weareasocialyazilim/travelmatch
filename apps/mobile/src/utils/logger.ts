@@ -338,8 +338,8 @@ class Logger {
     try {
       if (typeof err === 'object')
         return JSON.stringify(this.sanitizeData(err));
-    } catch {
-      // fallback
+    } catch (_stringifyError) {
+      // fallback - object cannot be serialized
     }
     return String(err);
   }
@@ -366,8 +366,8 @@ class Logger {
     try {
       // @ts-ignore runtime optional
       this.flushInterval?.unref?.();
-    } catch {
-      // ignore
+    } catch (_unrefError) {
+      // ignore - unref not available in all environments
     }
   }
 
@@ -395,7 +395,7 @@ class Logger {
         } as any);
       });
       return;
-    } catch {
+    } catch (_requireError) {
       // fallback to dynamic import if require fails
     }
 
@@ -408,7 +408,7 @@ class Logger {
           data: { args: log.args, timestamp: log.timestamp },
         } as any);
       });
-    } catch {
+    } catch (_sentryError) {
       // Sentry not available, logs are discarded
     }
   }

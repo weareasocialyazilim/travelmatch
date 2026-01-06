@@ -263,7 +263,7 @@ const SearchMapScreen: React.FC = () => {
 
     try {
       return supercluster.getClusters(bounds, Math.floor(currentZoom));
-    } catch {
+    } catch (_clusterError) {
       return mapMarkers.map((m) => ({ ...m, cluster: false, point_count: 1 }));
     }
   }, [supercluster, userLocation, currentZoom, mapMarkers]);
@@ -313,7 +313,7 @@ const SearchMapScreen: React.FC = () => {
             longitude: location.coords.longitude,
           });
         }
-      } catch {
+      } catch (_locationPermissionError) {
         // Default to Istanbul if permission denied
         setUserLocation({
           latitude: 41.0082,

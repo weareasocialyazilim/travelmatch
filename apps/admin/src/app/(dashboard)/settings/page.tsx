@@ -18,7 +18,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -31,14 +37,16 @@ const profileSchema = z.object({
   email: z.string().email('Geçerli bir e-posta adresi girin'),
 });
 
-const passwordSchema = z.object({
-  currentPassword: z.string().min(6, 'Mevcut şifre gerekli'),
-  newPassword: z.string().min(8, 'Yeni şifre en az 8 karakter olmalıdır'),
-  confirmPassword: z.string(),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: 'Şifreler eşleşmiyor',
-  path: ['confirmPassword'],
-});
+const passwordSchema = z
+  .object({
+    currentPassword: z.string().min(6, 'Mevcut şifre gerekli'),
+    newPassword: z.string().min(8, 'Yeni şifre en az 8 karakter olmalıdır'),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Şifreler eşleşmiyor',
+    path: ['confirmPassword'],
+  });
 
 type ProfileForm = z.infer<typeof profileSchema>;
 type PasswordForm = z.infer<typeof passwordSchema>;
@@ -69,7 +77,7 @@ export default function SettingsPage() {
     try {
       // API call would go here
       toast.success('Profil güncellendi');
-    } catch {
+    } catch (profileError) {
       toast.error('Profil güncellenemedi');
     }
   };
@@ -79,7 +87,7 @@ export default function SettingsPage() {
       // API call would go here
       toast.success('Şifre güncellendi');
       passwordForm.reset();
-    } catch {
+    } catch (passwordError) {
       toast.error('Şifre güncellenemedi');
     }
   };
@@ -119,12 +127,13 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Profil Bilgileri</CardTitle>
-              <CardDescription>
-                Hesap bilgilerinizi güncelleyin
-              </CardDescription>
+              <CardDescription>Hesap bilgilerinizi güncelleyin</CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
+              <form
+                onSubmit={profileForm.handleSubmit(onProfileSubmit)}
+                className="space-y-6"
+              >
                 {/* Avatar */}
                 <div className="flex items-center gap-6">
                   <Avatar className="h-20 w-20">
@@ -205,7 +214,10 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-4">
+              <form
+                onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}
+                className="space-y-4"
+              >
                 <div className="space-y-2">
                   <Label htmlFor="currentPassword">Mevcut Şifre</Label>
                   <div className="relative">
@@ -220,7 +232,9 @@ export default function SettingsPage() {
                       variant="ghost"
                       size="icon"
                       className="absolute right-0 top-0 h-full px-3"
-                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      onClick={() =>
+                        setShowCurrentPassword(!showCurrentPassword)
+                      }
                     >
                       {showCurrentPassword ? (
                         <EyeOff className="h-4 w-4" />
@@ -327,7 +341,9 @@ export default function SettingsPage() {
                       Son aktivite: Şu an aktif
                     </div>
                   </div>
-                  <div className="text-sm text-green-600 font-medium">Aktif</div>
+                  <div className="text-sm text-green-600 font-medium">
+                    Aktif
+                  </div>
                 </div>
               </div>
               <Button variant="outline" className="mt-4 w-full">

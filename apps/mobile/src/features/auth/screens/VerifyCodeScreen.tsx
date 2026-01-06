@@ -102,7 +102,7 @@ export const VerifyCodeScreen: React.FC = () => {
         showToast('Code verified successfully!', 'success');
         navigation.navigate('SetPassword');
       }
-    } catch {
+    } catch (_verifyError) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       showToast('Verification failed. Please try again.', 'error');
     } finally {
@@ -133,7 +133,7 @@ export const VerifyCodeScreen: React.FC = () => {
         setCode(Array(CODE_LENGTH).fill(''));
         inputRefs.current[0]?.focus();
       }
-    } catch {
+    } catch (_resendError) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       showToast('Failed to resend code. Please try again.', 'error');
     } finally {

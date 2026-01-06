@@ -97,7 +97,7 @@ export const Storage = {
     if (!value) return null;
     try {
       return JSON.parse(value) as T;
-    } catch {
+    } catch (_parseError) {
       return null;
     }
   },

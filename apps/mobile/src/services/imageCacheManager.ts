@@ -401,7 +401,7 @@ class ImageCacheManager {
           await FileSystem.deleteAsync(entry.localPath, { idempotent: true });
           freedSpace += entry.size;
           this.metadata.delete(key);
-        } catch {
+        } catch (_deleteError) {
           logger.warn('[ImageCache] Failed to delete:', entry.localPath);
         }
       }
@@ -523,8 +523,8 @@ class ImageCacheManager {
         const cacheKey = await this.getCacheKey(url, variant);
         try {
           await this.fetchAndCache(url, cacheKey);
-        } catch {
-          // Ignore prefetch errors
+        } catch (_prefetchError) {
+          // Ignore prefetch errors - these are background optimizations
         }
       }),
     ).catch(() => {
@@ -555,8 +555,8 @@ class ImageCacheManager {
             await FileSystem.deleteAsync(entry.localPath, { idempotent: true });
             this.stats.diskSize -= entry.size;
             cleaned++;
-          } catch {
-            // Ignore
+          } catch (_cleanError) {
+            // Ignore - file may already be deleted
           }
         }
         this.metadata.delete(key);
@@ -626,8 +626,8 @@ try {
       logger.error('[ImageCache] Auto-init failed:', error);
     });
   }
-} catch {
-  // ignore
+} catch (_initError) {
+  // ignore - Jest environment detection may fail
 }
 
 // Provide legacy-compatible public helpers used by tests and older code
@@ -656,7 +656,7 @@ try {
     return await (imageCacheManager as any).evictLRU?.(
       Math.max(1, (imageCacheManager as any).config?.maxDiskCacheSizeMB * 0.8),
     );
-  } catch {
+  } catch (_evictError) {
     return await (imageCacheManager as any).cleanExpired?.();
   }
 };

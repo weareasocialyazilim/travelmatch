@@ -53,8 +53,24 @@ export interface GiftInboxItem {
   momentTitle?: string;
 }
 
-export type SortOption = 'newest' | 'highest_amount' | 'highest_rating' | 'best_match' | 'date' | 'amount' | 'status' | 'sender';
-export type FilterOption = 'all' | 'pending' | 'accepted' | 'rejected' | 'expired' | 'thirty_plus' | 'verified_only' | 'ready_to_chat';
+export type SortOption =
+  | 'newest'
+  | 'highest_amount'
+  | 'highest_rating'
+  | 'best_match'
+  | 'date'
+  | 'amount'
+  | 'status'
+  | 'sender';
+export type FilterOption =
+  | 'all'
+  | 'pending'
+  | 'accepted'
+  | 'rejected'
+  | 'expired'
+  | 'thirty_plus'
+  | 'verified_only'
+  | 'ready_to_chat';
 export type SortField = 'date' | 'amount' | 'status';
 export type SortOrder = 'asc' | 'desc';
 
@@ -101,13 +117,18 @@ export function useGiftInbox() {
               id: senderId,
               sender: {
                 id: senderId,
-                username: req.requesterName?.replace(/\s/g, '').toLowerCase() || senderId,
+                username:
+                  req.requesterName?.replace(/\s/g, '').toLowerCase() ||
+                  senderId,
                 name: req.requesterName || 'Unknown',
                 avatar: req.requesterAvatar || '',
                 isVerified: req.requesterVerified || false,
                 rating: req.requesterRating || 0,
                 tripCount: 0,
-                city: typeof req.requesterLocation === 'string' ? req.requesterLocation : '',
+                city:
+                  typeof req.requesterLocation === 'string'
+                    ? req.requesterLocation
+                    : '',
               },
               gifts: [],
               totalAmount: 0,
@@ -116,7 +137,8 @@ export function useGiftInbox() {
               latestGiftAt: req.createdAt || new Date().toISOString(),
               status: 'pending' as const,
               createdAt: req.createdAt || new Date().toISOString(),
-              canStartChat: req.status === 'accepted' || req.status === 'completed',
+              canStartChat:
+                req.status === 'accepted' || req.status === 'completed',
               score: 0,
             };
           }
@@ -143,15 +165,23 @@ export function useGiftInbox() {
           acc[senderId].score = acc[senderId].totalAmount;
 
           // Update latest gift timestamp
-          if (!acc[senderId].latestGiftAt ||
-              (req.createdAt && new Date(req.createdAt) > new Date(acc[senderId].latestGiftAt))) {
-            acc[senderId].latestGiftAt = req.createdAt || acc[senderId].latestGiftAt;
+          if (
+            !acc[senderId].latestGiftAt ||
+            (req.createdAt &&
+              new Date(req.createdAt) > new Date(acc[senderId].latestGiftAt))
+          ) {
+            acc[senderId].latestGiftAt =
+              req.createdAt || acc[senderId].latestGiftAt;
             acc[senderId].latestMessage = req.message || '';
           }
 
           // Update overall status based on gifts
-          const hasAccepted = acc[senderId].gifts.some(g => g.status === 'accepted');
-          const allRejected = acc[senderId].gifts.every(g => g.status === 'rejected');
+          const hasAccepted = acc[senderId].gifts.some(
+            (g) => g.status === 'accepted',
+          );
+          const allRejected = acc[senderId].gifts.every(
+            (g) => g.status === 'rejected',
+          );
           if (hasAccepted) {
             acc[senderId].status = 'accepted';
             acc[senderId].canStartChat = true;
@@ -188,29 +218,35 @@ export function useGiftInbox() {
     setFilters((prev) => ({ ...prev, ...newFilters }));
   }, []);
 
-  const acceptGift = useCallback(async (giftId: string) => {
-    try {
-      await requestService.acceptRequest(giftId, {});
-      logger.info('Gift accepted', { giftId });
-      // Refresh the list after accepting
-      await fetchGifts();
-    } catch (err) {
-      logger.error('Failed to accept gift', { giftId, error: err });
-      throw err;
-    }
-  }, [fetchGifts]);
+  const acceptGift = useCallback(
+    async (giftId: string) => {
+      try {
+        await requestService.acceptRequest(giftId, {});
+        logger.info('Gift accepted', { giftId });
+        // Refresh the list after accepting
+        await fetchGifts();
+      } catch (err) {
+        logger.error('Failed to accept gift', { giftId, error: err });
+        throw err;
+      }
+    },
+    [fetchGifts],
+  );
 
-  const rejectGift = useCallback(async (giftId: string, reason?: string) => {
-    try {
-      await requestService.declineRequest(giftId, reason);
-      logger.info('Gift rejected', { giftId });
-      // Refresh the list after rejecting
-      await fetchGifts();
-    } catch (err) {
-      logger.error('Failed to reject gift', { giftId, error: err });
-      throw err;
-    }
-  }, [fetchGifts]);
+  const rejectGift = useCallback(
+    async (giftId: string, reason?: string) => {
+      try {
+        await requestService.declineRequest(giftId, reason);
+        logger.info('Gift rejected', { giftId });
+        // Refresh the list after rejecting
+        await fetchGifts();
+      } catch (err) {
+        logger.error('Failed to reject gift', { giftId, error: err });
+        throw err;
+      }
+    },
+    [fetchGifts],
+  );
 
   // Apply filters
   const filteredItems = useMemo(() => {
@@ -242,7 +278,10 @@ export function useGiftInbox() {
       switch (sortBy) {
         case 'newest':
         case 'date':
-          return new Date(b.latestGiftAt).getTime() - new Date(a.latestGiftAt).getTime();
+          return (
+            new Date(b.latestGiftAt).getTime() -
+            new Date(a.latestGiftAt).getTime()
+          );
         case 'highest_amount':
         case 'amount':
           return b.totalAmount - a.totalAmount;
@@ -271,10 +310,10 @@ export function useGiftInbox() {
   const newToday = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return gifts.filter(g => {
+    return gifts.filter((g) => {
       try {
         return new Date(g.latestGiftAt) >= today;
-      } catch {
+      } catch (_dateError) {
         return false;
       }
     });
@@ -282,29 +321,47 @@ export function useGiftInbox() {
 
   const getSortLabel = useCallback((sort: SortOption): string => {
     switch (sort) {
-      case 'date': return 'Date';
-      case 'amount': return 'Amount';
-      case 'status': return 'Status';
-      case 'sender': return 'Sender';
-      case 'newest': return 'Newest';
-      case 'highest_amount': return 'Highest Amount';
-      case 'highest_rating': return 'Highest Rating';
-      case 'best_match': return 'Best Match';
-      default: return 'Date';
+      case 'date':
+        return 'Date';
+      case 'amount':
+        return 'Amount';
+      case 'status':
+        return 'Status';
+      case 'sender':
+        return 'Sender';
+      case 'newest':
+        return 'Newest';
+      case 'highest_amount':
+        return 'Highest Amount';
+      case 'highest_rating':
+        return 'Highest Rating';
+      case 'best_match':
+        return 'Best Match';
+      default:
+        return 'Date';
     }
   }, []);
 
   const getFilterLabel = useCallback((filter: FilterOption): string => {
     switch (filter) {
-      case 'all': return 'All';
-      case 'pending': return 'Pending';
-      case 'accepted': return 'Accepted';
-      case 'rejected': return 'Rejected';
-      case 'expired': return 'Expired';
-      case 'thirty_plus': return '30+';
-      case 'verified_only': return 'Verified Only';
-      case 'ready_to_chat': return 'Ready to Chat';
-      default: return 'All';
+      case 'all':
+        return 'All';
+      case 'pending':
+        return 'Pending';
+      case 'accepted':
+        return 'Accepted';
+      case 'rejected':
+        return 'Rejected';
+      case 'expired':
+        return 'Expired';
+      case 'thirty_plus':
+        return '30+';
+      case 'verified_only':
+        return 'Verified Only';
+      case 'ready_to_chat':
+        return 'Ready to Chat';
+      default:
+        return 'All';
     }
   }, []);
 

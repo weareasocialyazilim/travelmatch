@@ -14,7 +14,7 @@ export class ValidationError extends Error {
 
 export const validateRequest = <T>(
   schema: z.ZodSchema<T>,
-  data: unknown
+  data: unknown,
 ): T => {
   const result = schema.safeParse(data);
 
@@ -28,7 +28,7 @@ export const validateRequest = <T>(
 export const parseJsonBody = async (req: Request): Promise<unknown> => {
   try {
     return await req.json();
-  } catch {
+  } catch (jsonError) {
     throw new Error('Invalid JSON body');
   }
 };

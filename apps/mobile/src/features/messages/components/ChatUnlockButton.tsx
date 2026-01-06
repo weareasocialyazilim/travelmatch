@@ -109,7 +109,7 @@ export const ChatUnlockButton: React.FC<ChatUnlockButtonProps> = memo(
       try {
         await onUnlock();
         setShowConfirmModal(false);
-      } catch {
+      } catch (_unlockError) {
         // Error handled by parent
       } finally {
         setIsUnlocking(false);

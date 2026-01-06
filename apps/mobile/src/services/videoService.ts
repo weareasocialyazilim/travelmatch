@@ -52,10 +52,9 @@ let Compressor: {
 } | null = null;
 
 try {
-   
   Compressor = require('react-native-compressor');
   logger.info('[VideoService] react-native-compressor loaded');
-} catch {
+} catch (_importError) {
   logger.warn(
     '[VideoService] react-native-compressor not installed. Video compression disabled.',
   );
