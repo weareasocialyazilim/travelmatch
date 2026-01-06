@@ -20,7 +20,6 @@ import {
   TouchableOpacity,
   RefreshControl,
   Dimensions,
-  StatusBar,
   FlatList,
 } from 'react-native';
 import { showAlert } from '@/stores/modalStore';

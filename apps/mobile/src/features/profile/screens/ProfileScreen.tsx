@@ -516,10 +516,6 @@ const ProfileScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-    backgroundColor: PROFILE_COLORS.background.primary,
-  },
   container: {
     flex: 1,
   },

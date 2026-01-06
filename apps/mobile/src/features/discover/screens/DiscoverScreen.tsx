@@ -19,7 +19,6 @@ import {
   StyleSheet,
   Dimensions,
   FlatList,
-  StatusBar,
   ActivityIndicator,
   Text,
   TouchableOpacity,
@@ -469,12 +468,6 @@ const DiscoverScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  // Main Container - "Soft Minimalist" background
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.bg.primary,
-  },
-
   // Header Section with Stories
   headerSection: {
     marginVertical: 12,
