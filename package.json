@@ -4,7 +4,6 @@
   "private": true,
   "description": "TravelMatch Monorepo - Social travel platform",
   "scripts": {
-    "eas-build-pre-install": "npm install -g pnpm@9.15.9 && pnpm install --frozen-lockfile",
     "dev": "turbo run dev",
     "dev:mobile": "pnpm --filter @travelmatch/mobile dev",
     "dev:web": "pnpm --filter @travelmatch/web dev",
