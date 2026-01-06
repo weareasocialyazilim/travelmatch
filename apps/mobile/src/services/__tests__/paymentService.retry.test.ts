@@ -269,7 +269,7 @@ describe('PaymentService - Retry Logic', () => {
   });
 
   describe('Withdrawal Retry', () => {
-    // Skip this test - fake timers don't work well with nested Promise/setTimeout patterns
+    // Skip - nested Promise/setTimeout patterns don't work with fake timers
     it.skip('should retry withdrawal after network failure', async () => {
       const mockTransaction = {
         id: 'tx-456',
@@ -322,7 +322,7 @@ describe('PaymentService - Retry Logic', () => {
   });
 
   describe('Concurrent Retry Scenarios', () => {
-    // Skip this test - fake timers don't work well with concurrent Promise patterns
+    // Skip - concurrent Promise patterns don't work with fake timers
     it.skip('should handle multiple concurrent payments with retries', async () => {
       const mockTransaction1 = {
         id: 'tx-1',

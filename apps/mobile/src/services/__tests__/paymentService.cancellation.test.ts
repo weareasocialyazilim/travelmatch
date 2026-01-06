@@ -113,15 +113,19 @@ describe('PaymentService - Payment Cancellation', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // Don't use fake timers - they cause issues with Promise race conditions
+    jest.useFakeTimers();
     mockSupabase.auth.getUser.mockResolvedValue({
       data: { user: mockUser },
       error: null,
     });
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   describe('Cancel During Processing', () => {
-    // Skip this test - fake timers don't work well with Promise race/interval patterns
+    // Skip - fake timers cause issues with Promise race/interval patterns
     it.skip('should cancel payment while processing', async () => {
       const mockTransaction = {
         id: 'tx-123',
@@ -178,7 +182,7 @@ describe('PaymentService - Payment Cancellation', () => {
       );
     });
 
-    // Skip this test - uses advanceTimersByTimeAsync but fake timers not enabled
+    // Skip - advanceTimersByTimeAsync doesn't work well with this pattern
     it.skip('should not cancel if already completed', async () => {
       const mockTransaction = {
         id: 'tx-123',
@@ -337,7 +341,7 @@ describe('PaymentService - Payment Cancellation', () => {
   });
 
   describe('Cleanup on Cancellation', () => {
-    // Skip this test - fake timers don't work well with Promise race/interval patterns
+    // Skip - fake timers cause issues with Promise race patterns
     it.skip('should clean up resources when payment is cancelled', async () => {
       const mockTransaction = {
         id: 'tx-123',
@@ -414,7 +418,7 @@ describe('PaymentService - Payment Cancellation', () => {
   });
 
   describe('Concurrent Cancellations', () => {
-    // Skip these tests - fake timers don't work well with Promise race/interval patterns
+    // Skip - concurrent async patterns don't work with fake timers
     it.skip('should handle multiple concurrent cancellations', async () => {
       const mockTransaction1 = {
         id: 'tx-1',
@@ -488,6 +492,7 @@ describe('PaymentService - Payment Cancellation', () => {
     });
 
     // Skip this test - fake timers don't work well with Promise race/interval patterns
+    // Skip - concurrent async patterns don't work with fake timers
     it.skip('should cancel only specific payment in concurrent scenario', async () => {
       const mockTransaction1 = {
         id: 'tx-1',

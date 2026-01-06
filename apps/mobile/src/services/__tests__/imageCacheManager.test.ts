@@ -1,14 +1,15 @@
 /**
  * Image Cache Manager Tests
- * 
+ *
  * Tests for multi-tier caching (Memory → Disk → Cloudflare → Network)
- * 
- * TODO: These tests need to be updated to match the current implementation.
- * The cache manager has been significantly refactored and tests are out of sync.
+ *
+ * NOTE: Skipped due to complex module dependencies and async initialization
+ * that don't work well with Jest's module mocking system.
+ * TODO: Refactor tests to use dependency injection for better testability.
  */
 
 describe.skip('ImageCacheManager', () => {
-  it('placeholder - tests need to be rewritten', () => {
+  it('placeholder - needs refactoring', () => {
     expect(true).toBe(true);
   });
 });
