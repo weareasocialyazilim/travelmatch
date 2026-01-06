@@ -110,18 +110,24 @@ export const LiquidMomentCard: React.FC<LiquidMomentCardProps> = memo(
     const tierConfig = TIER_CONFIG[hostSubscriptionTier];
     const hasPremiumBorder = tierConfig.showBadge;
 
+    // Premium border style
+    const premiumBorderStyle = useMemo(
+      () =>
+        hasPremiumBorder
+          ? {
+              borderWidth: 2,
+              borderColor: tierConfig.borderColor,
+              shadowColor: tierConfig.borderColor,
+              shadowOpacity: 0.6,
+              shadowRadius: 12,
+            }
+          : null,
+      [hasPremiumBorder, tierConfig.borderColor],
+    );
+
     return (
       <TouchableOpacity
-        style={[
-          styles.container,
-          hasPremiumBorder && {
-            borderWidth: 2,
-            borderColor: tierConfig.borderColor,
-            shadowColor: tierConfig.borderColor,
-            shadowOpacity: 0.6,
-            shadowRadius: 12,
-          },
-        ]}
+        style={[styles.container, premiumBorderStyle]}
         activeOpacity={0.9}
         onPress={onPress}
       >

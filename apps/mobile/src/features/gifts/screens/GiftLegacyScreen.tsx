@@ -139,6 +139,38 @@ const GiftItemCard: React.FC<{
   const statusConfig = STATUS_CONFIG[item.status];
   const proofConfig = PROOF_STATUS_CONFIG[item.proofStatus];
 
+  // Memoized styles for dynamic values
+  const typeColor = item.type === 'sent' ? '#A855F7' : '#10B981';
+  const trustScoreColor =
+    (item.trustScoreChange ?? 0) > 0 ? '#10B981' : '#EF4444';
+
+  const typeIndicatorStyle = useMemo(
+    () => ({ backgroundColor: typeColor }),
+    [typeColor],
+  );
+
+  const categoryIconStyle = useMemo(
+    () => ({ backgroundColor: typeColor + '20' }),
+    [typeColor],
+  );
+
+  const trustScoreChangeStyle = useMemo(
+    () => ({ color: trustScoreColor }),
+    [trustScoreColor],
+  );
+
+  const amountStyle = useMemo(() => ({ color: typeColor }), [typeColor]);
+
+  const statusTextStyle = useMemo(
+    () => ({ color: statusConfig.color }),
+    [statusConfig.color],
+  );
+
+  const proofIndicatorStyle = useMemo(
+    () => ({ backgroundColor: proofConfig.color }),
+    [proofConfig.color],
+  );
+
   return (
     <Animated.View
       entering={FadeInRight.delay(index * 50).springify()}
@@ -147,28 +179,15 @@ const GiftItemCard: React.FC<{
       <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
         <GlassCard intensity={12} style={styles.giftCard}>
           {/* Type indicator */}
-          <View
-            style={[
-              styles.typeIndicator,
-              { backgroundColor: item.type === 'sent' ? '#A855F7' : '#10B981' },
-            ]}
-          />
+          <View style={[styles.typeIndicator, typeIndicatorStyle]} />
 
           <View style={styles.giftContent}>
             {/* Category Icon */}
-            <View
-              style={[
-                styles.categoryIcon,
-                {
-                  backgroundColor:
-                    (item.type === 'sent' ? '#A855F7' : '#10B981') + '20',
-                },
-              ]}
-            >
+            <View style={[styles.categoryIcon, categoryIconStyle]}>
               <MaterialCommunityIcons
                 name={categoryIcon}
                 size={24}
-                color={item.type === 'sent' ? '#A855F7' : '#10B981'}
+                color={typeColor}
               />
             </View>
 
@@ -193,16 +212,10 @@ const GiftItemCard: React.FC<{
                           : 'trending-down'
                       }
                       size={14}
-                      color={item.trustScoreChange > 0 ? '#10B981' : '#EF4444'}
+                      color={trustScoreColor}
                     />
                     <Text
-                      style={[
-                        styles.trustScoreChange,
-                        {
-                          color:
-                            item.trustScoreChange > 0 ? '#10B981' : '#EF4444',
-                        },
-                      ]}
+                      style={[styles.trustScoreChange, trustScoreChangeStyle]}
                     >
                       {item.trustScoreChange > 0 ? '+' : ''}
                       {item.trustScoreChange} Güven Puanı
@@ -213,12 +226,7 @@ const GiftItemCard: React.FC<{
 
             {/* Amount & Status */}
             <View style={styles.giftRight}>
-              <Text
-                style={[
-                  styles.amount,
-                  { color: item.type === 'sent' ? '#A855F7' : '#10B981' },
-                ]}
-              >
+              <Text style={[styles.amount, amountStyle]}>
                 {item.type === 'sent' ? '-' : '+'}₺{item.amount}
               </Text>
               <View style={styles.statusContainer}>
@@ -227,9 +235,7 @@ const GiftItemCard: React.FC<{
                   size={12}
                   color={statusConfig.color}
                 />
-                <Text
-                  style={[styles.statusText, { color: statusConfig.color }]}
-                >
+                <Text style={[styles.statusText, statusTextStyle]}>
                   {statusConfig.label}
                 </Text>
               </View>
@@ -238,12 +244,7 @@ const GiftItemCard: React.FC<{
 
           {/* Proof Status Bar */}
           <View style={styles.proofBar}>
-            <View
-              style={[
-                styles.proofIndicator,
-                { backgroundColor: proofConfig.color },
-              ]}
-            />
+            <View style={[styles.proofIndicator, proofIndicatorStyle]} />
             <Text style={styles.proofText}>{proofConfig.label}</Text>
             <TouchableOpacity style={styles.viewProofButton}>
               <Text style={styles.viewProofText}>Kanıtı Gör</Text>

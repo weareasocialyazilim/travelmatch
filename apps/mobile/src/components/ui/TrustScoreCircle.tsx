@@ -68,11 +68,46 @@ export interface TrustScoreCircleProps {
 
 // Default trust factors if none provided
 const DEFAULT_FACTORS: TrustFactor[] = [
-  { id: '1', name: 'Kimlik', value: 0, maxValue: 30, color: '#10B981', icon: 'shield-check' },
-  { id: '2', name: 'Sosyal', value: 0, maxValue: 15, color: '#3B82F6', icon: 'link-variant' },
-  { id: '3', name: 'Deneyim', value: 0, maxValue: 30, color: '#EC4899', icon: 'check-circle' },
-  { id: '4', name: 'Yanıt', value: 0, maxValue: 15, color: '#F59E0B', icon: 'message-reply' },
-  { id: '5', name: 'Puan', value: 0, maxValue: 10, color: '#8B5CF6', icon: 'star' },
+  {
+    id: '1',
+    name: 'Kimlik',
+    value: 0,
+    maxValue: 30,
+    color: '#10B981',
+    icon: 'shield-check',
+  },
+  {
+    id: '2',
+    name: 'Sosyal',
+    value: 0,
+    maxValue: 15,
+    color: '#3B82F6',
+    icon: 'link-variant',
+  },
+  {
+    id: '3',
+    name: 'Deneyim',
+    value: 0,
+    maxValue: 30,
+    color: '#EC4899',
+    icon: 'check-circle',
+  },
+  {
+    id: '4',
+    name: 'Yanıt',
+    value: 0,
+    maxValue: 15,
+    color: '#F59E0B',
+    icon: 'message-reply',
+  },
+  {
+    id: '5',
+    name: 'Puan',
+    value: 0,
+    maxValue: 10,
+    color: '#8B5CF6',
+    icon: 'star',
+  },
 ];
 
 export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({
@@ -101,7 +136,7 @@ export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({
         withTiming(score / 100, {
           duration: 1500,
           easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-        })
+        }),
       );
     } else {
       cardScale.value = 1;
@@ -166,7 +201,13 @@ export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({
           <View style={[styles.circleContainer, { width: size, height: size }]}>
             <Svg width={size} height={size}>
               <Defs>
-                <LinearGradient id="trustScoreGradient" x1="0" y1="0" x2="1" y2="1">
+                <LinearGradient
+                  id="trustScoreGradient"
+                  x1="0"
+                  y1="0"
+                  x2="1"
+                  y2="1"
+                >
                   <Stop offset="0%" stopColor={primitives.amber[500]} />
                   <Stop offset="100%" stopColor={primitives.magenta[500]} />
                 </LinearGradient>
@@ -187,7 +228,8 @@ export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({
                 {factorSegments.map((segment) => {
                   const segmentRadius = radius + strokeWidth / 2 + 6;
                   const segmentCircumference = 2 * Math.PI * segmentRadius;
-                  const segmentLength = (segment.endAngle - segment.startAngle) / 360;
+                  const segmentLength =
+                    (segment.endAngle - segment.startAngle) / 360;
                   const gapSize = 0.012;
 
                   return (
@@ -200,7 +242,9 @@ export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({
                       strokeWidth={4}
                       fill="none"
                       strokeDasharray={`${segmentCircumference * (segmentLength - gapSize)} ${segmentCircumference}`}
-                      strokeDashoffset={-segmentCircumference * (segment.startAngle / 360)}
+                      strokeDashoffset={
+                        -segmentCircumference * (segment.startAngle / 360)
+                      }
                       strokeLinecap="round"
                       opacity={0.25 + segment.fillPercentage * 0.75}
                     />
@@ -226,7 +270,12 @@ export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({
 
             {/* Center Content */}
             <View style={styles.centerContent}>
-              <View style={[styles.levelIconContainer, { backgroundColor: `${levelColor}12` }]}>
+              <View
+                style={[
+                  styles.levelIconContainer,
+                  { backgroundColor: `${levelColor}12` },
+                ]}
+              >
                 <MaterialCommunityIcons
                   name={getLevelIcon()}
                   size={24}
@@ -235,7 +284,9 @@ export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({
               </View>
               <Text style={styles.scoreText}>{score}</Text>
               <Text style={styles.scoreLabel}>/ 100</Text>
-              <Text style={[styles.levelText, { color: levelColor }]}>{level}</Text>
+              <Text style={[styles.levelText, { color: levelColor }]}>
+                {level}
+              </Text>
             </View>
           </View>
         </Animated.View>
@@ -244,7 +295,12 @@ export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({
       {/* Factor Stats Cards - Floating design */}
       <View style={styles.statsContainer}>
         {factors.slice(0, 3).map((factor, index) => (
-          <StatCard key={factor.id} factor={factor} index={index} animated={animated} />
+          <StatCard
+            key={factor.id}
+            factor={factor}
+            index={index}
+            animated={animated}
+          />
         ))}
       </View>
 
@@ -252,7 +308,12 @@ export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({
       <View style={styles.additionalStats}>
         {factors.slice(3).map((factor) => (
           <View key={factor.id} style={styles.additionalStatItem}>
-            <View style={[styles.additionalStatDot, { backgroundColor: factor.color }]} />
+            <View
+              style={[
+                styles.additionalStatDot,
+                { backgroundColor: factor.color },
+              ]}
+            />
             <Text style={styles.additionalStatLabel}>{factor.name}</Text>
             <Text style={styles.additionalStatValue}>
               {factor.value}/{factor.maxValue}
@@ -265,18 +326,24 @@ export const TrustScoreCircle: React.FC<TrustScoreCircleProps> = ({
 };
 
 // Animated Stat Card Component
-const StatCard: React.FC<{ factor: TrustFactor; index: number; animated: boolean }> = ({
-  factor,
-  index,
-  animated
-}) => {
+const StatCard: React.FC<{
+  factor: TrustFactor;
+  index: number;
+  animated: boolean;
+}> = ({ factor, index, animated }) => {
   const cardOpacity = useSharedValue(0);
   const cardTranslateY = useSharedValue(20);
 
   useEffect(() => {
     if (animated) {
-      cardOpacity.value = withDelay(800 + index * 100, withTiming(1, { duration: 400 }));
-      cardTranslateY.value = withDelay(800 + index * 100, withSpring(0, { damping: 15 }));
+      cardOpacity.value = withDelay(
+        800 + index * 100,
+        withTiming(1, { duration: 400 }),
+      );
+      cardTranslateY.value = withDelay(
+        800 + index * 100,
+        withSpring(0, { damping: 15 }),
+      );
     } else {
       cardOpacity.value = 1;
       cardTranslateY.value = 0;
@@ -369,7 +436,9 @@ export const TrustScoreRingCompact: React.FC<{
       </Svg>
 
       <View style={stylesCompact.centerContent}>
-        <Text style={[stylesCompact.scoreText, { color: levelColor }]}>{score}</Text>
+        <Text style={[stylesCompact.scoreText, { color: levelColor }]}>
+          {score}
+        </Text>
       </View>
     </View>
   );
@@ -548,12 +617,9 @@ interface AwwwardsTrustScoreCircleProps {
  * Kullanıcının Trust Score'unu temsil eden premium SVG ring.
  * Neon glow efekti ve minimalist tasarım.
  */
-export const AwwwardsTrustScoreCircle: React.FC<AwwwardsTrustScoreCircleProps> = ({
-  score,
-  size = 120,
-  animated = true,
-  label = 'GÜVEN PUANI',
-}) => {
+export const AwwwardsTrustScoreCircle: React.FC<
+  AwwwardsTrustScoreCircleProps
+> = ({ score, size = 120, animated = true, label = 'GÜVEN PUANI' }) => {
   const progress = useSharedValue(0);
 
   const strokeWidth = size * 0.08;
@@ -589,26 +655,33 @@ export const AwwwardsTrustScoreCircle: React.FC<AwwwardsTrustScoreCircleProps> =
     return primitives.magenta[400];
   }, [score]);
 
+  // Container style
+  const containerSizeStyle = useMemo(
+    () => ({ width: size, height: size }),
+    [size],
+  );
+
+  // Glow ring style
+  const glowRingStyle = useMemo(
+    () => ({
+      width: size + 4,
+      height: size + 4,
+      borderRadius: (size + 4) / 2,
+      borderColor: glowColor,
+      borderWidth: 2,
+    }),
+    [size, glowColor],
+  );
+
   // Animated progress
   const animatedProps = useAnimatedProps(() => ({
     strokeDasharray: `${progress.value * circumference} ${circumference}`,
   }));
 
   return (
-    <View style={[awwwardsCircleStyles.container, { width: size, height: size }]}>
+    <View style={[awwwardsCircleStyles.container, containerSizeStyle]}>
       {/* Neon Glow Ring (Background) */}
-      <View
-        style={[
-          awwwardsCircleStyles.glowRing,
-          {
-            width: size + 4,
-            height: size + 4,
-            borderRadius: (size + 4) / 2,
-            borderColor: glowColor,
-            borderWidth: 2,
-          },
-        ]}
-      />
+      <View style={[awwwardsCircleStyles.glowRing, glowRingStyle]} />
 
       {/* SVG Circle */}
       <Svg width={size} height={size} style={awwwardsCircleStyles.svg}>
@@ -654,12 +727,7 @@ export const AwwwardsTrustScoreCircle: React.FC<AwwwardsTrustScoreCircleProps> =
         >
           {score}
         </Text>
-        <Text
-          style={[
-            awwwardsCircleStyles.label,
-            { fontSize: size * 0.08 },
-          ]}
-        >
+        <Text style={[awwwardsCircleStyles.label, { fontSize: size * 0.08 }]}>
           {label}
         </Text>
       </View>

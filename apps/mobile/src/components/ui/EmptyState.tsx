@@ -52,6 +52,22 @@ const NeonParticle: React.FC<NeonParticleProps> = ({
   const progress = useSharedValue(0);
   const opacity = useSharedValue(0);
 
+  const particleStyle = useMemo(
+    () => ({
+      left: startX,
+      top: startY,
+      width: size,
+      height: size,
+      borderRadius: size / 2,
+      backgroundColor: color,
+      shadowColor: color,
+      shadowOffset: { width: 0, height: 0 } as const,
+      shadowOpacity: 0.8,
+      shadowRadius: size,
+    }),
+    [startX, startY, size, color],
+  );
+
   useEffect(() => {
     // Animate particle floating upward
     progress.value = withDelay(
@@ -93,24 +109,7 @@ const NeonParticle: React.FC<NeonParticleProps> = ({
   });
 
   return (
-    <Animated.View
-      style={[
-        styles.particle,
-        {
-          left: startX,
-          top: startY,
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          backgroundColor: color,
-          shadowColor: color,
-          shadowOffset: { width: 0, height: 0 },
-          shadowOpacity: 0.8,
-          shadowRadius: size,
-        },
-        animatedStyle,
-      ]}
-    />
+    <Animated.View style={[styles.particle, particleStyle, animatedStyle]} />
   );
 };
 
