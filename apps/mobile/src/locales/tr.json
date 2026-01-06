@@ -606,6 +606,26 @@
   "tagline": {
     "main": "Anları paylaş, deneyimleri hediye et"
   },
+  "feedback": {
+    "title": "Geri Bildirim Paylaş",
+    "subtitle": "Deneyimini geliştirmemize yardım et",
+    "ratingQuestion": "Deneyimini nasıl değerlendirirsin?",
+    "categoryLabel": "Kategori (isteğe bağlı)",
+    "commentLabel": "Ek yorumlar (isteğe bağlı)",
+    "commentPlaceholder": "Deneyimin hakkında daha fazla bilgi ver...",
+    "submitButton": "Geri Bildirim Gönder",
+    "submitting": "Gönderiliyor...",
+    "categories": {
+      "suspiciousActivity": "Şüpheli İşlem 🚨",
+      "fakeProfile": "Sahte Profil",
+      "inappropriateContent": "Uygunsuz İçerik",
+      "fraudSuspicion": "Dolandırıcılık Şüphesi",
+      "giftIssue": "Hediye Sorunu",
+      "generalFeedback": "Genel Geri Bildirim",
+      "bugReport": "Hata Bildirimi",
+      "featureRequest": "Özellik İsteği"
+    }
+  },
   "screens": {
     "linkInvalid": {
       "title": "Geçersiz Link",
