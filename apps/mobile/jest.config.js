@@ -89,7 +89,7 @@ module.exports = {
     'BottomNav\\.test\\.tsx$',
     'ChatAttachmentBottomSheet\\.test\\.tsx$',
     'ChooseCategoryBottomSheet\\.test\\.tsx$',
-    'ClearCacheDialog\\.test\\.tsx$',
+    // 'ClearCacheDialog\\.test\\.tsx$', // FIXED: Migrated from UNSAFE_getByType to testID
     'CompleteGiftBottomSheet\\.test\\.tsx$',
     'ConfirmGiftModal\\.test\\.tsx$',
     'CurrencySelectionBottomSheet\\.test\\.tsx$',
