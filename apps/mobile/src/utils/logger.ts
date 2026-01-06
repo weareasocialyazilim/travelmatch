@@ -325,8 +325,8 @@ class Logger {
       if (env.NODE_ENV === 'test') return true;
       if (Object.prototype.hasOwnProperty.call(env, 'JEST_WORKER_ID'))
         return true;
-    } catch {
-      // ignore
+    } catch (_envCheckError) {
+      // ignore - environment detection may fail in some contexts
     }
     if (typeof (globalThis as any).expect === 'function') return true;
     if (typeof (globalThis as any).jest !== 'undefined') return true;

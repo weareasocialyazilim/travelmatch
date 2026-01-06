@@ -16,43 +16,46 @@ interface PasswordInputProps extends Omit<TextInputProps, 'secureTextEntry'> {
   containerStyle?: ViewStyle;
 }
 
-export const PasswordInput: React.FC<PasswordInputProps> = memo(({
-  label,
-  error,
-  containerStyle,
-  ...props
-}) => {
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+export const PasswordInput: React.FC<PasswordInputProps> = memo(
+  ({ label, error, containerStyle, ...props }) => {
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  const togglePasswordVisibility = useCallback(() => {
-    setIsPasswordVisible((prev) => !prev);
-  }, []);
+    const togglePasswordVisibility = useCallback(() => {
+      setIsPasswordVisible((prev) => !prev);
+    }, []);
 
-  return (
-    <View style={[styles.container, containerStyle]}>
-      <LiquidInput
-        label={label}
-        icon="lock-closed-outline"
-        error={error}
-        secureTextEntry={!isPasswordVisible}
-        autoCapitalize="none"
-        autoCorrect={false}
-        {...props}
-      />
-      <TouchableOpacity
-        style={styles.toggleButton}
-        onPress={togglePasswordVisibility}
-        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-      >
-        <Ionicons
-          name={isPasswordVisible ? 'eye-off-outline' : 'eye-outline'}
-          size={20}
-          color={COLORS.textMuted}
+    return (
+      <View style={[styles.container, containerStyle]}>
+        <LiquidInput
+          label={label}
+          icon="lock-closed-outline"
+          error={error}
+          secureTextEntry={!isPasswordVisible}
+          autoCapitalize="none"
+          autoCorrect={false}
+          {...props}
         />
-      </TouchableOpacity>
-    </View>
-  );
-});
+        <TouchableOpacity
+          style={styles.toggleButton}
+          onPress={togglePasswordVisibility}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel={
+            isPasswordVisible ? 'Hide password' : 'Show password'
+          }
+          accessibilityHint="Double tap to toggle password visibility"
+        >
+          <Ionicons
+            name={isPasswordVisible ? 'eye-off-outline' : 'eye-outline'}
+            size={20}
+            color={COLORS.textMuted}
+          />
+        </TouchableOpacity>
+      </View>
+    );
+  },
+);
 
 PasswordInput.displayName = 'PasswordInput';
 
