@@ -57,6 +57,27 @@ jest.mock('react-native-gesture-handler', () => {
 // Set global __DEV__ for React Native
 global.__DEV__ = true;
 
+// Mock react-native-confetti-cannon
+jest.mock('react-native-confetti-cannon', () => {
+  const React = require('react');
+  return React.forwardRef((props, ref) => null);
+});
+
+// Mock react-native-view-shot
+jest.mock('react-native-view-shot', () => {
+  const React = require('react');
+  const ViewShot = React.forwardRef((props, ref) => {
+    const { View } = require('react-native');
+    return React.createElement(View, { ...props, ref });
+  });
+  return {
+    __esModule: true,
+    default: ViewShot,
+    captureRef: jest.fn().mockResolvedValue('mock-uri'),
+    captureScreen: jest.fn().mockResolvedValue('mock-uri'),
+  };
+});
+
 // Fail-fast guard: throw on invalid element types to get better diagnostics
 try {
   const React = require('react');

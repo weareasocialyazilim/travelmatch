@@ -1,9 +1,10 @@
 /**
  * Discover Flow Integration Tests
  * Tests the complete discovery flow from filtering to viewing moments
- * 
- * NOTE: Temporarily skipped due to NavigationContainer.getConstants mock issues
- * TODO: Fix react-navigation mocking for SSR/server rendering context
+ *
+ * NOTE: Skipped due to complex dependency chain requiring many mocks
+ * (react-native-confetti-cannon, react-native-view-shot, expo-media-library, etc.)
+ * TODO: Consider creating a simpler unit test or adding comprehensive mocks
  */
 
 import React from 'react';
@@ -43,7 +44,7 @@ jest.mock('../../context/NetworkContext', () => ({
   NetworkProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-// Skip entire suite until NavigationContainer mock is fixed
+// Skip entire suite - requires too many unmocked native modules
 describe.skip('Discover Flow Integration', () => {
   const mockMoments = [
     mockMoment({
