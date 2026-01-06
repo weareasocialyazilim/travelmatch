@@ -161,6 +161,13 @@ export const editProfileSchema = z.object({
   dateOfBirth: z.date().optional(),
 });
 
+// Phone validation for profile completion (optional, but validates if provided)
+export const optionalPhoneValidation = z
+  .string()
+  .regex(/^\+?[1-9]\d{9,14}$/, 'forms.validation.phone.invalid')
+  .optional()
+  .or(z.literal(''));
+
 export const completeProfileSchema = z.object({
   fullName: nameValidation,
   username: usernameValidation,
@@ -170,6 +177,8 @@ export const completeProfileSchema = z.object({
     .array(z.string())
     .min(1, 'forms.validation.interests.min')
     .max(5, 'forms.validation.interests.max'),
+  // Phone number for SMS verification (optional but recommended)
+  phone: optionalPhoneValidation,
 });
 
 // ============================================================================
