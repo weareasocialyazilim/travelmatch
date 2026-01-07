@@ -34,7 +34,6 @@ export {
   reviewsService,
   notificationsService,
   subscriptionsService,
-  promoCodesService,
 } from './supabaseDbService';
 
 // Storage Service
