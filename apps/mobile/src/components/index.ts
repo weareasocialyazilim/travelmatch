@@ -63,11 +63,13 @@ export {
 export { LimitReachedModal } from './LimitReachedModal';
 
 // Moments Components - Taşındı: features/moments/components
+// NOTE: LocationPickerBottomSheet is NOT exported here to prevent Mapbox from loading at startup
+// Use LazyLocationPicker instead for lazy loading
 export {
   RetakeProofBottomSheet,
   DeleteProofModal,
   RequestAdditionalProofBottomSheet,
-  LocationPickerBottomSheet,
+  // LocationPickerBottomSheet - use LazyLocationPicker instead
   LazyLocationPicker,
   ChooseCategoryBottomSheet,
   ShareMomentBottomSheet,
