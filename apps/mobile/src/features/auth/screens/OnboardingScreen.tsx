@@ -92,9 +92,25 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   const { completeOnboarding } = useOnboarding();
 
   const handleNext = useCallback(async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    logger.debug('OnboardingScreen handleNext called', {
+      activeIndex,
+      totalSlides: SLIDES.length,
+    });
+
+    // Haptics - wrap in try/catch to prevent crashes
+    try {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } catch (hapticError) {
+      // Haptics may fail on simulator, ignore
+      logger.debug('Haptics failed (expected on simulator)', {
+        error: hapticError,
+      });
+    }
 
     if (activeIndex < SLIDES.length - 1) {
+      logger.debug('OnboardingScreen scrolling to next slide', {
+        nextIndex: activeIndex + 1,
+      });
       flatListRef.current?.scrollToIndex({ index: activeIndex + 1 });
 
       analytics.trackEvent('onboarding_page_view', {
@@ -103,6 +119,9 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
         page_id: SLIDES[activeIndex + 1].id,
       });
     } else {
+      logger.info(
+        'OnboardingScreen completing onboarding and navigating to MainTabs',
+      );
       analytics.trackEvent('onboarding_completed', {
         screen: 'onboarding',
         total_screens: SLIDES.length,
@@ -110,13 +129,18 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
 
       try {
         await completeOnboarding();
+        logger.info(
+          'OnboardingScreen completeOnboarding success, navigating...',
+        );
         // Guest Mode: Go directly to MainTabs so users can browse
         navigation.reset({
           index: 0,
           routes: [{ name: 'MainTabs' }],
         });
       } catch (error) {
-        logger.error('Onboarding completion error', { error });
+        logger.error('Onboarding completion error, navigating anyway', {
+          error,
+        });
         navigation.reset({
           index: 0,
           routes: [{ name: 'MainTabs' }],
@@ -165,19 +189,23 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
         keyExtractor={(item) => item.id}
       />
 
-      {/* Content Overlay */}
-      <View style={[styles.overlay, { paddingBottom: insets.bottom + 30 }]}>
+      {/* Content Overlay - pointerEvents allows touches to pass through to children */}
+      <View
+        style={[styles.overlay, { paddingBottom: insets.bottom + 30 }]}
+        pointerEvents="box-none"
+      >
         <Animated.View
           key={currentSlide.id}
           entering={FadeInDown.springify()}
           style={styles.textContainer}
+          pointerEvents="none"
         >
           <Text style={styles.title}>{currentSlide.title}</Text>
           <Text style={styles.desc}>{currentSlide.desc}</Text>
         </Animated.View>
 
         {/* Footer Actions */}
-        <View style={styles.footer}>
+        <View style={styles.footer} pointerEvents="box-none">
           {/* Paginator */}
           <View style={styles.paginator}>
             {SLIDES.map((_, index) => (
@@ -192,6 +220,9 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
           <TouchableOpacity
             style={styles.button}
             onPress={handleNext}
+            onPressIn={() => logger.debug('Button onPressIn')}
+            activeOpacity={0.7}
+            hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
             accessible={true}
             accessibilityLabel={
               activeIndex === SLIDES.length - 1 ? 'Get Started' : 'Next'

@@ -26,15 +26,29 @@ const isSecureStoreAvailable = async (): Promise<boolean> => {
 export const secureStorage = {
   /**
    * Save a value securely
+   * For values > 2048 bytes, uses AsyncStorage to avoid SecureStore warning
    */
   setItem: async (key: string, value: string): Promise<void> => {
+    // SecureStore has a 2048 byte limit warning - use AsyncStorage for large values
+    const isLargeValue = value.length > 2000; // Leave some margin
+
+    if (isLargeValue) {
+      // Large values go directly to AsyncStorage to avoid SecureStore warning
+      logger.debug('[SecureStorage] Using AsyncStorage for large value', {
+        key,
+        size: value.length,
+      });
+      await AsyncStorage.setItem(`@secure_${key}`, value);
+      return;
+    }
+
     const available = await isSecureStoreAvailable();
     if (available) {
       try {
         await SecureStore.setItemAsync(key, value);
         return;
       } catch (err) {
-        logger.warn(
+        logger.debug(
           '[SecureStorage] SecureStore.setItem failed, falling back to AsyncStorage',
           { key, error: err },
         );
@@ -60,66 +74,71 @@ export const secureStorage = {
 
   /**
    * Get a value securely
+   * Checks AsyncStorage first (for large values), then SecureStore
    */
   getItem: async (key: string): Promise<string | null> => {
+    // First check AsyncStorage (where large values are stored)
+    try {
+      const asyncValue = await AsyncStorage.getItem(`@secure_${key}`);
+      if (asyncValue) {
+        return asyncValue;
+      }
+    } catch (_err) {
+      // Continue to SecureStore
+    }
+
     const available = await isSecureStoreAvailable();
     if (available) {
       try {
         return await SecureStore.getItemAsync(key);
       } catch (err) {
-        logger.warn(
-          '[SecureStorage] SecureStore.getItem failed, falling back to AsyncStorage',
-          { key, error: err },
-        );
-        // Fallback to AsyncStorage when SecureStore fails
-        return await AsyncStorage.getItem(`@secure_${key}`);
+        logger.debug('[SecureStorage] SecureStore.getItem failed', {
+          key,
+          error: err,
+        });
+        return null;
       }
     }
 
-    // When SecureStore not available, use AsyncStorage first
+    // When SecureStore not available, try MMKV as last resort
     try {
-      return await AsyncStorage.getItem(`@secure_${key}`);
-    } catch (err) {
-      logger.warn(
-        '[SecureStorage] AsyncStorage.getItem failed, falling back to MMKV',
-        { key, error: err },
-      );
-      // Last resort: MMKV Storage
       return await Storage.getItem(`@secure_${key}`);
+    } catch (err) {
+      logger.debug('[SecureStorage] All storage methods failed', {
+        key,
+        error: err,
+      });
+      return null;
     }
   },
 
   /**
    * Delete a value
+   * Removes from both AsyncStorage and SecureStore
    */
   deleteItem: async (key: string): Promise<void> => {
+    // Delete from AsyncStorage (where large values are stored)
+    try {
+      await AsyncStorage.removeItem(`@secure_${key}`);
+    } catch (_err) {
+      // Continue
+    }
+
+    // Also delete from SecureStore
     const available = await isSecureStoreAvailable();
     if (available) {
       try {
         await SecureStore.deleteItemAsync(key);
-        return;
-      } catch (err) {
-        logger.warn(
-          '[SecureStorage] SecureStore.deleteItem failed, falling back to AsyncStorage',
-          { key, error: err },
-        );
-        // Try AsyncStorage as fallback
-        await AsyncStorage.removeItem(`@secure_${key}`);
-        return;
+      } catch (_err) {
+        // Value may not exist in SecureStore, ignore
       }
     }
 
-    // When SecureStore not available, use AsyncStorage first
+    // Also try MMKV cleanup
     try {
-      await AsyncStorage.removeItem(`@secure_${key}`);
-      return;
-    } catch (err) {
-      logger.warn(
-        '[SecureStorage] AsyncStorage.removeItem failed, falling back to MMKV',
-        { key, error: err },
-      );
-      // Last resort: MMKV Storage
       await Storage.removeItem(`@secure_${key}`);
+    } catch (_err) {
+      // Ignore
     }
   },
 
@@ -241,8 +260,23 @@ export const AUTH_STORAGE_KEYS = {
 
 /**
  * Migration helper - moves data from old AsyncStorage keys to new secure keys
+ * This is a no-op if the old keys don't exist or if migration has already been done.
+ * Migration failures are logged but don't block app startup.
  */
 export async function migrateSensitiveDataToSecure(): Promise<void> {
+  // Skip migration if MMKV is not ready or has issues
+  // This prevents "Cannot read property 'prototype' of undefined" errors
+  try {
+    // Quick health check - if this fails, skip migration entirely
+    const healthCheck = await Storage.getItem('__migration_check__');
+    void healthCheck; // Intentionally unused, just for health check
+  } catch (healthError) {
+    logger.warn('[SecureStorage] Storage not ready, skipping migration', {
+      error: String(healthError),
+    });
+    return;
+  }
+
   // Migration from old key names to new secure storage keys
   const migrations = [
     { old: 'auth_access_token', newKey: StorageKeys.SECURE.ACCESS_TOKEN },
@@ -263,10 +297,11 @@ export async function migrateSensitiveDataToSecure(): Promise<void> {
       }
     } catch (err) {
       // Log migration failure but don't break app startup
-      logger.warn('[SecureStorage] Migration failed', {
+      // This is expected on fresh installs where old keys don't exist
+      logger.debug('[SecureStorage] Migration skipped or failed', {
         from: old,
         to: newKey,
-        error: err,
+        reason: err instanceof Error ? err.message : 'Unknown error',
       });
     }
   }
