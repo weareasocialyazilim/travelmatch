@@ -36,8 +36,9 @@ const clientEnvSchema = z.object({
   APP_VERSION: z.string().default('1.0.0'),
 
   // Supabase (anon key is safe to expose)
-  SUPABASE_URL: z.string().url(),
-  SUPABASE_ANON_KEY: z.string().min(20),
+  // Optional to prevent crash on startup - validated in production via REQUIRED_IN_PRODUCTION
+  SUPABASE_URL: z.string().url().optional().default(''),
+  SUPABASE_ANON_KEY: z.string().optional().default(''),
 
   // API Configuration
   API_URL: z.string().url().optional(),
@@ -237,22 +238,69 @@ export function getApiUrl(): string {
 }
 
 /**
+ * Environment validation result
+ */
+export interface EnvValidationResult {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+}
+
+/**
  * Validate environment on app startup
+ * Returns validation result instead of throwing to prevent crash
  * Call this in your app entry point (App.tsx)
  */
-export function validateEnvironment(): void {
+export function validateEnvironment(): EnvValidationResult {
+  const result: EnvValidationResult = {
+    isValid: true,
+    errors: [],
+    warnings: [],
+  };
+
   try {
     parseEnv();
+
+    // Check required vars in production
+    const isProd =
+      env.APP_ENV === 'production' || env.NODE_ENV === 'production';
+
+    if (!env.SUPABASE_URL) {
+      if (isProd) {
+        result.errors.push('EXPO_PUBLIC_SUPABASE_URL is required');
+        result.isValid = false;
+      } else {
+        result.warnings.push('EXPO_PUBLIC_SUPABASE_URL is missing');
+      }
+    }
+
+    if (!env.SUPABASE_ANON_KEY) {
+      if (isProd) {
+        result.errors.push('EXPO_PUBLIC_SUPABASE_ANON_KEY is required');
+        result.isValid = false;
+      } else {
+        result.warnings.push('EXPO_PUBLIC_SUPABASE_ANON_KEY is missing');
+      }
+    }
+
     if (isDevelopment() && __DEV__) {
-      // Development only - safe to use logger for env validation
-      // Production: This code path never executes
-      logger.info('Environment validation passed', { mode: env.APP_ENV });
+      if (result.warnings.length > 0) {
+        logger.warn('Environment validation warnings:', result.warnings);
+      }
+      if (result.isValid) {
+        logger.info('Environment validation passed', { mode: env.APP_ENV });
+      }
     }
   } catch (error) {
-    // CRITICAL: Always throw env errors (blocks app startup)
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
+    result.errors.push(errorMessage);
+    result.isValid = false;
+
     if (__DEV__) {
       logger.error('Environment validation failed:', error);
     }
-    throw error;
   }
+
+  return result;
 }
