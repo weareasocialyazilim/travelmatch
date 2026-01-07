@@ -6,7 +6,8 @@
 
 // Bottom Sheets
 export { ChooseCategoryBottomSheet } from './ChooseCategoryBottomSheet';
-export { LocationPickerBottomSheet } from './LocationPickerBottomSheet';
+// LocationPickerBottomSheet - NOT exported here to prevent Mapbox from loading at startup
+// Use LazyLocationPicker instead, or import directly with React.lazy()
 export { ShareMomentBottomSheet } from './ShareMomentBottomSheet';
 
 // Dialogs & Modals
