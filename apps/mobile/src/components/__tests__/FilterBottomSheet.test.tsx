@@ -79,7 +79,9 @@ describe('FilterBottomSheet', () => {
     });
 
     it('does not render when not visible', () => {
-      const { toJSON } = render(<FilterBottomSheet {...defaultProps} visible={false} />);
+      const { toJSON } = render(
+        <FilterBottomSheet {...defaultProps} visible={false} />,
+      );
       const modal = toJSON();
       expect(modal?.props.visible).toBe(false);
     });
@@ -119,10 +121,10 @@ describe('FilterBottomSheet', () => {
       const { getByText } = render(<FilterBottomSheet {...defaultProps} />);
       const coffeeChip = getByText('Coffee');
       const mealsChip = getByText('Meals');
-      
+
       fireEvent.press(coffeeChip);
       fireEvent.press(mealsChip);
-      
+
       expect(mealsChip).toBeTruthy();
     });
   });
@@ -153,10 +155,10 @@ describe('FilterBottomSheet', () => {
       const { getByText } = render(<FilterBottomSheet {...defaultProps} />);
       const todayButton = getByText('Today');
       const thisWeekButton = getByText('This week');
-      
+
       fireEvent.press(todayButton);
       fireEvent.press(thisWeekButton);
-      
+
       expect(thisWeekButton).toBeTruthy();
     });
   });
@@ -166,7 +168,7 @@ describe('FilterBottomSheet', () => {
       const { getByText } = render(<FilterBottomSheet {...defaultProps} />);
       const applyButton = getByText('Show 15 results');
       fireEvent.press(applyButton);
-      
+
       expect(mockOnApply).toHaveBeenCalledWith({
         category: 'All',
         priceRange: { min: 5, max: 200 },
@@ -176,13 +178,13 @@ describe('FilterBottomSheet', () => {
 
     it('applies filters with selected category', () => {
       const { getByText } = render(<FilterBottomSheet {...defaultProps} />);
-      
+
       const coffeeChip = getByText('Coffee');
       fireEvent.press(coffeeChip);
-      
+
       const applyButton = getByText('Show 15 results');
       fireEvent.press(applyButton);
-      
+
       expect(mockOnApply).toHaveBeenCalledWith({
         category: 'Coffee',
         priceRange: { min: 5, max: 200 },
@@ -192,13 +194,13 @@ describe('FilterBottomSheet', () => {
 
     it('applies filters with selected timing', () => {
       const { getByText } = render(<FilterBottomSheet {...defaultProps} />);
-      
+
       const thisWeekButton = getByText('This week');
       fireEvent.press(thisWeekButton);
-      
+
       const applyButton = getByText('Show 15 results');
       fireEvent.press(applyButton);
-      
+
       expect(mockOnApply).toHaveBeenCalledWith({
         category: 'All',
         priceRange: { min: 5, max: 200 },
@@ -208,16 +210,16 @@ describe('FilterBottomSheet', () => {
 
     it('applies filters with multiple selections', () => {
       const { getByText } = render(<FilterBottomSheet {...defaultProps} />);
-      
+
       const mealsChip = getByText('Meals');
       fireEvent.press(mealsChip);
-      
+
       const next3DaysButton = getByText('Next 3 days');
       fireEvent.press(next3DaysButton);
-      
+
       const applyButton = getByText('Show 15 results');
       fireEvent.press(applyButton);
-      
+
       expect(mockOnApply).toHaveBeenCalledWith({
         category: 'Meals',
         priceRange: { min: 5, max: 200 },
@@ -229,7 +231,7 @@ describe('FilterBottomSheet', () => {
       const { getByText } = render(<FilterBottomSheet {...defaultProps} />);
       const applyButton = getByText('Show 15 results');
       fireEvent.press(applyButton);
-      
+
       expect(mockOnClose).toHaveBeenCalled();
     });
   });
@@ -237,22 +239,22 @@ describe('FilterBottomSheet', () => {
   describe('Clear Filters', () => {
     it('clears all filters to default', () => {
       const { getByText } = render(<FilterBottomSheet {...defaultProps} />);
-      
+
       // Make some selections
       const coffeeChip = getByText('Coffee');
       fireEvent.press(coffeeChip);
-      
+
       const thisWeekButton = getByText('This week');
       fireEvent.press(thisWeekButton);
-      
+
       // Clear filters
       const clearButton = getByText('Clear filters');
       fireEvent.press(clearButton);
-      
+
       // Apply should now use defaults
       const applyButton = getByText('Show 15 results');
       fireEvent.press(applyButton);
-      
+
       expect(mockOnApply).toHaveBeenCalledWith({
         category: 'All',
         priceRange: { min: 5, max: 200 },
@@ -264,7 +266,7 @@ describe('FilterBottomSheet', () => {
       const { getByText } = render(<FilterBottomSheet {...defaultProps} />);
       const clearButton = getByText('Clear filters');
       fireEvent.press(clearButton);
-      
+
       expect(mockOnClose).not.toHaveBeenCalled();
     });
   });
@@ -274,7 +276,7 @@ describe('FilterBottomSheet', () => {
       const component = render(<FilterBottomSheet {...defaultProps} />);
       const { TouchableWithoutFeedback } = require('react-native');
       const backdrop = component.UNSAFE_getByType(TouchableWithoutFeedback);
-      
+
       fireEvent.press(backdrop);
       expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
@@ -307,37 +309,37 @@ describe('FilterBottomSheet', () => {
       const coffeeChip = getByText('Coffee');
       const mealsChip = getByText('Meals');
       const ticketsChip = getByText('Tickets');
-      
+
       fireEvent.press(coffeeChip);
       fireEvent.press(mealsChip);
       fireEvent.press(ticketsChip);
-      
+
       expect(ticketsChip).toBeTruthy();
     });
 
     it('handles rapid apply clicks', () => {
       const { getByText } = render(<FilterBottomSheet {...defaultProps} />);
       const applyButton = getByText('Show 15 results');
-      
+
       fireEvent.press(applyButton);
       fireEvent.press(applyButton);
-      
+
       // Both clicks register (no debouncing in component)
       expect(mockOnApply).toHaveBeenCalledTimes(2);
     });
 
     it('handles clear then apply immediately', () => {
       const { getByText } = render(<FilterBottomSheet {...defaultProps} />);
-      
+
       const coffeeChip = getByText('Coffee');
       fireEvent.press(coffeeChip);
-      
+
       const clearButton = getByText('Clear filters');
       fireEvent.press(clearButton);
-      
+
       const applyButton = getByText('Show 15 results');
       fireEvent.press(applyButton);
-      
+
       expect(mockOnApply).toHaveBeenCalledWith({
         category: 'All',
         priceRange: { min: 5, max: 200 },
@@ -348,11 +350,11 @@ describe('FilterBottomSheet', () => {
     it('handles multiple clear clicks', () => {
       const { getByText } = render(<FilterBottomSheet {...defaultProps} />);
       const clearButton = getByText('Clear filters');
-      
+
       fireEvent.press(clearButton);
       fireEvent.press(clearButton);
       fireEvent.press(clearButton);
-      
+
       // Should not crash or cause issues
       expect(clearButton).toBeTruthy();
     });

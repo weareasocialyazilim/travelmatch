@@ -1,9 +1,9 @@
 /**
  * Pending Transactions Service
- * 
+ *
  * Manages incomplete/pending payment and upload operations.
  * Handles app crashes, kills, and background interruptions.
- * 
+ *
  * Features:
  * - Track pending payments (crash recovery)
  * - Track pending uploads (background/kill recovery)
@@ -72,7 +72,9 @@ class PendingTransactionsService {
   /**
    * Add a pending payment transaction
    */
-  async addPendingPayment(payment: Omit<PendingPayment, 'createdAt' | 'updatedAt'>): Promise<void> {
+  async addPendingPayment(
+    payment: Omit<PendingPayment, 'createdAt' | 'updatedAt'>,
+  ): Promise<void> {
     try {
       const payments = await this.getPendingPayments();
       const newPayment: PendingPayment = {
@@ -80,17 +82,24 @@ class PendingTransactionsService {
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
-      
+
       payments.push(newPayment);
-      await AsyncStorage.setItem(PENDING_PAYMENTS_KEY, JSON.stringify(payments));
-      
+      await AsyncStorage.setItem(
+        PENDING_PAYMENTS_KEY,
+        JSON.stringify(payments),
+      );
+
       logger.info('PendingTransactions', 'Payment added', {
         id: payment.id,
         type: payment.type,
         amount: payment.amount,
       });
     } catch (error) {
-      logger.error('PendingTransactions', 'Failed to add pending payment', error);
+      logger.error(
+        'PendingTransactions',
+        'Failed to add pending payment',
+        error,
+      );
       throw error;
     }
   }
@@ -98,14 +107,19 @@ class PendingTransactionsService {
   /**
    * Update pending payment status
    */
-  async updatePaymentStatus(id: string, status: TransactionStatus): Promise<void> {
+  async updatePaymentStatus(
+    id: string,
+    status: TransactionStatus,
+  ): Promise<void> {
     try {
       const stored = await AsyncStorage.getItem(PENDING_PAYMENTS_KEY);
       const payments = stored ? JSON.parse(stored) : [];
       const index = payments.findIndex((p: any) => p.id === id);
 
       if (index === -1) {
-        logger.warn('PendingTransactions', 'Payment not found for update', { id });
+        logger.warn('PendingTransactions', 'Payment not found for update', {
+          id,
+        });
         return;
       }
 
@@ -116,15 +130,28 @@ class PendingTransactionsService {
       payment.updatedAt = Date.now();
 
       // Remove if completed or failed
-      if (status === TransactionStatus.COMPLETED || status === TransactionStatus.FAILED) {
+      if (
+        status === TransactionStatus.COMPLETED ||
+        status === TransactionStatus.FAILED
+      ) {
         payments.splice(index, 1);
       }
 
-      await AsyncStorage.setItem(PENDING_PAYMENTS_KEY, JSON.stringify(payments));
+      await AsyncStorage.setItem(
+        PENDING_PAYMENTS_KEY,
+        JSON.stringify(payments),
+      );
 
-      logger.info('PendingTransactions', 'Payment status updated', { id, status });
+      logger.info('PendingTransactions', 'Payment status updated', {
+        id,
+        status,
+      });
     } catch (error) {
-      logger.error('PendingTransactions', 'Failed to update payment status', error);
+      logger.error(
+        'PendingTransactions',
+        'Failed to update payment status',
+        error,
+      );
     }
   }
 
@@ -135,24 +162,31 @@ class PendingTransactionsService {
     try {
       const stored = await AsyncStorage.getItem(PENDING_PAYMENTS_KEY);
       if (!stored) return [];
-      
+
       const payments: PendingPayment[] = JSON.parse(stored);
-      
+
       // Filter out expired transactions
       const now = Date.now();
-      const validPayments = payments.filter(p => {
+      const validPayments = payments.filter((p) => {
         const age = now - p.createdAt;
         return age < TRANSACTION_EXPIRY_MS;
       });
-      
+
       // Save cleaned list if we removed any
       if (validPayments.length !== payments.length) {
-        await AsyncStorage.setItem(PENDING_PAYMENTS_KEY, JSON.stringify(validPayments));
+        await AsyncStorage.setItem(
+          PENDING_PAYMENTS_KEY,
+          JSON.stringify(validPayments),
+        );
       }
-      
+
       return validPayments;
     } catch (error) {
-      logger.error('PendingTransactions', 'Failed to get pending payments', error);
+      logger.error(
+        'PendingTransactions',
+        'Failed to get pending payments',
+        error,
+      );
       return [];
     }
   }
@@ -163,9 +197,12 @@ class PendingTransactionsService {
   async clearPayment(id: string): Promise<void> {
     try {
       const payments = await this.getPendingPayments();
-      const filtered = payments.filter(p => p.id !== id);
-      await AsyncStorage.setItem(PENDING_PAYMENTS_KEY, JSON.stringify(filtered));
-      
+      const filtered = payments.filter((p) => p.id !== id);
+      await AsyncStorage.setItem(
+        PENDING_PAYMENTS_KEY,
+        JSON.stringify(filtered),
+      );
+
       logger.info('PendingTransactions', 'Payment cleared', { id });
     } catch (error) {
       logger.error('PendingTransactions', 'Failed to clear payment', error);
@@ -182,7 +219,9 @@ class PendingTransactionsService {
   /**
    * Add a pending upload transaction
    */
-  async addPendingUpload(upload: Omit<PendingUpload, 'createdAt' | 'updatedAt' | 'retryCount'>): Promise<void> {
+  async addPendingUpload(
+    upload: Omit<PendingUpload, 'createdAt' | 'updatedAt' | 'retryCount'>,
+  ): Promise<void> {
     try {
       const uploads = await this.getPendingUploads();
       const newUpload: PendingUpload = {
@@ -191,17 +230,21 @@ class PendingTransactionsService {
         updatedAt: Date.now(),
         retryCount: 0,
       };
-      
+
       uploads.push(newUpload);
       await AsyncStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(uploads));
-      
+
       logger.info('PendingTransactions', 'Upload added', {
         id: upload.id,
         type: upload.type,
         fileName: upload.fileName,
       });
     } catch (error) {
-      logger.error('PendingTransactions', 'Failed to add pending upload', error);
+      logger.error(
+        'PendingTransactions',
+        'Failed to add pending upload',
+        error,
+      );
       throw error;
     }
   }
@@ -209,14 +252,22 @@ class PendingTransactionsService {
   /**
    * Update upload progress
    */
-  async updateUploadProgress(id: string, progress: number, status?: TransactionStatus): Promise<void> {
+  async updateUploadProgress(
+    id: string,
+    progress: number,
+    status?: TransactionStatus,
+  ): Promise<void> {
     try {
       const stored = await AsyncStorage.getItem(PENDING_UPLOADS_KEY);
       const uploads = stored ? JSON.parse(stored) : [];
       const index = uploads.findIndex((u: any) => u.id === id);
 
       if (index === -1) {
-        logger.warn('PendingTransactions', 'Upload not found for progress update', { id });
+        logger.warn(
+          'PendingTransactions',
+          'Upload not found for progress update',
+          { id },
+        );
         return;
       }
 
@@ -231,16 +282,26 @@ class PendingTransactionsService {
       }
 
       // Remove if completed or max retries reached
-      if (status === TransactionStatus.COMPLETED ||
-          (status === TransactionStatus.FAILED && upload.retryCount >= 3)) {
+      if (
+        status === TransactionStatus.COMPLETED ||
+        (status === TransactionStatus.FAILED && upload.retryCount >= 3)
+      ) {
         uploads.splice(index, 1);
       }
 
       await AsyncStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(uploads));
 
-      logger.info('PendingTransactions', 'Upload progress updated', { id, progress, status });
+      logger.info('PendingTransactions', 'Upload progress updated', {
+        id,
+        progress,
+        status,
+      });
     } catch (error) {
-      logger.error('PendingTransactions', 'Failed to update upload progress', error);
+      logger.error(
+        'PendingTransactions',
+        'Failed to update upload progress',
+        error,
+      );
     }
   }
 
@@ -250,24 +311,28 @@ class PendingTransactionsService {
   async incrementUploadRetry(id: string): Promise<number> {
     try {
       const uploads = await this.getPendingUploads();
-      const index = uploads.findIndex(u => u.id === id);
-      
+      const index = uploads.findIndex((u) => u.id === id);
+
       if (index === -1) {
         return 0;
       }
-      
+
       const upload = uploads[index];
       if (!upload) return 0;
-      
+
       upload.retryCount++;
       upload.updatedAt = Date.now();
       upload.status = TransactionStatus.FAILED;
-      
+
       await AsyncStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(uploads));
-      
+
       return upload.retryCount;
     } catch (error) {
-      logger.error('PendingTransactions', 'Failed to increment retry count', error);
+      logger.error(
+        'PendingTransactions',
+        'Failed to increment retry count',
+        error,
+      );
       return 0;
     }
   }
@@ -279,24 +344,31 @@ class PendingTransactionsService {
     try {
       const stored = await AsyncStorage.getItem(PENDING_UPLOADS_KEY);
       if (!stored) return [];
-      
+
       const uploads: PendingUpload[] = JSON.parse(stored);
-      
+
       // Filter out expired uploads
       const now = Date.now();
-      const validUploads = uploads.filter(u => {
+      const validUploads = uploads.filter((u) => {
         const age = now - u.createdAt;
         return age < TRANSACTION_EXPIRY_MS;
       });
-      
+
       // Save cleaned list if we removed any
       if (validUploads.length !== uploads.length) {
-        await AsyncStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(validUploads));
+        await AsyncStorage.setItem(
+          PENDING_UPLOADS_KEY,
+          JSON.stringify(validUploads),
+        );
       }
-      
+
       return validUploads;
     } catch (error) {
-      logger.error('PendingTransactions', 'Failed to get pending uploads', error);
+      logger.error(
+        'PendingTransactions',
+        'Failed to get pending uploads',
+        error,
+      );
       return [];
     }
   }
@@ -307,9 +379,9 @@ class PendingTransactionsService {
   async clearUpload(id: string): Promise<void> {
     try {
       const uploads = await this.getPendingUploads();
-      const filtered = uploads.filter(u => u.id !== id);
+      const filtered = uploads.filter((u) => u.id !== id);
       await AsyncStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(filtered));
-      
+
       logger.info('PendingTransactions', 'Upload cleared', { id });
     } catch (error) {
       logger.error('PendingTransactions', 'Failed to clear upload', error);
@@ -348,15 +420,23 @@ class PendingTransactionsService {
       };
 
       if (result.hasPayments || result.hasUploads) {
-        logger.warn('PendingTransactions', 'Found pending transactions on startup', {
-          paymentsCount: payments.length,
-          uploadsCount: uploads.length,
-        });
+        logger.warn(
+          'PendingTransactions',
+          'Found pending transactions on startup',
+          {
+            paymentsCount: payments.length,
+            uploadsCount: uploads.length,
+          },
+        );
       }
 
       return result;
     } catch (error) {
-      logger.error('PendingTransactions', 'Failed to check pending transactions', error);
+      logger.error(
+        'PendingTransactions',
+        'Failed to check pending transactions',
+        error,
+      );
       return {
         hasPayments: false,
         hasUploads: false,
@@ -371,10 +451,17 @@ class PendingTransactionsService {
    */
   async clearAll(): Promise<void> {
     try {
-      await AsyncStorage.multiRemove([PENDING_PAYMENTS_KEY, PENDING_UPLOADS_KEY]);
+      await AsyncStorage.multiRemove([
+        PENDING_PAYMENTS_KEY,
+        PENDING_UPLOADS_KEY,
+      ]);
       logger.info('PendingTransactions', 'All pending transactions cleared');
     } catch (error) {
-      logger.error('PendingTransactions', 'Failed to clear all transactions', error);
+      logger.error(
+        'PendingTransactions',
+        'Failed to clear all transactions',
+        error,
+      );
     }
   }
 }

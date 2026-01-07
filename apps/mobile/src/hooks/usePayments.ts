@@ -27,7 +27,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { securePaymentService } from '../services/securePaymentService';
 import { walletService } from '../services/walletService';
-import { transactionService, type Transaction } from '../services/transactionService';
+import {
+  transactionService,
+  type Transaction,
+} from '../services/transactionService';
 import { logger } from '../utils/logger';
 import { ErrorHandler, retryWithErrorHandling } from '../utils/errorHandler';
 import type {
@@ -232,7 +235,10 @@ export const usePayments = (): UsePaymentsReturn => {
         limit: PAGE_SIZE,
       });
 
-      setTransactions((prev) => [...prev, ...(newTransactions as Transaction[])]);
+      setTransactions((prev) => [
+        ...prev,
+        ...(newTransactions as Transaction[]),
+      ]);
       setTransactionPage(nextPage);
       setHasMoreTransactions(newTransactions.length === PAGE_SIZE);
     } catch (error) {
@@ -463,7 +469,12 @@ export const usePayments = (): UsePaymentsReturn => {
     refreshPaymentMethods();
     loadTransactions();
     fetchWithdrawalLimits();
-  }, [refreshBalance, refreshPaymentMethods, loadTransactions, fetchWithdrawalLimits]);
+  }, [
+    refreshBalance,
+    refreshPaymentMethods,
+    loadTransactions,
+    fetchWithdrawalLimits,
+  ]);
 
   return {
     // Wallet

@@ -547,7 +547,8 @@ const awwwardsStyles = StyleSheet.create({
     fontSize: TYPOGRAPHY_SYSTEM.sizes.bodyS,
     fontFamily: TYPOGRAPHY_SYSTEM.families.body,
     color: COLORS.text.secondary,
-    lineHeight: TYPOGRAPHY_SYSTEM.sizes.bodyS * TYPOGRAPHY_SYSTEM.lineHeights.normal,
+    lineHeight:
+      TYPOGRAPHY_SYSTEM.sizes.bodyS * TYPOGRAPHY_SYSTEM.lineHeights.normal,
   },
   lastMessageUnread: {
     color: COLORS.text.primary,

@@ -21,21 +21,16 @@ export const useUIStore = create<UIState>((set) => ({
   commandPaletteOpen: false,
   theme: 'system',
 
-  toggleSidebar: () =>
-    set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+  toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
 
-  setSidebarOpen: (open) =>
-    set({ sidebarOpen: open }),
+  setSidebarOpen: (open) => set({ sidebarOpen: open }),
 
-  setSidebarCollapsed: (collapsed) =>
-    set({ sidebarCollapsed: collapsed }),
+  setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
 
   toggleCommandPalette: () =>
     set((state) => ({ commandPaletteOpen: !state.commandPaletteOpen })),
 
-  setCommandPaletteOpen: (open) =>
-    set({ commandPaletteOpen: open }),
+  setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),
 
-  setTheme: (theme) =>
-    set({ theme }),
+  setTheme: (theme) => set({ theme }),
 }));

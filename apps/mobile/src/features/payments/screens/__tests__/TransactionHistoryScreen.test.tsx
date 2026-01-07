@@ -103,7 +103,7 @@ describe('TransactionHistoryScreen', () => {
 
       // Should show sent transaction
       expect(getByText("Gift for Maria's trip")).toBeTruthy();
-      
+
       // Should not show received transactions
       expect(queryByText('Gift from Alex Johnson')).toBeNull();
       expect(queryByText('Gift from Samantha Bee')).toBeNull();
@@ -119,7 +119,7 @@ describe('TransactionHistoryScreen', () => {
       // Should show received transactions
       expect(getByText('Gift from Alex Johnson')).toBeTruthy();
       expect(getByText('Gift from Samantha Bee')).toBeTruthy();
-      
+
       // Should not show sent or withdrawal transactions
       expect(queryByText("Gift for Maria's trip")).toBeNull();
       expect(queryByText('Withdrawal to Bank Account')).toBeNull();
@@ -133,7 +133,7 @@ describe('TransactionHistoryScreen', () => {
 
       // Should show withdrawal transaction
       expect(getByText('Withdrawal to Bank Account')).toBeTruthy();
-      
+
       // Should not show received or sent transactions
       expect(queryByText('Gift from Alex Johnson')).toBeNull();
       expect(queryByText('Gift from Samantha Bee')).toBeNull();
@@ -145,7 +145,7 @@ describe('TransactionHistoryScreen', () => {
 
       // Filter to Sent
       fireEvent.press(getByText('Sent'));
-      
+
       // Return to All
       fireEvent.press(getByText('All'));
 
@@ -174,7 +174,7 @@ describe('TransactionHistoryScreen', () => {
       // Find and press the back button (it's a TouchableOpacity with arrow-left icon)
       // We'll test the header renders which contains the back button
       expect(getByText('Transaction History')).toBeTruthy();
-      
+
       // Note: Back button navigation would require finding by accessibility or testID
     });
 
@@ -184,9 +184,12 @@ describe('TransactionHistoryScreen', () => {
       const transaction = getByText('Gift from Alex Johnson');
       fireEvent.press(transaction);
 
-      expect(mockNavigation.navigate).toHaveBeenCalledWith('TransactionDetail', {
-        transactionId: '1',
-      });
+      expect(mockNavigation.navigate).toHaveBeenCalledWith(
+        'TransactionDetail',
+        {
+          transactionId: '1',
+        },
+      );
     });
 
     it('should navigate to correct transaction detail for different transactions', () => {
@@ -195,9 +198,12 @@ describe('TransactionHistoryScreen', () => {
       const transaction2 = getByText("Gift for Maria's trip");
       fireEvent.press(transaction2);
 
-      expect(mockNavigation.navigate).toHaveBeenCalledWith('TransactionDetail', {
-        transactionId: '2',
-      });
+      expect(mockNavigation.navigate).toHaveBeenCalledWith(
+        'TransactionDetail',
+        {
+          transactionId: '2',
+        },
+      );
     });
   });
 
@@ -283,7 +289,7 @@ describe('TransactionHistoryScreen', () => {
       // After filtering, if no results, empty state should appear
       // Since mock data always has transactions, we test the filtering logic
       fireEvent.press(getByText('Sent'));
-      
+
       // Only sent transactions should appear
       expect(queryByText('Gift from Alex Johnson')).toBeNull();
     });

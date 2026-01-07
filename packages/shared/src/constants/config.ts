@@ -36,13 +36,13 @@ export const PAGINATION = {
  * Currency Configuration
  */
 export const CURRENCIES = ['USD', 'EUR', 'TRY'] as const;
-export type Currency = typeof CURRENCIES[number];
+export type Currency = (typeof CURRENCIES)[number];
 
 /**
  * Language Configuration
  */
 export const LANGUAGES = ['en', 'tr'] as const;
-export type Language = typeof LANGUAGES[number];
+export type Language = (typeof LANGUAGES)[number];
 
 /**
  * Validation Rules

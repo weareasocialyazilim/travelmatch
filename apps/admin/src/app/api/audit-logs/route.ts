@@ -28,7 +28,9 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('audit_logs')
-      .select('*, admin:admin_users(id, name, email, avatar_url)', { count: 'exact' })
+      .select('*, admin:admin_users(id, name, email, avatar_url)', {
+        count: 'exact',
+      })
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
@@ -56,7 +58,10 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('Audit logs query error:', error);
-      return NextResponse.json({ error: 'Audit logları yüklenemedi' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Audit logları yüklenemedi' },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({

@@ -640,7 +640,8 @@ describe('validation.ts', () => {
       const result = feedbackSchema.safeParse({
         type: 'bug',
         title: 'App crashes on startup',
-        description: 'The app crashes immediately when I try to open it on my device',
+        description:
+          'The app crashes immediately when I try to open it on my device',
         priority: 'high',
       });
       expect(result.success).toBe(true);
@@ -664,7 +665,7 @@ describe('validation.ts', () => {
     it('should validate valid coordinates', () => {
       const result = coordinateSchema.safeParse({
         latitude: 40.7128,
-        longitude: -74.0060,
+        longitude: -74.006,
       });
       expect(result.success).toBe(true);
     });
@@ -832,7 +833,7 @@ describe('validation.ts', () => {
         email: 'invalid-email',
         password: 'short',
       });
-      
+
       if (!result.success) {
         const formatted = formatZodErrors(result.error);
         expect(formatted).toBeDefined();
@@ -848,7 +849,7 @@ describe('validation.ts', () => {
         password: 'weak',
         confirmPassword: 'different',
       });
-      
+
       if (!result.success) {
         const formatted = formatZodErrors(result.error);
         expect(formatted.name).toBeDefined();

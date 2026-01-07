@@ -102,7 +102,7 @@ export const OTPInput: React.FC<OTPInputProps> = ({
         onComplete?.(newValue);
       }
     },
-    [digits, length, onChange, onComplete]
+    [digits, length, onChange, onComplete],
   );
 
   // Handle backspace
@@ -116,7 +116,7 @@ export const OTPInput: React.FC<OTPInputProps> = ({
         onChange(newDigits.join(''));
       }
     },
-    [digits, onChange]
+    [digits, onChange],
   );
 
   // Handle focus
@@ -164,9 +164,7 @@ export const OTPInput: React.FC<OTPInputProps> = ({
         ))}
       </Pressable>
 
-      {errorMessage && (
-        <Text style={styles.errorText}>{errorMessage}</Text>
-      )}
+      {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
     </View>
   );
 };
@@ -198,7 +196,7 @@ const OTPDigitInput = React.forwardRef<TextInput, OTPDigitInputProps>(
       onFocus,
       onBlur,
     },
-    ref
+    ref,
   ) => {
     const scale = useSharedValue(1);
     const borderWidth = useSharedValue(1.5);
@@ -208,7 +206,7 @@ const OTPDigitInput = React.forwardRef<TextInput, OTPDigitInputProps>(
       if (isFocused) {
         scale.value = withSequence(
           withSpring(1.05, { damping: 15, stiffness: 300 }),
-          withSpring(1, { damping: 15, stiffness: 300 })
+          withSpring(1, { damping: 15, stiffness: 300 }),
         );
         borderWidth.value = withTiming(2, { duration: 150 });
       } else {
@@ -221,7 +219,7 @@ const OTPDigitInput = React.forwardRef<TextInput, OTPDigitInputProps>(
       if (isFilled) {
         scale.value = withSequence(
           withSpring(1.1, { damping: 15, stiffness: 400 }),
-          withSpring(1, { damping: 15, stiffness: 300 })
+          withSpring(1, { damping: 15, stiffness: 300 }),
         );
       }
     }, [isFilled, scale]);
@@ -280,12 +278,10 @@ const OTPDigitInput = React.forwardRef<TextInput, OTPDigitInputProps>(
         />
 
         {/* Cursor indicator when focused and empty */}
-        {isFocused && !value && (
-          <View style={styles.cursor} />
-        )}
+        {isFocused && !value && <View style={styles.cursor} />}
       </AnimatedView>
     );
-  }
+  },
 );
 
 OTPDigitInput.displayName = 'OTPDigitInput';

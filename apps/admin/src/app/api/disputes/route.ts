@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
         requester:users!disputes_requester_id_fkey(id, display_name, avatar_url),
         responder:users!disputes_responder_id_fkey(id, display_name, avatar_url)
       `,
-        { count: 'exact' }
+        { count: 'exact' },
       )
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
@@ -58,7 +58,10 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('Disputes query error:', error);
-      return NextResponse.json({ error: 'Anlaşmazlıklar yüklenemedi' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Anlaşmazlıklar yüklenemedi' },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({
@@ -97,7 +100,7 @@ export async function POST(request: NextRequest) {
     if (!requester_id || !responder_id || !request_id || !reason) {
       return NextResponse.json(
         { error: 'Gerekli alanlar eksik' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -119,7 +122,10 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       logger.error('Dispute creation error:', error);
-      return NextResponse.json({ error: 'Anlaşmazlık oluşturulamadı' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Anlaşmazlık oluşturulamadı' },
+        { status: 500 },
+      );
     }
 
     // Create audit log
@@ -131,7 +137,7 @@ export async function POST(request: NextRequest) {
       null,
       dispute,
       request.headers.get('x-forwarded-for') || undefined,
-      request.headers.get('user-agent') || undefined
+      request.headers.get('user-agent') || undefined,
     );
 
     return NextResponse.json({ dispute }, { status: 201 });

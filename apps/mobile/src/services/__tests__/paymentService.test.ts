@@ -60,7 +60,7 @@ describe('paymentService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Mock authenticated user by default
-    (supabase.auth.getUser ).mockResolvedValue({
+    supabase.auth.getUser.mockResolvedValue({
       data: { user: mockUser },
       error: null,
     });
@@ -78,7 +78,7 @@ describe('paymentService', () => {
         error: null,
       });
 
-      (supabase.from ).mockReturnValue({
+      supabase.from.mockReturnValue({
         select: mockSelect,
       });
 
@@ -108,7 +108,7 @@ describe('paymentService', () => {
         error: null,
       });
 
-      (supabase.from ).mockReturnValue({
+      supabase.from.mockReturnValue({
         select: mockSelect,
       });
 
@@ -129,7 +129,7 @@ describe('paymentService', () => {
         error: { message: 'Database error' },
       });
 
-      (supabase.from ).mockReturnValue({
+      supabase.from.mockReturnValue({
         select: mockSelect,
       });
 
@@ -145,7 +145,7 @@ describe('paymentService', () => {
     });
 
     it('should handle unauthenticated user', async () => {
-      (supabase.auth.getUser ).mockResolvedValue({
+      supabase.auth.getUser.mockResolvedValue({
         data: { user: null },
         error: null,
       });
@@ -165,7 +165,7 @@ describe('paymentService', () => {
         error: null,
       });
 
-      (supabase.from ).mockReturnValue({
+      supabase.from.mockReturnValue({
         select: mockSelect,
       });
 
@@ -185,7 +185,7 @@ describe('paymentService', () => {
     it('should retrieve transaction history successfully', async () => {
       const mockTransactions = [mockTransaction];
 
-      (transactionsService.list ).mockResolvedValue({
+      transactionsService.list.mockResolvedValue({
         data: mockTransactions,
         count: 1,
         error: null,
@@ -207,7 +207,7 @@ describe('paymentService', () => {
     });
 
     it('should filter transactions by type', async () => {
-      (transactionsService.list ).mockResolvedValue({
+      transactionsService.list.mockResolvedValue({
         data: [],
         count: 0,
         error: null,
@@ -225,7 +225,7 @@ describe('paymentService', () => {
     });
 
     it('should filter transactions by status', async () => {
-      (transactionsService.list ).mockResolvedValue({
+      transactionsService.list.mockResolvedValue({
         data: [],
         count: 0,
         error: null,
@@ -243,7 +243,7 @@ describe('paymentService', () => {
     });
 
     it('should support pagination', async () => {
-      (transactionsService.list ).mockResolvedValue({
+      transactionsService.list.mockResolvedValue({
         data: [],
         count: 0,
         error: null,
@@ -261,7 +261,7 @@ describe('paymentService', () => {
     });
 
     it('should filter transactions by date range', async () => {
-      (transactionsService.list ).mockResolvedValue({
+      transactionsService.list.mockResolvedValue({
         data: [],
         count: 0,
         error: null,
@@ -282,7 +282,7 @@ describe('paymentService', () => {
     });
 
     it('should handle multiple filters simultaneously', async () => {
-      (transactionsService.list ).mockResolvedValue({
+      transactionsService.list.mockResolvedValue({
         data: [],
         count: 0,
         error: null,
@@ -306,7 +306,7 @@ describe('paymentService', () => {
     });
 
     it('should return empty array on error', async () => {
-      (transactionsService.list ).mockResolvedValue({
+      transactionsService.list.mockResolvedValue({
         data: [],
         count: 0,
         error: { message: 'Database error' },
@@ -320,7 +320,7 @@ describe('paymentService', () => {
     });
 
     it('should handle unauthenticated user', async () => {
-      (supabase.auth.getUser ).mockResolvedValue({
+      supabase.auth.getUser.mockResolvedValue({
         data: { user: null },
         error: null,
       });
@@ -339,7 +339,7 @@ describe('paymentService', () => {
         { ...mockTransaction, id: 'txn-126', type: 'refund' },
       ];
 
-      (transactionsService.list ).mockResolvedValue({
+      transactionsService.list.mockResolvedValue({
         data: mockTransactions,
         count: 4,
         error: null,
@@ -357,7 +357,7 @@ describe('paymentService', () => {
 
   describe('getTransaction', () => {
     it('should retrieve single transaction successfully', async () => {
-      (transactionsService.get ).mockResolvedValue({
+      transactionsService.get.mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -372,13 +372,18 @@ describe('paymentService', () => {
 
     it('should throw error when transaction not found', async () => {
       const error = new Error('Transaction not found');
-      (transactionsService.get ).mockResolvedValue({
+      transactionsService.get.mockResolvedValue({
         data: null,
         error,
       });
 
-      await expect(paymentService.getTransaction('invalid-id')).rejects.toThrow('Transaction not found');
-      expect(logger.error).toHaveBeenCalledWith('Get transaction error:', error);
+      await expect(paymentService.getTransaction('invalid-id')).rejects.toThrow(
+        'Transaction not found',
+      );
+      expect(logger.error).toHaveBeenCalledWith(
+        'Get transaction error:',
+        error,
+      );
     });
 
     it('should map transaction metadata correctly', async () => {
@@ -387,7 +392,7 @@ describe('paymentService', () => {
         metadata: { momentId: 'moment-123', requestId: 'req-456' },
       };
 
-      (transactionsService.get ).mockResolvedValue({
+      transactionsService.get.mockResolvedValue({
         data: txnWithMetadata,
         error: null,
       });
@@ -406,7 +411,7 @@ describe('paymentService', () => {
   // ========================================
   describe('processPayment', () => {
     it('should process payment successfully', async () => {
-      (transactionsService.create ).mockResolvedValue({
+      transactionsService.create.mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -435,7 +440,7 @@ describe('paymentService', () => {
 
     it('should handle payment creation errors', async () => {
       const error = new Error('Insufficient funds');
-      (transactionsService.create ).mockResolvedValue({
+      transactionsService.create.mockResolvedValue({
         data: null,
         error,
       });
@@ -445,13 +450,16 @@ describe('paymentService', () => {
           amount: 1000,
           currency: 'USD',
           paymentMethodId: 'card-123',
-        })
+        }),
       ).rejects.toThrow('Insufficient funds');
-      expect(logger.error).toHaveBeenCalledWith('Process payment error:', error);
+      expect(logger.error).toHaveBeenCalledWith(
+        'Process payment error:',
+        error,
+      );
     });
 
     it('should require authentication', async () => {
-      (supabase.auth.getUser ).mockResolvedValue({
+      supabase.auth.getUser.mockResolvedValue({
         data: { user: null },
         error: null,
       });
@@ -461,12 +469,12 @@ describe('paymentService', () => {
           amount: 25.0,
           currency: 'USD',
           paymentMethodId: 'card-123',
-        })
+        }),
       ).rejects.toThrow('Not authenticated');
     });
 
     it('should process payment without optional fields', async () => {
-      (transactionsService.create ).mockResolvedValue({
+      transactionsService.create.mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -490,7 +498,7 @@ describe('paymentService', () => {
 
     it('should handle large payment amounts', async () => {
       const largeTransaction = { ...mockTransaction, amount: 9999.99 };
-      (transactionsService.create ).mockResolvedValue({
+      transactionsService.create.mockResolvedValue({
         data: largeTransaction,
         error: null,
       });
@@ -518,7 +526,7 @@ describe('paymentService', () => {
         amount: 100.0,
       };
 
-      (transactionsService.create ).mockResolvedValue({
+      transactionsService.create.mockResolvedValue({
         data: withdrawalTxn,
         error: null,
       });
@@ -544,7 +552,7 @@ describe('paymentService', () => {
 
     it('should handle withdrawal errors', async () => {
       const error = new Error('Insufficient balance');
-      (transactionsService.create ).mockResolvedValue({
+      transactionsService.create.mockResolvedValue({
         data: null,
         error,
       });
@@ -554,13 +562,13 @@ describe('paymentService', () => {
           amount: 1000,
           currency: 'USD',
           bankAccountId: 'bank-123',
-        })
+        }),
       ).rejects.toThrow('Insufficient balance');
       expect(logger.error).toHaveBeenCalledWith('Withdraw funds error:', error);
     });
 
     it('should require authentication for withdrawal', async () => {
-      (supabase.auth.getUser ).mockResolvedValue({
+      supabase.auth.getUser.mockResolvedValue({
         data: { user: null },
         error: null,
       });
@@ -570,12 +578,12 @@ describe('paymentService', () => {
           amount: 50,
           currency: 'USD',
           bankAccountId: 'bank-123',
-        })
+        }),
       ).rejects.toThrow('Not authenticated');
     });
 
     it('should create withdrawal with correct description', async () => {
-      (transactionsService.create ).mockResolvedValue({
+      transactionsService.create.mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -589,7 +597,7 @@ describe('paymentService', () => {
       expect(transactionsService.create).toHaveBeenCalledWith(
         expect.objectContaining({
           description: 'Withdrawal to bank account',
-        })
+        }),
       );
     });
   });

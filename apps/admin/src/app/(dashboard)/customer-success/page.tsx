@@ -19,7 +19,13 @@ import {
   Clock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
@@ -133,8 +139,12 @@ export default function CustomerSuccessPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Müşteri Başarısı</h1>
-          <p className="text-muted-foreground">NPS, memnuniyet ve risk analizi</p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Müşteri Başarısı
+          </h1>
+          <p className="text-muted-foreground">
+            NPS, memnuniyet ve risk analizi
+          </p>
         </div>
         <Button>
           <Mail className="mr-2 h-4 w-4" />
@@ -148,28 +158,38 @@ export default function CustomerSuccessPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Net Promoter Score</p>
+                <p className="text-sm text-muted-foreground">
+                  Net Promoter Score
+                </p>
                 <p className="text-5xl font-bold">{npsData.score}</p>
                 <div className="mt-2 flex items-center gap-1 text-sm text-green-600">
-                  <TrendingUp className="h-4 w-4" />
-                  +{npsData.change} geçen aya göre
+                  <TrendingUp className="h-4 w-4" />+{npsData.change} geçen aya
+                  göre
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-sm text-muted-foreground">{npsData.responses} yanıt</p>
+                <p className="text-sm text-muted-foreground">
+                  {npsData.responses} yanıt
+                </p>
               </div>
             </div>
             <div className="mt-6 flex gap-2">
               <div className="flex-1 rounded-lg bg-green-100 p-3 text-center">
-                <p className="text-2xl font-bold text-green-600">{npsData.promoters}%</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {npsData.promoters}%
+                </p>
                 <p className="text-xs text-green-600">Destekçi</p>
               </div>
               <div className="flex-1 rounded-lg bg-gray-100 p-3 text-center">
-                <p className="text-2xl font-bold text-gray-600">{npsData.passives}%</p>
+                <p className="text-2xl font-bold text-gray-600">
+                  {npsData.passives}%
+                </p>
                 <p className="text-xs text-gray-600">Pasif</p>
               </div>
               <div className="flex-1 rounded-lg bg-red-100 p-3 text-center">
-                <p className="text-2xl font-bold text-red-600">{npsData.detractors}%</p>
+                <p className="text-2xl font-bold text-red-600">
+                  {npsData.detractors}%
+                </p>
                 <p className="text-xs text-red-600">Eleştiren</p>
               </div>
             </div>
@@ -241,7 +261,9 @@ export default function CustomerSuccessPage() {
                           <p className="font-medium">{user.name}</p>
                           {getRiskBadge(user.status)}
                         </div>
-                        <p className="text-sm text-muted-foreground">{user.reason}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {user.reason}
+                        </p>
                         <div className="mt-1 flex items-center gap-4 text-xs text-muted-foreground">
                           <span>{user.subscription}</span>
                           <span>LTV: ₺{user.ltv}</span>
@@ -294,9 +316,13 @@ export default function CustomerSuccessPage() {
                         >
                           {feedback.score}/10
                         </Badge>
-                        <span className="text-xs text-muted-foreground">{feedback.date}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {feedback.date}
+                        </span>
                       </div>
-                      <p className="mt-2 text-sm text-muted-foreground">{feedback.comment}</p>
+                      <p className="mt-2 text-sm text-muted-foreground">
+                        {feedback.comment}
+                      </p>
                     </div>
                     <Button size="sm" variant="outline">
                       Yanıtla
@@ -313,7 +339,9 @@ export default function CustomerSuccessPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Planlanmış İletişimler</CardTitle>
-                <CardDescription>Otomatik gönderilecek mesajlar</CardDescription>
+                <CardDescription>
+                  Otomatik gönderilecek mesajlar
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -343,11 +371,15 @@ export default function CustomerSuccessPage() {
                     >
                       <div>
                         <p className="font-medium">{campaign.title}</p>
-                        <p className="text-sm text-muted-foreground">{campaign.trigger}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {campaign.trigger}
+                        </p>
                       </div>
                       <div className="text-right text-sm">
                         <p>{campaign.sent} gönderildi</p>
-                        <p className="text-muted-foreground">{campaign.opened} açıldı</p>
+                        <p className="text-muted-foreground">
+                          {campaign.opened} açıldı
+                        </p>
                       </div>
                     </div>
                   ))}

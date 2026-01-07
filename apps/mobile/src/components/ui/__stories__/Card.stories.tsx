@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from 'storybook/react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Card } from './Card';
 
@@ -103,7 +103,9 @@ export const Interactive: Story = {
     children: (
       <View>
         <Text style={styles.title}>Clickable Card</Text>
-        <Text style={styles.description}>Tap me to trigger the press handler</Text>
+        <Text style={styles.description}>
+          Tap me to trigger the press handler
+        </Text>
       </View>
     ),
   },
@@ -190,7 +192,11 @@ export const NestedCards: Story = {
 
 export const TripCard: Story = {
   render: () => (
-    <Card variant="elevated" padding="md" onPress={() => console.log('Trip pressed')}>
+    <Card
+      variant="elevated"
+      padding="md"
+      onPress={() => console.log('Trip pressed')}
+    >
       <View>
         <Text style={styles.title}>Paris Adventure</Text>
         <Text style={[styles.description, { marginTop: 4 }]}>

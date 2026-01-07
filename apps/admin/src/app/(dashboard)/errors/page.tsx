@@ -20,7 +20,13 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -175,7 +181,10 @@ export default function ErrorsPage() {
   const filteredErrors = errors.filter((error) => {
     if (levelFilter !== 'all' && error.level !== levelFilter) return false;
     if (statusFilter !== 'all' && error.status !== statusFilter) return false;
-    if (searchQuery && !error.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+    if (
+      searchQuery &&
+      !error.title.toLowerCase().includes(searchQuery.toLowerCase())
+    ) {
       return false;
     }
     return true;
@@ -187,7 +196,9 @@ export default function ErrorsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Hata Takibi</h1>
-          <p className="text-muted-foreground">Sentry entegrasyonu ile hata izleme</p>
+          <p className="text-muted-foreground">
+            Sentry entegrasyonu ile hata izleme
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm">
@@ -208,7 +219,9 @@ export default function ErrorsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">24s Hata</p>
-                <p className="text-2xl font-bold">{errorStats.total_errors_24h}</p>
+                <p className="text-2xl font-bold">
+                  {errorStats.total_errors_24h}
+                </p>
               </div>
               <Bug className="h-8 w-8 text-red-500" />
             </div>
@@ -223,7 +236,9 @@ export default function ErrorsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Etkilenen</p>
-                <p className="text-2xl font-bold">{errorStats.affected_users}</p>
+                <p className="text-2xl font-bold">
+                  {errorStats.affected_users}
+                </p>
               </div>
               <Users className="h-8 w-8 text-orange-500" />
             </div>
@@ -235,7 +250,9 @@ export default function ErrorsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Crash-Free</p>
-                <p className="text-2xl font-bold text-green-600">{errorStats.crash_free_rate}%</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {errorStats.crash_free_rate}%
+                </p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-500" />
             </div>
@@ -247,7 +264,9 @@ export default function ErrorsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Çözülmemiş</p>
-                <p className="text-2xl font-bold text-red-600">{errorStats.unresolved}</p>
+                <p className="text-2xl font-bold text-red-600">
+                  {errorStats.unresolved}
+                </p>
               </div>
               <AlertTriangle className="h-8 w-8 text-red-500" />
             </div>
@@ -339,18 +358,25 @@ export default function ErrorsPage() {
               </TableHeader>
               <TableBody>
                 {filteredErrors.map((error) => (
-                  <TableRow key={error.id} className="cursor-pointer hover:bg-muted/50">
+                  <TableRow
+                    key={error.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                  >
                     <TableCell>{getStatusIcon(error.status)}</TableCell>
                     <TableCell>
                       <div>
-                        <p className="font-medium truncate max-w-md">{error.title}</p>
+                        <p className="font-medium truncate max-w-md">
+                          {error.title}
+                        </p>
                         <p className="text-sm text-muted-foreground truncate max-w-md">
                           {error.culprit}
                         </p>
                       </div>
                     </TableCell>
                     <TableCell>{getLevelBadge(error.level)}</TableCell>
-                    <TableCell className="text-right font-medium">{error.count}</TableCell>
+                    <TableCell className="text-right font-medium">
+                      {error.count}
+                    </TableCell>
                     <TableCell className="text-right">{error.users}</TableCell>
                     <TableCell className="text-muted-foreground">
                       {new Date(error.last_seen).toLocaleString('tr-TR')}
@@ -371,7 +397,9 @@ export default function ErrorsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Release Geçmişi</CardTitle>
-              <CardDescription>Son yayınlanan versiyonlar ve hata oranları</CardDescription>
+              <CardDescription>
+                Son yayınlanan versiyonlar ve hata oranları
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -383,7 +411,9 @@ export default function ErrorsPage() {
                     <div className="flex items-center gap-4">
                       <div>
                         <p className="font-medium">{release.version}</p>
-                        <p className="text-sm text-muted-foreground">{release.date}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {release.date}
+                        </p>
                       </div>
                       {release.status === 'active' && (
                         <Badge className="bg-green-500">Aktif</Badge>
@@ -395,8 +425,12 @@ export default function ErrorsPage() {
                         <p className="font-medium">{release.errors}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-muted-foreground">Crash-Free</p>
-                        <p className="font-medium text-green-600">{release.crash_free}%</p>
+                        <p className="text-sm text-muted-foreground">
+                          Crash-Free
+                        </p>
+                        <p className="font-medium text-green-600">
+                          {release.crash_free}%
+                        </p>
                       </div>
                       <Button variant="ghost" size="sm">
                         <ChevronRight className="h-4 w-4" />
@@ -413,7 +447,9 @@ export default function ErrorsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Alert Kuralları</CardTitle>
-              <CardDescription>Hata bildirimleri için yapılandırılmış kurallar</CardDescription>
+              <CardDescription>
+                Hata bildirimleri için yapılandırılmış kurallar
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">

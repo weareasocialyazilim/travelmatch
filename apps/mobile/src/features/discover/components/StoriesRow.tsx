@@ -47,9 +47,7 @@ const StoriesRow: React.FC<StoriesRowProps> = memo(
     return (
       <View style={styles.storiesSection}>
         {/* Section Title - Energy Band Label */}
-        {!hideTitle && (
-          <Text style={styles.sectionTitle}>{sectionTitle}</Text>
-        )}
+        {!hideTitle && <Text style={styles.sectionTitle}>{sectionTitle}</Text>}
 
         <ScrollView
           horizontal

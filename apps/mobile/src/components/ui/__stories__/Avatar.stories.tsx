@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from 'storybook/react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Avatar } from './Avatar';
 
@@ -35,7 +35,13 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <View style={{ padding: 16, backgroundColor: '#f9fafb', alignItems: 'center' }}>
+      <View
+        style={{
+          padding: 16,
+          backgroundColor: '#f9fafb',
+          alignItems: 'center',
+        }}
+      >
         <Story />
       </View>
     ),
@@ -182,19 +188,39 @@ export const OnlineStatuses: Story = {
   render: () => (
     <View style={styles.grid}>
       <View style={styles.gridItem}>
-        <Avatar source={SAMPLE_IMAGE} size="lg" showBadge badgeColor="#22c55e" />
+        <Avatar
+          source={SAMPLE_IMAGE}
+          size="lg"
+          showBadge
+          badgeColor="#22c55e"
+        />
         <Text style={styles.label}>Online</Text>
       </View>
       <View style={styles.gridItem}>
-        <Avatar source={SAMPLE_IMAGE} size="lg" showBadge badgeColor="#ef4444" />
+        <Avatar
+          source={SAMPLE_IMAGE}
+          size="lg"
+          showBadge
+          badgeColor="#ef4444"
+        />
         <Text style={styles.label}>Busy</Text>
       </View>
       <View style={styles.gridItem}>
-        <Avatar source={SAMPLE_IMAGE} size="lg" showBadge badgeColor="#f59e0b" />
+        <Avatar
+          source={SAMPLE_IMAGE}
+          size="lg"
+          showBadge
+          badgeColor="#f59e0b"
+        />
         <Text style={styles.label}>Away</Text>
       </View>
       <View style={styles.gridItem}>
-        <Avatar source={SAMPLE_IMAGE} size="lg" showBadge badgeColor="#6b7280" />
+        <Avatar
+          source={SAMPLE_IMAGE}
+          size="lg"
+          showBadge
+          badgeColor="#6b7280"
+        />
         <Text style={styles.label}>Offline</Text>
       </View>
     </View>
@@ -240,7 +266,8 @@ export const UserList: Story = {
           <View style={styles.listContent}>
             <Text style={styles.listName}>{user.name}</Text>
             <Text style={styles.listStatus}>
-              {user.online ? 'Online' : 'Offline'} • {user.verified ? 'Verified' : 'Unverified'}
+              {user.online ? 'Online' : 'Offline'} •{' '}
+              {user.verified ? 'Verified' : 'Unverified'}
             </Text>
           </View>
         </View>
@@ -252,9 +279,21 @@ export const UserList: Story = {
 export const AvatarGroup: Story = {
   render: () => (
     <View style={styles.avatarGroup}>
-      <Avatar source="https://i.pravatar.cc/150?img=1" size="md" style={styles.groupAvatar} />
-      <Avatar source="https://i.pravatar.cc/150?img=2" size="md" style={styles.groupAvatar} />
-      <Avatar source="https://i.pravatar.cc/150?img=3" size="md" style={styles.groupAvatar} />
+      <Avatar
+        source="https://i.pravatar.cc/150?img=1"
+        size="md"
+        style={styles.groupAvatar}
+      />
+      <Avatar
+        source="https://i.pravatar.cc/150?img=2"
+        size="md"
+        style={styles.groupAvatar}
+      />
+      <Avatar
+        source="https://i.pravatar.cc/150?img=3"
+        size="md"
+        style={styles.groupAvatar}
+      />
       <View style={styles.moreIndicator}>
         <Text style={styles.moreText}>+5</Text>
       </View>

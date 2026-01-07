@@ -18,7 +18,7 @@ export function QueryProvider({ children }: { children: ReactNode }) {
             retry: 0,
           },
         },
-      })
+      }),
   );
 
   return (

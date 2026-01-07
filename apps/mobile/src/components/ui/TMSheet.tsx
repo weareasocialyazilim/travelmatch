@@ -68,7 +68,7 @@ export const TMSheet = forwardRef<BottomSheetRef, TMSheetProps>(
         {...props}
       />
     );
-  }
+  },
 );
 
 TMSheet.displayName = 'TMSheet';

@@ -76,7 +76,7 @@ const TrustRing = React.forwardRef<HTMLDivElement, TrustRingProps>(
       animated = true,
       className,
     },
-    ref
+    ref,
   ) => {
     const { container, avatar, stroke, fontSize } = sizeMap[size];
     const trustLevel = getTrustLevel(score);
@@ -90,7 +90,7 @@ const TrustRing = React.forwardRef<HTMLDivElement, TrustRingProps>(
         ref={ref}
         className={cn(
           'relative inline-flex flex-col items-center justify-center',
-          className
+          className,
         )}
       >
         {/* Ring Container */}
@@ -126,7 +126,7 @@ const TrustRing = React.forwardRef<HTMLDivElement, TrustRingProps>(
               strokeDasharray={circumference}
               strokeDashoffset={circumference - progress}
               className={cn(
-                animated && 'transition-all duration-1000 ease-out'
+                animated && 'transition-all duration-1000 ease-out',
               )}
             />
             <defs>
@@ -168,7 +168,7 @@ const TrustRing = React.forwardRef<HTMLDivElement, TrustRingProps>(
                 size === 'sm' && 'px-1.5 py-0.5 text-[10px] min-w-[22px]',
                 size === 'md' && 'px-2 py-0.5 text-xs',
                 size === 'lg' && 'px-2.5 py-1 text-sm',
-                size === 'xl' && 'px-3 py-1 text-base'
+                size === 'xl' && 'px-3 py-1 text-base',
               )}
             >
               {score}
@@ -184,7 +184,7 @@ const TrustRing = React.forwardRef<HTMLDivElement, TrustRingProps>(
               size === 'sm' && 'text-xs',
               size === 'md' && 'text-sm',
               size === 'lg' && 'text-base',
-              size === 'xl' && 'text-lg'
+              size === 'xl' && 'text-lg',
             )}
             style={{
               background: `linear-gradient(to right, ${trustLevel.gradientStart}, ${trustLevel.gradientEnd})`,
@@ -198,7 +198,7 @@ const TrustRing = React.forwardRef<HTMLDivElement, TrustRingProps>(
         )}
       </div>
     );
-  }
+  },
 );
 TrustRing.displayName = 'TrustRing';
 

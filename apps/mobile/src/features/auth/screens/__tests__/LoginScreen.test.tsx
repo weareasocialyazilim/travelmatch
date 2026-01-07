@@ -33,7 +33,11 @@ jest.mock('react-hook-form', () => ({
     }) => React.ReactNode;
   }) =>
     renderProp({
-      field: { onChange: jest.fn() as jest.Mock, onBlur: jest.fn() as jest.Mock, value: '' },
+      field: {
+        onChange: jest.fn() as jest.Mock,
+        onBlur: jest.fn() as jest.Mock,
+        value: '',
+      },
       fieldState: { error: null },
     }),
 }));

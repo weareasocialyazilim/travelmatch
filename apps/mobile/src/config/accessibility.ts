@@ -1,7 +1,7 @@
 /**
  * Accessibility Configuration
  * WCAG 2.1 Level AA Compliance
- * 
+ *
  * Standards:
  * - Perceivable: Color contrast, text alternatives, adaptable content
  * - Operable: Keyboard accessible, enough time, seizures prevention
@@ -52,17 +52,17 @@ export const ARIA_LABELS = {
   mainNav: 'Main navigation',
   breadcrumb: 'Breadcrumb',
   pagination: 'Pagination',
-  
+
   // Actions
   search: 'Search',
   filter: 'Filter options',
   sort: 'Sort options',
-  
+
   // Content
   momentCard: 'Moment card',
   userProfile: 'User profile',
   giftButton: 'Send gift',
-  
+
   // Forms
   required: 'Required field',
   error: 'Error message',
@@ -83,7 +83,10 @@ export const SEMANTIC_ELEMENTS = {
 /**
  * Check color contrast ratio (WCAG 2.1)
  */
-export function checkContrastRatio(foreground: string, background: string): {
+export function checkContrastRatio(
+  foreground: string,
+  background: string,
+): {
   ratio: number;
   passesAA: boolean;
   passesAAA: boolean;
@@ -169,11 +172,15 @@ export function validateAccessibility(element: HTMLElement): {
   });
 
   // Check for keyboard accessibility
-  const interactiveElements = element.querySelectorAll('button, a, input, select, textarea');
+  const interactiveElements = element.querySelectorAll(
+    'button, a, input, select, textarea',
+  );
   interactiveElements.forEach((el) => {
     const tabindex = el.getAttribute('tabindex');
     if (tabindex && parseInt(tabindex) < 0) {
-      warnings.push(`Interactive element not keyboard accessible: ${el.tagName}`);
+      warnings.push(
+        `Interactive element not keyboard accessible: ${el.tagName}`,
+      );
     }
   });
 
@@ -183,13 +190,17 @@ export function validateAccessibility(element: HTMLElement): {
   headings.forEach((heading) => {
     const level = parseInt(heading.tagName.substring(1));
     if (previousLevel > 0 && level > previousLevel + 1) {
-      warnings.push(`Heading hierarchy skipped from H${previousLevel} to H${level}`);
+      warnings.push(
+        `Heading hierarchy skipped from H${previousLevel} to H${level}`,
+      );
     }
     previousLevel = level;
   });
 
   // Check for ARIA landmarks
-  const landmarks = element.querySelectorAll('[role="main"], [role="navigation"], [role="complementary"]');
+  const landmarks = element.querySelectorAll(
+    '[role="main"], [role="navigation"], [role="complementary"]',
+  );
   if (landmarks.length === 0 && element.children.length > 5) {
     warnings.push('Consider adding ARIA landmarks for better navigation');
   }
@@ -276,7 +287,7 @@ export const KeyboardNav = {
     event: KeyboardEvent,
     currentIndex: number,
     itemCount: number,
-    onSelect: (index: number) => void
+    onSelect: (index: number) => void,
   ) => {
     const { key } = event;
     let newIndex = currentIndex;

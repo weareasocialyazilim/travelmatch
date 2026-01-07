@@ -4,4 +4,8 @@
  */
 
 export { useRequestsScreen } from '@/features/discover/hooks/useRequestsScreen';
-export type { RequestItem, NotificationItem, TabType } from '@/features/discover/types/requests.types';
+export type {
+  RequestItem,
+  NotificationItem,
+  TabType,
+} from '@/features/discover/types/requests.types';

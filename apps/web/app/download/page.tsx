@@ -1,10 +1,10 @@
-import Link from "next/link";
-import type { Metadata } from "next";
+import Link from 'next/link';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Download TravelMatch",
+  title: 'Download TravelMatch',
   description:
-    "Download TravelMatch for iOS and Android. Gift real travel experiences and see verified proof when they happen.",
+    'Download TravelMatch for iOS and Android. Gift real travel experiences and see verified proof when they happen.',
 };
 
 export default function DownloadPage() {

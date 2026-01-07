@@ -25,9 +25,12 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('moments')
-      .select('*, user:users!moments_user_id_fkey(id, display_name, avatar_url)', {
-        count: 'exact',
-      })
+      .select(
+        '*, user:users!moments_user_id_fkey(id, display_name, avatar_url)',
+        {
+          count: 'exact',
+        },
+      )
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
@@ -47,7 +50,10 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('Moments query error:', error);
-      return NextResponse.json({ error: 'Momentler yüklenemedi' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Momentler yüklenemedi' },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({

@@ -73,7 +73,7 @@ export const FilterPanel = memo<FilterPanelProps>(function FilterPanel({
 }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
-    new Set(sections.filter((s) => s.collapsed).map((s) => s.id))
+    new Set(sections.filter((s) => s.collapsed).map((s) => s.id)),
   );
 
   const handleSearch = useCallback(
@@ -81,7 +81,7 @@ export const FilterPanel = memo<FilterPanelProps>(function FilterPanel({
       setSearchQuery(query);
       onSearch?.(query);
     },
-    [onSearch]
+    [onSearch],
   );
 
   const toggleSection = useCallback((sectionId: string) => {
@@ -111,14 +111,14 @@ export const FilterPanel = memo<FilterPanelProps>(function FilterPanel({
         onFilterChange(sectionId, newValues);
       }
     },
-    [selectedFilters, onFilterChange]
+    [selectedFilters, onFilterChange],
   );
 
   // Count active filters
   const activeFilterCount = useMemo(() => {
     return Object.values(selectedFilters).reduce(
       (sum, values) => sum + values.length,
-      0
+      0,
     );
   }, [selectedFilters]);
 
@@ -273,7 +273,7 @@ const FilterSectionComponent = memo<FilterSectionComponentProps>(
         )}
       </View>
     );
-  }
+  },
 );
 
 // Filter option item
@@ -325,10 +325,7 @@ const FilterOptionItem = memo<FilterOptionItemProps>(function FilterOptionItem({
 
       {/* Label */}
       <Text
-        style={[
-          styles.optionLabel,
-          isSelected && styles.optionLabelSelected,
-        ]}
+        style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}
       >
         {option.label}
       </Text>

@@ -54,7 +54,10 @@ export const usernameSchema = z
   .string()
   .min(3, 'Username must be at least 3 characters')
   .max(30, 'Username must be at most 30 characters')
-  .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores');
+  .regex(
+    /^[a-zA-Z0-9_]+$/,
+    'Username can only contain letters, numbers, and underscores',
+  );
 
 /**
  * Currency schema
@@ -93,13 +96,14 @@ export type CursorPaginationInput = z.infer<typeof cursorPaginationSchema>;
 /**
  * Date range schema
  */
-export const dateRangeSchema = z.object({
-  startDate: z.string().datetime(),
-  endDate: z.string().datetime(),
-}).refine(
-  (data) => new Date(data.startDate) <= new Date(data.endDate),
-  { message: 'Start date must be before end date' }
-);
+export const dateRangeSchema = z
+  .object({
+    startDate: z.string().datetime(),
+    endDate: z.string().datetime(),
+  })
+  .refine((data) => new Date(data.startDate) <= new Date(data.endDate), {
+    message: 'Start date must be before end date',
+  });
 
 export type DateRangeInput = z.infer<typeof dateRangeSchema>;
 

@@ -10,7 +10,7 @@ declare module '@expo/vector-icons/MaterialCommunityIcons' {
 }
 
 // Prop-types declaration
- 
+
 declare module 'prop-types' {
   export const string: any;
   export const number: any;
@@ -28,4 +28,3 @@ declare module 'prop-types' {
   export const shape: (shape: any) => any;
   export const exact: (shape: any) => any;
 }
- 

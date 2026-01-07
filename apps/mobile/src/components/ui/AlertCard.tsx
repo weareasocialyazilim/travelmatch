@@ -20,7 +20,13 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 
-type AlertType = 'alert' | 'anticipated' | 'onboarding' | 'progress' | 'info' | 'success';
+type AlertType =
+  | 'alert'
+  | 'anticipated'
+  | 'onboarding'
+  | 'progress'
+  | 'info'
+  | 'success';
 
 interface AlertCardProps {
   type: AlertType;
@@ -177,9 +183,7 @@ export const AlertCard = memo<AlertCardProps>(function AlertCard({
 
         {/* Timestamp and action */}
         <View style={styles.footer}>
-          {timestamp && (
-            <Text style={styles.timestamp}>{timestamp}</Text>
-          )}
+          {timestamp && <Text style={styles.timestamp}>{timestamp}</Text>}
           {actionLabel && onActionPress && (
             <TouchableOpacity
               style={[styles.actionButton, { backgroundColor: config.bgColor }]}
@@ -230,11 +234,7 @@ export const AlertBadge = memo<AlertBadgeProps>(function AlertBadge({
 
   return (
     <Container
-      style={[
-        styles.badge,
-        { backgroundColor: config.bgColor },
-        style,
-      ]}
+      style={[styles.badge, { backgroundColor: config.bgColor }, style]}
       {...containerProps}
     >
       <MaterialCommunityIcons

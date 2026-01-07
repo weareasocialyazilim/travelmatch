@@ -20,12 +20,37 @@ export function TrustConstellationAdmin() {
   });
 
   const milestoneStats = [
-    { id: 'email', label: 'Email Dogrulama', percentage: 95, color: 'bg-blue-500' },
-    { id: 'phone', label: 'Telefon Dogrulama', percentage: 78, color: 'bg-green-500' },
+    {
+      id: 'email',
+      label: 'Email Dogrulama',
+      percentage: 95,
+      color: 'bg-blue-500',
+    },
+    {
+      id: 'phone',
+      label: 'Telefon Dogrulama',
+      percentage: 78,
+      color: 'bg-green-500',
+    },
     { id: 'id', label: 'Kimlik Onayi', percentage: 45, color: 'bg-amber-500' },
-    { id: 'bank', label: 'Banka Baglantisi', percentage: 32, color: 'bg-purple-500' },
-    { id: 'firstGift', label: 'Ilk Hediye', percentage: 28, color: 'bg-pink-500' },
-    { id: 'firstProof', label: 'Ilk Kanit', percentage: 22, color: 'bg-teal-500' },
+    {
+      id: 'bank',
+      label: 'Banka Baglantisi',
+      percentage: 32,
+      color: 'bg-purple-500',
+    },
+    {
+      id: 'firstGift',
+      label: 'Ilk Hediye',
+      percentage: 28,
+      color: 'bg-pink-500',
+    },
+    {
+      id: 'firstProof',
+      label: 'Ilk Kanit',
+      percentage: 22,
+      color: 'bg-teal-500',
+    },
   ];
 
   const tiers = [
@@ -47,8 +72,10 @@ export function TrustConstellationAdmin() {
         <CardContent>
           <div className="space-y-4">
             {tiers.map((tier) => {
-              const count = distribution?.find((d) => d.range === tier.range)?.count || 0;
-              const percentage = totalCount > 0 ? (count / totalCount) * 100 : 0;
+              const count =
+                distribution?.find((d) => d.range === tier.range)?.count || 0;
+              const percentage =
+                totalCount > 0 ? (count / totalCount) * 100 : 0;
 
               return (
                 <div key={tier.range}>
@@ -106,14 +133,62 @@ export function TrustConstellationAdmin() {
             {/* SVG Constellation visualization */}
             <svg viewBox="0 0 200 200" className="w-full h-full">
               {/* Connection lines */}
-              <line x1="100" y1="20" x2="50" y2="70" stroke="#E5E7EB" strokeWidth="1" />
-              <line x1="100" y1="20" x2="150" y2="70" stroke="#E5E7EB" strokeWidth="1" />
-              <line x1="50" y1="70" x2="100" y2="100" stroke="#E5E7EB" strokeWidth="1" />
-              <line x1="150" y1="70" x2="100" y2="100" stroke="#E5E7EB" strokeWidth="1" />
-              <line x1="100" y1="100" x2="60" y2="150" stroke="#E5E7EB" strokeWidth="1" />
-              <line x1="100" y1="100" x2="100" y2="150" stroke="#E5E7EB" strokeWidth="1" />
-              <line x1="100" y1="100" x2="140" y2="150" stroke="#E5E7EB" strokeWidth="1" />
-
+              <line
+                x1="100"
+                y1="20"
+                x2="50"
+                y2="70"
+                stroke="#E5E7EB"
+                strokeWidth="1"
+              />
+              <line
+                x1="100"
+                y1="20"
+                x2="150"
+                y2="70"
+                stroke="#E5E7EB"
+                strokeWidth="1"
+              />
+              <line
+                x1="50"
+                y1="70"
+                x2="100"
+                y2="100"
+                stroke="#E5E7EB"
+                strokeWidth="1"
+              />
+              <line
+                x1="150"
+                y1="70"
+                x2="100"
+                y2="100"
+                stroke="#E5E7EB"
+                strokeWidth="1"
+              />
+              <line
+                x1="100"
+                y1="100"
+                x2="60"
+                y2="150"
+                stroke="#E5E7EB"
+                strokeWidth="1"
+              />
+              <line
+                x1="100"
+                y1="100"
+                x2="100"
+                y2="150"
+                stroke="#E5E7EB"
+                strokeWidth="1"
+              />
+              <line
+                x1="100"
+                y1="100"
+                x2="140"
+                y2="150"
+                stroke="#E5E7EB"
+                strokeWidth="1"
+              />
               {/* Stars */}
               <circle cx="100" cy="20" r="8" fill="#3B82F6" /> {/* Email */}
               <circle cx="50" cy="70" r="8" fill="#10B981" /> {/* Phone */}
@@ -121,15 +196,20 @@ export function TrustConstellationAdmin() {
               <circle cx="100" cy="100" r="10" fill="#8B5CF6" /> {/* Bank */}
               <circle cx="60" cy="150" r="6" fill="#EC4899" /> {/* Gift */}
               <circle cx="100" cy="150" r="6" fill="#14B8A6" /> {/* Proof */}
-              <circle cx="140" cy="150" r="6" fill="#6B7280" /> {/* Unverified */}
+              <circle cx="140" cy="150" r="6" fill="#6B7280" />{' '}
+              {/* Unverified */}
             </svg>
 
             {/* Labels */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 text-xs text-blue-500">
               Email
             </div>
-            <div className="absolute top-16 left-4 text-xs text-emerald-500">Phone</div>
-            <div className="absolute top-16 right-4 text-xs text-amber-500">ID</div>
+            <div className="absolute top-16 left-4 text-xs text-emerald-500">
+              Phone
+            </div>
+            <div className="absolute top-16 right-4 text-xs text-amber-500">
+              ID
+            </div>
           </div>
         </CardContent>
       </Card>

@@ -49,9 +49,7 @@ const MapLoadingFallback: React.FC<{ visible: boolean }> = ({ visible }) => {
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={COLORS.brand.primary} />
         <Text style={styles.loadingText}>Loading map...</Text>
-        <Text style={styles.loadingHint}>
-          This only happens once!
-        </Text>
+        <Text style={styles.loadingHint}>This only happens once!</Text>
       </View>
     </Modal>
   );
@@ -83,7 +81,9 @@ const MapLoadingFallback: React.FC<{ visible: boolean }> = ({ visible }) => {
  * - Memory: Only loaded when needed
  * - UX: Minimal impact (100-300ms first load)
  */
-export const LazyLocationPicker: React.FC<LazyLocationPickerProps> = (props) => {
+export const LazyLocationPicker: React.FC<LazyLocationPickerProps> = (
+  props,
+) => {
   // Don't even start loading until modal opens
   if (!props.visible) {
     return null;

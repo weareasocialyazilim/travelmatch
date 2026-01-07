@@ -52,7 +52,8 @@ export const MomentCommentsScreen: React.FC = () => {
     try {
       const { data, error } = await supabase
         .from('moment_comments')
-        .select(`
+        .select(
+          `
           id,
           content,
           created_at,
@@ -65,7 +66,8 @@ export const MomentCommentsScreen: React.FC = () => {
           moment:moments!moment_id (
             host_id
           )
-        `)
+        `,
+        )
         .eq('moment_id', momentId)
         .order('created_at', { ascending: true });
 
@@ -83,7 +85,9 @@ export const MomentCommentsScreen: React.FC = () => {
         user: { id: string; full_name: string; avatar_url: string } | null;
         moment: { host_id: string } | null;
       };
-      const transformedComments: Comment[] = ((data || []) as CommentItem[]).map((item) => {
+      const transformedComments: Comment[] = (
+        (data || []) as CommentItem[]
+      ).map((item) => {
         const user = item.user;
         const moment = item.moment;
         const createdAt = new Date(item.created_at);
@@ -143,7 +147,9 @@ export const MomentCommentsScreen: React.FC = () => {
     setText(''); // Clear input immediately for better UX
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
         logger.warn('User not authenticated');
         return;
@@ -181,8 +187,10 @@ export const MomentCommentsScreen: React.FC = () => {
       // Update temp comment with real ID
       setComments((prev) =>
         prev.map((c) =>
-          c.id === tempComment.id ? { ...c, id: (data as { id: string }).id } : c
-        )
+          c.id === tempComment.id
+            ? { ...c, id: (data as { id: string }).id }
+            : c,
+        ),
       );
     } catch (error) {
       logger.error('Error posting comment:', error);
@@ -195,8 +203,8 @@ export const MomentCommentsScreen: React.FC = () => {
       prev.map((comment) =>
         comment.id === commentId
           ? { ...comment, likes: comment.likes + 1 }
-          : comment
-      )
+          : comment,
+      ),
     );
 
     try {
@@ -212,8 +220,8 @@ export const MomentCommentsScreen: React.FC = () => {
           prev.map((comment) =>
             comment.id === commentId
               ? { ...comment, likes: comment.likes - 1 }
-              : comment
-          )
+              : comment,
+          ),
         );
       }
     } catch (error) {
@@ -271,7 +279,9 @@ export const MomentCommentsScreen: React.FC = () => {
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No comments yet. Be the first!</Text>
+              <Text style={styles.emptyText}>
+                No comments yet. Be the first!
+              </Text>
             </View>
           }
         />
@@ -280,7 +290,9 @@ export const MomentCommentsScreen: React.FC = () => {
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <View style={[styles.inputContainer, { paddingBottom: insets.bottom + 10 }]}>
+        <View
+          style={[styles.inputContainer, { paddingBottom: insets.bottom + 10 }]}
+        >
           <Image
             source={{
               uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100',
@@ -297,10 +309,7 @@ export const MomentCommentsScreen: React.FC = () => {
             returnKeyType="send"
           />
           <TouchableOpacity
-            style={[
-              styles.sendBtn,
-              !text.trim() && styles.sendBtnDisabled,
-            ]}
+            style={[styles.sendBtn, !text.trim() && styles.sendBtnDisabled]}
             onPress={handleSend}
             disabled={!text.trim()}
           >

@@ -96,7 +96,8 @@ export async function GET(request: NextRequest) {
     // Calculate fraud rule type counts
     const ruleTypeCounts: Record<string, number> = {};
     fraudRules?.forEach((rule) => {
-      ruleTypeCounts[rule.rule_type] = (ruleTypeCounts[rule.rule_type] || 0) + 1;
+      ruleTypeCounts[rule.rule_type] =
+        (ruleTypeCounts[rule.rule_type] || 0) + 1;
     });
 
     return NextResponse.json({
@@ -126,8 +127,10 @@ export async function GET(request: NextRequest) {
         latestAlerts: recentAlerts || [],
       },
       thresholds: {
-        masak: amlThresholds?.filter((t) => t.action === 'report_masak').length || 0,
-        fiu: amlThresholds?.filter((t) => t.action === 'report_fiu').length || 0,
+        masak:
+          amlThresholds?.filter((t) => t.action === 'report_masak').length || 0,
+        fiu:
+          amlThresholds?.filter((t) => t.action === 'report_fiu').length || 0,
         block: amlThresholds?.filter((t) => t.action === 'block').length || 0,
       },
       fraudRules: {

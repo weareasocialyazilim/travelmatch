@@ -76,6 +76,6 @@ export const useFilterStore = create<FilterState>()(
         taskFilters: state.taskFilters,
         dateRange: state.dateRange,
       }),
-    }
-  )
+    },
+  ),
 );

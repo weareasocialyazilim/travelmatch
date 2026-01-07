@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from 'storybook/react';
 import { View } from 'react-native';
 import { Button } from './Button';
 
@@ -8,7 +8,14 @@ const meta = {
   component: Button,
   argTypes: {
     variant: {
-      options: ['primary', 'secondary', 'outline', 'ghost', 'destructive', 'link'],
+      options: [
+        'primary',
+        'secondary',
+        'outline',
+        'ghost',
+        'destructive',
+        'link',
+      ],
       control: { type: 'select' },
     },
     size: {

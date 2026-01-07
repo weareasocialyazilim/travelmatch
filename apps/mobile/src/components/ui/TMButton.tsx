@@ -38,10 +38,24 @@ import { TYPOGRAPHY } from '@/theme/typography';
 import { RADIUS, SIZES, SPACING } from '@/constants/spacing';
 import { SPRING, HAPTIC } from '@/hooks/useMotion';
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'outline' | 'danger' | 'neon' | 'glass';
+type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'ghost'
+  | 'outline'
+  | 'danger'
+  | 'neon'
+  | 'glass';
 type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 type AnimationMode = 'none' | 'pulse' | 'shimmer';
-type HapticType = 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error' | 'none';
+type HapticType =
+  | 'light'
+  | 'medium'
+  | 'heavy'
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'none';
 
 interface TMButtonProps {
   /** Button text - use either children or title */
@@ -73,7 +87,13 @@ interface TMButtonProps {
   accessibilityHint?: string;
 }
 
-export type { TMButtonProps, ButtonVariant, ButtonSize, AnimationMode, HapticType };
+export type {
+  TMButtonProps,
+  ButtonVariant,
+  ButtonSize,
+  AnimationMode,
+  HapticType,
+};
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -136,7 +156,10 @@ export const TMButton: React.FC<TMButtonProps> = ({
     if (animationMode === 'pulse' && !disabled) {
       pulseScale.value = withRepeat(
         withSequence(
-          withTiming(1.05, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
+          withTiming(1.05, {
+            duration: 1000,
+            easing: Easing.inOut(Easing.ease),
+          }),
           withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
         ),
         -1,
@@ -182,10 +205,7 @@ export const TMButton: React.FC<TMButtonProps> = ({
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: scale.value },
-      { scale: pulseScale.value },
-    ],
+    transform: [{ scale: scale.value }, { scale: pulseScale.value }],
   }));
 
   const shimmerStyle = useAnimatedStyle(() => ({
@@ -216,7 +236,16 @@ export const TMButton: React.FC<TMButtonProps> = ({
     xl: RADIUS.buttonLarge,
   };
 
-  const iconSize = size === 'xl' ? 24 : size === 'lg' ? 22 : size === 'md' ? 20 : size === 'sm' ? 18 : 16;
+  const iconSize =
+    size === 'xl'
+      ? 24
+      : size === 'lg'
+        ? 22
+        : size === 'md'
+          ? 20
+          : size === 'sm'
+            ? 18
+            : 16;
 
   const getTextColor = (): string => {
     if (disabled) return COLORS.textDisabled;
@@ -266,7 +295,14 @@ export const TMButton: React.FC<TMButtonProps> = ({
 
       {loading ? (
         <ActivityIndicator
-          color={variant === 'primary' || variant === 'neon' || variant === 'danger' || variant === 'glass' ? '#FFF' : COLORS.primary}
+          color={
+            variant === 'primary' ||
+            variant === 'neon' ||
+            variant === 'danger' ||
+            variant === 'glass'
+              ? '#FFF'
+              : COLORS.primary
+          }
           size="small"
         />
       ) : (
@@ -435,10 +471,7 @@ export const TMButton: React.FC<TMButtonProps> = ({
           <BlurView
             intensity={Platform.OS === 'ios' ? 20 : 80}
             tint="light"
-            style={[
-              styles.glassFill,
-              { borderRadius: radiusBySize[size] },
-            ]}
+            style={[styles.glassFill, { borderRadius: radiusBySize[size] }]}
           >
             {renderContent()}
           </BlurView>

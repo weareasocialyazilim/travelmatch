@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
         recipient:users!escrow_transactions_recipient_id_fkey(id, display_name, avatar_url, email),
         moment:moments(id, title, price)
       `,
-        { count: 'exact' }
+        { count: 'exact' },
       )
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
@@ -48,19 +48,44 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('Escrow query error:', error);
-      return NextResponse.json({ error: 'Escrow işlemleri yüklenemedi' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Escrow işlemleri yüklenemedi' },
+        { status: 500 },
+      );
     }
 
     // Calculate summary
     type EscrowTransaction = { status?: string; amount?: number };
     const summary = {
       total: count || 0,
-      pending: escrowTransactions?.filter((e: EscrowTransaction) => e.status === 'pending').length || 0,
-      released: escrowTransactions?.filter((e: EscrowTransaction) => e.status === 'released').length || 0,
-      refunded: escrowTransactions?.filter((e: EscrowTransaction) => e.status === 'refunded').length || 0,
-      expired: escrowTransactions?.filter((e: EscrowTransaction) => e.status === 'expired').length || 0,
-      totalAmount: escrowTransactions?.reduce((sum: number, e: EscrowTransaction) => sum + (e.amount || 0), 0) || 0,
-      pendingAmount: escrowTransactions?.filter((e: EscrowTransaction) => e.status === 'pending').reduce((sum: number, e: EscrowTransaction) => sum + (e.amount || 0), 0) || 0,
+      pending:
+        escrowTransactions?.filter(
+          (e: EscrowTransaction) => e.status === 'pending',
+        ).length || 0,
+      released:
+        escrowTransactions?.filter(
+          (e: EscrowTransaction) => e.status === 'released',
+        ).length || 0,
+      refunded:
+        escrowTransactions?.filter(
+          (e: EscrowTransaction) => e.status === 'refunded',
+        ).length || 0,
+      expired:
+        escrowTransactions?.filter(
+          (e: EscrowTransaction) => e.status === 'expired',
+        ).length || 0,
+      totalAmount:
+        escrowTransactions?.reduce(
+          (sum: number, e: EscrowTransaction) => sum + (e.amount || 0),
+          0,
+        ) || 0,
+      pendingAmount:
+        escrowTransactions
+          ?.filter((e: EscrowTransaction) => e.status === 'pending')
+          .reduce(
+            (sum: number, e: EscrowTransaction) => sum + (e.amount || 0),
+            0,
+          ) || 0,
     };
 
     return NextResponse.json({
@@ -93,14 +118,14 @@ export async function POST(request: NextRequest) {
     if (!escrow_id || !action) {
       return NextResponse.json(
         { error: 'escrow_id ve action gerekli' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!['release', 'refund', 'extend'].includes(action)) {
       return NextResponse.json(
         { error: 'Geçersiz action. Geçerli değerler: release, refund, extend' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -114,13 +139,16 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (fetchError || !escrow) {
-      return NextResponse.json({ error: 'Escrow işlemi bulunamadı' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Escrow işlemi bulunamadı' },
+        { status: 404 },
+      );
     }
 
     if (escrow.status !== 'pending') {
       return NextResponse.json(
-        { error: 'Bu işlem sadece bekleyen escrow\'lar için yapılabilir' },
-        { status: 400 }
+        { error: "Bu işlem sadece bekleyen escrow'lar için yapılabilir" },
+        { status: 400 },
       );
     }
 
@@ -169,7 +197,10 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       logger.error('Escrow update error:', updateError);
-      return NextResponse.json({ error: 'Escrow güncellenemedi' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Escrow güncellenemedi' },
+        { status: 500 },
+      );
     }
 
     // Create audit log
@@ -181,7 +212,7 @@ export async function POST(request: NextRequest) {
       escrow,
       updated,
       request.headers.get('x-forwarded-for') || undefined,
-      request.headers.get('user-agent') || undefined
+      request.headers.get('user-agent') || undefined,
     );
 
     return NextResponse.json({ escrow: updated, message: 'İşlem başarılı' });

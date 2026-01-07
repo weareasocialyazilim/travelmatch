@@ -1,9 +1,9 @@
 /**
  * Secure Image Upload Service
- * 
+ *
  * Handles image uploads via Supabase Edge Functions (server-side)
  * All uploads are authenticated and rate-limited
- * 
+ *
  * 🔒 SECURITY:
  * - Never exposes Cloudflare API tokens in client
  * - All uploads authenticated via Supabase auth
@@ -29,26 +29,29 @@ export interface ImageUploadResult {
 
 /**
  * Upload image to Cloudflare via Supabase Edge Function
- * 
+ *
  * @param imageUri - Local file URI or Blob
  * @param options - Upload options (type, metadata)
  * @returns Upload result with CDN URLs
  */
 export async function uploadImage(
   imageUri: string,
-  options: ImageUploadOptions = {}
+  options: ImageUploadOptions = {},
 ): Promise<ImageUploadResult> {
   try {
     // 1. Get auth session
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
-    
+    const {
+      data: { session },
+      error: authError,
+    } = await supabase.auth.getSession();
+
     if (authError || !session) {
       throw new Error('Authentication required to upload images');
     }
 
     // 2. Prepare form data
     const formData = new FormData();
-    
+
     // Convert URI to Blob/File
     let file: Blob;
     if (imageUri.startsWith('http')) {
@@ -66,47 +69,50 @@ export async function uploadImage(
     }
 
     // FormData.append accepts Blob in browsers but React Native uses a different FormData implementation
-     
+
     formData.append('file', file as Blob);
-    
+
     // Add metadata
     if (options.type || options.metadata) {
-      formData.append('metadata', JSON.stringify({
-        type: options.type || 'general',
-        ...options.metadata,
-      }));
+      formData.append(
+        'metadata',
+        JSON.stringify({
+          type: options.type || 'general',
+          ...options.metadata,
+        }),
+      );
     }
 
     // 3. Upload via Edge Function
     logger.info('Uploading image via Edge Function...');
-    
+
     const uploadResponse = await fetch(
       `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/upload-image`,
       {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'apikey': process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '',
+          Authorization: `Bearer ${session.access_token}`,
+          apikey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '',
         },
         body: formData,
-      }
+      },
     );
 
     if (!uploadResponse.ok) {
       const error = await uploadResponse.json();
-      
+
       // Handle specific error cases
       if (uploadResponse.status === 429) {
         throw new Error('Upload rate limit exceeded. Please try again later.');
       }
-      
+
       throw new Error(error.error?.message || 'Image upload failed');
     }
 
     const result = await uploadResponse.json();
-    
+
     logger.info('Image uploaded successfully:', result.data.id);
-    
+
     return result.data as ImageUploadResult;
   } catch (error) {
     logger.error('Image upload failed:', error);
@@ -132,7 +138,7 @@ export interface BatchUploadResult {
  */
 export async function uploadImages(
   imageUris: string[],
-  options: ImageUploadOptions = {}
+  options: ImageUploadOptions = {},
 ): Promise<BatchUploadResult> {
   const uploads = imageUris.map((uri) => uploadImage(uri, options));
   const results = await Promise.allSettled(uploads);
@@ -151,7 +157,10 @@ export async function uploadImages(
             ? result.reason
             : new Error(String(result.reason)),
       });
-      logger.warn(`Image upload failed for ${imageUris[index]}:`, result.reason);
+      logger.warn(
+        `Image upload failed for ${imageUris[index]}:`,
+        result.reason,
+      );
     }
   });
 
@@ -171,8 +180,11 @@ export async function uploadImages(
  */
 export async function deleteImage(imageId: string): Promise<void> {
   try {
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
-    
+    const {
+      data: { session },
+      error: authError,
+    } = await supabase.auth.getSession();
+
     if (authError || !session) {
       throw new Error('Authentication required to delete images');
     }
@@ -182,12 +194,12 @@ export async function deleteImage(imageId: string): Promise<void> {
       {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'apikey': process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '',
+          Authorization: `Bearer ${session.access_token}`,
+          apikey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ imageId }),
-      }
+      },
     );
 
     if (!response.ok) {

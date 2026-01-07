@@ -1,9 +1,9 @@
 /**
  * Type declarations for expo-image-manipulator
- * 
+ *
  * Expo Image Manipulator provides functions to modify image dimensions,
  * crop, rotate, and convert images.
- * 
+ *
  * To install: pnpm add expo-image-manipulator
  */
 
@@ -50,7 +50,7 @@ declare module 'expo-image-manipulator' {
   export function manipulateAsync(
     uri: string,
     actions?: Action[],
-    saveOptions?: SaveOptions
+    saveOptions?: SaveOptions,
   ): Promise<ImageResult>;
 
   export const SaveFormat: {

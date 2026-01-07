@@ -35,7 +35,8 @@ export const Default: Story = {
 export const WithFallback: Story = {
   args: {
     uri: 'https://invalid-url.com/image.jpg',
-    fallbackUri: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
+    fallbackUri:
+      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
     style: { width: 300, height: 200, borderRadius: 12 },
     showLoader: true,
   },
@@ -44,7 +45,12 @@ export const WithFallback: Story = {
 export const ErrorState: Story = {
   args: {
     uri: 'https://invalid-url.com/nonexistent-image.jpg',
-    style: { width: 300, height: 200, borderRadius: 12, backgroundColor: '#e0e0e0' },
+    style: {
+      width: 300,
+      height: 200,
+      borderRadius: 12,
+      backgroundColor: '#e0e0e0',
+    },
     fallbackIcon: 'image-off-outline',
     fallbackIconSize: 48,
   },

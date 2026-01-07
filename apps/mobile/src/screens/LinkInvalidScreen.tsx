@@ -5,12 +5,7 @@
  */
 
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRoute, RouteProp } from '@react-navigation/native';
@@ -26,7 +21,8 @@ const LinkInvalidScreen: React.FC = () => {
   const navigation = useNavigation();
   const route = useRoute<LinkInvalidRouteProp>();
   const { t } = useTranslation();
-  const message = route.params?.message || t('screens.linkInvalid.defaultMessage');
+  const message =
+    route.params?.message || t('screens.linkInvalid.defaultMessage');
 
   const handleGoHome = () => {
     navigation.reset({
@@ -69,7 +65,9 @@ const LinkInvalidScreen: React.FC = () => {
             color={COLORS.utility.white}
             style={styles.buttonIcon}
           />
-          <Text style={styles.primaryButtonText}>{t('screens.linkInvalid.goHome')}</Text>
+          <Text style={styles.primaryButtonText}>
+            {t('screens.linkInvalid.goHome')}
+          </Text>
         </TouchableOpacity>
 
         {/* Info */}

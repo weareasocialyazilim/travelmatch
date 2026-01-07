@@ -29,10 +29,20 @@ interface CommandItem {
 
 const navigationItems: CommandItem[] = [
   { id: 'queue', title: 'İş Kuyruğu', icon: ListTodo, href: '/queue' },
-  { id: 'dashboard', title: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
+  {
+    id: 'dashboard',
+    title: 'Dashboard',
+    icon: LayoutDashboard,
+    href: '/dashboard',
+  },
   { id: 'users', title: 'Kullanıcılar', icon: Users, href: '/users' },
   { id: 'moments', title: 'Momentler', icon: Image, href: '/moments' },
-  { id: 'disputes', title: 'Anlaşmazlıklar', icon: AlertTriangle, href: '/disputes' },
+  {
+    id: 'disputes',
+    title: 'Anlaşmazlıklar',
+    icon: AlertTriangle,
+    href: '/disputes',
+  },
   { id: 'finance', title: 'Finans', icon: DollarSign, href: '/finance' },
   { id: 'settings', title: 'Ayarlar', icon: Settings, href: '/settings' },
 ];
@@ -54,7 +64,7 @@ export function CommandPalette() {
         router.push(item.href);
       }
     },
-    [router, setCommandPaletteOpen]
+    [router, setCommandPaletteOpen],
   );
 
   const actionItems: CommandItem[] = [

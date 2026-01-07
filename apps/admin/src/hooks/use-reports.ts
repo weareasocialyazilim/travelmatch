@@ -6,7 +6,13 @@ interface Report {
   id: string;
   reporter_id: string;
   reported_id: string;
-  type: 'spam' | 'harassment' | 'fake_profile' | 'inappropriate_content' | 'scam' | 'other';
+  type:
+    | 'spam'
+    | 'harassment'
+    | 'fake_profile'
+    | 'inappropriate_content'
+    | 'scam'
+    | 'other';
   reason: string;
   description: string;
   evidence: string[];
@@ -99,7 +105,13 @@ export function useResolveReport() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, resolution }: { id: string; resolution: string }) => {
+    mutationFn: async ({
+      id,
+      resolution,
+    }: {
+      id: string;
+      resolution: string;
+    }) => {
       const response = await fetch(`/api/reports/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },

@@ -5,7 +5,7 @@ import { getAdminSession } from '@/lib/auth';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getAdminSession();
@@ -18,7 +18,9 @@ export async function GET(
 
     const { data: task, error } = await supabase
       .from('tasks')
-      .select('*, assigned_to_user:admin_users!tasks_assigned_to_fkey(id, name, email, avatar_url)')
+      .select(
+        '*, assigned_to_user:admin_users!tasks_assigned_to_fkey(id, name, email, avatar_url)',
+      )
       .eq('id', id)
       .single();
 
@@ -35,7 +37,7 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getAdminSession();
@@ -63,10 +65,12 @@ export async function PATCH(
 
     if (body.status) updateData.status = body.status;
     if (body.priority) updateData.priority = body.priority;
-    if (body.assigned_to !== undefined) updateData.assigned_to = body.assigned_to;
+    if (body.assigned_to !== undefined)
+      updateData.assigned_to = body.assigned_to;
     if (body.assigned_roles) updateData.assigned_roles = body.assigned_roles;
     if (body.due_date !== undefined) updateData.due_date = body.due_date;
-    if (body.metadata) updateData.metadata = { ...currentTask.metadata, ...body.metadata };
+    if (body.metadata)
+      updateData.metadata = { ...currentTask.metadata, ...body.metadata };
 
     // Handle completion
     if (body.status === 'completed') {
@@ -83,7 +87,10 @@ export async function PATCH(
 
     if (error) {
       logger.error('Task update error:', error);
-      return NextResponse.json({ error: 'Görev güncellenemedi' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Görev güncellenemedi' },
+        { status: 500 },
+      );
     }
 
     // Create audit log
@@ -94,7 +101,10 @@ export async function PATCH(
       resource_id: id,
       old_value: currentTask,
       new_value: task,
-      ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined,
+      ip_address:
+        request.headers.get('x-forwarded-for') ||
+        request.headers.get('x-real-ip') ||
+        undefined,
       user_agent: request.headers.get('user-agent'),
     });
 
@@ -107,7 +117,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getAdminSession();
@@ -130,10 +140,7 @@ export async function DELETE(
       .eq('id', id)
       .single();
 
-    const { error } = await supabase
-      .from('tasks')
-      .delete()
-      .eq('id', id);
+    const { error } = await supabase.from('tasks').delete().eq('id', id);
 
     if (error) {
       logger.error('Task delete error:', error);
@@ -148,7 +155,10 @@ export async function DELETE(
         resource_type: 'task',
         resource_id: id,
         old_value: currentTask,
-        ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined,
+        ip_address:
+          request.headers.get('x-forwarded-for') ||
+          request.headers.get('x-real-ip') ||
+          undefined,
         user_agent: request.headers.get('user-agent'),
       });
     }

@@ -8,7 +8,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { SparklesIcon, ClockIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import {
+  SparklesIcon,
+  ClockIcon,
+  CheckCircleIcon,
+} from '@heroicons/react/24/outline';
 import { PageHeader } from '@/components/common/page-header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';

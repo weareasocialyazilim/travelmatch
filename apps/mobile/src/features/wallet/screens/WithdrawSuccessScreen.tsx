@@ -7,13 +7,18 @@ import { TMButton } from '@/components/ui/TMButton';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 
-type WithdrawSuccessScreenProps = StackScreenProps<RootStackParamList, 'WithdrawSuccess'>;
+type WithdrawSuccessScreenProps = StackScreenProps<
+  RootStackParamList,
+  'WithdrawSuccess'
+>;
 
 /**
  * Çekim Başarılı Seremoni Ekranı.
  * Liquid animasyonlar ve "Para Yolda" görselleştirmesi.
  */
-export const WithdrawSuccessScreen = ({ navigation }: WithdrawSuccessScreenProps) => {
+export const WithdrawSuccessScreen = ({
+  navigation,
+}: WithdrawSuccessScreenProps) => {
   const scaleAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -27,14 +32,17 @@ export const WithdrawSuccessScreen = ({ navigation }: WithdrawSuccessScreenProps
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Animated.View style={[styles.iconContainer, { transform: [{ scale: scaleAnim }] }]}>
+        <Animated.View
+          style={[styles.iconContainer, { transform: [{ scale: scaleAnim }] }]}
+        >
           <View style={styles.glow} />
           <Ionicons name="checkmark-circle" size={100} color={COLORS.primary} />
         </Animated.View>
 
         <Text style={styles.title}>Talep Alındı!</Text>
         <Text style={styles.subtitle}>
-          Ödemen banka hesabına doğru yola çıktı. Genellikle 1-3 iş günü içinde hesabında olur.
+          Ödemen banka hesabına doğru yola çıktı. Genellikle 1-3 iş günü içinde
+          hesabında olur.
         </Text>
 
         <View style={styles.receiptContainer}>
@@ -116,7 +124,7 @@ const styles = StyleSheet.create({
   doneButton: {
     height: 60,
     borderRadius: 30,
-  }
+  },
 });
 
 export default WithdrawSuccessScreen;

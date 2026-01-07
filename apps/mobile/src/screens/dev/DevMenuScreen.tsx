@@ -1,5 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { COLORS } from '@/constants/colors';
@@ -52,10 +58,26 @@ export const DevMenuScreen = ({ navigation }: Props) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
-  header: { padding: 20, borderBottomWidth: 1, borderBottomColor: '#222', backgroundColor: '#111' },
-  title: { color: COLORS.brand.primary, fontWeight: 'bold', fontSize: 20, fontFamily: 'monospace' },
+  header: {
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#222',
+    backgroundColor: '#111',
+  },
+  title: {
+    color: COLORS.brand.primary,
+    fontWeight: 'bold',
+    fontSize: 20,
+    fontFamily: 'monospace',
+  },
   list: { padding: 10 },
-  item: { flexDirection: 'row', justifyContent: 'space-between', padding: 16, borderBottomWidth: 1, borderBottomColor: '#222' },
+  item: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#222',
+  },
   itemText: { color: 'white', fontFamily: 'monospace' },
   arrow: { color: '#666' },
 });

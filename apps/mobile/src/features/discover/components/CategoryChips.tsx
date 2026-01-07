@@ -61,7 +61,7 @@ export const CategoryChips: React.FC<CategoryChipsProps> = ({
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       onSelect(categoryId);
     },
-    [onSelect]
+    [onSelect],
   );
 
   return (
@@ -114,7 +114,11 @@ interface Tab {
 }
 
 const DEFAULT_TABS: Tab[] = [
-  { id: 'nearby', label: 'Yakındakiler', description: 'Yerel olarak hediye ver' },
+  {
+    id: 'nearby',
+    label: 'Yakındakiler',
+    description: 'Yerel olarak hediye ver',
+  },
   { id: 'explore', label: 'Keşfet', description: 'Uzaktan hediye ver' },
   { id: 'foryou', label: 'Senin İçin', description: 'Sana özel' },
 ];
@@ -135,7 +139,7 @@ export const TabChips: React.FC<TabChipsProps> = ({
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       onSelect(tabId);
     },
-    [onSelect]
+    [onSelect],
   );
 
   return (
@@ -150,7 +154,9 @@ export const TabChips: React.FC<TabChipsProps> = ({
             activeOpacity={0.7}
             style={[styles.tab, isSelected && styles.tabSelected]}
           >
-            <Text style={[styles.tabLabel, isSelected && styles.tabLabelSelected]}>
+            <Text
+              style={[styles.tabLabel, isSelected && styles.tabLabelSelected]}
+            >
               {tab.label}
             </Text>
             {isSelected && tab.description && (

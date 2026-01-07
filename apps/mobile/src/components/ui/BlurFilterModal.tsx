@@ -28,7 +28,14 @@ interface BlurFilterModalProps {
 }
 
 const PRICE_LABELS = ['$', '$$', '$$$', '$$$$'];
-const CATEGORIES = ['All', 'Dining', 'Nightlife', 'Adventure', 'Culture', 'Relax'];
+const CATEGORIES = [
+  'All',
+  'Dining',
+  'Nightlife',
+  'Adventure',
+  'Culture',
+  'Relax',
+];
 
 export const BlurFilterModal: React.FC<BlurFilterModalProps> = ({
   visible,

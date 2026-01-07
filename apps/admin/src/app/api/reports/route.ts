@@ -62,8 +62,11 @@ export async function GET(request: NextRequest) {
 
     if (!filterResult.success) {
       return NextResponse.json(
-        { error: 'Invalid filter parameters', details: filterResult.error.errors },
-        { status: 400 }
+        {
+          error: 'Invalid filter parameters',
+          details: filterResult.error.errors,
+        },
+        { status: 400 },
       );
     }
 
@@ -78,7 +81,7 @@ export async function GET(request: NextRequest) {
         reported:users!reported_id(id, full_name, avatar_url),
         assigned_to:admin_users!assigned_to(id, full_name)
       `,
-        { count: 'exact' }
+        { count: 'exact' },
       )
       .order('created_at', { ascending: false });
 
@@ -104,7 +107,7 @@ export async function GET(request: NextRequest) {
     logger.error('Reports API error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch reports' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -130,7 +133,7 @@ export async function POST(request: NextRequest) {
     if (!parseResult.success) {
       return NextResponse.json(
         { error: 'Invalid request body', details: parseResult.error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -162,7 +165,7 @@ export async function POST(request: NextRequest) {
       null,
       data,
       request.headers.get('x-forwarded-for') || request.ip || 'unknown',
-      request.headers.get('user-agent') || 'unknown'
+      request.headers.get('user-agent') || 'unknown',
     );
 
     return NextResponse.json(data, { status: 201 });
@@ -170,7 +173,7 @@ export async function POST(request: NextRequest) {
     logger.error('Create report error:', error);
     return NextResponse.json(
       { error: 'Failed to create report' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

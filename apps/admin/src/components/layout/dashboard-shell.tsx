@@ -7,11 +7,7 @@ import { Header } from '@/components/layout/header';
 import { CommandPalette } from '@/components/layout/command-palette';
 import { useAuthStore } from '@/stores/auth-store';
 
-export function DashboardShell({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function DashboardShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { isAuthenticated, is2FAVerified, user, isLoading } = useAuthStore();
 
@@ -47,7 +43,9 @@ export function DashboardShell({
       <Sidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto bg-muted/30 p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto bg-muted/30 p-6">
+          {children}
+        </main>
       </div>
       <CommandPalette />
     </div>

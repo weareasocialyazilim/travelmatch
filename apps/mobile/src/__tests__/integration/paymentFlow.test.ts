@@ -573,17 +573,19 @@ describe('Payment Flow Integration', () => {
         { amount: 100, id: 'txn-3' },
       ];
 
-      mockTransactionsService.create.mockImplementation((data: Record<string, unknown>) => {
-        return Promise.resolve({
-          data: {
-            id: `txn-${Date.now()}`,
-            user_id: mockUser.id,
-            ...data,
-            created_at: new Date().toISOString(),
-          },
-          error: null,
-        });
-      });
+      mockTransactionsService.create.mockImplementation(
+        (data: Record<string, unknown>) => {
+          return Promise.resolve({
+            data: {
+              id: `txn-${Date.now()}`,
+              user_id: mockUser.id,
+              ...data,
+              created_at: new Date().toISOString(),
+            },
+            error: null,
+          });
+        },
+      );
 
       // Process all transactions concurrently
       const results = await Promise.all(

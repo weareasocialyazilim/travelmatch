@@ -22,7 +22,13 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -121,7 +127,7 @@ const mockAutoBanRules = [
   {
     id: 'r4',
     name: 'VPN/Proxy Tespiti',
-    description: 'Bilinen VPN IP\'lerinden giriş yapanları işaretle',
+    description: "Bilinen VPN IP'lerinden giriş yapanları işaretle",
     condition: 'is_vpn = true',
     action: 'flag',
     is_active: false,
@@ -166,16 +172,30 @@ const getFraudScoreColor = (score: number) => {
 const getAlertTypeConfig = (type: string) => {
   switch (type) {
     case 'critical':
-      return { icon: AlertCircle, color: 'text-red-600', bg: 'bg-red-100 dark:bg-red-900/30' };
+      return {
+        icon: AlertCircle,
+        color: 'text-red-600',
+        bg: 'bg-red-100 dark:bg-red-900/30',
+      };
     case 'warning':
-      return { icon: AlertTriangle, color: 'text-orange-600', bg: 'bg-orange-100 dark:bg-orange-900/30' };
+      return {
+        icon: AlertTriangle,
+        color: 'text-orange-600',
+        bg: 'bg-orange-100 dark:bg-orange-900/30',
+      };
     default:
-      return { icon: Flag, color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30' };
+      return {
+        icon: Flag,
+        color: 'text-blue-600',
+        bg: 'bg-blue-100 dark:bg-blue-900/30',
+      };
   }
 };
 
 export default function TrustSafetyPage() {
-  const [selectedUser, setSelectedUser] = useState<typeof mockSuspiciousUsers[0] | null>(null);
+  const [selectedUser, setSelectedUser] = useState<
+    (typeof mockSuspiciousUsers)[0] | null
+  >(null);
   const [search, setSearch] = useState('');
 
   const unacknowledgedAlerts = mockAlerts.filter((a) => !a.acknowledged).length;
@@ -204,7 +224,9 @@ export default function TrustSafetyPage() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Fraud Skoru Ortalaması</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Fraud Skoru Ortalaması
+            </CardTitle>
             <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -217,7 +239,9 @@ export default function TrustSafetyPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Şüpheli Hesaplar</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Şüpheli Hesaplar
+            </CardTitle>
             <UserX className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
@@ -229,7 +253,9 @@ export default function TrustSafetyPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Bu Ay Engellenen</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Bu Ay Engellenen
+            </CardTitle>
             <Ban className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
@@ -242,12 +268,16 @@ export default function TrustSafetyPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Otomasyon Başarısı</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Otomasyon Başarısı
+            </CardTitle>
             <Zap className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">94%</div>
-            <p className="text-xs text-muted-foreground">Otomatik tespit oranı</p>
+            <p className="text-xs text-muted-foreground">
+              Otomatik tespit oranı
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -318,12 +348,14 @@ export default function TrustSafetyPage() {
                       <div className="relative">
                         <Avatar className="h-12 w-12">
                           <AvatarImage src={user.avatar_url || undefined} />
-                          <AvatarFallback>{getInitials(user.full_name)}</AvatarFallback>
+                          <AvatarFallback>
+                            {getInitials(user.full_name)}
+                          </AvatarFallback>
                         </Avatar>
                         <div
                           className={cn(
                             'absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold',
-                            getFraudScoreColor(user.fraud_score)
+                            getFraudScoreColor(user.fraud_score),
                           )}
                         >
                           {user.fraud_score}
@@ -333,21 +365,32 @@ export default function TrustSafetyPage() {
                         <div className="flex items-center gap-2">
                           <span className="font-medium">{user.full_name}</span>
                           <Badge
-                            variant={user.status === 'flagged' ? 'error' : 'warning'}
+                            variant={
+                              user.status === 'flagged' ? 'error' : 'warning'
+                            }
                           >
-                            {user.status === 'flagged' ? 'İşaretlendi' : 'İnceleniyor'}
+                            {user.status === 'flagged'
+                              ? 'İşaretlendi'
+                              : 'İnceleniyor'}
                           </Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground">{user.email}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {user.email}
+                        </p>
                         <div className="mt-1 flex flex-wrap gap-1">
                           {user.risk_factors.map((factor, i) => (
-                            <Badge key={i} variant="outline" className="text-xs">
+                            <Badge
+                              key={i}
+                              variant="outline"
+                              className="text-xs"
+                            >
                               {factor}
                             </Badge>
                           ))}
                         </div>
                         <p className="mt-1 text-xs text-muted-foreground">
-                          Son aktivite: {user.last_activity} • {formatRelativeDate(user.created_at)}
+                          Son aktivite: {user.last_activity} •{' '}
+                          {formatRelativeDate(user.created_at)}
                         </p>
                       </div>
                     </div>
@@ -411,14 +454,14 @@ export default function TrustSafetyPage() {
                       key={alert.id}
                       className={cn(
                         'flex items-center justify-between rounded-lg border p-4',
-                        alert.acknowledged && 'opacity-60'
+                        alert.acknowledged && 'opacity-60',
                       )}
                     >
                       <div className="flex items-center gap-4">
                         <div
                           className={cn(
                             'flex h-10 w-10 items-center justify-center rounded-full',
-                            config.bg
+                            config.bg,
                           )}
                         >
                           <AlertIcon className={cn('h-5 w-5', config.color)} />
@@ -481,13 +524,13 @@ export default function TrustSafetyPage() {
                           'flex h-10 w-10 items-center justify-center rounded-full',
                           rule.is_active
                             ? 'bg-green-100 dark:bg-green-900/30'
-                            : 'bg-gray-100 dark:bg-gray-900/30'
+                            : 'bg-gray-100 dark:bg-gray-900/30',
                         )}
                       >
                         <Shield
                           className={cn(
                             'h-5 w-5',
-                            rule.is_active ? 'text-green-600' : 'text-gray-400'
+                            rule.is_active ? 'text-green-600' : 'text-gray-400',
                           )}
                         />
                       </div>
@@ -499,22 +542,24 @@ export default function TrustSafetyPage() {
                               rule.action === 'block'
                                 ? 'error'
                                 : rule.action === 'suspend'
-                                ? 'warning'
-                                : 'secondary'
+                                  ? 'warning'
+                                  : 'secondary'
                             }
                           >
                             {rule.action === 'block'
                               ? 'Engelle'
                               : rule.action === 'suspend'
-                              ? 'Askıya Al'
-                              : 'İşaretle'}
+                                ? 'Askıya Al'
+                                : 'İşaretle'}
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">
                           {rule.description}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          <code className="rounded bg-muted px-1">{rule.condition}</code>
+                          <code className="rounded bg-muted px-1">
+                            {rule.condition}
+                          </code>
                           <span className="mx-2">•</span>
                           {rule.triggered_count} kez tetiklendi
                         </p>
@@ -560,14 +605,16 @@ export default function TrustSafetyPage() {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h3 className="text-lg font-semibold">{selectedUser.full_name}</h3>
+                  <h3 className="text-lg font-semibold">
+                    {selectedUser.full_name}
+                  </h3>
                   <p className="text-muted-foreground">{selectedUser.email}</p>
                 </div>
                 <div className="ml-auto text-center">
                   <div
                     className={cn(
                       'inline-flex h-16 w-16 items-center justify-center rounded-full text-2xl font-bold',
-                      getFraudScoreColor(selectedUser.fraud_score)
+                      getFraudScoreColor(selectedUser.fraud_score),
                     )}
                   >
                     {selectedUser.fraud_score}
@@ -590,8 +637,12 @@ export default function TrustSafetyPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="rounded-lg border p-3">
-                  <p className="text-sm text-muted-foreground">Hesap Oluşturma</p>
-                  <p className="font-medium">{formatRelativeDate(selectedUser.created_at)}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Hesap Oluşturma
+                  </p>
+                  <p className="font-medium">
+                    {formatRelativeDate(selectedUser.created_at)}
+                  </p>
                 </div>
                 <div className="rounded-lg border p-3">
                   <p className="text-sm text-muted-foreground">Son Aktivite</p>
@@ -612,7 +663,10 @@ export default function TrustSafetyPage() {
               <Ban className="mr-2 h-4 w-4" />
               Yasakla
             </Button>
-            <Button variant="default" className="bg-green-600 hover:bg-green-700">
+            <Button
+              variant="default"
+              className="bg-green-600 hover:bg-green-700"
+            >
               <CheckCircle className="mr-2 h-4 w-4" />
               Temiz
             </Button>

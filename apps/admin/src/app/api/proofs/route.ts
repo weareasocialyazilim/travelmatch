@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
         moment:moments(id, title, price, user_id),
         verified_by_admin:admin_users!proofs_verified_by_fkey(id, name)
       `,
-        { count: 'exact' }
+        { count: 'exact' },
       )
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
@@ -61,7 +61,10 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('Proofs query error:', error);
-      return NextResponse.json({ error: 'Kanıtlar yüklenemedi' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Kanıtlar yüklenemedi' },
+        { status: 500 },
+      );
     }
 
     // Calculate summary
@@ -69,13 +72,21 @@ export async function GET(request: NextRequest) {
     const summary = {
       total: count || 0,
       pending: proofs?.filter((p: Proof) => p.status === 'pending').length || 0,
-      verified: proofs?.filter((p: Proof) => p.status === 'verified').length || 0,
-      rejected: proofs?.filter((p: Proof) => p.status === 'rejected').length || 0,
+      verified:
+        proofs?.filter((p: Proof) => p.status === 'verified').length || 0,
+      rejected:
+        proofs?.filter((p: Proof) => p.status === 'rejected').length || 0,
       byType: {
-        'micro-kindness': proofs?.filter((p: Proof) => p.type === 'micro-kindness').length || 0,
-        'verified-experience': proofs?.filter((p: Proof) => p.type === 'verified-experience').length || 0,
-        'community-proof': proofs?.filter((p: Proof) => p.type === 'community-proof').length || 0,
-        'milestone': proofs?.filter((p: Proof) => p.type === 'milestone').length || 0,
+        'micro-kindness':
+          proofs?.filter((p: Proof) => p.type === 'micro-kindness').length || 0,
+        'verified-experience':
+          proofs?.filter((p: Proof) => p.type === 'verified-experience')
+            .length || 0,
+        'community-proof':
+          proofs?.filter((p: Proof) => p.type === 'community-proof').length ||
+          0,
+        milestone:
+          proofs?.filter((p: Proof) => p.type === 'milestone').length || 0,
       },
     };
 
@@ -109,21 +120,21 @@ export async function PUT(request: NextRequest) {
     if (!proof_id || !action) {
       return NextResponse.json(
         { error: 'proof_id ve action gerekli' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!['verify', 'reject'].includes(action)) {
       return NextResponse.json(
         { error: 'Geçersiz action. Geçerli değerler: verify, reject' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (action === 'reject' && !rejection_reason) {
       return NextResponse.json(
         { error: 'Reddetme sebebi gerekli' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -143,7 +154,7 @@ export async function PUT(request: NextRequest) {
     if (proof.status !== 'pending') {
       return NextResponse.json(
         { error: 'Bu işlem sadece bekleyen kanıtlar için yapılabilir' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -166,7 +177,10 @@ export async function PUT(request: NextRequest) {
 
     if (updateError) {
       logger.error('Proof update error:', updateError);
-      return NextResponse.json({ error: 'Kanıt güncellenemedi' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Kanıt güncellenemedi' },
+        { status: 500 },
+      );
     }
 
     // Create audit log
@@ -178,7 +192,7 @@ export async function PUT(request: NextRequest) {
       proof,
       updated,
       request.headers.get('x-forwarded-for') || undefined,
-      request.headers.get('user-agent') || undefined
+      request.headers.get('user-agent') || undefined,
     );
 
     return NextResponse.json({ proof: updated, message: 'İşlem başarılı' });

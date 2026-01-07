@@ -20,8 +20,8 @@ describe('useAsync Hook', () => {
 
     it('accepts initial data', () => {
       const asyncFn = jest.fn().mockResolvedValue('new data');
-      const { result } = renderHook(() => 
-        useAsync(asyncFn, { initialData: 'initial data' })
+      const { result } = renderHook(() =>
+        useAsync(asyncFn, { initialData: 'initial data' }),
       );
 
       expect(result.current.data).toBe('initial data');
@@ -29,12 +29,12 @@ describe('useAsync Hook', () => {
 
     it('executes immediately when immediate option is true', async () => {
       const asyncFn = jest.fn().mockResolvedValue('data');
-      const { result } = renderHook(() => 
-        useAsync(asyncFn, { immediate: true })
+      const { result } = renderHook(() =>
+        useAsync(asyncFn, { immediate: true }),
       );
 
       expect(result.current.isLoading).toBe(true);
-      
+
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
       });
@@ -63,9 +63,7 @@ describe('useAsync Hook', () => {
     it('calls onSuccess callback', async () => {
       const onSuccess = jest.fn() as jest.Mock;
       const asyncFn = jest.fn().mockResolvedValue('data');
-      const { result } = renderHook(() => 
-        useAsync(asyncFn, { onSuccess })
-      );
+      const { result } = renderHook(() => useAsync(asyncFn, { onSuccess }));
 
       await act(async () => {
         await result.current.execute();
@@ -112,9 +110,7 @@ describe('useAsync Hook', () => {
       const error = new Error('Test error');
       const onError = jest.fn() as jest.Mock;
       const asyncFn = jest.fn().mockRejectedValue(error);
-      const { result } = renderHook(() => 
-        useAsync(asyncFn, { onError })
-      );
+      const { result } = renderHook(() => useAsync(asyncFn, { onError }));
 
       await act(async () => {
         await result.current.execute();
@@ -156,9 +152,9 @@ describe('useAsync Hook', () => {
         .fn()
         .mockResolvedValueOnce('first')
         .mockResolvedValueOnce('second');
-      
-      const { result } = renderHook(() => 
-        useAsync(asyncFn, { keepPreviousData: true })
+
+      const { result } = renderHook(() =>
+        useAsync(asyncFn, { keepPreviousData: true }),
       );
 
       await act(async () => {
@@ -185,9 +181,9 @@ describe('useAsync Hook', () => {
         .fn()
         .mockResolvedValueOnce('first')
         .mockResolvedValueOnce('second');
-      
-      const { result } = renderHook(() => 
-        useAsync(asyncFn, { keepPreviousData: false })
+
+      const { result } = renderHook(() =>
+        useAsync(asyncFn, { keepPreviousData: false }),
       );
 
       await act(async () => {
@@ -234,8 +230,8 @@ describe('useAsync Hook', () => {
 
     it('resets to initial data when provided', async () => {
       const asyncFn = jest.fn().mockResolvedValue('new data');
-      const { result } = renderHook(() => 
-        useAsync(asyncFn, { initialData: 'initial' })
+      const { result } = renderHook(() =>
+        useAsync(asyncFn, { initialData: 'initial' }),
       );
 
       await act(async () => {
@@ -296,7 +292,7 @@ describe('useAsync Hook', () => {
         .mockResolvedValueOnce('first')
         .mockResolvedValueOnce('second')
         .mockResolvedValueOnce('third');
-      
+
       const { result } = renderHook(() => useAsync(asyncFn));
 
       await act(async () => {

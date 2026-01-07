@@ -5,8 +5,20 @@ import { createAppUser } from './user.factory';
 type MomentStatus = 'pending' | 'approved' | 'rejected';
 type DisputeType = 'scam' | 'harassment' | 'inappropriate' | 'spam' | 'other';
 type DisputeStatus = 'open' | 'investigating' | 'resolved' | 'dismissed';
-type ReportType = 'spam' | 'harassment' | 'fake_profile' | 'inappropriate_content' | 'scam' | 'safety' | 'other';
-type ReportStatus = 'pending' | 'reviewing' | 'resolved' | 'dismissed' | 'escalated';
+type ReportType =
+  | 'spam'
+  | 'harassment'
+  | 'fake_profile'
+  | 'inappropriate_content'
+  | 'scam'
+  | 'safety'
+  | 'other';
+type ReportStatus =
+  | 'pending'
+  | 'reviewing'
+  | 'resolved'
+  | 'dismissed'
+  | 'escalated';
 type Priority = 'low' | 'medium' | 'high' | 'critical';
 
 interface AppUser {
@@ -86,8 +98,14 @@ export function createMoment(overrides: Partial<Moment> = {}): Moment {
     title: faker.lorem.sentence({ min: 3, max: 8 }),
     description: faker.helpers.maybe(() => faker.lorem.paragraph()) ?? null,
     location: faker.helpers.maybe(() => faker.location.city()) ?? null,
-    images: Array.from({ length: faker.number.int({ min: 1, max: 5 }) }, () => faker.image.url()),
-    status: faker.helpers.arrayElement<MomentStatus>(['pending', 'approved', 'rejected']),
+    images: Array.from({ length: faker.number.int({ min: 1, max: 5 }) }, () =>
+      faker.image.url(),
+    ),
+    status: faker.helpers.arrayElement<MomentStatus>([
+      'pending',
+      'approved',
+      'rejected',
+    ]),
     moderation_notes: null,
     moderated_by: null,
     moderated_at: null,
@@ -99,7 +117,9 @@ export function createMoment(overrides: Partial<Moment> = {}): Moment {
 /**
  * Factory for creating a Moment with user data
  */
-export function createMomentWithUser(overrides: Partial<Moment> = {}): Moment & { user: AppUser } {
+export function createMomentWithUser(
+  overrides: Partial<Moment> = {},
+): Moment & { user: AppUser } {
   const user = createAppUser();
   const moment = createMoment({ user_id: user.id, ...overrides });
   return { ...moment, user };
@@ -113,10 +133,23 @@ export function createDispute(overrides: Partial<Dispute> = {}): Dispute {
     id: faker.string.uuid(),
     reporter_id: faker.string.uuid(),
     reported_id: faker.string.uuid(),
-    type: faker.helpers.arrayElement<DisputeType>(['scam', 'harassment', 'inappropriate', 'spam', 'other']),
+    type: faker.helpers.arrayElement<DisputeType>([
+      'scam',
+      'harassment',
+      'inappropriate',
+      'spam',
+      'other',
+    ]),
     description: faker.lorem.paragraph(),
-    evidence: Array.from({ length: faker.number.int({ min: 0, max: 3 }) }, () => faker.image.url()),
-    status: faker.helpers.arrayElement<DisputeStatus>(['open', 'investigating', 'resolved', 'dismissed']),
+    evidence: Array.from({ length: faker.number.int({ min: 0, max: 3 }) }, () =>
+      faker.image.url(),
+    ),
+    status: faker.helpers.arrayElement<DisputeStatus>([
+      'open',
+      'investigating',
+      'resolved',
+      'dismissed',
+    ]),
     resolution: null,
     resolved_by: null,
     resolved_at: null,
@@ -133,12 +166,33 @@ export function createReport(overrides: Partial<Report> = {}): Report {
     id: faker.string.uuid(),
     reporter_id: faker.string.uuid(),
     reported_id: faker.string.uuid(),
-    type: faker.helpers.arrayElement<ReportType>(['spam', 'harassment', 'fake_profile', 'inappropriate_content', 'scam', 'safety', 'other']),
+    type: faker.helpers.arrayElement<ReportType>([
+      'spam',
+      'harassment',
+      'fake_profile',
+      'inappropriate_content',
+      'scam',
+      'safety',
+      'other',
+    ]),
     reason: faker.lorem.sentence(),
     description: faker.lorem.paragraph(),
-    evidence: Array.from({ length: faker.number.int({ min: 0, max: 3 }) }, () => faker.image.url()),
-    status: faker.helpers.arrayElement<ReportStatus>(['pending', 'reviewing', 'resolved', 'dismissed', 'escalated']),
-    priority: faker.helpers.arrayElement<Priority>(['low', 'medium', 'high', 'critical']),
+    evidence: Array.from({ length: faker.number.int({ min: 0, max: 3 }) }, () =>
+      faker.image.url(),
+    ),
+    status: faker.helpers.arrayElement<ReportStatus>([
+      'pending',
+      'reviewing',
+      'resolved',
+      'dismissed',
+      'escalated',
+    ]),
+    priority: faker.helpers.arrayElement<Priority>([
+      'low',
+      'medium',
+      'high',
+      'critical',
+    ]),
     assigned_to: null,
     resolution: null,
     action_taken: null,
@@ -152,20 +206,29 @@ export function createReport(overrides: Partial<Report> = {}): Report {
 /**
  * Factory for creating a list of Moments
  */
-export function createMomentList(count: number, overrides: Partial<Moment> = {}): Moment[] {
+export function createMomentList(
+  count: number,
+  overrides: Partial<Moment> = {},
+): Moment[] {
   return Array.from({ length: count }, () => createMoment(overrides));
 }
 
 /**
  * Factory for creating a list of Disputes
  */
-export function createDisputeList(count: number, overrides: Partial<Dispute> = {}): Dispute[] {
+export function createDisputeList(
+  count: number,
+  overrides: Partial<Dispute> = {},
+): Dispute[] {
   return Array.from({ length: count }, () => createDispute(overrides));
 }
 
 /**
  * Factory for creating a list of Reports
  */
-export function createReportList(count: number, overrides: Partial<Report> = {}): Report[] {
+export function createReportList(
+  count: number,
+  overrides: Partial<Report> = {},
+): Report[] {
   return Array.from({ length: count }, () => createReport(overrides));
 }

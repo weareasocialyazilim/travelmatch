@@ -89,7 +89,9 @@ export function uploadWithProgress<T = unknown>(
         }
       } else {
         reject(
-          new Error(`Upload failed with status ${xhr.status}: ${xhr.statusText}`),
+          new Error(
+            `Upload failed with status ${xhr.status}: ${xhr.statusText}`,
+          ),
         );
       }
     });

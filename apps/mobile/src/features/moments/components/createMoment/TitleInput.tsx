@@ -173,7 +173,8 @@ const awwwardsStyles = StyleSheet.create({
     color: COLORS.text.primary,
     fontSize: TYPOGRAPHY_SYSTEM.sizes.bodyL,
     fontFamily: TYPOGRAPHY_SYSTEM.families.body,
-    lineHeight: TYPOGRAPHY_SYSTEM.sizes.bodyL * TYPOGRAPHY_SYSTEM.lineHeights.normal,
+    lineHeight:
+      TYPOGRAPHY_SYSTEM.sizes.bodyL * TYPOGRAPHY_SYSTEM.lineHeights.normal,
   },
 
   // Character counter

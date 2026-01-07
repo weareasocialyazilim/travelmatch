@@ -55,7 +55,13 @@ export type Resource =
   | 'integrations';
 
 // Actions
-export type Action = 'view' | 'create' | 'update' | 'delete' | 'export' | 'impersonate';
+export type Action =
+  | 'view'
+  | 'create'
+  | 'update'
+  | 'delete'
+  | 'export'
+  | 'impersonate';
 
 // Task Queue
 export type TaskPriority = 'urgent' | 'high' | 'medium' | 'low';
@@ -271,7 +277,14 @@ export interface Report {
   reporter?: AppUser;
   reported_id: string;
   reported?: AppUser;
-  type: 'spam' | 'harassment' | 'fake_profile' | 'inappropriate_content' | 'scam' | 'safety' | 'other';
+  type:
+    | 'spam'
+    | 'harassment'
+    | 'fake_profile'
+    | 'inappropriate_content'
+    | 'scam'
+    | 'safety'
+    | 'other';
   reason: string;
   description: string;
   evidence: string[];
@@ -290,7 +303,13 @@ export interface SupportTicket {
   id: string;
   user_id: string;
   user?: AppUser;
-  category: 'account' | 'payment' | 'technical' | 'safety' | 'general' | 'feedback';
+  category:
+    | 'account'
+    | 'payment'
+    | 'technical'
+    | 'safety'
+    | 'general'
+    | 'feedback';
   subject: string;
   description: string;
   status: 'open' | 'in_progress' | 'waiting_user' | 'resolved' | 'closed';

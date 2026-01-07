@@ -76,7 +76,7 @@ async function fetchUser(id: string): Promise<{ user: UserDetails }> {
 
 async function updateUser(
   id: string,
-  data: Partial<User>
+  data: Partial<User>,
 ): Promise<{ user: User }> {
   const response = await fetch(`/api/users/${id}`, {
     method: 'PATCH',
@@ -127,12 +127,18 @@ export function useSuspendUser() {
     mutate: (id: string, reason?: string) =>
       updateUser.mutate({
         id,
-        data: { is_suspended: true, suspension_reason: reason } as Partial<User>,
+        data: {
+          is_suspended: true,
+          suspension_reason: reason,
+        } as Partial<User>,
       }),
     mutateAsync: (id: string, reason?: string) =>
       updateUser.mutateAsync({
         id,
-        data: { is_suspended: true, suspension_reason: reason } as Partial<User>,
+        data: {
+          is_suspended: true,
+          suspension_reason: reason,
+        } as Partial<User>,
       }),
   };
 }

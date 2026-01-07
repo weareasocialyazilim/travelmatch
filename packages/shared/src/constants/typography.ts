@@ -13,7 +13,7 @@ export const TYPOGRAPHY = {
     xxl: 24,
     xxxl: 32,
   },
-  
+
   fontWeights: {
     light: '300',
     regular: '400',
@@ -21,7 +21,7 @@ export const TYPOGRAPHY = {
     semibold: '600',
     bold: '700',
   },
-  
+
   lineHeights: {
     tight: 1.2,
     normal: 1.5,

@@ -25,10 +25,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
 
   useEffect(() => {
     // 1. Logo Pop
-    scale.value = withSequence(
-      withSpring(1.2),
-      withSpring(1)
-    );
+    scale.value = withSequence(withSpring(1.2), withSpring(1));
     opacity.value = withTiming(1, { duration: 800 });
 
     // 2. Text Fade In
@@ -57,22 +54,53 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
       <StatusBar style="light" />
 
       <Animated.View style={[styles.logoContainer, logoStyle]}>
-        <MaterialCommunityIcons name="compass-rose" size={100} color={COLORS.brand.primary} />
+        <MaterialCommunityIcons
+          name="compass-rose"
+          size={100}
+          color={COLORS.brand.primary}
+        />
       </Animated.View>
 
       <Animated.View style={[styles.textContainer, textStyle]}>
-        <Animated.Text style={styles.brandName}>TRAVEL<Animated.Text style={styles.brandHighlight}>MATCH.</Animated.Text></Animated.Text>
-        <Animated.Text style={styles.tagline}>Gift Moments, Collect Memories.</Animated.Text>
+        <Animated.Text style={styles.brandName}>
+          TRAVEL
+          <Animated.Text style={styles.brandHighlight}>MATCH.</Animated.Text>
+        </Animated.Text>
+        <Animated.Text style={styles.tagline}>
+          Gift Moments, Collect Memories.
+        </Animated.Text>
       </Animated.View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'black', alignItems: 'center', justifyContent: 'center' },
-  logoContainer: { marginBottom: 20, shadowColor: COLORS.brand.primary, shadowOpacity: 0.5, shadowRadius: 20, shadowOffset: { width: 0, height: 0 } },
+  container: {
+    flex: 1,
+    backgroundColor: 'black',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoContainer: {
+    marginBottom: 20,
+    shadowColor: COLORS.brand.primary,
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 0 },
+  },
   textContainer: { alignItems: 'center' },
-  brandName: { color: 'white', fontSize: 42, fontWeight: '900', letterSpacing: -1 },
+  brandName: {
+    color: 'white',
+    fontSize: 42,
+    fontWeight: '900',
+    letterSpacing: -1,
+  },
   brandHighlight: { color: COLORS.brand.primary },
-  tagline: { color: COLORS.text.secondary, marginTop: 8, fontSize: 14, letterSpacing: 2, textTransform: 'uppercase' },
+  tagline: {
+    color: COLORS.text.secondary,
+    marginTop: 8,
+    fontSize: 14,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+  },
 });

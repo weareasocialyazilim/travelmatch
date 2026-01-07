@@ -36,7 +36,6 @@ export const SPACING = {
   inlineGap: 8,
 } as const;
 
-
 // ═══════════════════════════════════════════════════
 // RADIUS - Premium corners
 // ═══════════════════════════════════════════════════
@@ -59,7 +58,6 @@ export const RADIUS = {
   sheet: 28,
   avatar: 9999,
 } as const;
-
 
 // ═══════════════════════════════════════════════════
 // SIZES - Component dimensions
@@ -113,7 +111,6 @@ export const SIZES = {
   fabSmall: 44,
 } as const;
 
-
 // ═══════════════════════════════════════════════════
 // BORDER
 // ═══════════════════════════════════════════════════
@@ -123,7 +120,6 @@ export const BORDER = {
   medium: 1.5,
   thick: 2,
 } as const;
-
 
 // ═══════════════════════════════════════════════════
 // LAYOUT - Legacy compatibility
@@ -137,7 +133,6 @@ export const LAYOUT = {
   headerHeight: SIZES.header,
   tabBarHeight: SIZES.tabBar,
 } as const;
-
 
 // ═══════════════════════════════════════════════════
 // Type exports

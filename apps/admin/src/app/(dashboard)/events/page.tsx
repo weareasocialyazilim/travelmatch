@@ -22,7 +22,13 @@ import {
   Zap,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -158,8 +164,12 @@ export default function EventsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Etkinlik Yönetimi</h1>
-          <p className="text-muted-foreground">Kampanyalar ve sezonluk etkinlikler</p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Etkinlik Yönetimi
+          </h1>
+          <p className="text-muted-foreground">
+            Kampanyalar ve sezonluk etkinlikler
+          </p>
         </div>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
@@ -174,7 +184,9 @@ export default function EventsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Aktif</p>
-                <p className="text-2xl font-bold text-green-600">{eventStats.active}</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {eventStats.active}
+                </p>
               </div>
               <Zap className="h-8 w-8 text-green-500" />
             </div>
@@ -206,7 +218,9 @@ export default function EventsPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Toplam Katılımcı</p>
+                <p className="text-sm text-muted-foreground">
+                  Toplam Katılımcı
+                </p>
                 <p className="text-2xl font-bold">
                   {eventStats.total_participants.toLocaleString('tr-TR')}
                 </p>
@@ -236,7 +250,9 @@ export default function EventsPage() {
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <h3 className="font-medium text-lg">{event.name}</h3>
+                            <h3 className="font-medium text-lg">
+                              {event.name}
+                            </h3>
                             {getStatusBadge(event.status)}
                             {getTypeBadge(event.type)}
                           </div>
@@ -247,7 +263,9 @@ export default function EventsPage() {
                           {/* Progress */}
                           <div className="mt-4 space-y-2">
                             <div className="flex items-center justify-between text-sm">
-                              <span className="text-muted-foreground">Katılımcı Hedefi</span>
+                              <span className="text-muted-foreground">
+                                Katılımcı Hedefi
+                              </span>
                               <span className="font-medium">
                                 {event.participants.toLocaleString('tr-TR')} /{' '}
                                 {event.target.toLocaleString('tr-TR')}
@@ -366,7 +384,8 @@ export default function EventsPage() {
                             {getStatusBadge(event.status)}
                           </div>
                           <p className="text-sm text-muted-foreground mt-1">
-                            {event.participants.toLocaleString('tr-TR')} katılımcı
+                            {event.participants.toLocaleString('tr-TR')}{' '}
+                            katılımcı
                           </p>
                         </div>
                         <div className="text-right">
@@ -406,7 +425,9 @@ export default function EventsPage() {
                       <span className="text-2xl">{item.icon}</span>
                       <div>
                         <p className="font-medium">{item.event}</p>
-                        <p className="text-sm text-muted-foreground">{item.date}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {item.date}
+                        </p>
                       </div>
                     </div>
                     <Button size="sm" variant="outline">
@@ -428,19 +449,27 @@ export default function EventsPage() {
             <CardContent>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Bu Ay Harcanan</span>
+                  <span className="text-sm text-muted-foreground">
+                    Bu Ay Harcanan
+                  </span>
                   <span className="font-medium">₺65,000</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Ortalama ROI</span>
+                  <span className="text-sm text-muted-foreground">
+                    Ortalama ROI
+                  </span>
                   <span className="font-medium text-green-600">3.2x</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">En Başarılı</span>
+                  <span className="text-sm text-muted-foreground">
+                    En Başarılı
+                  </span>
                   <span className="font-medium">Black Friday</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Katılım Oranı</span>
+                  <span className="text-sm text-muted-foreground">
+                    Katılım Oranı
+                  </span>
                   <span className="font-medium">24%</span>
                 </div>
               </div>

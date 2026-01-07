@@ -39,35 +39,55 @@ describe('Button Component', () => {
   describe('Variants', () => {
     it('renders primary variant', () => {
       const { getByText } = render(
-        <Button title="Primary" onPress={jest.fn() as jest.Mock} variant="primary" />,
+        <Button
+          title="Primary"
+          onPress={jest.fn() as jest.Mock}
+          variant="primary"
+        />,
       );
       expect(getByText('Primary')).toBeTruthy();
     });
 
     it('renders secondary variant', () => {
       const { getByText } = render(
-        <Button title="Secondary" onPress={jest.fn() as jest.Mock} variant="secondary" />,
+        <Button
+          title="Secondary"
+          onPress={jest.fn() as jest.Mock}
+          variant="secondary"
+        />,
       );
       expect(getByText('Secondary')).toBeTruthy();
     });
 
     it('renders outline variant', () => {
       const { getByText } = render(
-        <Button title="Outline" onPress={jest.fn() as jest.Mock} variant="outline" />,
+        <Button
+          title="Outline"
+          onPress={jest.fn() as jest.Mock}
+          variant="outline"
+        />,
       );
       expect(getByText('Outline')).toBeTruthy();
     });
 
     it('renders ghost variant', () => {
       const { getByText } = render(
-        <Button title="Ghost" onPress={jest.fn() as jest.Mock} variant="ghost" />,
+        <Button
+          title="Ghost"
+          onPress={jest.fn() as jest.Mock}
+          variant="ghost"
+        />,
       );
       expect(getByText('Ghost')).toBeTruthy();
     });
 
     it('renders danger variant', () => {
       const { getByText } = render(
-        <Button title="Danger" onPress={jest.fn() as jest.Mock} variant="danger" />,
+        <Button
+          title="Danger"
+          onPress={jest.fn() as jest.Mock}
+          variant="danger"
+        />,
       );
       expect(getByText('Danger')).toBeTruthy();
     });
@@ -179,7 +199,11 @@ describe('Button Component', () => {
     it('applies custom container style', () => {
       const customStyle = { marginTop: 20 };
       const { getByText } = render(
-        <Button title="Test" onPress={jest.fn() as jest.Mock} style={customStyle} />,
+        <Button
+          title="Test"
+          onPress={jest.fn() as jest.Mock}
+          style={customStyle}
+        />,
       );
       const button = getByText('Test').parent?.parent;
       // Verify that style prop is defined and applied
@@ -190,7 +214,11 @@ describe('Button Component', () => {
     it('applies custom text style', () => {
       const customTextStyle = { fontSize: 20 };
       const { getByText } = render(
-        <Button title="Test" onPress={jest.fn() as jest.Mock} textStyle={customTextStyle} />,
+        <Button
+          title="Test"
+          onPress={jest.fn() as jest.Mock}
+          textStyle={customTextStyle}
+        />,
       );
       const text = getByText('Test');
       expect(text.props.style).toContainEqual(
@@ -202,7 +230,11 @@ describe('Button Component', () => {
   describe('Snapshots', () => {
     it('matches snapshot for primary variant', () => {
       const { toJSON } = render(
-        <Button title="Primary" onPress={jest.fn() as jest.Mock} variant="primary" />,
+        <Button
+          title="Primary"
+          onPress={jest.fn() as jest.Mock}
+          variant="primary"
+        />,
       );
       expect(toJSON()).toMatchSnapshot();
     });

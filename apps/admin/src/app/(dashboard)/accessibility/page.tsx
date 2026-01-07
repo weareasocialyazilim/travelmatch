@@ -15,7 +15,13 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -163,7 +169,9 @@ export default function AccessibilityPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Genel WCAG Skoru</p>
+                <p className="text-sm text-muted-foreground">
+                  Genel WCAG Skoru
+                </p>
                 <p className="text-4xl font-bold">{wcagScore.overall}%</p>
                 <p className="text-sm text-green-600 flex items-center gap-1 mt-1">
                   <TrendingUp className="h-4 w-4" />
@@ -202,7 +210,9 @@ export default function AccessibilityPage() {
       <Tabs defaultValue="issues" className="space-y-4">
         <TabsList>
           <TabsTrigger value="issues">Sorunlar</TabsTrigger>
-          <TabsTrigger value="features">Erişilebilirlik Özellikleri</TabsTrigger>
+          <TabsTrigger value="features">
+            Erişilebilirlik Özellikleri
+          </TabsTrigger>
           <TabsTrigger value="audit">Denetim Geçmişi</TabsTrigger>
         </TabsList>
 
@@ -247,7 +257,12 @@ export default function AccessibilityPage() {
                         </p>
                       </div>
                     </div>
-                    <Button size="sm" variant={issue.status === 'resolved' ? 'outline' : 'default'}>
+                    <Button
+                      size="sm"
+                      variant={
+                        issue.status === 'resolved' ? 'outline' : 'default'
+                      }
+                    >
                       {issue.status === 'resolved' ? 'Çözüldü' : 'Düzelt'}
                     </Button>
                   </div>
@@ -270,7 +285,10 @@ export default function AccessibilityPage() {
                 <CardContent>
                   <div className="space-y-3">
                     {category.items.map((item, i) => (
-                      <div key={i} className="flex items-center justify-between">
+                      <div
+                        key={i}
+                        className="flex items-center justify-between"
+                      >
                         <span className="text-sm">{item.name}</span>
                         <div className="flex items-center gap-2">
                           {getStatusIcon(item.status)}

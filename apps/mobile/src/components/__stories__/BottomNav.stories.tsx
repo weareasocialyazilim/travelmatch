@@ -8,7 +8,9 @@ const meta: Meta<typeof BottomNav> = {
   component: BottomNav,
   decorators: [
     (Story) => (
-      <View style={{ flex: 1, backgroundColor: '#fff', justifyContent: 'flex-end' }}>
+      <View
+        style={{ flex: 1, backgroundColor: '#fff', justifyContent: 'flex-end' }}
+      >
         <Story />
       </View>
     ),

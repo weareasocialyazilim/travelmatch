@@ -5,7 +5,13 @@
  * Features neon text accents and smooth press animations.
  */
 import React, { memo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Platform,
+} from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -54,60 +60,56 @@ interface StatItemProps {
   onPress?: () => void;
 }
 
-const StatItem: React.FC<StatItemProps> = memo(({
-  value,
-  label,
-  accentColor,
-  onPress,
-}) => {
-  const scale = useSharedValue(1);
+const StatItem: React.FC<StatItemProps> = memo(
+  ({ value, label, accentColor, onPress }) => {
+    const scale = useSharedValue(1);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scale.value }],
+    }));
 
-  const handlePressIn = () => {
-    if (onPress) {
-      scale.value = withSpring(0.95, SPRINGS.snappy);
-    }
-  };
+    const handlePressIn = () => {
+      if (onPress) {
+        scale.value = withSpring(0.95, SPRINGS.snappy);
+      }
+    };
 
-  const handlePressOut = () => {
-    if (onPress) {
-      scale.value = withSpring(1, SPRINGS.bouncy);
-    }
-  };
+    const handlePressOut = () => {
+      if (onPress) {
+        scale.value = withSpring(1, SPRINGS.bouncy);
+      }
+    };
 
-  const content = (
-    <View style={styles.statItem}>
-      <Text style={[
-        styles.statNumber,
-        accentColor && { color: accentColor },
-      ]}>
-        {value}
-      </Text>
-      <Text style={styles.statLabel}>{label}</Text>
-    </View>
-  );
-
-  if (onPress) {
-    return (
-      <AnimatedTouchable
-        style={animatedStyle}
-        onPress={onPress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        accessibilityLabel={`${value} ${label}. Tap to view`}
-        accessibilityRole="button"
-        activeOpacity={0.8}
-      >
-        {content}
-      </AnimatedTouchable>
+    const content = (
+      <View style={styles.statItem}>
+        <Text
+          style={[styles.statNumber, accentColor && { color: accentColor }]}
+        >
+          {value}
+        </Text>
+        <Text style={styles.statLabel}>{label}</Text>
+      </View>
     );
-  }
 
-  return <Animated.View style={animatedStyle}>{content}</Animated.View>;
-});
+    if (onPress) {
+      return (
+        <AnimatedTouchable
+          style={animatedStyle}
+          onPress={onPress}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          accessibilityLabel={`${value} ${label}. Tap to view`}
+          accessibilityRole="button"
+          activeOpacity={0.8}
+        >
+          {content}
+        </AnimatedTouchable>
+      );
+    }
+
+    return <Animated.View style={animatedStyle}>{content}</Animated.View>;
+  },
+);
 
 StatItem.displayName = 'StatItem';
 

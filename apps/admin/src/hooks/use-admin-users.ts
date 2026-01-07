@@ -32,7 +32,7 @@ interface AdminUserFilters {
 }
 
 async function fetchAdminUsers(
-  filters: AdminUserFilters = {}
+  filters: AdminUserFilters = {},
 ): Promise<AdminUsersResponse> {
   const params = new URLSearchParams();
   if (filters.search) params.set('search', filters.search);
@@ -57,7 +57,7 @@ async function fetchAdminUser(id: string): Promise<{ admin: AdminUser }> {
 }
 
 async function createAdminUser(
-  data: Partial<AdminUser>
+  data: Partial<AdminUser>,
 ): Promise<{ admin: AdminUser }> {
   const response = await fetch('/api/admin-users', {
     method: 'POST',
@@ -73,7 +73,7 @@ async function createAdminUser(
 
 async function updateAdminUser(
   id: string,
-  data: Partial<AdminUser>
+  data: Partial<AdminUser>,
 ): Promise<{ admin: AdminUser }> {
   const response = await fetch(`/api/admin-users/${id}`, {
     method: 'PATCH',

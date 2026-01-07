@@ -11,7 +11,10 @@ export async function POST(request: NextRequest) {
 
     if (sessionToken) {
       const supabase = createServiceClient();
-      const sessionHash = crypto.createHash('sha256').update(sessionToken).digest('hex');
+      const sessionHash = crypto
+        .createHash('sha256')
+        .update(sessionToken)
+        .digest('hex');
 
       // Delete the session
       await supabase
@@ -29,7 +32,7 @@ export async function POST(request: NextRequest) {
     logger.error('Logout error:', error);
     return NextResponse.json(
       { error: 'Çıkış yapılırken bir hata oluştu' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

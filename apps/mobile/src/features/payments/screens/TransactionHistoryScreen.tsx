@@ -46,7 +46,7 @@ export const TransactionHistoryScreen: React.FC = () => {
     {
       id: '1',
       type: 'received',
-      title: 'Ayşe\'den Hediye',
+      title: "Ayşe'den Hediye",
       date: '26 Ara 2024',
       amount: 250.0,
       status: 'Tamamlandı',
@@ -56,7 +56,7 @@ export const TransactionHistoryScreen: React.FC = () => {
     {
       id: '2',
       type: 'sent',
-      title: 'Mehmet\'e Hediye',
+      title: "Mehmet'e Hediye",
       date: '24 Ara 2024',
       amount: -125.0,
       status: 'Doğrulandı',
@@ -76,7 +76,7 @@ export const TransactionHistoryScreen: React.FC = () => {
     {
       id: '4',
       type: 'received',
-      title: 'Zeynep\'den Hediye',
+      title: "Zeynep'den Hediye",
       date: '19 Ara 2024',
       amount: 175.0,
       status: 'Başarısız',
@@ -199,8 +199,8 @@ export const TransactionHistoryScreen: React.FC = () => {
                         transaction.type === 'received'
                           ? primitives.emerald[500]
                           : transaction.type === 'sent'
-                          ? primitives.stone[600]
-                          : primitives.amber[600]
+                            ? primitives.stone[600]
+                            : primitives.amber[600]
                       }
                     />
                   </View>
@@ -263,7 +263,8 @@ export const TransactionHistoryScreen: React.FC = () => {
             </View>
             <Text style={styles.emptyStateTitle}>Henüz İşlem Yok</Text>
             <Text style={styles.emptyStateText}>
-              Hediye gönderdiğinizde veya aldığınızda tüm işlemleriniz burada görünecek.
+              Hediye gönderdiğinizde veya aldığınızda tüm işlemleriniz burada
+              görünecek.
             </Text>
           </View>
         )}

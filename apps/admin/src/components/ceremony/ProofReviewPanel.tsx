@@ -160,7 +160,7 @@ export function ProofReviewPanel({
             <span
               className={cn(
                 'font-bold',
-                getConfidenceColor(proof.aiAnalysis.confidence)
+                getConfidenceColor(proof.aiAnalysis.confidence),
               )}
             >
               {(proof.aiAnalysis.confidence * 100).toFixed(0)}%
@@ -196,7 +196,9 @@ export function ProofReviewPanel({
           {/* Scene Analysis */}
           <div className="pt-2 border-t border-gray-200">
             <span className="text-gray-600 text-sm">Sahne Analizi:</span>
-            <p className="text-gray-800 mt-1">{proof.aiAnalysis.sceneAnalysis}</p>
+            <p className="text-gray-800 mt-1">
+              {proof.aiAnalysis.sceneAnalysis}
+            </p>
           </div>
 
           {/* Flags */}
@@ -220,7 +222,9 @@ export function ProofReviewPanel({
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="p-4 bg-blue-50 rounded-lg">
           <h4 className="font-medium text-blue-700 text-sm">Beklenen</h4>
-          <p className="text-blue-900 font-medium mt-1">{expectedMoment.title}</p>
+          <p className="text-blue-900 font-medium mt-1">
+            {expectedMoment.title}
+          </p>
           {expectedMoment.location && (
             <p className="text-blue-600 text-sm mt-1 flex items-center gap-1">
               <MapPinIcon className="w-3 h-3" />
@@ -260,10 +264,7 @@ export function ProofReviewPanel({
           <QuestionMarkCircleIcon className="w-5 h-5 mr-2" />
           Daha Fazla Bilgi
         </Button>
-        <Button
-          variant="destructive"
-          onClick={() => setShowRejectModal(true)}
-        >
+        <Button variant="destructive" onClick={() => setShowRejectModal(true)}>
           <XMarkIcon className="w-5 h-5 mr-2" />
           Reddet
         </Button>
@@ -281,7 +282,9 @@ export function ProofReviewPanel({
             </label>
             <Textarea
               value={rejectReason}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setRejectReason(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                setRejectReason(e.target.value)
+              }
               placeholder="Kullanıcıya gösterilecek red nedenini yazın..."
               className="mt-2"
               rows={4}
@@ -310,7 +313,9 @@ export function ProofReviewPanel({
             </label>
             <Textarea
               value={infoMessage}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInfoMessage(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                setInfoMessage(e.target.value)
+              }
               placeholder="Kullanıcıdan ne tür bilgi istediğinizi açıklayın..."
               className="mt-2"
               rows={4}
@@ -327,7 +332,10 @@ export function ProofReviewPanel({
 
       {/* Lightbox */}
       {lightboxImage && (
-        <Dialog open={!!lightboxImage} onOpenChange={() => setLightboxImage(null)}>
+        <Dialog
+          open={!!lightboxImage}
+          onOpenChange={() => setLightboxImage(null)}
+        >
           <DialogContent className="max-w-4xl">
             <div className="relative aspect-video">
               <Image

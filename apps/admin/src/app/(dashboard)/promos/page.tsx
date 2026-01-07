@@ -24,7 +24,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
@@ -164,13 +170,22 @@ export default function PromosPage() {
   const [promoType, setPromoType] = useState<string>('percentage');
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, { variant: 'default' | 'secondary' | 'outline' | 'destructive'; label: string }> = {
+    const variants: Record<
+      string,
+      {
+        variant: 'default' | 'secondary' | 'outline' | 'destructive';
+        label: string;
+      }
+    > = {
       active: { variant: 'default', label: 'Aktif' },
       scheduled: { variant: 'secondary', label: 'Zamanlandı' },
       expired: { variant: 'outline', label: 'Süresi Doldu' },
       disabled: { variant: 'destructive', label: 'Devre Dışı' },
     };
-    const { variant, label } = variants[status] || { variant: 'outline', label: status };
+    const { variant, label } = variants[status] || {
+      variant: 'outline',
+      label: status,
+    };
     return <Badge variant={variant}>{label}</Badge>;
   };
 
@@ -193,7 +208,9 @@ export default function PromosPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Promosyonlar & Referans</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Promosyonlar & Referans
+          </h1>
           <p className="text-muted-foreground">
             Promosyon kodları ve referans programını yönet
           </p>
@@ -218,8 +235,17 @@ export default function PromosPage() {
               <div className="space-y-2">
                 <Label htmlFor="code">Promosyon Kodu</Label>
                 <div className="flex gap-2">
-                  <Input id="code" placeholder="YILBASI30" className="uppercase" />
-                  <Button variant="outline" onClick={() => toast.info(`Önerilen kod: ${generateCode()}`)}>
+                  <Input
+                    id="code"
+                    placeholder="YILBASI30"
+                    className="uppercase"
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={() =>
+                      toast.info(`Önerilen kod: ${generateCode()}`)
+                    }
+                  >
                     Oluştur
                   </Button>
                 </div>
@@ -233,7 +259,9 @@ export default function PromosPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="percentage">Yüzde İndirim (%)</SelectItem>
+                    <SelectItem value="percentage">
+                      Yüzde İndirim (%)
+                    </SelectItem>
                     <SelectItem value="fixed">Sabit İndirim (₺)</SelectItem>
                     <SelectItem value="free_trial">Ücretsiz Deneme</SelectItem>
                     <SelectItem value="gift">Hediye</SelectItem>
@@ -271,10 +299,14 @@ export default function PromosPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Tüm Ürünler</SelectItem>
-                    <SelectItem value="premium_subscription">Premium Abonelik</SelectItem>
+                    <SelectItem value="premium_subscription">
+                      Premium Abonelik
+                    </SelectItem>
                     <SelectItem value="boost">Boost</SelectItem>
                     <SelectItem value="super_like">Super Like</SelectItem>
-                    <SelectItem value="first_purchase">İlk Satın Alma</SelectItem>
+                    <SelectItem value="first_purchase">
+                      İlk Satın Alma
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -282,7 +314,11 @@ export default function PromosPage() {
               {/* Usage Limit */}
               <div className="space-y-2">
                 <Label htmlFor="limit">Kullanım Limiti (Opsiyonel)</Label>
-                <Input id="limit" type="number" placeholder="Sınırsız için boş bırakın" />
+                <Input
+                  id="limit"
+                  type="number"
+                  placeholder="Sınırsız için boş bırakın"
+                />
               </div>
 
               {/* Date Range */}
@@ -299,10 +335,18 @@ export default function PromosPage() {
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsCreatePromoOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsCreatePromoOpen(false)}
+              >
                 İptal
               </Button>
-              <Button onClick={() => { toast.success('Promosyon kodu oluşturuldu'); setIsCreatePromoOpen(false); }}>
+              <Button
+                onClick={() => {
+                  toast.success('Promosyon kodu oluşturuldu');
+                  setIsCreatePromoOpen(false);
+                }}
+              >
                 Oluştur
               </Button>
             </DialogFooter>
@@ -337,7 +381,9 @@ export default function PromosPage() {
             <Card>
               <CardContent className="pt-6">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-green-600">{promoStats.activeCodes}</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {promoStats.activeCodes}
+                  </p>
                   <p className="text-sm text-muted-foreground">Aktif</p>
                 </div>
               </CardContent>
@@ -348,14 +394,18 @@ export default function PromosPage() {
                   <p className="text-2xl font-bold">
                     {promoStats.totalUsage.toLocaleString('tr-TR')}
                   </p>
-                  <p className="text-sm text-muted-foreground">Toplam Kullanım</p>
+                  <p className="text-sm text-muted-foreground">
+                    Toplam Kullanım
+                  </p>
                 </div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6">
                 <div className="text-center">
-                  <p className="text-2xl font-bold">%{promoStats.avgConversion}</p>
+                  <p className="text-2xl font-bold">
+                    %{promoStats.avgConversion}
+                  </p>
                   <p className="text-sm text-muted-foreground">Ort. Dönüşüm</p>
                 </div>
               </CardContent>
@@ -376,7 +426,9 @@ export default function PromosPage() {
           <Card>
             <CardHeader>
               <CardTitle>Promosyon Kodları</CardTitle>
-              <CardDescription>Aktif ve geçmiş promosyon kodları</CardDescription>
+              <CardDescription>
+                Aktif ve geçmiş promosyon kodları
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -408,16 +460,21 @@ export default function PromosPage() {
                           </Button>
                           {getStatusBadge(promo.status)}
                         </div>
-                        <p className="text-sm text-muted-foreground">{promo.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {promo.description}
+                        </p>
                         <div className="flex items-center gap-4 text-xs text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Gift className="h-3 w-3" />
-                            {promo.type === 'percentage' ? `%${promo.value}` : `₺${promo.value}`}
+                            {promo.type === 'percentage'
+                              ? `%${promo.value}`
+                              : `₺${promo.value}`}
                           </span>
                           <span className="flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
                             {formatDate(promo.valid_from)}
-                            {promo.valid_until && ` - ${formatDate(promo.valid_until)}`}
+                            {promo.valid_until &&
+                              ` - ${formatDate(promo.valid_until)}`}
                           </span>
                         </div>
                       </div>
@@ -427,7 +484,9 @@ export default function PromosPage() {
                       {/* Usage Progress */}
                       <div className="w-32 space-y-1">
                         <div className="flex items-center justify-between text-xs">
-                          <span>{promo.usage.current.toLocaleString('tr-TR')}</span>
+                          <span>
+                            {promo.usage.current.toLocaleString('tr-TR')}
+                          </span>
                           <span className="text-muted-foreground">
                             {promo.usage.limit
                               ? `/ ${promo.usage.limit.toLocaleString('tr-TR')}`
@@ -436,7 +495,9 @@ export default function PromosPage() {
                         </div>
                         {promo.usage.limit && (
                           <Progress
-                            value={(promo.usage.current / promo.usage.limit) * 100}
+                            value={
+                              (promo.usage.current / promo.usage.limit) * 100
+                            }
                             className="h-1"
                           />
                         )}
@@ -495,7 +556,9 @@ export default function PromosPage() {
                   <p className="text-2xl font-bold">
                     {referralStats.totalReferrers.toLocaleString('tr-TR')}
                   </p>
-                  <p className="text-sm text-muted-foreground">Toplam Referrer</p>
+                  <p className="text-sm text-muted-foreground">
+                    Toplam Referrer
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -515,14 +578,18 @@ export default function PromosPage() {
                   <p className="text-2xl font-bold">
                     {referralStats.totalReferrals.toLocaleString('tr-TR')}
                   </p>
-                  <p className="text-sm text-muted-foreground">Toplam Referans</p>
+                  <p className="text-sm text-muted-foreground">
+                    Toplam Referans
+                  </p>
                 </div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6">
                 <div className="text-center">
-                  <p className="text-2xl font-bold">%{referralStats.successRate}</p>
+                  <p className="text-2xl font-bold">
+                    %{referralStats.successRate}
+                  </p>
                   <p className="text-sm text-muted-foreground">Başarı Oranı</p>
                 </div>
               </CardContent>
@@ -543,7 +610,9 @@ export default function PromosPage() {
           <Card>
             <CardHeader>
               <CardTitle>En İyi Referrer\'lar</CardTitle>
-              <CardDescription>En çok referans yapan kullanıcılar</CardDescription>
+              <CardDescription>
+                En çok referans yapan kullanıcılar
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -590,7 +659,9 @@ export default function PromosPage() {
           <Card>
             <CardHeader>
               <CardTitle>Referans Programı Ayarları</CardTitle>
-              <CardDescription>Referans ödül ve kurallarını yapılandırın</CardDescription>
+              <CardDescription>
+                Referans ödül ve kurallarını yapılandırın
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">

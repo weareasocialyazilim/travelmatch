@@ -24,7 +24,13 @@ import {
   Zap,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
@@ -155,7 +161,7 @@ const mockIntegrations = [
       quota_used: '78%',
     },
     last_check: new Date(Date.now() - 1000 * 60 * 1).toISOString(),
-    alert: 'API quota %80\'e ulaştı',
+    alert: "API quota %80'e ulaştı",
   },
 ];
 
@@ -196,9 +202,24 @@ const mockWebhookLogs = [
 ];
 
 const statusConfig = {
-  healthy: { label: 'Sağlıklı', color: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30', icon: CheckCircle },
-  warning: { label: 'Uyarı', color: 'text-yellow-600', bg: 'bg-yellow-100 dark:bg-yellow-900/30', icon: AlertTriangle },
-  error: { label: 'Hata', color: 'text-red-600', bg: 'bg-red-100 dark:bg-red-900/30', icon: XCircle },
+  healthy: {
+    label: 'Sağlıklı',
+    color: 'text-green-600',
+    bg: 'bg-green-100 dark:bg-green-900/30',
+    icon: CheckCircle,
+  },
+  warning: {
+    label: 'Uyarı',
+    color: 'text-yellow-600',
+    bg: 'bg-yellow-100 dark:bg-yellow-900/30',
+    icon: AlertTriangle,
+  },
+  error: {
+    label: 'Hata',
+    color: 'text-red-600',
+    bg: 'bg-red-100 dark:bg-red-900/30',
+    icon: XCircle,
+  },
 };
 
 const categoryLabels: Record<string, string> = {
@@ -215,9 +236,15 @@ const categoryLabels: Record<string, string> = {
 export default function IntegrationsPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const healthyCount = mockIntegrations.filter((i) => i.status === 'healthy').length;
-  const warningCount = mockIntegrations.filter((i) => i.status === 'warning').length;
-  const errorCount = mockIntegrations.filter((i) => i.status === 'error').length;
+  const healthyCount = mockIntegrations.filter(
+    (i) => i.status === 'healthy',
+  ).length;
+  const warningCount = mockIntegrations.filter(
+    (i) => i.status === 'warning',
+  ).length;
+  const errorCount = mockIntegrations.filter(
+    (i) => i.status === 'error',
+  ).length;
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -237,7 +264,9 @@ export default function IntegrationsPage() {
           </p>
         </div>
         <Button onClick={handleRefresh} disabled={isRefreshing}>
-          <RefreshCw className={cn('mr-2 h-4 w-4', isRefreshing && 'animate-spin')} />
+          <RefreshCw
+            className={cn('mr-2 h-4 w-4', isRefreshing && 'animate-spin')}
+          />
           {isRefreshing ? 'Kontrol ediliyor...' : 'Durumu Kontrol Et'}
         </Button>
       </div>
@@ -246,7 +275,9 @@ export default function IntegrationsPage() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Toplam Entegrasyon</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Toplam Entegrasyon
+            </CardTitle>
             <Plug className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -260,7 +291,9 @@ export default function IntegrationsPage() {
             <CheckCircle className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{healthyCount}</div>
+            <div className="text-2xl font-bold text-green-600">
+              {healthyCount}
+            </div>
             <p className="text-xs text-muted-foreground">Sorunsuz çalışıyor</p>
           </CardContent>
         </Card>
@@ -270,7 +303,9 @@ export default function IntegrationsPage() {
             <AlertTriangle className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{warningCount}</div>
+            <div className="text-2xl font-bold text-yellow-600">
+              {warningCount}
+            </div>
             <p className="text-xs text-muted-foreground">Dikkat gerektiriyor</p>
           </CardContent>
         </Card>
@@ -302,7 +337,8 @@ export default function IntegrationsPage() {
         <TabsContent value="services">
           <div className="grid gap-4 md:grid-cols-2">
             {mockIntegrations.map((integration) => {
-              const status = statusConfig[integration.status as keyof typeof statusConfig];
+              const status =
+                statusConfig[integration.status as keyof typeof statusConfig];
               const StatusIcon = status.icon;
               const IntegrationIcon = integration.icon;
 
@@ -315,8 +351,12 @@ export default function IntegrationsPage() {
                           <IntegrationIcon className="h-5 w-5" />
                         </div>
                         <div>
-                          <CardTitle className="text-base">{integration.name}</CardTitle>
-                          <CardDescription>{integration.description}</CardDescription>
+                          <CardTitle className="text-base">
+                            {integration.name}
+                          </CardTitle>
+                          <CardDescription>
+                            {integration.description}
+                          </CardDescription>
                         </div>
                       </div>
                       <Badge
@@ -335,7 +375,7 @@ export default function IntegrationsPage() {
                           'mb-3 rounded-lg p-2 text-sm',
                           integration.status === 'error'
                             ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                            : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                            : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
                         )}
                       >
                         <AlertTriangle className="mr-1 inline h-4 w-4" />
@@ -344,20 +384,23 @@ export default function IntegrationsPage() {
                     )}
 
                     <div className="grid grid-cols-2 gap-3 text-sm">
-                      {Object.entries(integration.metrics).map(([key, value]) => (
-                        <div key={key} className="rounded-lg bg-muted/50 p-2">
-                          <p className="text-xs text-muted-foreground">
-                            {key.replace(/_/g, ' ')}
-                          </p>
-                          <p className="font-medium">{value}</p>
-                        </div>
-                      ))}
+                      {Object.entries(integration.metrics).map(
+                        ([key, value]) => (
+                          <div key={key} className="rounded-lg bg-muted/50 p-2">
+                            <p className="text-xs text-muted-foreground">
+                              {key.replace(/_/g, ' ')}
+                            </p>
+                            <p className="font-medium">{value}</p>
+                          </div>
+                        ),
+                      )}
                     </div>
 
                     <div className="mt-4 flex items-center justify-between">
                       <p className="text-xs text-muted-foreground">
                         <Clock className="mr-1 inline h-3 w-3" />
-                        Son kontrol: {formatRelativeDate(integration.last_check)}
+                        Son kontrol:{' '}
+                        {formatRelativeDate(integration.last_check)}
                       </p>
                       <div className="flex gap-2">
                         <Button size="sm" variant="ghost">
@@ -398,7 +441,9 @@ export default function IntegrationsPage() {
                     key={log.id}
                     className="grid grid-cols-[1fr_1fr_auto_auto_auto] items-center gap-4 border-b px-4 py-3 text-sm last:border-0"
                   >
-                    <div className="font-medium capitalize">{log.integration}</div>
+                    <div className="font-medium capitalize">
+                      {log.integration}
+                    </div>
                     <div className="font-mono text-xs text-muted-foreground">
                       {log.event}
                     </div>
@@ -407,7 +452,9 @@ export default function IntegrationsPage() {
                     >
                       {log.status === 'success' ? 'Başarılı' : 'Hata'}
                     </Badge>
-                    <div className="text-muted-foreground">{log.response_time}</div>
+                    <div className="text-muted-foreground">
+                      {log.response_time}
+                    </div>
                     <div className="text-muted-foreground">
                       {formatRelativeDate(log.created_at)}
                     </div>

@@ -3,7 +3,11 @@ import { View, Text, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
-import type { SavedCard, Wallet, WalletSettings } from '../types/payment-methods.types';
+import type {
+  SavedCard,
+  Wallet,
+  WalletSettings,
+} from '../types/payment-methods.types';
 
 interface PaymentPriorityNoticeProps {
   wallets: Wallet[];
@@ -33,7 +37,11 @@ export const PaymentPriorityNotice = ({
 
   return (
     <View style={styles.priorityNotice}>
-      <MaterialCommunityIcons name="information-outline" size={20} color={COLORS.brown} />
+      <MaterialCommunityIcons
+        name="information-outline"
+        size={20}
+        color={COLORS.brown}
+      />
       <View style={styles.priorityNoticeText}>
         <Text style={styles.priorityNoticeTitle}>Payment Priority</Text>
         <Text style={styles.priorityNoticeDescription}>{getNoticeText()}</Text>

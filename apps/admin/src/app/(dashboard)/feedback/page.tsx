@@ -21,7 +21,13 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -179,7 +185,10 @@ export default function FeedbackPage() {
   const filteredFeedback = feedbackItems.filter((item) => {
     if (typeFilter !== 'all' && item.type !== typeFilter) return false;
     if (statusFilter !== 'all' && item.status !== statusFilter) return false;
-    if (searchQuery && !item.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+    if (
+      searchQuery &&
+      !item.title.toLowerCase().includes(searchQuery.toLowerCase())
+    ) {
       return false;
     }
     return true;
@@ -190,8 +199,12 @@ export default function FeedbackPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Geri Bildirim Merkezi</h1>
-          <p className="text-muted-foreground">Kullanıcı önerileri ve hata raporları</p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Geri Bildirim Merkezi
+          </h1>
+          <p className="text-muted-foreground">
+            Kullanıcı önerileri ve hata raporları
+          </p>
         </div>
         <Button>
           <MessageSquare className="mr-2 h-4 w-4" />
@@ -228,7 +241,9 @@ export default function FeedbackPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Devam Eden</p>
-                <p className="text-2xl font-bold">{feedbackStats.in_progress}</p>
+                <p className="text-2xl font-bold">
+                  {feedbackStats.in_progress}
+                </p>
               </div>
               <TrendingUp className="h-8 w-8 text-yellow-500" />
             </div>
@@ -239,7 +254,9 @@ export default function FeedbackPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Tamamlanan</p>
-                <p className="text-2xl font-bold text-green-600">{feedbackStats.completed}</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {feedbackStats.completed}
+                </p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-500" />
             </div>
@@ -261,7 +278,9 @@ export default function FeedbackPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Memnuniyet</p>
-                <p className="text-2xl font-bold">{feedbackStats.avg_satisfaction}/5</p>
+                <p className="text-2xl font-bold">
+                  {feedbackStats.avg_satisfaction}/5
+                </p>
               </div>
               <ThumbsUp className="h-8 w-8 text-emerald-500" />
             </div>
@@ -324,11 +343,15 @@ export default function FeedbackPage() {
                       <div className="flex items-start justify-between">
                         <div>
                           <div className="flex items-center gap-2">
-                            <h3 className="font-medium text-lg">{item.title}</h3>
+                            <h3 className="font-medium text-lg">
+                              {item.title}
+                            </h3>
                             {getTypeBadge(item.type)}
                             {getStatusBadge(item.status)}
                           </div>
-                          <p className="mt-1 text-muted-foreground">{item.description}</p>
+                          <p className="mt-1 text-muted-foreground">
+                            {item.description}
+                          </p>
                         </div>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -340,7 +363,9 @@ export default function FeedbackPage() {
                             <DropdownMenuItem>Detayları Gör</DropdownMenuItem>
                             <DropdownMenuItem>Durumu Değiştir</DropdownMenuItem>
                             <DropdownMenuItem>Yanıtla</DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600">Reddet</DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-600">
+                              Reddet
+                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
@@ -360,7 +385,9 @@ export default function FeedbackPage() {
                           <div className="flex items-center gap-2">
                             <Avatar className="h-6 w-6">
                               <AvatarImage src={item.author.avatar} />
-                              <AvatarFallback>{item.author.name[0]}</AvatarFallback>
+                              <AvatarFallback>
+                                {item.author.name[0]}
+                              </AvatarFallback>
                             </Avatar>
                             <span className="text-sm text-muted-foreground">
                               {item.author.name}
@@ -387,10 +414,14 @@ export default function FeedbackPage() {
         </TabsContent>
 
         <TabsContent value="features">
-          <p className="text-muted-foreground">Özellik istekleri burada listelenecek.</p>
+          <p className="text-muted-foreground">
+            Özellik istekleri burada listelenecek.
+          </p>
         </TabsContent>
         <TabsContent value="bugs">
-          <p className="text-muted-foreground">Hata raporları burada listelenecek.</p>
+          <p className="text-muted-foreground">
+            Hata raporları burada listelenecek.
+          </p>
         </TabsContent>
         <TabsContent value="ideas">
           <p className="text-muted-foreground">Fikirler burada listelenecek.</p>

@@ -1,16 +1,11 @@
 /**
  * Link Not Found Screen
- * 
+ *
  * Shown when deep link points to non-existent resource (404)
  */
 
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRoute, RouteProp } from '@react-navigation/native';
@@ -102,7 +97,8 @@ const LinkNotFoundScreen: React.FC = () => {
             color={COLORS.text.secondary}
           />
           <Text style={styles.helpText}>
-            Link yanlışsa veya sorun yaşıyorsanız destek ekibimizle iletişime geçin.
+            Link yanlışsa veya sorun yaşıyorsanız destek ekibimizle iletişime
+            geçin.
           </Text>
         </View>
       </View>

@@ -41,7 +41,7 @@ function StatCard({ title, value, change, icon, color }: StatCardProps) {
         <div
           className={cn(
             'w-12 h-12 rounded-lg flex items-center justify-center',
-            colorClasses[color]
+            colorClasses[color],
           )}
         >
           {icon}
@@ -50,7 +50,7 @@ function StatCard({ title, value, change, icon, color }: StatCardProps) {
           <div
             className={cn(
               'flex items-center gap-1 text-sm font-medium',
-              change >= 0 ? 'text-emerald-600' : 'text-rose-600'
+              change >= 0 ? 'text-emerald-600' : 'text-rose-600',
             )}
           >
             {change >= 0 ? (
@@ -160,7 +160,8 @@ export function CeremonyAnalytics({
                 ⭐ Platinum (90-100)
               </span>
               <span className="text-gray-500">
-                {trustDistribution.platinum} ({getPercentage(trustDistribution.platinum)}%)
+                {trustDistribution.platinum} (
+                {getPercentage(trustDistribution.platinum)}%)
               </span>
             </div>
             <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
@@ -176,11 +177,10 @@ export function CeremonyAnalytics({
           {/* Gold */}
           <div>
             <div className="flex justify-between text-sm mb-1">
-              <span className="font-medium text-gray-700">
-                🥇 Gold (70-89)
-              </span>
+              <span className="font-medium text-gray-700">🥇 Gold (70-89)</span>
               <span className="text-gray-500">
-                {trustDistribution.gold} ({getPercentage(trustDistribution.gold)}%)
+                {trustDistribution.gold} (
+                {getPercentage(trustDistribution.gold)}%)
               </span>
             </div>
             <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
@@ -200,7 +200,8 @@ export function CeremonyAnalytics({
                 🥈 Silver (50-69)
               </span>
               <span className="text-gray-500">
-                {trustDistribution.silver} ({getPercentage(trustDistribution.silver)}%)
+                {trustDistribution.silver} (
+                {getPercentage(trustDistribution.silver)}%)
               </span>
             </div>
             <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
@@ -220,7 +221,8 @@ export function CeremonyAnalytics({
                 🥉 Bronze (0-49)
               </span>
               <span className="text-gray-500">
-                {trustDistribution.bronze} ({getPercentage(trustDistribution.bronze)}%)
+                {trustDistribution.bronze} (
+                {getPercentage(trustDistribution.bronze)}%)
               </span>
             </div>
             <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
@@ -278,7 +280,7 @@ export function CeremonyAnalytics({
                         ? 'bg-emerald-500'
                         : activity.type === 'rejected'
                           ? 'bg-rose-500'
-                          : 'bg-amber-500'
+                          : 'bg-amber-500',
                     )}
                   />
                   <div>
@@ -298,7 +300,7 @@ export function CeremonyAnalytics({
                         ? 'bg-emerald-50 text-emerald-600'
                         : activity.type === 'rejected'
                           ? 'bg-rose-50 text-rose-600'
-                          : 'bg-amber-50 text-amber-600'
+                          : 'bg-amber-50 text-amber-600',
                     )}
                   >
                     {activity.type === 'verified'

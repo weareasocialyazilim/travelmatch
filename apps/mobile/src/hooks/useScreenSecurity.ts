@@ -1,8 +1,8 @@
 /**
  * Screen Security Hook
- * 
+ *
  * Enables screenshot protection for sensitive screens (payments, banking, etc.)
- * 
+ *
  * Usage:
  * function WithdrawScreen() {
  *   useScreenSecurity(); // Blocks screenshots while this screen is active
@@ -24,7 +24,11 @@ export function useScreenSecurity() {
         hasPermission = true;
         logger.info('ScreenSecurity', 'Screenshot protection enabled');
       } catch (error) {
-        logger.warn('ScreenSecurity', 'Failed to enable screenshot protection', error);
+        logger.warn(
+          'ScreenSecurity',
+          'Failed to enable screenshot protection',
+          error,
+        );
       }
     }
 
@@ -34,7 +38,11 @@ export function useScreenSecurity() {
           await ScreenCapture.allowScreenCaptureAsync();
           logger.info('ScreenSecurity', 'Screenshot protection disabled');
         } catch (error) {
-          logger.warn('ScreenSecurity', 'Failed to disable screenshot protection', error);
+          logger.warn(
+            'ScreenSecurity',
+            'Failed to disable screenshot protection',
+            error,
+          );
         }
       }
     }

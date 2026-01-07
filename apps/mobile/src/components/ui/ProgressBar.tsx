@@ -316,12 +316,12 @@ export const CircularProgress = memo<CircularProgressProps>(
     }, [percentage, circumference, animated]);
 
     const label =
-      labelFormat === 'percentage'
-        ? `${Math.round(percentage)}%`
-        : `${value}`;
+      labelFormat === 'percentage' ? `${Math.round(percentage)}%` : `${value}`;
 
     return (
-      <View style={[styles.circularContainer, { width: size, height: size }, style]}>
+      <View
+        style={[styles.circularContainer, { width: size, height: size }, style]}
+      >
         <View style={styles.circularSvgContainer}>
           {/* Background circle */}
           <View

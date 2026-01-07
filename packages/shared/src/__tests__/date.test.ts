@@ -362,12 +362,16 @@ describe('Date Utilities', () => {
 
     it('should format hours and minutes', () => {
       expect(formatDuration(60 * 60 * 1000)).toBe('1h 0m');
-      expect(formatDuration(2 * 60 * 60 * 1000 + 30 * 60 * 1000)).toBe('2h 30m');
+      expect(formatDuration(2 * 60 * 60 * 1000 + 30 * 60 * 1000)).toBe(
+        '2h 30m',
+      );
     });
 
     it('should format days and hours', () => {
       expect(formatDuration(24 * 60 * 60 * 1000)).toBe('1d 0h');
-      expect(formatDuration(2 * 24 * 60 * 60 * 1000 + 5 * 60 * 60 * 1000)).toBe('2d 5h');
+      expect(formatDuration(2 * 24 * 60 * 60 * 1000 + 5 * 60 * 60 * 1000)).toBe(
+        '2d 5h',
+      );
     });
 
     it('should handle zero duration', () => {

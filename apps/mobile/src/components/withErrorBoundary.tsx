@@ -1,6 +1,6 @@
 /**
  * Higher-Order Component for wrapping screens with ErrorBoundary
- * 
+ *
  * Usage:
  * export default withErrorBoundary(MyScreen, { fallbackType: 'network' });
  */
@@ -24,7 +24,7 @@ interface MaybeNavigationProps {
  */
 export function withErrorBoundary<P extends object>(
   Component: React.ComponentType<P>,
-  options: WithErrorBoundaryOptions = {}
+  options: WithErrorBoundaryOptions = {},
 ): React.FC<P> {
   const { fallbackType, displayName } = options;
 
@@ -40,7 +40,8 @@ export function withErrorBoundary<P extends object>(
   };
 
   // Set display name for debugging
-  const componentName = displayName || Component.displayName || Component.name || 'Component';
+  const componentName =
+    displayName || Component.displayName || Component.name || 'Component';
   WrappedComponent.displayName = `withErrorBoundary(${componentName})`;
 
   return WrappedComponent;
@@ -50,13 +51,13 @@ export function withErrorBoundary<P extends object>(
  * Convenience functions for specific error types
  */
 export const withNetworkErrorBoundary = <P extends object>(
-  Component: React.ComponentType<P>
+  Component: React.ComponentType<P>,
 ) => withErrorBoundary(Component, { fallbackType: 'network' });
 
 export const withGenericErrorBoundary = <P extends object>(
-  Component: React.ComponentType<P>
+  Component: React.ComponentType<P>,
 ) => withErrorBoundary(Component, { fallbackType: 'generic' });
 
 export const withCriticalErrorBoundary = <P extends object>(
-  Component: React.ComponentType<P>
+  Component: React.ComponentType<P>,
 ) => withErrorBoundary(Component, { fallbackType: 'critical' });

@@ -4,7 +4,10 @@ import { tr } from 'date-fns/locale';
 /**
  * Format a number as Turkish Lira currency
  */
-export function formatCurrency(amount: number, currency: string = 'TRY'): string {
+export function formatCurrency(
+  amount: number,
+  currency: string = 'TRY',
+): string {
   return new Intl.NumberFormat('tr-TR', {
     style: 'currency',
     currency,
@@ -30,7 +33,10 @@ export function formatPercentage(num: number, decimals: number = 1): string {
 /**
  * Format a date string to Turkish locale
  */
-export function formatDate(date: string | Date, formatStr: string = 'dd MMM yyyy'): string {
+export function formatDate(
+  date: string | Date,
+  formatStr: string = 'dd MMM yyyy',
+): string {
   const d = typeof date === 'string' ? parseISO(date) : date;
   return format(d, formatStr, { locale: tr });
 }

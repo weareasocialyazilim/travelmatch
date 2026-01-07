@@ -96,7 +96,7 @@ export const PERMISSIONS: Record<AdminRole, Record<Resource, Action[]>> = {
 export function hasPermission(
   role: AdminRole,
   resource: Resource,
-  action: Action
+  action: Action,
 ): boolean {
   return PERMISSIONS[role]?.[resource]?.includes(action) ?? false;
 }
@@ -107,7 +107,7 @@ export function hasPermission(
 export function hasAnyPermission(
   role: AdminRole,
   resource: Resource,
-  actions: Action[]
+  actions: Action[],
 ): boolean {
   return actions.some((action) => hasPermission(role, resource, action));
 }
@@ -118,7 +118,7 @@ export function hasAnyPermission(
 export function hasAllPermissions(
   role: AdminRole,
   resource: Resource,
-  actions: Action[]
+  actions: Action[],
 ): boolean {
   return actions.every((action) => hasPermission(role, resource, action));
 }
@@ -126,14 +126,19 @@ export function hasAllPermissions(
 /**
  * Get all permissions for a role
  */
-export function getRolePermissions(role: AdminRole): Record<Resource, Action[]> {
+export function getRolePermissions(
+  role: AdminRole,
+): Record<Resource, Action[]> {
   return PERMISSIONS[role];
 }
 
 /**
  * Check if a role is at or above a certain level
  */
-export function isRoleAtLeast(role: AdminRole, minimumRole: AdminRole): boolean {
+export function isRoleAtLeast(
+  role: AdminRole,
+  minimumRole: AdminRole,
+): boolean {
   const roleHierarchy: AdminRole[] = [
     'super_admin',
     'manager',
@@ -173,10 +178,14 @@ export function getRoleDisplayName(role: AdminRole): string {
 export function getRoleBadgeColor(role: AdminRole): string {
   const colors: Record<AdminRole, string> = {
     super_admin: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-    manager: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-    moderator: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-    finance: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-    marketing: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
+    manager:
+      'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+    moderator:
+      'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+    finance:
+      'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+    marketing:
+      'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
     support: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400',
     viewer: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
   };

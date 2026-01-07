@@ -51,7 +51,7 @@ export default function InviteContactsScreen({
     return CONTACTS.filter(
       (contact) =>
         contact.name.toLowerCase().includes(query) ||
-        contact.phone.includes(query)
+        contact.phone.includes(query),
     );
   }, [search]);
 
@@ -71,7 +71,10 @@ export default function InviteContactsScreen({
         <Text style={styles.phone}>{item.phone}</Text>
       </View>
       <TouchableOpacity
-        style={[styles.actionBtn, item.hasApp ? styles.addBtn : styles.inviteBtn]}
+        style={[
+          styles.actionBtn,
+          item.hasApp ? styles.addBtn : styles.inviteBtn,
+        ]}
       >
         <Text
           style={[

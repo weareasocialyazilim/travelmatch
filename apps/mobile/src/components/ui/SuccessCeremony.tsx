@@ -40,7 +40,10 @@ export const SuccessCeremony: React.FC<SuccessCeremonyProps> = ({
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]} testID={testID}>
+    <View
+      style={[styles.container, { paddingTop: insets.top }]}
+      testID={testID}
+    >
       <LinearGradient
         colors={['#121214', '#1E1E20', '#121214']}
         style={StyleSheet.absoluteFill}
@@ -51,10 +54,7 @@ export const SuccessCeremony: React.FC<SuccessCeremonyProps> = ({
         entering={ZoomIn.delay(200).springify()}
         style={styles.iconContainer}
       >
-        <LinearGradient
-          colors={GRADIENTS.primary}
-          style={styles.iconGradient}
-        >
+        <LinearGradient colors={GRADIENTS.primary} style={styles.iconGradient}>
           <MaterialCommunityIcons
             name={icon as keyof typeof MaterialCommunityIcons.glyphMap}
             size={64}

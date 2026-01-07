@@ -26,7 +26,10 @@ type QueryBuilder = {
   maybeSingle: jest.Mock;
 };
 
-export function createMockQueryBuilder(defaultData: unknown = null, defaultError: unknown = null): QueryBuilder {
+export function createMockQueryBuilder(
+  defaultData: unknown = null,
+  defaultError: unknown = null,
+): QueryBuilder {
   const resolvedValue = { data: defaultData, error: defaultError };
 
   const builder: QueryBuilder = {
@@ -67,19 +70,27 @@ export interface MockSupabaseAuth {
   onAuthStateChange: jest.Mock;
 }
 
-export function createMockSupabaseAuth(options: {
-  session?: unknown;
-  user?: unknown;
-} = {}): MockSupabaseAuth {
+export function createMockSupabaseAuth(
+  options: {
+    session?: unknown;
+    user?: unknown;
+  } = {},
+): MockSupabaseAuth {
   const { session = null, user = null } = options;
 
   return {
     getSession: jest.fn().mockResolvedValue({ data: { session }, error: null }),
     getUser: jest.fn().mockResolvedValue({ data: { user }, error: null }),
-    signInWithPassword: jest.fn().mockResolvedValue({ data: { session, user }, error: null }),
-    signUp: jest.fn().mockResolvedValue({ data: { session, user }, error: null }),
+    signInWithPassword: jest
+      .fn()
+      .mockResolvedValue({ data: { session, user }, error: null }),
+    signUp: jest
+      .fn()
+      .mockResolvedValue({ data: { session, user }, error: null }),
     signOut: jest.fn().mockResolvedValue({ error: null }),
-    resetPasswordForEmail: jest.fn().mockResolvedValue({ data: {}, error: null }),
+    resetPasswordForEmail: jest
+      .fn()
+      .mockResolvedValue({ data: {}, error: null }),
     updateUser: jest.fn().mockResolvedValue({ data: { user }, error: null }),
     onAuthStateChange: jest.fn().mockReturnValue({
       data: { subscription: { unsubscribe: jest.fn() } },
@@ -97,10 +108,12 @@ export interface MockSupabaseClient {
   removeChannel: jest.Mock;
 }
 
-export function createMockSupabaseClient(options: {
-  auth?: Partial<MockSupabaseAuth>;
-  defaultQueryData?: unknown;
-} = {}): MockSupabaseClient {
+export function createMockSupabaseClient(
+  options: {
+    auth?: Partial<MockSupabaseAuth>;
+    defaultQueryData?: unknown;
+  } = {},
+): MockSupabaseClient {
   const auth = {
     ...createMockSupabaseAuth(),
     ...options.auth,
@@ -113,10 +126,16 @@ export function createMockSupabaseClient(options: {
     from: jest.fn().mockReturnValue(queryBuilder),
     storage: {
       from: jest.fn().mockReturnValue({
-        upload: jest.fn().mockResolvedValue({ data: { path: 'test-path' }, error: null }),
-        download: jest.fn().mockResolvedValue({ data: new Blob(), error: null }),
+        upload: jest
+          .fn()
+          .mockResolvedValue({ data: { path: 'test-path' }, error: null }),
+        download: jest
+          .fn()
+          .mockResolvedValue({ data: new Blob(), error: null }),
         remove: jest.fn().mockResolvedValue({ data: [], error: null }),
-        getPublicUrl: jest.fn().mockReturnValue({ data: { publicUrl: 'https://example.com/image.jpg' } }),
+        getPublicUrl: jest.fn().mockReturnValue({
+          data: { publicUrl: 'https://example.com/image.jpg' },
+        }),
         list: jest.fn().mockResolvedValue({ data: [], error: null }),
       }),
     },

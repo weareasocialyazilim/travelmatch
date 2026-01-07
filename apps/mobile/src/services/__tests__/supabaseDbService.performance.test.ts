@@ -229,18 +229,24 @@ describe('Supabase Query Performance Optimization', () => {
   });
 
   describe('usersService.getById', () => {
-    it('should fetch user with aggregated counts in single query', async () => {
+    it('should fetch user with explicit column selection', async () => {
       const mockQuery = {
         select: jest.fn().mockReturnThis(),
         eq: jest.fn().mockReturnThis(),
         single: jest.fn().mockResolvedValue({
           data: {
             id: 'user-1',
-            name: 'John',
-            moments_count: [{ count: 5 }],
-            followers_count: [{ count: 100 }],
-            following_count: [{ count: 50 }],
-            reviews_count: [{ count: 20 }],
+            full_name: 'John',
+            email: 'john@example.com',
+            avatar_url: null,
+            location: 'Test',
+            public_key: null,
+            kyc_status: 'none',
+            verified: false,
+            rating: 0,
+            review_count: 0,
+            created_at: '2024-01-01',
+            updated_at: '2024-01-01',
           },
           error: null,
         }),
@@ -250,18 +256,18 @@ describe('Supabase Query Performance Optimization', () => {
 
       await usersService.getById('user-1');
 
-      // Verify aggregated counts are fetched
+      // Verify basic user fields are fetched with explicit column selection
       expect(mockQuery.select).toHaveBeenCalledWith(
-        expect.stringContaining('moments_count:moments!user_id(count)'),
+        expect.stringContaining('id'),
       );
       expect(mockQuery.select).toHaveBeenCalledWith(
-        expect.stringContaining('followers_count:follows!following_id(count)'),
+        expect.stringContaining('email'),
       );
       expect(mockQuery.select).toHaveBeenCalledWith(
-        expect.stringContaining('following_count:follows!follower_id(count)'),
+        expect.stringContaining('full_name'),
       );
 
-      // Should only make 1 query instead of 1 + 4 count queries
+      // Should only make 1 query for user data
       expect(mockSupabaseFrom).toHaveBeenCalledTimes(1);
     });
   });

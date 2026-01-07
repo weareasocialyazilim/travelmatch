@@ -25,15 +25,15 @@ const POSTGREST_SPECIAL_CHARS = /[%_,().'"\[\]{}\\;:*?<>|&=!]/g;
  * sanitizeSearchTerm("john%,id.eq.123")  // Returns: "johnideq123"
  * sanitizeSearchTerm("normal search")     // Returns: "normal search"
  */
-export function sanitizeSearchTerm(input: string | null | undefined, maxLength = 100): string {
+export function sanitizeSearchTerm(
+  input: string | null | undefined,
+  maxLength = 100,
+): string {
   if (!input || typeof input !== 'string') {
     return '';
   }
 
-  return input
-    .replace(POSTGREST_SPECIAL_CHARS, '')
-    .trim()
-    .slice(0, maxLength);
+  return input.replace(POSTGREST_SPECIAL_CHARS, '').trim().slice(0, maxLength);
 }
 
 /**
@@ -48,7 +48,8 @@ export function sanitizeUUID(input: string | null | undefined): string | null {
   }
 
   // Standard UUID regex
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
   const trimmed = input.trim().toLowerCase();
   return uuidRegex.test(trimmed) ? trimmed : null;
@@ -67,7 +68,7 @@ export function sanitizeUUID(input: string | null | undefined): string | null {
  */
 export function buildSafeSearchFilter(
   columns: string[],
-  searchTerm: string | null | undefined
+  searchTerm: string | null | undefined,
 ): string | null {
   const sanitized = sanitizeSearchTerm(searchTerm);
 
@@ -76,15 +77,15 @@ export function buildSafeSearchFilter(
   }
 
   // Validate column names (alphanumeric and underscore only)
-  const validColumns = columns.filter(col => /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(col));
+  const validColumns = columns.filter((col) =>
+    /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(col),
+  );
 
   if (validColumns.length === 0) {
     return null;
   }
 
-  return validColumns
-    .map(col => `${col}.ilike.%${sanitized}%`)
-    .join(',');
+  return validColumns.map((col) => `${col}.ilike.%${sanitized}%`).join(',');
 }
 
 /**
@@ -100,7 +101,7 @@ export function buildSafeSearchFilter(
  */
 export function buildSafeUUIDFilter(
   column: string,
-  uuid: string | null | undefined
+  uuid: string | null | undefined,
 ): string | null {
   const sanitizedUUID = sanitizeUUID(uuid);
 
@@ -129,7 +130,7 @@ export function buildSafeUUIDFilter(
  */
 export function buildSafeMultiColumnUUIDFilter(
   columns: string[],
-  uuid: string | null | undefined
+  uuid: string | null | undefined,
 ): string | null {
   const sanitizedUUID = sanitizeUUID(uuid);
 
@@ -138,15 +139,15 @@ export function buildSafeMultiColumnUUIDFilter(
   }
 
   // Validate column names
-  const validColumns = columns.filter(col => /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(col));
+  const validColumns = columns.filter((col) =>
+    /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(col),
+  );
 
   if (validColumns.length === 0) {
     return null;
   }
 
-  return validColumns
-    .map(col => `${col}.eq.${sanitizedUUID}`)
-    .join(',');
+  return validColumns.map((col) => `${col}.eq.${sanitizedUUID}`).join(',');
 }
 
 /**
@@ -160,7 +161,7 @@ export function buildSafeMultiColumnUUIDFilter(
 export function validateSortColumn(
   column: string | null | undefined,
   allowedColumns: string[],
-  defaultColumn: string
+  defaultColumn: string,
 ): string {
   if (!column || typeof column !== 'string') {
     return defaultColumn;
@@ -176,7 +177,9 @@ export function validateSortColumn(
  * @param order - User-provided sort order
  * @returns 'asc' or 'desc'
  */
-export function validateSortOrder(order: string | null | undefined): 'asc' | 'desc' {
+export function validateSortOrder(
+  order: string | null | undefined,
+): 'asc' | 'desc' {
   if (!order || typeof order !== 'string') {
     return 'desc';
   }
@@ -195,13 +198,16 @@ export function validateSortOrder(order: string | null | undefined): 'asc' | 'de
 export function validatePagination(
   limit: string | null | undefined,
   offset: string | null | undefined,
-  maxLimit = 100
+  maxLimit = 100,
 ): { limit: number; offset: number } {
   const parsedLimit = parseInt(limit || '50', 10);
   const parsedOffset = parseInt(offset || '0', 10);
 
   return {
-    limit: Math.min(Math.max(1, isNaN(parsedLimit) ? 50 : parsedLimit), maxLimit),
+    limit: Math.min(
+      Math.max(1, isNaN(parsedLimit) ? 50 : parsedLimit),
+      maxLimit,
+    ),
     offset: Math.max(0, isNaN(parsedOffset) ? 0 : parsedOffset),
   };
 }
@@ -215,7 +221,7 @@ export function validatePagination(
  */
 export function buildSafeArrayContainsFilter(
   column: string,
-  value: string | null | undefined
+  value: string | null | undefined,
 ): string | null {
   if (!value || typeof value !== 'string') {
     return null;

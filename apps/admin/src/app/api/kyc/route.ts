@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
         ),
         reviewed_by_admin:admin_users!kyc_submissions_reviewed_by_fkey(id, name)
       `,
-        { count: 'exact' }
+        { count: 'exact' },
       )
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
@@ -61,7 +61,10 @@ export async function GET(request: NextRequest) {
       // If table doesn't exist, query users for KYC status
       const usersQuery = supabase
         .from('users')
-        .select('id, display_name, avatar_url, email, phone, kyc_status, kyc_submitted_at, kyc_reviewed_at, created_at', { count: 'exact' })
+        .select(
+          'id, display_name, avatar_url, email, phone, kyc_status, kyc_submitted_at, kyc_reviewed_at, created_at',
+          { count: 'exact' },
+        )
         .order('created_at', { ascending: false })
         .range(offset, offset + limit - 1);
 
@@ -71,13 +74,30 @@ export async function GET(request: NextRequest) {
         usersQuery.eq('kyc_status', status);
       }
 
-      const { data: users, count: userCount, error: userError } = await usersQuery;
+      const {
+        data: users,
+        count: userCount,
+        error: userError,
+      } = await usersQuery;
 
       if (userError) {
-        return NextResponse.json({ error: 'KYC verileri yüklenemedi' }, { status: 500 });
+        return NextResponse.json(
+          { error: 'KYC verileri yüklenemedi' },
+          { status: 500 },
+        );
       }
 
-      type UserKyc = { id: string; kyc_status?: string; kyc_submitted_at?: string; kyc_reviewed_at?: string; created_at: string; display_name?: string; avatar_url?: string; email?: string; phone?: string };
+      type UserKyc = {
+        id: string;
+        kyc_status?: string;
+        kyc_submitted_at?: string;
+        kyc_reviewed_at?: string;
+        created_at: string;
+        display_name?: string;
+        avatar_url?: string;
+        email?: string;
+        phone?: string;
+      };
       return NextResponse.json({
         submissions: users?.map((p: UserKyc) => ({
           id: p.id,
@@ -103,9 +123,16 @@ export async function GET(request: NextRequest) {
     type Submission = { status?: string };
     const summary = {
       total: count || 0,
-      pending: submissions?.filter((s: Submission) => s.status === 'pending').length || 0,
-      approved: submissions?.filter((s: Submission) => s.status === 'approved' || s.status === 'verified').length || 0,
-      rejected: submissions?.filter((s: Submission) => s.status === 'rejected').length || 0,
+      pending:
+        submissions?.filter((s: Submission) => s.status === 'pending').length ||
+        0,
+      approved:
+        submissions?.filter(
+          (s: Submission) => s.status === 'approved' || s.status === 'verified',
+        ).length || 0,
+      rejected:
+        submissions?.filter((s: Submission) => s.status === 'rejected')
+          .length || 0,
     };
 
     return NextResponse.json({
@@ -138,21 +165,21 @@ export async function PUT(request: NextRequest) {
     if (!user_id || !action) {
       return NextResponse.json(
         { error: 'user_id ve action gerekli' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!['approve', 'reject'].includes(action)) {
       return NextResponse.json(
         { error: 'Geçersiz action. Geçerli değerler: approve, reject' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (action === 'reject' && !rejection_reason) {
       return NextResponse.json(
         { error: 'Reddetme sebebi gerekli' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -166,7 +193,10 @@ export async function PUT(request: NextRequest) {
       .single();
 
     if (fetchError || !profile) {
-      return NextResponse.json({ error: 'Kullanıcı bulunamadı' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Kullanıcı bulunamadı' },
+        { status: 404 },
+      );
     }
 
     // Update profile KYC status
@@ -194,7 +224,10 @@ export async function PUT(request: NextRequest) {
 
     if (updateError) {
       logger.error('KYC update error:', updateError);
-      return NextResponse.json({ error: 'KYC güncellenemedi' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'KYC güncellenemedi' },
+        { status: 500 },
+      );
     }
 
     // Try to update kyc_submissions table if it exists
@@ -219,7 +252,7 @@ export async function PUT(request: NextRequest) {
       { kyc_status: profile.kyc_status },
       { kyc_status: updates.kyc_status },
       request.headers.get('x-forwarded-for') || undefined,
-      request.headers.get('user-agent') || undefined
+      request.headers.get('user-agent') || undefined,
     );
 
     return NextResponse.json({

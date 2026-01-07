@@ -155,9 +155,9 @@ export const COLORS = {
   // Ultra siyah değil, derinliği olan antrasit
   // ─────────────────────────────────────────────────
   background: {
-    main: '#121214',           // Ana zemin - derin antrasit
-    surface: '#1E1E20',        // Kartlar ve yüzeyler
-    elevated: '#27272A',       // Yükseltilmiş yüzeyler
+    main: '#121214', // Ana zemin - derin antrasit
+    surface: '#1E1E20', // Kartlar ve yüzeyler
+    elevated: '#27272A', // Yükseltilmiş yüzeyler
     overlay: 'rgba(18, 18, 20, 0.85)',
     glass: 'rgba(255, 255, 255, 0.03)', // Liquid Glass etkisi
   },
@@ -183,9 +183,9 @@ export const COLORS = {
   // Gift gönder, Create, Continue, Confirm
   // ─────────────────────────────────────────────────
   primary: {
-    main: '#DFFF00',           // Neon Lime - Ana aksiyon rengi
-    dark: '#C8E600',           // Pressed state
-    light: '#E8FF4D',          // Hover state
+    main: '#DFFF00', // Neon Lime - Ana aksiyon rengi
+    dark: '#C8E600', // Pressed state
+    light: '#E8FF4D', // Hover state
     glow: 'rgba(223, 255, 0, 0.3)', // Glow efekti
     muted: 'rgba(223, 255, 0, 0.12)',
   },
@@ -202,9 +202,9 @@ export const COLORS = {
   // Premium özellikler, AI özellikleri
   // ─────────────────────────────────────────────────
   secondary: {
-    main: '#A855F7',           // Electric Violet
-    dark: '#9333EA',           // Pressed state
-    light: '#C084FC',          // Hover state
+    main: '#A855F7', // Electric Violet
+    dark: '#9333EA', // Pressed state
+    light: '#C084FC', // Hover state
     glow: 'rgba(168, 85, 247, 0.3)',
     muted: 'rgba(168, 85, 247, 0.12)',
   },
@@ -220,11 +220,11 @@ export const COLORS = {
   // Accent - Fonksiyonel Renkler
   // ─────────────────────────────────────────────────
   accent: {
-    rose: '#F43F5E',           // Kalpler, beğeniler ve hatalar
+    rose: '#F43F5E', // Kalpler, beğeniler ve hatalar
     roseGlow: 'rgba(244, 63, 94, 0.3)',
-    cyan: '#06B6D4',           // Doğrulanmış hesaplar & Güven
+    cyan: '#06B6D4', // Doğrulanmış hesaplar & Güven
     cyanGlow: 'rgba(6, 182, 212, 0.3)',
-    amber: '#F59E0B',          // Uyarılar & Geri sayımlar
+    amber: '#F59E0B', // Uyarılar & Geri sayımlar
     amberGlow: 'rgba(245, 158, 11, 0.3)',
   },
 
@@ -237,12 +237,12 @@ export const COLORS = {
   // Text - Yüksek Okunabilirlik
   // ─────────────────────────────────────────────────
   text: {
-    primary: '#F8FAFC',        // Neredeyse beyaz (Zinc 50)
-    secondary: '#94A3B8',      // Yardımcı metinler (Slate 400)
-    muted: '#475569',          // Pasif metinler (Slate 600)
-    disabled: '#334155',       // Devre dışı metinler
-    inverse: '#121214',        // Koyu zemin üzerine açık buton metinleri
-    link: '#DFFF00',           // Link rengi (Primary)
+    primary: '#F8FAFC', // Neredeyse beyaz (Zinc 50)
+    secondary: '#94A3B8', // Yardımcı metinler (Slate 400)
+    muted: '#475569', // Pasif metinler (Slate 600)
+    disabled: '#334155', // Devre dışı metinler
+    inverse: '#121214', // Koyu zemin üzerine açık buton metinleri
+    link: '#DFFF00', // Link rengi (Primary)
   },
 
   // Flat text aliases
@@ -263,7 +263,7 @@ export const COLORS = {
     light: 'rgba(255, 255, 255, 0.08)',
     medium: 'rgba(255, 255, 255, 0.15)',
     strong: 'rgba(255, 255, 255, 0.25)',
-    focus: '#DFFF00',          // Focus state (Primary)
+    focus: '#DFFF00', // Focus state (Primary)
   },
 
   // Flat border aliases
@@ -630,7 +630,10 @@ export const GRADIENTS = {
   heroLight: ['transparent', 'rgba(0, 0, 0, 0.6)'] as const,
 
   // Glass
-  glassLight: ['rgba(255, 255, 255, 0.08)', 'rgba(255, 255, 255, 0.03)'] as const,
+  glassLight: [
+    'rgba(255, 255, 255, 0.08)',
+    'rgba(255, 255, 255, 0.03)',
+  ] as const,
   glassDark: ['rgba(18, 18, 20, 0.9)', 'rgba(18, 18, 20, 0.7)'] as const,
 
   // Neon Glow

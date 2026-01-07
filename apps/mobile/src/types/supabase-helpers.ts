@@ -28,8 +28,10 @@ export interface PaginationResult<T> {
  * Supabase Query Type Helper
  * Provides type-safe query building
  */
- 
-export type SupabaseQuery<T extends Record<string, unknown> = Record<string, unknown>> = PostgrestFilterBuilder<any, any, T, any, any>;
+
+export type SupabaseQuery<
+  T extends Record<string, unknown> = Record<string, unknown>,
+> = PostgrestFilterBuilder<any, any, T, any, any>;
 
 /**
  * Generic Service Response
@@ -53,7 +55,7 @@ export class DatabaseError extends Error {
   constructor(
     message: string,
     public code?: string,
-    public details?: unknown
+    public details?: unknown,
   ) {
     super(message);
     this.name = 'DatabaseError';
@@ -64,7 +66,7 @@ export class SupabaseValidationError extends Error {
   constructor(
     message: string,
     public field?: string,
-    public constraint?: string
+    public constraint?: string,
   ) {
     super(message);
     this.name = 'SupabaseValidationError';
@@ -76,9 +78,14 @@ export class SupabaseValidationError extends Error {
  */
 export function withCursorPagination<T extends Record<string, unknown>>(
   query: SupabaseQuery<T>,
-  options: PaginationOptions & { cursor?: string }
+  options: PaginationOptions & { cursor?: string },
 ): SupabaseQuery<T> {
-  const { pageSize = 20, orderBy = 'created_at', ascending = false, cursor } = options;
+  const {
+    pageSize = 20,
+    orderBy = 'created_at',
+    ascending = false,
+    cursor,
+  } = options;
 
   let paginatedQuery = query.order(orderBy, { ascending });
 
@@ -94,14 +101,17 @@ export function withCursorPagination<T extends Record<string, unknown>>(
  */
 export function withOffsetPagination<T extends Record<string, unknown>>(
   query: SupabaseQuery<T>,
-  options: PaginationOptions & { page?: number }
+  options: PaginationOptions & { page?: number },
 ): SupabaseQuery<T> {
-  const { pageSize = 20, orderBy = 'created_at', ascending = false, page = 1 } = options;
+  const {
+    pageSize = 20,
+    orderBy = 'created_at',
+    ascending = false,
+    page = 1,
+  } = options;
 
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  return query
-    .order(orderBy, { ascending })
-    .range(from, to);
+  return query.order(orderBy, { ascending }).range(from, to);
 }

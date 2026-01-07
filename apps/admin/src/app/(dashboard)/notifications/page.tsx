@@ -25,7 +25,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
@@ -54,7 +60,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 import { formatDate } from '@/lib/utils';
-import { useNotifications, useCreateNotification, useSendNotification } from '@/hooks/use-notifications';
+import {
+  useNotifications,
+  useCreateNotification,
+  useSendNotification,
+} from '@/hooks/use-notifications';
 import { Loader2, AlertTriangle } from 'lucide-react';
 
 // Fallback mock data (will be replaced by API data when available)
@@ -75,7 +85,7 @@ const mockNotifications = [
   },
   {
     id: '2',
-    title: 'Premium\'a Özel İndirim 💎',
+    title: "Premium'a Özel İndirim 💎",
     body: 'Sadece bugün! Premium üyeliğe %30 indirimle geç.',
     segment: 'free_users',
     status: 'scheduled',
@@ -103,10 +113,30 @@ const mockSegments = [
 ];
 
 const mockTemplates = [
-  { id: '1', name: 'Hoş Geldin', title: 'TravelMatch\'e Hoş Geldin! 🌍', body: 'Seyahat arkadaşını bulmaya hazır mısın?' },
-  { id: '2', name: 'Yeni Eşleşme', title: 'Yeni bir eşleşmen var! 💕', body: 'Biri seninle tanışmak istiyor. Şimdi gör!' },
-  { id: '3', name: 'Moment Hatırlatma', title: 'Moment paylaş! 📸', body: 'Son seyahatinden fotoğraflar paylaşmayı unuttun mu?' },
-  { id: '4', name: 'Premium Teklif', title: 'Premium\'u Dene 💎', body: 'Sınırsız beğeni ve özel özellikler seni bekliyor.' },
+  {
+    id: '1',
+    name: 'Hoş Geldin',
+    title: "TravelMatch'e Hoş Geldin! 🌍",
+    body: 'Seyahat arkadaşını bulmaya hazır mısın?',
+  },
+  {
+    id: '2',
+    name: 'Yeni Eşleşme',
+    title: 'Yeni bir eşleşmen var! 💕',
+    body: 'Biri seninle tanışmak istiyor. Şimdi gör!',
+  },
+  {
+    id: '3',
+    name: 'Moment Hatırlatma',
+    title: 'Moment paylaş! 📸',
+    body: 'Son seyahatinden fotoğraflar paylaşmayı unuttun mu?',
+  },
+  {
+    id: '4',
+    name: 'Premium Teklif',
+    title: "Premium'u Dene 💎",
+    body: 'Sınırsız beğeni ve özel özellikler seni bekliyor.',
+  },
 ];
 
 const mockCampaignStats = {
@@ -123,7 +153,9 @@ export default function NotificationsPage() {
   const [notificationBody, setNotificationBody] = useState('');
   const [scheduleEnabled, setScheduleEnabled] = useState(false);
   const [abTestEnabled, setAbTestEnabled] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(
+    undefined,
+  );
 
   // Use real API data
   const { data, isLoading, error } = useNotifications({ status: statusFilter });
@@ -156,7 +188,7 @@ export default function NotificationsPage() {
         onError: (error) => {
           toast.error(error.message || 'Bildirim gönderilemedi');
         },
-      }
+      },
     );
   };
 
@@ -180,19 +212,25 @@ export default function NotificationsPage() {
     setAbTestEnabled(false);
   };
 
-  const applyTemplate = (template: typeof mockTemplates[0]) => {
+  const applyTemplate = (template: (typeof mockTemplates)[0]) => {
     setNotificationTitle(template.title);
     setNotificationBody(template.body);
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, { variant: 'default' | 'secondary' | 'outline'; label: string }> = {
+    const variants: Record<
+      string,
+      { variant: 'default' | 'secondary' | 'outline'; label: string }
+    > = {
       sent: { variant: 'default', label: 'Gönderildi' },
       scheduled: { variant: 'secondary', label: 'Zamanlandı' },
       draft: { variant: 'outline', label: 'Taslak' },
       failed: { variant: 'outline', label: 'Başarısız' },
     };
-    const { variant, label } = variants[status] || { variant: 'outline', label: status };
+    const { variant, label } = variants[status] || {
+      variant: 'outline',
+      label: status,
+    };
     return <Badge variant={variant}>{label}</Badge>;
   };
 
@@ -201,7 +239,9 @@ export default function NotificationsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Push Bildirimleri</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Push Bildirimleri
+          </h1>
           <p className="text-muted-foreground">
             Kullanıcılara push bildirim gönder ve performansı takip et
           </p>
@@ -284,7 +324,8 @@ export default function NotificationsPage() {
                         {notificationTitle || 'Bildirim başlığı'}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {notificationBody || 'Bildirim içeriği burada görünecek...'}
+                        {notificationBody ||
+                          'Bildirim içeriği burada görünecek...'}
                       </p>
                     </div>
                   </div>
@@ -294,14 +335,18 @@ export default function NotificationsPage() {
               {/* Segment Selection */}
               <div className="space-y-2">
                 <Label>Hedef Kitle</Label>
-                <Select value={selectedSegment} onValueChange={setSelectedSegment}>
+                <Select
+                  value={selectedSegment}
+                  onValueChange={setSelectedSegment}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Segment seçin" />
                   </SelectTrigger>
                   <SelectContent>
                     {mockSegments.map((segment) => (
                       <SelectItem key={segment.id} value={segment.id}>
-                        {segment.name} ({segment.count.toLocaleString('tr-TR')} kullanıcı)
+                        {segment.name} ({segment.count.toLocaleString('tr-TR')}{' '}
+                        kullanıcı)
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -317,7 +362,10 @@ export default function NotificationsPage() {
                       Bildirimi ileri bir tarihte gönder
                     </p>
                   </div>
-                  <Switch checked={scheduleEnabled} onCheckedChange={setScheduleEnabled} />
+                  <Switch
+                    checked={scheduleEnabled}
+                    onCheckedChange={setScheduleEnabled}
+                  />
                 </div>
 
                 {scheduleEnabled && (
@@ -340,7 +388,10 @@ export default function NotificationsPage() {
                       Farklı varyasyonları test et
                     </p>
                   </div>
-                  <Switch checked={abTestEnabled} onCheckedChange={setAbTestEnabled} />
+                  <Switch
+                    checked={abTestEnabled}
+                    onCheckedChange={setAbTestEnabled}
+                  />
                 </div>
               </div>
             </div>
@@ -389,7 +440,9 @@ export default function NotificationsPage() {
                 <CheckCircle className="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">%{mockCampaignStats.avgDeliveryRate}</p>
+                <p className="text-2xl font-bold">
+                  %{mockCampaignStats.avgDeliveryRate}
+                </p>
                 <p className="text-sm text-muted-foreground">Teslimat Oranı</p>
               </div>
             </div>
@@ -402,7 +455,9 @@ export default function NotificationsPage() {
                 <Eye className="h-6 w-6 text-purple-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">%{mockCampaignStats.avgOpenRate}</p>
+                <p className="text-2xl font-bold">
+                  %{mockCampaignStats.avgOpenRate}
+                </p>
                 <p className="text-sm text-muted-foreground">Açılma Oranı</p>
               </div>
             </div>
@@ -415,7 +470,9 @@ export default function NotificationsPage() {
                 <TrendingUp className="h-6 w-6 text-orange-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">%{mockCampaignStats.avgClickRate}</p>
+                <p className="text-2xl font-bold">
+                  %{mockCampaignStats.avgClickRate}
+                </p>
                 <p className="text-sm text-muted-foreground">Tıklama Oranı</p>
               </div>
             </div>
@@ -454,11 +511,17 @@ export default function NotificationsPage() {
                         <h3 className="font-semibold">{notification.title}</h3>
                         {getStatusBadge(notification.status)}
                       </div>
-                      <p className="text-sm text-muted-foreground">{notification.body}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {notification.body}
+                      </p>
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Target className="h-4 w-4" />
-                          {mockSegments.find((s) => s.id === notification.segment)?.name}
+                          {
+                            mockSegments.find(
+                              (s) => s.id === notification.segment,
+                            )?.name
+                          }
                         </span>
                         {notification.sent_at && (
                           <span className="flex items-center gap-1">
@@ -479,20 +542,38 @@ export default function NotificationsPage() {
                     {notification.stats && (
                       <div className="flex items-center gap-6 text-sm mr-4">
                         <div className="text-center">
-                          <p className="font-semibold">{notification.stats.sent.toLocaleString('tr-TR')}</p>
-                          <p className="text-xs text-muted-foreground">Gönderilen</p>
+                          <p className="font-semibold">
+                            {notification.stats.sent.toLocaleString('tr-TR')}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Gönderilen
+                          </p>
                         </div>
                         <div className="text-center">
                           <p className="font-semibold">
-                            %{((notification.stats.opened / notification.stats.delivered) * 100).toFixed(1)}
+                            %
+                            {(
+                              (notification.stats.opened /
+                                notification.stats.delivered) *
+                              100
+                            ).toFixed(1)}
                           </p>
-                          <p className="text-xs text-muted-foreground">Açılma</p>
+                          <p className="text-xs text-muted-foreground">
+                            Açılma
+                          </p>
                         </div>
                         <div className="text-center">
                           <p className="font-semibold">
-                            %{((notification.stats.clicked / notification.stats.delivered) * 100).toFixed(1)}
+                            %
+                            {(
+                              (notification.stats.clicked /
+                                notification.stats.delivered) *
+                              100
+                            ).toFixed(1)}
                           </p>
-                          <p className="text-xs text-muted-foreground">Tıklama</p>
+                          <p className="text-xs text-muted-foreground">
+                            Tıklama
+                          </p>
                         </div>
                       </div>
                     )}
@@ -545,7 +626,9 @@ export default function NotificationsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-semibold">{notification.title}</h3>
-                      <p className="text-sm text-muted-foreground">{notification.body}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {notification.body}
+                      </p>
                     </div>
                     {getStatusBadge(notification.status)}
                   </div>
@@ -563,7 +646,9 @@ export default function NotificationsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-semibold">{notification.title}</h3>
-                      <p className="text-sm text-muted-foreground">{notification.body}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {notification.body}
+                      </p>
                     </div>
                     {getStatusBadge(notification.status)}
                   </div>
@@ -581,7 +666,9 @@ export default function NotificationsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-semibold">{notification.title}</h3>
-                      <p className="text-sm text-muted-foreground">{notification.body}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {notification.body}
+                      </p>
                     </div>
                     {getStatusBadge(notification.status)}
                   </div>
@@ -595,7 +682,9 @@ export default function NotificationsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Kullanıcı Segmentleri</CardTitle>
-          <CardDescription>Hedef kitle segmentleri ve kullanıcı sayıları</CardDescription>
+          <CardDescription>
+            Hedef kitle segmentleri ve kullanıcı sayıları
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

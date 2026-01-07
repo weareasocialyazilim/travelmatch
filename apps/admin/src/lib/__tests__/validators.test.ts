@@ -446,7 +446,8 @@ describe('Admin Validators', () => {
     it('should accept valid marketing campaign data', () => {
       const validCampaign = {
         name: 'Summer Promo Campaign',
-        description: 'This is a promotional campaign for the summer season with special discounts.',
+        description:
+          'This is a promotional campaign for the summer season with special discounts.',
         type: 'email',
         budget: 5000,
         start_date: '2024-06-01T00:00:00Z',
@@ -476,7 +477,8 @@ describe('Admin Validators', () => {
       types.forEach((type) => {
         const campaign = {
           name: 'Valid Campaign Name',
-          description: 'This is a valid campaign description with enough characters.',
+          description:
+            'This is a valid campaign description with enough characters.',
           type,
           budget: 1000,
           start_date: '2024-06-01T00:00:00Z',
@@ -491,7 +493,8 @@ describe('Admin Validators', () => {
     it('should reject negative budget', () => {
       const invalidCampaign = {
         name: 'Valid Campaign Name',
-        description: 'This is a valid campaign description with enough characters.',
+        description:
+          'This is a valid campaign description with enough characters.',
         type: 'email',
         budget: -100,
         start_date: '2024-06-01T00:00:00Z',

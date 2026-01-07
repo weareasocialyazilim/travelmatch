@@ -133,9 +133,8 @@ describe('Request Flow Integration', () => {
         error: null,
       });
 
-      const { request: createdRequest } = await requestService.createRequest(
-        requestData,
-      );
+      const { request: createdRequest } =
+        await requestService.createRequest(requestData);
 
       expect(createdRequest).toBeDefined();
       expect(createdRequest.status).toBe('pending');

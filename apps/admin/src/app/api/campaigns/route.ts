@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     logger.error('Campaigns API error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch campaigns' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     logger.error('Create campaign error:', error);
     return NextResponse.json(
       { error: 'Failed to create campaign' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

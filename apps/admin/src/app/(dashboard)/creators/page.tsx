@@ -22,7 +22,13 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -182,7 +188,9 @@ export default function CreatorsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Creator Program</h1>
-          <p className="text-muted-foreground">İçerik üreticilerini yönet ve takip et</p>
+          <p className="text-muted-foreground">
+            İçerik üreticilerini yönet ve takip et
+          </p>
         </div>
         <Button>
           <Sparkles className="mr-2 h-4 w-4" />
@@ -210,7 +218,9 @@ export default function CreatorsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Onaylı</p>
-                <p className="text-2xl font-bold">{creatorStats.verified_creators}</p>
+                <p className="text-2xl font-bold">
+                  {creatorStats.verified_creators}
+                </p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-500" />
             </div>
@@ -247,7 +257,9 @@ export default function CreatorsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Ort. Etkileşim</p>
-                <p className="text-2xl font-bold">{creatorStats.avg_engagement}%</p>
+                <p className="text-2xl font-bold">
+                  {creatorStats.avg_engagement}%
+                </p>
               </div>
               <TrendingUp className="h-8 w-8 text-pink-500" />
             </div>
@@ -310,7 +322,9 @@ export default function CreatorsPage() {
                             <CheckCircle className="h-4 w-4 text-blue-500" />
                           )}
                         </div>
-                        <p className="text-sm text-muted-foreground">{creator.username}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {creator.username}
+                        </p>
                       </div>
                     </div>
                     <DropdownMenu>
@@ -323,7 +337,9 @@ export default function CreatorsPage() {
                         <DropdownMenuItem>Profili Görüntüle</DropdownMenuItem>
                         <DropdownMenuItem>Tier Değiştir</DropdownMenuItem>
                         <DropdownMenuItem>Mesaj Gönder</DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">Askıya Al</DropdownMenuItem>
+                        <DropdownMenuItem className="text-red-600">
+                          Askıya Al
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
@@ -379,18 +395,26 @@ export default function CreatorsPage() {
                       </Avatar>
                       <div>
                         <p className="font-medium">{app.name}</p>
-                        <p className="text-sm text-muted-foreground">{app.username}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{app.notes}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {app.username}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {app.notes}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-6">
                       <div className="text-right text-sm">
                         <p>{formatNumber(app.followers)} takipçi</p>
-                        <p className="text-muted-foreground">{app.moments} moment</p>
+                        <p className="text-muted-foreground">
+                          {app.moments} moment
+                        </p>
                       </div>
                       <div className="text-right text-sm">
                         <p>{app.engagement}% etkileşim</p>
-                        <p className="text-muted-foreground">{app.applied_at}</p>
+                        <p className="text-muted-foreground">
+                          {app.applied_at}
+                        </p>
                       </div>
                       <div className="flex gap-2">
                         <Button size="sm" variant="outline">
@@ -425,14 +449,20 @@ export default function CreatorsPage() {
                 <CardContent>
                   <div className="space-y-4">
                     <div>
-                      <p className="text-sm text-muted-foreground">Takipçi Aralığı</p>
+                      <p className="text-sm text-muted-foreground">
+                        Takipçi Aralığı
+                      </p>
                       <p className="font-medium">
                         {formatNumber(config.min)} -{' '}
-                        {config.max === Infinity ? '∞' : formatNumber(config.max)}
+                        {config.max === Infinity
+                          ? '∞'
+                          : formatNumber(config.max)}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Komisyon Payı</p>
+                      <p className="text-sm text-muted-foreground">
+                        Komisyon Payı
+                      </p>
                       <p className="font-medium">
                         {tier === 'bronze'
                           ? '70%'
@@ -444,7 +474,9 @@ export default function CreatorsPage() {
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Özel Avantajlar</p>
+                      <p className="text-sm text-muted-foreground">
+                        Özel Avantajlar
+                      </p>
                       <ul className="mt-1 text-sm space-y-1">
                         {tier === 'platinum' && (
                           <>
@@ -480,19 +512,27 @@ export default function CreatorsPage() {
               <div className="space-y-6">
                 <div className="grid gap-4 md:grid-cols-3">
                   <div className="rounded-lg border p-4">
-                    <p className="text-sm text-muted-foreground">Bekleyen Ödemeler</p>
+                    <p className="text-sm text-muted-foreground">
+                      Bekleyen Ödemeler
+                    </p>
                     <p className="text-2xl font-bold">₺24,500</p>
                     <p className="text-sm text-muted-foreground">12 creator</p>
                   </div>
                   <div className="rounded-lg border p-4">
-                    <p className="text-sm text-muted-foreground">Bu Ay Ödenen</p>
+                    <p className="text-sm text-muted-foreground">
+                      Bu Ay Ödenen
+                    </p>
                     <p className="text-2xl font-bold text-green-600">₺89,450</p>
                     <p className="text-sm text-muted-foreground">45 creator</p>
                   </div>
                   <div className="rounded-lg border p-4">
-                    <p className="text-sm text-muted-foreground">Sonraki Ödeme</p>
+                    <p className="text-sm text-muted-foreground">
+                      Sonraki Ödeme
+                    </p>
                     <p className="text-2xl font-bold">3 gün</p>
-                    <p className="text-sm text-muted-foreground">21 Aralık 2024</p>
+                    <p className="text-sm text-muted-foreground">
+                      21 Aralık 2024
+                    </p>
                   </div>
                 </div>
 
@@ -510,7 +550,9 @@ export default function CreatorsPage() {
                         </Avatar>
                         <div>
                           <p className="font-medium text-sm">{creator.name}</p>
-                          <p className="text-xs text-muted-foreground">{creator.username}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {creator.username}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-4">

@@ -3,7 +3,8 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { Keyboard, Text, TextInput } from 'react-native';
 import FormComponents from '../FormComponents';
 
-const { DismissKeyboardView, KeyboardAwareScrollView, FormInput } = FormComponents;
+const { DismissKeyboardView, KeyboardAwareScrollView, FormInput } =
+  FormComponents;
 
 describe('FormComponents', () => {
   describe('DismissKeyboardView', () => {
@@ -15,7 +16,7 @@ describe('FormComponents', () => {
       const { getByText } = render(
         <DismissKeyboardView>
           <Text>Test Content</Text>
-        </DismissKeyboardView>
+        </DismissKeyboardView>,
       );
 
       expect(getByText('Test Content')).toBeTruthy();
@@ -26,7 +27,7 @@ describe('FormComponents', () => {
       const { UNSAFE_getAllByType } = render(
         <DismissKeyboardView>
           <Text>Content</Text>
-        </DismissKeyboardView>
+        </DismissKeyboardView>,
       );
 
       const { TouchableWithoutFeedback } = require('react-native');
@@ -41,12 +42,12 @@ describe('FormComponents', () => {
       const { UNSAFE_getAllByType } = render(
         <DismissKeyboardView style={customStyle}>
           <React.Fragment>Content</React.Fragment>
-        </DismissKeyboardView>
+        </DismissKeyboardView>,
       );
 
       const { View } = require('react-native');
       const views = UNSAFE_getAllByType(View);
-      
+
       // Check if custom style is applied
       const styledView = views.find((view: { props: { style?: unknown } }) => {
         const style = JSON.stringify(view.props.style);
@@ -59,12 +60,12 @@ describe('FormComponents', () => {
       const { UNSAFE_getAllByType } = render(
         <DismissKeyboardView>
           <React.Fragment>Content</React.Fragment>
-        </DismissKeyboardView>
+        </DismissKeyboardView>,
       );
 
       const { TouchableWithoutFeedback } = require('react-native');
       const touchables = UNSAFE_getAllByType(TouchableWithoutFeedback);
-      
+
       expect(touchables[0].props.accessible).toBe(false);
     });
   });
@@ -74,7 +75,7 @@ describe('FormComponents', () => {
       const { getByText } = render(
         <KeyboardAwareScrollView>
           <Text>Scroll Content</Text>
-        </KeyboardAwareScrollView>
+        </KeyboardAwareScrollView>,
       );
 
       expect(getByText('Scroll Content')).toBeTruthy();
@@ -85,12 +86,12 @@ describe('FormComponents', () => {
       const { UNSAFE_getAllByType } = render(
         <KeyboardAwareScrollView style={customStyle}>
           <React.Fragment>Content</React.Fragment>
-        </KeyboardAwareScrollView>
+        </KeyboardAwareScrollView>,
       );
 
       const { ScrollView } = require('react-native');
       const scrollViews = UNSAFE_getAllByType(ScrollView);
-      
+
       expect(scrollViews.length).toBeGreaterThan(0);
     });
 
@@ -99,12 +100,12 @@ describe('FormComponents', () => {
       const { UNSAFE_getAllByType } = render(
         <KeyboardAwareScrollView contentContainerStyle={contentStyle}>
           <React.Fragment>Content</React.Fragment>
-        </KeyboardAwareScrollView>
+        </KeyboardAwareScrollView>,
       );
 
       const { ScrollView } = require('react-native');
       const scrollViews = UNSAFE_getAllByType(ScrollView);
-      
+
       expect(scrollViews[0].props.contentContainerStyle).toBeDefined();
     });
 
@@ -112,12 +113,12 @@ describe('FormComponents', () => {
       const { UNSAFE_getAllByType } = render(
         <KeyboardAwareScrollView>
           <React.Fragment>Content</React.Fragment>
-        </KeyboardAwareScrollView>
+        </KeyboardAwareScrollView>,
       );
 
       const { ScrollView } = require('react-native');
       const scrollViews = UNSAFE_getAllByType(ScrollView);
-      
+
       expect(scrollViews[0].props.keyboardShouldPersistTaps).toBe('handled');
     });
 
@@ -125,12 +126,12 @@ describe('FormComponents', () => {
       const { UNSAFE_getAllByType } = render(
         <KeyboardAwareScrollView keyboardShouldPersistTaps="always">
           <React.Fragment>Content</React.Fragment>
-        </KeyboardAwareScrollView>
+        </KeyboardAwareScrollView>,
       );
 
       const { ScrollView } = require('react-native');
       const scrollViews = UNSAFE_getAllByType(ScrollView);
-      
+
       expect(scrollViews[0].props.keyboardShouldPersistTaps).toBe('always');
     });
 
@@ -138,12 +139,12 @@ describe('FormComponents', () => {
       const { UNSAFE_getAllByType } = render(
         <KeyboardAwareScrollView extraScrollHeight={50}>
           <React.Fragment>Content</React.Fragment>
-        </KeyboardAwareScrollView>
+        </KeyboardAwareScrollView>,
       );
 
       const { ScrollView } = require('react-native');
       const scrollViews = UNSAFE_getAllByType(ScrollView);
-      
+
       const style = JSON.stringify(scrollViews[0].props.contentContainerStyle);
       expect(style).toContain('50');
     });
@@ -152,12 +153,12 @@ describe('FormComponents', () => {
       const { UNSAFE_getAllByType } = render(
         <KeyboardAwareScrollView>
           <React.Fragment>Content</React.Fragment>
-        </KeyboardAwareScrollView>
+        </KeyboardAwareScrollView>,
       );
 
       const { ScrollView } = require('react-native');
       const scrollViews = UNSAFE_getAllByType(ScrollView);
-      
+
       expect(scrollViews[0].props.showsVerticalScrollIndicator).toBe(false);
     });
   });
@@ -176,7 +177,7 @@ describe('FormComponents', () => {
     describe('Basic Rendering', () => {
       it('renders input with value', () => {
         const { UNSAFE_getByType } = render(
-          <FormInput value="Test" onChangeText={mockOnChangeText} />
+          <FormInput value="Test" onChangeText={mockOnChangeText} />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -185,11 +186,7 @@ describe('FormComponents', () => {
 
       it('renders with label', () => {
         const { getByText } = render(
-          <FormInput
-            value=""
-            onChangeText={mockOnChangeText}
-            label="Email"
-          />
+          <FormInput value="" onChangeText={mockOnChangeText} label="Email" />,
         );
 
         expect(getByText('Email')).toBeTruthy();
@@ -201,7 +198,7 @@ describe('FormComponents', () => {
             value=""
             onChangeText={mockOnChangeText}
             placeholder="Enter email"
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -214,7 +211,7 @@ describe('FormComponents', () => {
             value=""
             onChangeText={mockOnChangeText}
             placeholder="Test"
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -229,7 +226,7 @@ describe('FormComponents', () => {
             value=""
             onChangeText={mockOnChangeText}
             placeholder="Type here"
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -245,7 +242,7 @@ describe('FormComponents', () => {
             onChangeText={mockOnChangeText}
             placeholder="Test"
             onFocus={mockOnFocus}
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -261,7 +258,7 @@ describe('FormComponents', () => {
             onChangeText={mockOnChangeText}
             placeholder="Test"
             onBlur={mockOnBlur}
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -277,7 +274,7 @@ describe('FormComponents', () => {
             onChangeText={mockOnChangeText}
             placeholder="Test"
             onSubmitEditing={mockOnSubmitEditing}
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -295,7 +292,7 @@ describe('FormComponents', () => {
             onChangeText={mockOnChangeText}
             error="Error message"
             touched={false}
-          />
+          />,
         );
 
         expect(queryByText('Error message')).toBeNull();
@@ -308,7 +305,7 @@ describe('FormComponents', () => {
             onChangeText={mockOnChangeText}
             error="Error message"
             touched={true}
-          />
+          />,
         );
 
         expect(getByText('Error message')).toBeTruthy();
@@ -321,7 +318,7 @@ describe('FormComponents', () => {
             onChangeText={mockOnChangeText}
             error="Error"
             touched={true}
-          />
+          />,
         );
 
         expect(getByText('Error')).toBeTruthy();
@@ -329,7 +326,10 @@ describe('FormComponents', () => {
         const { MaterialCommunityIcons } = require('@expo/vector-icons');
         const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
 
-        const errorIcon = icons.find((icon: { props: { name: string } }) => icon.props.name === 'alert-circle');
+        const errorIcon = icons.find(
+          (icon: { props: { name: string } }) =>
+            icon.props.name === 'alert-circle',
+        );
         expect(errorIcon).toBeTruthy();
         expect(errorIcon?.props.size).toBe(14);
       });
@@ -343,7 +343,7 @@ describe('FormComponents', () => {
             onChangeText={mockOnChangeText}
             placeholder="Password"
             secureTextEntry={true}
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -356,14 +356,16 @@ describe('FormComponents', () => {
             value=""
             onChangeText={mockOnChangeText}
             secureTextEntry={true}
-          />
+          />,
         );
 
         const { MaterialCommunityIcons } = require('@expo/vector-icons');
         const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
 
-        const eyeIcon = icons.find((icon: { props: { name: string } }) =>
-          icon.props.name === 'eye-outline' || icon.props.name === 'eye-off-outline'
+        const eyeIcon = icons.find(
+          (icon: { props: { name: string } }) =>
+            icon.props.name === 'eye-outline' ||
+            icon.props.name === 'eye-off-outline',
         );
         expect(eyeIcon).toBeTruthy();
       });
@@ -374,7 +376,7 @@ describe('FormComponents', () => {
             value="password"
             onChangeText={mockOnChangeText}
             secureTextEntry={true}
-          />
+          />,
         );
 
         const showButton = getByLabelText('Show password');
@@ -393,13 +395,15 @@ describe('FormComponents', () => {
             value=""
             onChangeText={mockOnChangeText}
             leftIcon="email"
-          />
+          />,
         );
 
         const { MaterialCommunityIcons } = require('@expo/vector-icons');
         const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
 
-        const leftIcon = icons.find((icon: { props: { name: string } }) => icon.props.name === 'email');
+        const leftIcon = icons.find(
+          (icon: { props: { name: string } }) => icon.props.name === 'email',
+        );
         expect(leftIcon).toBeTruthy();
       });
 
@@ -410,13 +414,15 @@ describe('FormComponents', () => {
             onChangeText={mockOnChangeText}
             rightIcon="close"
             onRightIconPress={mockOnRightIconPress}
-          />
+          />,
         );
 
         const { MaterialCommunityIcons } = require('@expo/vector-icons');
         const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
 
-        const rightIcon = icons.find((icon: { props: { name: string } }) => icon.props.name === 'close');
+        const rightIcon = icons.find(
+          (icon: { props: { name: string } }) => icon.props.name === 'close',
+        );
         expect(rightIcon).toBeTruthy();
       });
 
@@ -427,14 +433,16 @@ describe('FormComponents', () => {
             onChangeText={mockOnChangeText}
             rightIcon="close"
             onRightIconPress={mockOnRightIconPress}
-          />
+          />,
         );
 
         const { TouchableOpacity } = require('react-native');
         const buttons = UNSAFE_getAllByType(TouchableOpacity);
 
         // Find the button with the close icon
-        const rightIconButton = buttons.find((btn: { props: { disabled?: boolean } }) => !btn.props.disabled);
+        const rightIconButton = buttons.find(
+          (btn: { props: { disabled?: boolean } }) => !btn.props.disabled,
+        );
         if (rightIconButton) {
           fireEvent.press(rightIconButton);
           expect(mockOnRightIconPress).toHaveBeenCalled();
@@ -448,14 +456,16 @@ describe('FormComponents', () => {
             onChangeText={mockOnChangeText}
             rightIcon="close"
             secureTextEntry={true}
-          />
+          />,
         );
 
         const { MaterialCommunityIcons } = require('@expo/vector-icons');
         const icons = UNSAFE_getAllByType(MaterialCommunityIcons);
 
         // Should only have eye icon, not close icon
-        const closeIcon = icons.find((icon: { props: { name: string } }) => icon.props.name === 'close');
+        const closeIcon = icons.find(
+          (icon: { props: { name: string } }) => icon.props.name === 'close',
+        );
         expect(closeIcon).toBeFalsy();
       });
     });
@@ -469,7 +479,7 @@ describe('FormComponents', () => {
             placeholder="Description"
             multiline={true}
             numberOfLines={4}
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -485,7 +495,7 @@ describe('FormComponents', () => {
             value="Hello"
             onChangeText={mockOnChangeText}
             maxLength={100}
-          />
+          />,
         );
 
         expect(getByText('5/100')).toBeTruthy();
@@ -493,7 +503,7 @@ describe('FormComponents', () => {
 
       it('does not show character count when maxLength not provided', () => {
         const { queryByText } = render(
-          <FormInput value="Hello" onChangeText={mockOnChangeText} />
+          <FormInput value="Hello" onChangeText={mockOnChangeText} />,
         );
 
         expect(queryByText(/\d+\/\d+/)).toBeNull();
@@ -505,7 +515,7 @@ describe('FormComponents', () => {
             value="Hi"
             onChangeText={mockOnChangeText}
             maxLength={50}
-          />
+          />,
         );
 
         expect(getByText('2/50')).toBeTruthy();
@@ -515,7 +525,7 @@ describe('FormComponents', () => {
             value="Hello World"
             onChangeText={mockOnChangeText}
             maxLength={50}
-          />
+          />,
         );
 
         expect(getByText('11/50')).toBeTruthy();
@@ -529,7 +539,7 @@ describe('FormComponents', () => {
             value=""
             onChangeText={mockOnChangeText}
             placeholder="Test"
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -543,7 +553,7 @@ describe('FormComponents', () => {
             onChangeText={mockOnChangeText}
             placeholder="Test"
             editable={false}
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -558,7 +568,7 @@ describe('FormComponents', () => {
             value=""
             onChangeText={mockOnChangeText}
             placeholder="Test"
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -572,7 +582,7 @@ describe('FormComponents', () => {
             onChangeText={mockOnChangeText}
             placeholder="Email"
             keyboardType="email-address"
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -586,7 +596,7 @@ describe('FormComponents', () => {
             onChangeText={mockOnChangeText}
             placeholder="Phone"
             keyboardType="numeric"
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -601,7 +611,7 @@ describe('FormComponents', () => {
             value=""
             onChangeText={mockOnChangeText}
             placeholder="Test"
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -615,7 +625,7 @@ describe('FormComponents', () => {
             onChangeText={mockOnChangeText}
             placeholder="Name"
             autoCapitalize="words"
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -628,7 +638,7 @@ describe('FormComponents', () => {
             value=""
             onChangeText={mockOnChangeText}
             placeholder="Test"
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -642,7 +652,7 @@ describe('FormComponents', () => {
             onChangeText={mockOnChangeText}
             placeholder="Email"
             autoComplete="email"
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -658,7 +668,7 @@ describe('FormComponents', () => {
             onChangeText={mockOnChangeText}
             label="Email Address"
             placeholder="test@example.com"
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -671,7 +681,7 @@ describe('FormComponents', () => {
             value=""
             onChangeText={mockOnChangeText}
             placeholder="Enter your name"
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -684,7 +694,7 @@ describe('FormComponents', () => {
             value=""
             onChangeText={mockOnChangeText}
             testID="email-input"
-          />
+          />,
         );
 
         expect(getByTestId('email-input')).toBeTruthy();
@@ -698,7 +708,7 @@ describe('FormComponents', () => {
             value=""
             onChangeText={mockOnChangeText}
             placeholder="Empty"
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -708,7 +718,7 @@ describe('FormComponents', () => {
       it('handles very long value', () => {
         const longValue = 'A'.repeat(1000);
         const { UNSAFE_getByType } = render(
-          <FormInput value={longValue} onChangeText={mockOnChangeText} />
+          <FormInput value={longValue} onChangeText={mockOnChangeText} />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -718,7 +728,7 @@ describe('FormComponents', () => {
       it('handles special characters in value', () => {
         const specialValue = '!@#$%^&*()_+<>?:"{}|';
         const { UNSAFE_getByType } = render(
-          <FormInput value={specialValue} onChangeText={mockOnChangeText} />
+          <FormInput value={specialValue} onChangeText={mockOnChangeText} />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -732,16 +742,18 @@ describe('FormComponents', () => {
             value=""
             onChangeText={mockOnChangeText}
             style={customStyle}
-          />
+          />,
         );
 
         const { View } = require('react-native');
         const views = UNSAFE_getAllByType(View);
 
-        const styledView = views.find((view: { props: { style?: unknown } }) => {
-          const style = JSON.stringify(view.props.style);
-          return style.includes('32');
-        });
+        const styledView = views.find(
+          (view: { props: { style?: unknown } }) => {
+            const style = JSON.stringify(view.props.style);
+            return style.includes('32');
+          },
+        );
         expect(styledView).toBeTruthy();
       });
     });
@@ -753,7 +765,7 @@ describe('FormComponents', () => {
             value=""
             onChangeText={mockOnChangeText}
             placeholder="Test"
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -767,7 +779,7 @@ describe('FormComponents', () => {
             onChangeText={mockOnChangeText}
             placeholder="Test"
             blurOnSubmit={false}
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);
@@ -781,7 +793,7 @@ describe('FormComponents', () => {
             onChangeText={mockOnChangeText}
             placeholder="Test"
             returnKeyType="search"
-          />
+          />,
         );
 
         const input = UNSAFE_getByType(TextInput);

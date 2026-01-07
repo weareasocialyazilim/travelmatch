@@ -22,7 +22,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
@@ -38,7 +44,11 @@ import {
 const apiEndpoints = [
   { method: 'GET', path: '/api/users', description: 'Kullanıcı listesi' },
   { method: 'GET', path: '/api/users/:id', description: 'Kullanıcı detayı' },
-  { method: 'PATCH', path: '/api/users/:id', description: 'Kullanıcı güncelle' },
+  {
+    method: 'PATCH',
+    path: '/api/users/:id',
+    description: 'Kullanıcı güncelle',
+  },
   { method: 'GET', path: '/api/moments', description: 'Moment listesi' },
   { method: 'GET', path: '/api/tasks', description: 'Görev listesi' },
   { method: 'POST', path: '/api/tasks', description: 'Yeni görev oluştur' },
@@ -140,8 +150,12 @@ export default function DevToolsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Geliştirici Araçları</h1>
-          <p className="text-muted-foreground">API playground ve hata ayıklama</p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Geliştirici Araçları
+          </h1>
+          <p className="text-muted-foreground">
+            API playground ve hata ayıklama
+          </p>
         </div>
       </div>
 
@@ -172,11 +186,16 @@ export default function DevToolsPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>API İsteği</CardTitle>
-                  <CardDescription>API uç noktalarını test edin</CardDescription>
+                  <CardDescription>
+                    API uç noktalarını test edin
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex gap-2">
-                    <Select value={selectedMethod} onValueChange={setSelectedMethod}>
+                    <Select
+                      value={selectedMethod}
+                      onValueChange={setSelectedMethod}
+                    >
                       <SelectTrigger className="w-28">
                         <SelectValue />
                       </SelectTrigger>
@@ -234,7 +253,9 @@ export default function DevToolsPage() {
                         </Button>
                       </div>
                       <div className="relative rounded-lg bg-muted p-4 overflow-auto max-h-96">
-                        <pre className="text-sm font-mono text-green-600">{response}</pre>
+                        <pre className="text-sm font-mono text-green-600">
+                          {response}
+                        </pre>
                       </div>
                     </div>
                   )}
@@ -259,12 +280,18 @@ export default function DevToolsPage() {
                       }}
                       className="w-full flex items-center gap-2 rounded-lg border p-3 text-left hover:bg-muted transition-colors"
                     >
-                      <Badge className={`${getMethodColor(endpoint.method)} text-white text-xs`}>
+                      <Badge
+                        className={`${getMethodColor(endpoint.method)} text-white text-xs`}
+                      >
                         {endpoint.method}
                       </Badge>
                       <div className="flex-1 min-w-0">
-                        <p className="font-mono text-sm truncate">{endpoint.path}</p>
-                        <p className="text-xs text-muted-foreground">{endpoint.description}</p>
+                        <p className="font-mono text-sm truncate">
+                          {endpoint.path}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {endpoint.description}
+                        </p>
                       </div>
                     </button>
                   ))}
@@ -295,12 +322,18 @@ export default function DevToolsPage() {
                           <AlertTriangle className="h-5 w-5 text-red-500" />
                         )}
                         <div>
-                          <p className="font-medium font-mono text-sm">{webhook.event}</p>
+                          <p className="font-medium font-mono text-sm">
+                            {webhook.event}
+                          </p>
                           <p className="text-xs text-muted-foreground">
-                            {new Date(webhook.timestamp).toLocaleString('tr-TR')}
+                            {new Date(webhook.timestamp).toLocaleString(
+                              'tr-TR',
+                            )}
                           </p>
                           {webhook.error && (
-                            <p className="text-xs text-red-500">{webhook.error}</p>
+                            <p className="text-xs text-red-500">
+                              {webhook.error}
+                            </p>
                           )}
                         </div>
                       </div>
@@ -365,7 +398,8 @@ export default function DevToolsPage() {
             <CardHeader>
               <CardTitle>SQL Sorgusu</CardTitle>
               <CardDescription>
-                Veritabanı üzerinde salt okunur sorgular çalıştırın (SELECT only)
+                Veritabanı üzerinde salt okunur sorgular çalıştırın (SELECT
+                only)
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

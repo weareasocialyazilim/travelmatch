@@ -1,5 +1,12 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  ScrollView,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
@@ -27,11 +34,7 @@ const TopPickCard: React.FC<TopPickCardProps> = ({ item, onPress }) => (
     </Text>
     <Text style={styles.topPickAmount}>${item.totalAmount}</Text>
     <View style={styles.topPickRating}>
-      <MaterialCommunityIcons
-        name="star"
-        size={12}
-        color={COLORS.softOrange}
-      />
+      <MaterialCommunityIcons name="star" size={12} color={COLORS.softOrange} />
       <Text style={styles.topPickRatingText}>{item.sender.rating}</Text>
     </View>
   </TouchableOpacity>
@@ -63,7 +66,11 @@ export const TopPicksSection: React.FC<TopPicksSectionProps> = ({
         contentContainerStyle={styles.topPicksContainer}
       >
         {topPicks.map((item) => (
-          <TopPickCard key={item.id} item={item} onPress={() => onItemPress(item)} />
+          <TopPickCard
+            key={item.id}
+            item={item}
+            onPress={() => onItemPress(item)}
+          />
         ))}
       </ScrollView>
     </View>

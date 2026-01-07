@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
           `
           *,
           user:users!wallets_user_id_fkey(id, display_name, avatar_url, email, kyc_status)
-        `
+        `,
         )
         .eq('user_id', userId)
         .single();
@@ -64,7 +64,10 @@ export async function GET(request: NextRequest) {
             },
           });
         }
-        return NextResponse.json({ error: 'Kullanıcı bulunamadı' }, { status: 404 });
+        return NextResponse.json(
+          { error: 'Kullanıcı bulunamadı' },
+          { status: 404 },
+        );
       }
 
       // Get recent transactions for this user
@@ -89,7 +92,7 @@ export async function GET(request: NextRequest) {
         *,
         user:users!wallets_user_id_fkey(id, display_name, avatar_url, email, kyc_status)
       `,
-        { count: 'exact' }
+        { count: 'exact' },
       )
       .order('available_balance', { ascending: false })
       .range(offset, offset + limit - 1);
@@ -102,27 +105,44 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('Wallets query error:', error);
-      return NextResponse.json({ error: 'Cüzdanlar yüklenemedi' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Cüzdanlar yüklenemedi' },
+        { status: 500 },
+      );
     }
 
     // Filter by search if provided
     let filteredWallets = wallets;
     if (search && wallets) {
       const safeSearch = search.toLowerCase();
-      filteredWallets = wallets.filter((w: WalletWithUser) =>
-        w.user?.display_name?.toLowerCase().includes(safeSearch) ||
-        w.user?.email?.toLowerCase().includes(safeSearch)
+      filteredWallets = wallets.filter(
+        (w: WalletWithUser) =>
+          w.user?.display_name?.toLowerCase().includes(safeSearch) ||
+          w.user?.email?.toLowerCase().includes(safeSearch),
       );
     }
 
     // Calculate summary
     const summary = {
       totalWallets: count || 0,
-      totalAvailableBalance: wallets?.reduce((sum: number, w: WalletWithUser) => sum + (w.available_balance || 0), 0) || 0,
-      totalPendingBalance: wallets?.reduce((sum: number, w: WalletWithUser) => sum + (w.pending_balance || 0), 0) || 0,
-      averageBalance: wallets && wallets.length > 0
-        ? wallets.reduce((sum: number, w: WalletWithUser) => sum + (w.available_balance || 0), 0) / wallets.length
-        : 0,
+      totalAvailableBalance:
+        wallets?.reduce(
+          (sum: number, w: WalletWithUser) => sum + (w.available_balance || 0),
+          0,
+        ) || 0,
+      totalPendingBalance:
+        wallets?.reduce(
+          (sum: number, w: WalletWithUser) => sum + (w.pending_balance || 0),
+          0,
+        ) || 0,
+      averageBalance:
+        wallets && wallets.length > 0
+          ? wallets.reduce(
+              (sum: number, w: WalletWithUser) =>
+                sum + (w.available_balance || 0),
+              0,
+            ) / wallets.length
+          : 0,
     };
 
     return NextResponse.json({

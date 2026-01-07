@@ -182,7 +182,8 @@ export async function requestMediaLibraryPermission(): Promise<boolean> {
 export async function launchCamera(
   config: CameraConfig | keyof typeof CAMERA_CONFIGS = 'MOMENT_PHOTO',
 ): Promise<ImagePicker.ImagePickerAsset | null> {
-  const cameraConfig = typeof config === 'string' ? CAMERA_CONFIGS[config] : config;
+  const cameraConfig =
+    typeof config === 'string' ? CAMERA_CONFIGS[config] : config;
 
   const hasPermission = await requestCameraPermission();
   if (!hasPermission) {
@@ -231,7 +232,8 @@ export async function launchGallery(
   allowMultiple = false,
   selectionLimit = 10,
 ): Promise<ImagePicker.ImagePickerAsset[]> {
-  const pickerConfig = typeof config === 'string' ? CAMERA_CONFIGS[config] : config;
+  const pickerConfig =
+    typeof config === 'string' ? CAMERA_CONFIGS[config] : config;
 
   const hasPermission = await requestMediaLibraryPermission();
   if (!hasPermission) {
@@ -281,11 +283,12 @@ export async function launchVideoCamera(
   }
 
   // Map quality to expo-image-picker format
-  const videoQuality = quality === 'high'
-    ? ImagePicker.UIImagePickerControllerQualityType.High
-    : quality === 'medium'
-    ? ImagePicker.UIImagePickerControllerQualityType.Medium
-    : ImagePicker.UIImagePickerControllerQualityType.Low;
+  const videoQuality =
+    quality === 'high'
+      ? ImagePicker.UIImagePickerControllerQualityType.High
+      : quality === 'medium'
+        ? ImagePicker.UIImagePickerControllerQualityType.Medium
+        : ImagePicker.UIImagePickerControllerQualityType.Low;
 
   try {
     const result = await ImagePicker.launchCameraAsync({

@@ -7,9 +7,8 @@ declare const __DEV__: boolean;
 
 // Extend globalThis for test environments
 declare global {
-   
   var __DEV__: boolean;
-  
+
   namespace NodeJS {
     interface Global {
       __DEV__: boolean;
@@ -70,12 +69,12 @@ declare module 'react-native-image-picker' {
 
   export function launchImageLibrary(
     options: ImagePickerOptions,
-    callback?: (response: ImagePickerResponse) => void
+    callback?: (response: ImagePickerResponse) => void,
   ): Promise<ImagePickerResponse>;
 
   export function launchCamera(
     options: ImagePickerOptions,
-    callback?: (response: ImagePickerResponse) => void
+    callback?: (response: ImagePickerResponse) => void,
   ): Promise<ImagePickerResponse>;
 }
 
@@ -91,7 +90,7 @@ declare module '@travelmatch/design-system/tokens' {
     warning: string;
     [key: string]: string;
   };
-  
+
   export const spacing: {
     xs: number;
     sm: number;
@@ -100,7 +99,7 @@ declare module '@travelmatch/design-system/tokens' {
     xl: number;
     [key: string]: number;
   };
-  
+
   export const typography: {
     fontSize: {
       xs: number;
@@ -126,7 +125,7 @@ declare module 'expo-sharing' {
       mimeType?: string;
       dialogTitle?: string;
       UTI?: string;
-    }
+    },
   ): Promise<void>;
 }
 
@@ -150,8 +149,12 @@ declare module 'react-native-fast-image' {
     style?: StyleProp<ImageStyle>;
     resizeMode?: 'contain' | 'cover' | 'stretch' | 'center';
     onLoadStart?: () => void;
-    onProgress?: (event: { nativeEvent: { loaded: number; total: number } }) => void;
-    onLoad?: (event: { nativeEvent: { width: number; height: number } }) => void;
+    onProgress?: (event: {
+      nativeEvent: { loaded: number; total: number };
+    }) => void;
+    onLoad?: (event: {
+      nativeEvent: { width: number; height: number };
+    }) => void;
     onError?: () => void;
     onLoadEnd?: () => void;
     fallback?: boolean;
@@ -201,7 +204,7 @@ declare module '@react-native-firebase/analytics' {
 // TanStack Query Persist Client modules
 declare module '@tanstack/query-async-storage-persister' {
   import { AsyncStorage } from '@react-native-async-storage/async-storage';
-  
+
   export interface AsyncStoragePersisterOptions {
     storage: typeof AsyncStorage;
     key?: string;
@@ -211,7 +214,7 @@ declare module '@tanstack/query-async-storage-persister' {
   }
 
   export function createAsyncStoragePersister(
-    options: AsyncStoragePersisterOptions
+    options: AsyncStoragePersisterOptions,
   ): unknown;
 }
 
@@ -231,6 +234,6 @@ declare module '@tanstack/react-query-persist-client' {
   }
 
   export function PersistQueryClientProvider(
-    props: PersistQueryClientProviderProps
+    props: PersistQueryClientProviderProps,
   ): JSX.Element;
 }

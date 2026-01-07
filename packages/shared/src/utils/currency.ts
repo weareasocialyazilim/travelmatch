@@ -20,7 +20,7 @@ const CURRENCY_SYMBOLS: Record<Currency, string> = {
 export const formatCurrency = (
   amount: number,
   currency: Currency = 'USD',
-  locale = 'en-US'
+  locale = 'en-US',
 ): string => {
   return new Intl.NumberFormat(locale, {
     style: 'currency',
@@ -40,11 +40,11 @@ export const getCurrencySymbol = (currency: Currency): string => {
  */
 export const formatCurrencyWithSymbol = (
   amount: number,
-  currency: Currency = 'USD'
+  currency: Currency = 'USD',
 ): string => {
   const symbol = getCurrencySymbol(currency);
   const formatted = amount.toFixed(2);
-  
+
   // Place symbol based on currency
   if (currency === 'EUR') {
     return `${formatted}${symbol}`;
@@ -78,7 +78,10 @@ export const dollarsToCents = (dollars: number): number => {
 /**
  * Calculate percentage of amount
  */
-export const calculatePercentage = (amount: number, percentage: number): number => {
+export const calculatePercentage = (
+  amount: number,
+  percentage: number,
+): number => {
   return (amount * percentage) / 100;
 };
 
@@ -87,7 +90,7 @@ export const calculatePercentage = (amount: number, percentage: number): number 
  */
 export const calculateDiscount = (
   originalPrice: number,
-  discountPercentage: number
+  discountPercentage: number,
 ): number => {
   return originalPrice - calculatePercentage(originalPrice, discountPercentage);
 };

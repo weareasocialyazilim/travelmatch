@@ -110,9 +110,9 @@ describe('Card Component', () => {
             .reduce(
               (
                 acc: Record<string, unknown>,
-                s: Record<string, unknown> | null | undefined
+                s: Record<string, unknown> | null | undefined,
               ): Record<string, unknown> => ({ ...acc, ...s }),
-              {} as Record<string, unknown>
+              {} as Record<string, unknown>,
             )
         : card.props.style;
       expect(styles.marginTop).toBe(20);
@@ -170,7 +170,10 @@ describe('Card Component', () => {
 
     it('has custom accessibility label', () => {
       const { getByLabelText } = render(
-        <Card onPress={jest.fn() as jest.Mock} accessibilityLabel="Product card">
+        <Card
+          onPress={jest.fn() as jest.Mock}
+          accessibilityLabel="Product card"
+        >
           <Text>Product</Text>
         </Card>,
       );

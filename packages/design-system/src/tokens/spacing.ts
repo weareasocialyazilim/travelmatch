@@ -38,7 +38,6 @@ export const SPACING = {
 // Legacy alias for backwards compatibility
 export const spacing = SPACING;
 
-
 // ═══════════════════════════════════════════════════
 // RADIUS - Premium corners
 // ═══════════════════════════════════════════════════
@@ -65,7 +64,6 @@ export const RADIUS = {
 // Legacy alias
 export const radii = RADIUS;
 export const radius = RADIUS;
-
 
 // ═══════════════════════════════════════════════════
 // SIZES - Component dimensions
@@ -119,7 +117,6 @@ export const SIZES = {
   fabSmall: 44,
 } as const;
 
-
 // ═══════════════════════════════════════════════════
 // BORDER
 // ═══════════════════════════════════════════════════
@@ -129,7 +126,6 @@ export const BORDER = {
   medium: 1.5,
   thick: 2,
 } as const;
-
 
 // ═══════════════════════════════════════════════════
 // SHADOWS - Elevation system
@@ -143,7 +139,6 @@ export const shadows = {
   '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
   inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
 } as const;
-
 
 // ═══════════════════════════════════════════════════
 // Type exports

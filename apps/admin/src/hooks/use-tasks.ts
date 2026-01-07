@@ -78,7 +78,10 @@ async function createTask(data: Partial<Task>): Promise<{ task: Task }> {
   return response.json();
 }
 
-async function updateTask(id: string, data: Partial<Task>): Promise<{ task: Task }> {
+async function updateTask(
+  id: string,
+  data: Partial<Task>,
+): Promise<{ task: Task }> {
   const response = await fetch(`/api/tasks/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
@@ -157,7 +160,8 @@ export function useCompleteTask() {
 
   return {
     ...updateTask,
-    mutate: (id: string) => updateTask.mutate({ id, data: { status: 'completed' } }),
+    mutate: (id: string) =>
+      updateTask.mutate({ id, data: { status: 'completed' } }),
     mutateAsync: (id: string) =>
       updateTask.mutateAsync({ id, data: { status: 'completed' } }),
   };

@@ -1,6 +1,6 @@
 /**
  * Payment Service - Concurrency Edge Cases
- * 
+ *
  * Tests for concurrent payment scenarios:
  * - Duplicate payment prevention (double-click)
  * - Concurrent payment requests
@@ -39,23 +39,25 @@ jest.mock('../../utils/logger', () => ({
 }));
 
 const mockSupabase = supabase as jest.Mocked<typeof supabase>;
-const mockTransactionsService = transactionsService as jest.Mocked<typeof transactionsService>;
+const mockTransactionsService = transactionsService as jest.Mocked<
+  typeof transactionsService
+>;
 const mockLogger = logger as jest.Mocked<typeof logger>;
 
 // Simulated idempotency helper (would be in paymentService in production)
 const pendingPayments = new Map<string, Promise<any>>();
 
-async function processPaymentWithIdempotency(
-  data: {
-    amount: number;
-    currency: string;
-    paymentMethodId: string;
-    description?: string;
-    metadata?: Record<string, unknown>;
-    idempotencyKey?: string;
-  }
-): Promise<any> {
-  const key = data.idempotencyKey || `${data.paymentMethodId}-${data.amount}-${Date.now()}`;
+async function processPaymentWithIdempotency(data: {
+  amount: number;
+  currency: string;
+  paymentMethodId: string;
+  description?: string;
+  metadata?: Record<string, unknown>;
+  idempotencyKey?: string;
+}): Promise<any> {
+  const key =
+    data.idempotencyKey ||
+    `${data.paymentMethodId}-${data.amount}-${Date.now()}`;
 
   // Check if payment is already in progress
   if (pendingPayments.has(key)) {
@@ -84,9 +86,9 @@ describe('PaymentService - Concurrency Edge Cases', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     pendingPayments.clear();
-    (mockSupabase.auth.getUser ).mockResolvedValue({ 
-      data: { user: mockUser }, 
-      error: null 
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: mockUser },
+      error: null,
     });
   });
 
@@ -103,7 +105,7 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         description: 'Gift sent',
       };
 
-      (mockTransactionsService.create ).mockResolvedValue({
+      mockTransactionsService.create.mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -124,13 +126,13 @@ describe('PaymentService - Concurrency Edge Cases', () => {
 
       // Both should return the same result
       expect(result1).toBe(result2);
-      
+
       // But only one payment should be created
       expect(mockTransactionsService.create).toHaveBeenCalledTimes(1);
-      
+
       // Warning should be logged for duplicate
       expect(mockLogger.warn).toHaveBeenCalledWith(
-        expect.stringContaining('Duplicate payment detected')
+        expect.stringContaining('Duplicate payment detected'),
       );
     });
 
@@ -157,7 +159,7 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         description: 'Gift 2',
       };
 
-      (mockTransactionsService.create )
+      mockTransactionsService.create
         .mockResolvedValueOnce({ data: mockTransaction1, error: null })
         .mockResolvedValueOnce({ data: mockTransaction2, error: null });
 
@@ -209,7 +211,7 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         description: 'Gift 2',
       };
 
-      (mockTransactionsService.create )
+      mockTransactionsService.create
         .mockResolvedValueOnce({ data: mockTransaction1, error: null })
         .mockResolvedValueOnce({ data: mockTransaction2, error: null });
 
@@ -273,7 +275,7 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         description: 'Gift for Moment 3',
       };
 
-      (mockTransactionsService.create )
+      mockTransactionsService.create
         .mockResolvedValueOnce({ data: mockTransaction1, error: null })
         .mockResolvedValueOnce({ data: mockTransaction2, error: null })
         .mockResolvedValueOnce({ data: mockTransaction3, error: null });
@@ -326,12 +328,12 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         description: 'Gift 1',
       };
 
-      (mockTransactionsService.create )
+      mockTransactionsService.create
         .mockResolvedValueOnce({ data: mockTransaction1, error: null })
         .mockRejectedValueOnce(new Error('Insufficient funds'))
-        .mockResolvedValueOnce({ 
-          data: { ...mockTransaction1, id: 'tx-3', description: 'Gift 3' }, 
-          error: null 
+        .mockResolvedValueOnce({
+          data: { ...mockTransaction1, id: 'tx-3', description: 'Gift 3' },
+          error: null,
         });
 
       const payment1 = processPaymentWithIdempotency({
@@ -348,7 +350,7 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         paymentMethodId: 'pm_123',
         description: 'Gift 2 (too large)',
         idempotencyKey: 'key-2',
-      }).catch(err => err);
+      }).catch((err) => err);
 
       const payment3 = processPaymentWithIdempotency({
         amount: 50,
@@ -358,7 +360,11 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         idempotencyKey: 'key-3',
       });
 
-      const [result1, result2, result3] = await Promise.all([payment1, payment2, payment3]);
+      const [result1, result2, result3] = await Promise.all([
+        payment1,
+        payment2,
+        payment3,
+      ]);
 
       expect(result1).toHaveProperty('transaction');
       expect(result2).toBeInstanceOf(Error);
@@ -371,10 +377,12 @@ describe('PaymentService - Concurrency Edge Cases', () => {
     it('should handle race condition when checking balance simultaneously', async () => {
       const mockBalance = { balance: 100, currency: 'USD' };
 
-      (mockSupabase.from ).mockReturnValue({
+      mockSupabase.from.mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ data: mockBalance, error: null }),
+            single: jest
+              .fn()
+              .mockResolvedValue({ data: mockBalance, error: null }),
           }),
         }),
       });
@@ -384,7 +392,11 @@ describe('PaymentService - Concurrency Edge Cases', () => {
       const balance2 = paymentService.getBalance();
       const balance3 = paymentService.getBalance();
 
-      const [result1, result2, result3] = await Promise.all([balance1, balance2, balance3]);
+      const [result1, result2, result3] = await Promise.all([
+        balance1,
+        balance2,
+        balance3,
+      ]);
 
       // All should return same balance
       expect(result1.available).toBe(100);
@@ -399,10 +411,12 @@ describe('PaymentService - Concurrency Edge Cases', () => {
       // Simulate balance check before withdrawal
       const mockBalance = { balance: 100, currency: 'USD' };
 
-      (mockSupabase.from ).mockReturnValue({
+      mockSupabase.from.mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ data: mockBalance, error: null }),
+            single: jest
+              .fn()
+              .mockResolvedValue({ data: mockBalance, error: null }),
           }),
         }),
       });
@@ -419,7 +433,7 @@ describe('PaymentService - Concurrency Edge Cases', () => {
       };
 
       // First withdrawal should succeed, second should fail (insufficient funds)
-      (mockTransactionsService.create )
+      mockTransactionsService.create
         .mockResolvedValueOnce({ data: mockTransaction1, error: null })
         .mockRejectedValueOnce(new Error('Insufficient funds'));
 
@@ -429,11 +443,13 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         bankAccountId: 'bank_123',
       });
 
-      const withdrawal2 = paymentService.withdrawFunds({
-        amount: 80,
-        currency: 'USD',
-        bankAccountId: 'bank_123',
-      }).catch(err => err);
+      const withdrawal2 = paymentService
+        .withdrawFunds({
+          amount: 80,
+          currency: 'USD',
+          bankAccountId: 'bank_123',
+        })
+        .catch((err) => err);
 
       const [result1, result2] = await Promise.all([withdrawal1, withdrawal2]);
 
@@ -447,7 +463,7 @@ describe('PaymentService - Concurrency Edge Cases', () => {
     it('should process payments in correct order despite concurrent requests', async () => {
       const transactions: string[] = [];
 
-      (mockTransactionsService.create ).mockImplementation((data) => {
+      mockTransactionsService.create.mockImplementation((data) => {
         transactions.push(data.description);
         return Promise.resolve({
           data: {
@@ -515,7 +531,7 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         description: 'Gift',
       };
 
-      (mockTransactionsService.create ).mockResolvedValue({
+      mockTransactionsService.create.mockResolvedValue({
         data: mockTransaction,
         error: null,
       });

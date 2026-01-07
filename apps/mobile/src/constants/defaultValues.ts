@@ -43,9 +43,9 @@ export const TRUST_GARDEN_DEFAULTS = {
 
   /** Trust levels */
   LEVELS: {
-    SPROUT: 0,      // 0-24
-    GROWING: 25,    // 25-49
-    BLOOMING: 50,   // 50-74
+    SPROUT: 0, // 0-24
+    GROWING: 25, // 25-49
+    BLOOMING: 50, // 50-74
     FLOURISHING: 75, // 75-100
   },
 } as const;

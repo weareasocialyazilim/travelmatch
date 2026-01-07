@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email ve şifre gerekli' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     if (userError || !adminUserData) {
       return NextResponse.json(
         { error: 'Geçersiz kimlik bilgileri' },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -38,15 +38,16 @@ export async function POST(request: NextRequest) {
     const adminUser = adminUserData as any;
 
     // Authenticate with Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { data: authData, error: authError } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
     if (authError) {
       return NextResponse.json(
         { error: 'Geçersiz kimlik bilgileri' },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -54,7 +55,10 @@ export async function POST(request: NextRequest) {
     if (adminUser.totp_enabled) {
       // Create temporary session token for 2FA verification
       const tempToken = crypto.randomBytes(32).toString('hex');
-      const tokenHash = crypto.createHash('sha256').update(tempToken).digest('hex');
+      const tokenHash = crypto
+        .createHash('sha256')
+        .update(tempToken)
+        .digest('hex');
 
       // Store temp session
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -75,7 +79,10 @@ export async function POST(request: NextRequest) {
 
     // Create session token
     const sessionToken = crypto.randomBytes(32).toString('hex');
-    const sessionHash = crypto.createHash('sha256').update(sessionToken).digest('hex');
+    const sessionHash = crypto
+      .createHash('sha256')
+      .update(sessionToken)
+      .digest('hex');
 
     // Store session
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -125,7 +132,7 @@ export async function POST(request: NextRequest) {
     logger.error('Login error:', error);
     return NextResponse.json(
       { error: 'Giriş yapılırken bir hata oluştu' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

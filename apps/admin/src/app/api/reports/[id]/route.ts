@@ -4,30 +4,29 @@ import { createClient } from '@/lib/supabase';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const supabase = createClient();
 
     const { data: report, error } = await supabase
       .from('reports')
-      .select(`
+      .select(
+        `
         *,
         reporter:users!reporter_id(id, full_name, avatar_url, email),
         reported:users!reported_id(id, full_name, avatar_url, email),
         assigned_to:admin_users!assigned_to(id, full_name),
         actions:report_actions(*)
-      `)
+      `,
+      )
       .eq('id', params.id)
       .single();
 
     if (error) throw error;
 
     if (!report) {
-      return NextResponse.json(
-        { error: 'Report not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Report not found' }, { status: 404 });
     }
 
     return NextResponse.json(report);
@@ -35,14 +34,14 @@ export async function GET(
     logger.error('Get report error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch report' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const supabase = createClient();
@@ -55,7 +54,8 @@ export async function PATCH(
         priority: body.priority,
         assigned_to: body.assigned_to,
         resolution: body.resolution,
-        resolved_at: body.status === 'resolved' ? new Date().toISOString() : null,
+        resolved_at:
+          body.status === 'resolved' ? new Date().toISOString() : null,
         updated_at: new Date().toISOString(),
       })
       .eq('id', params.id)
@@ -69,7 +69,7 @@ export async function PATCH(
     logger.error('Update report error:', error);
     return NextResponse.json(
       { error: 'Failed to update report' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

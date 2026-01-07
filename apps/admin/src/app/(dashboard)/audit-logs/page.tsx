@@ -23,7 +23,13 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -55,25 +61,100 @@ import { formatDate, getInitials } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useAuditLogs } from '@/hooks/use-audit-logs';
 
-const actionLabels: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  'user.ban': { label: 'Kullanıcı Yasaklama', color: 'bg-red-100 text-red-800', icon: Shield },
-  'user.unban': { label: 'Yasak Kaldırma', color: 'bg-green-100 text-green-800', icon: Shield },
-  'user.update': { label: 'Kullanıcı Güncelleme', color: 'bg-blue-100 text-blue-800', icon: User },
-  'user.delete': { label: 'Kullanıcı Silme', color: 'bg-red-100 text-red-800', icon: User },
-  'user.verify': { label: 'Kullanıcı Doğrulama', color: 'bg-green-100 text-green-800', icon: User },
-  'moment.approve': { label: 'Moment Onay', color: 'bg-green-100 text-green-800', icon: FileText },
-  'moment.reject': { label: 'Moment Red', color: 'bg-red-100 text-red-800', icon: FileText },
-  'moment.delete': { label: 'Moment Silme', color: 'bg-red-100 text-red-800', icon: FileText },
-  'transaction.approve': { label: 'İşlem Onay', color: 'bg-green-100 text-green-800', icon: DollarSign },
-  'transaction.refund': { label: 'İade İşlemi', color: 'bg-orange-100 text-orange-800', icon: DollarSign },
-  'settings.update': { label: 'Ayar Değişikliği', color: 'bg-purple-100 text-purple-800', icon: Settings },
-  'admin.create': { label: 'Admin Oluşturma', color: 'bg-blue-100 text-blue-800', icon: User },
-  'admin.update': { label: 'Admin Güncelleme', color: 'bg-blue-100 text-blue-800', icon: User },
-  'admin.delete': { label: 'Admin Silme', color: 'bg-red-100 text-red-800', icon: User },
-  'report.resolve': { label: 'Rapor Çözümleme', color: 'bg-green-100 text-green-800', icon: Shield },
-  'feature_flag.toggle': { label: 'Feature Flag Değişikliği', color: 'bg-purple-100 text-purple-800', icon: Settings },
-  'campaign.create': { label: 'Kampanya Oluşturma', color: 'bg-blue-100 text-blue-800', icon: FileText },
-  'campaign.update': { label: 'Kampanya Güncelleme', color: 'bg-blue-100 text-blue-800', icon: FileText },
+const actionLabels: Record<
+  string,
+  { label: string; color: string; icon: React.ElementType }
+> = {
+  'user.ban': {
+    label: 'Kullanıcı Yasaklama',
+    color: 'bg-red-100 text-red-800',
+    icon: Shield,
+  },
+  'user.unban': {
+    label: 'Yasak Kaldırma',
+    color: 'bg-green-100 text-green-800',
+    icon: Shield,
+  },
+  'user.update': {
+    label: 'Kullanıcı Güncelleme',
+    color: 'bg-blue-100 text-blue-800',
+    icon: User,
+  },
+  'user.delete': {
+    label: 'Kullanıcı Silme',
+    color: 'bg-red-100 text-red-800',
+    icon: User,
+  },
+  'user.verify': {
+    label: 'Kullanıcı Doğrulama',
+    color: 'bg-green-100 text-green-800',
+    icon: User,
+  },
+  'moment.approve': {
+    label: 'Moment Onay',
+    color: 'bg-green-100 text-green-800',
+    icon: FileText,
+  },
+  'moment.reject': {
+    label: 'Moment Red',
+    color: 'bg-red-100 text-red-800',
+    icon: FileText,
+  },
+  'moment.delete': {
+    label: 'Moment Silme',
+    color: 'bg-red-100 text-red-800',
+    icon: FileText,
+  },
+  'transaction.approve': {
+    label: 'İşlem Onay',
+    color: 'bg-green-100 text-green-800',
+    icon: DollarSign,
+  },
+  'transaction.refund': {
+    label: 'İade İşlemi',
+    color: 'bg-orange-100 text-orange-800',
+    icon: DollarSign,
+  },
+  'settings.update': {
+    label: 'Ayar Değişikliği',
+    color: 'bg-purple-100 text-purple-800',
+    icon: Settings,
+  },
+  'admin.create': {
+    label: 'Admin Oluşturma',
+    color: 'bg-blue-100 text-blue-800',
+    icon: User,
+  },
+  'admin.update': {
+    label: 'Admin Güncelleme',
+    color: 'bg-blue-100 text-blue-800',
+    icon: User,
+  },
+  'admin.delete': {
+    label: 'Admin Silme',
+    color: 'bg-red-100 text-red-800',
+    icon: User,
+  },
+  'report.resolve': {
+    label: 'Rapor Çözümleme',
+    color: 'bg-green-100 text-green-800',
+    icon: Shield,
+  },
+  'feature_flag.toggle': {
+    label: 'Feature Flag Değişikliği',
+    color: 'bg-purple-100 text-purple-800',
+    icon: Settings,
+  },
+  'campaign.create': {
+    label: 'Kampanya Oluşturma',
+    color: 'bg-blue-100 text-blue-800',
+    icon: FileText,
+  },
+  'campaign.update': {
+    label: 'Kampanya Güncelleme',
+    color: 'bg-blue-100 text-blue-800',
+    icon: FileText,
+  },
 };
 
 const roleLabels: Record<string, string> = {
@@ -116,7 +197,7 @@ export default function AuditLogsPage() {
   const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
   const paginatedLogs = filteredLogs.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   // Stats
@@ -146,11 +227,19 @@ export default function AuditLogsPage() {
 
   // Export to CSV
   const handleExportCSV = () => {
-    const dataToExport = selectedLogs.length > 0
-      ? logs.filter((log) => selectedLogs.includes(log.id))
-      : filteredLogs;
+    const dataToExport =
+      selectedLogs.length > 0
+        ? logs.filter((log) => selectedLogs.includes(log.id))
+        : filteredLogs;
 
-    const headers = ['Tarih', 'Admin', 'Email', 'Aksiyon', 'Kaynak', 'IP Adresi'];
+    const headers = [
+      'Tarih',
+      'Admin',
+      'Email',
+      'Aksiyon',
+      'Kaynak',
+      'IP Adresi',
+    ];
     const rows = dataToExport.map((log) => [
       formatDate(log.created_at),
       log.admin?.name || 'Bilinmiyor',
@@ -164,7 +253,9 @@ export default function AuditLogsPage() {
       .map((row) => row.map((cell) => `"${cell}"`).join(','))
       .join('\n');
 
-    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob(['\ufeff' + csvContent], {
+      type: 'text/csv;charset=utf-8;',
+    });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -181,7 +272,9 @@ export default function AuditLogsPage() {
         <div className="text-center">
           <AlertTriangle className="mx-auto h-12 w-12 text-destructive" />
           <h2 className="mt-4 text-lg font-semibold">Bir hata oluştu</h2>
-          <p className="text-muted-foreground">Audit logları yüklenemedi. Lütfen tekrar deneyin.</p>
+          <p className="text-muted-foreground">
+            Audit logları yüklenemedi. Lütfen tekrar deneyin.
+          </p>
         </div>
       </div>
     );
@@ -218,7 +311,11 @@ export default function AuditLogsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : todayLogs.length}
+              {isLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                todayLogs.length
+              )}
             </div>
             <p className="text-xs text-muted-foreground">işlem kaydı</p>
           </CardContent>
@@ -230,7 +327,11 @@ export default function AuditLogsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : weekLogs.length}
+              {isLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                weekLogs.length
+              )}
             </div>
             <p className="text-xs text-muted-foreground">işlem kaydı</p>
           </CardContent>
@@ -242,7 +343,11 @@ export default function AuditLogsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : activeAdmins}
+              {isLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                activeAdmins
+              )}
             </div>
             <p className="text-xs text-muted-foreground">bugün işlem yaptı</p>
           </CardContent>
@@ -254,7 +359,11 @@ export default function AuditLogsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : data?.total || logs.length}
+              {isLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                data?.total || logs.length
+              )}
             </div>
             <p className="text-xs text-muted-foreground">kayıt</p>
           </CardContent>
@@ -309,7 +418,11 @@ export default function AuditLogsPage() {
                   <Download className="mr-2 h-4 w-4" />
                   Seçilenleri İndir
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => setSelectedLogs([])}>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setSelectedLogs([])}
+                >
                   Seçimi Temizle
                 </Button>
               </div>
@@ -322,9 +435,7 @@ export default function AuditLogsPage() {
       <Card>
         <CardHeader>
           <CardTitle>İşlem Kayıtları</CardTitle>
-          <CardDescription>
-            {filteredLogs.length} kayıt bulundu
-          </CardDescription>
+          <CardDescription>{filteredLogs.length} kayıt bulundu</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -339,7 +450,9 @@ export default function AuditLogsPage() {
                     <Checkbox
                       checked={
                         paginatedLogs.length > 0 &&
-                        paginatedLogs.every((log) => selectedLogs.includes(log.id))
+                        paginatedLogs.every((log) =>
+                          selectedLogs.includes(log.id),
+                        )
                       }
                       onCheckedChange={handleSelectAll}
                     />
@@ -370,7 +483,9 @@ export default function AuditLogsPage() {
                             if (checked) {
                               setSelectedLogs([...selectedLogs, log.id]);
                             } else {
-                              setSelectedLogs(selectedLogs.filter((id) => id !== log.id));
+                              setSelectedLogs(
+                                selectedLogs.filter((id) => id !== log.id),
+                              );
                             }
                           }}
                         />
@@ -378,19 +493,25 @@ export default function AuditLogsPage() {
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm">{formatDate(log.created_at)}</span>
+                          <span className="text-sm">
+                            {formatDate(log.created_at)}
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <Avatar className="h-8 w-8">
-                            <AvatarImage src={log.admin?.avatar_url || undefined} />
+                            <AvatarImage
+                              src={log.admin?.avatar_url || undefined}
+                            />
                             <AvatarFallback>
                               {getInitials(log.admin?.name || 'Admin')}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="text-sm font-medium">{log.admin?.name || 'Bilinmiyor'}</p>
+                            <p className="text-sm font-medium">
+                              {log.admin?.name || 'Bilinmiyor'}
+                            </p>
                             <p className="text-xs text-muted-foreground">
                               {log.admin?.email || '-'}
                             </p>
@@ -407,7 +528,9 @@ export default function AuditLogsPage() {
                         {log.resource_type ? (
                           <div>
                             <p className="text-sm">{log.resource_id}</p>
-                            <p className="text-xs text-muted-foreground">{log.resource_type}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {log.resource_type}
+                            </p>
                           </div>
                         ) : (
                           <span className="text-muted-foreground">-</span>
@@ -416,7 +539,9 @@ export default function AuditLogsPage() {
                       <TableCell>
                         <div className="flex items-center gap-1">
                           <MapPin className="h-3 w-3 text-muted-foreground" />
-                          <span className="text-sm font-mono">{log.ip_address || '-'}</span>
+                          <span className="text-sm font-mono">
+                            {log.ip_address || '-'}
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
@@ -437,21 +562,32 @@ export default function AuditLogsPage() {
                               {/* Admin Info */}
                               <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
                                 <Avatar className="h-12 w-12">
-                                  <AvatarImage src={log.admin?.avatar_url || undefined} />
+                                  <AvatarImage
+                                    src={log.admin?.avatar_url || undefined}
+                                  />
                                   <AvatarFallback>
                                     {getInitials(log.admin?.name || 'Admin')}
                                   </AvatarFallback>
                                 </Avatar>
                                 <div>
-                                  <p className="font-medium">{log.admin?.name || 'Bilinmiyor'}</p>
-                                  <p className="text-sm text-muted-foreground">{log.admin?.email}</p>
+                                  <p className="font-medium">
+                                    {log.admin?.name || 'Bilinmiyor'}
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {log.admin?.email}
+                                  </p>
                                 </div>
                               </div>
 
                               {/* Action */}
                               <div>
-                                <h4 className="text-sm font-medium mb-2">İşlem</h4>
-                                <Badge className={actionInfo.color} variant="secondary">
+                                <h4 className="text-sm font-medium mb-2">
+                                  İşlem
+                                </h4>
+                                <Badge
+                                  className={actionInfo.color}
+                                  variant="secondary"
+                                >
                                   <ActionIcon className="mr-1 h-3 w-3" />
                                   {actionInfo.label}
                                 </Badge>
@@ -460,15 +596,23 @@ export default function AuditLogsPage() {
                               {/* Resource */}
                               {log.resource_type && (
                                 <div>
-                                  <h4 className="text-sm font-medium mb-2">Kaynak</h4>
+                                  <h4 className="text-sm font-medium mb-2">
+                                    Kaynak
+                                  </h4>
                                   <div className="p-3 bg-muted/50 rounded-lg">
                                     <p className="text-sm">
-                                      <span className="text-muted-foreground">Tip:</span>{' '}
+                                      <span className="text-muted-foreground">
+                                        Tip:
+                                      </span>{' '}
                                       {log.resource_type}
                                     </p>
                                     <p className="text-sm">
-                                      <span className="text-muted-foreground">ID:</span>{' '}
-                                      <code className="font-mono">{log.resource_id}</code>
+                                      <span className="text-muted-foreground">
+                                        ID:
+                                      </span>{' '}
+                                      <code className="font-mono">
+                                        {log.resource_id}
+                                      </code>
                                     </p>
                                   </div>
                                 </div>
@@ -477,16 +621,20 @@ export default function AuditLogsPage() {
                               {/* Changes */}
                               {(log.old_value || log.new_value) && (
                                 <div>
-                                  <h4 className="text-sm font-medium mb-2">Değişiklikler</h4>
+                                  <h4 className="text-sm font-medium mb-2">
+                                    Değişiklikler
+                                  </h4>
                                   <div className="p-3 bg-muted/50 rounded-lg text-sm font-mono">
                                     {log.old_value && (
                                       <div className="text-red-600">
-                                        - {JSON.stringify(log.old_value, null, 2)}
+                                        -{' '}
+                                        {JSON.stringify(log.old_value, null, 2)}
                                       </div>
                                     )}
                                     {log.new_value && (
                                       <div className="text-green-600">
-                                        + {JSON.stringify(log.new_value, null, 2)}
+                                        +{' '}
+                                        {JSON.stringify(log.new_value, null, 2)}
                                       </div>
                                     )}
                                   </div>
@@ -501,7 +649,9 @@ export default function AuditLogsPage() {
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <Monitor className="h-4 w-4 text-muted-foreground" />
-                                  <span className="truncate text-xs">{log.user_agent || 'N/A'}</span>
+                                  <span className="truncate text-xs">
+                                    {log.user_agent || 'N/A'}
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -530,7 +680,8 @@ export default function AuditLogsPage() {
             <div className="flex items-center justify-between mt-4">
               <p className="text-sm text-muted-foreground">
                 {(currentPage - 1) * itemsPerPage + 1} -{' '}
-                {Math.min(currentPage * itemsPerPage, filteredLogs.length)} / {filteredLogs.length}
+                {Math.min(currentPage * itemsPerPage, filteredLogs.length)} /{' '}
+                {filteredLogs.length}
               </p>
               <div className="flex items-center gap-2">
                 <Button
@@ -547,7 +698,9 @@ export default function AuditLogsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(totalPages, p + 1))
+                  }
                   disabled={currentPage === totalPages}
                 >
                   <ChevronRight className="h-4 w-4" />

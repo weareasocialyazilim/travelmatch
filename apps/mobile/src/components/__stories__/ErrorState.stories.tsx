@@ -29,7 +29,8 @@ export const Default: Story = {
 
 export const NetworkError: Story = {
   args: {
-    message: 'Unable to connect. Please check your internet connection and try again.',
+    message:
+      'Unable to connect. Please check your internet connection and try again.',
     icon: 'wifi-off',
     onRetry: () => console.log('Retry pressed'),
     retryText: 'Retry Connection',
@@ -97,7 +98,8 @@ export const WithoutRetryButton: Story = {
 
 export const LongErrorMessage: Story = {
   args: {
-    message: 'We encountered an unexpected error while processing your request. This could be due to network issues, server problems, or invalid data. Please check your connection and try again. If the problem persists, contact support.',
+    message:
+      'We encountered an unexpected error while processing your request. This could be due to network issues, server problems, or invalid data. Please check your connection and try again. If the problem persists, contact support.',
     icon: 'alert-circle-outline',
     onRetry: () => console.log('Retry pressed'),
     retryText: 'Try Again',

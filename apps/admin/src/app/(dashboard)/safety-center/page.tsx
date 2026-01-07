@@ -20,7 +20,13 @@ import {
   History,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -186,8 +192,12 @@ export default function SafetyCenterPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Güvenlik Merkezi</h1>
-          <p className="text-muted-foreground">SOS talepleri ve seyahat uyarıları</p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Güvenlik Merkezi
+          </h1>
+          <p className="text-muted-foreground">
+            SOS talepleri ve seyahat uyarıları
+          </p>
         </div>
         <div className="flex items-center gap-2">
           {sosStats.active_sos > 0 && (
@@ -203,16 +213,22 @@ export default function SafetyCenterPage() {
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className={sosStats.active_sos > 0 ? 'border-red-500 bg-red-50' : ''}>
+        <Card
+          className={sosStats.active_sos > 0 ? 'border-red-500 bg-red-50' : ''}
+        >
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Aktif SOS</p>
-                <p className={`text-2xl font-bold ${sosStats.active_sos > 0 ? 'text-red-600' : ''}`}>
+                <p
+                  className={`text-2xl font-bold ${sosStats.active_sos > 0 ? 'text-red-600' : ''}`}
+                >
                   {sosStats.active_sos}
                 </p>
               </div>
-              <Siren className={`h-8 w-8 ${sosStats.active_sos > 0 ? 'text-red-600 animate-pulse' : 'text-gray-400'}`} />
+              <Siren
+                className={`h-8 w-8 ${sosStats.active_sos > 0 ? 'text-red-600 animate-pulse' : 'text-gray-400'}`}
+              />
             </div>
           </CardContent>
         </Card>
@@ -221,7 +237,9 @@ export default function SafetyCenterPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Bugün Çözülen</p>
-                <p className="text-2xl font-bold text-green-600">{sosStats.resolved_today}</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {sosStats.resolved_today}
+                </p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-500" />
             </div>
@@ -231,8 +249,12 @@ export default function SafetyCenterPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Ort. Yanıt Süresi</p>
-                <p className="text-2xl font-bold">{sosStats.avg_response_time}</p>
+                <p className="text-sm text-muted-foreground">
+                  Ort. Yanıt Süresi
+                </p>
+                <p className="text-2xl font-bold">
+                  {sosStats.avg_response_time}
+                </p>
               </div>
               <Clock className="h-8 w-8 text-blue-500" />
             </div>
@@ -242,7 +264,9 @@ export default function SafetyCenterPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Seyahat Uyarıları</p>
+                <p className="text-sm text-muted-foreground">
+                  Seyahat Uyarıları
+                </p>
                 <p className="text-2xl font-bold">{sosStats.travel_alerts}</p>
               </div>
               <AlertTriangle className="h-8 w-8 text-orange-500" />
@@ -261,7 +285,9 @@ export default function SafetyCenterPage() {
                   <Siren className="h-5 w-5 text-red-600" />
                   Aktif SOS Talepleri
                 </CardTitle>
-                <CardDescription>Acil müdahale bekleyen talepler</CardDescription>
+                <CardDescription>
+                  Acil müdahale bekleyen talepler
+                </CardDescription>
               </div>
               <Button variant="outline" size="sm">
                 <History className="mr-2 h-4 w-4" />
@@ -274,7 +300,9 @@ export default function SafetyCenterPage() {
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <Shield className="h-12 w-12 text-green-500 mb-4" />
                 <p className="text-lg font-medium">Tüm Kullanıcılar Güvende</p>
-                <p className="text-muted-foreground">Aktif SOS talebi bulunmuyor</p>
+                <p className="text-muted-foreground">
+                  Aktif SOS talebi bulunmuyor
+                </p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -309,7 +337,10 @@ export default function SafetyCenterPage() {
                       </div>
                       <div className="flex items-center gap-2">
                         {sos.status === 'active' ? (
-                          <Badge variant="destructive" className="animate-pulse">
+                          <Badge
+                            variant="destructive"
+                            className="animate-pulse"
+                          >
                             Acil
                           </Badge>
                         ) : (
@@ -326,7 +357,9 @@ export default function SafetyCenterPage() {
                       <div className="mt-3 flex items-center gap-2 text-sm">
                         <Avatar className="h-6 w-6">
                           <AvatarImage src={sos.responder.avatar} />
-                          <AvatarFallback>{sos.responder.name[0]}</AvatarFallback>
+                          <AvatarFallback>
+                            {sos.responder.name[0]}
+                          </AvatarFallback>
                         </Avatar>
                         <span className="text-muted-foreground">
                           {sos.responder.name} yanıtlıyor
@@ -380,7 +413,9 @@ export default function SafetyCenterPage() {
                         <span className="text-2xl">{alert.flag}</span>
                         <div>
                           <p className="font-medium">{alert.country}</p>
-                          <p className="text-sm text-muted-foreground">{alert.title}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {alert.title}
+                          </p>
                         </div>
                       </div>
                       {getAlertLevelBadge(alert.level)}

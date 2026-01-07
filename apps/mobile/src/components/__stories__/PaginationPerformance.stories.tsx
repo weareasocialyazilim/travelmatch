@@ -1,6 +1,6 @@
 /**
  * Storybook Performance Testing Examples
- * 
+ *
  * This file demonstrates how to test cursor pagination performance
  * vs offset pagination performance using Storybook controls.
  */
@@ -33,7 +33,7 @@ const generateMockData = (count: number) => {
 // Simulate offset pagination (slow for large offsets)
 const createOffsetFetcher = (totalItems: number) => {
   const allData = generateMockData(totalItems);
-  
+
   return async (cursor?: string | null) => {
     const offset = cursor ? parseInt(cursor) : 0;
     const limit = 20;
@@ -59,7 +59,7 @@ const createOffsetFetcher = (totalItems: number) => {
 // Simulate cursor pagination (fast regardless of position)
 const createCursorFetcher = (totalItems: number) => {
   const allData = generateMockData(totalItems);
-  
+
   return async (cursor?: string | null) => {
     const limit = 20;
     let startIndex = 0;
@@ -69,7 +69,7 @@ const createCursorFetcher = (totalItems: number) => {
 
     if (cursor) {
       const { id } = JSON.parse(
-        Buffer.from(cursor, 'base64').toString('utf-8')
+        Buffer.from(cursor, 'base64').toString('utf-8'),
       );
       const itemId = parseInt(id.split('-')[1]);
       startIndex = itemId + 1;
@@ -85,7 +85,7 @@ const createCursorFetcher = (totalItems: number) => {
         JSON.stringify({
           created_at: lastItem.created_at,
           id: lastItem.id,
-        })
+        }),
       ).toString('base64');
     }
 
@@ -133,9 +133,10 @@ const PerformanceTest = ({
     }
   }, [loading]);
 
-  const avgLoadTime = loadTimes.length > 0
-    ? Math.round(loadTimes.reduce((a, b) => a + b, 0) / loadTimes.length)
-    : 0;
+  const avgLoadTime =
+    loadTimes.length > 0
+      ? Math.round(loadTimes.reduce((a, b) => a + b, 0) / loadTimes.length)
+      : 0;
 
   const lastLoadTime = loadTimes[loadTimes.length - 1] || 0;
 
@@ -160,7 +161,9 @@ const PerformanceTest = ({
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>
-          {paginationType === 'offset' ? 'Offset Pagination' : 'Cursor Pagination'}
+          {paginationType === 'offset'
+            ? 'Offset Pagination'
+            : 'Cursor Pagination'}
         </Text>
         <View style={styles.stats}>
           <View style={styles.stat}>
@@ -169,27 +172,33 @@ const PerformanceTest = ({
           </View>
           <View style={styles.stat}>
             <Text style={styles.statLabel}>Last Load Time</Text>
-            <Text style={[
-              styles.statValue,
-              lastLoadTime > 500 && { color: '#FF3B30' }
-            ]}>
+            <Text
+              style={[
+                styles.statValue,
+                lastLoadTime > 500 && { color: '#FF3B30' },
+              ]}
+            >
               {lastLoadTime}ms
             </Text>
           </View>
           <View style={styles.stat}>
             <Text style={styles.statLabel}>Avg Load Time</Text>
-            <Text style={[
-              styles.statValue,
-              avgLoadTime > 500 && { color: '#FF3B30' }
-            ]}>
+            <Text
+              style={[
+                styles.statValue,
+                avgLoadTime > 500 && { color: '#FF3B30' },
+              ]}
+            >
               {avgLoadTime}ms
             </Text>
           </View>
         </View>
-        
+
         <View style={styles.performanceNote}>
           <Text style={styles.noteTitle}>
-            {paginationType === 'offset' ? '⚠️ O(n) Performance' : '✅ O(1) Performance'}
+            {paginationType === 'offset'
+              ? '⚠️ O(n) Performance'
+              : '✅ O(1) Performance'}
           </Text>
           <Text style={styles.noteText}>
             {paginationType === 'offset'

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { StyleSheet, AppState } from 'react-native';
+import { StyleSheet, AppState, Button, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -319,6 +319,31 @@ function App() {
         <ProviderComposer providers={appProviders}>
           <ModalProvider>
             <StatusBar style="auto" />
+            {/* SENTRY TEST BUTTON - Remove after testing */}
+            {__DEV__ && (
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 50,
+                  right: 10,
+                  zIndex: 9999,
+                }}
+              >
+                <Button
+                  title="🧪 Test Sentry"
+                  onPress={() => {
+                    Sentry.captureException(
+                      new Error(
+                        'Test error from App.tsx - ' + new Date().toISOString(),
+                      ),
+                    );
+                    Sentry.captureMessage('Test message from TravelMatch');
+                    console.log('✅ Sentry test events sent!');
+                  }}
+                  color="#F59E0B"
+                />
+              </View>
+            )}
             <AppNavigator />
             <FeedbackModal visible={showFeedback} onClose={dismissFeedback} />
             <PendingTransactionsModal

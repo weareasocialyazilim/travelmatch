@@ -1,10 +1,10 @@
-import Link from "next/link";
-import type { Metadata } from "next";
+import Link from 'next/link';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Partner with TravelMatch",
+  title: 'Partner with TravelMatch',
   description:
-    "Join the TravelMatch partner network. Reach engaged travelers and grow your business with our experience gifting platform.",
+    'Join the TravelMatch partner network. Reach engaged travelers and grow your business with our experience gifting platform.',
 };
 
 export default function PartnerPage() {
@@ -73,8 +73,8 @@ export default function PartnerPage() {
                     />
                   </svg>
                 ),
-                title: "Reach Engaged Travelers",
-                desc: "Connect with travelers actively seeking unique local experiences in your area.",
+                title: 'Reach Engaged Travelers',
+                desc: 'Connect with travelers actively seeking unique local experiences in your area.',
               },
               {
                 icon: (
@@ -92,8 +92,8 @@ export default function PartnerPage() {
                     />
                   </svg>
                 ),
-                title: "No Upfront Costs",
-                desc: "Pay only when you receive bookings. No listing fees or monthly subscriptions.",
+                title: 'No Upfront Costs',
+                desc: 'Pay only when you receive bookings. No listing fees or monthly subscriptions.',
               },
               {
                 icon: (
@@ -111,8 +111,8 @@ export default function PartnerPage() {
                     />
                   </svg>
                 ),
-                title: "Verified Reviews",
-                desc: "Build trust with verified proof photos from actual experiences.",
+                title: 'Verified Reviews',
+                desc: 'Build trust with verified proof photos from actual experiences.',
               },
             ].map((benefit, i) => (
               <div
@@ -142,12 +142,12 @@ export default function PartnerPage() {
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
             {[
-              "Cafes & Restaurants",
-              "Tour Operators",
-              "Hotels & Accommodations",
-              "Experience Providers",
-              "Local Guides",
-              "Activity Centers",
+              'Cafes & Restaurants',
+              'Tour Operators',
+              'Hotels & Accommodations',
+              'Experience Providers',
+              'Local Guides',
+              'Activity Centers',
             ].map((type, i) => (
               <div
                 key={i}

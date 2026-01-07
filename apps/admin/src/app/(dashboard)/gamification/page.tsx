@@ -18,7 +18,13 @@ import {
   MoreHorizontal,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
@@ -87,11 +93,41 @@ const badges = [
 ];
 
 const leaderboard = [
-  { rank: 1, name: 'Ahmet Y.', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ahmet', points: 45678, badges: 32 },
-  { rank: 2, name: 'Fatma D.', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=fatma', points: 42345, badges: 28 },
-  { rank: 3, name: 'Can Ö.', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=can', points: 38901, badges: 25 },
-  { rank: 4, name: 'Zeynep A.', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=zeynep', points: 35678, badges: 23 },
-  { rank: 5, name: 'Emre K.', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=emre', points: 32456, badges: 21 },
+  {
+    rank: 1,
+    name: 'Ahmet Y.',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ahmet',
+    points: 45678,
+    badges: 32,
+  },
+  {
+    rank: 2,
+    name: 'Fatma D.',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=fatma',
+    points: 42345,
+    badges: 28,
+  },
+  {
+    rank: 3,
+    name: 'Can Ö.',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=can',
+    points: 38901,
+    badges: 25,
+  },
+  {
+    rank: 4,
+    name: 'Zeynep A.',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=zeynep',
+    points: 35678,
+    badges: 23,
+  },
+  {
+    rank: 5,
+    name: 'Emre K.',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=emre',
+    points: 32456,
+    badges: 21,
+  },
 ];
 
 const challenges = [
@@ -149,7 +185,9 @@ export default function GamificationPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Oyunlaştırma</h1>
-          <p className="text-muted-foreground">Rozetler, puanlar ve liderlik tablosu</p>
+          <p className="text-muted-foreground">
+            Rozetler, puanlar ve liderlik tablosu
+          </p>
         </div>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
@@ -250,7 +288,9 @@ export default function GamificationPage() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
-                  <p className="mt-3 text-sm text-muted-foreground">{badge.description}</p>
+                  <p className="mt-3 text-sm text-muted-foreground">
+                    {badge.description}
+                  </p>
                   <div className="mt-4 flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Kazanan</span>
                     <span className="font-medium">
@@ -279,7 +319,9 @@ export default function GamificationPage() {
                     <div className="mt-4 space-y-2">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">İlerleme</span>
-                        <span className="font-medium">{challenge.progress}%</span>
+                        <span className="font-medium">
+                          {challenge.progress}%
+                        </span>
                       </div>
                       <Progress value={challenge.progress} className="h-2" />
                     </div>
@@ -290,7 +332,9 @@ export default function GamificationPage() {
                       </div>
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4 text-muted-foreground" />
-                        <span>{challenge.participants.toLocaleString()} katılımcı</span>
+                        <span>
+                          {challenge.participants.toLocaleString()} katılımcı
+                        </span>
                       </div>
                       <div className="text-muted-foreground">
                         Bitiş: {challenge.end_date}
@@ -313,7 +357,9 @@ export default function GamificationPage() {
                 <Trophy className="h-5 w-5 text-yellow-500" />
                 Bu Ay En İyiler
               </CardTitle>
-              <CardDescription>En çok puan toplayan kullanıcılar</CardDescription>
+              <CardDescription>
+                En çok puan toplayan kullanıcılar
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -342,7 +388,9 @@ export default function GamificationPage() {
                       </Avatar>
                       <div>
                         <p className="font-medium">{user.name}</p>
-                        <p className="text-sm text-muted-foreground">{user.badges} rozet</p>
+                        <p className="text-sm text-muted-foreground">
+                          {user.badges} rozet
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -362,7 +410,9 @@ export default function GamificationPage() {
           <Card>
             <CardHeader>
               <CardTitle>Ödül Kataloğu</CardTitle>
-              <CardDescription>Puanlarla takas edilebilir ödüller</CardDescription>
+              <CardDescription>
+                Puanlarla takas edilebilir ödüller
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 md:grid-cols-3">

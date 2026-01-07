@@ -1,9 +1,9 @@
 /**
  * Type declarations for react-native-mmkv
- * 
+ *
  * MMKV is a fast, efficient, small mobile key-value storage framework.
  * This module provides basic type definitions until the package is installed.
- * 
+ *
  * To install: pnpm add react-native-mmkv
  */
 
@@ -34,6 +34,6 @@ declare module 'react-native-mmkv' {
   export function useMMKVStorage<T>(
     key: string,
     instance: MMKV,
-    defaultValue?: T
+    defaultValue?: T,
   ): [T | undefined, (value: T | ((prev: T | undefined) => T)) => void];
 }

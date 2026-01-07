@@ -130,13 +130,9 @@ export abstract class BaseService {
     fallback: T,
     errorMessage?: string,
   ): Promise<T> {
-    return safeAsync(
-      operation,
-      fallback,
-      (error) => {
-        this.logError(errorMessage || 'Safe operation failed', error);
-      },
-    );
+    return safeAsync(operation, fallback, (error) => {
+      this.logError(errorMessage || 'Safe operation failed', error);
+    });
   }
 
   /**

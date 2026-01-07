@@ -108,7 +108,8 @@
       "react-native-svg>react-native": "0.81.5",
       "@react-native/virtualized-lists>react": "19.1.0",
       "@react-native/virtualized-lists>react-native": "0.81.5",
-      "@react-native-async-storage/async-storage>react-native": "0.81.5"
+      "@react-native-async-storage/async-storage>react-native": "0.81.5",
+      "react-native-reanimated": "~4.1.6"
     },
     "peerDependencyRules": {
       "ignoreMissing": [

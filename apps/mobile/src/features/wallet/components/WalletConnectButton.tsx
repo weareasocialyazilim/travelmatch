@@ -1,5 +1,11 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
@@ -28,7 +34,11 @@ export const WalletConnectButton = ({ onPress }: WalletConnectButtonProps) => {
           color={COLORS.text.primary}
         />
         <Text style={styles.connectWalletText}>{walletName} Bağla</Text>
-        <MaterialCommunityIcons name="plus-circle-outline" size={20} color={COLORS.text.primary} />
+        <MaterialCommunityIcons
+          name="plus-circle-outline"
+          size={20}
+          color={COLORS.text.primary}
+        />
       </TouchableOpacity>
       <Text style={styles.walletHelpText}>{helpText}</Text>
     </View>

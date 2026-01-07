@@ -167,7 +167,7 @@ export const KYC_REQUIREMENTS = [
 
 // Helper to get step index
 export const getStepIndex = (stepId: string): number => {
-  const index = KYC_STEPS.findIndex(s => s.id === stepId);
+  const index = KYC_STEPS.findIndex((s) => s.id === stepId);
   return index >= 0 ? index : 0;
 };
 

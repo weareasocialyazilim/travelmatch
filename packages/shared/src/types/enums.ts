@@ -16,7 +16,12 @@
  * User account status
  * Used by admin panel for user management actions
  */
-export type UserStatus = 'active' | 'suspended' | 'banned' | 'pending' | 'deleted';
+export type UserStatus =
+  | 'active'
+  | 'suspended'
+  | 'banned'
+  | 'pending'
+  | 'deleted';
 
 /**
  * User account status values (for runtime validation)
@@ -60,9 +65,9 @@ export type LegacyKYCStatus = 'Unverified' | 'Pending' | 'Verified';
  */
 export function mapLegacyKYCStatus(legacy: LegacyKYCStatus): KYCStatus {
   const mapping: Record<LegacyKYCStatus, KYCStatus> = {
-    'Unverified': 'not_started',
-    'Pending': 'pending',
-    'Verified': 'verified',
+    Unverified: 'not_started',
+    Pending: 'pending',
+    Verified: 'verified',
   };
   return mapping[legacy];
 }
@@ -72,10 +77,10 @@ export function mapLegacyKYCStatus(legacy: LegacyKYCStatus): KYCStatus {
  */
 export function mapKYCStatusToLegacy(status: KYCStatus): LegacyKYCStatus {
   const mapping: Record<KYCStatus, LegacyKYCStatus> = {
-    'not_started': 'Unverified',
-    'pending': 'Pending',
-    'verified': 'Verified',
-    'rejected': 'Unverified', // No direct mapping, treat as unverified
+    not_started: 'Unverified',
+    pending: 'Pending',
+    verified: 'Verified',
+    rejected: 'Unverified', // No direct mapping, treat as unverified
   };
   return mapping[status];
 }
@@ -88,36 +93,44 @@ export function mapKYCStatusToLegacy(status: KYCStatus): LegacyKYCStatus {
  * Moment lifecycle status
  * Tracks the lifecycle state of a moment
  */
-export type MomentLifecycleStatus = 'draft' | 'active' | 'full' | 'paused' | 'completed' | 'cancelled' | 'deleted';
+export type MomentLifecycleStatus =
+  | 'draft'
+  | 'active'
+  | 'full'
+  | 'paused'
+  | 'completed'
+  | 'cancelled'
+  | 'deleted';
 
 /**
  * Moment lifecycle status values
  */
-export const MOMENT_LIFECYCLE_STATUS_VALUES: readonly MomentLifecycleStatus[] = [
-  'draft',
-  'active',
-  'full',
-  'paused',
-  'completed',
-  'cancelled',
-  'deleted',
-] as const;
+export const MOMENT_LIFECYCLE_STATUS_VALUES: readonly MomentLifecycleStatus[] =
+  [
+    'draft',
+    'active',
+    'full',
+    'paused',
+    'completed',
+    'cancelled',
+    'deleted',
+  ] as const;
 
 /**
  * Moment moderation status
  * Used by admin panel for content moderation
  */
-export type MomentModerationStatus = 'pending_review' | 'approved' | 'rejected' | 'flagged';
+export type MomentModerationStatus =
+  | 'pending_review'
+  | 'approved'
+  | 'rejected'
+  | 'flagged';
 
 /**
  * Moment moderation status values
  */
-export const MOMENT_MODERATION_STATUS_VALUES: readonly MomentModerationStatus[] = [
-  'pending_review',
-  'approved',
-  'rejected',
-  'flagged',
-] as const;
+export const MOMENT_MODERATION_STATUS_VALUES: readonly MomentModerationStatus[] =
+  ['pending_review', 'approved', 'rejected', 'flagged'] as const;
 
 // ============================================
 // TRANSACTION TYPES
@@ -128,13 +141,13 @@ export const MOMENT_MODERATION_STATUS_VALUES: readonly MomentModerationStatus[] 
  * Unified transaction type across all platforms
  */
 export type TransactionType =
-  | 'gift'       // User-to-user gift
-  | 'deposit'    // Money added to wallet
+  | 'gift' // User-to-user gift
+  | 'deposit' // Money added to wallet
   | 'withdrawal' // Money withdrawn from wallet
-  | 'refund'     // Refund of a previous transaction
-  | 'payment'    // Direct payment (admin view)
-  | 'payout'     // Payout to creator (admin view)
-  | 'fee'        // Platform fee
+  | 'refund' // Refund of a previous transaction
+  | 'payment' // Direct payment (admin view)
+  | 'payout' // Payout to creator (admin view)
+  | 'fee' // Platform fee
   | 'commission'; // Creator commission
 
 /**
@@ -156,12 +169,12 @@ export const TRANSACTION_TYPE_VALUES: readonly TransactionType[] = [
  * Unified transaction status across all platforms
  */
 export type TransactionStatus =
-  | 'pending'     // Awaiting processing
-  | 'processing'  // Currently being processed
-  | 'completed'   // Successfully completed
-  | 'failed'      // Failed to process
-  | 'cancelled'   // Cancelled by user/admin
-  | 'refunded';   // Refunded (subset of completed)
+  | 'pending' // Awaiting processing
+  | 'processing' // Currently being processed
+  | 'completed' // Successfully completed
+  | 'failed' // Failed to process
+  | 'cancelled' // Cancelled by user/admin
+  | 'refunded'; // Refunded (subset of completed)
 
 /**
  * Transaction status values
@@ -184,17 +197,17 @@ export const TRANSACTION_STATUS_VALUES: readonly TransactionStatus[] = [
  * Unified proof type across all platforms
  */
 export type ProofType =
-  | 'photo'              // Photo evidence
-  | 'receipt'            // Receipt/invoice
-  | 'geo'                // Geolocation proof
-  | 'ticket_qr'          // QR code ticket
-  | 'delivery'           // Delivery confirmation
-  | 'experience'         // Experience completion
-  | 'micro-kindness'     // Micro-kindness act
-  | 'verified-experience'// Verified experience
-  | 'community-proof'    // Community-verified
-  | 'milestone'          // Milestone achievement
-  | 'custom';            // Custom proof type
+  | 'photo' // Photo evidence
+  | 'receipt' // Receipt/invoice
+  | 'geo' // Geolocation proof
+  | 'ticket_qr' // QR code ticket
+  | 'delivery' // Delivery confirmation
+  | 'experience' // Experience completion
+  | 'micro-kindness' // Micro-kindness act
+  | 'verified-experience' // Verified experience
+  | 'community-proof' // Community-verified
+  | 'milestone' // Milestone achievement
+  | 'custom'; // Custom proof type
 
 /**
  * Proof type values
@@ -216,7 +229,12 @@ export const PROOF_TYPE_VALUES: readonly ProofType[] = [
 /**
  * Proof verification status
  */
-export type ProofStatus = 'pending' | 'verified' | 'rejected' | 'failed' | 'expired';
+export type ProofStatus =
+  | 'pending'
+  | 'verified'
+  | 'rejected'
+  | 'failed'
+  | 'expired';
 
 /**
  * Proof status values
@@ -237,12 +255,12 @@ export const PROOF_STATUS_VALUES: readonly ProofStatus[] = [
  * Escrow status
  */
 export type EscrowStatus =
-  | 'pending'        // Payment received, awaiting action
-  | 'held'           // Funds held in escrow
-  | 'released'       // Funds released to recipient
-  | 'refunded'       // Funds refunded to sender
-  | 'disputed'       // Under dispute
-  | 'cancelled';     // Cancelled before completion
+  | 'pending' // Payment received, awaiting action
+  | 'held' // Funds held in escrow
+  | 'released' // Funds released to recipient
+  | 'refunded' // Funds refunded to sender
+  | 'disputed' // Under dispute
+  | 'cancelled'; // Cancelled before completion
 
 /**
  * Escrow status values
@@ -264,11 +282,11 @@ export const ESCROW_STATUS_VALUES: readonly EscrowStatus[] = [
  * Dispute status
  */
 export type DisputeStatus =
-  | 'open'          // Newly opened
+  | 'open' // Newly opened
   | 'investigating' // Being investigated
-  | 'resolved'      // Resolved
-  | 'dismissed'     // Dismissed (no action)
-  | 'escalated';    // Escalated to higher authority
+  | 'resolved' // Resolved
+  | 'dismissed' // Dismissed (no action)
+  | 'escalated'; // Escalated to higher authority
 
 /**
  * Dispute status values
@@ -333,23 +351,24 @@ export type AdminNotificationType =
 /**
  * Admin notification type values
  */
-export const ADMIN_NOTIFICATION_TYPE_VALUES: readonly AdminNotificationType[] = [
-  'account_banned',
-  'account_suspended',
-  'account_reinstated',
-  'moment_approved',
-  'moment_rejected',
-  'proof_verified',
-  'proof_rejected',
-  'refund_processed',
-  'dispute_opened',
-  'dispute_resolved',
-  'kyc_approved',
-  'kyc_rejected',
-  'payout_completed',
-  'payout_failed',
-  'thank_you_message',
-] as const;
+export const ADMIN_NOTIFICATION_TYPE_VALUES: readonly AdminNotificationType[] =
+  [
+    'account_banned',
+    'account_suspended',
+    'account_reinstated',
+    'moment_approved',
+    'moment_rejected',
+    'proof_verified',
+    'proof_rejected',
+    'refund_processed',
+    'dispute_opened',
+    'dispute_resolved',
+    'kyc_approved',
+    'kyc_rejected',
+    'payout_completed',
+    'payout_failed',
+    'thank_you_message',
+  ] as const;
 
 // ============================================
 // TYPE GUARDS
@@ -363,12 +382,20 @@ export function isKYCStatus(value: string): value is KYCStatus {
   return KYC_STATUS_VALUES.includes(value as KYCStatus);
 }
 
-export function isMomentLifecycleStatus(value: string): value is MomentLifecycleStatus {
-  return MOMENT_LIFECYCLE_STATUS_VALUES.includes(value as MomentLifecycleStatus);
+export function isMomentLifecycleStatus(
+  value: string,
+): value is MomentLifecycleStatus {
+  return MOMENT_LIFECYCLE_STATUS_VALUES.includes(
+    value as MomentLifecycleStatus,
+  );
 }
 
-export function isMomentModerationStatus(value: string): value is MomentModerationStatus {
-  return MOMENT_MODERATION_STATUS_VALUES.includes(value as MomentModerationStatus);
+export function isMomentModerationStatus(
+  value: string,
+): value is MomentModerationStatus {
+  return MOMENT_MODERATION_STATUS_VALUES.includes(
+    value as MomentModerationStatus,
+  );
 }
 
 export function isTransactionType(value: string): value is TransactionType {

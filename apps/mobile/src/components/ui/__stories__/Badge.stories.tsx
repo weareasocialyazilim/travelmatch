@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from 'storybook/react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Badge } from './Badge';
 
@@ -32,7 +32,13 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <View style={{ padding: 16, backgroundColor: '#f9fafb', alignItems: 'flex-start' }}>
+      <View
+        style={{
+          padding: 16,
+          backgroundColor: '#f9fafb',
+          alignItems: 'flex-start',
+        }}
+      >
         <Story />
       </View>
     ),
@@ -262,7 +268,12 @@ export const InteractiveBadges: Story = {
       <View style={styles.card}>
         <Text style={styles.cardTitle}>John Doe</Text>
         <View style={styles.badgeGroup}>
-          <Badge label="Verified" variant="success" icon="check-circle" size="sm" />
+          <Badge
+            label="Verified"
+            variant="success"
+            icon="check-circle"
+            size="sm"
+          />
           <Badge label="Premium" variant="primary" icon="star" size="sm" />
           <Badge label="Guide" variant="info" icon="map-marker" size="sm" />
         </View>
@@ -272,7 +283,12 @@ export const InteractiveBadges: Story = {
         <View style={styles.badgeGroup}>
           <Badge label="Trending" variant="warning" icon="fire" size="sm" dot />
           <Badge label="5 spots left" variant="error" size="sm" />
-          <Badge label="Dec 15-20" variant="default" icon="calendar" size="sm" />
+          <Badge
+            label="Dec 15-20"
+            variant="default"
+            icon="calendar"
+            size="sm"
+          />
         </View>
       </View>
     </View>

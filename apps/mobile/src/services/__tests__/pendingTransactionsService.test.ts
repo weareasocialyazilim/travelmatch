@@ -1,6 +1,6 @@
 /**
  * Pending Transactions Service Tests
- * 
+ *
  * Tests pending payment and upload tracking with:
  * - Payment transaction tracking (add, update, remove)
  * - Upload transaction tracking with retry limits
@@ -11,9 +11,9 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { 
-  pendingTransactionsService, 
-  TransactionStatus
+import {
+  pendingTransactionsService,
+  TransactionStatus,
 } from '../pendingTransactionsService';
 import { logger } from '../../utils/logger';
 
@@ -38,7 +38,7 @@ describe('PendingTransactionsService', () => {
       const payment = {
         id: 'payment-1',
         type: 'gift' as const,
-        amount: 25.00,
+        amount: 25.0,
         currency: 'USD',
         recipientId: 'user-123',
         momentId: 'moment-456',
@@ -54,7 +54,7 @@ describe('PendingTransactionsService', () => {
       // Verify AsyncStorage was called with correct data
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
         '@travelmatch/pending_payments',
-        expect.stringContaining('"id":"payment-1"')
+        expect.stringContaining('"id":"payment-1"'),
       );
 
       // Verify logger was called
@@ -64,8 +64,8 @@ describe('PendingTransactionsService', () => {
         expect.objectContaining({
           id: 'payment-1',
           type: 'gift',
-          amount: 25.00,
-        })
+          amount: 25.0,
+        }),
       );
     });
 
@@ -74,7 +74,7 @@ describe('PendingTransactionsService', () => {
         {
           id: 'payment-1',
           type: 'gift',
-          amount: 25.00,
+          amount: 25.0,
           currency: 'USD',
           status: TransactionStatus.PROCESSING,
           createdAt: Date.now() - 1000,
@@ -83,7 +83,7 @@ describe('PendingTransactionsService', () => {
         {
           id: 'payment-2',
           type: 'withdraw',
-          amount: 50.00,
+          amount: 50.0,
           currency: 'USD',
           status: TransactionStatus.INITIATED,
           createdAt: Date.now() - 2000,
@@ -91,14 +91,18 @@ describe('PendingTransactionsService', () => {
         },
       ];
 
-      mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(storedPayments));
+      mockAsyncStorage.getItem.mockResolvedValue(
+        JSON.stringify(storedPayments),
+      );
 
       const payments = await pendingTransactionsService.getPendingPayments();
 
       expect(payments).toHaveLength(2);
       expect(payments[0]?.id).toBe('payment-1');
       expect(payments[1]?.id).toBe('payment-2');
-      expect(mockAsyncStorage.getItem).toHaveBeenCalledWith('@travelmatch/pending_payments');
+      expect(mockAsyncStorage.getItem).toHaveBeenCalledWith(
+        '@travelmatch/pending_payments',
+      );
     });
 
     it('should return empty array when no pending payments', async () => {
@@ -114,7 +118,7 @@ describe('PendingTransactionsService', () => {
         {
           id: 'payment-1',
           type: 'gift',
-          amount: 25.00,
+          amount: 25.0,
           currency: 'USD',
           status: TransactionStatus.INITIATED,
           createdAt: Date.now(),
@@ -122,9 +126,14 @@ describe('PendingTransactionsService', () => {
         },
       ];
 
-      mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(storedPayments));
+      mockAsyncStorage.getItem.mockResolvedValue(
+        JSON.stringify(storedPayments),
+      );
 
-      await pendingTransactionsService.updatePaymentStatus('payment-1', TransactionStatus.PROCESSING);
+      await pendingTransactionsService.updatePaymentStatus(
+        'payment-1',
+        TransactionStatus.PROCESSING,
+      );
 
       expect(mockAsyncStorage.setItem).toHaveBeenCalled();
       expect(mockLogger.info).toHaveBeenCalledWith(
@@ -133,7 +142,7 @@ describe('PendingTransactionsService', () => {
         expect.objectContaining({
           id: 'payment-1',
           status: TransactionStatus.PROCESSING,
-        })
+        }),
       );
     });
 
@@ -142,7 +151,7 @@ describe('PendingTransactionsService', () => {
         {
           id: 'payment-1',
           type: 'gift',
-          amount: 25.00,
+          amount: 25.0,
           currency: 'USD',
           status: TransactionStatus.PROCESSING,
           createdAt: Date.now(),
@@ -150,12 +159,20 @@ describe('PendingTransactionsService', () => {
         },
       ];
 
-      mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(storedPayments));
+      mockAsyncStorage.getItem.mockResolvedValue(
+        JSON.stringify(storedPayments),
+      );
 
-      await pendingTransactionsService.updatePaymentStatus('payment-1', TransactionStatus.COMPLETED);
+      await pendingTransactionsService.updatePaymentStatus(
+        'payment-1',
+        TransactionStatus.COMPLETED,
+      );
 
       // Verify payment was removed (array should be empty)
-      const lastCall = mockAsyncStorage.setItem.mock.calls[mockAsyncStorage.setItem.mock.calls.length - 1];
+      const lastCall =
+        mockAsyncStorage.setItem.mock.calls[
+          mockAsyncStorage.setItem.mock.calls.length - 1
+        ];
       expect(lastCall).toBeDefined();
       if (lastCall) {
         const savedData = JSON.parse(lastCall[1] as string);
@@ -168,7 +185,7 @@ describe('PendingTransactionsService', () => {
         {
           id: 'payment-1',
           type: 'gift',
-          amount: 25.00,
+          amount: 25.0,
           currency: 'USD',
           status: TransactionStatus.PROCESSING,
           createdAt: Date.now(),
@@ -176,11 +193,19 @@ describe('PendingTransactionsService', () => {
         },
       ];
 
-      mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(storedPayments));
+      mockAsyncStorage.getItem.mockResolvedValue(
+        JSON.stringify(storedPayments),
+      );
 
-      await pendingTransactionsService.updatePaymentStatus('payment-1', TransactionStatus.FAILED);
+      await pendingTransactionsService.updatePaymentStatus(
+        'payment-1',
+        TransactionStatus.FAILED,
+      );
 
-      const lastCall = mockAsyncStorage.setItem.mock.calls[mockAsyncStorage.setItem.mock.calls.length - 1];
+      const lastCall =
+        mockAsyncStorage.setItem.mock.calls[
+          mockAsyncStorage.setItem.mock.calls.length - 1
+        ];
       expect(lastCall).toBeDefined();
       if (lastCall) {
         const savedData = JSON.parse(lastCall[1] as string);
@@ -191,12 +216,15 @@ describe('PendingTransactionsService', () => {
     it('should handle update for non-existent payment', async () => {
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify([]));
 
-      await pendingTransactionsService.updatePaymentStatus('non-existent', TransactionStatus.PROCESSING);
+      await pendingTransactionsService.updatePaymentStatus(
+        'non-existent',
+        TransactionStatus.PROCESSING,
+      );
 
       expect(mockLogger.warn).toHaveBeenCalledWith(
         'PendingTransactions',
         'Payment not found for update',
-        expect.objectContaining({ id: 'non-existent' })
+        expect.objectContaining({ id: 'non-existent' }),
       );
     });
 
@@ -205,7 +233,7 @@ describe('PendingTransactionsService', () => {
         {
           id: 'payment-1',
           type: 'gift',
-          amount: 25.00,
+          amount: 25.0,
           currency: 'USD',
           status: TransactionStatus.INITIATED,
           createdAt: Date.now(),
@@ -214,7 +242,7 @@ describe('PendingTransactionsService', () => {
         {
           id: 'payment-2',
           type: 'withdraw',
-          amount: 50.00,
+          amount: 50.0,
           currency: 'USD',
           status: TransactionStatus.INITIATED,
           createdAt: Date.now(),
@@ -222,11 +250,16 @@ describe('PendingTransactionsService', () => {
         },
       ];
 
-      mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(storedPayments));
+      mockAsyncStorage.getItem.mockResolvedValue(
+        JSON.stringify(storedPayments),
+      );
 
       await pendingTransactionsService.clearPayment('payment-1');
 
-      const lastCall = mockAsyncStorage.setItem.mock.calls[mockAsyncStorage.setItem.mock.calls.length - 1];
+      const lastCall =
+        mockAsyncStorage.setItem.mock.calls[
+          mockAsyncStorage.setItem.mock.calls.length - 1
+        ];
       expect(lastCall).toBeDefined();
       if (lastCall) {
         const savedData = JSON.parse(lastCall[1] as string);
@@ -237,7 +270,7 @@ describe('PendingTransactionsService', () => {
       expect(mockLogger.info).toHaveBeenCalledWith(
         'PendingTransactions',
         'Payment cleared',
-        expect.objectContaining({ id: 'payment-1' })
+        expect.objectContaining({ id: 'payment-1' }),
       );
     });
 
@@ -246,7 +279,7 @@ describe('PendingTransactionsService', () => {
         {
           id: 'payment-1',
           type: 'gift',
-          amount: 25.00,
+          amount: 25.0,
           currency: 'USD',
           status: TransactionStatus.INITIATED,
           createdAt: Date.now(),
@@ -254,7 +287,9 @@ describe('PendingTransactionsService', () => {
         },
       ];
 
-      mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(storedPayments));
+      mockAsyncStorage.getItem.mockResolvedValue(
+        JSON.stringify(storedPayments),
+      );
 
       await pendingTransactionsService.removePendingPayment('payment-1');
 
@@ -262,7 +297,7 @@ describe('PendingTransactionsService', () => {
       expect(mockLogger.info).toHaveBeenCalledWith(
         'PendingTransactions',
         'Payment cleared',
-        expect.objectContaining({ id: 'payment-1' })
+        expect.objectContaining({ id: 'payment-1' }),
       );
     });
   });
@@ -270,14 +305,14 @@ describe('PendingTransactionsService', () => {
   describe('24h Auto-Cleanup', () => {
     it('should auto-remove payments older than 24 hours', async () => {
       const now = Date.now();
-      const twentyFiveHoursAgo = now - (25 * 60 * 60 * 1000); // 25h ago
-      const oneHourAgo = now - (60 * 60 * 1000); // 1h ago
+      const twentyFiveHoursAgo = now - 25 * 60 * 60 * 1000; // 25h ago
+      const oneHourAgo = now - 60 * 60 * 1000; // 1h ago
 
       const storedPayments = [
         {
           id: 'payment-expired',
           type: 'gift',
-          amount: 25.00,
+          amount: 25.0,
           currency: 'USD',
           status: TransactionStatus.INITIATED,
           createdAt: twentyFiveHoursAgo,
@@ -286,7 +321,7 @@ describe('PendingTransactionsService', () => {
         {
           id: 'payment-valid',
           type: 'gift',
-          amount: 30.00,
+          amount: 30.0,
           currency: 'USD',
           status: TransactionStatus.INITIATED,
           createdAt: oneHourAgo,
@@ -294,7 +329,9 @@ describe('PendingTransactionsService', () => {
         },
       ];
 
-      mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(storedPayments));
+      mockAsyncStorage.getItem.mockResolvedValue(
+        JSON.stringify(storedPayments),
+      );
 
       const payments = await pendingTransactionsService.getPendingPayments();
 
@@ -305,14 +342,14 @@ describe('PendingTransactionsService', () => {
       // Should save cleaned list
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
         '@travelmatch/pending_payments',
-        expect.stringContaining('"id":"payment-valid"')
+        expect.stringContaining('"id":"payment-valid"'),
       );
     });
 
     it('should auto-remove uploads older than 24 hours', async () => {
       const now = Date.now();
-      const twentyFiveHoursAgo = now - (25 * 60 * 60 * 1000);
-      const oneHourAgo = now - (60 * 60 * 1000);
+      const twentyFiveHoursAgo = now - 25 * 60 * 60 * 1000;
+      const oneHourAgo = now - 60 * 60 * 1000;
 
       const storedUploads = [
         {
@@ -358,7 +395,7 @@ describe('PendingTransactionsService', () => {
         {
           id: 'payment-1',
           type: 'gift',
-          amount: 25.00,
+          amount: 25.0,
           currency: 'USD',
           status: TransactionStatus.INITIATED,
           createdAt: Date.now() - 1000,
@@ -366,7 +403,9 @@ describe('PendingTransactionsService', () => {
         },
       ];
 
-      mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(storedPayments));
+      mockAsyncStorage.getItem.mockResolvedValue(
+        JSON.stringify(storedPayments),
+      );
 
       await pendingTransactionsService.getPendingPayments();
 
@@ -397,7 +436,7 @@ describe('PendingTransactionsService', () => {
 
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
         '@travelmatch/pending_uploads',
-        expect.stringContaining('"id":"upload-1"')
+        expect.stringContaining('"id":"upload-1"'),
       );
 
       expect(mockLogger.info).toHaveBeenCalledWith(
@@ -407,7 +446,7 @@ describe('PendingTransactionsService', () => {
           id: 'upload-1',
           type: 'moment',
           fileName: 'moment-image.jpg',
-        })
+        }),
       );
     });
 
@@ -426,7 +465,10 @@ describe('PendingTransactionsService', () => {
 
       await pendingTransactionsService.addPendingUpload(upload);
 
-      const lastCall = mockAsyncStorage.setItem.mock.calls[mockAsyncStorage.setItem.mock.calls.length - 1];
+      const lastCall =
+        mockAsyncStorage.setItem.mock.calls[
+          mockAsyncStorage.setItem.mock.calls.length - 1
+        ];
       expect(lastCall).toBeDefined();
       if (lastCall) {
         const savedData = JSON.parse(lastCall[1] as string);
@@ -458,7 +500,9 @@ describe('PendingTransactionsService', () => {
 
       expect(uploads).toHaveLength(1);
       expect(uploads[0]?.id).toBe('upload-1');
-      expect(mockAsyncStorage.getItem).toHaveBeenCalledWith('@travelmatch/pending_uploads');
+      expect(mockAsyncStorage.getItem).toHaveBeenCalledWith(
+        '@travelmatch/pending_uploads',
+      );
     });
 
     it('should update upload progress', async () => {
@@ -483,7 +527,10 @@ describe('PendingTransactionsService', () => {
 
       await pendingTransactionsService.updateUploadProgress('upload-1', 75);
 
-      const lastCall = mockAsyncStorage.setItem.mock.calls[mockAsyncStorage.setItem.mock.calls.length - 1];
+      const lastCall =
+        mockAsyncStorage.setItem.mock.calls[
+          mockAsyncStorage.setItem.mock.calls.length - 1
+        ];
       expect(lastCall).toBeDefined();
       if (lastCall) {
         const savedData = JSON.parse(lastCall[1] as string);
@@ -496,7 +543,7 @@ describe('PendingTransactionsService', () => {
         expect.objectContaining({
           id: 'upload-1',
           progress: 75,
-        })
+        }),
       );
     });
 
@@ -520,9 +567,16 @@ describe('PendingTransactionsService', () => {
 
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(storedUploads));
 
-      await pendingTransactionsService.updateUploadProgress('upload-1', 100, TransactionStatus.VERIFYING);
+      await pendingTransactionsService.updateUploadProgress(
+        'upload-1',
+        100,
+        TransactionStatus.VERIFYING,
+      );
 
-      const lastCall = mockAsyncStorage.setItem.mock.calls[mockAsyncStorage.setItem.mock.calls.length - 1];
+      const lastCall =
+        mockAsyncStorage.setItem.mock.calls[
+          mockAsyncStorage.setItem.mock.calls.length - 1
+        ];
       expect(lastCall).toBeDefined();
       if (lastCall) {
         const savedData = JSON.parse(lastCall[1] as string);
@@ -551,9 +605,16 @@ describe('PendingTransactionsService', () => {
 
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(storedUploads));
 
-      await pendingTransactionsService.updateUploadProgress('upload-1', 100, TransactionStatus.COMPLETED);
+      await pendingTransactionsService.updateUploadProgress(
+        'upload-1',
+        100,
+        TransactionStatus.COMPLETED,
+      );
 
-      const lastCall = mockAsyncStorage.setItem.mock.calls[mockAsyncStorage.setItem.mock.calls.length - 1];
+      const lastCall =
+        mockAsyncStorage.setItem.mock.calls[
+          mockAsyncStorage.setItem.mock.calls.length - 1
+        ];
       expect(lastCall).toBeDefined();
       if (lastCall) {
         const savedData = JSON.parse(lastCall[1] as string);
@@ -569,7 +630,7 @@ describe('PendingTransactionsService', () => {
       expect(mockLogger.warn).toHaveBeenCalledWith(
         'PendingTransactions',
         'Upload not found for progress update',
-        expect.objectContaining({ id: 'non-existent' })
+        expect.objectContaining({ id: 'non-existent' }),
       );
     });
 
@@ -609,7 +670,10 @@ describe('PendingTransactionsService', () => {
 
       await pendingTransactionsService.clearUpload('upload-1');
 
-      const lastCall = mockAsyncStorage.setItem.mock.calls[mockAsyncStorage.setItem.mock.calls.length - 1];
+      const lastCall =
+        mockAsyncStorage.setItem.mock.calls[
+          mockAsyncStorage.setItem.mock.calls.length - 1
+        ];
       expect(lastCall).toBeDefined();
       if (lastCall) {
         const savedData = JSON.parse(lastCall[1] as string);
@@ -644,7 +708,7 @@ describe('PendingTransactionsService', () => {
       expect(mockLogger.info).toHaveBeenCalledWith(
         'PendingTransactions',
         'Upload cleared',
-        expect.objectContaining({ id: 'upload-1' })
+        expect.objectContaining({ id: 'upload-1' }),
       );
     });
   });
@@ -670,11 +734,15 @@ describe('PendingTransactionsService', () => {
 
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(storedUploads));
 
-      const retryCount = await pendingTransactionsService.incrementUploadRetry('upload-1');
+      const retryCount =
+        await pendingTransactionsService.incrementUploadRetry('upload-1');
 
       expect(retryCount).toBe(1);
 
-      const lastCall = mockAsyncStorage.setItem.mock.calls[mockAsyncStorage.setItem.mock.calls.length - 1];
+      const lastCall =
+        mockAsyncStorage.setItem.mock.calls[
+          mockAsyncStorage.setItem.mock.calls.length - 1
+        ];
       expect(lastCall).toBeDefined();
       if (lastCall) {
         const savedData = JSON.parse(lastCall[1] as string);
@@ -701,18 +769,23 @@ describe('PendingTransactionsService', () => {
         },
       ];
 
-      mockAsyncStorage.getItem.mockImplementation(async () => JSON.stringify(storedUploads));
+      mockAsyncStorage.getItem.mockImplementation(async () =>
+        JSON.stringify(storedUploads),
+      );
       mockAsyncStorage.setItem.mockImplementation(async (_key, value) => {
         storedUploads = JSON.parse(value);
       });
 
-      const retry1 = await pendingTransactionsService.incrementUploadRetry('upload-1');
+      const retry1 =
+        await pendingTransactionsService.incrementUploadRetry('upload-1');
       expect(retry1).toBe(1);
 
-      const retry2 = await pendingTransactionsService.incrementUploadRetry('upload-1');
+      const retry2 =
+        await pendingTransactionsService.incrementUploadRetry('upload-1');
       expect(retry2).toBe(2);
 
-      const retry3 = await pendingTransactionsService.incrementUploadRetry('upload-1');
+      const retry3 =
+        await pendingTransactionsService.incrementUploadRetry('upload-1');
       expect(retry3).toBe(3);
     });
 
@@ -740,17 +813,26 @@ describe('PendingTransactionsService', () => {
       await pendingTransactionsService.incrementUploadRetry('upload-1');
 
       // Now try to update with FAILED status (should remove)
-      mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify([
-        {
-          ...storedUploads[0],
-          retryCount: 3,
-          status: TransactionStatus.FAILED,
-        },
-      ]));
+      mockAsyncStorage.getItem.mockResolvedValue(
+        JSON.stringify([
+          {
+            ...storedUploads[0],
+            retryCount: 3,
+            status: TransactionStatus.FAILED,
+          },
+        ]),
+      );
 
-      await pendingTransactionsService.updateUploadProgress('upload-1', 0, TransactionStatus.FAILED);
+      await pendingTransactionsService.updateUploadProgress(
+        'upload-1',
+        0,
+        TransactionStatus.FAILED,
+      );
 
-      const lastCall = mockAsyncStorage.setItem.mock.calls[mockAsyncStorage.setItem.mock.calls.length - 1];
+      const lastCall =
+        mockAsyncStorage.setItem.mock.calls[
+          mockAsyncStorage.setItem.mock.calls.length - 1
+        ];
       expect(lastCall).toBeDefined();
       if (lastCall) {
         const savedData = JSON.parse(lastCall[1] as string);
@@ -761,7 +843,8 @@ describe('PendingTransactionsService', () => {
     it('should return 0 for non-existent upload retry', async () => {
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify([]));
 
-      const retryCount = await pendingTransactionsService.incrementUploadRetry('non-existent');
+      const retryCount =
+        await pendingTransactionsService.incrementUploadRetry('non-existent');
 
       expect(retryCount).toBe(0);
     });
@@ -786,9 +869,16 @@ describe('PendingTransactionsService', () => {
 
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(storedUploads));
 
-      await pendingTransactionsService.updateUploadProgress('upload-1', 0, TransactionStatus.FAILED);
+      await pendingTransactionsService.updateUploadProgress(
+        'upload-1',
+        0,
+        TransactionStatus.FAILED,
+      );
 
-      const lastCall = mockAsyncStorage.setItem.mock.calls[mockAsyncStorage.setItem.mock.calls.length - 1];
+      const lastCall =
+        mockAsyncStorage.setItem.mock.calls[
+          mockAsyncStorage.setItem.mock.calls.length - 1
+        ];
       expect(lastCall).toBeDefined();
       if (lastCall) {
         const savedData = JSON.parse(lastCall[1] as string);
@@ -803,7 +893,7 @@ describe('PendingTransactionsService', () => {
         {
           id: 'payment-1',
           type: 'gift',
-          amount: 25.00,
+          amount: 25.0,
           currency: 'USD',
           status: TransactionStatus.PROCESSING,
           createdAt: Date.now(),
@@ -831,7 +921,7 @@ describe('PendingTransactionsService', () => {
         expect.objectContaining({
           paymentsCount: 1,
           uploadsCount: 0,
-        })
+        }),
       );
     });
 
@@ -873,7 +963,7 @@ describe('PendingTransactionsService', () => {
         {
           id: 'payment-1',
           type: 'gift',
-          amount: 25.00,
+          amount: 25.0,
           currency: 'USD',
           status: TransactionStatus.PROCESSING,
           createdAt: Date.now(),
@@ -921,7 +1011,7 @@ describe('PendingTransactionsService', () => {
         expect.objectContaining({
           paymentsCount: 1,
           uploadsCount: 1,
-        })
+        }),
       );
     });
 
@@ -949,7 +1039,7 @@ describe('PendingTransactionsService', () => {
       expect(mockLogger.error).toHaveBeenCalledWith(
         'PendingTransactions',
         'Failed to check pending transactions',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
   });
@@ -965,19 +1055,21 @@ describe('PendingTransactionsService', () => {
 
       expect(mockLogger.info).toHaveBeenCalledWith(
         'PendingTransactions',
-        'All pending transactions cleared'
+        'All pending transactions cleared',
       );
     });
 
     it('should handle clear all errors', async () => {
-      mockAsyncStorage.multiRemove.mockRejectedValue(new Error('Storage error'));
+      mockAsyncStorage.multiRemove.mockRejectedValue(
+        new Error('Storage error'),
+      );
 
       await pendingTransactionsService.clearAll();
 
       expect(mockLogger.error).toHaveBeenCalledWith(
         'PendingTransactions',
         'Failed to clear all transactions',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
   });
@@ -989,17 +1081,19 @@ describe('PendingTransactionsService', () => {
       const payment = {
         id: 'payment-1',
         type: 'gift' as const,
-        amount: 25.00,
+        amount: 25.0,
         currency: 'USD',
         status: TransactionStatus.INITIATED,
       };
 
-      await expect(pendingTransactionsService.addPendingPayment(payment)).rejects.toThrow('Storage error');
+      await expect(
+        pendingTransactionsService.addPendingPayment(payment),
+      ).rejects.toThrow('Storage error');
 
       expect(mockLogger.error).toHaveBeenCalledWith(
         'PendingTransactions',
         'Failed to add pending payment',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
 
@@ -1012,19 +1106,22 @@ describe('PendingTransactionsService', () => {
       expect(mockLogger.error).toHaveBeenCalledWith(
         'PendingTransactions',
         'Failed to get pending payments',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
 
     it('should handle update payment status error', async () => {
       mockAsyncStorage.getItem.mockRejectedValue(new Error('Storage error'));
 
-      await pendingTransactionsService.updatePaymentStatus('payment-1', TransactionStatus.PROCESSING);
+      await pendingTransactionsService.updatePaymentStatus(
+        'payment-1',
+        TransactionStatus.PROCESSING,
+      );
 
       expect(mockLogger.error).toHaveBeenCalledWith(
         'PendingTransactions',
         'Failed to update payment status',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
 
@@ -1043,12 +1140,14 @@ describe('PendingTransactionsService', () => {
         progress: 0,
       };
 
-      await expect(pendingTransactionsService.addPendingUpload(upload)).rejects.toThrow('Storage error');
+      await expect(
+        pendingTransactionsService.addPendingUpload(upload),
+      ).rejects.toThrow('Storage error');
 
       expect(mockLogger.error).toHaveBeenCalledWith(
         'PendingTransactions',
         'Failed to add pending upload',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
 
@@ -1061,7 +1160,7 @@ describe('PendingTransactionsService', () => {
       expect(mockLogger.error).toHaveBeenCalledWith(
         'PendingTransactions',
         'Failed to get pending uploads',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
   });
@@ -1073,7 +1172,7 @@ describe('PendingTransactionsService', () => {
       const payment1 = {
         id: 'payment-1',
         type: 'gift' as const,
-        amount: 25.00,
+        amount: 25.0,
         currency: 'USD',
         status: TransactionStatus.INITIATED,
       };
@@ -1081,7 +1180,7 @@ describe('PendingTransactionsService', () => {
       const payment2 = {
         id: 'payment-2',
         type: 'withdraw' as const,
-        amount: 50.00,
+        amount: 50.0,
         currency: 'USD',
         status: TransactionStatus.INITIATED,
       };

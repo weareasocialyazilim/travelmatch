@@ -45,11 +45,16 @@ export const DateTimePickerScreen = () => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="close" size={24} color="white" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('screens.dateTimePicker.title')}</Text>
+        <Text style={styles.headerTitle}>
+          {t('screens.dateTimePicker.title')}
+        </Text>
         <View style={styles.spacer} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+      >
         <Text style={styles.label}>{t('screens.dateTimePicker.date')}</Text>
         <Calendar
           style={styles.calendar}
@@ -105,7 +110,9 @@ export const DateTimePickerScreen = () => {
           onPress={handleConfirm}
           disabled={!selectedDate}
         >
-          <Text style={styles.confirmText}>{t('screens.dateTimePicker.setSchedule')}</Text>
+          <Text style={styles.confirmText}>
+            {t('screens.dateTimePicker.setSchedule')}
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </View>

@@ -155,7 +155,9 @@ describe('secureStorage', () => {
       (SecureStore.setItemAsync as jest.Mock).mockRejectedValue(
         new Error('SecureStore error'),
       );
-      (AsyncStorage.setItem as jest.Mock).mockRejectedValue(new Error('AsyncStorage error'));
+      (AsyncStorage.setItem as jest.Mock).mockRejectedValue(
+        new Error('AsyncStorage error'),
+      );
 
       await expect(
         secureStorage.setItem('test_key', 'test_value'),
@@ -186,7 +188,9 @@ describe('secureStorage', () => {
     });
 
     it('should retrieve auth tokens from SecureStore', async () => {
-      (SecureStore.getItemAsync as jest.Mock).mockResolvedValue('refresh_token_456');
+      (SecureStore.getItemAsync as jest.Mock).mockResolvedValue(
+        'refresh_token_456',
+      );
 
       const result = await secureStorage.getItem(
         AUTH_STORAGE_KEYS.REFRESH_TOKEN,
@@ -355,13 +359,15 @@ describe('secureStorage', () => {
     beforeEach(() => {
       (SecureStore.isAvailableAsync as jest.Mock).mockResolvedValue(true);
       (SecureStore.setItemAsync as jest.Mock).mockResolvedValue(undefined);
-      (SecureStore.getItemAsync as jest.Mock).mockImplementation((key: string) => {
-        const storage: Record<string, string> = {
-          [AUTH_STORAGE_KEYS.ACCESS_TOKEN]: 'access_123',
-          [AUTH_STORAGE_KEYS.REFRESH_TOKEN]: 'refresh_456',
-        };
-        return Promise.resolve(storage[key] || null);
-      });
+      (SecureStore.getItemAsync as jest.Mock).mockImplementation(
+        (key: string) => {
+          const storage: Record<string, string> = {
+            [AUTH_STORAGE_KEYS.ACCESS_TOKEN]: 'access_123',
+            [AUTH_STORAGE_KEYS.REFRESH_TOKEN]: 'refresh_456',
+          };
+          return Promise.resolve(storage[key] || null);
+        },
+      );
       (SecureStore.deleteItemAsync as jest.Mock).mockResolvedValue(undefined);
     });
 

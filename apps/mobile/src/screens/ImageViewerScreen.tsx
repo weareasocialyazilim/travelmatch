@@ -1,5 +1,11 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Dimensions, Image } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Dimensions,
+  Image,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn } from 'react-native-reanimated';
@@ -25,7 +31,10 @@ export const ImageViewerScreen = ({ route, navigation }: Props) => {
       </TouchableOpacity>
 
       {/* Image */}
-      <Animated.View entering={FadeIn.duration(300)} style={styles.imageContainer}>
+      <Animated.View
+        entering={FadeIn.duration(300)}
+        style={styles.imageContainer}
+      >
         <Image
           source={{ uri: imageUrl }}
           style={styles.image}
@@ -48,9 +57,28 @@ export const ImageViewerScreen = ({ route, navigation }: Props) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'black' },
-  closeBtn: { position: 'absolute', right: 20, zIndex: 10, padding: 10, backgroundColor: 'rgba(50,50,50,0.5)', borderRadius: 20 },
+  closeBtn: {
+    position: 'absolute',
+    right: 20,
+    zIndex: 10,
+    padding: 10,
+    backgroundColor: 'rgba(50,50,50,0.5)',
+    borderRadius: 20,
+  },
   imageContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   image: { width: width, height: height },
-  actionBar: { position: 'absolute', flexDirection: 'row', gap: 20, alignSelf: 'center' },
-  actionBtn: { width: 50, height: 50, borderRadius: 25, backgroundColor: 'rgba(50,50,50,0.5)', alignItems: 'center', justifyContent: 'center' }
+  actionBar: {
+    position: 'absolute',
+    flexDirection: 'row',
+    gap: 20,
+    alignSelf: 'center',
+  },
+  actionBtn: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(50,50,50,0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

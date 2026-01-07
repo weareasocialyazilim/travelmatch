@@ -449,7 +449,9 @@ describe('Moment Creation Flow Integration', () => {
       expect(moment).toBeDefined();
 
       // Act: Upload fails
-      (uploadImage as jest.Mock).mockRejectedValue(new Error('Upload rate limit exceeded'));
+      (uploadImage as jest.Mock).mockRejectedValue(
+        new Error('Upload rate limit exceeded'),
+      );
 
       // Assert: Should handle error gracefully
       await expect(

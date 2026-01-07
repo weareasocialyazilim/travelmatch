@@ -69,8 +69,7 @@ const TrustGardenDetailScreen: React.FC = () => {
       {
         id: '1',
         name: t('trust.factors.identity'),
-        value:
-          user?.kyc === 'Verified' ? 30 : user?.kyc === 'Pending' ? 15 : 0,
+        value: user?.kyc === 'Verified' ? 30 : user?.kyc === 'Pending' ? 15 : 0,
         maxValue: 30,
         color: primitives.emerald[500],
         icon: 'shield-check',
@@ -96,7 +95,7 @@ const TrustGardenDetailScreen: React.FC = () => {
         name: t('trust.factors.response'),
         value: Math.round(
           TRUST_GARDEN_DEFAULTS.RESPONSE_RATE_PERCENTAGE *
-            (TRUST_GARDEN_DEFAULTS.MAX_SCORE / 100)
+            (TRUST_GARDEN_DEFAULTS.MAX_SCORE / 100),
         ),
         maxValue: 15,
         color: primitives.amber[500],
@@ -111,7 +110,7 @@ const TrustGardenDetailScreen: React.FC = () => {
         icon: 'star',
       },
     ],
-    [user, userProfile, socialScore, t]
+    [user, userProfile, socialScore, t],
   );
 
   // Detailed factors for the list below
@@ -139,7 +138,11 @@ const TrustGardenDetailScreen: React.FC = () => {
       value: socialScore,
       maxValue: 15,
       color: primitives.blue[500],
-      tips: [t('trust.garden.tips.connectInstagram'), t('trust.garden.tips.connectTwitter'), t('trust.garden.tips.addWebsite')],
+      tips: [
+        t('trust.garden.tips.connectInstagram'),
+        t('trust.garden.tips.connectTwitter'),
+        t('trust.garden.tips.addWebsite'),
+      ],
       onPress: () => navigation.navigate('ConnectedAccounts'),
     },
     {
@@ -220,7 +223,9 @@ const TrustGardenDetailScreen: React.FC = () => {
 
         {/* Trust Factors Details */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('trust.garden.factorsTitle')}</Text>
+          <Text style={styles.sectionTitle}>
+            {t('trust.garden.factorsTitle')}
+          </Text>
 
           {detailedFactors.map((factor) => (
             <TouchableOpacity
@@ -253,7 +258,9 @@ const TrustGardenDetailScreen: React.FC = () => {
                 </View>
                 <View style={styles.factorValueContainer}>
                   <View style={styles.factorValue}>
-                    <Text style={[styles.factorValueText, { color: factor.color }]}>
+                    <Text
+                      style={[styles.factorValueText, { color: factor.color }]}
+                    >
                       {factor.id === '5'
                         ? factor.value.toFixed(1)
                         : factor.value}
@@ -289,7 +296,9 @@ const TrustGardenDetailScreen: React.FC = () => {
 
               {factor.value < factor.maxValue && (
                 <View style={styles.tipsContainer}>
-                  <Text style={styles.tipsTitle}>{t('trust.garden.howToImprove')}</Text>
+                  <Text style={styles.tipsTitle}>
+                    {t('trust.garden.howToImprove')}
+                  </Text>
                   {factor.tips.slice(0, 2).map((tip, index) => (
                     <View key={index} style={styles.tipItem}>
                       <MaterialCommunityIcons
@@ -308,7 +317,9 @@ const TrustGardenDetailScreen: React.FC = () => {
 
         {/* Trust Levels Guide */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('trust.garden.levelsTitle')}</Text>
+          <Text style={styles.sectionTitle}>
+            {t('trust.garden.levelsTitle')}
+          </Text>
 
           <View style={styles.levelsCard}>
             {[

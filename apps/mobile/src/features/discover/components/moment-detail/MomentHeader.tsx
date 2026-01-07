@@ -66,12 +66,17 @@ export const MomentHeader: React.FC<MomentHeaderProps> = React.memo(
                   accessibilityRole="button"
                 >
                   {actionLoading === 'save' ? (
-                    <ActivityIndicator size="small" color={COLORS.brand.primary} />
+                    <ActivityIndicator
+                      size="small"
+                      color={COLORS.brand.primary}
+                    />
                   ) : (
                     <MaterialCommunityIcons
                       name={isSaved ? 'bookmark' : 'bookmark-outline'}
                       size={22}
-                      color={isSaved ? COLORS.brand.primary : COLORS.text.primary}
+                      color={
+                        isSaved ? COLORS.brand.primary : COLORS.text.primary
+                      }
                     />
                   )}
                 </TouchableOpacity>
@@ -105,7 +110,10 @@ export const MomentHeader: React.FC<MomentHeaderProps> = React.memo(
                   accessibilityRole="button"
                 >
                   {actionLoading === 'delete' ? (
-                    <ActivityIndicator size="small" color={COLORS.feedback.error} />
+                    <ActivityIndicator
+                      size="small"
+                      color={COLORS.feedback.error}
+                    />
                   ) : (
                     <MaterialCommunityIcons
                       name="trash-can-outline"

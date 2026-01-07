@@ -19,24 +19,36 @@ describe('LeaveTrustNoteBottomSheet', () => {
 
   describe('Rendering', () => {
     it('renders when visible is true', () => {
-      const { getByText } = render(<LeaveTrustNoteBottomSheet {...defaultProps} />);
+      const { getByText } = render(
+        <LeaveTrustNoteBottomSheet {...defaultProps} />,
+      );
       expect(getByText('Leave a Trust Note')).toBeTruthy();
     });
 
     it('does not render when visible is false', () => {
-      const { UNSAFE_queryByType } = render(<LeaveTrustNoteBottomSheet {...defaultProps} visible={false} />);
+      const { UNSAFE_queryByType } = render(
+        <LeaveTrustNoteBottomSheet {...defaultProps} visible={false} />,
+      );
       const { Modal } = require('react-native');
       const modal = UNSAFE_queryByType(Modal);
       expect(modal.props.visible).toBe(false);
     });
 
     it('renders recipient name in subtitle', () => {
-      const { getByText } = render(<LeaveTrustNoteBottomSheet {...defaultProps} />);
+      const { getByText } = render(
+        <LeaveTrustNoteBottomSheet {...defaultProps} />,
+      );
       expect(getByText('For Lina after Galata coffee')).toBeTruthy();
     });
 
     it('renders moment title in subtitle', () => {
-      const { getByText } = render(<LeaveTrustNoteBottomSheet {...defaultProps} recipientName="Maria" momentTitle="Istanbul tour" />);
+      const { getByText } = render(
+        <LeaveTrustNoteBottomSheet
+          {...defaultProps}
+          recipientName="Maria"
+          momentTitle="Istanbul tour"
+        />,
+      );
       expect(getByText('For Maria after Istanbul tour')).toBeTruthy();
     });
 
@@ -44,26 +56,36 @@ describe('LeaveTrustNoteBottomSheet', () => {
       const component = render(<LeaveTrustNoteBottomSheet {...defaultProps} />);
       const { TextInput } = require('react-native');
       const input = component.UNSAFE_getByType(TextInput);
-      expect(input.props.placeholder).toBe('Share what you loved about this moment...');
+      expect(input.props.placeholder).toBe(
+        'Share what you loved about this moment...',
+      );
     });
 
     it('renders character counter', () => {
-      const { getByText } = render(<LeaveTrustNoteBottomSheet {...defaultProps} />);
+      const { getByText } = render(
+        <LeaveTrustNoteBottomSheet {...defaultProps} />,
+      );
       expect(getByText('0/280')).toBeTruthy();
     });
 
     it('renders Submit Note button', () => {
-      const { getByText } = render(<LeaveTrustNoteBottomSheet {...defaultProps} />);
+      const { getByText } = render(
+        <LeaveTrustNoteBottomSheet {...defaultProps} />,
+      );
       expect(getByText('Submit Note')).toBeTruthy();
     });
 
     it('renders Cancel button', () => {
-      const { getByText } = render(<LeaveTrustNoteBottomSheet {...defaultProps} />);
+      const { getByText } = render(
+        <LeaveTrustNoteBottomSheet {...defaultProps} />,
+      );
       expect(getByText('Cancel')).toBeTruthy();
     });
 
     it('renders handle bar', () => {
-      const { UNSAFE_getAllByType } = render(<LeaveTrustNoteBottomSheet {...defaultProps} />);
+      const { UNSAFE_getAllByType } = render(
+        <LeaveTrustNoteBottomSheet {...defaultProps} />,
+      );
       const { View } = require('react-native');
       const views = UNSAFE_getAllByType(View);
       expect(views.length).toBeGreaterThan(0);
@@ -112,7 +134,9 @@ describe('LeaveTrustNoteBottomSheet', () => {
     };
 
     it('disables submit button when text is empty', () => {
-      const { getByText } = render(<LeaveTrustNoteBottomSheet {...defaultProps} />);
+      const { getByText } = render(
+        <LeaveTrustNoteBottomSheet {...defaultProps} />,
+      );
       const submitButton = getByText('Submit Note');
       fireEvent.press(submitButton);
       expect(mockOnSubmit).not.toHaveBeenCalled();
@@ -161,14 +185,18 @@ describe('LeaveTrustNoteBottomSheet', () => {
 
   describe('Cancel Functionality', () => {
     it('calls onClose when Cancel button is pressed', () => {
-      const { getByText } = render(<LeaveTrustNoteBottomSheet {...defaultProps} />);
+      const { getByText } = render(
+        <LeaveTrustNoteBottomSheet {...defaultProps} />,
+      );
       const cancelButton = getByText('Cancel');
       fireEvent.press(cancelButton);
       expect(mockOnClose).toHaveBeenCalled();
     });
 
     it('calls onClose when backdrop is pressed', () => {
-      const { UNSAFE_getByType } = render(<LeaveTrustNoteBottomSheet {...defaultProps} />);
+      const { UNSAFE_getByType } = render(
+        <LeaveTrustNoteBottomSheet {...defaultProps} />,
+      );
       const { TouchableWithoutFeedback } = require('react-native');
       const backdrop = UNSAFE_getByType(TouchableWithoutFeedback);
       fireEvent.press(backdrop);
@@ -178,21 +206,27 @@ describe('LeaveTrustNoteBottomSheet', () => {
 
   describe('Modal Properties', () => {
     it('renders as Modal with transparent background', () => {
-      const { UNSAFE_getByType } = render(<LeaveTrustNoteBottomSheet {...defaultProps} />);
+      const { UNSAFE_getByType } = render(
+        <LeaveTrustNoteBottomSheet {...defaultProps} />,
+      );
       const { Modal } = require('react-native');
       const modal = UNSAFE_getByType(Modal);
       expect(modal.props.transparent).toBe(true);
     });
 
     it('uses slide animation', () => {
-      const { UNSAFE_getByType } = render(<LeaveTrustNoteBottomSheet {...defaultProps} />);
+      const { UNSAFE_getByType } = render(
+        <LeaveTrustNoteBottomSheet {...defaultProps} />,
+      );
       const { Modal } = require('react-native');
       const modal = UNSAFE_getByType(Modal);
       expect(modal.props.animationType).toBe('slide');
     });
 
     it('calls onClose when modal requests close', () => {
-      const { UNSAFE_getByType } = render(<LeaveTrustNoteBottomSheet {...defaultProps} />);
+      const { UNSAFE_getByType } = render(
+        <LeaveTrustNoteBottomSheet {...defaultProps} />,
+      );
       const { Modal } = require('react-native');
       const modal = UNSAFE_getByType(Modal);
       modal.props.onRequestClose();
@@ -241,7 +275,13 @@ describe('LeaveTrustNoteBottomSheet', () => {
     });
 
     it('uses default recipient name when not provided', () => {
-      const { getByText } = render(<LeaveTrustNoteBottomSheet {...defaultProps} recipientName={undefined} momentTitle={undefined} />);
+      const { getByText } = render(
+        <LeaveTrustNoteBottomSheet
+          {...defaultProps}
+          recipientName={undefined}
+          momentTitle={undefined}
+        />,
+      );
       expect(getByText('For Lina after Galata coffee')).toBeTruthy();
     });
   });

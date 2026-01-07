@@ -263,7 +263,7 @@ export const createAccessibleTouchable = (
     hint?: string;
     disabled?: boolean;
     selected?: boolean;
-  }
+  },
 ) => ({
   accessible: true,
   accessibilityRole: role,
@@ -282,14 +282,14 @@ export const createAccessibleCard = (
   title: string,
   subtitle?: string,
   index?: number,
-  total?: number
+  total?: number,
 ) => {
   let label = title;
   if (subtitle) label += `, ${subtitle}`;
   if (index !== undefined && total !== undefined) {
     label += `, item ${index + 1} of ${total}`;
   }
-  
+
   return {
     accessible: true,
     accessibilityLabel: label,

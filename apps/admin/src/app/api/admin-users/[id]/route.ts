@@ -17,7 +17,7 @@ interface AdminUser {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getAdminSession();
@@ -39,7 +39,10 @@ export async function GET(
       .single();
 
     if (error || !admin) {
-      return NextResponse.json({ error: 'Admin kullanıcı bulunamadı' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Admin kullanıcı bulunamadı' },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json({ admin });
@@ -51,7 +54,7 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getAdminSession();
@@ -75,7 +78,10 @@ export async function PATCH(
       .single();
 
     if (fetchError || !currentAdminData) {
-      return NextResponse.json({ error: 'Admin kullanıcı bulunamadı' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Admin kullanıcı bulunamadı' },
+        { status: 404 },
+      );
     }
 
     const currentAdmin = currentAdminData as AdminUser;
@@ -89,12 +95,18 @@ export async function PATCH(
     ) {
       return NextResponse.json(
         { error: 'Kendi rolünüzü düşüremezsiniz' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Allowed update fields
-    const allowedFields = ['name', 'role', 'is_active', 'requires_2fa', 'avatar_url'];
+    const allowedFields = [
+      'name',
+      'role',
+      'is_active',
+      'requires_2fa',
+      'avatar_url',
+    ];
     const updateData: Partial<AdminUser> = {};
 
     for (const field of allowedFields) {
@@ -113,7 +125,10 @@ export async function PATCH(
 
     if (error) {
       logger.error('Admin user update error:', error);
-      return NextResponse.json({ error: 'Admin kullanıcı güncellenemedi' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Admin kullanıcı güncellenemedi' },
+        { status: 500 },
+      );
     }
 
     // Create audit log
@@ -125,7 +140,7 @@ export async function PATCH(
       currentAdmin,
       admin,
       request.headers.get('x-forwarded-for') || undefined,
-      request.headers.get('user-agent') || undefined
+      request.headers.get('user-agent') || undefined,
     );
 
     return NextResponse.json({ admin });
@@ -137,7 +152,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getAdminSession();
@@ -155,7 +170,7 @@ export async function DELETE(
     if (id === session.admin.id) {
       return NextResponse.json(
         { error: 'Kendinizi silemezsiniz' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -177,7 +192,10 @@ export async function DELETE(
 
     if (error) {
       logger.error('Admin user delete error:', error);
-      return NextResponse.json({ error: 'Admin kullanıcı silinemedi' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Admin kullanıcı silinemedi' },
+        { status: 500 },
+      );
     }
 
     // Create audit log
@@ -190,7 +208,7 @@ export async function DELETE(
         currentAdmin,
         null,
         request.headers.get('x-forwarded-for') || undefined,
-        request.headers.get('user-agent') || undefined
+        request.headers.get('user-agent') || undefined,
       );
     }
 

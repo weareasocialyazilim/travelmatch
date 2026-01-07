@@ -15,7 +15,13 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -98,7 +104,11 @@ const priorityConfig = {
 const typeConfig = {
   kyc_verification: { icon: Users, label: 'KYC', href: '/users' },
   payout_approval: { icon: DollarSign, label: 'Ödeme', href: '/finance' },
-  dispute_review: { icon: AlertTriangle, label: 'Anlaşmazlık', href: '/disputes' },
+  dispute_review: {
+    icon: AlertTriangle,
+    label: 'Anlaşmazlık',
+    href: '/disputes',
+  },
   content_moderation: { icon: Image, label: 'İçerik', href: '/moments' },
   report_review: { icon: AlertCircle, label: 'Şikayet', href: '/disputes' },
 };
@@ -107,7 +117,7 @@ export default function QueuePage() {
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
 
   const filteredTasks = mockTasks.filter(
-    (task) => priorityFilter === 'all' || task.priority === priorityFilter
+    (task) => priorityFilter === 'all' || task.priority === priorityFilter,
   );
 
   return (
@@ -158,7 +168,9 @@ export default function QueuePage() {
 
         <Card className="border-l-4 border-l-green-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Bugün Tamamlanan</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Bugün Tamamlanan
+            </CardTitle>
             <CheckCircle2 className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
@@ -171,11 +183,15 @@ export default function QueuePage() {
 
         <Card className="border-l-4 border-l-primary">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Platform Sağlığı</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Platform Sağlığı
+            </CardTitle>
             <CheckCircle2 className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">%{mockStats.platformHealth}</div>
+            <div className="text-2xl font-bold">
+              %{mockStats.platformHealth}
+            </div>
             <p className="text-xs text-muted-foreground">Sağlıklı çalışıyor</p>
           </CardContent>
         </Card>
@@ -218,7 +234,8 @@ export default function QueuePage() {
 
             <TabsContent value="all" className="space-y-3">
               {filteredTasks.map((task) => {
-                const typeInfo = typeConfig[task.type as keyof typeof typeConfig];
+                const typeInfo =
+                  typeConfig[task.type as keyof typeof typeConfig];
                 const priorityInfo = priorityConfig[task.priority];
                 const TypeIcon = typeInfo?.icon || AlertCircle;
 
@@ -227,14 +244,14 @@ export default function QueuePage() {
                     key={task.id}
                     className={cn(
                       'flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-accent/50',
-                      `priority-${task.priority}`
+                      `priority-${task.priority}`,
                     )}
                   >
                     <div className="flex items-center gap-4">
                       <div
                         className={cn(
                           'flex h-10 w-10 items-center justify-center rounded-lg',
-                          'bg-muted'
+                          'bg-muted',
                         )}
                       >
                         <TypeIcon className="h-5 w-5" />

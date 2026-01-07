@@ -54,7 +54,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { formatCurrency, formatNumber, cn } from '@/lib/utils';
-import { useAnalytics, useUserMetrics, useRevenueMetrics, useEngagementMetrics } from '@/hooks/use-analytics';
+import {
+  useAnalytics,
+  useUserMetrics,
+  useRevenueMetrics,
+  useEngagementMetrics,
+} from '@/hooks/use-analytics';
 import { Loader2, AlertTriangle } from 'lucide-react';
 
 // Chart data - will be enhanced with real API data
@@ -111,7 +116,9 @@ const contentStats = [
 ];
 
 export default function AnalyticsPage() {
-  const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d' | '365d'>('7d');
+  const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d' | '365d'>(
+    '7d',
+  );
 
   // Use real API data
   const { data, isLoading, error } = useAnalytics({ period: dateRange });
@@ -125,7 +132,9 @@ export default function AnalyticsPage() {
         <div className="text-center">
           <AlertTriangle className="mx-auto h-12 w-12 text-destructive" />
           <h2 className="mt-4 text-lg font-semibold">Bir hata oluştu</h2>
-          <p className="text-muted-foreground">Analitik verileri yüklenemedi. Lütfen tekrar deneyin.</p>
+          <p className="text-muted-foreground">
+            Analitik verileri yüklenemedi. Lütfen tekrar deneyin.
+          </p>
         </div>
       </div>
     );
@@ -172,7 +181,11 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : formatNumber(userMetrics.activeUsers || 4521)}
+              {isLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                formatNumber(userMetrics.activeUsers || 4521)
+              )}
             </div>
             <div className="flex items-center text-xs">
               <ArrowUpRight className="mr-1 h-3 w-3 text-green-600" />
@@ -188,7 +201,11 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : formatCurrency(revenueMetrics.totalRevenue / 30 || 24500)}
+              {isLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                formatCurrency(revenueMetrics.totalRevenue / 30 || 24500)
+              )}
             </div>
             <div className="flex items-center text-xs">
               <ArrowUpRight className="mr-1 h-3 w-3 text-green-600" />

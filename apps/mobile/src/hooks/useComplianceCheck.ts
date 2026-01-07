@@ -29,7 +29,7 @@ interface UseComplianceCheckReturn {
   // Send limit check
   checkSendLimit: (
     amount: number,
-    currency?: CurrencyCode
+    currency?: CurrencyCode,
   ) => Promise<{
     allowed: boolean;
     message: string;
@@ -41,7 +41,7 @@ interface UseComplianceCheckReturn {
   // Receive limit check
   checkReceiveLimit: (
     amount: number,
-    currency?: CurrencyCode
+    currency?: CurrencyCode,
   ) => Promise<{
     allowed: boolean;
     message: string;
@@ -51,7 +51,7 @@ interface UseComplianceCheckReturn {
   // Moment contribution check
   checkContribution: (
     momentId: string,
-    amount: number
+    amount: number,
   ) => Promise<{
     allowed: boolean;
     message: string;
@@ -72,7 +72,7 @@ interface UseComplianceCheckReturn {
   checkCompliance: (
     amount: number,
     currency: CurrencyCode,
-    recipientId?: string
+    recipientId?: string,
   ) => Promise<{
     allowed: boolean;
     riskLevel: string;
@@ -110,7 +110,7 @@ export const useComplianceCheck = (): UseComplianceCheckReturn => {
         setIsChecking(false);
       }
     },
-    []
+    [],
   );
 
   const checkReceiveLimit = useCallback(
@@ -135,7 +135,7 @@ export const useComplianceCheck = (): UseComplianceCheckReturn => {
         setIsChecking(false);
       }
     },
-    []
+    [],
   );
 
   const checkContribution = useCallback(
@@ -154,14 +154,16 @@ export const useComplianceCheck = (): UseComplianceCheckReturn => {
         };
       } catch (err) {
         const message =
-          err instanceof Error ? err.message : 'Katkı limiti kontrolü başarısız';
+          err instanceof Error
+            ? err.message
+            : 'Katkı limiti kontrolü başarısız';
         setError(message);
         throw err;
       } finally {
         setIsChecking(false);
       }
     },
-    []
+    [],
   );
 
   const checkCanCreateMoment = useCallback(async () => {
@@ -200,11 +202,7 @@ export const useComplianceCheck = (): UseComplianceCheckReturn => {
   }, []);
 
   const checkCompliance = useCallback(
-    async (
-      amount: number,
-      currency: CurrencyCode,
-      recipientId?: string
-    ) => {
+    async (amount: number, currency: CurrencyCode, recipientId?: string) => {
       setIsChecking(true);
       setError(null);
 
@@ -213,7 +211,7 @@ export const useComplianceCheck = (): UseComplianceCheckReturn => {
           amount,
           currency,
           'send',
-          recipientId
+          recipientId,
         );
 
         return {
@@ -225,16 +223,14 @@ export const useComplianceCheck = (): UseComplianceCheckReturn => {
         };
       } catch (err) {
         const message =
-          err instanceof Error
-            ? err.message
-            : 'Uyumluluk kontrolü başarısız';
+          err instanceof Error ? err.message : 'Uyumluluk kontrolü başarısız';
         setError(message);
         throw err;
       } finally {
         setIsChecking(false);
       }
     },
-    []
+    [],
   );
 
   return {

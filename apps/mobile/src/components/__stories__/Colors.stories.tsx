@@ -31,7 +31,10 @@ export const AllColors: StoryObj = {
       <View style={styles.row}>
         <ColorSwatch name="Text Primary" color={COLORS.text.primary} />
         <ColorSwatch name="Text Secondary" color={COLORS.text.secondary} />
-        <ColorSwatch name="Text Disabled" color={COLORS.text.primaryDisabled || '#999'} />
+        <ColorSwatch
+          name="Text Disabled"
+          color={COLORS.text.primaryDisabled || '#999'}
+        />
       </View>
 
       <Text style={styles.sectionTitle}>Neutral Colors</Text>
@@ -44,9 +47,10 @@ export const AllColors: StoryObj = {
 
       <Text style={styles.sectionTitle}>Gray Scale</Text>
       <View style={styles.row}>
-        {COLORS.gray && Object.entries(COLORS.gray).map(([shade, color]) => (
-          <ColorSwatch key={shade} name={`Gray ${shade}`} color={color} />
-        ))}
+        {COLORS.gray &&
+          Object.entries(COLORS.gray).map(([shade, color]) => (
+            <ColorSwatch key={shade} name={`Gray ${shade}`} color={color} />
+          ))}
       </View>
     </ScrollView>
   ),
@@ -57,7 +61,9 @@ export const PrimaryPalette: StoryObj = {
     <View style={styles.container}>
       <ColorSwatch name="Primary" color={COLORS.brand.primary} large />
       <View style={styles.description}>
-        <Text style={styles.descText}>Main brand color used for primary actions, links, and key UI elements</Text>
+        <Text style={styles.descText}>
+          Main brand color used for primary actions, links, and key UI elements
+        </Text>
       </View>
     </View>
   ),
@@ -74,9 +80,23 @@ export const SemanticColors: StoryObj = {
   ),
 };
 
-const ColorSwatch = ({ name, color, large }: { name: string; color: string; large?: boolean }) => (
+const ColorSwatch = ({
+  name,
+  color,
+  large,
+}: {
+  name: string;
+  color: string;
+  large?: boolean;
+}) => (
   <View style={[styles.swatch, large && styles.swatchLarge]}>
-    <View style={[styles.color, { backgroundColor: color }, large && styles.colorLarge]} />
+    <View
+      style={[
+        styles.color,
+        { backgroundColor: color },
+        large && styles.colorLarge,
+      ]}
+    />
     <Text style={styles.name}>{name}</Text>
     <Text style={styles.hex}>{color}</Text>
   </View>
