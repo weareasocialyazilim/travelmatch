@@ -372,6 +372,19 @@ describe('secureStorage', () => {
     });
 
     it('should handle full auth flow: store, retrieve, delete tokens', async () => {
+      // Mock SecureStore to store and retrieve values
+      const storedValues: Record<string, string> = {};
+      (SecureStore.setItemAsync as jest.Mock).mockImplementation(
+        async (key: string, value: string) => {
+          storedValues[key] = value;
+        },
+      );
+      (SecureStore.getItemAsync as jest.Mock).mockImplementation(
+        async (key: string) => storedValues[key] || null,
+      );
+      // AsyncStorage should return null so SecureStore is checked
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
+
       // Store tokens
       await secureStorage.setItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN, 'access_123');
       await secureStorage.setItem(
@@ -401,11 +414,20 @@ describe('secureStorage', () => {
     });
 
     it('should handle token refresh scenario', async () => {
-      // Set item to return different values on subsequent calls
-      let currentToken = 'old_token';
-      (SecureStore.getItemAsync as jest.Mock).mockImplementation(() =>
-        Promise.resolve(currentToken),
+      // Mock SecureStore to store and retrieve values
+      const storedValues: Record<string, string> = {
+        [AUTH_STORAGE_KEYS.ACCESS_TOKEN]: 'old_token',
+      };
+      (SecureStore.getItemAsync as jest.Mock).mockImplementation(
+        async (key: string) => storedValues[key] || null,
       );
+      (SecureStore.setItemAsync as jest.Mock).mockImplementation(
+        async (key: string, value: string) => {
+          storedValues[key] = value;
+        },
+      );
+      // AsyncStorage should return null so SecureStore is checked
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
 
       // Get old token
       const oldToken = await secureStorage.getItem(
@@ -414,7 +436,7 @@ describe('secureStorage', () => {
       expect(oldToken).toBe('old_token');
 
       // Update with new token
-      currentToken = 'new_token';
+      storedValues[AUTH_STORAGE_KEYS.ACCESS_TOKEN] = 'new_token';
       await secureStorage.setItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN, 'new_token');
 
       // Verify new token
@@ -425,6 +447,9 @@ describe('secureStorage', () => {
     });
 
     it('should handle concurrent operations', async () => {
+      // AsyncStorage should return null so SecureStore is checked for getItem
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
+
       const operations = [
         secureStorage.setItem('key1', 'value1'),
         secureStorage.setItem('key2', 'value2'),
@@ -436,6 +461,7 @@ describe('secureStorage', () => {
 
       expect(SecureStore.setItemAsync).toHaveBeenCalledTimes(2);
       expect(SecureStore.getItemAsync).toHaveBeenCalledTimes(1);
+      // deleteItem calls both AsyncStorage.removeItem and SecureStore.deleteItemAsync
       expect(SecureStore.deleteItemAsync).toHaveBeenCalledTimes(1);
     });
   });

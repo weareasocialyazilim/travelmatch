@@ -124,6 +124,9 @@
   },
   "dependencies": {
     "react-native-qrcode-svg": "^6.3.21",
-    "react-native-svg": "^15.15.1"
+    "react-native-svg": "^15.15.1",
+    "expo": "~54.0.31",
+    "react": "19.1.0",
+    "react-native": "0.81.5"
   }
 }
