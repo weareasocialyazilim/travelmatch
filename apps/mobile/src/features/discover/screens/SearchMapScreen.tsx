@@ -54,6 +54,7 @@ import { useDiscoverMoments } from '@/hooks/useDiscoverMoments';
 import { useSubscription } from '@/features/payments/hooks/usePayments';
 import { supabase } from '@/config/supabase';
 import TrustBadge from '@/components/ui/TMBadge';
+import { logger } from '@/utils/logger';
 import {
   applyLocationJitter,
   type LocationJitterLevel,
@@ -157,7 +158,7 @@ const SearchMapScreen: React.FC = () => {
           setMapboxGL(() => mapboxModule);
         }
       } catch (error) {
-        console.warn('[SearchMapScreen] Failed to load Mapbox:', error);
+        logger.warn('[SearchMapScreen] Failed to load Mapbox:', { error });
       } finally {
         if (mounted) {
           setMapboxLoading(false);
@@ -464,9 +465,7 @@ const SearchMapScreen: React.FC = () => {
       <View style={styles.container}>
         <View style={styles.fallbackContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text style={[styles.fallbackTitle, { marginTop: 16 }]}>
-            Loading Map...
-          </Text>
+          <Text style={styles.fallbackTitle}>Loading Map...</Text>
         </View>
         <BottomNav activeTab="Discover" />
       </View>

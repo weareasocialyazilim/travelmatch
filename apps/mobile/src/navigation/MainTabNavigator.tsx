@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { COLORS } from '@/constants/colors';
 
@@ -16,18 +16,20 @@ const LazySearchMapScreen = lazy(() =>
   })),
 );
 
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.background.primary,
+  },
+});
+
 // Wrapper component for lazy-loaded SearchMapScreen
 const SearchMapScreenWrapper = () => (
   <Suspense
     fallback={
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: COLORS.background.primary,
-        }}
-      >
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={COLORS.brand.primary} />
       </View>
     }
