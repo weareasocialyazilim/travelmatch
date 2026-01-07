@@ -110,10 +110,17 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
 
       try {
         await completeOnboarding();
-        navigation.replace('Welcome');
+        // Guest Mode: Go directly to MainTabs so users can browse
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'MainTabs' }],
+        });
       } catch (error) {
         logger.error('Onboarding completion error', { error });
-        navigation.replace('Welcome');
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'MainTabs' }],
+        });
       }
     }
   }, [activeIndex, navigation, analytics, completeOnboarding]);
