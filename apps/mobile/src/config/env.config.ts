@@ -36,9 +36,18 @@ const clientEnvSchema = z.object({
   APP_VERSION: z.string().default('1.0.0'),
 
   // Supabase (anon key is safe to expose)
-  // Optional to prevent crash on startup - validated in production via REQUIRED_IN_PRODUCTION
-  SUPABASE_URL: z.string().url().optional().default(''),
-  SUPABASE_ANON_KEY: z.string().optional().default(''),
+  // Use transform to handle empty/undefined values gracefully
+  SUPABASE_URL: z
+    .string()
+    .optional()
+    .transform((val) => val || '')
+    .refine((val) => val === '' || /^https?:\/\/.+/.test(val), {
+      message: 'SUPABASE_URL must be a valid URL or empty',
+    }),
+  SUPABASE_ANON_KEY: z
+    .string()
+    .optional()
+    .transform((val) => val || ''),
 
   // API Configuration
   API_URL: z.string().url().optional(),
