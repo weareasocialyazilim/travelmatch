@@ -203,8 +203,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       '@rnmapbox/maps',
       {
         // Token is now read from RNMAPBOX_MAPS_DOWNLOAD_TOKEN env var automatically
-        // Native SDK v11 with New Architecture support
-        RNMapboxMapsVersion: '11.17.0',
+        // @rnmapbox/maps 10.2.10 requires MapboxMaps ~> 11.16.2 (from package.json)
+        RNMapboxMapsVersion: '11.16.2',
       },
     ],
     [
