@@ -189,7 +189,8 @@ function App() {
       subscription.remove();
       appBootstrap.cleanup();
     };
-  }, [incrementSessionCount]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run only once on mount - incrementSessionCount is now stable via useRef
 
   // Handle retry of failed services
   const handleRetryService = useCallback(async (serviceName: ServiceName) => {
@@ -319,31 +320,6 @@ function App() {
         <ProviderComposer providers={appProviders}>
           <ModalProvider>
             <StatusBar style="auto" />
-            {/* SENTRY TEST BUTTON - Remove after testing */}
-            {__DEV__ && (
-              <View
-                style={{
-                  position: 'absolute',
-                  top: 50,
-                  right: 10,
-                  zIndex: 9999,
-                }}
-              >
-                <Button
-                  title="🧪 Test Sentry"
-                  onPress={() => {
-                    Sentry.captureException(
-                      new Error(
-                        'Test error from App.tsx - ' + new Date().toISOString(),
-                      ),
-                    );
-                    Sentry.captureMessage('Test message from TravelMatch');
-                    console.log('✅ Sentry test events sent!');
-                  }}
-                  color="#F59E0B"
-                />
-              </View>
-            )}
             <AppNavigator />
             <FeedbackModal visible={showFeedback} onClose={dismissFeedback} />
             <PendingTransactionsModal

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logger } from '../utils/logger';
 
@@ -21,6 +21,12 @@ const defaultState: FeedbackState = {
 export function useFeedbackPrompt() {
   const [showFeedback, setShowFeedback] = useState(false);
   const [state, setState] = useState<FeedbackState>(defaultState);
+  const stateRef = useRef<FeedbackState>(state);
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
 
   // Load state from storage on mount
   useEffect(() => {
@@ -70,12 +76,13 @@ export function useFeedbackPrompt() {
     [],
   );
 
-  // Increment session count
+  // Increment session count - stable callback using ref to prevent infinite re-renders
   const incrementSessionCount = useCallback(async () => {
     try {
+      const currentState = stateRef.current;
       const newState: FeedbackState = {
-        ...state,
-        sessionCount: state.sessionCount + 1,
+        ...currentState,
+        sessionCount: currentState.sessionCount + 1,
       };
 
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
@@ -97,13 +104,13 @@ export function useFeedbackPrompt() {
         error,
       );
     }
-  }, [state, shouldShowFeedback]);
+  }, [shouldShowFeedback]);
 
-  // Dismiss feedback prompt
+  // Dismiss feedback prompt - stable callback using ref
   const dismissFeedback = useCallback(async () => {
     try {
       const newState: FeedbackState = {
-        ...state,
+        ...stateRef.current,
         lastPromptDate: new Date().toISOString(),
       };
 
@@ -116,13 +123,13 @@ export function useFeedbackPrompt() {
       logger.error('useFeedbackPrompt', 'Failed to dismiss feedback', error);
       setShowFeedback(false);
     }
-  }, [state]);
+  }, []);
 
-  // Mark feedback as submitted
+  // Mark feedback as submitted - stable callback using ref
   const markFeedbackSubmitted = useCallback(async () => {
     try {
       const newState: FeedbackState = {
-        ...state,
+        ...stateRef.current,
         hasSubmittedFeedback: true,
         lastPromptDate: new Date().toISOString(),
       };
@@ -140,7 +147,7 @@ export function useFeedbackPrompt() {
       );
       setShowFeedback(false);
     }
-  }, [state]);
+  }, []);
 
   // Reset feedback state (for testing)
   const resetFeedbackState = useCallback(async () => {
