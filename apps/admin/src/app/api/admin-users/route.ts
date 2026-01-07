@@ -35,7 +35,9 @@ export async function GET(request: NextRequest) {
     if (search) {
       const safeSearch = escapeSupabaseFilter(search);
       if (safeSearch) {
-        query = query.or(`name.ilike.%${safeSearch}%,email.ilike.%${safeSearch}%`);
+        query = query.or(
+          `name.ilike.%${safeSearch}%,email.ilike.%${safeSearch}%`,
+        );
       }
     }
 
@@ -51,7 +53,10 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('Admin users query error:', error);
-      return NextResponse.json({ error: 'Admin kullanıcıları yüklenemedi' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Admin kullanıcıları yüklenemedi' },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({
@@ -83,7 +88,7 @@ export async function POST(request: NextRequest) {
     if (!email || !name || !role) {
       return NextResponse.json(
         { error: 'Email, isim ve rol gerekli' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -100,7 +105,7 @@ export async function POST(request: NextRequest) {
     if (existing) {
       return NextResponse.json(
         { error: 'Bu email adresi zaten kullanımda' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -119,7 +124,10 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       logger.error('Admin user creation error:', error);
-      return NextResponse.json({ error: 'Admin kullanıcı oluşturulamadı' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Admin kullanıcı oluşturulamadı' },
+        { status: 500 },
+      );
     }
 
     // Create audit log
@@ -131,7 +139,7 @@ export async function POST(request: NextRequest) {
       null,
       admin,
       request.headers.get('x-forwarded-for') || undefined,
-      request.headers.get('user-agent') || undefined
+      request.headers.get('user-agent') || undefined,
     );
 
     return NextResponse.json({ admin }, { status: 201 });

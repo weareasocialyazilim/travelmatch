@@ -16,7 +16,7 @@ import { getAdminSession, hasPermission } from '@/lib/auth';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   try {
     const session = await getAdminSession();
@@ -33,7 +33,7 @@ export async function DELETE(
     if (!userId) {
       return NextResponse.json(
         { error: 'Kullanıcı ID gerekli' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -49,7 +49,7 @@ export async function DELETE(
       logger.error('Remove VIP error:', error);
       return NextResponse.json(
         { error: 'VIP statüsü kaldırılamadı: ' + error.message },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -66,7 +66,7 @@ export async function DELETE(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   try {
     const session = await getAdminSession();
@@ -84,7 +84,7 @@ export async function PATCH(
     if (!userId) {
       return NextResponse.json(
         { error: 'Kullanıcı ID gerekli' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -95,10 +95,7 @@ export async function PATCH(
 
     if (body.tier !== undefined) {
       if (!['vip', 'influencer', 'partner'].includes(body.tier)) {
-        return NextResponse.json(
-          { error: 'Geçersiz statü' },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: 'Geçersiz statü' }, { status: 400 });
       }
       updateData.tier = body.tier;
     }
@@ -108,7 +105,7 @@ export async function PATCH(
       if (commission < 0 || commission > 15) {
         return NextResponse.json(
           { error: 'Komisyon oranı 0-15 arasında olmalı' },
-          { status: 400 }
+          { status: 400 },
         );
       }
       updateData.commission_override = commission;
@@ -129,7 +126,7 @@ export async function PATCH(
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json(
         { error: 'Güncellenecek alan bulunamadı' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -144,7 +141,7 @@ export async function PATCH(
       logger.error('Update VIP error:', error);
       return NextResponse.json(
         { error: 'VIP ayarları güncellenemedi: ' + error.message },
-        { status: 500 }
+        { status: 500 },
       );
     }
 

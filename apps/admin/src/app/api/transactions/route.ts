@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
         receiver:users!transactions_receiver_id_fkey(id, display_name, avatar_url, email),
         moment:moments(id, title)
       `,
-        { count: 'exact' }
+        { count: 'exact' },
       )
       .gte('created_at', startDate.toISOString())
       .order('created_at', { ascending: false })
@@ -70,7 +70,9 @@ export async function GET(request: NextRequest) {
     if (userId) {
       const safeUserId = escapeSupabaseFilter(userId);
       if (safeUserId) {
-        query = query.or(`sender_id.eq.${safeUserId},receiver_id.eq.${safeUserId},user_id.eq.${safeUserId}`);
+        query = query.or(
+          `sender_id.eq.${safeUserId},receiver_id.eq.${safeUserId},user_id.eq.${safeUserId}`,
+        );
       }
     }
 
@@ -86,22 +88,49 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('Transactions query error:', error);
-      return NextResponse.json({ error: 'İşlemler yüklenemedi' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'İşlemler yüklenemedi' },
+        { status: 500 },
+      );
     }
 
     // Calculate summary stats
     type Transaction = { amount?: number; status?: string; type?: string };
     const summary = {
       total: count || 0,
-      totalAmount: transactions?.reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) || 0,
-      completedAmount: transactions?.filter((t: Transaction) => t.status === 'completed').reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) || 0,
-      pendingAmount: transactions?.filter((t: Transaction) => t.status === 'pending').reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) || 0,
-      failedAmount: transactions?.filter((t: Transaction) => t.status === 'failed').reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) || 0,
+      totalAmount:
+        transactions?.reduce(
+          (sum: number, t: Transaction) => sum + (t.amount || 0),
+          0,
+        ) || 0,
+      completedAmount:
+        transactions
+          ?.filter((t: Transaction) => t.status === 'completed')
+          .reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) ||
+        0,
+      pendingAmount:
+        transactions
+          ?.filter((t: Transaction) => t.status === 'pending')
+          .reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) ||
+        0,
+      failedAmount:
+        transactions
+          ?.filter((t: Transaction) => t.status === 'failed')
+          .reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) ||
+        0,
       byType: {
-        gift: transactions?.filter((t: Transaction) => t.type === 'gift').length || 0,
-        withdrawal: transactions?.filter((t: Transaction) => t.type === 'withdrawal').length || 0,
-        refund: transactions?.filter((t: Transaction) => t.type === 'refund').length || 0,
-        deposit: transactions?.filter((t: Transaction) => t.type === 'deposit').length || 0,
+        gift:
+          transactions?.filter((t: Transaction) => t.type === 'gift').length ||
+          0,
+        withdrawal:
+          transactions?.filter((t: Transaction) => t.type === 'withdrawal')
+            .length || 0,
+        refund:
+          transactions?.filter((t: Transaction) => t.type === 'refund')
+            .length || 0,
+        deposit:
+          transactions?.filter((t: Transaction) => t.type === 'deposit')
+            .length || 0,
       },
     };
 

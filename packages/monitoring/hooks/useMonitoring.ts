@@ -1,6 +1,6 @@
 /**
  * Custom hooks for production monitoring
- * 
+ *
  * Provides React hooks for tracking user interactions, performance metrics,
  * and errors throughout the application.
  */
@@ -11,7 +11,7 @@ import { monitoringService } from '../services/monitoring';
 
 /**
  * Track screen views automatically
- * 
+ *
  * @example
  * ```typescript
  * function MomentDetailScreen() {
@@ -22,7 +22,7 @@ import { monitoringService } from '../services/monitoring';
  */
 export function useScreenTracking(
   screenName: string,
-  attributes?: Record<string, any>
+  attributes?: Record<string, any>,
 ): void {
   const route = useRoute();
 
@@ -47,7 +47,7 @@ export function useScreenTracking(
 
 /**
  * Track navigation events automatically
- * 
+ *
  * @example
  * ```typescript
  * function App() {
@@ -83,16 +83,16 @@ export function useNavigationTracking(): void {
 
 /**
  * Track custom actions with easy callback wrapping
- * 
+ *
  * @example
  * ```typescript
  * function MomentCard({ moment }) {
  *   const trackAction = useActionTracking();
- *   
+ *
  *   const handleLike = trackAction('moment_liked', async () => {
  *     await likeMoment(moment.id);
  *   }, { moment_id: moment.id, category: moment.category });
- *   
+ *
  *   return <Button onPress={handleLike}>Like</Button>;
  * }
  * ```
@@ -102,7 +102,7 @@ export function useActionTracking() {
     <T extends (...args: any[]) => any>(
       actionName: string,
       callback: T,
-      attributes?: Record<string, any>
+      attributes?: Record<string, any>,
     ): T => {
       return ((...args: any[]) => {
         if (monitoringService.isEnabled()) {
@@ -111,18 +111,18 @@ export function useActionTracking() {
         return callback(...args);
       }) as T;
     },
-    []
+    [],
   );
 }
 
 /**
  * Track performance timing automatically
- * 
+ *
  * @example
  * ```typescript
  * function MomentsScreen() {
  *   const { startTiming, endTiming } = usePerformanceTracking('moments_load');
- *   
+ *
  *   useEffect(() => {
  *     startTiming();
  *     loadMoments().then(() => {
@@ -147,7 +147,7 @@ export function usePerformanceTracking(metricName: string) {
       monitoringService.addTiming(metricName, duration, attributes);
       startTimeRef.current = undefined;
     },
-    [metricName]
+    [metricName],
   );
 
   return { startTiming, endTiming };
@@ -155,12 +155,12 @@ export function usePerformanceTracking(metricName: string) {
 
 /**
  * Track errors automatically with error boundary integration
- * 
+ *
  * @example
  * ```typescript
  * function useDataFetching() {
  *   const trackError = useErrorTracking('data_fetch');
- *   
+ *
  *   try {
  *     const data = await fetchData();
  *     return data;
@@ -181,21 +181,21 @@ export function useErrorTracking(context?: string) {
         ...attributes,
       });
     },
-    [context]
+    [context],
   );
 }
 
 /**
  * Track API calls automatically
- * 
+ *
  * @example
  * ```typescript
  * function useMoments() {
  *   const trackApi = useApiTracking();
- *   
+ *
  *   const fetchMoments = async () => {
  *     const { start, success, error } = trackApi('GET', '/api/moments');
- *     
+ *
  *     const resourceId = start();
  *     try {
  *       const response = await fetch('/api/moments');
@@ -232,7 +232,7 @@ export function useApiTracking() {
 
 /**
  * Track user authentication state
- * 
+ *
  * @example
  * ```typescript
  * function AuthProvider({ children }) {
@@ -242,7 +242,9 @@ export function useApiTracking() {
  * }
  * ```
  */
-export function useUserTracking(user: { id: string; email?: string; name?: string } | null): void {
+export function useUserTracking(
+  user: { id: string; email?: string; name?: string } | null,
+): void {
   useEffect(() => {
     if (!monitoringService.isEnabled()) return;
 

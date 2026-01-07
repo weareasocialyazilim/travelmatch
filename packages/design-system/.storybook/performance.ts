@@ -51,27 +51,28 @@ export interface PerformanceMetrics {
   componentType: keyof typeof PERFORMANCE_BUDGETS;
 }
 
-export function checkPerformanceBudget(
-  metrics: PerformanceMetrics
-): { passed: boolean; violations: string[] } {
+export function checkPerformanceBudget(metrics: PerformanceMetrics): {
+  passed: boolean;
+  violations: string[];
+} {
   const budget = PERFORMANCE_BUDGETS[metrics.componentType];
   const violations: string[] = [];
 
   if (metrics.renderTime > budget.maxRenderTime) {
     violations.push(
-      `Render time (${metrics.renderTime}ms) exceeds budget (${budget.maxRenderTime}ms)`
+      `Render time (${metrics.renderTime}ms) exceeds budget (${budget.maxRenderTime}ms)`,
     );
   }
 
   if (metrics.reRenderCount > budget.maxReRenderCount) {
     violations.push(
-      `Re-render count (${metrics.reRenderCount}) exceeds budget (${budget.maxReRenderCount})`
+      `Re-render count (${metrics.reRenderCount}) exceeds budget (${budget.maxReRenderCount})`,
     );
   }
 
   if (metrics.memoryUsage > budget.maxMemoryUsage) {
     violations.push(
-      `Memory usage (${metrics.memoryUsage}MB) exceeds budget (${budget.maxMemoryUsage}MB)`
+      `Memory usage (${metrics.memoryUsage}MB) exceeds budget (${budget.maxMemoryUsage}MB)`,
     );
   }
 

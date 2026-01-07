@@ -29,7 +29,13 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -53,7 +59,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { getInitials, formatDate, formatCurrency } from '@/lib/utils';
-import { useUser, useSuspendUser, useBanUser, useVerifyUser } from '@/hooks/use-users';
+import {
+  useUser,
+  useSuspendUser,
+  useBanUser,
+  useVerifyUser,
+} from '@/hooks/use-users';
 import { Loader2 } from 'lucide-react';
 
 // Fallback mock user data
@@ -83,8 +94,8 @@ const mockUser = {
     total_moments: 24,
     total_matches: 156,
     total_messages: 1243,
-    total_spent: 450.00,
-    total_earned: 120.00,
+    total_spent: 450.0,
+    total_earned: 120.0,
     avg_rating: 4.8,
     review_count: 42,
   },
@@ -237,24 +248,56 @@ export default function UserDetailPage() {
   const user = userData || mockUser;
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string }> = {
+    const variants: Record<
+      string,
+      {
+        variant: 'default' | 'secondary' | 'destructive' | 'outline';
+        label: string;
+      }
+    > = {
       active: { variant: 'default', label: 'Aktif' },
       suspended: { variant: 'secondary', label: 'Askıya Alındı' },
       banned: { variant: 'destructive', label: 'Yasaklandı' },
       inactive: { variant: 'outline', label: 'Pasif' },
     };
-    const { variant, label } = variants[status] || { variant: 'outline', label: status };
+    const { variant, label } = variants[status] || {
+      variant: 'outline',
+      label: status,
+    };
     return <Badge variant={variant}>{label}</Badge>;
   };
 
   const getKycBadge = (status: string) => {
-    const variants: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string; icon: React.ReactNode }> = {
-      verified: { variant: 'default', label: 'Doğrulandı', icon: <CheckCircle className="h-3 w-3" /> },
-      pending: { variant: 'secondary', label: 'Bekliyor', icon: <Clock className="h-3 w-3" /> },
-      rejected: { variant: 'destructive', label: 'Reddedildi', icon: <XCircle className="h-3 w-3" /> },
+    const variants: Record<
+      string,
+      {
+        variant: 'default' | 'secondary' | 'destructive' | 'outline';
+        label: string;
+        icon: React.ReactNode;
+      }
+    > = {
+      verified: {
+        variant: 'default',
+        label: 'Doğrulandı',
+        icon: <CheckCircle className="h-3 w-3" />,
+      },
+      pending: {
+        variant: 'secondary',
+        label: 'Bekliyor',
+        icon: <Clock className="h-3 w-3" />,
+      },
+      rejected: {
+        variant: 'destructive',
+        label: 'Reddedildi',
+        icon: <XCircle className="h-3 w-3" />,
+      },
       not_submitted: { variant: 'outline', label: 'Gönderilmedi', icon: null },
     };
-    const { variant, label, icon } = variants[status] || { variant: 'outline', label: status, icon: null };
+    const { variant, label, icon } = variants[status] || {
+      variant: 'outline',
+      label: status,
+      icon: null,
+    };
     return (
       <Badge variant={variant} className="gap-1">
         {icon}
@@ -280,7 +323,9 @@ export default function UserDetailPage() {
         toast.info('Şifre sıfırlama bağlantısı gönderildi');
       }
     } catch (err) {
-      toast.error(`İşlem başarısız: ${err instanceof Error ? err.message : 'Bilinmeyen hata'}`);
+      toast.error(
+        `İşlem başarısız: ${err instanceof Error ? err.message : 'Bilinmeyen hata'}`,
+      );
     }
     setActionDialog(null);
     setActionReason('');
@@ -302,8 +347,14 @@ export default function UserDetailPage() {
         <div className="text-center">
           <AlertTriangle className="mx-auto h-12 w-12 text-destructive" />
           <h2 className="mt-4 text-lg font-semibold">Bir hata oluştu</h2>
-          <p className="text-muted-foreground">Kullanıcı bilgileri yüklenemedi.</p>
-          <Button variant="outline" className="mt-4" onClick={() => router.back()}>
+          <p className="text-muted-foreground">
+            Kullanıcı bilgileri yüklenemedi.
+          </p>
+          <Button
+            variant="outline"
+            className="mt-4"
+            onClick={() => router.back()}
+          >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Geri Dön
           </Button>
@@ -331,7 +382,9 @@ export default function UserDetailPage() {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div className="flex-1">
-          <h1 className="text-3xl font-bold tracking-tight">Kullanıcı Detayı</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Kullanıcı Detayı
+          </h1>
           <p className="text-muted-foreground">ID: {params.id}</p>
         </div>
         <div className="flex items-center gap-2">
@@ -363,7 +416,9 @@ export default function UserDetailPage() {
                 <Shield className="mr-2 h-4 w-4" />
                 KYC Onayla
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setActionDialog('reset_password')}>
+              <DropdownMenuItem
+                onClick={() => setActionDialog('reset_password')}
+              >
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Şifre Sıfırla
               </DropdownMenuItem>
@@ -395,7 +450,10 @@ export default function UserDetailPage() {
                 <div className="mt-2 flex items-center gap-2">
                   {getStatusBadge(user.status)}
                   {user.subscription.plan === 'premium' && (
-                    <Badge variant="secondary" className="bg-amber-100 text-amber-800">
+                    <Badge
+                      variant="secondary"
+                      className="bg-amber-100 text-amber-800"
+                    >
                       Premium
                     </Badge>
                   )}
@@ -454,7 +512,9 @@ export default function UserDetailPage() {
 
                 <div className="flex items-center gap-3">
                   <User className="h-4 w-4 text-muted-foreground" />
-                  <p className="text-sm capitalize">{user.gender === 'male' ? 'Erkek' : 'Kadın'}</p>
+                  <p className="text-sm capitalize">
+                    {user.gender === 'male' ? 'Erkek' : 'Kadın'}
+                  </p>
                 </div>
               </div>
 
@@ -484,7 +544,9 @@ export default function UserDetailPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Risk Skoru</span>
+                <span className="text-sm text-muted-foreground">
+                  Risk Skoru
+                </span>
                 <div className="flex items-center gap-2">
                   <div className="h-2 w-24 rounded-full bg-gray-200">
                     <div
@@ -492,7 +554,9 @@ export default function UserDetailPage() {
                       style={{ width: `${user.risk_score}%` }}
                     />
                   </div>
-                  <span className="text-sm font-medium text-green-600">{user.risk_score}/100</span>
+                  <span className="text-sm font-medium text-green-600">
+                    {user.risk_score}/100
+                  </span>
                 </div>
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
@@ -514,8 +578,13 @@ export default function UserDetailPage() {
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Plan</span>
-                <Badge variant="secondary" className="bg-amber-100 text-amber-800">
-                  {user.subscription.plan === 'premium' ? 'Premium' : 'Ücretsiz'}
+                <Badge
+                  variant="secondary"
+                  className="bg-amber-100 text-amber-800"
+                >
+                  {user.subscription.plan === 'premium'
+                    ? 'Premium'
+                    : 'Ücretsiz'}
                 </Badge>
               </div>
               <div className="flex items-center justify-between text-sm">
@@ -528,7 +597,9 @@ export default function UserDetailPage() {
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Otomatik Yenileme</span>
-                <Badge variant={user.subscription.auto_renew ? 'default' : 'outline'}>
+                <Badge
+                  variant={user.subscription.auto_renew ? 'default' : 'outline'}
+                >
                   {user.subscription.auto_renew ? 'Aktif' : 'Kapalı'}
                 </Badge>
               </div>
@@ -563,13 +634,17 @@ export default function UserDetailPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Son Aktiviteler</CardTitle>
-                  <CardDescription>Kullanıcının son 30 günlük aktiviteleri</CardDescription>
+                  <CardDescription>
+                    Kullanıcının son 30 günlük aktiviteleri
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     {mockActivity.map((activity) => (
                       <div key={activity.id} className="flex items-start gap-4">
-                        <div className="mt-1">{getActivityIcon(activity.type)}</div>
+                        <div className="mt-1">
+                          {getActivityIcon(activity.type)}
+                        </div>
                         <div className="flex-1">
                           <p className="text-sm">{activity.description}</p>
                           <p className="text-xs text-muted-foreground">
@@ -590,10 +665,14 @@ export default function UserDetailPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle>İşlem Geçmişi</CardTitle>
-                      <CardDescription>Tüm ödeme ve iadeleri görüntüle</CardDescription>
+                      <CardDescription>
+                        Tüm ödeme ve iadeleri görüntüle
+                      </CardDescription>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm text-muted-foreground">Toplam Harcama</p>
+                      <p className="text-sm text-muted-foreground">
+                        Toplam Harcama
+                      </p>
                       <p className="text-2xl font-bold text-green-600">
                         {formatCurrency(user.stats.total_spent, 'TRY')}
                       </p>
@@ -634,10 +713,16 @@ export default function UserDetailPage() {
                             {formatCurrency(txn.amount, txn.currency)}
                           </p>
                           <Badge
-                            variant={txn.status === 'completed' ? 'default' : 'secondary'}
+                            variant={
+                              txn.status === 'completed'
+                                ? 'default'
+                                : 'secondary'
+                            }
                             className="text-xs"
                           >
-                            {txn.status === 'completed' ? 'Tamamlandı' : 'Bekliyor'}
+                            {txn.status === 'completed'
+                              ? 'Tamamlandı'
+                              : 'Bekliyor'}
                           </Badge>
                         </div>
                       </div>
@@ -654,9 +739,13 @@ export default function UserDetailPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle>Momentler</CardTitle>
-                      <CardDescription>Kullanıcının paylaştığı içerikler</CardDescription>
+                      <CardDescription>
+                        Kullanıcının paylaştığı içerikler
+                      </CardDescription>
                     </div>
-                    <Badge variant="secondary">{user.stats.total_moments} Moment</Badge>
+                    <Badge variant="secondary">
+                      {user.stats.total_moments} Moment
+                    </Badge>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -708,7 +797,9 @@ export default function UserDetailPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Raporlar & Şikayetler</CardTitle>
-                  <CardDescription>Alınan ve gönderilen raporlar</CardDescription>
+                  <CardDescription>
+                    Alınan ve gönderilen raporlar
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -756,7 +847,9 @@ export default function UserDetailPage() {
                                 : report.status}
                           </Badge>
                           <p className="mt-1 text-xs text-muted-foreground">
-                            {report.type === 'received' ? 'Alınan' : 'Gönderilen'}
+                            {report.type === 'received'
+                              ? 'Alınan'
+                              : 'Gönderilen'}
                           </p>
                         </div>
                       </div>
@@ -776,7 +869,9 @@ export default function UserDetailPage() {
                     <Camera className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{user.stats.total_moments}</p>
+                    <p className="text-2xl font-bold">
+                      {user.stats.total_moments}
+                    </p>
                     <p className="text-sm text-muted-foreground">Moment</p>
                   </div>
                 </div>
@@ -789,7 +884,9 @@ export default function UserDetailPage() {
                     <Heart className="h-6 w-6 text-pink-600" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{user.stats.total_matches}</p>
+                    <p className="text-2xl font-bold">
+                      {user.stats.total_matches}
+                    </p>
                     <p className="text-sm text-muted-foreground">Eşleşme</p>
                   </div>
                 </div>
@@ -802,7 +899,9 @@ export default function UserDetailPage() {
                     <MessageSquare className="h-6 w-6 text-purple-600" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{user.stats.total_messages}</p>
+                    <p className="text-2xl font-bold">
+                      {user.stats.total_messages}
+                    </p>
                     <p className="text-sm text-muted-foreground">Mesaj</p>
                   </div>
                 </div>
@@ -818,7 +917,9 @@ export default function UserDetailPage() {
                     <p className="text-2xl font-bold">
                       {formatCurrency(user.stats.total_spent, 'TRY')}
                     </p>
-                    <p className="text-sm text-muted-foreground">Toplam Harcama</p>
+                    <p className="text-sm text-muted-foreground">
+                      Toplam Harcama
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -842,7 +943,8 @@ export default function UserDetailPage() {
                 'Kullanıcı geçici olarak askıya alınacak. Erişimi kısıtlanacak.'}
               {actionDialog === 'ban' &&
                 'Kullanıcı kalıcı olarak yasaklanacak. Bu işlem geri alınabilir.'}
-              {actionDialog === 'verify_kyc' && 'Kullanıcının kimlik doğrulaması onaylanacak.'}
+              {actionDialog === 'verify_kyc' &&
+                'Kullanıcının kimlik doğrulaması onaylanacak.'}
               {actionDialog === 'reset_password' &&
                 'Kullanıcıya şifre sıfırlama bağlantısı gönderilecek.'}
             </DialogDescription>

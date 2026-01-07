@@ -21,6 +21,7 @@ overrides:
   '@react-native/virtualized-lists>react': 19.1.0
   '@react-native/virtualized-lists>react-native': 0.81.5
   '@react-native-async-storage/async-storage>react-native': 0.81.5
+  react-native-reanimated: ~4.1.6
 
 importers:
   .:
@@ -49,7 +50,7 @@ importers:
         version: 1.57.0
       '@supabase/supabase-js':
         specifier: ^2.88.0
-        version: 2.89.0
+        version: 2.90.0
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.50.0
         version: 8.52.0(@typescript-eslint/parser@8.52.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
@@ -169,10 +170,10 @@ importers:
         version: 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@supabase/ssr':
         specifier: ^0.8.0
-        version: 0.8.0(@supabase/supabase-js@2.89.0)
+        version: 0.8.0(@supabase/supabase-js@2.90.0)
       '@supabase/supabase-js':
         specifier: ^2.88.0
-        version: 2.89.0
+        version: 2.90.0
       '@tanstack/react-query':
         specifier: ^5.90.12
         version: 5.90.16(react@19.1.0)
@@ -317,10 +318,10 @@ importers:
         version: 2.2.0(@babel/runtime@7.28.4)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
       '@supabase/postgrest-js':
         specifier: ^2.89.0
-        version: 2.89.0
+        version: 2.90.0
       '@supabase/supabase-js':
         specifier: ^2.88.0
-        version: 2.89.0
+        version: 2.90.0
       '@tanstack/query-async-storage-persister':
         specifier: ^5.90.18
         version: 5.90.18
@@ -505,9 +506,6 @@ importers:
       '@eslint/js':
         specifier: ^9.39.2
         version: 9.39.2
-      '@storybook/react':
-        specifier: ^8.6.15
-        version: 8.6.15(@storybook/test@8.6.15(storybook@10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(typescript@5.9.3)
       '@storybook/react-native':
         specifier: ^10.1.1
         version: 10.1.11(44lvbkpjdm54mgwynhjolpxt4e)
@@ -600,7 +598,7 @@ importers:
         version: link:../../packages/shared
       framer-motion:
         specifier: ^12.23.26
-        version: 12.24.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 12.24.10(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       lucide-react:
         specifier: ^0.561.0
         version: 0.561.0(react@19.1.0)
@@ -730,8 +728,8 @@ importers:
         specifier: ~2.29.1
         version: 2.29.1(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.7)(react@19.1.0))(react@19.1.0)
       react-native-reanimated:
-        specifier: ~4.2.0
-        version: 4.2.1(react-native-worklets@0.7.1(@babel/core@7.28.5)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.7)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.7)(react@19.1.0))(react@19.1.0)
+        specifier: ~4.1.6
+        version: 4.1.6(@babel/core@7.28.5)(react-native-worklets@0.7.1(@babel/core@7.28.5)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.7)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.7)(react@19.1.0))(react@19.1.0)
       react-native-svg:
         specifier: 15.15.1
         version: 15.15.1(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.7)(react@19.1.0))(react@19.1.0)
@@ -811,7 +809,7 @@ importers:
     dependencies:
       '@supabase/supabase-js':
         specifier: ^2.88.0
-        version: 2.89.0
+        version: 2.90.0
     devDependencies:
       '@types/jest':
         specifier: ^29.5.14
@@ -2807,7 +2805,7 @@ packages:
       react: 19.1.0
       react-native: 0.81.5
       react-native-gesture-handler: '>=2.16.1'
-      react-native-reanimated: '>=3.16.0 || >=4.0.0-'
+      react-native-reanimated: ~4.1.6
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -5388,7 +5386,7 @@ packages:
       react: 19.1.0
       react-native: 0.81.5
       react-native-gesture-handler: '>=2'
-      react-native-reanimated: '>=3'
+      react-native-reanimated: ~4.1.6
       react-native-safe-area-context: 5.6.2
       react-native-svg: '>=14'
       storybook: '>=10 || ^10'
@@ -5405,7 +5403,7 @@ packages:
       react: 19.1.0
       react-native: 0.81.5
       react-native-gesture-handler: '>=2'
-      react-native-reanimated: '>=2'
+      react-native-reanimated: ~4.1.6
       react-native-safe-area-context: 5.6.2
       storybook: '>=10 || ^10'
     peerDependenciesMeta:
@@ -5500,31 +5498,31 @@ packages:
     peerDependencies:
       storybook: ^8.2.0 || ^8.3.0-0 || ^8.4.0-0 || ^8.5.0-0 || ^8.6.0-0
 
-  '@supabase/auth-js@2.89.0':
+  '@supabase/auth-js@2.90.0':
     resolution:
       {
-        integrity: sha512-wiWZdz8WMad8LQdJMWYDZ2SJtZP5MwMqzQq3ehtW2ngiI3UTgbKiFrvMUUS3KADiVlk4LiGfODB2mrYx7w2f8w==,
+        integrity: sha512-J5Jgr1XE86NpK0LX8yLdjv3NzzsUnGky72QIGR1AcdVXHQIhwjb3JFEjNutODNKyOrknx00lyClOvqooHFHIiw==,
       }
     engines: { node: '>=20.0.0' }
 
-  '@supabase/functions-js@2.89.0':
+  '@supabase/functions-js@2.90.0':
     resolution:
       {
-        integrity: sha512-XEueaC5gMe5NufNYfBh9kPwJlP5M2f+Ogr8rvhmRDAZNHgY6mI35RCkYDijd92pMcNM7g8pUUJov93UGUnqfyw==,
+        integrity: sha512-YEk4AVtdaUzjxhil2GemOjq0VQVQfg8LmPyooJt80lNscQHfDyCGmHeQ6pDI48dkICTE87V7KVrlXaVGCZa1Rw==,
       }
     engines: { node: '>=20.0.0' }
 
-  '@supabase/postgrest-js@2.89.0':
+  '@supabase/postgrest-js@2.90.0':
     resolution:
       {
-        integrity: sha512-/b0fKrxV9i7RNOEXMno/I1862RsYhuUo+Q6m6z3ar1f4ulTMXnDfv0y4YYxK2POcgrOXQOgKYQx1eArybyNvtg==,
+        integrity: sha512-XCgrXuGtBPgxQWKfS8tZ4/deK5+cgUW+XLl4zq4v7JRUfCHlc3ZewZid5hjcpAIDYwGWq9ihrfPUNDAfl5jDdg==,
       }
     engines: { node: '>=20.0.0' }
 
-  '@supabase/realtime-js@2.89.0':
+  '@supabase/realtime-js@2.90.0':
     resolution:
       {
-        integrity: sha512-aMOvfDb2a52u6PX6jrrjvACHXGV3zsOlWRzZsTIOAJa0hOVvRp01AwC1+nLTGUzxzezejrYeCX+KnnM1xHdl+w==,
+        integrity: sha512-Hncs2Obk2Wd4Mcj51XDtLqOuiDT6onSmpHkwjsaLDZylgLi4uN81W4LYhj+rdPm3A9nQIRB4/5SZ3Hab2Adlsg==,
       }
     engines: { node: '>=20.0.0' }
 
@@ -5536,17 +5534,17 @@ packages:
     peerDependencies:
       '@supabase/supabase-js': ^2.76.1
 
-  '@supabase/storage-js@2.89.0':
+  '@supabase/storage-js@2.90.0':
     resolution:
       {
-        integrity: sha512-6zKcXofk/M/4Eato7iqpRh+B+vnxeiTumCIP+Tz26xEqIiywzD9JxHq+udRrDuv6hXE+pmetvJd8n5wcf4MFRQ==,
+        integrity: sha512-50XiDACfHXhibm20J94TEdOYMLXm4fZCHTdAAs9xBDJTBA4RXVN52Bx1MVW34pu3S72rAgObQxVyAFaZ+7+7Tg==,
       }
     engines: { node: '>=20.0.0' }
 
-  '@supabase/supabase-js@2.89.0':
+  '@supabase/supabase-js@2.90.0':
     resolution:
       {
-        integrity: sha512-KlaRwSfFA0fD73PYVMHj5/iXFtQGCcX7PSx0FdQwYEEw9b2wqM7GxadY+5YwcmuEhalmjFB/YvqaoNVF+sWUlg==,
+        integrity: sha512-foWQl5x1+LuqT7qdnAoCDcKHTNBSaED+eSEOEmmpqXiQuCfJU2K0lDkfGm7PUBx/BDaw3tFObzuJyZtHDbrehA==,
       }
     engines: { node: '>=20.0.0' }
 
@@ -7267,10 +7265,10 @@ packages:
         integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==,
       }
 
-  baseline-browser-mapping@2.9.11:
+  baseline-browser-mapping@2.9.12:
     resolution:
       {
-        integrity: sha512-Sg0xJUNDU1sJNGdfGWhVHX0kkZ+HWcvmVymJbj6NSgZZmW/8S9Y2HQ5euytnIgakgxN6papOAWiwDo1ctFDcoQ==,
+        integrity: sha512-Mij6Lij93pTAIsSYy5cyBQ975Qh9uLEc5rwGTpomiZeXZL9yIS6uORJakb3ScHgfs0serMMfIbXzokPMuEiRyw==,
       }
     hasBin: true
 
@@ -9604,10 +9602,10 @@ packages:
         integrity: sha512-1X1NTtiJphryn/uLQz3whtY6jK3fTqoE3ohKs0tT+Ujr1W59oopxmoEh7Lu5p6vBaPbgoM0bzveAW4Qi5RyWDQ==,
       }
 
-  framer-motion@12.24.7:
+  framer-motion@12.24.10:
     resolution:
       {
-        integrity: sha512-EolFLm7NdEMhWO/VTMZ0LlR4fLHGDiJItTx3i8dlyQooOOBoYAaysK4paGD4PrwqnoDdeDOS+TxnSBIAnNHs3w==,
+        integrity: sha512-8yoyMkCn2RmV9UB9mfmMuzKyenQe909hRQRl0yGBhbZJjZZ9bSU87NIGAruqCXCuTNCA0qHw2LWLrcXLL9GF6A==,
       }
     peerDependencies:
       '@emotion/is-prop-valid': '*'
@@ -11948,16 +11946,16 @@ packages:
         integrity: sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==,
       }
 
-  motion-dom@12.24.3:
+  motion-dom@12.24.10:
     resolution:
       {
-        integrity: sha512-ZjMZCwhTglim0LM64kC1iFdm4o+2P9IKk3rl/Nb4RKsb5p4O9HJ1C2LWZXOFdsRtp6twpqWRXaFKOduF30ntow==,
+        integrity: sha512-H3HStYaJ6wANoZVNT0ZmYZHGvrpvi9pKJRzsgNEHkdITR4Qd9FFu2e9sH4e2Phr4tKCmyyloex6SOSmv0Tlq+g==,
       }
 
-  motion-utils@12.23.28:
+  motion-utils@12.24.10:
     resolution:
       {
-        integrity: sha512-0W6cWd5Okoyf8jmessVK3spOmbyE0yTdNKujHctHH9XdAE4QDuZ1/LjSXC68rrhsJU+TkzXURC5OdSWh9ibOwQ==,
+        integrity: sha512-x5TFgkCIP4pPsRLpKoI86jv/q8t8FQOiM/0E8QKBzfMozWHfkKap2gA1hOki+B5g3IsBNpxbUnfOum1+dgvYww==,
       }
 
   ms@2.0.0:
@@ -13135,16 +13133,6 @@ packages:
       react: 19.1.0
       react-native: 0.81.5
       react-native-worklets: '>=0.5.0'
-
-  react-native-reanimated@4.2.1:
-    resolution:
-      {
-        integrity: sha512-/NcHnZMyOvsD/wYXug/YqSKw90P9edN0kEPL5lP4PFf1aQ4F1V7MKe/E0tvfkXKIajy3Qocp5EiEnlcrK/+BZg==,
-      }
-    peerDependencies:
-      react: 19.1.0
-      react-native: 0.81.5
-      react-native-worklets: '>=0.7.0'
 
   react-native-safe-area-context@5.6.2:
     resolution:
@@ -19030,10 +19018,6 @@ snapshots:
       ts-dedent: 2.2.0
       vite: 6.4.1(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
 
-  '@storybook/components@8.6.15(storybook@10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))':
-    dependencies:
-      storybook: 10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-
   '@storybook/components@8.6.15(storybook@8.6.15(prettier@3.7.4))':
     dependencies:
       storybook: 8.6.15(prettier@3.7.4)
@@ -19091,30 +19075,15 @@ snapshots:
       '@vitest/utils': 2.1.9
       storybook: 8.6.15(prettier@3.7.4)
 
-  '@storybook/instrumenter@8.6.15(storybook@10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))':
-    dependencies:
-      '@storybook/global': 5.0.0
-      '@vitest/utils': 2.1.9
-      storybook: 10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-    optional: true
-
   '@storybook/instrumenter@8.6.15(storybook@8.6.15(prettier@3.7.4))':
     dependencies:
       '@storybook/global': 5.0.0
       '@vitest/utils': 2.1.9
       storybook: 8.6.15(prettier@3.7.4)
 
-  '@storybook/manager-api@8.6.15(storybook@10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))':
-    dependencies:
-      storybook: 10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-
   '@storybook/manager-api@8.6.15(storybook@8.6.15(prettier@3.7.4))':
     dependencies:
       storybook: 8.6.15(prettier@3.7.4)
-
-  '@storybook/preview-api@8.6.15(storybook@10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))':
-    dependencies:
-      storybook: 10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
 
   '@storybook/preview-api@8.6.15(storybook@8.6.15(prettier@3.7.4))':
     dependencies:
@@ -19131,12 +19100,6 @@ snapshots:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
       storybook: 8.6.15(prettier@3.7.4)
-
-  '@storybook/react-dom-shim@8.6.15(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))':
-    dependencies:
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-      storybook: 10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
 
   '@storybook/react-dom-shim@8.6.15(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.15(prettier@3.7.4))':
     dependencies:
@@ -19253,21 +19216,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@storybook/react@8.6.15(@storybook/test@8.6.15(storybook@10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(typescript@5.9.3)':
-    dependencies:
-      '@storybook/components': 8.6.15(storybook@10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
-      '@storybook/global': 5.0.0
-      '@storybook/manager-api': 8.6.15(storybook@10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
-      '@storybook/preview-api': 8.6.15(storybook@10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
-      '@storybook/react-dom-shim': 8.6.15(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
-      '@storybook/theming': 8.6.15(storybook@10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-      storybook: 10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-    optionalDependencies:
-      '@storybook/test': 8.6.15(storybook@10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
-      typescript: 5.9.3
-
   '@storybook/react@8.6.15(@storybook/test@8.6.15(storybook@8.6.15(prettier@3.7.4)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.15(prettier@3.7.4))(typescript@5.9.3)':
     dependencies:
       '@storybook/components': 8.6.15(storybook@8.6.15(prettier@3.7.4))
@@ -19325,18 +19273,6 @@ snapshots:
       '@vitest/spy': 2.0.5
       storybook: 8.6.15(prettier@3.7.4)
 
-  '@storybook/test@8.6.15(storybook@10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))':
-    dependencies:
-      '@storybook/global': 5.0.0
-      '@storybook/instrumenter': 8.6.15(storybook@10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
-      '@testing-library/dom': 10.4.0
-      '@testing-library/jest-dom': 6.5.0
-      '@testing-library/user-event': 14.5.2(@testing-library/dom@10.4.0)
-      '@vitest/expect': 2.0.5
-      '@vitest/spy': 2.0.5
-      storybook: 10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-    optional: true
-
   '@storybook/test@8.6.15(storybook@8.6.15(prettier@3.7.4))':
     dependencies:
       '@storybook/global': 5.0.0
@@ -19348,27 +19284,23 @@ snapshots:
       '@vitest/spy': 2.0.5
       storybook: 8.6.15(prettier@3.7.4)
 
-  '@storybook/theming@8.6.15(storybook@10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))':
-    dependencies:
-      storybook: 10.1.11(@testing-library/dom@10.4.0)(prettier@3.7.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-
   '@storybook/theming@8.6.15(storybook@8.6.15(prettier@3.7.4))':
     dependencies:
       storybook: 8.6.15(prettier@3.7.4)
 
-  '@supabase/auth-js@2.89.0':
+  '@supabase/auth-js@2.90.0':
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/functions-js@2.89.0':
+  '@supabase/functions-js@2.90.0':
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/postgrest-js@2.89.0':
+  '@supabase/postgrest-js@2.90.0':
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/realtime-js@2.89.0':
+  '@supabase/realtime-js@2.90.0':
     dependencies:
       '@types/phoenix': 1.6.7
       '@types/ws': 8.18.1
@@ -19378,23 +19310,23 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@supabase/ssr@0.8.0(@supabase/supabase-js@2.89.0)':
+  '@supabase/ssr@0.8.0(@supabase/supabase-js@2.90.0)':
     dependencies:
-      '@supabase/supabase-js': 2.89.0
+      '@supabase/supabase-js': 2.90.0
       cookie: 1.1.1
 
-  '@supabase/storage-js@2.89.0':
+  '@supabase/storage-js@2.90.0':
     dependencies:
       iceberg-js: 0.8.1
       tslib: 2.8.1
 
-  '@supabase/supabase-js@2.89.0':
+  '@supabase/supabase-js@2.90.0':
     dependencies:
-      '@supabase/auth-js': 2.89.0
-      '@supabase/functions-js': 2.89.0
-      '@supabase/postgrest-js': 2.89.0
-      '@supabase/realtime-js': 2.89.0
-      '@supabase/storage-js': 2.89.0
+      '@supabase/auth-js': 2.90.0
+      '@supabase/functions-js': 2.90.0
+      '@supabase/postgrest-js': 2.90.0
+      '@supabase/realtime-js': 2.90.0
+      '@supabase/storage-js': 2.90.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -20586,7 +20518,7 @@ snapshots:
 
   base64-js@1.5.1: {}
 
-  baseline-browser-mapping@2.9.11: {}
+  baseline-browser-mapping@2.9.12: {}
 
   basic-auth@2.0.1:
     dependencies:
@@ -20631,7 +20563,7 @@ snapshots:
 
   browserslist@4.28.1:
     dependencies:
-      baseline-browser-mapping: 2.9.11
+      baseline-browser-mapping: 2.9.12
       caniuse-lite: 1.0.30001762
       electron-to-chromium: 1.5.267
       node-releases: 2.0.27
@@ -22370,10 +22302,10 @@ snapshots:
 
   fraction.js@5.3.4: {}
 
-  framer-motion@12.24.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+  framer-motion@12.24.10(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
-      motion-dom: 12.24.3
-      motion-utils: 12.23.28
+      motion-dom: 12.24.10
+      motion-utils: 12.24.10
       tslib: 2.8.1
     optionalDependencies:
       react: 19.1.0
@@ -24367,11 +24299,11 @@ snapshots:
   moment@2.30.1:
     optional: true
 
-  motion-dom@12.24.3:
+  motion-dom@12.24.10:
     dependencies:
-      motion-utils: 12.23.28
+      motion-utils: 12.24.10
 
-  motion-utils@12.23.28: {}
+  motion-utils@12.24.10: {}
 
   ms@2.0.0: {}
 
@@ -25095,13 +25027,14 @@ snapshots:
       react-native-worklets: 0.7.1(@babel/core@7.28.5)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
       semver: 7.7.2
 
-  react-native-reanimated@4.2.1(react-native-worklets@0.7.1(@babel/core@7.28.5)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.7)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.7)(react@19.1.0))(react@19.1.0):
+  react-native-reanimated@4.1.6(@babel/core@7.28.5)(react-native-worklets@0.7.1(@babel/core@7.28.5)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.7)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.7)(react@19.1.0))(react@19.1.0):
     dependencies:
+      '@babel/core': 7.28.5
       react: 19.1.0
       react-native: 0.81.5(@babel/core@7.28.5)(@types/react@19.2.7)(react@19.1.0)
       react-native-is-edge-to-edge: 1.2.1(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.7)(react@19.1.0))(react@19.1.0)
       react-native-worklets: 0.7.1(@babel/core@7.28.5)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.7)(react@19.1.0))(react@19.1.0)
-      semver: 7.7.3
+      semver: 7.7.2
 
   react-native-safe-area-context@5.6.2(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0):
     dependencies:

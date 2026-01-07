@@ -1,5 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Modal,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import { BlurView } from 'expo-blur';
 import { COLORS } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,14 +32,16 @@ export const GlassModal = ({
   onConfirm,
   onCancel,
   confirmText = 'Confirm',
-  cancelText = 'Cancel'
+  cancelText = 'Cancel',
 }: GlassModalProps) => {
-
   const getIcon = () => {
     switch (type) {
-      case 'success': return { name: 'checkmark-circle', color: COLORS.feedback.success };
-      case 'danger': return { name: 'alert-circle', color: COLORS.feedback.error };
-      default: return { name: 'information-circle', color: COLORS.brand.primary };
+      case 'success':
+        return { name: 'checkmark-circle', color: COLORS.feedback.success };
+      case 'danger':
+        return { name: 'alert-circle', color: COLORS.feedback.error };
+      default:
+        return { name: 'information-circle', color: COLORS.brand.primary };
     }
   };
 
@@ -42,8 +51,17 @@ export const GlassModal = ({
     <Modal transparent visible={visible} animationType="fade">
       <View style={styles.overlay}>
         <BlurView intensity={40} tint="dark" style={styles.container}>
-          <View style={[styles.iconCircle, { backgroundColor: `${iconData.color}20` }]}>
-            <Ionicons name={iconData.name as any} size={32} color={iconData.color} />
+          <View
+            style={[
+              styles.iconCircle,
+              { backgroundColor: `${iconData.color}20` },
+            ]}
+          >
+            <Ionicons
+              name={iconData.name as any}
+              size={32}
+              color={iconData.color}
+            />
           </View>
 
           <Text style={styles.title}>{title}</Text>
@@ -55,10 +73,25 @@ export const GlassModal = ({
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.confirmBtn, { backgroundColor: type === 'danger' ? COLORS.feedback.error : COLORS.brand.primary }]}
+              style={[
+                styles.confirmBtn,
+                {
+                  backgroundColor:
+                    type === 'danger'
+                      ? COLORS.feedback.error
+                      : COLORS.brand.primary,
+                },
+              ]}
               onPress={onConfirm}
             >
-              <Text style={[styles.confirmText, type === 'danger' ? { color: COLORS.utility.white } : { color: COLORS.textPrimary }]}>
+              <Text
+                style={[
+                  styles.confirmText,
+                  type === 'danger'
+                    ? { color: COLORS.utility.white }
+                    : { color: COLORS.textPrimary },
+                ]}
+              >
                 {confirmText}
               </Text>
             </TouchableOpacity>
@@ -76,7 +109,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.overlay.heavy,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   container: {
     width: width * 0.85,
@@ -86,7 +119,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: COLORS.surface.glassBorder,
-    backgroundColor: COLORS.background.glass
+    backgroundColor: COLORS.background.glass,
   },
   iconCircle: {
     width: 60,
@@ -94,45 +127,45 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16
+    marginBottom: 16,
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
     color: COLORS.text.primary,
     marginBottom: 8,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   message: {
     fontSize: 14,
     color: COLORS.text.secondary,
     textAlign: 'center',
     marginBottom: 24,
-    lineHeight: 20
+    lineHeight: 20,
   },
   actions: {
     flexDirection: 'row',
     width: '100%',
-    gap: 12
+    gap: 12,
   },
   cancelBtn: {
     flex: 1,
     paddingVertical: 14,
     borderRadius: 16,
     alignItems: 'center',
-    backgroundColor: COLORS.glass
+    backgroundColor: COLORS.glass,
   },
   confirmBtn: {
     flex: 1,
     paddingVertical: 14,
     borderRadius: 16,
-    alignItems: 'center'
+    alignItems: 'center',
   },
   cancelText: {
     color: COLORS.text.primary,
-    fontWeight: '600'
+    fontWeight: '600',
   },
   confirmText: {
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
 });

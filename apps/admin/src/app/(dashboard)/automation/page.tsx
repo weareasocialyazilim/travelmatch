@@ -28,7 +28,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
@@ -67,7 +73,10 @@ const mockRules = [
     status: 'active',
     trigger: 'user_signup',
     conditions: ['Kayıt tamamlandı'],
-    actions: ['E-posta gönder: Hoş Geldin Şablonu', '3 gün sonra: Moment hatırlatma'],
+    actions: [
+      'E-posta gönder: Hoş Geldin Şablonu',
+      '3 gün sonra: Moment hatırlatma',
+    ],
     executions: {
       total: 12450,
       success: 12380,
@@ -97,7 +106,11 @@ const mockRules = [
     status: 'active',
     trigger: 'fraud_score_update',
     conditions: ['Fraud skoru > 80', 'Hesap yaşı < 7 gün'],
-    actions: ['Hesabı askıya al', 'Trust & Safety ekibine bildir', 'E-posta gönder: Hesap askıda'],
+    actions: [
+      'Hesabı askıya al',
+      'Trust & Safety ekibine bildir',
+      'E-posta gönder: Hesap askıda',
+    ],
     executions: {
       total: 234,
       success: 230,
@@ -108,7 +121,8 @@ const mockRules = [
   {
     id: '4',
     name: 'Premium Yenileme Hatırlatma',
-    description: 'Premium aboneliği sona ermek üzere olan kullanıcılara hatırlatma',
+    description:
+      'Premium aboneliği sona ermek üzere olan kullanıcılara hatırlatma',
     status: 'active',
     trigger: 'scheduled',
     conditions: ['Premium üye', 'Abonelik bitiş < 7 gün'],
@@ -167,12 +181,18 @@ export default function AutomationPage() {
   const [selectedTrigger, setSelectedTrigger] = useState<string | null>(null);
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, { variant: 'default' | 'secondary' | 'outline'; label: string }> = {
+    const variants: Record<
+      string,
+      { variant: 'default' | 'secondary' | 'outline'; label: string }
+    > = {
       active: { variant: 'default', label: 'Aktif' },
       paused: { variant: 'secondary', label: 'Duraklatıldı' },
       draft: { variant: 'outline', label: 'Taslak' },
     };
-    const { variant, label } = variants[status] || { variant: 'outline', label: status };
+    const { variant, label } = variants[status] || {
+      variant: 'outline',
+      label: status,
+    };
     return <Badge variant={variant}>{label}</Badge>;
   };
 
@@ -190,7 +210,9 @@ export default function AutomationPage() {
 
   const handleToggleRule = (ruleId: string, currentStatus: string) => {
     const newStatus = currentStatus === 'active' ? 'paused' : 'active';
-    toast.success(`Kural ${newStatus === 'active' ? 'aktifleştirildi' : 'duraklatıldı'}`);
+    toast.success(
+      `Kural ${newStatus === 'active' ? 'aktifleştirildi' : 'duraklatıldı'}`,
+    );
   };
 
   return (
@@ -198,7 +220,9 @@ export default function AutomationPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Otomasyon Kuralları</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Otomasyon Kuralları
+          </h1>
           <p className="text-muted-foreground">
             Otomatik iş akışları ve tetikleyici bazlı aksiyonlar
           </p>
@@ -214,7 +238,8 @@ export default function AutomationPage() {
             <DialogHeader>
               <DialogTitle>Yeni Otomasyon Kuralı</DialogTitle>
               <DialogDescription>
-                Tetikleyici, koşul ve aksiyon belirleyerek otomatik iş akışı oluşturun
+                Tetikleyici, koşul ve aksiyon belirleyerek otomatik iş akışı
+                oluşturun
               </DialogDescription>
             </DialogHeader>
 
@@ -240,7 +265,9 @@ export default function AutomationPage() {
                       }`}
                     >
                       <trigger.icon className="h-5 w-5 text-muted-foreground" />
-                      <span className="text-sm font-medium">{trigger.name}</span>
+                      <span className="text-sm font-medium">
+                        {trigger.name}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -258,8 +285,12 @@ export default function AutomationPage() {
                       <SelectContent>
                         <SelectItem value="user_age">Kullanıcı Yaşı</SelectItem>
                         <SelectItem value="account_age">Hesap Yaşı</SelectItem>
-                        <SelectItem value="total_moments">Toplam Moment</SelectItem>
-                        <SelectItem value="subscription">Abonelik Tipi</SelectItem>
+                        <SelectItem value="total_moments">
+                          Toplam Moment
+                        </SelectItem>
+                        <SelectItem value="subscription">
+                          Abonelik Tipi
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <Select>
@@ -302,7 +333,12 @@ export default function AutomationPage() {
               <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
                 İptal
               </Button>
-              <Button onClick={() => { toast.success('Kural oluşturuldu'); setIsCreateOpen(false); }}>
+              <Button
+                onClick={() => {
+                  toast.success('Kural oluşturuldu');
+                  setIsCreateOpen(false);
+                }}
+              >
                 <ChevronRight className="mr-2 h-4 w-4" />
                 Oluştur
               </Button>
@@ -320,7 +356,9 @@ export default function AutomationPage() {
                 <Zap className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{executionStats.totalRules}</p>
+                <p className="text-2xl font-bold">
+                  {executionStats.totalRules}
+                </p>
                 <p className="text-sm text-muted-foreground">Toplam Kural</p>
               </div>
             </div>
@@ -333,7 +371,9 @@ export default function AutomationPage() {
                 <Play className="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{executionStats.activeRules}</p>
+                <p className="text-2xl font-bold">
+                  {executionStats.activeRules}
+                </p>
                 <p className="text-sm text-muted-foreground">Aktif Kural</p>
               </div>
             </div>
@@ -361,7 +401,9 @@ export default function AutomationPage() {
                 <CheckCircle className="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">%{executionStats.successRate}</p>
+                <p className="text-2xl font-bold">
+                  %{executionStats.successRate}
+                </p>
                 <p className="text-sm text-muted-foreground">Başarı Oranı</p>
               </div>
             </div>
@@ -399,7 +441,9 @@ export default function AutomationPage() {
                         <h3 className="font-semibold">{rule.name}</h3>
                         {getStatusBadge(rule.status)}
                       </div>
-                      <p className="text-sm text-muted-foreground">{rule.description}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {rule.description}
+                      </p>
 
                       {/* Trigger & Conditions */}
                       <div className="flex items-center gap-4 text-sm">
@@ -408,7 +452,11 @@ export default function AutomationPage() {
                           {getTriggerLabel(rule.trigger)}
                         </Badge>
                         {rule.conditions.map((condition, i) => (
-                          <Badge key={i} variant="secondary" className="text-xs">
+                          <Badge
+                            key={i}
+                            variant="secondary"
+                            className="text-xs"
+                          >
                             {condition}
                           </Badge>
                         ))}
@@ -440,7 +488,11 @@ export default function AutomationPage() {
                       </div>
                       <div className="text-center">
                         <p className="font-semibold text-green-600">
-                          {((rule.executions.success / rule.executions.total) * 100).toFixed(1)}%
+                          {(
+                            (rule.executions.success / rule.executions.total) *
+                            100
+                          ).toFixed(1)}
+                          %
                         </p>
                         <p className="text-xs text-muted-foreground">Başarı</p>
                       </div>
@@ -448,14 +500,18 @@ export default function AutomationPage() {
                         <p className="font-semibold text-muted-foreground text-xs">
                           {formatDate(rule.executions.lastRun)}
                         </p>
-                        <p className="text-xs text-muted-foreground">Son Çalışma</p>
+                        <p className="text-xs text-muted-foreground">
+                          Son Çalışma
+                        </p>
                       </div>
                     </div>
 
                     {/* Toggle & Actions */}
                     <Switch
                       checked={rule.status === 'active'}
-                      onCheckedChange={() => handleToggleRule(rule.id, rule.status)}
+                      onCheckedChange={() =>
+                        handleToggleRule(rule.id, rule.status)
+                      }
                     />
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -507,7 +563,9 @@ export default function AutomationPage() {
                       </div>
                       <div>
                         <h3 className="font-semibold">{rule.name}</h3>
-                        <p className="text-sm text-muted-foreground">{rule.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {rule.description}
+                        </p>
                       </div>
                     </div>
                     {getStatusBadge(rule.status)}
@@ -530,7 +588,9 @@ export default function AutomationPage() {
                       </div>
                       <div>
                         <h3 className="font-semibold">{rule.name}</h3>
-                        <p className="text-sm text-muted-foreground">{rule.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {rule.description}
+                        </p>
                       </div>
                     </div>
                     {getStatusBadge(rule.status)}

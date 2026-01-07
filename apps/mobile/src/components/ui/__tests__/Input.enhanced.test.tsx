@@ -21,14 +21,14 @@ describe('Input Component - Enhanced Tests', () => {
 
     it('should render with placeholder', () => {
       const { getByPlaceholderText } = render(
-        <Input placeholder="Enter your email" />
+        <Input placeholder="Enter your email" />,
       );
       expect(getByPlaceholderText('Enter your email')).toBeTruthy();
     });
 
     it('should render without label', () => {
       const { queryByText, getByPlaceholderText } = render(
-        <Input placeholder="No label" />
+        <Input placeholder="No label" />,
       );
       expect(queryByText(/label/i)).toBeNull();
       expect(getByPlaceholderText('No label')).toBeTruthy();
@@ -43,14 +43,14 @@ describe('Input Component - Enhanced Tests', () => {
   describe('Validation States', () => {
     it('should display error message', () => {
       const { getByText } = render(
-        <Input label="Password" error="Password is required" />
+        <Input label="Password" error="Password is required" />,
       );
       expect(getByText('Password is required')).toBeTruthy();
     });
 
     it('should display hint when no error', () => {
       const { getByText } = render(
-        <Input label="Username" hint="Choose a unique username" />
+        <Input label="Username" hint="Choose a unique username" />,
       );
       expect(getByText('Choose a unique username')).toBeTruthy();
     });
@@ -61,7 +61,7 @@ describe('Input Component - Enhanced Tests', () => {
           label="Email"
           hint="We'll never share your email"
           error="Invalid email format"
-        />
+        />,
       );
       expect(getByText('Invalid email format')).toBeTruthy();
       expect(queryByText("We'll never share your email")).toBeNull();
@@ -69,7 +69,7 @@ describe('Input Component - Enhanced Tests', () => {
 
     it('should apply error border color when error exists', () => {
       const { getByPlaceholderText } = render(
-        <Input placeholder="Test" error="Error message" />
+        <Input placeholder="Test" error="Error message" />,
       );
       const input = getByPlaceholderText('Test');
       expect(input.parent?.props.style).toBeDefined();
@@ -77,7 +77,7 @@ describe('Input Component - Enhanced Tests', () => {
 
     it('should show success state', () => {
       const { getByPlaceholderText } = render(
-        <Input placeholder="Success" showSuccess />
+        <Input placeholder="Success" showSuccess />,
       );
       const input = getByPlaceholderText('Success');
       expect(input).toBeTruthy();
@@ -88,7 +88,7 @@ describe('Input Component - Enhanced Tests', () => {
     it('should call onChangeText handler', () => {
       const onChangeText = jest.fn() as jest.Mock;
       const { getByPlaceholderText } = render(
-        <Input placeholder="Type" onChangeText={onChangeText} />
+        <Input placeholder="Type" onChangeText={onChangeText} />,
       );
 
       fireEvent.changeText(getByPlaceholderText('Type'), 'Test Input');
@@ -98,7 +98,7 @@ describe('Input Component - Enhanced Tests', () => {
     it('should call onChangeText multiple times', () => {
       const onChangeText = jest.fn() as jest.Mock;
       const { getByPlaceholderText } = render(
-        <Input placeholder="Type" onChangeText={onChangeText} />
+        <Input placeholder="Type" onChangeText={onChangeText} />,
       );
 
       const input = getByPlaceholderText('Type');
@@ -114,7 +114,7 @@ describe('Input Component - Enhanced Tests', () => {
     it('should handle focus event', () => {
       const onFocus = jest.fn() as jest.Mock;
       const { getByPlaceholderText } = render(
-        <Input placeholder="Focus me" onFocus={onFocus} />
+        <Input placeholder="Focus me" onFocus={onFocus} />,
       );
 
       fireEvent(getByPlaceholderText('Focus me'), 'focus');
@@ -124,7 +124,7 @@ describe('Input Component - Enhanced Tests', () => {
     it('should handle blur event', () => {
       const onBlur = jest.fn() as jest.Mock;
       const { getByPlaceholderText } = render(
-        <Input placeholder="Blur me" onBlur={onBlur} />
+        <Input placeholder="Blur me" onBlur={onBlur} />,
       );
 
       fireEvent(getByPlaceholderText('Blur me'), 'blur');
@@ -133,7 +133,7 @@ describe('Input Component - Enhanced Tests', () => {
 
     it('should update border color on focus', () => {
       const { getByPlaceholderText } = render(
-        <Input placeholder="Focus Test" />
+        <Input placeholder="Focus Test" />,
       );
 
       const input = getByPlaceholderText('Focus Test');
@@ -143,7 +143,7 @@ describe('Input Component - Enhanced Tests', () => {
 
     it('should update border color on blur', () => {
       const { getByPlaceholderText } = render(
-        <Input placeholder="Blur Test" />
+        <Input placeholder="Blur Test" />,
       );
 
       const input = getByPlaceholderText('Blur Test');
@@ -156,7 +156,7 @@ describe('Input Component - Enhanced Tests', () => {
   describe('Password Field', () => {
     it('should render as secure text entry', () => {
       const { getByPlaceholderText } = render(
-        <Input placeholder="Password" secureTextEntry />
+        <Input placeholder="Password" secureTextEntry />,
       );
 
       const input = getByPlaceholderText('Password');
@@ -165,7 +165,7 @@ describe('Input Component - Enhanced Tests', () => {
 
     it('should toggle password visibility', () => {
       const { getByPlaceholderText, getByLabelText } = render(
-        <Input placeholder="Password" secureTextEntry />
+        <Input placeholder="Password" secureTextEntry />,
       );
 
       const input = getByPlaceholderText('Password');
@@ -182,14 +182,14 @@ describe('Input Component - Enhanced Tests', () => {
 
     it('should show eye icon for password field', () => {
       const { getByLabelText } = render(
-        <Input placeholder="Password" secureTextEntry />
+        <Input placeholder="Password" secureTextEntry />,
       );
       expect(getByLabelText('Show password')).toBeTruthy();
     });
 
     it('should change icon when password is visible', () => {
       const { getByLabelText } = render(
-        <Input placeholder="Password" secureTextEntry />
+        <Input placeholder="Password" secureTextEntry />,
       );
 
       const toggle = getByLabelText('Show password');
@@ -202,7 +202,7 @@ describe('Input Component - Enhanced Tests', () => {
   describe('Icons', () => {
     it('should render left icon', () => {
       const { getByPlaceholderText, toJSON } = render(
-        <Input placeholder="Search" leftIcon="magnify" />
+        <Input placeholder="Search" leftIcon="magnify" />,
       );
 
       expect(getByPlaceholderText('Search')).toBeTruthy();
@@ -212,7 +212,7 @@ describe('Input Component - Enhanced Tests', () => {
 
     it('should render right icon', () => {
       const { getByPlaceholderText, toJSON } = render(
-        <Input placeholder="Clear" rightIcon="close" />
+        <Input placeholder="Clear" rightIcon="close" />,
       );
 
       expect(getByPlaceholderText('Clear')).toBeTruthy();
@@ -222,11 +222,7 @@ describe('Input Component - Enhanced Tests', () => {
 
     it('should render both left and right icons', () => {
       const { getByPlaceholderText, toJSON } = render(
-        <Input
-          placeholder="Both"
-          leftIcon="account"
-          rightIcon="check"
-        />
+        <Input placeholder="Both" leftIcon="account" rightIcon="check" />,
       );
 
       expect(getByPlaceholderText('Both')).toBeTruthy();
@@ -236,11 +232,7 @@ describe('Input Component - Enhanced Tests', () => {
 
     it('should not render right icon when password field has eye icon', () => {
       const { getByLabelText } = render(
-        <Input
-          placeholder="Password"
-          secureTextEntry
-          rightIcon="check"
-        />
+        <Input placeholder="Password" secureTextEntry rightIcon="check" />,
       );
 
       // Should only have password toggle, not custom right icon
@@ -251,17 +243,14 @@ describe('Input Component - Enhanced Tests', () => {
   describe('Accessibility', () => {
     it('should have accessibility label from label prop', () => {
       const { getByLabelText } = render(
-        <Input label="Email Address" placeholder="Enter email" />
+        <Input label="Email Address" placeholder="Enter email" />,
       );
       expect(getByLabelText('Email Address')).toBeTruthy();
     });
 
     it('should have accessibility hint from hint prop', () => {
       const { getByPlaceholderText } = render(
-        <Input
-          placeholder="Username"
-          hint="Must be 3-20 characters"
-        />
+        <Input placeholder="Username" hint="Must be 3-20 characters" />,
       );
       const input = getByPlaceholderText('Username');
       expect(input.props.accessibilityHint).toBe('Must be 3-20 characters');
@@ -271,7 +260,7 @@ describe('Input Component - Enhanced Tests', () => {
   describe('TextInput Props Pass-through', () => {
     it('should pass through autoCapitalize', () => {
       const { getByPlaceholderText } = render(
-        <Input placeholder="Test" autoCapitalize="none" />
+        <Input placeholder="Test" autoCapitalize="none" />,
       );
 
       const input = getByPlaceholderText('Test');
@@ -280,7 +269,7 @@ describe('Input Component - Enhanced Tests', () => {
 
     it('should pass through keyboardType', () => {
       const { getByPlaceholderText } = render(
-        <Input placeholder="Email" keyboardType="email-address" />
+        <Input placeholder="Email" keyboardType="email-address" />,
       );
 
       const input = getByPlaceholderText('Email');
@@ -289,7 +278,7 @@ describe('Input Component - Enhanced Tests', () => {
 
     it('should pass through autoComplete', () => {
       const { getByPlaceholderText } = render(
-        <Input placeholder="Email" autoComplete="email" />
+        <Input placeholder="Email" autoComplete="email" />,
       );
 
       const input = getByPlaceholderText('Email');
@@ -298,7 +287,7 @@ describe('Input Component - Enhanced Tests', () => {
 
     it('should pass through maxLength', () => {
       const { getByPlaceholderText } = render(
-        <Input placeholder="Code" maxLength={6} />
+        <Input placeholder="Code" maxLength={6} />,
       );
 
       const input = getByPlaceholderText('Code');
@@ -307,7 +296,7 @@ describe('Input Component - Enhanced Tests', () => {
 
     it('should pass through editable prop', () => {
       const { getByPlaceholderText } = render(
-        <Input placeholder="Readonly" editable={false} />
+        <Input placeholder="Readonly" editable={false} />,
       );
 
       const input = getByPlaceholderText('Readonly');
@@ -316,7 +305,7 @@ describe('Input Component - Enhanced Tests', () => {
 
     it('should pass through multiline prop', () => {
       const { getByPlaceholderText } = render(
-        <Input placeholder="Multiline" multiline numberOfLines={4} />
+        <Input placeholder="Multiline" multiline numberOfLines={4} />,
       );
 
       const input = getByPlaceholderText('Multiline');
@@ -328,7 +317,7 @@ describe('Input Component - Enhanced Tests', () => {
   describe('Edge Cases', () => {
     it('should handle empty value', () => {
       const { getByPlaceholderText } = render(
-        <Input placeholder="Empty" value="" />
+        <Input placeholder="Empty" value="" />,
       );
 
       const input = getByPlaceholderText('Empty');
@@ -338,7 +327,7 @@ describe('Input Component - Enhanced Tests', () => {
     it('should handle very long text', () => {
       const longText = 'A'.repeat(500);
       const { getByPlaceholderText } = render(
-        <Input placeholder="Long" value={longText} />
+        <Input placeholder="Long" value={longText} />,
       );
 
       const input = getByPlaceholderText('Long');
@@ -349,7 +338,7 @@ describe('Input Component - Enhanced Tests', () => {
   describe('Focus State Management', () => {
     it('should update focus state on focus', () => {
       const { getByPlaceholderText } = render(
-        <Input placeholder="Focus State" />
+        <Input placeholder="Focus State" />,
       );
 
       const input = getByPlaceholderText('Focus State');
@@ -363,7 +352,7 @@ describe('Input Component - Enhanced Tests', () => {
       const onFocus = jest.fn() as jest.Mock;
       const onBlur = jest.fn() as jest.Mock;
       const { getByPlaceholderText } = render(
-        <Input placeholder="Persist Focus" onFocus={onFocus} onBlur={onBlur} />
+        <Input placeholder="Persist Focus" onFocus={onFocus} onBlur={onBlur} />,
       );
 
       const input = getByPlaceholderText('Persist Focus');
@@ -384,7 +373,7 @@ describe('Input Component - Enhanced Tests', () => {
   describe('Icon Color States', () => {
     it('should update left icon color on focus', () => {
       const { getByPlaceholderText } = render(
-        <Input placeholder="Icon Color" leftIcon="account" />
+        <Input placeholder="Icon Color" leftIcon="account" />,
       );
 
       const input = getByPlaceholderText('Icon Color');
@@ -398,7 +387,7 @@ describe('Input Component - Enhanced Tests', () => {
     it('should accept container style', () => {
       const customStyle = { marginTop: 20, marginBottom: 10 };
       const { getByPlaceholderText } = render(
-        <Input placeholder="Custom" containerStyle={customStyle} />
+        <Input placeholder="Custom" containerStyle={customStyle} />,
       );
 
       const input = getByPlaceholderText('Custom');
@@ -407,10 +396,7 @@ describe('Input Component - Enhanced Tests', () => {
 
     it('should merge custom styles with default styles', () => {
       const { getByPlaceholderText } = render(
-        <Input
-          placeholder="Styled"
-          containerStyle={{ padding: 10 }}
-        />
+        <Input placeholder="Styled" containerStyle={{ padding: 10 }} />,
       );
       expect(getByPlaceholderText('Styled')).toBeTruthy();
     });

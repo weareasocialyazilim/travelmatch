@@ -9,7 +9,7 @@ import {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getAdminSession();
@@ -25,7 +25,10 @@ export async function GET(
     // SECURITY: Validate UUID to prevent injection (VULN-001)
     const id = sanitizeUUID(rawId);
     if (!id) {
-      return NextResponse.json({ error: 'Geçersiz kullanıcı ID' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Geçersiz kullanıcı ID' },
+        { status: 400 },
+      );
     }
 
     const supabase = createServiceClient();
@@ -38,11 +41,17 @@ export async function GET(
       .single();
 
     if (error || !user) {
-      return NextResponse.json({ error: 'Kullanıcı bulunamadı' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Kullanıcı bulunamadı' },
+        { status: 404 },
+      );
     }
 
     // SECURITY: Build safe filter for multi-column OR query (VULN-001)
-    const matchFilter = buildSafeMultiColumnUUIDFilter(['user1_id', 'user2_id'], id);
+    const matchFilter = buildSafeMultiColumnUUIDFilter(
+      ['user1_id', 'user2_id'],
+      id,
+    );
 
     // Get user stats
     const [
@@ -51,12 +60,26 @@ export async function GET(
       { count: reportCount },
       { data: recentTransactions },
     ] = await Promise.all([
-      supabase.from('moments').select('*', { count: 'exact', head: true }).eq('user_id', id),
+      supabase
+        .from('moments')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', id),
       matchFilter
-        ? supabase.from('matches').select('*', { count: 'exact', head: true }).or(matchFilter)
+        ? supabase
+            .from('matches')
+            .select('*', { count: 'exact', head: true })
+            .or(matchFilter)
         : Promise.resolve({ count: 0 }),
-      supabase.from('reports').select('*', { count: 'exact', head: true }).eq('reported_user_id', id),
-      supabase.from('transactions').select('*').eq('user_id', id).order('created_at', { ascending: false }).limit(10),
+      supabase
+        .from('reports')
+        .select('*', { count: 'exact', head: true })
+        .eq('reported_user_id', id),
+      supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', id)
+        .order('created_at', { ascending: false })
+        .limit(10),
     ]);
 
     return NextResponse.json({
@@ -76,7 +99,7 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getAdminSession();
@@ -100,7 +123,10 @@ export async function PATCH(
       .single();
 
     if (fetchError || !currentUser) {
-      return NextResponse.json({ error: 'Kullanıcı bulunamadı' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Kullanıcı bulunamadı' },
+        { status: 404 },
+      );
     }
 
     // Allowed update fields
@@ -137,7 +163,10 @@ export async function PATCH(
 
     if (error) {
       logger.error('User update error:', error);
-      return NextResponse.json({ error: 'Kullanıcı güncellenemedi' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Kullanıcı güncellenemedi' },
+        { status: 500 },
+      );
     }
 
     // Create audit log
@@ -149,7 +178,7 @@ export async function PATCH(
       currentUser,
       user,
       request.headers.get('x-forwarded-for') || undefined,
-      request.headers.get('user-agent') || undefined
+      request.headers.get('user-agent') || undefined,
     );
 
     return NextResponse.json({ user });

@@ -179,7 +179,11 @@ export const FormInput: React.FC<FormInputProps> = ({
 
         <TextInput
           value={value}
-          onChangeText={(text) => onChangeText(keyboardType === 'email-address' ? text.toLowerCase() : text)}
+          onChangeText={(text) =>
+            onChangeText(
+              keyboardType === 'email-address' ? text.toLowerCase() : text,
+            )
+          }
           placeholder={placeholder}
           placeholderTextColor={primitives.stone[400]}
           secureTextEntry={actualSecureEntry}

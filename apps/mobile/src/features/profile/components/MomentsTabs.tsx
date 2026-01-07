@@ -48,7 +48,10 @@ const MomentsTabs: React.FC<MomentsTabsProps> = memo(
             color={activeTab === 'past' ? COLORS.mint : COLORS.text.secondary}
           />
           <Text
-            style={[styles.tabText, activeTab === 'past' && styles.tabTextActive]}
+            style={[
+              styles.tabText,
+              activeTab === 'past' && styles.tabTextActive,
+            ]}
           >
             Past ({pastMomentsCount})
           </Text>

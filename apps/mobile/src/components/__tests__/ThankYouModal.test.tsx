@@ -14,7 +14,10 @@ jest.mock('@expo/vector-icons/MaterialCommunityIcons', () => {
   const { View, Text } = require('react-native');
 
   const MockIcon = React.forwardRef(
-    (props: { name: string; size?: number; color?: string; testID?: string }, ref: React.Ref<typeof View>) => (
+    (
+      props: { name: string; size?: number; color?: string; testID?: string },
+      ref: React.Ref<typeof View>,
+    ) => (
       <View testID={props.testID || `icon-${props.name}`} ref={ref}>
         <Text>{props.name}</Text>
       </View>
@@ -302,7 +305,10 @@ describe('ThankYouModal', () => {
   describe('Edge Cases', () => {
     it('handles undefined onClose gracefully', () => {
       const { getByText } = render(
-        <ThankYouModal {...defaultProps} onClose={undefined as unknown as () => void} />,
+        <ThankYouModal
+          {...defaultProps}
+          onClose={undefined as unknown as () => void}
+        />,
       );
 
       expect(() => fireEvent.press(getByText('Continue'))).not.toThrow();

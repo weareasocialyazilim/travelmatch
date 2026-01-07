@@ -20,7 +20,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -116,7 +122,7 @@ export default function AdminUsersPage() {
         onError: (error) => {
           toast.error(error.message || 'Admin oluşturulamadı');
         },
-      }
+      },
     );
   };
 
@@ -130,7 +136,7 @@ export default function AdminUsersPage() {
         onError: (error) => {
           toast.error(error.message || 'İşlem başarısız');
         },
-      }
+      },
     );
   };
 
@@ -144,7 +150,7 @@ export default function AdminUsersPage() {
         onError: (error) => {
           toast.error(error.message || 'İşlem başarısız');
         },
-      }
+      },
     );
   };
 
@@ -163,7 +169,7 @@ export default function AdminUsersPage() {
         onError: (error) => {
           toast.error(error.message || 'İşlem başarısız');
         },
-      }
+      },
     );
   };
 
@@ -173,7 +179,9 @@ export default function AdminUsersPage() {
         <div className="text-center">
           <AlertTriangle className="mx-auto h-12 w-12 text-destructive" />
           <h2 className="mt-4 text-lg font-semibold">Bir hata oluştu</h2>
-          <p className="text-muted-foreground">Admin kullanıcıları yüklenemedi. Lütfen tekrar deneyin.</p>
+          <p className="text-muted-foreground">
+            Admin kullanıcıları yüklenemedi. Lütfen tekrar deneyin.
+          </p>
         </div>
       </div>
     );
@@ -184,7 +192,9 @@ export default function AdminUsersPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Admin Kullanıcıları</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Admin Kullanıcıları
+          </h1>
           <p className="text-muted-foreground">
             Admin paneline erişimi olan kullanıcıları yönetin
           </p>
@@ -228,7 +238,10 @@ export default function AdminUsersPage() {
 
               <div className="space-y-2">
                 <Label>Rol</Label>
-                <Select value={selectedRole} onValueChange={(v) => setSelectedRole(v as AdminRole)}>
+                <Select
+                  value={selectedRole}
+                  onValueChange={(v) => setSelectedRole(v as AdminRole)}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -249,7 +262,10 @@ export default function AdminUsersPage() {
                     İki faktörlü doğrulamayı zorunlu kıl
                   </p>
                 </div>
-                <Switch checked={requires2FA} onCheckedChange={setRequires2FA} />
+                <Switch
+                  checked={requires2FA}
+                  onCheckedChange={setRequires2FA}
+                />
               </div>
             </div>
 
@@ -257,8 +273,13 @@ export default function AdminUsersPage() {
               <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
                 İptal
               </Button>
-              <Button onClick={handleCreateAdmin} disabled={createAdminMutation.isPending}>
-                {createAdminMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <Button
+                onClick={handleCreateAdmin}
+                disabled={createAdminMutation.isPending}
+              >
+                {createAdminMutation.isPending && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Oluştur
               </Button>
             </DialogFooter>
@@ -276,7 +297,11 @@ export default function AdminUsersPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">
-                  {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : data?.total || admins.length}
+                  {isLoading ? (
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                  ) : (
+                    data?.total || admins.length
+                  )}
                 </p>
                 <p className="text-sm text-muted-foreground">Toplam Admin</p>
               </div>
@@ -291,7 +316,11 @@ export default function AdminUsersPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">
-                  {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : admins.filter((u) => u.is_active).length}
+                  {isLoading ? (
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                  ) : (
+                    admins.filter((u) => u.is_active).length
+                  )}
                 </p>
                 <p className="text-sm text-muted-foreground">Aktif</p>
               </div>
@@ -306,7 +335,11 @@ export default function AdminUsersPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">
-                  {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : admins.filter((u) => u.totp_enabled).length}
+                  {isLoading ? (
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                  ) : (
+                    admins.filter((u) => u.totp_enabled).length
+                  )}
                 </p>
                 <p className="text-sm text-muted-foreground">2FA Aktif</p>
               </div>
@@ -328,7 +361,10 @@ export default function AdminUsersPage() {
                       if (!u.last_login_at) return false;
                       const lastLogin = new Date(u.last_login_at);
                       const today = new Date();
-                      return today.getTime() - lastLogin.getTime() < 24 * 60 * 60 * 1000;
+                      return (
+                        today.getTime() - lastLogin.getTime() <
+                        24 * 60 * 60 * 1000
+                      );
                     }).length
                   )}
                 </p>
@@ -343,7 +379,9 @@ export default function AdminUsersPage() {
       <Card>
         <CardHeader>
           <CardTitle>Admin Kullanıcıları</CardTitle>
-          <CardDescription>Tüm admin kullanıcıları ve yetkileri</CardDescription>
+          <CardDescription>
+            Tüm admin kullanıcıları ve yetkileri
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -370,16 +408,22 @@ export default function AdminUsersPage() {
                       <div className="flex items-center gap-3">
                         <Avatar className="h-9 w-9">
                           <AvatarImage src={admin.avatar_url || undefined} />
-                          <AvatarFallback>{getInitials(admin.name)}</AvatarFallback>
+                          <AvatarFallback>
+                            {getInitials(admin.name)}
+                          </AvatarFallback>
                         </Avatar>
                         <div>
                           <p className="font-medium">{admin.name}</p>
-                          <p className="text-sm text-muted-foreground">{admin.email}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {admin.email}
+                          </p>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge className={getRoleBadgeColor(admin.role as AdminRole)}>
+                      <Badge
+                        className={getRoleBadgeColor(admin.role as AdminRole)}
+                      >
                         {getRoleDisplayName(admin.role as AdminRole)}
                       </Badge>
                     </TableCell>
@@ -398,17 +442,26 @@ export default function AdminUsersPage() {
                     </TableCell>
                     <TableCell>
                       {admin.totp_enabled ? (
-                        <Badge variant="outline" className="gap-1 text-green-600">
+                        <Badge
+                          variant="outline"
+                          className="gap-1 text-green-600"
+                        >
                           <Shield className="h-3 w-3" />
                           Aktif
                         </Badge>
                       ) : admin.requires_2fa ? (
-                        <Badge variant="outline" className="gap-1 text-yellow-600">
+                        <Badge
+                          variant="outline"
+                          className="gap-1 text-yellow-600"
+                        >
                           <Clock className="h-3 w-3" />
                           Bekliyor
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="gap-1 text-gray-500">
+                        <Badge
+                          variant="outline"
+                          className="gap-1 text-gray-500"
+                        >
                           <XCircle className="h-3 w-3" />
                           Kapalı
                         </Badge>
@@ -416,7 +469,9 @@ export default function AdminUsersPage() {
                     </TableCell>
                     <TableCell>
                       <span className="text-sm text-muted-foreground">
-                        {admin.last_login_at ? formatDate(admin.last_login_at) : '-'}
+                        {admin.last_login_at
+                          ? formatDate(admin.last_login_at)
+                          : '-'}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -441,11 +496,15 @@ export default function AdminUsersPage() {
                             Düzenle
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => handleResetPassword(admin.id)}>
+                          <DropdownMenuItem
+                            onClick={() => handleResetPassword(admin.id)}
+                          >
                             <Key className="mr-2 h-4 w-4" />
                             Şifre Sıfırla
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleReset2FA(admin.id)}>
+                          <DropdownMenuItem
+                            onClick={() => handleReset2FA(admin.id)}
+                          >
                             <Shield className="mr-2 h-4 w-4" />
                             2FA Sıfırla
                           </DropdownMenuItem>
@@ -480,8 +539,12 @@ export default function AdminUsersPage() {
           {!isLoading && admins.length === 0 && (
             <div className="py-12 text-center">
               <Users className="mx-auto h-12 w-12 text-muted-foreground" />
-              <h3 className="mt-4 text-lg font-semibold">Admin kullanıcısı bulunamadı</h3>
-              <p className="text-muted-foreground">Yeni bir admin ekleyerek başlayın</p>
+              <h3 className="mt-4 text-lg font-semibold">
+                Admin kullanıcısı bulunamadı
+              </h3>
+              <p className="text-muted-foreground">
+                Yeni bir admin ekleyerek başlayın
+              </p>
             </div>
           )}
         </CardContent>
@@ -498,9 +561,12 @@ export default function AdminUsersPage() {
             {roles.map((role) => (
               <div key={role.value} className="rounded-lg border p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <Badge className={getRoleBadgeColor(role.value)}>{role.label}</Badge>
+                  <Badge className={getRoleBadgeColor(role.value)}>
+                    {role.label}
+                  </Badge>
                   <span className="text-sm text-muted-foreground">
-                    {admins.filter((u) => u.role === role.value).length} kullanıcı
+                    {admins.filter((u) => u.role === role.value).length}{' '}
+                    kullanıcı
                   </span>
                 </div>
                 <div className="space-y-1 text-sm">
@@ -509,20 +575,32 @@ export default function AdminUsersPage() {
                   )}
                   {role.value === 'manager' && (
                     <>
-                      <p className="text-muted-foreground">• Kullanıcı yönetimi</p>
-                      <p className="text-muted-foreground">• İçerik moderasyonu</p>
-                      <p className="text-muted-foreground">• Finans görüntüleme</p>
+                      <p className="text-muted-foreground">
+                        • Kullanıcı yönetimi
+                      </p>
+                      <p className="text-muted-foreground">
+                        • İçerik moderasyonu
+                      </p>
+                      <p className="text-muted-foreground">
+                        • Finans görüntüleme
+                      </p>
                     </>
                   )}
                   {role.value === 'moderator' && (
                     <>
-                      <p className="text-muted-foreground">• İçerik moderasyonu</p>
-                      <p className="text-muted-foreground">• Şikayet yönetimi</p>
+                      <p className="text-muted-foreground">
+                        • İçerik moderasyonu
+                      </p>
+                      <p className="text-muted-foreground">
+                        • Şikayet yönetimi
+                      </p>
                     </>
                   )}
                   {role.value === 'finance' && (
                     <>
-                      <p className="text-muted-foreground">• İşlem görüntüleme</p>
+                      <p className="text-muted-foreground">
+                        • İşlem görüntüleme
+                      </p>
                       <p className="text-muted-foreground">• Ödeme yönetimi</p>
                       <p className="text-muted-foreground">• Raporlar</p>
                     </>
@@ -535,8 +613,12 @@ export default function AdminUsersPage() {
                   )}
                   {role.value === 'support' && (
                     <>
-                      <p className="text-muted-foreground">• Kullanıcı desteği</p>
-                      <p className="text-muted-foreground">• Şikayet yönetimi</p>
+                      <p className="text-muted-foreground">
+                        • Kullanıcı desteği
+                      </p>
+                      <p className="text-muted-foreground">
+                        • Şikayet yönetimi
+                      </p>
                     </>
                   )}
                   {role.value === 'viewer' && (

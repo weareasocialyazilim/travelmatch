@@ -100,14 +100,20 @@ describe('Common Schemas', () => {
 
   describe('uuidSchema', () => {
     it('should accept valid UUIDs', () => {
-      expect(() => uuidSchema.parse('550e8400-e29b-41d4-a716-446655440000')).not.toThrow();
-      expect(() => uuidSchema.parse('f47ac10b-58cc-4372-a567-0e02b2c3d479')).not.toThrow();
+      expect(() =>
+        uuidSchema.parse('550e8400-e29b-41d4-a716-446655440000'),
+      ).not.toThrow();
+      expect(() =>
+        uuidSchema.parse('f47ac10b-58cc-4372-a567-0e02b2c3d479'),
+      ).not.toThrow();
     });
 
     it('should reject invalid UUIDs', () => {
       expect(() => uuidSchema.parse('')).toThrow();
       expect(() => uuidSchema.parse('not-a-uuid')).toThrow();
-      expect(() => uuidSchema.parse('550e8400e29b41d4a716446655440000')).toThrow();
+      expect(() =>
+        uuidSchema.parse('550e8400e29b41d4a716446655440000'),
+      ).toThrow();
     });
   });
 
@@ -115,7 +121,9 @@ describe('Common Schemas', () => {
     it('should accept valid URLs', () => {
       expect(() => urlSchema.parse('https://example.com')).not.toThrow();
       expect(() => urlSchema.parse('http://localhost:3000')).not.toThrow();
-      expect(() => urlSchema.parse('https://sub.domain.com/path?query=1')).not.toThrow();
+      expect(() =>
+        urlSchema.parse('https://sub.domain.com/path?query=1'),
+      ).not.toThrow();
     });
 
     it('should reject invalid URLs', () => {
@@ -203,7 +211,10 @@ describe('Common Schemas', () => {
 
   describe('cursorPaginationSchema', () => {
     it('should accept valid cursor pagination', () => {
-      const result = cursorPaginationSchema.parse({ cursor: 'abc123', limit: 10 });
+      const result = cursorPaginationSchema.parse({
+        cursor: 'abc123',
+        limit: 10,
+      });
       expect(result.cursor).toBe('abc123');
       expect(result.limit).toBe(10);
     });
@@ -216,42 +227,62 @@ describe('Common Schemas', () => {
 
   describe('dateRangeSchema', () => {
     it('should accept valid date ranges', () => {
-      expect(() => dateRangeSchema.parse({
-        startDate: '2024-01-01T00:00:00Z',
-        endDate: '2024-12-31T23:59:59Z',
-      })).not.toThrow();
+      expect(() =>
+        dateRangeSchema.parse({
+          startDate: '2024-01-01T00:00:00Z',
+          endDate: '2024-12-31T23:59:59Z',
+        }),
+      ).not.toThrow();
     });
 
     it('should reject end date before start date', () => {
-      expect(() => dateRangeSchema.parse({
-        startDate: '2024-12-31T00:00:00Z',
-        endDate: '2024-01-01T00:00:00Z',
-      })).toThrow();
+      expect(() =>
+        dateRangeSchema.parse({
+          startDate: '2024-12-31T00:00:00Z',
+          endDate: '2024-01-01T00:00:00Z',
+        }),
+      ).toThrow();
     });
 
     it('should accept same start and end date', () => {
-      expect(() => dateRangeSchema.parse({
-        startDate: '2024-06-15T00:00:00Z',
-        endDate: '2024-06-15T00:00:00Z',
-      })).not.toThrow();
+      expect(() =>
+        dateRangeSchema.parse({
+          startDate: '2024-06-15T00:00:00Z',
+          endDate: '2024-06-15T00:00:00Z',
+        }),
+      ).not.toThrow();
     });
   });
 
   describe('coordinatesSchema', () => {
     it('should accept valid coordinates', () => {
-      expect(() => coordinatesSchema.parse({ latitude: 40.7128, longitude: -74.0060 })).not.toThrow();
-      expect(() => coordinatesSchema.parse({ latitude: 0, longitude: 0 })).not.toThrow();
-      expect(() => coordinatesSchema.parse({ latitude: -90, longitude: 180 })).not.toThrow();
+      expect(() =>
+        coordinatesSchema.parse({ latitude: 40.7128, longitude: -74.006 }),
+      ).not.toThrow();
+      expect(() =>
+        coordinatesSchema.parse({ latitude: 0, longitude: 0 }),
+      ).not.toThrow();
+      expect(() =>
+        coordinatesSchema.parse({ latitude: -90, longitude: 180 }),
+      ).not.toThrow();
     });
 
     it('should reject invalid latitude', () => {
-      expect(() => coordinatesSchema.parse({ latitude: 91, longitude: 0 })).toThrow();
-      expect(() => coordinatesSchema.parse({ latitude: -91, longitude: 0 })).toThrow();
+      expect(() =>
+        coordinatesSchema.parse({ latitude: 91, longitude: 0 }),
+      ).toThrow();
+      expect(() =>
+        coordinatesSchema.parse({ latitude: -91, longitude: 0 }),
+      ).toThrow();
     });
 
     it('should reject invalid longitude', () => {
-      expect(() => coordinatesSchema.parse({ latitude: 0, longitude: 181 })).toThrow();
-      expect(() => coordinatesSchema.parse({ latitude: 0, longitude: -181 })).toThrow();
+      expect(() =>
+        coordinatesSchema.parse({ latitude: 0, longitude: 181 }),
+      ).toThrow();
+      expect(() =>
+        coordinatesSchema.parse({ latitude: 0, longitude: -181 }),
+      ).toThrow();
     });
   });
 
@@ -259,7 +290,7 @@ describe('Common Schemas', () => {
     it('should accept valid location search', () => {
       const result = locationSearchSchema.parse({
         latitude: 40.7128,
-        longitude: -74.0060,
+        longitude: -74.006,
         radiusKm: 25,
       });
       expect(result.radiusKm).toBe(25);
@@ -268,17 +299,19 @@ describe('Common Schemas', () => {
     it('should use default radius', () => {
       const result = locationSearchSchema.parse({
         latitude: 40.7128,
-        longitude: -74.0060,
+        longitude: -74.006,
       });
       expect(result.radiusKm).toBe(50);
     });
 
     it('should reject radius over 500km', () => {
-      expect(() => locationSearchSchema.parse({
-        latitude: 40.7128,
-        longitude: -74.0060,
-        radiusKm: 501,
-      })).toThrow();
+      expect(() =>
+        locationSearchSchema.parse({
+          latitude: 40.7128,
+          longitude: -74.006,
+          radiusKm: 501,
+        }),
+      ).toThrow();
     });
   });
 });
@@ -286,177 +319,221 @@ describe('Common Schemas', () => {
 describe('Auth Schemas', () => {
   describe('loginSchema', () => {
     it('should accept valid login credentials', () => {
-      expect(() => loginSchema.parse({
-        email: 'user@example.com',
-        password: 'password123',
-      })).not.toThrow();
+      expect(() =>
+        loginSchema.parse({
+          email: 'user@example.com',
+          password: 'password123',
+        }),
+      ).not.toThrow();
     });
 
     it('should reject empty password', () => {
-      expect(() => loginSchema.parse({
-        email: 'user@example.com',
-        password: '',
-      })).toThrow();
+      expect(() =>
+        loginSchema.parse({
+          email: 'user@example.com',
+          password: '',
+        }),
+      ).toThrow();
     });
 
     it('should reject invalid email', () => {
-      expect(() => loginSchema.parse({
-        email: 'notanemail',
-        password: 'password123',
-      })).toThrow();
+      expect(() =>
+        loginSchema.parse({
+          email: 'notanemail',
+          password: 'password123',
+        }),
+      ).toThrow();
     });
   });
 
   describe('registerSchema', () => {
     it('should accept valid registration data', () => {
-      expect(() => registerSchema.parse({
-        name: 'John Doe',
-        email: 'john@example.com',
-        password: 'Password1',
-        confirmPassword: 'Password1',
-      })).not.toThrow();
+      expect(() =>
+        registerSchema.parse({
+          name: 'John Doe',
+          email: 'john@example.com',
+          password: 'Password1',
+          confirmPassword: 'Password1',
+        }),
+      ).not.toThrow();
     });
 
     it('should reject mismatched passwords', () => {
-      expect(() => registerSchema.parse({
-        name: 'John Doe',
-        email: 'john@example.com',
-        password: 'Password1',
-        confirmPassword: 'Password2',
-      })).toThrow();
+      expect(() =>
+        registerSchema.parse({
+          name: 'John Doe',
+          email: 'john@example.com',
+          password: 'Password1',
+          confirmPassword: 'Password2',
+        }),
+      ).toThrow();
     });
 
     it('should reject short name', () => {
-      expect(() => registerSchema.parse({
-        name: 'J',
-        email: 'john@example.com',
-        password: 'Password1',
-        confirmPassword: 'Password1',
-      })).toThrow();
+      expect(() =>
+        registerSchema.parse({
+          name: 'J',
+          email: 'john@example.com',
+          password: 'Password1',
+          confirmPassword: 'Password1',
+        }),
+      ).toThrow();
     });
 
     it('should reject long name', () => {
-      expect(() => registerSchema.parse({
-        name: 'J'.repeat(51),
-        email: 'john@example.com',
-        password: 'Password1',
-        confirmPassword: 'Password1',
-      })).toThrow();
+      expect(() =>
+        registerSchema.parse({
+          name: 'J'.repeat(51),
+          email: 'john@example.com',
+          password: 'Password1',
+          confirmPassword: 'Password1',
+        }),
+      ).toThrow();
     });
 
     it('should accept optional phone', () => {
-      expect(() => registerSchema.parse({
-        name: 'John Doe',
-        email: 'john@example.com',
-        password: 'Password1',
-        confirmPassword: 'Password1',
-        phone: '+14155551234',
-      })).not.toThrow();
+      expect(() =>
+        registerSchema.parse({
+          name: 'John Doe',
+          email: 'john@example.com',
+          password: 'Password1',
+          confirmPassword: 'Password1',
+          phone: '+14155551234',
+        }),
+      ).not.toThrow();
     });
   });
 
   describe('forgotPasswordSchema', () => {
     it('should accept valid email', () => {
-      expect(() => forgotPasswordSchema.parse({
-        email: 'user@example.com',
-      })).not.toThrow();
+      expect(() =>
+        forgotPasswordSchema.parse({
+          email: 'user@example.com',
+        }),
+      ).not.toThrow();
     });
 
     it('should reject invalid email', () => {
-      expect(() => forgotPasswordSchema.parse({
-        email: 'notanemail',
-      })).toThrow();
+      expect(() =>
+        forgotPasswordSchema.parse({
+          email: 'notanemail',
+        }),
+      ).toThrow();
     });
   });
 
   describe('resetPasswordSchema', () => {
     it('should accept valid password reset', () => {
-      expect(() => resetPasswordSchema.parse({
-        password: 'NewPassword1',
-        confirmPassword: 'NewPassword1',
-      })).not.toThrow();
+      expect(() =>
+        resetPasswordSchema.parse({
+          password: 'NewPassword1',
+          confirmPassword: 'NewPassword1',
+        }),
+      ).not.toThrow();
     });
 
     it('should reject mismatched passwords', () => {
-      expect(() => resetPasswordSchema.parse({
-        password: 'NewPassword1',
-        confirmPassword: 'NewPassword2',
-      })).toThrow();
+      expect(() =>
+        resetPasswordSchema.parse({
+          password: 'NewPassword1',
+          confirmPassword: 'NewPassword2',
+        }),
+      ).toThrow();
     });
 
     it('should validate password strength', () => {
-      expect(() => resetPasswordSchema.parse({
-        password: 'weak',
-        confirmPassword: 'weak',
-      })).toThrow();
+      expect(() =>
+        resetPasswordSchema.parse({
+          password: 'weak',
+          confirmPassword: 'weak',
+        }),
+      ).toThrow();
     });
   });
 
   describe('changePasswordSchema', () => {
     it('should accept valid password change', () => {
-      expect(() => changePasswordSchema.parse({
-        currentPassword: 'OldPassword1',
-        newPassword: 'NewPassword1',
-        confirmPassword: 'NewPassword1',
-      })).not.toThrow();
+      expect(() =>
+        changePasswordSchema.parse({
+          currentPassword: 'OldPassword1',
+          newPassword: 'NewPassword1',
+          confirmPassword: 'NewPassword1',
+        }),
+      ).not.toThrow();
     });
 
     it('should reject same old and new password', () => {
-      expect(() => changePasswordSchema.parse({
-        currentPassword: 'Password1',
-        newPassword: 'Password1',
-        confirmPassword: 'Password1',
-      })).toThrow();
+      expect(() =>
+        changePasswordSchema.parse({
+          currentPassword: 'Password1',
+          newPassword: 'Password1',
+          confirmPassword: 'Password1',
+        }),
+      ).toThrow();
     });
 
     it('should reject mismatched confirm password', () => {
-      expect(() => changePasswordSchema.parse({
-        currentPassword: 'OldPassword1',
-        newPassword: 'NewPassword1',
-        confirmPassword: 'NewPassword2',
-      })).toThrow();
+      expect(() =>
+        changePasswordSchema.parse({
+          currentPassword: 'OldPassword1',
+          newPassword: 'NewPassword1',
+          confirmPassword: 'NewPassword2',
+        }),
+      ).toThrow();
     });
   });
 
   describe('verifyEmailSchema', () => {
     it('should accept valid token', () => {
-      expect(() => verifyEmailSchema.parse({
-        token: 'verification-token-123',
-      })).not.toThrow();
+      expect(() =>
+        verifyEmailSchema.parse({
+          token: 'verification-token-123',
+        }),
+      ).not.toThrow();
     });
 
     it('should reject empty token', () => {
-      expect(() => verifyEmailSchema.parse({
-        token: '',
-      })).toThrow();
+      expect(() =>
+        verifyEmailSchema.parse({
+          token: '',
+        }),
+      ).toThrow();
     });
   });
 
   describe('verifyOtpSchema', () => {
     it('should accept valid OTP', () => {
-      expect(() => verifyOtpSchema.parse({
-        email: 'user@example.com',
-        otp: '123456',
-      })).not.toThrow();
+      expect(() =>
+        verifyOtpSchema.parse({
+          email: 'user@example.com',
+          otp: '123456',
+        }),
+      ).not.toThrow();
     });
 
     it('should reject OTP with wrong length', () => {
-      expect(() => verifyOtpSchema.parse({
-        email: 'user@example.com',
-        otp: '12345',
-      })).toThrow();
+      expect(() =>
+        verifyOtpSchema.parse({
+          email: 'user@example.com',
+          otp: '12345',
+        }),
+      ).toThrow();
 
-      expect(() => verifyOtpSchema.parse({
-        email: 'user@example.com',
-        otp: '1234567',
-      })).toThrow();
+      expect(() =>
+        verifyOtpSchema.parse({
+          email: 'user@example.com',
+          otp: '1234567',
+        }),
+      ).toThrow();
     });
 
     it('should reject OTP with non-numeric characters', () => {
-      expect(() => verifyOtpSchema.parse({
-        email: 'user@example.com',
-        otp: '12345a',
-      })).toThrow();
+      expect(() =>
+        verifyOtpSchema.parse({
+          email: 'user@example.com',
+          otp: '12345a',
+        }),
+      ).toThrow();
     });
   });
 });

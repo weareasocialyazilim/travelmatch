@@ -1,6 +1,6 @@
 /**
  * Test Utilities - Phase 1: act() wrapper helpers
- * 
+ *
  * Provides utilities to properly wrap async operations in act()
  * and handle React state updates in tests.
  */
@@ -11,7 +11,9 @@ import { act, waitFor as rtlWaitFor } from '@testing-library/react-native';
  * Wrapper for async operations that cause state updates
  * Automatically wraps in act() to prevent warnings
  */
-export const actAsync = async (callback: () => Promise<void> | void): Promise<void> => {
+export const actAsync = async (
+  callback: () => Promise<void> | void,
+): Promise<void> => {
   await act(async () => {
     await callback();
   });
@@ -22,7 +24,7 @@ export const actAsync = async (callback: () => Promise<void> | void): Promise<vo
  */
 export const waitFor = async (
   callback: () => void,
-  options: { timeout?: number; interval?: number } = {}
+  options: { timeout?: number; interval?: number } = {},
 ): Promise<void> => {
   return rtlWaitFor(callback, {
     timeout: options.timeout || 5000, // Increased from default 1000ms
@@ -36,15 +38,15 @@ export const waitFor = async (
  */
 export const waitForCondition = async (
   condition: () => boolean,
-  timeout = 5000
+  timeout = 5000,
 ): Promise<void> => {
   const startTime = Date.now();
-  
+
   while (!condition()) {
     if (Date.now() - startTime > timeout) {
       throw new Error(`Timeout waiting for condition after ${timeout}ms`);
     }
-    await new Promise(resolve => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 50));
   }
 };
 
@@ -53,7 +55,7 @@ export const waitForCondition = async (
  */
 export const flushPromises = async (): Promise<void> => {
   await act(async () => {
-    await new Promise(resolve => setImmediate(resolve));
+    await new Promise((resolve) => setImmediate(resolve));
   });
 };
 
@@ -71,7 +73,7 @@ export const advanceTimersAndFlush = async (ms: number): Promise<void> => {
  * Wait for next tick
  */
 export const nextTick = (): Promise<void> => {
-  return new Promise(resolve => setImmediate(resolve));
+  return new Promise((resolve) => setImmediate(resolve));
 };
 
 /**
@@ -90,7 +92,7 @@ export const suppressActWarnings = (callback: () => void): void => {
     }
     originalError.call(console, ...args);
   };
-  
+
   try {
     callback();
   } finally {

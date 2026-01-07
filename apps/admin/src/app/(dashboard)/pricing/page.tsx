@@ -19,7 +19,13 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -65,7 +71,12 @@ const subscriptionPlans = [
     price_yearly: 399.99,
     subscribers: 12345,
     revenue: 617377,
-    features: ['Sınırsız swipe', 'Super Like x5/gün', 'Reklamsız', 'Kimin beğendiğini gör'],
+    features: [
+      'Sınırsız swipe',
+      'Super Like x5/gün',
+      'Reklamsız',
+      'Kimin beğendiğini gör',
+    ],
     limits: {
       giftsPerMonth: 10,
       momentsPerMonth: 15,
@@ -79,7 +90,12 @@ const subscriptionPlans = [
     price_yearly: 799.99,
     subscribers: 3456,
     revenue: 345543,
-    features: ['Premium özellikleri', 'Öne çıkarılma', 'Mesaj önceliği', 'Profil boost'],
+    features: [
+      'Premium özellikleri',
+      'Öne çıkarılma',
+      'Mesaj önceliği',
+      'Profil boost',
+    ],
     limits: {
       giftsPerMonth: -1, // unlimited
       momentsPerMonth: -1, // unlimited
@@ -124,11 +140,46 @@ const dynamicRules = [
 ];
 
 const regionalPricing = [
-  { country: '🇹🇷 Türkiye', currency: 'TRY', basic: 0, premium: 49.99, premiumPlus: 99.99, ppp: 1.0 },
-  { country: '🇺🇸 ABD', currency: 'USD', basic: 0, premium: 14.99, premiumPlus: 29.99, ppp: 1.0 },
-  { country: '🇪🇺 Avrupa', currency: 'EUR', basic: 0, premium: 12.99, premiumPlus: 24.99, ppp: 0.95 },
-  { country: '🇧🇷 Brezilya', currency: 'BRL', basic: 0, premium: 39.99, premiumPlus: 79.99, ppp: 0.65 },
-  { country: '🇮🇳 Hindistan', currency: 'INR', basic: 0, premium: 499, premiumPlus: 999, ppp: 0.45 },
+  {
+    country: '🇹🇷 Türkiye',
+    currency: 'TRY',
+    basic: 0,
+    premium: 49.99,
+    premiumPlus: 99.99,
+    ppp: 1.0,
+  },
+  {
+    country: '🇺🇸 ABD',
+    currency: 'USD',
+    basic: 0,
+    premium: 14.99,
+    premiumPlus: 29.99,
+    ppp: 1.0,
+  },
+  {
+    country: '🇪🇺 Avrupa',
+    currency: 'EUR',
+    basic: 0,
+    premium: 12.99,
+    premiumPlus: 24.99,
+    ppp: 0.95,
+  },
+  {
+    country: '🇧🇷 Brezilya',
+    currency: 'BRL',
+    basic: 0,
+    premium: 39.99,
+    premiumPlus: 79.99,
+    ppp: 0.65,
+  },
+  {
+    country: '🇮🇳 Hindistan',
+    currency: 'INR',
+    basic: 0,
+    premium: 499,
+    premiumPlus: 999,
+    ppp: 0.45,
+  },
 ];
 
 export default function PricingPage() {
@@ -139,8 +190,12 @@ export default function PricingPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dinamik Fiyatlandırma</h1>
-          <p className="text-muted-foreground">Fiyat kuralları ve bölgesel ayarlar</p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Dinamik Fiyatlandırma
+          </h1>
+          <p className="text-muted-foreground">
+            Fiyat kuralları ve bölgesel ayarlar
+          </p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
@@ -163,7 +218,9 @@ export default function PricingPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Aylık Gelir (MRR)</p>
+                <p className="text-sm text-muted-foreground">
+                  Aylık Gelir (MRR)
+                </p>
                 <p className="text-2xl font-bold">
                   ₺{pricingStats.current_mrr.toLocaleString('tr-TR')}
                 </p>
@@ -196,7 +253,9 @@ export default function PricingPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Dönüşüm Oranı</p>
-                <p className="text-2xl font-bold">{pricingStats.conversion_rate}%</p>
+                <p className="text-2xl font-bold">
+                  {pricingStats.conversion_rate}%
+                </p>
               </div>
               <Percent className="h-8 w-8 text-purple-500" />
             </div>
@@ -211,7 +270,9 @@ export default function PricingPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Aktif Promosyon</p>
-                <p className="text-2xl font-bold">{pricingStats.active_promos}</p>
+                <p className="text-2xl font-bold">
+                  {pricingStats.active_promos}
+                </p>
               </div>
               <Zap className="h-8 w-8 text-yellow-500" />
             </div>
@@ -246,7 +307,9 @@ export default function PricingPage() {
                   <div className="space-y-4">
                     <div>
                       <div className="flex items-baseline gap-1">
-                        <span className="text-3xl font-bold">₺{plan.price_monthly}</span>
+                        <span className="text-3xl font-bold">
+                          ₺{plan.price_monthly}
+                        </span>
                         <span className="text-muted-foreground">/ay</span>
                       </div>
                       <p className="text-sm text-muted-foreground">
@@ -255,7 +318,10 @@ export default function PricingPage() {
                     </div>
                     <div className="space-y-2">
                       {plan.features.map((feature, i) => (
-                        <div key={i} className="flex items-center gap-2 text-sm">
+                        <div
+                          key={i}
+                          className="flex items-center gap-2 text-sm"
+                        >
                           <div className="h-1.5 w-1.5 rounded-full bg-primary" />
                           {feature}
                         </div>
@@ -263,17 +329,25 @@ export default function PricingPage() {
                     </div>
                     {plan.revenue > 0 && (
                       <div className="pt-4 border-t">
-                        <p className="text-sm text-muted-foreground">Bu ay gelir</p>
+                        <p className="text-sm text-muted-foreground">
+                          Bu ay gelir
+                        </p>
                         <p className="text-lg font-bold">
                           ₺{plan.revenue.toLocaleString('tr-TR')}
                         </p>
                       </div>
                     )}
                     <div className="pt-4 border-t">
-                      <Label className="text-sm text-muted-foreground">Gifts/month</Label>
+                      <Label className="text-sm text-muted-foreground">
+                        Gifts/month
+                      </Label>
                       <Input
                         type="number"
-                        defaultValue={plan.limits.giftsPerMonth === -1 ? '' : plan.limits.giftsPerMonth}
+                        defaultValue={
+                          plan.limits.giftsPerMonth === -1
+                            ? ''
+                            : plan.limits.giftsPerMonth
+                        }
                         placeholder="Unlimited"
                         className="mt-1"
                       />
@@ -331,7 +405,9 @@ export default function PricingPage() {
                           <Badge className="bg-blue-500">Planlandı</Badge>
                         )}
                       </TableCell>
-                      <TableCell className="text-muted-foreground">{rule.impact}</TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {rule.impact}
+                      </TableCell>
                       <TableCell>
                         <Button variant="ghost" size="icon">
                           <Settings className="h-4 w-4" />
@@ -369,13 +445,19 @@ export default function PricingPage() {
                 <TableBody>
                   {regionalPricing.map((region, i) => (
                     <TableRow key={i}>
-                      <TableCell className="font-medium">{region.country}</TableCell>
+                      <TableCell className="font-medium">
+                        {region.country}
+                      </TableCell>
                       <TableCell>{region.currency}</TableCell>
                       <TableCell className="text-right">
                         {region.basic === 0 ? 'Ücretsiz' : region.basic}
                       </TableCell>
-                      <TableCell className="text-right">{region.premium}</TableCell>
-                      <TableCell className="text-right">{region.premiumPlus}</TableCell>
+                      <TableCell className="text-right">
+                        {region.premium}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {region.premiumPlus}
+                      </TableCell>
                       <TableCell className="text-right">
                         <Badge variant="outline">{region.ppp}x</Badge>
                       </TableCell>
@@ -397,7 +479,9 @@ export default function PricingPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Fiyat Elastikiyeti</CardTitle>
-                <CardDescription>Fiyat değişikliklerinin etkisi</CardDescription>
+                <CardDescription>
+                  Fiyat değişikliklerinin etkisi
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -410,7 +494,9 @@ export default function PricingPage() {
                     <span className="text-green-500">+15% abone</span>
                   </div>
                   <div className="pt-4 border-t">
-                    <p className="text-sm text-muted-foreground">Optimal fiyat noktası</p>
+                    <p className="text-sm text-muted-foreground">
+                      Optimal fiyat noktası
+                    </p>
                     <p className="text-2xl font-bold">₺44.99 - ₺54.99</p>
                   </div>
                 </div>
@@ -425,17 +511,25 @@ export default function PricingPage() {
                 <div className="space-y-4">
                   <div className="rounded-lg border p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium">Premium Yıllık Fiyat Testi</span>
+                      <span className="font-medium">
+                        Premium Yıllık Fiyat Testi
+                      </span>
                       <Badge className="bg-green-500">Aktif</Badge>
                     </div>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <p className="text-muted-foreground">Kontrol (₺399.99)</p>
+                        <p className="text-muted-foreground">
+                          Kontrol (₺399.99)
+                        </p>
                         <p className="font-medium">3.2% dönüşüm</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Varyant (₺349.99)</p>
-                        <p className="font-medium text-green-600">4.1% dönüşüm</p>
+                        <p className="text-muted-foreground">
+                          Varyant (₺349.99)
+                        </p>
+                        <p className="font-medium text-green-600">
+                          4.1% dönüşüm
+                        </p>
                       </div>
                     </div>
                     <p className="text-xs text-muted-foreground mt-2">

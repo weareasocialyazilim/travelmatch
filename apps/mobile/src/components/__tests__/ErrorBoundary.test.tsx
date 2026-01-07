@@ -12,7 +12,6 @@
 
 // Ensure __DEV__ is defined for React Native
 declare global {
-   
   var __DEV__: boolean;
 }
 global.__DEV__ = true;

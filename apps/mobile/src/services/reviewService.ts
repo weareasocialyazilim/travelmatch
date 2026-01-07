@@ -164,14 +164,21 @@ export const reviewService = {
         count = result.count;
       } else if (filters.momentId) {
         // Fetch reviews for a specific moment
-        const { data: momentReviews, count: momentCount, error } = await supabase
+        const {
+          data: momentReviews,
+          count: momentCount,
+          error,
+        } = await supabase
           .from('reviews')
-          .select('*, reviewer:users!reviews_reviewer_id_fkey(*), moment:moments(*)', { count: 'exact' })
+          .select(
+            '*, reviewer:users!reviews_reviewer_id_fkey(*), moment:moments(*)',
+            { count: 'exact' },
+          )
           .eq('moment_id', filters.momentId)
           .order('created_at', { ascending: false })
           .range(
             ((filters.page || 1) - 1) * (filters.pageSize || 20),
-            (filters.page || 1) * (filters.pageSize || 20) - 1
+            (filters.page || 1) * (filters.pageSize || 20) - 1,
           );
 
         if (error) throw error;
@@ -179,14 +186,21 @@ export const reviewService = {
         count = momentCount || 0;
       } else if (filters.reviewerId) {
         // Fetch reviews written by a specific user
-        const { data: reviewerReviews, count: reviewerCount, error } = await supabase
+        const {
+          data: reviewerReviews,
+          count: reviewerCount,
+          error,
+        } = await supabase
           .from('reviews')
-          .select('*, reviewer:users!reviews_reviewer_id_fkey(*), moment:moments(*)', { count: 'exact' })
+          .select(
+            '*, reviewer:users!reviews_reviewer_id_fkey(*), moment:moments(*)',
+            { count: 'exact' },
+          )
           .eq('reviewer_id', filters.reviewerId)
           .order('created_at', { ascending: false })
           .range(
             ((filters.page || 1) - 1) * (filters.pageSize || 20),
-            (filters.page || 1) * (filters.pageSize || 20) - 1
+            (filters.page || 1) * (filters.pageSize || 20) - 1,
           );
 
         if (error) throw error;
@@ -194,13 +208,20 @@ export const reviewService = {
         count = reviewerCount || 0;
       } else {
         // No specific filter - fetch all reviews (paginated)
-        const { data: allReviews, count: allCount, error } = await supabase
+        const {
+          data: allReviews,
+          count: allCount,
+          error,
+        } = await supabase
           .from('reviews')
-          .select('*, reviewer:users!reviews_reviewer_id_fkey(*), moment:moments(*)', { count: 'exact' })
+          .select(
+            '*, reviewer:users!reviews_reviewer_id_fkey(*), moment:moments(*)',
+            { count: 'exact' },
+          )
           .order('created_at', { ascending: false })
           .range(
             ((filters.page || 1) - 1) * (filters.pageSize || 20),
-            (filters.page || 1) * (filters.pageSize || 20) - 1
+            (filters.page || 1) * (filters.pageSize || 20) - 1,
           );
 
         if (error) throw error;
@@ -353,7 +374,8 @@ export const reviewService = {
       // Step 1: Get all completed requests where I am either the host or the requester
       const { data: completedRequests, error: requestsError } = await supabase
         .from('requests')
-        .select(`
+        .select(
+          `
           id,
           moment_id,
           user_id,
@@ -370,7 +392,8 @@ export const reviewService = {
             full_name,
             avatar_url
           )
-        `)
+        `,
+        )
         .eq('status', 'completed')
         .order('updated_at', { ascending: false });
 
@@ -386,7 +409,7 @@ export const reviewService = {
 
       // Create a Set of reviewed combinations for fast lookup
       const reviewedSet = new Set(
-        (myReviews || []).map(r => `${r.moment_id}-${r.reviewed_id}`)
+        (myReviews || []).map((r) => `${r.moment_id}-${r.reviewed_id}`),
       );
 
       // Step 3: Filter out requests I've already reviewed
@@ -400,13 +423,14 @@ export const reviewService = {
         completedAt: string;
       }> = [];
 
-      for (const request of (completedRequests || [])) {
+      for (const request of completedRequests || []) {
         const req = request as any;
         const moment = req.moments;
         const requester = req.users;
 
         // Determine who I should review based on my role
-        let userToReview: { id: string; name: string; avatar: string } | null = null;
+        let userToReview: { id: string; name: string; avatar: string } | null =
+          null;
 
         if (moment.user_id === user.id) {
           // I am the host - I should review the requester
@@ -434,7 +458,10 @@ export const reviewService = {
         }
 
         // Check if I've already reviewed this person for this moment
-        if (userToReview && !reviewedSet.has(`${moment.id}-${userToReview.id}`)) {
+        if (
+          userToReview &&
+          !reviewedSet.has(`${moment.id}-${userToReview.id}`)
+        ) {
           pendingReviews.push({
             requestId: req.id,
             momentId: moment.id,

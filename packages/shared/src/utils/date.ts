@@ -30,7 +30,10 @@ export const formatRelativeTime = (date: string | Date): string => {
 /**
  * Format date to short format (e.g., "Jan 1, 2024")
  */
-export const formatShortDate = (date: string | Date, locale = 'en-US'): string => {
+export const formatShortDate = (
+  date: string | Date,
+  locale = 'en-US',
+): string => {
   return new Intl.DateTimeFormat(locale, {
     month: 'short',
     day: 'numeric',
@@ -41,7 +44,10 @@ export const formatShortDate = (date: string | Date, locale = 'en-US'): string =
 /**
  * Format date to long format (e.g., "January 1, 2024")
  */
-export const formatLongDate = (date: string | Date, locale = 'en-US'): string => {
+export const formatLongDate = (
+  date: string | Date,
+  locale = 'en-US',
+): string => {
   return new Intl.DateTimeFormat(locale, {
     month: 'long',
     day: 'numeric',
@@ -63,7 +69,10 @@ export const formatTime = (date: string | Date, locale = 'en-US'): string => {
 /**
  * Format date and time (e.g., "Jan 1, 2024 at 2:30 PM")
  */
-export const formatDateTime = (date: string | Date, locale = 'en-US'): string => {
+export const formatDateTime = (
+  date: string | Date,
+  locale = 'en-US',
+): string => {
   return `${formatShortDate(date, locale)} at ${formatTime(date, locale)}`;
 };
 
@@ -73,7 +82,7 @@ export const formatDateTime = (date: string | Date, locale = 'en-US'): string =>
 export const isToday = (date: string | Date): boolean => {
   const today = new Date();
   const checkDate = new Date(date);
-  
+
   return (
     checkDate.getDate() === today.getDate() &&
     checkDate.getMonth() === today.getMonth() &&
@@ -88,7 +97,7 @@ export const isYesterday = (date: string | Date): boolean => {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
   const checkDate = new Date(date);
-  
+
   return (
     checkDate.getDate() === yesterday.getDate() &&
     checkDate.getMonth() === yesterday.getMonth() &&

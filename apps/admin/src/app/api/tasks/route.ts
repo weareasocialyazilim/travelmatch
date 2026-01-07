@@ -27,20 +27,27 @@ export async function GET(request: NextRequest) {
     const assignedTo = searchParams.get('assigned_to');
     const { limit, offset } = validatePagination(
       searchParams.get('limit'),
-      searchParams.get('offset')
+      searchParams.get('offset'),
     );
 
     // SECURITY: Validate status and priority against whitelists
-    const status = rawStatus && VALID_STATUSES.includes(rawStatus) ? rawStatus : null;
-    const priority = rawPriority && VALID_PRIORITIES.includes(rawPriority) ? rawPriority : null;
+    const status =
+      rawStatus && VALID_STATUSES.includes(rawStatus) ? rawStatus : null;
+    const priority =
+      rawPriority && VALID_PRIORITIES.includes(rawPriority)
+        ? rawPriority
+        : null;
 
     const supabase = createServiceClient();
 
     let query = supabase
       .from('tasks')
-      .select('*, assigned_to_user:admin_users!tasks_assigned_to_fkey(id, name, email, avatar_url)', {
-        count: 'exact',
-      })
+      .select(
+        '*, assigned_to_user:admin_users!tasks_assigned_to_fkey(id, name, email, avatar_url)',
+        {
+          count: 'exact',
+        },
+      )
       .order('priority', { ascending: false })
       .order('created_at', { ascending: true })
       .range(offset, offset + limit - 1);
@@ -74,7 +81,10 @@ export async function GET(request: NextRequest) {
     // SECURITY: Use safe filter builders for session data (VULN-001)
     if (!['super_admin', 'manager'].includes(session.admin.role)) {
       const uuidFilter = buildSafeUUIDFilter('assigned_to', session.admin.id);
-      const roleFilter = buildSafeArrayContainsFilter('assigned_roles', session.admin.role);
+      const roleFilter = buildSafeArrayContainsFilter(
+        'assigned_roles',
+        session.admin.role,
+      );
 
       if (uuidFilter && roleFilter) {
         query = query.or(`${uuidFilter},${roleFilter}`);
@@ -87,7 +97,10 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('Tasks query error:', error);
-      return NextResponse.json({ error: 'Görevler yüklenemedi' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Görevler yüklenemedi' },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({
@@ -126,7 +139,7 @@ export async function POST(request: NextRequest) {
     if (!type || !title || !resource_type || !resource_id) {
       return NextResponse.json(
         { error: 'Gerekli alanlar eksik' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -151,7 +164,10 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       logger.error('Task creation error:', error);
-      return NextResponse.json({ error: 'Görev oluşturulamadı' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Görev oluşturulamadı' },
+        { status: 500 },
+      );
     }
 
     // Create audit log
@@ -161,7 +177,10 @@ export async function POST(request: NextRequest) {
       resource_type: 'task',
       resource_id: task.id,
       new_value: task,
-      ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined,
+      ip_address:
+        request.headers.get('x-forwarded-for') ||
+        request.headers.get('x-real-ip') ||
+        undefined,
       user_agent: request.headers.get('user-agent'),
     });
 

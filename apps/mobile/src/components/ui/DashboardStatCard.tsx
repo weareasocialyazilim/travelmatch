@@ -101,9 +101,7 @@ export const DashboardStatCard = memo<DashboardStatCardProps>(
     const isCompact = variant === 'compact';
 
     const Container = onPress ? TouchableOpacity : View;
-    const containerProps = onPress
-      ? { onPress, activeOpacity: 0.7 }
-      : {};
+    const containerProps = onPress ? { onPress, activeOpacity: 0.7 } : {};
 
     return (
       <Container
@@ -120,15 +118,14 @@ export const DashboardStatCard = memo<DashboardStatCardProps>(
         <View style={styles.header}>
           {icon && (
             <View
-              style={[
-                styles.iconContainer,
-                isDark && styles.iconContainerDark,
-              ]}
+              style={[styles.iconContainer, isDark && styles.iconContainerDark]}
             >
               <MaterialCommunityIcons
                 name={icon}
                 size={20}
-                color={iconColor || (isDark ? COLORS.white : COLORS.text.secondary)}
+                color={
+                  iconColor || (isDark ? COLORS.white : COLORS.text.secondary)
+                }
               />
             </View>
           )}
@@ -137,7 +134,9 @@ export const DashboardStatCard = memo<DashboardStatCardProps>(
             <View
               style={[
                 styles.trendBadge,
-                isDark ? styles.trendBadgeDark : { backgroundColor: trendConfig.bgColor },
+                isDark
+                  ? styles.trendBadgeDark
+                  : { backgroundColor: trendConfig.bgColor },
               ]}
             >
               <MaterialCommunityIcons
@@ -146,7 +145,8 @@ export const DashboardStatCard = memo<DashboardStatCardProps>(
                 color={trendConfig.color}
               />
               <Text style={[styles.trendText, { color: trendConfig.color }]}>
-                {trend.value > 0 ? '+' : ''}{trend.value}%
+                {trend.value > 0 ? '+' : ''}
+                {trend.value}%
               </Text>
             </View>
           )}
@@ -173,12 +173,7 @@ export const DashboardStatCard = memo<DashboardStatCardProps>(
         {/* Value */}
         <View style={styles.valueRow}>
           {prefix && (
-            <Text
-              style={[
-                styles.prefix,
-                isDark && styles.textWhite,
-              ]}
-            >
+            <Text style={[styles.prefix, isDark && styles.textWhite]}>
               {prefix}
             </Text>
           )}
@@ -192,12 +187,7 @@ export const DashboardStatCard = memo<DashboardStatCardProps>(
             {value}
           </Text>
           {suffix && (
-            <Text
-              style={[
-                styles.suffix,
-                isDark && styles.textWhite,
-              ]}
-            >
+            <Text style={[styles.suffix, isDark && styles.textWhite]}>
               {suffix}
             </Text>
           )}
@@ -208,15 +198,22 @@ export const DashboardStatCard = memo<DashboardStatCardProps>(
           <View style={styles.progressContainer}>
             {progress.label && (
               <View style={styles.progressLabelRow}>
-                <Text style={[styles.progressLabel, isDark && styles.textLight]}>
+                <Text
+                  style={[styles.progressLabel, isDark && styles.textLight]}
+                >
                   {progress.label}
                 </Text>
-                <Text style={[styles.progressValue, isDark && styles.textLight]}>
-                  {progress.current.toLocaleString('tr-TR')} / {progress.max.toLocaleString('tr-TR')}
+                <Text
+                  style={[styles.progressValue, isDark && styles.textLight]}
+                >
+                  {progress.current.toLocaleString('tr-TR')} /{' '}
+                  {progress.max.toLocaleString('tr-TR')}
                 </Text>
               </View>
             )}
-            <View style={[styles.progressBar, isDark && styles.progressBarDark]}>
+            <View
+              style={[styles.progressBar, isDark && styles.progressBarDark]}
+            >
               <View
                 style={[
                   styles.progressFill,

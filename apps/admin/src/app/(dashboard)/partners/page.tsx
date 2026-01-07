@@ -24,7 +24,13 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -166,7 +172,9 @@ export default function PartnersPage() {
 
   const getTierBadge = (tier: string) => {
     const config = partnerTiers[tier as keyof typeof partnerTiers];
-    return <Badge className={`${config.color} text-white`}>{config.label}</Badge>;
+    return (
+      <Badge className={`${config.color} text-white`}>{config.label}</Badge>
+    );
   };
 
   const getTypeBadge = (type: string) => {
@@ -182,7 +190,10 @@ export default function PartnersPage() {
 
   const filteredPartners = partners.filter((partner) => {
     if (typeFilter !== 'all' && partner.type !== typeFilter) return false;
-    if (searchQuery && !partner.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+    if (
+      searchQuery &&
+      !partner.name.toLowerCase().includes(searchQuery.toLowerCase())
+    ) {
       return false;
     }
     return true;
@@ -220,7 +231,9 @@ export default function PartnersPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Aktif</p>
-                <p className="text-2xl font-bold text-green-600">{partnerStats.active}</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {partnerStats.active}
+                </p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-500" />
             </div>
@@ -231,7 +244,9 @@ export default function PartnersPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Bekleyen</p>
-                <p className="text-2xl font-bold text-yellow-600">{partnerStats.pending}</p>
+                <p className="text-2xl font-bold text-yellow-600">
+                  {partnerStats.pending}
+                </p>
               </div>
               <Clock className="h-8 w-8 text-yellow-500" />
             </div>
@@ -255,7 +270,9 @@ export default function PartnersPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Ort. Komisyon</p>
-                <p className="text-2xl font-bold">%{partnerStats.avg_commission}</p>
+                <p className="text-2xl font-bold">
+                  %{partnerStats.avg_commission}
+                </p>
               </div>
               <TrendingUp className="h-8 w-8 text-purple-500" />
             </div>
@@ -309,7 +326,9 @@ export default function PartnersPage() {
                       </Avatar>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="font-medium text-lg">{partner.name}</h3>
+                          <h3 className="font-medium text-lg">
+                            {partner.name}
+                          </h3>
                           {partner.rating > 0 && (
                             <span className="flex items-center gap-1 text-sm">
                               <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
@@ -374,11 +393,17 @@ export default function PartnersPage() {
                       </div>
                       <div className="text-center">
                         <p className="text-2xl font-bold">{partner.bookings}</p>
-                        <p className="text-xs text-muted-foreground">Rezervasyon</p>
+                        <p className="text-xs text-muted-foreground">
+                          Rezervasyon
+                        </p>
                       </div>
                       <div className="text-center">
-                        <p className="text-2xl font-bold">%{partner.commission}</p>
-                        <p className="text-xs text-muted-foreground">Komisyon</p>
+                        <p className="text-2xl font-bold">
+                          %{partner.commission}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Komisyon
+                        </p>
                       </div>
                     </div>
                   )}
@@ -402,10 +427,14 @@ export default function PartnersPage() {
         </TabsContent>
 
         <TabsContent value="active">
-          <p className="text-muted-foreground">Aktif partnerler burada listelenecek.</p>
+          <p className="text-muted-foreground">
+            Aktif partnerler burada listelenecek.
+          </p>
         </TabsContent>
         <TabsContent value="pending">
-          <p className="text-muted-foreground">Onay bekleyen partnerler burada listelenecek.</p>
+          <p className="text-muted-foreground">
+            Onay bekleyen partnerler burada listelenecek.
+          </p>
         </TabsContent>
       </Tabs>
     </div>

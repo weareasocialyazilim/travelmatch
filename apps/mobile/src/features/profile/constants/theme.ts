@@ -8,10 +8,10 @@
 export const PROFILE_COLORS = {
   // Background layers (Twilight Zinc)
   background: {
-    primary: '#121214',    // Main background - deep anthracite
-    secondary: '#1E1E20',  // Card surfaces
-    tertiary: '#27272A',   // Elevated surfaces
-    elevated: '#3F3F46',   // Hover/pressed states
+    primary: '#121214', // Main background - deep anthracite
+    secondary: '#1E1E20', // Card surfaces
+    tertiary: '#27272A', // Elevated surfaces
+    elevated: '#3F3F46', // Hover/pressed states
   },
 
   // Glass effects (Liquid Glass)
@@ -35,12 +35,12 @@ export const PROFILE_COLORS = {
 
   // Neon accent colors (Neon Energy)
   neon: {
-    lime: '#DFFF00',       // Primary action (Gift-Lime)
-    violet: '#A855F7',     // Premium/AI features
-    cyan: '#06B6D4',       // Verified & Trust
-    rose: '#F43F5E',       // Hearts & Notifications
-    amber: '#F59E0B',      // Warnings
-    emerald: '#10B981',    // Success
+    lime: '#DFFF00', // Primary action (Gift-Lime)
+    violet: '#A855F7', // Premium/AI features
+    cyan: '#06B6D4', // Verified & Trust
+    rose: '#F43F5E', // Hearts & Notifications
+    amber: '#F59E0B', // Warnings
+    emerald: '#10B981', // Success
   },
 
   // Trust levels for constellation
@@ -66,9 +66,15 @@ export const PROFILE_COLORS = {
   // Gradient presets
   gradients: {
     header: ['#DFFF00', '#A855F7'] as const,
-    headerDark: ['rgba(223, 255, 0, 0.15)', 'rgba(168, 85, 247, 0.15)'] as const,
+    headerDark: [
+      'rgba(223, 255, 0, 0.15)',
+      'rgba(168, 85, 247, 0.15)',
+    ] as const,
     trust: ['#06B6D4', '#A855F7'] as const,
-    constellation: ['rgba(223, 255, 0, 0.1)', 'rgba(6, 182, 212, 0.1)'] as const,
+    constellation: [
+      'rgba(223, 255, 0, 0.1)',
+      'rgba(6, 182, 212, 0.1)',
+    ] as const,
     cardOverlay: ['transparent', 'rgba(18, 18, 20, 0.95)'] as const,
   },
 } as const;
@@ -133,7 +139,9 @@ export const PROFILE_TYPOGRAPHY = {
 } as const;
 
 // Trust score helpers
-export const getTrustLevel = (score: number): 'platinum' | 'gold' | 'silver' | 'bronze' => {
+export const getTrustLevel = (
+  score: number,
+): 'platinum' | 'gold' | 'silver' | 'bronze' => {
   if (score >= 90) return 'platinum';
   if (score >= 70) return 'gold';
   if (score >= 50) return 'silver';

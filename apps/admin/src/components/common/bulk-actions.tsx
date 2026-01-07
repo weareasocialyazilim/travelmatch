@@ -1,6 +1,12 @@
 'use client';
 
-import { Download, Trash2, CheckCircle, XCircle, MoreHorizontal } from 'lucide-react';
+import {
+  Download,
+  Trash2,
+  CheckCircle,
+  XCircle,
+  MoreHorizontal,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -91,7 +97,9 @@ export function BulkActions({
                     <DropdownMenuItem
                       key={action.id}
                       onClick={action.onClick}
-                      className={action.variant === 'destructive' ? 'text-red-600' : ''}
+                      className={
+                        action.variant === 'destructive' ? 'text-red-600' : ''
+                      }
                     >
                       {action.icon}
                       <span className="ml-2">{action.label}</span>

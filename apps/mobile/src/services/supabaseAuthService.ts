@@ -24,7 +24,9 @@ const generateOAuthState = (): string => {
     }
   }
   // Convert to base64-like string
-  return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('');
+  return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join(
+    '',
+  );
 };
 
 export interface AuthResult {
@@ -239,20 +241,27 @@ export const handleOAuthCallback = async (
 
     // Validate state parameter for CSRF protection
     const receivedState = hashParams.get('state') || queryParams.get('state');
-    const storedState = await secureStorage.getItem(StorageKeys.SECURE.OAUTH_STATE);
+    const storedState = await secureStorage.getItem(
+      StorageKeys.SECURE.OAUTH_STATE,
+    );
 
     // Clean up stored state immediately (one-time use)
     await secureStorage.deleteItem(StorageKeys.SECURE.OAUTH_STATE);
 
     if (!receivedState || !storedState || receivedState !== storedState) {
-      logger.error('[Auth] OAuth state validation failed - potential CSRF attack', {
-        hasReceivedState: !!receivedState,
-        hasStoredState: !!storedState,
-        match: receivedState === storedState,
-      });
+      logger.error(
+        '[Auth] OAuth state validation failed - potential CSRF attack',
+        {
+          hasReceivedState: !!receivedState,
+          hasStoredState: !!storedState,
+          match: receivedState === storedState,
+        },
+      );
       return {
         session: null,
-        error: { message: 'OAuth state validation failed. Please try again.' } as AuthError,
+        error: {
+          message: 'OAuth state validation failed. Please try again.',
+        } as AuthError,
       };
     }
 
@@ -629,17 +638,25 @@ export const requestDataExport = async (): Promise<{
       .single();
 
     if (error) {
-      logger.error('[Auth] DataExport - Failed to create export request', { error });
+      logger.error('[Auth] DataExport - Failed to create export request', {
+        error,
+      });
       return { error: error as unknown as AuthError };
     }
 
     const requestId = (data as { id?: string } | null)?.id;
-    logger.info('[Auth] DataExport - Export request created', { userId, requestId });
+    logger.info('[Auth] DataExport - Export request created', {
+      userId,
+      requestId,
+    });
     return { error: null, requestId };
   } catch (error) {
     logger.error('[Auth] DataExport - Unexpected error', { error });
     return {
-      error: error instanceof Error ? (error as unknown as AuthError) : ({ message: 'Unknown error' } as AuthError),
+      error:
+        error instanceof Error
+          ? (error as unknown as AuthError)
+          : ({ message: 'Unknown error' } as AuthError),
     };
   }
 };

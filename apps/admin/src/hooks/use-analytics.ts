@@ -55,7 +55,9 @@ export function useUserMetrics(period: '7d' | '30d' | '90d' | '365d' = '30d') {
   };
 }
 
-export function useRevenueMetrics(period: '7d' | '30d' | '90d' | '365d' = '30d') {
+export function useRevenueMetrics(
+  period: '7d' | '30d' | '90d' | '365d' = '30d',
+) {
   const { data, isLoading, error } = useAnalytics({ period });
 
   return {
@@ -66,7 +68,9 @@ export function useRevenueMetrics(period: '7d' | '30d' | '90d' | '365d' = '30d')
   };
 }
 
-export function useEngagementMetrics(period: '7d' | '30d' | '90d' | '365d' = '30d') {
+export function useEngagementMetrics(
+  period: '7d' | '30d' | '90d' | '365d' = '30d',
+) {
   const { data, isLoading, error } = useAnalytics({ period });
 
   return {

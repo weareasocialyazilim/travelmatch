@@ -166,12 +166,23 @@ export interface GiverSlot {
 /**
  * Moment lifecycle status (owner-controlled)
  */
-export type MomentLifecycleStatus = 'draft' | 'active' | 'full' | 'paused' | 'completed' | 'cancelled' | 'deleted';
+export type MomentLifecycleStatus =
+  | 'draft'
+  | 'active'
+  | 'full'
+  | 'paused'
+  | 'completed'
+  | 'cancelled'
+  | 'deleted';
 
 /**
  * Moment moderation status (admin-controlled)
  */
-export type MomentModerationStatus = 'pending_review' | 'approved' | 'rejected' | 'flagged';
+export type MomentModerationStatus =
+  | 'pending_review'
+  | 'approved'
+  | 'rejected'
+  | 'flagged';
 
 export interface MomentLocation {
   name?: string;

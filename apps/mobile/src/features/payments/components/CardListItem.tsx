@@ -11,7 +11,11 @@ interface CardListItemProps {
   onPress: (card: SavedCard) => void;
 }
 
-export const CardListItem = ({ card, showDefault, onPress }: CardListItemProps) => {
+export const CardListItem = ({
+  card,
+  showDefault,
+  onPress,
+}: CardListItemProps) => {
   return (
     <TouchableOpacity
       style={styles.cardItem}
@@ -41,7 +45,11 @@ export const CardListItem = ({ card, showDefault, onPress }: CardListItemProps) 
           <View style={styles.defaultDot} />
         </View>
       )}
-      <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.softGray} />
+      <MaterialCommunityIcons
+        name="chevron-right"
+        size={20}
+        color={COLORS.softGray}
+      />
     </TouchableOpacity>
   );
 };

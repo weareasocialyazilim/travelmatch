@@ -33,10 +33,15 @@ describe('useScreenSecurity', () => {
     renderHook(() => useScreenSecurity());
 
     await waitFor(() => {
-      expect(mockScreenCapture.preventScreenCaptureAsync).toHaveBeenCalledTimes(1);
+      expect(mockScreenCapture.preventScreenCaptureAsync).toHaveBeenCalledTimes(
+        1,
+      );
     });
 
-    expect(mockLogger.info).toHaveBeenCalledWith('ScreenSecurity', 'Screenshot protection enabled');
+    expect(mockLogger.info).toHaveBeenCalledWith(
+      'ScreenSecurity',
+      'Screenshot protection enabled',
+    );
   });
 
   it('allows screenshots on unmount and logs', async () => {
@@ -52,9 +57,14 @@ describe('useScreenSecurity', () => {
     unmount();
 
     await waitFor(() => {
-      expect(mockScreenCapture.allowScreenCaptureAsync).toHaveBeenCalledTimes(1);
+      expect(mockScreenCapture.allowScreenCaptureAsync).toHaveBeenCalledTimes(
+        1,
+      );
     });
 
-    expect(mockLogger.info).toHaveBeenCalledWith('ScreenSecurity', 'Screenshot protection disabled');
+    expect(mockLogger.info).toHaveBeenCalledWith(
+      'ScreenSecurity',
+      'Screenshot protection disabled',
+    );
   });
 });

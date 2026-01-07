@@ -23,63 +23,188 @@
 export const TYPOGRAPHY_SCALE = {
   // Display - Hero sections
   display: {
-    '2xl': { fontSize: 32, lineHeight: 40, fontWeight: '800' as const, letterSpacing: -0.8 },
-    xl: { fontSize: 28, lineHeight: 36, fontWeight: '700' as const, letterSpacing: -0.6 },
-    lg: { fontSize: 24, lineHeight: 32, fontWeight: '700' as const, letterSpacing: -0.4 },
+    '2xl': {
+      fontSize: 32,
+      lineHeight: 40,
+      fontWeight: '800' as const,
+      letterSpacing: -0.8,
+    },
+    xl: {
+      fontSize: 28,
+      lineHeight: 36,
+      fontWeight: '700' as const,
+      letterSpacing: -0.6,
+    },
+    lg: {
+      fontSize: 24,
+      lineHeight: 32,
+      fontWeight: '700' as const,
+      letterSpacing: -0.4,
+    },
   },
 
   // Headline - Card titles, section headers
   headline: {
-    lg: { fontSize: 20, lineHeight: 28, fontWeight: '600' as const, letterSpacing: -0.3 },
-    md: { fontSize: 18, lineHeight: 26, fontWeight: '600' as const, letterSpacing: -0.2 },
-    sm: { fontSize: 16, lineHeight: 24, fontWeight: '600' as const, letterSpacing: -0.1 },
+    lg: {
+      fontSize: 20,
+      lineHeight: 28,
+      fontWeight: '600' as const,
+      letterSpacing: -0.3,
+    },
+    md: {
+      fontSize: 18,
+      lineHeight: 26,
+      fontWeight: '600' as const,
+      letterSpacing: -0.2,
+    },
+    sm: {
+      fontSize: 16,
+      lineHeight: 24,
+      fontWeight: '600' as const,
+      letterSpacing: -0.1,
+    },
   },
 
   // Subheadline - Descriptions, secondary titles
   subheadline: {
-    lg: { fontSize: 16, lineHeight: 24, fontWeight: '500' as const, letterSpacing: 0 },
-    md: { fontSize: 15, lineHeight: 22, fontWeight: '500' as const, letterSpacing: 0 },
-    sm: { fontSize: 14, lineHeight: 20, fontWeight: '500' as const, letterSpacing: 0 },
+    lg: {
+      fontSize: 16,
+      lineHeight: 24,
+      fontWeight: '500' as const,
+      letterSpacing: 0,
+    },
+    md: {
+      fontSize: 15,
+      lineHeight: 22,
+      fontWeight: '500' as const,
+      letterSpacing: 0,
+    },
+    sm: {
+      fontSize: 14,
+      lineHeight: 20,
+      fontWeight: '500' as const,
+      letterSpacing: 0,
+    },
   },
 
   // Body - Main content
   body: {
-    lg: { fontSize: 16, lineHeight: 26, fontWeight: '400' as const, letterSpacing: 0 },
-    md: { fontSize: 14, lineHeight: 22, fontWeight: '400' as const, letterSpacing: 0 },
-    sm: { fontSize: 13, lineHeight: 20, fontWeight: '400' as const, letterSpacing: 0 },
+    lg: {
+      fontSize: 16,
+      lineHeight: 26,
+      fontWeight: '400' as const,
+      letterSpacing: 0,
+    },
+    md: {
+      fontSize: 14,
+      lineHeight: 22,
+      fontWeight: '400' as const,
+      letterSpacing: 0,
+    },
+    sm: {
+      fontSize: 13,
+      lineHeight: 20,
+      fontWeight: '400' as const,
+      letterSpacing: 0,
+    },
   },
 
   // Caption - Labels, timestamps
   caption: {
-    md: { fontSize: 12, lineHeight: 16, fontWeight: '400' as const, letterSpacing: 0.1 },
-    sm: { fontSize: 11, lineHeight: 14, fontWeight: '400' as const, letterSpacing: 0.2 },
+    md: {
+      fontSize: 12,
+      lineHeight: 16,
+      fontWeight: '400' as const,
+      letterSpacing: 0.1,
+    },
+    sm: {
+      fontSize: 11,
+      lineHeight: 14,
+      fontWeight: '400' as const,
+      letterSpacing: 0.2,
+    },
   },
 
   // Button text
   button: {
-    lg: { fontSize: 16, lineHeight: 24, fontWeight: '600' as const, letterSpacing: 0.3 },
-    md: { fontSize: 14, lineHeight: 20, fontWeight: '600' as const, letterSpacing: 0.2 },
-    sm: { fontSize: 12, lineHeight: 16, fontWeight: '600' as const, letterSpacing: 0.2 },
+    lg: {
+      fontSize: 16,
+      lineHeight: 24,
+      fontWeight: '600' as const,
+      letterSpacing: 0.3,
+    },
+    md: {
+      fontSize: 14,
+      lineHeight: 20,
+      fontWeight: '600' as const,
+      letterSpacing: 0.2,
+    },
+    sm: {
+      fontSize: 12,
+      lineHeight: 16,
+      fontWeight: '600' as const,
+      letterSpacing: 0.2,
+    },
   },
 
   // Label - Form labels, tags
   label: {
-    lg: { fontSize: 14, lineHeight: 20, fontWeight: '500' as const, letterSpacing: 0 },
-    md: { fontSize: 13, lineHeight: 18, fontWeight: '500' as const, letterSpacing: 0 },
-    sm: { fontSize: 11, lineHeight: 14, fontWeight: '600' as const, letterSpacing: 0.3 },
+    lg: {
+      fontSize: 14,
+      lineHeight: 20,
+      fontWeight: '500' as const,
+      letterSpacing: 0,
+    },
+    md: {
+      fontSize: 13,
+      lineHeight: 18,
+      fontWeight: '500' as const,
+      letterSpacing: 0,
+    },
+    sm: {
+      fontSize: 11,
+      lineHeight: 14,
+      fontWeight: '600' as const,
+      letterSpacing: 0.3,
+    },
   },
 
   // Overline - Section labels (uppercase)
   overline: {
-    md: { fontSize: 11, lineHeight: 14, fontWeight: '600' as const, letterSpacing: 1 },
-    sm: { fontSize: 10, lineHeight: 12, fontWeight: '600' as const, letterSpacing: 1.2 },
+    md: {
+      fontSize: 11,
+      lineHeight: 14,
+      fontWeight: '600' as const,
+      letterSpacing: 1,
+    },
+    sm: {
+      fontSize: 10,
+      lineHeight: 12,
+      fontWeight: '600' as const,
+      letterSpacing: 1.2,
+    },
   },
 
   // Mono - Prices, numbers
   mono: {
-    lg: { fontSize: 18, lineHeight: 24, fontWeight: '700' as const, letterSpacing: 0 },
-    md: { fontSize: 15, lineHeight: 20, fontWeight: '600' as const, letterSpacing: 0 },
-    sm: { fontSize: 13, lineHeight: 16, fontWeight: '600' as const, letterSpacing: 0 },
+    lg: {
+      fontSize: 18,
+      lineHeight: 24,
+      fontWeight: '700' as const,
+      letterSpacing: 0,
+    },
+    md: {
+      fontSize: 15,
+      lineHeight: 20,
+      fontWeight: '600' as const,
+      letterSpacing: 0,
+    },
+    sm: {
+      fontSize: 13,
+      lineHeight: 16,
+      fontWeight: '600' as const,
+      letterSpacing: 0,
+    },
   },
 } as const;
 
@@ -89,24 +214,24 @@ export const TYPOGRAPHY_SCALE = {
 
 export const SPACING = {
   // Micro spacing
-  '0.5': 2,    // Border widths, small gaps
-  '1': 4,     // Icon-text gap
-  '1.5': 6,   // Badge padding
-  '2': 8,     // Inline element spacing
+  '0.5': 2, // Border widths, small gaps
+  '1': 4, // Icon-text gap
+  '1.5': 6, // Badge padding
+  '2': 8, // Inline element spacing
 
   // Component spacing
-  '3': 12,    // Card padding (compact)
-  '4': 16,    // Card padding (default)
-  '5': 20,    // Section padding
-  '6': 24,    // Large component padding
+  '3': 12, // Card padding (compact)
+  '4': 16, // Card padding (default)
+  '5': 20, // Section padding
+  '6': 24, // Large component padding
 
   // Layout spacing
-  '8': 32,    // Section gaps
-  '10': 40,   // Major section gaps
-  '12': 48,   // Page padding
-  '16': 64,   // Hero sections
-  '20': 80,   // Large spacing
-  '24': 96,   // Maximum spacing
+  '8': 32, // Section gaps
+  '10': 40, // Major section gaps
+  '12': 48, // Page padding
+  '16': 64, // Hero sections
+  '20': 80, // Large spacing
+  '24': 96, // Maximum spacing
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════
@@ -115,13 +240,13 @@ export const SPACING = {
 
 export const RADII = {
   none: 0,
-  xs: 4,      // Small badges, tags
-  sm: 8,      // Buttons, inputs
-  md: 12,     // Cards (compact)
-  lg: 16,     // Cards (default), modals
-  xl: 20,     // Large cards
-  '2xl': 24,  // Hero cards
-  '3xl': 32,  // Special containers
+  xs: 4, // Small badges, tags
+  sm: 8, // Buttons, inputs
+  md: 12, // Cards (compact)
+  lg: 16, // Cards (default), modals
+  xl: 20, // Large cards
+  '2xl': 24, // Hero cards
+  '3xl': 32, // Special containers
   full: 9999, // Pills, avatars
 } as const;
 
@@ -229,10 +354,10 @@ export const COMPONENT_SIZES = {
 
 export const BREAKPOINTS = {
   // Mobile first
-  sm: 375,    // Small phones
-  md: 414,    // Standard phones
-  lg: 768,    // Tablets
-  xl: 1024,   // Small laptops
+  sm: 375, // Small phones
+  md: 414, // Standard phones
+  lg: 768, // Tablets
+  xl: 1024, // Small laptops
   '2xl': 1280, // Desktops
 } as const;
 

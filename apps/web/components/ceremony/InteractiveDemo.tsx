@@ -9,28 +9,31 @@ export function InteractiveDemo() {
   const [activeStep, setActiveStep] = useState<DemoStep>('gift');
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
-  const steps = useMemo<{ id: DemoStep; title: string; description: string }[]>(() => [
-    {
-      id: 'gift',
-      title: 'Hediye Gönder',
-      description: 'Sevdiklerinize deneyim hediye edin',
-    },
-    {
-      id: 'experience',
-      title: 'Deneyimle',
-      description: 'Alıcı deneyimi yaşar',
-    },
-    {
-      id: 'proof',
-      title: 'Anı Paylaş',
-      description: 'Proof Ceremony ile belgele',
-    },
-    {
-      id: 'celebrate',
-      title: 'Kutla',
-      description: 'Para aktarılır, anılar kalır',
-    },
-  ], []);
+  const steps = useMemo<{ id: DemoStep; title: string; description: string }[]>(
+    () => [
+      {
+        id: 'gift',
+        title: 'Hediye Gönder',
+        description: 'Sevdiklerinize deneyim hediye edin',
+      },
+      {
+        id: 'experience',
+        title: 'Deneyimle',
+        description: 'Alıcı deneyimi yaşar',
+      },
+      {
+        id: 'proof',
+        title: 'Anı Paylaş',
+        description: 'Proof Ceremony ile belgele',
+      },
+      {
+        id: 'celebrate',
+        title: 'Kutla',
+        description: 'Para aktarılır, anılar kalır',
+      },
+    ],
+    [],
+  );
 
   // Auto-advance demo
   useEffect(() => {

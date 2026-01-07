@@ -44,7 +44,6 @@ export const useScreenPerformance = (screenName: string) => {
     });
 
     if (typeof global.performance !== 'undefined') {
-       
       logger.debug(`📊 [Performance] ${screenName}:`, {
         mountTime: mountDuration,
         timestamp: new Date().toISOString(),

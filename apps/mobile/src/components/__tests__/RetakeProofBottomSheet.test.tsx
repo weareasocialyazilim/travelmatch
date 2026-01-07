@@ -18,17 +18,23 @@ describe('RetakeProofBottomSheet', () => {
 
   describe('Rendering', () => {
     it('renders when visible', () => {
-      const { getByText } = render(<RetakeProofBottomSheet {...defaultProps} />);
+      const { getByText } = render(
+        <RetakeProofBottomSheet {...defaultProps} />,
+      );
       expect(getByText('Retake proof?')).toBeTruthy();
     });
 
     it('renders headline text', () => {
-      const { getByText } = render(<RetakeProofBottomSheet {...defaultProps} />);
+      const { getByText } = render(
+        <RetakeProofBottomSheet {...defaultProps} />,
+      );
       expect(getByText('Retake proof?')).toBeTruthy();
     });
 
     it('renders "Take new photo" option', () => {
-      const { getByText } = render(<RetakeProofBottomSheet {...defaultProps} />);
+      const { getByText } = render(
+        <RetakeProofBottomSheet {...defaultProps} />,
+      );
       expect(getByText('Take new photo')).toBeTruthy();
     });
 
@@ -41,7 +47,9 @@ describe('RetakeProofBottomSheet', () => {
     });
 
     it('renders Cancel button', () => {
-      const { getByText } = render(<RetakeProofBottomSheet {...defaultProps} />);
+      const { getByText } = render(
+        <RetakeProofBottomSheet {...defaultProps} />,
+      );
       expect(getByText('Cancel')).toBeTruthy();
     });
 
@@ -62,7 +70,9 @@ describe('RetakeProofBottomSheet', () => {
     });
 
     it('does not render when not visible', () => {
-      const { toJSON } = render(<RetakeProofBottomSheet {...defaultProps} visible={false} />);
+      const { toJSON } = render(
+        <RetakeProofBottomSheet {...defaultProps} visible={false} />,
+      );
       const modal = toJSON();
       expect(modal?.props.visible).toBe(false);
     });
@@ -70,21 +80,27 @@ describe('RetakeProofBottomSheet', () => {
 
   describe('User Interactions', () => {
     it('calls onTakeNewPhoto when "Take new photo" pressed', () => {
-      const { getByText } = render(<RetakeProofBottomSheet {...defaultProps} />);
+      const { getByText } = render(
+        <RetakeProofBottomSheet {...defaultProps} />,
+      );
       const takePhotoButton = getByText('Take new photo');
       fireEvent.press(takePhotoButton);
       expect(mockOnTakeNewPhoto).toHaveBeenCalledTimes(1);
     });
 
     it('calls onClose when "Take new photo" pressed', () => {
-      const { getByText } = render(<RetakeProofBottomSheet {...defaultProps} />);
+      const { getByText } = render(
+        <RetakeProofBottomSheet {...defaultProps} />,
+      );
       const takePhotoButton = getByText('Take new photo');
       fireEvent.press(takePhotoButton);
       expect(mockOnClose).not.toHaveBeenCalled();
     });
 
     it('calls onClose when Cancel button pressed', () => {
-      const { getByText } = render(<RetakeProofBottomSheet {...defaultProps} />);
+      const { getByText } = render(
+        <RetakeProofBottomSheet {...defaultProps} />,
+      );
       const cancelButton = getByText('Cancel');
       fireEvent.press(cancelButton);
       expect(mockOnClose).toHaveBeenCalledTimes(1);
@@ -122,7 +138,9 @@ describe('RetakeProofBottomSheet', () => {
 
   describe('Edge Cases', () => {
     it('handles rapid clicks on "Take new photo"', () => {
-      const { getByText } = render(<RetakeProofBottomSheet {...defaultProps} />);
+      const { getByText } = render(
+        <RetakeProofBottomSheet {...defaultProps} />,
+      );
       const takePhotoButton = getByText('Take new photo');
       fireEvent.press(takePhotoButton);
       fireEvent.press(takePhotoButton);
@@ -132,7 +150,9 @@ describe('RetakeProofBottomSheet', () => {
     });
 
     it('handles rapid clicks on Cancel', () => {
-      const { getByText } = render(<RetakeProofBottomSheet {...defaultProps} />);
+      const { getByText } = render(
+        <RetakeProofBottomSheet {...defaultProps} />,
+      );
       const cancelButton = getByText('Cancel');
       fireEvent.press(cancelButton);
       fireEvent.press(cancelButton);
@@ -150,7 +170,9 @@ describe('RetakeProofBottomSheet', () => {
     });
 
     it('renders correctly when toggling visibility', () => {
-      const { rerender, getByText } = render(<RetakeProofBottomSheet {...defaultProps} visible={false} />);
+      const { rerender, getByText } = render(
+        <RetakeProofBottomSheet {...defaultProps} visible={false} />,
+      );
       rerender(<RetakeProofBottomSheet {...defaultProps} visible={true} />);
       expect(getByText('Retake proof?')).toBeTruthy();
     });

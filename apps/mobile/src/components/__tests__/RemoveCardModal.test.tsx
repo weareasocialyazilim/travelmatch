@@ -25,7 +25,7 @@ describe('RemoveCardModal', () => {
 
     it('should not render when visible is false', () => {
       const { UNSAFE_getByType } = render(
-        <RemoveCardModal {...defaultProps} visible={false} />
+        <RemoveCardModal {...defaultProps} visible={false} />,
       );
       const modal = UNSAFE_getByType(require('react-native').Modal);
       expect(modal.props.visible).toBe(false);
@@ -53,10 +53,10 @@ describe('RemoveCardModal', () => {
 
     it('should render delete icon', () => {
       const { UNSAFE_getByType } = render(
-        <RemoveCardModal {...defaultProps} />
+        <RemoveCardModal {...defaultProps} />,
       );
       const icon = UNSAFE_getByType(
-        require('@expo/vector-icons').MaterialCommunityIcons
+        require('@expo/vector-icons').MaterialCommunityIcons,
       );
       expect(icon).toBeTruthy();
     });
@@ -79,7 +79,7 @@ describe('RemoveCardModal', () => {
 
     it('should call onCancel when modal onRequestClose is triggered', () => {
       const { UNSAFE_getByType } = render(
-        <RemoveCardModal {...defaultProps} />
+        <RemoveCardModal {...defaultProps} />,
       );
       const modal = UNSAFE_getByType(require('react-native').Modal);
       modal.props.onRequestClose();
@@ -107,7 +107,7 @@ describe('RemoveCardModal', () => {
   describe('Modal Properties', () => {
     it('should use transparent mode', () => {
       const { UNSAFE_getByType } = render(
-        <RemoveCardModal {...defaultProps} />
+        <RemoveCardModal {...defaultProps} />,
       );
       const modal = UNSAFE_getByType(require('react-native').Modal);
       expect(modal.props.transparent).toBe(true);
@@ -115,7 +115,7 @@ describe('RemoveCardModal', () => {
 
     it('should use fade animation', () => {
       const { UNSAFE_getByType } = render(
-        <RemoveCardModal {...defaultProps} />
+        <RemoveCardModal {...defaultProps} />,
       );
       const modal = UNSAFE_getByType(require('react-native').Modal);
       expect(modal.props.animationType).toBe('fade');
@@ -123,7 +123,7 @@ describe('RemoveCardModal', () => {
 
     it('should respect visible prop', () => {
       const { UNSAFE_getByType } = render(
-        <RemoveCardModal {...defaultProps} />
+        <RemoveCardModal {...defaultProps} />,
       );
       const modal = UNSAFE_getByType(require('react-native').Modal);
       expect(modal.props.visible).toBe(true);
@@ -137,7 +137,7 @@ describe('RemoveCardModal', () => {
           visible={true}
           onCancel={mockOnCancel}
           onRemove={mockOnRemove}
-        />
+        />,
       );
       // Component doesn't display last 4, but it accepts the prop
       expect(getByText('Remove card?')).toBeTruthy();
@@ -145,14 +145,14 @@ describe('RemoveCardModal', () => {
 
     it('should accept custom card last 4 digits', () => {
       const { getByText } = render(
-        <RemoveCardModal {...defaultProps} cardLast4="1234" />
+        <RemoveCardModal {...defaultProps} cardLast4="1234" />,
       );
       expect(getByText('Remove card?')).toBeTruthy();
     });
 
     it('should handle empty string for cardLast4', () => {
       const { getByText } = render(
-        <RemoveCardModal {...defaultProps} cardLast4="" />
+        <RemoveCardModal {...defaultProps} cardLast4="" />,
       );
       expect(getByText('Remove card?')).toBeTruthy();
     });
@@ -161,7 +161,7 @@ describe('RemoveCardModal', () => {
   describe('Edge Cases', () => {
     it('should handle onCancel being called when not visible', () => {
       const { UNSAFE_getByType } = render(
-        <RemoveCardModal {...defaultProps} visible={false} />
+        <RemoveCardModal {...defaultProps} visible={false} />,
       );
       const modal = UNSAFE_getByType(require('react-native').Modal);
       modal.props.onRequestClose();
@@ -174,7 +174,7 @@ describe('RemoveCardModal', () => {
           visible={true}
           onCancel={() => {}}
           onRemove={() => {}}
-        />
+        />,
       );
       const removeButton = getByText('Remove');
       expect(() => fireEvent.press(removeButton)).not.toThrow();
@@ -187,14 +187,14 @@ describe('RemoveCardModal', () => {
           onCancel={mockOnCancel}
           onRemove={mockOnRemove}
           cardLast4={undefined}
-        />
+        />,
       );
       expect(getByText('Remove card?')).toBeTruthy();
     });
 
     it('should render correctly after visibility toggle', () => {
       const { rerender, UNSAFE_getByType } = render(
-        <RemoveCardModal {...defaultProps} visible={false} />
+        <RemoveCardModal {...defaultProps} visible={false} />,
       );
       let modal = UNSAFE_getByType(require('react-native').Modal);
       expect(modal.props.visible).toBe(false);

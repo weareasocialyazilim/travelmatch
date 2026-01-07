@@ -145,7 +145,6 @@ export const FEATURES = {
  * Log configuration (only in development)
  */
 if (isDevelopment) {
-   
   logger.debug('📦 App Configuration:', {
     name: config.APP_NAME,
     version: config.APP_VERSION,

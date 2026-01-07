@@ -1,6 +1,6 @@
 /**
  * @travelmatch/shared
- * 
+ *
  * Core shared package for TravelMatch monorepo.
  * Contains types, constants, utilities, and validation schemas
  * used across mobile, admin, and edge function applications.

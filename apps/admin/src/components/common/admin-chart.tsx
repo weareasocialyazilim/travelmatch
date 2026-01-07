@@ -19,7 +19,13 @@ import {
   Legend,
   TooltipProps,
 } from 'recharts';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 // TravelMatch Chart Color Palette
@@ -78,29 +84,39 @@ interface CustomTooltipProps {
   formatter?: (value: number, name: string) => [string, string];
 }
 
-export function CustomTooltip({ active, payload, label, formatter }: CustomTooltipProps) {
+export function CustomTooltip({
+  active,
+  payload,
+  label,
+  formatter,
+}: CustomTooltipProps) {
   if (!active || !payload || !payload.length) return null;
 
   return (
     <div className="rounded-lg border bg-popover p-3 shadow-md">
       <p className="mb-2 text-sm font-medium text-foreground">{label}</p>
       <div className="space-y-1">
-        {payload.map((entry: { value?: number; name?: string; color?: string }, index: number) => {
-          const [formattedValue, formattedName] = formatter
-            ? formatter(entry.value as number, entry.name as string)
-            : [String(entry.value), entry.name as string];
+        {payload.map(
+          (
+            entry: { value?: number; name?: string; color?: string },
+            index: number,
+          ) => {
+            const [formattedValue, formattedName] = formatter
+              ? formatter(entry.value as number, entry.name as string)
+              : [String(entry.value), entry.name as string];
 
-          return (
-            <div key={index} className="flex items-center gap-2 text-sm">
-              <div
-                className="h-2.5 w-2.5 rounded-full"
-                style={{ backgroundColor: entry.color }}
-              />
-              <span className="text-muted-foreground">{formattedName}:</span>
-              <span className="font-medium">{formattedValue}</span>
-            </div>
-          );
-        })}
+            return (
+              <div key={index} className="flex items-center gap-2 text-sm">
+                <div
+                  className="h-2.5 w-2.5 rounded-full"
+                  style={{ backgroundColor: entry.color }}
+                />
+                <span className="text-muted-foreground">{formattedName}:</span>
+                <span className="font-medium">{formattedValue}</span>
+              </div>
+            );
+          },
+        )}
       </div>
     </div>
   );
@@ -131,9 +147,13 @@ export function ChartContainer({
       {(title || description || action) && (
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <div>
-            {title && <CardTitle className="text-base font-semibold">{title}</CardTitle>}
+            {title && (
+              <CardTitle className="text-base font-semibold">{title}</CardTitle>
+            )}
             {description && (
-              <CardDescription className="text-sm">{description}</CardDescription>
+              <CardDescription className="text-sm">
+                {description}
+              </CardDescription>
             )}
           </div>
           {action}
@@ -170,7 +190,10 @@ export function ChartLegend({ items, className }: ChartLegendProps) {
     <div className={cn('flex flex-wrap items-center gap-4', className)}>
       {items.map((item, index) => (
         <div key={index} className="chart-legend-item">
-          <div className="chart-legend-dot" style={{ backgroundColor: item.color }} />
+          <div
+            className="chart-legend-dot"
+            style={{ backgroundColor: item.color }}
+          />
           <span>{item.label}</span>
           {item.value !== undefined && (
             <span className="font-medium text-foreground">{item.value}</span>
@@ -216,9 +239,19 @@ export function AdminLineChart({
   className,
 }: AdminLineChartProps) {
   return (
-    <ChartContainer title={title} description={description} height={height} className={className}>
-      <LineChart data={data} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
-        {showGrid && <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />}
+    <ChartContainer
+      title={title}
+      description={description}
+      height={height}
+      className={className}
+    >
+      <LineChart
+        data={data}
+        margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
+      >
+        {showGrid && (
+          <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+        )}
         <XAxis
           dataKey={xAxisKey}
           tick={{ fontSize: 12 }}
@@ -241,9 +274,15 @@ export function AdminLineChart({
             type="monotone"
             dataKey={line.dataKey}
             name={line.name}
-            stroke={line.color || CHART_COLOR_ARRAY[index % CHART_COLOR_ARRAY.length]}
+            stroke={
+              line.color || CHART_COLOR_ARRAY[index % CHART_COLOR_ARRAY.length]
+            }
             strokeWidth={line.strokeWidth || 2}
-            dot={line.dot !== false ? { fill: line.color || CHART_COLOR_ARRAY[index] } : false}
+            dot={
+              line.dot !== false
+                ? { fill: line.color || CHART_COLOR_ARRAY[index] }
+                : false
+            }
             activeDot={{ r: 4 }}
           />
         ))}
@@ -288,10 +327,20 @@ export function AdminAreaChart({
   className,
 }: AdminAreaChartProps) {
   return (
-    <ChartContainer title={title} description={description} height={height} className={className}>
-      <AreaChart data={data} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
+    <ChartContainer
+      title={title}
+      description={description}
+      height={height}
+      className={className}
+    >
+      <AreaChart
+        data={data}
+        margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
+      >
         <ChartGradients />
-        {showGrid && <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />}
+        {showGrid && (
+          <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+        )}
         <XAxis
           dataKey={xAxisKey}
           tick={{ fontSize: 12 }}
@@ -309,8 +358,11 @@ export function AdminAreaChart({
         <Tooltip content={<CustomTooltip formatter={formatter} />} />
         {showLegend && <Legend />}
         {areas.map((area, index) => {
-          const color = area.color || CHART_COLOR_ARRAY[index % CHART_COLOR_ARRAY.length];
-          const gradientId = area.gradientId || `gradient${['Primary', 'Secondary', 'Accent', 'Trust', 'Info'][index % 5]}`;
+          const color =
+            area.color || CHART_COLOR_ARRAY[index % CHART_COLOR_ARRAY.length];
+          const gradientId =
+            area.gradientId ||
+            `gradient${['Primary', 'Secondary', 'Accent', 'Trust', 'Info'][index % 5]}`;
 
           return (
             <Area
@@ -368,13 +420,20 @@ export function AdminBarChart({
   className,
 }: AdminBarChartProps) {
   return (
-    <ChartContainer title={title} description={description} height={height} className={className}>
+    <ChartContainer
+      title={title}
+      description={description}
+      height={height}
+      className={className}
+    >
       <BarChart
         data={data}
         layout={layout === 'vertical' ? 'vertical' : 'horizontal'}
         margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
       >
-        {showGrid && <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />}
+        {showGrid && (
+          <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+        )}
         <XAxis
           dataKey={layout === 'vertical' ? undefined : xAxisKey}
           type={layout === 'vertical' ? 'number' : 'category'}
@@ -400,7 +459,9 @@ export function AdminBarChart({
             key={bar.dataKey}
             dataKey={bar.dataKey}
             name={bar.name}
-            fill={bar.color || CHART_COLOR_ARRAY[index % CHART_COLOR_ARRAY.length]}
+            fill={
+              bar.color || CHART_COLOR_ARRAY[index % CHART_COLOR_ARRAY.length]
+            }
             radius={bar.radius ?? 4}
             stackId={stacked ? 'stack' : undefined}
           />
@@ -442,7 +503,12 @@ export function AdminPieChart({
   }));
 
   return (
-    <ChartContainer title={title} description={description} height={height} className={className}>
+    <ChartContainer
+      title={title}
+      description={description}
+      height={height}
+      className={className}
+    >
       <PieChart>
         <Pie
           data={dataWithColors}
@@ -452,14 +518,22 @@ export function AdminPieChart({
           outerRadius={outerRadius}
           paddingAngle={2}
           dataKey="value"
-          label={showLabels ? ({ name, percent }: { name: string; percent?: number }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%` : false}
+          label={
+            showLabels
+              ? ({ name, percent }: { name: string; percent?: number }) =>
+                  `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
+              : false
+          }
         >
           {dataWithColors.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={entry.color} />
           ))}
         </Pie>
         <Tooltip
-          formatter={(value: number | undefined) => [formatter && value !== undefined ? formatter(value) : (value ?? 0), '']}
+          formatter={(value: number | undefined) => [
+            formatter && value !== undefined ? formatter(value) : (value ?? 0),
+            '',
+          ]}
         />
         {showLegend && <Legend />}
       </PieChart>

@@ -1,7 +1,7 @@
 /**
  * NetworkGuard Component
  * Wraps children and shows offline state when disconnected
- * 
+ *
  * Use this to protect sections that require network
  */
 
@@ -14,24 +14,24 @@ export interface NetworkGuardProps {
    * Children to render when online
    */
   children: React.ReactNode;
-  
+
   /**
    * Custom offline message
    */
   offlineMessage?: string;
-  
+
   /**
    * Callback when retry is pressed
    * If not provided, will use network refresh
    */
   onRetry?: () => void | Promise<void>;
-  
+
   /**
    * Show compact banner instead of full screen
    * @default false
    */
   compact?: boolean;
-  
+
   /**
    * Custom OfflineState component props
    */
@@ -40,18 +40,18 @@ export interface NetworkGuardProps {
 
 /**
  * NetworkGuard - Protect components that require network
- * 
+ *
  * @example
  * <NetworkGuard>
  *   <MyNetworkDependentComponent />
  * </NetworkGuard>
- * 
+ *
  * @example
  * // With custom retry
  * <NetworkGuard onRetry={refetchData}>
  *   <DataList />
  * </NetworkGuard>
- * 
+ *
  * @example
  * // Compact mode
  * <NetworkGuard compact>

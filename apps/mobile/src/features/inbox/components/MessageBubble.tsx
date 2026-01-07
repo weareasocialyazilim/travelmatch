@@ -44,7 +44,10 @@ export const MessageBubble: React.FC<MessageBubbleProps> = memo(
         style={[styles.wrapper, isMe ? styles.myWrapper : styles.otherWrapper]}
       >
         <View
-          style={[styles.container, isMe ? styles.myBubble : styles.otherBubble]}
+          style={[
+            styles.container,
+            isMe ? styles.myBubble : styles.otherBubble,
+          ]}
         >
           <Text style={[styles.text, isMe ? styles.myText : styles.otherText]}>
             {message.text}
@@ -104,7 +107,8 @@ const styles = StyleSheet.create({
   text: {
     fontSize: TYPOGRAPHY_SYSTEM.sizes.bodyM,
     fontFamily: TYPOGRAPHY_SYSTEM.families.body,
-    lineHeight: TYPOGRAPHY_SYSTEM.sizes.bodyM * TYPOGRAPHY_SYSTEM.lineHeights.normal,
+    lineHeight:
+      TYPOGRAPHY_SYSTEM.sizes.bodyM * TYPOGRAPHY_SYSTEM.lineHeights.normal,
   },
   myText: {
     color: COLORS.text.primary,

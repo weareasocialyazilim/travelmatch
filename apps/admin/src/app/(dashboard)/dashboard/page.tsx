@@ -190,7 +190,9 @@ export default function DashboardPage() {
         <div className="text-center">
           <AlertTriangle className="mx-auto h-12 w-12 text-destructive" />
           <h2 className="mt-4 text-lg font-semibold">Bir hata oluştu</h2>
-          <p className="text-muted-foreground">İstatistikler yüklenemedi. Lütfen tekrar deneyin.</p>
+          <p className="text-muted-foreground">
+            İstatistikler yüklenemedi. Lütfen tekrar deneyin.
+          </p>
         </div>
       </div>
     );
@@ -210,7 +212,13 @@ export default function DashboardPage() {
       <div className="dashboard-grid">
         <StatCard
           title="Toplam Kullanıcı"
-          value={isLoading ? '...' : (stats?.totalUsers || stats?.total_users || 0).toLocaleString('tr-TR')}
+          value={
+            isLoading
+              ? '...'
+              : (stats?.totalUsers || stats?.total_users || 0).toLocaleString(
+                  'tr-TR',
+                )
+          }
           icon={Users}
           change={stats?.userGrowth || 0}
           changeLabel="son 30 gün"
@@ -219,7 +227,15 @@ export default function DashboardPage() {
         />
         <StatCard
           title="Aktif Kullanıcı"
-          value={isLoading ? '...' : (stats?.activeUsers || stats?.active_users_24h || 0).toLocaleString('tr-TR')}
+          value={
+            isLoading
+              ? '...'
+              : (
+                  stats?.activeUsers ||
+                  stats?.active_users_24h ||
+                  0
+                ).toLocaleString('tr-TR')
+          }
           icon={Activity}
           change={stats?.activeGrowth || 0}
           changeLabel="son 7 gün"
@@ -229,7 +245,9 @@ export default function DashboardPage() {
         />
         <StatCard
           title="Toplam Gelir"
-          value={isLoading ? '...' : formatCurrency(stats?.totalRevenue || 0, 'TRY')}
+          value={
+            isLoading ? '...' : formatCurrency(stats?.totalRevenue || 0, 'TRY')
+          }
           icon={DollarSign}
           change={stats?.revenueGrowth || 0}
           changeLabel="son 30 gün"
@@ -239,7 +257,15 @@ export default function DashboardPage() {
         />
         <StatCard
           title="Toplam Moment"
-          value={isLoading ? '...' : (stats?.totalMoments || stats?.total_moments || 0).toLocaleString('tr-TR')}
+          value={
+            isLoading
+              ? '...'
+              : (
+                  stats?.totalMoments ||
+                  stats?.total_moments ||
+                  0
+                ).toLocaleString('tr-TR')
+          }
           icon={Camera}
           change={stats?.momentGrowth || 0}
           changeLabel="son 30 gün"
@@ -416,27 +442,36 @@ export default function DashboardPage() {
                     <span className="text-sm text-muted-foreground">
                       Yeni Kayıt
                     </span>
-                    <span className="text-sm font-semibold">+{stats?.todayRegistrations || 0}</span>
+                    <span className="text-sm font-semibold">
+                      +{stats?.todayRegistrations || 0}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">
                       Aktif Oturum
                     </span>
-                    <span className="text-sm font-semibold">{(stats?.activeSessions || 0).toLocaleString('tr-TR')}</span>
+                    <span className="text-sm font-semibold">
+                      {(stats?.activeSessions || 0).toLocaleString('tr-TR')}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">
                       Günlük Gelir
                     </span>
                     <span className="text-sm font-semibold text-emerald-600">
-                      {formatCurrency(stats?.todayRevenue || stats?.today_revenue || 0, 'TRY')}
+                      {formatCurrency(
+                        stats?.todayRevenue || stats?.today_revenue || 0,
+                        'TRY',
+                      )}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">
                       Yeni Moment
                     </span>
-                    <span className="text-sm font-semibold">{stats?.todayMoments || 0}</span>
+                    <span className="text-sm font-semibold">
+                      {stats?.todayMoments || 0}
+                    </span>
                   </div>
                 </div>
               )}

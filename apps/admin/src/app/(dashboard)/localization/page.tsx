@@ -18,7 +18,13 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -40,23 +46,123 @@ import {
 
 // Mock localization data
 const languages = [
-  { code: 'tr', name: 'Türkçe', flag: '🇹🇷', progress: 100, strings: 2456, missing: 0, status: 'complete' },
-  { code: 'en', name: 'English', flag: '🇺🇸', progress: 100, strings: 2456, missing: 0, status: 'complete' },
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪', progress: 85, strings: 2087, missing: 369, status: 'review' },
-  { code: 'fr', name: 'Français', flag: '🇫🇷', progress: 78, strings: 1916, missing: 540, status: 'in_progress' },
-  { code: 'es', name: 'Español', flag: '🇪🇸', progress: 72, strings: 1768, missing: 688, status: 'in_progress' },
-  { code: 'ar', name: 'العربية', flag: '🇸🇦', progress: 45, strings: 1105, missing: 1351, status: 'in_progress' },
-  { code: 'ja', name: '日本語', flag: '🇯🇵', progress: 30, strings: 737, missing: 1719, status: 'draft' },
-  { code: 'zh', name: '中文', flag: '🇨🇳', progress: 25, strings: 614, missing: 1842, status: 'draft' },
+  {
+    code: 'tr',
+    name: 'Türkçe',
+    flag: '🇹🇷',
+    progress: 100,
+    strings: 2456,
+    missing: 0,
+    status: 'complete',
+  },
+  {
+    code: 'en',
+    name: 'English',
+    flag: '🇺🇸',
+    progress: 100,
+    strings: 2456,
+    missing: 0,
+    status: 'complete',
+  },
+  {
+    code: 'de',
+    name: 'Deutsch',
+    flag: '🇩🇪',
+    progress: 85,
+    strings: 2087,
+    missing: 369,
+    status: 'review',
+  },
+  {
+    code: 'fr',
+    name: 'Français',
+    flag: '🇫🇷',
+    progress: 78,
+    strings: 1916,
+    missing: 540,
+    status: 'in_progress',
+  },
+  {
+    code: 'es',
+    name: 'Español',
+    flag: '🇪🇸',
+    progress: 72,
+    strings: 1768,
+    missing: 688,
+    status: 'in_progress',
+  },
+  {
+    code: 'ar',
+    name: 'العربية',
+    flag: '🇸🇦',
+    progress: 45,
+    strings: 1105,
+    missing: 1351,
+    status: 'in_progress',
+  },
+  {
+    code: 'ja',
+    name: '日本語',
+    flag: '🇯🇵',
+    progress: 30,
+    strings: 737,
+    missing: 1719,
+    status: 'draft',
+  },
+  {
+    code: 'zh',
+    name: '中文',
+    flag: '🇨🇳',
+    progress: 25,
+    strings: 614,
+    missing: 1842,
+    status: 'draft',
+  },
 ];
 
 const translations = [
-  { key: 'common.welcome', tr: 'Hoş Geldiniz', en: 'Welcome', de: 'Willkommen', fr: 'Bienvenue' },
-  { key: 'common.login', tr: 'Giriş Yap', en: 'Login', de: 'Anmelden', fr: 'Connexion' },
-  { key: 'common.signup', tr: 'Kayıt Ol', en: 'Sign Up', de: 'Registrieren', fr: "S'inscrire" },
-  { key: 'common.logout', tr: 'Çıkış', en: 'Logout', de: 'Abmelden', fr: 'Déconnexion' },
-  { key: 'profile.edit', tr: 'Profili Düzenle', en: 'Edit Profile', de: 'Profil bearbeiten', fr: '' },
-  { key: 'moment.share', tr: 'Moment Paylaş', en: 'Share Moment', de: 'Moment teilen', fr: '' },
+  {
+    key: 'common.welcome',
+    tr: 'Hoş Geldiniz',
+    en: 'Welcome',
+    de: 'Willkommen',
+    fr: 'Bienvenue',
+  },
+  {
+    key: 'common.login',
+    tr: 'Giriş Yap',
+    en: 'Login',
+    de: 'Anmelden',
+    fr: 'Connexion',
+  },
+  {
+    key: 'common.signup',
+    tr: 'Kayıt Ol',
+    en: 'Sign Up',
+    de: 'Registrieren',
+    fr: "S'inscrire",
+  },
+  {
+    key: 'common.logout',
+    tr: 'Çıkış',
+    en: 'Logout',
+    de: 'Abmelden',
+    fr: 'Déconnexion',
+  },
+  {
+    key: 'profile.edit',
+    tr: 'Profili Düzenle',
+    en: 'Edit Profile',
+    de: 'Profil bearbeiten',
+    fr: '',
+  },
+  {
+    key: 'moment.share',
+    tr: 'Moment Paylaş',
+    en: 'Share Moment',
+    de: 'Moment teilen',
+    fr: '',
+  },
 ];
 
 export default function LocalizationPage() {
@@ -112,7 +218,9 @@ export default function LocalizationPage() {
                   <span className="text-2xl">{lang.flag}</span>
                   <div>
                     <p className="font-medium">{lang.name}</p>
-                    <p className="text-xs text-muted-foreground">{lang.code.toUpperCase()}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {lang.code.toUpperCase()}
+                    </p>
                   </div>
                 </div>
                 {getStatusBadge(lang.status)}
@@ -144,7 +252,9 @@ export default function LocalizationPage() {
           <Card>
             <CardHeader>
               <CardTitle>Tüm Diller</CardTitle>
-              <CardDescription>Desteklenen diller ve çeviri durumları</CardDescription>
+              <CardDescription>
+                Desteklenen diller ve çeviri durumları
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -168,15 +278,22 @@ export default function LocalizationPage() {
                           <span className="font-medium">{lang.name}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="font-mono">{lang.code.toUpperCase()}</TableCell>
+                      <TableCell className="font-mono">
+                        {lang.code.toUpperCase()}
+                      </TableCell>
                       <TableCell>{getStatusBadge(lang.status)}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Progress value={lang.progress} className="h-2 w-20" />
+                          <Progress
+                            value={lang.progress}
+                            className="h-2 w-20"
+                          />
                           <span className="text-sm">{lang.progress}%</span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-right">{lang.strings.toLocaleString()}</TableCell>
+                      <TableCell className="text-right">
+                        {lang.strings.toLocaleString()}
+                      </TableCell>
                       <TableCell className="text-right">
                         {lang.missing > 0 ? (
                           <span className="text-red-500">{lang.missing}</span>
@@ -238,7 +355,9 @@ export default function LocalizationPage() {
               <TableBody>
                 {translations.map((item) => (
                   <TableRow key={item.key}>
-                    <TableCell className="font-mono text-sm">{item.key}</TableCell>
+                    <TableCell className="font-mono text-sm">
+                      {item.key}
+                    </TableCell>
                     <TableCell>{item.tr}</TableCell>
                     <TableCell>{item.en}</TableCell>
                     <TableCell>{item.de}</TableCell>

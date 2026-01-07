@@ -1,4 +1,3 @@
- 
 const API_URL: string = process.env.API_URL ?? 'https://api.travelmatch.com';
 
 const config = {

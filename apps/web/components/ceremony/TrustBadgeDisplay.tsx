@@ -16,22 +16,22 @@ export function TrustBadgeDisplay({ stats }: TrustBadgeDisplayProps) {
     {
       value: `${(stats.totalGifts / 1000).toFixed(0)}K+`,
       label: 'Hediye Gönderildi',
-      icon: '🎁'
+      icon: '🎁',
     },
     {
       value: `${(stats.verifiedProofs / 1000).toFixed(0)}K+`,
       label: 'Anı Onaylandı',
-      icon: '✨'
+      icon: '✨',
     },
     {
       value: `${stats.happyUsers.toLocaleString()}+`,
       label: 'Mutlu Kullanıcı',
-      icon: '😊'
+      icon: '😊',
     },
     {
       value: `${stats.countriesReached}+`,
       label: 'Ülkeye Ulaştı',
-      icon: '🌍'
+      icon: '🌍',
     },
   ];
 

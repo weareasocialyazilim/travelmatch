@@ -24,4 +24,7 @@ export {
 export * from './types/moderation.types';
 
 // Constants
-export { REPORT_CATEGORIES, REPORT_CATEGORY_LABELS } from './constants/reportCategories';
+export {
+  REPORT_CATEGORIES,
+  REPORT_CATEGORY_LABELS,
+} from './constants/reportCategories';

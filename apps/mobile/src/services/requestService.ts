@@ -138,7 +138,8 @@ export const requestService = {
       const { data: newRequest, error } =
         await dbRequestsService.create(requestData);
       if (error) throw error;
-      if (!newRequest) throw new Error('Failed to create request - no data returned');
+      if (!newRequest)
+        throw new Error('Failed to create request - no data returned');
 
       const computedTotal =
         Number(momentRow.price || 0) * Number(data.guestCount || 0);

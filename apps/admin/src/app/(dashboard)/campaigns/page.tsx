@@ -29,7 +29,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
@@ -58,13 +64,33 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 import { formatDate, formatCurrency } from '@/lib/utils';
-import { useCampaigns, useCreateCampaign, useUpdateCampaign } from '@/hooks/use-campaigns';
+import {
+  useCampaigns,
+  useCreateCampaign,
+  useUpdateCampaign,
+} from '@/hooks/use-campaigns';
 
 const campaignTypes = [
-  { id: 'one_time', name: 'Tek Seferlik', description: 'Belirli tarihler arasında çalışır' },
-  { id: 'recurring', name: 'Tekrarlayan', description: 'Haftalık/Aylık otomatik gönderim' },
-  { id: 'automated', name: 'Otomatik', description: 'Tetikleyicilere göre çalışır' },
-  { id: 'multi_channel', name: 'Çok Kanallı', description: 'Birden fazla kanal kombinasyonu' },
+  {
+    id: 'one_time',
+    name: 'Tek Seferlik',
+    description: 'Belirli tarihler arasında çalışır',
+  },
+  {
+    id: 'recurring',
+    name: 'Tekrarlayan',
+    description: 'Haftalık/Aylık otomatik gönderim',
+  },
+  {
+    id: 'automated',
+    name: 'Otomatik',
+    description: 'Tetikleyicilere göre çalışır',
+  },
+  {
+    id: 'multi_channel',
+    name: 'Çok Kanallı',
+    description: 'Birden fazla kanal kombinasyonu',
+  },
 ];
 
 export default function CampaignsPage() {
@@ -85,17 +111,37 @@ export default function CampaignsPage() {
   // Calculate stats from real data
   const overallStats = {
     totalCampaigns: data?.total || campaigns.length,
-    activeCampaigns: campaigns.filter(c => c.status === 'active').length,
+    activeCampaigns: campaigns.filter((c) => c.status === 'active').length,
     totalReach: campaigns.reduce((sum, c) => sum + (c.impressions || 0), 0),
-    totalConversions: campaigns.reduce((sum, c) => sum + (c.conversions || 0), 0),
-    totalRevenue: campaigns.reduce((sum, c) => sum + ((c.budget || 0) - (c.spent || 0)), 0),
-    avgConversionRate: campaigns.length > 0
-      ? (campaigns.reduce((sum, c) => sum + (c.impressions > 0 ? (c.clicks / c.impressions) * 100 : 0), 0) / campaigns.length).toFixed(1)
-      : 0,
+    totalConversions: campaigns.reduce(
+      (sum, c) => sum + (c.conversions || 0),
+      0,
+    ),
+    totalRevenue: campaigns.reduce(
+      (sum, c) => sum + ((c.budget || 0) - (c.spent || 0)),
+      0,
+    ),
+    avgConversionRate:
+      campaigns.length > 0
+        ? (
+            campaigns.reduce(
+              (sum, c) =>
+                sum +
+                (c.impressions > 0 ? (c.clicks / c.impressions) * 100 : 0),
+              0,
+            ) / campaigns.length
+          ).toFixed(1)
+        : 0,
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, { variant: 'default' | 'secondary' | 'outline' | 'destructive'; label: string }> = {
+    const variants: Record<
+      string,
+      {
+        variant: 'default' | 'secondary' | 'outline' | 'destructive';
+        label: string;
+      }
+    > = {
       active: { variant: 'default', label: 'Aktif' },
       scheduled: { variant: 'secondary', label: 'Zamanlandı' },
       paused: { variant: 'outline', label: 'Duraklatıldı' },
@@ -103,7 +149,10 @@ export default function CampaignsPage() {
       draft: { variant: 'outline', label: 'Taslak' },
       cancelled: { variant: 'destructive', label: 'İptal' },
     };
-    const { variant, label } = variants[status] || { variant: 'outline', label: status };
+    const { variant, label } = variants[status] || {
+      variant: 'outline',
+      label: status,
+    };
     return <Badge variant={variant}>{label}</Badge>;
   };
 
@@ -153,7 +202,7 @@ export default function CampaignsPage() {
         onError: (error) => {
           toast.error(error.message || 'Kampanya oluşturulamadı');
         },
-      }
+      },
     );
   };
 
@@ -167,7 +216,7 @@ export default function CampaignsPage() {
         onError: (error) => {
           toast.error(error.message || 'İşlem başarısız');
         },
-      }
+      },
     );
   };
 
@@ -181,7 +230,7 @@ export default function CampaignsPage() {
         onError: (error) => {
           toast.error(error.message || 'İşlem başarısız');
         },
-      }
+      },
     );
   };
 
@@ -191,7 +240,9 @@ export default function CampaignsPage() {
         <div className="text-center">
           <AlertTriangle className="mx-auto h-12 w-12 text-destructive" />
           <h2 className="mt-4 text-lg font-semibold">Bir hata oluştu</h2>
-          <p className="text-muted-foreground">Kampanyalar yüklenemedi. Lütfen tekrar deneyin.</p>
+          <p className="text-muted-foreground">
+            Kampanyalar yüklenemedi. Lütfen tekrar deneyin.
+          </p>
         </div>
       </div>
     );
@@ -202,7 +253,9 @@ export default function CampaignsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Kampanya Yönetimi</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Kampanya Yönetimi
+          </h1>
           <p className="text-muted-foreground">
             Pazarlama kampanyalarını oluştur, yönet ve performansı takip et
           </p>
@@ -237,7 +290,10 @@ export default function CampaignsPage() {
               {/* Campaign Type Selection */}
               <div className="space-y-2">
                 <Label>Kampanya Tipi</Label>
-                <Select value={newCampaignType} onValueChange={setNewCampaignType}>
+                <Select
+                  value={newCampaignType}
+                  onValueChange={setNewCampaignType}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -260,9 +316,13 @@ export default function CampaignsPage() {
                   <SelectContent>
                     <SelectItem value="all_users">Tüm Kullanıcılar</SelectItem>
                     <SelectItem value="free_users">Ücretsiz Üyeler</SelectItem>
-                    <SelectItem value="premium_users">Premium Üyeler</SelectItem>
+                    <SelectItem value="premium_users">
+                      Premium Üyeler
+                    </SelectItem>
                     <SelectItem value="new_users">Yeni Üyeler</SelectItem>
-                    <SelectItem value="inactive_users">Pasif Kullanıcılar</SelectItem>
+                    <SelectItem value="inactive_users">
+                      Pasif Kullanıcılar
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -290,8 +350,13 @@ export default function CampaignsPage() {
               <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
                 İptal
               </Button>
-              <Button onClick={handleCreateCampaign} disabled={createCampaign.isPending}>
-                {createCampaign.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <Button
+                onClick={handleCreateCampaign}
+                disabled={createCampaign.isPending}
+              >
+                {createCampaign.isPending && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 <ChevronRight className="mr-2 h-4 w-4" />
                 Oluştur
               </Button>
@@ -306,7 +371,11 @@ export default function CampaignsPage() {
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-2xl font-bold">
-                {isLoading ? <Loader2 className="mx-auto h-6 w-6 animate-spin" /> : overallStats.totalCampaigns}
+                {isLoading ? (
+                  <Loader2 className="mx-auto h-6 w-6 animate-spin" />
+                ) : (
+                  overallStats.totalCampaigns
+                )}
               </p>
               <p className="text-sm text-muted-foreground">Toplam Kampanya</p>
             </div>
@@ -316,7 +385,11 @@ export default function CampaignsPage() {
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-2xl font-bold text-green-600">
-                {isLoading ? <Loader2 className="mx-auto h-6 w-6 animate-spin" /> : overallStats.activeCampaigns}
+                {isLoading ? (
+                  <Loader2 className="mx-auto h-6 w-6 animate-spin" />
+                ) : (
+                  overallStats.activeCampaigns
+                )}
               </p>
               <p className="text-sm text-muted-foreground">Aktif</p>
             </div>
@@ -326,7 +399,11 @@ export default function CampaignsPage() {
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-2xl font-bold">
-                {isLoading ? <Loader2 className="mx-auto h-6 w-6 animate-spin" /> : `${(overallStats.totalReach / 1000).toFixed(0)}K`}
+                {isLoading ? (
+                  <Loader2 className="mx-auto h-6 w-6 animate-spin" />
+                ) : (
+                  `${(overallStats.totalReach / 1000).toFixed(0)}K`
+                )}
               </p>
               <p className="text-sm text-muted-foreground">Toplam Erişim</p>
             </div>
@@ -336,7 +413,11 @@ export default function CampaignsPage() {
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-2xl font-bold">
-                {isLoading ? <Loader2 className="mx-auto h-6 w-6 animate-spin" /> : overallStats.totalConversions.toLocaleString('tr-TR')}
+                {isLoading ? (
+                  <Loader2 className="mx-auto h-6 w-6 animate-spin" />
+                ) : (
+                  overallStats.totalConversions.toLocaleString('tr-TR')
+                )}
               </p>
               <p className="text-sm text-muted-foreground">Dönüşüm</p>
             </div>
@@ -345,7 +426,9 @@ export default function CampaignsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
-              <p className="text-2xl font-bold">%{overallStats.avgConversionRate}</p>
+              <p className="text-2xl font-bold">
+                %{overallStats.avgConversionRate}
+              </p>
               <p className="text-sm text-muted-foreground">Ort. Dönüşüm</p>
             </div>
           </CardContent>
@@ -354,7 +437,14 @@ export default function CampaignsPage() {
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-2xl font-bold text-green-600">
-                {isLoading ? <Loader2 className="mx-auto h-6 w-6 animate-spin" /> : formatCurrency(campaigns.reduce((sum, c) => sum + (c.spent || 0), 0), 'TRY')}
+                {isLoading ? (
+                  <Loader2 className="mx-auto h-6 w-6 animate-spin" />
+                ) : (
+                  formatCurrency(
+                    campaigns.reduce((sum, c) => sum + (c.spent || 0), 0),
+                    'TRY',
+                  )
+                )}
               </p>
               <p className="text-sm text-muted-foreground">Harcama</p>
             </div>
@@ -363,7 +453,11 @@ export default function CampaignsPage() {
       </div>
 
       {/* Campaigns List */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-4"
+      >
         <TabsList>
           <TabsTrigger value="all">Tümü</TabsTrigger>
           <TabsTrigger value="active">Aktif</TabsTrigger>
@@ -380,8 +474,12 @@ export default function CampaignsPage() {
           ) : campaigns.length === 0 ? (
             <div className="py-12 text-center">
               <Megaphone className="mx-auto h-12 w-12 text-muted-foreground" />
-              <h3 className="mt-4 text-lg font-semibold">Kampanya bulunamadı</h3>
-              <p className="text-muted-foreground">Yeni bir kampanya oluşturarak başlayın</p>
+              <h3 className="mt-4 text-lg font-semibold">
+                Kampanya bulunamadı
+              </h3>
+              <p className="text-muted-foreground">
+                Yeni bir kampanya oluşturarak başlayın
+              </p>
             </div>
           ) : (
             campaigns.map((campaign) => (
@@ -396,14 +494,17 @@ export default function CampaignsPage() {
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold">{campaign.name}</h3>
                           {getStatusBadge(campaign.status)}
-                          <Badge variant="outline">{getCampaignTypeLabel(campaign.type)}</Badge>
+                          <Badge variant="outline">
+                            {getCampaignTypeLabel(campaign.type)}
+                          </Badge>
                         </div>
 
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Calendar className="h-4 w-4" />
                             {formatDate(campaign.start_date)}
-                            {campaign.end_date && ` - ${formatDate(campaign.end_date)}`}
+                            {campaign.end_date &&
+                              ` - ${formatDate(campaign.end_date)}`}
                           </span>
                         </div>
 
@@ -411,12 +512,20 @@ export default function CampaignsPage() {
                         {campaign.budget && campaign.budget > 0 && (
                           <div className="space-y-1 max-w-xs">
                             <div className="flex items-center justify-between text-sm">
-                              <span className="text-muted-foreground">Bütçe</span>
+                              <span className="text-muted-foreground">
+                                Bütçe
+                              </span>
                               <span>
-                                {formatCurrency(campaign.spent || 0, 'TRY')} / {formatCurrency(campaign.budget, 'TRY')}
+                                {formatCurrency(campaign.spent || 0, 'TRY')} /{' '}
+                                {formatCurrency(campaign.budget, 'TRY')}
                               </span>
                             </div>
-                            <Progress value={((campaign.spent || 0) / campaign.budget) * 100} className="h-2" />
+                            <Progress
+                              value={
+                                ((campaign.spent || 0) / campaign.budget) * 100
+                              }
+                              className="h-2"
+                            />
                           </div>
                         )}
                       </div>
@@ -430,11 +539,17 @@ export default function CampaignsPage() {
                             <p className="font-semibold">
                               {(campaign.impressions / 1000).toFixed(1)}K
                             </p>
-                            <p className="text-xs text-muted-foreground">Görüntüleme</p>
+                            <p className="text-xs text-muted-foreground">
+                              Görüntüleme
+                            </p>
                           </div>
                           <div className="text-center">
                             <p className="font-semibold">
-                              {((campaign.clicks / campaign.impressions) * 100).toFixed(1)}%
+                              {(
+                                (campaign.clicks / campaign.impressions) *
+                                100
+                              ).toFixed(1)}
+                              %
                             </p>
                             <p className="text-xs text-muted-foreground">CTR</p>
                           </div>
@@ -442,7 +557,9 @@ export default function CampaignsPage() {
                             <p className="font-semibold">
                               {campaign.conversions.toLocaleString('tr-TR')}
                             </p>
-                            <p className="text-xs text-muted-foreground">Dönüşüm</p>
+                            <p className="text-xs text-muted-foreground">
+                              Dönüşüm
+                            </p>
                           </div>
                         </div>
                       )}
@@ -473,13 +590,17 @@ export default function CampaignsPage() {
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           {campaign.status === 'active' && (
-                            <DropdownMenuItem onClick={() => handlePauseCampaign(campaign.id)}>
+                            <DropdownMenuItem
+                              onClick={() => handlePauseCampaign(campaign.id)}
+                            >
                               <Pause className="mr-2 h-4 w-4" />
                               Duraklat
                             </DropdownMenuItem>
                           )}
                           {campaign.status === 'paused' && (
-                            <DropdownMenuItem onClick={() => handleResumeCampaign(campaign.id)}>
+                            <DropdownMenuItem
+                              onClick={() => handleResumeCampaign(campaign.id)}
+                            >
                               <Play className="mr-2 h-4 w-4" />
                               Devam Et
                             </DropdownMenuItem>

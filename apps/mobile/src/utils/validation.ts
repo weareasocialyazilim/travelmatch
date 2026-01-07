@@ -1,7 +1,7 @@
 /**
  * Validation Schemas
  * Re-exports from @travelmatch/shared and mobile-specific schemas
- * 
+ *
  * @see packages/shared/src/schemas for base schemas
  */
 
@@ -24,11 +24,11 @@ export {
   type ChangePasswordInput,
   type VerifyEmailInput,
   type VerifyOtpInput,
-  
+
   // User schemas
   updateProfileSchema,
   type UpdateProfileInput,
-  
+
   // Common schemas
   emailSchema,
   passwordSchema,
@@ -236,7 +236,9 @@ export const privacySettingsSchema = z.object({
   showActivityStatus: z.boolean(),
 });
 
-export type NotificationSettingsInput = z.infer<typeof notificationSettingsSchema>;
+export type NotificationSettingsInput = z.infer<
+  typeof notificationSettingsSchema
+>;
 export type PrivacySettingsInput = z.infer<typeof privacySettingsSchema>;
 
 /**

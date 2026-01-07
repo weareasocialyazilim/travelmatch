@@ -128,11 +128,7 @@ describe('FormComponents', () => {
     it('should update character count on input', async () => {
       const onChangeText = jest.fn() as jest.Mock;
       const { getByText, rerender } = render(
-        <FormInput
-          value="Hello"
-          maxLength={100}
-          onChangeText={onChangeText}
-        />,
+        <FormInput value="Hello" maxLength={100} onChangeText={onChangeText} />,
       );
 
       expect(getByText('5/100')).toBeTruthy();

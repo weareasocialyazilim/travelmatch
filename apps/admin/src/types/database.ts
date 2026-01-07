@@ -18,7 +18,14 @@ export interface Database {
           email: string;
           name: string;
           avatar_url: string | null;
-          role: 'super_admin' | 'manager' | 'moderator' | 'finance' | 'marketing' | 'support' | 'viewer';
+          role:
+            | 'super_admin'
+            | 'manager'
+            | 'moderator'
+            | 'finance'
+            | 'marketing'
+            | 'support'
+            | 'viewer';
           is_active: boolean;
           requires_2fa: boolean;
           totp_secret: string | null;
@@ -32,7 +39,14 @@ export interface Database {
           email: string;
           name: string;
           avatar_url?: string | null;
-          role?: 'super_admin' | 'manager' | 'moderator' | 'finance' | 'marketing' | 'support' | 'viewer';
+          role?:
+            | 'super_admin'
+            | 'manager'
+            | 'moderator'
+            | 'finance'
+            | 'marketing'
+            | 'support'
+            | 'viewer';
           is_active?: boolean;
           requires_2fa?: boolean;
           totp_secret?: string | null;
@@ -46,7 +60,14 @@ export interface Database {
           email?: string;
           name?: string;
           avatar_url?: string | null;
-          role?: 'super_admin' | 'manager' | 'moderator' | 'finance' | 'marketing' | 'support' | 'viewer';
+          role?:
+            | 'super_admin'
+            | 'manager'
+            | 'moderator'
+            | 'finance'
+            | 'marketing'
+            | 'support'
+            | 'viewer';
           is_active?: boolean;
           requires_2fa?: boolean;
           totp_secret?: string | null;
@@ -126,19 +147,40 @@ export interface Database {
       role_permissions: {
         Row: {
           id: string;
-          role: 'super_admin' | 'manager' | 'moderator' | 'finance' | 'marketing' | 'support' | 'viewer';
+          role:
+            | 'super_admin'
+            | 'manager'
+            | 'moderator'
+            | 'finance'
+            | 'marketing'
+            | 'support'
+            | 'viewer';
           resource: string;
           action: string;
         };
         Insert: {
           id?: string;
-          role: 'super_admin' | 'manager' | 'moderator' | 'finance' | 'marketing' | 'support' | 'viewer';
+          role:
+            | 'super_admin'
+            | 'manager'
+            | 'moderator'
+            | 'finance'
+            | 'marketing'
+            | 'support'
+            | 'viewer';
           resource: string;
           action: string;
         };
         Update: {
           id?: string;
-          role?: 'super_admin' | 'manager' | 'moderator' | 'finance' | 'marketing' | 'support' | 'viewer';
+          role?:
+            | 'super_admin'
+            | 'manager'
+            | 'moderator'
+            | 'finance'
+            | 'marketing'
+            | 'support'
+            | 'viewer';
           resource?: string;
           action?: string;
         };
@@ -218,17 +260,397 @@ export interface Database {
           kyc_status?: string;
         };
       };
+      // Campaign tables
+      notification_campaigns: {
+        Row: {
+          id: string;
+          title: string;
+          message: string;
+          type: 'push' | 'email' | 'sms' | 'in_app';
+          target_audience: Json;
+          status:
+            | 'draft'
+            | 'scheduled'
+            | 'sending'
+            | 'sent'
+            | 'cancelled'
+            | 'failed';
+          scheduled_at: string | null;
+          sent_at: string | null;
+          total_recipients: number;
+          delivered_count: number;
+          opened_count: number;
+          clicked_count: number;
+          failed_count: number;
+          metadata: Json;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          message: string;
+          type: 'push' | 'email' | 'sms' | 'in_app';
+          target_audience?: Json;
+          status?:
+            | 'draft'
+            | 'scheduled'
+            | 'sending'
+            | 'sent'
+            | 'cancelled'
+            | 'failed';
+          scheduled_at?: string | null;
+          sent_at?: string | null;
+          total_recipients?: number;
+          delivered_count?: number;
+          opened_count?: number;
+          clicked_count?: number;
+          failed_count?: number;
+          metadata?: Json;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          message?: string;
+          type?: 'push' | 'email' | 'sms' | 'in_app';
+          target_audience?: Json;
+          status?:
+            | 'draft'
+            | 'scheduled'
+            | 'sending'
+            | 'sent'
+            | 'cancelled'
+            | 'failed';
+          scheduled_at?: string | null;
+          sent_at?: string | null;
+          total_recipients?: number;
+          delivered_count?: number;
+          opened_count?: number;
+          clicked_count?: number;
+          failed_count?: number;
+          metadata?: Json;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      marketing_campaigns: {
+        Row: {
+          id: string;
+          name: string;
+          description: string | null;
+          type:
+            | 'promo'
+            | 'referral'
+            | 'seasonal'
+            | 'partnership'
+            | 'retention'
+            | 'acquisition';
+          status: 'draft' | 'active' | 'paused' | 'completed' | 'cancelled';
+          target_audience: Json;
+          budget: number;
+          spent: number;
+          currency: string;
+          start_date: string | null;
+          end_date: string | null;
+          impressions: number;
+          clicks: number;
+          conversions: number;
+          revenue: number;
+          banner_url: string | null;
+          landing_url: string | null;
+          promo_code: string | null;
+          discount_type: 'percentage' | 'fixed' | 'free_shipping' | null;
+          discount_value: number | null;
+          utm_source: string | null;
+          utm_medium: string | null;
+          utm_campaign: string | null;
+          metadata: Json;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          description?: string | null;
+          type:
+            | 'promo'
+            | 'referral'
+            | 'seasonal'
+            | 'partnership'
+            | 'retention'
+            | 'acquisition';
+          status?: 'draft' | 'active' | 'paused' | 'completed' | 'cancelled';
+          target_audience?: Json;
+          budget?: number;
+          spent?: number;
+          currency?: string;
+          start_date?: string | null;
+          end_date?: string | null;
+          impressions?: number;
+          clicks?: number;
+          conversions?: number;
+          revenue?: number;
+          banner_url?: string | null;
+          landing_url?: string | null;
+          promo_code?: string | null;
+          discount_type?: 'percentage' | 'fixed' | 'free_shipping' | null;
+          discount_value?: number | null;
+          utm_source?: string | null;
+          utm_medium?: string | null;
+          utm_campaign?: string | null;
+          metadata?: Json;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          description?: string | null;
+          type?:
+            | 'promo'
+            | 'referral'
+            | 'seasonal'
+            | 'partnership'
+            | 'retention'
+            | 'acquisition';
+          status?: 'draft' | 'active' | 'paused' | 'completed' | 'cancelled';
+          target_audience?: Json;
+          budget?: number;
+          spent?: number;
+          currency?: string;
+          start_date?: string | null;
+          end_date?: string | null;
+          impressions?: number;
+          clicks?: number;
+          conversions?: number;
+          revenue?: number;
+          banner_url?: string | null;
+          landing_url?: string | null;
+          promo_code?: string | null;
+          discount_type?: 'percentage' | 'fixed' | 'free_shipping' | null;
+          discount_value?: number | null;
+          utm_source?: string | null;
+          utm_medium?: string | null;
+          utm_campaign?: string | null;
+          metadata?: Json;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      promo_codes: {
+        Row: {
+          id: string;
+          code: string;
+          campaign_id: string | null;
+          description: string | null;
+          discount_type: 'percentage' | 'fixed' | 'free_shipping';
+          discount_value: number;
+          min_order_amount: number;
+          max_discount_amount: number | null;
+          usage_limit: number | null;
+          used_count: number;
+          per_user_limit: number;
+          valid_from: string;
+          valid_until: string | null;
+          is_active: boolean;
+          applicable_to: Json;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          code: string;
+          campaign_id?: string | null;
+          description?: string | null;
+          discount_type: 'percentage' | 'fixed' | 'free_shipping';
+          discount_value: number;
+          min_order_amount?: number;
+          max_discount_amount?: number | null;
+          usage_limit?: number | null;
+          used_count?: number;
+          per_user_limit?: number;
+          valid_from?: string;
+          valid_until?: string | null;
+          is_active?: boolean;
+          applicable_to?: Json;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          code?: string;
+          campaign_id?: string | null;
+          description?: string | null;
+          discount_type?: 'percentage' | 'fixed' | 'free_shipping';
+          discount_value?: number;
+          min_order_amount?: number;
+          max_discount_amount?: number | null;
+          usage_limit?: number | null;
+          used_count?: number;
+          per_user_limit?: number;
+          valid_from?: string;
+          valid_until?: string | null;
+          is_active?: boolean;
+          applicable_to?: Json;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      // Moments table for moderation
+      moments: {
+        Row: {
+          id: string;
+          user_id: string;
+          title: string;
+          description: string | null;
+          location: string | null;
+          images: string[] | null;
+          status: string | null;
+          moderation_status:
+            | 'pending_review'
+            | 'approved'
+            | 'rejected'
+            | 'flagged'
+            | null;
+          moderation_notes: string | null;
+          moderated_by: string | null;
+          moderated_at: string | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: never; // Admin shouldn't create moments
+        Update: {
+          status?: string | null;
+          moderation_status?:
+            | 'pending_review'
+            | 'approved'
+            | 'rejected'
+            | 'flagged'
+            | null;
+          moderation_notes?: string | null;
+          moderated_by?: string | null;
+          moderated_at?: string | null;
+        };
+      };
+      // Users table for admin operations
+      users: {
+        Row: {
+          id: string;
+          email: string;
+          full_name: string;
+          avatar_url: string | null;
+          status:
+            | 'active'
+            | 'suspended'
+            | 'banned'
+            | 'pending'
+            | 'deleted'
+            | null;
+          is_banned: boolean | null;
+          is_suspended: boolean | null;
+          banned_at: string | null;
+          suspended_at: string | null;
+          ban_reason: string | null;
+          suspension_reason: string | null;
+          banned_by: string | null;
+          suspended_by: string | null;
+          suspension_ends_at: string | null;
+          reinstated_at: string | null;
+          kyc_status: string | null;
+          verified: boolean | null;
+          rating: number | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: never; // Admin shouldn't create users
+        Update: {
+          status?:
+            | 'active'
+            | 'suspended'
+            | 'banned'
+            | 'pending'
+            | 'deleted'
+            | null;
+          is_banned?: boolean | null;
+          is_suspended?: boolean | null;
+          banned_at?: string | null;
+          suspended_at?: string | null;
+          ban_reason?: string | null;
+          suspension_reason?: string | null;
+          banned_by?: string | null;
+          suspended_by?: string | null;
+          suspension_ends_at?: string | null;
+          reinstated_at?: string | null;
+          kyc_status?: string | null;
+          verified?: boolean | null;
+        };
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      validate_promo_code: {
+        Args: {
+          p_code: string;
+          p_user_id: string;
+          p_order_amount?: number;
+        };
+        Returns: {
+          is_valid: boolean;
+          promo_code_id: string | null;
+          discount_type: string | null;
+          discount_value: number | null;
+          final_discount: number | null;
+          error_message: string | null;
+        }[];
+      };
     };
     Enums: {
-      admin_role: 'super_admin' | 'manager' | 'moderator' | 'finance' | 'marketing' | 'support' | 'viewer';
+      admin_role:
+        | 'super_admin'
+        | 'manager'
+        | 'moderator'
+        | 'finance'
+        | 'marketing'
+        | 'support'
+        | 'viewer';
       task_priority: 'urgent' | 'high' | 'medium' | 'low';
       task_status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
+      notification_campaign_type: 'push' | 'email' | 'sms' | 'in_app';
+      notification_campaign_status:
+        | 'draft'
+        | 'scheduled'
+        | 'sending'
+        | 'sent'
+        | 'cancelled'
+        | 'failed';
+      marketing_campaign_type:
+        | 'promo'
+        | 'referral'
+        | 'seasonal'
+        | 'partnership'
+        | 'retention'
+        | 'acquisition';
+      marketing_campaign_status:
+        | 'draft'
+        | 'active'
+        | 'paused'
+        | 'completed'
+        | 'cancelled';
+      moderation_status: 'pending_review' | 'approved' | 'rejected' | 'flagged';
+      user_status: 'active' | 'suspended' | 'banned' | 'pending' | 'deleted';
     };
   };
 }

@@ -40,12 +40,12 @@ const config: TestRunnerConfig = {
         rules: {
           // WCAG 2.1 Level AA
           'color-contrast': { enabled: true },
-          'label': { enabled: true },
+          label: { enabled: true },
           'button-name': { enabled: true },
           'link-name': { enabled: true },
           'image-alt': { enabled: true },
-          'list': { enabled: true },
-          'listitem': { enabled: true },
+          list: { enabled: true },
+          listitem: { enabled: true },
         },
       },
     });
@@ -54,7 +54,7 @@ const config: TestRunnerConfig = {
     const performanceMetrics = await page.evaluate(() => {
       const marks = (window as any).__performanceMarks;
       const memory = (performance as any).memory;
-      
+
       return {
         renderTime: performance.now() - marks.renderStart,
         reRenderCount: marks.renderCount,
@@ -64,18 +64,20 @@ const config: TestRunnerConfig = {
 
     // Determine component type from story path
     const componentType = getComponentType(title);
-    
+
     const metrics: PerformanceMetrics = {
       ...performanceMetrics,
       componentType,
     };
 
     const budgetCheck = checkPerformanceBudget(metrics);
-    
+
     if (!budgetCheck.passed) {
       console.error(`❌ Performance budget violations for ${title}/${name}:`);
-      budgetCheck.violations.forEach(v => console.error(`  - ${v}`));
-      throw new Error(`Performance budget exceeded: ${budgetCheck.violations.join(', ')}`);
+      budgetCheck.violations.forEach((v) => console.error(`  - ${v}`));
+      throw new Error(
+        `Performance budget exceeded: ${budgetCheck.violations.join(', ')}`,
+      );
     } else {
       console.log(`✅ Performance budget passed for ${title}/${name}`);
     }
@@ -100,12 +102,14 @@ const config: TestRunnerConfig = {
   },
 };
 
-function getComponentType(title: string): keyof typeof import('./performance').PERFORMANCE_BUDGETS {
+function getComponentType(
+  title: string,
+): keyof typeof import('./performance').PERFORMANCE_BUDGETS {
   if (title.includes('Atoms')) return 'atoms';
   if (title.includes('Molecules')) return 'molecules';
   if (title.includes('Organisms')) return 'organisms';
   if (title.includes('Templates')) return 'templates';
-  
+
   // Default based on complexity
   return 'molecules';
 }

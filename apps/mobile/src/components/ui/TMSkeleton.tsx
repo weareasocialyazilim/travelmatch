@@ -47,11 +47,31 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 // Types
 // ═══════════════════════════════════════════════════════════════════
 
-export type TMSkeletonType = 'base' | 'avatar' | 'text' | 'card' | 'message' | 'list' | 'screen';
+export type TMSkeletonType =
+  | 'base'
+  | 'avatar'
+  | 'text'
+  | 'card'
+  | 'message'
+  | 'list'
+  | 'screen';
 
-export type SkeletonListType = 'chat' | 'moment' | 'gift' | 'transaction' | 'notification' | 'request' | 'trip';
+export type SkeletonListType =
+  | 'chat'
+  | 'moment'
+  | 'gift'
+  | 'transaction'
+  | 'notification'
+  | 'request'
+  | 'trip';
 
-export type SkeletonScreenType = 'generic' | 'profile' | 'chat' | 'detail' | 'form' | 'grid';
+export type SkeletonScreenType =
+  | 'generic'
+  | 'profile'
+  | 'chat'
+  | 'detail'
+  | 'form'
+  | 'grid';
 
 export type SkeletonVariant = 'rect' | 'circle';
 
@@ -139,22 +159,58 @@ export const TMSkeleton: React.FC<TMSkeletonProps> = ({
 }) => {
   switch (type) {
     case 'avatar':
-      return <SkeletonBase width={size} height={size} borderRadius={size / 2} shimmer={shimmer} style={style} testID={testID} />;
+      return (
+        <SkeletonBase
+          width={size}
+          height={size}
+          borderRadius={size / 2}
+          shimmer={shimmer}
+          style={style}
+          testID={testID}
+        />
+      );
 
     case 'text':
-      return <SkeletonTextInternal lines={lines} lineHeight={lineHeight} lastLineWidth={lastLineWidth} style={style} testID={testID} />;
+      return (
+        <SkeletonTextInternal
+          lines={lines}
+          lineHeight={lineHeight}
+          lastLineWidth={lastLineWidth}
+          style={style}
+          testID={testID}
+        />
+      );
 
     case 'card':
       return <SkeletonCardInternal style={style} testID={testID} />;
 
     case 'message':
-      return <SkeletonMessageInternal isOwn={isOwn} style={style} testID={testID} />;
+      return (
+        <SkeletonMessageInternal isOwn={isOwn} style={style} testID={testID} />
+      );
 
     case 'list':
-      return <SkeletonListInternal type={listType} count={count} minDisplayTime={minDisplayTime} show={show} style={style} testID={testID} />;
+      return (
+        <SkeletonListInternal
+          type={listType}
+          count={count}
+          minDisplayTime={minDisplayTime}
+          show={show}
+          style={style}
+          testID={testID}
+        />
+      );
 
     case 'screen':
-      return <ScreenSkeletonInternal screenType={screenType} showHeader={showHeader} showTabBar={showTabBar} style={style} testID={testID} />;
+      return (
+        <ScreenSkeletonInternal
+          screenType={screenType}
+          showHeader={showHeader}
+          showTabBar={showTabBar}
+          style={style}
+          testID={testID}
+        />
+      );
 
     case 'base':
     default:
@@ -162,7 +218,13 @@ export const TMSkeleton: React.FC<TMSkeletonProps> = ({
         <SkeletonBase
           width={width}
           height={height}
-          borderRadius={variant === 'circle' ? (typeof height === 'number' ? height / 2 : 8) : borderRadius}
+          borderRadius={
+            variant === 'circle'
+              ? typeof height === 'number'
+                ? height / 2
+                : 8
+              : borderRadius
+          }
           shimmer={shimmer}
           style={style}
           testID={testID}
@@ -199,17 +261,20 @@ const SkeletonBase = memo<SkeletonBaseProps>(function SkeletonBase({
     opacity.value = withRepeat(
       withSequence(
         withTiming(0.7, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0.4, { duration: 1000, easing: Easing.inOut(Easing.ease) })
+        withTiming(0.4, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
       ),
       -1,
-      false
+      false,
     );
 
     if (shimmer) {
       translateX.value = withRepeat(
-        withTiming(SCREEN_WIDTH, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
+        withTiming(SCREEN_WIDTH, {
+          duration: 1500,
+          easing: Easing.inOut(Easing.ease),
+        }),
         -1,
-        false
+        false,
       );
     }
 
@@ -230,7 +295,11 @@ const SkeletonBase = memo<SkeletonBaseProps>(function SkeletonBase({
 
   return (
     <View
-      style={[styles.skeleton, { width: width as number, height, borderRadius }, style]}
+      style={[
+        styles.skeleton,
+        { width: width as number, height, borderRadius },
+        style,
+      ]}
       testID={testID}
     >
       <Animated.View style={[StyleSheet.absoluteFillObject, opacityStyle]} />
@@ -289,7 +358,10 @@ interface SkeletonCardInternalProps {
   testID?: string;
 }
 
-const SkeletonCardInternal: React.FC<SkeletonCardInternalProps> = ({ style, testID }) => (
+const SkeletonCardInternal: React.FC<SkeletonCardInternalProps> = ({
+  style,
+  testID,
+}) => (
   <View style={[styles.card, style]} testID={testID}>
     <SkeletonBase width="100%" height={160} borderRadius={0} />
     <View style={styles.cardContent}>
@@ -301,8 +373,18 @@ const SkeletonCardInternal: React.FC<SkeletonCardInternalProps> = ({ style, test
         </View>
       </View>
       <SkeletonBase width="80%" height={20} style={styles.mt12} />
-      <SkeletonTextInternal lines={2} lineHeight={14} lastLineWidth="60%" style={styles.mt12} />
-      <SkeletonBase width="100%" height={48} borderRadius={24} style={styles.mt16} />
+      <SkeletonTextInternal
+        lines={2}
+        lineHeight={14}
+        lastLineWidth="60%"
+        style={styles.mt12}
+      />
+      <SkeletonBase
+        width="100%"
+        height={48}
+        borderRadius={24}
+        style={styles.mt16}
+      />
     </View>
   </View>
 );
@@ -317,9 +399,27 @@ interface SkeletonMessageInternalProps {
   testID?: string;
 }
 
-const SkeletonMessageInternal: React.FC<SkeletonMessageInternalProps> = ({ isOwn, style, testID }) => (
-  <View style={[styles.message, isOwn ? styles.messageOwn : styles.messageOther, style]} testID={testID}>
-    {!isOwn && <SkeletonBase width={32} height={32} borderRadius={16} style={styles.messageAvatar} />}
+const SkeletonMessageInternal: React.FC<SkeletonMessageInternalProps> = ({
+  isOwn,
+  style,
+  testID,
+}) => (
+  <View
+    style={[
+      styles.message,
+      isOwn ? styles.messageOwn : styles.messageOther,
+      style,
+    ]}
+    testID={testID}
+  >
+    {!isOwn && (
+      <SkeletonBase
+        width={32}
+        height={32}
+        borderRadius={16}
+        style={styles.messageAvatar}
+      />
+    )}
     <View style={[styles.messageBubble, isOwn && styles.messageBubbleOwn]}>
       <SkeletonBase width={isOwn ? 120 : 180} height={14} />
       <SkeletonBase width={isOwn ? 80 : 140} height={14} style={styles.mt6} />
@@ -359,7 +459,9 @@ const SkeletonListInternal: React.FC<SkeletonListInternalProps> = ({
     } else if (hasShown) {
       timeout = setTimeout(() => setShouldShow(false), minDisplayTime);
     }
-    return () => { if (timeout) clearTimeout(timeout); };
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
   }, [show, minDisplayTime, hasShown]);
 
   if (!shouldShow) return null;
@@ -403,7 +505,12 @@ const ChatSkeletonItem: React.FC = () => (
         <SkeletonBase width={120} height={16} />
         <SkeletonBase width={40} height={12} />
       </View>
-      <SkeletonBase width={80} height={20} borderRadius={6} style={styles.mt6} />
+      <SkeletonBase
+        width={80}
+        height={20}
+        borderRadius={6}
+        style={styles.mt6}
+      />
       <SkeletonBase width="85%" height={14} style={styles.mt6} />
     </View>
   </View>
@@ -475,7 +582,12 @@ const RequestSkeletonItem: React.FC = () => (
       </View>
       <SkeletonBase width={60} height={24} borderRadius={12} />
     </View>
-    <SkeletonBase width="100%" height={40} borderRadius={8} style={styles.mt12} />
+    <SkeletonBase
+      width="100%"
+      height={40}
+      borderRadius={8}
+      style={styles.mt12}
+    />
     <View style={styles.requestActions}>
       <SkeletonBase width="48%" height={44} borderRadius={10} />
       <SkeletonBase width="48%" height={44} borderRadius={10} />
@@ -548,7 +660,12 @@ const HeaderSkeletonContent: React.FC = () => (
     <SkeletonBase width={100} height={24} borderRadius={4} />
     <View style={styles.headerRight}>
       <SkeletonBase width={32} height={32} borderRadius={16} />
-      <SkeletonBase width={32} height={32} borderRadius={16} style={styles.ml8} />
+      <SkeletonBase
+        width={32}
+        height={32}
+        borderRadius={16}
+        style={styles.ml8}
+      />
     </View>
   </View>
 );
@@ -558,7 +675,12 @@ const TabBarSkeletonContent: React.FC = () => (
     {[1, 2, 3, 4, 5].map((i) => (
       <View key={i} style={styles.tabItem}>
         <SkeletonBase width={24} height={24} borderRadius={4} />
-        <SkeletonBase width={40} height={10} borderRadius={4} style={styles.mt4} />
+        <SkeletonBase
+          width={40}
+          height={10}
+          borderRadius={4}
+          style={styles.mt4}
+        />
       </View>
     ))}
   </View>
@@ -570,9 +692,23 @@ const ListSkeletonContent: React.FC = () => (
       <View key={i} style={styles.listSkeletonItem}>
         <SkeletonBase width={56} height={56} borderRadius={28} />
         <View style={styles.listSkeletonItemContent}>
-          <SkeletonBase width={SCREEN_WIDTH * 0.5} height={16} borderRadius={4} />
-          <SkeletonBase width={SCREEN_WIDTH * 0.7} height={12} borderRadius={4} style={styles.mt8} />
-          <SkeletonBase width={SCREEN_WIDTH * 0.4} height={12} borderRadius={4} style={styles.mt4} />
+          <SkeletonBase
+            width={SCREEN_WIDTH * 0.5}
+            height={16}
+            borderRadius={4}
+          />
+          <SkeletonBase
+            width={SCREEN_WIDTH * 0.7}
+            height={12}
+            borderRadius={4}
+            style={styles.mt8}
+          />
+          <SkeletonBase
+            width={SCREEN_WIDTH * 0.4}
+            height={12}
+            borderRadius={4}
+            style={styles.mt4}
+          />
         </View>
       </View>
     ))}
@@ -587,9 +723,23 @@ const GridSkeletonContent: React.FC = () => {
     <View style={styles.gridContainer}>
       {Array.from({ length: 6 }).map((_, i) => (
         <View key={i} style={[styles.gridItem, { width: itemWidth }]}>
-          <SkeletonBase width={itemWidth - 8} height={itemHeight} borderRadius={12} />
-          <SkeletonBase width={itemWidth * 0.8} height={14} borderRadius={4} style={styles.mt8} />
-          <SkeletonBase width={itemWidth * 0.5} height={12} borderRadius={4} style={styles.mt4} />
+          <SkeletonBase
+            width={itemWidth - 8}
+            height={itemHeight}
+            borderRadius={12}
+          />
+          <SkeletonBase
+            width={itemWidth * 0.8}
+            height={14}
+            borderRadius={4}
+            style={styles.mt8}
+          />
+          <SkeletonBase
+            width={itemWidth * 0.5}
+            height={12}
+            borderRadius={4}
+            style={styles.mt4}
+          />
         </View>
       ))}
     </View>
@@ -598,34 +748,78 @@ const GridSkeletonContent: React.FC = () => {
 
 const DetailSkeletonContent: React.FC = () => (
   <View style={styles.detailContainer}>
-    <SkeletonBase width={SCREEN_WIDTH} height={SCREEN_WIDTH * 0.75} borderRadius={0} />
+    <SkeletonBase
+      width={SCREEN_WIDTH}
+      height={SCREEN_WIDTH * 0.75}
+      borderRadius={0}
+    />
     <View style={styles.detailUserRow}>
       <SkeletonBase width={48} height={48} borderRadius={24} />
       <View style={styles.ml12}>
         <SkeletonBase width={120} height={16} borderRadius={4} />
-        <SkeletonBase width={80} height={12} borderRadius={4} style={styles.mt4} />
+        <SkeletonBase
+          width={80}
+          height={12}
+          borderRadius={4}
+          style={styles.mt4}
+        />
       </View>
     </View>
     <View style={styles.detailContent}>
       <SkeletonBase width={SCREEN_WIDTH * 0.8} height={24} borderRadius={4} />
-      <SkeletonBase width={SCREEN_WIDTH * 0.6} height={16} borderRadius={4} style={styles.mt12} />
-      <SkeletonBase width={SCREEN_WIDTH - 32} height={14} borderRadius={4} style={styles.mt16} />
-      <SkeletonBase width={SCREEN_WIDTH - 32} height={14} borderRadius={4} style={styles.mt8} />
-      <SkeletonBase width={SCREEN_WIDTH * 0.7} height={14} borderRadius={4} style={styles.mt8} />
+      <SkeletonBase
+        width={SCREEN_WIDTH * 0.6}
+        height={16}
+        borderRadius={4}
+        style={styles.mt12}
+      />
+      <SkeletonBase
+        width={SCREEN_WIDTH - 32}
+        height={14}
+        borderRadius={4}
+        style={styles.mt16}
+      />
+      <SkeletonBase
+        width={SCREEN_WIDTH - 32}
+        height={14}
+        borderRadius={4}
+        style={styles.mt8}
+      />
+      <SkeletonBase
+        width={SCREEN_WIDTH * 0.7}
+        height={14}
+        borderRadius={4}
+        style={styles.mt8}
+      />
     </View>
   </View>
 );
 
 const FormSkeletonContent: React.FC = () => (
   <View style={styles.formContainer}>
-    <SkeletonBase width={SCREEN_WIDTH - 32} height={120} borderRadius={12} style={styles.mb16} />
+    <SkeletonBase
+      width={SCREEN_WIDTH - 32}
+      height={120}
+      borderRadius={12}
+      style={styles.mb16}
+    />
     {[1, 2, 3, 4].map((i) => (
       <View key={i} style={styles.formField}>
         <SkeletonBase width={100} height={14} borderRadius={4} />
-        <SkeletonBase width={SCREEN_WIDTH - 32} height={48} borderRadius={8} style={styles.mt8} />
+        <SkeletonBase
+          width={SCREEN_WIDTH - 32}
+          height={48}
+          borderRadius={8}
+          style={styles.mt8}
+        />
       </View>
     ))}
-    <SkeletonBase width={SCREEN_WIDTH - 32} height={52} borderRadius={26} style={styles.mt24} />
+    <SkeletonBase
+      width={SCREEN_WIDTH - 32}
+      height={52}
+      borderRadius={26}
+      style={styles.mt24}
+    />
   </View>
 );
 
@@ -633,13 +827,28 @@ const ProfileSkeletonContent: React.FC = () => (
   <View>
     <View style={styles.profileHeader}>
       <SkeletonBase width={100} height={100} borderRadius={50} />
-      <SkeletonBase width={160} height={24} borderRadius={4} style={styles.mt16} />
-      <SkeletonBase width={200} height={14} borderRadius={4} style={styles.mt8} />
+      <SkeletonBase
+        width={160}
+        height={24}
+        borderRadius={4}
+        style={styles.mt16}
+      />
+      <SkeletonBase
+        width={200}
+        height={14}
+        borderRadius={4}
+        style={styles.mt8}
+      />
       <View style={styles.statsRow}>
         {[1, 2, 3].map((i) => (
           <View key={i} style={styles.statItem}>
             <SkeletonBase width={40} height={20} borderRadius={4} />
-            <SkeletonBase width={50} height={12} borderRadius={4} style={styles.mt4} />
+            <SkeletonBase
+              width={50}
+              height={12}
+              borderRadius={4}
+              style={styles.mt4}
+            />
           </View>
         ))}
       </View>
@@ -659,25 +868,49 @@ const ChatScreenSkeletonContent: React.FC = () => (
       <SkeletonBase width={40} height={40} borderRadius={20} />
       <View style={styles.ml12}>
         <SkeletonBase width={120} height={16} borderRadius={4} />
-        <SkeletonBase width={60} height={12} borderRadius={4} style={styles.mt4} />
+        <SkeletonBase
+          width={60}
+          height={12}
+          borderRadius={4}
+          style={styles.mt4}
+        />
       </View>
     </View>
     <View style={styles.chatMessages}>
       <View style={styles.messageReceived}>
         <SkeletonBase width={24} height={24} borderRadius={12} />
-        <SkeletonBase width={SCREEN_WIDTH * 0.6} height={60} borderRadius={16} style={styles.ml8} />
+        <SkeletonBase
+          width={SCREEN_WIDTH * 0.6}
+          height={60}
+          borderRadius={16}
+          style={styles.ml8}
+        />
       </View>
       <View style={styles.messageSent}>
-        <SkeletonBase width={SCREEN_WIDTH * 0.5} height={40} borderRadius={16} />
+        <SkeletonBase
+          width={SCREEN_WIDTH * 0.5}
+          height={40}
+          borderRadius={16}
+        />
       </View>
       <View style={styles.messageReceived}>
         <SkeletonBase width={24} height={24} borderRadius={12} />
-        <SkeletonBase width={SCREEN_WIDTH * 0.4} height={40} borderRadius={16} style={styles.ml8} />
+        <SkeletonBase
+          width={SCREEN_WIDTH * 0.4}
+          height={40}
+          borderRadius={16}
+          style={styles.ml8}
+        />
       </View>
     </View>
     <View style={styles.chatInput}>
       <SkeletonBase width={SCREEN_WIDTH - 80} height={44} borderRadius={22} />
-      <SkeletonBase width={44} height={44} borderRadius={22} style={styles.ml8} />
+      <SkeletonBase
+        width={44}
+        height={44}
+        borderRadius={22}
+        style={styles.ml8}
+      />
     </View>
   </View>
 );
@@ -733,7 +966,11 @@ const styles = StyleSheet.create({
 
   // List container
   listContainer: { flex: 1 },
-  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
 
   // List items
   chatItem: {
@@ -754,7 +991,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   momentInfo: { padding: 12 },
-  momentFooter: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 },
+  momentFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 12,
+  },
   giftItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -801,7 +1042,11 @@ const styles = StyleSheet.create({
   },
   requestHeader: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   requestInfo: { flex: 1 },
-  requestActions: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 16 },
+  requestActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 16,
+  },
   tripCard: {
     backgroundColor: COLORS.utility.white,
     borderRadius: 12,
@@ -810,7 +1055,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   tripInfo: { padding: 12 },
-  tripFooter: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 },
+  tripFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 12,
+  },
 
   // Screen skeleton
   screenContainer: { flex: 1, backgroundColor: COLORS.bg.primary },
@@ -845,14 +1094,22 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.gray[100],
   },
   listSkeletonItemContent: { flex: 1, marginLeft: 12 },
-  gridContainer: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 16 },
+  gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 16,
+  },
   gridItem: { padding: 4, marginBottom: 16 },
   detailContainer: { flex: 1 },
   detailUserRow: { flexDirection: 'row', alignItems: 'center', padding: 16 },
   detailContent: { paddingHorizontal: 16 },
   formContainer: { padding: 16 },
   formField: { marginBottom: 16 },
-  profileHeader: { alignItems: 'center', paddingVertical: 24, backgroundColor: COLORS.utility.white },
+  profileHeader: {
+    alignItems: 'center',
+    paddingVertical: 24,
+    backgroundColor: COLORS.utility.white,
+  },
   statsRow: { flexDirection: 'row', marginTop: 24 },
   statItem: { alignItems: 'center', marginHorizontal: 24 },
   profileTabs: {
@@ -874,7 +1131,11 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.border.default,
   },
   chatMessages: { flex: 1, padding: 16 },
-  messageReceived: { flexDirection: 'row', alignItems: 'flex-end', marginBottom: 16 },
+  messageReceived: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    marginBottom: 16,
+  },
   messageSent: { alignItems: 'flex-end', marginBottom: 16 },
   chatInput: {
     flexDirection: 'row',
@@ -906,14 +1167,18 @@ const styles = StyleSheet.create({
 export const Skeleton = SkeletonBase;
 
 /** @deprecated Use TMSkeleton with type="avatar" */
-export const SkeletonAvatar: React.FC<{ size?: number; style?: ViewStyle }> = ({ size = 48, style }) => (
-  <TMSkeleton type="avatar" size={size} style={style} />
-);
+export const SkeletonAvatar: React.FC<{ size?: number; style?: ViewStyle }> = ({
+  size = 48,
+  style,
+}) => <TMSkeleton type="avatar" size={size} style={style} />;
 
 /** @deprecated Use TMSkeleton with type="text" */
-export const SkeletonText: React.FC<{ lines?: number; lineHeight?: number; lastLineWidth?: string; style?: ViewStyle }> = (props) => (
-  <TMSkeleton type="text" {...props} />
-);
+export const SkeletonText: React.FC<{
+  lines?: number;
+  lineHeight?: number;
+  lastLineWidth?: string;
+  style?: ViewStyle;
+}> = (props) => <TMSkeleton type="text" {...props} />;
 
 /** @deprecated Use TMSkeleton with type="card" */
 export const SkeletonCard: React.FC<{ style?: ViewStyle }> = ({ style }) => (
@@ -921,21 +1186,35 @@ export const SkeletonCard: React.FC<{ style?: ViewStyle }> = ({ style }) => (
 );
 
 /** @deprecated Use TMSkeleton with type="message" */
-export const SkeletonMessage: React.FC<{ isOwn?: boolean; style?: ViewStyle }> = ({ isOwn, style }) => (
+export const SkeletonMessage: React.FC<{
+  isOwn?: boolean;
+  style?: ViewStyle;
+}> = ({ isOwn, style }) => (
   <TMSkeleton type="message" isOwn={isOwn} style={style} />
 );
 
 /** @deprecated Use TMSkeleton with type="list" */
-export const SkeletonList: React.FC<{ type: SkeletonListType; count?: number; minDisplayTime?: number; show?: boolean }> = (props) => (
-  <TMSkeleton type="list" listType={props.type} count={props.count} minDisplayTime={props.minDisplayTime} show={props.show} />
+export const SkeletonList: React.FC<{
+  type: SkeletonListType;
+  count?: number;
+  minDisplayTime?: number;
+  show?: boolean;
+}> = (props) => (
+  <TMSkeleton
+    type="list"
+    listType={props.type}
+    count={props.count}
+    minDisplayTime={props.minDisplayTime}
+    show={props.show}
+  />
 );
 
 /** @deprecated Use TMSkeleton with type="screen" */
-export const ScreenSkeleton: React.FC<{ showHeader?: boolean; showTabBar?: boolean; contentType?: string }> = ({
-  showHeader,
-  showTabBar,
-  contentType = 'list',
-}) => (
+export const ScreenSkeleton: React.FC<{
+  showHeader?: boolean;
+  showTabBar?: boolean;
+  contentType?: string;
+}> = ({ showHeader, showTabBar, contentType = 'list' }) => (
   <TMSkeleton
     type="screen"
     screenType={contentType as SkeletonScreenType}

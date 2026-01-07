@@ -1,7 +1,7 @@
 /**
  * SOC 2 Type II Compliance Configuration
  * Security, availability, processing integrity, confidentiality, and privacy
- * 
+ *
  * Compliance Requirements:
  * - Access controls and authentication
  * - Data encryption (at rest and in transit)
@@ -139,11 +139,26 @@ export const ENCRYPTION_CONFIG = {
 export const AUDIT_CONFIG = {
   // Events to log
   events: {
-    authentication: ['login', 'logout', 'login_failed', 'password_reset', 'mfa_enabled'],
+    authentication: [
+      'login',
+      'logout',
+      'login_failed',
+      'password_reset',
+      'mfa_enabled',
+    ],
     authorization: ['access_granted', 'access_denied', 'permission_changed'],
     dataAccess: ['read', 'create', 'update', 'delete'],
-    configuration: ['setting_changed', 'user_created', 'user_deleted', 'role_changed'],
-    security: ['encryption_key_rotated', 'security_alert', 'vulnerability_detected'],
+    configuration: [
+      'setting_changed',
+      'user_created',
+      'user_deleted',
+      'role_changed',
+    ],
+    security: [
+      'encryption_key_rotated',
+      'security_alert',
+      'vulnerability_detected',
+    ],
   },
 
   // Log retention
@@ -181,12 +196,16 @@ interface AuditLogEntry {
  * SECURITY: Audit logging is handled via Edge Function with service_role access
  * Client code never has access to service_role key
  */
-export async function logAuditEvent(entry: Omit<AuditLogEntry, 'id' | 'timestamp'>): Promise<void> {
+export async function logAuditEvent(
+  entry: Omit<AuditLogEntry, 'id' | 'timestamp'>,
+): Promise<void> {
   try {
     // Import supabase client dynamically to avoid circular dependencies
     const { supabase } = await import('./supabase');
-    const { data: { session } } = await supabase.auth.getSession();
-    
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
     if (!session) {
       logger.warn('Cannot log audit event: No active session');
       return;
@@ -205,12 +224,12 @@ export async function logAuditEvent(entry: Omit<AuditLogEntry, 'id' | 'timestamp
       {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'apikey': anonKey,
+          Authorization: `Bearer ${session.access_token}`,
+          apikey: anonKey,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(entry),
-      }
+      },
     );
 
     if (!response.ok) {
@@ -236,8 +255,10 @@ export async function queryAuditLogs(filters: {
 }): Promise<AuditLogEntry[]> {
   try {
     const { supabase } = await import('./supabase');
-    const { data: { session } } = await supabase.auth.getSession();
-    
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
     if (!session) {
       throw new Error('Authentication required');
     }
@@ -261,10 +282,10 @@ export async function queryAuditLogs(filters: {
       `${supabaseUrl}/functions/v1/audit-logging/query?${queryParams.toString()}`,
       {
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'apikey': anonKey,
+          Authorization: `Bearer ${session.access_token}`,
+          apikey: anonKey,
         },
-      }
+      },
     );
 
     if (!response.ok) {
@@ -285,13 +306,17 @@ export async function queryAuditLogs(filters: {
 export async function encryptData(data: string, key: string): Promise<string> {
   const crypto = require('crypto');
   const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv('aes-256-gcm', Buffer.from(key, 'hex'), iv);
-  
+  const cipher = crypto.createCipheriv(
+    'aes-256-gcm',
+    Buffer.from(key, 'hex'),
+    iv,
+  );
+
   let encrypted = cipher.update(data, 'utf8', 'hex');
   encrypted += cipher.final('hex');
-  
+
   const authTag = cipher.getAuthTag();
-  
+
   return JSON.stringify({
     encrypted,
     iv: iv.toString('hex'),
@@ -302,28 +327,34 @@ export async function encryptData(data: string, key: string): Promise<string> {
 /**
  * Decrypt sensitive data
  */
-export async function decryptData(encryptedData: string, key: string): Promise<string> {
+export async function decryptData(
+  encryptedData: string,
+  key: string,
+): Promise<string> {
   const crypto = require('crypto');
   const { encrypted, iv, authTag } = JSON.parse(encryptedData);
-  
+
   const decipher = crypto.createDecipheriv(
     'aes-256-gcm',
     Buffer.from(key, 'hex'),
-    Buffer.from(iv, 'hex')
+    Buffer.from(iv, 'hex'),
   );
-  
+
   decipher.setAuthTag(Buffer.from(authTag, 'hex'));
-  
+
   let decrypted = decipher.update(encrypted, 'hex', 'utf8');
   decrypted += decipher.final('utf8');
-  
+
   return decrypted;
 }
 
 /**
  * Check password against policy
  */
-export function validatePassword(password: string): { valid: boolean; errors: string[] } {
+export function validatePassword(password: string): {
+  valid: boolean;
+  errors: string[];
+} {
   const errors: string[] = [];
   const policy = SECURITY_CONFIG.password;
 

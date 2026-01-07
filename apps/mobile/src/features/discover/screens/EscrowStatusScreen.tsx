@@ -69,14 +69,14 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
           status === 'pending_proof'
             ? 'pending'
             : status === 'in_escrow'
-            ? 'current'
-            : 'completed',
+              ? 'current'
+              : 'completed',
         time:
           status === 'pending_proof'
             ? undefined
             : status === 'in_escrow'
-            ? undefined
-            : '1 day ago',
+              ? undefined
+              : '1 day ago',
       },
       {
         id: '4',
@@ -87,8 +87,8 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
           status === 'pending_verification'
             ? 'current'
             : status === 'pending_proof' || status === 'in_escrow'
-            ? 'pending'
-            : 'completed',
+              ? 'pending'
+              : 'completed',
         time: status === 'verified' ? '3 hours ago' : undefined,
       },
       {
@@ -241,8 +241,8 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
                 status === 'verified'
                   ? 'check-circle'
                   : status === 'refunded'
-                  ? 'undo-variant'
-                  : 'timer-sand'
+                    ? 'undo-variant'
+                    : 'timer-sand'
               }
               size={16}
               color={getStatusColor()}
@@ -629,7 +629,9 @@ const styles = StyleSheet.create({
 });
 
 // Wrap with ScreenErrorBoundary for critical escrow functionality
-const EscrowStatusScreenWithErrorBoundary = (props: EscrowStatusScreenProps) => (
+const EscrowStatusScreenWithErrorBoundary = (
+  props: EscrowStatusScreenProps,
+) => (
   <ScreenErrorBoundary>
     <EscrowStatusScreen {...props} />
   </ScreenErrorBoundary>

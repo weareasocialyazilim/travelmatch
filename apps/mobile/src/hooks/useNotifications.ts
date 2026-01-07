@@ -236,13 +236,13 @@ export const useNotifications = (): UseNotificationsReturn => {
     // The notificationService doesn't expose subscribeToNotifications
     // For now, we rely on polling via refresh() or push notifications
     // If real-time is needed, it should be added to notificationService
-    
+
     // Placeholder for future real-time implementation:
     // const channel = supabase
     //   .channel('notifications')
     //   .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, callback)
     //   .subscribe();
-    
+
     return () => {
       // Cleanup would go here
     };

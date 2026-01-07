@@ -39,7 +39,7 @@ interface AuditLogFilters {
 }
 
 async function fetchAuditLogs(
-  filters: AuditLogFilters = {}
+  filters: AuditLogFilters = {},
 ): Promise<AuditLogsResponse> {
   const params = new URLSearchParams();
   if (filters.admin_id) params.set('admin_id', filters.admin_id);

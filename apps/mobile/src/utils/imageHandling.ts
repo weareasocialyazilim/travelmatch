@@ -178,10 +178,14 @@ export async function compressImage(
 
     // Log compression result
     const originalSize =
-      'size' in imageInfo ? (imageInfo as FileSystem.FileInfo & { size: number }).size : 0;
+      'size' in imageInfo
+        ? (imageInfo as FileSystem.FileInfo & { size: number }).size
+        : 0;
     const newInfo = await FileSystem.getInfoAsync(result.uri);
     const newSize =
-      'size' in newInfo ? (newInfo as FileSystem.FileInfo & { size: number }).size : 0;
+      'size' in newInfo
+        ? (newInfo as FileSystem.FileInfo & { size: number }).size
+        : 0;
 
     if (originalSize > 0 && newSize > 0) {
       const savings = ((originalSize - newSize) / originalSize) * 100;

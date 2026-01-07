@@ -17,8 +17,14 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-const ROUTE_PARAMS_PATH = path.join(__dirname, '../src/navigation/routeParams.ts');
-const APP_NAVIGATOR_PATH = path.join(__dirname, '../src/navigation/AppNavigator.tsx');
+const ROUTE_PARAMS_PATH = path.join(
+  __dirname,
+  '../src/navigation/routeParams.ts',
+);
+const APP_NAVIGATOR_PATH = path.join(
+  __dirname,
+  '../src/navigation/AppNavigator.tsx',
+);
 
 interface SyncResult {
   declared: string[];
@@ -32,7 +38,9 @@ function extractDeclaredRoutes(content: string): string[] {
 
   // Match route names in RootStackParamList type definition
   // Pattern: RouteName: { ... } | undefined;
-  const typeMatch = content.match(/export type RootStackParamList = \{([^}]+(?:\{[^}]*\}[^}]*)*)\}/s);
+  const typeMatch = content.match(
+    /export type RootStackParamList = \{([^}]+(?:\{[^}]*\}[^}]*)*)\}/s,
+  );
 
   if (typeMatch) {
     const typeBody = typeMatch[1];
@@ -58,7 +66,8 @@ function extractRegisteredScreens(content: string): string[] {
   }
 
   // Also match conditional screens: {__DEV__ && <Stack.Screen name="..."
-  const conditionalPattern = /\{__DEV__\s*&&\s*\(\s*<Stack\.Screen\s+name="(\w+)"/g;
+  const conditionalPattern =
+    /\{__DEV__\s*&&\s*\(\s*<Stack\.Screen\s+name="(\w+)"/g;
   while ((match = conditionalPattern.exec(content)) !== null) {
     screens.push(match[1]);
   }
@@ -77,10 +86,10 @@ function checkSync(): SyncResult {
   const registeredSet = new Set(registered);
 
   // Routes declared in routeParams but not registered in AppNavigator
-  const missing = declared.filter(route => !registeredSet.has(route));
+  const missing = declared.filter((route) => !registeredSet.has(route));
 
   // Screens registered in AppNavigator but not declared in routeParams
-  const extra = registered.filter(screen => !declaredSet.has(screen));
+  const extra = registered.filter((screen) => !declaredSet.has(screen));
 
   return { declared, registered, missing, extra };
 }
@@ -91,16 +100,22 @@ function main() {
   try {
     const result = checkSync();
 
-    console.log(`📋 Declared routes in routeParams.ts: ${result.declared.length}`);
-    console.log(`📋 Registered screens in AppNavigator.tsx: ${result.registered.length}\n`);
+    console.log(
+      `📋 Declared routes in routeParams.ts: ${result.declared.length}`,
+    );
+    console.log(
+      `📋 Registered screens in AppNavigator.tsx: ${result.registered.length}\n`,
+    );
 
     let hasErrors = false;
 
     if (result.missing.length > 0) {
       hasErrors = true;
       console.log('❌ MISSING SCREENS (declared but not registered):');
-      console.log('   These routes will cause runtime crashes if navigated to!\n');
-      result.missing.forEach(route => {
+      console.log(
+        '   These routes will cause runtime crashes if navigated to!\n',
+      );
+      result.missing.forEach((route) => {
         console.log(`   - ${route}`);
       });
       console.log('');
@@ -109,7 +124,7 @@ function main() {
     if (result.extra.length > 0) {
       console.log('⚠️  EXTRA SCREENS (registered but not declared):');
       console.log('   These screens lack TypeScript type safety.\n');
-      result.extra.forEach(screen => {
+      result.extra.forEach((screen) => {
         console.log(`   - ${screen}`);
       });
       console.log('');

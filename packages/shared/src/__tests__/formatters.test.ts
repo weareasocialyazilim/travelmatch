@@ -278,7 +278,9 @@ describe('Formatter Utilities', () => {
     });
 
     it('should handle complex strings', () => {
-      expect(slugify('  Hello, World! This is a TEST  ')).toBe('hello-world-this-is-a-test');
+      expect(slugify('  Hello, World! This is a TEST  ')).toBe(
+        'hello-world-this-is-a-test',
+      );
     });
 
     it('should collapse multiple hyphens', () => {

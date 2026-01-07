@@ -24,13 +24,7 @@ export const REPORT_CATEGORIES = {
     'inappropriate_content',
     'other',
   ],
-  message: [
-    'harassment',
-    'spam',
-    'inappropriate_content',
-    'scam',
-    'other',
-  ],
+  message: ['harassment', 'spam', 'inappropriate_content', 'scam', 'other'],
   comment: [
     'harassment',
     'hate_speech',

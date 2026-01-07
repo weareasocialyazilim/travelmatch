@@ -18,7 +18,13 @@ import {
   Settings,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
@@ -171,22 +177,37 @@ export default function AICenterPage() {
   const [_selectedModel, _setSelectedModel] = useState<string | null>(null);
 
   const getSeverityBadge = (severity: string) => {
-    const variants: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string }> = {
+    const variants: Record<
+      string,
+      {
+        variant: 'default' | 'secondary' | 'destructive' | 'outline';
+        label: string;
+      }
+    > = {
       critical: { variant: 'destructive', label: 'Kritik' },
       warning: { variant: 'secondary', label: 'Uyarı' },
       info: { variant: 'outline', label: 'Bilgi' },
     };
-    const { variant, label } = variants[severity] || { variant: 'outline', label: severity };
+    const { variant, label } = variants[severity] || {
+      variant: 'outline',
+      label: severity,
+    };
     return <Badge variant={variant}>{label}</Badge>;
   };
 
   const getRiskBadge = (risk: string) => {
-    const variants: Record<string, { variant: 'default' | 'secondary' | 'destructive'; color: string }> = {
+    const variants: Record<
+      string,
+      { variant: 'default' | 'secondary' | 'destructive'; color: string }
+    > = {
       high: { variant: 'destructive', color: 'bg-red-500' },
       medium: { variant: 'secondary', color: 'bg-yellow-500' },
       low: { variant: 'default', color: 'bg-green-500' },
     };
-    const { variant } = variants[risk] || { variant: 'default', color: 'bg-gray-500' };
+    const { variant } = variants[risk] || {
+      variant: 'default',
+      color: 'bg-gray-500',
+    };
     return (
       <Badge variant={variant}>
         {risk === 'high' ? 'Yüksek' : risk === 'medium' ? 'Orta' : 'Düşük'}
@@ -199,7 +220,9 @@ export default function AICenterPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">AI Command Center</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            AI Command Center
+          </h1>
           <p className="text-muted-foreground">
             Makine öğrenmesi modelleri ve otomatik moderasyon
           </p>
@@ -279,7 +302,9 @@ export default function AICenterPage() {
                 <Target className="h-6 w-6 text-purple-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">%{moderationStats.accuracy}</p>
+                <p className="text-2xl font-bold">
+                  %{moderationStats.accuracy}
+                </p>
                 <p className="text-sm text-muted-foreground">Doğruluk</p>
               </div>
             </div>
@@ -315,7 +340,11 @@ export default function AICenterPage() {
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base">{model.name}</CardTitle>
-                    <Badge variant={model.status === 'active' ? 'default' : 'secondary'}>
+                    <Badge
+                      variant={
+                        model.status === 'active' ? 'default' : 'secondary'
+                      }
+                    >
                       {model.status === 'active' ? 'Aktif' : 'Pasif'}
                     </Badge>
                   </div>
@@ -337,7 +366,9 @@ export default function AICenterPage() {
                   </div>
 
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Son Güncelleme</span>
+                    <span className="text-muted-foreground">
+                      Son Güncelleme
+                    </span>
                     <span className="text-muted-foreground">
                       {formatDate(model.lastUpdated)}
                     </span>
@@ -382,11 +413,17 @@ export default function AICenterPage() {
                           {getRiskBadge(prediction.risk)}
                         </div>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <span>Churn olasılığı: %{prediction.probability}</span>
+                          <span>
+                            Churn olasılığı: %{prediction.probability}
+                          </span>
                         </div>
                         <div className="flex flex-wrap gap-2 mt-2">
                           {prediction.factors.map((factor, i) => (
-                            <Badge key={i} variant="outline" className="text-xs">
+                            <Badge
+                              key={i}
+                              variant="outline"
+                              className="text-xs"
+                            >
                               {factor}
                             </Badge>
                           ))}
@@ -394,7 +431,9 @@ export default function AICenterPage() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm text-muted-foreground mb-2">Önerilen Aksiyon</p>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Önerilen Aksiyon
+                      </p>
                       <Button size="sm" variant="outline">
                         <Zap className="mr-2 h-4 w-4" />
                         {prediction.suggested_action}
@@ -410,12 +449,17 @@ export default function AICenterPage() {
           <Card>
             <CardHeader>
               <CardTitle>LTV Tahminleri</CardTitle>
-              <CardDescription>Segment bazlı yaşam boyu değer tahminleri</CardDescription>
+              <CardDescription>
+                Segment bazlı yaşam boyu değer tahminleri
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {ltvPredictions.map((segment, index) => (
-                  <div key={index} className="flex items-center justify-between">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between"
+                  >
                     <div className="flex items-center gap-4">
                       <div className="w-40">
                         <p className="font-medium">{segment.segment}</p>
@@ -427,7 +471,9 @@ export default function AICenterPage() {
                     <div className="flex items-center gap-4">
                       <div className="text-right">
                         <p className="font-semibold">₺{segment.avgLTV}</p>
-                        <p className="text-xs text-muted-foreground">Ort. LTV</p>
+                        <p className="text-xs text-muted-foreground">
+                          Ort. LTV
+                        </p>
                       </div>
                       <div className="flex h-8 w-8 items-center justify-center rounded-full">
                         {segment.trend === 'up' && (
@@ -504,7 +550,9 @@ export default function AICenterPage() {
                             <p className="font-medium">{anomaly.message}</p>
                             {getSeverityBadge(anomaly.severity)}
                           </div>
-                          <p className="mt-1 text-sm text-muted-foreground">{anomaly.details}</p>
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            {anomaly.details}
+                          </p>
                           <p className="mt-2 text-xs text-muted-foreground">
                             Tespit: {formatDate(anomaly.detected_at)}
                           </p>
@@ -528,7 +576,9 @@ export default function AICenterPage() {
             <Card>
               <CardHeader>
                 <CardTitle>İçerik Kalite Trendi</CardTitle>
-                <CardDescription>Son 7 günlük ortalama kalite skoru</CardDescription>
+                <CardDescription>
+                  Son 7 günlük ortalama kalite skoru
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">

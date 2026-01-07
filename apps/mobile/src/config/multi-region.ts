@@ -25,7 +25,7 @@ export const EDGE_REGIONS = {
 // CDN configuration for static assets
 export const CDN_CONFIG = {
   provider: 'cloudflare', // or 'cloudfront', 'fastly'
-  
+
   // Cache headers
   cacheControl: {
     images: 'public, max-age=31536000, immutable', // 1 year
@@ -108,11 +108,19 @@ export const CACHE_STRATEGIES = {
 };
 
 // Geographic routing
-export function getClosestRegion(userLat: number, userLon: number): keyof typeof EDGE_REGIONS {
+export function getClosestRegion(
+  userLat: number,
+  userLon: number,
+): keyof typeof EDGE_REGIONS {
   // Simple distance calculation (could use more sophisticated routing)
   const distances = Object.entries(EDGE_REGIONS).map(([key, region]) => {
     const regionCoords = getRegionCoordinates(region.region);
-    const distance = calculateDistance(userLat, userLon, regionCoords.lat, regionCoords.lon);
+    const distance = calculateDistance(
+      userLat,
+      userLon,
+      regionCoords.lat,
+      regionCoords.lon,
+    );
     return { key: key as keyof typeof EDGE_REGIONS, distance };
   });
 
@@ -129,23 +137,33 @@ function getRegionCoordinates(region: string): { lat: number; lon: number } {
   return coords[region] || coords['eu-west-1'];
 }
 
-function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+function calculateDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+): number {
   const R = 6371; // Earth's radius in km
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
 
 // Cloudflare Workers edge function
 // Note: This code is designed to run in Cloudflare Workers environment
- 
+
 export const edgeHandler = {
-  async fetch(request: Request, _env: Record<string, unknown>): Promise<Response> {
+  async fetch(
+    request: Request,
+    _env: Record<string, unknown>,
+  ): Promise<Response> {
     const url = new URL(request.url);
 
     // Determine cache strategy based on path
@@ -162,7 +180,7 @@ export const edgeHandler = {
     const rawCacheKey = strategy.cacheKey(request);
     // Sanitize: only allow alphanumeric, dash, underscore, colon, slash
     const cacheKey = rawCacheKey.replace(/[^a-zA-Z0-9\-_:/]/g, '');
-    
+
     // caches.default is Cloudflare Workers API
     const cache = (caches as unknown as { default: Cache }).default;
     let response = await cache.match(cacheKey);
@@ -175,9 +193,12 @@ export const edgeHandler = {
       if (response.ok) {
         const clonedResponse = response.clone();
         const headers = new Headers(clonedResponse.headers);
-        
+
         // Add cache headers
-        headers.set('Cache-Control', `max-age=${strategy.ttl}, stale-while-revalidate=${strategy.staleWhileRevalidate}`);
+        headers.set(
+          'Cache-Control',
+          `max-age=${strategy.ttl}, stale-while-revalidate=${strategy.staleWhileRevalidate}`,
+        );
         headers.set('CDN-Cache-Control', `max-age=${strategy.ttl}`);
         headers.set('Cloudflare-CDN-Cache-Control', `max-age=${strategy.ttl}`);
 

@@ -91,16 +91,22 @@ class OfflineSyncQueue {
    */
   private setupNetworkListener(): void {
     // Support both default and named import shapes from the NetInfo mock/runtime
-    const addListener: any = (NetInfo as any).addEventListener ||
+    const addListener: any =
+      (NetInfo as any).addEventListener ||
       (NetInfo as any).default?.addEventListener;
 
     if (addListener) {
-      logger.info('OfflineSyncQueue.setupNetworkListener hasAddListener', !!addListener);
-      addListener((state: { isConnected?: boolean; isInternetReachable?: boolean }) => {
-        if (state.isConnected && state.isInternetReachable) {
-          void this.processQueue();
-        }
-      });
+      logger.info(
+        'OfflineSyncQueue.setupNetworkListener hasAddListener',
+        !!addListener,
+      );
+      addListener(
+        (state: { isConnected?: boolean; isInternetReachable?: boolean }) => {
+          if (state.isConnected && state.isInternetReachable) {
+            void this.processQueue();
+          }
+        },
+      );
     }
   }
 
@@ -239,47 +245,46 @@ class OfflineSyncQueue {
 
       for (const action of pendingActions) {
         // processing action
-      try {
-        action.status = 'processing';
+        try {
+          action.status = 'processing';
+          await this.saveQueue();
+
+          const handler = this.handlers.get(action.type);
+          if (!handler) {
+            throw new Error(
+              `No handler registered for action type: ${action.type}`,
+            );
+          }
+
+          const success = await handler(action.payload);
+
+          if (success) {
+            action.status = 'completed';
+            result.processedCount++;
+            // Remove completed action
+            this.queue = this.queue.filter((a) => a.id !== action.id);
+            // action removed from queue
+          } else {
+            throw new Error('Handler returned false');
+          }
+        } catch (error) {
+          action.retryCount++;
+
+          // Only mark as failed when retryCount exceeds allowed maxRetries.
+          // This preserves actions for the intended number of retries.
+          if (action.retryCount > action.maxRetries) {
+            action.status = 'failed';
+            action.error =
+              error instanceof Error ? error.message : 'Unknown error';
+            result.failedCount++;
+            result.errors.push(`${action.type}: ${action.error}`);
+          } else {
+            action.status = 'pending';
+          }
+        }
+
         await this.saveQueue();
-
-        const handler = this.handlers.get(action.type);
-        if (!handler) {
-          throw new Error(
-            `No handler registered for action type: ${action.type}`,
-          );
-        }
-
-        const success = await handler(action.payload);
-
-        if (success) {
-          action.status = 'completed';
-          result.processedCount++;
-          // Remove completed action
-          this.queue = this.queue.filter((a) => a.id !== action.id);
-          // action removed from queue
-        } else {
-          throw new Error('Handler returned false');
-        }
-      } catch (error) {
-        action.retryCount++;
-
-        // Only mark as failed when retryCount exceeds allowed maxRetries.
-        // This preserves actions for the intended number of retries.
-        if (action.retryCount > action.maxRetries) {
-          action.status = 'failed';
-          action.error =
-            error instanceof Error ? error.message : 'Unknown error';
-          result.failedCount++;
-          result.errors.push(`${action.type}: ${action.error}`);
-        } else {
-          action.status = 'pending';
-        }
       }
-
-      await this.saveQueue();
-    }
-
     } finally {
       this.isProcessing = false;
       result.success = result.failedCount === 0;

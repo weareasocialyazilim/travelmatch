@@ -5,7 +5,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   withTiming,
-  runOnJS
+  runOnJS,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
@@ -19,7 +19,11 @@ interface FlashMessageProps {
   onHide: () => void;
 }
 
-export const FlashMessage = ({ message, type = 'success', onHide }: FlashMessageProps) => {
+export const FlashMessage = ({
+  message,
+  type = 'success',
+  onHide,
+}: FlashMessageProps) => {
   const insets = useSafeAreaInsets();
   const translateY = useSharedValue(-100);
 
@@ -38,22 +42,28 @@ export const FlashMessage = ({ message, type = 'success', onHide }: FlashMessage
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }]
+    transform: [{ translateY: translateY.value }],
   }));
 
   const getColor = () => {
-    switch(type) {
-      case 'error': return COLORS.feedback.error;
-      case 'info': return COLORS.feedback.info;
-      default: return COLORS.feedback.success;
+    switch (type) {
+      case 'error':
+        return COLORS.feedback.error;
+      case 'info':
+        return COLORS.feedback.info;
+      default:
+        return COLORS.feedback.success;
     }
   };
 
   const getIcon = (): keyof typeof Ionicons.glyphMap => {
-    switch(type) {
-      case 'error': return 'alert-circle';
-      case 'info': return 'information-circle';
-      default: return 'checkmark-circle';
+    switch (type) {
+      case 'error':
+        return 'alert-circle';
+      case 'info':
+        return 'information-circle';
+      default:
+        return 'checkmark-circle';
     }
   };
 

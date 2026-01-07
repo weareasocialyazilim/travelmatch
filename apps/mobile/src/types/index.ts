@@ -1,12 +1,12 @@
 /**
  * TravelMatch Types - Central Export Hub
- * 
+ *
  * TYPE HIERARCHY:
  * 1. db.ts - Database types (SINGLE SOURCE OF TRUTH)
  * 2. domain.ts - Business domain types
  * 3. core.ts - Core application types
  * 4. api.ts - API response wrappers
- * 
+ *
  * PREFER using types from db.ts for any database-related work.
  * The types in domain.ts and core.ts are maintained for backward
  * compatibility but should eventually be consolidated.
@@ -32,7 +32,7 @@ export {
   DbKycVerification,
   DbSubscriptionPlan,
   DbUserSubscription,
-  
+
   // Insert types
   DbUserInsert,
   DbMomentInsert,
@@ -43,7 +43,7 @@ export {
   DbReviewInsert,
   DbNotificationInsert,
   DbFavoriteInsert,
-  
+
   // Update types
   DbUserUpdate,
   DbMomentUpdate,
@@ -51,7 +51,7 @@ export {
   DbConversationUpdate,
   DbTransactionUpdate,
   DbRequestUpdate,
-  
+
   // Extended types (with frontend fields)
   type User as ExtendedUser,
   type Moment as ExtendedMoment,
@@ -60,14 +60,14 @@ export {
   type Transaction as ExtendedTransaction,
   type Request as ExtendedRequest,
   type Notification as ExtendedNotification,
-  
+
   // Utility types
   type TableName,
   type TableRow,
   type TableInsert,
   type TableUpdate,
   type Json,
-  
+
   // Type guards
   isDbUser,
   isDbMoment,

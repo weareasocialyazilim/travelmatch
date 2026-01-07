@@ -21,12 +21,12 @@ describe('StatsRow Component', () => {
   describe('Rendering', () => {
     it('renders moments count', () => {
       const { getByText } = render(
-        <StatsRow 
+        <StatsRow
           momentsCount={15}
           exchangesCount={0}
           responseRate={0}
           {...mockHandlers}
-        />
+        />,
       );
       expect(getByText('15')).toBeTruthy();
       expect(getByText(/Moments/i)).toBeTruthy();
@@ -34,12 +34,12 @@ describe('StatsRow Component', () => {
 
     it('renders exchanges count', () => {
       const { getByText } = render(
-        <StatsRow 
+        <StatsRow
           momentsCount={0}
           exchangesCount={42}
           responseRate={0}
           {...mockHandlers}
-        />
+        />,
       );
       expect(getByText('42')).toBeTruthy();
       expect(getByText(/Exchanges/i)).toBeTruthy();
@@ -47,12 +47,12 @@ describe('StatsRow Component', () => {
 
     it('renders response rate as percentage', () => {
       const { getByText } = render(
-        <StatsRow 
+        <StatsRow
           momentsCount={0}
           exchangesCount={0}
           responseRate={95}
           {...mockHandlers}
-        />
+        />,
       );
       expect(getByText('95%')).toBeTruthy();
       expect(getByText(/Response/i)).toBeTruthy();
@@ -60,12 +60,12 @@ describe('StatsRow Component', () => {
 
     it('renders all three stats', () => {
       const { getByText } = render(
-        <StatsRow 
+        <StatsRow
           momentsCount={15}
           exchangesCount={42}
           responseRate={88}
           {...mockHandlers}
-        />
+        />,
       );
       expect(getByText('15')).toBeTruthy();
       expect(getByText('42')).toBeTruthy();
@@ -76,43 +76,42 @@ describe('StatsRow Component', () => {
   describe('Interactions', () => {
     it('calls onMomentsPress when moments stat is clicked', () => {
       const { getByText } = render(
-        <StatsRow 
+        <StatsRow
           momentsCount={15}
           exchangesCount={0}
           responseRate={0}
           {...mockHandlers}
-        />
+        />,
       );
-      
+
       fireEvent.press(getByText('15'));
       expect(mockHandlers.onMomentsPress).toHaveBeenCalledTimes(1);
     });
 
     it('calls onExchangesPress when exchanges stat is clicked', () => {
       const { getByText } = render(
-        <StatsRow 
+        <StatsRow
           momentsCount={0}
           exchangesCount={42}
           responseRate={0}
           {...mockHandlers}
-        />
+        />,
       );
-      
+
       fireEvent.press(getByText('42'));
       expect(mockHandlers.onExchangesPress).toHaveBeenCalledTimes(1);
     });
-
   });
 
   describe('Formatting', () => {
     it('formats large numbers correctly', () => {
       const { getByText } = render(
-        <StatsRow 
+        <StatsRow
           momentsCount={1234}
           exchangesCount={9999}
           responseRate={100}
           {...mockHandlers}
-        />
+        />,
       );
       // Component displays numbers as-is (no formatting)
       expect(getByText('1234')).toBeTruthy();
@@ -121,12 +120,12 @@ describe('StatsRow Component', () => {
 
     it('handles zero values', () => {
       const { getAllByText, getByText } = render(
-        <StatsRow 
+        <StatsRow
           momentsCount={0}
           exchangesCount={0}
           responseRate={0}
           {...mockHandlers}
-        />
+        />,
       );
       // Two zeros for moments and exchanges
       expect(getAllByText('0').length).toBe(2);
@@ -140,22 +139,21 @@ describe('StatsRow Component', () => {
           exchangesCount={0}
           responseRate={88}
           {...mockHandlers}
-        />
+        />,
       );
       expect(getByText('88%')).toBeTruthy();
     });
   });
 
-
   describe('Accessibility', () => {
     it('has accessible labels for each stat', () => {
       const { getByLabelText } = render(
-        <StatsRow 
+        <StatsRow
           momentsCount={15}
           exchangesCount={42}
           responseRate={0.88}
           {...mockHandlers}
-        />
+        />,
       );
       // Check for accessibility labels
     });
@@ -164,24 +162,24 @@ describe('StatsRow Component', () => {
   describe('Snapshots', () => {
     it('matches snapshot with various counts', () => {
       const { toJSON } = render(
-        <StatsRow 
+        <StatsRow
           momentsCount={15}
           exchangesCount={42}
           responseRate={0.88}
           {...mockHandlers}
-        />
+        />,
       );
       expect(toJSON()).toMatchSnapshot();
     });
 
     it('matches snapshot with zero values', () => {
       const { toJSON } = render(
-        <StatsRow 
+        <StatsRow
           momentsCount={0}
           exchangesCount={0}
           responseRate={0}
           {...mockHandlers}
-        />
+        />,
       );
       expect(toJSON()).toMatchSnapshot();
     });

@@ -9,7 +9,7 @@
 export const formatName = (name: string): string => {
   return name
     .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
 };
 
@@ -17,14 +17,19 @@ export const formatName = (name: string): string => {
  * Get initials from name
  */
 export const getInitials = (name: string): string => {
-  const words = name.trim().split(' ').filter(w => w.length > 0);
+  const words = name
+    .trim()
+    .split(' ')
+    .filter((w) => w.length > 0);
   if (words.length === 0) {
     return '';
   }
   if (words.length === 1) {
     return words[0]!.charAt(0).toUpperCase();
   }
-  return (words[0]!.charAt(0) + words[words.length - 1]!.charAt(0)).toUpperCase();
+  return (
+    words[0]!.charAt(0) + words[words.length - 1]!.charAt(0)
+  ).toUpperCase();
 };
 
 /**
@@ -41,12 +46,12 @@ export const truncate = (text: string, maxLength: number): string => {
 export const formatPhoneNumber = (phone: string): string => {
   // Remove all non-digits
   const digits = phone.replace(/\D/g, '');
-  
+
   // Format based on length
   if (digits.length === 10) {
     return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
   }
-  
+
   return phone; // Return as-is if not standard length
 };
 
@@ -67,7 +72,11 @@ export const formatPercentage = (value: number, decimals = 0): string => {
 /**
  * Pluralize word
  */
-export const pluralize = (count: number, singular: string, plural?: string): string => {
+export const pluralize = (
+  count: number,
+  singular: string,
+  plural?: string,
+): string => {
   if (count === 1) return singular;
   return plural || `${singular}s`;
 };
@@ -79,12 +88,12 @@ export const formatFileSize = (bytes: number): string => {
   const units = ['B', 'KB', 'MB', 'GB', 'TB'];
   let size = bytes;
   let unitIndex = 0;
-  
+
   while (size >= 1024 && unitIndex < units.length - 1) {
     size /= 1024;
     unitIndex++;
   }
-  
+
   return `${size.toFixed(1)} ${units[unitIndex]}`;
 };
 

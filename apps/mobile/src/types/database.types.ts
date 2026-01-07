@@ -111,6 +111,109 @@ export type Database = {
         };
         Relationships: [];
       };
+      // Promo codes for mobile users
+      promo_codes: {
+        Row: {
+          id: string;
+          code: string;
+          campaign_id: string | null;
+          description: string | null;
+          discount_type: 'percentage' | 'fixed' | 'free_shipping';
+          discount_value: number;
+          min_order_amount: number;
+          max_discount_amount: number | null;
+          usage_limit: number | null;
+          used_count: number;
+          per_user_limit: number;
+          valid_from: string;
+          valid_until: string | null;
+          is_active: boolean;
+          applicable_to: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          code: string;
+          campaign_id?: string | null;
+          description?: string | null;
+          discount_type: 'percentage' | 'fixed' | 'free_shipping';
+          discount_value: number;
+          min_order_amount?: number;
+          max_discount_amount?: number | null;
+          usage_limit?: number | null;
+          used_count?: number;
+          per_user_limit?: number;
+          valid_from?: string;
+          valid_until?: string | null;
+          is_active?: boolean;
+          applicable_to?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          code?: string;
+          campaign_id?: string | null;
+          description?: string | null;
+          discount_type?: 'percentage' | 'fixed' | 'free_shipping';
+          discount_value?: number;
+          min_order_amount?: number;
+          max_discount_amount?: number | null;
+          usage_limit?: number | null;
+          used_count?: number;
+          per_user_limit?: number;
+          valid_from?: string;
+          valid_until?: string | null;
+          is_active?: boolean;
+          applicable_to?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      promo_code_usage: {
+        Row: {
+          id: string;
+          promo_code_id: string;
+          user_id: string;
+          order_id: string | null;
+          discount_amount: number;
+          used_at: string;
+        };
+        Insert: {
+          id?: string;
+          promo_code_id: string;
+          user_id: string;
+          order_id?: string | null;
+          discount_amount: number;
+          used_at?: string;
+        };
+        Update: {
+          id?: string;
+          promo_code_id?: string;
+          user_id?: string;
+          order_id?: string | null;
+          discount_amount?: number;
+          used_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'promo_code_usage_promo_code_id_fkey';
+            columns: ['promo_code_id'];
+            isOneToOne: false;
+            referencedRelation: 'promo_codes';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'promo_code_usage_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       cdn_invalidation_logs: {
         Row: {
           created_at: string;
@@ -546,6 +649,15 @@ export type Database = {
           is_featured: boolean | null;
           location: string;
           max_participants: number | null;
+          moderation_status:
+            | 'pending_review'
+            | 'approved'
+            | 'rejected'
+            | 'flagged'
+            | null;
+          moderated_by: string | null;
+          moderated_at: string | null;
+          moderation_notes: string | null;
           price: number | null;
           requirements: string | null;
           status: string | null;
@@ -570,6 +682,15 @@ export type Database = {
           is_featured?: boolean | null;
           location: string;
           max_participants?: number | null;
+          moderation_status?:
+            | 'pending_review'
+            | 'approved'
+            | 'rejected'
+            | 'flagged'
+            | null;
+          moderated_by?: string | null;
+          moderated_at?: string | null;
+          moderation_notes?: string | null;
           price?: number | null;
           requirements?: string | null;
           status?: string | null;
@@ -594,6 +715,15 @@ export type Database = {
           is_featured?: boolean | null;
           location?: string;
           max_participants?: number | null;
+          moderation_status?:
+            | 'pending_review'
+            | 'approved'
+            | 'rejected'
+            | 'flagged'
+            | null;
+          moderated_by?: string | null;
+          moderated_at?: string | null;
+          moderation_notes?: string | null;
           price?: number | null;
           requirements?: string | null;
           status?: string | null;
@@ -1268,7 +1398,13 @@ export type Database = {
           rating: number | null;
           reinstated_at: string | null;
           review_count: number | null;
-          status: 'active' | 'suspended' | 'banned' | 'pending' | 'deleted' | null;
+          status:
+            | 'active'
+            | 'suspended'
+            | 'banned'
+            | 'pending'
+            | 'deleted'
+            | null;
           stripe_customer_id: string | null;
           suspended_at: string | null;
           suspended_by: string | null;
@@ -1306,7 +1442,13 @@ export type Database = {
           rating?: number | null;
           reinstated_at?: string | null;
           review_count?: number | null;
-          status?: 'active' | 'suspended' | 'banned' | 'pending' | 'deleted' | null;
+          status?:
+            | 'active'
+            | 'suspended'
+            | 'banned'
+            | 'pending'
+            | 'deleted'
+            | null;
           stripe_customer_id?: string | null;
           suspended_at?: string | null;
           suspended_by?: string | null;
@@ -1344,7 +1486,13 @@ export type Database = {
           rating?: number | null;
           reinstated_at?: string | null;
           review_count?: number | null;
-          status?: 'active' | 'suspended' | 'banned' | 'pending' | 'deleted' | null;
+          status?:
+            | 'active'
+            | 'suspended'
+            | 'banned'
+            | 'pending'
+            | 'deleted'
+            | null;
           stripe_customer_id?: string | null;
           suspended_at?: string | null;
           suspended_by?: string | null;
@@ -3151,14 +3299,14 @@ export type Tables<
     ? R
     : never
   : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] &
-      DefaultSchema['Views'])
-  ? (DefaultSchema['Tables'] &
-      DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
-      Row: infer R;
-    }
-    ? R
-    : never
-  : never;
+        DefaultSchema['Views'])
+    ? (DefaultSchema['Tables'] &
+        DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R;
+      }
+      ? R
+      : never
+    : never;
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
@@ -3178,12 +3326,12 @@ export type TablesInsert<
     ? I
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-  ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
-      Insert: infer I;
-    }
-    ? I
-    : never
-  : never;
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I;
+      }
+      ? I
+      : never
+    : never;
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
@@ -3203,12 +3351,12 @@ export type TablesUpdate<
     ? U
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-  ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
-      Update: infer U;
-    }
-    ? U
-    : never
-  : never;
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U;
+      }
+      ? U
+      : never
+    : never;
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
@@ -3224,8 +3372,8 @@ export type Enums<
 }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
-  ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
-  : never;
+    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
+    : never;
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
@@ -3241,8 +3389,8 @@ export type CompositeTypes<
 }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
-  ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
-  : never;
+    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
+    : never;
 
 export const Constants = {
   public: {

@@ -1,5 +1,13 @@
 import React from 'react';
-import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet, Platform } from 'react-native';
+import {
+  Modal,
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  Platform,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
@@ -48,38 +56,70 @@ export const CardOptionsModal = ({
 
           <ScrollView style={styles.optionsScroll}>
             {!card.isDefault && (
-              <TouchableOpacity style={styles.optionItem} onPress={onSetDefault}>
-                <MaterialCommunityIcons name="star-outline" size={24} color={COLORS.text.primary} />
+              <TouchableOpacity
+                style={styles.optionItem}
+                onPress={onSetDefault}
+              >
+                <MaterialCommunityIcons
+                  name="star-outline"
+                  size={24}
+                  color={COLORS.text.primary}
+                />
                 <View style={styles.optionText}>
                   <Text style={styles.optionTitle}>Varsayılan Yap</Text>
                   <Text style={styles.optionDescription}>
                     Tüm ödemelerde bu kartı kullan
                   </Text>
                 </View>
-                <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.softGray} />
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={20}
+                  color={COLORS.softGray}
+                />
               </TouchableOpacity>
             )}
 
             <TouchableOpacity style={styles.optionItem} onPress={onEdit}>
-              <MaterialCommunityIcons name="pencil-outline" size={24} color={COLORS.text.primary} />
+              <MaterialCommunityIcons
+                name="pencil-outline"
+                size={24}
+                color={COLORS.text.primary}
+              />
               <View style={styles.optionText}>
-                <Text style={styles.optionTitle}>Kart Bilgilerini Güncelle</Text>
+                <Text style={styles.optionTitle}>
+                  Kart Bilgilerini Güncelle
+                </Text>
                 <Text style={styles.optionDescription}>
                   Son kullanma tarihi veya CVV değiştir
                 </Text>
               </View>
-              <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.softGray} />
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={20}
+                color={COLORS.softGray}
+              />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.optionItemDanger} onPress={onRemove}>
-              <MaterialCommunityIcons name="delete-outline" size={24} color={COLORS.destructive} />
+            <TouchableOpacity
+              style={styles.optionItemDanger}
+              onPress={onRemove}
+            >
+              <MaterialCommunityIcons
+                name="delete-outline"
+                size={24}
+                color={COLORS.destructive}
+              />
               <View style={styles.optionText}>
                 <Text style={styles.optionTitleDanger}>Kartı Kaldır</Text>
                 <Text style={styles.optionDescription}>
                   Bu işlem geri alınamaz
                 </Text>
               </View>
-              <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.destructive} />
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={20}
+                color={COLORS.destructive}
+              />
             </TouchableOpacity>
           </ScrollView>
         </TouchableOpacity>

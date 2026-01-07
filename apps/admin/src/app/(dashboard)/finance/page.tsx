@@ -17,7 +17,13 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -34,7 +40,11 @@ import { useFinance } from '@/hooks/use-finance';
 
 const transactionTypeConfig = {
   payment: { label: 'Ödeme', icon: ArrowUpRight, color: 'text-green-600' },
-  subscription: { label: 'Abonelik', icon: ArrowUpRight, color: 'text-green-600' },
+  subscription: {
+    label: 'Abonelik',
+    icon: ArrowUpRight,
+    color: 'text-green-600',
+  },
   boost: { label: 'Boost', icon: ArrowUpRight, color: 'text-blue-600' },
   payout: { label: 'Çekim', icon: ArrowDownRight, color: 'text-blue-600' },
   refund: { label: 'İade', icon: ArrowDownRight, color: 'text-orange-600' },
@@ -71,8 +81,7 @@ export default function FinancePage() {
   // Filter transactions
   const filteredTransactions = transactions.filter((tx) => {
     const matchesSearch =
-      search === '' ||
-      tx.id.toLowerCase().includes(search.toLowerCase());
+      search === '' || tx.id.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || tx.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -80,7 +89,10 @@ export default function FinancePage() {
   // Pending payouts (filter by type)
   const pendingPayouts = transactions.filter((tx) => tx.status === 'pending');
   const pendingPayoutsCount = pendingPayouts.length;
-  const pendingPayoutsTotal = pendingPayouts.reduce((sum, p) => sum + p.amount, 0);
+  const pendingPayoutsTotal = pendingPayouts.reduce(
+    (sum, p) => sum + p.amount,
+    0,
+  );
 
   if (error) {
     return (
@@ -88,7 +100,9 @@ export default function FinancePage() {
         <div className="text-center">
           <AlertTriangle className="mx-auto h-12 w-12 text-destructive" />
           <h2 className="mt-4 text-lg font-semibold">Bir hata oluştu</h2>
-          <p className="text-muted-foreground">Finansal veriler yüklenemedi. Lütfen tekrar deneyin.</p>
+          <p className="text-muted-foreground">
+            Finansal veriler yüklenemedi. Lütfen tekrar deneyin.
+          </p>
         </div>
       </div>
     );
@@ -105,7 +119,10 @@ export default function FinancePage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Select value={period} onValueChange={(v) => setPeriod(v as '7d' | '30d' | '90d')}>
+          <Select
+            value={period}
+            onValueChange={(v) => setPeriod(v as '7d' | '30d' | '90d')}
+          >
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>
@@ -131,35 +148,62 @@ export default function FinancePage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : formatCurrency(summary.totalRevenue)}
+              {isLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                formatCurrency(summary.totalRevenue)
+              )}
             </div>
             <p className="text-xs text-muted-foreground">
-              Son {period === '7d' ? '7 gün' : period === '30d' ? '30 gün' : '90 gün'}
+              Son{' '}
+              {period === '7d'
+                ? '7 gün'
+                : period === '30d'
+                  ? '30 gün'
+                  : '90 gün'}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Abonelik Geliri</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Abonelik Geliri
+            </CardTitle>
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : formatCurrency(summary.subscriptionRevenue)}
+              {isLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                formatCurrency(summary.subscriptionRevenue)
+              )}
             </div>
             <p className="text-xs text-muted-foreground">
-              Toplam gelirin %{summary.totalRevenue > 0 ? Math.round((summary.subscriptionRevenue / summary.totalRevenue) * 100) : 0}'i
+              Toplam gelirin %
+              {summary.totalRevenue > 0
+                ? Math.round(
+                    (summary.subscriptionRevenue / summary.totalRevenue) * 100,
+                  )
+                : 0}
+              'i
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Bekleyen İşlemler</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Bekleyen İşlemler
+            </CardTitle>
             <Clock className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-yellow-600">
-              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : pendingPayoutsCount}
+              {isLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                pendingPayoutsCount
+              )}
             </div>
             <p className="text-xs text-muted-foreground">
               Toplam {formatCurrency(pendingPayoutsTotal)}
@@ -173,7 +217,11 @@ export default function FinancePage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : summary.transactionCount}
+              {isLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                summary.transactionCount
+              )}
             </div>
             <p className="text-xs text-muted-foreground">Bu dönem</p>
           </CardContent>
@@ -250,10 +298,16 @@ export default function FinancePage() {
                     <div>Tarih</div>
                   </div>
                   {filteredTransactions.map((tx) => {
-                    const typeInfo = transactionTypeConfig[tx.type as keyof typeof transactionTypeConfig] ||
-                      { label: tx.type, icon: DollarSign, color: 'text-gray-600' };
-                    const statusInfo = statusConfig[tx.status as keyof typeof statusConfig] ||
-                      { label: tx.status, variant: 'secondary' as const };
+                    const typeInfo = transactionTypeConfig[
+                      tx.type as keyof typeof transactionTypeConfig
+                    ] || {
+                      label: tx.type,
+                      icon: DollarSign,
+                      color: 'text-gray-600',
+                    };
+                    const statusInfo = statusConfig[
+                      tx.status as keyof typeof statusConfig
+                    ] || { label: tx.status, variant: 'secondary' as const };
                     const TypeIcon = typeInfo.icon;
 
                     return (
@@ -262,20 +316,26 @@ export default function FinancePage() {
                         className="grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-4 border-b px-4 py-3 last:border-0"
                       >
                         <div>
-                          <div className="font-medium font-mono text-sm">{tx.id}</div>
+                          <div className="font-medium font-mono text-sm">
+                            {tx.id}
+                          </div>
                           <div className="text-xs text-muted-foreground">
                             User: {tx.user_id}
                           </div>
                         </div>
                         <div className="flex items-center gap-1">
                           <TypeIcon className={`h-4 w-4 ${typeInfo.color}`} />
-                          <span className={typeInfo.color}>{typeInfo.label}</span>
+                          <span className={typeInfo.color}>
+                            {typeInfo.label}
+                          </span>
                         </div>
                         <div className="text-right font-medium">
                           {tx.type === 'refund' ? '-' : '+'}
                           {formatCurrency(tx.amount, tx.currency)}
                         </div>
-                        <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+                        <Badge variant={statusInfo.variant}>
+                          {statusInfo.label}
+                        </Badge>
                         <div className="text-sm text-muted-foreground">
                           {formatRelativeDate(tx.created_at)}
                         </div>
@@ -288,7 +348,9 @@ export default function FinancePage() {
               {!isLoading && filteredTransactions.length === 0 && (
                 <div className="py-12 text-center">
                   <DollarSign className="mx-auto h-12 w-12 text-muted-foreground" />
-                  <h3 className="mt-4 text-lg font-semibold">İşlem bulunamadı</h3>
+                  <h3 className="mt-4 text-lg font-semibold">
+                    İşlem bulunamadı
+                  </h3>
                   <p className="text-muted-foreground">
                     Arama kriterlerine uygun işlem yok
                   </p>
@@ -315,8 +377,12 @@ export default function FinancePage() {
               ) : (
                 <div className="space-y-3">
                   {pendingPayouts.map((payout) => {
-                    const statusInfo = statusConfig[payout.status as keyof typeof statusConfig] ||
-                      { label: payout.status, variant: 'secondary' as const };
+                    const statusInfo = statusConfig[
+                      payout.status as keyof typeof statusConfig
+                    ] || {
+                      label: payout.status,
+                      variant: 'secondary' as const,
+                    };
 
                     return (
                       <div
@@ -339,7 +405,9 @@ export default function FinancePage() {
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                               <span>User: {payout.user_id}</span>
                               <span>•</span>
-                              <span>{formatRelativeDate(payout.created_at)}</span>
+                              <span>
+                                {formatRelativeDate(payout.created_at)}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -354,14 +422,18 @@ export default function FinancePage() {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => toast.info('İade işlemi henüz bağlı değil')}
+                                onClick={() =>
+                                  toast.info('İade işlemi henüz bağlı değil')
+                                }
                               >
                                 <XCircle className="mr-1 h-4 w-4" />
                                 Reddet
                               </Button>
                               <Button
                                 size="sm"
-                                onClick={() => toast.info('Onay işlemi henüz bağlı değil')}
+                                onClick={() =>
+                                  toast.info('Onay işlemi henüz bağlı değil')
+                                }
                               >
                                 <CheckCircle className="mr-1 h-4 w-4" />
                                 Onayla
@@ -378,7 +450,9 @@ export default function FinancePage() {
               {!isLoading && pendingPayouts.length === 0 && (
                 <div className="py-12 text-center">
                   <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
-                  <h3 className="mt-4 text-lg font-semibold">Bekleyen ödeme yok</h3>
+                  <h3 className="mt-4 text-lg font-semibold">
+                    Bekleyen ödeme yok
+                  </h3>
                   <p className="text-muted-foreground">
                     Tüm ödemeler işlenmiş durumda
                   </p>

@@ -45,7 +45,7 @@ interface DisputeFilters {
 }
 
 async function fetchDisputes(
-  filters: DisputeFilters = {}
+  filters: DisputeFilters = {},
 ): Promise<DisputesResponse> {
   const params = new URLSearchParams();
   if (filters.status) params.set('status', filters.status);
@@ -62,7 +62,7 @@ async function fetchDisputes(
 }
 
 async function createDispute(
-  data: Partial<Dispute>
+  data: Partial<Dispute>,
 ): Promise<{ dispute: Dispute }> {
   const response = await fetch('/api/disputes', {
     method: 'POST',
@@ -98,7 +98,7 @@ export function useCreateDispute() {
 async function updateDisputeStatus(
   id: string,
   status: 'resolved' | 'rejected',
-  resolution?: string
+  resolution?: string,
 ): Promise<{ dispute: Dispute }> {
   const response = await fetch(`/api/disputes/${id}`, {
     method: 'PATCH',

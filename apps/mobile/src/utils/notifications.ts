@@ -50,7 +50,7 @@ export async function registerForPushNotifications(): Promise<string | null> {
     }
 
     // Get push token
-     
+
     const projectId = Constants.expoConfig?.extra?.eas?.projectId as
       | string
       | undefined;

@@ -13,7 +13,13 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -33,7 +39,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 import { formatRelativeDate, getInitials } from '@/lib/utils';
-import { useDisputes, useResolveDispute, useRejectDispute } from '@/hooks/use-disputes';
+import {
+  useDisputes,
+  useResolveDispute,
+  useRejectDispute,
+} from '@/hooks/use-disputes';
 
 const statusConfig = {
   pending: { label: 'Açık', variant: 'error' as const },
@@ -70,8 +80,12 @@ export default function DisputesPage() {
   const filteredDisputes = disputes.filter((dispute) => {
     const matchesSearch =
       search === '' ||
-      dispute.requester?.display_name?.toLowerCase().includes(search.toLowerCase()) ||
-      dispute.responder?.display_name?.toLowerCase().includes(search.toLowerCase()) ||
+      dispute.requester?.display_name
+        ?.toLowerCase()
+        .includes(search.toLowerCase()) ||
+      dispute.responder?.display_name
+        ?.toLowerCase()
+        .includes(search.toLowerCase()) ||
       dispute.description?.toLowerCase().includes(search.toLowerCase()) ||
       dispute.reason?.toLowerCase().includes(search.toLowerCase());
     const matchesType = typeFilter === 'all' || dispute.reason === typeFilter;
@@ -79,7 +93,9 @@ export default function DisputesPage() {
   });
 
   const pendingCount = disputes.filter((d) => d.status === 'pending').length;
-  const underReviewCount = disputes.filter((d) => d.status === 'under_review').length;
+  const underReviewCount = disputes.filter(
+    (d) => d.status === 'under_review',
+  ).length;
 
   const handleResolve = (disputeId: string) => {
     resolveDispute.mutate(
@@ -91,7 +107,7 @@ export default function DisputesPage() {
         onError: (error) => {
           toast.error(error.message || 'Bir hata oluştu');
         },
-      }
+      },
     );
   };
 
@@ -105,7 +121,7 @@ export default function DisputesPage() {
         onError: (error) => {
           toast.error(error.message || 'Bir hata oluştu');
         },
-      }
+      },
     );
   };
 
@@ -115,7 +131,9 @@ export default function DisputesPage() {
         <div className="text-center">
           <AlertTriangle className="mx-auto h-12 w-12 text-destructive" />
           <h2 className="mt-4 text-lg font-semibold">Bir hata oluştu</h2>
-          <p className="text-muted-foreground">Anlaşmazlıklar yüklenemedi. Lütfen tekrar deneyin.</p>
+          <p className="text-muted-foreground">
+            Anlaşmazlıklar yüklenemedi. Lütfen tekrar deneyin.
+          </p>
         </div>
       </div>
     );
@@ -145,11 +163,17 @@ export default function DisputesPage() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Açık Şikayetler</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Açık Şikayetler
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">
-              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : pendingCount}
+              {isLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                pendingCount
+              )}
             </div>
             <p className="text-xs text-muted-foreground">Acil ilgi bekliyor</p>
           </CardContent>
@@ -160,9 +184,15 @@ export default function DisputesPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-yellow-600">
-              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : underReviewCount}
+              {isLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                underReviewCount
+              )}
             </div>
-            <p className="text-xs text-muted-foreground">Değerlendirme altında</p>
+            <p className="text-xs text-muted-foreground">
+              Değerlendirme altında
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -171,14 +201,20 @@ export default function DisputesPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : data?.total || 0}
+              {isLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                data?.total || 0
+              )}
             </div>
             <p className="text-xs text-muted-foreground">Tüm anlaşmazlıklar</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Ort. Çözüm Süresi</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Ort. Çözüm Süresi
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">4.2</div>
@@ -249,8 +285,12 @@ export default function DisputesPage() {
           {!isLoading && (
             <div className="space-y-3">
               {filteredDisputes.map((dispute) => {
-                const statusInfo = statusConfig[dispute.status as keyof typeof statusConfig] || statusConfig.pending;
-                const typeInfo = typeConfig[dispute.reason as keyof typeof typeConfig] || typeConfig.other;
+                const statusInfo =
+                  statusConfig[dispute.status as keyof typeof statusConfig] ||
+                  statusConfig.pending;
+                const typeInfo =
+                  typeConfig[dispute.reason as keyof typeof typeConfig] ||
+                  typeConfig.other;
 
                 return (
                   <div
@@ -259,14 +299,18 @@ export default function DisputesPage() {
                   >
                     <div className="flex items-start gap-4">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                        <AlertTriangle className={`h-5 w-5 ${typeInfo.color}`} />
+                        <AlertTriangle
+                          className={`h-5 w-5 ${typeInfo.color}`}
+                        />
                       </div>
                       <div>
                         <div className="mb-1 flex items-center gap-2">
                           <span className={`font-medium ${typeInfo.color}`}>
                             {typeInfo.label}
                           </span>
-                          <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+                          <Badge variant={statusInfo.variant}>
+                            {statusInfo.label}
+                          </Badge>
                         </div>
                         <p className="mb-2 text-sm text-muted-foreground line-clamp-1">
                           {dispute.description || dispute.reason}
@@ -275,22 +319,36 @@ export default function DisputesPage() {
                           <div className="flex items-center gap-1">
                             <span>Şikayet eden:</span>
                             <Avatar className="h-4 w-4">
-                              <AvatarImage src={dispute.requester?.avatar_url || undefined} />
+                              <AvatarImage
+                                src={dispute.requester?.avatar_url || undefined}
+                              />
                               <AvatarFallback className="text-[8px]">
-                                {getInitials(dispute.requester?.display_name || 'Bilinmiyor')}
+                                {getInitials(
+                                  dispute.requester?.display_name ||
+                                    'Bilinmiyor',
+                                )}
                               </AvatarFallback>
                             </Avatar>
-                            <span>{dispute.requester?.display_name || 'Bilinmiyor'}</span>
+                            <span>
+                              {dispute.requester?.display_name || 'Bilinmiyor'}
+                            </span>
                           </div>
                           <div className="flex items-center gap-1">
                             <span>Hakkında:</span>
                             <Avatar className="h-4 w-4">
-                              <AvatarImage src={dispute.responder?.avatar_url || undefined} />
+                              <AvatarImage
+                                src={dispute.responder?.avatar_url || undefined}
+                              />
                               <AvatarFallback className="text-[8px]">
-                                {getInitials(dispute.responder?.display_name || 'Bilinmiyor')}
+                                {getInitials(
+                                  dispute.responder?.display_name ||
+                                    'Bilinmiyor',
+                                )}
                               </AvatarFallback>
                             </Avatar>
-                            <span>{dispute.responder?.display_name || 'Bilinmiyor'}</span>
+                            <span>
+                              {dispute.responder?.display_name || 'Bilinmiyor'}
+                            </span>
                           </div>
                           <span>{formatRelativeDate(dispute.created_at)}</span>
                         </div>
@@ -301,7 +359,8 @@ export default function DisputesPage() {
                         <Eye className="mr-1 h-4 w-4" />
                         İncele
                       </Button>
-                      {(dispute.status === 'pending' || dispute.status === 'under_review') && (
+                      {(dispute.status === 'pending' ||
+                        dispute.status === 'under_review') && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button size="sm" variant="ghost">
@@ -321,7 +380,9 @@ export default function DisputesPage() {
                               disabled={resolveDispute.isPending}
                             >
                               <CheckCircle className="mr-2 h-4 w-4" />
-                              {resolveDispute.isPending ? 'İşleniyor...' : 'Çözüldü İşaretle'}
+                              {resolveDispute.isPending
+                                ? 'İşleniyor...'
+                                : 'Çözüldü İşaretle'}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-muted-foreground"
@@ -329,7 +390,9 @@ export default function DisputesPage() {
                               disabled={rejectDispute.isPending}
                             >
                               <XCircle className="mr-2 h-4 w-4" />
-                              {rejectDispute.isPending ? 'İşleniyor...' : 'Reddet'}
+                              {rejectDispute.isPending
+                                ? 'İşleniyor...'
+                                : 'Reddet'}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>

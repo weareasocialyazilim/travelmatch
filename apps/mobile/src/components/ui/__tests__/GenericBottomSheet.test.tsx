@@ -553,7 +553,6 @@ describe('GenericBottomSheet', () => {
       const sheet = getByTestId('bottom-sheet');
       expect(sheet.props.accessible).toBe(true);
     });
-
   });
 
   describe('Edge Cases', () => {

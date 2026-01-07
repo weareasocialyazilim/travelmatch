@@ -1,6 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Switch, Slider } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Switch,
+  Slider,
+} from 'react-native';
 import { AnimatedButton } from './AnimatedComponents';
 
 const meta: Meta = {
@@ -20,32 +27,34 @@ export default meta;
 export const Counter: StoryObj = {
   render: () => {
     const [count, setCount] = useState(0);
-    
+
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Counter Example</Text>
         <Text style={styles.count}>{count}</Text>
-        
+
         <View style={styles.buttonRow}>
-          <AnimatedButton onPress={() => setCount(c => c - 1)}>
+          <AnimatedButton onPress={() => setCount((c) => c - 1)}>
             <View style={[styles.button, styles.secondaryButton]}>
               <Text style={styles.buttonText}>−</Text>
             </View>
           </AnimatedButton>
-          
+
           <AnimatedButton onPress={() => setCount(0)}>
             <View style={[styles.button, styles.outlineButton]}>
-              <Text style={[styles.buttonText, { color: '#007AFF' }]}>Reset</Text>
+              <Text style={[styles.buttonText, { color: '#007AFF' }]}>
+                Reset
+              </Text>
             </View>
           </AnimatedButton>
-          
-          <AnimatedButton onPress={() => setCount(c => c + 1)}>
+
+          <AnimatedButton onPress={() => setCount((c) => c + 1)}>
             <View style={styles.button}>
               <Text style={styles.buttonText}>+</Text>
             </View>
           </AnimatedButton>
         </View>
-        
+
         <Text style={styles.hint}>Tap buttons to test interactions</Text>
       </View>
     );
@@ -59,19 +68,19 @@ export const FormInputs: StoryObj = {
     const [password, setPassword] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
     const [submitted, setSubmitted] = useState(false);
-    
+
     const handleSubmit = () => {
       setSubmitted(true);
       console.log('Form submitted:', { email, password, rememberMe });
-      
+
       // Reset after 2 seconds
       setTimeout(() => setSubmitted(false), 2000);
     };
-    
+
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Login Form</Text>
-        
+
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Email</Text>
           <TextInput
@@ -83,7 +92,7 @@ export const FormInputs: StoryObj = {
             autoCapitalize="none"
           />
         </View>
-        
+
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Password</Text>
           <TextInput
@@ -94,12 +103,12 @@ export const FormInputs: StoryObj = {
             secureTextEntry
           />
         </View>
-        
+
         <View style={styles.switchRow}>
           <Text style={styles.label}>Remember me</Text>
           <Switch value={rememberMe} onValueChange={setRememberMe} />
         </View>
-        
+
         <AnimatedButton onPress={handleSubmit}>
           <View style={[styles.button, styles.fullWidth]}>
             <Text style={styles.buttonText}>
@@ -107,7 +116,7 @@ export const FormInputs: StoryObj = {
             </Text>
           </View>
         </AnimatedButton>
-        
+
         {submitted && (
           <Text style={styles.success}>Form submitted successfully!</Text>
         )}
@@ -121,29 +130,30 @@ export const ToggleStates: StoryObj = {
   render: () => {
     const [activeTab, setActiveTab] = useState(0);
     const tabs = ['All', 'Adventure', 'Food', 'Culture'];
-    
+
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Tab Navigation</Text>
-        
+
         <View style={styles.tabs}>
           {tabs.map((tab, index) => (
             <AnimatedButton key={tab} onPress={() => setActiveTab(index)}>
-              <View style={[
-                styles.tab,
-                activeTab === index && styles.tabActive
-              ]}>
-                <Text style={[
-                  styles.tabText,
-                  activeTab === index && styles.tabTextActive
-                ]}>
+              <View
+                style={[styles.tab, activeTab === index && styles.tabActive]}
+              >
+                <Text
+                  style={[
+                    styles.tabText,
+                    activeTab === index && styles.tabTextActive,
+                  ]}
+                >
                   {tab}
                 </Text>
               </View>
             </AnimatedButton>
           ))}
         </View>
-        
+
         <View style={styles.tabContent}>
           <Text style={styles.tabContentText}>
             Showing content for: {tabs[activeTab]}
@@ -159,11 +169,11 @@ export const RangeSlider: StoryObj = {
   render: () => {
     const [minPrice, setMinPrice] = useState(50);
     const [maxPrice, setMaxPrice] = useState(200);
-    
+
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Price Range Filter</Text>
-        
+
         <View style={styles.sliderGroup}>
           <Text style={styles.label}>Min Price: ${minPrice}</Text>
           <Slider
@@ -176,7 +186,7 @@ export const RangeSlider: StoryObj = {
             maximumTrackTintColor="#ddd"
           />
         </View>
-        
+
         <View style={styles.sliderGroup}>
           <Text style={styles.label}>Max Price: ${maxPrice}</Text>
           <Slider
@@ -189,7 +199,7 @@ export const RangeSlider: StoryObj = {
             maximumTrackTintColor="#ddd"
           />
         </View>
-        
+
         <View style={styles.priceDisplay}>
           <Text style={styles.priceRange}>
             ${Math.round(minPrice)} - ${Math.round(maxPrice)}
@@ -212,43 +222,47 @@ export const MultiSelect: StoryObj = {
       'Nature',
       'Sports',
     ];
-    
+
     const toggleOption = (option: string) => {
-      setSelected(prev =>
+      setSelected((prev) =>
         prev.includes(option)
-          ? prev.filter(o => o !== option)
-          : [...prev, option]
+          ? prev.filter((o) => o !== option)
+          : [...prev, option],
       );
     };
-    
+
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Select Categories</Text>
-        <Text style={styles.subtitle}>
-          {selected.length} selected
-        </Text>
-        
+        <Text style={styles.subtitle}>{selected.length} selected</Text>
+
         <View style={styles.optionsGrid}>
-          {options.map(option => (
+          {options.map((option) => (
             <AnimatedButton key={option} onPress={() => toggleOption(option)}>
-              <View style={[
-                styles.option,
-                selected.includes(option) && styles.optionSelected
-              ]}>
-                <Text style={[
-                  styles.optionText,
-                  selected.includes(option) && styles.optionTextSelected
-                ]}>
+              <View
+                style={[
+                  styles.option,
+                  selected.includes(option) && styles.optionSelected,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.optionText,
+                    selected.includes(option) && styles.optionTextSelected,
+                  ]}
+                >
                   {option}
                 </Text>
               </View>
             </AnimatedButton>
           ))}
         </View>
-        
+
         {selected.length > 0 && (
           <AnimatedButton onPress={() => setSelected([])}>
-            <View style={[styles.button, styles.outlineButton, styles.fullWidth]}>
+            <View
+              style={[styles.button, styles.outlineButton, styles.fullWidth]}
+            >
               <Text style={[styles.buttonText, { color: '#007AFF' }]}>
                 Clear Selection
               </Text>
@@ -270,31 +284,31 @@ export const ComplexFlow: StoryObj = {
       category: '',
       agree: false,
     });
-    
+
     const canProceed = () => {
       if (step === 1) return formData.name.length > 0;
       if (step === 2) return formData.email.includes('@');
       if (step === 3) return formData.category.length > 0;
       return formData.agree;
     };
-    
+
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Multi-Step Form</Text>
         <Text style={styles.subtitle}>Step {step} of 4</Text>
-        
+
         <View style={styles.progress}>
-          {[1, 2, 3, 4].map(s => (
+          {[1, 2, 3, 4].map((s) => (
             <View
               key={s}
               style={[
                 styles.progressDot,
-                s <= step && styles.progressDotActive
+                s <= step && styles.progressDotActive,
               ]}
             />
           ))}
         </View>
-        
+
         {step === 1 && (
           <View style={styles.inputGroup}>
             <Text style={styles.label}>What's your name?</Text>
@@ -302,11 +316,13 @@ export const ComplexFlow: StoryObj = {
               style={styles.input}
               placeholder="Enter your name"
               value={formData.name}
-              onChangeText={text => setFormData(prev => ({ ...prev, name: text }))}
+              onChangeText={(text) =>
+                setFormData((prev) => ({ ...prev, name: text }))
+              }
             />
           </View>
         )}
-        
+
         {step === 2 && (
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Your email address?</Text>
@@ -314,28 +330,36 @@ export const ComplexFlow: StoryObj = {
               style={styles.input}
               placeholder="email@example.com"
               value={formData.email}
-              onChangeText={text => setFormData(prev => ({ ...prev, email: text }))}
+              onChangeText={(text) =>
+                setFormData((prev) => ({ ...prev, email: text }))
+              }
               keyboardType="email-address"
             />
           </View>
         )}
-        
+
         {step === 3 && (
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Choose a category</Text>
-            {['Adventure', 'Food', 'Culture'].map(cat => (
+            {['Adventure', 'Food', 'Culture'].map((cat) => (
               <AnimatedButton
                 key={cat}
-                onPress={() => setFormData(prev => ({ ...prev, category: cat }))}
+                onPress={() =>
+                  setFormData((prev) => ({ ...prev, category: cat }))
+                }
               >
-                <View style={[
-                  styles.option,
-                  formData.category === cat && styles.optionSelected
-                ]}>
-                  <Text style={[
-                    styles.optionText,
-                    formData.category === cat && styles.optionTextSelected
-                  ]}>
+                <View
+                  style={[
+                    styles.option,
+                    formData.category === cat && styles.optionSelected,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.optionText,
+                      formData.category === cat && styles.optionTextSelected,
+                    ]}
+                  >
                     {cat}
                   </Text>
                 </View>
@@ -343,30 +367,38 @@ export const ComplexFlow: StoryObj = {
             ))}
           </View>
         )}
-        
+
         {step === 4 && (
           <View style={styles.inputGroup}>
             <View style={styles.switchRow}>
               <Text style={styles.label}>I agree to terms</Text>
               <Switch
                 value={formData.agree}
-                onValueChange={agree => setFormData(prev => ({ ...prev, agree }))}
+                onValueChange={(agree) =>
+                  setFormData((prev) => ({ ...prev, agree }))
+                }
               />
             </View>
           </View>
         )}
-        
+
         <View style={styles.buttonRow}>
           {step > 1 && (
-            <AnimatedButton onPress={() => setStep(s => s - 1)}>
+            <AnimatedButton onPress={() => setStep((s) => s - 1)}>
               <View style={[styles.button, styles.outlineButton]}>
-                <Text style={[styles.buttonText, { color: '#007AFF' }]}>Back</Text>
+                <Text style={[styles.buttonText, { color: '#007AFF' }]}>
+                  Back
+                </Text>
               </View>
             </AnimatedButton>
           )}
-          
+
           <AnimatedButton
-            onPress={() => step < 4 ? setStep(s => s + 1) : console.log('Submit:', formData)}
+            onPress={() =>
+              step < 4
+                ? setStep((s) => s + 1)
+                : console.log('Submit:', formData)
+            }
             disabled={!canProceed()}
           >
             <View style={styles.button}>

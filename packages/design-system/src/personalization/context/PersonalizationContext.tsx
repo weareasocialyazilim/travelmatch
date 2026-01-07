@@ -21,17 +21,22 @@ const defaultSettings: PersonalizationSettings = {
   highContrast: false,
 };
 
-const PersonalizationContext = createContext<PersonalizationContextType | undefined>(undefined);
+const PersonalizationContext = createContext<
+  PersonalizationContextType | undefined
+>(undefined);
 
 interface PersonalizationProviderProps {
   children: ReactNode;
 }
 
-export function PersonalizationProvider({ children }: PersonalizationProviderProps) {
-  const [settings, setSettings] = useState<PersonalizationSettings>(defaultSettings);
+export function PersonalizationProvider({
+  children,
+}: PersonalizationProviderProps) {
+  const [settings, setSettings] =
+    useState<PersonalizationSettings>(defaultSettings);
 
   const updateSettings = (newSettings: Partial<PersonalizationSettings>) => {
-    setSettings(prev => ({ ...prev, ...newSettings }));
+    setSettings((prev) => ({ ...prev, ...newSettings }));
   };
 
   return (
@@ -44,7 +49,9 @@ export function PersonalizationProvider({ children }: PersonalizationProviderPro
 export function usePersonalization() {
   const context = useContext(PersonalizationContext);
   if (context === undefined) {
-    throw new Error('usePersonalization must be used within a PersonalizationProvider');
+    throw new Error(
+      'usePersonalization must be used within a PersonalizationProvider',
+    );
   }
   return context;
 }

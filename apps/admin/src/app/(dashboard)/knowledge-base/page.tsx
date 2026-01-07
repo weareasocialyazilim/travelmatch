@@ -23,19 +23,61 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 // Mock knowledge base data
 const categories = [
-  { id: 'getting-started', name: 'Başlangıç', icon: BookOpen, count: 12, color: 'bg-blue-100' },
-  { id: 'users', name: 'Kullanıcı Yönetimi', icon: Users, count: 18, color: 'bg-green-100' },
-  { id: 'moderation', name: 'Moderasyon', icon: Shield, count: 15, color: 'bg-purple-100' },
-  { id: 'finance', name: 'Finans & Ödemeler', icon: CreditCard, count: 10, color: 'bg-emerald-100' },
-  { id: 'support', name: 'Müşteri Desteği', icon: HelpCircle, count: 22, color: 'bg-orange-100' },
-  { id: 'settings', name: 'Sistem Ayarları', icon: Settings, count: 8, color: 'bg-gray-100' },
+  {
+    id: 'getting-started',
+    name: 'Başlangıç',
+    icon: BookOpen,
+    count: 12,
+    color: 'bg-blue-100',
+  },
+  {
+    id: 'users',
+    name: 'Kullanıcı Yönetimi',
+    icon: Users,
+    count: 18,
+    color: 'bg-green-100',
+  },
+  {
+    id: 'moderation',
+    name: 'Moderasyon',
+    icon: Shield,
+    count: 15,
+    color: 'bg-purple-100',
+  },
+  {
+    id: 'finance',
+    name: 'Finans & Ödemeler',
+    icon: CreditCard,
+    count: 10,
+    color: 'bg-emerald-100',
+  },
+  {
+    id: 'support',
+    name: 'Müşteri Desteği',
+    icon: HelpCircle,
+    count: 22,
+    color: 'bg-orange-100',
+  },
+  {
+    id: 'settings',
+    name: 'Sistem Ayarları',
+    icon: Settings,
+    count: 8,
+    color: 'bg-gray-100',
+  },
 ];
 
 const articles = [
@@ -43,7 +85,8 @@ const articles = [
     id: '1',
     title: 'Admin Paneline Giriş',
     category: 'getting-started',
-    excerpt: 'Admin panelinin temel özellikleri ve kullanımı hakkında genel bilgi.',
+    excerpt:
+      'Admin panelinin temel özellikleri ve kullanımı hakkında genel bilgi.',
     author: 'Sistem',
     views: 1245,
     updated: '2024-12-15',
@@ -113,7 +156,10 @@ export default function KnowledgeBasePage() {
 
   const filteredArticles = articles.filter((article) => {
     if (selectedCategory && article.category !== selectedCategory) return false;
-    if (searchQuery && !article.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+    if (
+      searchQuery &&
+      !article.title.toLowerCase().includes(searchQuery.toLowerCase())
+    ) {
       return false;
     }
     return true;
@@ -162,7 +208,9 @@ export default function KnowledgeBasePage() {
                 <button
                   onClick={() => setSelectedCategory(null)}
                   className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-left transition-colors ${
-                    selectedCategory === null ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                    selectedCategory === null
+                      ? 'bg-primary text-primary-foreground'
+                      : 'hover:bg-muted'
                   }`}
                 >
                   <span className="flex items-center gap-2">
@@ -210,7 +258,9 @@ export default function KnowledgeBasePage() {
                     <Clock className="h-4 w-4 mt-0.5 text-muted-foreground" />
                     <div>
                       <p className="font-medium">{article.title}</p>
-                      <p className="text-xs text-muted-foreground">{article.category}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {article.category}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -229,7 +279,10 @@ export default function KnowledgeBasePage() {
                 .map((article) => {
                   const Icon = getCategoryIcon(article.category);
                   return (
-                    <Card key={article.id} className="cursor-pointer hover:shadow-md transition-shadow">
+                    <Card
+                      key={article.id}
+                      className="cursor-pointer hover:shadow-md transition-shadow"
+                    >
                       <CardContent className="pt-6">
                         <div className="flex items-start gap-4">
                           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
@@ -275,7 +328,9 @@ export default function KnowledgeBasePage() {
               <div className="space-y-3">
                 {filteredArticles.map((article) => {
                   const Icon = getCategoryIcon(article.category);
-                  const categoryName = categories.find((c) => c.id === article.category)?.name;
+                  const categoryName = categories.find(
+                    (c) => c.id === article.category,
+                  )?.name;
                   return (
                     <div
                       key={article.id}

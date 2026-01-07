@@ -29,7 +29,9 @@ const QuickLinks: React.FC<QuickLinksProps> = memo(
             >
               <View style={styles.quickLinkLeft}>
                 <MaterialCommunityIcons
-                  name={link.icon as keyof typeof MaterialCommunityIcons.glyphMap}
+                  name={
+                    link.icon as keyof typeof MaterialCommunityIcons.glyphMap
+                  }
                   size={22}
                   color={link.color}
                 />
@@ -44,7 +46,9 @@ const QuickLinks: React.FC<QuickLinksProps> = memo(
                 />
               </View>
             </TouchableOpacity>
-            {index < links.length - 1 && <View style={styles.quickLinkDivider} />}
+            {index < links.length - 1 && (
+              <View style={styles.quickLinkDivider} />
+            )}
           </React.Fragment>
         ))}
       </View>

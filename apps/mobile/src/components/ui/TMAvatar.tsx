@@ -217,7 +217,9 @@ export const TMAvatar: React.FC<TMAvatarProps> = ({
         <View
           style={[
             styles.statusIndicator,
-            size === 'xxs' ? styles.statusBorderThin : styles.statusBorderNormal,
+            size === 'xxs'
+              ? styles.statusBorderThin
+              : styles.statusBorderNormal,
             {
               width: STATUS_SIZE[size],
               height: STATUS_SIZE[size],

@@ -18,7 +18,9 @@ export function useCeremonyStats() {
     queryFn: async (): Promise<CeremonyStats> => {
       const supabase = getClient();
       const today = new Date().toISOString().split('T')[0];
-      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+      const yesterday = new Date(Date.now() - 86400000)
+        .toISOString()
+        .split('T')[0];
 
       // Get verified count for today
       const { count: verifiedToday } = await supabase
@@ -52,9 +54,10 @@ export function useCeremonyStats() {
         .select('*', { count: 'exact', head: true })
         .in('status', ['verified', 'rejected']);
 
-      const aiSuccessRate = totalProcessed && totalProcessed > 0
-        ? Math.round(((aiVerified || 0) / totalProcessed) * 100)
-        : 0;
+      const aiSuccessRate =
+        totalProcessed && totalProcessed > 0
+          ? Math.round(((aiVerified || 0) / totalProcessed) * 100)
+          : 0;
 
       return {
         verifiedToday: verifiedToday || 0,

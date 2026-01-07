@@ -23,7 +23,7 @@ describe('useDebounce Hook', () => {
     it('delays value update', () => {
       const { result, rerender } = renderHook(
         ({ value, delay }) => useDebounce(value, delay),
-        { initialProps: { value: 'first', delay: 500 } }
+        { initialProps: { value: 'first', delay: 500 } },
       );
 
       expect(result.current).toBe('first');
@@ -45,7 +45,7 @@ describe('useDebounce Hook', () => {
     it('cancels previous timeout on rapid changes', () => {
       const { result, rerender } = renderHook(
         ({ value }) => useDebounce(value, 500),
-        { initialProps: { value: 'first' } }
+        { initialProps: { value: 'first' } },
       );
 
       rerender({ value: 'second' });
@@ -67,36 +67,30 @@ describe('useDebounce Hook', () => {
 
     it('handles different data types', () => {
       // String
-      const { result: stringResult } = renderHook(() => 
-        useDebounce('test', 100)
+      const { result: stringResult } = renderHook(() =>
+        useDebounce('test', 100),
       );
       expect(stringResult.current).toBe('test');
 
       // Number
-      const { result: numberResult } = renderHook(() => 
-        useDebounce(42, 100)
-      );
+      const { result: numberResult } = renderHook(() => useDebounce(42, 100));
       expect(numberResult.current).toBe(42);
 
       // Object
       const obj = { key: 'value' };
-      const { result: objectResult } = renderHook(() => 
-        useDebounce(obj, 100)
-      );
+      const { result: objectResult } = renderHook(() => useDebounce(obj, 100));
       expect(objectResult.current).toBe(obj);
 
       // Array
       const arr = [1, 2, 3];
-      const { result: arrayResult } = renderHook(() => 
-        useDebounce(arr, 100)
-      );
+      const { result: arrayResult } = renderHook(() => useDebounce(arr, 100));
       expect(arrayResult.current).toBe(arr);
     });
 
     it('respects different delay values', () => {
       const { result, rerender } = renderHook(
         ({ value, delay }) => useDebounce(value, delay),
-        { initialProps: { value: 'first', delay: 1000 } }
+        { initialProps: { value: 'first', delay: 1000 } },
       );
 
       rerender({ value: 'second', delay: 1000 });
@@ -114,9 +108,9 @@ describe('useDebounce Hook', () => {
 
     it('cleans up timeout on unmount', () => {
       const { unmount } = renderHook(() => useDebounce('test', 500));
-      
+
       unmount();
-      
+
       // Should not throw or cause memory leaks
       act(() => {
         jest.advanceTimersByTime(500);
@@ -127,9 +121,7 @@ describe('useDebounce Hook', () => {
   describe('useDebouncedCallback', () => {
     it('delays callback execution', () => {
       const callback = jest.fn() as jest.Mock;
-      const { result } = renderHook(() => 
-        useDebouncedCallback(callback, 500)
-      );
+      const { result } = renderHook(() => useDebouncedCallback(callback, 500));
 
       act(() => {
         result.current('arg1', 'arg2');
@@ -147,9 +139,7 @@ describe('useDebounce Hook', () => {
 
     it('cancels previous call on rapid invocations', () => {
       const callback = jest.fn() as jest.Mock;
-      const { result } = renderHook(() => 
-        useDebouncedCallback(callback, 500)
-      );
+      const { result } = renderHook(() => useDebouncedCallback(callback, 500));
 
       act(() => {
         result.current('first');
@@ -179,9 +169,7 @@ describe('useDebounce Hook', () => {
 
     it('handles multiple arguments', () => {
       const callback = jest.fn() as jest.Mock;
-      const { result } = renderHook(() => 
-        useDebouncedCallback(callback, 500)
-      );
+      const { result } = renderHook(() => useDebouncedCallback(callback, 500));
 
       act(() => {
         result.current(1, 'two', { three: 3 }, [4, 5]);
@@ -201,7 +189,7 @@ describe('useDebounce Hook', () => {
 
       const { result, rerender } = renderHook(
         ({ cb }) => useDebouncedCallback(cb, 500),
-        { initialProps: { cb: callback1 } }
+        { initialProps: { cb: callback1 } },
       );
 
       act(() => {
@@ -221,8 +209,8 @@ describe('useDebounce Hook', () => {
 
     it('cleans up timeout on unmount', () => {
       const callback = jest.fn() as jest.Mock;
-      const { result, unmount } = renderHook(() => 
-        useDebouncedCallback(callback, 500)
+      const { result, unmount } = renderHook(() =>
+        useDebouncedCallback(callback, 500),
       );
 
       act(() => {
@@ -241,9 +229,7 @@ describe('useDebounce Hook', () => {
 
     it('handles zero delay', () => {
       const callback = jest.fn() as jest.Mock;
-      const { result } = renderHook(() => 
-        useDebouncedCallback(callback, 0)
-      );
+      const { result } = renderHook(() => useDebouncedCallback(callback, 0));
 
       act(() => {
         result.current('immediate');
@@ -260,7 +246,7 @@ describe('useDebounce Hook', () => {
       const callback = jest.fn() as jest.Mock;
       const { result, rerender } = renderHook(
         ({ cb }) => useDebouncedCallback(cb, 500),
-        { initialProps: { cb: callback } }
+        { initialProps: { cb: callback } },
       );
 
       const firstRef = result.current;
@@ -278,7 +264,7 @@ describe('useDebounce Hook', () => {
       const searchApi = jest.fn() as jest.Mock;
       const { result, rerender } = renderHook(
         ({ query }) => useDebounce(query, 300),
-        { initialProps: { query: '' } }
+        { initialProps: { query: '' } },
       );
 
       // User types "hello" quickly
@@ -300,8 +286,8 @@ describe('useDebounce Hook', () => {
 
     it('window resize debouncing', () => {
       const handleResize = jest.fn() as jest.Mock;
-      const { result } = renderHook(() => 
-        useDebouncedCallback(handleResize, 200)
+      const { result } = renderHook(() =>
+        useDebouncedCallback(handleResize, 200),
       );
 
       // Simulate rapid resize events

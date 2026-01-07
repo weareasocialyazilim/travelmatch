@@ -12,7 +12,8 @@ const starPositions = Array.from({ length: 20 }, (_, i) => ({
 
 export const metadata: Metadata = {
   title: 'Proof Ceremony - TravelMatch',
-  description: 'Hediye deneyimlerinizi unutulmaz anılara dönüştürün. AI destekli doğrulama, Sunset Clock ve daha fazlası.',
+  description:
+    'Hediye deneyimlerinizi unutulmaz anılara dönüştürün. AI destekli doğrulama, Sunset Clock ve daha fazlası.',
 };
 
 export default function ProofCeremonyPage() {
@@ -25,14 +26,20 @@ export default function ProofCeremonyPage() {
             Proof Ceremony
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
-            Hediye doğrulamasını sıkıcı bir işlemden
-            kutlanacak bir ana dönüştürdük.
+            Hediye doğrulamasını sıkıcı bir işlemden kutlanacak bir ana
+            dönüştürdük.
           </p>
           <div className="flex gap-4 justify-center">
-            <a href="/download" className="px-8 py-4 bg-amber-500 text-white font-semibold rounded-full hover:bg-amber-600 transition">
+            <a
+              href="/download"
+              className="px-8 py-4 bg-amber-500 text-white font-semibold rounded-full hover:bg-amber-600 transition"
+            >
               Hemen Dene
             </a>
-            <a href="#features" className="px-8 py-4 border-2 border-gray-300 font-semibold rounded-full hover:border-gray-400 transition">
+            <a
+              href="#features"
+              className="px-8 py-4 border-2 border-gray-300 font-semibold rounded-full hover:border-gray-400 transition"
+            >
               Özellikleri Gör
             </a>
           </div>
@@ -65,15 +72,21 @@ export default function ProofCeremonyPage() {
               </p>
               <ul className="space-y-3">
                 <li className="flex items-center gap-2">
-                  <span className="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm">✓</span>
+                  <span className="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm">
+                    ✓
+                  </span>
                   Sinematik animasyonlar
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm">✓</span>
+                  <span className="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm">
+                    ✓
+                  </span>
                   Haptic bildirimler
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm">✓</span>
+                  <span className="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm">
+                    ✓
+                  </span>
                   Premium süre uzatma
                 </li>
               </ul>
@@ -94,7 +107,7 @@ export default function ProofCeremonyPage() {
                     style={{
                       top: star.top,
                       left: star.left,
-                      animationDelay: star.delay
+                      animationDelay: star.delay,
                     }}
                   />
                 ))}
@@ -102,22 +115,31 @@ export default function ProofCeremonyPage() {
               <div className="text-6xl">⭐</div>
             </div>
             <div className="order-1 md:order-2">
-              <h3 className="text-3xl font-bold mb-4">⭐ Trust Constellation</h3>
+              <h3 className="text-3xl font-bold mb-4">
+                ⭐ Trust Constellation
+              </h3>
               <p className="text-gray-600 mb-6">
-                Güven skorunuz sayısal olmaktan çıkıp görsel bir yıldız haritasına dönüşür.
-                Her başarılı doğrulama yeni bir yıldız ekler.
+                Güven skorunuz sayısal olmaktan çıkıp görsel bir yıldız
+                haritasına dönüşür. Her başarılı doğrulama yeni bir yıldız
+                ekler.
               </p>
               <ul className="space-y-3">
                 <li className="flex items-center gap-2">
-                  <span className="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm">✓</span>
+                  <span className="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm">
+                    ✓
+                  </span>
                   Kişiselleştirilmiş yıldız haritası
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm">✓</span>
+                  <span className="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm">
+                    ✓
+                  </span>
                   Başarı rozetleri
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm">✓</span>
+                  <span className="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm">
+                    ✓
+                  </span>
                   Paylaşılabilir profil kartı
                 </li>
               </ul>
@@ -129,20 +151,26 @@ export default function ProofCeremonyPage() {
             <div>
               <h3 className="text-3xl font-bold mb-4">🔐 Sacred Moments</h3>
               <p className="text-gray-600 mb-6">
-                En özel anlarınız uçtan uca şifreleme ile korunur.
-                Sadece siz kontrol edersiniz - kiminle, ne zaman paylaşacağınızı.
+                En özel anlarınız uçtan uca şifreleme ile korunur. Sadece siz
+                kontrol edersiniz - kiminle, ne zaman paylaşacağınızı.
               </p>
               <ul className="space-y-3">
                 <li className="flex items-center gap-2">
-                  <span className="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm">✓</span>
+                  <span className="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm">
+                    ✓
+                  </span>
                   Uçtan uca şifreleme
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm">✓</span>
+                  <span className="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm">
+                    ✓
+                  </span>
                   Screenshot koruması
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm">✓</span>
+                  <span className="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm">
+                    ✓
+                  </span>
                   Süreli paylaşım linkleri
                 </li>
               </ul>
@@ -163,14 +191,20 @@ export default function ProofCeremonyPage() {
             Hediye Deneyimini Yeniden Keşfet
           </h2>
           <p className="text-xl text-white/90 max-w-2xl mx-auto mb-8">
-            Proof Ceremony ile her deneyim unutulmaz bir anıya dönüşür.
-            Hemen uygulamayı indir ve farkı yaşa.
+            Proof Ceremony ile her deneyim unutulmaz bir anıya dönüşür. Hemen
+            uygulamayı indir ve farkı yaşa.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
-            <a href="/download" className="px-8 py-4 bg-white text-amber-600 font-semibold rounded-full hover:bg-gray-100 transition shadow-lg">
+            <a
+              href="/download"
+              className="px-8 py-4 bg-white text-amber-600 font-semibold rounded-full hover:bg-gray-100 transition shadow-lg"
+            >
               App Store
             </a>
-            <a href="/download" className="px-8 py-4 bg-white text-amber-600 font-semibold rounded-full hover:bg-gray-100 transition shadow-lg">
+            <a
+              href="/download"
+              className="px-8 py-4 bg-white text-amber-600 font-semibold rounded-full hover:bg-gray-100 transition shadow-lg"
+            >
               Google Play
             </a>
           </div>

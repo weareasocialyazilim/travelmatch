@@ -53,15 +53,23 @@ export const useNotificationStore = create<NotificationStore>((set) => ({
 // Helper functions for common notification types
 export const notify = {
   success: (title: string, message?: string) => {
-    useNotificationStore.getState().addNotification({ type: 'success', title, message });
+    useNotificationStore
+      .getState()
+      .addNotification({ type: 'success', title, message });
   },
   error: (title: string, message?: string) => {
-    useNotificationStore.getState().addNotification({ type: 'error', title, message });
+    useNotificationStore
+      .getState()
+      .addNotification({ type: 'error', title, message });
   },
   warning: (title: string, message?: string) => {
-    useNotificationStore.getState().addNotification({ type: 'warning', title, message });
+    useNotificationStore
+      .getState()
+      .addNotification({ type: 'warning', title, message });
   },
   info: (title: string, message?: string) => {
-    useNotificationStore.getState().addNotification({ type: 'info', title, message });
+    useNotificationStore
+      .getState()
+      .addNotification({ type: 'info', title, message });
   },
 };

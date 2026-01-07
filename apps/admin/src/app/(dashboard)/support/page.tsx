@@ -23,7 +23,13 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -58,13 +64,15 @@ const mockTickets = [
       {
         id: 'm1',
         sender: 'user',
-        content: 'Merhaba, dün yaptığım ödeme hala işlenmedi. 500 TL tutarında bir işlem yaptım ama bakiyemde görünmüyor.',
+        content:
+          'Merhaba, dün yaptığım ödeme hala işlenmedi. 500 TL tutarında bir işlem yaptım ama bakiyemde görünmüyor.',
         created_at: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
       },
       {
         id: 'm2',
         sender: 'admin',
-        content: 'Merhaba Ali Bey, sorununuzu inceliyoruz. İşlem numaranızı paylaşabilir misiniz?',
+        content:
+          'Merhaba Ali Bey, sorununuzu inceliyoruz. İşlem numaranızı paylaşabilir misiniz?',
         created_at: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
         admin_name: 'Destek Ekibi',
       },
@@ -95,7 +103,8 @@ const mockTickets = [
       {
         id: 'm1',
         sender: 'user',
-        content: 'Şifremi değiştirdikten sonra hesabıma giriş yapamıyorum. "Geçersiz kimlik bilgileri" hatası alıyorum.',
+        content:
+          'Şifremi değiştirdikten sonra hesabıma giriş yapamıyorum. "Geçersiz kimlik bilgileri" hatası alıyorum.',
         created_at: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
       },
     ],
@@ -125,7 +134,8 @@ const mockTickets = [
       {
         id: 'm2',
         sender: 'admin',
-        content: 'İade işleminiz başlatıldı. 3-5 iş günü içinde hesabınıza yansıyacaktır.',
+        content:
+          'İade işleminiz başlatıldı. 3-5 iş günü içinde hesabınıza yansıyacaktır.',
         created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
         admin_name: 'Finans Ekibi',
       },
@@ -138,24 +148,31 @@ const mockCannedResponses = [
   {
     id: 'c1',
     title: 'Ödeme Gecikmesi',
-    content: 'Merhaba, ödeme işleminiz inceleniyor. Bankalar arası transferlerde 1-3 iş günü gecikme olabilmektedir. İşleminizin durumunu takip ediyoruz.',
+    content:
+      'Merhaba, ödeme işleminiz inceleniyor. Bankalar arası transferlerde 1-3 iş günü gecikme olabilmektedir. İşleminizin durumunu takip ediyoruz.',
   },
   {
     id: 'c2',
     title: 'Şifre Sıfırlama',
-    content: 'Şifrenizi sıfırlamak için giriş sayfasındaki "Şifremi Unuttum" bağlantısını kullanabilirsiniz. E-posta adresinize sıfırlama linki gönderilecektir.',
+    content:
+      'Şifrenizi sıfırlamak için giriş sayfasındaki "Şifremi Unuttum" bağlantısını kullanabilirsiniz. E-posta adresinize sıfırlama linki gönderilecektir.',
   },
   {
     id: 'c3',
     title: 'İade Süreci',
-    content: 'İade talebiniz alınmıştır. İade işlemleri 3-5 iş günü içinde tamamlanmaktadır. İşlem tamamlandığında size bilgilendirme yapılacaktır.',
+    content:
+      'İade talebiniz alınmıştır. İade işlemleri 3-5 iş günü içinde tamamlanmaktadır. İşlem tamamlandığında size bilgilendirme yapılacaktır.',
   },
 ];
 
 const statusConfig = {
   open: { label: 'Açık', variant: 'error' as const, icon: AlertCircle },
   pending: { label: 'Bekliyor', variant: 'warning' as const, icon: Clock },
-  resolved: { label: 'Çözüldü', variant: 'success' as const, icon: CheckCircle },
+  resolved: {
+    label: 'Çözüldü',
+    variant: 'success' as const,
+    icon: CheckCircle,
+  },
 };
 
 const priorityConfig = {
@@ -173,22 +190,25 @@ const categoryConfig = {
 };
 
 export default function SupportPage() {
-  const [selectedTicket, setSelectedTicket] = useState<typeof mockTickets[0] | null>(
-    mockTickets[0]
-  );
+  const [selectedTicket, setSelectedTicket] = useState<
+    (typeof mockTickets)[0] | null
+  >(mockTickets[0]);
   const [search, setSearch] = useState('');
   const [replyText, setReplyText] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
   const openTickets = mockTickets.filter((t) => t.status === 'open').length;
-  const pendingTickets = mockTickets.filter((t) => t.status === 'pending').length;
+  const pendingTickets = mockTickets.filter(
+    (t) => t.status === 'pending',
+  ).length;
 
   const filteredTickets = mockTickets.filter((ticket) => {
     const matchesSearch =
       ticket.subject.toLowerCase().includes(search.toLowerCase()) ||
       ticket.user.full_name.toLowerCase().includes(search.toLowerCase()) ||
       ticket.id.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || ticket.status === statusFilter;
+    const matchesStatus =
+      statusFilter === 'all' || ticket.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -222,7 +242,9 @@ export default function SupportPage() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Toplam Talepler</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Toplam Talepler
+            </CardTitle>
             <Inbox className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -232,7 +254,9 @@ export default function SupportPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ortalama Yanıt Süresi</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Ortalama Yanıt Süresi
+            </CardTitle>
             <Timer className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -258,7 +282,9 @@ export default function SupportPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Müşteri Memnuniyeti</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Müşteri Memnuniyeti
+            </CardTitle>
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -300,7 +326,8 @@ export default function SupportPage() {
           <CardContent className="p-0">
             <ScrollArea className="h-[500px]">
               {filteredTickets.map((ticket) => {
-                const statusInfo = statusConfig[ticket.status as keyof typeof statusConfig];
+                const statusInfo =
+                  statusConfig[ticket.status as keyof typeof statusConfig];
                 const StatusIcon = statusInfo.icon;
 
                 return (
@@ -308,7 +335,7 @@ export default function SupportPage() {
                     key={ticket.id}
                     className={cn(
                       'cursor-pointer border-b p-4 transition-colors hover:bg-accent/50',
-                      selectedTicket?.id === ticket.id && 'bg-accent'
+                      selectedTicket?.id === ticket.id && 'bg-accent',
                     )}
                     onClick={() => setSelectedTicket(ticket)}
                   >
@@ -320,8 +347,12 @@ export default function SupportPage() {
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="text-sm font-medium">{ticket.user.full_name}</p>
-                          <p className="text-xs text-muted-foreground">{ticket.id}</p>
+                          <p className="text-sm font-medium">
+                            {ticket.user.full_name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {ticket.id}
+                          </p>
                         </div>
                       </div>
                       <Badge variant={statusInfo.variant} className="text-xs">
@@ -350,15 +381,44 @@ export default function SupportPage() {
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <CardTitle className="text-lg">{selectedTicket.subject}</CardTitle>
-                      <Badge variant={statusConfig[selectedTicket.status as keyof typeof statusConfig].variant}>
-                        {statusConfig[selectedTicket.status as keyof typeof statusConfig].label}
+                      <CardTitle className="text-lg">
+                        {selectedTicket.subject}
+                      </CardTitle>
+                      <Badge
+                        variant={
+                          statusConfig[
+                            selectedTicket.status as keyof typeof statusConfig
+                          ].variant
+                        }
+                      >
+                        {
+                          statusConfig[
+                            selectedTicket.status as keyof typeof statusConfig
+                          ].label
+                        }
                       </Badge>
                     </div>
                     <CardDescription className="mt-1">
-                      {selectedTicket.id} • {categoryConfig[selectedTicket.category as keyof typeof categoryConfig]} •{' '}
-                      <span className={priorityConfig[selectedTicket.priority as keyof typeof priorityConfig].color}>
-                        {priorityConfig[selectedTicket.priority as keyof typeof priorityConfig].label} öncelik
+                      {selectedTicket.id} •{' '}
+                      {
+                        categoryConfig[
+                          selectedTicket.category as keyof typeof categoryConfig
+                        ]
+                      }{' '}
+                      •{' '}
+                      <span
+                        className={
+                          priorityConfig[
+                            selectedTicket.priority as keyof typeof priorityConfig
+                          ].color
+                        }
+                      >
+                        {
+                          priorityConfig[
+                            selectedTicket.priority as keyof typeof priorityConfig
+                          ].label
+                        }{' '}
+                        öncelik
                       </span>
                     </CardDescription>
                   </div>
@@ -383,7 +443,9 @@ export default function SupportPage() {
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium">{selectedTicket.user.full_name}</p>
+                      <p className="font-medium">
+                        {selectedTicket.user.full_name}
+                      </p>
                       <p className="text-sm text-muted-foreground">
                         {selectedTicket.user.email}
                       </p>
@@ -411,7 +473,9 @@ export default function SupportPage() {
                         key={message.id}
                         className={cn(
                           'flex',
-                          message.sender === 'admin' ? 'justify-end' : 'justify-start'
+                          message.sender === 'admin'
+                            ? 'justify-end'
+                            : 'justify-start',
                         )}
                       >
                         <div
@@ -419,7 +483,7 @@ export default function SupportPage() {
                             'max-w-[80%] rounded-lg p-3',
                             message.sender === 'admin'
                               ? 'bg-primary text-primary-foreground'
-                              : 'bg-muted'
+                              : 'bg-muted',
                           )}
                         >
                           <p className="text-sm">{message.content}</p>
@@ -428,13 +492,20 @@ export default function SupportPage() {
                               'mt-1 flex items-center gap-2 text-xs',
                               message.sender === 'admin'
                                 ? 'text-primary-foreground/70'
-                                : 'text-muted-foreground'
+                                : 'text-muted-foreground',
                             )}
                           >
                             {message.sender === 'admin' && (
-                              <span>{(message as { admin_name?: string }).admin_name}</span>
+                              <span>
+                                {
+                                  (message as { admin_name?: string })
+                                    .admin_name
+                                }
+                              </span>
                             )}
-                            <span>{formatRelativeDate(message.created_at)}</span>
+                            <span>
+                              {formatRelativeDate(message.created_at)}
+                            </span>
                           </div>
                         </div>
                       </div>

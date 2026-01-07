@@ -217,7 +217,18 @@ export function Sidebar() {
     if (sidebarCollapsed) {
       return (
         <Tooltip delayDuration={0}>
-          <TooltipTrigger asChild>{content}</TooltipTrigger>
+          <TooltipTrigger asChild>
+            <Link
+              href={item.href}
+              className={cn(
+                'admin-sidebar-item',
+                isActive && 'admin-sidebar-item-active',
+                'justify-center px-2',
+              )}
+            >
+              <item.icon className="admin-sidebar-item-icon" />
+            </Link>
+          </TooltipTrigger>
           <TooltipContent side="right" className="flex items-center gap-2">
             {item.title}
             {item.badge !== undefined && item.badge > 0 && (
@@ -303,7 +314,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <ScrollArea className="admin-sidebar-nav flex-1">
+      <div className="admin-sidebar-nav flex-1 overflow-y-auto">
         <NavSection title="Ana Menu" items={mainNavItems} />
         <NavSection title="Yonetim" items={managementNavItems} />
         <NavSection title="Operasyon" items={operationsNavItems} />
@@ -311,7 +322,7 @@ export function Sidebar() {
         <NavSection title="Buyume" items={growthNavItems} />
         <NavSection title="Teknoloji" items={techNavItems} />
         <NavSection title="Sistem" items={settingsNavItems} />
-      </ScrollArea>
+      </div>
 
       {/* User Section */}
       <div className="border-t p-3">

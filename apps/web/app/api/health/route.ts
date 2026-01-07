@@ -9,6 +9,6 @@ export function GET() {
       timestamp: new Date().toISOString(),
       service: 'travelmatch-web',
     },
-    { status: 200 }
+    { status: 200 },
   );
 }

@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
             id, email, kyc_status, created_at
           )
         `,
-          { count: 'exact' }
+          { count: 'exact' },
         )
         .order('created_at', { ascending: false })
         .range(offset, offset + limit - 1);
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
         logger.error('SAR query error:', error);
         return NextResponse.json(
           { error: 'SAR kayıtları yüklenemedi' },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
             id, email, kyc_status, created_at
           )
         `,
-          { count: 'exact' }
+          { count: 'exact' },
         )
         .order('risk_score', { ascending: false })
         .range(offset, offset + limit - 1);
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
         logger.error('Risk profiles query error:', error);
         return NextResponse.json(
           { error: 'Risk profilleri yüklenemedi' },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
         logger.error('AML thresholds query error:', error);
         return NextResponse.json(
           { error: 'AML eşikleri yüklenemedi' },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
@@ -137,7 +137,7 @@ export async function GET(request: NextRequest) {
         logger.error('Fraud rules query error:', error);
         return NextResponse.json(
           { error: 'Fraud kuralları yüklenemedi' },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
@@ -172,7 +172,14 @@ export async function POST(request: NextRequest) {
     const supabase = createServiceClient();
 
     if (action === 'create_sar') {
-      const { user_id, report_type, triggered_rules, risk_score, total_amount, currency } = data;
+      const {
+        user_id,
+        report_type,
+        triggered_rules,
+        risk_score,
+        total_amount,
+        currency,
+      } = data;
 
       const { data: sar, error } = await supabase
         .from('suspicious_activity_reports')
@@ -193,7 +200,7 @@ export async function POST(request: NextRequest) {
         logger.error('SAR creation error:', error);
         return NextResponse.json(
           { error: 'SAR oluşturulamadı' },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
@@ -205,7 +212,7 @@ export async function POST(request: NextRequest) {
         null,
         sar,
         request.headers.get('x-forwarded-for') || undefined,
-        request.headers.get('user-agent') || undefined
+        request.headers.get('user-agent') || undefined,
       );
 
       return NextResponse.json({ sar }, { status: 201 });
@@ -214,20 +221,18 @@ export async function POST(request: NextRequest) {
     if (action === 'block_user') {
       const { user_id, block_reason } = data;
 
-      const { error } = await supabase
-        .from('user_risk_profiles')
-        .upsert({
-          user_id,
-          is_blocked: true,
-          block_reason,
-          blocked_at: new Date().toISOString(),
-        });
+      const { error } = await supabase.from('user_risk_profiles').upsert({
+        user_id,
+        is_blocked: true,
+        block_reason,
+        blocked_at: new Date().toISOString(),
+      });
 
       if (error) {
         logger.error('User block error:', error);
         return NextResponse.json(
           { error: 'Kullanıcı engellenemedi' },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
@@ -239,7 +244,7 @@ export async function POST(request: NextRequest) {
         { is_blocked: false },
         { is_blocked: true, block_reason },
         request.headers.get('x-forwarded-for') || undefined,
-        request.headers.get('user-agent') || undefined
+        request.headers.get('user-agent') || undefined,
       );
 
       return NextResponse.json({ success: true });
@@ -261,7 +266,7 @@ export async function POST(request: NextRequest) {
         logger.error('User unblock error:', error);
         return NextResponse.json(
           { error: 'Kullanıcı engeli kaldırılamadı' },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
@@ -273,7 +278,7 @@ export async function POST(request: NextRequest) {
         { is_blocked: true },
         { is_blocked: false },
         request.headers.get('x-forwarded-for') || undefined,
-        request.headers.get('user-agent') || undefined
+        request.headers.get('user-agent') || undefined,
       );
 
       return NextResponse.json({ success: true });
@@ -350,7 +355,7 @@ export async function PATCH(request: NextRequest) {
       logger.error('SAR update error:', error);
       return NextResponse.json(
         { error: 'SAR güncellenemedi' },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -362,7 +367,7 @@ export async function PATCH(request: NextRequest) {
       currentSar,
       sar,
       request.headers.get('x-forwarded-for') || undefined,
-      request.headers.get('user-agent') || undefined
+      request.headers.get('user-agent') || undefined,
     );
 
     return NextResponse.json({ sar });

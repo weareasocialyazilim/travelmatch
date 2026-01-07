@@ -77,7 +77,7 @@ export const useOfflineSupabase = () => {
 
             // Execute original method (typed call)
             const fn = original as (...a: unknown[]) => unknown;
-             
+
             return fn(...args);
           };
         }

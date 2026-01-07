@@ -13,23 +13,28 @@ export interface ExportColumn<T> {
 export function exportToCSV<T extends Record<string, unknown>>(
   data: T[],
   columns: ExportColumn<T>[],
-  filename: string
+  filename: string,
 ): void {
   const headers = columns.map((col) => col.header);
   const rows = data.map((item) =>
     columns.map((col) => {
-      const value = typeof col.accessor === 'function'
-        ? col.accessor(item)
-        : item[col.accessor];
+      const value =
+        typeof col.accessor === 'function'
+          ? col.accessor(item)
+          : item[col.accessor];
       return value?.toString() ?? '';
-    })
+    }),
   );
 
   const csvContent = [headers, ...rows]
-    .map((row) => row.map((cell) => `"${cell.toString().replace(/"/g, '""')}"`).join(','))
+    .map((row) =>
+      row.map((cell) => `"${cell.toString().replace(/"/g, '""')}"`).join(','),
+    )
     .join('\n');
 
-  const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob(['\ufeff' + csvContent], {
+    type: 'text/csv;charset=utf-8;',
+  });
   downloadBlob(blob, `${filename}.csv`);
 }
 
@@ -40,21 +45,23 @@ export function exportToExcel<T extends Record<string, unknown>>(
   data: T[],
   columns: ExportColumn<T>[],
   filename: string,
-  sheetName: string = 'Sheet1'
+  sheetName: string = 'Sheet1',
 ): void {
   const headers = columns.map((col) => col.header);
   const rows = data.map((item) =>
     columns.map((col) => {
-      const value = typeof col.accessor === 'function'
-        ? col.accessor(item)
-        : item[col.accessor];
+      const value =
+        typeof col.accessor === 'function'
+          ? col.accessor(item)
+          : item[col.accessor];
       return value?.toString() ?? '';
-    })
+    }),
   );
 
   let xmlContent = '<?xml version="1.0" encoding="UTF-8"?>\n';
   xmlContent += '<?mso-application progid="Excel.Sheet"?>\n';
-  xmlContent += '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" ';
+  xmlContent +=
+    '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" ';
   xmlContent += 'xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">\n';
   xmlContent += `<Worksheet ss:Name="${escapeXml(sheetName)}">\n<Table>\n`;
 

@@ -70,7 +70,10 @@ export const HelpCenterScreen: React.FC<HelpCenterScreenProps> = ({
         {FAQS.map((faq) => (
           <TouchableOpacity
             key={faq.id}
-            style={[styles.faqItem, expandedId === faq.id && styles.faqItemActive]}
+            style={[
+              styles.faqItem,
+              expandedId === faq.id && styles.faqItemActive,
+            ]}
             onPress={() => setExpandedId(expandedId === faq.id ? null : faq.id)}
             activeOpacity={0.8}
           >

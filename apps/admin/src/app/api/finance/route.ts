@@ -46,10 +46,28 @@ export async function GET(request: NextRequest) {
     // Calculate summary stats
     type Transaction = { type?: string; amount?: number };
     const summary = {
-      totalRevenue: transactions?.filter((t: Transaction) => t.type === 'subscription' || t.type === 'boost').reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) || 0,
-      totalRefunds: transactions?.filter((t: Transaction) => t.type === 'refund').reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) || 0,
-      subscriptionRevenue: transactions?.filter((t: Transaction) => t.type === 'subscription').reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) || 0,
-      boostRevenue: transactions?.filter((t: Transaction) => t.type === 'boost').reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) || 0,
+      totalRevenue:
+        transactions
+          ?.filter(
+            (t: Transaction) => t.type === 'subscription' || t.type === 'boost',
+          )
+          .reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) ||
+        0,
+      totalRefunds:
+        transactions
+          ?.filter((t: Transaction) => t.type === 'refund')
+          .reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) ||
+        0,
+      subscriptionRevenue:
+        transactions
+          ?.filter((t: Transaction) => t.type === 'subscription')
+          .reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) ||
+        0,
+      boostRevenue:
+        transactions
+          ?.filter((t: Transaction) => t.type === 'boost')
+          .reduce((sum: number, t: Transaction) => sum + (t.amount || 0), 0) ||
+        0,
       transactionCount: count || 0,
     };
 
@@ -62,7 +80,7 @@ export async function GET(request: NextRequest) {
     logger.error('Finance API error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch finance data' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

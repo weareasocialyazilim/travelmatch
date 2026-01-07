@@ -60,7 +60,13 @@ export type LabelVariant =
   | 'rejected'
   | 'pending';
 
-export type StatusVariant = 'info' | 'success' | 'warning' | 'error' | 'neutral' | 'premium';
+export type StatusVariant =
+  | 'info'
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'neutral'
+  | 'premium';
 
 export type BadgeSize = 'sm' | 'md' | 'lg';
 
@@ -102,43 +108,106 @@ export interface TMBadgeProps {
 // Config
 // ═══════════════════════════════════════════════════════════════════
 
-const LABEL_VARIANT_CONFIG: Record<LabelVariant, { bg: string; text: string }> = {
-  default: { bg: primitives.stone[100], text: primitives.stone[600] },
-  success: { bg: primitives.emerald[50], text: primitives.emerald[600] },
-  warning: { bg: primitives.amber[50], text: primitives.amber[600] },
-  error: { bg: primitives.red[50], text: primitives.red[600] },
-  info: { bg: primitives.blue[50], text: primitives.blue[600] },
-  primary: { bg: primitives.amber[50], text: primitives.amber[600] },
-  featured: { bg: '#3D4A3A', text: COLORS.white },
-  popular: { bg: primitives.seafoam[500], text: COLORS.white },
-  new: { bg: primitives.stone[800], text: COLORS.white },
-  premium: { bg: primitives.amber[500], text: COLORS.white },
-  interview: { bg: primitives.blue[500], text: COLORS.white },
-  approved: { bg: primitives.emerald[500], text: COLORS.white },
-  rejected: { bg: primitives.red[500], text: COLORS.white },
-  pending: { bg: primitives.amber[500], text: COLORS.white },
+const LABEL_VARIANT_CONFIG: Record<LabelVariant, { bg: string; text: string }> =
+  {
+    default: { bg: primitives.stone[100], text: primitives.stone[600] },
+    success: { bg: primitives.emerald[50], text: primitives.emerald[600] },
+    warning: { bg: primitives.amber[50], text: primitives.amber[600] },
+    error: { bg: primitives.red[50], text: primitives.red[600] },
+    info: { bg: primitives.blue[50], text: primitives.blue[600] },
+    primary: { bg: primitives.amber[50], text: primitives.amber[600] },
+    featured: { bg: '#3D4A3A', text: COLORS.white },
+    popular: { bg: primitives.seafoam[500], text: COLORS.white },
+    new: { bg: primitives.stone[800], text: COLORS.white },
+    premium: { bg: primitives.amber[500], text: COLORS.white },
+    interview: { bg: primitives.blue[500], text: COLORS.white },
+    approved: { bg: primitives.emerald[500], text: COLORS.white },
+    rejected: { bg: primitives.red[500], text: COLORS.white },
+    pending: { bg: primitives.amber[500], text: COLORS.white },
+  };
+
+const STATUS_VARIANT_CONFIG: Record<
+  StatusVariant,
+  { bg: string; text: string; border: string; dot: string }
+> = {
+  info: {
+    bg: 'rgba(59, 130, 246, 0.15)',
+    text: primitives.blue[400],
+    border: 'rgba(59, 130, 246, 0.3)',
+    dot: primitives.blue[500],
+  },
+  success: {
+    bg: 'rgba(16, 185, 129, 0.15)',
+    text: primitives.emerald[400],
+    border: 'rgba(16, 185, 129, 0.3)',
+    dot: primitives.emerald[500],
+  },
+  warning: {
+    bg: 'rgba(245, 158, 11, 0.15)',
+    text: primitives.amber[400],
+    border: 'rgba(245, 158, 11, 0.3)',
+    dot: primitives.amber[500],
+  },
+  error: {
+    bg: 'rgba(239, 68, 68, 0.15)',
+    text: primitives.red[400],
+    border: 'rgba(239, 68, 68, 0.3)',
+    dot: primitives.red[500],
+  },
+  neutral: {
+    bg: 'rgba(168, 162, 158, 0.15)',
+    text: primitives.stone[400],
+    border: 'rgba(168, 162, 158, 0.3)',
+    dot: primitives.stone[500],
+  },
+  premium: {
+    bg: 'rgba(245, 158, 11, 0.2)',
+    text: primitives.amber[300],
+    border: 'rgba(245, 158, 11, 0.4)',
+    dot: COLORS.primary,
+  },
 };
 
-const STATUS_VARIANT_CONFIG: Record<StatusVariant, { bg: string; text: string; border: string; dot: string }> = {
-  info: { bg: 'rgba(59, 130, 246, 0.15)', text: primitives.blue[400], border: 'rgba(59, 130, 246, 0.3)', dot: primitives.blue[500] },
-  success: { bg: 'rgba(16, 185, 129, 0.15)', text: primitives.emerald[400], border: 'rgba(16, 185, 129, 0.3)', dot: primitives.emerald[500] },
-  warning: { bg: 'rgba(245, 158, 11, 0.15)', text: primitives.amber[400], border: 'rgba(245, 158, 11, 0.3)', dot: primitives.amber[500] },
-  error: { bg: 'rgba(239, 68, 68, 0.15)', text: primitives.red[400], border: 'rgba(239, 68, 68, 0.3)', dot: primitives.red[500] },
-  neutral: { bg: 'rgba(168, 162, 158, 0.15)', text: primitives.stone[400], border: 'rgba(168, 162, 158, 0.3)', dot: primitives.stone[500] },
-  premium: { bg: 'rgba(245, 158, 11, 0.2)', text: primitives.amber[300], border: 'rgba(245, 158, 11, 0.4)', dot: COLORS.primary },
-};
-
-const SIZE_CONFIG: Record<BadgeSize, { height: number; paddingH: number; fontSize: number; iconSize: number; dotSize: number }> = {
+const SIZE_CONFIG: Record<
+  BadgeSize,
+  {
+    height: number;
+    paddingH: number;
+    fontSize: number;
+    iconSize: number;
+    dotSize: number;
+  }
+> = {
   sm: { height: 22, paddingH: 8, fontSize: 10, iconSize: 12, dotSize: 6 },
   md: { height: 28, paddingH: 10, fontSize: 12, iconSize: 14, dotSize: 7 },
   lg: { height: 34, paddingH: 14, fontSize: 14, iconSize: 16, dotSize: 8 },
 };
 
 const TRUST_LEVELS = [
-  { min: 90, label: 'PLATINUM', colors: ['#E5E4E2', '#B0B0B0'], icon: 'shield-crown' },
-  { min: 70, label: 'GOLD', colors: ['#FFD700', '#FDB931'], icon: 'shield-star' },
-  { min: 50, label: 'SILVER', colors: ['#C0C0C0', '#E0E0E0'], icon: 'shield-check' },
-  { min: 0, label: 'MEMBER', colors: ['#CD7F32', '#A0522D'], icon: 'shield-outline' },
+  {
+    min: 90,
+    label: 'PLATINUM',
+    colors: ['#E5E4E2', '#B0B0B0'],
+    icon: 'shield-crown',
+  },
+  {
+    min: 70,
+    label: 'GOLD',
+    colors: ['#FFD700', '#FDB931'],
+    icon: 'shield-star',
+  },
+  {
+    min: 50,
+    label: 'SILVER',
+    colors: ['#C0C0C0', '#E0E0E0'],
+    icon: 'shield-check',
+  },
+  {
+    min: 0,
+    label: 'MEMBER',
+    colors: ['#CD7F32', '#A0522D'],
+    icon: 'shield-outline',
+  },
 ] as const;
 
 // ═══════════════════════════════════════════════════════════════════
@@ -167,10 +236,10 @@ export const TMBadge: React.FC<TMBadgeProps> = ({
       pulseOpacity.value = withRepeat(
         withSequence(
           withTiming(0.5, { duration: 800, easing: Easing.inOut(Easing.ease) }),
-          withTiming(1, { duration: 800, easing: Easing.inOut(Easing.ease) })
+          withTiming(1, { duration: 800, easing: Easing.inOut(Easing.ease) }),
         ),
         -1,
-        false
+        false,
       );
     }
   }, [pulse, type, pulseOpacity]);
@@ -182,10 +251,24 @@ export const TMBadge: React.FC<TMBadgeProps> = ({
   // Render based on type
   switch (type) {
     case 'notification':
-      return <NotificationBadgeInternal count={count || 0} max={maxCount} style={style} testID={testID} />;
+      return (
+        <NotificationBadgeInternal
+          count={count || 0}
+          max={maxCount}
+          style={style}
+          testID={testID}
+        />
+      );
 
     case 'trust':
-      return <TrustBadgeInternal score={trustScore || 0} size={size} style={style} testID={testID} />;
+      return (
+        <TrustBadgeInternal
+          score={trustScore || 0}
+          size={size}
+          style={style}
+          testID={testID}
+        />
+      );
 
     case 'status':
       return (
@@ -258,12 +341,33 @@ const LabelBadgeInternal: React.FC<LabelBadgeInternalProps> = ({
       testID={testID}
     >
       {showDot && (
-        <View style={[styles.dot, { width: sizeConf.dotSize, height: sizeConf.dotSize, backgroundColor: config.text }]} />
+        <View
+          style={[
+            styles.dot,
+            {
+              width: sizeConf.dotSize,
+              height: sizeConf.dotSize,
+              backgroundColor: config.text,
+            },
+          ]}
+        />
       )}
       {icon && (
-        <MaterialCommunityIcons name={icon} size={sizeConf.iconSize} color={config.text} style={styles.icon} />
+        <MaterialCommunityIcons
+          name={icon}
+          size={sizeConf.iconSize}
+          color={config.text}
+          style={styles.icon}
+        />
       )}
-      <Text style={[styles.labelText, { color: config.text, fontSize: sizeConf.fontSize }]}>{label}</Text>
+      <Text
+        style={[
+          styles.labelText,
+          { color: config.text, fontSize: sizeConf.fontSize },
+        ]}
+      >
+        {label}
+      </Text>
     </View>
   );
 };
@@ -291,7 +395,8 @@ const StatusBadgeInternal: React.FC<StatusBadgeInternalProps> = ({
   style,
   testID,
 }) => {
-  const config = STATUS_VARIANT_CONFIG[variant] || STATUS_VARIANT_CONFIG.neutral;
+  const config =
+    STATUS_VARIANT_CONFIG[variant] || STATUS_VARIANT_CONFIG.neutral;
   const sizeConf = SIZE_CONFIG[size];
 
   return (
@@ -324,9 +429,21 @@ const StatusBadgeInternal: React.FC<StatusBadgeInternalProps> = ({
         />
       )}
       {icon && (
-        <MaterialCommunityIcons name={icon} size={sizeConf.iconSize} color={config.text} style={styles.icon} />
+        <MaterialCommunityIcons
+          name={icon}
+          size={sizeConf.iconSize}
+          color={config.text}
+          style={styles.icon}
+        />
       )}
-      <Text style={[styles.statusText, { fontSize: sizeConf.fontSize, color: config.text }]}>{label.toUpperCase()}</Text>
+      <Text
+        style={[
+          styles.statusText,
+          { fontSize: sizeConf.fontSize, color: config.text },
+        ]}
+      >
+        {label.toUpperCase()}
+      </Text>
     </View>
   );
 };
@@ -338,7 +455,12 @@ interface TrustBadgeInternalProps {
   testID?: string;
 }
 
-const TrustBadgeInternal: React.FC<TrustBadgeInternalProps> = ({ score, size, style, testID }) => {
+const TrustBadgeInternal: React.FC<TrustBadgeInternalProps> = ({
+  score,
+  size,
+  style,
+  testID,
+}) => {
   const level = useMemo(() => {
     for (const l of TRUST_LEVELS) {
       if (score >= l.min) return l;
@@ -353,10 +475,21 @@ const TrustBadgeInternal: React.FC<TrustBadgeInternalProps> = ({ score, size, st
       colors={level.colors as unknown as [string, string]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
-      style={[styles.trustContainer, { paddingHorizontal: sizeConf.paddingH, paddingVertical: sizeConf.height / 6 }, style]}
+      style={[
+        styles.trustContainer,
+        {
+          paddingHorizontal: sizeConf.paddingH,
+          paddingVertical: sizeConf.height / 6,
+        },
+        style,
+      ]}
       testID={testID}
     >
-      <MaterialCommunityIcons name={level.icon as any} size={sizeConf.iconSize} color="#333" />
+      <MaterialCommunityIcons
+        name={level.icon as any}
+        size={sizeConf.iconSize}
+        color="#333"
+      />
       <Text style={[styles.trustText, { fontSize: sizeConf.fontSize }]}>
         {level.label} • {score}
       </Text>
@@ -371,7 +504,12 @@ interface NotificationBadgeInternalProps {
   testID?: string;
 }
 
-const NotificationBadgeInternal: React.FC<NotificationBadgeInternalProps> = ({ count, max, style, testID }) => {
+const NotificationBadgeInternal: React.FC<NotificationBadgeInternalProps> = ({
+  count,
+  max,
+  style,
+  testID,
+}) => {
   if (count <= 0) return null;
 
   const displayCount = count > max ? `${max}+` : count.toString();
@@ -460,18 +598,49 @@ const styles = StyleSheet.create({
 // ═══════════════════════════════════════════════════════════════════
 
 /** @deprecated Use TMBadge with type="status" variant="error" pulse showDot */
-export const LiveStatusBadge: React.FC<{ label?: string; style?: ViewStyle }> = ({ label = 'CANLI', style }) => (
-  <TMBadge type="status" variant="error" label={label} size="sm" showDot pulse style={style} />
+export const LiveStatusBadge: React.FC<{
+  label?: string;
+  style?: ViewStyle;
+}> = ({ label = 'CANLI', style }) => (
+  <TMBadge
+    type="status"
+    variant="error"
+    label={label}
+    size="sm"
+    showDot
+    pulse
+    style={style}
+  />
 );
 
 /** @deprecated Use TMBadge with type="status" variant="success" icon="check-decagram" */
-export const VerifiedBadge: React.FC<{ size?: BadgeSize; style?: ViewStyle }> = ({ size = 'sm', style }) => (
-  <TMBadge type="status" variant="success" label="Onaylı" size={size} icon="check-decagram" style={style} />
+export const VerifiedBadge: React.FC<{
+  size?: BadgeSize;
+  style?: ViewStyle;
+}> = ({ size = 'sm', style }) => (
+  <TMBadge
+    type="status"
+    variant="success"
+    label="Onaylı"
+    size={size}
+    icon="check-decagram"
+    style={style}
+  />
 );
 
 /** @deprecated Use TMBadge with type="status" variant="premium" icon="crown" */
-export const PremiumBadge: React.FC<{ size?: BadgeSize; style?: ViewStyle }> = ({ size = 'sm', style }) => (
-  <TMBadge type="status" variant="premium" label="Premium" size={size} icon="crown" style={style} />
+export const PremiumBadge: React.FC<{
+  size?: BadgeSize;
+  style?: ViewStyle;
+}> = ({ size = 'sm', style }) => (
+  <TMBadge
+    type="status"
+    variant="premium"
+    label="Premium"
+    size={size}
+    icon="crown"
+    style={style}
+  />
 );
 
 export default TMBadge;

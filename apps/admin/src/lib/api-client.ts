@@ -20,7 +20,10 @@ class ApiClient {
     this.baseUrl = baseUrl;
   }
 
-  private buildUrl(endpoint: string, params?: Record<string, string | number | boolean | undefined>): string {
+  private buildUrl(
+    endpoint: string,
+    params?: Record<string, string | number | boolean | undefined>,
+  ): string {
     const url = new URL(`${this.baseUrl}${endpoint}`, window.location.origin);
 
     if (params) {
@@ -56,7 +59,10 @@ class ApiClient {
     return { status: response.status };
   }
 
-  async get<T>(endpoint: string, config?: RequestConfig): Promise<ApiResponse<T>> {
+  async get<T>(
+    endpoint: string,
+    config?: RequestConfig,
+  ): Promise<ApiResponse<T>> {
     const { params, ...fetchConfig } = config || {};
     const url = this.buildUrl(endpoint, params);
 
@@ -79,7 +85,11 @@ class ApiClient {
     }
   }
 
-  async post<T>(endpoint: string, data?: unknown, config?: RequestConfig): Promise<ApiResponse<T>> {
+  async post<T>(
+    endpoint: string,
+    data?: unknown,
+    config?: RequestConfig,
+  ): Promise<ApiResponse<T>> {
     const { params, ...fetchConfig } = config || {};
     const url = this.buildUrl(endpoint, params);
 
@@ -103,7 +113,11 @@ class ApiClient {
     }
   }
 
-  async patch<T>(endpoint: string, data?: unknown, config?: RequestConfig): Promise<ApiResponse<T>> {
+  async patch<T>(
+    endpoint: string,
+    data?: unknown,
+    config?: RequestConfig,
+  ): Promise<ApiResponse<T>> {
     const { params, ...fetchConfig } = config || {};
     const url = this.buildUrl(endpoint, params);
 
@@ -127,7 +141,11 @@ class ApiClient {
     }
   }
 
-  async put<T>(endpoint: string, data?: unknown, config?: RequestConfig): Promise<ApiResponse<T>> {
+  async put<T>(
+    endpoint: string,
+    data?: unknown,
+    config?: RequestConfig,
+  ): Promise<ApiResponse<T>> {
     const { params, ...fetchConfig } = config || {};
     const url = this.buildUrl(endpoint, params);
 
@@ -151,7 +169,10 @@ class ApiClient {
     }
   }
 
-  async delete<T>(endpoint: string, config?: RequestConfig): Promise<ApiResponse<T>> {
+  async delete<T>(
+    endpoint: string,
+    config?: RequestConfig,
+  ): Promise<ApiResponse<T>> {
     const { params, ...fetchConfig } = config || {};
     const url = this.buildUrl(endpoint, params);
 

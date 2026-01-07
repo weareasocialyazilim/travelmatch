@@ -21,9 +21,9 @@ export { ToastProvider, useToast } from './ToastContext';
 export { ConfirmationProvider, useConfirmation } from './ConfirmationContext';
 
 // Network status
-export { 
-  NetworkProvider, 
-  useNetwork, 
+export {
+  NetworkProvider,
+  useNetwork,
   useNetworkStatus,
   type NetworkStatus,
   type NetworkContextValue,

@@ -25,8 +25,15 @@ export async function GET(request: NextRequest) {
     const sortOrder = searchParams.get('sort_order') || 'desc';
 
     // Validate sortBy to prevent arbitrary column access
-    const allowedSortColumns = ['created_at', 'updated_at', 'display_name', 'email'];
-    const safeSortBy = allowedSortColumns.includes(sortBy) ? sortBy : 'created_at';
+    const allowedSortColumns = [
+      'created_at',
+      'updated_at',
+      'display_name',
+      'email',
+    ];
+    const safeSortBy = allowedSortColumns.includes(sortBy)
+      ? sortBy
+      : 'created_at';
 
     const supabase = createServiceClient();
 
@@ -40,7 +47,9 @@ export async function GET(request: NextRequest) {
     if (search) {
       const safeSearch = escapeSupabaseFilter(search);
       if (safeSearch) {
-        query = query.or(`display_name.ilike.%${safeSearch}%,email.ilike.%${safeSearch}%`);
+        query = query.or(
+          `display_name.ilike.%${safeSearch}%,email.ilike.%${safeSearch}%`,
+        );
       }
     }
 
@@ -64,7 +73,10 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('Users query error:', error);
-      return NextResponse.json({ error: 'Kullanıcılar yüklenemedi' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Kullanıcılar yüklenemedi' },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({

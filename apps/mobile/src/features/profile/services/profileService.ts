@@ -479,7 +479,10 @@ export const profileApi = {
     if (item.item_type === 'moment') {
       await supabase
         .from('moments')
-        .update({ deleted_at: new Date().toISOString() } as Record<string, unknown>)
+        .update({ deleted_at: new Date().toISOString() } as Record<
+          string,
+          unknown
+        >)
         .eq('id', item.item_id)
         .eq('user_id', user.id);
     }

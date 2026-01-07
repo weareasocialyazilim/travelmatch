@@ -55,31 +55,44 @@ describe('errorHandler', () => {
     });
 
     it('should contain user-friendly language', () => {
-      expect(USER_FRIENDLY_MESSAGES[ErrorCode.NETWORK_ERROR]).toContain('internet connection');
-      expect(USER_FRIENDLY_MESSAGES[ErrorCode.UNAUTHORIZED]).toContain('log in');
+      expect(USER_FRIENDLY_MESSAGES[ErrorCode.NETWORK_ERROR]).toContain(
+        'internet connection',
+      );
+      expect(USER_FRIENDLY_MESSAGES[ErrorCode.UNAUTHORIZED]).toContain(
+        'log in',
+      );
     });
   });
 
   describe('ERROR_RECOVERY_SUGGESTIONS', () => {
     it('should have recovery suggestions for all error codes', () => {
-      expect(ERROR_RECOVERY_SUGGESTIONS[ErrorCode.NETWORK_ERROR]).toBeInstanceOf(Array);
-      expect(ERROR_RECOVERY_SUGGESTIONS[ErrorCode.TIMEOUT_ERROR]).toBeInstanceOf(Array);
+      expect(
+        ERROR_RECOVERY_SUGGESTIONS[ErrorCode.NETWORK_ERROR],
+      ).toBeInstanceOf(Array);
+      expect(
+        ERROR_RECOVERY_SUGGESTIONS[ErrorCode.TIMEOUT_ERROR],
+      ).toBeInstanceOf(Array);
     });
 
     it('should provide actionable suggestions', () => {
-      const networkSuggestions = ERROR_RECOVERY_SUGGESTIONS[ErrorCode.NETWORK_ERROR];
+      const networkSuggestions =
+        ERROR_RECOVERY_SUGGESTIONS[ErrorCode.NETWORK_ERROR];
       expect(networkSuggestions.length).toBeGreaterThan(0);
     });
   });
 
   describe('standardizeError', () => {
     it('should standardize AppError', () => {
-      const appError = new AppError('Test error', { code: ErrorCode.API_ERROR });
+      const appError = new AppError('Test error', {
+        code: ErrorCode.API_ERROR,
+      });
       const result = standardizeError(appError, 'TestContext');
 
       expect(result.code).toBe(ErrorCode.API_ERROR);
       expect(result.message).toBe('Test error');
-      expect(result.userMessage).toBe(USER_FRIENDLY_MESSAGES[ErrorCode.API_ERROR]);
+      expect(result.userMessage).toBe(
+        USER_FRIENDLY_MESSAGES[ErrorCode.API_ERROR],
+      );
       expect(result.severity).toBe(ErrorSeverity.ERROR);
       expect(result.recoverable).toBe(true);
     });
@@ -169,7 +182,10 @@ describe('errorHandler', () => {
       const error = new ApiError('Test');
       ErrorHandler.handle(error);
 
-      expect(logger.error).toHaveBeenCalledWith('Error in error listener:', expect.any(Error));
+      expect(logger.error).toHaveBeenCalledWith(
+        'Error in error listener:',
+        expect.any(Error),
+      );
     });
   });
 
@@ -189,7 +205,9 @@ describe('errorHandler', () => {
 
   describe('ErrorHandler.wrap', () => {
     it('should wrap async functions and handle errors', async () => {
-      const mockFn = jest.fn().mockRejectedValue(new ApiError('API call failed'));
+      const mockFn = jest
+        .fn()
+        .mockRejectedValue(new ApiError('API call failed'));
       const wrappedFn = ErrorHandler.wrap(mockFn, 'WrappedFunction');
 
       await expect(wrappedFn()).rejects.toMatchObject({
@@ -289,7 +307,10 @@ describe('errorHandler', () => {
         .mockRejectedValueOnce(new NetworkError('Failed 2'))
         .mockResolvedValueOnce('Success');
 
-      const promise = retryWithErrorHandling(mockFn, { maxRetries: 3, baseDelay: 100 });
+      const promise = retryWithErrorHandling(mockFn, {
+        maxRetries: 3,
+        baseDelay: 100,
+      });
 
       await jest.advanceTimersByTimeAsync(100);
       await jest.advanceTimersByTimeAsync(200);
@@ -304,7 +325,9 @@ describe('errorHandler', () => {
 
       const promise = retryWithErrorHandling(mockFn, { maxRetries: 3 });
 
-      await expect(promise).rejects.toMatchObject({ code: ErrorCode.UNAUTHORIZED });
+      await expect(promise).rejects.toMatchObject({
+        code: ErrorCode.UNAUTHORIZED,
+      });
       expect(mockFn).toHaveBeenCalledTimes(1);
     });
 

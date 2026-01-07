@@ -42,7 +42,9 @@ describe('Validation Utilities', () => {
 
     it('should handle edge cases', () => {
       expect(isValidEmail('a@b.co')).toBe(true);
-      expect(isValidEmail('very.long.email.address@subdomain.domain.com')).toBe(true);
+      expect(isValidEmail('very.long.email.address@subdomain.domain.com')).toBe(
+        true,
+      );
     });
   });
 
@@ -124,7 +126,9 @@ describe('Validation Utilities', () => {
       it('should return invalid for short passwords', () => {
         const result = checkPasswordStrength('Pass1');
         expect(result.isValid).toBe(false);
-        expect(result.feedback).toContain('Password must be at least 8 characters');
+        expect(result.feedback).toContain(
+          'Password must be at least 8 characters',
+        );
       });
 
       it('should provide feedback for passwords without uppercase', () => {
@@ -180,7 +184,9 @@ describe('Validation Utilities', () => {
 
   describe('sanitizeString', () => {
     it('should remove dangerous HTML characters', () => {
-      expect(sanitizeString('<script>alert("xss")</script>')).toBe('scriptalert(xss)/script');
+      expect(sanitizeString('<script>alert("xss")</script>')).toBe(
+        'scriptalert(xss)/script',
+      );
       expect(sanitizeString('Hello <b>World</b>')).toBe('Hello bWorld/b');
     });
 

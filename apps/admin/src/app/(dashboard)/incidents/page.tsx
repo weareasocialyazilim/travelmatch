@@ -20,7 +20,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -117,7 +123,7 @@ const mockIncidents = [
       },
       {
         id: 2,
-        message: 'Bağlantı havuzu 100\'den 200\'e çıkarıldı',
+        message: "Bağlantı havuzu 100'den 200'e çıkarıldı",
         author: 'Mehmet D.',
         created_at: '2024-12-17T22:30:00Z',
       },
@@ -129,12 +135,13 @@ const mockIncidents = [
       },
     ],
     postmortem: {
-      summary: 'Beklenenden yüksek trafik nedeniyle veritabanı bağlantı havuzu doldu',
+      summary:
+        'Beklenenden yüksek trafik nedeniyle veritabanı bağlantı havuzu doldu',
       root_cause: 'Connection pool boyutu yetersizdi',
       action_items: [
         'Bağlantı havuzu boyutunu artır',
         'Auto-scaling kuralları ekle',
-        'Monitoring threshold\'larını güncelle',
+        "Monitoring threshold'larını güncelle",
       ],
     },
   },
@@ -150,16 +157,45 @@ const incidentStats = {
 
 export default function IncidentsPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [selectedIncident, setSelectedIncident] = useState<typeof mockIncidents[0] | null>(null);
+  const [selectedIncident, setSelectedIncident] = useState<
+    (typeof mockIncidents)[0] | null
+  >(null);
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string; icon: React.ReactNode }> = {
-      investigating: { variant: 'destructive', label: 'İnceleniyor', icon: <AlertCircle className="h-3 w-3" /> },
-      identified: { variant: 'secondary', label: 'Tespit Edildi', icon: <Eye className="h-3 w-3" /> },
-      monitoring: { variant: 'outline', label: 'İzleniyor', icon: <Clock className="h-3 w-3" /> },
-      resolved: { variant: 'default', label: 'Çözüldü', icon: <CheckCircle className="h-3 w-3" /> },
+    const variants: Record<
+      string,
+      {
+        variant: 'default' | 'secondary' | 'destructive' | 'outline';
+        label: string;
+        icon: React.ReactNode;
+      }
+    > = {
+      investigating: {
+        variant: 'destructive',
+        label: 'İnceleniyor',
+        icon: <AlertCircle className="h-3 w-3" />,
+      },
+      identified: {
+        variant: 'secondary',
+        label: 'Tespit Edildi',
+        icon: <Eye className="h-3 w-3" />,
+      },
+      monitoring: {
+        variant: 'outline',
+        label: 'İzleniyor',
+        icon: <Clock className="h-3 w-3" />,
+      },
+      resolved: {
+        variant: 'default',
+        label: 'Çözüldü',
+        icon: <CheckCircle className="h-3 w-3" />,
+      },
     };
-    const { variant, label, icon } = variants[status] || { variant: 'outline', label: status, icon: null };
+    const { variant, label, icon } = variants[status] || {
+      variant: 'outline',
+      label: status,
+      icon: null,
+    };
     return (
       <Badge variant={variant} className="gap-1">
         {icon}
@@ -199,7 +235,9 @@ export default function IncidentsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Olay Yönetimi</h1>
-          <p className="text-muted-foreground">Sistem olaylarını ve kesintileri yönetin</p>
+          <p className="text-muted-foreground">
+            Sistem olaylarını ve kesintileri yönetin
+          </p>
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
@@ -211,7 +249,9 @@ export default function IncidentsPage() {
           <DialogContent className="max-w-lg">
             <DialogHeader>
               <DialogTitle>Yeni Olay Bildirimi</DialogTitle>
-              <DialogDescription>Sistem olayı veya kesinti bildirin</DialogDescription>
+              <DialogDescription>
+                Sistem olayı veya kesinti bildirin
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4">
@@ -222,7 +262,11 @@ export default function IncidentsPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="description">Açıklama</Label>
-                <Textarea id="description" placeholder="Olayın detaylı açıklaması" rows={3} />
+                <Textarea
+                  id="description"
+                  placeholder="Olayın detaylı açıklaması"
+                  rows={3}
+                />
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
@@ -259,19 +303,34 @@ export default function IncidentsPage() {
               <div className="space-y-2">
                 <Label>Etkilenen Servisler</Label>
                 <div className="flex flex-wrap gap-2">
-                  <Badge variant="outline" className="cursor-pointer hover:bg-accent">
+                  <Badge
+                    variant="outline"
+                    className="cursor-pointer hover:bg-accent"
+                  >
                     API
                   </Badge>
-                  <Badge variant="outline" className="cursor-pointer hover:bg-accent">
+                  <Badge
+                    variant="outline"
+                    className="cursor-pointer hover:bg-accent"
+                  >
                     Database
                   </Badge>
-                  <Badge variant="outline" className="cursor-pointer hover:bg-accent">
+                  <Badge
+                    variant="outline"
+                    className="cursor-pointer hover:bg-accent"
+                  >
                     Auth
                   </Badge>
-                  <Badge variant="outline" className="cursor-pointer hover:bg-accent">
+                  <Badge
+                    variant="outline"
+                    className="cursor-pointer hover:bg-accent"
+                  >
                     Payments
                   </Badge>
-                  <Badge variant="outline" className="cursor-pointer hover:bg-accent">
+                  <Badge
+                    variant="outline"
+                    className="cursor-pointer hover:bg-accent"
+                  >
                     Notifications
                   </Badge>
                 </div>
@@ -301,7 +360,9 @@ export default function IncidentsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
-              <p className="text-2xl font-bold text-orange-600">{incidentStats.active}</p>
+              <p className="text-2xl font-bold text-orange-600">
+                {incidentStats.active}
+              </p>
               <p className="text-sm text-muted-foreground">Aktif</p>
             </div>
           </CardContent>
@@ -309,7 +370,9 @@ export default function IncidentsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
-              <p className="text-2xl font-bold text-green-600">{incidentStats.resolved}</p>
+              <p className="text-2xl font-bold text-green-600">
+                {incidentStats.resolved}
+              </p>
               <p className="text-sm text-muted-foreground">Çözüldü</p>
             </div>
           </CardContent>
@@ -317,7 +380,9 @@ export default function IncidentsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
-              <p className="text-2xl font-bold">{incidentStats.avgResolutionTime}</p>
+              <p className="text-2xl font-bold">
+                {incidentStats.avgResolutionTime}
+              </p>
               <p className="text-sm text-muted-foreground">Ort. Çözüm Süresi</p>
             </div>
           </CardContent>
@@ -337,7 +402,8 @@ export default function IncidentsPage() {
         <TabsList>
           <TabsTrigger value="active">
             <AlertTriangle className="mr-2 h-4 w-4" />
-            Aktif ({mockIncidents.filter((i) => i.status !== 'resolved').length})
+            Aktif ({mockIncidents.filter((i) => i.status !== 'resolved').length}
+            )
           </TabsTrigger>
           <TabsTrigger value="resolved">
             <CheckCircle className="mr-2 h-4 w-4" />
@@ -382,7 +448,9 @@ export default function IncidentsPage() {
                           {getStatusBadge(incident.status)}
                           {getSeverityBadge(incident.severity)}
                         </div>
-                        <p className="text-sm text-muted-foreground">{incident.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {incident.description}
+                        </p>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Users className="h-4 w-4" />
@@ -395,7 +463,11 @@ export default function IncidentsPage() {
                         </div>
                         <div className="flex flex-wrap gap-2">
                           {incident.affected_services.map((service) => (
-                            <Badge key={service} variant="outline" className="text-xs">
+                            <Badge
+                              key={service}
+                              variant="outline"
+                              className="text-xs"
+                            >
                               {service}
                             </Badge>
                           ))}
@@ -414,7 +486,9 @@ export default function IncidentsPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => setSelectedIncident(incident)}>
+                          <DropdownMenuItem
+                            onClick={() => setSelectedIncident(incident)}
+                          >
                             <Eye className="mr-2 h-4 w-4" />
                             Detaylar
                           </DropdownMenuItem>
@@ -435,15 +509,21 @@ export default function IncidentsPage() {
                   {/* Updates Timeline */}
                   {incident.updates.length > 0 && (
                     <div className="mt-4 border-t pt-4">
-                      <p className="text-sm font-medium mb-2">Son Güncellemeler</p>
+                      <p className="text-sm font-medium mb-2">
+                        Son Güncellemeler
+                      </p>
                       <div className="space-y-2">
                         {incident.updates.slice(-2).map((update) => (
-                          <div key={update.id} className="flex items-start gap-2 text-sm">
+                          <div
+                            key={update.id}
+                            className="flex items-start gap-2 text-sm"
+                          >
                             <div className="h-2 w-2 mt-2 rounded-full bg-blue-500" />
                             <div>
                               <p>{update.message}</p>
                               <p className="text-xs text-muted-foreground">
-                                {update.author} • {formatDate(update.created_at)}
+                                {update.author} •{' '}
+                                {formatDate(update.created_at)}
                               </p>
                             </div>
                           </div>
@@ -476,12 +556,18 @@ export default function IncidentsPage() {
                           {getStatusBadge(incident.status)}
                         </div>
                         <div className="mt-1 flex items-center gap-4 text-sm text-muted-foreground">
-                          <span>Çözüldü: {formatDate(incident.resolved_at!)}</span>
+                          <span>
+                            Çözüldü: {formatDate(incident.resolved_at!)}
+                          </span>
                           <span>Süre: 1.75 saat</span>
                         </div>
                       </div>
                     </div>
-                    <Button size="sm" variant="outline" onClick={() => setSelectedIncident(incident)}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setSelectedIncident(incident)}
+                    >
                       <FileText className="mr-2 h-4 w-4" />
                       Post-mortem
                     </Button>
@@ -492,18 +578,25 @@ export default function IncidentsPage() {
         </TabsContent>
 
         <TabsContent value="all">
-          <p className="text-muted-foreground">Tüm olaylar burada listelenir...</p>
+          <p className="text-muted-foreground">
+            Tüm olaylar burada listelenir...
+          </p>
         </TabsContent>
       </Tabs>
 
       {/* Incident Detail Dialog */}
-      <Dialog open={!!selectedIncident} onOpenChange={() => setSelectedIncident(null)}>
+      <Dialog
+        open={!!selectedIncident}
+        onOpenChange={() => setSelectedIncident(null)}
+      >
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
               {selectedIncident?.id} - {selectedIncident?.title}
             </DialogTitle>
-            <DialogDescription>{selectedIncident?.description}</DialogDescription>
+            <DialogDescription>
+              {selectedIncident?.description}
+            </DialogDescription>
           </DialogHeader>
 
           {selectedIncident && (
@@ -517,7 +610,10 @@ export default function IncidentsPage() {
                 <p className="text-sm font-medium">Güncelleme Geçmişi</p>
                 <div className="space-y-3">
                   {selectedIncident.updates.map((update) => (
-                    <div key={update.id} className="flex items-start gap-2 text-sm">
+                    <div
+                      key={update.id}
+                      className="flex items-start gap-2 text-sm"
+                    >
                       <div className="h-2 w-2 mt-2 rounded-full bg-blue-500" />
                       <div>
                         <p>{update.message}</p>
@@ -535,17 +631,21 @@ export default function IncidentsPage() {
                   <p className="text-sm font-medium">Post-mortem</p>
                   <div className="space-y-2 text-sm">
                     <p>
-                      <strong>Özet:</strong> {selectedIncident.postmortem.summary}
+                      <strong>Özet:</strong>{' '}
+                      {selectedIncident.postmortem.summary}
                     </p>
                     <p>
-                      <strong>Kök Neden:</strong> {selectedIncident.postmortem.root_cause}
+                      <strong>Kök Neden:</strong>{' '}
+                      {selectedIncident.postmortem.root_cause}
                     </p>
                     <div>
                       <strong>Aksiyon Maddeleri:</strong>
                       <ul className="list-disc list-inside mt-1">
-                        {selectedIncident.postmortem.action_items.map((item, i) => (
-                          <li key={i}>{item}</li>
-                        ))}
+                        {selectedIncident.postmortem.action_items.map(
+                          (item, i) => (
+                            <li key={i}>{item}</li>
+                          ),
+                        )}
                       </ul>
                     </div>
                   </div>

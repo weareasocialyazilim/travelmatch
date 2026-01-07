@@ -22,7 +22,13 @@ import {
   Star,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -113,9 +119,27 @@ const teamMembers = [
 ];
 
 const shifts = [
-  { name: 'Sabah Vardiyası', time: '09:00 - 17:00', icon: Sun, members: 4, color: 'bg-yellow-100' },
-  { name: 'Öğleden Sonra', time: '14:00 - 22:00', icon: Coffee, members: 3, color: 'bg-orange-100' },
-  { name: 'Gece Vardiyası', time: '22:00 - 06:00', icon: Moon, members: 2, color: 'bg-indigo-100' },
+  {
+    name: 'Sabah Vardiyası',
+    time: '09:00 - 17:00',
+    icon: Sun,
+    members: 4,
+    color: 'bg-yellow-100',
+  },
+  {
+    name: 'Öğleden Sonra',
+    time: '14:00 - 22:00',
+    icon: Coffee,
+    members: 3,
+    color: 'bg-orange-100',
+  },
+  {
+    name: 'Gece Vardiyası',
+    time: '22:00 - 06:00',
+    icon: Moon,
+    members: 2,
+    color: 'bg-indigo-100',
+  },
 ];
 
 const leaderboard = [
@@ -158,7 +182,7 @@ export default function TeamPage() {
   };
 
   const filteredMembers = teamMembers.filter(
-    (m) => selectedShift === 'all' || m.shift === selectedShift
+    (m) => selectedShift === 'all' || m.shift === selectedShift,
   );
 
   return (
@@ -167,7 +191,9 @@ export default function TeamPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Ekip Merkezi</h1>
-          <p className="text-muted-foreground">Ekip yönetimi ve performans takibi</p>
+          <p className="text-muted-foreground">
+            Ekip yönetimi ve performans takibi
+          </p>
         </div>
         <Button>
           <Calendar className="mr-2 h-4 w-4" />
@@ -193,7 +219,9 @@ export default function TeamPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Şu An Çevrimiçi</p>
-                <p className="text-2xl font-bold text-green-600">{teamStats.online_now}</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {teamStats.online_now}
+                </p>
               </div>
               <div className="flex h-8 w-8 items-center justify-center">
                 <div className="h-3 w-3 rounded-full bg-green-500 animate-pulse" />
@@ -205,8 +233,12 @@ export default function TeamPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Bugün Tamamlanan</p>
-                <p className="text-2xl font-bold">{teamStats.tasks_completed_today}</p>
+                <p className="text-sm text-muted-foreground">
+                  Bugün Tamamlanan
+                </p>
+                <p className="text-2xl font-bold">
+                  {teamStats.tasks_completed_today}
+                </p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-500" />
             </div>
@@ -216,8 +248,12 @@ export default function TeamPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Ort. Yanıt Süresi</p>
-                <p className="text-2xl font-bold">{teamStats.avg_response_time}</p>
+                <p className="text-sm text-muted-foreground">
+                  Ort. Yanıt Süresi
+                </p>
+                <p className="text-2xl font-bold">
+                  {teamStats.avg_response_time}
+                </p>
               </div>
               <Clock className="h-8 w-8 text-orange-500" />
             </div>
@@ -237,7 +273,9 @@ export default function TeamPage() {
                   </div>
                   <div>
                     <p className="font-medium">{shift.name}</p>
-                    <p className="text-sm text-muted-foreground">{shift.time}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {shift.time}
+                    </p>
                   </div>
                 </div>
                 <div className="text-right">
@@ -306,13 +344,17 @@ export default function TeamPage() {
                         <Laptop className="h-4 w-4 text-muted-foreground" />
                         <span className="text-muted-foreground">Şu an:</span>
                       </div>
-                      <p className="mt-1 text-sm font-medium">{member.current_task}</p>
+                      <p className="mt-1 text-sm font-medium">
+                        {member.current_task}
+                      </p>
                     </div>
                   )}
 
                   <div className="mt-4 flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Bugün</span>
-                    <span className="font-medium">{member.tasks_today} görev</span>
+                    <span className="font-medium">
+                      {member.tasks_today} görev
+                    </span>
                   </div>
 
                   <div className="mt-4 flex gap-2">
@@ -340,7 +382,9 @@ export default function TeamPage() {
                   <Award className="h-5 w-5 text-yellow-500" />
                   Bu Hafta Liderlik Tablosu
                 </CardTitle>
-                <CardDescription>En çok görev tamamlayan ekip üyeleri</CardDescription>
+                <CardDescription>
+                  En çok görev tamamlayan ekip üyeleri
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -365,7 +409,9 @@ export default function TeamPage() {
                         </div>
                         <div>
                           <p className="font-medium">{item.name}</p>
-                          <p className="text-sm text-muted-foreground">{item.tasks} görev</p>
+                          <p className="text-sm text-muted-foreground">
+                            {item.tasks} görev
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
@@ -391,35 +437,59 @@ export default function TeamPage() {
                 <div className="space-y-6">
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium">Görev Tamamlama</span>
-                      <span className="text-sm text-muted-foreground">324 / 400</span>
+                      <span className="text-sm font-medium">
+                        Görev Tamamlama
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        324 / 400
+                      </span>
                     </div>
                     <Progress value={81} className="h-2" />
-                    <p className="mt-1 text-xs text-muted-foreground">%81 tamamlandı</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      %81 tamamlandı
+                    </p>
                   </div>
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium">Yanıt Süresi Hedefi</span>
-                      <span className="text-sm text-muted-foreground">4.2 dk / 5 dk</span>
+                      <span className="text-sm font-medium">
+                        Yanıt Süresi Hedefi
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        4.2 dk / 5 dk
+                      </span>
                     </div>
                     <Progress value={92} className="h-2" />
-                    <p className="mt-1 text-xs text-green-600">Hedefin altında!</p>
+                    <p className="mt-1 text-xs text-green-600">
+                      Hedefin altında!
+                    </p>
                   </div>
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium">Müşteri Memnuniyeti</span>
-                      <span className="text-sm text-muted-foreground">4.7 / 5.0</span>
+                      <span className="text-sm font-medium">
+                        Müşteri Memnuniyeti
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        4.7 / 5.0
+                      </span>
                     </div>
                     <Progress value={94} className="h-2" />
-                    <p className="mt-1 text-xs text-muted-foreground">%94 memnuniyet</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      %94 memnuniyet
+                    </p>
                   </div>
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium">İlk Yanıt Çözümü</span>
-                      <span className="text-sm text-muted-foreground">68% / 75%</span>
+                      <span className="text-sm font-medium">
+                        İlk Yanıt Çözümü
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        68% / 75%
+                      </span>
                     </div>
                     <Progress value={68} className="h-2" />
-                    <p className="mt-1 text-xs text-orange-600">Hedefe yaklaşılıyor</p>
+                    <p className="mt-1 text-xs text-orange-600">
+                      Hedefe yaklaşılıyor
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -431,34 +501,52 @@ export default function TeamPage() {
           <Card>
             <CardHeader>
               <CardTitle>Vardiya Takvimi</CardTitle>
-              <CardDescription>Bu hafta için planlanan vardiyalar</CardDescription>
+              <CardDescription>
+                Bu hafta için planlanan vardiyalar
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="rounded-lg border">
                 <div className="grid grid-cols-8 border-b">
                   <div className="p-3 font-medium text-muted-foreground"></div>
-                  {['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'].map((day) => (
-                    <div key={day} className="p-3 text-center font-medium">
-                      {day}
-                    </div>
-                  ))}
+                  {['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'].map(
+                    (day) => (
+                      <div key={day} className="p-3 text-center font-medium">
+                        {day}
+                      </div>
+                    ),
+                  )}
                 </div>
                 {shifts.map((shift) => (
-                  <div key={shift.name} className="grid grid-cols-8 border-b last:border-0">
+                  <div
+                    key={shift.name}
+                    className="grid grid-cols-8 border-b last:border-0"
+                  >
                     <div className="p-3 flex items-center gap-2">
                       <shift.icon className="h-4 w-4" />
-                      <span className="text-sm font-medium">{shift.name.split(' ')[0]}</span>
+                      <span className="text-sm font-medium">
+                        {shift.name.split(' ')[0]}
+                      </span>
                     </div>
                     {[...Array(7)].map((_, i) => (
                       <div key={i} className="p-3 text-center">
                         <div className="flex -space-x-2 justify-center">
                           {teamMembers
-                            .filter((m) => m.shift === shift.name.toLowerCase().split(' ')[0])
+                            .filter(
+                              (m) =>
+                                m.shift ===
+                                shift.name.toLowerCase().split(' ')[0],
+                            )
                             .slice(0, 3)
                             .map((m) => (
-                              <Avatar key={m.id} className="h-6 w-6 border-2 border-background">
+                              <Avatar
+                                key={m.id}
+                                className="h-6 w-6 border-2 border-background"
+                              >
                                 <AvatarImage src={m.avatar} />
-                                <AvatarFallback className="text-xs">{m.name[0]}</AvatarFallback>
+                                <AvatarFallback className="text-xs">
+                                  {m.name[0]}
+                                </AvatarFallback>
                               </Avatar>
                             ))}
                         </div>

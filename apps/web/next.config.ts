@@ -1,4 +1,4 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 // Security headers configuration
 // OWASP recommended headers for web application security

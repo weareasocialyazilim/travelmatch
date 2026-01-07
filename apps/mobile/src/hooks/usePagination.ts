@@ -1,18 +1,18 @@
 /**
  * usePagination Hook
  * Generic cursor-based pagination for Supabase
- * 
+ *
  * Why cursor-based pagination?
  * - O(1) vs O(n) performance for offset-based
  * - Consistent results even with real-time inserts
  * - Better scalability for large datasets (1000+ items)
- * 
+ *
  * @example
  * ```typescript
  * const fetcher = async (cursor?: string) => {
  *   return await momentsService.listWithCursor({ cursor, limit: 20 });
  * };
- * 
+ *
  * const { items, loadMore, refresh, hasMore, loading } = usePagination(fetcher);
  * ```
  */
@@ -81,11 +81,11 @@ export interface UsePaginationReturn<T> {
 
 /**
  * Cursor-based pagination hook
- * 
+ *
  * Performance characteristics:
  * - Offset pagination: SELECT * FROM table OFFSET 1000 LIMIT 20 → Scans 1000 rows (O(n))
  * - Cursor pagination: SELECT * FROM table WHERE id < cursor LIMIT 20 → Uses index (O(1))
- * 
+ *
  * @param fetcher - Function that fetches paginated data
  * @param options - Configuration options
  * @returns Pagination state and controls
@@ -251,7 +251,7 @@ export function usePagination<T>(
 
 /**
  * Utility: Encode cursor from timestamp and ID
- * 
+ *
  * @example
  * ```typescript
  * const cursor = encodeCursor('2024-01-15T10:30:00Z', 'uuid-123');
@@ -265,7 +265,7 @@ export function encodeCursor(created_at: string, id: string): string {
 
 /**
  * Utility: Decode cursor to timestamp and ID
- * 
+ *
  * @example
  * ```typescript
  * const { created_at, id } = decodeCursor(cursorString);
@@ -286,7 +286,7 @@ export function decodeCursor(cursor: string): {
 
 /**
  * Utility: Build Supabase query with cursor pagination
- * 
+ *
  * @example
  * ```typescript
  * const query = supabase.from('moments').select('*');

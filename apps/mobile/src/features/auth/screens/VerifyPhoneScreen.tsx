@@ -59,7 +59,7 @@ export const VerifyPhoneScreen: React.FC<VerifyPhoneScreenProps> = ({
     if (resendCooldown > 0) {
       const timer = setTimeout(
         () => setResendCooldown(resendCooldown - 1),
-        1000
+        1000,
       );
       return () => clearTimeout(timer);
     }
@@ -252,9 +252,7 @@ export const VerifyPhoneScreen: React.FC<VerifyPhoneScreenProps> = ({
           >
             <LinearGradient
               colors={
-                isCodeComplete && !loading
-                  ? GRADIENTS.gift
-                  : GRADIENTS.disabled
+                isCodeComplete && !loading ? GRADIENTS.gift : GRADIENTS.disabled
               }
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}

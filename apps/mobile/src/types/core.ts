@@ -13,7 +13,12 @@ export type KYCStatusNew = 'not_started' | 'pending' | 'verified' | 'rejected';
 /**
  * User account status
  */
-export type UserAccountStatus = 'active' | 'suspended' | 'banned' | 'pending' | 'deleted';
+export type UserAccountStatus =
+  | 'active'
+  | 'suspended'
+  | 'banned'
+  | 'pending'
+  | 'deleted';
 
 export interface UserLocation {
   lat: number;

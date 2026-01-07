@@ -34,7 +34,10 @@ export const secureStorage = {
         await SecureStore.setItemAsync(key, value);
         return;
       } catch (err) {
-        logger.warn('[SecureStorage] SecureStore.setItem failed, falling back to AsyncStorage', { key, error: err });
+        logger.warn(
+          '[SecureStorage] SecureStore.setItem failed, falling back to AsyncStorage',
+          { key, error: err },
+        );
         // Try AsyncStorage as a fallback when SecureStore fails
         await AsyncStorage.setItem(`@secure_${key}`, value);
         return;
@@ -46,7 +49,10 @@ export const secureStorage = {
       await AsyncStorage.setItem(`@secure_${key}`, value);
       return;
     } catch (err) {
-      logger.warn('[SecureStorage] AsyncStorage.setItem failed, falling back to MMKV', { key, error: err });
+      logger.warn(
+        '[SecureStorage] AsyncStorage.setItem failed, falling back to MMKV',
+        { key, error: err },
+      );
       // As a last resort, persist to MMKV Storage
       await Storage.setItem(`@secure_${key}`, value);
     }
@@ -61,7 +67,10 @@ export const secureStorage = {
       try {
         return await SecureStore.getItemAsync(key);
       } catch (err) {
-        logger.warn('[SecureStorage] SecureStore.getItem failed, falling back to AsyncStorage', { key, error: err });
+        logger.warn(
+          '[SecureStorage] SecureStore.getItem failed, falling back to AsyncStorage',
+          { key, error: err },
+        );
         // Fallback to AsyncStorage when SecureStore fails
         return await AsyncStorage.getItem(`@secure_${key}`);
       }
@@ -71,7 +80,10 @@ export const secureStorage = {
     try {
       return await AsyncStorage.getItem(`@secure_${key}`);
     } catch (err) {
-      logger.warn('[SecureStorage] AsyncStorage.getItem failed, falling back to MMKV', { key, error: err });
+      logger.warn(
+        '[SecureStorage] AsyncStorage.getItem failed, falling back to MMKV',
+        { key, error: err },
+      );
       // Last resort: MMKV Storage
       return await Storage.getItem(`@secure_${key}`);
     }
@@ -87,7 +99,10 @@ export const secureStorage = {
         await SecureStore.deleteItemAsync(key);
         return;
       } catch (err) {
-        logger.warn('[SecureStorage] SecureStore.deleteItem failed, falling back to AsyncStorage', { key, error: err });
+        logger.warn(
+          '[SecureStorage] SecureStore.deleteItem failed, falling back to AsyncStorage',
+          { key, error: err },
+        );
         // Try AsyncStorage as fallback
         await AsyncStorage.removeItem(`@secure_${key}`);
         return;
@@ -99,7 +114,10 @@ export const secureStorage = {
       await AsyncStorage.removeItem(`@secure_${key}`);
       return;
     } catch (err) {
-      logger.warn('[SecureStorage] AsyncStorage.removeItem failed, falling back to MMKV', { key, error: err });
+      logger.warn(
+        '[SecureStorage] AsyncStorage.removeItem failed, falling back to MMKV',
+        { key, error: err },
+      );
       // Last resort: MMKV Storage
       await Storage.removeItem(`@secure_${key}`);
     }
@@ -238,11 +256,18 @@ export async function migrateSensitiveDataToSecure(): Promise<void> {
       if (value) {
         await secureStorage.setItem(newKey, value);
         await Storage.removeItem(old);
-        logger.info('[SecureStorage] Migration successful', { from: old, to: newKey });
+        logger.info('[SecureStorage] Migration successful', {
+          from: old,
+          to: newKey,
+        });
       }
     } catch (err) {
       // Log migration failure but don't break app startup
-      logger.warn('[SecureStorage] Migration failed', { from: old, to: newKey, error: err });
+      logger.warn('[SecureStorage] Migration failed', {
+        from: old,
+        to: newKey,
+        error: err,
+      });
     }
   }
 }

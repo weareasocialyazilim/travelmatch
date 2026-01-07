@@ -1,7 +1,14 @@
 import { faker } from '@faker-js/faker';
 
 // Types (compatible with admin types)
-type AdminRole = 'super_admin' | 'manager' | 'moderator' | 'finance' | 'marketing' | 'support' | 'viewer';
+type AdminRole =
+  | 'super_admin'
+  | 'manager'
+  | 'moderator'
+  | 'finance'
+  | 'marketing'
+  | 'support'
+  | 'viewer';
 type UserStatus = 'active' | 'suspended' | 'banned' | 'pending';
 type KycStatus = 'not_started' | 'pending' | 'verified' | 'rejected';
 
@@ -43,7 +50,15 @@ export function createAdminUser(overrides: Partial<AdminUser> = {}): AdminUser {
     email: faker.internet.email(),
     name: faker.person.fullName(),
     avatar_url: faker.helpers.maybe(() => faker.image.avatar()) ?? null,
-    role: faker.helpers.arrayElement<AdminRole>(['super_admin', 'manager', 'moderator', 'finance', 'marketing', 'support', 'viewer']),
+    role: faker.helpers.arrayElement<AdminRole>([
+      'super_admin',
+      'manager',
+      'moderator',
+      'finance',
+      'marketing',
+      'support',
+      'viewer',
+    ]),
     is_active: true,
     requires_2fa: false,
     totp_enabled: false,
@@ -64,13 +79,24 @@ export function createAppUser(overrides: Partial<AppUser> = {}): AppUser {
     full_name: faker.person.fullName(),
     display_name: faker.helpers.maybe(() => faker.internet.userName()) ?? null,
     avatar_url: faker.helpers.maybe(() => faker.image.avatar()) ?? null,
-    status: faker.helpers.arrayElement<UserStatus>(['active', 'suspended', 'banned', 'pending']),
-    kyc_status: faker.helpers.arrayElement<KycStatus>(['not_started', 'pending', 'verified', 'rejected']),
+    status: faker.helpers.arrayElement<UserStatus>([
+      'active',
+      'suspended',
+      'banned',
+      'pending',
+    ]),
+    kyc_status: faker.helpers.arrayElement<KycStatus>([
+      'not_started',
+      'pending',
+      'verified',
+      'rejected',
+    ]),
     balance: faker.number.float({ min: 0, max: 10000, fractionDigits: 2 }),
     total_trips: faker.number.int({ min: 0, max: 100 }),
     rating: faker.number.float({ min: 1, max: 5, fractionDigits: 1 }),
     created_at: faker.date.past().toISOString(),
-    last_active_at: faker.helpers.maybe(() => faker.date.recent().toISOString()) ?? null,
+    last_active_at:
+      faker.helpers.maybe(() => faker.date.recent().toISOString()) ?? null,
     ...overrides,
   };
 }
@@ -78,14 +104,20 @@ export function createAppUser(overrides: Partial<AppUser> = {}): AppUser {
 /**
  * Factory for creating a list of AdminUsers
  */
-export function createAdminUserList(count: number, overrides: Partial<AdminUser> = {}): AdminUser[] {
+export function createAdminUserList(
+  count: number,
+  overrides: Partial<AdminUser> = {},
+): AdminUser[] {
   return Array.from({ length: count }, () => createAdminUser(overrides));
 }
 
 /**
  * Factory for creating a list of AppUsers
  */
-export function createAppUserList(count: number, overrides: Partial<AppUser> = {}): AppUser[] {
+export function createAppUserList(
+  count: number,
+  overrides: Partial<AppUser> = {},
+): AppUser[] {
   return Array.from({ length: count }, () => createAppUser(overrides));
 }
 
@@ -103,7 +135,9 @@ export function createVerifiedUser(overrides: Partial<AppUser> = {}): AppUser {
 /**
  * Factory for creating a super admin user
  */
-export function createSuperAdmin(overrides: Partial<AdminUser> = {}): AdminUser {
+export function createSuperAdmin(
+  overrides: Partial<AdminUser> = {},
+): AdminUser {
   return createAdminUser({
     role: 'super_admin',
     is_active: true,

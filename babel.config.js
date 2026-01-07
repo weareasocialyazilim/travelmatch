@@ -35,8 +35,5 @@ module.exports = function (api) {
       // Reanimated MUST be last
       'react-native-reanimated/plugin',
     ],
-    // Exclude node_modules from root babel config processing
-    // React Native's Flow types must be handled by babel-preset-expo in apps/mobile
-    ignore: [/node_modules/],
   };
 };

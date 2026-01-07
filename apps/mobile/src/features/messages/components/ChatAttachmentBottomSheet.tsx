@@ -20,99 +20,98 @@ interface ChatAttachmentBottomSheetProps {
   onGift: () => void;
 }
 
-export const ChatAttachmentBottomSheet: React.FC<
-  ChatAttachmentBottomSheetProps
-> = memo(({ visible, onClose, onPhotoVideo, onGift }) => {
-  const options = [
-    {
-      id: 'photo',
-      icon: 'camera' as IconName,
-      label: 'Photo or Video',
-      description: 'Share a photo or video',
-      onPress: onPhotoVideo,
-      color: COLORS.brand.primary,
-    },
-    {
-      id: 'gift',
-      icon: 'gift' as IconName,
-      label: 'Send a Gift',
-      description: 'Gift this moment to someone',
-      onPress: onGift,
-      color: COLORS.brand.secondary,
-    },
-  ];
+export const ChatAttachmentBottomSheet: React.FC<ChatAttachmentBottomSheetProps> =
+  memo(({ visible, onClose, onPhotoVideo, onGift }) => {
+    const options = [
+      {
+        id: 'photo',
+        icon: 'camera' as IconName,
+        label: 'Photo or Video',
+        description: 'Share a photo or video',
+        onPress: onPhotoVideo,
+        color: COLORS.brand.primary,
+      },
+      {
+        id: 'gift',
+        icon: 'gift' as IconName,
+        label: 'Send a Gift',
+        description: 'Gift this moment to someone',
+        onPress: onGift,
+        color: COLORS.brand.secondary,
+      },
+    ];
 
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-      statusBarTranslucent
-    >
-      <Pressable style={styles.backdrop} onPress={onClose}>
-        <Pressable
-          style={styles.sheetContainer}
-          onPress={(e) => e.stopPropagation()}
-        >
-          {/* Handle */}
-          <View style={styles.handleContainer}>
-            <View style={styles.handle} />
-          </View>
+    return (
+      <Modal
+        visible={visible}
+        transparent
+        animationType="slide"
+        onRequestClose={onClose}
+        statusBarTranslucent
+      >
+        <Pressable style={styles.backdrop} onPress={onClose}>
+          <Pressable
+            style={styles.sheetContainer}
+            onPress={(e) => e.stopPropagation()}
+          >
+            {/* Handle */}
+            <View style={styles.handleContainer}>
+              <View style={styles.handle} />
+            </View>
 
-          {/* Header */}
-          <Text style={styles.header}>Add to message</Text>
+            {/* Header */}
+            <Text style={styles.header}>Add to message</Text>
 
-          {/* Options List */}
-          <View style={styles.optionsList}>
-            {options.map((option, index) => (
-              <React.Fragment key={option.id}>
-                <TouchableOpacity
-                  style={styles.optionItem}
-                  onPress={() => {
-                    option.onPress();
-                    onClose();
-                  }}
-                  activeOpacity={0.7}
-                >
-                  <View
-                    style={[
-                      styles.iconContainer,
-                      { backgroundColor: option.color + '20' },
-                    ]}
+            {/* Options List */}
+            <View style={styles.optionsList}>
+              {options.map((option, index) => (
+                <React.Fragment key={option.id}>
+                  <TouchableOpacity
+                    style={styles.optionItem}
+                    onPress={() => {
+                      option.onPress();
+                      onClose();
+                    }}
+                    activeOpacity={0.7}
                   >
+                    <View
+                      style={[
+                        styles.iconContainer,
+                        { backgroundColor: option.color + '20' },
+                      ]}
+                    >
+                      <MaterialCommunityIcons
+                        name={option.icon}
+                        size={28}
+                        color={option.color}
+                      />
+                    </View>
+                    <View style={styles.optionTextContainer}>
+                      <Text style={styles.optionLabel}>{option.label}</Text>
+                      <Text style={styles.optionDescription}>
+                        {option.description}
+                      </Text>
+                    </View>
                     <MaterialCommunityIcons
-                      name={option.icon}
-                      size={28}
-                      color={option.color}
+                      name={'chevron-right' as IconName}
+                      size={24}
+                      color={COLORS.text.secondary}
                     />
-                  </View>
-                  <View style={styles.optionTextContainer}>
-                    <Text style={styles.optionLabel}>{option.label}</Text>
-                    <Text style={styles.optionDescription}>
-                      {option.description}
-                    </Text>
-                  </View>
-                  <MaterialCommunityIcons
-                    name={'chevron-right' as IconName}
-                    size={24}
-                    color={COLORS.text.secondary}
-                  />
-                </TouchableOpacity>
-                {index < options.length - 1 && (
-                  <View style={styles.separator} />
-                )}
-              </React.Fragment>
-            ))}
-          </View>
+                  </TouchableOpacity>
+                  {index < options.length - 1 && (
+                    <View style={styles.separator} />
+                  )}
+                </React.Fragment>
+              ))}
+            </View>
 
-          {/* Bottom Safe Area */}
-          <View style={styles.bottomSpacer} />
+            {/* Bottom Safe Area */}
+            <View style={styles.bottomSpacer} />
+          </Pressable>
         </Pressable>
-      </Pressable>
-    </Modal>
-  );
-});
+      </Modal>
+    );
+  });
 
 ChatAttachmentBottomSheet.displayName = 'ChatAttachmentBottomSheet';
 

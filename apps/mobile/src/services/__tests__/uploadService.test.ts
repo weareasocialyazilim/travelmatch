@@ -172,7 +172,9 @@ describe('uploadService - Basic Functionality', () => {
   });
 
   it('should handle file not found', async () => {
-    (global.fetch as jest.Mock) = jest.fn().mockRejectedValue(new Error('File not found'));
+    (global.fetch as jest.Mock) = jest
+      .fn()
+      .mockRejectedValue(new Error('File not found'));
 
     await expect(
       uploadService.uploadImage('file:///tmp/missing.jpg', {

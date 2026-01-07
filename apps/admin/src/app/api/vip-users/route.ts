@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
           display_name
         )
       `,
-        { count: 'exact' }
+        { count: 'exact' },
       )
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
       logger.error('VIP users query error:', error);
       return NextResponse.json(
         { error: 'VIP kullanıcıları yüklenemedi' },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
           (u: VIPUserWithDetails) =>
             u.user?.display_name?.toLowerCase().includes(safeSearch) ||
             u.user?.full_name?.toLowerCase().includes(safeSearch) ||
-            u.user?.email?.toLowerCase().includes(safeSearch)
+            u.user?.email?.toLowerCase().includes(safeSearch),
         );
       }
     }
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
     if (!userId || !tier) {
       return NextResponse.json(
         { error: 'Kullanıcı ID ve statü gerekli' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
     if (!['vip', 'influencer', 'partner'].includes(tier)) {
       return NextResponse.json(
         { error: 'Geçersiz statü: vip, influencer veya partner olmalı' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
     if (commission < 0 || commission > 15) {
       return NextResponse.json(
         { error: 'Komisyon oranı 0-15 arasında olmalı' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
     if (!existingUser) {
       return NextResponse.json(
         { error: 'Kullanıcı bulunamadı' },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
     if (existingVIP) {
       return NextResponse.json(
         { error: 'Bu kullanıcı zaten VIP statüsüne sahip' },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
@@ -199,7 +199,7 @@ export async function POST(request: NextRequest) {
       logger.error('Add VIP error:', error);
       return NextResponse.json(
         { error: 'VIP statüsü eklenemedi: ' + error.message },
-        { status: 500 }
+        { status: 500 },
       );
     }
 

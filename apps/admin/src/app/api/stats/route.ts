@@ -14,11 +14,21 @@ export async function GET(request: NextRequest) {
 
     const now = new Date();
     const today = now.toISOString().split('T')[0];
-    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
-    const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000).toISOString();
-    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
-    const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000).toISOString();
-    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+    const thirtyDaysAgo = new Date(
+      now.getTime() - 30 * 24 * 60 * 60 * 1000,
+    ).toISOString();
+    const sixtyDaysAgo = new Date(
+      now.getTime() - 60 * 24 * 60 * 60 * 1000,
+    ).toISOString();
+    const sevenDaysAgo = new Date(
+      now.getTime() - 7 * 24 * 60 * 60 * 1000,
+    ).toISOString();
+    const fourteenDaysAgo = new Date(
+      now.getTime() - 14 * 24 * 60 * 60 * 1000,
+    ).toISOString();
+    const twentyFourHoursAgo = new Date(
+      now.getTime() - 24 * 60 * 60 * 1000,
+    ).toISOString();
 
     // Get various stats in parallel
     const [
@@ -128,42 +138,49 @@ export async function GET(request: NextRequest) {
 
     // Calculate growth percentages
     const newUsersThisMonth = totalUsers - prevPeriodUsers;
-    const userGrowth = prevPeriodUsers > 0
-      ? ((newUsersThisMonth / prevPeriodUsers) * 100)
-      : 0;
+    const userGrowth =
+      prevPeriodUsers > 0 ? (newUsersThisMonth / prevPeriodUsers) * 100 : 0;
 
-    const activeGrowth = prevPeriodActive > 0
-      ? (((activeUsers - prevPeriodActive) / prevPeriodActive) * 100)
-      : 0;
+    const activeGrowth =
+      prevPeriodActive > 0
+        ? ((activeUsers - prevPeriodActive) / prevPeriodActive) * 100
+        : 0;
 
     const newMomentsThisMonth = totalMoments - prevPeriodMoments;
-    const momentGrowth = prevPeriodMoments > 0
-      ? ((newMomentsThisMonth / prevPeriodMoments) * 100)
-      : 0;
+    const momentGrowth =
+      prevPeriodMoments > 0
+        ? (newMomentsThisMonth / prevPeriodMoments) * 100
+        : 0;
 
     // Calculate revenue
     type TransactionAmount = { amount?: number };
-    const currentMonthRevenue = currentMonthRevenueResult.data?.reduce(
-      (sum: number, t: TransactionAmount) => sum + (t.amount || 0),
-      0
-    ) || 0;
+    const currentMonthRevenue =
+      currentMonthRevenueResult.data?.reduce(
+        (sum: number, t: TransactionAmount) => sum + (t.amount || 0),
+        0,
+      ) || 0;
 
-    const prevMonthRevenue = prevMonthRevenueResult.data?.reduce(
-      (sum: number, t: TransactionAmount) => sum + (t.amount || 0),
-      0
-    ) || 0;
+    const prevMonthRevenue =
+      prevMonthRevenueResult.data?.reduce(
+        (sum: number, t: TransactionAmount) => sum + (t.amount || 0),
+        0,
+      ) || 0;
 
-    const revenueGrowth = prevMonthRevenue > 0
-      ? (((currentMonthRevenue - prevMonthRevenue) / prevMonthRevenue) * 100)
-      : 0;
+    const revenueGrowth =
+      prevMonthRevenue > 0
+        ? ((currentMonthRevenue - prevMonthRevenue) / prevMonthRevenue) * 100
+        : 0;
 
-    const todayRevenue = todayRevenueResult.data?.reduce(
-      (sum: number, t: TransactionAmount) => sum + (t.amount || 0),
-      0
-    ) || 0;
+    const todayRevenue =
+      todayRevenueResult.data?.reduce(
+        (sum: number, t: TransactionAmount) => sum + (t.amount || 0),
+        0,
+      ) || 0;
 
     // Get active sessions (users active in last 15 minutes as approximation)
-    const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000).toISOString();
+    const fifteenMinutesAgo = new Date(
+      now.getTime() - 15 * 60 * 1000,
+    ).toISOString();
     const activeSessionsResult = await supabase
       .from('users')
       .select('*', { count: 'exact', head: true })

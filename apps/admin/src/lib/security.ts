@@ -17,7 +17,7 @@
  */
 export function escapeSupabaseFilter(
   input: string,
-  maxLength: number = 100
+  maxLength: number = 100,
 ): string {
   if (!input || typeof input !== 'string') {
     return '';
@@ -95,13 +95,15 @@ export function isValidEmail(email: string): boolean {
  * @returns Sanitized message safe for logging
  */
 export function sanitizeForLogging(message: string): string {
-  return message
-    // Mask potential API keys
-    .replace(/[a-zA-Z0-9]{32,}/g, '[REDACTED]')
-    // Mask emails
-    .replace(/[^\s@]+@[^\s@]+\.[^\s@]+/g, '[EMAIL]')
-    // Mask potential tokens
-    .replace(/Bearer\s+[^\s]+/gi, 'Bearer [REDACTED]')
-    // Mask potential passwords in URLs
-    .replace(/password=[^&\s]+/gi, 'password=[REDACTED]');
+  return (
+    message
+      // Mask potential API keys
+      .replace(/[a-zA-Z0-9]{32,}/g, '[REDACTED]')
+      // Mask emails
+      .replace(/[^\s@]+@[^\s@]+\.[^\s@]+/g, '[EMAIL]')
+      // Mask potential tokens
+      .replace(/Bearer\s+[^\s]+/gi, 'Bearer [REDACTED]')
+      // Mask potential passwords in URLs
+      .replace(/password=[^&\s]+/gi, 'password=[REDACTED]')
+  );
 }

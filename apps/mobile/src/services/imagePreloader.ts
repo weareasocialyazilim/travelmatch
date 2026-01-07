@@ -1,6 +1,6 @@
 /**
  * Image Preload Pipeline for Moments Feed
- * 
+ *
  * Optimizations:
  * - Prefetch next page of moments before user scrolls
  * - Preload images in background
@@ -32,10 +32,7 @@ class ImagePreloader {
   /**
    * Add images to preload queue
    */
-  preload(
-    uris: string[],
-    priority: 'high' | 'normal' | 'low' = 'normal'
-  ) {
+  preload(uris: string[], priority: 'high' | 'normal' | 'low' = 'normal') {
     const newItems = uris
       .filter((uri) => !this.preloaded.has(uri) && !this.preloading.has(uri))
       .map((uri) => ({
@@ -52,15 +49,17 @@ class ImagePreloader {
   /**
    * Prefetch moments images
    */
-  async prefetchMomentsImages(moments: Array<{ id: string; imageUrl: string }>) {
+  async prefetchMomentsImages(
+    moments: Array<{ id: string; imageUrl: string }>,
+  ) {
     const uris = moments.map((m) => m.imageUrl).filter(Boolean);
-    
+
     // Use FastImage preload for better performance
     await FastImage.preload(
       uris.map((uri) => ({
         uri,
         priority: FastImage.priority.normal,
-      }))
+      })),
     );
 
     logger.info('[Preload] Prefetched moment images', { count: uris.length });
@@ -69,7 +68,10 @@ class ImagePreloader {
   /**
    * Prefetch next page of moments
    */
-  async prefetchNextPage(currentPage: number, fetchPage: (page: number) => Promise<any>) {
+  async prefetchNextPage(
+    currentPage: number,
+    fetchPage: (page: number) => Promise<any>,
+  ) {
     const nextPage = currentPage + 1;
     const queryKey = ['moments', 'feed', 'page', nextPage];
 
@@ -89,7 +91,7 @@ class ImagePreloader {
 
       // Get moments from cache
       const data = queryClient.getQueryData<any>(queryKey);
-      
+
       if (data?.moments) {
         // Preload images from next page
         await this.prefetchMomentsImages(data.moments);
@@ -97,7 +99,10 @@ class ImagePreloader {
 
       logger.info('[Preload] Prefetched page', { page: nextPage });
     } catch (error) {
-      logger.error('[Preload] Failed to prefetch page', { page: nextPage, error });
+      logger.error('[Preload] Failed to prefetch page', {
+        page: nextPage,
+        error,
+      });
     }
   }
 
@@ -106,7 +111,7 @@ class ImagePreloader {
    */
   private sortQueue() {
     const priorityOrder = { high: 0, normal: 1, low: 2 };
-    
+
     this.queue.sort((a, b) => {
       // Sort by priority first
       if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
@@ -138,7 +143,10 @@ class ImagePreloader {
           this.processQueue(); // Process next item
         })
         .catch((error) => {
-          logger.error('[Preload] Failed to preload image', { uri: item.uri, error });
+          logger.error('[Preload] Failed to preload image', {
+            uri: item.uri,
+            error,
+          });
           this.preloading.delete(item.uri);
           this.processQueue(); // Process next item
         });
@@ -197,7 +205,8 @@ export const imagePreloader = new ImagePreloader();
 export function useImagePreload() {
   return {
     preload: imagePreloader.preload.bind(imagePreloader),
-    prefetchMomentsImages: imagePreloader.prefetchMomentsImages.bind(imagePreloader),
+    prefetchMomentsImages:
+      imagePreloader.prefetchMomentsImages.bind(imagePreloader),
     prefetchNextPage: imagePreloader.prefetchNextPage.bind(imagePreloader),
     clear: imagePreloader.clear.bind(imagePreloader),
     stats: imagePreloader.getStats(),
@@ -235,7 +244,7 @@ export class ViewportObserver {
    */
   markVisible(itemId: string) {
     if (this.visibleItems.has(itemId)) return;
-    
+
     this.visibleItems.add(itemId);
     const tracker = this.trackers.get(itemId);
     tracker?.onVisible();
@@ -246,7 +255,7 @@ export class ViewportObserver {
    */
   markHidden(itemId: string) {
     if (!this.visibleItems.has(itemId)) return;
-    
+
     this.visibleItems.delete(itemId);
     const tracker = this.trackers.get(itemId);
     tracker?.onHidden();
@@ -267,7 +276,7 @@ export const viewportObserver = new ViewportObserver();
 export function useViewportTracking(
   itemId: string,
   onVisible: () => void,
-  onHidden: () => void
+  onHidden: () => void,
 ) {
   React.useEffect(() => {
     viewportObserver.track(itemId, onVisible, onHidden);

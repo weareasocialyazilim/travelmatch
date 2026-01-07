@@ -8,10 +8,10 @@
 export const VIBE_ROOM_COLORS = {
   // Background layers (Twilight Zinc)
   background: {
-    primary: '#121214',    // Main background - deep anthracite
-    secondary: '#1E1E20',  // Card surfaces
-    tertiary: '#27272A',   // Elevated surfaces
-    elevated: '#3F3F46',   // Hover/pressed states
+    primary: '#121214', // Main background - deep anthracite
+    secondary: '#1E1E20', // Card surfaces
+    tertiary: '#27272A', // Elevated surfaces
+    elevated: '#3F3F46', // Hover/pressed states
   },
 
   // Glass effects (Liquid Glass)
@@ -35,12 +35,12 @@ export const VIBE_ROOM_COLORS = {
 
   // Neon accent colors (Neon Energy)
   neon: {
-    lime: '#DFFF00',       // Primary action (Gift-Lime)
-    violet: '#A855F7',     // Premium/AI features
-    cyan: '#06B6D4',       // Verified & Trust
-    rose: '#F43F5E',       // Hearts & Notifications
-    amber: '#F59E0B',      // Warnings & Offers
-    emerald: '#10B981',    // Success & Online status
+    lime: '#DFFF00', // Primary action (Gift-Lime)
+    violet: '#A855F7', // Premium/AI features
+    cyan: '#06B6D4', // Verified & Trust
+    rose: '#F43F5E', // Hearts & Notifications
+    amber: '#F59E0B', // Warnings & Offers
+    emerald: '#10B981', // Success & Online status
     // Legacy aliases
     magenta: '#A855F7',
     purple: '#A855F7',

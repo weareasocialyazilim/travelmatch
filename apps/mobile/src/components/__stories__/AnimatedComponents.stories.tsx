@@ -67,13 +67,13 @@ export const MultipleButtons: StoryObj = {
           <Text style={styles.buttonText}>Primary</Text>
         </View>
       </AnimatedButton>
-      
+
       <AnimatedButton onPress={() => console.log('Secondary')}>
         <View style={[styles.button, { backgroundColor: '#5856D6' }]}>
           <Text style={styles.buttonText}>Secondary</Text>
         </View>
       </AnimatedButton>
-      
+
       <AnimatedButton onPress={() => console.log('Danger')}>
         <View style={[styles.button, { backgroundColor: '#FF3B30' }]}>
           <Text style={styles.buttonText}>Danger</Text>
@@ -89,7 +89,9 @@ export const FadeIn: StoryObj<typeof FadeInView> = {
     <FadeInView duration={500}>
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Fades In</Text>
-        <Text style={styles.cardText}>This view animates opacity from 0 to 1</Text>
+        <Text style={styles.cardText}>
+          This view animates opacity from 0 to 1
+        </Text>
       </View>
     </FadeInView>
   ),
@@ -114,13 +116,13 @@ export const SequentialFadeIn: StoryObj = {
           <Text>First (0ms delay)</Text>
         </View>
       </FadeInView>
-      
+
       <FadeInView delay={200} duration={400}>
         <View style={styles.card}>
           <Text>Second (200ms delay)</Text>
         </View>
       </FadeInView>
-      
+
       <FadeInView delay={400} duration={400}>
         <View style={styles.card}>
           <Text>Third (400ms delay)</Text>
@@ -175,15 +177,21 @@ export const SequentialSlides: StoryObj = {
   render: () => (
     <View style={{ gap: 12 }}>
       <SlideInView direction="left" delay={0} duration={400}>
-        <View style={styles.card}><Text>From Left</Text></View>
+        <View style={styles.card}>
+          <Text>From Left</Text>
+        </View>
       </SlideInView>
-      
+
       <SlideInView direction="right" delay={200} duration={400}>
-        <View style={styles.card}><Text>From Right</Text></View>
+        <View style={styles.card}>
+          <Text>From Right</Text>
+        </View>
       </SlideInView>
-      
+
       <SlideInView direction="up" delay={400} duration={400}>
-        <View style={styles.card}><Text>From Bottom</Text></View>
+        <View style={styles.card}>
+          <Text>From Bottom</Text>
+        </View>
       </SlideInView>
     </View>
   ),
@@ -205,15 +213,21 @@ export const CustomScaleAmount: StoryObj<typeof ScaleOnPress> = {
   render: () => (
     <View style={{ gap: 12 }}>
       <ScaleOnPress scale={0.9} onPress={() => console.log('90%')}>
-        <View style={styles.card}><Text>Scale: 0.9</Text></View>
+        <View style={styles.card}>
+          <Text>Scale: 0.9</Text>
+        </View>
       </ScaleOnPress>
-      
+
       <ScaleOnPress scale={0.95} onPress={() => console.log('95%')}>
-        <View style={styles.card}><Text>Scale: 0.95</Text></View>
+        <View style={styles.card}>
+          <Text>Scale: 0.95</Text>
+        </View>
       </ScaleOnPress>
-      
+
       <ScaleOnPress scale={0.85} onPress={() => console.log('85%')}>
-        <View style={styles.card}><Text>Scale: 0.85</Text></View>
+        <View style={styles.card}>
+          <Text>Scale: 0.85</Text>
+        </View>
       </ScaleOnPress>
     </View>
   ),
@@ -225,7 +239,9 @@ export const PulseAnimation: StoryObj<typeof PulseView> = {
     <PulseView>
       <View style={[styles.card, { backgroundColor: '#007AFF' }]}>
         <Text style={[styles.cardTitle, { color: '#fff' }]}>Pulsing</Text>
-        <Text style={[styles.cardText, { color: '#fff' }]}>Continuously scales</Text>
+        <Text style={[styles.cardText, { color: '#fff' }]}>
+          Continuously scales
+        </Text>
       </View>
     </PulseView>
   ),
@@ -239,7 +255,7 @@ export const CustomPulseScale: StoryObj<typeof PulseView> = {
           <Text>Subtle Pulse (1.05)</Text>
         </View>
       </PulseView>
-      
+
       <PulseView pulseScale={1.15}>
         <View style={styles.card}>
           <Text>Strong Pulse (1.15)</Text>
@@ -263,7 +279,7 @@ export const ComplexAnimation: StoryObj = {
           </ScaleOnPress>
         </SlideInView>
       </FadeInView>
-      
+
       <FadeInView delay={200} duration={600}>
         <SlideInView direction="right" delay={200} duration={600}>
           <ScaleOnPress onPress={() => console.log('Combo 2')}>

@@ -26,7 +26,13 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -79,7 +85,7 @@ const editorialContent = [
   {
     id: '1',
     type: 'article',
-    title: 'İstanbul\'un Gizli Hazineleri',
+    title: "İstanbul'un Gizli Hazineleri",
     author: 'Editör Ekibi',
     status: 'published',
     views: 12450,
@@ -155,10 +161,30 @@ const curatedMoments = [
 ];
 
 const contentCalendar = [
-  { date: '2024-12-18', type: 'article', title: 'Yılbaşı Özel Rehberi', status: 'scheduled' },
-  { date: '2024-12-20', type: 'collection', title: '2025 Trend Destinasyonları', status: 'scheduled' },
-  { date: '2024-12-22', type: 'video', title: 'Yılsonu Özeti', status: 'draft' },
-  { date: '2024-12-25', type: 'guide', title: 'Kış Kampı Rehberi', status: 'in_progress' },
+  {
+    date: '2024-12-18',
+    type: 'article',
+    title: 'Yılbaşı Özel Rehberi',
+    status: 'scheduled',
+  },
+  {
+    date: '2024-12-20',
+    type: 'collection',
+    title: '2025 Trend Destinasyonları',
+    status: 'scheduled',
+  },
+  {
+    date: '2024-12-22',
+    type: 'video',
+    title: 'Yılsonu Özeti',
+    status: 'draft',
+  },
+  {
+    date: '2024-12-25',
+    type: 'guide',
+    title: 'Kış Kampı Rehberi',
+    status: 'in_progress',
+  },
 ];
 
 export default function EditorialPage() {
@@ -242,7 +268,9 @@ export default function EditorialPage() {
                 <Eye className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Bu Ay Görüntüleme</p>
+                <p className="text-sm text-muted-foreground">
+                  Bu Ay Görüntüleme
+                </p>
                 <p className="text-2xl font-bold">245K</p>
               </div>
             </div>
@@ -321,13 +349,17 @@ export default function EditorialPage() {
                   <div className="flex items-start justify-between">
                     <div>
                       <h3 className="font-medium">{collection.title}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">{collection.description}</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {collection.description}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center justify-between mt-4 pt-4 border-t">
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <span>{collection.items} içerik</span>
-                      <span>{collection.views.toLocaleString()} görüntüleme</span>
+                      <span>
+                        {collection.views.toLocaleString()} görüntüleme
+                      </span>
                     </div>
                     {getStatusBadge(collection.status)}
                   </div>
@@ -401,7 +433,9 @@ export default function EditorialPage() {
                         </div>
                         <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                           <span>{content.author}</span>
-                          {content.publishDate && <span>{content.publishDate}</span>}
+                          {content.publishDate && (
+                            <span>{content.publishDate}</span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -409,12 +443,18 @@ export default function EditorialPage() {
                       {content.views > 0 && (
                         <>
                           <div className="text-right">
-                            <p className="font-medium">{content.views.toLocaleString()}</p>
-                            <p className="text-xs text-muted-foreground">Görüntüleme</p>
+                            <p className="font-medium">
+                              {content.views.toLocaleString()}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Görüntüleme
+                            </p>
                           </div>
                           <div className="text-right">
                             <p className="font-medium">{content.engagement}%</p>
-                            <p className="text-xs text-muted-foreground">Engagement</p>
+                            <p className="text-xs text-muted-foreground">
+                              Engagement
+                            </p>
                           </div>
                         </>
                       )}
@@ -434,7 +474,9 @@ export default function EditorialPage() {
           <Card>
             <CardHeader>
               <CardTitle>Küratörlük İçin Bekleyen Momentler</CardTitle>
-              <CardDescription>Öne çıkarılabilecek kullanıcı içerikleri</CardDescription>
+              <CardDescription>
+                Öne çıkarılabilecek kullanıcı içerikleri
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 md:grid-cols-3">
@@ -498,11 +540,27 @@ export default function EditorialPage() {
               <CardContent>
                 <div className="space-y-3">
                   {[
-                    { criteria: 'Görsel Kalitesi', weight: '30%', status: 'active' },
-                    { criteria: 'Engagement Oranı', weight: '25%', status: 'active' },
+                    {
+                      criteria: 'Görsel Kalitesi',
+                      weight: '30%',
+                      status: 'active',
+                    },
+                    {
+                      criteria: 'Engagement Oranı',
+                      weight: '25%',
+                      status: 'active',
+                    },
                     { criteria: 'Özgünlük', weight: '20%', status: 'active' },
-                    { criteria: 'Topluluk Kuralları', weight: '15%', status: 'active' },
-                    { criteria: 'Lokasyon Çeşitliliği', weight: '10%', status: 'active' },
+                    {
+                      criteria: 'Topluluk Kuralları',
+                      weight: '15%',
+                      status: 'active',
+                    },
+                    {
+                      criteria: 'Lokasyon Çeşitliliği',
+                      weight: '10%',
+                      status: 'active',
+                    },
                   ].map((item, i) => (
                     <div key={i} className="flex items-center justify-between">
                       <span className="text-sm">{item.criteria}</span>
@@ -556,7 +614,9 @@ export default function EditorialPage() {
                   >
                     <div className="flex items-center gap-4">
                       <div className="text-center w-16">
-                        <p className="text-2xl font-bold">{item.date.split('-')[2]}</p>
+                        <p className="text-2xl font-bold">
+                          {item.date.split('-')[2]}
+                        </p>
                         <p className="text-xs text-muted-foreground">Aralık</p>
                       </div>
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
@@ -564,7 +624,9 @@ export default function EditorialPage() {
                       </div>
                       <div>
                         <h4 className="font-medium">{item.title}</h4>
-                        <p className="text-sm text-muted-foreground capitalize">{item.type}</p>
+                        <p className="text-sm text-muted-foreground capitalize">
+                          {item.type}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
@@ -586,7 +648,9 @@ export default function EditorialPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold">4</div>
-                <p className="text-sm text-muted-foreground">planlanmış içerik</p>
+                <p className="text-sm text-muted-foreground">
+                  planlanmış içerik
+                </p>
               </CardContent>
             </Card>
             <Card>
@@ -604,7 +668,9 @@ export default function EditorialPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-orange-500">7</div>
-                <p className="text-sm text-muted-foreground">doldurulması gereken</p>
+                <p className="text-sm text-muted-foreground">
+                  doldurulması gereken
+                </p>
               </CardContent>
             </Card>
           </div>

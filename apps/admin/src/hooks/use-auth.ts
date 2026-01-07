@@ -66,12 +66,14 @@ export function useAuth() {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
-      if (event === 'SIGNED_OUT') {
-        logoutStore();
-        router.push('/login');
-      }
-    });
+    } = supabase.auth.onAuthStateChange(
+      async (event: AuthChangeEvent, session: Session | null) => {
+        if (event === 'SIGNED_OUT') {
+          logoutStore();
+          router.push('/login');
+        }
+      },
+    );
 
     return () => {
       subscription.unsubscribe();

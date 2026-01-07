@@ -30,9 +30,7 @@ export const FilterSortBar: React.FC<FilterSortBarProps> = ({
           size={16}
           color={COLORS.brand.primary}
         />
-        <Text style={styles.filterButtonText}>
-          {getFilterLabel(filterBy)}
-        </Text>
+        <Text style={styles.filterButtonText}>{getFilterLabel(filterBy)}</Text>
         <MaterialCommunityIcons
           name="chevron-down"
           size={16}
@@ -46,9 +44,7 @@ export const FilterSortBar: React.FC<FilterSortBarProps> = ({
           size={16}
           color={COLORS.brand.primary}
         />
-        <Text style={styles.filterButtonText}>
-          {getSortLabel(sortBy)}
-        </Text>
+        <Text style={styles.filterButtonText}>{getSortLabel(sortBy)}</Text>
         <MaterialCommunityIcons
           name="chevron-down"
           size={16}
@@ -117,7 +113,7 @@ export function SortFilterModal<T extends string>({
       </View>
     </TouchableOpacity>
   );
-};
+}
 
 const styles = StyleSheet.create({
   filterBar: {

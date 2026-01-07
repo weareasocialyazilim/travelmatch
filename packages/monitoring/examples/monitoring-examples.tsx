@@ -55,10 +55,15 @@ interface ImageFile {
 const supabaseDb = {
   moments: {
     like: async (_id: string): Promise<void> => {},
-    getAll: async (): Promise<{ data: Moment[] | null; error: Error | null }> => ({ data: [], error: null }),
-    create: async (data: Partial<Moment>): Promise<{ data: Moment | null; error: Error | null }> => ({
+    getAll: async (): Promise<{
+      data: Moment[] | null;
+      error: Error | null;
+    }> => ({ data: [], error: null }),
+    create: async (
+      data: Partial<Moment>,
+    ): Promise<{ data: Moment | null; error: Error | null }> => ({
       data: data as Moment,
-      error: null
+      error: null,
     }),
   },
 };
@@ -76,11 +81,7 @@ export function MomentDetailScreen({ route }: MomentDetailScreenProps) {
     source: route.params.source || 'unknown',
   });
 
-  return (
-    <View>
-      {/* Screen content */}
-    </View>
-  );
+  return <View>{/* Screen content */}</View>;
 }
 
 // ==========================================
@@ -100,7 +101,7 @@ export function MomentCard({ moment }: MomentCardProps) {
       moment_id: moment.id,
       category: moment.category,
       location: moment.location,
-    }
+    },
   );
 
   const handleShare = trackAction(
@@ -111,7 +112,7 @@ export function MomentCard({ moment }: MomentCardProps) {
     {
       moment_id: moment.id,
       platform: 'instagram',
-    }
+    },
   );
 
   return (
@@ -127,7 +128,8 @@ export function MomentCard({ moment }: MomentCardProps) {
 // ==========================================
 
 export function MomentsListScreen() {
-  const { startTiming, endTiming } = usePerformanceTracking('moments_feed_load');
+  const { startTiming, endTiming } =
+    usePerformanceTracking('moments_feed_load');
 
   const { data: moments } = useQuery({
     queryKey: ['moments'],
@@ -189,7 +191,7 @@ export function CreateMomentScreen() {
         trackError(err, {
           form_data: {
             category: data.category,
-            has_image: !!(data.images?.length),
+            has_image: !!data.images?.length,
             location: data.location,
           },
         });
@@ -250,7 +252,9 @@ export function ImageUploadComponent() {
       monitoringService.addTiming('image_compression', Date.now() - startTime, {
         original_size: image.size,
         compressed_size: compressed.size,
-        reduction_percent: ((1 - compressed.size / image.size) * 100).toFixed(2),
+        reduction_percent: ((1 - compressed.size / image.size) * 100).toFixed(
+          2,
+        ),
       });
 
       // Upload
@@ -282,17 +286,25 @@ export function ImageUploadComponent() {
 export function BookingFlow() {
   const trackAction = useActionTracking();
   const [selectedMoment, setSelectedMoment] = useState<Moment | null>(null);
-  const [bookingDetails, setBookingDetails] = useState<BookingDetails | null>(null);
+  const [bookingDetails, setBookingDetails] = useState<BookingDetails | null>(
+    null,
+  );
 
   // Step 1: Select moment
-  const handleSelectMoment = trackAction('booking_step_1_moment_selected', (moment: Moment) => {
-    setSelectedMoment(moment);
-  });
+  const handleSelectMoment = trackAction(
+    'booking_step_1_moment_selected',
+    (moment: Moment) => {
+      setSelectedMoment(moment);
+    },
+  );
 
   // Step 2: Fill details
-  const handleFillDetails = trackAction('booking_step_2_details_filled', (details: BookingDetails) => {
-    setBookingDetails(details);
-  });
+  const handleFillDetails = trackAction(
+    'booking_step_2_details_filled',
+    (details: BookingDetails) => {
+      setBookingDetails(details);
+    },
+  );
 
   // Step 3: Payment
   const handlePayment = trackAction(
@@ -303,11 +315,15 @@ export function BookingFlow() {
       try {
         const result = await processPayment(paymentMethod);
 
-        monitoringService.addTiming('payment_processing', Date.now() - startTime, {
-          method: paymentMethod,
-          amount: bookingDetails?.total,
-          success: true,
-        });
+        monitoringService.addTiming(
+          'payment_processing',
+          Date.now() - startTime,
+          {
+            method: paymentMethod,
+            amount: bookingDetails?.total,
+            success: true,
+          },
+        );
 
         monitoringService.trackAction('booking_completed', {
           moment_id: selectedMoment?.id,
@@ -326,7 +342,7 @@ export function BookingFlow() {
         });
         throw error;
       }
-    }
+    },
   );
 
   return <View>{/* Booking steps */}</View>;
@@ -422,7 +438,10 @@ interface ErrorBoundaryState {
   hasError: boolean;
 }
 
-export class MonitoredErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class MonitoredErrorBoundary extends React.Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };

@@ -6,7 +6,13 @@ import { toast } from 'sonner';
 import { Loader2, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
 
 export default function TwoFactorPage() {
@@ -36,7 +42,10 @@ export default function TwoFactorPage() {
     }
   };
 
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (
+    index: number,
+    e: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
     if (e.key === 'Backspace' && !code[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
@@ -44,7 +53,10 @@ export default function TwoFactorPage() {
 
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    const pastedData = e.clipboardData
+      .getData('text')
+      .replace(/\D/g, '')
+      .slice(0, 6);
     const newCode = [...code];
     for (let i = 0; i < pastedData.length; i++) {
       const char = pastedData[i];
@@ -71,7 +83,9 @@ export default function TwoFactorPage() {
       toast.success('Doğrulama başarılı');
       router.push('/queue');
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Doğrulama başarısız');
+      toast.error(
+        error instanceof Error ? error.message : 'Doğrulama başarısız',
+      );
       setCode(['', '', '', '', '', '']);
       inputRefs.current[0]?.focus();
     } finally {
