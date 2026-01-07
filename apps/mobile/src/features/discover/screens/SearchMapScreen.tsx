@@ -69,18 +69,9 @@ const MAPBOX_TOKEN =
 // Check if Mapbox is properly configured
 const isMapboxConfigured = Boolean(MAPBOX_TOKEN);
 
-// Lazy import Mapbox only if token is available
-let MapboxGL: typeof import('@rnmapbox/maps').default | null = null;
-if (isMapboxConfigured) {
-  try {
-    MapboxGL = require('@rnmapbox/maps').default;
-    if (MapboxGL) {
-      MapboxGL.setAccessToken(MAPBOX_TOKEN);
-    }
-  } catch (error) {
-    console.warn('[SearchMapScreen] Failed to load Mapbox:', error);
-  }
-}
+// NOTE: Mapbox is now loaded dynamically inside the component to prevent
+// TurboModule initialization at module load time, which causes crashes
+// with React Native's New Architecture when the module is imported via barrel exports.
 
 const { width: _SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -141,6 +132,45 @@ const SearchMapScreen: React.FC = () => {
   const mapRef = useRef<any>(null);
 
   const cameraRef = useRef<any>(null);
+
+  // Dynamic Mapbox loading to prevent TurboModule init crash
+  const [MapboxGL, setMapboxGL] = useState<
+    typeof import('@rnmapbox/maps').default | null
+  >(null);
+  const [mapboxLoading, setMapboxLoading] = useState(true);
+
+  // Load Mapbox dynamically on component mount
+  useEffect(() => {
+    let mounted = true;
+
+    const loadMapbox = async () => {
+      if (!isMapboxConfigured) {
+        setMapboxLoading(false);
+        return;
+      }
+
+      try {
+        // Dynamic import to prevent module-level TurboModule init
+        const mapboxModule = require('@rnmapbox/maps').default;
+        if (mounted && mapboxModule) {
+          mapboxModule.setAccessToken(MAPBOX_TOKEN);
+          setMapboxGL(() => mapboxModule);
+        }
+      } catch (error) {
+        console.warn('[SearchMapScreen] Failed to load Mapbox:', error);
+      } finally {
+        if (mounted) {
+          setMapboxLoading(false);
+        }
+      }
+    };
+
+    loadMapbox();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // Hooks - Real data & subscription
   // Using PostGIS-based discovery for location-aware moments
@@ -408,7 +438,7 @@ const SearchMapScreen: React.FC = () => {
   }));
 
   // Show fallback UI if Mapbox is not configured or has error
-  if (!isMapboxConfigured || !MapboxGL || mapError) {
+  if (!isMapboxConfigured || mapError) {
     return (
       <View style={styles.container}>
         <View style={styles.fallbackContainer}>
@@ -421,6 +451,21 @@ const SearchMapScreen: React.FC = () => {
           <Text style={styles.fallbackSubtitle}>
             {mapError ||
               'Map service is not configured. Please add your Mapbox token to .env file.'}
+          </Text>
+        </View>
+        <BottomNav activeTab="Discover" />
+      </View>
+    );
+  }
+
+  // Show loading while Mapbox is initializing
+  if (mapboxLoading || !MapboxGL) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.fallbackContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+          <Text style={[styles.fallbackTitle, { marginTop: 16 }]}>
+            Loading Map...
           </Text>
         </View>
         <BottomNav activeTab="Discover" />

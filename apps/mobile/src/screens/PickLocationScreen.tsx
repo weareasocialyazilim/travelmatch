@@ -14,8 +14,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
-// Initialize Mapbox
-Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN || '');
+// Initialize Mapbox - use correct EAS env var name
+Mapbox.setAccessToken(
+  process.env.EXPO_PUBLIC_MAPBOX_PUBLIC_TOKEN ||
+    process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ||
+    '',
+);
 
 const { width, height } = Dimensions.get('window');
 
