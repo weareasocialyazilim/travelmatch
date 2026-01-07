@@ -247,21 +247,28 @@ class AppBootstrapService {
     logger.info('AppBootstrap', '🚀 Starting app initialization...');
     const startTime = Date.now();
 
-    // 1. Environment Validation (critical - no retry)
-    try {
-      validateEnvironment();
-      this.updateServiceStatus('environment', 'success');
-      logger.info('AppBootstrap', '✅ Environment validated');
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
+    // 1. Environment Validation (critical in production, warning in dev)
+    const envResult = validateEnvironment();
+
+    if (!envResult.isValid) {
+      // In production, environment errors are critical
+      const errorMessage = envResult.errors.join(', ');
       this.updateServiceStatus('environment', 'failed', errorMessage);
       logger.error(
         'AppBootstrap',
         '🚨 Environment validation failed - app cannot continue',
-        { error: errorMessage },
+        { errors: envResult.errors },
       );
       return this.getProgress();
+    } else if (envResult.warnings.length > 0) {
+      // Warnings don't block but are logged
+      this.updateServiceStatus('environment', 'success');
+      logger.warn('AppBootstrap', '⚠️ Environment has warnings', {
+        warnings: envResult.warnings,
+      });
+    } else {
+      this.updateServiceStatus('environment', 'success');
+      logger.info('AppBootstrap', '✅ Environment validated');
     }
 
     // 2. Security Check (non-critical)
