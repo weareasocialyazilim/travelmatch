@@ -82,7 +82,7 @@ module.exports = {
     'SkeletonList\\.test\\.tsx$', // Animation mock issues - needs test update
     'authFlow\\.test\\.ts$', // Integration test needs update for UnifiedAuth
     'security\\.test\\.ts$', // Security utils mock structure changed
-    'searchStore\\.test\\.ts$', // Store implementation changed
+    // 'searchStore\\.test\\.ts$', // FIXED: Persistence tests now verify in-memory state
     'messageService\\.test\\.ts$', // Service init method changed
     'AddCardBottomSheet\\.test\\.tsx$',
     'BlockConfirmation\\.test\\.tsx$',
@@ -100,7 +100,7 @@ module.exports = {
     'FilterBottomSheet\\.test\\.tsx$',
     'FilterPill\\.test\\.tsx$',
     'FormComponents\\.test\\.tsx$',
-    'GiftSuccessModal\\.test\\.tsx$',
+    'GiftSuccessModal\\.test\\.tsx$', // Modal visibility issue - React Native Modal renders children when visible=false in tests
     'LanguageSelectionBottomSheet\\.test\\.tsx$',
     'LeaveTrustNoteBottomSheet\\.test\\.tsx$',
     'LimitReachedModal\\.test\\.tsx$',
@@ -115,14 +115,14 @@ module.exports = {
     'RequestMoreProofBottomSheet\\.test\\.tsx$',
     'RetakeProofBottomSheet\\.test\\.tsx$',
     'SetPriceBottomSheet\\.test\\.tsx$',
-    'ShareMomentBottomSheet\\.test\\.tsx$',
+    'ShareMomentBottomSheet\\.test\\.tsx$', // Modal visibility issue - same as GiftSuccessModal
     'SmartImage\\.test\\.tsx$',
     'SocialButton\\.test\\.tsx$',
     'ThankYouModal\\.test\\.tsx$',
     'UnblockUserBottomSheet\\.test\\.tsx$',
     'WithdrawConfirmationModal\\.test\\.tsx$',
     'Button\\.enhanced\\.test\\.tsx$',
-    'GenericBottomSheet\\.test\\.tsx$',
+    // 'GenericBottomSheet\\.test\\.tsx$', // FIXED: Animation/swipe tests simplified
     'Input\\.enhanced\\.test\\.tsx$',
     'SortSelector\\.test\\.tsx$',
     'RequestCard\\.test\\.tsx$',
@@ -131,7 +131,7 @@ module.exports = {
     'paymentService\\.test\\.ts$', // Uses old mock structure - needs update
     // 'paymentService\\.retry\\.test\\.ts$', // FIXED: Timer + error type handling
     // 'paymentService\\.cancellation\\.test\\.ts$', // FIXED: Balance mock + timer fixes
-    'paymentService\\.timeout\\.test\\.ts$',
+    // 'paymentService\\.timeout\\.test\\.ts$', // FIXED: Removed skip, mocks already correct
     'paymentService\\.concurrency\\.test\\.ts$',
     'paymentFlow\\.test\\.ts$',
     'TransactionHistoryScreen\\.test\\.tsx$',
@@ -142,7 +142,7 @@ module.exports = {
     'SunsetClock\\.test\\.tsx$',
     'TrustConstellation\\.test\\.tsx$',
     // Skip form tests with controlled input issues
-    'ControlledInput\\.test\\.tsx$',
+    // 'ControlledInput\\.test\\.tsx$', // FIXED: Validation/Password/Progressive tests working
     'Input\\.test\\.tsx$',
     'PasswordInput\\.test\\.tsx$',
     'RegisterScreen\\.test\\.tsx$',

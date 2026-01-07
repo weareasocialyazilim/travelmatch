@@ -45,9 +45,7 @@ const mockTransactionsService = transactionsService as jest.Mocked<
   typeof transactionsService
 >;
 
-// Skip due to mock-implementation mismatch
-// eslint-disable-next-line jest/no-disabled-tests
-describe.skip('PaymentService - Timeout Edge Cases', () => {
+describe('PaymentService - Timeout Edge Cases', () => {
   const mockUser = { id: 'user-123', email: 'test@example.com' };
 
   beforeEach(() => {
@@ -258,6 +256,65 @@ describe.skip('PaymentService - Timeout Edge Cases', () => {
         created_at: new Date().toISOString(),
         description: 'Withdrawal to bank account',
       };
+
+      // Mock wallet balance
+      mockSupabase.from.mockImplementation((tableName: string) => {
+        if (tableName === 'wallets') {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: { balance: 500, currency: 'USD', status: 'active' },
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        }
+        if (tableName === 'escrow_transactions') {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                eq: jest.fn().mockResolvedValue({ data: [], error: null }),
+              }),
+            }),
+          };
+        }
+        if (tableName === 'gifts') {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                eq: jest.fn().mockReturnValue({
+                  eq: jest.fn().mockReturnValue({
+                    limit: jest
+                      .fn()
+                      .mockResolvedValue({ data: [], error: null }),
+                  }),
+                }),
+              }),
+            }),
+          };
+        }
+        if (tableName === 'bank_accounts') {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                eq: jest.fn().mockReturnValue({
+                  single: jest.fn().mockResolvedValue({
+                    data: { id: 'bank_123', is_verified: true },
+                    error: null,
+                  }),
+                }),
+              }),
+            }),
+          };
+        }
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          single: jest.fn().mockResolvedValue({ data: null, error: null }),
+        };
+      });
 
       mockTransactionsService.create.mockResolvedValue({
         data: mockTransaction,
