@@ -12,7 +12,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   icon: './assets/icon.png',
   userInterfaceStyle: 'automatic',
   scheme: 'travelmatch',
-  newArchEnabled: true,
+  // TEMPORARILY DISABLED: New Architecture causing startup crash
+  // Re-enable after identifying root cause
+  newArchEnabled: false,
 
   // Splash screen - matches brand warm white
   splash: {
