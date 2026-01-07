@@ -11,8 +11,12 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Mapbox, { Camera, MapView, PointAnnotation } from '@rnmapbox/maps';
 import { COLORS } from '@/constants/colors';
 
-// Initialize Mapbox - access token should be set in env
-Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN || '');
+// Initialize Mapbox - use correct EAS env var name
+Mapbox.setAccessToken(
+  process.env.EXPO_PUBLIC_MAPBOX_PUBLIC_TOKEN ||
+    process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ||
+    '',
+);
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
@@ -123,11 +127,17 @@ export const LocationPickerBottomSheet: React.FC<
           <MapView style={styles.map}>
             <Camera
               zoomLevel={14}
-              centerCoordinate={[selectedLocation.longitude, selectedLocation.latitude]}
+              centerCoordinate={[
+                selectedLocation.longitude,
+                selectedLocation.latitude,
+              ]}
             />
             <PointAnnotation
               id="selected-location"
-              coordinate={[selectedLocation.longitude, selectedLocation.latitude]}
+              coordinate={[
+                selectedLocation.longitude,
+                selectedLocation.latitude,
+              ]}
               title={selectedLocation.name}
             >
               <View style={styles.markerContainer}>

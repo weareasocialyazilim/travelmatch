@@ -1,11 +1,40 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { COLORS } from '@/constants/colors';
 
 // Screens
-import { DiscoverScreen, SearchMapScreen } from '@/features/discover';
+import { DiscoverScreen } from '@/features/discover';
 import { InboxScreen } from '@/features/inbox';
 import { ProfileScreen } from '@/features/profile';
 import { CreateMomentScreen } from '@/features/moments';
+
+// SearchMapScreen - lazy loaded to prevent Mapbox TurboModule crash at startup
+const LazySearchMapScreen = lazy(() =>
+  import('@/features/discover/screens/SearchMapScreen').then((m) => ({
+    default: m.default,
+  })),
+);
+
+// Wrapper component for lazy-loaded SearchMapScreen
+const SearchMapScreenWrapper = () => (
+  <Suspense
+    fallback={
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: COLORS.background.primary,
+        }}
+      >
+        <ActivityIndicator size="large" color={COLORS.brand.primary} />
+      </View>
+    }
+  >
+    <LazySearchMapScreen />
+  </Suspense>
+);
 
 // Custom Navigation Components
 import { FloatingDock } from '@/components/navigation';
@@ -28,7 +57,7 @@ export const MainTabNavigator = () => {
     >
       <Tab.Screen name="Home" component={DiscoverScreen} />
 
-      <Tab.Screen name="Search" component={SearchMapScreen} />
+      <Tab.Screen name="Search" component={SearchMapScreenWrapper} />
 
       {/* Create Moment - Opens as modal */}
       <Tab.Screen

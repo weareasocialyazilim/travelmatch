@@ -2,11 +2,16 @@
  * Discover Feature - Barrel Exports
  *
  * Moment discovery, booking, escrow yönetimi
+ *
+ * NOTE: SearchMapScreen is NOT exported here to prevent Mapbox TurboModule
+ * from being initialized at module load time. Import it directly from
+ * './screens/SearchMapScreen' and use lazy loading.
  */
 
 // Screens
 export { default as DiscoverScreen } from './screens/DiscoverScreen';
-export { default as SearchMapScreen } from './screens/SearchMapScreen';
+// SearchMapScreen - REMOVED from barrel to prevent TurboModule crash
+// Import directly with lazy loading: import('../features/discover/screens/SearchMapScreen')
 export { default as EscrowStatusScreen } from './screens/EscrowStatusScreen';
 export { HowEscrowWorksScreen } from './screens/HowEscrowWorksScreen';
 export { default as MatchConfirmationScreen } from './screens/MatchConfirmationScreen';

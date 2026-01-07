@@ -52,7 +52,12 @@ import LinkInvalidScreen from '../screens/LinkInvalidScreen';
 import { ImageViewerScreen } from '../screens/ImageViewerScreen';
 import { DateTimePickerScreen } from '../screens/DateTimePickerScreen';
 import { NotFoundScreen } from '../screens/NotFoundScreen';
-import { PickLocationScreen } from '../screens/PickLocationScreen';
+// PickLocationScreen - lazy loaded to prevent Mapbox init at startup
+const PickLocationScreen = React.lazy(() =>
+  import('../screens/PickLocationScreen').then((m) => ({
+    default: m.PickLocationScreen,
+  })),
+);
 // Dev Menu - only loaded in development
 const DevMenuScreen = __DEV__
   ? require('../screens/dev/DevMenuScreen').DevMenuScreen
@@ -84,9 +89,14 @@ import {
 } from '../features/messages';
 
 // ===================================
-// NEW FEATURE SCREENS
+// NEW FEATURE SCREENS (LAZY LOADED)
 // ===================================
-import { SearchMapScreen } from '../features/discover';
+// SearchMapScreen - lazy loaded to prevent Mapbox TurboModule init at startup
+const SearchMapScreen = React.lazy(() =>
+  import('../features/discover/screens/SearchMapScreen').then((m) => ({
+    default: m.default,
+  })),
+);
 import { InboxScreen } from '../features/inbox';
 import { NotificationsScreen } from '../features/notifications';
 import { CheckoutScreen } from '../features/payments';
