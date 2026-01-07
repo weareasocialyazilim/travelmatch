@@ -78,7 +78,9 @@ def write_file_safely(filepath: str, content: str, base_dir: Optional[str] = Non
     # Using pathlib for additional safety
     # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected
     # Snyk: Path is sanitized by validate_safe_path() - false positive
-    Path(safe_path).write_text(content, encoding='utf-8')  # nosec B108
+    # deepcode ignore PT: safe_path is fully validated by validate_safe_path()
+    path = Path(safe_path)  # nosec B108
+    path.write_text(content, encoding='utf-8')
 
 
 def hex_to_rgb(hex_color: str) -> Tuple[int, int, int]:
