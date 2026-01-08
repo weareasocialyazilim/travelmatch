@@ -118,7 +118,6 @@ export type {
   UserProfile,
   UserPreferences,
   UpdateProfileData,
-  FollowUser,
 } from './userService';
 
 export { cacheService, cache, CACHE_KEYS } from './cacheService';

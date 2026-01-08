@@ -48,7 +48,7 @@ import { FONT_SIZES, FONTS } from '@/constants/typography';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { BlurFilterModal, type FilterValues } from '@/components/ui';
-import { EnhancedSearchBar, NeonPulseMarker } from '../components';
+import { NeonPulseMarker } from '../components';
 // Using useDiscoverMoments for PostGIS-based location discovery
 import { useDiscoverMoments } from '@/hooks/useDiscoverMoments';
 import { useSubscription } from '@/features/payments/hooks/usePayments';
@@ -433,7 +433,7 @@ const SearchMapScreen: React.FC = () => {
   const handleFilterApply = useCallback((filters: FilterValues) => {
     setActiveFilters(filters);
     // TODO: Apply filters to moments query
-    console.log('Map filters applied:', filters);
+    logger.debug('Map filters applied:', filters);
   }, []);
 
   // Location button animations

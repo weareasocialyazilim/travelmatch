@@ -186,12 +186,13 @@ const AnimatedTrustRing: React.FC<AnimatedTrustRingProps> = ({
 // ============================================
 // STAT CARD COMPONENT
 // ============================================
-interface StatCardProps {
+interface _StatCardProps {
   value: string | number;
   label: string;
 }
 
-const StatCard: React.FC<StatCardProps> = memo(({ value, label }) => {
+// StatCard is currently unused but kept for future use
+const _StatCard: React.FC<_StatCardProps> = memo(({ value, label }) => {
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(20);
   const scale = useSharedValue(1);
@@ -259,7 +260,8 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
   }) => {
     const insets = useSafeAreaInsets();
     const editButtonScale = useSharedValue(1);
-    const { t } = useTranslation();
+    // Translation hook available for future i18n
+    const { t: _t } = useTranslation();
 
     // Normalize values to support both `user` shape and individual props
     const resolvedAvatar = avatarUrl || user?.avatar || '';
@@ -280,9 +282,10 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
         : !!user?.kyc || !!user?.isVerified;
     const resolvedTrust =
       typeof trustScore === 'number' ? trustScore : (user?.trust_score ?? 0);
-    const resolvedMoments = momentsCount ?? user?.momentsCount ?? 0;
-    const resolvedExchanges = exchangesCount ?? user?.exchangesCount ?? 0;
-    const resolvedResponse = responseRate ?? user?.responseRate ?? 0;
+    // Stats values prepared for future stats display
+    const _resolvedMoments = momentsCount ?? user?.momentsCount ?? 0;
+    const _resolvedExchanges = exchangesCount ?? user?.exchangesCount ?? 0;
+    const _resolvedResponse = responseRate ?? user?.responseRate ?? 0;
 
     const handleEditPress = useCallback(() => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -512,32 +515,32 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  trustBadge: {
-    position: 'absolute',
-    bottom: 4,
-    right: 4,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 3,
-    borderColor: PALETTE.white,
-  },
-  trustBadgeGlow: {
-    // Neon glow on badge
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  trustBadgeText: {
-    ...TYPE_SCALE.label.small,
-    color: PALETTE.white,
-    fontSize: 11,
-    fontWeight: '700',
-  },
+  // trustBadge styles reserved for future trust badge UI
+  // trustBadge: {
+  //   position: 'absolute',
+  //   bottom: 4,
+  //   right: 4,
+  //   width: 32,
+  //   height: 32,
+  //   borderRadius: 16,
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  //   borderWidth: 3,
+  //   borderColor: PALETTE.white,
+  // },
+  // trustBadgeGlow: {
+  //   shadowColor: COLORS.primary,
+  //   shadowOffset: { width: 0, height: 0 },
+  //   shadowOpacity: 0.8,
+  //   shadowRadius: 8,
+  //   elevation: 4,
+  // },
+  // trustBadgeText: {
+  //   ...TYPE_SCALE.label.small,
+  //   color: PALETTE.white,
+  //   fontSize: 11,
+  //   fontWeight: '700',
+  // },
   userInfo: {
     alignItems: 'center',
     marginTop: 16,
@@ -583,13 +586,14 @@ const styles = StyleSheet.create({
     ...TYPE_SCALE.body.base,
     color: 'rgba(255,255,255,0.8)',
   },
-  statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 12,
-    marginTop: 24,
-    paddingHorizontal: 20,
-  },
+  // statsRow reserved for future stats display
+  // statsRow: {
+  //   flexDirection: 'row',
+  //   justifyContent: 'center',
+  //   gap: 12,
+  //   marginTop: 24,
+  //   paddingHorizontal: 20,
+  // },
   statCardPressable: {
     borderRadius: 16,
     overflow: 'hidden',
