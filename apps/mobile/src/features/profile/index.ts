@@ -5,7 +5,7 @@ export { default as ProfileScreen } from './screens/ProfileScreen';
 // AchievementCard moved to @/features/gamification
 export { ProfileDetailScreen } from './screens/ProfileDetailScreen';
 export { default as EditProfileScreen } from './screens/EditProfileScreen';
-export { UserProfileScreen } from './screens/UserProfileScreen';
+// REMOVED: UserProfileScreen - duplicate of ProfileDetailScreen (zombie cleanup)
 
 // Reputation & Trust
 // ReputationScreen removed - use TrustGardenDetailScreen instead

@@ -1,17 +1,11 @@
 /**
  * Profile/Users Database Queries
- * CRUD operations for user profiles, follows, and search
+ * CRUD operations for user profiles and search
  */
 
 import { supabase, isSupabaseConfigured } from '../../config/supabase';
 import { logger } from '../../utils/logger';
-import type {
-  Tables,
-  DbResult,
-  ListResult,
-  FollowerRecord,
-  FollowingRecord,
-} from './types';
+import type { Tables, DbResult, ListResult } from './types';
 import { okSingle, okList } from './types';
 
 /**
@@ -71,105 +65,6 @@ export const usersService = {
     } catch (error) {
       logger.error('[DB] Update user error:', error);
       return { data: null, error: error as Error };
-    }
-  },
-
-  async follow(
-    followerId: string,
-    followingId: string,
-  ): Promise<{ error: Error | null }> {
-    try {
-      const { error } = await supabase
-        .from('follows')
-        .insert({ follower_id: followerId, following_id: followingId });
-
-      if (error) throw error;
-      return { error: null };
-    } catch (error) {
-      logger.error('[DB] Follow user error:', error);
-      return { error: error as Error };
-    }
-  },
-
-  async unfollow(
-    followerId: string,
-    followingId: string,
-  ): Promise<{ error: Error | null }> {
-    try {
-      const { error } = await supabase
-        .from('follows')
-        .delete()
-        .eq('follower_id', followerId)
-        .eq('following_id', followingId);
-
-      if (error) throw error;
-      return { error: null };
-    } catch (error) {
-      logger.error('[DB] Unfollow user error:', error);
-      return { error: error as Error };
-    }
-  },
-
-  async getFollowers(userId: string): Promise<ListResult<FollowerRecord>> {
-    try {
-      const { data, count, error } = await supabase
-        .from('follows')
-        .select('follower_id', { count: 'exact' })
-        .eq('following_id', userId);
-
-      if (error) throw error;
-      return {
-        data: (data as FollowerRecord[]) || [],
-        count: count || 0,
-        error: null,
-      };
-    } catch (error) {
-      logger.error('[DB] Get followers error:', error);
-      return { data: [], count: 0, error: error as Error };
-    }
-  },
-
-  async getFollowing(userId: string): Promise<ListResult<FollowingRecord>> {
-    try {
-      const { data, count, error } = await supabase
-        .from('follows')
-        .select('following_id', { count: 'exact' })
-        .eq('follower_id', userId);
-
-      if (error) throw error;
-      return {
-        data: (data as FollowingRecord[]) || [],
-        count: count || 0,
-        error: null,
-      };
-    } catch (error) {
-      logger.error('[DB] Get following error:', error);
-      return { data: [], count: 0, error: error as Error };
-    }
-  },
-
-  async checkFollowStatus(
-    followerId: string,
-    followingId: string,
-  ): Promise<{ isFollowing: boolean; error: Error | null }> {
-    try {
-      const { data, count, error } = await supabase
-        .from('follows')
-        .select('*', { count: 'exact' })
-        .eq('follower_id', followerId)
-        .eq('following_id', followingId);
-
-      if (error) throw error;
-
-      const isFollowing = !!(
-        (Array.isArray(data) && data.length > 0) ||
-        (typeof count === 'number' && count > 0)
-      );
-
-      return { isFollowing, error: null };
-    } catch (error) {
-      logger.error('[DB] Check follow status error:', error);
-      return { isFollowing: false, error: error as Error };
     }
   },
 

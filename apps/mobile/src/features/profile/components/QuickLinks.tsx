@@ -1,7 +1,17 @@
 import React, { memo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '@/constants/colors';
+
+// Profile dark theme colors
+const QUICKLINK_COLORS = {
+  background: 'rgba(255, 255, 255, 0.06)',
+  border: 'rgba(255, 255, 255, 0.08)',
+  divider: 'rgba(255, 255, 255, 0.06)',
+  text: {
+    primary: '#F8FAFC',
+    secondary: '#94A3B8',
+  },
+};
 
 interface QuickLink {
   icon: string;
@@ -24,7 +34,7 @@ const QuickLinks: React.FC<QuickLinksProps> = memo(
             <TouchableOpacity
               style={styles.quickLink}
               onPress={link.onPress}
-              accessibilityLabel={`${link.label}: ${link.count}. Tap to view`}
+              accessibilityLabel={`${link.label}: ${link.count}. Görmek için dokun`}
               accessibilityRole="button"
             >
               <View style={styles.quickLinkLeft}>
@@ -32,7 +42,7 @@ const QuickLinks: React.FC<QuickLinksProps> = memo(
                   name={
                     link.icon as keyof typeof MaterialCommunityIcons.glyphMap
                   }
-                  size={22}
+                  size={20}
                   color={link.color}
                 />
                 <Text style={styles.quickLinkText}>{link.label}</Text>
@@ -41,8 +51,8 @@ const QuickLinks: React.FC<QuickLinksProps> = memo(
                 <Text style={styles.quickLinkCount}>{link.count}</Text>
                 <MaterialCommunityIcons
                   name="chevron-right"
-                  size={20}
-                  color={COLORS.text.secondary}
+                  size={18}
+                  color={QUICKLINK_COLORS.text.secondary}
                 />
               </View>
             </TouchableOpacity>
@@ -63,16 +73,13 @@ QuickLinks.displayName = 'QuickLinks';
 
 const styles = StyleSheet.create({
   quickLinks: {
-    backgroundColor: COLORS.utility.white,
+    backgroundColor: QUICKLINK_COLORS.background,
     marginHorizontal: 16,
     marginTop: 12,
-    borderRadius: 16,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: QUICKLINK_COLORS.border,
     overflow: 'hidden',
-    shadowColor: COLORS.utility.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
   },
   quickLink: {
     flexDirection: 'row',
@@ -87,9 +94,9 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   quickLinkText: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '500',
-    color: COLORS.text.primary,
+    color: QUICKLINK_COLORS.text.primary,
   },
   quickLinkRight: {
     flexDirection: 'row',
@@ -97,14 +104,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   quickLinkCount: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text.secondary,
+    color: QUICKLINK_COLORS.text.secondary,
   },
   quickLinkDivider: {
     height: 1,
-    backgroundColor: COLORS.border.default,
-    marginLeft: 50,
+    backgroundColor: QUICKLINK_COLORS.divider,
+    marginLeft: 48,
   },
 });
 

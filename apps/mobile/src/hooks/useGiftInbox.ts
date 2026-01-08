@@ -11,7 +11,6 @@ import { requestService } from '@/services/requestService';
 
 export interface GiftSender {
   id: string;
-  username: string;
   name: string;
   avatar: string;
   isVerified: boolean;
@@ -117,9 +116,6 @@ export function useGiftInbox() {
               id: senderId,
               sender: {
                 id: senderId,
-                username:
-                  req.requesterName?.replace(/\s/g, '').toLowerCase() ||
-                  senderId,
                 name: req.requesterName || 'Unknown',
                 avatar: req.requesterAvatar || '',
                 isVerified: req.requesterVerified || false,

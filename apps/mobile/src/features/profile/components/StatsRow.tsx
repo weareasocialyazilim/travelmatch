@@ -47,10 +47,9 @@ const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 interface StatsRowProps {
   momentsCount: number;
-  exchangesCount: number;
+  activeMoments: number;
   responseRate: number;
   onMomentsPress: () => void;
-  onExchangesPress: () => void;
 }
 
 interface StatItemProps {
@@ -114,13 +113,7 @@ const StatItem: React.FC<StatItemProps> = memo(
 StatItem.displayName = 'StatItem';
 
 const StatsRow: React.FC<StatsRowProps> = memo(
-  ({
-    momentsCount,
-    exchangesCount,
-    responseRate,
-    onMomentsPress,
-    onExchangesPress,
-  }) => {
+  ({ momentsCount, activeMoments, responseRate, onMomentsPress }) => {
     return (
       <View style={styles.statsRow}>
         <StatItem
@@ -131,10 +124,9 @@ const StatsRow: React.FC<StatsRowProps> = memo(
         />
         <View style={styles.statDivider} />
         <StatItem
-          value={exchangesCount}
-          label="Takaslar"
+          value={activeMoments}
+          label="Aktif"
           accentColor={STATS_COLORS.neon.violet}
-          onPress={onExchangesPress}
         />
         <View style={styles.statDivider} />
         <StatItem
@@ -147,7 +139,7 @@ const StatsRow: React.FC<StatsRowProps> = memo(
   },
   (prevProps, nextProps) =>
     prevProps.momentsCount === nextProps.momentsCount &&
-    prevProps.exchangesCount === nextProps.exchangesCount &&
+    prevProps.activeMoments === nextProps.activeMoments &&
     prevProps.responseRate === nextProps.responseRate,
 );
 

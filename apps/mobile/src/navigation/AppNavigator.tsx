@@ -118,11 +118,7 @@ const TrustGardenDetailScreen = lazyLoad(() =>
     default: m.TrustGardenDetailScreen,
   })),
 );
-import {
-  TrustNotesScreen,
-  ProfileDetailScreen,
-  UserProfileScreen,
-} from '../features/profile';
+import { TrustNotesScreen, ProfileDetailScreen } from '../features/profile';
 
 // Gamification feature (elevated from profile)
 import { AchievementsScreen } from '../features/gamification';
@@ -578,9 +574,6 @@ const AppNavigator = () => {
             {/* Communication */}
             <Stack.Screen name="Chat" component={ChatScreen} />
             <Stack.Screen name="ChatDetail" component={ChatDetailScreen} />
-
-            {/* User Profile (Public View) */}
-            <Stack.Screen name="UserProfile" component={UserProfileScreen} />
 
             {/* Checkout & Reviews (Modals) */}
             <Stack.Screen

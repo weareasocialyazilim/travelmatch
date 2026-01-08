@@ -42,7 +42,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { COLORS } from '@/constants/colors';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { LiquidScreenWrapper } from '@/components/layout';
-import { BlurFilterModal } from '@/components/ui';
+import { BlurFilterModal, type FilterValues } from '@/components/ui';
 import { showLoginPrompt } from '@/stores/modalStore';
 import type { NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/routeParams';
@@ -55,9 +55,7 @@ const DiscoverScreen = () => {
 
   // Filter modal state
   const [showFilterModal, setShowFilterModal] = useState(false);
-  const [activeFilters, setActiveFilters] = useState<Record<string, unknown>>(
-    {},
-  );
+  const [activeFilters, setActiveFilters] = useState<FilterValues | null>(null);
 
   // Use PostGIS-based discovery for location-aware moments
   const {
@@ -117,6 +115,12 @@ const DiscoverScreen = () => {
   const handleFilterPress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowFilterModal(true);
+  }, []);
+
+  const handleFilterApply = useCallback((filters: FilterValues) => {
+    setActiveFilters(filters);
+    // TODO: Apply filters to useDiscoverMoments when backend supports it
+    console.log('Filters applied:', filters);
   }, []);
 
   const handleAvatarPress = useCallback(() => {
@@ -378,10 +382,14 @@ const DiscoverScreen = () => {
       <BlurFilterModal
         visible={showFilterModal}
         onClose={() => setShowFilterModal(false)}
-        onApply={({ priceRange, category }) => {
-          setActiveFilters({ priceRange, category });
-          setShowFilterModal(false);
-        }}
+        onApply={handleFilterApply}
+        initialPriceRange={(activeFilters.priceRange as number) || 2}
+        initialCategory={(activeFilters.category as string) || 'All'}
+        initialDistance={(activeFilters.distance as number) || 25}
+        initialAgeRange={
+          (activeFilters.ageRange as [number, number]) || [18, 99]
+        }
+        initialGender={(activeFilters.gender as string) || 'all'}
       />
 
       {/* Guest Login Prompt Modal - Now rendered by ModalProvider */}

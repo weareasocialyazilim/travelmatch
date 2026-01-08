@@ -88,9 +88,9 @@ export type RootStackParamList = {
   MomentComments: { momentId: string; commentCount?: number };
   Profile: undefined;
   ProfileDetail: { userId: string };
-  UserProfile: { userId: string };
   MyGifts: undefined;
   // REMOVED: GiftCardMarket - legacy gift card system (zombie cleanup)
+  // REMOVED: UserProfile - duplicate of ProfileDetail (zombie cleanup)
   TrustNotes: undefined;
   MomentGallery: { momentId: string };
   ProofHistory: { momentId: string };
@@ -422,11 +422,6 @@ export type RootStackParamList = {
     }>;
   };
 
-  // Gift Selection (choose gift for recipient)
-  GiftSelection: {
-    recipientId: string;
-    recipientName: string;
-    recipientAvatar: string;
-    topMomentId?: string;
-  };
+  // REMOVED: GiftSelection - use UnifiedGiftFlow instead
+  // GiftSelection was consolidated into UnifiedGiftFlow for all gift initiation flows
 };

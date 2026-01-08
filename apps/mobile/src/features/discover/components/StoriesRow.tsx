@@ -18,10 +18,10 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  Image,
   StyleSheet,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { TMAvatar } from '@/components/ui/TMAvatar';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
 import type { UserStory } from './types';
@@ -91,8 +91,10 @@ const StoriesRow: React.FC<StoriesRowProps> = memo(
                   !user.isNew && styles.storyRingViewed,
                 ]}
               >
-                <Image
-                  source={{ uri: user.avatar }}
+                <TMAvatar
+                  source={user.avatar}
+                  name={user.name}
+                  size="lg"
                   style={styles.storyAvatar}
                 />
               </View>

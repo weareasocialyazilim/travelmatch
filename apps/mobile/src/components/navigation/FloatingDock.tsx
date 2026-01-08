@@ -85,6 +85,11 @@ export const FloatingDock: React.FC<BottomTabBarProps> = ({
             name: focused ? 'compass' : 'compass-outline',
             type: 'material',
           };
+        case 'Map':
+          return {
+            name: focused ? 'map' : 'map-outline',
+            type: 'ionicon',
+          };
         case 'Create':
           return {
             name: 'add',
@@ -244,6 +249,7 @@ const TabItem: React.FC<TabItemProps> = ({
   const getAccessibleLabel = (name: string): string => {
     const labels: Record<string, string> = {
       Home: 'Ana sayfa sekmesi',
+      Map: 'Harita sekmesi',
       Search: 'Keşfet sekmesi',
       Create: 'Yeni an oluştur',
       Inbox: 'Mesajlar sekmesi',
@@ -370,22 +376,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: DOCK_HORIZONTAL_PADDING,
     zIndex: 100,
+    overflow: 'visible',
   },
   glowLayer: {
     position: 'absolute',
-    top: 10,
-    left: DOCK_HORIZONTAL_PADDING + 20,
-    right: DOCK_HORIZONTAL_PADDING + 20,
-    height: DOCK_HEIGHT - 10,
+    top: 0,
+    left: DOCK_HORIZONTAL_PADDING,
+    right: DOCK_HORIZONTAL_PADDING,
+    height: DOCK_HEIGHT,
     borderRadius: DOCK_BORDER_RADIUS,
-    backgroundColor: COLORS.brand.primary,
-    opacity: 0.08,
+    backgroundColor: 'transparent',
     ...Platform.select({
       ios: {
         shadowColor: COLORS.brand.primary,
         shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.3,
-        shadowRadius: 20,
+        shadowOpacity: 0.15,
+        shadowRadius: 15,
       },
       android: {
         elevation: 0,
@@ -397,14 +403,11 @@ const styles = StyleSheet.create({
     height: DOCK_HEIGHT,
     borderRadius: DOCK_BORDER_RADIUS,
     overflow: 'hidden',
+    backgroundColor: 'rgba(20, 20, 22, 0.9)',
   },
   container: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: 'rgba(30, 30, 32, 0.75)',
-    borderRadius: DOCK_BORDER_RADIUS,
-    borderWidth: 1,
-    borderColor: COLORS.border.default,
     justifyContent: 'space-around',
     alignItems: 'center',
     paddingHorizontal: 8,
@@ -500,13 +503,14 @@ const styles = StyleSheet.create({
   centerButtonWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -25,
+    marginTop: -30,
+    zIndex: 10,
   },
   centerButtonGlow: {
     position: 'absolute',
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     backgroundColor: COLORS.brand.primary,
     ...Platform.select({
       ios: {
@@ -521,13 +525,13 @@ const styles = StyleSheet.create({
     }),
   },
   centerButton: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: COLORS.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 4,
+    borderWidth: 3,
     borderColor: COLORS.background.primary,
     // Subtle inner shadow effect
     ...Platform.select({

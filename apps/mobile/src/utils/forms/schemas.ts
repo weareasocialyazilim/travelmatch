@@ -154,7 +154,6 @@ export const verifyCodeSchema = z.object({
 
 export const editProfileSchema = z.object({
   fullName: nameValidation,
-  username: usernameValidation.optional(),
   bio: bioValidation,
   location: z.string().max(100, 'forms.validation.location.max').optional(),
   website: urlValidation,

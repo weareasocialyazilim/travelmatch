@@ -224,10 +224,10 @@ describe('Optimistic UI Updates', () => {
       const initialProfile = {
         id: '123',
         stats: {
-          followers: 100,
-          following: 50,
+          moments: 100,
+          gifts: 50,
         },
-        isFollowing: false,
+        isSaved: false,
       };
 
       cacheService.setQueryData(cacheKey, initialProfile);
@@ -241,14 +241,14 @@ describe('Optimistic UI Updates', () => {
       await act(async () => {
         result.current.mutate({ userId: '123' });
 
-        // Optimistic update for follow
+        // Optimistic update for save moment
         cacheService.setQueryData(cacheKey, {
           id: '123',
           stats: {
-            followers: 101,
-            following: 50,
+            moments: 101,
+            gifts: 50,
           },
-          isFollowing: true,
+          isSaved: true,
         });
       });
 
@@ -256,10 +256,10 @@ describe('Optimistic UI Updates', () => {
       expect(data).toEqual({
         id: '123',
         stats: {
-          followers: 101,
-          following: 50,
+          moments: 101,
+          gifts: 50,
         },
-        isFollowing: true,
+        isSaved: true,
       });
     });
   });

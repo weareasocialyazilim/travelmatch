@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
     top: '100%',
     left: 0,
     right: 0,
-    backgroundColor: COLORS.utility.white,
+    backgroundColor: COLORS.bg.secondary,
     borderRadius: 12,
     marginTop: 4,
     maxHeight: 200,
@@ -374,6 +374,8 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
     zIndex: 1000,
+    borderWidth: 1,
+    borderColor: COLORS.border.default,
   },
   suggestionItem: {
     flexDirection: 'row',

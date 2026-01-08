@@ -5,7 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  ActivityIndicator as _ActivityIndicator,
+  ActivityIndicator,
   Platform,
 } from 'react-native';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
@@ -46,25 +46,71 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 }) => {
   const [selectedPlan, setSelectedPlan] = useState<string>('first_class');
   const [plans, setPlans] = useState<SubscriptionPlan[]>(PLANS);
-  const [_loading, _setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchPlans = async () => {
-      _setLoading(true);
-      const { data } = await subscriptionsService.getPlans();
-      if (data && data.length > 0) {
-        // Map API plans to our structure if needed
-        // For now, use static plans
+      setLoading(true);
+      try {
+        const { data, error } = await subscriptionsService.getPlans();
+        if (!error && data && data.length > 0) {
+          // Map API plans to SubscriptionPlan structure
+          const mappedPlans: SubscriptionPlan[] = data.map((apiPlan: any) => {
+            // Find matching static plan for features/limits
+            const staticPlan = PLANS.find((p) => p.id === apiPlan.id);
+            return {
+              id: apiPlan.id,
+              name: apiPlan.name,
+              tagline: staticPlan?.tagline || apiPlan.description || '',
+              price: Number(apiPlan.price) || 0,
+              currency: apiPlan.currency || 'USD',
+              interval: apiPlan.interval || 'month',
+              features: apiPlan.features || staticPlan?.features || [],
+              limits: staticPlan?.limits || {
+                momentsPerMonth: 3,
+                messagesPerDay: 20,
+                giftsPerMonth: 1,
+                savedMoments: 10,
+                photoPerMoment: 5,
+              },
+              popular: apiPlan.is_popular || false,
+              icon: apiPlan.icon || staticPlan?.icon || 'sparkles',
+              color: apiPlan.color || staticPlan?.color || COLORS.brand.primary,
+            };
+          });
+          setPlans(mappedPlans);
+        } else {
+          // Fallback to static plans if API fails
+          logger.debug('Using static plans (API returned empty or error)');
+          setPlans(PLANS);
+        }
+      } catch (error) {
+        logger.error('Failed to fetch plans:', error);
         setPlans(PLANS);
+      } finally {
+        setLoading(false);
       }
-      _setLoading(false);
     };
     fetchPlans();
   }, []);
 
   const handleSubscribe = (planId: string) => {
-    // Implement subscription logic
-    logger.debug('Subscribe to plan', { planId });
+    const plan = plans.find((p) => p.id === planId);
+    if (!plan) return;
+
+    if (plan.price === 0) {
+      // Free plan - no payment needed
+      logger.debug('Selected free plan', { planId });
+      return;
+    }
+
+    // Navigate to checkout with selected plan
+    navigation.navigate('Checkout', {
+      planId,
+      planName: plan.name,
+      amount: plan.price,
+      currency: plan.currency || 'USD',
+    });
   };
 
   const renderPlanCard = (plan: SubscriptionPlan) => {
@@ -188,7 +234,14 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {plans.map(renderPlanCard)}
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={COLORS.brand.primary} />
+            <Text style={styles.loadingText}>Planlar yükleniyor...</Text>
+          </View>
+        ) : (
+          plans.map(renderPlanCard)
+        )}
 
         {/* Info Card */}
         <View style={styles.infoCard}>
@@ -651,5 +704,15 @@ const styles = StyleSheet.create({
     color: COLORS.utility.white,
     ...TYPOGRAPHY.bodyLarge,
     fontWeight: '700',
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: LAYOUT.padding * 4,
+  },
+  loadingText: {
+    color: COLORS.text.secondary,
+    marginTop: LAYOUT.padding,
+    ...TYPOGRAPHY.bodyMedium,
   },
 });

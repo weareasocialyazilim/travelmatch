@@ -59,7 +59,6 @@ export type NotificationType =
   | 'request_completed' // @deprecated - use gift_completed
   // Social & Moment notifications
   | 'review_received'
-  | 'new_follower'
   | 'moment_liked'
   | 'moment_saved'
   | 'moment_comment'
@@ -406,8 +405,6 @@ export const getNotificationIcon = (type: NotificationType): string => {
     // Social icons
     case 'review_received':
       return 'star-outline';
-    case 'new_follower':
-      return 'person-add-outline';
     case 'moment_liked':
       return 'heart-outline';
     case 'moment_saved':
@@ -472,7 +469,6 @@ export const getNotificationColor = (
       return '#00BFA5'; // Teal for trust
     // Communication
     case 'message':
-    case 'new_follower':
       return '#2196F3'; // Blue
     // Social engagement
     case 'moment_liked':
@@ -536,7 +532,6 @@ export const getNotificationRoute = (notification: Notification): any => {
       };
     // Profile routes
     case 'review_received':
-    case 'new_follower':
       return {
         name: 'Profile',
         params: { userId: notification.userId },

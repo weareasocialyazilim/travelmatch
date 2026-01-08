@@ -28,6 +28,7 @@ import {
   Dimensions,
   KeyboardAvoidingView,
   Platform,
+  Switch,
 } from 'react-native';
 import { showAlert } from '@/stores/modalStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -56,7 +57,9 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { CurrencySelectionBottomSheet } from '@/features/payments/components/CurrencySelectionBottomSheet';
 import { LazyLocationPicker } from '../components/LazyLocationPicker';
 import { useMoments } from '@/hooks/useMoments';
+import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/context/ToastContext';
+import { showLoginPrompt } from '@/stores/modalStore';
 import { logger } from '@/utils/logger';
 
 // Currency symbols for display
@@ -78,6 +81,15 @@ const getEscrowTier = (
   message: string;
   color: string;
 } => {
+  // Handle NaN or invalid amounts
+  if (isNaN(amount) || amount <= 0) {
+    return {
+      tier: 'direct',
+      message: 'Miktar girin',
+      color: COLORS.text.secondary,
+    };
+  }
+
   // Convert to USD equivalent for threshold comparison (simplified)
   const usdEquivalent =
     currency === 'TRY'
@@ -91,19 +103,19 @@ const getEscrowTier = (
   if (usdEquivalent < ESCROW_THRESHOLDS.DIRECT_MAX) {
     return {
       tier: 'direct',
-      message: `${CURRENCY_SYMBOLS[currency]}0-${Math.round(ESCROW_THRESHOLDS.DIRECT_MAX * (currency === 'TRY' ? 35 : currency === 'EUR' ? 0.9 : 1))}: Doğrudan ödeme • Anında transfer`,
+      message: 'Doğrudan ödeme aktif • Anında cüzdanınıza aktarılır',
       color: COLORS.feedback.success,
     };
   } else if (usdEquivalent < ESCROW_THRESHOLDS.OPTIONAL_MAX) {
     return {
       tier: 'optional',
-      message: `${CURRENCY_SYMBOLS[currency]}${Math.round(ESCROW_THRESHOLDS.DIRECT_MAX * (currency === 'TRY' ? 35 : 1))}-${Math.round(ESCROW_THRESHOLDS.OPTIONAL_MAX * (currency === 'TRY' ? 35 : 1))}: İsteğe bağlı koruma • Escrow seçeneği`,
+      message: 'Escrow koruması isteğe bağlı • Alıcı onayından sonra ödeme',
       color: COLORS.feedback.warning,
     };
   } else {
     return {
       tier: 'mandatory',
-      message: `${CURRENCY_SYMBOLS[currency]}${Math.round(ESCROW_THRESHOLDS.OPTIONAL_MAX * (currency === 'TRY' ? 35 : 1))}+: Zorunlu koruma • Güvenli escrow`,
+      message: 'Zorunlu escrow koruması • 48 saat güvenli tutulur',
       color: COLORS.feedback.error,
     };
   }
@@ -157,6 +169,7 @@ const CreateMomentScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
   const { createMoment } = useMoments();
+  const { user, isGuest } = useAuth();
   const { showToast } = useToast();
   const { t } = useTranslation();
 
@@ -178,6 +191,7 @@ const CreateMomentScreen: React.FC = () => {
     lng: number;
   } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAsStory, setShowAsStory] = useState(true); // Default: show as story for 24h
 
   // 1. Media Selection - Story format (9:16)
   const pickImage = useCallback(async () => {
@@ -209,6 +223,12 @@ const CreateMomentScreen: React.FC = () => {
 
   // 2. Drop Action (Submit to API) - UPDATED with new fields
   const handleDrop = useCallback(async () => {
+    // Check if user is authenticated
+    if (isGuest || !user) {
+      showLoginPrompt({ action: 'create_moment' });
+      return;
+    }
+
     if (!title || !selectedCategory || !imageUri || !locationName) {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       showAlert({
@@ -250,6 +270,7 @@ const CreateMomentScreen: React.FC = () => {
         maxGuests: 4,
         duration: '2 hours',
         availability: [new Date().toISOString()],
+        showAsStory: showAsStory, // Show as story for 24 hours
       };
 
       const createdMoment = await createMoment(momentData);
@@ -258,6 +279,8 @@ const CreateMomentScreen: React.FC = () => {
         await Haptics.notificationAsync(
           Haptics.NotificationFeedbackType.Success,
         );
+
+        // Navigate to Profile after successful creation
         showAlert({
           title: t('screens.createMoment.successTitle'),
           message: t('screens.createMoment.successMessage'),
@@ -265,7 +288,7 @@ const CreateMomentScreen: React.FC = () => {
             {
               text: t('screens.createMoment.successButton'),
               onPress: () =>
-                navigation.navigate('MainTabs', { screen: 'Home' }),
+                navigation.navigate('MainTabs', { screen: 'Profile' }),
             },
           ],
         });
@@ -290,10 +313,13 @@ const CreateMomentScreen: React.FC = () => {
     locationCoords,
     requestedAmount,
     currency,
+    showAsStory,
     createMoment,
     navigation,
     showToast,
     t,
+    isGuest,
+    user,
   ]);
 
   // Navigate back - UPDATED for new step flow
@@ -337,15 +363,27 @@ const CreateMomentScreen: React.FC = () => {
   // Step 1: Media Selection - Clean upload UI
   const renderMediaStep = () => (
     <Animated.View entering={FadeIn} style={styles.centerContent}>
-      {/* Step Indicator */}
-      <View style={styles.stepIndicatorContainer}>
-        <FormStepIndicator
-          steps={FORM_STEPS}
-          currentStep={STEP_INDEX_MAP[step]}
-          onStepPress={handleStepPress}
-          showLabels={false}
-          compact
-        />
+      {/* Header with Close Button and Step Indicator */}
+      <View style={[styles.mediaHeader, { paddingTop: insets.top + 10 }]}>
+        <View style={styles.mediaHeaderSpacer} />
+        <View style={styles.mediaHeaderCenter}>
+          <FormStepIndicator
+            steps={FORM_STEPS}
+            currentStep={STEP_INDEX_MAP[step]}
+            onStepPress={handleStepPress}
+            showLabels={false}
+            compact
+          />
+        </View>
+        <TouchableOpacity
+          onPress={handleClose}
+          style={styles.mediaCloseButton}
+          accessibilityLabel={t('common.cancel')}
+          accessibilityRole="button"
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name="close" size={24} color="white" />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.mediaStepContent}>
@@ -433,6 +471,10 @@ const CreateMomentScreen: React.FC = () => {
                 onChangeText={setTitle}
                 maxLength={40}
                 autoFocus
+                autoCorrect={false}
+                autoCapitalize="sentences"
+                spellCheck={false}
+                keyboardType="default"
                 accessibilityLabel={t('screens.createMoment.a11y.momentTitle')}
               />
 
@@ -592,9 +634,17 @@ const CreateMomentScreen: React.FC = () => {
                 <TextInput
                   style={styles.priceInput}
                   value={requestedAmount}
-                  onChangeText={setRequestedAmount}
+                  onChangeText={(text) => {
+                    // Only allow numeric input
+                    const numericValue = text.replace(/[^0-9]/g, '');
+                    setRequestedAmount(numericValue);
+                  }}
                   keyboardType="number-pad"
                   maxLength={5}
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  contextMenuHidden={true}
                   accessibilityLabel="Hediye miktarı"
                 />
               </View>
@@ -657,7 +707,8 @@ const CreateMomentScreen: React.FC = () => {
 
               <Text style={styles.priceHint}>
                 Bu miktarı kabul eden kişiler sana hediye gönderebilir.
-                {'\n'}Platform komisyonu: %5 • Minimum: 1
+                {'\n'}Platform komisyonu: %5 • Minimum:{' '}
+                {CURRENCY_SYMBOLS[currency]}1
               </Text>
 
               <TouchableOpacity
@@ -765,6 +816,37 @@ const CreateMomentScreen: React.FC = () => {
                     {requestedAmount} hediye göndererek destek olabilir.
                   </Text>
                 </View>
+
+                {/* Story Toggle Option */}
+                <View style={styles.storyToggleContainer}>
+                  <View style={styles.storyToggleInfo}>
+                    <MaterialCommunityIcons
+                      name="fire"
+                      size={20}
+                      color={
+                        showAsStory ? COLORS.primary : COLORS.text.secondary
+                      }
+                    />
+                    <View style={styles.storyToggleText}>
+                      <Text style={styles.storyToggleTitle}>
+                        Story olarak göster
+                      </Text>
+                      <Text style={styles.storyToggleSubtitle}>
+                        24 saat boyunca öne çıkar, sonra normal akışta kalır
+                      </Text>
+                    </View>
+                  </View>
+                  <Switch
+                    value={showAsStory}
+                    onValueChange={setShowAsStory}
+                    trackColor={{
+                      false: '#3e3e3e',
+                      true: COLORS.primary + '60',
+                    }}
+                    thumbColor={showAsStory ? COLORS.primary : '#f4f3f4'}
+                    ios_backgroundColor="#3e3e3e"
+                  />
+                </View>
               </GlassCard>
 
               <TouchableOpacity
@@ -857,10 +939,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
   },
-  stepIndicatorContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-  },
   mediaStepContent: {
     flex: 1,
     alignItems: 'center',
@@ -916,6 +994,36 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
+  // Media Step Header
+  mediaHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+  },
+  mediaHeaderSpacer: {
+    width: 44,
+  },
+  mediaHeaderCenter: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    borderRadius: 20,
+    paddingVertical: 10,
+    marginHorizontal: 12,
+  },
+  mediaCloseButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+
   // Overlay Controls
   overlayContainer: {
     flex: 1,
@@ -930,14 +1038,25 @@ const styles = StyleSheet.create({
   headerStepIndicator: {
     flex: 1,
     marginHorizontal: 12,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderRadius: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
   },
   iconButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 4,
   },
   contentLayer: {
     paddingHorizontal: 24,
@@ -1135,6 +1254,40 @@ const styles = StyleSheet.create({
     color: COLORS.text.secondary,
     lineHeight: 18,
   },
+
+  // Story Toggle
+  storyToggleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  storyToggleInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: 12,
+  },
+  storyToggleText: {
+    flex: 1,
+  },
+  storyToggleTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: 'white',
+    marginBottom: 2,
+  },
+  storyToggleSubtitle: {
+    fontSize: 11,
+    color: COLORS.text.secondary,
+    lineHeight: 14,
+  },
+
   reviewMetaRow: {
     flexDirection: 'row',
     gap: 20,

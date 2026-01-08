@@ -1,12 +1,12 @@
 -- ============================================================================
--- Migration: discover_nearby_moments RPC Function
--- Description: PostGIS-optimized function for discovering nearby moments
+-- Migration: Fix discover_nearby_moments RPC Function
+-- Description: Fix table reference from 'profiles' to 'users'
 -- ============================================================================
 
--- Drop existing function if exists
+-- Drop existing function
 DROP FUNCTION IF EXISTS discover_nearby_moments(double precision, double precision, double precision, integer, uuid, integer, integer, text);
 
--- Create the discover_nearby_moments function using PostGIS geography
+-- Recreate the discover_nearby_moments function with correct table reference
 CREATE OR REPLACE FUNCTION discover_nearby_moments(
     p_lat double precision,
     p_lng double precision,
@@ -86,5 +86,8 @@ $$;
 -- Grant execute permission to authenticated users
 GRANT EXECUTE ON FUNCTION discover_nearby_moments(double precision, double precision, double precision, integer, uuid, integer, integer, text) TO authenticated;
 
+-- Also grant to anon for guest access
+GRANT EXECUTE ON FUNCTION discover_nearby_moments(double precision, double precision, double precision, integer, uuid, integer, integer, text) TO anon;
+
 -- Add helpful comment
-COMMENT ON FUNCTION discover_nearby_moments IS 'Discovers nearby moments using PostGIS geography for accurate distance calculations. Returns moments within specified radius ordered by distance.';
+COMMENT ON FUNCTION discover_nearby_moments IS 'Discovers nearby moments using PostGIS geography for accurate distance calculations. Returns moments within specified radius ordered by distance. Fixed to use users table instead of profiles.';

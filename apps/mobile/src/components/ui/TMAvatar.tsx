@@ -156,7 +156,9 @@ export const TMAvatar: React.FC<TMAvatarProps> = ({
 }) => {
   const [imageError, setImageError] = useState(false);
   const avatarSize = SIZE_CONFIG[size];
-  const showInitials = !source || imageError;
+  // Only show image if source exists and is not empty string
+  const hasValidSource = source && source.trim().length > 0;
+  const showInitials = !hasValidSource || imageError;
 
   const containerStyle: ViewStyle = {
     width: avatarSize,

@@ -73,7 +73,6 @@ describe('Auth Flow Integration', () => {
     id: 'user-123',
     email: 'test@example.com',
     name: 'Test User',
-    username: 'testuser',
     avatar: 'https://example.com/avatar.jpg',
     bio: 'Test bio',
     location: {
@@ -87,8 +86,6 @@ describe('Auth Flow Integration', () => {
     rating: 5.0,
     reviewCount: 0,
     momentCount: 0,
-    followerCount: 0,
-    followingCount: 0,
     giftsSent: 0,
     giftsReceived: 0,
     createdAt: '2024-01-15T10:00:00Z',
