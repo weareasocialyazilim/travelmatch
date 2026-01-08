@@ -44,6 +44,7 @@ import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { LiquidScreenWrapper } from '@/components/layout';
 import { BlurFilterModal, type FilterValues } from '@/components/ui';
 import { showLoginPrompt } from '@/stores/modalStore';
+import { logger } from '@/utils/logger';
 import type { NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
@@ -120,7 +121,7 @@ const DiscoverScreen = () => {
   const handleFilterApply = useCallback((filters: FilterValues) => {
     setActiveFilters(filters);
     // TODO: Apply filters to useDiscoverMoments when backend supports it
-    console.log('Filters applied:', filters);
+    logger.debug('Filters applied:', filters);
   }, []);
 
   const handleAvatarPress = useCallback(() => {
@@ -346,7 +347,9 @@ const DiscoverScreen = () => {
       <AwwwardsDiscoverHeader
         userName={user?.name || 'Explorer'}
         notificationCount={3}
-        activeFiltersCount={Object.keys(activeFilters).length}
+        activeFiltersCount={
+          activeFilters ? Object.keys(activeFilters).length : 0
+        }
         onNotificationsPress={handleNotificationsPress}
         onFilterPress={handleFilterPress}
         onAvatarPress={handleAvatarPress}
@@ -383,13 +386,13 @@ const DiscoverScreen = () => {
         visible={showFilterModal}
         onClose={() => setShowFilterModal(false)}
         onApply={handleFilterApply}
-        initialPriceRange={(activeFilters.priceRange as number) || 2}
-        initialCategory={(activeFilters.category as string) || 'All'}
-        initialDistance={(activeFilters.distance as number) || 25}
+        initialPriceRange={(activeFilters?.priceRange as number) || 2}
+        initialCategory={(activeFilters?.category as string) || 'All'}
+        initialDistance={(activeFilters?.distance as number) || 25}
         initialAgeRange={
-          (activeFilters.ageRange as [number, number]) || [18, 99]
+          (activeFilters?.ageRange as [number, number]) || [18, 99]
         }
-        initialGender={(activeFilters.gender as string) || 'all'}
+        initialGender={(activeFilters?.gender as string) || 'all'}
       />
 
       {/* Guest Login Prompt Modal - Now rendered by ModalProvider */}

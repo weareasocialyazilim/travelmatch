@@ -106,10 +106,9 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
     // Navigate to checkout with selected plan
     navigation.navigate('Checkout', {
-      planId,
-      planName: plan.name,
+      momentId: planId, // Use momentId for plan identifier
+      title: plan.name,
       amount: plan.price,
-      currency: plan.currency || 'USD',
     });
   };
 

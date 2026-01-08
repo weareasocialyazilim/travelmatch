@@ -763,21 +763,21 @@ const styles = StyleSheet.create({
     padding: 0,
   },
 
-  // Username
-  usernameInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-  },
-  usernamePrefix: {
-    ...TYPOGRAPHY.bodyLarge,
-    color: COLORS.text.secondary,
-  },
-  usernameError: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.error,
-    marginTop: SPACING.xs,
-  },
+  // Username styles reserved for future username input UI
+  // usernameInputContainer: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   gap: 2,
+  // },
+  // usernamePrefix: {
+  //   ...TYPOGRAPHY.bodyLarge,
+  //   color: COLORS.text.secondary,
+  // },
+  // usernameError: {
+  //   ...TYPOGRAPHY.caption,
+  //   color: COLORS.error,
+  //   marginTop: SPACING.xs,
+  // },
 
   // Bio
   bioLabelRow: {

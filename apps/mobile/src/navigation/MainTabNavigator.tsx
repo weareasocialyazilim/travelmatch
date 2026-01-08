@@ -19,18 +19,18 @@ import { COLORS } from '@/constants/colors';
 
 const Tab = createBottomTabNavigator();
 
+const mapWrapperLoadingStyle = {
+  flex: 1,
+  backgroundColor: COLORS.background.primary,
+  alignItems: 'center' as const,
+  justifyContent: 'center' as const,
+};
+
 // Loading fallback for lazy-loaded screens
 const MapScreenWrapper: React.FC = () => (
   <Suspense
     fallback={
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: COLORS.background.primary,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
+      <View style={mapWrapperLoadingStyle}>
         <ActivityIndicator size="large" color={COLORS.brand.primary} />
       </View>
     }

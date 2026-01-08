@@ -19,8 +19,6 @@ export type {
   Tables,
   DbResult,
   ListResult,
-  FollowerRecord,
-  FollowingRecord,
   ReportRecord,
   BlockRecord,
   TransactionInput,
