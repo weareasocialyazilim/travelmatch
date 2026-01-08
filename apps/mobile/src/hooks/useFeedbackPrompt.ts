@@ -21,12 +21,8 @@ const defaultState: FeedbackState = {
 export function useFeedbackPrompt() {
   const [showFeedback, setShowFeedback] = useState(false);
   const [state, setState] = useState<FeedbackState>(defaultState);
-<<<<<<< Updated upstream
-  const stateRef = useRef<FeedbackState>(state);
-=======
   const stateRef = useRef<FeedbackState>(defaultState);
   const hasIncrementedRef = useRef(false);
->>>>>>> Stashed changes
 
   // Keep ref in sync with state
   useEffect(() => {
@@ -81,11 +77,7 @@ export function useFeedbackPrompt() {
     [],
   );
 
-<<<<<<< Updated upstream
-  // Increment session count - stable callback using ref to prevent infinite re-renders
-=======
   // Increment session count - stable reference, only runs once per mount
->>>>>>> Stashed changes
   const incrementSessionCount = useCallback(async () => {
     // Prevent multiple increments
     if (hasIncrementedRef.current) {
@@ -126,11 +118,7 @@ export function useFeedbackPrompt() {
     try {
       const currentState = stateRef.current;
       const newState: FeedbackState = {
-<<<<<<< Updated upstream
-        ...stateRef.current,
-=======
         ...currentState,
->>>>>>> Stashed changes
         lastPromptDate: new Date().toISOString(),
       };
 
@@ -150,11 +138,7 @@ export function useFeedbackPrompt() {
     try {
       const currentState = stateRef.current;
       const newState: FeedbackState = {
-<<<<<<< Updated upstream
-        ...stateRef.current,
-=======
         ...currentState,
->>>>>>> Stashed changes
         hasSubmittedFeedback: true,
         lastPromptDate: new Date().toISOString(),
       };
