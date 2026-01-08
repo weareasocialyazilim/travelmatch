@@ -1,7 +1,5 @@
 {
-  "name": "TravelMatch",
-  "slug": "travelmatch",
   "ios": {
-    "bundleIdentifier": "com.travelmatch.mobile"
+    "bundleIdentifier": "com.anonymous.travelmatch-new"
   }
 }

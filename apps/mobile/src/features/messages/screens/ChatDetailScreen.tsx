@@ -116,7 +116,15 @@ const ChatDetailScreen: React.FC = () => {
   const flatListRef = useRef<FlatList>(null);
   const { t } = useTranslation();
 
-  const { conversationId, otherUser } = route.params;
+  const { conversationId, otherUser: routeOtherUser } = route.params;
+
+  // Provide default fallback for otherUser to prevent undefined errors
+  const otherUser = routeOtherUser || {
+    id: '',
+    name: 'Unknown User',
+    avatarUrl: null,
+  };
+
   const { user: currentUser } = useAuth();
   const [messageText, setMessageText] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
@@ -232,7 +240,12 @@ const ChatDetailScreen: React.FC = () => {
           }
         >
           <Image
-            source={{ uri: otherUser.avatarUrl ?? undefined }}
+            source={{
+              uri:
+                otherUser.avatarUrl ||
+                'https://ui-avatars.com/api/?name=' +
+                  encodeURIComponent(otherUser.name || 'User'),
+            }}
             style={styles.headerAvatar}
             contentFit="cover"
           />

@@ -92,7 +92,8 @@ import {
 // NEW FEATURE SCREENS (LAZY LOADED)
 // ===================================
 // SearchMapScreen - lazy loaded to prevent Mapbox TurboModule init at startup
-const SearchMapScreen = React.lazy(() =>
+// Note: Search feature removed - platform is filter-based only
+const _SearchMapScreen = React.lazy(() =>
   import('../features/discover/screens/SearchMapScreen').then((m) => ({
     default: m.default,
   })),
@@ -508,11 +509,7 @@ const AppNavigator = () => {
               component={DiscoverScreen}
               options={{ animation: 'fade' }}
             />
-            <Stack.Screen
-              name="Search"
-              component={SearchMapScreen}
-              options={{ animation: 'fade' }}
-            />
+            {/* Search removed - platform is filter-based only */}
             <Stack.Screen
               name="Inbox"
               component={InboxScreen}

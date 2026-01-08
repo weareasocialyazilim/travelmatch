@@ -33,7 +33,13 @@ interface LoginPromptModalProps {
   onLogin: () => void;
   onRegister: () => void;
   /** Action type that triggered the modal */
-  action?: 'gift' | 'chat' | 'chat_unlock' | 'save' | 'default';
+  action?:
+    | 'gift'
+    | 'chat'
+    | 'chat_unlock'
+    | 'save'
+    | 'counter_offer'
+    | 'default';
 }
 
 const ACTION_CONFIG = {
@@ -60,6 +66,12 @@ const ACTION_CONFIG = {
     title: 'Anı Kaydet',
     description: 'Anları kaydetmek için üye olmalısın.',
     gradient: ['#10B981', '#06B6D4'] as [string, string],
+  },
+  counter_offer: {
+    icon: 'swap-horizontal' as const,
+    title: 'Karşı Teklif Gönder',
+    description: 'Alternatif teklif göndermek için üye olmalısın.',
+    gradient: ['#8B5CF6', '#EC4899'] as [string, string],
   },
   default: {
     icon: 'star-four-points-outline' as const,

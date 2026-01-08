@@ -340,7 +340,7 @@ const WalletScreen = () => {
           style={styles.emptyCTAButton}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-            navigation.navigate('Discover');
+            navigation.navigate('MainTabs', { screen: 'Home' });
           }}
           activeOpacity={0.8}
         >

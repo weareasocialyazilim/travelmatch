@@ -30,7 +30,7 @@ export const PaymentFailedScreen: React.FC = () => {
   };
 
   const handleClose = () => {
-    navigation.navigate('Discover');
+    navigation.navigate('MainTabs', { screen: 'Home' });
   };
 
   return (

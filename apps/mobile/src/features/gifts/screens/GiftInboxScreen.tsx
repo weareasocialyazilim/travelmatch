@@ -184,7 +184,7 @@ const GiftInboxScreen: React.FC = () => {
             title="No Gifts Yet"
             description="When travelers send you gifts for your moments, they'll appear here. Keep creating amazing moments!"
             actionLabel="Discover Moments"
-            onAction={() => navigation.navigate('Discover')}
+            onAction={() => navigation.navigate('MainTabs', { screen: 'Home' })}
           />
         ) : (
           <ScrollView

@@ -134,7 +134,7 @@ const InboxScreen: React.FC = () => {
         {activeTab === 'active' && (
           <TouchableOpacity
             style={styles.emptyButton}
-            onPress={() => navigation.navigate('Discover')}
+            onPress={() => navigation.navigate('MainTabs', { screen: 'Home' })}
             activeOpacity={0.8}
           >
             <LinearGradient

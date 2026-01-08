@@ -34,14 +34,13 @@ export interface ImmersiveMomentCardProps {
   item: Moment;
   onGiftPress: () => void;
   onCounterOfferPress: () => void;
-  onLikePress?: () => void;
-  onCommentPress?: () => void;
   onSharePress?: () => void;
   onUserPress?: () => void;
 }
 
 // Format large numbers (e.g., 2400 -> 2.4k)
-const formatCount = (count: number): string => {
+// Note: Unused after like/comment feature removal, kept for future use
+const _formatCount = (count: number): string => {
   if (count >= 1000000) {
     return `${(count / 1000000).toFixed(1)}M`;
   }
@@ -113,8 +112,6 @@ export const ImmersiveMomentCard = memo(
     item,
     onGiftPress,
     onCounterOfferPress,
-    onLikePress,
-    onCommentPress,
     onSharePress,
     onUserPress,
   }: ImmersiveMomentCardProps) => {
@@ -218,21 +215,8 @@ export const ImmersiveMomentCard = memo(
             </View>
           </View>
 
-          {/* 4. Action Sidebar (Right Side - Like TikTok) */}
+          {/* 4. Action Sidebar (Right Side - Share only) */}
           <View style={styles.sidebar}>
-            <SidebarButton
-              icon={item.isSaved ? 'heart' : 'heart-outline'}
-              count={formatCount(item.saves || 0)}
-              onPress={onLikePress}
-              isLiked={item.isSaved}
-            />
-
-            <SidebarButton
-              icon="chatbubble-ellipses"
-              count={formatCount(item.requestCount || 0)}
-              onPress={onCommentPress}
-            />
-
             <SidebarButton
               icon="share-social"
               count="Share"

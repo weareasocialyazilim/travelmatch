@@ -85,11 +85,6 @@ export const FloatingDock: React.FC<BottomTabBarProps> = ({
             name: focused ? 'compass' : 'compass-outline',
             type: 'material',
           };
-        case 'Search':
-          return {
-            name: focused ? 'map' : 'map-outline',
-            type: 'ionicon',
-          };
         case 'Create':
           return {
             name: 'add',

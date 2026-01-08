@@ -17,6 +17,7 @@ import {
   TouchableOpacity,
   RefreshControl,
   Platform,
+  Share,
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Ionicons } from '@expo/vector-icons';
@@ -176,10 +177,16 @@ const ProfileScreen: React.FC = () => {
     () => navigation.navigate('SavedMoments'),
     [navigation],
   );
-  const handleShare = useCallback(
-    () => navigation.navigate('SharePreview'),
-    [navigation],
-  );
+  const handleShare = useCallback(async () => {
+    try {
+      await Share.share({
+        message: 'TravelMatch profilime göz at!',
+        url: `https://travelmatch.app/profile/${authUser?.id}`,
+      });
+    } catch (_error) {
+      // User cancelled or share failed
+    }
+  }, [authUser?.id]);
 
   const activeMomentsList = useMemo(
     () =>

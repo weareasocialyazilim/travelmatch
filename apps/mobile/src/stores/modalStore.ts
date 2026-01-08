@@ -48,7 +48,13 @@ export interface ConfirmationModalProps {
 }
 
 export interface LoginModalProps {
-  action: 'gift' | 'chat' | 'save' | 'default';
+  action:
+    | 'gift'
+    | 'chat'
+    | 'chat_unlock'
+    | 'save'
+    | 'counter_offer'
+    | 'default';
   onSuccess?: () => void;
 }
 

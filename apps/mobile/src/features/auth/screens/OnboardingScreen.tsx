@@ -25,6 +25,9 @@ import {
   ImageBackground,
   Animated as RNAnimated,
   TouchableOpacity,
+  PanResponder,
+  type GestureResponderEvent,
+  type PanResponderGestureState,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -89,6 +92,58 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   const insets = useSafeAreaInsets();
   const analytics = useAnalytics();
   const { completeOnboarding } = useOnboarding();
+
+  // Swipe gesture handler for navigating between slides
+  const handleSwipe = useCallback(
+    (direction: 'left' | 'right') => {
+      if (direction === 'left' && activeIndex < SLIDES.length - 1) {
+        // Swipe left = next slide
+        setActiveIndex(activeIndex + 1);
+        try {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        } catch (_e) {
+          // ignore haptics error
+        }
+      } else if (direction === 'right' && activeIndex > 0) {
+        // Swipe right = previous slide
+        setActiveIndex(activeIndex - 1);
+        try {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        } catch (_e) {
+          // ignore haptics error
+        }
+      }
+    },
+    [activeIndex],
+  );
+
+  // PanResponder for swipe gestures
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (
+        _evt: GestureResponderEvent,
+        gestureState: PanResponderGestureState,
+      ) => {
+        // Only respond to horizontal swipes
+        return (
+          Math.abs(gestureState.dx) > Math.abs(gestureState.dy) &&
+          Math.abs(gestureState.dx) > 10
+        );
+      },
+      onPanResponderRelease: (
+        _evt: GestureResponderEvent,
+        gestureState: PanResponderGestureState,
+      ) => {
+        const SWIPE_THRESHOLD = 50;
+        if (gestureState.dx < -SWIPE_THRESHOLD) {
+          handleSwipe('left');
+        } else if (gestureState.dx > SWIPE_THRESHOLD) {
+          handleSwipe('right');
+        }
+      },
+    }),
+  ).current;
 
   const handleNext = useCallback(async () => {
     logger.debug('OnboardingScreen handleNext called', {
@@ -175,7 +230,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   });
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} {...panResponder.panHandlers}>
       {/* Background Image - with fallback color */}
       <View style={[StyleSheet.absoluteFillObject, styles.backgroundFallback]}>
         <ImageBackground

@@ -28,7 +28,7 @@ const MatchConfirmationScreen: React.FC = () => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      navigation.navigate('Discover');
+      navigation.navigate('MainTabs', { screen: 'Home' });
     }, 1500);
   };
 

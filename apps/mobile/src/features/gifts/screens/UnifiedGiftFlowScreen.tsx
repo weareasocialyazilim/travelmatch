@@ -380,7 +380,7 @@ export const UnifiedGiftFlowScreen: React.FC<UnifiedGiftFlowScreenProps> = ({
   // Handle done
   const handleDone = useCallback(() => {
     impact('light');
-    navigation.navigate('Discover');
+    navigation.navigate('MainTabs', { screen: 'Home' });
   }, [impact, navigation]);
 
   // Celebration modal

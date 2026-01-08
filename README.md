@@ -2,7 +2,9 @@
 
 **Gift travel experiences to the people you love.**
 
-TravelMatch is a platform where you can send monetary gifts for travel experiences. Recipients must provide proof of completing the experience before funds are released — turning every gift into a guaranteed memory.
+TravelMatch is a platform where you can send monetary gifts for travel experiences. Recipients must
+provide proof of completing the experience before funds are released — turning every gift into a
+guaranteed memory.
 
 ---
 
@@ -18,16 +20,19 @@ TravelMatch is a platform where you can send monetary gifts for travel experienc
 ## ✨ Features
 
 **For Gifters**
+
 - Browse thousands of travel experiences worldwide
 - Secure escrow payments — funds only release after verification
 - Real-time notifications when your gift is claimed
 
 **For Recipients**
+
 - Accept gifts and plan your experience
 - Easy proof submission with AI-powered verification
 - Instant withdrawals to your bank account
 
 **Trust & Security**
+
 - KYC verification for all users
 - Trust scoring system
 - PCI-DSS compliant payments via PayTR
@@ -37,14 +42,14 @@ TravelMatch is a platform where you can send monetary gifts for travel experienc
 
 ## 🛠 Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Mobile | React Native 0.81 · Expo SDK 54 · TypeScript 5.9 |
-| Web | Next.js 16 · Tailwind CSS |
-| Backend | Supabase (PostgreSQL + Edge Functions) |
-| Payments | PayTR (Escrow) |
-| AI/ML | Proof verification · Smart notifications |
-| Infra | Turborepo · pnpm · GitHub Actions |
+| Layer    | Technology                                       |
+| -------- | ------------------------------------------------ |
+| Mobile   | React Native 0.81 · Expo SDK 54 · TypeScript 5.9 |
+| Web      | Next.js 16 · Tailwind CSS                        |
+| Backend  | Supabase (PostgreSQL + Edge Functions)           |
+| Payments | PayTR (Escrow)                                   |
+| AI/ML    | Proof verification · Smart notifications         |
+| Infra    | Turborepo · pnpm · GitHub Actions                |
 
 ---
 
@@ -87,6 +92,7 @@ pnpm dev
 ```
 
 **Run specific apps:**
+
 ```bash
 pnpm dev:mobile    # Mobile (Expo)
 pnpm dev:web       # Landing page
@@ -94,6 +100,19 @@ pnpm dev:admin     # Admin panel
 pnpm ios           # iOS Simulator
 pnpm android       # Android Emulator
 ```
+
+**iOS Development:**
+
+```bash
+pnpm ios                 # Run on iOS Simulator
+pnpm ios:device          # Run on physical device
+pnpm ios:pods            # Install CocoaPods
+pnpm ios:pods:update     # Clean & reinstall pods
+pnpm ios:clean           # Full clean rebuild
+```
+
+> ⚠️ **Important:** Never run `expo run:ios` from root directory! Always use `pnpm ios` or run from
+> `apps/mobile/`.
 
 ---
 
@@ -111,17 +130,20 @@ pnpm android       # Android Emulator
 ## 🤝 Contributing
 
 **Branch strategy:**
+
 ```
 main ← develop ← feature/xxx, fix/xxx, chore/xxx
 ```
 
 **Commit convention:** [Conventional Commits](https://conventionalcommits.org)
+
 ```
 feat(mobile): add trust score animation
 fix(payments): handle PayTR timeout
 ```
 
 **Before committing:**
+
 ```bash
 pnpm validate   # Runs lint + type-check + test
 ```

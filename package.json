@@ -57,7 +57,14 @@
     "validate:hooks": "node scripts/validate-husky-setup.js",
     "tm": "node bin/tm.mjs",
     "android": "pnpm --filter @travelmatch/mobile android",
-    "ios": "pnpm --filter @travelmatch/mobile ios"
+    "ios": "pnpm --filter @travelmatch/mobile ios",
+    "ios:simulator": "pnpm --filter @travelmatch/mobile ios",
+    "ios:device": "pnpm --filter @travelmatch/mobile ios -- --device",
+    "ios:pods": "cd apps/mobile/ios && pod install",
+    "ios:pods:update": "cd apps/mobile/ios && rm -rf Pods Podfile.lock && pod install --repo-update",
+    "ios:clean": "cd apps/mobile/ios && rm -rf Pods Podfile.lock build && pod install",
+    "mobile:prebuild": "pnpm --filter @travelmatch/mobile prebuild",
+    "mobile:start": "pnpm --filter @travelmatch/mobile start"
   },
   "bin": {
     "tm": "./bin/tm.mjs"

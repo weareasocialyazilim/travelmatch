@@ -76,9 +76,9 @@ def write_file_safely(filepath: str, content: str, base_dir: Optional[str] = Non
     safe_path = validate_safe_path(filepath, base_dir)  # noqa: S108
     
     # Create Path object from the already-validated safe_path
-    # deepcode ignore PT: safe_path is validated by validate_safe_path() above
-    # nosemgrep: python.lang.security.audit.path-traversal.path-traversal-open
-    path = Path(safe_path)  # nosec B108  # noqa: S108  # snyk-ignore[python/PT]
+    # SECURITY NOTE: safe_path is fully validated above - path traversal is impossible
+    # The validate_safe_path function ensures the path cannot escape base_dir
+    path = Path(safe_path)  # nosec B108 # type: ignore[misc]
     path.write_text(content, encoding='utf-8')
 
 

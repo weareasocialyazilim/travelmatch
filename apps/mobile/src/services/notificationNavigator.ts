@@ -433,13 +433,13 @@ const NOTIFICATION_ROUTES: Record<
   // 📱 PROMOTIONAL
   // ====================
   promotional: () => ({
-    screen: 'Discover',
+    screen: 'MainTabs',
     params: undefined,
     success: true,
   }),
 
   general: () => ({
-    screen: 'Discover',
+    screen: 'MainTabs',
     params: undefined,
     success: true,
   }),
@@ -508,7 +508,7 @@ export function navigateFromNotification(
         `[NotificationNavigator] Unknown notification type: ${payload.type}`,
       );
       return {
-        screen: 'Discover',
+        screen: 'MainTabs',
         success: false,
         error: `Unknown notification type: ${payload.type}`,
       };

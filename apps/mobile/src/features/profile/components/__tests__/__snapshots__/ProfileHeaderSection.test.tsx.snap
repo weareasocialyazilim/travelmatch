@@ -12,7 +12,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
   }
 >
   <View
-    data-colors="["#FFD700","#FFA500"]"
+    data-colors="["#18181B","#27272A","#3F3F46"]"
     data-end="{"x":1,"y":1}"
     data-start="{"x":0,"y":0}"
     ref={null}
@@ -694,7 +694,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
   }
 >
   <View
-    data-colors="["#FFD700","#FFA500"]"
+    data-colors="["#18181B","#27272A","#3F3F46"]"
     data-end="{"x":1,"y":1}"
     data-start="{"x":0,"y":0}"
     ref={null}
