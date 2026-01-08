@@ -64,14 +64,14 @@ export const navigationHelpers = {
 
   /**
    * Navigate to discover (search is part of Discover screen)
-   * @deprecated Use navigation.navigate('Discover') directly
+   * Uses MainTabs wrapper to preserve navigation bar
    */
   goToSearch: (
     navigation: StackNavigationProp<RootStackParamList>,
     _initialQuery?: string,
   ) => {
-    // Search functionality is integrated into Discover screen
-    navigation.navigate('Discover');
+    // Navigate via MainTabs to preserve bottom navigation
+    navigation.navigate('MainTabs', { screen: 'Home' });
   },
 
   /**

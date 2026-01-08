@@ -40,12 +40,7 @@ import Svg, {
   Stop,
 } from 'react-native-svg';
 
-import {
-  COLORS,
-  GRADIENTS,
-  PALETTE,
-  getTrustRingColors,
-} from '@/constants/colors';
+import { COLORS, PALETTE, getTrustRingColors } from '@/constants/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { TYPE_SCALE } from '@/theme/typography';
 import { SPRINGS } from '@/hooks/useAnimations';
@@ -333,9 +328,9 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
 
     return (
       <View style={[styles.container, { paddingTop: insets.top }]}>
-        {/* Background Gradient */}
+        {/* Background Gradient - Twilight Zinc Dark Theme */}
         <LinearGradient
-          colors={GRADIENTS.gift}
+          colors={['#18181B', '#27272A', '#3F3F46']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.backgroundGradient}

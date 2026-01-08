@@ -1,14 +1,14 @@
 /**
  * Translation Hook
- * Wrapper around useTranslation with type safety
+ * Wrapper around useTranslation with type safety and persistence
  */
 
 import { useTranslation as useI18nTranslation } from 'react-i18next';
-import i18n from '../config/i18n';
+import i18n, { changeLanguageAndPersist } from '../config/i18n';
 import type { SupportedLanguage } from '../config/i18n';
 
 /**
- * Type-safe translation hook
+ * Type-safe translation hook with language persistence
  *
  * @example
  * const { t, language, changeLanguage } = useTranslation();
@@ -17,13 +17,15 @@ import type { SupportedLanguage } from '../config/i18n';
  * <Text>{t('validation.maxLength', { max: 100 })}</Text>
  */
 export function useTranslation() {
-  const { t, i18n } = useI18nTranslation();
+  const { t, i18n: i18nInstance } = useI18nTranslation();
 
   return {
     t,
-    language: i18n.language as SupportedLanguage,
-    changeLanguage: (lang: SupportedLanguage) => i18n.changeLanguage(lang),
-    languages: i18n.languages,
+    language: i18nInstance.language as SupportedLanguage,
+    changeLanguage: async (lang: SupportedLanguage) => {
+      await changeLanguageAndPersist(lang);
+    },
+    languages: i18nInstance.languages,
   };
 }
 

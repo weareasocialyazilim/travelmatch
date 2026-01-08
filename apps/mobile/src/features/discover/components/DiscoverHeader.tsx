@@ -175,10 +175,12 @@ interface AwwwardsDiscoverHeaderProps {
   greeting?: string;
   /** Notification count (shows dot if > 0) */
   notificationCount?: number;
-  /** Callback when search is pressed */
-  onSearchPress?: () => void;
+  /** Active filters count (shows badge if > 0) */
+  activeFiltersCount?: number;
   /** Callback when notifications are pressed */
   onNotificationsPress?: () => void;
+  /** Callback when filter is pressed */
+  onFilterPress?: () => void;
   /** Callback when avatar is pressed */
   onAvatarPress?: () => void;
 }
@@ -204,8 +206,9 @@ export const AwwwardsDiscoverHeader: React.FC<AwwwardsDiscoverHeaderProps> = ({
   userAvatar,
   greeting,
   notificationCount = 0,
-  onSearchPress,
+  activeFiltersCount = 0,
   onNotificationsPress,
+  onFilterPress,
   onAvatarPress,
 }) => {
   const insets = useSafeAreaInsets();
@@ -221,19 +224,26 @@ export const AwwwardsDiscoverHeader: React.FC<AwwwardsDiscoverHeaderProps> = ({
 
       {/* Right Section - Actions & Avatar */}
       <View style={awwwardsStyles.rightSection}>
-        {/* Search Button */}
+        {/* Filter Button */}
         <TouchableOpacity
           style={awwwardsStyles.iconButton}
-          onPress={onSearchPress}
+          onPress={onFilterPress}
           activeOpacity={0.7}
-          accessibilityLabel="Ara"
+          accessibilityLabel={`Filtrele${activeFiltersCount > 0 ? `, ${activeFiltersCount} aktif` : ''}`}
           accessibilityRole="button"
         >
           <Ionicons
-            name="search-outline"
+            name="options-outline"
             size={24}
             color={COLORS.text.primary}
           />
+          {activeFiltersCount > 0 && (
+            <View style={awwwardsStyles.filterBadge}>
+              <Text style={awwwardsStyles.filterBadgeText}>
+                {activeFiltersCount}
+              </Text>
+            </View>
+          )}
         </TouchableOpacity>
 
         {/* Notifications Button */}
@@ -326,6 +336,25 @@ const awwwardsStyles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     borderWidth: 2,
     borderColor: COLORS.surface.base,
+  },
+  filterBadge: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: COLORS.brand.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+    borderWidth: 2,
+    borderColor: COLORS.surface.base,
+  },
+  filterBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: COLORS.utility.white,
   },
 });
 

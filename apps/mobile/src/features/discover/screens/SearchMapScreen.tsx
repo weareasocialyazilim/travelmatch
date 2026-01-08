@@ -493,19 +493,13 @@ const SearchMapScreen: React.FC = () => {
           animationDuration={1000}
         />
 
-        {/* User Location Marker */}
+        {/* User Location Marker - Use UserLocation component for better performance */}
         {userLocation && (
-          <MapboxGL.PointAnnotation
-            id="user-location"
-            coordinate={[userLocation.longitude, userLocation.latitude]}
-          >
-            <View style={styles.userMarker}>
-              <View style={styles.userMarkerComposite}>
-                <View style={styles.userMarkerPulse} />
-                <View style={styles.userMarkerInner} />
-              </View>
-            </View>
-          </MapboxGL.PointAnnotation>
+          <MapboxGL.UserLocation
+            visible={true}
+            animated={true}
+            showsUserHeadingIndicator={true}
+          />
         )}
 
         {/* Moment Markers - Clustered with Supercluster */}
@@ -843,39 +837,7 @@ const styles = StyleSheet.create({
     left: '50%',
     transform: [{ translateX: -20 }, { translateY: -20 }],
   },
-  // User marker
-  userMarker: {
-    width: 28,
-    height: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  userMarkerComposite: {
-    width: 28,
-    height: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  userMarkerPulse: {
-    position: 'absolute',
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: 'rgba(59, 130, 246, 0.25)',
-  },
-  userMarkerInner: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: '#3B82F6',
-    borderWidth: 3,
-    borderColor: '#fff',
-    shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 6,
-    elevation: 4,
-  },
+  // User marker styles removed - using MapboxGL.UserLocation instead
   fallbackContainer: {
     flex: 1,
     justifyContent: 'center',

@@ -25,7 +25,7 @@ export const NotFoundScreen = ({ navigation }: Props) => {
 
       <TouchableOpacity
         style={styles.btn}
-        onPress={() => navigation.navigate('Discover')}
+        onPress={() => navigation.navigate('MainTabs', { screen: 'Home' })}
       >
         <Text style={styles.btnText}>Back to Discovery</Text>
       </TouchableOpacity>

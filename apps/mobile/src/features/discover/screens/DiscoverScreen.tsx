@@ -42,64 +42,22 @@ import { useAuth } from '@/hooks/useAuth';
 import { COLORS } from '@/constants/colors';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { LiquidScreenWrapper } from '@/components/layout';
-import { showLoginPrompt, showAlert } from '@/stores/modalStore';
+import { BlurFilterModal } from '@/components/ui';
+import { showLoginPrompt } from '@/stores/modalStore';
 import type { NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
 const { height } = Dimensions.get('window');
 
-// Tier system for counter-offer validation
-interface PlaceTier {
-  category: string;
-  tier: number; // 1 = budget, 2 = mid, 3 = premium, 4 = luxury
-  price: number;
-}
-
-// Anti-Cheapskate Logic: Validate counter-offer tier
-const validateCounterOffer = (
-  proposedPlace: PlaceTier,
-  originalMoment: PlaceTier,
-): { valid: boolean; message?: string } => {
-  // Same category check
-  if (proposedPlace.category !== originalMoment.category) {
-    return {
-      valid: false,
-      message: 'Please suggest a place in the same category.',
-    };
-  }
-
-  // Tier check - proposed place must be at least the same tier
-  if (proposedPlace.tier < originalMoment.tier) {
-    return {
-      valid: false,
-      message:
-        "This suggestion doesn't match the moment's standards. TravelMatch maintains quality - please suggest something in a similar or higher tier!",
-    };
-  }
-
-  return { valid: true };
-};
-
-// Get tier from price (simplified logic)
-const getTierFromPrice = (price: number, category: string): number => {
-  // Food category tiers
-  if (category === 'food' || category === 'restaurant') {
-    if (price < 20) return 1; // Budget
-    if (price < 50) return 2; // Mid
-    if (price < 150) return 3; // Premium
-    return 4; // Luxury
-  }
-
-  // Default tiers for other categories
-  if (price < 50) return 1;
-  if (price < 150) return 2;
-  if (price < 500) return 3;
-  return 4;
-};
-
 const DiscoverScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const flatListRef = useRef<FlatList>(null);
+
+  // Filter modal state
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<Record<string, unknown>>(
+    {},
+  );
 
   // Use PostGIS-based discovery for location-aware moments
   const {
@@ -151,19 +109,19 @@ const DiscoverScreen = () => {
   }, [userStories]);
 
   // Header actions
-  const handleSearchPress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    navigation.navigate('SearchMap' as any);
-  }, [navigation]);
-
   const handleNotificationsPress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    navigation.navigate('Notifications' as any);
+    navigation.navigate('Notifications');
   }, [navigation]);
+
+  const handleFilterPress = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setShowFilterModal(true);
+  }, []);
 
   const handleAvatarPress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    navigation.navigate('Profile' as any);
+    navigation.navigate('Profile');
   }, [navigation]);
 
   // Stories actions
@@ -171,66 +129,44 @@ const DiscoverScreen = () => {
     (story: UserStory, _index: number) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       // Navigate to story viewer
-      navigation.navigate('ProfileDetail' as any, { userId: story.id });
+      navigation.navigate('ProfileDetail', { userId: story.id });
     },
     [navigation],
   );
 
   const handleCreateStoryPress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    navigation.navigate('CreateMoment' as any);
+    navigation.navigate('CreateMoment');
   }, [navigation]);
 
-  // Handle Counter-Offer with Anti-Cheapskate Logic
-  const handleCounterOffer = useCallback((moment: Moment) => {
-    // In a real implementation, this would open a BottomSheet
-    // where the user selects an alternative place.
-    // For now, we simulate the validation logic.
+  // Handle Counter-Offer / Subscriber Offer
+  const handleCounterOffer = useCallback(
+    (moment: Moment) => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      // Guest kullanıcı kontrolü
+      if (isGuest || !user) {
+        setPendingMoment(moment);
+        showLoginPrompt({ action: 'counter_offer' });
+        return;
+      }
 
-    // Get the original moment's tier info
-    const originalCategory =
-      typeof moment.category === 'string'
-        ? moment.category
-        : moment.category?.id || 'experience';
-    const originalPrice = moment.price || moment.pricePerGuest || 0;
-    const originalTier = getTierFromPrice(originalPrice, originalCategory);
-
-    // Simulated proposed place (in real app, this comes from user selection)
-    // Simulating a "cheapskate" attempt for demo
-    const proposedPlace: PlaceTier = {
-      category: originalCategory,
-      tier: originalTier - 1, // Trying to downgrade
-      price: originalPrice * 0.3, // 70% cheaper
-    };
-
-    const validation = validateCounterOffer(proposedPlace, {
-      category: originalCategory,
-      tier: originalTier,
-      price: originalPrice,
-    });
-
-    if (!validation.valid) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-      showAlert({
-        title: 'Whoops! 📉',
-        message:
-          validation.message ||
-          "This doesn't match the moment's standards. Suggest something similar or better!",
-        buttons: [{ text: "Got it, I'll upgrade", style: 'default' }],
+      // Navigate to subscriber offer modal (correct route name)
+      navigation.navigate('SubscriberOfferModal', {
+        momentId: moment.id,
+        momentTitle: moment.title || 'Moment',
+        momentCategory:
+          typeof moment.category === 'string'
+            ? moment.category
+            : moment.category?.id || 'experience',
+        targetValue: moment.price || moment.pricePerGuest || 0,
+        targetCurrency: moment.currency || 'TRY',
+        hostId: moment.hostId,
+        hostName: moment.hostName || 'Host',
       });
-      return;
-    }
-
-    // If valid, proceed with counter-offer flow
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    showAlert({
-      title: 'Offer Sent! 🚀',
-      message: 'Great alternative suggestion! The host will review it.',
-      buttons: [{ text: 'Awesome', style: 'default' }],
-    });
-  }, []);
+    },
+    [navigation, isGuest, user],
+  );
 
   // Handle Gift Press
   const handleGiftPress = useCallback(
@@ -264,23 +200,6 @@ const DiscoverScreen = () => {
     [navigation, isGuest, user],
   );
 
-  // Handle Like Press (Save)
-  const handleLikePress = useCallback(
-    (moment: Moment) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
-      // Guest kullanıcı kontrolü - showLoginPrompt via modalStore
-      if (isGuest || !user) {
-        setPendingMoment(moment);
-        showLoginPrompt({ action: 'save' });
-        return;
-      }
-
-      // TODO: Implement save/unsave logic using moment.id
-    },
-    [isGuest, user],
-  );
-
   // Login Modal Handlers - Now using centralized modalStore
   const _handleLoginModalClose = useCallback(() => {
     setPendingMoment(null);
@@ -309,18 +228,11 @@ const DiscoverScreen = () => {
         item={item}
         onGiftPress={() => handleGiftPress(item)}
         onCounterOfferPress={() => handleCounterOffer(item)}
-        onLikePress={() => handleLikePress(item)}
         onUserPress={() => handleUserPress(item)}
         onSharePress={() => handleSharePress(item)}
       />
     ),
-    [
-      handleGiftPress,
-      handleCounterOffer,
-      handleLikePress,
-      handleUserPress,
-      handleSharePress,
-    ],
+    [handleGiftPress, handleCounterOffer, handleUserPress, handleSharePress],
   );
 
   // Handle refresh
@@ -408,7 +320,7 @@ const DiscoverScreen = () => {
           </Text>
           <TouchableOpacity
             style={styles.emptyCTAButton}
-            onPress={() => navigation.navigate('CreateMoment' as any)}
+            onPress={() => navigation.navigate('CreateMoment')}
           >
             <LinearGradient
               colors={[COLORS.primary, '#22C55E']}
@@ -428,10 +340,11 @@ const DiscoverScreen = () => {
     <LiquidScreenWrapper variant="twilight" safeAreaTop animated={false}>
       {/* Awwwards-style Header */}
       <AwwwardsDiscoverHeader
-        userName="Explorer"
+        userName={user?.name || 'Explorer'}
         notificationCount={3}
-        onSearchPress={handleSearchPress}
+        activeFiltersCount={Object.keys(activeFilters).length}
         onNotificationsPress={handleNotificationsPress}
+        onFilterPress={handleFilterPress}
         onAvatarPress={handleAvatarPress}
       />
 
@@ -460,6 +373,16 @@ const DiscoverScreen = () => {
           <ActivityIndicator size="small" color={COLORS.brand.primary} />
         </View>
       )}
+
+      {/* Filter Modal */}
+      <BlurFilterModal
+        visible={showFilterModal}
+        onClose={() => setShowFilterModal(false)}
+        onApply={({ priceRange, category }) => {
+          setActiveFilters({ priceRange, category });
+          setShowFilterModal(false);
+        }}
+      />
 
       {/* Guest Login Prompt Modal - Now rendered by ModalProvider */}
       {/* FloatingDock is rendered by MainTabNavigator */}

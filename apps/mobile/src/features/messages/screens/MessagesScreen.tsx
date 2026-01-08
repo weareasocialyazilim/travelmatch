@@ -282,7 +282,7 @@ const MessagesScreen: React.FC = () => {
         title={t('messages.empty.title')}
         description={t('messages.empty.description')}
         actionLabel={t('navigation.discover')}
-        onAction={() => navigation.navigate('Discover')}
+        onAction={() => navigation.navigate('MainTabs', { screen: 'Home' })}
         style={styles.emptyStateContainer}
       />
     ),

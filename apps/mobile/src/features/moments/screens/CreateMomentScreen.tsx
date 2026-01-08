@@ -264,7 +264,8 @@ const CreateMomentScreen: React.FC = () => {
           buttons: [
             {
               text: t('screens.createMoment.successButton'),
-              onPress: () => navigation.navigate('Discover'),
+              onPress: () =>
+                navigation.navigate('MainTabs', { screen: 'Home' }),
             },
           ],
         });
@@ -348,7 +349,7 @@ const CreateMomentScreen: React.FC = () => {
       </View>
 
       <View style={styles.mediaStepContent}>
-        <Text style={styles.stepTitle}>Görsel Kanıtını Yükle</Text>
+        <Text style={styles.stepTitle}>Anını Görselleştir</Text>
         <Text style={styles.stepSubtitle}>
           Unutulmaz anılarını en kaliteli haliyle paylaş.
         </Text>
@@ -364,7 +365,7 @@ const CreateMomentScreen: React.FC = () => {
                 size={40}
                 color="white"
               />
-              <Text style={styles.uploadText}>Upload Visual</Text>
+              <Text style={styles.uploadText}>Fotoğraf Ekle</Text>
             </View>
           </LinearGradient>
         </TouchableOpacity>

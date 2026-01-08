@@ -4,6 +4,7 @@
  * when screens need to import navigation types.
  */
 
+import type { NavigatorScreenParams } from '@react-navigation/native';
 import type { VerificationData as KYCVerificationData } from '../features/verifications/kyc/types';
 import type { SuccessType } from '../features/payments/types/success.types';
 import type { Moment, User, SelectedGiver } from '../types';
@@ -15,6 +16,14 @@ export interface SuccessDetails {
   referenceId?: string;
   estimatedArrival?: string;
 }
+
+// Main Tab Navigator params (4 tabs: Home, Create, Inbox, Profile)
+export type MainTabParamList = {
+  Home: undefined;
+  Create: undefined;
+  Inbox: { initialTab?: 'active' | 'requests' } | undefined;
+  Profile: undefined;
+};
 
 export type RootStackParamList = {
   Splash: undefined;
@@ -62,12 +71,12 @@ export type RootStackParamList = {
     details?: SuccessDetails;
   };
 
-  // Main App - Tab Navigator
-  MainTabs: undefined;
+  // Main App - Tab Navigator with nested navigation support
+  MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
 
   // Individual Tab Screens (for deep linking)
   Discover: undefined;
-  Search: undefined;
+  // Search removed - platform is filter-based only
   Inbox: { initialTab?: 'active' | 'requests' } | undefined;
   Requests: { initialTab?: 'pending' | 'notifications' } | undefined;
   Messages: undefined;
