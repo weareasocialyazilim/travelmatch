@@ -541,7 +541,7 @@ const CaptureStep = memo<CaptureStepProps>(
       setIsCapturing(true);
       try {
         const result = await ImagePicker.launchCameraAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          mediaTypes: ['images'],
           quality: 0.8,
         });
 

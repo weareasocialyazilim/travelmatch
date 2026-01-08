@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { CompleteGiftBottomSheet } from '../CompleteGiftBottomSheet';
+import { CompleteGiftBottomSheet } from '../../features/gifts/components/CompleteGiftBottomSheet';
 
 describe('CompleteGiftBottomSheet', () => {
   const mockOnClose = jest.fn() as jest.Mock;

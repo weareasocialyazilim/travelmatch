@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { CurrencySelectionBottomSheet } from '../CurrencySelectionBottomSheet';
+import { CurrencySelectionBottomSheet } from '../../features/payments/components/CurrencySelectionBottomSheet';
 
 // Mock GenericBottomSheet
 jest.mock('../ui/GenericBottomSheet', () => ({

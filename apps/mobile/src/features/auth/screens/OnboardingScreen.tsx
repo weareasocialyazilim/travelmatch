@@ -21,9 +21,10 @@ import {
   StyleSheet,
   FlatList,
   Dimensions,
-  TouchableOpacity,
+  Pressable,
   ImageBackground,
   Animated as RNAnimated,
+  TouchableOpacity,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -86,7 +87,6 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
     useNavigation<StackNavigationProp<RootStackParamList>>();
   const navigation = navProp || defaultNavigation;
   const [activeIndex, setActiveIndex] = useState(0);
-  const flatListRef = useRef<FlatList>(null);
   const insets = useSafeAreaInsets();
   const analytics = useAnalytics();
   const { completeOnboarding } = useOnboarding();
@@ -108,15 +108,16 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
     }
 
     if (activeIndex < SLIDES.length - 1) {
-      logger.debug('OnboardingScreen scrolling to next slide', {
-        nextIndex: activeIndex + 1,
-      });
-      flatListRef.current?.scrollToIndex({ index: activeIndex + 1 });
+      const nextIndex = activeIndex + 1;
+      logger.debug('OnboardingScreen moving to next slide', { nextIndex });
+
+      // Update state to show next slide
+      setActiveIndex(nextIndex);
 
       analytics.trackEvent('onboarding_page_view', {
         screen: 'onboarding',
-        page_number: activeIndex + 2,
-        page_id: SLIDES[activeIndex + 1].id,
+        page_number: nextIndex + 1,
+        page_id: SLIDES[nextIndex].id,
       });
     } else {
       logger.info(
@@ -156,8 +157,10 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
         style={styles.image}
         resizeMode="cover"
       >
+        {/* Lighter gradient for better image visibility */}
         <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.6)', 'black']}
+          colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.85)']}
+          locations={[0.3, 0.6, 1]}
           style={styles.gradient}
         />
       </ImageBackground>
@@ -166,46 +169,50 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
 
   const currentSlide = SLIDES[activeIndex];
 
+  // Debug: Log when component renders
+  logger.info('🎬 OnboardingScreen RENDER', {
+    activeIndex,
+    currentSlide: currentSlide.title,
+  });
+
   return (
     <View style={styles.container}>
-      <FlatList
-        ref={flatListRef}
-        data={SLIDES}
-        renderItem={renderItem}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={(ev) => {
-          const newIndex = Math.round(ev.nativeEvent.contentOffset.x / width);
-          if (newIndex !== activeIndex) {
-            setActiveIndex(newIndex);
-            analytics.trackEvent('onboarding_page_view', {
-              screen: 'onboarding',
-              page_number: newIndex + 1,
-              page_id: SLIDES[newIndex].id,
-            });
-          }
-        }}
-        keyExtractor={(item) => item.id}
-      />
-
-      {/* Content Overlay - pointerEvents allows touches to pass through to children */}
+      {/* Background Image - with fallback color */}
       <View
-        style={[styles.overlay, { paddingBottom: insets.bottom + 30 }]}
-        pointerEvents="box-none"
+        style={[StyleSheet.absoluteFillObject, { backgroundColor: '#1a1a2e' }]}
       >
-        <Animated.View
-          key={currentSlide.id}
-          entering={FadeInDown.springify()}
-          style={styles.textContainer}
-          pointerEvents="none"
+        <ImageBackground
+          source={{ uri: currentSlide.image }}
+          style={StyleSheet.absoluteFillObject}
+          resizeMode="cover"
+          onLoad={() => logger.info('🖼️ Image loaded', { id: currentSlide.id })}
+          onError={(e) =>
+            logger.error('🖼️ Image error', { error: e.nativeEvent })
+          }
         >
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.8)']}
+            locations={[0.3, 0.6, 1]}
+            style={StyleSheet.absoluteFillObject}
+          />
+        </ImageBackground>
+      </View>
+
+      {/* Content overlay - full screen touchable area */}
+      <View
+        style={[styles.contentContainer, { paddingBottom: insets.bottom + 30 }]}
+      >
+        {/* Spacer to push content down */}
+        <View style={{ flex: 1 }} />
+
+        {/* Text Content */}
+        <View style={styles.textContainer}>
           <Text style={styles.title}>{currentSlide.title}</Text>
           <Text style={styles.desc}>{currentSlide.desc}</Text>
-        </Animated.View>
+        </View>
 
         {/* Footer Actions */}
-        <View style={styles.footer} pointerEvents="box-none">
+        <View style={styles.footer}>
           {/* Paginator */}
           <View style={styles.paginator}>
             {SLIDES.map((_, index) => (
@@ -216,26 +223,29 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
             ))}
           </View>
 
-          {/* Next Button */}
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleNext}
-            onPressIn={() => logger.debug('Button onPressIn')}
-            activeOpacity={0.7}
-            hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-            accessible={true}
-            accessibilityLabel={
-              activeIndex === SLIDES.length - 1 ? 'Get Started' : 'Next'
-            }
-            accessibilityRole="button"
+          {/* Next Button - Simple Pressable with direct onPress */}
+          <Pressable
+            onPress={() => {
+              logger.info('🔘 BUTTON PRESSED!', { activeIndex });
+              try {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              } catch (e) {
+                // ignore haptics error
+              }
+              handleNext();
+            }}
+            style={({ pressed }) => [
+              styles.nextButton,
+              pressed && styles.nextButtonPressed,
+            ]}
           >
             <LinearGradient
               colors={[COLORS.brand.primary, '#A2FF00']}
-              style={styles.btnGradient}
+              style={styles.nextButtonGradient}
             >
               <Ionicons name="arrow-forward" size={24} color="black" />
             </LinearGradient>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     </View>
@@ -248,7 +258,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black',
+    backgroundColor: '#1a1a2e',
   },
   slide: {
     width,
@@ -261,10 +271,8 @@ const styles = StyleSheet.create({
   gradient: {
     ...StyleSheet.absoluteFillObject,
   },
-  overlay: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
+  contentContainer: {
+    flex: 1,
     padding: 30,
   },
   textContainer: {
@@ -295,17 +303,50 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: 'rgba(255,255,255,0.3)',
   },
   activeDot: {
     backgroundColor: COLORS.brand.primary,
     width: 24,
+  },
+  nextButton: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    overflow: 'hidden',
+  },
+  nextButtonPressed: {
+    opacity: 0.7,
+    transform: [{ scale: 0.95 }],
+  },
+  nextButtonGradient: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Legacy styles (keep for backward compatibility)
+  overlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 30,
   },
   button: {
     width: 64,
     height: 64,
     borderRadius: 32,
     overflow: 'hidden',
+  },
+  buttonWrapper: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    overflow: 'hidden',
+  },
+  buttonPressed: {
+    opacity: 0.7,
+    transform: [{ scale: 0.95 }],
   },
   btnGradient: {
     flex: 1,
@@ -366,23 +407,26 @@ export const AwwwardsOnboardingScreen: React.FC<
   AwwwardsOnboardingScreenProps
 > = ({ navigation }) => {
   const insets = useSafeAreaInsets();
+  const { completeOnboarding } = useOnboarding();
   const scrollX = useRef(new RNAnimated.Value(0)).current;
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     if (currentIndex < AWWWARDS_SLIDES.length - 1) {
       flatListRef.current?.scrollToIndex({ index: currentIndex + 1 });
     } else {
-      navigation.navigate('Login');
+      await completeOnboarding();
+      navigation.replace('Welcome');
     }
   };
 
-  const handleSkip = () => {
+  const handleSkip = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    navigation.navigate('Login');
+    await completeOnboarding();
+    navigation.replace('Welcome');
   };
 
   const renderSlide = ({ item }: { item: (typeof AWWWARDS_SLIDES)[0] }) => (

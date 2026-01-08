@@ -1,5 +1,26 @@
 # 🔐 Secret Management - TravelMatch
 
+## ⚠️ Important Security Notes
+
+1. **NEVER create `.env` files** - All secrets are managed via Infisical
+2. **Always use `infisical run`** - Secrets are injected at runtime, never stored on disk
+3. **EU Region** - We use `eu.infisical.com` for GDPR compliance
+
+## Quick Start
+
+```bash
+# Login to Infisical (EU region)
+infisical login
+
+# Run app with secrets injected
+cd apps/mobile
+pnpm ios:secure    # iOS with secrets
+pnpm dev:secure    # Dev server with secrets
+
+# Or manually
+infisical run --env=dev -- expo start
+```
+
 ## Architecture
 
 ```
@@ -8,13 +29,13 @@
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │  ┌─────────────────┐          ┌─────────────────────────┐  │
-│  │  GitHub Secrets │          │       Infisical         │  │
-│  │   (4 secrets)   │          │     (41+ secrets)       │  │
+│  │  GitHub Secrets │          │   Infisical (EU)        │  │
+│  │   (4 secrets)   │          │   eu.infisical.com      │  │
 │  ├─────────────────┤          ├─────────────────────────┤  │
 │  │ INFISICAL_*     │─────────▶│ All app secrets:        │  │
 │  │ TURBO_*         │          │ - Supabase              │  │
 │  └─────────────────┘          │ - Sentry                │  │
-│                               │ - Stripe                │  │
+│                               │ - PayTR (payments)      │  │
 │                               │ - Expo                  │  │
 │                               │ - Cloudflare            │  │
 │                               │ - Mapbox                │  │
@@ -49,8 +70,9 @@ CLOUDFLARE_IMAGES_TOKEN
 CODECOV_TOKEN
 EXPO_PUBLIC_CLOUDFLARE_ACCOUNT_HASH
 EXPO_PUBLIC_CLOUDFLARE_ACCOUNT_ID
+EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN
 EXPO_PUBLIC_MAPBOX_PUBLIC_TOKEN
-EXPO_PUBLIC_MAPBOX_SECRET_TOKEN
+MAPBOX_SECRET_TOKEN
 EXPO_PUBLIC_POSTHOG_API_KEY
 EXPO_PUBLIC_POSTHOG_HOST
 EXPO_PUBLIC_SENTRY_DSN
@@ -64,8 +86,13 @@ SENTRY_DSN
 SENTRY_ORG
 SENTRY_PROJECT
 SNYK_TOKEN
-STRIPE_PUBLISHABLE_KEY
-STRIPE_SECRET_KEY
+
+# PayTR (Payment Processing)
+PAYTR_MERCHANT_ID
+PAYTR_MERCHANT_KEY
+PAYTR_MERCHANT_SALT
+PAYTR_TEST_MODE
+
 SUPABASE_DB_PASSWORD
 SUPABASE_SERVICE_ROLE_KEY
 TOTP_ENCRYPTION_KEY
@@ -100,8 +127,9 @@ CLOUDFLARE_IMAGES_TOKEN
 CODECOV_TOKEN
 EXPO_PUBLIC_CLOUDFLARE_ACCOUNT_HASH
 EXPO_PUBLIC_CLOUDFLARE_ACCOUNT_ID
+EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN
 EXPO_PUBLIC_MAPBOX_PUBLIC_TOKEN
-EXPO_PUBLIC_MAPBOX_SECRET_TOKEN
+MAPBOX_SECRET_TOKEN
 EXPO_PUBLIC_POSTHOG_API_KEY
 EXPO_PUBLIC_POSTHOG_HOST
 EXPO_PUBLIC_SENTRY_DSN

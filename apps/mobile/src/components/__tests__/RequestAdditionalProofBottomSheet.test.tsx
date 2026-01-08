@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { RequestAdditionalProofBottomSheet } from '../RequestAdditionalProofBottomSheet';
+import { RequestAdditionalProofBottomSheet } from '../../features/moments/components/RequestAdditionalProofBottomSheet';
 
 describe('RequestAdditionalProofBottomSheet', () => {
   const mockOnClose = jest.fn() as jest.Mock;

@@ -144,7 +144,7 @@ const CreateMomentScreen: React.FC = () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsEditing: true,
       aspect: [9, 16], // Story format
       quality: 1,

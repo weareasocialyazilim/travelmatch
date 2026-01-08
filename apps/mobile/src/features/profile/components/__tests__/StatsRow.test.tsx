@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { fireEvent } from '@testing-library/react-native';
-import { render } from '../../../__tests__/testUtilsRender.helper';
+import { render } from '../../../../__tests__/testUtilsRender.helper';
 import { StatsRow } from '../StatsRow';
 
 describe('StatsRow Component', () => {

@@ -175,7 +175,7 @@ export const BulkThankYouScreen: React.FC = () => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+        mediaTypes: ['videos'],
         allowsEditing: true,
         quality: 0.8,
         videoMaxDuration: VIDEO_COMPRESSION_CONFIG.maxDurationThankYou, // 15 seconds

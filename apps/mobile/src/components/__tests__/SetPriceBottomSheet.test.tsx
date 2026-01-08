@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { SetPriceBottomSheet } from '../SetPriceBottomSheet';
+import { SetPriceBottomSheet } from '../../features/moments/components/SetPriceBottomSheet';
 
 describe('SetPriceBottomSheet', () => {
   const mockOnClose = jest.fn() as jest.Mock;

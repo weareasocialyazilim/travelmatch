@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { DeleteMomentDialog } from '../DeleteMomentDialog';
+import { DeleteMomentDialog } from '../../features/moments/components/DeleteMomentDialog';
 
 // Mock lucide-react-native
 jest.mock('lucide-react-native', () => ({

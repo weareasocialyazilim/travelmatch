@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { WithdrawConfirmationModal } from '../WithdrawConfirmationModal';
+import { WithdrawConfirmationModal } from '../../features/wallet/components/WithdrawConfirmationModal';
 
 describe('WithdrawConfirmationModal', () => {
   const mockOnConfirm = jest.fn() as jest.Mock;

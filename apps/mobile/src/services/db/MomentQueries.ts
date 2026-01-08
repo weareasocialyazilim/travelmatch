@@ -364,7 +364,7 @@ export const momentsService = {
           status,
           visibility,
           category,
-          image_url,
+          images,
           video_url,
           created_at,
           updated_at,

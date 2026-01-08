@@ -503,8 +503,10 @@ const SearchMapScreen: React.FC = () => {
             coordinate={[userLocation.longitude, userLocation.latitude]}
           >
             <View style={styles.userMarker}>
-              <View style={styles.userMarkerPulse} />
-              <View style={styles.userMarkerInner} />
+              <View style={styles.userMarkerComposite}>
+                <View style={styles.userMarkerPulse} />
+                <View style={styles.userMarkerInner} />
+              </View>
             </View>
           </MapboxGL.PointAnnotation>
         )}
@@ -849,6 +851,12 @@ const styles = StyleSheet.create({
   },
   // User marker
   userMarker: {
+    width: 28,
+    height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  userMarkerComposite: {
     width: 28,
     height: 28,
     alignItems: 'center',

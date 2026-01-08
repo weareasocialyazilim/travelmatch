@@ -237,6 +237,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
           'TravelMatch needs camera access to capture travel moments.',
       },
     ],
+    // Video compression for optimized uploads
+    'react-native-compressor',
   ],
 
   // ============================================

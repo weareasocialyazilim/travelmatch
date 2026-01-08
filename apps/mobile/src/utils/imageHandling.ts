@@ -71,7 +71,7 @@ export async function pickImageFromCamera(
   }
 
   const result = await ImagePicker.launchCameraAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    mediaTypes: ['images'],
     allowsEditing: options.allowsEditing ?? true,
     aspect: options.aspect,
     quality: options.quality ?? 0.8,
@@ -107,7 +107,7 @@ export async function pickImageFromGallery(
   }
 
   const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    mediaTypes: ['images'],
     allowsEditing: options.allowsEditing ?? true,
     aspect: options.aspect,
     quality: options.quality ?? 0.8,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { UnblockUserBottomSheet } from '../UnblockUserBottomSheet';
+import { UnblockUserBottomSheet } from '../../features/profile/components/UnblockUserBottomSheet';
 
 describe('UnblockUserBottomSheet', () => {
   const mockOnUnblock = jest.fn() as jest.Mock;
