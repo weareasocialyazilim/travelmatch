@@ -236,7 +236,7 @@ const ChatDetailScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.userInfo}
           onPress={() =>
-            navigation.navigate('UserProfile', { userId: otherUser.id })
+            navigation.navigate('ProfileDetail', { userId: otherUser.id })
           }
         >
           <Image

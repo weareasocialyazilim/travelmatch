@@ -47,6 +47,7 @@ import { COLORS } from '@/constants/colors';
 import { FONT_SIZES, FONTS } from '@/constants/typography';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { GlassCard } from '@/components/ui/GlassCard';
+import { BlurFilterModal, type FilterValues } from '@/components/ui';
 import { EnhancedSearchBar, NeonPulseMarker } from '../components';
 // Using useDiscoverMoments for PostGIS-based location discovery
 import { useDiscoverMoments } from '@/hooks/useDiscoverMoments';
@@ -189,6 +190,10 @@ const SearchMapScreen: React.FC = () => {
     null,
   );
   const [hasActiveFilters, _setHasActiveFilters] = useState(false);
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [_activeFilters, setActiveFilters] = useState<FilterValues | null>(
+    null,
+  );
   const [_mapLoaded, setMapLoaded] = useState(false);
   const [mapError, _setMapError] = useState<string | null>(null);
   const [currentZoom, _setCurrentZoom] = useState(13);
@@ -390,7 +395,7 @@ const SearchMapScreen: React.FC = () => {
 
       // If user is subscriber (premium/platinum), open offer flow directly
       if (['premium', 'platinum'].includes(userTier)) {
-        navigation.navigate('SubscriberOffer', {
+        navigation.navigate('SubscriberOfferModal', {
           momentId: selectedMoment.id,
           momentTitle: selectedMoment.title,
           hostName: selectedMoment.hostName,
@@ -421,8 +426,15 @@ const SearchMapScreen: React.FC = () => {
   // Handle filter press
   const handleFilterPress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    navigation.navigate('FilterPanel');
-  }, [navigation]);
+    setShowFilterModal(true);
+  }, []);
+
+  // Handle filter apply
+  const handleFilterApply = useCallback((filters: FilterValues) => {
+    setActiveFilters(filters);
+    // TODO: Apply filters to moments query
+    console.log('Map filters applied:', filters);
+  }, []);
 
   // Location button animations
   const handleLocationPressIn = useCallback(() => {
@@ -597,20 +609,32 @@ const SearchMapScreen: React.FC = () => {
         </Animated.View>
       )}
 
-      {/* Top Overlay - Enhanced Search Bar */}
-      <View style={[styles.topOverlay, { top: insets.top + 8 }]}>
-        <EnhancedSearchBar
-          placeholder="Hangi anıya ortak olmak istersin?"
-          onFilterPress={handleFilterPress}
-          hasActiveFilters={hasActiveFilters}
-        />
+      {/* Top Overlay - Filter Button Only (No Search) */}
+      <View style={[styles.topOverlay, { top: insets.top + 12 }]}>
+        <TouchableOpacity
+          onPress={handleFilterPress}
+          activeOpacity={0.8}
+          style={styles.filterButton}
+        >
+          <GlassCard
+            intensity={50}
+            tint="dark"
+            padding={0}
+            borderRadius={16}
+            style={styles.filterButtonCard}
+          >
+            <Ionicons name="options" size={20} color={COLORS.primary} />
+            <Text style={styles.filterButtonText}>Filtrele</Text>
+            {hasActiveFilters && <View style={styles.filterActiveDot} />}
+          </GlassCard>
+        </TouchableOpacity>
       </View>
 
       {/* Right Side - Location Button */}
       <Animated.View
         style={[
           styles.locationButtonContainer,
-          { top: insets.top + 80 },
+          { top: insets.top + 12 },
           locationButtonStyle,
         ]}
       >
@@ -714,6 +738,13 @@ const SearchMapScreen: React.FC = () => {
           </GlassCard>
         </Animated.View>
       )}
+
+      {/* Filter Modal */}
+      <BlurFilterModal
+        visible={showFilterModal}
+        onClose={() => setShowFilterModal(false)}
+        onApply={handleFilterApply}
+      />
     </View>
   );
 };
@@ -729,8 +760,32 @@ const styles = StyleSheet.create({
   // Top overlay
   topOverlay: {
     position: 'absolute',
-    width: '100%',
+    left: 20,
     zIndex: 10,
+  },
+  // Filter button
+  filterButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  filterButtonCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 8,
+  },
+  filterButtonText: {
+    color: COLORS.text.primary,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  filterActiveDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLORS.primary,
+    marginLeft: 4,
   },
   // Location button
   locationButtonContainer: {

@@ -564,10 +564,6 @@ describe('notificationService', () => {
       expect(getNotificationIcon('review_received')).toBe('star-outline');
     });
 
-    it('should return correct icon for new_follower type', () => {
-      expect(getNotificationIcon('new_follower')).toBe('person-add-outline');
-    });
-
     it('should return correct icon for moment_liked type', () => {
       expect(getNotificationIcon('moment_liked')).toBe('heart-outline');
     });
@@ -599,7 +595,6 @@ describe('notificationService', () => {
 
     it('should return blue for communication types', () => {
       expect(getNotificationColor('message')).toBe('#2196F3');
-      expect(getNotificationColor('new_follower')).toBe('#2196F3');
     });
 
     it('should return pink for moment_liked', () => {
@@ -661,21 +656,6 @@ describe('notificationService', () => {
       expect(route).toEqual({
         name: 'Profile',
         params: { userId: 'reviewer-123' },
-      });
-    });
-
-    it('should return Profile route for new_follower', () => {
-      const notification: Notification = {
-        ...mockNotification,
-        type: 'new_follower',
-        userId: 'follower-123',
-      };
-
-      const route = getNotificationRoute(notification);
-
-      expect(route).toEqual({
-        name: 'Profile',
-        params: { userId: 'follower-123' },
       });
     });
 

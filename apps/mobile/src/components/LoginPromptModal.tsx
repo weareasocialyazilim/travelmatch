@@ -39,6 +39,7 @@ interface LoginPromptModalProps {
     | 'chat_unlock'
     | 'save'
     | 'counter_offer'
+    | 'create_moment'
     | 'default';
 }
 
@@ -72,6 +73,12 @@ const ACTION_CONFIG = {
     title: 'Karşı Teklif Gönder',
     description: 'Alternatif teklif göndermek için üye olmalısın.',
     gradient: ['#8B5CF6', '#EC4899'] as [string, string],
+  },
+  create_moment: {
+    icon: 'camera-plus-outline' as const,
+    title: 'An Oluştur',
+    description: 'An paylaşmak için üye olmalısın.',
+    gradient: [COLORS.brand.primary, '#F59E0B'] as [string, string],
   },
   default: {
     icon: 'star-four-points-outline' as const,

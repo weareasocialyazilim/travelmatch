@@ -99,7 +99,9 @@ export function ControlledInput<T extends FieldValues>({
               containerStyle={containerStyle}
               secureTextEntry={isPassword && !showPassword}
               autoCapitalize={isPassword ? 'none' : inputProps.autoCapitalize}
-              autoCorrect={isPassword ? false : inputProps.autoCorrect}
+              autoCorrect={false}
+              autoComplete="off"
+              spellCheck={false}
               accessibilityLabel={accessibilityLabel || label}
               accessibilityHint={accessibilityHint}
               {...inputProps}

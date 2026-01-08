@@ -54,6 +54,7 @@ export interface LoginModalProps {
     | 'chat_unlock'
     | 'save'
     | 'counter_offer'
+    | 'create_moment'
     | 'default';
   onSuccess?: () => void;
 }

@@ -23,7 +23,6 @@ export interface UserProfile {
   id: string;
   email: string;
   name: string;
-  username: string;
   avatar: string;
   coverImage?: string;
   bio?: string;
@@ -42,8 +41,6 @@ export interface UserProfile {
   rating: number;
   reviewCount: number;
   momentCount: number;
-  followerCount: number;
-  followingCount: number;
   giftsSent: number;
   giftsReceived: number;
 
@@ -57,8 +54,6 @@ export interface UserProfile {
   website?: string;
 
   // Relationship with current user
-  isFollowing?: boolean;
-  isFollowedBy?: boolean;
   isBlocked?: boolean;
   publicKey?: string;
 }
@@ -87,7 +82,6 @@ export interface UserPreferences {
 export interface UpdateProfileData {
   name?: string;
   fullName?: string;
-  username?: string;
   bio?: string;
   location?: {
     city: string;
@@ -98,16 +92,6 @@ export interface UpdateProfileData {
   instagram?: string;
   twitter?: string;
   website?: string;
-}
-
-export interface FollowUser {
-  id: string;
-  name: string;
-  username: string;
-  avatar: string;
-  isVerified: boolean;
-  isFollowing: boolean;
-  isFollowedBy: boolean;
 }
 
 // Lightweight DB user shape used for mapping - includes snake_case fields returned from PostgREST
@@ -201,7 +185,6 @@ export const userService = {
       id: profile.id,
       email: profile.email || '',
       name: profile.full_name || 'User',
-      username: profile.email?.split('@')[0] || '', // Derive username from email
       avatar: profile.avatar_url || '',
       bio: profile.bio || undefined,
       location: profile.location
@@ -216,8 +199,6 @@ export const userService = {
       rating: profile.rating || 0,
       reviewCount: profile.review_count || 0,
       momentCount: 0,
-      followerCount: 0,
-      followingCount: 0,
       giftsSent: 0,
       giftsReceived: 0,
       createdAt: profile.created_at || '',
@@ -262,7 +243,6 @@ export const userService = {
       id: profile.id,
       email: '',
       name: profile.full_name || 'User',
-      username: profile.email?.split('@')[0] || '', // Derive username from email
       avatar: profile.avatar_url || '',
       bio: profile.bio || undefined,
       location: profile.location
@@ -277,8 +257,6 @@ export const userService = {
       rating: profile.rating || 0,
       reviewCount: profile.review_count || 0,
       momentCount: 0,
-      followerCount: 0,
-      followingCount: 0,
       giftsSent: 0,
       giftsReceived: 0,
       createdAt: '',
@@ -289,13 +267,13 @@ export const userService = {
   },
 
   /**
-   * Get user profile by username (searches by email prefix since username column doesn't exist)
+   * Get user profile by name search
    */
   getUserByUsername: async (
     username: string,
   ): Promise<{ user: UserProfile }> => {
     // SECURITY: Only select public profile fields
-    // Note: Search by email since username column doesn't exist in database
+    // Note: Search by name or email since username column doesn't exist
     const { data: profile, error } = await supabase
       .from('users')
       .select(
@@ -317,7 +295,7 @@ export const userService = {
       .single();
 
     if (error) {
-      logger.error(`Error fetching user by username ${username}:`, error);
+      logger.error(`Error fetching user by search term ${username}:`, error);
       throw error;
     }
 
@@ -326,7 +304,6 @@ export const userService = {
       id: profile.id,
       email: '',
       name: profile.full_name || 'User',
-      username: profile.email?.split('@')[0] || '', // Derive username from email
       avatar: profile.avatar_url || '',
       bio: profile.bio || undefined,
       location: profile.location
@@ -341,8 +318,6 @@ export const userService = {
       rating: profile.rating || 0,
       reviewCount: profile.review_count || 0,
       momentCount: 0,
-      followerCount: 0,
-      followingCount: 0,
       giftsSent: 0,
       giftsReceived: 0,
       createdAt: '',
@@ -352,23 +327,7 @@ export const userService = {
     return { user: mappedProfile };
   },
 
-  /**
-   * Check if username is available
-   */
-  checkUsernameAvailability: async (username: string): Promise<boolean> => {
-    const { data, error } = await supabase
-      .from('users')
-      .select('id')
-      .eq('username', username)
-      .maybeSingle();
-
-    if (error) {
-      logger.error(`Error checking username availability:`, error);
-      return false;
-    }
-
-    return data === null;
-  },
+  // --- Profile Updates ---
 
   /**
    * Update current user profile
@@ -444,131 +403,6 @@ export const userService = {
     // Just set avatar to default or null
     const updatePayload: UpdateProfilePayload = { avatar: '' };
     await userService.updateProfile(updatePayload);
-    return { success: true };
-  },
-
-  // --- Follow/Unfollow ---
-
-  /**
-   * Follow a user
-   */
-  followUser: async (userId: string): Promise<{ success: boolean }> => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
-
-    const { error } = await dbUsersService.follow(user.id, userId);
-    if (error) throw error;
-    return { success: true };
-  },
-
-  /**
-   * Unfollow a user
-   */
-  unfollowUser: async (userId: string): Promise<{ success: boolean }> => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
-
-    const { error } = await dbUsersService.unfollow(user.id, userId);
-    if (error) throw error;
-    return { success: true };
-  },
-
-  /**
-   * Get followers list
-   */
-  getFollowers: async (
-    userId: string,
-    params?: { page?: number; pageSize?: number },
-  ): Promise<{ followers: FollowUser[]; total: number }> => {
-    const {
-      data: { user: _currentUser },
-    } = await supabase.auth.getUser();
-
-    // Get followers from DB
-    const { data, count, error } = await dbUsersService.getFollowers(userId);
-
-    if (error) throw error;
-
-    // NOTE: Follow system not implemented - platform does not have social follow features
-    // Returning empty relationships for backward compatibility
-    const myFollowingIds: Set<string> = new Set();
-    const myFollowerIds: Set<string> = new Set();
-
-    const allFollowers = ((data as unknown as UserRow[]) || []).map(
-      (follower) => ({
-        id: follower.id,
-        name: follower.full_name || 'Unknown',
-        username: follower.email ? follower.email.split('@')[0] : '',
-        avatar: follower.avatar_url || '',
-        isVerified: follower.verified || false,
-        isFollowing: myFollowingIds.has(follower.id),
-        isFollowedBy: myFollowerIds.has(follower.id),
-      }),
-    );
-
-    // Manual pagination since db service returns all
-    const start = (params?.page || 0) * (params?.pageSize || 10);
-    const end = start + (params?.pageSize || 10);
-    const paginatedFollowers = allFollowers.slice(start, end);
-
-    return { followers: paginatedFollowers, total: count || 0 };
-  },
-  /**
-   * Get following list
-   */
-  getFollowing: async (
-    userId: string,
-    params?: { page?: number; pageSize?: number },
-  ): Promise<{ following: FollowUser[]; total: number }> => {
-    const {
-      data: { user: _currentUser },
-    } = await supabase.auth.getUser();
-
-    const { data, count, error } = await dbUsersService.getFollowing(userId);
-
-    if (error) throw error;
-
-    // NOTE: Follow system not implemented - platform does not have social follow features
-    // Returning empty relationships for backward compatibility
-    const myFollowingIds: Set<string> = new Set();
-    const myFollowerIds: Set<string> = new Set();
-
-    const allFollowing = ((data as unknown as UserRow[]) || []).map(
-      (followingUser) => ({
-        id: followingUser.id,
-        name: followingUser.full_name || 'Unknown',
-        username: followingUser.email ? followingUser.email.split('@')[0] : '',
-        avatar: followingUser.avatar_url || '',
-        isVerified: followingUser.verified || false,
-        isFollowing: myFollowingIds.has(followingUser.id),
-        isFollowedBy: myFollowerIds.has(followingUser.id),
-      }),
-    );
-
-    // Manual pagination
-    const start = (params?.page || 0) * (params?.pageSize || 10);
-    const end = start + (params?.pageSize || 10);
-    const paginatedFollowing = allFollowing.slice(start, end);
-
-    return { following: paginatedFollowing, total: count || 0 };
-  },
-
-  /**
-   * Remove a follower
-   */
-  removeFollower: async (userId: string): Promise<{ success: boolean }> => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
-
-    const { error } = await dbUsersService.unfollow(userId, user.id);
-
-    if (error) throw error;
     return { success: true };
   },
 
@@ -850,7 +684,6 @@ export const userService = {
         id: u.id || '',
         email: u.email || '',
         name: u.full_name || u.name || 'Unknown',
-        username: u.email ? u.email.split('@')[0] : '',
         avatar: u.avatar_url || u.avatar || '',
         languages: Array.isArray(u.languages) ? u.languages : [],
         interests: Array.isArray(u.interests) ? u.interests : [],
@@ -864,8 +697,6 @@ export const userService = {
         rating: Number(u.rating) || 0,
         reviewCount: Number(u.review_count) || 0,
         momentCount: 0,
-        followerCount: 0,
-        followingCount: 0,
         giftsSent: 0,
         giftsReceived: 0,
         createdAt: u.created_at || '',
@@ -877,7 +708,7 @@ export const userService = {
   },
 
   /**
-   * Get suggested users to follow
+   * Get suggested users
    */
   getSuggestedUsers: async (
     limit?: number,
@@ -899,7 +730,6 @@ export const userService = {
         id: u.id || '',
         email: u.email || '',
         name: u.full_name || u.name || 'Unknown',
-        username: u.email ? u.email.split('@')[0] : '',
         avatar: u.avatar_url || u.avatar || '',
         languages: Array.isArray(u.languages) ? u.languages : [],
         interests: Array.isArray(u.interests) ? u.interests : [],
@@ -913,8 +743,6 @@ export const userService = {
         rating: Number(u.rating) || 0,
         reviewCount: Number(u.review_count) || 0,
         momentCount: 0,
-        followerCount: 0,
-        followingCount: 0,
         giftsSent: 0,
         giftsReceived: 0,
         createdAt: u.created_at || '',

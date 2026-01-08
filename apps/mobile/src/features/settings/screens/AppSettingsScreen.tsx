@@ -191,11 +191,7 @@ const AppSettingsScreen: React.FC = () => {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <MaterialCommunityIcons
-            name="arrow-left"
-            size={24}
-            color={COLORS.text.primary}
-          />
+          <MaterialCommunityIcons name="arrow-left" size={24} color="#FFFFFF" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Settings</Text>
         <View style={styles.placeholder} />
@@ -207,12 +203,12 @@ const AppSettingsScreen: React.FC = () => {
           <MaterialCommunityIcons
             name="magnify"
             size={20}
-            color={COLORS.text.secondary}
+            color="rgba(255,255,255,0.5)"
           />
           <TextInput
             style={styles.searchInput}
             placeholder="Search settings..."
-            placeholderTextColor={COLORS.text.secondary}
+            placeholderTextColor="rgba(255,255,255,0.4)"
             value={searchQuery}
             onChangeText={setSearchQuery}
             autoCapitalize="none"
@@ -223,7 +219,7 @@ const AppSettingsScreen: React.FC = () => {
               <MaterialCommunityIcons
                 name="close-circle"
                 size={18}
-                color={COLORS.text.secondary}
+                color="rgba(255,255,255,0.5)"
               />
             </TouchableOpacity>
           )}
@@ -523,11 +519,7 @@ const AppSettingsScreen: React.FC = () => {
             style={styles.signOutButton}
             onPress={handleSignOut}
           >
-            <MaterialCommunityIcons
-              name="logout"
-              size={20}
-              color={COLORS.text.primary}
-            />
+            <MaterialCommunityIcons name="logout" size={20} color="#FFFFFF" />
             <Text style={styles.signOutText}>Sign Out</Text>
           </TouchableOpacity>
 
@@ -576,7 +568,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: COLORS.bg.primary,
+    backgroundColor: '#121214',
   },
   header: {
     flexDirection: 'row',
@@ -594,7 +586,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...TYPOGRAPHY.h4,
     fontWeight: '700',
-    color: COLORS.text.primary,
+    color: '#FFFFFF',
   },
   placeholder: {
     width: 40,
@@ -606,21 +598,18 @@ const styles = StyleSheet.create({
   searchInputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.utility.white,
+    backgroundColor: 'rgba(255,255,255,0.08)',
     borderRadius: 12,
     paddingHorizontal: 14,
     height: 44,
     gap: 10,
-    shadowColor: COLORS.utility.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 1,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
   },
   searchInput: {
     flex: 1,
     fontSize: 15,
-    color: COLORS.text.primary,
+    color: '#FFFFFF',
   },
   noResults: {
     alignItems: 'center',
@@ -691,14 +680,11 @@ const styles = StyleSheet.create({
 
   // Settings Card
   settingsCard: {
-    backgroundColor: COLORS.utility.white,
+    backgroundColor: 'rgba(255,255,255,0.06)',
     borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: COLORS.utility.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
   },
   settingItem: {
     flexDirection: 'row',
@@ -719,21 +705,21 @@ const styles = StyleSheet.create({
   settingLabel: {
     ...TYPOGRAPHY.body,
     fontWeight: '600',
-    color: COLORS.text.primary,
+    color: '#FFFFFF',
     marginBottom: 2,
   },
   settingDesc: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.text.secondary,
+    color: 'rgba(255,255,255,0.6)',
   },
   divider: {
     height: 1,
-    backgroundColor: COLORS.border.default,
+    backgroundColor: 'rgba(255,255,255,0.08)',
     marginHorizontal: 14,
   },
   dividerFull: {
     height: 1,
-    backgroundColor: COLORS.border.default,
+    backgroundColor: 'rgba(255,255,255,0.08)',
   },
 
   // Expanded notifications
@@ -750,7 +736,7 @@ const styles = StyleSheet.create({
   },
   subSettingLabel: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.text.primary,
+    color: '#FFFFFF',
   },
 
   // Action Buttons
@@ -765,17 +751,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.utility.white,
+    backgroundColor: 'rgba(255,255,255,0.08)',
     borderRadius: 14,
     paddingVertical: 14,
     gap: 8,
     borderWidth: 1,
-    borderColor: COLORS.border.default,
+    borderColor: 'rgba(255,255,255,0.12)',
   },
   signOutText: {
     ...TYPOGRAPHY.body,
     fontWeight: '600',
-    color: COLORS.text.primary,
+    color: '#FFFFFF',
   },
   deleteButton: {
     flex: 1,
@@ -801,7 +787,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     ...TYPOGRAPHY.caption,
-    color: COLORS.text.tertiary,
+    color: 'rgba(255,255,255,0.4)',
     fontWeight: '500',
   },
 });

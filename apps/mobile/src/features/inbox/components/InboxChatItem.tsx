@@ -43,6 +43,7 @@ import {
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
 import StatusBadge from './StatusBadge';
+import { TMAvatar } from '@/components/ui/TMAvatar';
 import type { InboxChat } from '../types/inbox.types';
 
 interface InboxChatItemProps {
@@ -137,7 +138,12 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
           <View style={styles.content}>
             {/* User Row */}
             <View style={styles.userRow}>
-              <Image source={{ uri: chat.user.avatar }} style={styles.avatar} />
+              <TMAvatar
+                source={chat.user.avatar}
+                name={chat.user.name}
+                size="md"
+                style={styles.avatar}
+              />
               <View style={styles.userInfo}>
                 <View style={styles.nameRow}>
                   <Text style={styles.userName} numberOfLines={1}>

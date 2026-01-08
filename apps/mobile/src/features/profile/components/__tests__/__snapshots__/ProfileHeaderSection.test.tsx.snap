@@ -198,61 +198,41 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
           }
         }
       >
-        <RCTImage
+        <RCTView
+          accessibilityLabel="Test User's avatar"
+          accessibilityRole="image"
+          accessible={true}
           ref={null}
-          source="avatar.jpg"
           style={
             {
+              "alignItems": "center",
+              "borderRadius": 60,
               "height": "100%",
+              "justifyContent": "center",
+              "overflow": "visible",
+              "position": "relative",
               "width": "100%",
             }
           }
           testID="profile-avatar"
-        />
-      </RCTView>
-      <RCTView
-        ref={null}
-        style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "#F59E0B",
-            "borderColor": "#FFFFFF",
-            "borderRadius": 16,
-            "borderWidth": 3,
-            "bottom": 4,
-            "elevation": 4,
-            "height": 32,
-            "justifyContent": "center",
-            "position": "absolute",
-            "right": 4,
-            "shadowColor": "#DFFF00",
-            "shadowOffset": {
-              "height": 0,
-              "width": 0,
-            },
-            "shadowOpacity": 0.8,
-            "shadowRadius": 8,
-            "width": 32,
-          }
-        }
-      >
-        <RCTText
-          ref={null}
-          style={
-            {
-              "color": "#FFFFFF",
-              "fontFamily": "Satoshi-Medium",
-              "fontSize": 11,
-              "fontWeight": "700",
-              "letterSpacing": 1,
-              "lineHeight": 13,
-              "textTransform": "uppercase",
-            }
-          }
-          testID="RCTText"
         >
-          60
-        </RCTText>
+          <RCTImage
+            ref={null}
+            source="avatar.jpg"
+            style={
+              [
+                {
+                  "backgroundColor": "#E7E5E4",
+                },
+                {
+                  "borderRadius": 60,
+                  "height": 120,
+                  "width": 120,
+                },
+              ]
+            }
+          />
+        </RCTView>
       </RCTView>
     </RCTView>
   </RCTPressable>
@@ -329,280 +309,6 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
       >
         Test City
       </RCTText>
-    </RCTView>
-  </RCTView>
-  <RCTView
-    ref={null}
-    style={
-      {
-        "flexDirection": "row",
-        "gap": 12,
-        "justifyContent": "center",
-        "marginTop": 24,
-        "paddingHorizontal": 20,
-      }
-    }
-  >
-    <RCTView
-      ref={null}
-      style={
-        {
-          "opacity": 0,
-          "transform": [
-            {
-              "translateY": 20,
-            },
-            {
-              "scale": 1,
-            },
-          ],
-        }
-      }
-    >
-      <RCTPressable
-        accessibilityState={
-          {
-            "disabled": false,
-          }
-        }
-        accessible={true}
-        onPressIn={[Function]}
-        onPressOut={[Function]}
-        ref={null}
-        style={
-          {
-            "borderRadius": 16,
-            "overflow": "hidden",
-          }
-        }
-      >
-        <RCTView
-          data-intensity={20}
-          data-tint="light"
-          ref={null}
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "rgba(255,255,255,0.15)",
-              "borderColor": "rgba(255,255,255,0.2)",
-              "borderRadius": 16,
-              "borderWidth": 1,
-              "minWidth": 90,
-              "paddingHorizontal": 20,
-              "paddingVertical": 12,
-            }
-          }
-          testID="blur-view"
-        >
-          <RCTText
-            ref={null}
-            style={
-              {
-                "color": "#FFFFFF",
-                "fontFamily": "JetBrainsMono-Medium",
-                "fontSize": 20,
-                "fontWeight": "500",
-                "letterSpacing": -0.5,
-                "lineHeight": 20,
-              }
-            }
-            testID="RCTText"
-          >
-            0
-          </RCTText>
-          <RCTText
-            ref={null}
-            style={
-              {
-                "color": "rgba(255,255,255,0.7)",
-                "fontFamily": "Satoshi-Regular",
-                "fontSize": 12,
-                "fontWeight": "400",
-                "letterSpacing": 0.3,
-                "lineHeight": 18,
-                "marginTop": 2,
-              }
-            }
-            testID="RCTText"
-          >
-            Anlar
-          </RCTText>
-        </RCTView>
-      </RCTPressable>
-    </RCTView>
-    <RCTView
-      ref={null}
-      style={
-        {
-          "opacity": 0,
-          "transform": [
-            {
-              "translateY": 20,
-            },
-            {
-              "scale": 1,
-            },
-          ],
-        }
-      }
-    >
-      <RCTPressable
-        accessibilityState={
-          {
-            "disabled": false,
-          }
-        }
-        accessible={true}
-        onPressIn={[Function]}
-        onPressOut={[Function]}
-        ref={null}
-        style={
-          {
-            "borderRadius": 16,
-            "overflow": "hidden",
-          }
-        }
-      >
-        <RCTView
-          data-intensity={20}
-          data-tint="light"
-          ref={null}
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "rgba(255,255,255,0.15)",
-              "borderColor": "rgba(255,255,255,0.2)",
-              "borderRadius": 16,
-              "borderWidth": 1,
-              "minWidth": 90,
-              "paddingHorizontal": 20,
-              "paddingVertical": 12,
-            }
-          }
-          testID="blur-view"
-        >
-          <RCTText
-            ref={null}
-            style={
-              {
-                "color": "#FFFFFF",
-                "fontFamily": "JetBrainsMono-Medium",
-                "fontSize": 20,
-                "fontWeight": "500",
-                "letterSpacing": -0.5,
-                "lineHeight": 20,
-              }
-            }
-            testID="RCTText"
-          >
-            0
-          </RCTText>
-          <RCTText
-            ref={null}
-            style={
-              {
-                "color": "rgba(255,255,255,0.7)",
-                "fontFamily": "Satoshi-Regular",
-                "fontSize": 12,
-                "fontWeight": "400",
-                "letterSpacing": 0.3,
-                "lineHeight": 18,
-                "marginTop": 2,
-              }
-            }
-            testID="RCTText"
-          >
-            Hediyeler
-          </RCTText>
-        </RCTView>
-      </RCTPressable>
-    </RCTView>
-    <RCTView
-      ref={null}
-      style={
-        {
-          "opacity": 0,
-          "transform": [
-            {
-              "translateY": 20,
-            },
-            {
-              "scale": 1,
-            },
-          ],
-        }
-      }
-    >
-      <RCTPressable
-        accessibilityState={
-          {
-            "disabled": false,
-          }
-        }
-        accessible={true}
-        onPressIn={[Function]}
-        onPressOut={[Function]}
-        ref={null}
-        style={
-          {
-            "borderRadius": 16,
-            "overflow": "hidden",
-          }
-        }
-      >
-        <RCTView
-          data-intensity={20}
-          data-tint="light"
-          ref={null}
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "rgba(255,255,255,0.15)",
-              "borderColor": "rgba(255,255,255,0.2)",
-              "borderRadius": 16,
-              "borderWidth": 1,
-              "minWidth": 90,
-              "paddingHorizontal": 20,
-              "paddingVertical": 12,
-            }
-          }
-          testID="blur-view"
-        >
-          <RCTText
-            ref={null}
-            style={
-              {
-                "color": "#FFFFFF",
-                "fontFamily": "JetBrainsMono-Medium",
-                "fontSize": 20,
-                "fontWeight": "500",
-                "letterSpacing": -0.5,
-                "lineHeight": 20,
-              }
-            }
-            testID="RCTText"
-          >
-            0%
-          </RCTText>
-          <RCTText
-            ref={null}
-            style={
-              {
-                "color": "rgba(255,255,255,0.7)",
-                "fontFamily": "Satoshi-Regular",
-                "fontSize": 12,
-                "fontWeight": "400",
-                "letterSpacing": 0.3,
-                "lineHeight": 18,
-                "marginTop": 2,
-              }
-            }
-            testID="RCTText"
-          >
-            Yanıt
-          </RCTText>
-        </RCTView>
-      </RCTPressable>
     </RCTView>
   </RCTView>
   <RCTView
@@ -880,61 +586,41 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
           }
         }
       >
-        <RCTImage
+        <RCTView
+          accessibilityLabel="Test User's avatar"
+          accessibilityRole="image"
+          accessible={true}
           ref={null}
-          source="avatar.jpg"
           style={
             {
+              "alignItems": "center",
+              "borderRadius": 60,
               "height": "100%",
+              "justifyContent": "center",
+              "overflow": "visible",
+              "position": "relative",
               "width": "100%",
             }
           }
           testID="profile-avatar"
-        />
-      </RCTView>
-      <RCTView
-        ref={null}
-        style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "#E5E4E2",
-            "borderColor": "#FFFFFF",
-            "borderRadius": 16,
-            "borderWidth": 3,
-            "bottom": 4,
-            "elevation": 4,
-            "height": 32,
-            "justifyContent": "center",
-            "position": "absolute",
-            "right": 4,
-            "shadowColor": "#DFFF00",
-            "shadowOffset": {
-              "height": 0,
-              "width": 0,
-            },
-            "shadowOpacity": 0.8,
-            "shadowRadius": 8,
-            "width": 32,
-          }
-        }
-      >
-        <RCTText
-          ref={null}
-          style={
-            {
-              "color": "#FFFFFF",
-              "fontFamily": "Satoshi-Medium",
-              "fontSize": 11,
-              "fontWeight": "700",
-              "letterSpacing": 1,
-              "lineHeight": 13,
-              "textTransform": "uppercase",
-            }
-          }
-          testID="RCTText"
         >
-          90
-        </RCTText>
+          <RCTImage
+            ref={null}
+            source="avatar.jpg"
+            style={
+              [
+                {
+                  "backgroundColor": "#E7E5E4",
+                },
+                {
+                  "borderRadius": 60,
+                  "height": 120,
+                  "width": 120,
+                },
+              ]
+            }
+          />
+        </RCTView>
       </RCTView>
     </RCTView>
   </RCTPressable>
@@ -1035,280 +721,6 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
       >
         Test City
       </RCTText>
-    </RCTView>
-  </RCTView>
-  <RCTView
-    ref={null}
-    style={
-      {
-        "flexDirection": "row",
-        "gap": 12,
-        "justifyContent": "center",
-        "marginTop": 24,
-        "paddingHorizontal": 20,
-      }
-    }
-  >
-    <RCTView
-      ref={null}
-      style={
-        {
-          "opacity": 0,
-          "transform": [
-            {
-              "translateY": 20,
-            },
-            {
-              "scale": 1,
-            },
-          ],
-        }
-      }
-    >
-      <RCTPressable
-        accessibilityState={
-          {
-            "disabled": false,
-          }
-        }
-        accessible={true}
-        onPressIn={[Function]}
-        onPressOut={[Function]}
-        ref={null}
-        style={
-          {
-            "borderRadius": 16,
-            "overflow": "hidden",
-          }
-        }
-      >
-        <RCTView
-          data-intensity={20}
-          data-tint="light"
-          ref={null}
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "rgba(255,255,255,0.15)",
-              "borderColor": "rgba(255,255,255,0.2)",
-              "borderRadius": 16,
-              "borderWidth": 1,
-              "minWidth": 90,
-              "paddingHorizontal": 20,
-              "paddingVertical": 12,
-            }
-          }
-          testID="blur-view"
-        >
-          <RCTText
-            ref={null}
-            style={
-              {
-                "color": "#FFFFFF",
-                "fontFamily": "JetBrainsMono-Medium",
-                "fontSize": 20,
-                "fontWeight": "500",
-                "letterSpacing": -0.5,
-                "lineHeight": 20,
-              }
-            }
-            testID="RCTText"
-          >
-            0
-          </RCTText>
-          <RCTText
-            ref={null}
-            style={
-              {
-                "color": "rgba(255,255,255,0.7)",
-                "fontFamily": "Satoshi-Regular",
-                "fontSize": 12,
-                "fontWeight": "400",
-                "letterSpacing": 0.3,
-                "lineHeight": 18,
-                "marginTop": 2,
-              }
-            }
-            testID="RCTText"
-          >
-            Anlar
-          </RCTText>
-        </RCTView>
-      </RCTPressable>
-    </RCTView>
-    <RCTView
-      ref={null}
-      style={
-        {
-          "opacity": 0,
-          "transform": [
-            {
-              "translateY": 20,
-            },
-            {
-              "scale": 1,
-            },
-          ],
-        }
-      }
-    >
-      <RCTPressable
-        accessibilityState={
-          {
-            "disabled": false,
-          }
-        }
-        accessible={true}
-        onPressIn={[Function]}
-        onPressOut={[Function]}
-        ref={null}
-        style={
-          {
-            "borderRadius": 16,
-            "overflow": "hidden",
-          }
-        }
-      >
-        <RCTView
-          data-intensity={20}
-          data-tint="light"
-          ref={null}
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "rgba(255,255,255,0.15)",
-              "borderColor": "rgba(255,255,255,0.2)",
-              "borderRadius": 16,
-              "borderWidth": 1,
-              "minWidth": 90,
-              "paddingHorizontal": 20,
-              "paddingVertical": 12,
-            }
-          }
-          testID="blur-view"
-        >
-          <RCTText
-            ref={null}
-            style={
-              {
-                "color": "#FFFFFF",
-                "fontFamily": "JetBrainsMono-Medium",
-                "fontSize": 20,
-                "fontWeight": "500",
-                "letterSpacing": -0.5,
-                "lineHeight": 20,
-              }
-            }
-            testID="RCTText"
-          >
-            0
-          </RCTText>
-          <RCTText
-            ref={null}
-            style={
-              {
-                "color": "rgba(255,255,255,0.7)",
-                "fontFamily": "Satoshi-Regular",
-                "fontSize": 12,
-                "fontWeight": "400",
-                "letterSpacing": 0.3,
-                "lineHeight": 18,
-                "marginTop": 2,
-              }
-            }
-            testID="RCTText"
-          >
-            Hediyeler
-          </RCTText>
-        </RCTView>
-      </RCTPressable>
-    </RCTView>
-    <RCTView
-      ref={null}
-      style={
-        {
-          "opacity": 0,
-          "transform": [
-            {
-              "translateY": 20,
-            },
-            {
-              "scale": 1,
-            },
-          ],
-        }
-      }
-    >
-      <RCTPressable
-        accessibilityState={
-          {
-            "disabled": false,
-          }
-        }
-        accessible={true}
-        onPressIn={[Function]}
-        onPressOut={[Function]}
-        ref={null}
-        style={
-          {
-            "borderRadius": 16,
-            "overflow": "hidden",
-          }
-        }
-      >
-        <RCTView
-          data-intensity={20}
-          data-tint="light"
-          ref={null}
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "rgba(255,255,255,0.15)",
-              "borderColor": "rgba(255,255,255,0.2)",
-              "borderRadius": 16,
-              "borderWidth": 1,
-              "minWidth": 90,
-              "paddingHorizontal": 20,
-              "paddingVertical": 12,
-            }
-          }
-          testID="blur-view"
-        >
-          <RCTText
-            ref={null}
-            style={
-              {
-                "color": "#FFFFFF",
-                "fontFamily": "JetBrainsMono-Medium",
-                "fontSize": 20,
-                "fontWeight": "500",
-                "letterSpacing": -0.5,
-                "lineHeight": 20,
-              }
-            }
-            testID="RCTText"
-          >
-            0%
-          </RCTText>
-          <RCTText
-            ref={null}
-            style={
-              {
-                "color": "rgba(255,255,255,0.7)",
-                "fontFamily": "Satoshi-Regular",
-                "fontSize": 12,
-                "fontWeight": "400",
-                "letterSpacing": 0.3,
-                "lineHeight": 18,
-                "marginTop": 2,
-              }
-            }
-            testID="RCTText"
-          >
-            Yanıt
-          </RCTText>
-        </RCTView>
-      </RCTPressable>
     </RCTView>
   </RCTView>
   <RCTView

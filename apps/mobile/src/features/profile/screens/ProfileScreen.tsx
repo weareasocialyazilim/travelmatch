@@ -16,7 +16,6 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
-  Platform,
   Share,
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
@@ -51,7 +50,6 @@ import type { NavigationProp } from '@react-navigation/native';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { useNetworkStatus } from '../../../context/NetworkContext';
 import { OfflineState } from '../../../components/OfflineState';
-import { TrustConstellation } from '@/features/verifications/components';
 import {
   PROFILE_COLORS,
   PROFILE_SPACING,
@@ -116,8 +114,6 @@ const ProfileScreen: React.FC = () => {
           myMoments.length ||
           userProfile?.momentCount ||
           PROFILE_DEFAULTS.MOMENTS_COUNT,
-        exchangesCount:
-          (userProfile?.giftsSent || 0) + (userProfile?.giftsReceived || 0),
         responseRate: PROFILE_DEFAULTS.RESPONSE_RATE,
         activeMoments: myMoments.filter((m) =>
           ['active', 'paused', 'draft'].includes(m.status),
@@ -125,7 +121,6 @@ const ProfileScreen: React.FC = () => {
         completedMoments: myMoments.filter((m) => m.status === 'completed')
           .length,
         walletBalance: PROFILE_DEFAULTS.WALLET_BALANCE,
-        giftsSentCount: userProfile?.giftsSent || 0,
         savedCount: PROFILE_DEFAULTS.SAVED_COUNT,
       };
     }
@@ -138,12 +133,10 @@ const ProfileScreen: React.FC = () => {
       location: '',
       trustScore: 0,
       momentsCount: 0,
-      exchangesCount: 0,
       responseRate: 0,
       activeMoments: 0,
       completedMoments: 0,
       walletBalance: 0,
-      giftsSentCount: 0,
       savedCount: 0,
     };
   }, [authUser, myMoments, userProfile]);
@@ -167,10 +160,6 @@ const ProfileScreen: React.FC = () => {
   );
   const handleWallet = useCallback(
     () => navigation.navigate('Wallet'),
-    [navigation],
-  );
-  const handleMyGifts = useCallback(
-    () => navigation.navigate('MyGifts'),
     [navigation],
   );
   const handleSavedMoments = useCallback(
@@ -206,26 +195,14 @@ const ProfileScreen: React.FC = () => {
   const quickLinksData = useMemo(
     () => [
       {
-        icon: 'gift-outline',
-        color: PROFILE_COLORS.neon.lime,
-        label: 'Hediyeler',
-        count: userData.giftsSentCount,
-        onPress: handleMyGifts,
-      },
-      {
         icon: 'bookmark-outline',
         color: PROFILE_COLORS.neon.violet,
-        label: 'Kaydedilenler',
+        label: 'Kaydedilen Momentler',
         count: userData.savedCount,
         onPress: handleSavedMoments,
       },
     ],
-    [
-      userData.giftsSentCount,
-      userData.savedCount,
-      handleMyGifts,
-      handleSavedMoments,
-    ],
+    [userData.savedCount, handleSavedMoments],
   );
 
   const handleMomentPress = useCallback(
@@ -383,63 +360,46 @@ const ProfileScreen: React.FC = () => {
             <GlassCard intensity={20} style={styles.statsCard} padding={0}>
               <StatsRow
                 momentsCount={userData.momentsCount}
-                exchangesCount={userData.exchangesCount}
+                activeMoments={userData.activeMoments}
                 responseRate={userData.responseRate}
                 onMomentsPress={handleMyMoments}
-                onExchangesPress={handleMyGifts}
               />
             </GlassCard>
           </Animated.View>
 
-          {/* Trust Constellation - WOW Factor */}
+          {/* Trust Score Card - Minimal & Elegant Design */}
           <Animated.View
-            entering={FadeInDown.delay(200).springify()}
-            style={styles.section}
+            entering={FadeInDown.delay(150).springify()}
+            style={styles.trustSection}
           >
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>GÜVEN TAKIMYILDIZI</Text>
-              <TouchableOpacity onPress={handleTrustGarden}>
-                <Text style={styles.seeAllText}>Detaylar</Text>
-              </TouchableOpacity>
-            </View>
-            <GlassCard intensity={15} style={styles.constellationCard}>
-              <View style={styles.constellationContainer}>
-                <TrustConstellation
-                  score={userData.trustScore || 80}
-                  milestones={[]}
-                  size="lg"
+            <TouchableOpacity
+              onPress={handleTrustGarden}
+              activeOpacity={0.8}
+              style={styles.trustCard}
+            >
+              <View style={styles.trustCardContent}>
+                <View style={styles.trustIconContainer}>
+                  <Ionicons
+                    name="shield-checkmark"
+                    size={22}
+                    color={PROFILE_COLORS.neon.lime}
+                  />
+                </View>
+                <View style={styles.trustCardText}>
+                  <Text style={styles.trustCardTitle}>Güven Durumu</Text>
+                  <Text style={styles.trustCardSubtitle}>
+                    {(userData.trustScore || 0) > 0
+                      ? `${userData.trustScore} puan • Doğrulamalar`
+                      : 'Doğrulama yaparak güven kazan'}
+                  </Text>
+                </View>
+                <Ionicons
+                  name="chevron-forward"
+                  size={18}
+                  color={PROFILE_COLORS.text.tertiary}
                 />
               </View>
-              <View style={styles.trustLegend}>
-                <View style={styles.legendItem}>
-                  <View
-                    style={[
-                      styles.legendDot,
-                      { backgroundColor: PROFILE_COLORS.neon.lime },
-                    ]}
-                  />
-                  <Text style={styles.legendText}>Yüksek</Text>
-                </View>
-                <View style={styles.legendItem}>
-                  <View
-                    style={[
-                      styles.legendDot,
-                      { backgroundColor: PROFILE_COLORS.neon.cyan },
-                    ]}
-                  />
-                  <Text style={styles.legendText}>Orta</Text>
-                </View>
-                <View style={styles.legendItem}>
-                  <View
-                    style={[
-                      styles.legendDot,
-                      { backgroundColor: PROFILE_COLORS.neon.rose },
-                    ]}
-                  />
-                  <Text style={styles.legendText}>Düşük</Text>
-                </View>
-              </View>
-            </GlassCard>
+            </TouchableOpacity>
           </Animated.View>
 
           {/* Wallet Card */}
@@ -562,68 +522,43 @@ const styles = StyleSheet.create({
     borderColor: PROFILE_COLORS.glass.border,
   },
 
-  // Section styling
-  section: {
+  // Trust Score Card - Minimal & Elegant
+  trustSection: {
     marginHorizontal: PROFILE_SPACING.screenPadding,
-    marginTop: PROFILE_SPACING.sectionGap,
+    marginTop: 12,
   },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    ...PROFILE_TYPOGRAPHY.sectionTitle,
-    color: PROFILE_COLORS.text.secondary,
-  },
-  seeAllText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: PROFILE_COLORS.neon.lime,
-  },
-
-  // Trust Constellation
-  constellationCard: {
-    alignItems: 'center',
-    paddingVertical: 24,
+  trustCard: {
+    backgroundColor: PROFILE_COLORS.glass.backgroundMedium,
+    borderRadius: 14,
+    borderWidth: 1,
     borderColor: PROFILE_COLORS.glass.border,
-    ...Platform.select({
-      ios: {
-        shadowColor: PROFILE_COLORS.neon.lime,
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
-      },
-      android: {},
-    }),
+    paddingVertical: 14,
+    paddingHorizontal: 16,
   },
-  constellationContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-  },
-  trustLegend: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 24,
-    marginTop: 20,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: PROFILE_COLORS.glass.borderLight,
-  },
-  legendItem: {
+  trustCardContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 12,
   },
-  legendDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+  trustIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(223, 255, 0, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  legendText: {
-    ...PROFILE_TYPOGRAPHY.caption,
+  trustCardText: {
+    flex: 1,
+  },
+  trustCardTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: PROFILE_COLORS.text.primary,
+    marginBottom: 2,
+  },
+  trustCardSubtitle: {
+    fontSize: 12,
     color: PROFILE_COLORS.text.tertiary,
   },
 

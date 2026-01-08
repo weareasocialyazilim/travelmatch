@@ -33,12 +33,13 @@ describe('ProfileHeaderSection Component', () => {
       expect(getByText(/New York/)).toBeTruthy();
     });
 
-    it('renders trust score', () => {
+    it('renders trust ring based on score', () => {
       const user = mockUser({ trust_score: 85 });
-      const { getByText } = render(
+      const { getByTestId } = render(
         <ProfileHeaderSection user={user} onEditPress={mockOnEditPress} />,
       );
-      expect(getByText(/85/)).toBeTruthy();
+      // Trust ring is rendered around avatar, no number displayed
+      expect(getByTestId('profile-avatar')).toBeTruthy();
     });
 
     it('displays user avatar', () => {
@@ -151,19 +152,19 @@ describe('ProfileHeaderSection Component', () => {
 
     it('re-renders when user data changes', () => {
       const user1 = mockUser({ name: 'John', trust_score: 80 });
-      const user2 = mockUser({ name: 'John', trust_score: 90 });
+      const user2 = mockUser({ name: 'Jane', trust_score: 90 });
 
       const { rerender, getByText } = render(
         <ProfileHeaderSection user={user1} onEditPress={mockOnEditPress} />,
       );
 
-      expect(getByText(/80/)).toBeTruthy();
+      expect(getByText('John')).toBeTruthy();
 
       rerender(
         <ProfileHeaderSection user={user2} onEditPress={mockOnEditPress} />,
       );
 
-      expect(getByText(/90/)).toBeTruthy();
+      expect(getByText('Jane')).toBeTruthy();
     });
   });
 

@@ -80,60 +80,66 @@ export const LocationPickerBottomSheet: React.FC<
   }, [visible]);
 
   // Search for places using Mapbox Geocoding API
-  const searchPlaces = useCallback(async (query: string) => {
-    if (!query || query.length < 2) {
-      setSearchResults([]);
-      return;
-    }
-
-    if (!MAPBOX_ACCESS_TOKEN) {
-      logger.warn('LocationPicker: Mapbox token not configured');
-      return;
-    }
-
-    setIsSearching(true);
-    try {
-      // Search for POIs (restaurants, cafes, bars, hotels) and places
-      const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?` +
-          `types=poi,place,address,locality&limit=10&language=tr,en&access_token=${MAPBOX_ACCESS_TOKEN}`,
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to search places');
+  const searchPlaces = useCallback(
+    async (query: string) => {
+      if (!query || query.length < 2) {
+        setSearchResults([]);
+        return;
       }
 
-      const data = await response.json();
+      if (!MAPBOX_ACCESS_TOKEN) {
+        logger.warn('LocationPicker: Mapbox token not configured');
+        return;
+      }
 
-      const results: SearchResult[] =
-        data.features?.map(
-          (feature: {
-            id: string;
-            text: string;
-            place_name: string;
-            center: [number, number];
-            place_type: string[];
-            properties?: { category?: string };
-          }) => ({
-            id: feature.id,
-            name: feature.text,
-            address: feature.place_name,
-            latitude: feature.center[1],
-            longitude: feature.center[0],
-            type: feature.place_type[0] as SearchResult['type'],
-            category: feature.properties?.category,
-          }),
-        ) || [];
+      setIsSearching(true);
+      try {
+        // Use proximity parameter to sort results by distance from selected location
+        const proximityParam = `&proximity=${selectedLocation.longitude},${selectedLocation.latitude}`;
 
-      setSearchResults(results);
-      setShowResults(true);
-    } catch (err) {
-      logger.error('LocationPicker: Search error', err);
-      setSearchResults([]);
-    } finally {
-      setIsSearching(false);
-    }
-  }, []);
+        // Search for POIs (restaurants, cafes, bars, hotels) and places
+        const response = await fetch(
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?` +
+            `types=poi,place,address,locality&limit=10&language=tr,en${proximityParam}&access_token=${MAPBOX_ACCESS_TOKEN}`,
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to search places');
+        }
+
+        const data = await response.json();
+
+        const results: SearchResult[] =
+          data.features?.map(
+            (feature: {
+              id: string;
+              text: string;
+              place_name: string;
+              center: [number, number];
+              place_type: string[];
+              properties?: { category?: string };
+            }) => ({
+              id: feature.id,
+              name: feature.text,
+              address: feature.place_name,
+              latitude: feature.center[1],
+              longitude: feature.center[0],
+              type: feature.place_type[0] as SearchResult['type'],
+              category: feature.properties?.category,
+            }),
+          ) || [];
+
+        setSearchResults(results);
+        setShowResults(true);
+      } catch (err) {
+        logger.error('LocationPicker: Search error', err);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    },
+    [selectedLocation.longitude, selectedLocation.latitude],
+  );
 
   // Debounced search handler
   const handleSearchChange = useCallback(
@@ -532,7 +538,7 @@ const styles = StyleSheet.create({
   },
   resultsContainer: {
     maxHeight: 250,
-    backgroundColor: COLORS.utility.white,
+    backgroundColor: COLORS.bg.secondary,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border.default,
   },

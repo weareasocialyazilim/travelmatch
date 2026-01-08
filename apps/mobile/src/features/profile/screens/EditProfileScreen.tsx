@@ -88,7 +88,6 @@ const EditProfileScreen = () => {
     return {
       avatarUrl: user?.profilePhoto || user?.avatarUrl || '',
       name: user?.name || '',
-      username: user?.username || '',
       bio: user?.bio || '',
       location:
         typeof user?.location === 'string'
@@ -104,14 +103,12 @@ const EditProfileScreen = () => {
       mode: 'onChange',
       defaultValues: {
         fullName: originalProfile.name,
-        username: originalProfile.username,
         bio: originalProfile.bio,
         location: originalProfile.location,
       },
     });
 
   // Watch fields for real-time updates
-  const username = watch('username');
   const bio = watch('bio');
   const watchedLocation = watch('location');
 
@@ -119,7 +116,6 @@ const EditProfileScreen = () => {
   useEffect(() => {
     reset({
       fullName: originalProfile.name,
-      username: originalProfile.username,
       bio: originalProfile.bio,
       location: originalProfile.location,
     });
@@ -127,47 +123,11 @@ const EditProfileScreen = () => {
 
   // UI state
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
-  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(
-    null,
-  );
-  const [checkingUsername, setCheckingUsername] = useState(false);
 
   // Check if there are unsaved changes
   const hasChanges = useCallback(() => {
     return avatarUri !== null || formState.isDirty;
   }, [avatarUri, formState.isDirty]);
-
-  // Username availability check (debounced)
-  useEffect(() => {
-    if (username === originalProfile.username) {
-      setUsernameAvailable(null);
-      return;
-    }
-
-    if (!username || username.length < 3) {
-      setUsernameAvailable(null);
-      return;
-    }
-
-    setCheckingUsername(true);
-    const timer = setTimeout(async () => {
-      try {
-        const isAvailable =
-          await userService.checkUsernameAvailability(username);
-        setUsernameAvailable(isAvailable);
-      } catch (usernameCheckError) {
-        logger.debug('[EditProfile] Username check failed', {
-          error: usernameCheckError,
-          username,
-        });
-        // Keep username availability null on error
-      } finally {
-        setCheckingUsername(false);
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [username, originalProfile.username]);
 
   const pickImage = async (useCamera: boolean) => {
     try {
@@ -228,11 +188,6 @@ const EditProfileScreen = () => {
   const onSubmit = async (data: EditProfileInput) => {
     if (!hasChanges()) return;
 
-    if (usernameAvailable === false) {
-      showToast('Kullanıcı adı kullanılamaz', 'error');
-      return;
-    }
-
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
@@ -244,7 +199,6 @@ const EditProfileScreen = () => {
       // Update profile
       await userService.updateProfile({
         fullName: data.fullName,
-        username: data.username,
         bio: data.bio,
         location: data.location
           ? { city: data.location, country: '' }
@@ -266,14 +220,13 @@ const EditProfileScreen = () => {
     }
   };
 
-  const isSubmitDisabled =
-    !canSubmitForm(
-      { formState },
-      {
-        requireDirty: false,
-        requireValid: true,
-      },
-    ) || usernameAvailable === false;
+  const isSubmitDisabled = !canSubmitForm(
+    { formState },
+    {
+      requireDirty: false,
+      requireValid: true,
+    },
+  );
 
   const handleChangeAvatar = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -391,10 +344,20 @@ const EditProfileScreen = () => {
                 <Animated.View style={[styles.avatarGlow, glowStyle]} />
 
                 {/* Avatar image */}
-                <Image
-                  source={{ uri: avatarUri || originalProfile.avatarUrl }}
-                  style={styles.avatar}
-                />
+                {avatarUri || originalProfile.avatarUrl ? (
+                  <Image
+                    source={{ uri: avatarUri || originalProfile.avatarUrl }}
+                    style={styles.avatar}
+                  />
+                ) : (
+                  <View style={[styles.avatar, styles.avatarPlaceholder]}>
+                    <MaterialCommunityIcons
+                      name="account"
+                      size={60}
+                      color={COLORS.text.secondary}
+                    />
+                  </View>
+                )}
 
                 {/* Camera badge */}
                 <View style={styles.cameraOverlay}>
@@ -430,49 +393,6 @@ const EditProfileScreen = () => {
                   maxLength={50}
                   showSuccess={true}
                 />
-
-                <View style={styles.inputDivider} />
-
-                {/* Username */}
-                <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>Kullanıcı Adı</Text>
-                  <View style={styles.usernameInputContainer}>
-                    <Text style={styles.usernamePrefix}>@</Text>
-                    <ControlledInput<EditProfileInput>
-                      name="username"
-                      control={control}
-                      placeholder="kullaniciadi"
-                      autoCapitalize="none"
-                      maxLength={30}
-                      showSuccess={usernameAvailable === true}
-                    />
-                    {checkingUsername && (
-                      <ActivityIndicator
-                        size="small"
-                        color={COLORS.text.secondary}
-                      />
-                    )}
-                    {!checkingUsername && usernameAvailable === true && (
-                      <MaterialCommunityIcons
-                        name="check-circle"
-                        size={20}
-                        color={COLORS.trust.primary}
-                      />
-                    )}
-                    {!checkingUsername && usernameAvailable === false && (
-                      <MaterialCommunityIcons
-                        name="close-circle"
-                        size={20}
-                        color={COLORS.error}
-                      />
-                    )}
-                  </View>
-                  {usernameAvailable === false && (
-                    <Text style={styles.usernameError}>
-                      Bu kullanıcı adı zaten alınmış
-                    </Text>
-                  )}
-                </View>
               </GlassCard>
             </View>
           </Animated.View>
@@ -778,6 +698,11 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     borderWidth: 4,
     borderColor: COLORS.surface.base,
+  },
+  avatarPlaceholder: {
+    backgroundColor: COLORS.surface.elevated,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   cameraOverlay: {
     position: 'absolute',

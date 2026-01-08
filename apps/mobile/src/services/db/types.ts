@@ -20,14 +20,6 @@ export interface ListResult<T> {
 }
 
 // Type definitions for tables not yet in generated types
-export interface FollowerRecord {
-  follower_id: string;
-}
-
-export interface FollowingRecord {
-  following_id: string;
-}
-
 export interface ReportRecord {
   id: string;
   reporter_id: string;

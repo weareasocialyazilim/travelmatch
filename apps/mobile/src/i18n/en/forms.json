@@ -36,11 +36,6 @@
         "min": "Name must be at least 2 characters",
         "max": "Name must be at most 50 characters"
       },
-      "username": {
-        "min": "Username must be at least 3 characters",
-        "max": "Username must be at most 30 characters",
-        "invalid": "Username can only contain letters, numbers, and underscores"
-      },
       "amount": {
         "required": "Amount is required",
         "invalid": "Please enter a valid amount",

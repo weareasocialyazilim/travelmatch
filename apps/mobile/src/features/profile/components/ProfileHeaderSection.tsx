@@ -11,14 +11,8 @@
  */
 
 import React, { useCallback, useEffect, memo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  Image,
-  Platform,
-} from 'react-native';
+import { View, Text, StyleSheet, Pressable, Platform } from 'react-native';
+import { TMAvatar } from '@/components/ui/TMAvatar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -184,16 +178,7 @@ const AnimatedTrustRing: React.FC<AnimatedTrustRingProps> = ({
         {children}
       </View>
 
-      {/* Trust Badge with Neon Glow */}
-      <View
-        style={[
-          styles.trustBadge,
-          styles.trustBadgeGlow,
-          { backgroundColor: colors.ring },
-        ]}
-      >
-        <Text style={styles.trustBadgeText}>{score}</Text>
-      </View>
+      {/* Trust Badge - Color indicator only, no number */}
     </View>
   );
 };
@@ -363,9 +348,11 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
         {/* Avatar Section */}
         <Pressable onPress={handleTrustPress} style={styles.avatarSection}>
           <AnimatedTrustRing score={resolvedTrust}>
-            <Image
+            <TMAvatar
               testID="profile-avatar"
-              source={{ uri: resolvedAvatar }}
+              source={resolvedAvatar}
+              name={resolvedName}
+              size="profile"
               style={styles.avatar}
             />
           </AnimatedTrustRing>
@@ -402,16 +389,6 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
               <Text style={styles.location}>{resolvedLocation}</Text>
             </View>
           )}
-        </View>
-
-        {/* Stats Row - Glass Cards */}
-        <View style={styles.statsRow}>
-          <StatCard value={resolvedMoments} label={t('trust.stats.moments')} />
-          <StatCard value={resolvedExchanges} label={t('trust.stats.gifts')} />
-          <StatCard
-            value={`${resolvedResponse}%`}
-            label={t('trust.stats.response')}
-          />
         </View>
 
         {/* Edit Button - Floating */}

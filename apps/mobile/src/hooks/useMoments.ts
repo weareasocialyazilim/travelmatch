@@ -114,6 +114,7 @@ export interface CreateMomentData {
   maxGuests: number;
   duration: string;
   availability: string[];
+  showAsStory?: boolean; // Show as story for 24 hours, then as regular moment
 }
 
 interface UseMomentsReturn {
@@ -379,6 +380,28 @@ export const useMoments = (): UseMomentsReturn => {
           setMyMoments((prev) => [newMoment, ...prev]);
           // Note: Main feed uses cursor pagination, refresh to see new moment
           void refresh();
+
+          // Create story if showAsStory is enabled
+          if (data.showAsStory && uploadedImageUrls.length > 0) {
+            try {
+              const expiresAt = new Date();
+              expiresAt.setHours(expiresAt.getHours() + 24); // 24 hour expiry
+
+              await supabase.from('stories').insert({
+                user_id: user.id,
+                moment_id: newMoment.id,
+                image_url: uploadedImageUrls[0],
+                expires_at: expiresAt.toISOString(),
+                is_active: true,
+              });
+              logger.info('[createMoment] Story created for moment', {
+                momentId: newMoment.id,
+              });
+            } catch (storyErr) {
+              // Don't fail moment creation if story fails
+              logger.warn('[createMoment] Failed to create story:', storyErr);
+            }
+          }
         }
         return newMoment;
       } catch (err) {
