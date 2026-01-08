@@ -5,24 +5,97 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Build platform'
+        required: true
+        type: choice
+        options:
+          - ios
+          - android
+          - all
+        default: 'all'
+      profile:
+        description: 'Build profile'
+        required: true
+        type: choice
+        options:
+          - development
+          - preview
+          - production
+        default: 'production'
 
 env:
   NODE_VERSION: '20'
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build-ios:
+    name: Build iOS (Native)
+    runs-on: macos-latest
+    if: ${{ github.event.inputs.platform != 'android' }}
     steps:
       - uses: actions/checkout@v4
+
       - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v4
         with:
-          node-version: \${{ env.NODE_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
+
+      - name: 🔐 Import secrets from Infisical
+        uses: Infisical/secrets-action@v1.0.15
+        with:
+          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          project-id: 261defa2-bcaf-4905-9230-35c1acc3b026
+          env-slug: prod
+        continue-on-error: true
+
       - uses: expo/expo-github-action@v8
         with:
           eas-version: latest
-          token: \${{ secrets.EXPO_TOKEN }}
+          token: ${{ secrets.EXPO_TOKEN }}
+
       - run: pnpm install --frozen-lockfile
-      - run: eas build --platform android --profile production --non-interactive
-      - run: eas build --platform ios --profile production --non-interactive
+
+      - name: Build iOS App (Native - No Expo Go)
+        working-directory: apps/mobile
+        run: |
+          # Build native iOS without Expo Go
+          eas build --platform ios --profile ${{ github.event.inputs.profile || 'production' }} --non-interactive --local || \
+          eas build --platform ios --profile ${{ github.event.inputs.profile || 'production' }} --non-interactive
+
+  build-android:
+    name: Build Android
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.platform != 'ios' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 🔐 Import secrets from Infisical
+        uses: Infisical/secrets-action@v1.0.15
+        with:
+          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          project-id: 261defa2-bcaf-4905-9230-35c1acc3b026
+          env-slug: prod
+        continue-on-error: true
+
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build Android App
+        working-directory: apps/mobile
+        run: eas build --platform android --profile ${{ github.event.inputs.profile || 'production' }} --non-interactive

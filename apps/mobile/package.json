@@ -29,6 +29,7 @@
     "validate": "pnpm run type-check && pnpm run lint && pnpm run check:nav && pnpm run test:ci",
     "clean": "rm -rf node_modules .expo dist coverage",
     "prebuild": "pnpm exec expo prebuild",
+    "build": "pnpm exec expo export",
     "build:ios": "infisical run --env=prod -- pnpm exec eas build --platform ios",
     "build:android": "infisical run --env=prod -- pnpm exec eas build --platform android",
     "build:all": "infisical run --env=prod -- pnpm exec eas build --platform all",
