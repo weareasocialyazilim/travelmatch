@@ -45,6 +45,7 @@ import type { NavigationProp } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import { COLORS, GRADIENTS } from '@/constants/colors';
+import { VALUES, ESCROW_THRESHOLDS } from '@/constants/values';
 import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import {
@@ -66,6 +67,46 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
   GBP: '£',
   JPY: '¥',
   CAD: 'C$',
+};
+
+// Escrow tier helper - determines protection level based on amount
+const getEscrowTier = (
+  amount: number,
+  currency: string,
+): {
+  tier: 'direct' | 'optional' | 'mandatory';
+  message: string;
+  color: string;
+} => {
+  // Convert to USD equivalent for threshold comparison (simplified)
+  const usdEquivalent =
+    currency === 'TRY'
+      ? amount / 35
+      : currency === 'EUR'
+        ? amount * 1.1
+        : currency === 'GBP'
+          ? amount * 1.27
+          : amount;
+
+  if (usdEquivalent < ESCROW_THRESHOLDS.DIRECT_MAX) {
+    return {
+      tier: 'direct',
+      message: `${CURRENCY_SYMBOLS[currency]}0-${Math.round(ESCROW_THRESHOLDS.DIRECT_MAX * (currency === 'TRY' ? 35 : currency === 'EUR' ? 0.9 : 1))}: Doğrudan ödeme • Anında transfer`,
+      color: COLORS.feedback.success,
+    };
+  } else if (usdEquivalent < ESCROW_THRESHOLDS.OPTIONAL_MAX) {
+    return {
+      tier: 'optional',
+      message: `${CURRENCY_SYMBOLS[currency]}${Math.round(ESCROW_THRESHOLDS.DIRECT_MAX * (currency === 'TRY' ? 35 : 1))}-${Math.round(ESCROW_THRESHOLDS.OPTIONAL_MAX * (currency === 'TRY' ? 35 : 1))}: İsteğe bağlı koruma • Escrow seçeneği`,
+      color: COLORS.feedback.warning,
+    };
+  } else {
+    return {
+      tier: 'mandatory',
+      message: `${CURRENCY_SYMBOLS[currency]}${Math.round(ESCROW_THRESHOLDS.OPTIONAL_MAX * (currency === 'TRY' ? 35 : 1))}+: Zorunlu koruma • Güvenli escrow`,
+      color: COLORS.feedback.error,
+    };
+  }
 };
 
 const { width: _width, height: _height } = Dimensions.get('window');
@@ -566,6 +607,53 @@ const CreateMomentScreen: React.FC = () => {
                 {currency === 'CAD' && 'Canadian Dollar'}
               </Text>
 
+              {/* Escrow Rules Display */}
+              {requestedAmount && parseFloat(requestedAmount) > 0 && (
+                <View style={styles.escrowRulesContainer}>
+                  <View
+                    style={[
+                      styles.escrowTierBadge,
+                      {
+                        backgroundColor: `${getEscrowTier(parseFloat(requestedAmount), currency).color}20`,
+                      },
+                    ]}
+                  >
+                    <MaterialCommunityIcons
+                      name={
+                        getEscrowTier(parseFloat(requestedAmount), currency)
+                          .tier === 'direct'
+                          ? 'flash'
+                          : getEscrowTier(parseFloat(requestedAmount), currency)
+                                .tier === 'optional'
+                            ? 'shield-half-full'
+                            : 'shield-lock'
+                      }
+                      size={16}
+                      color={
+                        getEscrowTier(parseFloat(requestedAmount), currency)
+                          .color
+                      }
+                    />
+                    <Text
+                      style={[
+                        styles.escrowTierText,
+                        {
+                          color: getEscrowTier(
+                            parseFloat(requestedAmount),
+                            currency,
+                          ).color,
+                        },
+                      ]}
+                    >
+                      {
+                        getEscrowTier(parseFloat(requestedAmount), currency)
+                          .message
+                      }
+                    </Text>
+                  </View>
+                </View>
+              )}
+
               <Text style={styles.priceHint}>
                 Bu miktarı kabul eden kişiler sana hediye gönderebilir.
                 {'\n'}Platform komisyonu: %5 • Minimum: 1
@@ -680,9 +768,8 @@ const CreateMomentScreen: React.FC = () => {
 
               <TouchableOpacity
                 style={[
-                  styles.nextButton,
-                  styles.dropButton,
-                  isSubmitting && styles.nextButtonDisabled,
+                  styles.publishButton,
+                  isSubmitting && styles.publishButtonDisabled,
                 ]}
                 onPress={handleDrop}
                 disabled={isSubmitting}
@@ -690,14 +777,34 @@ const CreateMomentScreen: React.FC = () => {
                 accessibilityRole="button"
               >
                 <LinearGradient
-                  colors={GRADIENTS.gift}
+                  colors={GRADIENTS.primary}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  style={styles.dropButtonGradient}
+                  style={styles.publishButtonGradient}
                 >
-                  <Text style={styles.dropButtonText}>
-                    {isSubmitting ? 'DROPPING...' : 'YAYINLA 🔥'}
-                  </Text>
+                  {isSubmitting ? (
+                    <>
+                      <MaterialCommunityIcons
+                        name="loading"
+                        size={20}
+                        color="black"
+                      />
+                      <Text style={styles.publishButtonText}>
+                        Yayınlanıyor...
+                      </Text>
+                    </>
+                  ) : (
+                    <>
+                      <MaterialCommunityIcons
+                        name="rocket-launch"
+                        size={20}
+                        color="black"
+                      />
+                      <Text style={styles.publishButtonText}>
+                        Anını Yayınla
+                      </Text>
+                    </>
+                  )}
                 </LinearGradient>
               </TouchableOpacity>
             </Animated.View>
@@ -950,7 +1057,23 @@ const styles = StyleSheet.create({
   currencyName: {
     fontSize: 14,
     color: 'rgba(255,255,255,0.5)',
+    marginBottom: 12,
+  },
+  escrowRulesContainer: {
     marginBottom: 16,
+  },
+  escrowTierBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    gap: 8,
+  },
+  escrowTierText: {
+    fontSize: 12,
+    fontWeight: '600',
+    flex: 1,
   },
   priceInput: {
     fontSize: 64,
@@ -1051,27 +1174,32 @@ const styles = StyleSheet.create({
   nextButtonDisabled: {
     opacity: 0.5,
   },
-  dropButton: {
-    backgroundColor: 'transparent',
+  publishButton: {
+    height: 56,
+    borderRadius: 28,
     overflow: 'hidden',
-    // Neon glow effect
-    shadowColor: COLORS.secondary,
+    shadowColor: COLORS.brand.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 12,
+    elevation: 8,
   },
-  dropButtonGradient: {
+  publishButtonDisabled: {
+    opacity: 0.6,
+  },
+  publishButtonGradient: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 10,
     borderRadius: 28,
   },
-  dropButtonText: {
-    color: 'white',
-    fontSize: FONT_SIZES.bodyLarge,
-    fontFamily: FONTS.body.bold,
-    fontWeight: 'bold',
+  publishButtonText: {
+    color: 'black',
+    fontSize: 17,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
 });
 

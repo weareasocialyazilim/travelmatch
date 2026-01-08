@@ -122,6 +122,8 @@ interface AnimatedButtonProps {
   delay?: number;
   accessibilityLabel?: string;
   accessibilityHint?: string;
+  disabled?: boolean;
+  showComingSoon?: boolean;
 }
 
 const AnimatedButton: React.FC<AnimatedButtonProps> = ({
@@ -131,6 +133,8 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   delay = 0,
   accessibilityLabel,
   accessibilityHint,
+  disabled = false,
+  showComingSoon = false,
 }) => {
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(20);
@@ -180,16 +184,26 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   return (
     <Reanimated.View style={animatedStyle}>
       <Pressable
-        onPress={handlePress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        style={[styles.button, getButtonStyle()]}
+        onPress={disabled ? undefined : handlePress}
+        onPressIn={disabled ? undefined : handlePressIn}
+        onPressOut={disabled ? undefined : handlePressOut}
+        style={[
+          styles.button,
+          getButtonStyle(),
+          disabled && styles.disabledButton,
+        ]}
         accessible={true}
         accessibilityLabel={accessibilityLabel}
         accessibilityHint={accessibilityHint}
         accessibilityRole="button"
+        accessibilityState={{ disabled }}
       >
-        {children}
+        <View style={styles.buttonContent}>{children}</View>
+        {showComingSoon && (
+          <View style={styles.comingSoonBadge}>
+            <Text style={styles.comingSoonText}>SOON</Text>
+          </View>
+        )}
       </Pressable>
     </Reanimated.View>
   );
@@ -318,8 +332,10 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
             variant="google"
             onPress={handleGoogleLogin}
             delay={700}
-            accessibilityLabel="Google ile devam et"
-            accessibilityHint="Google hesabınızla giriş yaparsınız"
+            accessibilityLabel="Google ile devam et - Çok yakında"
+            accessibilityHint="Google ile giriş çok yakında aktif olacak"
+            disabled={true}
+            showComingSoon={true}
           >
             <MaterialCommunityIcons
               name="google"
@@ -470,14 +486,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
   },
   googleButton: {
     backgroundColor: COLORS.google,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
   },
   socialButtonText: {
     ...TYPE_SCALE.label.large,
@@ -505,6 +519,31 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     ...TYPE_SCALE.label.large,
     color: COLORS.brand.primary,
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    flex: 1,
+  },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  comingSoonBadge: {
+    position: 'absolute',
+    right: 12,
+    backgroundColor: COLORS.brand.primary,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
+  comingSoonText: {
+    ...TYPE_SCALE.body.caption,
+    color: PALETTE.white,
+    fontWeight: '700',
+    fontSize: 10,
+    letterSpacing: 1,
   },
   divider: {
     flexDirection: 'row',

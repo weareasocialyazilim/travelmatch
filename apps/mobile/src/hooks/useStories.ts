@@ -51,21 +51,6 @@ export const useStories = (): UseStoriesReturn => {
         return;
       }
 
-      // Check if stories table exists first
-      const { error: tableCheckError } = await supabase
-        .from('stories')
-        .select('id')
-        .limit(1);
-
-      // If stories table doesn't exist, return empty array gracefully
-      if (tableCheckError?.code === 'PGRST205') {
-        logger.debug(
-          '[useStories] Stories table not found, returning empty array',
-        );
-        setStories([]);
-        return;
-      }
-
       // Fetch stories from users the current user follows, ordered by recency
       // Stories expire after 24 hours
       const twentyFourHoursAgo = new Date();
@@ -93,6 +78,13 @@ export const useStories = (): UseStoriesReturn => {
         .gte('expires_at', new Date().toISOString())
         .gte('created_at', twentyFourHoursAgo.toISOString())
         .order('created_at', { ascending: false });
+
+      // If stories table doesn't exist, return empty array gracefully (no error logging)
+      if (fetchError?.code === 'PGRST205') {
+        // Table doesn't exist yet - this is expected in some environments
+        setStories([]);
+        return;
+      }
 
       if (fetchError) {
         throw fetchError;
@@ -159,8 +151,15 @@ export const useStories = (): UseStoriesReturn => {
       setStories(sortedStories);
     } catch (err) {
       const fetchError = err as Error;
-      logger.error('[useStories] Error fetching stories:', fetchError);
-      setError(fetchError);
+      // Don't log error if it's just a missing table (PGRST205)
+      const errorCode = (err as any)?.code;
+      if (errorCode !== 'PGRST205') {
+        logger.error('[useStories] Error fetching stories:', fetchError);
+        setError(fetchError);
+      } else {
+        // Table doesn't exist - silently return empty
+        setStories([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -171,11 +170,15 @@ export const useStories = (): UseStoriesReturn => {
       const { data: currentUser } = await supabase.auth.getUser();
       if (!currentUser.user) return;
 
-      await supabase.from('story_views').upsert({
+      const { error: upsertError } = await supabase.from('story_views').upsert({
         story_id: storyId,
         user_id: currentUser.user.id,
         viewed_at: new Date().toISOString(),
       });
+
+      // Silently ignore if table doesn't exist
+      if (upsertError?.code === 'PGRST205') return;
+      if (upsertError) throw upsertError;
 
       // Update local state
       setStories((prev) =>
@@ -189,7 +192,11 @@ export const useStories = (): UseStoriesReturn => {
         })),
       );
     } catch (err) {
-      logger.error('[useStories] Error marking story as viewed:', err);
+      // Don't log PGRST205 errors (table not found)
+      const errorCode = (err as any)?.code;
+      if (errorCode !== 'PGRST205') {
+        logger.error('[useStories] Error marking story as viewed:', err);
+      }
     }
   }, []);
 

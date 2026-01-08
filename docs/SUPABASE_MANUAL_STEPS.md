@@ -1,9 +1,22 @@
 # Supabase Manual Configuration Steps
 
-**Last Updated:** 2 January 2026
-**Related Audit:** Supabase Performance & Security Lint Analysis
+**Last Updated:** 8 January 2026 **Related Audit:** Supabase Performance & Security Lint Analysis
 
 This document outlines manual configuration steps that cannot be automated via SQL migrations.
+
+---
+
+## Quick CLI Setup
+
+Most settings can now be configured via CLI. Run the following command:
+
+```bash
+# Configure auth security settings
+./scripts/configure-auth-security.sh
+
+# Apply config.toml changes to remote
+supabase db push --project-ref bjikxgtbptrvawkguypv
+```
 
 ---
 
@@ -11,10 +24,20 @@ This document outlines manual configuration steps that cannot be automated via S
 
 ### 1. Enable Leaked Password Protection
 
-**Priority:** CRITICAL
-**Impact:** Prevents users from using passwords found in data breaches
+**Priority:** CRITICAL **Impact:** Prevents users from using passwords found in data breaches
 
-**Steps:**
+**Option A: Via CLI (Recommended)**
+
+```bash
+# Set your access token (get from Supabase Dashboard > Account > Access Tokens)
+export SUPABASE_ACCESS_TOKEN="your-token-here"
+
+# Run the configuration script
+./scripts/configure-auth-security.sh
+```
+
+**Option B: Via Dashboard**
+
 1. Go to Supabase Dashboard
 2. Navigate to **Authentication** → **Providers** → **Email**
 3. Scroll to **Security Settings**
@@ -22,30 +45,36 @@ This document outlines manual configuration steps that cannot be automated via S
 5. Click **Save**
 
 **Verification:**
+
 - Try to sign up with a known leaked password (e.g., "password123")
 - Should receive error: "Password has been found in a data breach"
 
 ---
 
-### 2. Review Database Connection Settings
+### 2. Database Connection Pooling (Already Configured)
 
-**Priority:** HIGH
-**Impact:** Prevents connection exhaustion under load
+**Priority:** HIGH **Status:** ✅ Configured in `config.toml`
 
-**Steps:**
-1. Go to Supabase Dashboard
-2. Navigate to **Settings** → **Database**
-3. Review **Connection Pooling** settings:
-   - **Pool Mode:** Transaction (recommended for most apps)
-   - **Pool Size:** Adjust based on your plan tier
-4. Navigate to **Settings** → **API**
-5. Review **Rate Limiting** settings
+The `[db.pooler]` section in `supabase/config.toml` now includes:
 
-**Recommended Settings:**
-| Setting | Free Tier | Pro Tier | Enterprise |
-|---------|-----------|----------|------------|
-| Pool Size | 15 | 50-100 | 200+ |
-| Statement Timeout | 8s | 30s | Custom |
+```toml
+[db.pooler]
+enabled = true
+port = 6543
+pool_mode = "transaction"
+default_pool_size = 20
+max_client_conn = 100
+```
+
+**To apply changes:**
+
+```bash
+supabase db push --project-ref bjikxgtbptrvawkguypv
+```
+
+**Recommended Settings:** | Setting | Free Tier | Pro Tier | Enterprise |
+|---------|-----------|----------|------------| | Pool Size | 15 | 50-100 | 200+ | | Statement
+Timeout | 8s | 30s | Custom |
 
 ---
 
@@ -53,10 +82,10 @@ This document outlines manual configuration steps that cannot be automated via S
 
 ### 3. Enable Query Performance Insights
 
-**Priority:** MEDIUM
-**Impact:** Helps identify slow queries
+**Priority:** MEDIUM **Impact:** Helps identify slow queries
 
 **Steps:**
+
 1. Go to Supabase Dashboard
 2. Navigate to **Database** → **Query Performance**
 3. Enable **Query Performance Insights**
@@ -66,12 +95,12 @@ This document outlines manual configuration steps that cannot be automated via S
 
 ### 4. Configure Realtime Subscriptions
 
-**Priority:** MEDIUM
-**Impact:** Reduces server load from realtime connections
+**Priority:** MEDIUM **Impact:** Reduces server load from realtime connections
 
 Based on audit findings (255,138 realtime calls consuming ~24 minutes total):
 
 **Steps:**
+
 1. Go to Supabase Dashboard
 2. Navigate to **Database** → **Replication**
 3. Review enabled tables for realtime
@@ -81,6 +110,7 @@ Based on audit findings (255,138 realtime calls consuming ~24 minutes total):
    - Administrative tables
 
 **Tables to Review:**
+
 ```sql
 -- Check current realtime-enabled tables
 SELECT * FROM supabase_realtime.subscription;
@@ -92,12 +122,12 @@ SELECT * FROM supabase_realtime.subscription;
 
 ### 5. Monitor and Clean Unused Indexes
 
-**Priority:** LOW (Monitor First)
-**Impact:** +5-10% write performance
+**Priority:** LOW (Monitor First) **Impact:** +5-10% write performance
 
 **DO NOT run immediately.** Monitor for 1-2 weeks first.
 
 **Monitoring Query (run in production):**
+
 ```sql
 SELECT
   schemaname,
@@ -113,6 +143,7 @@ ORDER BY pg_relation_size(indexrelid) DESC;
 ```
 
 **Candidate indexes for removal (after monitoring):**
+
 - Indexes with `idx_scan = 0` for extended period
 - Large indexes on write-heavy tables
 - Duplicate or redundant indexes
@@ -124,6 +155,7 @@ ORDER BY pg_relation_size(indexrelid) DESC;
 After applying the SQL migrations, verify:
 
 ### Security Verification
+
 ```sql
 -- 1. Verify spatial_ref_sys has RLS enabled
 SELECT relname, relrowsecurity
@@ -151,6 +183,7 @@ WHERE n.nspname = 'public'
 ```
 
 ### Policy Verification
+
 ```sql
 -- 4. Verify no unoptimized auth.uid() calls remain
 SELECT tablename, policyname
@@ -175,6 +208,7 @@ HAVING COUNT(*) > 1;
 ```
 
 ### Index Verification
+
 ```sql
 -- 6. Verify duplicate indexes removed
 SELECT indexname
@@ -216,11 +250,13 @@ WHERE schemaname = 'public'
 If issues occur after migration:
 
 ### Quick Rollback (Dashboard)
+
 1. Go to **Database** → **Backups**
 2. Select most recent backup before migration
 3. Click **Restore**
 
 ### Selective Rollback (SQL)
+
 ```sql
 -- Example: Restore old policy pattern
 DROP POLICY IF EXISTS "new_policy" ON table_name;
@@ -239,9 +275,9 @@ CREATE POLICY "old_policy" ON table_name ...;
 
 ## Migration Files Reference
 
-| Migration | Purpose | Risk Level |
-|-----------|---------|------------|
-| `20260102000001_critical_security_fixes.sql` | RLS on spatial_ref_sys, search_path fixes | LOW |
-| `20260102000002_rls_performance_fixes.sql` | auth.uid() caching optimization | LOW |
-| `20260102000003_cleanup_duplicate_indexes.sql` | Remove redundant indexes | LOW |
-| `20260102000004_consolidate_policies.sql` | Merge multiple permissive policies | MEDIUM |
+| Migration                                      | Purpose                                   | Risk Level |
+| ---------------------------------------------- | ----------------------------------------- | ---------- |
+| `20260102000001_critical_security_fixes.sql`   | RLS on spatial_ref_sys, search_path fixes | LOW        |
+| `20260102000002_rls_performance_fixes.sql`     | auth.uid() caching optimization           | LOW        |
+| `20260102000003_cleanup_duplicate_indexes.sql` | Remove redundant indexes                  | LOW        |
+| `20260102000004_consolidate_policies.sql`      | Merge multiple permissive policies        | MEDIUM     |

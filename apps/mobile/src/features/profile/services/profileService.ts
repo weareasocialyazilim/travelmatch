@@ -142,11 +142,11 @@ export const profileApi = {
       .select('*', { count: 'exact', head: true })
       .eq('reviewed_user_id', userId);
 
-    // Get completed trips count
-    const { count: tripsCount } = await supabase
-      .from('trip_participants')
+    // Get completed gifts count (user participated by sending gifts)
+    const { count: giftsCount } = await supabase
+      .from('gifts')
       .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId)
+      .eq('giver_id', userId)
       .eq('status', 'completed');
 
     const row = data as {
@@ -159,7 +159,7 @@ export const profileApi = {
       trust_score: row?.trust_score,
       is_verified: row?.is_verified,
       reviews_count: reviewsCount || 0,
-      trips_count: tripsCount || 0,
+      gifts_count: giftsCount || 0, // Renamed from trips_count
       member_since: row?.created_at,
     };
   },

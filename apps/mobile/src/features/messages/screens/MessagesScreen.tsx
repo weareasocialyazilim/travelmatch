@@ -16,7 +16,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ErrorState, EmptyState } from '@/components';
 import { SkeletonList } from '@/components/ui';
 import { FadeInView as _FadeInView } from '@/components/AnimatedComponents';
-import BottomNav from '@/components/BottomNav';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { useRealtime, useRealtimeEvent } from '@/context/RealtimeContext';
@@ -315,7 +314,6 @@ const MessagesScreen: React.FC = () => {
           show={isLoading}
           minDisplayTime={300}
         />
-        <BottomNav activeTab="Messages" messagesBadge={0} />
       </SafeAreaView>
     );
   }
@@ -330,7 +328,6 @@ const MessagesScreen: React.FC = () => {
           useMaterialIcon={true}
           materialIcon="chat-alert-outline"
         />
-        <BottomNav activeTab="Messages" messagesBadge={0} />
       </SafeAreaView>
     );
   }
@@ -385,8 +382,6 @@ const MessagesScreen: React.FC = () => {
           ListEmptyComponent={renderEmptyState}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
         />
-
-        <BottomNav activeTab="Messages" messagesBadge={totalUnreadCount} />
       </SafeAreaView>
     </NetworkGuard>
   );

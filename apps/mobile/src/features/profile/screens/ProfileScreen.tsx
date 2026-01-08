@@ -32,7 +32,6 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { SkeletonList } from '@/components/ui';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { PROFILE_DEFAULTS } from '@/constants/defaultValues';
-import BottomNav from '@/components/BottomNav';
 import {
   ProfileHeaderSection,
   StatsRow,
@@ -509,8 +508,6 @@ const ProfileScreen: React.FC = () => {
           <View style={styles.bottomSpacer} />
         </ScrollView>
       </View>
-
-      <BottomNav activeTab="Profile" />
     </LiquidScreenWrapper>
   );
 };
