@@ -37,7 +37,7 @@ jobs:
         with:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          project-slug: travelmatch
+          project-id: 261defa2-bcaf-4905-9230-35c1acc3b026
           env-slug: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
         continue-on-error: true
 

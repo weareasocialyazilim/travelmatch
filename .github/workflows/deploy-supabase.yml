@@ -53,7 +53,7 @@ jobs:
         with:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          project-id: cafe77a6-a1d6-4725-89d4-e1ec88c0f2b9
+          project-id: 261defa2-bcaf-4905-9230-35c1acc3b026
           environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
 
       - name: 📦 Install Supabase CLI
