@@ -14,6 +14,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   scheme: 'travelmatch',
   newArchEnabled: true,
 
+  // Entry point - use local index.ts instead of expo default
+  entryPoint: './index.ts',
+
   // Splash screen - matches brand warm white
   splash: {
     image: './assets/splash-icon.png',
