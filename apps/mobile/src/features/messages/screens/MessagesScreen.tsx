@@ -146,7 +146,7 @@ const MessagesScreen: React.FC = () => {
     };
   }, []);
 
-  const totalUnreadCount = useMemo(
+  const _totalUnreadCount = useMemo(
     () => conversations.reduce((sum, c) => sum + (c.unreadCount || 0), 0),
     [conversations],
   );

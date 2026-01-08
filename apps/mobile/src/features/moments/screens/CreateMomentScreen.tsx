@@ -45,7 +45,7 @@ import type { NavigationProp } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import { COLORS, GRADIENTS } from '@/constants/colors';
-import { VALUES, ESCROW_THRESHOLDS } from '@/constants/values';
+import { ESCROW_THRESHOLDS } from '@/constants/values';
 import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import {

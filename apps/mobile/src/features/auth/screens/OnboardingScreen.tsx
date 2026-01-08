@@ -28,7 +28,6 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import type { StackScreenProps } from '@react-navigation/stack';
@@ -150,7 +149,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
     }
   }, [activeIndex, navigation, analytics, completeOnboarding]);
 
-  const renderItem = ({ item }: { item: (typeof SLIDES)[0] }) => (
+  const _renderItem = ({ item }: { item: (typeof SLIDES)[0] }) => (
     <View style={styles.slide}>
       <ImageBackground
         source={{ uri: item.image }}
@@ -178,9 +177,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   return (
     <View style={styles.container}>
       {/* Background Image - with fallback color */}
-      <View
-        style={[StyleSheet.absoluteFillObject, { backgroundColor: '#1a1a2e' }]}
-      >
+      <View style={[StyleSheet.absoluteFillObject, styles.backgroundFallback]}>
         <ImageBackground
           source={{ uri: currentSlide.image }}
           style={StyleSheet.absoluteFillObject}
@@ -203,7 +200,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
         style={[styles.contentContainer, { paddingBottom: insets.bottom + 30 }]}
       >
         {/* Spacer to push content down */}
-        <View style={{ flex: 1 }} />
+        <View style={styles.spacer} />
 
         {/* Text Content */}
         <View style={styles.textContainer}>
@@ -229,7 +226,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
               logger.info('🔘 BUTTON PRESSED!', { activeIndex });
               try {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              } catch (e) {
+              } catch (_e) {
                 // ignore haptics error
               }
               handleNext();
@@ -324,34 +321,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  // Legacy styles (keep for backward compatibility)
-  overlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 30,
+  backgroundFallback: {
+    backgroundColor: '#1a1a2e',
   },
-  button: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    overflow: 'hidden',
-  },
-  buttonWrapper: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    overflow: 'hidden',
-  },
-  buttonPressed: {
-    opacity: 0.7,
-    transform: [{ scale: 0.95 }],
-  },
-  btnGradient: {
+  spacer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
 
