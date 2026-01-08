@@ -197,11 +197,7 @@ function App() {
       appBootstrap.cleanup();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-<<<<<<< Updated upstream
-  }, []); // Run only once on mount - incrementSessionCount is now stable via useRef
-=======
   }, []);
->>>>>>> Stashed changes
 
   // Handle retry of failed services
   const handleRetryService = useCallback(async (serviceName: ServiceName) => {
