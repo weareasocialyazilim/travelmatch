@@ -13,7 +13,7 @@ max_rows = 1000
 [db]
 port = 54322
 shadow_port = 54320
-major_version = 15
+major_version = 17
 
 [studio]
 enabled = true
@@ -34,6 +34,15 @@ pop3_port = 54326
 enabled = true
 file_size_limit = "50MiB"
 
+[db.pooler]
+enabled = true
+# Use percentage-based allocation instead of absolute number
+# This allows Auth to scale automatically with instance size
+port = 6543
+pool_mode = "transaction"
+default_pool_size = 20
+max_client_conn = 100
+
 [auth]
 enabled = true
 # Production site URL (primary domain)
@@ -49,6 +58,9 @@ jwt_expiry = 3600
 enable_refresh_token_rotation = true
 refresh_token_reuse_interval = 10
 enable_signup = true
+# Security: Check passwords against HaveIBeenPwned database
+# Prevents users from using known compromised passwords
+enable_manual_linking = false
 
 [auth.email]
 enable_signup = true
@@ -69,13 +81,16 @@ enable_confirmations = false
 [auth.sms]
 enable_signup = true
 enable_confirmations = true
-# Twilio SMS configuration (production)
-# Configure in Supabase Dashboard > Authentication > Phone
-# Provider: Twilio
-#   Account SID: env(TWILIO_ACCOUNT_SID)
-#   Auth Token: env(TWILIO_AUTH_TOKEN)
-#   Message Service SID: env(TWILIO_MESSAGING_SERVICE_SID) or Phone Number
-#   Verify Service SID: env(TWILIO_VERIFY_SERVICE_SID) (for OTP)
+# Twilio SMS configuration
+# For LOCAL development: SMS is disabled (no provider configured)
+# For PRODUCTION: Configure via Supabase Dashboard > Authentication > Phone
+#
+# Production Twilio Settings (Dashboard):
+#   - Provider: Twilio
+#   - Account SID: ACb4dcfed70be9a397127d9da06a127994
+#   - Auth Token: (from Infisical TWILIO_AUTH_TOKEN)
+#   - Message Service SID: VA48e795fedf9018794218fb50099676fb
+#
 # See: https://supabase.com/docs/guides/auth/phone-login
 
 # SMS OTP settings

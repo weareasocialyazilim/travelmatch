@@ -14,7 +14,6 @@ import { TYPOGRAPHY } from '@/theme/typography';
 import { logger } from '@/utils/logger';
 import { NetworkGuard } from '@/components/NetworkGuard';
 import { AddCardBottomSheet } from '@/features/wallet/components/AddCardBottomSheet';
-import BottomNav from '@/components/BottomNav';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
 import { RemoveCardModal } from '@/features/wallet/components/RemoveCardModal';
 import { CardListItem } from '../components/CardListItem';
@@ -198,8 +197,6 @@ const PaymentMethodsScreen = () => {
           </ScrollView>
         </NetworkGuard>
       </SafeAreaView>
-
-      <BottomNav activeTab="Profile" />
 
       <AddCardBottomSheet
         visible={isAddCardVisible}

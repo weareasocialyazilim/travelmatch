@@ -2,13 +2,13 @@
  * Moments Service - Single Source of Truth
  *
  * ELEVATED: This service handles ALL moment-related API operations.
- * Moved from features/discover to features/moments as part of
- * architectural reorganization (Moments are the core of the app).
+ * Moments are the core experience of TravelMatch - sharing and gifting
+ * unforgettable experiences with others.
  *
- * Ghost Terminology Purge:
- * - max_travelers → removed (not relevant for moments)
- * - destination → location_name
- * - budget_range → requested_amount + currency (Buyer sets price)
+ * Terminology Note:
+ * - location_name: Where the moment takes place
+ * - requested_amount: Gift expectation set by moment creator
+ * - currency: Currency for the gift amount
  */
 
 import { supabase } from '@/config/supabase';
@@ -28,7 +28,7 @@ export type SubscriptionTier = 'free' | 'premium' | 'platinum';
 
 /**
  * Profile with subscription data
- * Ghost Logic Cleanup: Replaces is_vip boolean with subscription_tier
+ * Uses subscription_tier for feature gating
  */
 export interface ProfileWithSubscription {
   id: string;
@@ -45,7 +45,7 @@ export interface ProfileWithSubscription {
 
 /**
  * Experience categories for moments
- * Replaces old travel-based categories
+ * Categories help users discover relevant experiences
  */
 export type ExperienceCategory =
   | 'dining'
@@ -58,7 +58,7 @@ export type ExperienceCategory =
   | 'other';
 
 /**
- * Moment filters - CLEANED from travel terminology
+ * Moment filters for discovery
  */
 export interface MomentFilters {
   /** Search by location name */
@@ -76,10 +76,10 @@ export interface MomentFilters {
 }
 
 /**
- * Create Moment DTO - CLEANED
+ * Create Moment DTO
  *
  * "Alıcı Fiyat Belirler" modeli:
- * - requested_amount: Anı oluşturan (Alıcı) kişinin istediği hediye miktarı
+ * - requested_amount: Anı oluşturan kişinin istediği hediye miktarı
  * - currency: Para birimi
  */
 export interface CreateMomentDto {
@@ -116,7 +116,7 @@ export interface CreateMomentDto {
 }
 
 /**
- * Update Moment DTO - CLEANED
+ * Update Moment DTO
  */
 export interface UpdateMomentDto {
   title?: string;
@@ -143,7 +143,7 @@ export interface UpdateMomentDto {
 
 /**
  * Get user's active subscription tier
- * Ghost Logic Cleanup: Replaces is_vip boolean checks
+ * Returns the current subscription plan for feature gating
  */
 export const getUserSubscriptionTier = async (
   userId: string,
@@ -178,59 +178,44 @@ export const canMakeSubscriberOffer = (tier: SubscriptionTier): boolean => {
  * Moments API Service
  *
  * Single source of truth for all moment operations.
- * LEGACY CLEANUP: Removed trip_requests and bookings functions.
- *
- * NOTE: DB table is still 'trips' but we filter category != 'trip'
+ * Handles creating, reading, updating, and deleting moments.
  */
 export const momentsApi = {
   /**
    * Get all moments (with filtering)
-   * Excludes travel plans - only moments
-   * Includes host profile for display
+   * Returns published moments with host profile
    */
   getAll: async (filters?: MomentFilters) => {
     // SECURITY: Explicit column selection - never use select('*')
     let query = supabase
-      .from('trips') // DB table name unchanged
+      .from('moments')
       .select(
         `
         id,
         user_id,
         title,
         description,
-        destination,
+        location,
         status,
         price,
         currency,
         category,
-        image_url,
         images,
         tags,
-        requested_amount,
-        requested_currency,
-        location_name,
-        location_lat,
-        location_lng,
         created_at,
         updated_at,
-        profiles (
+        users:user_id (
           id,
-          username,
           full_name,
-          avatar_url,
-          trust_score
+          avatar_url
         )
       `,
       )
-      .eq('is_published', true)
-      .neq('category', 'trip') // CRITICAL: Filter out travel plans, only moments
-      .is('deleted_at', null);
+      .eq('status', 'active');
 
-    // Location name search (replaces destination)
+    // Location name search
     if (filters?.location_name) {
-      query = query.or(
-        `destination.ilike.%${filters.location_name}%,location_name.ilike.%${filters.location_name}%`,
-      );
+      query = query.ilike('location', `%${filters.location_name}%`);
     }
 
     // Experience category filter
@@ -240,16 +225,16 @@ export const momentsApi = {
 
     // Gift range filters
     if (filters?.giftRangeMin) {
-      query = query.gte('requested_amount', filters.giftRangeMin);
+      query = query.gte('price', filters.giftRangeMin);
     }
 
     if (filters?.giftRangeMax) {
-      query = query.lte('requested_amount', filters.giftRangeMax);
+      query = query.lte('price', filters.giftRangeMax);
     }
 
     // Currency filter
     if (filters?.currency) {
-      query = query.eq('requested_currency', filters.currency);
+      query = query.eq('currency', filters.currency);
     }
 
     // Tags filter
@@ -271,40 +256,31 @@ export const momentsApi = {
   getById: async (id: string) => {
     // SECURITY: Explicit column selection
     const { data, error } = await supabase
-      .from('trips')
+      .from('moments')
       .select(
         `
         id,
         user_id,
         title,
         description,
-        destination,
+        location,
         status,
         price,
         currency,
         category,
-        image_url,
         images,
         tags,
-        requested_amount,
-        requested_currency,
-        location_name,
-        location_lat,
-        location_lng,
         created_at,
         updated_at,
-        profiles (
+        users:user_id (
           id,
-          username,
           full_name,
           avatar_url,
-          trust_score,
           bio
         )
       `,
       )
       .eq('id', id)
-      .is('deleted_at', null)
       .single();
 
     if (error) throw error;
@@ -331,27 +307,19 @@ export const momentsApi = {
     }
 
     const { data, error } = await supabase
-      .from('trips')
+      .from('moments')
       .insert({
         user_id: user.id,
         title: moment.title,
         description: moment.description,
         category: moment.experience_category,
-        // Map location_name to destination for DB compatibility
-        destination: moment.location_name,
-        location_name: moment.location_name,
-        location_lat: moment.location?.latitude,
-        location_lng: moment.location?.longitude,
-        image_url: moment.image_url,
-        images: moment.images,
-        tags: moment.tags,
-        // "Alıcı Fiyat Belirler" fields
-        requested_amount: moment.requested_amount,
-        requested_currency: moment.currency,
-        // Legacy price field for compatibility
+        location: moment.location_name,
+        images: moment.images || [],
+        tags: moment.tags || [],
         price: moment.requested_amount,
         currency: moment.currency,
-        is_published: true,
+        date: new Date().toISOString(),
+        status: 'active',
       })
       .select()
       .single();
@@ -372,29 +340,19 @@ export const momentsApi = {
     if (updates.experience_category)
       updateData.category = updates.experience_category;
     if (updates.location_name) {
-      updateData.location_name = updates.location_name;
-      updateData.destination = updates.location_name; // DB compatibility
-    }
-    if (updates.location) {
-      updateData.location_lat = updates.location.latitude;
-      updateData.location_lng = updates.location.longitude;
+      updateData.location = updates.location_name;
     }
     if (updates.images) updateData.images = updates.images;
-    if (updates.image_url) updateData.image_url = updates.image_url;
     if (updates.tags) updateData.tags = updates.tags;
-    if (updates.is_published !== undefined)
-      updateData.is_published = updates.is_published;
     if (updates.requested_amount) {
-      updateData.requested_amount = updates.requested_amount;
-      updateData.price = updates.requested_amount; // Legacy compatibility
+      updateData.price = updates.requested_amount;
     }
     if (updates.currency) {
       updateData.currency = updates.currency;
-      updateData.requested_currency = updates.currency;
     }
 
     const { data, error } = await supabase
-      .from('trips')
+      .from('moments')
       .update(updateData)
       .eq('id', id)
       .select()
@@ -409,8 +367,8 @@ export const momentsApi = {
    */
   delete: async (id: string) => {
     const { error } = await supabase
-      .from('trips')
-      .update({ deleted_at: new Date().toISOString() })
+      .from('moments')
+      .update({ status: 'cancelled' })
       .eq('id', id);
 
     if (error) throw error;
@@ -422,30 +380,25 @@ export const momentsApi = {
   getMyMoments: async (userId: string) => {
     // SECURITY: Explicit column selection
     const { data, error } = await supabase
-      .from('trips')
+      .from('moments')
       .select(
         `
         id,
         user_id,
         title,
         description,
-        destination,
-        location_name,
+        location,
         status,
         price,
         currency,
         category,
-        image_url,
         images,
-        requested_amount,
-        requested_currency,
         created_at,
         updated_at
       `,
       )
       .eq('user_id', userId)
-      .neq('category', 'trip') // Only moments, not travel plans
-      .is('deleted_at', null)
+      .neq('status', 'cancelled')
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -507,18 +460,18 @@ export const momentsApi = {
         `
         id,
         created_at,
-        trips (
+        moments (
           id,
           title,
           description,
-          image_url,
-          requested_amount,
-          requested_currency,
-          location_name,
+          images,
+          price,
+          currency,
+          location,
           category,
-          profiles (
+          users:user_id (
             id,
-            username,
+            full_name,
             avatar_url
           )
         )

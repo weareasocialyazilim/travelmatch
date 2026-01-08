@@ -48,7 +48,6 @@ import { FONT_SIZES, FONTS } from '@/constants/typography';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { EnhancedSearchBar, NeonPulseMarker } from '../components';
-import BottomNav from '@/components/BottomNav';
 // Using useDiscoverMoments for PostGIS-based location discovery
 import { useDiscoverMoments } from '@/hooks/useDiscoverMoments';
 import { useSubscription } from '@/features/payments/hooks/usePayments';
@@ -454,7 +453,6 @@ const SearchMapScreen: React.FC = () => {
               'Map service is not configured. Please add your Mapbox token to .env file.'}
           </Text>
         </View>
-        <BottomNav activeTab="Discover" />
       </View>
     );
   }
@@ -467,7 +465,6 @@ const SearchMapScreen: React.FC = () => {
           <ActivityIndicator size="large" color={COLORS.primary} />
           <Text style={styles.fallbackTitle}>Loading Map...</Text>
         </View>
-        <BottomNav activeTab="Discover" />
       </View>
     );
   }
@@ -723,9 +720,6 @@ const SearchMapScreen: React.FC = () => {
           </GlassCard>
         </Animated.View>
       )}
-
-      {/* Bottom Navigation */}
-      <BottomNav activeTab="Discover" />
     </View>
   );
 };

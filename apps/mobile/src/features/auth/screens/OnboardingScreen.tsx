@@ -66,7 +66,7 @@ const SLIDES = [
   {
     id: '3',
     image:
-      'https://images.unsplash.com/photo-1551632436-cbf8dd354ca8?q=80&w=1200',
+      'https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200',
     title: 'Secure & Cashless',
     desc: 'Pay safely via the app. No cash, no awkward moments. Just pure vibes.',
   },

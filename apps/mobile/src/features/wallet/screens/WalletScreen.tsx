@@ -35,7 +35,6 @@ import Animated, {
   FadeInUp,
   FadeInRight as _FadeInRight,
 } from 'react-native-reanimated';
-import BottomNav from '@/components/BottomNav';
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
 import { NetworkGuard } from '@/components/NetworkGuard';
 import { useToast } from '@/context/ToastContext';
@@ -521,9 +520,6 @@ const WalletScreen = () => {
               }
             />
           </View>
-
-          {/* Bottom Navigation */}
-          <BottomNav activeTab="Profile" />
         </NetworkGuard>
       </View>
     </LiquidScreenWrapper>
