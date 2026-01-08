@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { RetakeProofBottomSheet } from '../RetakeProofBottomSheet';
+import { RetakeProofBottomSheet } from '../../features/moments/components/RetakeProofBottomSheet';
 
 describe('RetakeProofBottomSheet', () => {
   const mockOnClose = jest.fn() as jest.Mock;

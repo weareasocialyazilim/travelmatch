@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { PendingTransactionsModal } from '../PendingTransactionsModal';
+import { PendingTransactionsModal } from '../../features/wallet/components/PendingTransactionsModal';
 import type {
   PendingPayment,
   PendingUpload,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { ChatAttachmentBottomSheet } from '../ChatAttachmentBottomSheet';
+import { ChatAttachmentBottomSheet } from '../../features/messages/components/ChatAttachmentBottomSheet';
 
 describe('ChatAttachmentBottomSheet', () => {
   const mockOnClose = jest.fn() as jest.Mock;

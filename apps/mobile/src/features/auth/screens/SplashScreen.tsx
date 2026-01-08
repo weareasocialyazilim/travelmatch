@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -16,6 +17,9 @@ import type { RootStackParamList } from '@/navigation/routeParams';
 
 const { width: _width } = Dimensions.get('window');
 
+const ONBOARDING_KEY = '@has_seen_onboarding';
+const GUEST_MODE_KEY = '@allow_guest_browse';
+
 type SplashScreenProps = StackScreenProps<RootStackParamList, 'Splash'>;
 
 export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
@@ -31,13 +35,36 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
     // 2. Text Fade In
     textOpacity.value = withDelay(800, withTiming(1, { duration: 500 }));
 
-    // 3. Navigate Away
-    const timeout = setTimeout(() => {
-      navigation.replace('Onboarding');
-    }, 2500);
+    // 3. Check onboarding status and navigate appropriately
+    const checkAndNavigate = async () => {
+      try {
+        const hasSeenOnboarding = await AsyncStorage.getItem(ONBOARDING_KEY);
+        const allowGuestBrowse = await AsyncStorage.getItem(GUEST_MODE_KEY);
 
-    return () => clearTimeout(timeout);
-  }, []);
+        // Wait for animation to complete (2.5s total)
+        await new Promise((resolve) => setTimeout(resolve, 2500));
+
+        if (hasSeenOnboarding === 'true') {
+          // User has completed onboarding
+          if (allowGuestBrowse !== 'false') {
+            // Guest mode enabled - go to MainTabs (Discover)
+            navigation.replace('MainTabs');
+          } else {
+            // Guest mode disabled - go to Welcome for login
+            navigation.replace('Welcome');
+          }
+        } else {
+          // First time user - show onboarding
+          navigation.replace('Onboarding');
+        }
+      } catch (_error) {
+        // On error, show onboarding as safe default
+        navigation.replace('Onboarding');
+      }
+    };
+
+    checkAndNavigate();
+  }, [navigation, scale, opacity, textOpacity]);
 
   const logoStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { AddCardBottomSheet } from '../AddCardBottomSheet';
+import { AddCardBottomSheet } from '../../features/wallet/components/AddCardBottomSheet';
 
 describe('AddCardBottomSheet', () => {
   const mockOnClose = jest.fn() as jest.Mock;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { DeleteProofModal } from '../DeleteProofModal';
+import { DeleteProofModal } from '../../features/moments/components/DeleteProofModal';
 
 describe('DeleteProofModal', () => {
   const mockOnCancel = jest.fn() as jest.Mock;

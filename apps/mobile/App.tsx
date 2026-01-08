@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { StyleSheet, AppState, Button, View } from 'react-native';
+import { StyleSheet, AppState } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -40,27 +40,33 @@ import type {
 } from './src/services/pendingTransactionsService';
 import * as Sentry from '@sentry/react-native';
 
-Sentry.init({
-  dsn: 'https://1237a6f4254344408cfecf338a7dcb74@o4510602285875200.ingest.de.sentry.io/4510602310189136',
+// Sentry DSN from environment variable - avoid hardcoding
+const SENTRY_DSN = process.env.EXPO_PUBLIC_SENTRY_DSN || '';
 
-  // Adds more context data to events (IP address, cookies, user, etc.)
-  // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
-  sendDefaultPii: true,
+// Only initialize Sentry if DSN is configured and not in development
+if (SENTRY_DSN && !__DEV__) {
+  Sentry.init({
+    dsn: SENTRY_DSN,
 
-  // Enable Logs
-  enableLogs: true,
+    // Adds more context data to events (IP address, cookies, user, etc.)
+    // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
+    sendDefaultPii: true,
 
-  // Configure Session Replay
-  replaysSessionSampleRate: 0.1,
-  replaysOnErrorSampleRate: 1,
-  integrations: [
-    Sentry.mobileReplayIntegration(),
-    Sentry.feedbackIntegration(),
-  ],
+    // Enable Logs
+    enableLogs: true,
 
-  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
-  // spotlight: __DEV__,
-});
+    // Configure Session Replay
+    replaysSessionSampleRate: 0.1,
+    replaysOnErrorSampleRate: 1,
+    integrations: [
+      Sentry.mobileReplayIntegration(),
+      Sentry.feedbackIntegration(),
+    ],
+
+    // uncomment the line below to enable Spotlight (https://spotlightjs.com)
+    // spotlight: __DEV__,
+  });
+}
 // Sentry is initialized lazily in useEffect to avoid JSI runtime issues with New Architecture
 // See: src/config/sentry.ts for full configuration
 
@@ -152,14 +158,15 @@ function App() {
         setAppInitState('ready');
         logger.info('App', '✅ App initialization complete');
 
+        // TEMPORARILY DISABLED: Privacy consent modal to debug onboarding touch issue
         // Check privacy consent status (GDPR/KVKK compliance)
-        const consentStatus = await checkConsentStatus();
-        if (!consentStatus.hasConsented) {
-          // Show consent modal after a brief delay for UX
-          setTimeout(() => setShowPrivacyConsent(true), 500);
-        } else {
-          setConsentPreferences(consentStatus.preferences);
-        }
+        // const consentStatus = await checkConsentStatus();
+        // if (!consentStatus.hasConsented) {
+        //   // Show consent modal after a brief delay for UX
+        //   setTimeout(() => setShowPrivacyConsent(true), 500);
+        // } else {
+        //   setConsentPreferences(consentStatus.preferences);
+        // }
       } catch (error) {
         logger.error('App', 'Fatal error during initialization', error);
         setAppInitState('error');
@@ -190,7 +197,11 @@ function App() {
       appBootstrap.cleanup();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+<<<<<<< Updated upstream
   }, []); // Run only once on mount - incrementSessionCount is now stable via useRef
+=======
+  }, []);
+>>>>>>> Stashed changes
 
   // Handle retry of failed services
   const handleRetryService = useCallback(async (serviceName: ServiceName) => {

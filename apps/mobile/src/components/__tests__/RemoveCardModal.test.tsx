@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { RemoveCardModal } from '../RemoveCardModal';
+import { RemoveCardModal } from '../../features/wallet/components/RemoveCardModal';
 
 describe('RemoveCardModal', () => {
   const mockOnCancel = jest.fn() as jest.Mock;

@@ -99,3 +99,11 @@ export const suppressActWarnings = (callback: () => void): void => {
     console.error = originalError;
   }
 };
+
+// Placeholder test to prevent "Test suite must contain at least one test" error
+// This file exports helpers for use in other test files
+describe('testUtilsAsync helpers', () => {
+  it('exports actAsync helper', () => {
+    expect(typeof actAsync).toBe('function');
+  });
+});

@@ -51,6 +51,21 @@ export const useStories = (): UseStoriesReturn => {
         return;
       }
 
+      // Check if stories table exists first
+      const { error: tableCheckError } = await supabase
+        .from('stories')
+        .select('id')
+        .limit(1);
+
+      // If stories table doesn't exist, return empty array gracefully
+      if (tableCheckError?.code === 'PGRST205') {
+        logger.debug(
+          '[useStories] Stories table not found, returning empty array',
+        );
+        setStories([]);
+        return;
+      }
+
       // Fetch stories from users the current user follows, ordered by recency
       // Stories expire after 24 hours
       const twentyFourHoursAgo = new Date();

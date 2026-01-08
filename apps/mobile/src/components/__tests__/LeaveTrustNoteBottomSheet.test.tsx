@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { LeaveTrustNoteBottomSheet } from '../LeaveTrustNoteBottomSheet';
+import { LeaveTrustNoteBottomSheet } from '../ui/LeaveTrustNoteBottomSheet';
 
 describe('LeaveTrustNoteBottomSheet', () => {
   const mockOnClose = jest.fn() as jest.Mock;

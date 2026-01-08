@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { View, Text } from 'react-native';
-import { ThankYouModal } from '../ThankYouModal';
+import { ThankYouModal } from '../../features/gifts/components/ThankYouModal';
 
 // Mock expo-linear-gradient
 jest.mock('expo-linear-gradient', () => ({

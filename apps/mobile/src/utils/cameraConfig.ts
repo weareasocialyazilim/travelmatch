@@ -192,7 +192,7 @@ export async function launchCamera(
 
   try {
     const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       quality: cameraConfig.quality,
       aspect: cameraConfig.aspect,
       allowsEditing: cameraConfig.allowsEditing,
@@ -242,7 +242,7 @@ export async function launchGallery(
 
   try {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       quality: pickerConfig.quality,
       aspect: pickerConfig.aspect,
       allowsEditing: !allowMultiple && pickerConfig.allowsEditing,
@@ -292,7 +292,7 @@ export async function launchVideoCamera(
 
   try {
     const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      mediaTypes: ['videos'],
       allowsEditing: Platform.OS === 'ios', // iOS supports video editing
       videoMaxDuration: maxDuration,
       videoQuality: Platform.OS === 'ios' ? videoQuality : undefined,
