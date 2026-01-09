@@ -30,7 +30,8 @@ import Animated, {
   Easing,
   interpolateColor,
 } from 'react-native-reanimated';
-import { LinearGradient, LinearGradientProps } from 'expo-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
+import type { LinearGradientProps as _LinearGradientProps } from 'expo-linear-gradient';
 
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 
@@ -104,9 +105,3 @@ export const AnimatedGradient: React.FC<AnimatedGradientProps> = ({
     />
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    ...StyleSheet.absoluteFillObject,
-  },
-});

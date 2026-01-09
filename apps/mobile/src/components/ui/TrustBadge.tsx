@@ -116,11 +116,11 @@ export const TrustBadge: React.FC<TrustBadgeProps> = ({
         <Animated.View
           style={[
             styles.pulseRing,
+            styles.pulseBorder,
             {
               width: size * 1.6,
               height: size * 1.6,
               borderRadius: (size * 1.6) / 2,
-              borderWidth: 2,
               borderColor: color,
             },
             pulseStyle,
@@ -164,6 +164,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  pulseBorder: {
+    borderWidth: 2,
   },
   shimmer: {
     position: 'absolute',

@@ -271,7 +271,7 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
     parallaxSubtitleStyle,
     parallaxContentStyle,
   }) => {
-    const insets = useSafeAreaInsets();
+    const _insets = useSafeAreaInsets();
     const editButtonScale = useSharedValue(1);
     // Translation hook available for future i18n
     const { t: _t } = useTranslation();

@@ -617,12 +617,7 @@ const SearchMapScreen: React.FC = () => {
           style={styles.filterButton}
         >
           <View style={styles.filterButtonCard}>
-            <Ionicons
-              name="options-outline"
-              size={24}
-              color={COLORS.primary}
-              style={{ marginLeft: 1 }}
-            />
+            <Ionicons name="options-outline" size={24} color={COLORS.primary} />
             {hasActiveFilters && <View style={styles.filterActiveDot} />}
           </View>
         </TouchableOpacity>
@@ -647,7 +642,6 @@ const SearchMapScreen: React.FC = () => {
               name="navigate-outline"
               size={24}
               color={COLORS.primary}
-              style={{ marginTop: 1, marginLeft: 2 }}
             />
           </View>
         </TouchableOpacity>
@@ -781,12 +775,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.14,
     shadowRadius: 6,
     elevation: 3,
-  },
-  filterButtonText: {
-    color: COLORS.primary,
-    fontSize: 15,
-    fontWeight: '700',
-    letterSpacing: 0.3,
   },
   filterActiveDot: {
     width: 8,

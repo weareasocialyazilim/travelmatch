@@ -13,7 +13,6 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   RefreshControl,
   Share,
@@ -36,7 +35,6 @@ import { PROFILE_DEFAULTS } from '@/constants/defaultValues';
 import {
   ProfileHeaderSection,
   StatsRow,
-  WalletCard,
   QuickLinks,
   ProfileMomentCard,
   MomentsTabs,
@@ -69,7 +67,7 @@ const ProfileScreen: React.FC = () => {
   // Parallax header configuration
   const {
     scrollHandler,
-    headerStyle: parallaxHeaderStyle,
+    headerStyle: _parallaxHeaderStyle,
     avatarStyle: parallaxAvatarStyle,
     titleStyle: parallaxTitleStyle,
     subtitleStyle: parallaxSubtitleStyle,

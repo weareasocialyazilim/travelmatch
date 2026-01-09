@@ -40,7 +40,7 @@ let Gyroscope: any = null;
 if (Platform.OS !== 'web') {
   try {
     Gyroscope = require('expo-sensors').Gyroscope;
-  } catch (e) {
+  } catch (_e) {
     Gyroscope = createMockGyroscope();
   }
 } else {

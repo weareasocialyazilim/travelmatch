@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TextInput,
   KeyboardAvoidingView,
   Platform,
   FlatList,
@@ -182,7 +181,6 @@ const ChatDetailScreen: React.FC = () => {
   const { user: currentUser } = useAuth();
   const [messageText, setMessageText] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
   const {
     sendMessage,
