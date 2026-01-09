@@ -105,7 +105,7 @@ const DiscoverScreen = () => {
     refresh,
     loadMore,
     hasMore,
-    userLocation,
+    userLocation: _userLocation,
     locationPermission,
   } = useDiscoverMoments();
 

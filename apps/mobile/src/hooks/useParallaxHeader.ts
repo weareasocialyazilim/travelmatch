@@ -181,7 +181,7 @@ export const useParallaxHeader = ({
   const blurIntensity = useAnimatedStyle(() => {
     if (!enableBlur) return { opacity: 0 };
 
-    const intensity = interpolate(
+    const _intensity = interpolate(
       scrollY.value,
       [0, maxScroll * 0.5, maxScroll],
       [0, 15, 25],

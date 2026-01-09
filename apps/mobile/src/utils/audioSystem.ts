@@ -20,13 +20,12 @@
  *   npx expo install expo-av
  */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let Audio: any = null;
 
 // Try to load expo-av dynamically - graceful degradation if not available
 try {
   // Dynamic require to avoid TypeScript compile errors when expo-av is not installed
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
+
   Audio = require('expo-av').Audio;
 } catch {
   console.warn(
@@ -37,7 +36,6 @@ try {
 import * as Haptics from 'expo-haptics';
 
 class AudioSystem {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private sounds: Map<string, any> = new Map();
   private enabled: boolean = true;
 

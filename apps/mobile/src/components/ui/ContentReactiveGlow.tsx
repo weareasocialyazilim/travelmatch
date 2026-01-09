@@ -42,7 +42,7 @@ export const ContentReactiveGlow: React.FC<ContentReactiveGlowProps> = ({
   colors,
   opacity,
   glowSize = 300,
-  enableBlur = true,
+  enableBlur: _enableBlur = true,
 }) => {
   const animatedStyle = useAnimatedStyle(() => {
     if (!opacity) return {};

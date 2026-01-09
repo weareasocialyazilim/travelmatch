@@ -21,7 +21,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { RefreshControl, RefreshControlProps, Platform } from 'react-native';
+import { RefreshControl, RefreshControlProps } from 'react-native';
 import { View, StyleSheet } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -65,10 +65,6 @@ export const LiquidSpinner: React.FC<LiquidSpinnerProps> = ({
       scale.value = 0.8;
     }
   }, [refreshing, rotation, scale]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${rotation.value}deg` }, { scale: scale.value }],
-  }));
 
   // Use platform-specific refresh control
   return (

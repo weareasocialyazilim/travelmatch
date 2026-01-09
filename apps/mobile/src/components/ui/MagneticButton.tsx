@@ -49,7 +49,7 @@ export const MagneticButton: React.FC<MagneticButtonProps> = ({
   style,
   ...buttonProps
 }) => {
-  const [buttonLayout, setButtonLayout] = useState({
+  const [_buttonLayout, setButtonLayout] = useState({
     x: 0,
     y: 0,
     width: 0,

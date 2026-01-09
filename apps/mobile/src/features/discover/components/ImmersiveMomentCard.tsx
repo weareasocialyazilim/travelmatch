@@ -257,7 +257,12 @@ export const ImmersiveMomentCard = memo(
             {/* Direct Gift Button */}
             <TouchableOpacity
               style={styles.giftButton}
-              onPress={onGiftPress}
+              onPress={() => {
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Success,
+                );
+                onGiftPress();
+              }}
               activeOpacity={0.8}
             >
               <Text style={styles.giftText}>Gift This</Text>

@@ -21,14 +21,14 @@ export { default as RequestsScreen } from './screens/RequestsScreen';
 export { default as TicketScreen } from './screens/TicketScreen';
 
 // Services
-export { momentsApi as momentsService } from './services/momentsService';
+export { momentsApi as momentsService } from '@/features/moments/services/momentsService';
 
 // Types
 export type {
   MomentFilters,
   CreateMomentDto,
   UpdateMomentDto,
-} from './services/momentsService';
+} from '@/features/moments/services/momentsService';
 
 // Types
 export type {

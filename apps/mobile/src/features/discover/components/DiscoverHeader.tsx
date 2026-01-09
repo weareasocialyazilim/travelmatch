@@ -185,15 +185,7 @@ interface AwwwardsDiscoverHeaderProps {
   onAvatarPress?: () => void;
 }
 
-/**
- * Get time-based greeting in Turkish
- */
-const getGreeting = (): string => {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'Günaydın';
-  if (hour < 18) return 'İyi günler';
-  return 'İyi akşamlar';
-};
+// Time-based greeting is handled by useSmartMicrocopy hook
 
 /**
  * AwwwardsDiscoverHeader - Awwwards standardında premium header
@@ -251,13 +243,6 @@ const awwwardsStyles = StyleSheet.create({
     color: COLORS.text.secondary,
     marginTop: 4,
     textAlign: 'center',
-  },
-  logoText: {
-    fontSize: 22,
-    fontFamily: TYPOGRAPHY_SYSTEM.families.heading,
-    fontWeight: '700',
-    color: COLORS.text.primary,
-    letterSpacing: -0.5,
   },
 });
 

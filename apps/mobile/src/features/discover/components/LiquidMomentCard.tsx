@@ -25,7 +25,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
-import type { SubscriptionTier } from '../services/momentsService';
+import type { SubscriptionTier } from '@/features/moments/services/momentsService';
 
 const AnimatedImageBackground =
   Animated.createAnimatedComponent(ImageBackground);
@@ -95,7 +95,7 @@ export interface LiquidMomentCardProps {
  */
 export const LiquidMomentCard: React.FC<LiquidMomentCardProps> = memo(
   ({
-    momentId,
+    momentId: _momentId,
     title,
     location,
     price,

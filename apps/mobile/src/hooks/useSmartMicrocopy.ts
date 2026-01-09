@@ -138,11 +138,11 @@ export const useSmartMicrocopy = ({
   walletBalance = 0,
   trustScore = 0,
   activeMoments = 0,
-  lastActive,
+  lastActive: _lastActive,
   isVerified = false,
 }: SmartMicrocopyConfig = {}): SmartMicrocopyResult => {
   const timeOfDay = getTimeOfDay();
-  const season = getSeason();
+  const _season = getSeason();
 
   const result = useMemo(() => {
     // Select time-based greeting

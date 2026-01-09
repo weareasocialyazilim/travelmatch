@@ -37,7 +37,7 @@ const { width: _width, height } = Dimensions.get('window');
 
 export const MomentDetailScreen = ({ navigation, route }: any) => {
   const insets = useSafeAreaInsets();
-  const momentId = route?.params?.momentId;
+  const _momentId = route?.params?.momentId;
 
   return (
     <View style={styles.container}>
@@ -62,21 +62,11 @@ export const MomentDetailScreen = ({ navigation, route }: any) => {
             onPress={() => navigation.goBack()}
             style={[styles.backBtn, { top: insets.top + 10 }]}
           >
-            <Ionicons
-              name="arrow-back"
-              size={24}
-              color="white"
-              style={{ marginRight: 2 }}
-            />
+            <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.shareBtn, { top: insets.top + 10 }]}>
-            <Ionicons
-              name="share-outline"
-              size={24}
-              color="white"
-              style={{ marginTop: -1, marginLeft: 1 }}
-            />
+            <Ionicons name="share-outline" size={24} color="white" />
           </TouchableOpacity>
         </View>
 
