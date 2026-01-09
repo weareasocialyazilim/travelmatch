@@ -10,7 +10,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@/hooks/useNavigationHelpers';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { useToast } from '@/context/ToastContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { COLORS } from '@/constants/colors';
@@ -83,7 +83,7 @@ export const VerifyCodeScreen: React.FC = () => {
     const codeToVerify = verificationCode || code.join('');
 
     if (codeToVerify.length !== CODE_LENGTH) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.error();
       showToast('Please enter the complete 6-digit code', 'error');
       return;
     }
@@ -93,19 +93,19 @@ export const VerifyCodeScreen: React.FC = () => {
       const { error } = await verifyOtp(codeToVerify);
       if (error) {
         // Error haptic feedback for invalid code
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        HapticManager.error();
         showToast(error.message || 'Invalid verification code', 'error');
         setCode(Array(CODE_LENGTH).fill(''));
         inputRefs.current[0]?.focus();
       } else {
         // Success haptic feedback
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        HapticManager.success();
         showToast('Code verified successfully!', 'success');
         navigation.navigate('SetPassword');
       }
     } catch (verifyError) {
       logger.error('[VerifyCode] Verification failed', { error: verifyError });
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.error();
       showToast('Verification failed. Please try again.', 'error');
     } finally {
       setIsLoading(false);
@@ -121,15 +121,15 @@ export const VerifyCodeScreen: React.FC = () => {
       return;
     }
 
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     setIsLoading(true);
     try {
       const { error } = await resendOtp(email);
       if (error) {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        HapticManager.error();
         showToast(error.message || 'Failed to resend code', 'error');
       } else {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        HapticManager.success();
         showToast('New code sent!', 'success');
         setResendCooldown(RESEND_COOLDOWN);
         setCode(Array(CODE_LENGTH).fill(''));
@@ -139,7 +139,7 @@ export const VerifyCodeScreen: React.FC = () => {
       logger.error('[VerifyCode] Failed to resend code', {
         error: resendError,
       });
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.error();
       showToast('Failed to resend code. Please try again.', 'error');
     } finally {
       setIsLoading(false);

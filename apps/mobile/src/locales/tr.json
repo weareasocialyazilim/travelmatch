@@ -870,9 +870,22 @@
     }
   },
   "profile": {
+    "title": "Profil",
     "shareMessage": "TravelMatch profilime göz at!",
+    "shareProfile": "Profili paylaş",
     "savedMoments": "Kaydedilen Anlar",
     "offlineTitle": "İnternet bağlantısı yok",
-    "offlineMessage": "Profili görüntülemek için internet bağlantısı gerekli."
+    "offlineMessage": "Profili görüntülemek için internet bağlantısı gerekli.",
+    "trustStatus": "Güven Durumu",
+    "trustScore": {
+      "points": "{{score}} puan • Doğrulamalar",
+      "earnTrust": "Doğrulama yaparak güven kazan"
+    },
+    "moments": {
+      "noActive": "Henüz aktif moment yok",
+      "noPast": "Geçmiş moment yok",
+      "createFirstDescription": "İlk momentini oluşturarak yolculuğuna başla",
+      "completedDescription": "Tamamlanan momentler burada görünecek"
+    }
   }
 }

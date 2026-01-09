@@ -29,7 +29,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import * as Location from 'expo-location';
 import Animated, {
   useAnimatedStyle,
@@ -369,7 +369,7 @@ const SearchMapScreen: React.FC = () => {
   // Handle marker selection - Subscription-based zoom
   const handleMarkerPress = useCallback(
     (marker: MomentMarker) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      HapticManager.buttonPress();
       setSelectedMoment(marker);
 
       // Dynamic zoom based on subscription tier
@@ -391,14 +391,14 @@ const SearchMapScreen: React.FC = () => {
 
   // Close preview card
   const handleClosePreview = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     setSelectedMoment(null);
   }, []);
 
   // Navigate to moment detail or subscriber offer flow
   const handleViewDetails = useCallback(() => {
     if (selectedMoment) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      HapticManager.buttonPress();
 
       // If user is subscriber (premium/platinum), open offer flow directly
       if (['premium', 'platinum'].includes(userTier)) {
@@ -424,7 +424,7 @@ const SearchMapScreen: React.FC = () => {
   // Center on user location
   const handleCenterOnUser = useCallback(() => {
     if (userLocation && cameraRef.current) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.buttonPress();
       cameraRef.current.setCamera({
         centerCoordinate: [userLocation.longitude, userLocation.latitude],
         zoomLevel: 14,
@@ -435,7 +435,7 @@ const SearchMapScreen: React.FC = () => {
 
   // Handle filter press
   const handleFilterPress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     setShowFilterModal(true);
   }, []);
 
@@ -478,7 +478,7 @@ const SearchMapScreen: React.FC = () => {
             style={styles.offlineRetryButton}
             onPress={() => {
               // Force re-render by toggling a state
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              HapticManager.buttonPress();
             }}
           >
             <MaterialCommunityIcons

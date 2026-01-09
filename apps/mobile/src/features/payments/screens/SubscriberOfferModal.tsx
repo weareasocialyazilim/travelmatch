@@ -31,7 +31,7 @@ import {
 import type { NavigationProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { useTranslation } from 'react-i18next';
 import { COLORS, GRADIENTS } from '@/constants/colors';
 import { FONTS, FONT_SIZES } from '@/constants/typography';
@@ -95,14 +95,14 @@ const SubscriberOfferModal: React.FC = () => {
   }, [offerAmount]);
 
   const handleClose = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     navigation.goBack();
   }, [navigation]);
 
   const handleSubmitOffer = useCallback(async () => {
     if (!isValidOffer || !user || !canMakeOffer) return;
 
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.buttonPress();
     setIsSubmitting(true);
 
     try {
@@ -122,7 +122,7 @@ const SubscriberOfferModal: React.FC = () => {
 
       if (error) throw error;
 
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      HapticManager.success();
 
       // Başarı ekranına git
       navigation.navigate('Success', {
@@ -132,7 +132,7 @@ const SubscriberOfferModal: React.FC = () => {
       });
     } catch (error) {
       logger.error('SubscriberOfferModal', 'Failed to submit offer', { error });
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.error();
     } finally {
       setIsSubmitting(false);
     }
@@ -156,7 +156,7 @@ const SubscriberOfferModal: React.FC = () => {
     subscription?.tier === 'platinum' ? COLORS.platinum : COLORS.primary;
 
   const handleViewPlans = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     navigation.goBack();
     // Navigate to subscription plans screen
     setTimeout(() => {

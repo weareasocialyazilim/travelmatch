@@ -39,7 +39,7 @@ import Animated, {
   SlideOutDown,
 } from 'react-native-reanimated';
 import * as ImagePicker from 'expo-image-picker';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import type { NavigationProp } from '@react-navigation/native';
@@ -237,7 +237,7 @@ const CreateMomentScreen: React.FC = () => {
   // 1. Media Selection - Story format (9:16)
   const pickImage = useCallback(async () => {
     // Liquid interaction haptic
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    await HapticManager.buttonPress();
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
@@ -247,7 +247,7 @@ const CreateMomentScreen: React.FC = () => {
     });
 
     if (!result.canceled) {
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      await HapticManager.buttonPress();
       setImageUri(result.assets[0].uri);
       setStep('details');
     }
@@ -256,7 +256,7 @@ const CreateMomentScreen: React.FC = () => {
   // Handle location selection with haptic feedback
   const handleLocationSelect = useCallback((location: Location) => {
     // Silky haptic feedback on location selection
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     setLocationName(location.name || location.address);
     setLocationCoords({ lat: location.latitude, lng: location.longitude });
     setShowLocationPicker(false);
@@ -271,7 +271,7 @@ const CreateMomentScreen: React.FC = () => {
     }
 
     if (!title || !selectedCategory || !imageUri || !locationName) {
-      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      await HapticManager.error();
       showAlert({
         title: t('screens.createMoment.missingInfoTitle'),
         message: t('screens.createMoment.missingInfoMessage'),
@@ -282,7 +282,7 @@ const CreateMomentScreen: React.FC = () => {
     // Validate requested amount (min: 1)
     const amount = parseFloat(requestedAmount);
     if (!amount || amount < 1) {
-      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      await HapticManager.error();
       showAlert({
         title: 'Geçersiz Miktar',
         message: 'Fiyat en az 1 olmalıdır.',
@@ -291,7 +291,7 @@ const CreateMomentScreen: React.FC = () => {
     }
 
     setIsSubmitting(true);
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    await HapticManager.buttonPress();
 
     try {
       const momentData = {
@@ -334,14 +334,14 @@ const CreateMomentScreen: React.FC = () => {
           ],
         });
       } else {
-        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        await HapticManager.error();
         showToast('Could not create moment. Please try again.', 'error');
       }
     } catch (createMomentError) {
       logger.error('[CreateMoment] Failed to create moment', {
         error: createMomentError,
       });
-      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      await HapticManager.error();
       showToast('Something went wrong. Please try again.', 'error');
     } finally {
       setIsSubmitting(false);
@@ -365,7 +365,7 @@ const CreateMomentScreen: React.FC = () => {
 
   // Navigate back - UPDATED for new step flow
   const handleBack = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     if (step === 'details') {
       setStep('media');
     } else if (step === 'location') {
@@ -394,7 +394,7 @@ const CreateMomentScreen: React.FC = () => {
         'review',
       ];
       if (stepIndex < STEP_INDEX_MAP[step]) {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        HapticManager.buttonPress();
         setStep(stepKeys[stepIndex]);
       }
     },
@@ -528,7 +528,7 @@ const CreateMomentScreen: React.FC = () => {
                       selectedCategory === cat.id && styles.categoryPillActive,
                     ]}
                     onPress={() => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      HapticManager.buttonPress();
                       setSelectedCategory(cat.id);
                     }}
                     accessibilityLabel={cat.label}
@@ -561,7 +561,7 @@ const CreateMomentScreen: React.FC = () => {
                   (!title || !selectedCategory) && styles.nextButtonDisabled,
                 ]}
                 onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  HapticManager.buttonPress();
                   setStep('location');
                 }}
                 disabled={!title || !selectedCategory}
@@ -590,7 +590,7 @@ const CreateMomentScreen: React.FC = () => {
                 <TouchableOpacity
                   style={styles.locationSelected}
                   onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    HapticManager.buttonPress();
                     setShowLocationPicker(true);
                   }}
                 >
@@ -610,7 +610,7 @@ const CreateMomentScreen: React.FC = () => {
                 <TouchableOpacity
                   style={styles.locationButton}
                   onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    HapticManager.buttonPress();
                     setShowLocationPicker(true);
                   }}
                 >
@@ -629,7 +629,7 @@ const CreateMomentScreen: React.FC = () => {
                   !locationName && styles.nextButtonDisabled,
                 ]}
                 onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  HapticManager.buttonPress();
                   setStep('price');
                 }}
                 disabled={!locationName}
@@ -657,7 +657,7 @@ const CreateMomentScreen: React.FC = () => {
                 <TouchableOpacity
                   style={styles.currencyButton}
                   onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    HapticManager.buttonPress();
                     setShowCurrencySheet(true);
                   }}
                   accessibilityLabel={t('screens.createMoment.a11y.currency')}
@@ -759,7 +759,7 @@ const CreateMomentScreen: React.FC = () => {
                     styles.nextButtonDisabled,
                 ]}
                 onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  HapticManager.buttonPress();
                   setStep('review');
                 }}
                 disabled={!requestedAmount || parseFloat(requestedAmount) < 1}
