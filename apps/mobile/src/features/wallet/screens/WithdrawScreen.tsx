@@ -41,6 +41,7 @@ import { walletService, type WalletBalance } from '@/services/walletService';
 import { useAuth } from '@/hooks/useAuth';
 import { useScreenSecurity } from '@/hooks/useScreenSecurity';
 import { showAlert } from '@/stores/modalStore';
+import { logger } from '@/utils/logger';
 
 // ═══════════════════════════════════════════════════════════════════
 // KYC LEVELS & REQUIREMENTS
@@ -443,7 +444,7 @@ const WithdrawScreen: React.FC = () => {
         setSelectedAccount(accounts[0].id);
       }
     } catch (err) {
-      console.error('[WithdrawScreen] Fetch error:', err);
+      logger.error('[WithdrawScreen] Fetch error:', { error: err });
       setError('Bakiye bilgisi alınamadı. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);
@@ -548,7 +549,7 @@ const WithdrawScreen: React.FC = () => {
                 ],
               );
             } catch (err: any) {
-              console.error('[WithdrawScreen] Settlement error:', err);
+              logger.error('[WithdrawScreen] Settlement error:', { error: err });
               HapticManager.error();
               setError(
                 err.message ||
