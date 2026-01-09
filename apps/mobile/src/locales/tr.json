@@ -101,7 +101,16 @@
     "momentDeleted": "An başarıyla silindi!",
     "confirmDelete": "Bu anı silmek istediğinizden emin misiniz?",
     "noMomentsFound": "An bulunamadı",
-    "loadMore": "Daha Fazla Yükle"
+    "loadMore": "Daha Fazla Yükle",
+    "card": {
+      "giftFor": "Hediye için",
+      "view": "Görüntüle",
+      "sendGift": "Hediye Gönder",
+      "featured": "Öne Çıkan",
+      "popular": "Popüler",
+      "new": "Yeni",
+      "premium": "Premium"
+    }
   },
   "booking": {
     "bookNow": "Hemen Rezervasyon Yap",

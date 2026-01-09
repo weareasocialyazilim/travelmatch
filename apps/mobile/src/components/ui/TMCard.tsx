@@ -10,7 +10,7 @@
  * - Turkish localization
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   View,
   StyleSheet,
@@ -29,6 +29,7 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { COLORS, GRADIENTS, SHADOWS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { RADIUS, SPACING, SIZES } from '@/constants/spacing';
@@ -38,17 +39,7 @@ import { TMTrustRing } from './TMTrustRing';
 // Badge type for moment cards (inspired by property card designs)
 export type MomentBadgeType = 'featured' | 'popular' | 'new' | 'premium' | null;
 
-// Badge configuration - use hardcoded colors for test compatibility
-// These match the design system values from primitives
-const BADGE_CONFIG: Record<
-  NonNullable<MomentBadgeType>,
-  { label: string; bg: string; icon?: string }
-> = {
-  featured: { label: 'Öne Çıkan', bg: '#3D4A3A', icon: 'fire' },
-  popular: { label: 'Popüler', bg: '#14B8A6', icon: 'heart' }, // seafoam[500]
-  new: { label: 'Yeni', bg: '#292524' }, // stone[800]
-  premium: { label: 'Premium', bg: '#F59E0B', icon: 'star' }, // amber[500]
-};
+// Badge type config moved to component body for i18n support
 
 export interface MomentData {
   id: string;
@@ -100,7 +91,19 @@ export const TMCard: React.FC<TMCardProps> = ({
   style,
   testID,
 }) => {
+  const { t } = useTranslation();
   const scale = useSharedValue(1);
+
+  // Memoized badge config with i18n labels
+  const badgeConfig = useMemo(
+    () => ({
+      featured: { label: t('moments.card.featured'), bg: '#3D4A3A', icon: 'fire' },
+      popular: { label: t('moments.card.popular'), bg: '#14B8A6', icon: 'heart' },
+      new: { label: t('moments.card.new'), bg: '#292524' },
+      premium: { label: t('moments.card.premium'), bg: '#F59E0B', icon: 'star' },
+    }),
+    [t],
+  );
 
   const handlePressIn = useCallback(() => {
     scale.value = withSpring(0.98, SPRING.snappy);
@@ -174,22 +177,22 @@ export const TMCard: React.FC<TMCardProps> = ({
           </BlurView>
 
           {/* Feature Badge - Top Left (Featured/Popular/New/Premium) */}
-          {moment.badge && BADGE_CONFIG[moment.badge] && (
+          {moment.badge && badgeConfig[moment.badge] && (
             <View
               style={[
                 styles.featureBadge,
-                { backgroundColor: BADGE_CONFIG[moment.badge].bg },
+                { backgroundColor: badgeConfig[moment.badge].bg },
               ]}
             >
-              {BADGE_CONFIG[moment.badge].icon && (
+              {badgeConfig[moment.badge].icon && (
                 <MaterialCommunityIcons
-                  name={BADGE_CONFIG[moment.badge].icon as any}
+                  name={badgeConfig[moment.badge].icon as any}
                   size={12}
                   color={COLORS.white}
                 />
               )}
               <Text style={styles.featureBadgeText}>
-                {BADGE_CONFIG[moment.badge].label}
+                {badgeConfig[moment.badge].label}
               </Text>
             </View>
           )}
@@ -302,7 +305,7 @@ export const TMCard: React.FC<TMCardProps> = ({
             <View style={styles.actionRow}>
               {/* Price */}
               <View style={styles.priceContainer}>
-                <Text style={styles.priceLabel}>Hediye için</Text>
+                <Text style={styles.priceLabel}>{t('moments.card.giftFor')}</Text>
                 <Text style={styles.price}>
                   {currency}
                   {moment.price}
@@ -312,7 +315,9 @@ export const TMCard: React.FC<TMCardProps> = ({
               {/* CTA Buttons - 16px balanced text */}
               <View style={styles.buttons}>
                 <Pressable style={styles.secondaryButton} onPress={onPress}>
-                  <Text style={styles.secondaryButtonText}>Görüntüle</Text>
+                  <Text style={styles.secondaryButtonText}>
+                    {t('moments.card.view')}
+                  </Text>
                 </Pressable>
 
                 {onGiftPress && (
@@ -329,7 +334,7 @@ export const TMCard: React.FC<TMCardProps> = ({
                         color={COLORS.white}
                       />
                       <Text style={styles.primaryButtonText}>
-                        Hediye Gönder
+                        {t('moments.card.sendGift')}
                       </Text>
                     </LinearGradient>
                   </Pressable>
