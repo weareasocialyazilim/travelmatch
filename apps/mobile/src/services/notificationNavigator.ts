@@ -10,7 +10,7 @@
 
 import { navigate, navigationRef } from './navigationService';
 import { logger } from '@/utils/logger';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 
 // ============================================
 // TYPES
@@ -423,19 +423,13 @@ const NOTIFICATION_ROUTES: Record<
 // HAPTIC PATTERNS
 // ============================================
 const HAPTIC_BY_TYPE: Partial<Record<NotificationType, () => void>> = {
-  payment_received: () =>
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success),
-  high_value_offer: () =>
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy),
-  proof_approved: () =>
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success),
-  proof_rejected: () =>
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning),
-  new_message: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
-  milestone_reached: () =>
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success),
-  dispute_opened: () =>
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning),
+  payment_received: () => HapticManager.paymentComplete(),
+  high_value_offer: () => HapticManager.destructiveAction(),
+  proof_approved: () => HapticManager.proofVerified(),
+  proof_rejected: () => HapticManager.warning(),
+  new_message: () => HapticManager.messageReceived(),
+  milestone_reached: () => HapticManager.success(),
+  dispute_opened: () => HapticManager.warning(),
 };
 
 // ============================================
@@ -497,7 +491,7 @@ export function navigateFromNotification(
       hapticFn();
     } else {
       // Default haptic
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.notificationReceived();
     }
 
     // Navigate to screen
