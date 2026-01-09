@@ -740,6 +740,60 @@
       }
     }
   },
+  "filter": {
+    "title": "Vibeleri Filtrele",
+    "reset": "Sıfırla",
+    "distance": "Mesafe",
+    "ageRange": "Yaş Aralığı",
+    "gender": "Cinsiyet",
+    "priceRange": "Fiyat Aralığı",
+    "category": "Kategori",
+    "showResults": "{{count}} Vibe Göster",
+    "any": "Hepsi",
+    "categories": {
+      "all": "Tümü",
+      "dining": "Yemek",
+      "nightlife": "Gece Hayatı",
+      "adventure": "Macera",
+      "culture": "Kültür",
+      "relax": "Dinlenme"
+    },
+    "genders": {
+      "all": "Tümü",
+      "female": "Kadın",
+      "male": "Erkek"
+    }
+  },
+  "pendingTransactions": {
+    "title": "Tamamlanmamış İşlemler",
+    "subtitle": "Tamamlanmayan bazı işlemler bulduk. Devam etmek ister misiniz?",
+    "pendingPayments": "Bekleyen Ödemeler",
+    "pendingUploads": "Bekleyen Yüklemeler",
+    "giftPayment": "Hediye Ödemesi",
+    "withdrawal": "Para Çekme",
+    "momentPurchase": "Moment Satın Alma",
+    "payment": "Ödeme",
+    "proofUpload": "Kanıt Yükleme",
+    "momentImage": "Moment Görseli",
+    "profilePicture": "Profil Fotoğrafı",
+    "messageAttachment": "Mesaj Eki",
+    "upload": "Yükleme",
+    "resume": "Devam Et",
+    "retry": "Tekrar Dene",
+    "dismiss": "Kapat",
+    "handleLater": "Sonra halledeceğim",
+    "justNow": "Az önce",
+    "minutesAgo": "{{count}}dk önce",
+    "hoursAgo": "{{count}}sa önce",
+    "failed": "{{count}} kez başarısız oldu"
+  },
+  "emptyState": {
+    "noMomentsNearby": "Bu civarda henüz an yok 🗺️",
+    "tryIncreasingDistance": "Mesafe filtreni artırmayı dene veya\nyeni bir an başlatan ilk sen ol!",
+    "createMoment": "An Oluştur",
+    "discoveringMoments": "Anlar keşfediliyor...",
+    "tapToRetry": "Yeniden denemek için dokun"
+  },
   "counterOffer": {
     "title": "Teklif Gönder",
     "tierFeature": "{{tier}} Özelliği",

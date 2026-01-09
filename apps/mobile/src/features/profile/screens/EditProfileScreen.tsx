@@ -124,6 +124,14 @@ const EditProfileScreen = () => {
   // UI state
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
 
+  // Privacy & visibility state
+  const [isDiscoverable, setIsDiscoverable] = useState<boolean>(
+    (user as any)?.is_discoverable ?? true,
+  );
+  const [distancePreference, setDistancePreference] = useState<number>(
+    (user as any)?.distance_preference ?? 50,
+  );
+
   // Check if there are unsaved changes
   const hasChanges = useCallback(() => {
     return avatarUri !== null || formState.isDirty;
@@ -482,16 +490,28 @@ const EditProfileScreen = () => {
                     <View style={styles.toggleTextContainer}>
                       <Text style={styles.toggleLabel}>Keşfet'te Görün</Text>
                       <Text style={styles.toggleDesc}>
-                        Kapatırsan anların haritada ve feedde görünmez
+                        {isDiscoverable
+                          ? 'Anların haritada ve feedde görünür'
+                          : 'Kapatırsan anların haritada ve feedde görünmez'}
                       </Text>
                     </View>
                   </View>
                   <TouchableOpacity
-                    style={[styles.toggleSwitch, styles.toggleSwitchActive]}
+                    style={[
+                      styles.toggleSwitch,
+                      isDiscoverable && styles.toggleSwitchActive,
+                    ]}
                     activeOpacity={0.8}
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      setIsDiscoverable(!isDiscoverable);
+                    }}
                   >
                     <View
-                      style={[styles.toggleKnob, styles.toggleKnobActive]}
+                      style={[
+                        styles.toggleKnob,
+                        isDiscoverable && styles.toggleKnobActive,
+                      ]}
                     />
                   </TouchableOpacity>
                 </View>
@@ -509,11 +529,31 @@ const EditProfileScreen = () => {
                     <View style={styles.toggleTextContainer}>
                       <Text style={styles.toggleLabel}>Mesafe Tercihi</Text>
                       <Text style={styles.toggleDesc}>
-                        Maksimum 50km (Premium: 500km)
+                        Maksimum mesafe ayarı
                       </Text>
                     </View>
                   </View>
-                  <Text style={styles.distanceValue}>50 km</Text>
+                  <View style={styles.distanceControls}>
+                    <TouchableOpacity
+                      style={styles.distanceButton}
+                      onPress={() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        setDistancePreference(Math.max(5, distancePreference - 5));
+                      }}
+                    >
+                      <MaterialCommunityIcons name="minus" size={18} color={COLORS.text.primary} />
+                    </TouchableOpacity>
+                    <Text style={styles.distanceValue}>{distancePreference} km</Text>
+                    <TouchableOpacity
+                      style={styles.distanceButton}
+                      onPress={() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        setDistancePreference(Math.min(500, distancePreference + 5));
+                      }}
+                    >
+                      <MaterialCommunityIcons name="plus" size={18} color={COLORS.text.primary} />
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </GlassCard>
             </View>
@@ -870,6 +910,23 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.body,
     fontWeight: '600',
     color: COLORS.brand?.primary || COLORS.primary,
+    minWidth: 60,
+    textAlign: 'center',
+  },
+  distanceControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
+  distanceButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.surface?.base || '#F5F5F5',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.border?.light || '#E0E0E0',
   },
 
   // Verification
