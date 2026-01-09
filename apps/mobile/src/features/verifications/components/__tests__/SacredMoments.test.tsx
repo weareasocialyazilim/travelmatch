@@ -24,19 +24,15 @@ jest.mock('expo-screen-capture', () => ({
   },
 }));
 
-// Mock expo-haptics
-jest.mock('expo-haptics', () => ({
-  notificationAsync: jest.fn(),
-  impactAsync: jest.fn(),
-  NotificationFeedbackType: {
-    Success: 'success',
-    Warning: 'warning',
-    Error: 'error',
-  },
-  ImpactFeedbackStyle: {
-    Light: 'light',
-    Medium: 'medium',
-    Heavy: 'heavy',
+// Mock HapticManager
+jest.mock('@/services/HapticManager', () => ({
+  HapticManager: {
+    buttonPress: jest.fn(),
+    success: jest.fn(),
+    error: jest.fn(),
+    warning: jest.fn(),
+    primaryAction: jest.fn(),
+    giftReceived: jest.fn(),
   },
 }));
 
@@ -207,7 +203,7 @@ describe('SacredMoments Component', () => {
     });
 
     it('triggers haptic feedback on screenshot', () => {
-      const Haptics = require('expo-haptics');
+      const { HapticManager } = require('@/services/HapticManager');
       render(
         <SacredMoments>
           <Text>Content</Text>
@@ -218,9 +214,7 @@ describe('SacredMoments Component', () => {
       const callback = mockAddScreenshotListener.mock.calls[0][0];
       callback();
 
-      expect(Haptics.notificationAsync).toHaveBeenCalledWith(
-        Haptics.NotificationFeedbackType.Warning,
-      );
+      expect(HapticManager.warning).toHaveBeenCalled();
     });
   });
 
@@ -551,7 +545,7 @@ describe('GiftVault Component', () => {
     });
 
     it('triggers success haptic on unlock', async () => {
-      const Haptics = require('expo-haptics');
+      const { HapticManager } = require('@/services/HapticManager');
       mockAuthenticateAsync.mockResolvedValue({ success: true });
 
       const { getByText } = render(
@@ -565,9 +559,7 @@ describe('GiftVault Component', () => {
       fireEvent.press(getByText('Kasayı Aç'));
 
       await waitFor(() => {
-        expect(Haptics.notificationAsync).toHaveBeenCalledWith(
-          Haptics.NotificationFeedbackType.Success,
-        );
+        expect(HapticManager.giftReceived).toHaveBeenCalled();
       });
     });
   });
@@ -758,10 +750,10 @@ describe('GiftVault Component', () => {
     });
 
     it('triggers light haptic when locking', async () => {
-      const Haptics = require('expo-haptics');
+      const { HapticManager } = require('@/services/HapticManager');
       mockHasHardwareAsync.mockResolvedValue(false);
 
-      const { getByText, getByTestId } = render(
+      const { getByText, getAllByTestId } = render(
         <GiftVault
           experiences={sampleExperiences}
           isPremium={true}
@@ -772,10 +764,9 @@ describe('GiftVault Component', () => {
       fireEvent.press(getByText('Kasayı Aç'));
 
       await waitFor(() => {
-        fireEvent.press(getByTestId('icon-lock'));
-        expect(Haptics.impactAsync).toHaveBeenCalledWith(
-          Haptics.ImpactFeedbackStyle.Light,
-        );
+        const lockIcons = getAllByTestId('icon-lock');
+        fireEvent.press(lockIcons[0]);
+        expect(HapticManager.buttonPress).toHaveBeenCalled();
       });
     });
   });

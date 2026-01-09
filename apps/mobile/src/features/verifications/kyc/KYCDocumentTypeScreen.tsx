@@ -201,7 +201,7 @@ const KYCDocumentTypeScreen: React.FC = () => {
   const handleContinue = () => {
     if (!selectedType) return;
 
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.primaryAction();
     navigation.navigate('KYCDocumentCapture', {
       data: {
         ...data,

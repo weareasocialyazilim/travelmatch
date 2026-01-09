@@ -304,7 +304,7 @@ export const MomentProofCeremony: React.FC = () => {
     }
 
     setIsUploading(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    HapticManager.proofStarted();
 
     try {
       // 1. Upload photos to storage
