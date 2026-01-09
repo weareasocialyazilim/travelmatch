@@ -204,13 +204,16 @@ const EditProfileScreen = () => {
         await userService.updateAvatar(avatarUri);
       }
 
-      // Update profile
+      // Update profile including visibility settings
       await userService.updateProfile({
         fullName: data.fullName,
         bio: data.bio,
         location: data.location
           ? { city: data.location, country: '' }
           : undefined,
+        // Save visibility and discovery preferences
+        is_discoverable: isDiscoverable,
+        distance_preference: distancePreference,
       });
 
       // Refresh user context
