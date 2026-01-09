@@ -40,10 +40,13 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
 import { TMButton } from '@/components/ui/TMButton';
+import { MagneticButton } from '@/components/ui/MagneticButton';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { useGyroscopeParallax } from '@/hooks/useGyroscopeParallax';
+import { useMagneticEffect } from '@/hooks/useMagneticEffect';
 import { HapticManager } from '@/services/HapticManager';
+import { GestureDetector } from 'react-native-gesture-handler';
 import { logger } from '../../../utils/logger';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
@@ -97,6 +100,15 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
 
   // Spatial depth effect - gyroscope parallax for premium feel
   const { parallaxStyle } = useGyroscopeParallax({ range: 5, enabled: true });
+
+  // Magnetic physics for CTA button - Apple Vision Pro style
+  const { magneticStyle, glowStyle, panGestureHandler, setButtonCenter } =
+    useMagneticEffect({
+      attractionRadius: 80,
+      maxPull: 4,
+      enableGlow: true,
+      enableHaptics: true,
+    });
 
   // Swipe gesture handler for navigating between slides
   const handleSwipe = useCallback(
@@ -265,25 +277,39 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
             ))}
           </View>
 
-          {/* Next Button - Simple Pressable with direct onPress */}
-          <Pressable
-            onPress={() => {
-              logger.info('🔘 BUTTON PRESSED!', { activeIndex });
-              HapticManager.primaryAction();
-              handleNext();
-            }}
-            style={({ pressed }) => [
-              styles.nextButton,
-              pressed && styles.nextButtonPressed,
-            ]}
-          >
-            <LinearGradient
-              colors={[COLORS.brand.primary, '#A2FF00']}
-              style={styles.nextButtonGradient}
+          {/* Next Button with Magnetic Physics - Apple Vision Pro style */}
+          <GestureDetector gesture={panGestureHandler}>
+            <Animated.View
+              style={[styles.magneticButtonContainer, magneticStyle]}
+              onLayout={(event) => {
+                const { x, y, width: w, height: h } = event.nativeEvent.layout;
+                // Set button center for magnetic attraction calculations
+                setButtonCenter(x + w / 2, y + h / 2);
+              }}
             >
-              <Ionicons name="arrow-forward" size={24} color="black" />
-            </LinearGradient>
-          </Pressable>
+              {/* Glow layer - appears when finger approaches */}
+              <Animated.View style={[styles.buttonGlow, glowStyle]} />
+
+              <Pressable
+                onPress={() => {
+                  logger.info('🔘 BUTTON PRESSED!', { activeIndex });
+                  HapticManager.primaryAction();
+                  handleNext();
+                }}
+                style={({ pressed }) => [
+                  styles.nextButton,
+                  pressed && styles.nextButtonPressed,
+                ]}
+              >
+                <LinearGradient
+                  colors={[COLORS.brand.primary, '#A2FF00']}
+                  style={styles.nextButtonGradient}
+                >
+                  <Ionicons name="arrow-forward" size={24} color="black" />
+                </LinearGradient>
+              </Pressable>
+            </Animated.View>
+          </GestureDetector>
         </View>
       </View>
     </View>
@@ -362,6 +388,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  magneticButtonContainer: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonGlow: {
+    position: 'absolute',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: COLORS.brand.primary,
+    shadowColor: COLORS.brand.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowRadius: 20,
+    shadowOpacity: 0.8,
+  },
   backgroundFallback: {
     backgroundColor: '#1a1a2e',
   },
@@ -428,7 +470,7 @@ export const AwwwardsOnboardingScreen: React.FC<
   const flatListRef = useRef<FlatList>(null);
 
   const handleContinue = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
 
     if (currentIndex < AWWWARDS_SLIDES.length - 1) {
       flatListRef.current?.scrollToIndex({ index: currentIndex + 1 });
@@ -439,7 +481,7 @@ export const AwwwardsOnboardingScreen: React.FC<
   };
 
   const handleSkip = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     await completeOnboarding();
     navigation.replace('Welcome');
   };
