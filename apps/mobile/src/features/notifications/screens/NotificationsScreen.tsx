@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,83 +6,133 @@ import {
   FlatList,
   TouchableOpacity,
   StatusBar,
+  RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, { FadeInDown, Layout } from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { COLORS } from '@/constants/colors';
 import { TYPE_SCALE, FONTS } from '@/constants/typography';
+import { useNotifications } from '@/hooks/useNotifications';
+import { useTranslation } from '@/hooks/useTranslation';
+import {
+  getNotificationRoute,
+  type Notification,
+  type NotificationType as ServiceNotificationType,
+} from '@/services/notificationService';
 
 /**
  * Awwwards standardında Bildirim Merkezi.
- * Ipeksi liste yapısı ve neon durum göstergeleri.
+ * Gerçek backend verilerini kullanan liste yapısı.
  * Her bildirim bir "aktivite kartı" olarak tasarlandı.
  */
 
-type NotificationType =
+// Map backend notification types to UI display types
+type UINotificationType =
   | 'gift'
   | 'trust'
   | 'comment'
   | 'social'
   | 'system'
-  | 'offer';
+  | 'offer'
+  | 'payment';
 
-interface NotificationItem {
-  id: string;
-  type: NotificationType;
-  user: string;
-  title?: string;
-  msg: string;
-  time: string;
-  read: boolean;
-}
+const mapNotificationType = (
+  type: ServiceNotificationType
+): UINotificationType => {
+  switch (type) {
+    case 'gesture_received':
+    case 'high_value_offer':
+    case 'subscriber_offer_received':
+    case 'premium_offer_received':
+      return 'offer';
+    case 'payment_confirmed':
+    case 'payment_completed':
+    case 'payment_received':
+    case 'payment_sent':
+    case 'paytr_authorized':
+    case 'payment_captured':
+    case 'proof_approved_payment_released':
+      return 'payment';
+    case 'trust_level_up':
+    case 'milestone_reached':
+    case 'achievement_unlocked':
+    case 'kyc_approved':
+      return 'trust';
+    case 'message':
+    case 'moment_comment':
+    case 'review_received':
+      return 'comment';
+    case 'moment_liked':
+    case 'moment_saved':
+      return 'social';
+    default:
+      return 'system';
+  }
+};
 
-const NOTIFICATIONS: NotificationItem[] = [
-  {
-    id: '1',
-    type: 'gift',
-    user: 'Caner Öz',
-    msg: 'sana bir Moment hediye etti!',
-    time: '2dk önce',
-    read: false,
-  },
-  {
-    id: '2',
-    type: 'trust',
-    user: 'Sistem',
-    msg: "Güven puanın 94'e yükseldi! 🎉",
-    time: '1sa önce',
-    read: false,
-  },
-  {
-    id: '3',
-    type: 'comment',
-    user: 'Melis Yılmaz',
-    msg: 'Momentine bir Trust Note bıraktı.',
-    time: '3sa önce',
-    read: true,
-  },
-  {
-    id: '4',
-    type: 'system',
-    user: 'Sistem',
-    msg: 'Doğrulanmış gezgin oldun! 🛡️',
-    time: '5sa önce',
-    read: true,
-  },
-];
+// Format relative time
+const formatRelativeTime = (dateString: string): string => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
 
-export const NotificationsScreen = ({ navigation }: any) => {
+  if (diffMins < 1) return 'Az önce';
+  if (diffMins < 60) return `${diffMins}dk önce`;
+  if (diffHours < 24) return `${diffHours}sa önce`;
+  if (diffDays < 7) return `${diffDays}g önce`;
+  return date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+};
+
+export const NotificationsScreen = () => {
   const insets = useSafeAreaInsets();
-  const [notifications, setNotifications] = useState(NOTIFICATIONS);
+  const navigation = useNavigation<any>();
+  const { t } = useTranslation();
 
-  const handleMarkAllRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  };
+  // Use real notifications from backend
+  const {
+    notifications,
+    loading,
+    error,
+    unreadCount,
+    refresh,
+    loadMore,
+    markAsRead,
+    markAllAsRead,
+    hasMore,
+  } = useNotifications();
 
-  const getIconData = (type: NotificationType, isUnread: boolean) => {
+  const handleMarkAllRead = useCallback(async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    await markAllAsRead();
+  }, [markAllAsRead]);
+
+  const handleNotificationPress = useCallback(
+    async (notification: Notification) => {
+      // Mark as read
+      if (!notification.read) {
+        await markAsRead(notification.id);
+      }
+
+      // Navigate to relevant screen
+      const route = getNotificationRoute(notification);
+      if (route) {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        navigation.navigate(route.name, route.params);
+      }
+    },
+    [markAsRead, navigation]
+  );
+
+  const getIconData = (type: UINotificationType, isUnread: boolean) => {
     const baseColor = isUnread ? COLORS.brand.primary : COLORS.text.muted;
 
     switch (type) {
@@ -95,8 +145,13 @@ export const NotificationsScreen = ({ navigation }: any) => {
             ? 'rgba(245, 158, 11, 0.15)'
             : 'rgba(168, 162, 158, 0.1)',
         };
+      case 'payment':
+        return {
+          name: 'cash' as const,
+          color: isUnread ? '#4CAF50' : COLORS.text.muted,
+          bg: isUnread ? 'rgba(76, 175, 80, 0.15)' : 'rgba(168, 162, 158, 0.1)',
+        };
       case 'trust':
-      case 'system':
         return {
           name: 'shield-check' as const,
           color: isUnread ? COLORS.trust.primary : COLORS.text.muted,
@@ -120,6 +175,7 @@ export const NotificationsScreen = ({ navigation }: any) => {
             ? 'rgba(236, 72, 153, 0.15)'
             : 'rgba(168, 162, 158, 0.1)',
         };
+      case 'system':
       default:
         return {
           name: 'bell' as const,
@@ -129,62 +185,102 @@ export const NotificationsScreen = ({ navigation }: any) => {
     }
   };
 
-  const renderItem = ({
-    item,
-    index,
-  }: {
-    item: NotificationItem;
-    index: number;
-  }) => {
-    const iconData = getIconData(item.type, !item.read);
+  const renderItem = useCallback(
+    ({ item, index }: { item: Notification; index: number }) => {
+      const uiType = mapNotificationType(item.type);
+      const iconData = getIconData(uiType, !item.read);
+      const displayTime = formatRelativeTime(item.createdAt);
+
+      return (
+        <Animated.View
+          entering={FadeInDown.delay(index * 80).springify()}
+          layout={Layout.springify()}
+          style={styles.notifWrapper}
+        >
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => handleNotificationPress(item)}
+          >
+            <GlassCard
+              intensity={item.read ? 5 : 15}
+              style={[styles.card, !item.read && styles.unreadCard]}
+              padding={16}
+              borderRadius={20}
+              showBorder={true}
+            >
+              {/* Icon Container */}
+              <View
+                style={[styles.iconContainer, { backgroundColor: iconData.bg }]}
+              >
+                <MaterialCommunityIcons
+                  name={iconData.name}
+                  size={22}
+                  color={iconData.color}
+                />
+              </View>
+
+              {/* Content */}
+              <View style={styles.content}>
+                <Text style={styles.title} numberOfLines={1}>
+                  {item.title}
+                </Text>
+                <Text style={styles.message} numberOfLines={2}>
+                  {item.body}
+                </Text>
+                <Text style={styles.time}>{displayTime}</Text>
+              </View>
+
+              {/* Unread Dot */}
+              {!item.read && <View style={styles.unreadDot} />}
+            </GlassCard>
+          </TouchableOpacity>
+        </Animated.View>
+      );
+    },
+    [handleNotificationPress]
+  );
+
+  const renderFooter = useCallback(() => {
+    if (!hasMore) return null;
+    return (
+      <View style={styles.footer}>
+        <ActivityIndicator size="small" color={COLORS.brand.primary} />
+      </View>
+    );
+  }, [hasMore]);
+
+  const renderEmpty = useCallback(() => {
+    if (loading) {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.brand.primary} />
+          <Text style={styles.loadingText}>{t('common.loading')}</Text>
+        </View>
+      );
+    }
+
+    if (error) {
+      return (
+        <EmptyState
+          icon="alert-circle-outline"
+          title={t('notifications.error.title')}
+          description={error}
+          actionLabel={t('common.retry')}
+          onAction={refresh}
+        />
+      );
+    }
 
     return (
-      <Animated.View
-        entering={FadeInDown.delay(index * 80).springify()}
-        layout={Layout.springify()}
-        style={styles.notifWrapper}
-      >
-        <TouchableOpacity activeOpacity={0.8}>
-          <GlassCard
-            intensity={item.read ? 5 : 15}
-            style={[styles.card, !item.read && styles.unreadCard]}
-            padding={16}
-            borderRadius={20}
-            showBorder={true}
-          >
-            {/* Icon Container */}
-            <View
-              style={[styles.iconContainer, { backgroundColor: iconData.bg }]}
-            >
-              <MaterialCommunityIcons
-                name={iconData.name}
-                size={22}
-                color={iconData.color}
-              />
-            </View>
-
-            {/* Content */}
-            <View style={styles.content}>
-              <Text style={styles.message} numberOfLines={2}>
-                <Text
-                  style={[styles.userName, !item.read && styles.userNameUnread]}
-                >
-                  {item.user}
-                </Text>{' '}
-                {item.msg}
-              </Text>
-              <Text style={styles.time}>{item.time}</Text>
-            </View>
-
-            {/* Unread Dot */}
-            {!item.read && <View style={styles.unreadDot} />}
-          </GlassCard>
-        </TouchableOpacity>
-      </Animated.View>
+      <EmptyState
+        icon="bell-sleep-outline"
+        title={t('notifications.empty.title')}
+        description={t('notifications.empty.description')}
+        actionLabel={t('discover.cta')}
+        onAction={() => navigation.navigate('MainTabs', { screen: 'Discover' })}
+      />
     );
-  };
-
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  }, [loading, error, refresh, navigation, t]);
 
   return (
     <View style={styles.container}>
@@ -195,7 +291,7 @@ export const NotificationsScreen = ({ navigation }: any) => {
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backButton}
-          accessibilityLabel="Geri dön"
+          accessibilityLabel={t('common.back')}
           accessibilityRole="button"
         >
           <MaterialCommunityIcons
@@ -206,7 +302,7 @@ export const NotificationsScreen = ({ navigation }: any) => {
         </TouchableOpacity>
 
         <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>Bildirimler</Text>
+          <Text style={styles.headerTitle}>{t('notifications.title')}</Text>
           {unreadCount > 0 && (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{unreadCount}</Text>
@@ -217,10 +313,18 @@ export const NotificationsScreen = ({ navigation }: any) => {
         <TouchableOpacity
           onPress={handleMarkAllRead}
           style={styles.markReadButton}
-          accessibilityLabel="Tümünü okundu olarak işaretle"
+          accessibilityLabel={t('notifications.markAllRead')}
           accessibilityRole="button"
+          disabled={unreadCount === 0}
         >
-          <Text style={styles.markReadText}>Tümünü Oku</Text>
+          <Text
+            style={[
+              styles.markReadText,
+              unreadCount === 0 && styles.markReadTextDisabled,
+            ]}
+          >
+            {t('notifications.markAllRead')}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -233,13 +337,19 @@ export const NotificationsScreen = ({ navigation }: any) => {
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
+          refreshControl={
+            <RefreshControl
+              refreshing={loading && notifications.length > 0}
+              onRefresh={refresh}
+              tintColor={COLORS.brand.primary}
+            />
+          }
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={renderFooter}
         />
       ) : (
-        <EmptyState
-          icon="bell-sleep-outline"
-          title="Henüz Bildirim Yok"
-          description="Harika bir şeyler olduğunda seni buradan haberdar edeceğiz."
-        />
+        renderEmpty()
       )}
     </View>
   );
@@ -299,6 +409,9 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.body.semibold,
     fontWeight: '600',
   },
+  markReadTextDisabled: {
+    color: COLORS.text.muted,
+  },
   listContent: {
     padding: 16,
     paddingBottom: 100,
@@ -329,13 +442,12 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  userName: {
+  title: {
     fontFamily: FONTS.body.bold,
     fontWeight: '700',
+    fontSize: 14,
     color: COLORS.text.primary,
-  },
-  userNameUnread: {
-    fontWeight: '800',
+    marginBottom: 2,
   },
   message: {
     ...TYPE_SCALE.body.small,
@@ -355,6 +467,21 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: COLORS.brand.primary,
     marginLeft: 12,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 16,
+  },
+  loadingText: {
+    color: COLORS.text.muted,
+    fontSize: 14,
+    fontFamily: FONTS.body.regular,
+  },
+  footer: {
+    paddingVertical: 20,
+    alignItems: 'center',
   },
 });
 
