@@ -336,8 +336,8 @@ const MessagesScreen: React.FC = () => {
     <NetworkGuard
       offlineMessage={
         conversations.length > 0
-          ? 'Son yüklenen mesajları gösteriyorsunuz'
-          : 'Mesajları görmek için internet bağlantısı gerekli'
+          ? t('messages.cached')
+          : t('messages.offline')
       }
       onRetry={refreshConversations}
     >

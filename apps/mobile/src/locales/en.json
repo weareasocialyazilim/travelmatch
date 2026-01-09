@@ -740,6 +740,60 @@
       }
     }
   },
+  "filter": {
+    "title": "Filter Vibes",
+    "reset": "Reset",
+    "distance": "Distance",
+    "ageRange": "Age Range",
+    "gender": "Gender",
+    "priceRange": "Price Range",
+    "category": "Category",
+    "showResults": "Show {{count}} Vibes",
+    "any": "Any",
+    "categories": {
+      "all": "All",
+      "dining": "Dining",
+      "nightlife": "Nightlife",
+      "adventure": "Adventure",
+      "culture": "Culture",
+      "relax": "Relax"
+    },
+    "genders": {
+      "all": "All",
+      "female": "Female",
+      "male": "Male"
+    }
+  },
+  "pendingTransactions": {
+    "title": "Incomplete Actions",
+    "subtitle": "We found some actions that didn't complete. Would you like to continue?",
+    "pendingPayments": "Pending Payments",
+    "pendingUploads": "Pending Uploads",
+    "giftPayment": "Gift Payment",
+    "withdrawal": "Withdrawal",
+    "momentPurchase": "Moment Purchase",
+    "payment": "Payment",
+    "proofUpload": "Proof Upload",
+    "momentImage": "Moment Image",
+    "profilePicture": "Profile Picture",
+    "messageAttachment": "Message Attachment",
+    "upload": "Upload",
+    "resume": "Resume",
+    "retry": "Retry",
+    "dismiss": "Dismiss",
+    "handleLater": "I'll handle this later",
+    "justNow": "Just now",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "failed": "Failed {{count}} time(s)"
+  },
+  "emptyState": {
+    "noMomentsNearby": "No moments nearby 🗺️",
+    "tryIncreasingDistance": "Try increasing your distance filter or\nbe the first to create a moment!",
+    "createMoment": "Create Moment",
+    "discoveringMoments": "Discovering moments...",
+    "tapToRetry": "Tap to retry"
+  },
   "counterOffer": {
     "title": "Send Offer",
     "tierFeature": "{{tier}} Feature",

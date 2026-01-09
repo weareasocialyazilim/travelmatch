@@ -28,6 +28,7 @@ import {
   ActivityIndicator,
   Text,
   TouchableOpacity,
+  Share,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
@@ -50,6 +51,7 @@ import { useStories } from '@/hooks/useStories';
 import { useAuth } from '@/hooks/useAuth';
 import { COLORS } from '@/constants/colors';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
+import { useTranslation } from 'react-i18next';
 import { LiquidScreenWrapper } from '@/components/layout';
 import {
   BlurFilterModal,
@@ -69,6 +71,7 @@ import { useContentReactiveGlow } from '@/hooks/useContentReactiveGlow';
 const { height } = Dimensions.get('window');
 
 const DiscoverScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const flatListRef = useRef<FlatList>(null);
 
@@ -302,10 +305,25 @@ const DiscoverScreen = () => {
     [navigation, handleStoryClose, selectedStoryUser],
   );
 
-  const handleStoryShare = useCallback((_story: Story) => {
-    // TODO: Implement share functionality
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-  }, []);
+  const handleStoryShare = useCallback(async (story: Story) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    try {
+      const shareMessage = `🌟 ${story.title || 'Bir hikaye'}\n\n${selectedStoryUser?.name || 'Bir kullanıcı'} TravelMatch\'te muhteşem bir an paylaştı!\n\n👉 TravelMatch\'te gör: https://travelmatch.app/stories/${story.id}`;
+
+      const result = await Share.share({
+        message: shareMessage,
+        title: story.title || 'TravelMatch Hikayesi',
+      });
+
+      if (result.action === Share.sharedAction) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        logger.info('Story shared successfully:', story.id);
+      }
+    } catch (error) {
+      logger.error('Story share failed:', error);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    }
+  }, [selectedStoryUser]);
 
   const handleCreateStoryPress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -389,9 +407,24 @@ const DiscoverScreen = () => {
   );
 
   // Handle Share Press
-  const handleSharePress = useCallback((_moment: Moment) => {
+  const handleSharePress = useCallback(async (moment: Moment) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    // TODO: Implement share logic using _moment.id
+    try {
+      const shareMessage = `🌟 ${moment.title || 'Bir an'}\n\n${moment.description || 'TravelMatch\'te bu muhteşem anı keşfet!'}\n\n📍 ${moment.location?.name || 'Bir yer'}\n💰 ${moment.price || 0} ${moment.currency || 'TRY'}\n\n👉 TravelMatch\'te gör: https://travelmatch.app/moments/${moment.id}`;
+
+      const result = await Share.share({
+        message: shareMessage,
+        title: moment.title || 'TravelMatch Anı',
+      });
+
+      if (result.action === Share.sharedAction) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        logger.info('Moment shared successfully:', moment.id);
+      }
+    } catch (error) {
+      logger.error('Share failed:', error);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    }
   }, []);
 
   // Viewability config for content-reactive glow
@@ -528,7 +561,7 @@ const DiscoverScreen = () => {
       <LiquidScreenWrapper variant="twilight" safeAreaTop>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.brand.primary} />
-          <Text style={styles.loadingText}>Discovering moments...</Text>
+          <Text style={styles.loadingText}>{t('emptyState.discoveringMoments')}</Text>
         </View>
       </LiquidScreenWrapper>
     );
@@ -541,14 +574,14 @@ const DiscoverScreen = () => {
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{String(error)}</Text>
           <Text style={styles.retryText} onPress={handleRefresh}>
-            Tap to retry
+            {t('emptyState.tapToRetry')}
           </Text>
         </View>
       </LiquidScreenWrapper>
     );
   }
 
-  // Empty state - Premium Turkish UX
+  // Empty state - Premium UX
   if (!loading && activeMoments.length === 0) {
     return (
       <LiquidScreenWrapper variant="twilight" safeAreaTop>
@@ -559,10 +592,9 @@ const DiscoverScreen = () => {
             color={COLORS.text.muted}
             style={styles.emptyIcon}
           />
-          <Text style={styles.emptyTitle}>Bu civarda henüz an yok 🗺️</Text>
+          <Text style={styles.emptyTitle}>{t('emptyState.noMomentsNearby')}</Text>
           <Text style={styles.emptySubtitle}>
-            Mesafe filtreni artırmayı dene veya{'\n'}yeni bir an başlatan ilk
-            sen ol!
+            {t('emptyState.tryIncreasingDistance')}
           </Text>
           <TouchableOpacity
             style={styles.emptyCTAButton}
@@ -574,7 +606,7 @@ const DiscoverScreen = () => {
               end={{ x: 1, y: 0 }}
               style={styles.emptyCTAGradient}
             >
-              <Text style={styles.emptyCTAText}>An Oluştur</Text>
+              <Text style={styles.emptyCTAText}>{t('emptyState.createMoment')}</Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>

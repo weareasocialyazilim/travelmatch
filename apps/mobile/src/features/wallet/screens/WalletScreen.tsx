@@ -26,7 +26,7 @@ import {
 import { showAlert } from '@/stores/modalStore';
 import * as Haptics from 'expo-haptics';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LiquidScreenWrapper } from '@/components/layout';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -192,6 +192,19 @@ const WalletScreen = () => {
     // Fetch pending proof items for the pending badge
     walletService.getPendingProofItems().then(setPendingProofItems);
   }, [isBiometricLocked, refreshBalance, loadTransactions]);
+
+  // Auto-refresh when screen comes back into focus (e.g., after proof flow)
+  useFocusEffect(
+    useCallback(() => {
+      if (isBiometricLocked) return;
+
+      // Refresh balance and pending items when screen gains focus
+      refreshBalance();
+      loadTransactions();
+      walletService.getPendingProofItems().then(setPendingProofItems);
+      logger.info('[Wallet] Screen focused - refreshing data');
+    }, [isBiometricLocked, refreshBalance, loadTransactions]),
+  );
 
   // Realtime balance updates - Subscribe to transactions table
   useEffect(() => {

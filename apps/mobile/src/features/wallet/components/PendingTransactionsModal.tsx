@@ -15,6 +15,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import type {
@@ -45,6 +46,7 @@ export const PendingTransactionsModal: React.FC<
   onDismissUpload,
   onClose,
 }) => {
+  const { t } = useTranslation();
   const hasPayments = payments.length > 0;
   const hasUploads = uploads.length > 0;
 
@@ -61,10 +63,29 @@ export const PendingTransactionsModal: React.FC<
     const now = Date.now();
     const diff = now - timestamp;
 
-    if (diff < 60000) return 'Just now';
-    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+    if (diff < 60000) return t('pendingTransactions.justNow');
+    if (diff < 3600000) return t('pendingTransactions.minutesAgo', { count: Math.floor(diff / 60000) });
+    if (diff < 86400000) return t('pendingTransactions.hoursAgo', { count: Math.floor(diff / 3600000) });
     return date.toLocaleDateString();
+  };
+
+  const getPaymentTitle = (type: string) => {
+    switch (type) {
+      case 'gift': return t('pendingTransactions.giftPayment');
+      case 'withdraw': return t('pendingTransactions.withdrawal');
+      case 'moment_purchase': return t('pendingTransactions.momentPurchase');
+      default: return t('pendingTransactions.payment');
+    }
+  };
+
+  const getUploadTitle = (type: string) => {
+    switch (type) {
+      case 'proof': return t('pendingTransactions.proofUpload');
+      case 'moment': return t('pendingTransactions.momentImage');
+      case 'avatar': return t('pendingTransactions.profilePicture');
+      case 'message': return t('pendingTransactions.messageAttachment');
+      default: return t('pendingTransactions.upload');
+    }
   };
 
   return (
@@ -83,7 +104,7 @@ export const PendingTransactionsModal: React.FC<
               size={24}
               color={COLORS.softOrange}
             />
-            <Text style={styles.title}>Incomplete Actions</Text>
+            <Text style={styles.title}>{t('pendingTransactions.title')}</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <MaterialCommunityIcons
                 name="close"
@@ -94,8 +115,7 @@ export const PendingTransactionsModal: React.FC<
           </View>
 
           <Text style={styles.subtitle}>
-            We found some actions that didn't complete. Would you like to
-            continue?
+            {t('pendingTransactions.subtitle')}
           </Text>
 
           <ScrollView
@@ -112,7 +132,7 @@ export const PendingTransactionsModal: React.FC<
                     color={COLORS.text.primary}
                   />
                   <Text style={styles.sectionTitle}>
-                    Pending Payments ({payments.length})
+                    {t('pendingTransactions.pendingPayments')} ({payments.length})
                   </Text>
                 </View>
 
@@ -121,13 +141,7 @@ export const PendingTransactionsModal: React.FC<
                     <View style={styles.cardHeader}>
                       <View>
                         <Text style={styles.cardTitle}>
-                          {payment.type === 'gift'
-                            ? 'Gift Payment'
-                            : payment.type === 'withdraw'
-                              ? 'Withdrawal'
-                              : payment.type === 'moment_purchase'
-                                ? 'Moment Purchase'
-                                : 'Payment'}
+                          {getPaymentTitle(payment.type)}
                         </Text>
                         <Text style={styles.cardAmount}>
                           {formatAmount(payment.amount, payment.currency)}
@@ -149,13 +163,13 @@ export const PendingTransactionsModal: React.FC<
                         style={[styles.actionButton, styles.dismissButton]}
                         onPress={() => onDismissPayment(payment.id)}
                       >
-                        <Text style={styles.dismissButtonText}>Dismiss</Text>
+                        <Text style={styles.dismissButtonText}>{t('pendingTransactions.dismiss')}</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={[styles.actionButton, styles.resumeButton]}
                         onPress={() => onResumePayment(payment)}
                       >
-                        <Text style={styles.resumeButtonText}>Resume</Text>
+                        <Text style={styles.resumeButtonText}>{t('pendingTransactions.resume')}</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -173,7 +187,7 @@ export const PendingTransactionsModal: React.FC<
                     color={COLORS.text.primary}
                   />
                   <Text style={styles.sectionTitle}>
-                    Pending Uploads ({uploads.length})
+                    {t('pendingTransactions.pendingUploads')} ({uploads.length})
                   </Text>
                 </View>
 
@@ -182,15 +196,7 @@ export const PendingTransactionsModal: React.FC<
                     <View style={styles.cardHeader}>
                       <View>
                         <Text style={styles.cardTitle}>
-                          {upload.type === 'proof'
-                            ? 'Proof Upload'
-                            : upload.type === 'moment'
-                              ? 'Moment Image'
-                              : upload.type === 'avatar'
-                                ? 'Profile Picture'
-                                : upload.type === 'message'
-                                  ? 'Message Attachment'
-                                  : 'Upload'}
+                          {getUploadTitle(upload.type)}
                         </Text>
                         <Text style={styles.cardSubtitle}>
                           {upload.fileName}
@@ -220,8 +226,7 @@ export const PendingTransactionsModal: React.FC<
 
                     {upload.retryCount > 0 && (
                       <Text style={styles.retryText}>
-                        Failed {upload.retryCount} time
-                        {upload.retryCount > 1 ? 's' : ''}
+                        {t('pendingTransactions.failed', { count: upload.retryCount })}
                       </Text>
                     )}
 
@@ -230,7 +235,7 @@ export const PendingTransactionsModal: React.FC<
                         style={[styles.actionButton, styles.dismissButton]}
                         onPress={() => onDismissUpload(upload.id)}
                       >
-                        <Text style={styles.dismissButtonText}>Dismiss</Text>
+                        <Text style={styles.dismissButtonText}>{t('pendingTransactions.dismiss')}</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={[styles.actionButton, styles.resumeButton]}
@@ -241,7 +246,7 @@ export const PendingTransactionsModal: React.FC<
                           size={16}
                           color={COLORS.utility.white}
                         />
-                        <Text style={styles.resumeButtonText}>Retry</Text>
+                        <Text style={styles.resumeButtonText}>{t('pendingTransactions.retry')}</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -253,7 +258,7 @@ export const PendingTransactionsModal: React.FC<
           {/* Footer */}
           <View style={styles.footer}>
             <TouchableOpacity style={styles.dismissAllButton} onPress={onClose}>
-              <Text style={styles.dismissAllText}>I'll handle this later</Text>
+              <Text style={styles.dismissAllText}>{t('pendingTransactions.handleLater')}</Text>
             </TouchableOpacity>
           </View>
         </View>

@@ -17,6 +17,7 @@ import {
 import * as Haptics from 'expo-haptics';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { COLORS } from '../../constants/colors';
 
 const { height } = Dimensions.get('window');
@@ -84,6 +85,7 @@ export const BlurFilterModal: React.FC<BlurFilterModalProps> = ({
   initialGender = 'all',
   resultCount = 24,
 }) => {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [priceRange, setPriceRange] = useState(initialPriceRange);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
@@ -126,9 +128,9 @@ export const BlurFilterModal: React.FC<BlurFilterModalProps> = ({
 
         <BlurView intensity={90} tint="dark" style={styles.modalContent}>
           <View style={styles.header}>
-            <Text style={styles.title}>Filter Vibes</Text>
+            <Text style={styles.title}>{t('filter.title')}</Text>
             <TouchableOpacity onPress={handleReset}>
-              <Text style={styles.resetText}>Reset</Text>
+              <Text style={styles.resetText}>{t('filter.reset')}</Text>
             </TouchableOpacity>
           </View>
 
@@ -142,7 +144,7 @@ export const BlurFilterModal: React.FC<BlurFilterModalProps> = ({
             ]}
           >
             {/* Distance */}
-            <Text style={styles.sectionLabel}>Distance</Text>
+            <Text style={styles.sectionLabel}>{t('filter.distance')}</Text>
             <View style={styles.optionRow}>
               {DISTANCE_OPTIONS.map((opt) => (
                 <TouchableOpacity
@@ -169,7 +171,7 @@ export const BlurFilterModal: React.FC<BlurFilterModalProps> = ({
             </View>
 
             {/* Age Range */}
-            <Text style={styles.sectionLabel}>Age Range</Text>
+            <Text style={styles.sectionLabel}>{t('filter.ageRange')}</Text>
             <View style={styles.optionRow}>
               {AGE_RANGES.map((opt) => (
                 <TouchableOpacity
@@ -200,7 +202,7 @@ export const BlurFilterModal: React.FC<BlurFilterModalProps> = ({
             </View>
 
             {/* Gender */}
-            <Text style={styles.sectionLabel}>Gender</Text>
+            <Text style={styles.sectionLabel}>{t('filter.gender')}</Text>
             <View style={styles.genderRow}>
               {GENDER_OPTIONS.map((opt) => (
                 <TouchableOpacity
@@ -224,7 +226,7 @@ export const BlurFilterModal: React.FC<BlurFilterModalProps> = ({
             </View>
 
             {/* Price Range */}
-            <Text style={styles.sectionLabel}>Price Range</Text>
+            <Text style={styles.sectionLabel}>{t('filter.priceRange')}</Text>
             <View style={styles.priceRow}>
               {PRICE_LABELS.map((label, index) => (
                 <TouchableOpacity
@@ -248,7 +250,7 @@ export const BlurFilterModal: React.FC<BlurFilterModalProps> = ({
             </View>
 
             {/* Categories */}
-            <Text style={styles.sectionLabel}>Category</Text>
+            <Text style={styles.sectionLabel}>{t('filter.category')}</Text>
             <View style={styles.tagsContainer}>
               {CATEGORIES.map((cat) => (
                 <TouchableOpacity
@@ -274,7 +276,7 @@ export const BlurFilterModal: React.FC<BlurFilterModalProps> = ({
 
           {/* Apply Button */}
           <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
-            <Text style={styles.applyText}>Show {resultCount} Vibes</Text>
+            <Text style={styles.applyText}>{t('filter.showResults', { count: resultCount })}</Text>
           </TouchableOpacity>
         </BlurView>
       </View>
