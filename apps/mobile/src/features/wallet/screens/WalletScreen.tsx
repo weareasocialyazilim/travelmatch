@@ -26,6 +26,7 @@ import {
 import { showAlert } from '@/stores/modalStore';
 import * as Haptics from 'expo-haptics';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import { HapticManager } from '@/services/HapticManager';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LiquidScreenWrapper } from '@/components/layout';
@@ -148,6 +149,8 @@ const WalletScreen = () => {
 
   // Handle withdrawal with KYC verification check
   const handleWithdraw = useCallback(() => {
+    HapticManager.paymentInitiated();
+
     // Check if user is KYC verified
     if (!user?.kyc || user.kyc !== 'Verified') {
       toast.info('Para çekmek için önce kimlik doğrulaması yapmalısınız');
@@ -265,18 +268,18 @@ const WalletScreen = () => {
   }, [displayTransactions, activeFilter]);
 
   const onRefresh = useCallback(async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.refreshTriggered();
     try {
       await refreshBalance();
       await loadTransactions();
       const proofItems = await walletService.getPendingProofItems();
       setPendingProofItems(proofItems);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      HapticManager.success();
     } catch (refreshError) {
       logger.error('[Wallet] Failed to refresh balance', {
         error: refreshError,
       });
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.error();
       toast.error('Cüzdan bilgileri yüklenemedi. Lütfen tekrar deneyin.');
     }
   }, [refreshBalance, loadTransactions, toast]);
@@ -300,7 +303,7 @@ const WalletScreen = () => {
 
   // Handle pending balance tap - Show proof reminder
   const handlePendingTap = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.primaryAction();
 
     if (pendingProofItems.length === 0) {
       showAlert(
@@ -366,7 +369,7 @@ const WalletScreen = () => {
           <TouchableOpacity
             style={styles.txItemContent}
             onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              HapticManager.buttonPress();
               navigation.navigate('TransactionDetail', {
                 transactionId: item.id,
               });
@@ -431,7 +434,7 @@ const WalletScreen = () => {
         <TouchableOpacity
           style={styles.emptyCTAButton}
           onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            HapticManager.primaryAction();
             navigation.navigate('MainTabs', { screen: 'Home' });
           }}
           activeOpacity={0.8}
@@ -584,7 +587,7 @@ const WalletScreen = () => {
                 <TouchableOpacity
                   key={filter.key}
                   onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    HapticManager.filterApplied();
                     setActiveFilter(filter.key);
                   }}
                   style={[

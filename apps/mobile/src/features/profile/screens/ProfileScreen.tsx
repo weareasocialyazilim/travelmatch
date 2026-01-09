@@ -50,6 +50,7 @@ import type { NavigationProp } from '@react-navigation/native';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { useNetworkStatus } from '../../../context/NetworkContext';
 import { OfflineState } from '../../../components/OfflineState';
+import { HapticManager } from '@/services/HapticManager';
 import {
   PROFILE_COLORS,
   PROFILE_SPACING,
@@ -160,36 +161,44 @@ const ProfileScreen: React.FC = () => {
     };
   }, [authUser, myMoments, userProfile]);
 
-  // Navigation handlers
-  const handleEditProfile = useCallback(
-    () => navigation.navigate('EditProfile'),
-    [navigation],
-  );
-  const handleMyMoments = useCallback(
-    () => navigation.navigate('MyMoments'),
-    [navigation],
-  );
-  const handleTrustGarden = useCallback(
-    () => navigation.navigate('TrustGardenDetail'),
-    [navigation],
-  );
-  const handleSettings = useCallback(
-    () => navigation.navigate('AppSettings'),
-    [navigation],
-  );
-  const handleWallet = useCallback(
-    () => navigation.navigate('Wallet'),
-    [navigation],
-  );
-  const handleSavedMoments = useCallback(
-    () => navigation.navigate('SavedMoments'),
-    [navigation],
-  );
-  const handleSubscriptionPress = useCallback(
-    () => navigation.navigate('Subscription'),
-    [navigation],
-  );
+  // Navigation handlers with haptic feedback
+  const handleEditProfile = useCallback(() => {
+    HapticManager.buttonPress();
+    navigation.navigate('EditProfile');
+  }, [navigation]);
+
+  const handleMyMoments = useCallback(() => {
+    HapticManager.buttonPress();
+    navigation.navigate('MyMoments');
+  }, [navigation]);
+
+  const handleTrustGarden = useCallback(() => {
+    HapticManager.buttonPress();
+    navigation.navigate('TrustGardenDetail');
+  }, [navigation]);
+
+  const handleSettings = useCallback(() => {
+    HapticManager.buttonPress();
+    navigation.navigate('AppSettings');
+  }, [navigation]);
+
+  const handleWallet = useCallback(() => {
+    HapticManager.buttonPress();
+    navigation.navigate('Wallet');
+  }, [navigation]);
+
+  const handleSavedMoments = useCallback(() => {
+    HapticManager.buttonPress();
+    navigation.navigate('SavedMoments');
+  }, [navigation]);
+
+  const handleSubscriptionPress = useCallback(() => {
+    HapticManager.buttonPress();
+    navigation.navigate('Subscription');
+  }, [navigation]);
+
   const handleShare = useCallback(async () => {
+    HapticManager.buttonPress();
     try {
       await Share.share({
         message: 'TravelMatch profilime göz at!',
