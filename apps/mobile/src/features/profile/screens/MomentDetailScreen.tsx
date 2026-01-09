@@ -52,7 +52,6 @@ export const MomentDetailScreen = ({ navigation, route }: any) => {
               uri: 'https://images.unsplash.com/photo-1514362545857-3bc16549766b?q=80&w=800',
             }}
             style={styles.image}
-            sharedTransitionTag={momentId ? `moment-${momentId}` : undefined}
           />
           <LinearGradient
             colors={['transparent', COLORS.background.primary]}

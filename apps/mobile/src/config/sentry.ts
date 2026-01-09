@@ -79,11 +79,7 @@ export function initSentry() {
         Sentry.mobileReplayIntegration(),
         Sentry.feedbackIntegration(),
         // ADDED: Track app start performance
-        Sentry.reactNativeTracingIntegration({
-          routingInstrumentation: new Sentry.ReactNavigationInstrumentation(),
-          enableUserInteractionTracing: true, // Track button presses, gestures
-          enableNativeFramesTracking: true, // Track slow/frozen frames
-        }),
+        Sentry.reactNativeTracingIntegration(),
       ],
 
       // Filter sensitive data - PRIVACY PROTECTION
@@ -376,7 +372,6 @@ export function measureScreenLoad(screenName: string) {
 
     // Send performance metric
     Sentry.metrics.distribution('screen.load.time', loadTime, {
-      tags: { screen: screenName },
       unit: 'millisecond',
     });
   };

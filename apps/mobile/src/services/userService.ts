@@ -597,25 +597,6 @@ export const userService = {
   },
 
   /**
-   * Delete account permanently
-   */
-  deleteAccount: async (_password: string): Promise<{ success: boolean }> => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
-
-    // Soft delete for now
-    const { error: delError } = await dbUsersService.update(user.id, {
-      deleted_at: new Date().toISOString(),
-    } as Database['public']['Tables']['users']['Update']);
-    if (delError) throw delError;
-
-    await supabase.auth.signOut();
-    return { success: true };
-  },
-
-  /**
    * Export user data (GDPR Article 20 - Right to Data Portability)
    * Calls Supabase Edge Function to generate comprehensive data export
    */

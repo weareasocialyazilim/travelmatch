@@ -5,8 +5,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
   ref={null}
   style={
     {
-      "paddingBottom": 24,
-      "paddingTop": 0,
+      "paddingBottom": 12,
       "position": "relative",
     }
   }
@@ -18,8 +17,8 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
     ref={null}
     style={
       {
-        "borderBottomLeftRadius": 32,
-        "borderBottomRightRadius": 32,
+        "borderBottomLeftRadius": 14,
+        "borderBottomRightRadius": 14,
         "bottom": 0,
         "left": 0,
         "position": "absolute",
@@ -35,10 +34,10 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
       {
         "alignItems": "center",
         "flexDirection": "row",
-        "height": 44,
-        "justifyContent": "space-between",
-        "paddingHorizontal": 20,
-        "paddingTop": 8,
+        "height": 30,
+        "justifyContent": "flex-end",
+        "paddingHorizontal": 14,
+        "paddingTop": 0,
       }
     }
   >
@@ -46,353 +45,366 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
       ref={null}
       style={
         {
-          "width": 36,
+          "width": 32,
         }
       }
     />
   </RCTView>
-  <RCTPressable
-    accessibilityState={
-      {
-        "disabled": false,
-      }
-    }
-    accessible={true}
-    onPress={[Function]}
+  <RCTView
     ref={null}
     style={
       {
         "alignItems": "center",
-        "marginTop": 8,
+        "backgroundColor": "transparent",
+        "borderRadius": 14,
+        "marginHorizontal": 16,
+        "marginTop": 6,
+        "paddingHorizontal": 12,
+        "paddingVertical": 10,
       }
     }
   >
     <RCTView
       ref={null}
-      style={
-        {
-          "alignItems": "center",
-          "height": 120,
-          "justifyContent": "center",
-          "position": "relative",
-          "width": 120,
-        }
-      }
+      style={{}}
     >
-      <RCTView
-        ref={null}
-        style={
+      <RCTPressable
+        accessibilityState={
           {
-            "backgroundColor": "#F59E0B",
-            "borderRadius": 70,
-            "height": 140,
-            "opacity": 0.25,
-            "position": "absolute",
-            "shadowColor": "#DFFF00",
-            "shadowOffset": {
-              "height": 0,
-              "width": 0,
-            },
-            "shadowOpacity": 0.6,
-            "shadowRadius": 20,
-            "width": 140,
+            "disabled": false,
           }
         }
-      />
-      <RCTView
-        height={120}
-        ref={null}
-        style={
-          {
-            "bottom": 0,
-            "left": 0,
-            "position": "absolute",
-            "right": 0,
-            "top": 0,
-          }
-        }
-        width={120}
-      >
-        <RCTView
-          cx={60}
-          cy={60}
-          fill="transparent"
-          r={58}
-          ref={null}
-          stroke="rgba(255,255,255,0.2)"
-          strokeWidth={4}
-        />
-      </RCTView>
-      <RCTView
-        ref={null}
-        style={
-          {
-            "bottom": 0,
-            "left": 0,
-            "position": "absolute",
-            "right": 0,
-            "top": 0,
-            "transform": [
-              {
-                "rotate": "0deg",
-              },
-            ],
-          }
-        }
-      >
-        <RCTView
-          height={120}
-          ref={null}
-          width={120}
-        >
-          <RCTView
-            ref={null}
-          >
-            <RCTView
-              id="trustGradient"
-              ref={null}
-              x1="0%"
-              x2="100%"
-              y1="0%"
-              y2="100%"
-            >
-              <RCTView
-                offset="0%"
-                ref={null}
-                stopColor="#F59E0B"
-              />
-              <RCTView
-                offset="100%"
-                ref={null}
-                stopColor="rgba(245, 158, 11, 0.4)"
-              />
-            </RCTView>
-          </RCTView>
-          <RCTView
-            cx={60}
-            cy={60}
-            fill="transparent"
-            r={58}
-            ref={null}
-            stroke="url(#trustGradient)"
-            strokeDasharray={364.424747816416}
-            strokeDashoffset={145.7698991265664}
-            strokeLinecap="round"
-            strokeWidth={4}
-            transform="rotate(-90 60 60)"
-          />
-        </RCTView>
-      </RCTView>
-      <RCTView
+        accessible={true}
+        onPress={[Function]}
         ref={null}
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderRadius": 100,
-            "height": 104,
-            "justifyContent": "center",
-            "overflow": "hidden",
-            "position": "absolute",
-            "width": 104,
+            "marginTop": 2,
           }
         }
       >
         <RCTView
-          accessibilityLabel="Test User's avatar"
-          accessibilityRole="image"
-          accessible={true}
           ref={null}
           style={
             {
               "alignItems": "center",
-              "borderRadius": 60,
-              "height": "100%",
+              "height": 104,
               "justifyContent": "center",
-              "overflow": "visible",
               "position": "relative",
-              "width": "100%",
+              "width": 104,
             }
           }
-          testID="profile-avatar"
         >
-          <RCTImage
+          <RCTView
             ref={null}
-            source="avatar.jpg"
             style={
-              [
-                {
-                  "backgroundColor": "#E7E5E4",
-                },
-                {
-                  "borderRadius": 60,
-                  "height": 120,
-                  "width": 120,
-                },
-              ]
+              {
+                "backgroundColor": "#F59E0B",
+                "borderRadius": 62,
+                "height": 124,
+                "opacity": 0,
+                "position": "absolute",
+                "width": 124,
+              }
             }
           />
+          <RCTView
+            height={104}
+            ref={null}
+            style={
+              {
+                "bottom": 0,
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              }
+            }
+            width={104}
+          >
+            <RCTView
+              cx={52}
+              cy={52}
+              fill="transparent"
+              r={50}
+              ref={null}
+              stroke="rgba(255,255,255,0.2)"
+              strokeWidth={4}
+            />
+          </RCTView>
+          <RCTView
+            ref={null}
+            style={
+              {
+                "bottom": 0,
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+                "transform": [
+                  {
+                    "rotate": "0deg",
+                  },
+                ],
+              }
+            }
+          >
+            <RCTView
+              height={104}
+              ref={null}
+              width={104}
+            >
+              <RCTView
+                ref={null}
+              >
+                <RCTView
+                  id="trustGradient"
+                  ref={null}
+                  x1="0%"
+                  x2="100%"
+                  y1="0%"
+                  y2="100%"
+                >
+                  <RCTView
+                    offset="0%"
+                    ref={null}
+                    stopColor="#F59E0B"
+                  />
+                  <RCTView
+                    offset="100%"
+                    ref={null}
+                    stopColor="rgba(245, 158, 11, 0.4)"
+                  />
+                </RCTView>
+              </RCTView>
+              <RCTView
+                cx={52}
+                cy={52}
+                fill="transparent"
+                r={50}
+                ref={null}
+                stroke="url(#trustGradient)"
+                strokeDasharray={314.1592653589793}
+                strokeDashoffset={125.66370614359174}
+                strokeLinecap="round"
+                strokeWidth={4}
+                transform="rotate(-90 52 52)"
+              />
+            </RCTView>
+          </RCTView>
+          <RCTView
+            ref={null}
+            style={
+              {
+                "alignItems": "center",
+                "backgroundColor": "#FFFFFF",
+                "borderRadius": 100,
+                "height": 88,
+                "justifyContent": "center",
+                "overflow": "hidden",
+                "position": "absolute",
+                "width": 88,
+              }
+            }
+          >
+            <RCTView
+              accessibilityLabel="Test User's avatar"
+              accessibilityRole="image"
+              accessible={true}
+              ref={null}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderRadius": 60,
+                  "height": "100%",
+                  "justifyContent": "center",
+                  "overflow": "visible",
+                  "position": "relative",
+                  "width": "100%",
+                }
+              }
+              testID="profile-avatar"
+            >
+              <RCTImage
+                ref={null}
+                source="avatar.jpg"
+                style={
+                  [
+                    {
+                      "backgroundColor": "#E7E5E4",
+                    },
+                    {
+                      "borderRadius": 60,
+                      "height": 120,
+                      "width": 120,
+                    },
+                  ]
+                }
+              />
+            </RCTView>
+          </RCTView>
         </RCTView>
-      </RCTView>
-    </RCTView>
-  </RCTPressable>
-  <RCTView
-    ref={null}
-    style={
-      {
-        "alignItems": "center",
-        "marginTop": 16,
-        "paddingHorizontal": 20,
-      }
-    }
-  >
-    <RCTView
-      ref={null}
-      style={
-        {
-          "alignItems": "center",
-          "flexDirection": "row",
-          "gap": 6,
-        }
-      }
-    >
-      <RCTText
-        ref={null}
-        style={
-          {
-            "color": "#FFFFFF",
-            "fontFamily": "ClashDisplay-Semibold",
-            "fontSize": 28,
-            "fontWeight": "600",
-            "letterSpacing": -0.5,
-            "lineHeight": 35,
-          }
-        }
-        testID="RCTText"
-      >
-        Test User
-      </RCTText>
+      </RCTPressable>
     </RCTView>
     <RCTView
       ref={null}
       style={
         {
           "alignItems": "center",
-          "marginTop": 8,
+          "marginTop": 6,
+          "paddingHorizontal": 10,
         }
       }
-    />
-    <RCTView
-      ref={null}
-      style={
-        {
-          "alignItems": "center",
-          "flexDirection": "row",
-          "gap": 4,
-          "marginTop": 4,
-        }
-      }
-    >
-      <RCTText
-        color="rgba(255,255,255,0.8)"
-        name="map-marker-outline"
-        ref={null}
-        size={16}
-        testID="RCTText"
-      >
-        map-marker-outline
-      </RCTText>
-      <RCTText
-        ref={null}
-        style={
-          {
-            "color": "rgba(255,255,255,0.8)",
-            "fontFamily": "Satoshi-Regular",
-            "fontSize": 16,
-            "fontWeight": "400",
-            "letterSpacing": 0,
-            "lineHeight": 24,
-          }
-        }
-        testID="RCTText"
-      >
-        Test City
-      </RCTText>
-    </RCTView>
-  </RCTView>
-  <RCTView
-    ref={null}
-    style={
-      {
-        "position": "absolute",
-        "right": 20,
-        "top": 80,
-        "transform": [
-          {
-            "scale": 1,
-          },
-        ],
-      }
-    }
-  >
-    <RCTPressable
-      accessibilityRole="button"
-      accessibilityState={
-        {
-          "disabled": false,
-        }
-      }
-      accessible={true}
-      onPress={[Function]}
-      onPressIn={[Function]}
-      onPressOut={[Function]}
-      ref={null}
-      role="button"
-      style={
-        {
-          "borderRadius": 22,
-          "elevation": 4,
-          "height": 44,
-          "overflow": "hidden",
-          "shadowColor": "#000000",
-          "shadowOffset": {
-            "height": 4,
-            "width": 0,
-          },
-          "shadowOpacity": 0.2,
-          "shadowRadius": 8,
-          "width": 44,
-        }
-      }
-      testID="edit-button"
     >
       <RCTView
-        data-intensity={30}
-        data-tint="light"
         ref={null}
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "rgba(255,255,255,0.2)",
-            "borderColor": "rgba(255,255,255,0.3)",
-            "borderWidth": 1,
-            "flex": 1,
-            "justifyContent": "center",
+            "flexDirection": "row",
+            "gap": 6,
           }
         }
-        testID="blur-view"
       >
         <RCTText
-          color="#FFFFFF"
-          name="pencil-outline"
           ref={null}
-          size={20}
+          style={
+            {
+              "color": "#FFFFFF",
+              "fontFamily": "ClashDisplay-Semibold",
+              "fontSize": 20,
+              "fontWeight": "600",
+              "letterSpacing": -0.5,
+              "lineHeight": 35,
+            }
+          }
           testID="RCTText"
         >
-          pencil-outline
+          Test User
         </RCTText>
       </RCTView>
-    </RCTPressable>
+      <RCTView
+        ref={null}
+        style={
+          {
+            "alignItems": "center",
+            "marginTop": 6,
+          }
+        }
+      />
+      <RCTView
+        ref={null}
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 4,
+            "marginTop": 4,
+          }
+        }
+      >
+        <RCTText
+          color="rgba(255,255,255,0.8)"
+          name="map-marker-outline"
+          ref={null}
+          size={16}
+          testID="RCTText"
+        >
+          map-marker-outline
+        </RCTText>
+        <RCTText
+          ref={null}
+          style={
+            {
+              "color": "rgba(255,255,255,0.8)",
+              "fontFamily": "Satoshi-Regular",
+              "fontSize": 16,
+              "fontWeight": "400",
+              "letterSpacing": 0,
+              "lineHeight": 24,
+            }
+          }
+          testID="RCTText"
+        >
+          Test City
+        </RCTText>
+      </RCTView>
+    </RCTView>
+    <RCTView
+      ref={null}
+      style={
+        {
+          "position": "absolute",
+          "right": 12,
+          "top": 12,
+          "transform": [
+            {
+              "scale": 1,
+            },
+          ],
+        }
+      }
+    >
+      <RCTPressable
+        accessibilityRole="button"
+        accessibilityState={
+          {
+            "disabled": false,
+          }
+        }
+        accessible={true}
+        onPress={[Function]}
+        onPressIn={[Function]}
+        onPressOut={[Function]}
+        ref={null}
+        role="button"
+        style={
+          {
+            "borderRadius": 19,
+            "elevation": 3,
+            "height": 38,
+            "overflow": "hidden",
+            "shadowColor": "#000000",
+            "shadowOffset": {
+              "height": 2,
+              "width": 0,
+            },
+            "shadowOpacity": 0.12,
+            "shadowRadius": 6,
+            "width": 38,
+          }
+        }
+        testID="edit-button"
+      >
+        <RCTView
+          data-intensity={30}
+          data-tint="light"
+          ref={null}
+          style={
+            {
+              "alignItems": "center",
+              "backgroundColor": "rgba(255,255,255,0.2)",
+              "borderColor": "rgba(255,255,255,0.3)",
+              "borderWidth": 1,
+              "flex": 1,
+              "justifyContent": "center",
+            }
+          }
+          testID="blur-view"
+        >
+          <RCTText
+            color="#FFFFFF"
+            name="pencil-outline"
+            ref={null}
+            size={22}
+            testID="RCTText"
+          >
+            pencil-outline
+          </RCTText>
+        </RCTView>
+      </RCTPressable>
+    </RCTView>
   </RCTView>
 </RCTView>
 `;
@@ -402,8 +414,7 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
   ref={null}
   style={
     {
-      "paddingBottom": 24,
-      "paddingTop": 0,
+      "paddingBottom": 12,
       "position": "relative",
     }
   }
@@ -415,8 +426,8 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
     ref={null}
     style={
       {
-        "borderBottomLeftRadius": 32,
-        "borderBottomRightRadius": 32,
+        "borderBottomLeftRadius": 14,
+        "borderBottomRightRadius": 14,
         "bottom": 0,
         "left": 0,
         "position": "absolute",
@@ -432,10 +443,10 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
       {
         "alignItems": "center",
         "flexDirection": "row",
-        "height": 44,
-        "justifyContent": "space-between",
-        "paddingHorizontal": 20,
-        "paddingTop": 8,
+        "height": 30,
+        "justifyContent": "flex-end",
+        "paddingHorizontal": 14,
+        "paddingTop": 0,
       }
     }
   >
@@ -443,377 +454,390 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
       ref={null}
       style={
         {
-          "width": 36,
+          "width": 32,
         }
       }
     />
   </RCTView>
-  <RCTPressable
-    accessibilityState={
-      {
-        "disabled": false,
-      }
-    }
-    accessible={true}
-    onPress={[Function]}
+  <RCTView
     ref={null}
     style={
       {
         "alignItems": "center",
-        "marginTop": 8,
+        "backgroundColor": "transparent",
+        "borderRadius": 14,
+        "marginHorizontal": 16,
+        "marginTop": 6,
+        "paddingHorizontal": 12,
+        "paddingVertical": 10,
       }
     }
   >
     <RCTView
       ref={null}
-      style={
-        {
-          "alignItems": "center",
-          "height": 120,
-          "justifyContent": "center",
-          "position": "relative",
-          "width": 120,
-        }
-      }
+      style={{}}
     >
-      <RCTView
-        ref={null}
-        style={
+      <RCTPressable
+        accessibilityState={
           {
-            "backgroundColor": "#E5E4E2",
-            "borderRadius": 70,
-            "height": 140,
-            "opacity": 0.25,
-            "position": "absolute",
-            "shadowColor": "#DFFF00",
-            "shadowOffset": {
-              "height": 0,
-              "width": 0,
-            },
-            "shadowOpacity": 0.6,
-            "shadowRadius": 20,
-            "width": 140,
+            "disabled": false,
           }
         }
-      />
-      <RCTView
-        height={120}
-        ref={null}
-        style={
-          {
-            "bottom": 0,
-            "left": 0,
-            "position": "absolute",
-            "right": 0,
-            "top": 0,
-          }
-        }
-        width={120}
-      >
-        <RCTView
-          cx={60}
-          cy={60}
-          fill="transparent"
-          r={58}
-          ref={null}
-          stroke="rgba(255,255,255,0.2)"
-          strokeWidth={4}
-        />
-      </RCTView>
-      <RCTView
-        ref={null}
-        style={
-          {
-            "bottom": 0,
-            "left": 0,
-            "position": "absolute",
-            "right": 0,
-            "top": 0,
-            "transform": [
-              {
-                "rotate": "0deg",
-              },
-            ],
-          }
-        }
-      >
-        <RCTView
-          height={120}
-          ref={null}
-          width={120}
-        >
-          <RCTView
-            ref={null}
-          >
-            <RCTView
-              id="trustGradient"
-              ref={null}
-              x1="0%"
-              x2="100%"
-              y1="0%"
-              y2="100%"
-            >
-              <RCTView
-                offset="0%"
-                ref={null}
-                stopColor="#E5E4E2"
-              />
-              <RCTView
-                offset="100%"
-                ref={null}
-                stopColor="rgba(229, 228, 226, 0.4)"
-              />
-            </RCTView>
-          </RCTView>
-          <RCTView
-            cx={60}
-            cy={60}
-            fill="transparent"
-            r={58}
-            ref={null}
-            stroke="url(#trustGradient)"
-            strokeDasharray={364.424747816416}
-            strokeDashoffset={36.44247478164159}
-            strokeLinecap="round"
-            strokeWidth={4}
-            transform="rotate(-90 60 60)"
-          />
-        </RCTView>
-      </RCTView>
-      <RCTView
+        accessible={true}
+        onPress={[Function]}
         ref={null}
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderRadius": 100,
-            "height": 104,
-            "justifyContent": "center",
-            "overflow": "hidden",
-            "position": "absolute",
-            "width": 104,
+            "marginTop": 2,
           }
         }
       >
         <RCTView
-          accessibilityLabel="Test User's avatar"
-          accessibilityRole="image"
-          accessible={true}
           ref={null}
           style={
             {
               "alignItems": "center",
-              "borderRadius": 60,
-              "height": "100%",
+              "height": 104,
               "justifyContent": "center",
-              "overflow": "visible",
               "position": "relative",
-              "width": "100%",
+              "width": 104,
             }
           }
-          testID="profile-avatar"
         >
-          <RCTImage
+          <RCTView
             ref={null}
-            source="avatar.jpg"
             style={
-              [
-                {
-                  "backgroundColor": "#E7E5E4",
-                },
-                {
-                  "borderRadius": 60,
-                  "height": 120,
-                  "width": 120,
-                },
-              ]
+              {
+                "backgroundColor": "#E5E4E2",
+                "borderRadius": 62,
+                "height": 124,
+                "opacity": 0,
+                "position": "absolute",
+                "width": 124,
+              }
             }
           />
+          <RCTView
+            height={104}
+            ref={null}
+            style={
+              {
+                "bottom": 0,
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+              }
+            }
+            width={104}
+          >
+            <RCTView
+              cx={52}
+              cy={52}
+              fill="transparent"
+              r={50}
+              ref={null}
+              stroke="rgba(255,255,255,0.2)"
+              strokeWidth={4}
+            />
+          </RCTView>
+          <RCTView
+            ref={null}
+            style={
+              {
+                "bottom": 0,
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+                "transform": [
+                  {
+                    "rotate": "0deg",
+                  },
+                ],
+              }
+            }
+          >
+            <RCTView
+              height={104}
+              ref={null}
+              width={104}
+            >
+              <RCTView
+                ref={null}
+              >
+                <RCTView
+                  id="trustGradient"
+                  ref={null}
+                  x1="0%"
+                  x2="100%"
+                  y1="0%"
+                  y2="100%"
+                >
+                  <RCTView
+                    offset="0%"
+                    ref={null}
+                    stopColor="#E5E4E2"
+                  />
+                  <RCTView
+                    offset="100%"
+                    ref={null}
+                    stopColor="rgba(229, 228, 226, 0.4)"
+                  />
+                </RCTView>
+              </RCTView>
+              <RCTView
+                cx={52}
+                cy={52}
+                fill="transparent"
+                r={50}
+                ref={null}
+                stroke="url(#trustGradient)"
+                strokeDasharray={314.1592653589793}
+                strokeDashoffset={31.415926535897924}
+                strokeLinecap="round"
+                strokeWidth={4}
+                transform="rotate(-90 52 52)"
+              />
+            </RCTView>
+          </RCTView>
+          <RCTView
+            ref={null}
+            style={
+              {
+                "alignItems": "center",
+                "backgroundColor": "#FFFFFF",
+                "borderRadius": 100,
+                "height": 88,
+                "justifyContent": "center",
+                "overflow": "hidden",
+                "position": "absolute",
+                "width": 88,
+              }
+            }
+          >
+            <RCTView
+              accessibilityLabel="Test User's avatar"
+              accessibilityRole="image"
+              accessible={true}
+              ref={null}
+              style={
+                {
+                  "alignItems": "center",
+                  "borderRadius": 60,
+                  "height": "100%",
+                  "justifyContent": "center",
+                  "overflow": "visible",
+                  "position": "relative",
+                  "width": "100%",
+                }
+              }
+              testID="profile-avatar"
+            >
+              <RCTImage
+                ref={null}
+                source="avatar.jpg"
+                style={
+                  [
+                    {
+                      "backgroundColor": "#E7E5E4",
+                    },
+                    {
+                      "borderRadius": 60,
+                      "height": 120,
+                      "width": 120,
+                    },
+                  ]
+                }
+              />
+            </RCTView>
+          </RCTView>
         </RCTView>
-      </RCTView>
-    </RCTView>
-  </RCTPressable>
-  <RCTView
-    ref={null}
-    style={
-      {
-        "alignItems": "center",
-        "marginTop": 16,
-        "paddingHorizontal": 20,
-      }
-    }
-  >
-    <RCTView
-      ref={null}
-      style={
-        {
-          "alignItems": "center",
-          "flexDirection": "row",
-          "gap": 6,
-        }
-      }
-    >
-      <RCTText
-        ref={null}
-        style={
-          {
-            "color": "#FFFFFF",
-            "fontFamily": "ClashDisplay-Semibold",
-            "fontSize": 28,
-            "fontWeight": "600",
-            "letterSpacing": -0.5,
-            "lineHeight": 35,
-          }
-        }
-        testID="RCTText"
-      >
-        Test User
-      </RCTText>
-      <RCTView
-        ref={null}
-        style={
-          {
-            "shadowColor": "#DFFF00",
-            "shadowOffset": {
-              "height": 0,
-              "width": 0,
-            },
-            "shadowOpacity": 0.6,
-            "shadowRadius": 6,
-          }
-        }
-      >
-        <RCTText
-          color="#DFFF00"
-          name="check-decagram"
-          ref={null}
-          size={24}
-          testID="RCTText"
-        >
-          check-decagram
-        </RCTText>
-      </RCTView>
+      </RCTPressable>
     </RCTView>
     <RCTView
       ref={null}
       style={
         {
           "alignItems": "center",
-          "marginTop": 8,
+          "marginTop": 6,
+          "paddingHorizontal": 10,
         }
       }
-    />
-    <RCTView
-      ref={null}
-      style={
-        {
-          "alignItems": "center",
-          "flexDirection": "row",
-          "gap": 4,
-          "marginTop": 4,
-        }
-      }
-    >
-      <RCTText
-        color="rgba(255,255,255,0.8)"
-        name="map-marker-outline"
-        ref={null}
-        size={16}
-        testID="RCTText"
-      >
-        map-marker-outline
-      </RCTText>
-      <RCTText
-        ref={null}
-        style={
-          {
-            "color": "rgba(255,255,255,0.8)",
-            "fontFamily": "Satoshi-Regular",
-            "fontSize": 16,
-            "fontWeight": "400",
-            "letterSpacing": 0,
-            "lineHeight": 24,
-          }
-        }
-        testID="RCTText"
-      >
-        Test City
-      </RCTText>
-    </RCTView>
-  </RCTView>
-  <RCTView
-    ref={null}
-    style={
-      {
-        "position": "absolute",
-        "right": 20,
-        "top": 80,
-        "transform": [
-          {
-            "scale": 1,
-          },
-        ],
-      }
-    }
-  >
-    <RCTPressable
-      accessibilityRole="button"
-      accessibilityState={
-        {
-          "disabled": false,
-        }
-      }
-      accessible={true}
-      onPress={[Function]}
-      onPressIn={[Function]}
-      onPressOut={[Function]}
-      ref={null}
-      role="button"
-      style={
-        {
-          "borderRadius": 22,
-          "elevation": 4,
-          "height": 44,
-          "overflow": "hidden",
-          "shadowColor": "#000000",
-          "shadowOffset": {
-            "height": 4,
-            "width": 0,
-          },
-          "shadowOpacity": 0.2,
-          "shadowRadius": 8,
-          "width": 44,
-        }
-      }
-      testID="edit-button"
     >
       <RCTView
-        data-intensity={30}
-        data-tint="light"
         ref={null}
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "rgba(255,255,255,0.2)",
-            "borderColor": "rgba(255,255,255,0.3)",
-            "borderWidth": 1,
-            "flex": 1,
-            "justifyContent": "center",
+            "flexDirection": "row",
+            "gap": 6,
           }
         }
-        testID="blur-view"
       >
         <RCTText
-          color="#FFFFFF"
-          name="pencil-outline"
           ref={null}
-          size={20}
+          style={
+            {
+              "color": "#FFFFFF",
+              "fontFamily": "ClashDisplay-Semibold",
+              "fontSize": 20,
+              "fontWeight": "600",
+              "letterSpacing": -0.5,
+              "lineHeight": 35,
+            }
+          }
           testID="RCTText"
         >
-          pencil-outline
+          Test User
+        </RCTText>
+        <RCTView
+          ref={null}
+          style={
+            {
+              "shadowColor": "#DFFF00",
+              "shadowOffset": {
+                "height": 0,
+                "width": 0,
+              },
+              "shadowOpacity": 0.6,
+              "shadowRadius": 6,
+            }
+          }
+        >
+          <RCTText
+            color="#DFFF00"
+            name="check-decagram"
+            ref={null}
+            size={22}
+            testID="RCTText"
+          >
+            check-decagram
+          </RCTText>
+        </RCTView>
+      </RCTView>
+      <RCTView
+        ref={null}
+        style={
+          {
+            "alignItems": "center",
+            "marginTop": 6,
+          }
+        }
+      />
+      <RCTView
+        ref={null}
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 4,
+            "marginTop": 4,
+          }
+        }
+      >
+        <RCTText
+          color="rgba(255,255,255,0.8)"
+          name="map-marker-outline"
+          ref={null}
+          size={16}
+          testID="RCTText"
+        >
+          map-marker-outline
+        </RCTText>
+        <RCTText
+          ref={null}
+          style={
+            {
+              "color": "rgba(255,255,255,0.8)",
+              "fontFamily": "Satoshi-Regular",
+              "fontSize": 16,
+              "fontWeight": "400",
+              "letterSpacing": 0,
+              "lineHeight": 24,
+            }
+          }
+          testID="RCTText"
+        >
+          Test City
         </RCTText>
       </RCTView>
-    </RCTPressable>
+    </RCTView>
+    <RCTView
+      ref={null}
+      style={
+        {
+          "position": "absolute",
+          "right": 12,
+          "top": 12,
+          "transform": [
+            {
+              "scale": 1,
+            },
+          ],
+        }
+      }
+    >
+      <RCTPressable
+        accessibilityRole="button"
+        accessibilityState={
+          {
+            "disabled": false,
+          }
+        }
+        accessible={true}
+        onPress={[Function]}
+        onPressIn={[Function]}
+        onPressOut={[Function]}
+        ref={null}
+        role="button"
+        style={
+          {
+            "borderRadius": 19,
+            "elevation": 3,
+            "height": 38,
+            "overflow": "hidden",
+            "shadowColor": "#000000",
+            "shadowOffset": {
+              "height": 2,
+              "width": 0,
+            },
+            "shadowOpacity": 0.12,
+            "shadowRadius": 6,
+            "width": 38,
+          }
+        }
+        testID="edit-button"
+      >
+        <RCTView
+          data-intensity={30}
+          data-tint="light"
+          ref={null}
+          style={
+            {
+              "alignItems": "center",
+              "backgroundColor": "rgba(255,255,255,0.2)",
+              "borderColor": "rgba(255,255,255,0.3)",
+              "borderWidth": 1,
+              "flex": 1,
+              "justifyContent": "center",
+            }
+          }
+          testID="blur-view"
+        >
+          <RCTText
+            color="#FFFFFF"
+            name="pencil-outline"
+            ref={null}
+            size={22}
+            testID="RCTText"
+          >
+            pencil-outline
+          </RCTText>
+        </RCTView>
+      </RCTPressable>
+    </RCTView>
   </RCTView>
 </RCTView>
 `;
