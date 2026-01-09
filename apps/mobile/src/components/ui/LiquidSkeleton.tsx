@@ -25,7 +25,13 @@
  */
 
 import React, { useEffect } from 'react';
-import { View, StyleSheet, ViewStyle, StyleProp, Platform } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ViewStyle,
+  StyleProp,
+  DimensionValue,
+} from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -35,7 +41,7 @@ import Animated, {
   interpolate,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS, GRADIENTS } from '@/constants/colors';
+import { COLORS } from '@/constants/colors';
 import { RADIUS, SPACING } from '@/constants/spacing';
 
 export type SkeletonVariant =
@@ -120,7 +126,7 @@ const SkeletonItem: React.FC<Omit<LiquidSkeletonProps, 'count' | 'gap'>> = ({
           easing: Easing.inOut(Easing.ease),
         }),
         -1,
-        false
+        false,
       );
     }
     return () => {
@@ -134,7 +140,8 @@ const SkeletonItem: React.FC<Omit<LiquidSkeletonProps, 'count' | 'gap'>> = ({
   // Calculate final dimensions
   const finalWidth = size ?? width ?? preset.width;
   const finalHeight = size ?? height ?? preset.height;
-  const finalBorderRadius = borderRadius ?? (size ? size / 2 : preset.borderRadius);
+  const finalBorderRadius =
+    borderRadius ?? (size ? size / 2 : preset.borderRadius);
 
   // Animated shimmer style
   const shimmerStyle = useAnimatedStyle(() => {
@@ -146,8 +153,8 @@ const SkeletonItem: React.FC<Omit<LiquidSkeletonProps, 'count' | 'gap'>> = ({
 
   // Base skeleton style
   const skeletonStyle: ViewStyle = {
-    width: finalWidth as ViewStyle['width'],
-    height: finalHeight,
+    width: finalWidth as DimensionValue,
+    height: finalHeight as DimensionValue,
     borderRadius: finalBorderRadius,
     backgroundColor: COLORS.bg.tertiary,
     overflow: 'hidden',
@@ -196,7 +203,11 @@ export const LiquidSkeleton: React.FC<LiquidSkeletonProps> = ({
   return (
     <View style={{ gap }}>
       {Array.from({ length: count }).map((_, index) => (
-        <SkeletonItem key={index} {...props} testID={props.testID ? `${props.testID}-${index}` : undefined} />
+        <SkeletonItem
+          key={index}
+          {...props}
+          testID={props.testID ? `${props.testID}-${index}` : undefined}
+        />
       ))}
     </View>
   );
@@ -240,8 +251,16 @@ export const SkeletonCard: React.FC<{
       <View style={styles.cardHeader}>
         <LiquidSkeleton variant="avatar-small" animated={animated} />
         <View style={{ flex: 1, gap: 4 }}>
-          <LiquidSkeleton variant="text-small" width="50%" animated={animated} />
-          <LiquidSkeleton variant="text-small" width="30%" animated={animated} />
+          <LiquidSkeleton
+            variant="text-small"
+            width="50%"
+            animated={animated}
+          />
+          <LiquidSkeleton
+            variant="text-small"
+            width="30%"
+            animated={animated}
+          />
         </View>
       </View>
 
@@ -253,8 +272,18 @@ export const SkeletonCard: React.FC<{
 
       {/* Action row */}
       <View style={styles.cardActions}>
-        <LiquidSkeleton width={80} height={32} borderRadius={16} animated={animated} />
-        <LiquidSkeleton width={100} height={32} borderRadius={16} animated={animated} />
+        <LiquidSkeleton
+          width={80}
+          height={32}
+          borderRadius={16}
+          animated={animated}
+        />
+        <LiquidSkeleton
+          width={100}
+          height={32}
+          borderRadius={16}
+          animated={animated}
+        />
       </View>
     </View>
   </View>
@@ -281,7 +310,12 @@ export const SkeletonMomentCard: React.FC<{
       </View>
       {/* Location badge */}
       <View style={styles.locationBadgePosition}>
-        <LiquidSkeleton width={80} height={24} borderRadius={12} animated={animated} />
+        <LiquidSkeleton
+          width={80}
+          height={24}
+          borderRadius={12}
+          animated={animated}
+        />
       </View>
     </View>
 
@@ -292,10 +326,25 @@ export const SkeletonMomentCard: React.FC<{
 
       {/* Action row */}
       <View style={styles.momentActions}>
-        <LiquidSkeleton width={60} height={20} borderRadius={4} animated={animated} />
+        <LiquidSkeleton
+          width={60}
+          height={20}
+          borderRadius={4}
+          animated={animated}
+        />
         <View style={{ flexDirection: 'row', gap: 8 }}>
-          <LiquidSkeleton width={70} height={32} borderRadius={8} animated={animated} />
-          <LiquidSkeleton width={100} height={32} borderRadius={8} animated={animated} />
+          <LiquidSkeleton
+            width={70}
+            height={32}
+            borderRadius={8}
+            animated={animated}
+          />
+          <LiquidSkeleton
+            width={100}
+            height={32}
+            borderRadius={8}
+            animated={animated}
+          />
         </View>
       </View>
     </View>

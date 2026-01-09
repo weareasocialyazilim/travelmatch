@@ -305,25 +305,28 @@ const DiscoverScreen = () => {
     [navigation, handleStoryClose, selectedStoryUser],
   );
 
-  const handleStoryShare = useCallback(async (story: Story) => {
-    HapticManager.buttonPress();
-    try {
-      const shareMessage = `🌟 ${story.title || 'Bir hikaye'}\n\n${selectedStoryUser?.name || 'Bir kullanıcı'} TravelMatch\'te muhteşem bir an paylaştı!\n\n👉 TravelMatch\'te gör: https://travelmatch.app/stories/${story.id}`;
+  const handleStoryShare = useCallback(
+    async (story: Story) => {
+      HapticManager.buttonPress();
+      try {
+        const shareMessage = `🌟 ${story.title || 'Bir hikaye'}\n\n${selectedStoryUser?.name || 'Bir kullanıcı'} TravelMatch\'te muhteşem bir an paylaştı!\n\n👉 TravelMatch\'te gör: https://travelmatch.app/stories/${story.id}`;
 
-      const result = await Share.share({
-        message: shareMessage,
-        title: story.title || 'TravelMatch Hikayesi',
-      });
+        const result = await Share.share({
+          message: shareMessage,
+          title: story.title || 'TravelMatch Hikayesi',
+        });
 
-      if (result.action === Share.sharedAction) {
-        HapticManager.success();
-        logger.info('Story shared successfully:', story.id);
+        if (result.action === Share.sharedAction) {
+          HapticManager.success();
+          logger.info('Story shared successfully:', story.id);
+        }
+      } catch (error) {
+        logger.error('Story share failed:', error);
+        HapticManager.error();
       }
-    } catch (error) {
-      logger.error('Story share failed:', error);
-      HapticManager.error();
-    }
-  }, [selectedStoryUser]);
+    },
+    [selectedStoryUser],
+  );
 
   const handleCreateStoryPress = useCallback(() => {
     HapticManager.primaryAction();
@@ -410,7 +413,12 @@ const DiscoverScreen = () => {
   const handleSharePress = useCallback(async (moment: Moment) => {
     HapticManager.buttonPress();
     try {
-      const shareMessage = `🌟 ${moment.title || 'Bir an'}\n\n${moment.description || 'TravelMatch\'te bu muhteşem anı keşfet!'}\n\n📍 ${moment.location?.name || 'Bir yer'}\n💰 ${moment.price || 0} ${moment.currency || 'TRY'}\n\n👉 TravelMatch\'te gör: https://travelmatch.app/moments/${moment.id}`;
+      // Get location display - handle both string and object types
+      const locationDisplay =
+        typeof moment.location === 'string'
+          ? moment.location
+          : moment.location?.city || 'Bir yer';
+      const shareMessage = `🌟 ${moment.title || 'Bir an'}\n\n${moment.description || "TravelMatch'te bu muhteşem anı keşfet!"}\n\n📍 ${locationDisplay}\n💰 ${moment.price || 0} ${moment.currency || 'TRY'}\n\n👉 TravelMatch\'te gör: https://travelmatch.app/moments/${moment.id}`;
 
       const result = await Share.share({
         message: shareMessage,
@@ -561,7 +569,9 @@ const DiscoverScreen = () => {
       <LiquidScreenWrapper variant="twilight" safeAreaTop>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.brand.primary} />
-          <Text style={styles.loadingText}>{t('emptyState.discoveringMoments')}</Text>
+          <Text style={styles.loadingText}>
+            {t('emptyState.discoveringMoments')}
+          </Text>
         </View>
       </LiquidScreenWrapper>
     );
@@ -592,7 +602,9 @@ const DiscoverScreen = () => {
             color={COLORS.text.muted}
             style={styles.emptyIcon}
           />
-          <Text style={styles.emptyTitle}>{t('emptyState.noMomentsNearby')}</Text>
+          <Text style={styles.emptyTitle}>
+            {t('emptyState.noMomentsNearby')}
+          </Text>
           <Text style={styles.emptySubtitle}>
             {t('emptyState.tryIncreasingDistance')}
           </Text>
@@ -606,7 +618,9 @@ const DiscoverScreen = () => {
               end={{ x: 1, y: 0 }}
               style={styles.emptyCTAGradient}
             >
-              <Text style={styles.emptyCTAText}>{t('emptyState.createMoment')}</Text>
+              <Text style={styles.emptyCTAText}>
+                {t('emptyState.createMoment')}
+              </Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>
