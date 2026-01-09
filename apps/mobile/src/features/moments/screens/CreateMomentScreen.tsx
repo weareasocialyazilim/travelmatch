@@ -17,7 +17,7 @@
  * - requested_amount zorunlu alan (min: 1)
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -192,6 +192,47 @@ const CreateMomentScreen: React.FC = () => {
   } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAsStory, setShowAsStory] = useState(true); // Default: show as story for 24h
+
+  // GUEST LOOP FIX: Block guests at component mount, not at the end
+  // This prevents guests from filling out the entire form before being asked to login
+  useEffect(() => {
+    if (isGuest || !user) {
+      // Show login prompt immediately when guest tries to create a moment
+      showLoginPrompt({
+        action: 'create_moment',
+        // Navigate back if user dismisses the login prompt
+        onDismiss: () => navigation.goBack(),
+      });
+    }
+  }, [isGuest, user, navigation]);
+
+  // If guest, don't render the form - waiting for login redirect
+  if (isGuest || !user) {
+    return (
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <LinearGradient
+          colors={GRADIENTS.dark as [string, string, ...string[]]}
+          style={StyleSheet.absoluteFill}
+        />
+        <View style={styles.guestBlockContainer}>
+          <MaterialCommunityIcons
+            name="account-lock"
+            size={64}
+            color={COLORS.brand.primary}
+          />
+          <Text style={styles.guestBlockTitle}>
+            {t('screens.createMoment.loginRequired', 'Giriş Yapın')}
+          </Text>
+          <Text style={styles.guestBlockSubtitle}>
+            {t(
+              'screens.createMoment.loginRequiredMessage',
+              'Anı oluşturmak için giriş yapmanız gerekiyor.',
+            )}
+          </Text>
+        </View>
+      </View>
+    );
+  }
 
   // 1. Media Selection - Story format (9:16)
   const pickImage = useCallback(async () => {
@@ -930,6 +971,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.backgroundDark,
+  },
+  // Guest block screen - shown when unauthenticated user tries to create moment
+  guestBlockContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 40,
+    gap: 16,
+  },
+  guestBlockTitle: {
+    fontSize: FONT_SIZES.h2,
+    fontFamily: FONTS.display.bold,
+    fontWeight: '800',
+    color: COLORS.white,
+    textAlign: 'center',
+    marginTop: 16,
+  },
+  guestBlockSubtitle: {
+    fontSize: FONT_SIZES.body,
+    fontFamily: FONTS.body.regular,
+    color: 'rgba(255,255,255,0.7)',
+    textAlign: 'center',
+    lineHeight: 22,
   },
   background: {
     flex: 1,

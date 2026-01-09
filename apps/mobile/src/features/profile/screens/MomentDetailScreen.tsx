@@ -169,7 +169,16 @@ export const MomentDetailScreen = ({ navigation, route }: any) => {
         </View>
         <TouchableOpacity
           style={styles.bookBtn}
-          onPress={() => navigation.navigate('ChatDetail', { chatId: 'new' })}
+          onPress={() =>
+            navigation.navigate('Chat', {
+              otherUser: {
+                id: 'demo-host-selin',
+                name: 'Selin Y.',
+                avatar:
+                  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100',
+              },
+            })
+          }
         >
           <Text style={styles.bookText}>Request to Join</Text>
         </TouchableOpacity>
