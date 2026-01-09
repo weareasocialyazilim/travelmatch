@@ -48,8 +48,6 @@ describe('supabaseDbService', () => {
       bio: 'Test bio',
       created_at: '2024-01-01T00:00:00Z',
       moments_count: [{ count: 5 }],
-      followers_count: [{ count: 10 }],
-      following_count: [{ count: 8 }],
       reviews_count: [{ count: 3 }],
     };
 

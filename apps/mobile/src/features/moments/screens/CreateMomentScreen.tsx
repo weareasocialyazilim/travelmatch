@@ -131,7 +131,7 @@ const FORM_STEPS: FormStep[] = [
   { key: 'media', label: 'Görsel', icon: 'camera' },
   { key: 'details', label: 'Detaylar', icon: 'text' },
   { key: 'location', label: 'Konum', icon: 'map-marker' },
-  { key: 'price', label: 'Hediye', icon: 'gift' },
+  { key: 'price', label: 'Fiyat', icon: 'currency-try' },
   { key: 'review', label: 'Önizleme', icon: 'eye' },
 ];
 
@@ -244,7 +244,7 @@ const CreateMomentScreen: React.FC = () => {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       showAlert({
         title: 'Geçersiz Miktar',
-        message: 'Hediye beklentisi en az 1 olmalıdır.',
+        message: 'Fiyat en az 1 olmalıdır.',
       });
       return;
     }
@@ -592,13 +592,13 @@ const CreateMomentScreen: React.FC = () => {
                   setStep('price');
                 }}
                 disabled={!locationName}
-                accessibilityLabel="Next: Set Gift Expectation"
+                accessibilityLabel="Next: Set Price"
                 accessibilityRole="button"
               >
                 <Text style={styles.nextButtonText}>
-                  Sonraki: Hediye Beklentisi
+                  Sonraki: Fiyat Belirle
                 </Text>
-                <Ionicons name="gift-outline" size={20} color="black" />
+                <Ionicons name="cash-outline" size={20} color="black" />
               </TouchableOpacity>
             </Animated.View>
           )}
@@ -610,7 +610,7 @@ const CreateMomentScreen: React.FC = () => {
               exiting={SlideOutDown}
               style={styles.priceStep}
             >
-              <Text style={styles.label}>HEDİYE BEKLENTİN</Text>
+              <Text style={styles.label}>FİYAT BELİRLE</Text>
 
               <View style={styles.priceContainer}>
                 <TouchableOpacity
@@ -645,7 +645,7 @@ const CreateMomentScreen: React.FC = () => {
                   autoCapitalize="none"
                   spellCheck={false}
                   contextMenuHidden={true}
-                  accessibilityLabel="Hediye miktarı"
+                  accessibilityLabel="Fiyat miktarı"
                 />
               </View>
 
@@ -706,7 +706,7 @@ const CreateMomentScreen: React.FC = () => {
               )}
 
               <Text style={styles.priceHint}>
-                Bu miktarı kabul eden kişiler sana hediye gönderebilir.
+                Bu fiyatı kabul eden kişiler sana destek olabilir.
                 {'\n'}Platform komisyonu: %5 • Minimum:{' '}
                 {CURRENCY_SYMBOLS[currency]}1
               </Text>
@@ -795,7 +795,7 @@ const CreateMomentScreen: React.FC = () => {
                 <View style={styles.reviewMetaRow}>
                   <View style={styles.reviewMetaItem}>
                     <MaterialCommunityIcons
-                      name="gift-outline"
+                      name="cash"
                       size={16}
                       color={COLORS.primary}
                     />
@@ -813,7 +813,7 @@ const CreateMomentScreen: React.FC = () => {
                   />
                   <Text style={styles.reviewInfoText}>
                     Bu anıyı beğenenler sana {CURRENCY_SYMBOLS[currency]}
-                    {requestedAmount} hediye göndererek destek olabilir.
+                    {requestedAmount} ödeyerek destek olabilir.
                   </Text>
                 </View>
 

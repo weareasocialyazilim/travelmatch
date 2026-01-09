@@ -314,8 +314,8 @@ describe('Optimistic UI Updates', () => {
       const originalProfile = {
         id: 'user1',
         stats: {
-          followers: 200,
-          following: 100,
+          momentsCount: 200,
+          activeMoments: 100,
         },
         bio: 'Original bio',
       };

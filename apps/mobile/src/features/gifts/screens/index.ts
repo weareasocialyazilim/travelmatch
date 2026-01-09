@@ -1,9 +1,0 @@
-/**
- * Gift Screens - Barrel Exports
- * ZOMBIE CLEANUP: GiftCardMarketScreen removed - legacy gift card system
- */
-export { default as GiftInboxScreen } from './GiftInboxScreen';
-export { GiftInboxDetailScreen } from './GiftInboxDetailScreen';
-export { GiftSuccessScreen } from './GiftSuccessScreen';
-export { UnifiedGiftFlowScreen } from './UnifiedGiftFlowScreen';
-export { MyGiftsScreen } from './MyGiftsScreen';

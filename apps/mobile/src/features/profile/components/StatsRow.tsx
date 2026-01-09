@@ -48,7 +48,6 @@ const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 interface StatsRowProps {
   momentsCount: number;
   activeMoments: number;
-  responseRate: number;
   onMomentsPress: () => void;
 }
 
@@ -113,12 +112,12 @@ const StatItem: React.FC<StatItemProps> = memo(
 StatItem.displayName = 'StatItem';
 
 const StatsRow: React.FC<StatsRowProps> = memo(
-  ({ momentsCount, activeMoments, responseRate, onMomentsPress }) => {
+  ({ momentsCount, activeMoments, onMomentsPress }) => {
     return (
       <View style={styles.statsRow}>
         <StatItem
           value={momentsCount}
-          label="Momentler"
+          label="Anlar"
           accentColor={STATS_COLORS.neon.lime}
           onPress={onMomentsPress}
         />
@@ -128,19 +127,12 @@ const StatsRow: React.FC<StatsRowProps> = memo(
           label="Aktif"
           accentColor={STATS_COLORS.neon.violet}
         />
-        <View style={styles.statDivider} />
-        <StatItem
-          value={`${responseRate}%`}
-          label="Yanıt"
-          accentColor={STATS_COLORS.neon.cyan}
-        />
       </View>
     );
   },
   (prevProps, nextProps) =>
     prevProps.momentsCount === nextProps.momentsCount &&
-    prevProps.activeMoments === nextProps.activeMoments &&
-    prevProps.responseRate === nextProps.responseRate,
+    prevProps.activeMoments === nextProps.activeMoments,
 );
 
 StatsRow.displayName = 'StatsRow';
@@ -150,21 +142,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    paddingVertical: 16,
-    paddingHorizontal: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 4,
     backgroundColor: STATS_COLORS.background.secondary,
-    borderRadius: 16,
+    borderRadius: 12,
   },
   statItem: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: 4,
+    paddingVertical: 2,
   },
   statNumber: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: '700',
     color: STATS_COLORS.text.primary,
-    marginBottom: 4,
+    marginBottom: 2,
     letterSpacing: -0.5,
     ...Platform.select({
       ios: {
@@ -174,14 +166,14 @@ const styles = StyleSheet.create({
     }),
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '500',
     color: STATS_COLORS.text.secondary,
-    letterSpacing: 0.3,
+    letterSpacing: 0.2,
   },
   statDivider: {
     width: 1,
-    height: 32,
+    height: 24,
     backgroundColor: STATS_COLORS.glass.border,
   },
 });

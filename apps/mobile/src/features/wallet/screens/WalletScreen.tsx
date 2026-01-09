@@ -52,13 +52,13 @@ import type { NavigationProp } from '@react-navigation/native';
 
 const { width: _SCREEN_WIDTH } = Dimensions.get('window');
 
-type FilterType = 'all' | 'incoming' | 'outgoing' | 'gifts';
+type FilterType = 'all' | 'incoming' | 'outgoing';
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
 // Transaction type for better categorization
 type TransactionCategory =
-  | 'gift_received'
-  | 'gift_sent'
+  | 'payment_received'
+  | 'payment_sent'
   | 'withdrawal'
   | 'deposit'
   | 'refund'
@@ -83,8 +83,8 @@ const DARK_THEME = {
 
 // Transaction icon mapping for silk-smooth visuals
 const TRANSACTION_ICONS: Record<TransactionCategory, IconName> = {
-  gift_received: 'gift-outline',
-  gift_sent: 'gift',
+  payment_received: 'cash-plus',
+  payment_sent: 'cash-minus',
   withdrawal: 'bank-transfer-out',
   deposit: 'bank-transfer-in',
   refund: 'cash-refund',
@@ -94,8 +94,8 @@ const TRANSACTION_ICONS: Record<TransactionCategory, IconName> = {
 // Transaction title mapping (Turkish)
 const getTransactionTitle = (category: TransactionCategory): string => {
   const titles: Record<TransactionCategory, string> = {
-    gift_received: 'Hediye Alındı',
-    gift_sent: 'Hediye Gönderildi',
+    payment_received: 'Ödeme Alındı',
+    payment_sent: 'Ödeme Gönderildi',
     withdrawal: 'Para Çekimi',
     deposit: 'Para Yatırma',
     refund: 'İade',
@@ -143,7 +143,7 @@ const WalletScreen = () => {
     return transactions.map((t) => {
       const category = t.type as TransactionCategory;
       const isPositive =
-        category === 'gift_received' ||
+        category === 'payment_received' ||
         category === 'deposit' ||
         category === 'refund' ||
         category === 'topup';
@@ -165,10 +165,6 @@ const WalletScreen = () => {
     if (activeFilter === 'all') return displayTransactions;
     if (activeFilter === 'incoming')
       return displayTransactions.filter((t) => t.isPositive);
-    if (activeFilter === 'gifts')
-      return displayTransactions.filter(
-        (t) => t.category === 'gift_received' || t.category === 'gift_sent',
-      );
     return displayTransactions.filter((t) => !t.isPositive);
   }, [displayTransactions, activeFilter]);
 
@@ -230,8 +226,8 @@ const WalletScreen = () => {
       .join('\n');
 
     showAlert(
-      '📸 Kanıt Yükleyin',
-      `${formatCurrency(totalPending)} tutarında bekleyen hediyeniz var.\n\nKanıt yükledikten sonra çekilebilir hale gelecektir:\n\n${itemsList}${pendingProofItems.length > 3 ? `\n...ve ${pendingProofItems.length - 3} daha` : ''}`,
+      '� Bekleyen Ödemeler',
+      `${formatCurrency(totalPending)} tutarında bekleyen ödemeniz var.\n\nKanıt yükledikten sonra çekilebilir hale gelecektir:\n\n${itemsList}${pendingProofItems.length > 3 ? `\n...ve ${pendingProofItems.length - 3} daha` : ''}`,
       [
         { text: 'Daha Sonra', style: 'cancel' },
         {
@@ -240,7 +236,7 @@ const WalletScreen = () => {
             // Navigate to first pending item's proof upload
             if (pendingProofItems[0]) {
               navigation.navigate('ProofFlow' as any, {
-                giftId: pendingProofItems[0].id,
+                paymentId: pendingProofItems[0].id,
               });
             }
           },
@@ -326,14 +322,14 @@ const WalletScreen = () => {
       <View style={styles.emptyState}>
         <View style={styles.emptyIconContainer}>
           <MaterialCommunityIcons
-            name="gift-outline"
+            name="wallet-outline"
             size={64}
             color={DARK_THEME.accentLime}
           />
         </View>
-        <Text style={styles.emptyTitle}>Henüz bir hediyen yok 🎁</Text>
+        <Text style={styles.emptyTitle}>Henüz işlem yok</Text>
         <Text style={styles.emptyText}>
-          İlk anını paylaş veya yakınındaki anlara hediye gönder. Her hediye
+          İlk anını paylaş veya yakınındaki anlara destek ol. Tüm işlemler
           burada görünecek!
         </Text>
         <TouchableOpacity
@@ -360,7 +356,6 @@ const WalletScreen = () => {
     { key: 'all', label: 'Tümü' },
     { key: 'incoming', label: 'Gelen' },
     { key: 'outgoing', label: 'Giden' },
-    { key: 'gifts', label: 'Hediyeler' },
   ];
 
   return (

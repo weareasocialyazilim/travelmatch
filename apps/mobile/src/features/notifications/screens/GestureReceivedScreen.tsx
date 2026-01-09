@@ -11,8 +11,7 @@ import { showAlert } from '@/stores/modalStore';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/colors';
-import { LeaveTrustNoteBottomSheet } from '@/components';
-import { ThankYouModal } from '@/features/gifts/components';
+import { LeaveTrustNoteBottomSheet, ThankYouModal } from '@/components';
 import {
   createTrustNote,
   hasWrittenNoteForGift,

@@ -1,7 +1,7 @@
 /**
  * Notification Navigator - Deep Linking Handler
  *
- * Dating & Gifting Platform için bildirim türlerine göre
+ * Experience & Payment Platform için bildirim türlerine göre
  * akıllı navigasyon yönetimi. Her bildirim türü ilgili ekrana yönlendirilir.
  *
  * @module notificationNavigator
@@ -18,11 +18,10 @@ import * as Haptics from 'expo-haptics';
 
 /** Supported notification types for navigation */
 export type NotificationType =
-  | 'gift_proposal_received'
-  | 'gift_received'
-  | 'gift_confirmed'
-  | 'gift_rejected'
-  | 'gift_sent'
+  | 'gesture_received'
+  | 'payment_received'
+  | 'payment_confirmed'
+  | 'payment_rejected'
   | 'high_value_offer'
   | 'proof_required'
   | 'proof_submitted'
@@ -34,9 +33,7 @@ export type NotificationType =
   | 'moment_commented'
   | 'moment_expired'
   | 'profile_viewed'
-  | 'new_follower'
   | 'transaction_completed'
-  | 'payment_received'
   | 'payout_processed'
   | 'refund_processed'
   | 'dispute_opened'
@@ -56,14 +53,14 @@ export interface NotificationPayload {
   id: string;
   /** Notification type for routing */
   type: NotificationType;
-  /** Related moment ID (for gift/proof notifications) */
+  /** Related moment ID (for payment/proof notifications) */
   momentId?: string;
   /** Related user ID (for profile/chat notifications) */
   userId?: string;
   /** Related conversation ID (for chat notifications) */
   conversationId?: string;
-  /** Related gift ID (for gift flow notifications) */
-  giftId?: string;
+  /** Related payment/gesture ID */
+  gestureId?: string;
   /** Related escrow ID (for escrow/proof notifications) */
   escrowId?: string;
   /** Transaction ID (for payment notifications) */
@@ -98,9 +95,9 @@ const NOTIFICATION_ROUTES: Record<
   (payload: NotificationPayload) => NavigationRoute
 > = {
   // ====================
-  // 🎁 GIFT FLOW
+  // 💰 PAYMENT FLOW
   // ====================
-  gift_proposal_received: (payload) => {
+  gesture_received: (payload) => {
     if (!payload.momentId) {
       return {
         screen: 'Inbox',
@@ -111,9 +108,9 @@ const NOTIFICATION_ROUTES: Record<
     return {
       screen: 'GestureReceived',
       params: {
-        gestureId: payload.giftId,
+        gestureId: payload.gestureId,
         senderId: payload.userId || '',
-        momentTitle: payload.metadata?.momentTitle || 'Hediye Teklifi',
+        momentTitle: payload.metadata?.momentTitle || 'Destek Teklifi',
         amount: payload.metadata?.amount || 0,
         isAnonymous: payload.metadata?.isAnonymous || false,
       },
@@ -121,15 +118,15 @@ const NOTIFICATION_ROUTES: Record<
     };
   },
 
-  gift_received: () => ({
-    screen: 'MyGifts',
+  payment_received: () => ({
+    screen: 'Wallet',
     params: undefined,
     success: true,
   }),
 
-  gift_confirmed: (payload) => {
+  payment_confirmed: (payload) => {
     if (!payload.escrowId) {
-      return { screen: 'MyGifts', success: true };
+      return { screen: 'Wallet', success: true };
     }
     return {
       screen: 'EscrowStatus',
@@ -144,15 +141,9 @@ const NOTIFICATION_ROUTES: Record<
     };
   },
 
-  gift_rejected: () => ({
+  payment_rejected: () => ({
     screen: 'Inbox',
     params: { initialTab: 'active' },
-    success: true,
-  }),
-
-  gift_sent: () => ({
-    screen: 'MyGifts',
-    params: undefined,
     success: true,
   }),
 
@@ -168,7 +159,7 @@ const NOTIFICATION_ROUTES: Record<
     return {
       screen: 'GestureReceived',
       params: {
-        gestureId: payload.giftId,
+        gestureId: payload.gestureId,
         senderId: payload.userId || '',
         momentTitle: payload.metadata?.momentTitle || 'VIP Teklif',
         amount: payload.metadata?.amount || 0,
@@ -182,14 +173,14 @@ const NOTIFICATION_ROUTES: Record<
   // 📸 PROOF SYSTEM
   // ====================
   proof_required: (payload) => {
-    if (!payload.escrowId || !payload.giftId) {
-      return { screen: 'MyGifts', success: true };
+    if (!payload.escrowId || !payload.gestureId) {
+      return { screen: 'Wallet', success: true };
     }
     return {
       screen: 'ProofFlow',
       params: {
         escrowId: payload.escrowId,
-        giftId: payload.giftId,
+        gestureId: payload.gestureId,
         momentId: payload.momentId,
         momentTitle: payload.metadata?.momentTitle || '',
         senderId: payload.userId,
@@ -218,21 +209,21 @@ const NOTIFICATION_ROUTES: Record<
     params: {
       type: 'proof_verified' as const,
       title: 'Kanıt Onaylandı!',
-      subtitle: 'Hediye tutarı hesabınıza aktarıldı.',
+      subtitle: 'Ödeme hesabınıza aktarıldı.',
     },
     success: true,
   }),
 
   proof_rejected: (payload) => {
     // Kullanıcının yeniden kanıt yüklemesi gerekiyor
-    if (!payload.escrowId || !payload.giftId) {
-      return { screen: 'MyGifts', success: true };
+    if (!payload.escrowId || !payload.gestureId) {
+      return { screen: 'Wallet', success: true };
     }
     return {
       screen: 'ProofFlow',
       params: {
         escrowId: payload.escrowId,
-        giftId: payload.giftId,
+        gestureId: payload.gestureId,
         momentId: payload.momentId,
         momentTitle: payload.metadata?.momentTitle || '',
         senderId: payload.userId,
@@ -316,17 +307,6 @@ const NOTIFICATION_ROUTES: Record<
     };
   },
 
-  new_follower: (payload) => {
-    if (!payload.userId) {
-      return { screen: 'Profile', success: true };
-    }
-    return {
-      screen: 'ProfileDetail',
-      params: { userId: payload.userId },
-      success: true,
-    };
-  },
-
   // ====================
   // 💰 TRANSACTIONS
   // ====================
@@ -340,12 +320,6 @@ const NOTIFICATION_ROUTES: Record<
       success: true,
     };
   },
-
-  payment_received: () => ({
-    screen: 'Wallet',
-    params: undefined,
-    success: true,
-  }),
 
   payout_processed: () => ({
     screen: 'Success',
@@ -370,7 +344,7 @@ const NOTIFICATION_ROUTES: Record<
     screen: 'DisputeFlow',
     params: {
       type: payload.metadata?.disputeType || 'transaction',
-      id: payload.transactionId || payload.giftId || '',
+      id: payload.transactionId || payload.gestureId || '',
     },
     success: true,
   }),
@@ -449,7 +423,7 @@ const NOTIFICATION_ROUTES: Record<
 // HAPTIC PATTERNS
 // ============================================
 const HAPTIC_BY_TYPE: Partial<Record<NotificationType, () => void>> = {
-  gift_received: () =>
+  payment_received: () =>
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success),
   high_value_offer: () =>
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy),
@@ -476,13 +450,13 @@ const HAPTIC_BY_TYPE: Partial<Record<NotificationType, () => void>> = {
  *
  * @example
  * ```typescript
- * // Gift notification tap
+ * // Payment notification tap
  * navigateFromNotification({
  *   id: 'notif-123',
- *   type: 'gift_proposal_received',
+ *   type: 'gesture_received',
  *   momentId: 'moment-456',
  *   userId: 'user-789',
- *   giftId: 'gift-101',
+ *   gestureId: 'gesture-101',
  * });
  * ```
  */

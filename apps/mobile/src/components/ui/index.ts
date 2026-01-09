@@ -119,6 +119,10 @@ export type { TMProofCardProps, ProofStatus, MediaType } from './TMProofCard';
 export { Paywall } from './Paywall';
 export type { PaywallProps, PaywallFeature } from './Paywall';
 
+// SubscriptionBadge - Tinder/Bumble style subscription tier badge
+export { SubscriptionBadge, SubscriptionUpgradeCTA } from './SubscriptionBadge';
+export type { SubscriptionTier } from './SubscriptionBadge';
+
 // ═══════════════════════════════════════════════════════════════════
 // Form Components
 // ═══════════════════════════════════════════════════════════════════

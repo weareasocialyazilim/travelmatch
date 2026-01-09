@@ -42,6 +42,7 @@ import {
 } from '../components';
 import { useAuth } from '@/context/AuthContext';
 import { useMoments, type Moment } from '@/hooks/useMoments';
+import { useSubscription } from '@/features/payments';
 import { userService } from '@/services/userService';
 import { logger } from '@/utils/logger';
 import type { RootStackParamList } from '@/navigation/routeParams';
@@ -85,6 +86,11 @@ const ProfileScreen: React.FC = () => {
   // Get moments
   const { myMoments, myMomentsLoading, loadMyMoments } = useMoments();
 
+  // Get subscription tier
+  const { subscription } = useSubscription();
+  const subscriptionTier =
+    (subscription?.tier as 'free' | 'premium' | 'platinum') || 'free';
+
   useEffect(() => {
     loadMyMoments();
   }, [loadMyMoments]);
@@ -114,7 +120,6 @@ const ProfileScreen: React.FC = () => {
           myMoments.length ||
           userProfile?.momentCount ||
           PROFILE_DEFAULTS.MOMENTS_COUNT,
-        responseRate: PROFILE_DEFAULTS.RESPONSE_RATE,
         activeMoments: myMoments.filter((m) =>
           ['active', 'paused', 'draft'].includes(m.status),
         ).length,
@@ -133,7 +138,6 @@ const ProfileScreen: React.FC = () => {
       location: '',
       trustScore: 0,
       momentsCount: 0,
-      responseRate: 0,
       activeMoments: 0,
       completedMoments: 0,
       walletBalance: 0,
@@ -164,6 +168,10 @@ const ProfileScreen: React.FC = () => {
   );
   const handleSavedMoments = useCallback(
     () => navigation.navigate('SavedMoments'),
+    [navigation],
+  );
+  const handleSubscriptionPress = useCallback(
+    () => navigation.navigate('Subscription'),
     [navigation],
   );
   const handleShare = useCallback(async () => {
@@ -348,8 +356,10 @@ const ProfileScreen: React.FC = () => {
             location={userData.location}
             isVerified={userData.isVerified}
             trustScore={userData.trustScore}
+            subscriptionTier={subscriptionTier}
             onEditPress={handleEditProfile}
             onTrustGardenPress={handleTrustGarden}
+            onSubscriptionPress={handleSubscriptionPress}
           />
 
           {/* Stats Row */}
@@ -361,7 +371,6 @@ const ProfileScreen: React.FC = () => {
               <StatsRow
                 momentsCount={userData.momentsCount}
                 activeMoments={userData.activeMoments}
-                responseRate={userData.responseRate}
                 onMomentsPress={handleMyMoments}
               />
             </GlassCard>

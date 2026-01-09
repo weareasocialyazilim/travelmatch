@@ -42,9 +42,6 @@ export interface SearchFilters {
   gender?: GenderOption[]; // Çoklu seçim desteği
   maxDistance?: number; // 1km - 500km/Global arası yarıçap
 
-  // Gifting Range (Hediye Aralığı) - 0-30-100+ baremine uygun
-  giftValueRange?: [number, number];
-
   // Konum & Tarih
   location?: string;
   dateFrom?: string;
@@ -60,7 +57,6 @@ export const DEFAULT_FILTERS: SearchFilters = {
   ageRange: [18, 99],
   gender: ['all'],
   maxDistance: 500, // Global by default
-  giftValueRange: [0, 999999], // All gift ranges
   momentCategory: undefined,
   showExclusiveMoments: false,
 };
@@ -199,9 +195,6 @@ export const useSearchStore = create<SearchState>()(
             (filters.gender && !filters.gender.includes('all')) ||
             (filters.maxDistance !== undefined &&
               filters.maxDistance !== 500) ||
-            (filters.giftValueRange &&
-              (filters.giftValueRange[0] !== 0 ||
-                filters.giftValueRange[1] !== 999999)) ||
             filters.location !== undefined ||
             filters.showExclusiveMoments === true
           );

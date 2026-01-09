@@ -31,7 +31,9 @@ import {
   ImmersiveMomentCard,
   AwwwardsDiscoverHeader,
   StoriesRow,
+  StoryViewer,
   type UserStory,
+  type Story,
 } from '../components';
 // Note: FloatingDock is now rendered by MainTabNavigator
 // Using useDiscoverMoments for PostGIS-based location discovery
@@ -42,7 +44,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { COLORS } from '@/constants/colors';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { LiquidScreenWrapper } from '@/components/layout';
-import { BlurFilterModal, type FilterValues } from '@/components/ui';
+import {
+  BlurFilterModal,
+  type FilterValues,
+  SubscriptionUpgradeCTA,
+} from '@/components/ui';
+import { useSubscription } from '@/features/payments';
 import { showLoginPrompt } from '@/stores/modalStore';
 import { logger } from '@/utils/logger';
 import type { NavigationProp } from '@react-navigation/native';
@@ -57,6 +64,14 @@ const DiscoverScreen = () => {
   // Filter modal state
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [activeFilters, setActiveFilters] = useState<FilterValues | null>(null);
+
+  // StoryViewer state
+  const [storyViewerVisible, setStoryViewerVisible] = useState(false);
+  const [selectedStoryUser, setSelectedStoryUser] = useState<UserStory | null>(
+    null,
+  );
+  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
+  const [isStoryPaused, setIsStoryPaused] = useState(false);
 
   // Use PostGIS-based discovery for location-aware moments
   const {
@@ -74,6 +89,11 @@ const DiscoverScreen = () => {
   const moments = discoveryMoments as unknown as Moment[];
 
   const { user, isGuest } = useAuth();
+
+  // Subscription state for upgrade CTA
+  const { subscription } = useSubscription();
+  const currentTier =
+    (subscription?.tier as 'free' | 'premium' | 'platinum') || 'free';
 
   // Pending moment for post-login action
   const [_pendingMoment, setPendingMoment] = useState<Moment | null>(null);
@@ -129,15 +149,88 @@ const DiscoverScreen = () => {
     navigation.navigate('Profile');
   }, [navigation]);
 
-  // Stories actions
-  const handleStoryPress = useCallback(
-    (story: UserStory, _index: number) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      // Navigate to story viewer
-      navigation.navigate('ProfileDetail', { userId: story.id });
+  // Handle subscription upgrade
+  const handleSubscriptionUpgrade = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    navigation.navigate('Subscription');
+  }, [navigation]);
+
+  // Stories actions - Instagram-style fullscreen viewer
+  const handleStoryPress = useCallback((story: UserStory, index: number) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    // Open StoryViewer modal (Instagram-style)
+    setSelectedStoryUser(story);
+    setCurrentStoryIndex(0);
+    setIsStoryPaused(false);
+    setStoryViewerVisible(true);
+  }, []);
+
+  // StoryViewer handlers
+  const handleStoryClose = useCallback(() => {
+    setStoryViewerVisible(false);
+    setSelectedStoryUser(null);
+    setCurrentStoryIndex(0);
+  }, []);
+
+  const handleNextStory = useCallback(() => {
+    if (!selectedStoryUser) return;
+    if (currentStoryIndex < selectedStoryUser.stories.length - 1) {
+      setCurrentStoryIndex((prev) => prev + 1);
+    } else {
+      // Last story - close viewer
+      handleStoryClose();
+    }
+  }, [selectedStoryUser, currentStoryIndex, handleStoryClose]);
+
+  const handlePreviousStory = useCallback(() => {
+    if (currentStoryIndex > 0) {
+      setCurrentStoryIndex((prev) => prev - 1);
+    }
+  }, [currentStoryIndex]);
+
+  const handleViewMoment = useCallback(
+    async (story: Story) => {
+      handleStoryClose();
+      if (story.momentId) {
+        // We need to get the moment data to navigate
+        // For now, navigate to profile instead which has moment access
+        navigation.navigate('ProfileDetail', {
+          userId: selectedStoryUser?.id || '',
+        });
+      }
     },
-    [navigation],
+    [navigation, handleStoryClose, selectedStoryUser],
   );
+
+  const handleStoryUserPress = useCallback(
+    (userId: string) => {
+      handleStoryClose();
+      navigation.navigate('ProfileDetail', { userId });
+    },
+    [navigation, handleStoryClose],
+  );
+
+  const handleStoryGift = useCallback(
+    (story: Story) => {
+      handleStoryClose();
+      if (story.momentId && selectedStoryUser) {
+        navigation.navigate('UnifiedGiftFlow', {
+          recipientId: selectedStoryUser.id,
+          recipientName: selectedStoryUser.name,
+          momentId: story.momentId,
+          momentTitle: story.title || 'Moment',
+          requestedAmount: story.price || 0,
+          requestedCurrency: 'TRY',
+        });
+      }
+    },
+    [navigation, handleStoryClose, selectedStoryUser],
+  );
+
+  const handleStoryShare = useCallback((_story: Story) => {
+    // TODO: Implement share functionality
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  }, []);
 
   const handleCreateStoryPress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -181,7 +274,7 @@ const DiscoverScreen = () => {
       // Guest kullanıcı kontrolü - showLoginPrompt via modalStore
       if (isGuest || !user) {
         setPendingMoment(moment);
-        showLoginPrompt({ action: 'gift' });
+        showLoginPrompt({ action: 'default' });
         return;
       }
 
@@ -276,9 +369,22 @@ const DiscoverScreen = () => {
           onStoryPress={handleStoryPress}
           onCreatePress={handleCreateStoryPress}
         />
+
+        {/* Subscription Upgrade CTA - Tinder/Bumble Style */}
+        <SubscriptionUpgradeCTA
+          currentTier={currentTier}
+          onUpgrade={handleSubscriptionUpgrade}
+          compact
+        />
       </View>
     ),
-    [stories, handleStoryPress, handleCreateStoryPress],
+    [
+      stories,
+      handleStoryPress,
+      handleCreateStoryPress,
+      currentTier,
+      handleSubscriptionUpgrade,
+    ],
   );
 
   // Loading state
@@ -393,6 +499,22 @@ const DiscoverScreen = () => {
           (activeFilters?.ageRange as [number, number]) || [18, 99]
         }
         initialGender={(activeFilters?.gender as string) || 'all'}
+      />
+
+      {/* Instagram-style Story Viewer Modal */}
+      <StoryViewer
+        visible={storyViewerVisible}
+        user={selectedStoryUser}
+        currentStoryIndex={currentStoryIndex}
+        onClose={handleStoryClose}
+        onNextStory={handleNextStory}
+        onPreviousStory={handlePreviousStory}
+        onViewMoment={handleViewMoment}
+        onUserPress={handleStoryUserPress}
+        onGift={handleStoryGift}
+        onShare={handleStoryShare}
+        isPaused={isStoryPaused}
+        setIsPaused={setIsStoryPaused}
       />
 
       {/* Guest Login Prompt Modal - Now rendered by ModalProvider */}

@@ -28,19 +28,8 @@ export { NetworkGuard, type NetworkGuardProps } from './NetworkGuard';
 export { OfflineState, type OfflineStateProps } from './OfflineState';
 export { FilterPill } from './FilterPill';
 
-// Gift Components - Taşındı: features/gifts/components
-// Legacy re-exports for backward compatibility
-export {
-  GiftMomentBottomSheet,
-  GiftSuccessModal,
-  ConfirmGiftModal,
-  ThankYouModal,
-  CompleteGiftBottomSheet,
-  GiftCelebration,
-} from '@/features/gifts/components';
-
-// ShareProofModal removed - ghost code, functionality is in ProofCeremonyFlow
 export { NotificationPermissionModal } from './NotificationPermissionModal';
+export { ThankYouModal } from './ThankYouModal';
 
 // Messages Components - Taşındı: features/messages/components
 export { ChatAttachmentBottomSheet } from '@/features/messages/components';

@@ -22,7 +22,7 @@ import * as Haptics from 'expo-haptics';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { COLORS } from '@/constants/colors';
 
-// Neon colors for gift badge
+// Neon colors for badges
 const NEON = {
   violet: '#A855F7',
   violetGlow: 'rgba(168, 85, 247, 0.6)',
@@ -43,15 +43,10 @@ const SPRING_CONFIG = {
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 /**
- * Get pending gift offers count from app state
- * TODO: Replace with actual store/context in production
- * This shows on Profile tab when user has unread gift offers
+ * Get pending notification count from app state
  */
-const getPendingGiftCount = (): number => {
-  // In production, this would read from:
-  // - Zustand store: useGiftStore.getState().pendingCount
-  // - MMKV cache: storage.getNumber('pendingGiftCount')
-  // - Or a context provider
+const getPendingNotificationCount = (): number => {
+  // In production, this would read from notifications store
   return 0; // Default to 0, will be populated by real data
 };
 
@@ -63,7 +58,7 @@ const getPendingGiftCount = (): number => {
  * - Neon glow on active state
  * - Silky smooth spring animations
  * - Elevated center action button
- * - Gift badge with neon violet pulse on Profile tab
+ * - Notification badges
  */
 export const FloatingDock: React.FC<BottomTabBarProps> = ({
   state,
@@ -166,7 +161,9 @@ export const FloatingDock: React.FC<BottomTabBarProps> = ({
                 onLongPress={onLongPress}
                 getTabIcon={getTabIcon}
                 showBadge={route.name === 'Inbox'}
-                giftCount={route.name === 'Profile' ? getPendingGiftCount() : 0}
+                badgeCount={
+                  route.name === 'Profile' ? getPendingNotificationCount() : 0
+                }
               />
             );
           })}
@@ -189,7 +186,7 @@ interface TabItemProps {
     focused: boolean,
   ) => { name: string; type: 'ionicon' | 'material' };
   showBadge?: boolean;
-  giftCount?: number; // Pending gift offers count
+  badgeCount?: number; // Pending notifications count
 }
 
 const TabItem: React.FC<TabItemProps> = ({
@@ -199,16 +196,16 @@ const TabItem: React.FC<TabItemProps> = ({
   onLongPress,
   getTabIcon,
   showBadge,
-  giftCount = 0,
+  badgeCount = 0,
 }) => {
   const scale = useSharedValue(1);
-  const giftPulse = useSharedValue(1);
+  const badgePulse = useSharedValue(1);
   const { name: iconName, type: iconType } = getTabIcon(routeName, isFocused);
 
-  // Pulse animation for gift badge
+  // Pulse animation for notification badge
   useEffect(() => {
-    if (giftCount > 0) {
-      giftPulse.value = withRepeat(
+    if (badgeCount > 0) {
+      badgePulse.value = withRepeat(
         withSequence(
           withSpring(1.15, { damping: 8 }),
           withSpring(1, { damping: 8 }),
@@ -217,16 +214,16 @@ const TabItem: React.FC<TabItemProps> = ({
         true,
       );
     } else {
-      giftPulse.value = 1;
+      badgePulse.value = 1;
     }
-  }, [giftCount, giftPulse]);
+  }, [badgeCount, badgePulse]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
 
-  const giftBadgeStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: giftPulse.value }],
+  const badgeStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: badgePulse.value }],
   }));
 
   const handlePressIn = () => {
@@ -294,11 +291,11 @@ const TabItem: React.FC<TabItemProps> = ({
           </View>
         )}
 
-        {/* Gift Badge - Neon Violet with count */}
-        {giftCount > 0 && (
-          <Animated.View style={[styles.giftBadge, giftBadgeStyle]}>
-            <Text style={styles.giftBadgeText}>
-              {giftCount > 9 ? '9+' : giftCount}
+        {/* Notification Badge with count */}
+        {badgeCount > 0 && (
+          <Animated.View style={[styles.notificationBadge, badgeStyle]}>
+            <Text style={styles.badgeText}>
+              {badgeCount > 9 ? '9+' : badgeCount}
             </Text>
           </Animated.View>
         )}
@@ -380,7 +377,7 @@ const styles = StyleSheet.create({
   },
   glowLayer: {
     position: 'absolute',
-    top: 0,
+    top: 20, // Offset for center button
     left: DOCK_HORIZONTAL_PADDING,
     right: DOCK_HORIZONTAL_PADDING,
     height: DOCK_HEIGHT,
@@ -402,18 +399,19 @@ const styles = StyleSheet.create({
     width: '100%',
     height: DOCK_HEIGHT,
     borderRadius: DOCK_BORDER_RADIUS,
-    overflow: 'hidden',
-    backgroundColor: 'rgba(20, 20, 22, 0.9)',
+    overflow: 'visible',
+    backgroundColor: 'rgba(20, 20, 22, 0.95)',
+    marginTop: 20, // Space for center button to overflow
   },
   container: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between', // Equal spacing between icons
     alignItems: 'center',
-    paddingHorizontal: 8,
+    paddingHorizontal: 24,
   },
   tab: {
-    flex: 1,
+    width: 50,
     alignItems: 'center',
     justifyContent: 'center',
     height: '100%',
@@ -467,8 +465,8 @@ const styles = StyleSheet.create({
       android: {},
     }),
   },
-  // Gift Badge - Neon Violet with pulse animation
-  giftBadge: {
+  // Notification Badge with pulse animation
+  notificationBadge: {
     position: 'absolute',
     top: -6,
     right: -10,
@@ -481,7 +479,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     borderWidth: 2,
     borderColor: 'rgba(30, 30, 32, 0.9)',
-    // Neon glow for gift badge
+    // Neon glow for badge
     ...Platform.select({
       ios: {
         shadowColor: NEON.violet,
@@ -494,7 +492,7 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  giftBadgeText: {
+  badgeText: {
     color: '#FFFFFF',
     fontSize: 10,
     fontWeight: '700',
@@ -503,8 +501,9 @@ const styles = StyleSheet.create({
   centerButtonWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -30,
+    marginTop: -32,
     zIndex: 10,
+    width: 64,
   },
   centerButtonGlow: {
     position: 'absolute',

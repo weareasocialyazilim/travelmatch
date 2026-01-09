@@ -9,9 +9,6 @@
  * Profile defaults
  */
 export const PROFILE_DEFAULTS = {
-  /** Default response rate for new users (100%) */
-  RESPONSE_RATE: 100,
-
   /** Default wallet balance */
   WALLET_BALANCE: 0,
 
