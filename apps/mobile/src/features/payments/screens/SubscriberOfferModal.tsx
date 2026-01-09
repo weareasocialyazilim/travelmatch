@@ -36,7 +36,7 @@ import { COLORS, GRADIENTS } from '@/constants/colors';
 import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { useAuth } from '@/hooks/useAuth';
-import { useSubscription } from '@/features/payments';
+import { useSubscription } from '../hooks/usePayments';
 import { supabase } from '@/services/supabase';
 import { logger } from '@/utils/logger';
 import type { RootStackParamList } from '@/navigation/routeParams';

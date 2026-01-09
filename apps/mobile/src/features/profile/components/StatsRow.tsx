@@ -2,7 +2,6 @@
  * StatsRow Component - Awwwards Edition
  *
  * Premium stats display with Twilight Zinc dark theme.
- * Features neon text accents and smooth press animations.
  */
 import React, { memo } from 'react';
 import {
@@ -18,12 +17,7 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 
-// Twilight Zinc + Neon Energy colors
 const STATS_COLORS = {
-  background: {
-    primary: '#121214',
-    secondary: '#1E1E20',
-  },
   text: {
     primary: '#F8FAFC',
     secondary: '#94A3B8',
@@ -96,7 +90,7 @@ const StatItem: React.FC<StatItemProps> = memo(
           onPress={onPress}
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
-          accessibilityLabel={`${value} ${label}. Tap to view`}
+          accessibilityLabel={`${label} ${value}. Tap to view`}
           accessibilityRole="button"
           activeOpacity={0.8}
         >
@@ -141,40 +135,42 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '100%',
-    paddingVertical: 12,
-    paddingHorizontal: 4,
-    backgroundColor: STATS_COLORS.background.secondary,
-    borderRadius: 12,
+    alignSelf: 'center',
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+    gap: 10,
+    minWidth: 0,
   },
   statItem: {
-    flex: 1,
-    alignItems: 'center',
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'center',
+    gap: 6,
     paddingVertical: 2,
   },
   statNumber: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 28,
+    fontWeight: '800',
     color: STATS_COLORS.text.primary,
-    marginBottom: 2,
-    letterSpacing: -0.5,
+    letterSpacing: -0.02 * 28, // -0.02em for modern technical look
+    includeFontPadding: false,
     ...Platform.select({
-      ios: {
-        // Subtle glow effect for numbers
-      },
-      android: {},
+      ios: { marginBottom: 0 },
+      android: { marginBottom: 0 },
     }),
   },
   statLabel: {
-    fontSize: 11,
-    fontWeight: '500',
+    fontSize: 16,
+    fontWeight: '700',
     color: STATS_COLORS.text.secondary,
     letterSpacing: 0.2,
+    marginLeft: 2,
   },
   statDivider: {
     width: 1,
     height: 24,
     backgroundColor: STATS_COLORS.glass.border,
+    marginHorizontal: 4,
   },
 });
 

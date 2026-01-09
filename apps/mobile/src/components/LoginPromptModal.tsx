@@ -123,7 +123,7 @@ export const LoginPromptModal: React.FC<LoginPromptModalProps> = ({
 
       <Animated.View
         style={styles.modalContainer}
-        entering={SlideInDown.springify().damping(15)}
+        entering={SlideInDown.springify().damping(25).stiffness(200)}
         exiting={SlideOutDown.springify()}
       >
         {Platform.OS === 'ios' ? (

@@ -1,6 +1,6 @@
 // Note: import/order disabled because lazyLoad imports are grouped by feature, not alphabetically
 import React, { Suspense, useState, useEffect } from 'react';
-import { View, ActivityIndicator, StatusBar } from 'react-native';
+import { View, ActivityIndicator, StatusBar, Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -11,6 +11,8 @@ import { MainTabNavigator } from './MainTabNavigator';
 import { navigationRef } from '../services/navigationService';
 import { apiClient } from '../services/apiV1Service';
 import { deepLinkHandler } from '../services/deepLinkHandler';
+import { logger } from '../utils/logger';
+import { addBreadcrumb } from '../config/sentry'; // ADDED: Sentry navigation tracking
 
 // Loading fallback for lazy-loaded screens
 const loadingStyle = {
@@ -350,6 +352,65 @@ const AppNavigator = () => {
     if (navigationRef.current) {
       deepLinkHandler.setNavigation(navigationRef.current);
     }
+
+    // Handle deep links for email verification and password reset
+    const handleDeepLink = (url: string) => {
+      try {
+        const urlObj = new URL(url);
+        const path = urlObj.pathname;
+        const params = Object.fromEntries(urlObj.searchParams);
+
+        if (!navigationRef.isReady()) {
+          logger.warn('Navigation not ready for deep link:', url);
+          return;
+        }
+
+        // Email verification
+        if (path.includes('/verify-email') || path.includes('/verify')) {
+          const { token, code } = params;
+          if (token || code) {
+            (navigationRef.navigate as any)('VerifyCode', {
+              verificationToken: token || code,
+              email: params.email,
+            });
+          }
+        }
+        // Password reset
+        else if (
+          path.includes('/reset-password') ||
+          path.includes('/password-reset')
+        ) {
+          const { token } = params;
+          if (token) {
+            (navigationRef.navigate as any)('SetPassword', {
+              resetToken: token,
+            });
+          }
+        }
+        // Fallback to deep link handler for other routes
+        else {
+          deepLinkHandler.handleURL(url);
+        }
+      } catch (error) {
+        logger.error('Failed to handle deep link:', error);
+      }
+    };
+
+    // Get initial URL
+    Linking.getInitialURL().then((url) => {
+      if (url) {
+        handleDeepLink(url);
+      }
+    });
+
+    // Listen for incoming URLs
+    const subscription = Linking.addEventListener('url', ({ url }) => {
+      handleDeepLink(url);
+    });
+
+    return () => {
+      subscription.remove();
+    };
   }, []);
 
   // Show loading while checking onboarding status
@@ -372,7 +433,34 @@ const AppNavigator = () => {
 
   return (
     <NavigationErrorBoundary>
-      <NavigationContainer linking={linking} ref={navigationRef}>
+      <NavigationContainer
+        linking={linking}
+        ref={navigationRef}
+        onReady={() => {
+          // ADDED: Track initial route
+          const currentRoute = navigationRef.current?.getCurrentRoute();
+          if (currentRoute) {
+            addBreadcrumb(
+              `App started: ${currentRoute.name}`,
+              'navigation',
+              'info',
+              { screen: currentRoute.name, params: currentRoute.params },
+            );
+          }
+        }}
+        onStateChange={() => {
+          // ADDED: Track navigation changes
+          const currentRoute = navigationRef.current?.getCurrentRoute();
+          if (currentRoute) {
+            addBreadcrumb(
+              `Navigated to: ${currentRoute.name}`,
+              'navigation',
+              'info',
+              { screen: currentRoute.name },
+            );
+          }
+        }}
+      >
         <StatusBar
           barStyle="light-content"
           backgroundColor="transparent"

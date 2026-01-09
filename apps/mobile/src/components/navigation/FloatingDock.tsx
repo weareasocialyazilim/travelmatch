@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
     height: DOCK_HEIGHT,
     borderRadius: DOCK_BORDER_RADIUS,
     overflow: 'visible',
-    backgroundColor: 'rgba(20, 20, 22, 0.95)',
+    backgroundColor: '#000000', // Pure black for depth perception
     marginTop: 20, // Space for center button to overflow
   },
   container: {

@@ -267,13 +267,10 @@ export const userService = {
   },
 
   /**
-   * Get user profile by name search
+   * Get user profile by email search
    */
-  getUserByUsername: async (
-    username: string,
-  ): Promise<{ user: UserProfile }> => {
+  getUserByEmail: async (email: string): Promise<{ user: UserProfile }> => {
     // SECURITY: Only select public profile fields
-    // Note: Search by name or email since username column doesn't exist
     const { data: profile, error } = await supabase
       .from('users')
       .select(
@@ -291,11 +288,11 @@ export const userService = {
         interests
       `,
       )
-      .ilike('email', `${username}@%`)
+      .ilike('email', `${email}%`)
       .single();
 
     if (error) {
-      logger.error(`Error fetching user by search term ${username}:`, error);
+      logger.error(`Error fetching user by email ${email}:`, error);
       throw error;
     }
 
@@ -847,6 +844,58 @@ export const userService = {
         kycStatus: stats?.kyc_status ?? 'unverified',
       },
     };
+  },
+
+  /**
+   * Delete user account permanently
+   * CRITICAL: KVKK/GDPR compliance - permanently removes all user data
+   */
+  deleteAccount: async (): Promise<{
+    success: boolean;
+    error: Error | null;
+  }> => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        return { success: false, error: new Error('Not authenticated') };
+      }
+
+      logger.info(
+        '[UserService] Initiating account deletion for user:',
+        user.id,
+      );
+
+      // Call the edge function for account deletion
+      // This will handle cascading deletes for all related data:
+      // - moments, chats, transactions, notifications, etc.
+      const { data, error } = await supabase.functions.invoke(
+        'delete-user-account',
+        {
+          body: { userId: user.id },
+        },
+      );
+
+      if (error) {
+        logger.error('[UserService] Account deletion failed:', error);
+        return { success: false, error };
+      }
+
+      logger.info('[UserService] Account deletion successful:', data);
+
+      // Sign out the user after successful deletion
+      await supabase.auth.signOut();
+
+      return { success: true, error: null };
+    } catch (error) {
+      logger.error('[UserService] Account deletion error:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error : new Error('Unknown error'),
+      };
+    }
   },
 };
 

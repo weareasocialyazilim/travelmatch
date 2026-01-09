@@ -41,6 +41,7 @@ import {
 } from '../utils/secureStorage';
 import { logger } from '../utils/logger';
 import type { User, KYCStatus, Role } from '../types/index';
+import { setSentryUser, clearSentryUser } from '../config/sentry'; // ADDED: Sentry integration
 
 /**
  * Helper to create a valid User object with defaults
@@ -430,6 +431,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       await saveUser(newUser);
       setAuthState('authenticated');
 
+      // ADDED: Set Sentry user context for error tracking
+      setSentryUser({
+        id: newUser.id,
+        username: newUser.name,
+        kycStatus: newUser.kyc,
+        accountType: newUser.role,
+      });
+
       return { success: true };
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Login failed';
@@ -542,6 +551,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         error,
       );
     } finally {
+      // ADDED: Clear Sentry user context on logout
+      clearSentryUser();
+
       // Clear local data regardless of server response
       await clearAuthData();
     }

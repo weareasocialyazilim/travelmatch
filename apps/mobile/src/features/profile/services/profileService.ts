@@ -1,7 +1,6 @@
 import { supabase } from '@/config/supabase';
 
 export interface UpdateProfileDto {
-  username?: string;
   full_name?: string;
   avatar_url?: string;
   bio?: string;
@@ -23,7 +22,6 @@ export const profileApi = {
       .select(
         `
         id,
-        username,
         full_name,
         avatar_url,
         bio,
@@ -58,7 +56,6 @@ export const profileApi = {
       .select(
         `
         id,
-        username,
         full_name,
         avatar_url,
         bio,

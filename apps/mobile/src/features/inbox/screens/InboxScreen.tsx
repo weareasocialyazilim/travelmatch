@@ -132,20 +132,50 @@ const InboxScreen: React.FC = () => {
             : 'Birisi momentine katılmak istediğinde burada göreceksin.'}
         </Text>
         {activeTab === 'active' && (
-          <TouchableOpacity
-            style={styles.emptyButton}
-            onPress={() => navigation.navigate('MainTabs', { screen: 'Home' })}
-            activeOpacity={0.8}
-          >
-            <LinearGradient
-              colors={VIBE_ROOM_COLORS.gradients.hero}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.emptyButtonGradient}
+          <>
+            <TouchableOpacity
+              style={styles.emptyButton}
+              onPress={() =>
+                navigation.navigate('MainTabs', { screen: 'Home' })
+              }
+              activeOpacity={0.8}
             >
-              <Text style={styles.emptyButtonText}>Keşfet</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+              <LinearGradient
+                colors={VIBE_ROOM_COLORS.gradients.hero}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.emptyButtonGradient}
+              >
+                <Text style={styles.emptyButtonText}>Keşfet</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+            {/* Smart suggestion: Popular moments */}
+            <View style={styles.suggestionSection}>
+              <Text style={styles.suggestionTitle}>Yakınındaki Anlar</Text>
+              <Text style={styles.suggestionSubtitle}>
+                Bu momentlere göz at ve yeni insanlarla tanış
+              </Text>
+              <TouchableOpacity
+                style={styles.suggestionCard}
+                onPress={() =>
+                  navigation.navigate('MainTabs', { screen: 'Discover' })
+                }
+                activeOpacity={0.9}
+              >
+                <MaterialCommunityIcons
+                  name="compass-outline"
+                  size={24}
+                  color={VIBE_ROOM_COLORS.accent.lime}
+                />
+                <Text style={styles.suggestionCardText}>Momentleri Keşfet</Text>
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={20}
+                  color={VIBE_ROOM_COLORS.text.secondary}
+                />
+              </TouchableOpacity>
+            </View>
+          </>
         )}
       </Animated.View>
     ),
@@ -159,7 +189,7 @@ const InboxScreen: React.FC = () => {
       {/* Header */}
       <Animated.View
         entering={FadeInDown.delay(100).springify()}
-        style={[styles.header, { paddingTop: insets.top + 12 }]}
+        style={[styles.header, { paddingTop: insets.top + 8 }]}
       >
         <View style={styles.headerContent}>
           <Text style={styles.pageTitle}>Gelen Kutusu</Text>
@@ -291,7 +321,7 @@ const styles = StyleSheet.create({
   // Segment Control Wrapper
   segmentWrapper: {
     paddingHorizontal: INBOX_SPACING.screenPadding,
-    marginBottom: 8,
+    marginBottom: 4,
   },
 
   // List
@@ -360,6 +390,40 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     letterSpacing: -0.3,
+  },
+
+  // Smart Suggestions
+  suggestionSection: {
+    marginTop: 32,
+    width: '100%',
+  },
+  suggestionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: VIBE_ROOM_COLORS.text.primary,
+    marginBottom: 4,
+    letterSpacing: -0.3,
+  },
+  suggestionSubtitle: {
+    fontSize: 13,
+    color: VIBE_ROOM_COLORS.text.secondary,
+    marginBottom: 16,
+  },
+  suggestionCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: VIBE_ROOM_COLORS.glass.backgroundMedium,
+    borderWidth: 1,
+    borderColor: VIBE_ROOM_COLORS.glass.border,
+    borderRadius: 14,
+    padding: 16,
+    gap: 12,
+  },
+  suggestionCardText: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '600',
+    color: VIBE_ROOM_COLORS.text.primary,
   },
 });
 

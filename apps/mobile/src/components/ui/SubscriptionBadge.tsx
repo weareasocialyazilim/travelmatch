@@ -126,7 +126,7 @@ export const SubscriptionBadge: React.FC<SubscriptionBadgeProps> = ({
         activeOpacity={0.8}
       >
         <LinearGradient
-          colors={['#DFFF00', '#C8E600']}
+          colors={['#1F1F24', '#2A2A30']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={[
@@ -135,9 +135,9 @@ export const SubscriptionBadge: React.FC<SubscriptionBadgeProps> = ({
           ]}
         >
           <MaterialCommunityIcons
-            name="crown"
+            name="crown-outline"
             size={sizeConfig.iconSize}
-            color="#1A1A1A"
+            color="#F8FAFC"
           />
           {showLabel && (
             <Text

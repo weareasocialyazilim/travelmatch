@@ -10,8 +10,10 @@
  * - Rate limiting preparation
  * - Crash recovery with pending transactions
  * - Low storage detection and warnings
+ * - Image optimization (compression & resizing)
  */
 import { Platform } from 'react-native';
+import * as ImageManipulator from 'expo-image-manipulator';
 import { supabase } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { uploadFile as supabaseUploadFile } from './supabaseStorageService';
@@ -338,6 +340,39 @@ const checkRateLimit = async (userId: string): Promise<boolean> => {
 };
 
 /**
+ * Optimize image before upload
+ * Resizes to max 1080px width and compresses to 80% quality
+ */
+const optimizeImage = async (uri: string): Promise<string> => {
+  try {
+    const result = await ImageManipulator.manipulateAsync(
+      uri,
+      [
+        {
+          resize: {
+            width: 1080, // Max width
+          },
+        },
+      ],
+      {
+        compress: 0.8, // 80% quality
+        format: ImageManipulator.SaveFormat.JPEG,
+      },
+    );
+
+    logger.debug('Image optimized:', {
+      originalUri: uri.substring(0, 50),
+      optimizedUri: result.uri.substring(0, 50),
+    });
+
+    return result.uri;
+  } catch (error) {
+    logger.warn('Image optimization failed, using original:', error);
+    return uri; // Fallback to original if optimization fails
+  }
+};
+
+/**
  * Upload an image with security validation
  */
 export const uploadImage = async (
@@ -353,6 +388,9 @@ export const uploadImage = async (
 
     if (!user) throw new Error('Not authenticated');
 
+    // Optimize image before upload (resize + compress)
+    const optimizedUri = await optimizeImage(uri);
+
     // Check rate limit
     const rateLimitOk = await checkRateLimit(user.id);
     if (!rateLimitOk) {
@@ -366,8 +404,8 @@ export const uploadImage = async (
     if (options.folder === 'proofs') bucket = 'proofs';
     if (options.folder === 'messages') bucket = 'messages';
 
-    // Get file information
-    const fileInfo = await getFileInfo(uri);
+    // Get file information from optimized image
+    const fileInfo = await getFileInfo(optimizedUri);
     logger.debug('Upload file info:', {
       name: fileInfo.name,
       size: fileInfo.size,
@@ -421,7 +459,7 @@ export const uploadImage = async (
     await pendingTransactionsService.addPendingUpload({
       id: uploadId,
       type: bucket as 'proof' | 'moment' | 'avatar' | 'message',
-      localUri: uri,
+      localUri: optimizedUri,
       bucket,
       fileName: fileInfo.name,
       fileSize: fileInfo.size,
@@ -486,10 +524,12 @@ export const uploadImage = async (
       TransactionStatus.UPLOADING,
     );
 
-    // TODO: Implement client-side compression if needed before upload
-    // For now, we upload directly
-
-    const { url, path, error } = await supabaseUploadFile(bucket, uri, user.id);
+    // Upload optimized image
+    const { url, path, error } = await supabaseUploadFile(
+      bucket,
+      optimizedUri,
+      user.id,
+    );
 
     if (error) {
       await trackUploadAttempt(user.id, bucket, fileInfo, 'failed');

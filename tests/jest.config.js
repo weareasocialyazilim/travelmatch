@@ -18,7 +18,7 @@ module.exports = {
   setupFiles: ['<rootDir>/apps/mobile/jest.setup.mobile.js'],
   setupFilesAfterEnv: ['<rootDir>/apps/mobile/jest.setup.afterEnv.js'],
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|@react-native|@testing-library|expo|@expo|@unimodules|react-navigation|@react-navigation|@supabase|@shopify)/)',
+    'node_modules/(?!(react-native|@react-native|@testing-library|expo|@expo|@unimodules|react-navigation|@react-navigation|@supabase|@shopify|expo-image-manipulator|expo-linking|expo-av)/)',
   ],
   moduleNameMapper: {
     // React Native mock - MUST be first

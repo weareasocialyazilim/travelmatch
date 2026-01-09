@@ -19,12 +19,16 @@ import {
   ImageBackground,
   TouchableOpacity,
 } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
 import type { SubscriptionTier } from '../services/momentsService';
+
+const AnimatedImageBackground =
+  Animated.createAnimatedComponent(ImageBackground);
 
 // Currency symbols for display
 const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -71,6 +75,7 @@ const TIER_CONFIG: Record<
 };
 
 export interface LiquidMomentCardProps {
+  momentId?: string;
   title: string;
   location: string;
   price: number;
@@ -90,6 +95,7 @@ export interface LiquidMomentCardProps {
  */
 export const LiquidMomentCard: React.FC<LiquidMomentCardProps> = memo(
   ({
+    momentId,
     title,
     location,
     price,
@@ -131,7 +137,7 @@ export const LiquidMomentCard: React.FC<LiquidMomentCardProps> = memo(
         activeOpacity={0.9}
         onPress={onPress}
       >
-        <ImageBackground
+        <AnimatedImageBackground
           source={{
             uri:
               imageUrl ||
@@ -139,6 +145,7 @@ export const LiquidMomentCard: React.FC<LiquidMomentCardProps> = memo(
           }}
           style={styles.backgroundImage}
           imageStyle={styles.imageStyle}
+          sharedTransitionTag={momentId ? `moment-${momentId}` : undefined}
         >
           {/* Top Scrim with Subscription Badge */}
           <LinearGradient
@@ -211,7 +218,7 @@ export const LiquidMomentCard: React.FC<LiquidMomentCardProps> = memo(
               </View>
             </GlassCard>
           </View>
-        </ImageBackground>
+        </AnimatedImageBackground>
       </TouchableOpacity>
     );
   },

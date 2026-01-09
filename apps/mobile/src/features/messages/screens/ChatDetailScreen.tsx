@@ -20,6 +20,8 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { COLORS } from '@/constants/colors';
 import { useMessages } from '@/hooks/useMessages';
@@ -27,6 +29,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import { logger } from '@/utils/logger';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
+import { LiquidTextInput } from '@/components/ui/LiquidTextInput';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 
@@ -37,7 +40,7 @@ interface Message {
   content: string;
   senderId: string;
   createdAt: string;
-  status: 'sending' | 'sent' | 'delivered' | 'read';
+  status: 'sending' | 'sent' | 'delivered' | 'read' | 'error';
 }
 
 interface MessageBubbleProps {
@@ -45,6 +48,7 @@ interface MessageBubbleProps {
   isOwnMessage: boolean;
   showAvatar?: boolean;
   otherUserAvatar?: string;
+  onRetry?: (message: Message) => void;
 }
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({
@@ -52,6 +56,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   isOwnMessage,
   showAvatar,
   otherUserAvatar,
+  onRetry,
 }) => {
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -84,26 +89,75 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
           isOwnMessage ? styles.ownMessage : styles.otherMessage,
         ]}
       >
-        <Text style={styles.messageText}>{message.content}</Text>
-        <View style={styles.messageFooter}>
-          <Text style={styles.messageTime}>
-            {formatTime(message.createdAt)}
-          </Text>
-          {isOwnMessage && (
-            <MaterialCommunityIcons
-              name={
-                message.status === 'read'
-                  ? 'check-all'
-                  : message.status === 'delivered'
-                    ? 'check-all'
-                    : 'check'
-              }
-              size={14}
-              color={message.status === 'read' ? '#3B82F6' : COLORS.text.muted}
-              style={styles.statusIcon}
-            />
-          )}
-        </View>
+        {Platform.OS === 'ios' ? (
+          <BlurView
+            intensity={isOwnMessage ? 40 : 20}
+            tint={isOwnMessage ? 'light' : 'dark'}
+            style={styles.messageBubbleContent}
+          >
+            <Text style={styles.messageText}>{message.content}</Text>
+            <View style={styles.messageFooter}>
+              <Text style={styles.messageTime}>
+                {formatTime(message.createdAt)}
+              </Text>
+              {isOwnMessage && message.status !== 'error' && (
+                <MaterialCommunityIcons
+                  name={
+                    message.status === 'read'
+                      ? 'check-all'
+                      : message.status === 'delivered'
+                        ? 'check-all'
+                        : 'check'
+                  }
+                  size={14}
+                  color={
+                    message.status === 'read' ? '#3B82F6' : COLORS.text.muted
+                  }
+                  style={styles.statusIcon}
+                />
+              )}
+              {isOwnMessage && message.status === 'error' && onRetry && (
+                <TouchableOpacity
+                  onPress={() => onRetry(message)}
+                  style={styles.retryButton}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <MaterialCommunityIcons
+                    name="alert-circle"
+                    size={16}
+                    color="#FF4444"
+                  />
+                  <Text style={styles.retryText}>Tekrar Dene</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </BlurView>
+        ) : (
+          <View style={styles.messageBubbleContent}>
+            <Text style={styles.messageText}>{message.content}</Text>
+            <View style={styles.messageFooter}>
+              <Text style={styles.messageTime}>
+                {formatTime(message.createdAt)}
+              </Text>
+              {isOwnMessage && (
+                <MaterialCommunityIcons
+                  name={
+                    message.status === 'read'
+                      ? 'check-all'
+                      : message.status === 'delivered'
+                        ? 'check-all'
+                        : 'check'
+                  }
+                  size={14}
+                  color={
+                    message.status === 'read' ? '#3B82F6' : COLORS.text.muted
+                  }
+                  style={styles.statusIcon}
+                />
+              )}
+            </View>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -128,6 +182,7 @@ const ChatDetailScreen: React.FC = () => {
   const { user: currentUser } = useAuth();
   const [messageText, setMessageText] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
   const {
     sendMessage,
@@ -190,11 +245,49 @@ const ChatDetailScreen: React.FC = () => {
       );
     } catch (error) {
       logger.error('[Chat] Failed to send message:', error);
+      // CRITICAL FIX: Mark message as failed with error status
       setMessages((prev) =>
-        prev.map((m) => (m.id === tempId ? { ...m, status: 'sending' } : m)),
+        prev.map((m) => (m.id === tempId ? { ...m, status: 'error' } : m)),
       );
+      // Show error toast
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     }
   }, [messageText, conversationId, currentUser, sendMessage]);
+
+  // Retry failed message
+  const handleRetry = useCallback(
+    async (message: Message) => {
+      if (!conversationId) return;
+
+      // Update status to sending
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === message.id ? { ...m, status: 'sending' } : m,
+        ),
+      );
+
+      try {
+        await sendMessage({
+          conversationId,
+          content: message.content,
+          type: 'text',
+        });
+        setMessages((prev) =>
+          prev.map((m) => (m.id === message.id ? { ...m, status: 'sent' } : m)),
+        );
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      } catch (error) {
+        logger.error('[Chat] Retry failed:', error);
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === message.id ? { ...m, status: 'error' } : m,
+          ),
+        );
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      }
+    },
+    [conversationId, sendMessage],
+  );
 
   const renderMessage = useCallback(
     ({ item, index }: { item: Message; index: number }) => {
@@ -210,62 +303,71 @@ const ChatDetailScreen: React.FC = () => {
           isOwnMessage={isOwnMessage}
           showAvatar={showAvatar}
           otherUserAvatar={otherUser.avatarUrl ?? undefined}
+          onRetry={handleRetry}
         />
       );
     },
-    [currentUser, messages, otherUser],
+    [currentUser, messages, otherUser, handleRetry],
   );
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-          accessibilityLabel={t('common.back')}
-          accessibilityRole="button"
-        >
-          <MaterialCommunityIcons
-            name="chevron-left"
-            size={28}
-            color={COLORS.text.primary}
-          />
-        </TouchableOpacity>
+      <View style={styles.headerWrapper}>
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+            accessibilityLabel={t('common.back')}
+            accessibilityRole="button"
+          >
+            <MaterialCommunityIcons
+              name="chevron-left"
+              size={28}
+              color={COLORS.text.primary}
+            />
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.userInfo}
-          onPress={() =>
-            navigation.navigate('ProfileDetail', { userId: otherUser.id })
-          }
-        >
-          <Image
-            source={{
-              uri:
-                otherUser.avatarUrl ||
-                'https://ui-avatars.com/api/?name=' +
-                  encodeURIComponent(otherUser.name || 'User'),
-            }}
-            style={styles.headerAvatar}
-            contentFit="cover"
-          />
-          <View>
-            <Text style={styles.headerName}>{otherUser.name}</Text>
-            <Text style={styles.headerStatus}>
-              {'lastSeen' in otherUser && otherUser.lastSeen
-                ? 'Online'
-                : 'Offline'}
-            </Text>
-          </View>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.userInfo}
+            onPress={() =>
+              navigation.navigate('ProfileDetail', { userId: otherUser.id })
+            }
+          >
+            <Image
+              source={{
+                uri:
+                  otherUser.avatarUrl ||
+                  'https://ui-avatars.com/api/?name=' +
+                    encodeURIComponent(otherUser.name || 'User'),
+              }}
+              style={styles.headerAvatar}
+              contentFit="cover"
+            />
+            <View>
+              <Text style={styles.headerName}>{otherUser.name}</Text>
+              <Text style={styles.headerStatus}>
+                {'lastSeen' in otherUser && otherUser.lastSeen
+                  ? 'Online'
+                  : 'Offline'}
+              </Text>
+            </View>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.moreButton}>
-          <MaterialCommunityIcons
-            name="dots-vertical"
-            size={24}
-            color={COLORS.text.secondary}
-          />
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.moreButton}>
+            <MaterialCommunityIcons
+              name="dots-vertical"
+              size={24}
+              color={COLORS.text.secondary}
+            />
+          </TouchableOpacity>
+        </View>
+        <LinearGradient
+          colors={['rgba(204, 255, 0, 0.1)', 'transparent']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.headerGradient}
+        />
       </View>
 
       {/* Messages List */}
@@ -295,18 +397,19 @@ const ChatDetailScreen: React.FC = () => {
             />
           </TouchableOpacity>
 
-          <View style={styles.inputWrapper}>
-            <TextInput
-              style={styles.textInput}
-              placeholder={t('messages.input.placeholder')}
-              placeholderTextColor={COLORS.text.muted}
-              value={messageText}
-              onChangeText={setMessageText}
-              multiline
-              maxLength={1000}
-              accessibilityLabel={t('messages.input.placeholder')}
-            />
-          </View>
+          <LiquidTextInput
+            placeholder={t('messages.input.placeholder')}
+            value={messageText}
+            onChangeText={setMessageText}
+            multiline
+            maxLength={1000}
+            accessibilityLabel={t('messages.input.placeholder')}
+            breathingColor={COLORS.primary}
+            containerStyle={styles.inputWrapper}
+            style={styles.textInput}
+            blurIntensity={20}
+            focusedBlurIntensity={60}
+          />
 
           <TouchableOpacity
             style={[
@@ -333,13 +436,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background.primary,
   },
+  headerWrapper: {
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border.default,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 8,
-    paddingVertical: 12,
-    borderBottomWidth: 0.5,
-    borderBottomColor: COLORS.border.default,
+    paddingVertical: 10,
+  },
+  headerGradient: {
+    height: 2,
+    width: '100%',
   },
   backButton: {
     padding: 4,
@@ -396,16 +505,27 @@ const styles = StyleSheet.create({
   },
   messageBubble: {
     maxWidth: '75%',
+    borderRadius: 18,
+    overflow: 'hidden',
+  },
+  messageBubbleContent: {
     paddingHorizontal: 14,
     paddingVertical: 10,
-    borderRadius: 18,
   },
   ownMessage: {
-    backgroundColor: COLORS.brand.primary,
+    backgroundColor: 'rgba(204, 255, 0, 0.3)',
     borderBottomRightRadius: 4,
+    borderWidth: Platform.OS === 'ios' ? 1 : 0,
+    borderColor:
+      Platform.OS === 'ios' ? 'rgba(204, 255, 0, 0.4)' : 'transparent',
   },
   otherMessage: {
-    backgroundColor: COLORS.background.secondary,
+    backgroundColor:
+      Platform.OS === 'ios'
+        ? 'rgba(39, 39, 42, 0.6)'
+        : COLORS.background.secondary,
+    borderWidth: Platform.OS === 'ios' ? 1 : 0,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
     borderBottomLeftRadius: 4,
   },
   messageText: {
@@ -426,6 +546,20 @@ const styles = StyleSheet.create({
   },
   statusIcon: {
     marginLeft: 2,
+  },
+  retryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255, 68, 68, 0.1)',
+  },
+  retryText: {
+    fontSize: 11,
+    color: '#FF4444',
+    fontWeight: '600',
   },
   inputContainer: {
     flexDirection: 'row',
