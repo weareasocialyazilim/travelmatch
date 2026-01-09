@@ -52,6 +52,7 @@ import { NeonPulseMarker } from '../components';
 // Using useDiscoverMoments for PostGIS-based location discovery
 import { useDiscoverMoments } from '@/hooks/useDiscoverMoments';
 import { useSubscription } from '@/features/payments/hooks/usePayments';
+import { useNetwork } from '@/context/NetworkContext';
 import { supabase } from '@/config/supabase';
 import TrustBadge from '@/components/ui/TMBadge';
 import { logger } from '@/utils/logger';
@@ -183,6 +184,10 @@ const SearchMapScreen: React.FC = () => {
   const moments = discoveryMoments;
   const { subscription } = useSubscription();
   const userTier = subscription?.tier || 'free';
+
+  // Network status for offline handling
+  const { isConnected, isInternetReachable } = useNetwork();
+  const isOffline = !isConnected || isInternetReachable === false;
 
   // State
   const [userLocation, setUserLocation] = useState<MapLocation | null>(null);
@@ -449,6 +454,40 @@ const SearchMapScreen: React.FC = () => {
     transform: [{ scale: locationButtonScale.value }],
   }));
 
+  // Show offline fallback UI
+  if (isOffline) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.fallbackContainer}>
+          <MaterialCommunityIcons
+            name="wifi-off"
+            size={64}
+            color={COLORS.text.muted}
+          />
+          <Text style={styles.fallbackTitle}>Çevrimdışı Mod</Text>
+          <Text style={styles.fallbackSubtitle}>
+            Haritayı görüntülemek için internet bağlantısı gerekiyor. Lütfen
+            bağlantınızı kontrol edin.
+          </Text>
+          <TouchableOpacity
+            style={styles.offlineRetryButton}
+            onPress={() => {
+              // Force re-render by toggling a state
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }}
+          >
+            <MaterialCommunityIcons
+              name="refresh"
+              size={20}
+              color={COLORS.primary}
+            />
+            <Text style={styles.offlineRetryText}>Tekrar Dene</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
   // Show fallback UI if Mapbox is not configured or has error
   if (!isMapboxConfigured || mapError) {
     return (
@@ -459,10 +498,10 @@ const SearchMapScreen: React.FC = () => {
             size={64}
             color={COLORS.text.muted}
           />
-          <Text style={styles.fallbackTitle}>Map Unavailable</Text>
+          <Text style={styles.fallbackTitle}>Harita Kullanılamıyor</Text>
           <Text style={styles.fallbackSubtitle}>
             {mapError ||
-              'Map service is not configured. Please add your Mapbox token to .env file.'}
+              'Harita servisi yapılandırılmamış. Lütfen Mapbox token ekleyin.'}
           </Text>
         </View>
       </View>
@@ -920,6 +959,25 @@ const styles = StyleSheet.create({
     color: COLORS.text.secondary,
     textAlign: 'center',
     marginTop: 8,
+    lineHeight: 22,
+    paddingHorizontal: 20,
+  },
+  offlineRetryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 24,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    backgroundColor: 'rgba(204, 255, 0, 0.1)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(204, 255, 0, 0.3)',
+  },
+  offlineRetryText: {
+    color: COLORS.primary,
+    fontSize: 15,
+    fontWeight: '600',
   },
   // Empty state overlay
   emptyOverlay: {

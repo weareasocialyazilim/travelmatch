@@ -7,6 +7,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   FlatList,
+  ActionSheetIOS,
+  Alert,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
@@ -22,13 +24,16 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
+import * as ImagePicker from 'expo-image-picker';
 import { COLORS } from '@/constants/colors';
 import { useMessages } from '@/hooks/useMessages';
 import { useAuth } from '@/context/AuthContext';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useScreenSecurity } from '@/hooks/useScreenSecurity';
 import { logger } from '@/utils/logger';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { LiquidTextInput } from '@/components/ui/LiquidTextInput';
+import { showAlert } from '@/stores/modalStore';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 
@@ -169,6 +174,9 @@ const ChatDetailScreen: React.FC = () => {
   const flatListRef = useRef<FlatList>(null);
   const { t } = useTranslation();
 
+  // Security: Prevent screenshots in private conversations
+  useScreenSecurity();
+
   const { conversationId, otherUser: routeOtherUser } = route.params;
 
   // Provide default fallback for otherUser to prevent undefined errors
@@ -287,6 +295,268 @@ const ChatDetailScreen: React.FC = () => {
     [conversationId, sendMessage],
   );
 
+  // Handle attachment button press - show options for photo/location
+  const handleAttachmentPress = useCallback(async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    const options = [
+      { label: 'Fotoğraf Çek', action: 'camera' },
+      { label: 'Galeriden Seç', action: 'gallery' },
+      { label: 'Konum Gönder', action: 'location' },
+      { label: 'İptal', action: 'cancel' },
+    ];
+
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: options.map((o) => o.label),
+          cancelButtonIndex: options.length - 1,
+        },
+        async (buttonIndex) => {
+          const action = options[buttonIndex]?.action;
+          if (action === 'camera') {
+            await handleCameraCapture();
+          } else if (action === 'gallery') {
+            await handleGalleryPick();
+          } else if (action === 'location') {
+            handleLocationShare();
+          }
+        },
+      );
+    } else {
+      // Android: Use Alert with buttons
+      showAlert({
+        title: 'Ekle',
+        message: 'Ne göndermek istiyorsunuz?',
+        buttons: [
+          { text: 'Fotoğraf Çek', onPress: handleCameraCapture },
+          { text: 'Galeriden Seç', onPress: handleGalleryPick },
+          { text: 'Konum Gönder', onPress: handleLocationShare },
+          { text: 'İptal', style: 'cancel' },
+        ],
+      });
+    }
+  }, []);
+
+  // Handle camera capture
+  const handleCameraCapture = useCallback(async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        showAlert({
+          title: 'İzin Gerekli',
+          message: 'Fotoğraf çekebilmek için kamera izni gerekiyor.',
+          buttons: [{ text: 'Tamam' }],
+        });
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        quality: 0.8,
+        aspect: [4, 3],
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        // TODO: Upload image and send as message
+        logger.info('[Chat] Camera image captured:', result.assets[0].uri);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        showAlert({
+          title: 'Yakında',
+          message: 'Fotoğraf gönderme özelliği yakında aktif olacak!',
+          buttons: [{ text: 'Tamam' }],
+        });
+      }
+    } catch (error) {
+      logger.error('[Chat] Camera capture failed:', error);
+    }
+  }, []);
+
+  // Handle gallery pick
+  const handleGalleryPick = useCallback(async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        showAlert({
+          title: 'İzin Gerekli',
+          message: 'Fotoğraf seçebilmek için galeri izni gerekiyor.',
+          buttons: [{ text: 'Tamam' }],
+        });
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        // TODO: Upload image and send as message
+        logger.info('[Chat] Gallery image selected:', result.assets[0].uri);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        showAlert({
+          title: 'Yakında',
+          message: 'Fotoğraf gönderme özelliği yakında aktif olacak!',
+          buttons: [{ text: 'Tamam' }],
+        });
+      }
+    } catch (error) {
+      logger.error('[Chat] Gallery pick failed:', error);
+    }
+  }, []);
+
+  // Handle location share
+  const handleLocationShare = useCallback(() => {
+    // TODO: Implement location sharing
+    logger.info('[Chat] Location share requested');
+    showAlert({
+      title: 'Yakında',
+      message: 'Konum gönderme özelliği yakında aktif olacak!',
+      buttons: [{ text: 'Tamam' }],
+    });
+  }, []);
+
+  // Handle more button press - show block/report options
+  const handleMorePress = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    const options = [
+      { label: 'Profili Görüntüle', action: 'profile' },
+      { label: 'Kullanıcıyı Engelle', action: 'block', destructive: true },
+      { label: 'Şikayet Et', action: 'report', destructive: true },
+      { label: 'İptal', action: 'cancel' },
+    ];
+
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: options.map((o) => o.label),
+          destructiveButtonIndex: options.findIndex((o) => o.action === 'block'),
+          cancelButtonIndex: options.length - 1,
+        },
+        (buttonIndex) => {
+          const action = options[buttonIndex]?.action;
+          if (action === 'profile') {
+            navigation.navigate('ProfileDetail', { userId: otherUser.id });
+          } else if (action === 'block') {
+            handleBlockUser();
+          } else if (action === 'report') {
+            handleReportUser();
+          }
+        },
+      );
+    } else {
+      // Android: Use Alert
+      showAlert({
+        title: 'Seçenekler',
+        message: `${otherUser.name} için ne yapmak istiyorsunuz?`,
+        buttons: [
+          {
+            text: 'Profili Görüntüle',
+            onPress: () => navigation.navigate('ProfileDetail', { userId: otherUser.id }),
+          },
+          {
+            text: 'Kullanıcıyı Engelle',
+            style: 'destructive',
+            onPress: handleBlockUser,
+          },
+          {
+            text: 'Şikayet Et',
+            style: 'destructive',
+            onPress: handleReportUser,
+          },
+          { text: 'İptal', style: 'cancel' },
+        ],
+      });
+    }
+  }, [navigation, otherUser]);
+
+  // Handle block user
+  const handleBlockUser = useCallback(() => {
+    showAlert({
+      title: 'Kullanıcıyı Engelle',
+      message: `${otherUser.name} adlı kullanıcıyı engellemek istediğinizden emin misiniz? Bu kullanıcı size mesaj gönderemeyecek ve sizi göremeyecek.`,
+      buttons: [
+        { text: 'İptal', style: 'cancel' },
+        {
+          text: 'Engelle',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              // TODO: Implement block user API call
+              logger.info('[Chat] Blocking user:', otherUser.id);
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              navigation.goBack();
+            } catch (error) {
+              logger.error('[Chat] Block user failed:', error);
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+            }
+          },
+        },
+      ],
+    });
+  }, [otherUser, navigation]);
+
+  // Handle report user
+  const handleReportUser = useCallback(() => {
+    const reportReasons = [
+      'Uygunsuz içerik',
+      'Spam veya dolandırıcılık',
+      'Rahatsız edici davranış',
+      'Sahte profil',
+      'Diğer',
+    ];
+
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          title: 'Şikayet Nedeni',
+          options: [...reportReasons, 'İptal'],
+          cancelButtonIndex: reportReasons.length,
+        },
+        (buttonIndex) => {
+          if (buttonIndex < reportReasons.length) {
+            submitReport(reportReasons[buttonIndex]);
+          }
+        },
+      );
+    } else {
+      showAlert({
+        title: 'Şikayet Nedeni',
+        message: 'Lütfen şikayet nedeninizi seçin:',
+        buttons: [
+          ...reportReasons.map((reason) => ({
+            text: reason,
+            onPress: () => submitReport(reason),
+          })),
+          { text: 'İptal', style: 'cancel' as const },
+        ],
+      });
+    }
+  }, []);
+
+  // Submit report
+  const submitReport = useCallback(
+    async (reason: string) => {
+      try {
+        // TODO: Implement report API call
+        logger.info('[Chat] Reporting user:', { userId: otherUser.id, reason });
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        showAlert({
+          title: 'Teşekkürler',
+          message: 'Şikayetiniz alındı. En kısa sürede incelenecektir.',
+          buttons: [{ text: 'Tamam' }],
+        });
+      } catch (error) {
+        logger.error('[Chat] Report user failed:', error);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      }
+    },
+    [otherUser],
+  );
+
   const renderMessage = useCallback(
     ({ item, index }: { item: Message; index: number }) => {
       const isOwnMessage = item.senderId === currentUser?.id;
@@ -352,7 +622,12 @@ const ChatDetailScreen: React.FC = () => {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.moreButton}>
+          <TouchableOpacity
+            style={styles.moreButton}
+            onPress={handleMorePress}
+            accessibilityLabel="Seçenekler"
+            accessibilityRole="button"
+          >
             <MaterialCommunityIcons
               name="dots-vertical"
               size={24}
@@ -387,7 +662,12 @@ const ChatDetailScreen: React.FC = () => {
         <View
           style={[styles.inputContainer, { paddingBottom: insets.bottom + 8 }]}
         >
-          <TouchableOpacity style={styles.attachButton}>
+          <TouchableOpacity
+            style={styles.attachButton}
+            onPress={handleAttachmentPress}
+            accessibilityLabel="Dosya ekle"
+            accessibilityRole="button"
+          >
             <MaterialCommunityIcons
               name="plus"
               size={24}

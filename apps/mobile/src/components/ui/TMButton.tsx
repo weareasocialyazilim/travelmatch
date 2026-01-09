@@ -385,11 +385,30 @@ export const TMButton: React.FC<TMButtonProps> = ({
   }
 
   // Neon variant with glow effect
+  // Android: Uses a colored backdrop for glow since elevation is gray-only
   if (variant === 'neon') {
+    const neonRadius = radiusBySize[size];
+
     return (
       <Animated.View
         style={[fullWidth && styles.fullWidth, animatedStyle, style]}
       >
+        {/* Android: Colored glow backdrop layer */}
+        {Platform.OS === 'android' && !disabled && (
+          <View
+            style={[
+              styles.androidNeonGlowBackdrop,
+              {
+                borderRadius: neonRadius + 4,
+                // Position slightly larger behind the button
+                top: -2,
+                left: -2,
+                right: -2,
+                bottom: -2,
+              },
+            ]}
+          />
+        )}
         <Pressable
           onPress={onPress}
           onPressIn={handlePressIn}
@@ -400,7 +419,7 @@ export const TMButton: React.FC<TMButtonProps> = ({
           style={[
             styles.button,
             sizeStyles[size],
-            { borderRadius: radiusBySize[size] },
+            { borderRadius: neonRadius },
             disabled && styles.disabled,
           ]}
         >
@@ -410,8 +429,8 @@ export const TMButton: React.FC<TMButtonProps> = ({
             end={{ x: 1, y: 0 }}
             style={[
               styles.gradient,
-              styles.neonGlow,
-              { borderRadius: radiusBySize[size] },
+              Platform.OS === 'ios' && styles.neonGlow,
+              { borderRadius: neonRadius },
             ]}
           >
             {renderContent()}
@@ -451,7 +470,14 @@ export const TMButton: React.FC<TMButtonProps> = ({
   }
 
   // Glass variant with blur effect
+  // Android fallback: Use opaque semi-transparent background instead of blur
+  // for better performance on low-end devices
   if (variant === 'glass') {
+    const glassContentStyle = [
+      styles.glassFill,
+      { borderRadius: radiusBySize[size] },
+    ];
+
     return (
       <Animated.View
         style={[fullWidth && styles.fullWidth, animatedStyle, style]}
@@ -470,13 +496,21 @@ export const TMButton: React.FC<TMButtonProps> = ({
             disabled && styles.disabled,
           ]}
         >
-          <BlurView
-            intensity={Platform.OS === 'ios' ? 20 : 80}
-            tint="light"
-            style={[styles.glassFill, { borderRadius: radiusBySize[size] }]}
-          >
-            {renderContent()}
-          </BlurView>
+          {Platform.OS === 'android' ? (
+            // Android: Opaque fallback for performance on low-end devices
+            <View style={[glassContentStyle, styles.glassAndroidFallback]}>
+              {renderContent()}
+            </View>
+          ) : (
+            // iOS: Full blur effect
+            <BlurView
+              intensity={20}
+              tint="light"
+              style={glassContentStyle}
+            >
+              {renderContent()}
+            </BlurView>
+          )}
         </Pressable>
       </Animated.View>
     );
@@ -571,6 +605,13 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 8,
   },
+  // Android: Colored glow backdrop since elevation only renders gray shadows
+  androidNeonGlowBackdrop: {
+    position: 'absolute',
+    backgroundColor: 'rgba(255, 215, 0, 0.25)', // Gold/neon color at 25% opacity
+    // Blur effect simulation using multiple semi-transparent layers
+    elevation: 0,
+  },
   glowOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
@@ -589,6 +630,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.2)',
     overflow: 'hidden',
+  },
+  // Android opaque fallback for performance on low-end devices
+  glassAndroidFallback: {
+    backgroundColor: 'rgba(30, 30, 32, 0.85)', // Matches COLORS.surface.glassBackground
   },
   shimmerOverlay: {
     position: 'absolute',
