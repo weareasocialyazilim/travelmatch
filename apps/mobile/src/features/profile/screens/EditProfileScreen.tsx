@@ -19,8 +19,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
-import * as Haptics from 'expo-haptics';
 import { useForm } from 'react-hook-form';
+import { HapticManager } from '@/services/HapticManager';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { logger } from '@/utils/logger';
 import Animated, {
@@ -158,7 +158,7 @@ const EditProfileScreen = () => {
         });
 
         if (!result.canceled) {
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          HapticManager.photoCaptured();
           setAvatarUri(result.assets[0].uri);
         }
       } else {
@@ -181,7 +181,7 @@ const EditProfileScreen = () => {
         });
 
         if (!result.canceled) {
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          HapticManager.photoCaptured();
           setAvatarUri(result.assets[0].uri);
         }
       }
@@ -197,7 +197,7 @@ const EditProfileScreen = () => {
     if (!hasChanges()) return;
 
     try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      HapticManager.primaryAction();
 
       // Upload avatar if changed
       if (avatarUri) {
@@ -219,7 +219,7 @@ const EditProfileScreen = () => {
       // Refresh user context
       await refreshUser();
 
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      HapticManager.profileUpdated();
       showAlert('Başarılı', 'Profil güncellendi', [
         { text: 'Tamam', onPress: () => navigation.goBack() },
       ]);
@@ -240,7 +240,7 @@ const EditProfileScreen = () => {
   );
 
   const handleChangeAvatar = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
 
     const options = avatarUri
       ? ['İptal', 'Fotoğraf Çek', 'Galeriden Seç', 'Fotoğrafı Kaldır']
@@ -506,7 +506,7 @@ const EditProfileScreen = () => {
                     ]}
                     activeOpacity={0.8}
                     onPress={() => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      HapticManager.toggle();
                       setIsDiscoverable(!isDiscoverable);
                     }}
                   >
@@ -540,7 +540,7 @@ const EditProfileScreen = () => {
                     <TouchableOpacity
                       style={styles.distanceButton}
                       onPress={() => {
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        HapticManager.selectionChange();
                         setDistancePreference(Math.max(5, distancePreference - 5));
                       }}
                     >
@@ -550,7 +550,7 @@ const EditProfileScreen = () => {
                     <TouchableOpacity
                       style={styles.distanceButton}
                       onPress={() => {
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        HapticManager.selectionChange();
                         setDistancePreference(Math.min(500, distancePreference + 5));
                       }}
                     >

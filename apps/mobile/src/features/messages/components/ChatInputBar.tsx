@@ -21,8 +21,8 @@ import {
 import { BlurView } from 'expo-blur';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import * as Haptics from 'expo-haptics';
 import { supabase } from '@/config/supabase';
+import { HapticManager } from '@/services/HapticManager';
 import { COLORS } from '@/constants/colors';
 import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { logger } from '@/utils/logger';
@@ -115,7 +115,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
       return;
     }
 
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.giftSent();
     logger.debug('Gift button pressed', {
       momentId: linkedMoment.id,
       requestedAmount: linkedMoment.requested_amount,
@@ -130,7 +130,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
         <TouchableOpacity
           style={styles.attachButton}
           onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            HapticManager.buttonPress();
             logger.debug('Attach button pressed - opening attachment sheet');
             onAttachPress();
           }}
@@ -201,7 +201,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
             (!isConnected || isSending) && styles.sendButtonDisabled,
           ]}
           onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            HapticManager.messageSent();
             onSend();
           }}
           disabled={

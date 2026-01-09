@@ -25,8 +25,8 @@ import { showAlert } from '@/stores/modalStore';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as Haptics from 'expo-haptics';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { HapticManager } from '@/services/HapticManager';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import type { RootStackParamList } from '@/navigation/routeParams';
@@ -79,7 +79,7 @@ export const ArchivedChatsScreen: React.FC = () => {
   ]);
 
   const handleUnarchive = (id: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     showAlert({
       title: t('messages.archived.unarchiveTitle'),
       message: t('messages.archived.unarchiveMessage'),
@@ -97,7 +97,7 @@ export const ArchivedChatsScreen: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.destructiveAction();
     showAlert({
       title: t('messages.archived.deleteTitle'),
       message: t('messages.archived.deleteMessage'),
@@ -116,7 +116,7 @@ export const ArchivedChatsScreen: React.FC = () => {
   };
 
   const handleOpenChat = (chat: ArchivedChat) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     navigation.navigate('Chat', {
       otherUser: {
         id: chat.id,

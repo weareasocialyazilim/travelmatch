@@ -30,8 +30,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
-import * as Haptics from 'expo-haptics';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
+import { HapticManager } from '@/services/HapticManager';
 import { useTranslation } from 'react-i18next';
 
 import { withErrorBoundary } from '@/components/withErrorBoundary';
@@ -74,14 +74,14 @@ const InboxScreen: React.FC = () => {
 
   // Handle refresh with haptic feedback
   const handleRefresh = useCallback(async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.refreshTriggered();
     await refreshInbox();
   }, [refreshInbox]);
 
   // Handle chat press
   const handleChatPress = useCallback(
     (chat: InboxChat) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.buttonPress();
       navigation.navigate('Chat', {
         otherUser: {
           id: chat.user.id,
@@ -100,7 +100,7 @@ const InboxScreen: React.FC = () => {
 
   // Handle archive button
   const handleArchive = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     navigation.navigate('ArchivedChats');
   }, [navigation]);
 
