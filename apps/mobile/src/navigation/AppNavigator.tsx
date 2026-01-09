@@ -101,7 +101,7 @@ const _SearchMapScreen = React.lazy(() =>
 import { InboxScreen } from '../features/inbox';
 import { NotificationsScreen } from '../features/notifications';
 import { CheckoutScreen } from '../features/payments';
-import { ChatDetailScreen } from '../features/messages';
+// REMOVED: ChatDetailScreen - duplicate of ChatScreen (zombie cleanup)
 
 // ===================================
 // PROFILE FEATURE SCREENS
@@ -642,7 +642,7 @@ const AppNavigator = () => {
 
             {/* Communication */}
             <Stack.Screen name="Chat" component={ChatScreen} />
-            <Stack.Screen name="ChatDetail" component={ChatDetailScreen} />
+            {/* REMOVED: ChatDetail - duplicate route, use Chat instead */}
 
             {/* Checkout & Reviews (Modals) */}
             <Stack.Screen
