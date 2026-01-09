@@ -35,7 +35,7 @@ import Animated, {
   Easing,
   cancelAnimation,
 } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { KYCProgressBar } from './KYCProgressBar';
@@ -311,32 +311,32 @@ const KYCSelfieScreen: React.FC = () => {
   };
 
   const startLivenessCheck = useCallback(async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.primaryAction();
     setScanState('scanning');
     setLivenessStep('turn_left');
     setLivenessProgress(0);
 
     // Step 1: Turn left (simulate detection)
     await new Promise((resolve) => setTimeout(resolve, 1500));
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     setLivenessProgress(33);
     setLivenessStep('turn_right');
 
     // Step 2: Turn right
     await new Promise((resolve) => setTimeout(resolve, 1500));
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     setLivenessProgress(66);
     setLivenessStep('blink');
 
     // Step 3: Blink
     await new Promise((resolve) => setTimeout(resolve, 1500));
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     setLivenessProgress(100);
     setLivenessStep('complete');
 
     // Complete
     await new Promise((resolve) => setTimeout(resolve, 500));
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    HapticManager.kycStepCompleted();
     setScanState('success');
     setData((prev) => ({
       ...prev,
@@ -346,7 +346,7 @@ const KYCSelfieScreen: React.FC = () => {
   }, []);
 
   const handleContinue = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     navigation.navigate('KYCReview', { data });
   };
 

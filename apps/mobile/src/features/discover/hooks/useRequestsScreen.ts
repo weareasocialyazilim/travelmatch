@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LayoutAnimation, Platform, UIManager } from 'react-native';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { logger } from '@/utils/logger';
 import { showAlert } from '@/stores/modalStore';
 import { useRequests as useRequestsAPI } from '@/hooks/useRequests';
@@ -151,7 +151,7 @@ export const useRequestsScreen = (initialTab: TabType = 'pending') => {
 
   // Handlers
   const handleAccept = async (item: RequestItem) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.primaryAction();
 
     if (item.proofRequired && !item.proofUploaded) {
       showAlert({
@@ -170,7 +170,7 @@ export const useRequestsScreen = (initialTab: TabType = 'pending') => {
     if (success) {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       setRequests((prev) => prev.filter((r) => r.id !== item.id));
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      HapticManager.requestAccepted();
     }
   };
 
@@ -190,9 +190,7 @@ export const useRequestsScreen = (initialTab: TabType = 'pending') => {
                 LayoutAnimation.Presets.easeInEaseOut,
               );
               setRequests((prev) => prev.filter((r) => r.id !== item.id));
-              Haptics.notificationAsync(
-                Haptics.NotificationFeedbackType.Success,
-              );
+              HapticManager.success();
             }
           },
         },

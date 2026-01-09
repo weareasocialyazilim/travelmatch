@@ -26,7 +26,7 @@ import Animated, {
   FadeIn,
   FadeInDown,
 } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { COLORS } from '@/constants/colors';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { NetworkGuard } from '@/components/NetworkGuard';
@@ -202,7 +202,7 @@ const KYCReviewScreen: React.FC = () => {
 
       if (error) throw error;
 
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      HapticManager.kycVerified();
       setAnalysisState('success');
 
       // Navigate after brief success state
@@ -212,7 +212,7 @@ const KYCReviewScreen: React.FC = () => {
     } catch (analysisError) {
       logger.error('[KYCReview] AI analysis failed', { error: analysisError });
       setAnalysisState('error');
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.error();
       showToast('AI analizi başarısız oldu. Lütfen tekrar deneyin.', 'error');
     }
   }, [data, navigation, showToast]);
@@ -221,7 +221,7 @@ const KYCReviewScreen: React.FC = () => {
     if (!confirmed) return;
 
     setLoading(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.primaryAction();
 
     await runAIAnalysis();
 

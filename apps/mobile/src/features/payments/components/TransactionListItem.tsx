@@ -13,7 +13,7 @@
 import React, { useCallback } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -135,7 +135,7 @@ export const TransactionListItem: React.FC<TransactionListItemProps> = ({
   }, [scale]);
 
   const handlePress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     onPress?.(transaction);
   }, [onPress, transaction]);
 
