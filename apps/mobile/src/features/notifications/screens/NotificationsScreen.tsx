@@ -66,18 +66,10 @@ const NOTIFICATIONS: NotificationItem[] = [
   },
   {
     id: '4',
-    type: 'social',
-    user: 'Selin Y.',
-    msg: 'maceralarını takip etmeye başladı.',
-    time: '5sa önce',
-    read: true,
-  },
-  {
-    id: '5',
     type: 'system',
     user: 'Sistem',
     msg: 'Doğrulanmış gezgin oldun! 🛡️',
-    time: '1g önce',
+    time: '5sa önce',
     read: true,
   },
 ];

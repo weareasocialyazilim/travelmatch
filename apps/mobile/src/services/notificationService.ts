@@ -31,11 +31,10 @@ import { toRecord } from '../utils/jsonHelper';
 // Types - Updated for Moment platform with PayTR integration
 export type NotificationType =
   | 'message'
-  // Gift & Offer notifications (replacing request_*)
-  | 'gift_proposal_received'
-  | 'gift_accepted'
-  | 'gift_declined'
-  | 'gift_completed'
+  // Payment & Offer notifications
+  | 'gesture_received'
+  | 'payment_confirmed'
+  | 'payment_completed'
   | 'high_value_offer' // Pro/Platinum subscriber special offers
   | 'subscriber_offer_received' // PayTR-backed subscriber offer
   | 'paytr_authorized' // PayTR has held funds
@@ -99,11 +98,11 @@ export interface Notification {
   momentId?: string;
   momentImage?: string;
   requestId?: string;
-  // Gift-specific fields
-  giftId?: string;
-  giftAmount?: number;
-  giftCurrency?: string;
-  isSubscriberOffer?: boolean;
+  // Payment-specific fields
+  gestureId?: string;
+  escrowId?: string;
+  paymentAmount?: number;
+  paymentCurrency?: string;
   // PayTR integration fields
   paytrTransactionId?: string;
   paytrStatus?: 'pending' | 'authorized' | 'captured' | 'voided';
@@ -122,7 +121,6 @@ export interface NotificationPreferences {
   messages: boolean;
   requests: boolean;
   reviews: boolean;
-  followers: boolean;
   momentActivity: boolean;
   payments: boolean;
   marketing: boolean;
@@ -294,7 +292,6 @@ export const notificationService = {
           messages: prefsRecord.messages ?? true,
           requests: prefsRecord.requests ?? true,
           reviews: prefsRecord.reviews ?? true,
-          followers: prefsRecord.followers ?? true,
           momentActivity: prefsRecord.momentActivity ?? true,
           payments: prefsRecord.payments ?? true,
           marketing: prefsRecord.marketing ?? false,
@@ -312,7 +309,6 @@ export const notificationService = {
           messages: true,
           requests: true,
           reviews: true,
-          followers: true,
           momentActivity: true,
           payments: true,
           marketing: false,
@@ -364,27 +360,26 @@ export const notificationService = {
 
 export default notificationService;
 
-// Helper functions - Updated for Moment platform (removed airplane icons)
+// Helper functions - Updated for Payment platform
 export const getNotificationIcon = (type: NotificationType): string => {
   switch (type) {
     case 'message':
       return 'chatbox-outline';
-    // Gift & Offer icons
-    case 'gift_proposal_received':
+    // Payment & Offer icons
+    case 'gesture_received':
     case 'request_received': // Legacy support
-      return 'gift-outline';
+      return 'hand-left-outline';
     case 'high_value_offer':
     case 'premium_offer_received':
       return 'diamond-outline'; // Premium icon for high-value
     case 'subscriber_offer_received':
       return 'sparkles'; // Sparkle icon for subscriber offers
-    case 'gift_accepted':
+    case 'payment_confirmed':
     case 'request_accepted':
       return 'checkmark-circle-outline';
-    case 'gift_declined':
     case 'request_declined':
       return 'close-circle-outline';
-    case 'gift_completed':
+    case 'payment_completed':
     case 'request_completed':
     case 'proof_approved_payment_released':
       return 'ribbon-outline';
@@ -443,17 +438,16 @@ export const getNotificationColor = (
 
   switch (type) {
     // Success states
-    case 'gift_accepted':
+    case 'payment_confirmed':
     case 'request_accepted':
     case 'payment_received':
-    case 'gift_completed':
+    case 'payment_completed':
     case 'request_completed':
     case 'kyc_approved':
     case 'payment_captured':
     case 'proof_submitted':
       return '#4CAF50'; // Green
     // Error/decline states
-    case 'gift_declined':
     case 'request_declined':
     case 'kyc_rejected':
       return '#F44336'; // Red
@@ -476,7 +470,7 @@ export const getNotificationColor = (
     case 'moment_saved':
       return '#7B61FF'; // Purple
     // New proposals
-    case 'gift_proposal_received':
+    case 'gesture_received':
     case 'request_received':
       return '#FFC107'; // Amber
     // PayTR states
@@ -494,24 +488,23 @@ export const getNotificationRoute = (notification: Notification): any => {
         name: 'Chat',
         params: { conversationId: notification.data?.conversationId },
       };
-    // Gift-related routes
-    case 'gift_proposal_received':
+    // Payment-related routes
+    case 'gesture_received':
     case 'high_value_offer':
-    case 'subscriber_offer_received':
       return {
-        name: 'GiftInboxDetail',
+        name: 'GestureReceived',
         params: {
           senderId: notification.userId,
-          giftId: notification.giftId,
+          gestureId: notification.gestureId,
         },
       };
     // PayTR status notifications
     case 'paytr_authorized':
     case 'payment_captured':
       return {
-        name: 'GiftInboxDetail',
+        name: 'EscrowStatus',
         params: {
-          giftId: notification.giftId,
+          escrowId: notification.escrowId,
           paytrStatus: notification.paytrStatus,
         },
       };
@@ -519,16 +512,16 @@ export const getNotificationRoute = (notification: Notification): any => {
       return {
         name: 'ProofReview',
         params: {
-          giftId: notification.giftId,
+          gestureId: notification.gestureId,
         },
       };
-    case 'gift_accepted':
-    case 'gift_completed':
+    case 'payment_confirmed':
+    case 'payment_completed':
     case 'request_received':
     case 'request_accepted':
       return {
-        name: 'GiftInbox',
-        params: { giftId: notification.giftId || notification.requestId },
+        name: 'Inbox',
+        params: { gestureId: notification.gestureId || notification.requestId },
       };
     // Profile routes
     case 'review_received':

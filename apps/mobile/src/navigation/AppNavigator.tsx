@@ -76,8 +76,6 @@ import {
   TicketScreen,
   DiscoverScreen,
 } from '../features/discover';
-// SubscriberOfferBottomSheet moved to features/gifts
-import { SubscriberOfferBottomSheet } from '../features/gifts/components';
 
 // ===================================
 // MESSAGES FEATURE SCREENS
@@ -217,6 +215,8 @@ import {
   ProofReviewScreen,
   PayTRWebViewScreen,
   PromoCodeScreen,
+  UnifiedGiftFlowScreen,
+  SubscriberOfferModal,
   // KYC Screens
   KYCIntroScreen,
   KYCDocumentTypeScreen,
@@ -234,23 +234,6 @@ import {
   WithdrawScreen,
   WithdrawSuccessScreen,
 } from '../features/wallet';
-
-// ===================================
-// GIFTS FEATURE SCREENS
-// ===================================
-import {
-  GiftInboxScreen,
-  GiftInboxDetailScreen,
-  UnifiedGiftFlowScreen,
-  MyGiftsScreen,
-} from '../features/gifts';
-
-// GiftSuccessScreen - import from gifts feature
-const GiftSuccessScreen = lazyLoad(() =>
-  import('../features/gifts/screens/GiftSuccessScreen').then((m) => ({
-    default: m.GiftSuccessScreen,
-  })),
-);
 
 // ===================================
 // NOTIFICATIONS FEATURE SCREENS
@@ -382,7 +365,6 @@ const AppNavigator = () => {
         MomentDetail: 'moment/:momentId',
         ProfileDetail: 'profile/:userId',
         Chat: 'chat/:conversationId',
-        GiftInboxDetail: 'gift/:giftId',
         Settings: 'settings',
       },
     },
@@ -543,7 +525,6 @@ const AppNavigator = () => {
               name="ProfileDetail"
               component={ProfileDetailScreen}
             />
-            <Stack.Screen name="MyGifts" component={MyGiftsScreen} />
             <Stack.Screen name="TrustNotes" component={TrustNotesScreen} />
             <Stack.Screen
               name="MomentGallery"
@@ -597,13 +578,6 @@ const AppNavigator = () => {
             <Stack.Screen
               name="GestureReceived"
               component={GestureReceivedScreen}
-            />
-
-            {/* Gift Inbox */}
-            <Stack.Screen name="GiftInbox" component={GiftInboxScreen} />
-            <Stack.Screen
-              name="GiftInboxDetail"
-              component={GiftInboxDetailScreen}
             />
 
             {/* Settings */}
@@ -699,6 +673,17 @@ const AppNavigator = () => {
             />
             <Stack.Screen name="AddCard" component={AddCardScreen} />
 
+            {/* Gift & Offer Flows */}
+            <Stack.Screen
+              name="UnifiedGiftFlow"
+              component={UnifiedGiftFlowScreen}
+            />
+            <Stack.Screen
+              name="SubscriberOfferModal"
+              component={SubscriberOfferModal}
+              options={{ presentation: 'modal' }}
+            />
+
             {/* Wallet & Settings */}
             <Stack.Screen name="Wallet" component={WalletScreen} />
             <Stack.Screen name="PromoCode" component={PromoCodeScreen} />
@@ -734,19 +719,6 @@ const AppNavigator = () => {
             {/* Ticket */}
             <Stack.Screen name="Ticket" component={TicketScreen} />
             <Stack.Screen name="ShareMoment" component={ShareMomentScreen} />
-            <Stack.Screen
-              name="UnifiedGiftFlow"
-              component={UnifiedGiftFlowScreen}
-            />
-            <Stack.Screen
-              name="SubscriberOfferModal"
-              component={SubscriberOfferBottomSheet}
-              options={{
-                presentation: 'transparentModal',
-                animation: 'slide_from_bottom',
-                headerShown: false,
-              }}
-            />
             <Stack.Screen name="PayTRWebView" component={PayTRWebViewScreen} />
 
             {/* Footer Pages */}
@@ -758,17 +730,6 @@ const AppNavigator = () => {
             <Stack.Screen
               name="DeletedMoments"
               component={DeletedMomentsScreen}
-            />
-
-            {/* NEW: Gift Success Screen - PayTR Güvenceli */}
-            <Stack.Screen
-              name="GiftSuccess"
-              component={GiftSuccessScreen}
-              options={{
-                animation: 'fade',
-                gestureEnabled: false,
-                presentation: 'fullScreenModal',
-              }}
             />
 
             {/* NEW: Moment Proof Ceremony - Anı Mühürleme */}

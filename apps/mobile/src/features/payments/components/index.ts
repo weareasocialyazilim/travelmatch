@@ -17,12 +17,7 @@ export type {
   TransactionType,
 } from './TransactionListItem';
 
-// Gift inbox
-export { GiftInboxCard } from './GiftInboxCard';
-
-// Filter and display
-export { FilterSortBar } from './FilterSortBar';
-export { TopPicksSection } from './TopPicksSection';
+// Payment display
 export { PaymentPriorityNotice } from './PaymentPriorityNotice';
 
 // Currency selection - Taşındı: components/ -> features/payments/components

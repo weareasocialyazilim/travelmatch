@@ -19,7 +19,10 @@ export interface Story {
   price?: number;
   timestamp?: number;
   time?: string; // Display time like "2 saat önce"
+  momentId?: string; // Links to the associated moment
 }
+
+export type SubscriptionTierType = 'free' | 'premium' | 'platinum';
 
 export interface UserStory {
   id: string;
@@ -27,6 +30,7 @@ export interface UserStory {
   avatar: string;
   hasStory: boolean;
   isNew?: boolean;
+  subscriptionTier?: SubscriptionTierType;
   stories: Story[];
 }
 

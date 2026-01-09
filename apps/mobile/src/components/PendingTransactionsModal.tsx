@@ -148,13 +148,17 @@ export const PendingTransactionsModal: React.FC<
                 <View key={payment.id} style={styles.item}>
                   <View style={styles.itemInfo}>
                     <Icon
-                      name={payment.type === 'gift' ? 'gift' : 'cash'}
+                      name={
+                        payment.type === 'withdraw'
+                          ? 'cash'
+                          : 'credit-card-outline'
+                      }
                       size={24}
                       color={COLORS.accent.primary}
                     />
                     <View style={styles.itemDetails}>
                       <Text style={styles.itemTitle}>
-                        {payment.type === 'gift' ? 'Hediye' : 'Para Çekme'}
+                        {payment.type === 'withdraw' ? 'Para Çekme' : 'İşlem'}
                       </Text>
                       <Text style={styles.itemAmount}>
                         {formatCurrency(

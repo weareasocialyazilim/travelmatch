@@ -763,7 +763,7 @@ const styles = StyleSheet.create({
     left: 20,
     zIndex: 10,
   },
-  // Filter button
+  // Filter button - Premium glass design
   filterButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -771,14 +771,18 @@ const styles = StyleSheet.create({
   filterButtonCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 8,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    gap: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(204, 255, 0, 0.3)',
+    backgroundColor: 'rgba(20, 20, 22, 0.85)',
   },
   filterButtonText: {
-    color: COLORS.text.primary,
-    fontSize: 14,
-    fontWeight: '600',
+    color: COLORS.primary,
+    fontSize: 15,
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
   filterActiveDot: {
     width: 8,
@@ -786,6 +790,10 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: COLORS.primary,
     marginLeft: 4,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
   },
   // Location button
   locationButtonContainer: {

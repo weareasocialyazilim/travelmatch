@@ -216,85 +216,34 @@ export const AwwwardsDiscoverHeader: React.FC<AwwwardsDiscoverHeaderProps> = ({
 
   return (
     <View style={[awwwardsStyles.container, { paddingTop: insets.top + 8 }]}>
-      {/* Left Section - Greeting & Brand */}
-      <View style={awwwardsStyles.leftSection}>
-        <Text style={awwwardsStyles.greeting}>{displayGreeting},</Text>
-        <Text style={awwwardsStyles.brandName}>TravelMatch</Text>
-      </View>
-
-      {/* Right Section - Actions & Avatar */}
-      <View style={awwwardsStyles.rightSection}>
-        {/* Filter Button */}
-        <TouchableOpacity
-          style={awwwardsStyles.iconButton}
-          onPress={onFilterPress}
-          activeOpacity={0.7}
-          accessibilityLabel={`Filtrele${activeFiltersCount > 0 ? `, ${activeFiltersCount} aktif` : ''}`}
-          accessibilityRole="button"
-        >
-          <Ionicons
-            name="options-outline"
-            size={24}
-            color={COLORS.text.primary}
-          />
-          {activeFiltersCount > 0 && (
-            <View style={awwwardsStyles.filterBadge}>
-              <Text style={awwwardsStyles.filterBadgeText}>
-                {activeFiltersCount}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
-
-        {/* Notifications Button */}
-        <TouchableOpacity
-          style={awwwardsStyles.iconButton}
-          onPress={onNotificationsPress}
-          activeOpacity={0.7}
-          accessibilityLabel={`Bildirimler${notificationCount > 0 ? `, ${notificationCount} yeni` : ''}`}
-          accessibilityRole="button"
-        >
-          <Ionicons
-            name="notifications-outline"
-            size={24}
-            color={COLORS.text.primary}
-          />
-          {notificationCount > 0 && (
-            <View style={awwwardsStyles.notificationDot} />
-          )}
-        </TouchableOpacity>
-
-        {/* User Avatar */}
-        <TouchableOpacity
-          onPress={onAvatarPress}
-          activeOpacity={0.8}
-          accessibilityLabel="Profil"
-          accessibilityRole="button"
-        >
-          <TMAvatar
-            source={userAvatar}
-            name={userName}
-            size="sm"
-            showBorder
-            borderColor={COLORS.border.light}
-          />
-        </TouchableOpacity>
-      </View>
+      {/* Center Only - TravelMatch Logo */}
+      <Text style={awwwardsStyles.logoText}>TravelMatch</Text>
     </View>
   );
 };
 
 const awwwardsStyles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 20,
-    paddingBottom: 16,
+    paddingBottom: 12,
     backgroundColor: COLORS.bg.primary,
   },
   leftSection: {
     flex: 1,
+  },
+  centerSection: {
+    flex: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoText: {
+    fontSize: 22,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.heading,
+    fontWeight: '700',
+    color: COLORS.text.primary,
+    letterSpacing: -0.5,
   },
   greeting: {
     fontSize: TYPOGRAPHY_SYSTEM.sizes.bodyS,

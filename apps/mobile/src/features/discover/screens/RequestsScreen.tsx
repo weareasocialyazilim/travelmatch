@@ -73,7 +73,9 @@ const RequestsScreen = ({ navigation }: any) => {
         momentId: metadata?.momentId as string | undefined,
         userId: metadata?.userId as string | undefined,
         conversationId: metadata?.conversationId as string | undefined,
-        giftId: metadata?.giftId as string | undefined,
+        gestureId: (metadata?.giftId || metadata?.gestureId) as
+          | string
+          | undefined,
         escrowId: metadata?.escrowId as string | undefined,
         transactionId: metadata?.transactionId as string | undefined,
         proofId: metadata?.proofId as string | undefined,

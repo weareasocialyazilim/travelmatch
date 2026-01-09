@@ -278,6 +278,15 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for unverifie
       style={
         {
           "alignItems": "center",
+          "marginTop": 8,
+        }
+      }
+    />
+    <RCTView
+      ref={null}
+      style={
+        {
+          "alignItems": "center",
           "flexDirection": "row",
           "gap": 4,
           "marginTop": 4,
@@ -685,6 +694,15 @@ exports[`ProfileHeaderSection Component Snapshots matches snapshot for verified 
         </RCTText>
       </RCTView>
     </RCTView>
+    <RCTView
+      ref={null}
+      style={
+        {
+          "alignItems": "center",
+          "marginTop": 8,
+        }
+      }
+    />
     <RCTView
       ref={null}
       style={

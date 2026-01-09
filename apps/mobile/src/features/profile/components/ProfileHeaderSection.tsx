@@ -38,6 +38,7 @@ import { COLORS, PALETTE, getTrustRingColors } from '@/constants/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { TYPE_SCALE } from '@/theme/typography';
 import { SPRINGS } from '@/hooks/useAnimations';
+import { SubscriptionBadge, type SubscriptionTier } from '@/components/ui';
 
 // ============================================
 // TYPES
@@ -69,9 +70,11 @@ interface ProfileHeaderSectionProps {
   momentsCount?: number;
   exchangesCount?: number;
   responseRate?: number;
+  subscriptionTier?: SubscriptionTier;
   onEditPress?: () => void;
   onTrustGardenPress?: () => void;
   onSettingsPress?: () => void;
+  onSubscriptionPress?: () => void;
 }
 
 // ============================================
@@ -254,9 +257,11 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
     momentsCount,
     exchangesCount,
     responseRate,
+    subscriptionTier = 'free',
     onEditPress,
     onTrustGardenPress,
     onSettingsPress,
+    onSubscriptionPress,
   }) => {
     const insets = useSafeAreaInsets();
     const editButtonScale = useSharedValue(1);
@@ -374,6 +379,16 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
                 />
               </View>
             )}
+          </View>
+
+          {/* Subscription Badge - Tinder/Bumble Style */}
+          <View style={styles.subscriptionRow}>
+            <SubscriptionBadge
+              tier={subscriptionTier}
+              size="medium"
+              showLabel
+              onPress={onSubscriptionPress}
+            />
           </View>
 
           {resolvedUsername && (
@@ -550,6 +565,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+  },
+  subscriptionRow: {
+    marginTop: 8,
+    alignItems: 'center',
   },
   userName: {
     ...TYPE_SCALE.display.h2,

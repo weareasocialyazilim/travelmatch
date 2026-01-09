@@ -30,6 +30,8 @@ export { ProofReviewScreen } from './screens/ProofReviewScreen';
 export { PayTRWebViewScreen } from './screens/PayTRWebViewScreen';
 export { default as PromoCodeScreen } from './screens/PromoCodeScreen';
 export { default as BulkThankYouScreen } from './screens/BulkThankYouScreen';
+export { default as UnifiedGiftFlowScreen } from './screens/UnifiedGiftFlowScreen';
+export { default as SubscriberOfferModal } from './screens/SubscriberOfferModal';
 
 // KYC Screens - MOVED TO features/verifications/kyc
 // Import from '@/features/verifications/kyc' for new code

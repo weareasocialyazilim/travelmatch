@@ -305,6 +305,15 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
         return <InfoModal />;
       case 'selection':
         return <SelectionModal />;
+      case 'gift':
+        // Gift modal is handled by the GiftFlow screens, not inline
+        return null;
+      case 'filter':
+        // Filter modal is handled by individual screens
+        return null;
+      case 'custom':
+        // Custom modals render their own component
+        return null;
       case 'none':
       default:
         return null;

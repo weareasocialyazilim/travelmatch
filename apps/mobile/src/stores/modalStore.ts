@@ -49,7 +49,6 @@ export interface ConfirmationModalProps {
 
 export interface LoginModalProps {
   action:
-    | 'gift'
     | 'chat'
     | 'chat_unlock'
     | 'save'

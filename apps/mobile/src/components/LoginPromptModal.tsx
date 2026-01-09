@@ -34,7 +34,6 @@ interface LoginPromptModalProps {
   onRegister: () => void;
   /** Action type that triggered the modal */
   action?:
-    | 'gift'
     | 'chat'
     | 'chat_unlock'
     | 'save'
@@ -44,12 +43,6 @@ interface LoginPromptModalProps {
 }
 
 const ACTION_CONFIG = {
-  gift: {
-    icon: 'gift-outline' as const,
-    title: 'Hediye Gönder',
-    description: 'Bu ipeksi anın bir parçası olmak için üye olmalısın.',
-    gradient: ['#F59E0B', '#EF4444'] as [string, string],
-  },
   chat: {
     icon: 'chat-outline' as const,
     title: 'Sohbet Başlat',
@@ -225,7 +218,7 @@ const ModalContent: React.FC<ModalContentProps> = ({
           size={18}
           color={COLORS.brand.primary}
         />
-        <Text style={styles.featureText}>Hediyelerle destek ol</Text>
+        <Text style={styles.featureText}>Anlar oluştur ve paylaş</Text>
       </View>
       <View style={styles.featureRow}>
         <MaterialCommunityIcons

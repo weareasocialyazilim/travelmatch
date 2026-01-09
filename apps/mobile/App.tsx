@@ -43,32 +43,38 @@ import * as Sentry from '@sentry/react-native';
 // Sentry DSN from environment variable - avoid hardcoding
 const SENTRY_DSN = process.env.EXPO_PUBLIC_SENTRY_DSN || '';
 
-// Only initialize Sentry if DSN is configured and not in development
-if (SENTRY_DSN && !__DEV__) {
+// Track if Sentry is initialized
+let isSentryInitialized = false;
+
+// Initialize Sentry before app mounts
+if (SENTRY_DSN) {
   Sentry.init({
     dsn: SENTRY_DSN,
 
+    // Only enable in production for performance
+    enabled: !__DEV__,
+
     // Adds more context data to events (IP address, cookies, user, etc.)
     // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
-    sendDefaultPii: true,
+    sendDefaultPii: !__DEV__,
 
-    // Enable Logs
-    enableLogs: true,
+    // Enable Logs only in production
+    enableLogs: !__DEV__,
 
-    // Configure Session Replay
-    replaysSessionSampleRate: 0.1,
-    replaysOnErrorSampleRate: 1,
-    integrations: [
-      Sentry.mobileReplayIntegration(),
-      Sentry.feedbackIntegration(),
-    ],
+    // Configure Session Replay (production only)
+    replaysSessionSampleRate: __DEV__ ? 0 : 0.1,
+    replaysOnErrorSampleRate: __DEV__ ? 0 : 1,
+    integrations: __DEV__
+      ? []
+      : [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
 
     // uncomment the line below to enable Spotlight (https://spotlightjs.com)
     // spotlight: __DEV__,
   });
+  isSentryInitialized = true;
 }
-// Sentry is initialized lazily in useEffect to avoid JSI runtime issues with New Architecture
-// See: src/config/sentry.ts for full configuration
+// Sentry.wrap should only be used after Sentry.init - we always call init now (even if disabled)
+// See: src/config/sentry.ts for additional configuration
 
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();

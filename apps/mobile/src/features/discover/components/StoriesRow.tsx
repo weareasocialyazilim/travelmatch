@@ -24,7 +24,14 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { TMAvatar } from '@/components/ui/TMAvatar';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
-import type { UserStory } from './types';
+import type { UserStory, SubscriptionTierType } from './types';
+
+// Subscription tier ring colors
+const TIER_RING_COLORS: Record<SubscriptionTierType, string> = {
+  free: COLORS.brand.primary,
+  premium: '#FFD700', // Gold
+  platinum: '#E5E4E2', // Platinum/Silver
+};
 
 interface StoriesRowProps {
   stories: UserStory[];
@@ -75,35 +82,49 @@ const StoriesRow: React.FC<StoriesRowProps> = memo(
           </TouchableOpacity>
 
           {/* User Stories */}
-          {stories.map((user, index) => (
-            <TouchableOpacity
-              key={user.id}
-              style={styles.storyItem}
-              onPress={() => onStoryPress(user, index)}
-              activeOpacity={0.8}
-              accessibilityRole="button"
-              accessibilityLabel={`View ${user.name}'s story`}
-            >
-              <View
-                style={[
-                  styles.storyRing,
-                  user.isNew && styles.storyRingNew,
-                  !user.isNew && styles.storyRingViewed,
-                ]}
+          {stories.map((user, index) => {
+            // Determine ring color based on subscription tier
+            const tierColor = user.subscriptionTier
+              ? TIER_RING_COLORS[user.subscriptionTier]
+              : COLORS.brand.primary;
+
+            return (
+              <TouchableOpacity
+                key={user.id}
+                style={styles.storyItem}
+                onPress={() => onStoryPress(user, index)}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel={`View ${user.name}'s story`}
               >
-                <TMAvatar
-                  source={user.avatar}
-                  name={user.name}
-                  size="lg"
-                  style={styles.storyAvatar}
-                />
-              </View>
-              <Text style={styles.storyName} numberOfLines={1}>
-                {user.name}
-              </Text>
-              {user.isNew && <View style={styles.newIndicator} />}
-            </TouchableOpacity>
-          ))}
+                <View
+                  style={[
+                    styles.storyRing,
+                    user.isNew && { borderColor: tierColor },
+                    !user.isNew && styles.storyRingViewed,
+                  ]}
+                >
+                  <TMAvatar
+                    source={user.avatar}
+                    name={user.name}
+                    size="lg"
+                    style={styles.storyAvatar}
+                  />
+                </View>
+                <Text style={styles.storyName} numberOfLines={1}>
+                  {user.name}
+                </Text>
+                {user.isNew && (
+                  <View
+                    style={[
+                      styles.newIndicator,
+                      { backgroundColor: tierColor },
+                    ]}
+                  />
+                )}
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
       </View>
     );

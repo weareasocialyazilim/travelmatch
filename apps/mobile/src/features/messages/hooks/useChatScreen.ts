@@ -6,7 +6,7 @@ import { useMessages } from '@/hooks/useMessages';
 import { useScreenPerformance } from '@/hooks/useScreenPerformance';
 import { logger } from '@/utils/logger';
 import { useToast } from '@/context/ToastContext';
-import { giftOfferService } from '@/services/giftOfferService';
+import { supabase } from '@/config/supabase';
 
 export interface Message {
   id: string;
@@ -306,11 +306,14 @@ export const useChatScreen = ({
           ),
         );
 
-        // Call API to accept offer
-        const result = await giftOfferService.acceptOffer(giftId);
+        // Call Supabase directly to accept offer
+        const { error: updateError } = await supabase
+          .from('moment_offers')
+          .update({ status: 'accepted' })
+          .eq('id', giftId);
 
-        if (!result.success) {
-          throw new Error(result.error || 'Failed to accept offer');
+        if (updateError) {
+          throw new Error(updateError.message || 'Failed to accept offer');
         }
 
         // Add system message
@@ -370,11 +373,14 @@ export const useChatScreen = ({
           ),
         );
 
-        // Call API to decline offer
-        const result = await giftOfferService.declineOffer(giftId);
+        // Call Supabase directly to decline offer
+        const { error: updateError } = await supabase
+          .from('moment_offers')
+          .update({ status: 'declined' })
+          .eq('id', giftId);
 
-        if (!result.success) {
-          throw new Error(result.error || 'Failed to decline offer');
+        if (updateError) {
+          throw new Error(updateError.message || 'Failed to decline offer');
         }
 
         // Add system message

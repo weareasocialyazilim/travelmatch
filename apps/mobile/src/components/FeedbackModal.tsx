@@ -52,7 +52,7 @@ const DEFAULT_CATEGORY_KEYS = [
   'fakeProfile',
   'inappropriateContent',
   'fraudSuspicion',
-  'giftIssue',
+  'transactionIssue',
   'generalFeedback',
   'bugReport',
   'featureRequest',
