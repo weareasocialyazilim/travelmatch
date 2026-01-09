@@ -237,7 +237,7 @@ const CreateMomentScreen: React.FC = () => {
   // 1. Media Selection - Story format (9:16)
   const pickImage = useCallback(async () => {
     // Liquid interaction haptic
-    await HapticManager.buttonPress();
+    HapticManager.buttonPress();
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
@@ -247,7 +247,7 @@ const CreateMomentScreen: React.FC = () => {
     });
 
     if (!result.canceled) {
-      await HapticManager.buttonPress();
+      HapticManager.buttonPress();
       setImageUri(result.assets[0].uri);
       setStep('details');
     }
@@ -271,7 +271,7 @@ const CreateMomentScreen: React.FC = () => {
     }
 
     if (!title || !selectedCategory || !imageUri || !locationName) {
-      await HapticManager.error();
+      HapticManager.error();
       showAlert({
         title: t('screens.createMoment.missingInfoTitle'),
         message: t('screens.createMoment.missingInfoMessage'),
@@ -282,7 +282,7 @@ const CreateMomentScreen: React.FC = () => {
     // Validate requested amount (min: 1)
     const amount = parseFloat(requestedAmount);
     if (!amount || amount < 1) {
-      await HapticManager.error();
+      HapticManager.error();
       showAlert({
         title: 'Geçersiz Miktar',
         message: 'Fiyat en az 1 olmalıdır.',
@@ -291,7 +291,7 @@ const CreateMomentScreen: React.FC = () => {
     }
 
     setIsSubmitting(true);
-    await HapticManager.buttonPress();
+    HapticManager.buttonPress();
 
     try {
       const momentData = {
@@ -317,9 +317,7 @@ const CreateMomentScreen: React.FC = () => {
       const createdMoment = await createMoment(momentData);
 
       if (createdMoment) {
-        await Haptics.notificationAsync(
-          Haptics.NotificationFeedbackType.Success,
-        );
+        HapticManager.success();
 
         // Navigate to Profile after successful creation
         showAlert({
@@ -334,14 +332,14 @@ const CreateMomentScreen: React.FC = () => {
           ],
         });
       } else {
-        await HapticManager.error();
+        HapticManager.error();
         showToast('Could not create moment. Please try again.', 'error');
       }
     } catch (createMomentError) {
       logger.error('[CreateMoment] Failed to create moment', {
         error: createMomentError,
       });
-      await HapticManager.error();
+      HapticManager.error();
       showToast('Something went wrong. Please try again.', 'error');
     } finally {
       setIsSubmitting(false);
@@ -778,7 +776,7 @@ const CreateMomentScreen: React.FC = () => {
             onClose={() => setShowCurrencySheet(false)}
             selectedCurrency={currency}
             onCurrencyChange={(newCurrency) => {
-              Haptics.selectionAsync();
+              HapticManager.buttonPress();
               setCurrency(newCurrency);
             }}
           />
