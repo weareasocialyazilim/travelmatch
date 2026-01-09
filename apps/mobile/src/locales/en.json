@@ -739,5 +739,27 @@
         "dropMoment": "Drop Moment"
       }
     }
+  },
+  "counterOffer": {
+    "title": "Send Offer",
+    "tierFeature": "{{tier}} Feature",
+    "momentInfo": {
+      "hostLabel": "Host:",
+      "askedPrice": "Asked Price:"
+    },
+    "yourOffer": "Your Offer",
+    "offerHint": "The host can accept or decline your offer.",
+    "messageLabel": "Message (Optional)",
+    "messagePlaceholder": "Explain why you're making this offer...",
+    "infoText": "With your {{tier}} membership, you can send custom offers to hosts. If the host accepts, you'll be directed to the payment screen.",
+    "submitButton": "Send Offer",
+    "successTitle": "Offer Sent!",
+    "successSubtitle": "{{hostName}} will review your offer. Please wait for a response!",
+    "upgradeRequired": {
+      "title": "Premium Feature",
+      "description": "You need to be a Premium or Platinum member to send custom offers to hosts.",
+      "upgradeButton": "View Plans",
+      "maybeLater": "Maybe Later"
+    }
   }
 }

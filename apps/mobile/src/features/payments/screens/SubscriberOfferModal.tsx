@@ -22,7 +22,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   useNavigation,
   useRoute,
@@ -32,6 +32,7 @@ import type { NavigationProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 import { COLORS, GRADIENTS } from '@/constants/colors';
 import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -56,6 +57,7 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
 };
 
 const SubscriberOfferModal: React.FC = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<SubscriberOfferModalRouteProp>();
   const insets = useSafeAreaInsets();
@@ -125,8 +127,8 @@ const SubscriberOfferModal: React.FC = () => {
       // Başarı ekranına git
       navigation.navigate('Success', {
         type: 'offer',
-        title: 'Teklif Gönderildi!',
-        subtitle: `${hostName || 'Host'} teklifinizi değerlendirecek. Yanıt bekleyin!`,
+        title: t('counterOffer.successTitle'),
+        subtitle: t('counterOffer.successSubtitle', { hostName: hostName || 'Host' }),
       });
     } catch (error) {
       logger.error('SubscriberOfferModal', 'Failed to submit offer', { error });
@@ -153,6 +155,70 @@ const SubscriberOfferModal: React.FC = () => {
   const tierColor =
     subscription?.tier === 'platinum' ? COLORS.platinum : COLORS.primary;
 
+  const handleViewPlans = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    navigation.goBack();
+    // Navigate to subscription plans screen
+    setTimeout(() => {
+      navigation.navigate('SubscriptionPlans' as never);
+    }, 300);
+  }, [navigation]);
+
+  // Show upgrade gate for non-premium users
+  if (!canMakeOffer) {
+    return (
+      <View style={[styles.container, { paddingBottom: insets.bottom }]}>
+        {/* Handle Bar */}
+        <View style={styles.handleBar} />
+
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>{t('counterOffer.title')}</Text>
+          <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
+            <Ionicons name="close" size={24} color={COLORS.text.secondary} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Upgrade Required Gate */}
+        <View style={styles.upgradeGate}>
+          <LinearGradient
+            colors={GRADIENTS.gift as readonly [string, string, ...string[]]}
+            style={styles.upgradeIconContainer}
+          >
+            <MaterialCommunityIcons name="crown" size={48} color={COLORS.white} />
+          </LinearGradient>
+
+          <Text style={styles.upgradeTitle}>
+            {t('counterOffer.upgradeRequired.title')}
+          </Text>
+          <Text style={styles.upgradeDescription}>
+            {t('counterOffer.upgradeRequired.description')}
+          </Text>
+
+          <TouchableOpacity style={styles.upgradeButton} onPress={handleViewPlans}>
+            <LinearGradient
+              colors={GRADIENTS.gift as readonly [string, string, ...string[]]}
+              style={styles.upgradeButtonGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+            >
+              <Ionicons name="rocket" size={20} color={COLORS.white} />
+              <Text style={styles.upgradeButtonText}>
+                {t('counterOffer.upgradeRequired.upgradeButton')}
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.maybeLaterButton} onPress={handleClose}>
+            <Text style={styles.maybeLaterText}>
+              {t('counterOffer.upgradeRequired.maybeLater')}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom }]}>
       {/* Handle Bar */}
@@ -161,11 +227,11 @@ const SubscriberOfferModal: React.FC = () => {
       {/* Header */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.headerTitle}>Teklif Gönder</Text>
+          <Text style={styles.headerTitle}>{t('counterOffer.title')}</Text>
           <View style={styles.tierBadge}>
             <Ionicons name="star" size={12} color={tierColor} />
             <Text style={[styles.tierText, { color: tierColor }]}>
-              {tierLabel} Özelliği
+              {t('counterOffer.tierFeature', { tier: tierLabel })}
             </Text>
           </View>
         </View>
@@ -195,10 +261,10 @@ const SubscriberOfferModal: React.FC = () => {
               {momentTitle}
             </Text>
             <Text style={styles.hostInfo}>
-              Ev sahibi: <Text style={styles.hostName}>{hostName}</Text>
+              {t('counterOffer.momentInfo.hostLabel')} <Text style={styles.hostName}>{hostName}</Text>
             </Text>
             <View style={styles.priceRow}>
-              <Text style={styles.originalPriceLabel}>İstenilen Fiyat:</Text>
+              <Text style={styles.originalPriceLabel}>{t('counterOffer.momentInfo.askedPrice')}</Text>
               <Text style={styles.originalPrice}>
                 {currencySymbol}
                 {targetValue?.toLocaleString('tr-TR')}
@@ -208,7 +274,7 @@ const SubscriberOfferModal: React.FC = () => {
 
           {/* Offer Amount Input */}
           <View style={styles.inputSection}>
-            <Text style={styles.sectionTitle}>Teklifiniz</Text>
+            <Text style={styles.sectionTitle}>{t('counterOffer.yourOffer')}</Text>
             <View style={styles.amountInputContainer}>
               <Text style={styles.currencySymbol}>{currencySymbol}</Text>
               <TextInput
@@ -221,18 +287,18 @@ const SubscriberOfferModal: React.FC = () => {
               />
             </View>
             <Text style={styles.offerHint}>
-              Host teklifinizi kabul veya reddedebilir.
+              {t('counterOffer.offerHint')}
             </Text>
           </View>
 
           {/* Message Input */}
           <View style={styles.inputSection}>
-            <Text style={styles.sectionTitle}>Mesajınız (Opsiyonel)</Text>
+            <Text style={styles.sectionTitle}>{t('counterOffer.messageLabel')}</Text>
             <TextInput
               style={styles.messageInput}
               value={offerMessage}
               onChangeText={setOfferMessage}
-              placeholder="Host'a neden bu teklifi yaptığınızı açıklayın..."
+              placeholder={t('counterOffer.messagePlaceholder')}
               placeholderTextColor={COLORS.text.muted}
               multiline
               maxLength={200}
@@ -249,9 +315,7 @@ const SubscriberOfferModal: React.FC = () => {
               color={COLORS.primary}
             />
             <Text style={styles.infoText}>
-              {tierLabel} üyeliğiniz ile host'lara özel teklif
-              gönderebilirsiniz. Host teklifinizi kabul ederse ödeme ekranına
-              yönlendirilirsiniz.
+              {t('counterOffer.infoText', { tier: tierLabel })}
             </Text>
           </View>
         </ScrollView>
@@ -282,7 +346,7 @@ const SubscriberOfferModal: React.FC = () => {
                 <>
                   <Ionicons name="paper-plane" size={20} color={COLORS.white} />
                   <Text style={styles.submitButtonText}>
-                    Teklif Gönder • {currencySymbol}
+                    {t('counterOffer.submitButton')} • {currencySymbol}
                     {parseFloat(offerAmount) || 0}
                   </Text>
                 </>
@@ -507,6 +571,64 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.body.bold,
     fontSize: FONT_SIZES.body,
     color: COLORS.white,
+  },
+  // Upgrade gate styles
+  upgradeGate: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 32,
+  },
+  upgradeIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
+  },
+  upgradeTitle: {
+    fontFamily: FONTS.display.bold,
+    fontSize: FONT_SIZES.h2,
+    color: COLORS.text.primary,
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  upgradeDescription: {
+    fontFamily: FONTS.body.regular,
+    fontSize: FONT_SIZES.body,
+    color: COLORS.text.secondary,
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 32,
+    paddingHorizontal: 16,
+  },
+  upgradeButton: {
+    borderRadius: 28,
+    overflow: 'hidden',
+    width: '100%',
+    marginBottom: 16,
+  },
+  upgradeButtonGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    gap: 8,
+  },
+  upgradeButtonText: {
+    fontFamily: FONTS.body.bold,
+    fontSize: FONT_SIZES.body,
+    color: COLORS.white,
+  },
+  maybeLaterButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+  },
+  maybeLaterText: {
+    fontFamily: FONTS.body.medium,
+    fontSize: FONT_SIZES.body,
+    color: COLORS.text.secondary,
   },
 });
 

@@ -39,6 +39,7 @@ import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { walletService, type WalletBalance } from '@/services/walletService';
 import { useAuth } from '@/hooks/useAuth';
+import { useScreenSecurity } from '@/hooks/useScreenSecurity';
 import { showAlert } from '@/stores/modalStore';
 
 // ═══════════════════════════════════════════════════════════════════
@@ -397,6 +398,9 @@ const AmountInput: React.FC<{
 const WithdrawScreen: React.FC = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
+
+  // Security: Prevent screenshots during withdrawal
+  useScreenSecurity();
 
   // KYC Level - get from user profile or default to 'none'
   // In production, this would come from user.kyc_level or a profile service
