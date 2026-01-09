@@ -18,7 +18,7 @@ import {
   Platform,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   useAnimatedStyle,
@@ -28,7 +28,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
-import { TMAvatar } from '@/components/ui/TMAvatar';
 import type { DiscoverHeaderProps } from './types';
 
 // Enhanced props interface for animated header
@@ -202,17 +201,17 @@ const getGreeting = (): string => {
  * 40+ yaş için okunabilirlik, GenZ için estetik derinlik.
  */
 export const AwwwardsDiscoverHeader: React.FC<AwwwardsDiscoverHeaderProps> = ({
-  userName,
-  userAvatar,
+  userName: _userName,
+  userAvatar: _userAvatar,
   greeting,
-  notificationCount = 0,
-  activeFiltersCount = 0,
-  onNotificationsPress,
-  onFilterPress,
-  onAvatarPress,
+  notificationCount: _notificationCount = 0,
+  activeFiltersCount: _activeFiltersCount = 0,
+  onNotificationsPress: _onNotificationsPress,
+  onFilterPress: _onFilterPress,
+  onAvatarPress: _onAvatarPress,
 }) => {
   const insets = useSafeAreaInsets();
-  const displayGreeting = greeting || getGreeting();
+  const _displayGreeting = greeting || getGreeting();
 
   return (
     <View style={[awwwardsStyles.container, { paddingTop: insets.top + 8 }]}>
@@ -230,80 +229,12 @@ const awwwardsStyles = StyleSheet.create({
     paddingBottom: 12,
     backgroundColor: COLORS.bg.primary,
   },
-  leftSection: {
-    flex: 1,
-  },
-  centerSection: {
-    flex: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   logoText: {
     fontSize: 22,
     fontFamily: TYPOGRAPHY_SYSTEM.families.heading,
     fontWeight: '700',
     color: COLORS.text.primary,
     letterSpacing: -0.5,
-  },
-  greeting: {
-    fontSize: TYPOGRAPHY_SYSTEM.sizes.bodyS,
-    fontFamily: TYPOGRAPHY_SYSTEM.families.body,
-    color: COLORS.text.secondary,
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
-  },
-  brandName: {
-    fontSize: TYPOGRAPHY_SYSTEM.sizes.h2,
-    fontFamily: TYPOGRAPHY_SYSTEM.families.heading,
-    fontWeight: TYPOGRAPHY_SYSTEM.weights.bold,
-    color: COLORS.text.primary,
-    marginTop: -2,
-    letterSpacing: TYPOGRAPHY_SYSTEM.letterSpacing.tight,
-  },
-  rightSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  iconButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: COLORS.surface.base,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.border.light,
-  },
-  notificationDot: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: COLORS.primary,
-    borderWidth: 2,
-    borderColor: COLORS.surface.base,
-  },
-  filterBadge: {
-    position: 'absolute',
-    top: 6,
-    right: 6,
-    minWidth: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: COLORS.brand.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 4,
-    borderWidth: 2,
-    borderColor: COLORS.surface.base,
-  },
-  filterBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: COLORS.utility.white,
   },
 });
 
