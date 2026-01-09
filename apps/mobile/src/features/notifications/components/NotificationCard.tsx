@@ -23,7 +23,7 @@ import React, { memo, useMemo, useCallback, useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -367,22 +367,22 @@ export const NotificationCard: React.FC<NotificationCardProps> = memo(
     const triggerHaptic = useCallback((pattern?: string) => {
       switch (pattern) {
         case 'success':
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          HapticManager.success();
           break;
         case 'warning':
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+          HapticManager.warning();
           break;
         case 'error':
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          HapticManager.error();
           break;
         case 'soft':
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+          HapticManager.buttonPress();
           break;
         case 'heavy':
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+          HapticManager.destructiveAction();
           break;
         default:
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          HapticManager.buttonPress();
       }
     }, []);
 
@@ -392,12 +392,12 @@ export const NotificationCard: React.FC<NotificationCardProps> = memo(
     }, [onPress, config.hapticPattern, triggerHaptic]);
 
     const handleMarkAsRead = useCallback(() => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.buttonPress();
       onMarkAsRead?.();
     }, [onMarkAsRead]);
 
     const handleActionPress = useCallback(() => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      HapticManager.primaryAction();
       onActionPress?.();
     }, [onActionPress]);
 
