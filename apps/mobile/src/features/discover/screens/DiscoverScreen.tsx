@@ -156,7 +156,7 @@ const DiscoverScreen = () => {
   }, [navigation]);
 
   // Stories actions - Instagram-style fullscreen viewer
-  const handleStoryPress = useCallback((story: UserStory, index: number) => {
+  const handleStoryPress = useCallback((story: UserStory, _index: number) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     // Open StoryViewer modal (Instagram-style)
     setSelectedStoryUser(story);
