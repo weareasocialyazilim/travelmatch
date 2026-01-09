@@ -111,7 +111,10 @@ export const FilterBottomSheet: React.FC<FilterBottomSheetProps> = memo(
         animationType="slide"
         onRequestClose={onClose}
       >
-        <TouchableWithoutFeedback onPress={onClose}>
+        <TouchableWithoutFeedback
+          onPress={onClose}
+          testID="filter-bottom-sheet-backdrop"
+        >
           <View style={styles.backdrop} />
         </TouchableWithoutFeedback>
 

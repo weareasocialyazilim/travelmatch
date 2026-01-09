@@ -141,6 +141,7 @@ export const RegisterScreen: React.FC = () => {
               showBorder={true}
             >
               <TextInput
+                testID="email-input"
                 style={styles.input}
                 placeholder="caner@travelmatch.io"
                 placeholderTextColor={COLORS.text.muted}
@@ -164,6 +165,7 @@ export const RegisterScreen: React.FC = () => {
               showBorder={true}
             >
               <TextInput
+                testID="password-input"
                 style={styles.input}
                 placeholder="En az 8 karakter"
                 placeholderTextColor={COLORS.text.muted}
@@ -194,6 +196,7 @@ export const RegisterScreen: React.FC = () => {
 
           <View style={styles.actionSection}>
             <TMButton
+              testID="register-button"
               variant="primary"
               onPress={handleRegister}
               size="lg"

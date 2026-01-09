@@ -1,0 +1,248 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormComponents Snapshots DismissKeyboardView matches snapshot 1`] = `
+<RCTTouchableWithoutFeedback
+  accessibilityState={
+    {
+      "disabled": false,
+    }
+  }
+  accessible={false}
+  onPress={[MockFunction]}
+  ref={null}
+>
+  <RCTView
+    ref={null}
+    style={
+      {
+        "flex": 1,
+      }
+    }
+  >
+    <RCTText
+      ref={null}
+      testID="RCTText"
+    >
+      Content
+    </RCTText>
+  </RCTView>
+</RCTTouchableWithoutFeedback>
+`;
+
+exports[`FormComponents Snapshots FormInput matches snapshot 1`] = `
+<RCTView
+  ref={null}
+  style={
+    {
+      "marginBottom": 16,
+    }
+  }
+>
+  <RCTText
+    ref={null}
+    style={
+      {
+        "color": "#F8FAFC",
+        "fontSize": 14,
+        "fontWeight": "600",
+        "marginBottom": 8,
+      }
+    }
+    testID="RCTText"
+  >
+    Test Label
+  </RCTText>
+  <RCTView
+    ref={null}
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "#121214",
+        "borderColor": "rgba(255, 255, 255, 0.08)",
+        "borderRadius": 12,
+        "borderWidth": 1.5,
+        "flexDirection": "row",
+        "minHeight": 52,
+        "paddingHorizontal": 14,
+      }
+    }
+  >
+    <RCTTextInput
+      accessibilityLabel="Test Label"
+      autoCapitalize="none"
+      autoComplete="off"
+      blurOnSubmit={true}
+      editable={true}
+      keyboardType="default"
+      multiline={false}
+      numberOfLines={1}
+      onBlur={[Function]}
+      onChange={[Function]}
+      onFocus={[Function]}
+      placeholder="Enter value"
+      placeholderTextColor="#A8A29E"
+      ref={null}
+      secureTextEntry={false}
+      style={
+        [
+          {
+            "color": "#F8FAFC",
+            "flex": 1,
+            "fontSize": 16,
+            "paddingVertical": 0,
+          },
+          false,
+          undefined,
+          false,
+        ]
+      }
+      value="test"
+    />
+  </RCTView>
+</RCTView>
+`;
+
+exports[`FormComponents Snapshots FormInput with error matches snapshot 1`] = `
+<RCTView
+  ref={null}
+  style={
+    {
+      "marginBottom": 16,
+    }
+  }
+>
+  <RCTText
+    ref={null}
+    style={
+      {
+        "color": "#F8FAFC",
+        "fontSize": 14,
+        "fontWeight": "600",
+        "marginBottom": 8,
+      }
+    }
+    testID="RCTText"
+  >
+    Email
+  </RCTText>
+  <RCTView
+    ref={null}
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "rgba(244, 63, 94, 0.15)",
+        "borderColor": "#F43F5E",
+        "borderRadius": 12,
+        "borderWidth": 1.5,
+        "flexDirection": "row",
+        "minHeight": 52,
+        "paddingHorizontal": 14,
+      }
+    }
+  >
+    <RCTTextInput
+      accessibilityLabel="Email"
+      autoCapitalize="none"
+      autoComplete="off"
+      blurOnSubmit={true}
+      editable={true}
+      keyboardType="default"
+      multiline={false}
+      numberOfLines={1}
+      onBlur={[Function]}
+      onChange={[Function]}
+      onFocus={[Function]}
+      placeholderTextColor="#A8A29E"
+      ref={null}
+      secureTextEntry={false}
+      style={
+        [
+          {
+            "color": "#F8FAFC",
+            "flex": 1,
+            "fontSize": 16,
+            "paddingVertical": 0,
+          },
+          false,
+          undefined,
+          false,
+        ]
+      }
+      value=""
+    />
+  </RCTView>
+  <RCTView
+    ref={null}
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "gap": 4,
+        "marginTop": 6,
+      }
+    }
+  >
+    <RCTText
+      color="#F43F5E"
+      name="alert-circle"
+      ref={null}
+      size={14}
+      testID="RCTText"
+    >
+      alert-circle
+    </RCTText>
+    <RCTText
+      ref={null}
+      style={
+        {
+          "color": "#F43F5E",
+          "fontSize": 12,
+        }
+      }
+      testID="RCTText"
+    >
+      Invalid email
+    </RCTText>
+  </RCTView>
+</RCTView>
+`;
+
+exports[`FormComponents Snapshots KeyboardAwareScrollView matches snapshot 1`] = `
+<RCTKeyboardAvoidingView
+  behavior="padding"
+  keyboardVerticalOffset={64}
+  ref={null}
+  style={
+    {
+      "flex": 1,
+    }
+  }
+  testID="RCTKeyboardAvoidingView"
+>
+  <RCTScrollView
+    keyboardShouldPersistTaps="handled"
+    showsVerticalScrollIndicator={false}
+  >
+    <RCTScrollContentView
+      style={
+        [
+          {
+            "flexGrow": 1,
+          },
+          undefined,
+          {
+            "paddingBottom": 20,
+          },
+        ]
+      }
+    >
+      <RCTText
+        ref={null}
+        testID="RCTText"
+      >
+        Content
+      </RCTText>
+    </RCTScrollContentView>
+  </RCTScrollView>
+</RCTKeyboardAvoidingView>
+`;

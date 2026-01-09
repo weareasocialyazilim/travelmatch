@@ -194,7 +194,22 @@
     "paymentSuccessful": "Payment successful!",
     "paymentFailed": "Payment failed. Please try again.",
     "refund": "Refund",
-    "transactionHistory": "Transaction History"
+    "transactionHistory": "Transaction History",
+    "filters": {
+      "all": "All",
+      "sent": "Sent",
+      "received": "Received",
+      "withdrawals": "Withdrawals"
+    },
+    "status": {
+      "completed": "Completed",
+      "verified": "Verified",
+      "pending": "Pending",
+      "failed": "Failed"
+    },
+    "giftFrom": "Gift from {{name}}",
+    "giftFor": "Gift for {{name}}'s trip",
+    "withdrawalTo": "Withdrawal to Bank Account"
   },
   "withdrawal": {
     "title": "Withdraw",

@@ -1,105 +1,62 @@
 /**
- * StatsRow Component Tests
+ * StatsRow Test Suite
+ * Tests for premium stats display component
  */
 
 import React from 'react';
-import { fireEvent } from '@testing-library/react-native';
-import { render } from '../../../../__tests__/testUtilsRender.helper';
+import { render, fireEvent } from '@testing-library/react-native';
 import { StatsRow } from '../StatsRow';
 
 describe('StatsRow Component', () => {
-  const mockHandlers = {
+  const defaultProps = {
+    momentsCount: 15,
+    activeMoments: 5,
     onMomentsPress: jest.fn(),
-    onExchangesPress: jest.fn(),
-    onResponsePress: jest.fn(),
   };
 
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks();
   });
 
   describe('Rendering', () => {
     it('renders moments count', () => {
-      const { getByText } = render(
-        <StatsRow
-          momentsCount={15}
-          exchangesCount={0}
-          responseRate={0}
-          {...mockHandlers}
-        />,
-      );
+      const { getByText } = render(<StatsRow {...defaultProps} />);
       expect(getByText('15')).toBeTruthy();
-      expect(getByText(/Moments/i)).toBeTruthy();
+      expect(getByText('Anlar')).toBeTruthy();
     });
 
-    it('renders exchanges count', () => {
+    it('renders active moments count', () => {
+      const { getByText } = render(<StatsRow {...defaultProps} />);
+      expect(getByText('5')).toBeTruthy();
+      expect(getByText('Aktif')).toBeTruthy();
+    });
+
+    it('renders both stats', () => {
       const { getByText } = render(
         <StatsRow
-          momentsCount={0}
-          exchangesCount={42}
-          responseRate={0}
-          {...mockHandlers}
+          momentsCount={42}
+          activeMoments={10}
+          onMomentsPress={jest.fn()}
         />,
       );
       expect(getByText('42')).toBeTruthy();
-      expect(getByText(/Exchanges/i)).toBeTruthy();
-    });
-
-    it('renders response rate as percentage', () => {
-      const { getByText } = render(
-        <StatsRow
-          momentsCount={0}
-          exchangesCount={0}
-          responseRate={95}
-          {...mockHandlers}
-        />,
-      );
-      expect(getByText('95%')).toBeTruthy();
-      expect(getByText(/Response/i)).toBeTruthy();
-    });
-
-    it('renders all three stats', () => {
-      const { getByText } = render(
-        <StatsRow
-          momentsCount={15}
-          exchangesCount={42}
-          responseRate={88}
-          {...mockHandlers}
-        />,
-      );
-      expect(getByText('15')).toBeTruthy();
-      expect(getByText('42')).toBeTruthy();
-      expect(getByText('88%')).toBeTruthy();
+      expect(getByText('10')).toBeTruthy();
     });
   });
 
   describe('Interactions', () => {
     it('calls onMomentsPress when moments stat is clicked', () => {
-      const { getByText } = render(
+      const onMomentsPress = jest.fn();
+      const { getByLabelText } = render(
         <StatsRow
           momentsCount={15}
-          exchangesCount={0}
-          responseRate={0}
-          {...mockHandlers}
+          activeMoments={5}
+          onMomentsPress={onMomentsPress}
         />,
       );
 
-      fireEvent.press(getByText('15'));
-      expect(mockHandlers.onMomentsPress).toHaveBeenCalledTimes(1);
-    });
-
-    it('calls onExchangesPress when exchanges stat is clicked', () => {
-      const { getByText } = render(
-        <StatsRow
-          momentsCount={0}
-          exchangesCount={42}
-          responseRate={0}
-          {...mockHandlers}
-        />,
-      );
-
-      fireEvent.press(getByText('42'));
-      expect(mockHandlers.onExchangesPress).toHaveBeenCalledTimes(1);
+      fireEvent.press(getByLabelText(/Anlar.*Tap to view/));
+      expect(onMomentsPress).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -108,54 +65,31 @@ describe('StatsRow Component', () => {
       const { getByText } = render(
         <StatsRow
           momentsCount={1234}
-          exchangesCount={9999}
-          responseRate={100}
-          {...mockHandlers}
+          activeMoments={567}
+          onMomentsPress={jest.fn()}
         />,
       );
-      // Component displays numbers as-is (no formatting)
       expect(getByText('1234')).toBeTruthy();
-      expect(getByText('9999')).toBeTruthy();
+      expect(getByText('567')).toBeTruthy();
     });
 
     it('handles zero values', () => {
-      const { getAllByText, getByText } = render(
+      const { getAllByText } = render(
         <StatsRow
           momentsCount={0}
-          exchangesCount={0}
-          responseRate={0}
-          {...mockHandlers}
+          activeMoments={0}
+          onMomentsPress={jest.fn()}
         />,
       );
-      // Two zeros for moments and exchanges
+      // Both stats show 0
       expect(getAllByText('0').length).toBe(2);
-      expect(getByText('0%')).toBeTruthy();
-    });
-
-    it('displays response rate as percentage', () => {
-      const { getByText } = render(
-        <StatsRow
-          momentsCount={0}
-          exchangesCount={0}
-          responseRate={88}
-          {...mockHandlers}
-        />,
-      );
-      expect(getByText('88%')).toBeTruthy();
     });
   });
 
   describe('Accessibility', () => {
-    it('has accessible labels for each stat', () => {
-      const { getByLabelText } = render(
-        <StatsRow
-          momentsCount={15}
-          exchangesCount={42}
-          responseRate={0.88}
-          {...mockHandlers}
-        />,
-      );
-      // Check for accessibility labels
+    it('has accessible labels for moments stat', () => {
+      const { getByLabelText } = render(<StatsRow {...defaultProps} />);
+      expect(getByLabelText(/Anlar.*Tap to view/)).toBeTruthy();
     });
   });
 
@@ -163,10 +97,9 @@ describe('StatsRow Component', () => {
     it('matches snapshot with various counts', () => {
       const { toJSON } = render(
         <StatsRow
-          momentsCount={15}
-          exchangesCount={42}
-          responseRate={0.88}
-          {...mockHandlers}
+          momentsCount={42}
+          activeMoments={12}
+          onMomentsPress={jest.fn()}
         />,
       );
       expect(toJSON()).toMatchSnapshot();
@@ -176,9 +109,8 @@ describe('StatsRow Component', () => {
       const { toJSON } = render(
         <StatsRow
           momentsCount={0}
-          exchangesCount={0}
-          responseRate={0}
-          {...mockHandlers}
+          activeMoments={0}
+          onMomentsPress={jest.fn()}
         />,
       );
       expect(toJSON()).toMatchSnapshot();

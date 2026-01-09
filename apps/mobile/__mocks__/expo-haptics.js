@@ -1,17 +1,35 @@
 // Mock expo-haptics for tests
+const ImpactFeedbackStyle = {
+  Light: 'light',
+  Medium: 'medium',
+  Heavy: 'heavy',
+};
+
+const NotificationFeedbackType = {
+  Success: 'success',
+  Warning: 'warning',
+  Error: 'error',
+};
+
+const SelectionAsync = jest.fn().mockResolvedValue(undefined);
+const impactAsync = jest.fn().mockResolvedValue(undefined);
+const notificationAsync = jest.fn().mockResolvedValue(undefined);
+const selectionAsync = jest.fn().mockResolvedValue(undefined);
+
 module.exports = {
-  ImpactFeedbackStyle: {
-    Light: 'light',
-    Medium: 'medium',
-    Heavy: 'heavy',
+  __esModule: true,
+  default: {
+    ImpactFeedbackStyle,
+    NotificationFeedbackType,
+    SelectionAsync,
+    impactAsync,
+    notificationAsync,
+    selectionAsync,
   },
-  NotificationFeedbackType: {
-    Success: 'success',
-    Warning: 'warning',
-    Error: 'error',
-  },
-  SelectionAsync: jest.fn().mockResolvedValue(undefined),
-  impactAsync: jest.fn().mockResolvedValue(undefined),
-  notificationAsync: jest.fn().mockResolvedValue(undefined),
-  selectionAsync: jest.fn().mockResolvedValue(undefined),
+  ImpactFeedbackStyle,
+  NotificationFeedbackType,
+  SelectionAsync,
+  impactAsync,
+  notificationAsync,
+  selectionAsync,
 };

@@ -6,16 +6,17 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
   style={
     {
       "alignItems": "center",
-      "borderTopColor": "#E7E5E4",
-      "borderTopWidth": 1,
+      "alignSelf": "center",
       "flexDirection": "row",
-      "paddingVertical": 16,
-      "width": "100%",
+      "gap": 10,
+      "minWidth": 0,
+      "paddingHorizontal": 12,
+      "paddingVertical": 4,
     }
   }
 >
   <RCTTouchableOpacity
-    accessibilityLabel="15 Moments. Tap to view"
+    accessibilityLabel="Anlar 42. Tap to view"
     accessibilityRole="button"
     accessibilityState={
       {
@@ -23,107 +24,80 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
       }
     }
     accessible={true}
-    aria-label="15 Moments. Tap to view"
+    activeOpacity={0.8}
+    aria-label="Anlar 42. Tap to view"
     onPress={[MockFunction]}
+    onPressIn={[Function]}
+    onPressOut={[Function]}
     ref={null}
     role="button"
     style={
       {
-        "alignItems": "center",
-        "flex": 1,
+        "transform": [
+          {
+            "scale": 1,
+          },
+        ],
       }
     }
   >
-    <RCTText
+    <RCTView
       ref={null}
       style={
         {
-          "color": "#1C1917",
-          "fontSize": 20,
-          "fontWeight": "700",
-          "marginBottom": 2,
+          "alignItems": "baseline",
+          "flexDirection": "row",
+          "gap": 6,
+          "justifyContent": "center",
+          "paddingVertical": 2,
         }
       }
-      testID="RCTText"
     >
-      15
-    </RCTText>
-    <RCTText
-      ref={null}
-      style={
-        {
-          "color": "#78716C",
-          "fontSize": 12,
+      <RCTText
+        ref={null}
+        style={
+          [
+            {
+              "color": "#F8FAFC",
+              "fontSize": 28,
+              "fontWeight": "800",
+              "includeFontPadding": false,
+              "letterSpacing": -0.56,
+              "marginBottom": 0,
+            },
+            {
+              "color": "#DFFF00",
+            },
+          ]
         }
-      }
-      testID="RCTText"
-    >
-      Moments
-    </RCTText>
+        testID="RCTText"
+      >
+        42
+      </RCTText>
+      <RCTText
+        ref={null}
+        style={
+          {
+            "color": "#94A3B8",
+            "fontSize": 16,
+            "fontWeight": "700",
+            "letterSpacing": 0.2,
+            "marginLeft": 2,
+          }
+        }
+        testID="RCTText"
+      >
+        Anlar
+      </RCTText>
+    </RCTView>
   </RCTTouchableOpacity>
   <RCTView
     ref={null}
     style={
       {
-        "backgroundColor": "#E7E5E4",
-        "height": 32,
-        "width": 1,
-      }
-    }
-  />
-  <RCTTouchableOpacity
-    accessibilityLabel="42 Exchanges. Tap to view"
-    accessibilityRole="button"
-    accessibilityState={
-      {
-        "disabled": false,
-      }
-    }
-    accessible={true}
-    aria-label="42 Exchanges. Tap to view"
-    onPress={[MockFunction]}
-    ref={null}
-    role="button"
-    style={
-      {
-        "alignItems": "center",
-        "flex": 1,
-      }
-    }
-  >
-    <RCTText
-      ref={null}
-      style={
-        {
-          "color": "#1C1917",
-          "fontSize": 20,
-          "fontWeight": "700",
-          "marginBottom": 2,
-        }
-      }
-      testID="RCTText"
-    >
-      42
-    </RCTText>
-    <RCTText
-      ref={null}
-      style={
-        {
-          "color": "#78716C",
-          "fontSize": 12,
-        }
-      }
-      testID="RCTText"
-    >
-      Exchanges
-    </RCTText>
-  </RCTTouchableOpacity>
-  <RCTView
-    ref={null}
-    style={
-      {
-        "backgroundColor": "#E7E5E4",
-        "height": 32,
+        "backgroundColor": "rgba(255, 255, 255, 0.08)",
+        "height": 24,
+        "marginHorizontal": 4,
         "width": 1,
       }
     }
@@ -132,38 +106,63 @@ exports[`StatsRow Component Snapshots matches snapshot with various counts 1`] =
     ref={null}
     style={
       {
-        "alignItems": "center",
-        "flex": 1,
+        "transform": [
+          {
+            "scale": 1,
+          },
+        ],
       }
     }
   >
-    <RCTText
+    <RCTView
       ref={null}
       style={
         {
-          "color": "#1C1917",
-          "fontSize": 20,
-          "fontWeight": "700",
-          "marginBottom": 2,
+          "alignItems": "baseline",
+          "flexDirection": "row",
+          "gap": 6,
+          "justifyContent": "center",
+          "paddingVertical": 2,
         }
       }
-      testID="RCTText"
     >
-      0.88
-      %
-    </RCTText>
-    <RCTText
-      ref={null}
-      style={
-        {
-          "color": "#78716C",
-          "fontSize": 12,
+      <RCTText
+        ref={null}
+        style={
+          [
+            {
+              "color": "#F8FAFC",
+              "fontSize": 28,
+              "fontWeight": "800",
+              "includeFontPadding": false,
+              "letterSpacing": -0.56,
+              "marginBottom": 0,
+            },
+            {
+              "color": "#A855F7",
+            },
+          ]
         }
-      }
-      testID="RCTText"
-    >
-      Response
-    </RCTText>
+        testID="RCTText"
+      >
+        12
+      </RCTText>
+      <RCTText
+        ref={null}
+        style={
+          {
+            "color": "#94A3B8",
+            "fontSize": 16,
+            "fontWeight": "700",
+            "letterSpacing": 0.2,
+            "marginLeft": 2,
+          }
+        }
+        testID="RCTText"
+      >
+        Aktif
+      </RCTText>
+    </RCTView>
   </RCTView>
 </RCTView>
 `;
@@ -174,16 +173,17 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
   style={
     {
       "alignItems": "center",
-      "borderTopColor": "#E7E5E4",
-      "borderTopWidth": 1,
+      "alignSelf": "center",
       "flexDirection": "row",
-      "paddingVertical": 16,
-      "width": "100%",
+      "gap": 10,
+      "minWidth": 0,
+      "paddingHorizontal": 12,
+      "paddingVertical": 4,
     }
   }
 >
   <RCTTouchableOpacity
-    accessibilityLabel="0 Moments. Tap to view"
+    accessibilityLabel="Anlar 0. Tap to view"
     accessibilityRole="button"
     accessibilityState={
       {
@@ -191,107 +191,80 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
       }
     }
     accessible={true}
-    aria-label="0 Moments. Tap to view"
+    activeOpacity={0.8}
+    aria-label="Anlar 0. Tap to view"
     onPress={[MockFunction]}
+    onPressIn={[Function]}
+    onPressOut={[Function]}
     ref={null}
     role="button"
     style={
       {
-        "alignItems": "center",
-        "flex": 1,
+        "transform": [
+          {
+            "scale": 1,
+          },
+        ],
       }
     }
   >
-    <RCTText
+    <RCTView
       ref={null}
       style={
         {
-          "color": "#1C1917",
-          "fontSize": 20,
-          "fontWeight": "700",
-          "marginBottom": 2,
+          "alignItems": "baseline",
+          "flexDirection": "row",
+          "gap": 6,
+          "justifyContent": "center",
+          "paddingVertical": 2,
         }
       }
-      testID="RCTText"
     >
-      0
-    </RCTText>
-    <RCTText
-      ref={null}
-      style={
-        {
-          "color": "#78716C",
-          "fontSize": 12,
+      <RCTText
+        ref={null}
+        style={
+          [
+            {
+              "color": "#F8FAFC",
+              "fontSize": 28,
+              "fontWeight": "800",
+              "includeFontPadding": false,
+              "letterSpacing": -0.56,
+              "marginBottom": 0,
+            },
+            {
+              "color": "#DFFF00",
+            },
+          ]
         }
-      }
-      testID="RCTText"
-    >
-      Moments
-    </RCTText>
+        testID="RCTText"
+      >
+        0
+      </RCTText>
+      <RCTText
+        ref={null}
+        style={
+          {
+            "color": "#94A3B8",
+            "fontSize": 16,
+            "fontWeight": "700",
+            "letterSpacing": 0.2,
+            "marginLeft": 2,
+          }
+        }
+        testID="RCTText"
+      >
+        Anlar
+      </RCTText>
+    </RCTView>
   </RCTTouchableOpacity>
   <RCTView
     ref={null}
     style={
       {
-        "backgroundColor": "#E7E5E4",
-        "height": 32,
-        "width": 1,
-      }
-    }
-  />
-  <RCTTouchableOpacity
-    accessibilityLabel="0 Exchanges. Tap to view"
-    accessibilityRole="button"
-    accessibilityState={
-      {
-        "disabled": false,
-      }
-    }
-    accessible={true}
-    aria-label="0 Exchanges. Tap to view"
-    onPress={[MockFunction]}
-    ref={null}
-    role="button"
-    style={
-      {
-        "alignItems": "center",
-        "flex": 1,
-      }
-    }
-  >
-    <RCTText
-      ref={null}
-      style={
-        {
-          "color": "#1C1917",
-          "fontSize": 20,
-          "fontWeight": "700",
-          "marginBottom": 2,
-        }
-      }
-      testID="RCTText"
-    >
-      0
-    </RCTText>
-    <RCTText
-      ref={null}
-      style={
-        {
-          "color": "#78716C",
-          "fontSize": 12,
-        }
-      }
-      testID="RCTText"
-    >
-      Exchanges
-    </RCTText>
-  </RCTTouchableOpacity>
-  <RCTView
-    ref={null}
-    style={
-      {
-        "backgroundColor": "#E7E5E4",
-        "height": 32,
+        "backgroundColor": "rgba(255, 255, 255, 0.08)",
+        "height": 24,
+        "marginHorizontal": 4,
         "width": 1,
       }
     }
@@ -300,38 +273,63 @@ exports[`StatsRow Component Snapshots matches snapshot with zero values 1`] = `
     ref={null}
     style={
       {
-        "alignItems": "center",
-        "flex": 1,
+        "transform": [
+          {
+            "scale": 1,
+          },
+        ],
       }
     }
   >
-    <RCTText
+    <RCTView
       ref={null}
       style={
         {
-          "color": "#1C1917",
-          "fontSize": 20,
-          "fontWeight": "700",
-          "marginBottom": 2,
+          "alignItems": "baseline",
+          "flexDirection": "row",
+          "gap": 6,
+          "justifyContent": "center",
+          "paddingVertical": 2,
         }
       }
-      testID="RCTText"
     >
-      0
-      %
-    </RCTText>
-    <RCTText
-      ref={null}
-      style={
-        {
-          "color": "#78716C",
-          "fontSize": 12,
+      <RCTText
+        ref={null}
+        style={
+          [
+            {
+              "color": "#F8FAFC",
+              "fontSize": 28,
+              "fontWeight": "800",
+              "includeFontPadding": false,
+              "letterSpacing": -0.56,
+              "marginBottom": 0,
+            },
+            {
+              "color": "#A855F7",
+            },
+          ]
         }
-      }
-      testID="RCTText"
-    >
-      Response
-    </RCTText>
+        testID="RCTText"
+      >
+        0
+      </RCTText>
+      <RCTText
+        ref={null}
+        style={
+          {
+            "color": "#94A3B8",
+            "fontSize": 16,
+            "fontWeight": "700",
+            "letterSpacing": 0.2,
+            "marginLeft": 2,
+          }
+        }
+        testID="RCTText"
+      >
+        Aktif
+      </RCTText>
+    </RCTView>
   </RCTView>
 </RCTView>
 `;

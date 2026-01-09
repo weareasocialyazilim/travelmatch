@@ -254,7 +254,8 @@ describe('SacredMoments Component', () => {
           <Text>Content</Text>
         </SacredMoments>,
       );
-      expect(usePreventScreenCapture).toHaveBeenCalledWith(true);
+      // When vaultMode && enabled, it's called with 'sacred-moments'
+      expect(usePreventScreenCapture).toHaveBeenCalledWith('sacred-moments');
     });
   });
 
@@ -383,25 +384,29 @@ describe('GiftVault Component', () => {
 
   describe('Premium States', () => {
     it('shows fingerprint icon for premium users', () => {
-      const { getByTestId } = render(
+      const { getAllByTestId } = render(
         <GiftVault
           experiences={sampleExperiences}
           isPremium={true}
           onExperienceSelect={jest.fn()}
         />,
       );
-      expect(getByTestId('icon-fingerprint')).toBeTruthy();
+      // Multiple fingerprint icons may be rendered for each experience
+      expect(getAllByTestId('icon-fingerprint').length).toBeGreaterThanOrEqual(
+        1,
+      );
     });
 
     it('shows crown icon for non-premium users', () => {
-      const { getByTestId } = render(
+      const { getAllByTestId } = render(
         <GiftVault
           experiences={sampleExperiences}
           isPremium={false}
           onExperienceSelect={jest.fn()}
         />,
       );
-      expect(getByTestId('icon-crown')).toBeTruthy();
+      // Multiple crown icons may be rendered for each experience
+      expect(getAllByTestId('icon-crown').length).toBeGreaterThanOrEqual(1);
     });
 
     it('shows "Kasayı Aç" text for premium users', () => {

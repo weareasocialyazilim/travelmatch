@@ -5,6 +5,7 @@
  * - Color-coded amounts (green for income, red for expense)
  * - Clean filter pills
  * - Minimalist card design
+ * - Full i18n support
  */
 
 import React, { useState } from 'react';
@@ -20,99 +21,119 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, primitives } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
-type FilterType = 'Tümü' | 'Gönderilen' | 'Alınan' | 'Çekimler';
+type FilterType = 'all' | 'sent' | 'received' | 'withdrawals';
+type StatusType = 'completed' | 'verified' | 'pending' | 'failed';
 
 interface Transaction {
   id: string;
   type: 'received' | 'sent' | 'withdrawal';
-  title: string;
+  titleKey: string;
+  titleParams?: Record<string, string>;
   date: string;
   amount: number;
-  status: 'Tamamlandı' | 'Doğrulandı' | 'Beklemede' | 'Başarısız';
+  status: StatusType;
   icon: IconName;
   iconBgColor: string;
 }
 
 export const TransactionHistoryScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const [filter, setFilter] = useState<FilterType>('Tümü');
+  const { t } = useTranslation();
+  const [filter, setFilter] = useState<FilterType>('all');
 
+  // Filter options with i18n keys
+  const filterOptions: { key: FilterType; label: string }[] = [
+    { key: 'all', label: t('payment.filters.all') },
+    { key: 'sent', label: t('payment.filters.sent') },
+    { key: 'received', label: t('payment.filters.received') },
+    { key: 'withdrawals', label: t('payment.filters.withdrawals') },
+  ];
+
+  // Mock transactions with i18n keys
   const transactions: Transaction[] = [
     {
       id: '1',
       type: 'received',
-      title: "Ayşe'den Hediye",
-      date: '26 Ara 2024',
-      amount: 250.0,
-      status: 'Tamamlandı',
+      titleKey: 'payment.giftFrom',
+      titleParams: { name: 'Alex Johnson' },
+      date: 'Oct 26, 2023',
+      amount: 50.0,
+      status: 'completed',
       icon: 'gift-outline',
       iconBgColor: primitives.emerald[50],
     },
     {
       id: '2',
       type: 'sent',
-      title: "Mehmet'e Hediye",
-      date: '24 Ara 2024',
-      amount: -125.0,
-      status: 'Doğrulandı',
+      titleKey: 'payment.giftFor',
+      titleParams: { name: 'Maria' },
+      date: 'Oct 24, 2023',
+      amount: -25.0,
+      status: 'verified',
       icon: 'gift',
       iconBgColor: primitives.stone[100],
     },
     {
       id: '3',
       type: 'withdrawal',
-      title: 'Banka Hesabına Transfer',
-      date: '20 Ara 2024',
-      amount: -500.0,
-      status: 'Beklemede',
+      titleKey: 'payment.withdrawalTo',
+      date: 'Oct 20, 2023',
+      amount: -150.0,
+      status: 'pending',
       icon: 'bank-transfer-out',
       iconBgColor: primitives.amber[50],
     },
     {
       id: '4',
       type: 'received',
-      title: "Zeynep'den Hediye",
-      date: '19 Ara 2024',
-      amount: 175.0,
-      status: 'Başarısız',
+      titleKey: 'payment.giftFrom',
+      titleParams: { name: 'Samantha Bee' },
+      date: 'Oct 19, 2023',
+      amount: 75.0,
+      status: 'failed',
       icon: 'gift-outline',
       iconBgColor: primitives.red[50],
     },
   ];
 
   const filteredTransactions = transactions.filter((transaction) => {
-    if (filter === 'Tümü') return true;
-    if (filter === 'Gönderilen') return transaction.type === 'sent';
-    if (filter === 'Alınan') return transaction.type === 'received';
-    if (filter === 'Çekimler') return transaction.type === 'withdrawal';
+    if (filter === 'all') return true;
+    if (filter === 'sent') return transaction.type === 'sent';
+    if (filter === 'received') return transaction.type === 'received';
+    if (filter === 'withdrawals') return transaction.type === 'withdrawal';
     return true;
   });
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: StatusType) => {
     switch (status) {
-      case 'Tamamlandı':
+      case 'completed':
         return { bg: primitives.emerald[50], text: primitives.emerald[600] };
-      case 'Doğrulandı':
+      case 'verified':
         return { bg: primitives.blue[50], text: primitives.blue[600] };
-      case 'Beklemede':
+      case 'pending':
         return { bg: primitives.amber[50], text: primitives.amber[600] };
-      case 'Başarısız':
+      case 'failed':
         return { bg: primitives.red[50], text: primitives.red[600] };
       default:
         return { bg: primitives.stone[100], text: COLORS.text.secondary };
     }
   };
 
-  // Format currency in Turkish Lira
+  const getStatusLabel = (status: StatusType): string => {
+    return t(`payment.status.${status}`);
+  };
+
+  // Format currency in USD
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('tr-TR', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'TRY',
+      currency: 'USD',
       minimumFractionDigits: 2,
     }).format(Math.abs(amount));
   };
@@ -136,7 +157,9 @@ export const TransactionHistoryScreen: React.FC = () => {
             color={COLORS.text.primary}
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>İşlem Geçmişi</Text>
+        <Text style={styles.headerTitle}>
+          {t('payment.transactionHistory')}
+        </Text>
         <View style={styles.headerSpacer} />
       </View>
 
@@ -144,28 +167,26 @@ export const TransactionHistoryScreen: React.FC = () => {
         {/* Filter Buttons */}
         <View style={styles.filterContainer}>
           <View style={styles.filterButtonGroup}>
-            {(['Tümü', 'Gönderilen', 'Alınan', 'Çekimler'] as FilterType[]).map(
-              (filterOption) => (
-                <TouchableOpacity
-                  key={filterOption}
+            {filterOptions.map((option) => (
+              <TouchableOpacity
+                key={option.key}
+                style={[
+                  styles.filterButton,
+                  filter === option.key && styles.filterButtonActive,
+                ]}
+                onPress={() => setFilter(option.key)}
+                activeOpacity={0.7}
+              >
+                <Text
                   style={[
-                    styles.filterButton,
-                    filter === filterOption && styles.filterButtonActive,
+                    styles.filterButtonText,
+                    filter === option.key && styles.filterButtonTextActive,
                   ]}
-                  onPress={() => setFilter(filterOption)}
-                  activeOpacity={0.7}
                 >
-                  <Text
-                    style={[
-                      styles.filterButtonText,
-                      filter === filterOption && styles.filterButtonTextActive,
-                    ]}
-                  >
-                    {filterOption}
-                  </Text>
-                </TouchableOpacity>
-              ),
-            )}
+                  {option.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
 
@@ -174,6 +195,7 @@ export const TransactionHistoryScreen: React.FC = () => {
           <View style={styles.transactionList}>
             {filteredTransactions.map((transaction) => {
               const statusColors = getStatusColor(transaction.status);
+              const title = t(transaction.titleKey, transaction.titleParams);
               return (
                 <TouchableOpacity
                   key={transaction.id}
@@ -207,9 +229,7 @@ export const TransactionHistoryScreen: React.FC = () => {
 
                   {/* Content */}
                   <View style={styles.transactionContent}>
-                    <Text style={styles.transactionTitle}>
-                      {transaction.title}
-                    </Text>
+                    <Text style={styles.transactionTitle}>{title}</Text>
                     <Text style={styles.transactionDate}>
                       {transaction.date}
                     </Text>
@@ -243,7 +263,7 @@ export const TransactionHistoryScreen: React.FC = () => {
                           { color: statusColors.text },
                         ]}
                       >
-                        {transaction.status}
+                        {getStatusLabel(transaction.status)}
                       </Text>
                     </View>
                   </View>
@@ -261,10 +281,9 @@ export const TransactionHistoryScreen: React.FC = () => {
                 color={COLORS.text.secondary}
               />
             </View>
-            <Text style={styles.emptyStateTitle}>Henüz İşlem Yok</Text>
+            <Text style={styles.emptyStateTitle}>{t('common.noData')}</Text>
             <Text style={styles.emptyStateText}>
-              Hediye gönderdiğinizde veya aldığınızda tüm işlemleriniz burada
-              görünecek.
+              {t('payment.noTransactions')}
             </Text>
           </View>
         )}
