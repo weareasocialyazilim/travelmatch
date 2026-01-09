@@ -32,7 +32,7 @@ import {
   useAnimatedStyle,
   withSpring,
 } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 
 interface UsePressAnimationOptions {
   /** Scale value when pressed (default: 0.98) */
@@ -59,7 +59,7 @@ export const usePressAnimation = (options?: UsePressAnimationOptions) => {
   const handlePressIn = useCallback(() => {
     scale.value = withSpring(pressScale, springConfig);
     if (haptics) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.buttonPress();
     }
   }, [scale, pressScale, springConfig, haptics]);
 

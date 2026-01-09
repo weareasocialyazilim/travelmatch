@@ -33,7 +33,7 @@ try {
   );
 }
 
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 
 class AudioSystem {
   private sounds: Map<string, any> = new Map();
@@ -97,7 +97,7 @@ export const AUDIO_HAPTIC = {
    * Success ceremony - liquid splash
    */
   success: async () => {
-    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    await HapticManager.success();
     // Note: Add actual sound file here
     // await audioSystem.playSound('success');
   },
@@ -106,7 +106,7 @@ export const AUDIO_HAPTIC = {
    * Message sent - water droplet
    */
   messageSent: async () => {
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    await HapticManager.messageSent();
     // Note: Add actual sound file here
     // await audioSystem.playSound('droplet');
   },
@@ -115,7 +115,7 @@ export const AUDIO_HAPTIC = {
    * Button press - subtle click
    */
   buttonPress: async () => {
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    await HapticManager.buttonPress();
     // Note: Add actual sound file here
     // await audioSystem.playSound('click');
   },
@@ -124,7 +124,7 @@ export const AUDIO_HAPTIC = {
    * Card swipe - glass slide
    */
   cardSwipe: async () => {
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    await HapticManager.swipe();
     // Note: Add actual sound file here
     // await audioSystem.playSound('swipe');
   },
@@ -133,7 +133,7 @@ export const AUDIO_HAPTIC = {
    * Error - warning tone
    */
   error: async () => {
-    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    await HapticManager.error();
     // Note: Add actual sound file here
     // await audioSystem.playSound('error');
   },
