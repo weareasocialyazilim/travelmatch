@@ -14,7 +14,7 @@ import {
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { COLORS, GRADIENTS } from '@/constants/colors';
 
 interface Category {
@@ -58,7 +58,7 @@ export const CategoryChips: React.FC<CategoryChipsProps> = ({
 
   const handleSelect = useCallback(
     (categoryId: string) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.categorySelected();
       onSelect(categoryId);
     },
     [onSelect],
@@ -136,7 +136,7 @@ export const TabChips: React.FC<TabChipsProps> = ({
 }) => {
   const handleSelect = useCallback(
     (tabId: string) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.categorySelected();
       onSelect(tabId);
     },
     [onSelect],

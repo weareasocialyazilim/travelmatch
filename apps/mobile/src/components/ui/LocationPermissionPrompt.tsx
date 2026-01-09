@@ -17,7 +17,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { Linking } from 'react-native';
 import { COLORS } from '@/constants/colors';
 
@@ -46,7 +46,7 @@ export const LocationPermissionPrompt: React.FC<
   const [showCityPicker, setShowCityPicker] = useState(false);
 
   const handleCitySelect = (city: (typeof CITIES)[0]) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.primaryAction();
     onCitySelect({
       latitude: city.coords.lat,
       longitude: city.coords.lng,
@@ -55,7 +55,7 @@ export const LocationPermissionPrompt: React.FC<
   };
 
   const handleOpenSettings = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     await Linking.openSettings();
   };
 

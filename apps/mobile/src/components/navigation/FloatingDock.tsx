@@ -18,7 +18,7 @@ import Animated, {
   withRepeat,
   withSequence,
 } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { COLORS } from '@/constants/colors';
 
@@ -236,7 +236,7 @@ const TabItem: React.FC<TabItemProps> = ({
 
   const handlePress = () => {
     // Haptic feedback on tab transition
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     onPress();
   };
 
@@ -339,7 +339,7 @@ const CenterButton: React.FC<CenterButtonProps> = ({
 
   const handlePress = () => {
     // Medium haptic for center action (create moment)
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.primaryAction();
     onPress();
   };
 

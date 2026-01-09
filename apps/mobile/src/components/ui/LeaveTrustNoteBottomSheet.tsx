@@ -25,7 +25,7 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { COLORS, GRADIENTS } from '@/constants/colors';
 
 interface TrustNoteUser {
@@ -114,18 +114,18 @@ export const LeaveTrustNoteBottomSheet: React.FC<
 
   const handleRatingPress = useCallback((value: number) => {
     setRating(value);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
   }, []);
 
   const handleTagToggle = useCallback((tagId: string) => {
     setSelectedTags((prev) =>
       prev.includes(tagId) ? prev.filter((t) => t !== tagId) : [...prev, tagId],
     );
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
   }, []);
 
   const handleSubmit = useCallback(() => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    HapticManager.success();
 
     if (isSimpleMode) {
       // Simple mode: just send the comment text

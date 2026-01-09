@@ -39,7 +39,7 @@ import Animated, {
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ConfettiCannon from 'react-native-confetti-cannon';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 
@@ -222,7 +222,7 @@ export const ProofCeremonyFlow = memo<ProofCeremonyFlowProps>(
       (newStep: CeremonyStep) => {
         // Only trigger haptics if enabled in animation config
         if (animationConfig.enableHaptics) {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          HapticManager.buttonPress();
         }
 
         // Skip animations in low power mode
@@ -271,7 +271,7 @@ export const ProofCeremonyFlow = memo<ProofCeremonyFlowProps>(
       (result: AuthenticationResult) => {
         setAuthResult(result);
         if (result.status === 'verified') {
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          HapticManager.proofVerified();
           handleNext('thank-you');
         }
       },
@@ -548,7 +548,7 @@ const CaptureStep = memo<CaptureStepProps>(
         if (!result.canceled && result.assets.length > 0) {
           setPhotos((prev) => [...prev, result.assets[0].uri]);
           // MASTER UX: Heavy haptic feedback when capturing - "Sacred Moment" feel
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+          HapticManager.destructiveAction();
         }
       } catch (error) {
         logger.error('Camera error:', error);
@@ -558,7 +558,7 @@ const CaptureStep = memo<CaptureStepProps>(
     };
 
     const removePhoto = (index: number) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.buttonPress();
       setPhotos((prev) => prev.filter((_, i) => i !== index));
     };
 
@@ -587,7 +587,7 @@ const CaptureStep = memo<CaptureStepProps>(
             `${address?.city || ''}, ${address?.country || ''}`.trim() ||
             'Konum alındı',
         });
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        HapticManager.success();
       } catch (error) {
         logger.error('Location error:', error);
         showAlert({
@@ -609,7 +609,7 @@ const CaptureStep = memo<CaptureStepProps>(
       }
 
       // MASTER UX: Confirm submission with medium haptic
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      HapticManager.primaryAction();
 
       const proofId = `proof_${Date.now()}`;
 
@@ -777,7 +777,7 @@ const CelebrationStep = memo<CelebrationStepProps>(
 
     React.useEffect(() => {
       // Celebration haptic
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      HapticManager.success();
 
       // Scale in animation
       scaleAnim.value = withSpring(1, { damping: 8, stiffness: 100 });

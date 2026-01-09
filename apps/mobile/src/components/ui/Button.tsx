@@ -39,7 +39,7 @@ import Reanimated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 
 import { COLORS, GRADIENTS, PALETTE } from '../../constants/colors';
 import { TYPE_SCALE } from '../../theme/typography';
@@ -175,7 +175,7 @@ export const Button: React.FC<ButtonProps> = memo(
 
     const handlePress = useCallback(() => {
       if (haptic) {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        HapticManager.buttonPress();
       }
       onPress();
     }, [onPress, haptic]);
