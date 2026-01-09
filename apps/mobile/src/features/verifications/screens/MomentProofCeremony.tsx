@@ -28,7 +28,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import * as Location from 'expo-location';
 import Animated, {
   useSharedValue,
@@ -264,14 +264,14 @@ export const MomentProofCeremony: React.FC = () => {
     }
 
     try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      HapticManager.buttonPress();
 
       // Launch camera with PROOF_PHOTO config
       const asset = await launchCamera('PROOF_PHOTO');
 
       if (asset?.uri) {
         setPhotos((prev) => [...prev, asset.uri]);
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        HapticManager.success();
 
         // Auto-advance to next step after first photo
         if (photos.length === 0) {
@@ -377,7 +377,7 @@ export const MomentProofCeremony: React.FC = () => {
       });
 
       // Success - ceremony completed!
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      HapticManager.success();
 
       // Navigate to success after animation
       setTimeout(() => {

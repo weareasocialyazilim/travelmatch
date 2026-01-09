@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, { FadeInDown, Layout } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { COLORS } from '@/constants/colors';
@@ -111,7 +111,7 @@ export const NotificationsScreen = () => {
   } = useNotifications();
 
   const handleMarkAllRead = useCallback(async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     await markAllAsRead();
   }, [markAllAsRead]);
 
@@ -125,7 +125,7 @@ export const NotificationsScreen = () => {
       // Navigate to relevant screen
       const route = getNotificationRoute(notification);
       if (route) {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        HapticManager.buttonPress();
         navigation.navigate(route.name, route.params);
       }
     },

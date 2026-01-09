@@ -10,7 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import biometricAuthService, { BiometricType } from '@/services/biometricAuth';
 import { logger } from '@/utils/logger';
@@ -53,7 +53,7 @@ export const BiometricSetupScreen = () => {
     }
 
     setIsLoading(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.buttonPress();
 
     try {
       // Authenticate to confirm user's biometric
@@ -70,7 +70,7 @@ export const BiometricSetupScreen = () => {
         await AsyncStorage.removeItem(BIOMETRIC_REMINDER_KEY);
 
         logger.info('[BiometricSetup] Biometric authentication enabled');
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        HapticManager.success();
 
         navigation.reset({ index: 0, routes: [{ name: 'MainTabs' as never }] });
       } else {
@@ -79,7 +79,7 @@ export const BiometricSetupScreen = () => {
           '[BiometricSetup] Authentication failed:',
           authResult.error,
         );
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        HapticManager.error();
       }
     } catch (error) {
       logger.error('[BiometricSetup] Setup failed:', error);
@@ -93,12 +93,12 @@ export const BiometricSetupScreen = () => {
   };
 
   const handleSkip = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     navigation.reset({ index: 0, routes: [{ name: 'MainTabs' as never }] });
   };
 
   const handleRemindLater = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     // Set remind later flag with timestamp
     const remindDate = new Date();
     remindDate.setDate(remindDate.getDate() + 3); // Remind in 3 days

@@ -24,7 +24,7 @@ import Reanimated, {
   Easing,
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 
 import { COLORS, GRADIENTS, PALETTE } from '@/constants/colors';
 import { TYPE_SCALE } from '../../../theme/typography';
@@ -162,7 +162,7 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   };
 
   const handlePress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     onPress();
   };
 

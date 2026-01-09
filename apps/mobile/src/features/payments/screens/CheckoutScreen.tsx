@@ -29,7 +29,7 @@ import {
 } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { COLORS, GRADIENTS } from '@/constants/colors';
 import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { usePayments } from '@/hooks/usePayments';
@@ -109,7 +109,7 @@ const CheckoutScreen: React.FC = () => {
     if (!selectedMethod || isProcessing || !momentId) return;
 
     setIsProcessing(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.buttonPress();
 
     try {
       const paymentIntent = await createPaymentIntent(momentId, amount || 0);
@@ -122,7 +122,7 @@ const CheckoutScreen: React.FC = () => {
         throw new Error('Payment confirmation failed');
       }
 
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      HapticManager.success();
       navigation.navigate('Success', {
         type: 'payment',
         title: 'Ödeme Başarılı',
@@ -134,7 +134,7 @@ const CheckoutScreen: React.FC = () => {
         momentId,
         amount,
       });
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.error();
       navigation.navigate('PaymentFailed', {
         error: 'Ödeme başarısız oldu. Lütfen tekrar deneyin.',
       });

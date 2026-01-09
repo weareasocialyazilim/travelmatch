@@ -870,9 +870,22 @@
     }
   },
   "profile": {
+    "title": "Profile",
     "shareMessage": "Check out my TravelMatch profile!",
+    "shareProfile": "Share profile",
     "savedMoments": "Saved Moments",
     "offlineTitle": "No internet connection",
-    "offlineMessage": "Internet connection required to view profile."
+    "offlineMessage": "Internet connection required to view profile.",
+    "trustStatus": "Trust Status",
+    "trustScore": {
+      "points": "{{score}} points • Verifications",
+      "earnTrust": "Earn trust through verifications"
+    },
+    "moments": {
+      "noActive": "No active moments yet",
+      "noPast": "No past moments",
+      "createFirstDescription": "Start your journey by creating your first moment",
+      "completedDescription": "Completed moments will appear here"
+    }
   }
 }
