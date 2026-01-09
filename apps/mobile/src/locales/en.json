@@ -609,10 +609,47 @@
       "placeholder": "Search conversations..."
     },
     "archived": {
-      "empty": "No archived chats"
+      "title": "Archived Chats",
+      "empty": "No archived chats",
+      "emptyDescription": "Chats you archive will appear here. Long press a chat to archive it.",
+      "info": "Archived chats are hidden from your main message list. You can access them here.",
+      "unarchive": "Unarchive",
+      "unarchiveTitle": "Unarchive Chat",
+      "unarchiveMessage": "This chat will be restored to your message list.",
+      "unarchiveSuccess": "Chat restored to your list.",
+      "deleteTitle": "Delete Chat?",
+      "deleteMessage": "This conversation will be permanently deleted. This action cannot be undone.",
+      "deleteSuccess": "Chat permanently deleted.",
+      "archivedAt": "Archived {{time}}",
+      "goToMessages": "Go to Messages"
     },
     "input": {
       "placeholder": "Message..."
+    }
+  },
+  "inbox": {
+    "title": "Inbox",
+    "tabs": {
+      "active": "Active Matches",
+      "requests": "Requests"
+    },
+    "empty": {
+      "activeTitle": "No messages yet",
+      "activeDescription": "Share a moment to meet new people!",
+      "requestsTitle": "No gift requests",
+      "requestsDescription": "You'll see requests here when someone wants to join your moment."
+    },
+    "explore": "Explore",
+    "suggestions": {
+      "title": "Nearby Moments",
+      "subtitle": "Check out these moments and meet new people",
+      "cardText": "Explore Moments"
+    },
+    "time": {
+      "now": "now",
+      "minutesAgo": "{{count}}m ago",
+      "hoursAgo": "{{count}}h ago",
+      "daysAgo": "{{count}}d ago"
     }
   },
   "wishCard": {

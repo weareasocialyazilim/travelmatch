@@ -609,10 +609,47 @@
       "placeholder": "Konuşmaları ara..."
     },
     "archived": {
-      "empty": "Arşivlenmiş sohbet yok"
+      "title": "Arşivlenmiş Sohbetler",
+      "empty": "Arşivlenmiş sohbet yok",
+      "emptyDescription": "Arşivlediğiniz sohbetler burada görünecek. Bir sohbeti arşivlemek için üzerine uzun basın.",
+      "info": "Arşivlenmiş sohbetler ana mesaj listenizden gizlenir. Onlara buradan erişebilirsiniz.",
+      "unarchive": "Geri Al",
+      "unarchiveTitle": "Sohbeti Geri Al",
+      "unarchiveMessage": "Bu sohbet mesajlar listenize geri yüklenecek.",
+      "unarchiveSuccess": "Sohbet listenize geri yüklendi.",
+      "deleteTitle": "Sohbeti Sil?",
+      "deleteMessage": "Bu konuşma kalıcı olarak silinecek. Bu işlem geri alınamaz.",
+      "deleteSuccess": "Sohbet kalıcı olarak silindi.",
+      "archivedAt": "Arşivlendi {{time}}",
+      "goToMessages": "Mesajlara Git"
     },
     "input": {
       "placeholder": "Mesaj..."
+    }
+  },
+  "inbox": {
+    "title": "Gelen Kutusu",
+    "tabs": {
+      "active": "Aktif Eşleşmeler",
+      "requests": "Talepler"
+    },
+    "empty": {
+      "activeTitle": "Henüz mesaj yok",
+      "activeDescription": "Yeni insanlarla tanışmak için bir moment paylaş!",
+      "requestsTitle": "Hediye talebi yok",
+      "requestsDescription": "Birisi momentine katılmak istediğinde burada göreceksin."
+    },
+    "explore": "Keşfet",
+    "suggestions": {
+      "title": "Yakınındaki Anlar",
+      "subtitle": "Bu momentlere göz at ve yeni insanlarla tanış",
+      "cardText": "Momentleri Keşfet"
+    },
+    "time": {
+      "now": "şimdi",
+      "minutesAgo": "{{count}}d önce",
+      "hoursAgo": "{{count}}s önce",
+      "daysAgo": "{{count}}g önce"
     }
   },
   "wishCard": {
