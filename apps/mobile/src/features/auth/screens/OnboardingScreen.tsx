@@ -29,10 +29,10 @@ import {
   type GestureResponderEvent,
   type PanResponderGestureState,
 } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import * as Haptics from 'expo-haptics';
 import type { StackScreenProps } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
@@ -42,6 +42,8 @@ import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
 import { TMButton } from '@/components/ui/TMButton';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useOnboarding } from '@/hooks/useOnboarding';
+import { useGyroscopeParallax } from '@/hooks/useGyroscopeParallax';
+import { HapticManager } from '@/services/HapticManager';
 import { logger } from '../../../utils/logger';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
@@ -93,25 +95,20 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   const analytics = useAnalytics();
   const { completeOnboarding } = useOnboarding();
 
+  // Spatial depth effect - gyroscope parallax for premium feel
+  const { parallaxStyle } = useGyroscopeParallax({ range: 5, enabled: true });
+
   // Swipe gesture handler for navigating between slides
   const handleSwipe = useCallback(
     (direction: 'left' | 'right') => {
       if (direction === 'left' && activeIndex < SLIDES.length - 1) {
         // Swipe left = next slide
         setActiveIndex(activeIndex + 1);
-        try {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        } catch (_e) {
-          // ignore haptics error
-        }
+        HapticManager.swipe();
       } else if (direction === 'right' && activeIndex > 0) {
         // Swipe right = previous slide
         setActiveIndex(activeIndex - 1);
-        try {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        } catch (_e) {
-          // ignore haptics error
-        }
+        HapticManager.swipe();
       }
     },
     [activeIndex],
@@ -151,15 +148,8 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
       totalSlides: SLIDES.length,
     });
 
-    // Haptics - wrap in try/catch to prevent crashes
-    try {
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch (hapticError) {
-      // Haptics may fail on simulator, ignore
-      logger.debug('Haptics failed (expected on simulator)', {
-        error: hapticError,
-      });
-    }
+    // Haptic feedback for button press
+    HapticManager.buttonPress();
 
     if (activeIndex < SLIDES.length - 1) {
       const nextIndex = activeIndex + 1;
@@ -257,11 +247,11 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
         {/* Spacer to push content down */}
         <View style={styles.spacer} />
 
-        {/* Text Content */}
-        <View style={styles.textContainer}>
+        {/* Text Content with Gyroscope Parallax */}
+        <Animated.View style={[styles.textContainer, parallaxStyle]}>
           <Text style={styles.title}>{currentSlide.title}</Text>
           <Text style={styles.desc}>{currentSlide.desc}</Text>
-        </View>
+        </Animated.View>
 
         {/* Footer Actions */}
         <View style={styles.footer}>
@@ -279,11 +269,7 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
           <Pressable
             onPress={() => {
               logger.info('🔘 BUTTON PRESSED!', { activeIndex });
-              try {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              } catch (_e) {
-                // ignore haptics error
-              }
+              HapticManager.primaryAction();
               handleNext();
             }}
             style={({ pressed }) => [

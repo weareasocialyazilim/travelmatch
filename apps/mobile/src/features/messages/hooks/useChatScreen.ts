@@ -10,6 +10,7 @@ import { useScreenPerformance } from '@/hooks/useScreenPerformance';
 import { logger } from '@/utils/logger';
 import { useToast } from '@/context/ToastContext';
 import { supabase } from '@/config/supabase';
+import { HapticManager } from '@/services/HapticManager';
 
 export interface Message {
   id: string;
@@ -174,6 +175,9 @@ export const useChatScreen = ({
   const handleSend = useCallback(async () => {
     const trimmedMessage = messageText.trim();
     if (!trimmedMessage || isSending) return;
+
+    // Haptic feedback for message sent
+    HapticManager.messageSent();
 
     // Generate optimistic message ID
     const optimisticId = `optimistic-${Date.now()}`;
