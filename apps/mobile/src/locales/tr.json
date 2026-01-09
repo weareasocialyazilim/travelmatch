@@ -818,6 +818,8 @@
   },
   "wallet": {
     "title": "Cüzdan",
+    "totalBalance": "Toplam Bakiye",
+    "recentTransactions": "Son İşlemler",
     "available": "Kullanılabilir",
     "pending": "Beklemede",
     "withdraw": "Para Çek",
