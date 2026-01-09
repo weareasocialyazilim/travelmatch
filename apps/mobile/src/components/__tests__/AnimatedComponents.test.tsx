@@ -6,7 +6,6 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { Text, View } from 'react-native';
-import * as Haptics from 'expo-haptics';
 import {
   AnimatedButton,
   FadeInView,
@@ -17,14 +16,16 @@ import {
   useShakeAnimation,
   SuccessAnimation,
 } from '../AnimatedComponents';
+import { HapticManager } from '@/services/HapticManager';
 
-// Mock Haptics
-jest.mock('expo-haptics', () => ({
-  impactAsync: jest.fn(),
-  ImpactFeedbackStyle: {
-    Light: 'light',
-    Medium: 'medium',
-    Heavy: 'heavy',
+// Mock HapticManager
+jest.mock('@/services/HapticManager', () => ({
+  HapticManager: {
+    buttonPress: jest.fn(),
+    success: jest.fn(),
+    error: jest.fn(),
+    warning: jest.fn(),
+    primaryAction: jest.fn(),
   },
 }));
 
@@ -68,9 +69,7 @@ describe('AnimatedComponents', () => {
       );
 
       fireEvent.press(getByText('Haptic'));
-      expect(Haptics.impactAsync).toHaveBeenCalledWith(
-        Haptics.ImpactFeedbackStyle.Light,
-      );
+      expect(HapticManager.buttonPress).toHaveBeenCalled();
     });
 
     it('does not trigger haptic when disabled', () => {
@@ -81,7 +80,7 @@ describe('AnimatedComponents', () => {
       );
 
       fireEvent.press(getByText('No Haptic'));
-      expect(Haptics.impactAsync).not.toHaveBeenCalled();
+      expect(HapticManager.buttonPress).not.toHaveBeenCalled();
     });
 
     it('is disabled when disabled prop is true', () => {
@@ -364,7 +363,7 @@ describe('AnimatedComponents', () => {
       );
 
       fireEvent.press(getByText('Haptic Scale'));
-      expect(Haptics.impactAsync).toHaveBeenCalled();
+      expect(HapticManager.buttonPress).toHaveBeenCalled();
     });
 
     it('does not trigger haptic when disabled', () => {
@@ -375,7 +374,7 @@ describe('AnimatedComponents', () => {
       );
 
       fireEvent.press(getByText('No Haptic Scale'));
-      expect(Haptics.impactAsync).not.toHaveBeenCalled();
+      expect(HapticManager.buttonPress).not.toHaveBeenCalled();
     });
 
     it('applies custom scale value', () => {

@@ -10,27 +10,25 @@ import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
 import { ProofCeremonyFlow } from '../ProofCeremonyFlow';
 import { CEREMONY_STEP_ORDER, type CeremonyStep } from '@/constants/ceremony';
 
-// Mock expo-haptics - use inline jest.fn() to avoid hoisting issues
-jest.mock('expo-haptics', () => ({
-  notificationAsync: jest.fn().mockResolvedValue(undefined),
-  impactAsync: jest.fn().mockResolvedValue(undefined),
-  selectionAsync: jest.fn().mockResolvedValue(undefined),
-  NotificationFeedbackType: {
-    Success: 'success',
-    Warning: 'warning',
-    Error: 'error',
-  },
-  ImpactFeedbackStyle: {
-    Light: 'light',
-    Medium: 'medium',
-    Heavy: 'heavy',
+// Mock HapticManager
+jest.mock('@/services/HapticManager', () => ({
+  HapticManager: {
+    buttonPress: jest.fn().mockResolvedValue(undefined),
+    success: jest.fn().mockResolvedValue(undefined),
+    error: jest.fn().mockResolvedValue(undefined),
+    warning: jest.fn().mockResolvedValue(undefined),
+    primaryAction: jest.fn().mockResolvedValue(undefined),
+    selectionChange: jest.fn().mockResolvedValue(undefined),
+    ceremonyComplete: jest.fn().mockResolvedValue(undefined),
+    proofVerified: jest.fn().mockResolvedValue(undefined),
+    photoCaptured: jest.fn().mockResolvedValue(undefined),
   },
 }));
 
 // Get a reference to the mocked functions after the mock is applied
-const Haptics = require('expo-haptics');
-const mockNotificationAsync = Haptics.notificationAsync;
-const mockImpactAsync = Haptics.impactAsync;
+const { HapticManager } = require('@/services/HapticManager');
+const mockButtonPress = HapticManager.buttonPress;
+const mockSuccess = HapticManager.success;
 
 // react-native-reanimated is mocked globally via moduleNameMapper
 
@@ -465,7 +463,7 @@ describe('ProofCeremonyFlow Component', () => {
         jest.advanceTimersByTime(500);
       });
 
-      expect(mockImpactAsync).toHaveBeenCalledWith('light');
+      expect(mockButtonPress).toHaveBeenCalled();
     });
 
     it('animates between steps', async () => {

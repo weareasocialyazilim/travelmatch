@@ -99,7 +99,7 @@ export const SacredMoments = memo<SacredMomentsProps>(
       onScreenshotAttempt?.();
 
       // Haptic warning
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      HapticManager.warning();
 
       // Animate blur in
       blurIntensity.value = withTiming(95, {
