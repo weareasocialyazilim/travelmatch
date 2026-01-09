@@ -33,7 +33,7 @@ import Animated, {
   withSpring,
   Layout,
 } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 
 import {
   VIBE_ROOM_COLORS,
@@ -67,7 +67,7 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
     }, [scale]);
 
     const handlePress = useCallback(() => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.buttonPress();
       onPress(chat);
     }, [chat, onPress]);
 
@@ -393,7 +393,7 @@ interface AwwwardsInboxChatItemProps {
 export const AwwwardsInboxChatItem: React.FC<AwwwardsInboxChatItemProps> = memo(
   ({ chat, onPress }) => {
     const handlePress = useCallback(() => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.buttonPress();
       onPress();
     }, [onPress]);
 

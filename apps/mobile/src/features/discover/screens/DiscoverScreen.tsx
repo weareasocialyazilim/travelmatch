@@ -31,8 +31,8 @@ import {
   Share,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
+import { HapticManager } from '@/services/HapticManager';
 import { LinearGradient } from 'expo-linear-gradient';
 import { measureScreenLoad } from '@/config/sentry'; // ADDED: Performance monitoring
 import {
@@ -157,12 +157,12 @@ const DiscoverScreen = () => {
 
   // Header actions
   const handleNotificationsPress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     navigation.navigate('Notifications');
   }, [navigation]);
 
   const handleFilterPress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.filterApplied();
     setShowFilterModal(true);
   }, []);
 
@@ -206,7 +206,7 @@ const DiscoverScreen = () => {
   );
 
   const handleAvatarPress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     navigation.navigate('Profile');
   }, [navigation]);
 
@@ -229,13 +229,13 @@ const DiscoverScreen = () => {
 
   // Handle subscription upgrade
   const handleSubscriptionUpgrade = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.primaryAction();
     navigation.navigate('Subscription');
   }, [navigation]);
 
   // Stories actions - Instagram-style fullscreen viewer
   const handleStoryPress = useCallback((story: UserStory, _index: number) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     // Open StoryViewer modal (Instagram-style)
     setSelectedStoryUser(story);
     setCurrentStoryIndex(0);
@@ -306,7 +306,7 @@ const DiscoverScreen = () => {
   );
 
   const handleStoryShare = useCallback(async (story: Story) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     try {
       const shareMessage = `🌟 ${story.title || 'Bir hikaye'}\n\n${selectedStoryUser?.name || 'Bir kullanıcı'} TravelMatch\'te muhteşem bir an paylaştı!\n\n👉 TravelMatch\'te gör: https://travelmatch.app/stories/${story.id}`;
 
@@ -316,24 +316,24 @@ const DiscoverScreen = () => {
       });
 
       if (result.action === Share.sharedAction) {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        HapticManager.success();
         logger.info('Story shared successfully:', story.id);
       }
     } catch (error) {
       logger.error('Story share failed:', error);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.error();
     }
   }, [selectedStoryUser]);
 
   const handleCreateStoryPress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.primaryAction();
     navigation.navigate('CreateMoment');
   }, [navigation]);
 
   // Handle Counter-Offer / Subscriber Offer
   const handleCounterOffer = useCallback(
     (moment: Moment) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      HapticManager.primaryAction();
 
       // Guest kullanıcı kontrolü
       if (isGuest || !user) {
@@ -362,7 +362,7 @@ const DiscoverScreen = () => {
   // Handle Gift Press
   const handleGiftPress = useCallback(
     (moment: Moment) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      HapticManager.giftSent();
 
       // Guest kullanıcı kontrolü - showLoginPrompt via modalStore
       if (isGuest || !user) {
@@ -408,7 +408,7 @@ const DiscoverScreen = () => {
 
   // Handle Share Press
   const handleSharePress = useCallback(async (moment: Moment) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     try {
       const shareMessage = `🌟 ${moment.title || 'Bir an'}\n\n${moment.description || 'TravelMatch\'te bu muhteşem anı keşfet!'}\n\n📍 ${moment.location?.name || 'Bir yer'}\n💰 ${moment.price || 0} ${moment.currency || 'TRY'}\n\n👉 TravelMatch\'te gör: https://travelmatch.app/moments/${moment.id}`;
 
@@ -418,12 +418,12 @@ const DiscoverScreen = () => {
       });
 
       if (result.action === Share.sharedAction) {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        HapticManager.success();
         logger.info('Moment shared successfully:', moment.id);
       }
     } catch (error) {
       logger.error('Share failed:', error);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.error();
     }
   }, []);
 
@@ -489,10 +489,10 @@ const DiscoverScreen = () => {
 
   // Handle refresh
   const handleRefresh = useCallback(async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.refreshTriggered();
     await refresh();
     // Success haptic after refresh completes
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    HapticManager.success();
   }, [refresh]);
 
   // Handle load more

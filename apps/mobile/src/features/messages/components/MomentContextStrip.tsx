@@ -12,8 +12,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
 import { COLORS } from '@/constants/colors';
+import { HapticManager } from '@/services/HapticManager';
 
 export interface MomentContext {
   id: string;
@@ -126,7 +126,7 @@ export const MomentContextStrip: React.FC<MomentContextStripProps> = ({
   const statusConfig = getStatusConfig();
 
   const handlePress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     onPress?.();
   };
 

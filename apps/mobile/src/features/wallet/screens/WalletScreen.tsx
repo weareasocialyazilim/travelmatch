@@ -24,9 +24,9 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { showAlert } from '@/stores/modalStore';
-import * as Haptics from 'expo-haptics';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { HapticManager } from '@/services/HapticManager';
+import { useTranslation } from 'react-i18next';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LiquidScreenWrapper } from '@/components/layout';

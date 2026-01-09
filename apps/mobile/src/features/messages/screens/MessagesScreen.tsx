@@ -11,8 +11,8 @@ import {
 import { FlashList } from '@shopify/flash-list';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import * as Haptics from 'expo-haptics';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { HapticManager } from '@/services/HapticManager';
 import { ErrorState, EmptyState } from '@/components';
 import { SkeletonList } from '@/components/ui';
 import { FadeInView as _FadeInView } from '@/components/AnimatedComponents';
@@ -164,13 +164,13 @@ const MessagesScreen: React.FC = () => {
   );
 
   const onRefresh = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.refreshTriggered();
     refreshConversations();
   }, [refreshConversations]);
 
   const handleChatPress = useCallback(
     (conversation: Conversation) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.buttonPress();
       navigation.navigate('Chat', {
         otherUser: {
           id: conversation.participantId || '',

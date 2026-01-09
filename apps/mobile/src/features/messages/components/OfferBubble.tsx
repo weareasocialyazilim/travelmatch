@@ -24,8 +24,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { WebView } from 'react-native-webview';
-import * as Haptics from 'expo-haptics';
 import { COLORS } from '@/constants/colors';
+import { HapticManager } from '@/services/HapticManager';
 import type { OfferStatus } from '@/types/message.types';
 
 /** Threshold for "Liquid Platinum" high-value offers (TRY) */
@@ -78,7 +78,7 @@ export const OfferBubble: React.FC<OfferBubbleProps> = ({
    * Legal requirement: Funds held in escrow until moment completion
    */
   const handleAccept = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.paymentInitiated();
 
     if (paytrToken) {
       // Open PayTR WebView for pre-authorization
@@ -90,7 +90,7 @@ export const OfferBubble: React.FC<OfferBubbleProps> = ({
   };
 
   const handleDecline = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     onDecline?.();
   };
 
@@ -107,7 +107,7 @@ export const OfferBubble: React.FC<OfferBubbleProps> = ({
       setShowPayTRWebView(false);
       setIsProcessing(false);
       // Trigger success celebration
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      HapticManager.paymentComplete();
       onPaymentSuccess?.();
     } else if (
       navState.url.includes('/odeme/hata') ||
@@ -115,7 +115,7 @@ export const OfferBubble: React.FC<OfferBubbleProps> = ({
     ) {
       setShowPayTRWebView(false);
       setIsProcessing(false);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.paymentFailed();
       onPaymentFailure?.('Ödeme işlemi başarısız');
     }
   };
