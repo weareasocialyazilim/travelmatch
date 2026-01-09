@@ -18,6 +18,7 @@ import Animated, { FadeInDown, FlipInYRight } from 'react-native-reanimated';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import { securePaymentService } from '@/services/securePaymentService';
+import { useScreenSecurity } from '@/hooks/useScreenSecurity';
 import { showError, showSuccess } from '@/stores/modalStore';
 import { logger } from '@/utils/logger';
 
@@ -27,6 +28,10 @@ type Props = StackScreenProps<RootStackParamList, 'AddCard'>;
 
 export const AddCardScreen = ({ navigation }: Props) => {
   const insets = useSafeAreaInsets();
+
+  // Security: Prevent screenshots during card entry
+  useScreenSecurity();
+
   const [cardName, setCardName] = useState('');
   const [cardNumber, setCardNumber] = useState('');
   const [expiry, setExpiry] = useState('');

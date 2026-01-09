@@ -739,5 +739,27 @@
         "dropMoment": "Moment'ı Drop Et"
       }
     }
+  },
+  "counterOffer": {
+    "title": "Teklif Gönder",
+    "tierFeature": "{{tier}} Özelliği",
+    "momentInfo": {
+      "hostLabel": "Ev sahibi:",
+      "askedPrice": "İstenilen Fiyat:"
+    },
+    "yourOffer": "Teklifiniz",
+    "offerHint": "Host teklifinizi kabul veya reddedebilir.",
+    "messageLabel": "Mesajınız (Opsiyonel)",
+    "messagePlaceholder": "Host'a neden bu teklifi yaptığınızı açıklayın...",
+    "infoText": "{{tier}} üyeliğiniz ile host'lara özel teklif gönderebilirsiniz. Host teklifinizi kabul ederse ödeme ekranına yönlendirilirsiniz.",
+    "submitButton": "Teklif Gönder",
+    "successTitle": "Teklif Gönderildi!",
+    "successSubtitle": "{{hostName}} teklifinizi değerlendirecek. Yanıt bekleyin!",
+    "upgradeRequired": {
+      "title": "Premium Özellik",
+      "description": "Host'lara özel teklif göndermek için Premium veya Platinum üyesi olmanız gerekiyor.",
+      "upgradeButton": "Planları Görüntüle",
+      "maybeLater": "Belki Sonra"
+    }
   }
 }
