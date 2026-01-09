@@ -1,6 +1,7 @@
 import { supabase } from '@/config/supabase';
 import type { Database } from '../../../types/database.types';
 import { ESCROW_THRESHOLDS } from '@/constants/values';
+import { logger } from '@/utils/logger';
 
 /**
  * Messages API Service
@@ -141,7 +142,7 @@ export const messagesApi = {
 
     if (notifError) {
       // Log but don't throw - notification failure shouldn't block unlock
-      console.error('Failed to create notification:', notifError);
+      logger.error('Failed to create notification:', { error: notifError });
     }
 
     return { success: true };
@@ -185,7 +186,7 @@ export const messagesApi = {
     });
 
     if (notifError) {
-      console.error('Failed to create gratitude notification:', notifError);
+      logger.error('Failed to create gratitude notification:', { error: notifError });
     }
 
     return { success: true };
