@@ -259,6 +259,9 @@ export interface UpdateProfilePayload {
   twitter?: string;
   notification_preferences?: NotificationPreferences;
   privacy_settings?: PrivacySettings;
+  // Discovery and visibility settings
+  is_discoverable?: boolean;
+  distance_preference?: number;
 }
 
 // ============================================

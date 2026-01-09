@@ -193,48 +193,8 @@ const CreateMomentScreen: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAsStory, setShowAsStory] = useState(true); // Default: show as story for 24h
 
-  // GUEST LOOP FIX: Block guests at component mount, not at the end
-  // This prevents guests from filling out the entire form before being asked to login
-  useEffect(() => {
-    if (isGuest || !user) {
-      // Show login prompt immediately when guest tries to create a moment
-      showLoginPrompt({
-        action: 'create_moment',
-        // Navigate back if user dismisses the login prompt
-        onDismiss: () => navigation.goBack(),
-      });
-    }
-  }, [isGuest, user, navigation]);
-
-  // If guest, don't render the form - waiting for login redirect
-  if (isGuest || !user) {
-    return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
-        <LinearGradient
-          colors={GRADIENTS.dark as [string, string, ...string[]]}
-          style={StyleSheet.absoluteFill}
-        />
-        <View style={styles.guestBlockContainer}>
-          <MaterialCommunityIcons
-            name="account-lock"
-            size={64}
-            color={COLORS.brand.primary}
-          />
-          <Text style={styles.guestBlockTitle}>
-            {t('screens.createMoment.loginRequired', 'Giriş Yapın')}
-          </Text>
-          <Text style={styles.guestBlockSubtitle}>
-            {t(
-              'screens.createMoment.loginRequiredMessage',
-              'Anı oluşturmak için giriş yapmanız gerekiyor.',
-            )}
-          </Text>
-        </View>
-      </View>
-    );
-  }
-
   // 1. Media Selection - Story format (9:16)
+  // NOTE: All hooks must be defined before any conditional returns (React rules of hooks)
   const pickImage = useCallback(async () => {
     // Liquid interaction haptic
     HapticManager.buttonPress();
@@ -398,6 +358,49 @@ const CreateMomentScreen: React.FC = () => {
     },
     [step],
   );
+
+  // GUEST LOOP FIX: Block guests at component mount
+  // This prevents guests from filling out the entire form before being asked to login
+  useEffect(() => {
+    if (isGuest || !user) {
+      // Show login prompt immediately when guest tries to create a moment
+      showLoginPrompt({
+        action: 'create_moment',
+        onSuccess: () => {
+          // User logged in successfully, form will render
+        },
+      });
+    }
+  }, [isGuest, user]);
+
+  // If guest, don't render the form - waiting for login redirect
+  // NOTE: This conditional return must come AFTER all hooks are defined
+  if (isGuest || !user) {
+    return (
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <LinearGradient
+          colors={[...GRADIENTS.dark] as [string, string, ...string[]]}
+          style={StyleSheet.absoluteFill}
+        />
+        <View style={styles.guestBlockContainer}>
+          <MaterialCommunityIcons
+            name="account-lock"
+            size={64}
+            color={COLORS.brand.primary}
+          />
+          <Text style={styles.guestBlockTitle}>
+            {t('screens.createMoment.loginRequired', 'Giriş Yapın')}
+          </Text>
+          <Text style={styles.guestBlockSubtitle}>
+            {t(
+              'screens.createMoment.loginRequiredMessage',
+              'Anı oluşturmak için giriş yapmanız gerekiyor.',
+            )}
+          </Text>
+        </View>
+      </View>
+    );
+  }
 
   // Step 1: Media Selection - Clean upload UI
   const renderMediaStep = () => (

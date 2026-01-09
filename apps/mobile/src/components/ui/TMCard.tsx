@@ -95,12 +95,27 @@ export const TMCard: React.FC<TMCardProps> = ({
   const scale = useSharedValue(1);
 
   // Memoized badge config with i18n labels
-  const badgeConfig = useMemo(
+  const badgeConfig: Record<
+    'featured' | 'popular' | 'new' | 'premium',
+    { label: string; bg: string; icon?: string }
+  > = useMemo(
     () => ({
-      featured: { label: t('moments.card.featured'), bg: '#3D4A3A', icon: 'fire' },
-      popular: { label: t('moments.card.popular'), bg: '#14B8A6', icon: 'heart' },
+      featured: {
+        label: t('moments.card.featured'),
+        bg: '#3D4A3A',
+        icon: 'fire',
+      },
+      popular: {
+        label: t('moments.card.popular'),
+        bg: '#14B8A6',
+        icon: 'heart',
+      },
       new: { label: t('moments.card.new'), bg: '#292524' },
-      premium: { label: t('moments.card.premium'), bg: '#F59E0B', icon: 'star' },
+      premium: {
+        label: t('moments.card.premium'),
+        bg: '#F59E0B',
+        icon: 'star',
+      },
     }),
     [t],
   );
@@ -184,13 +199,17 @@ export const TMCard: React.FC<TMCardProps> = ({
                 { backgroundColor: badgeConfig[moment.badge].bg },
               ]}
             >
-              {badgeConfig[moment.badge].icon && (
+              {badgeConfig[moment.badge].icon ? (
                 <MaterialCommunityIcons
-                  name={badgeConfig[moment.badge].icon as any}
+                  name={
+                    badgeConfig[moment.badge].icon as React.ComponentProps<
+                      typeof MaterialCommunityIcons
+                    >['name']
+                  }
                   size={12}
                   color={COLORS.white}
                 />
-              )}
+              ) : null}
               <Text style={styles.featureBadgeText}>
                 {badgeConfig[moment.badge].label}
               </Text>
@@ -305,7 +324,9 @@ export const TMCard: React.FC<TMCardProps> = ({
             <View style={styles.actionRow}>
               {/* Price */}
               <View style={styles.priceContainer}>
-                <Text style={styles.priceLabel}>{t('moments.card.giftFor')}</Text>
+                <Text style={styles.priceLabel}>
+                  {t('moments.card.giftFor')}
+                </Text>
                 <Text style={styles.price}>
                   {currency}
                   {moment.price}

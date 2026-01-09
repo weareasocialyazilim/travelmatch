@@ -188,8 +188,12 @@ const SearchMapScreen: React.FC = () => {
   const userTier = subscription?.tier || 'free';
 
   // Network status for offline handling
-  const { isConnected, isInternetReachable } = useNetwork();
-  const isOffline = !isConnected || isInternetReachable === false;
+  const { isConnected, status: networkStatus } = useNetwork();
+  // Handle null case - treat null as "unknown" (assume connected)
+  const isOffline =
+    !isConnected ||
+    (networkStatus.isInternetReachable !== null &&
+      networkStatus.isInternetReachable === false);
 
   // State
   const [userLocation, setUserLocation] = useState<MapLocation | null>(null);
