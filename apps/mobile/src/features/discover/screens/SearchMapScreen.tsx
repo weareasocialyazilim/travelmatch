@@ -105,8 +105,10 @@ interface MomentMarker {
   lng: number;
   price: string;
   numericPrice: number;
+  currency?: string;
   title: string;
   category?: string;
+  hostId?: string;
   hostName?: string;
   hostAvatar?: string;
   hostTrustScore?: number;
@@ -403,8 +405,11 @@ const SearchMapScreen: React.FC = () => {
         navigation.navigate('SubscriberOfferModal', {
           momentId: selectedMoment.id,
           momentTitle: selectedMoment.title,
-          hostName: selectedMoment.hostName,
-          currentPrice: selectedMoment.numericPrice,
+          momentCategory: selectedMoment.category || 'experience',
+          targetValue: selectedMoment.numericPrice,
+          targetCurrency: selectedMoment.currency || 'TRY',
+          hostId: selectedMoment.hostId || selectedMoment.id, // Fallback to moment ID if hostId missing
+          hostName: selectedMoment.hostName || 'Host',
         });
       } else {
         // Regular navigation to moment detail
