@@ -194,7 +194,22 @@
     "paymentSuccessful": "Ödeme başarılı!",
     "paymentFailed": "Ödeme başarısız. Lütfen tekrar deneyin.",
     "refund": "İade",
-    "transactionHistory": "İşlem Geçmişi"
+    "transactionHistory": "İşlem Geçmişi",
+    "filters": {
+      "all": "Tümü",
+      "sent": "Gönderilen",
+      "received": "Alınan",
+      "withdrawals": "Çekimler"
+    },
+    "status": {
+      "completed": "Tamamlandı",
+      "verified": "Doğrulandı",
+      "pending": "Beklemede",
+      "failed": "Başarısız"
+    },
+    "giftFrom": "{{name}}'den Hediye",
+    "giftFor": "{{name}}'e Hediye",
+    "withdrawalTo": "Banka Hesabına Transfer"
   },
   "withdrawal": {
     "title": "Para Çek",

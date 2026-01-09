@@ -8,6 +8,122 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 // See: https://github.com/callstack/react-native-testing-library/issues/1635
 // Tests that fail due to this issue are marked as skipped until the library is updated.
 
+// ===========================================================================
+// i18n Mock Setup - Must be defined before any component imports
+// ===========================================================================
+// Load English translations for consistent test assertions
+// Note: Variable names MUST start with "mock" to be accessible in jest.mock factories
+const mockEnTranslations = (() => {
+  try {
+    return require('./src/locales/en.json');
+  } catch {
+    return {};
+  }
+})();
+
+/**
+ * Helper to get nested translation value by dot-notation key
+ * e.g. mockGetNestedTranslation('auth.login') => mockEnTranslations.auth.login
+ * MUST be prefixed with "mock" to be accessible in jest.mock factories
+ */
+function mockGetNestedTranslation(key, options) {
+  if (!key || typeof key !== 'string') return key;
+
+  const parts = key.split('.');
+  let value = mockEnTranslations;
+
+  for (const part of parts) {
+    if (value && typeof value === 'object' && part in value) {
+      value = value[part];
+    } else {
+      // Key not found - return the key itself (common i18n fallback behavior)
+      return key;
+    }
+  }
+
+  // Handle interpolation (e.g., "Maximum {{max}} characters allowed")
+  if (typeof value === 'string' && options && typeof options === 'object') {
+    return value.replace(/\{\{(\w+)\}\}/g, (_, varName) => {
+      return options[varName] !== undefined
+        ? String(options[varName])
+        : `{{${varName}}}`;
+    });
+  }
+
+  return typeof value === 'string' ? value : key;
+}
+
+// Mock i18next
+jest.mock('i18next', () => ({
+  use: jest.fn().mockReturnThis(),
+  init: jest.fn().mockResolvedValue(undefined),
+  t: (key, options) => mockGetNestedTranslation(key, options),
+  language: 'en',
+  changeLanguage: jest.fn().mockResolvedValue(undefined),
+  on: jest.fn(),
+  off: jest.fn(),
+  exists: jest.fn().mockReturnValue(true),
+  getFixedT: jest.fn(
+    () => (key, options) => mockGetNestedTranslation(key, options),
+  ),
+  hasResourceBundle: jest.fn().mockReturnValue(true),
+  addResourceBundle: jest.fn(),
+  getResourceBundle: jest.fn(() => mockEnTranslations),
+  languages: ['en', 'tr'],
+  isInitialized: true,
+}));
+
+// Mock react-i18next
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key, options) => mockGetNestedTranslation(key, options),
+    i18n: {
+      language: 'en',
+      changeLanguage: jest.fn().mockResolvedValue(undefined),
+      languages: ['en', 'tr'],
+      isInitialized: true,
+      on: jest.fn(),
+      off: jest.fn(),
+    },
+  }),
+  Trans: ({ children }) => children,
+  withTranslation: () => (Component) => Component,
+  initReactI18next: {
+    type: '3rdParty',
+    init: jest.fn(),
+  },
+  I18nextProvider: ({ children }) => children,
+}));
+
+// Mock our custom useTranslation hook
+jest.mock('@/hooks/useTranslation', () => ({
+  useTranslation: () => ({
+    t: (key, options) => mockGetNestedTranslation(key, options),
+    language: 'en',
+    changeLanguage: jest.fn().mockResolvedValue(undefined),
+    languages: ['en', 'tr'],
+  }),
+  translate: (key, options) => mockGetNestedTranslation(key, options),
+}));
+
+// Mock i18n config
+jest.mock('@/config/i18n', () => ({
+  __esModule: true,
+  default: {
+    t: (key, options) => mockGetNestedTranslation(key, options),
+    language: 'en',
+    changeLanguage: jest.fn().mockResolvedValue(undefined),
+    on: jest.fn(),
+    off: jest.fn(),
+    isInitialized: true,
+  },
+  changeLanguageAndPersist: jest.fn().mockResolvedValue(undefined),
+  initI18n: jest.fn().mockResolvedValue(undefined),
+  SupportedLanguage: { en: 'en', tr: 'tr' },
+}));
+
+// ===========================================================================
+
 // Setup react-native-gesture-handler mocks inline to avoid babel transformation issues
 jest.mock('react-native-gesture-handler', () => {
   // Mock gesture builder that returns chainable methods

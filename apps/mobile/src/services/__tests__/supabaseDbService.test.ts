@@ -45,10 +45,14 @@ describe('supabaseDbService', () => {
       email: 'test@example.com',
       full_name: 'Test User',
       avatar_url: 'https://example.com/avatar.jpg',
-      bio: 'Test bio',
+      location: null,
+      public_key: null,
+      kyc_status: 'verified',
+      verified: true,
+      rating: 4.5,
+      review_count: 3,
       created_at: '2024-01-01T00:00:00Z',
-      moments_count: [{ count: 5 }],
-      reviews_count: [{ count: 3 }],
+      updated_at: '2024-01-01T00:00:00Z',
     };
 
     describe('getById', () => {
@@ -71,9 +75,8 @@ describe('supabaseDbService', () => {
         expect(result.data).toEqual(mockUser);
         expect(result.error).toBeNull();
         expect(supabase.from).toHaveBeenCalledWith('users');
-        expect(mockSelect).toHaveBeenCalledWith(
-          expect.stringContaining('moments_count'),
-        );
+        // Implementation uses explicit column selection (security best practice)
+        expect(mockSelect).toHaveBeenCalledWith(expect.stringContaining('id'));
         expect(mockEq).toHaveBeenCalledWith('id', 'user-123');
       });
 

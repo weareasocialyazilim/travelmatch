@@ -57,6 +57,7 @@ module.exports = {
     '^expo-localization$': '<rootDir>/__mocks__/expo-localization.js',
     '^expo-av$': '<rootDir>/__mocks__/expo-av.js',
     '^expo-image-manipulator$': '<rootDir>/__mocks__/expo-image-manipulator.js',
+    '^expo-haptics$': '<rootDir>/__mocks__/expo-haptics.js',
     '^posthog-react-native$': '<rootDir>/__mocks__/posthog-react-native.js',
     '^@travelmatch/design-system/tokens$': '<rootDir>/__mocks__/design-tokens.js',
     '^@react-native-community/datetimepicker$': '<rootDir>/__mocks__/@react-native-community/datetimepicker.js',
@@ -74,84 +75,6 @@ module.exports = {
     '\\.helper\\.(ts|tsx)$',
     'testUtilsRender\\.helper\\.tsx$',
     'testUtilsAsync\\.helper\\.ts$',
-    // Temporarily skip tests using deprecated UNSAFE_* APIs (pending v14 migration)
-    // Note: Avatar, EmptyState, Badge tests have been updated - re-enabled
-    // Note: authApi tests require complex mock updates - keeping skipped for now
-    'authApi\\..*\\.test\\.ts$', // authApi mock structure needs update for auth import
-    'LoginScreen\\.test\\.tsx$', // LoginScreen merged into UnifiedAuthScreen - needs test update
-    'AddBankAccountBottomSheet\\.test\\.tsx$', // Component moved - needs test update
-    'StatsRow\\.test\\.tsx$', // Missing helper - needs test update
-    'SkeletonList\\.test\\.tsx$', // Animation mock issues - needs test update
-    'authFlow\\.test\\.ts$', // Integration test needs update for UnifiedAuth
-    'security\\.test\\.ts$', // Security utils mock structure changed
-    // 'searchStore\\.test\\.ts$', // FIXED: Persistence tests now verify in-memory state
-    'messageService\\.test\\.ts$', // Service init method changed
-    'AddCardBottomSheet\\.test\\.tsx$',
-    'BlockConfirmation\\.test\\.tsx$',
-    // 'BottomNav\\.test\\.tsx$', // FIXED: Using testID instead of getByRole
-    'ChatAttachmentBottomSheet\\.test\\.tsx$',
-    'ChooseCategoryBottomSheet\\.test\\.tsx$',
-    // 'ClearCacheDialog\\.test\\.tsx$', // FIXED: Migrated from UNSAFE_getByType to testID
-    'CompleteGiftBottomSheet\\.test\\.tsx$',
-    'ConfirmGiftModal\\.test\\.tsx$',
-    'CurrencySelectionBottomSheet\\.test\\.tsx$',
-    'DeleteMomentDialog\\.test\\.tsx$',
-    'DeleteProofModal\\.test\\.tsx$',
-    'ErrorRecoveryComponents\\.test\\.tsx$',
-    // 'FeedbackModal\\.test\\.tsx$', // FIXED: Migrated from UNSAFE_getByType to testID + i18n support
-    'FilterBottomSheet\\.test\\.tsx$',
-    'FilterPill\\.test\\.tsx$',
-    'FormComponents\\.test\\.tsx$',
-    'GiftSuccessModal\\.test\\.tsx$', // Modal visibility issue - React Native Modal renders children when visible=false in tests
-    'LanguageSelectionBottomSheet\\.test\\.tsx$',
-    'LeaveTrustNoteBottomSheet\\.test\\.tsx$',
-    'LimitReachedModal\\.test\\.tsx$',
-    'LowStorageAlert\\.test\\.tsx$',
-    'NotificationPermissionModal\\.test\\.tsx$',
-    'OnboardingContainer\\.test\\.tsx$',
-    'PendingTransactionsModal\\.test\\.tsx$',
-    'RecentSearches\\.test\\.tsx$',
-    'RemoveCardModal\\.test\\.tsx$',
-    'ReportModal\\.test\\.tsx$',
-    'RequestAdditionalProofBottomSheet\\.test\\.tsx$',
-    'RequestMoreProofBottomSheet\\.test\\.tsx$',
-    'RetakeProofBottomSheet\\.test\\.tsx$',
-    'SetPriceBottomSheet\\.test\\.tsx$',
-    'ShareMomentBottomSheet\\.test\\.tsx$', // Modal visibility issue - same as GiftSuccessModal
-    'SmartImage\\.test\\.tsx$',
-    'SocialButton\\.test\\.tsx$',
-    'ThankYouModal\\.test\\.tsx$',
-    'UnblockUserBottomSheet\\.test\\.tsx$',
-    'WithdrawConfirmationModal\\.test\\.tsx$',
-    'Button\\.enhanced\\.test\\.tsx$',
-    // 'GenericBottomSheet\\.test\\.tsx$', // FIXED: Animation/swipe tests simplified
-    'Input\\.enhanced\\.test\\.tsx$',
-    'SortSelector\\.test\\.tsx$',
-    'RequestCard\\.test\\.tsx$',
-    // Temporarily skip payment tests with timer/async issues
-    // Note: These tests have complex timer interactions - keep skipped for stability
-    'paymentService\\.test\\.ts$', // Uses old mock structure - needs update
-    // 'paymentService\\.retry\\.test\\.ts$', // FIXED: Timer + error type handling
-    // 'paymentService\\.cancellation\\.test\\.ts$', // FIXED: Balance mock + timer fixes
-    // 'paymentService\\.timeout\\.test\\.ts$', // FIXED: Removed skip, mocks already correct
-    'paymentService\\.concurrency\\.test\\.ts$',
-    'paymentFlow\\.test\\.ts$',
-    'TransactionHistoryScreen\\.test\\.tsx$',
-    // Skip ceremony tests with animation mock issues
-    'MomentAuthenticator\\.test\\.tsx$',
-    'ProofCeremonyFlow\\.test\\.tsx$',
-    'SacredMoments\\.test\\.tsx$',
-    'SunsetClock\\.test\\.tsx$',
-    'TrustConstellation\\.test\\.tsx$',
-    // Skip form tests with controlled input issues
-    // 'ControlledInput\\.test\\.tsx$', // FIXED: Validation/Password/Progressive tests working
-    'Input\\.test\\.tsx$',
-    'PasswordInput\\.test\\.tsx$',
-    'RegisterScreen\\.test\\.tsx$',
-    'MomentCard\\.test\\.tsx$',
-    // Skip supabase service tests with mock issues
-    'supabaseDbService\\.test\\.ts$',
-    'supabaseDbService\\.performance\\.test\\.ts$',
   ],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',

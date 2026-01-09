@@ -89,6 +89,17 @@ jest.mock('../../../../utils/forms/helpers', () => ({
 }));
 
 jest.mock('../../../../constants/colors', () => ({
+  GRADIENTS: {
+    primary: ['#DFFF00', '#C8E600'],
+    secondary: ['#A855F7', '#9333EA'],
+    warm: ['#DFFF00', '#F43F5E'],
+    dark: ['transparent', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.95)'],
+    glass: ['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.03)'],
+    gift: ['#FFD700', '#FFA500'],
+    giftButton: ['#FFD700', '#FFA500'],
+    trust: ['#06B6D4', '#0891B2'],
+    disabled: ['#52525B', '#3F3F46'],
+  },
   SHADOWS: {
     card: {
       shadowColor: '#000',
@@ -125,6 +136,14 @@ jest.mock('../../../../constants/colors', () => ({
     },
     surface: {
       base: '#FFFFFF',
+      glassBackground: 'rgba(255, 255, 255, 0.08)',
+    },
+    background: {
+      primary: '#121214',
+      secondary: '#1E1E20',
+      tertiary: '#27272A',
+      elevated: '#27272A',
+      glass: 'rgba(255, 255, 255, 0.03)',
     },
     text: {
       primary: '#1C1917',
@@ -135,6 +154,7 @@ jest.mock('../../../../constants/colors', () => ({
     },
     border: {
       default: '#E7E5E4',
+      light: 'rgba(255, 255, 255, 0.1)',
     },
     feedback: {
       error: '#EF4444',
@@ -180,7 +200,7 @@ describe('RegisterScreen', () => {
   describe('Rendering', () => {
     it('should render register screen component', () => {
       const { getByText } = render(<RegisterScreen />);
-      expect(getByText('Hesap Oluştur')).toBeTruthy();
+      expect(getByText('Aramıza Katıl')).toBeTruthy();
     });
 
     it('should render form elements', () => {

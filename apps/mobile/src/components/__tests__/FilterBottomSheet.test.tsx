@@ -273,9 +273,9 @@ describe('FilterBottomSheet', () => {
 
   describe('Close Actions', () => {
     it('calls onClose when backdrop pressed', () => {
-      const component = render(<FilterBottomSheet {...defaultProps} />);
-      const { TouchableWithoutFeedback } = require('react-native');
-      const backdrop = component.UNSAFE_getByType(TouchableWithoutFeedback);
+      const { getByTestId } = render(<FilterBottomSheet {...defaultProps} />);
+      // Use testID instead of deprecated UNSAFE_getByType
+      const backdrop = getByTestId('filter-bottom-sheet-backdrop');
 
       fireEvent.press(backdrop);
       expect(mockOnClose).toHaveBeenCalledTimes(1);

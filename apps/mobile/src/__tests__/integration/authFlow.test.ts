@@ -69,7 +69,30 @@ describe('Auth Flow Integration', () => {
     user: mockUser,
   };
 
-  const mockProfile = {
+  // Database format profile (what Supabase returns)
+  const mockDbProfile = {
+    id: 'user-123',
+    email: 'test@example.com',
+    full_name: 'Test User',
+    avatar_url: 'https://example.com/avatar.jpg',
+    bio: 'Test bio',
+    location: {
+      city: 'New York',
+      country: 'USA',
+    },
+    languages: ['en'],
+    interests: ['travel', 'food'],
+    verified: false,
+    rating: 5.0,
+    review_count: 0,
+    notification_preferences: {},
+    created_at: '2024-01-15T10:00:00Z',
+    updated_at: '2024-01-15T10:00:00Z',
+    last_seen_at: '2024-01-15T10:00:00Z',
+  };
+
+  // Expected UserProfile format (what userService.getCurrentUser returns)
+  const expectedProfile = {
     id: 'user-123',
     email: 'test@example.com',
     name: 'Test User',
@@ -83,7 +106,7 @@ describe('Auth Flow Integration', () => {
     interests: ['travel', 'food'],
     isVerified: false,
     kycStatus: 'unverified' as const,
-    rating: 5.0,
+    rating: 5,
     reviewCount: 0,
     momentCount: 0,
     giftsSent: 0,
@@ -126,7 +149,9 @@ describe('Auth Flow Integration', () => {
       const mockFromChain = {
         select: jest.fn().mockReturnThis(),
         eq: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({ data: mockProfile, error: null }),
+        single: jest
+          .fn()
+          .mockResolvedValue({ data: mockDbProfile, error: null }),
       };
       mockSupabase.from.mockReturnValue(mockFromChain);
 
@@ -144,8 +169,8 @@ describe('Auth Flow Integration', () => {
       // Act: Fetch user profile
       const profileResult = await userService.getCurrentUser();
 
-      // Assert: Profile fetched successfully (userService returns different structure)
-      expect(profileResult.user).toEqual(mockProfile);
+      // Assert: Profile fetched successfully (userService returns mapped UserProfile)
+      expect(profileResult.user).toEqual(expectedProfile);
       expect(mockSupabase.from).toHaveBeenCalledWith('users');
 
       // Verify logging
