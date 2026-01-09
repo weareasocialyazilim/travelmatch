@@ -23,7 +23,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, GRADIENTS, primitives } from '../../constants/colors';
 import { SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../theme/typography';
-import { TMButton } from './TMButton';
+import { TMButton, type ButtonSize } from './TMButton';
 import { EmptyStateIllustration } from './EmptyStateIllustration';
 import type { IllustrationType } from './EmptyStateIllustration';
 
@@ -169,6 +169,7 @@ interface EmptyStateProps {
   subtitle?: string; // Alias for description
   actionLabel?: string;
   onAction?: () => void;
+  actionSize?: ButtonSize;
   secondaryActionLabel?: string;
   onSecondaryAction?: () => void;
   illustration?: React.ReactNode;
@@ -202,6 +203,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   subtitle,
   actionLabel,
   onAction,
+  actionSize = 'md',
   secondaryActionLabel,
   onSecondaryAction,
   illustration,
@@ -292,7 +294,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           <TMButton
             onPress={onAction}
             variant="primary"
-            size="md"
+            size={actionSize}
             style={styles.button}
             testID="empty-state-action-primary"
           >

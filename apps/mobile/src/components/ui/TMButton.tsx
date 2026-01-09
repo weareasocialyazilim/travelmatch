@@ -252,6 +252,7 @@ export const TMButton: React.FC<TMButtonProps> = ({
     switch (variant) {
       case 'primary':
       case 'neon':
+        return '#0A0A0A'; // Dark text on neon for WCAG contrast
       case 'danger':
       case 'glass':
         return PALETTE.white;
@@ -269,6 +270,7 @@ export const TMButton: React.FC<TMButtonProps> = ({
     switch (variant) {
       case 'primary':
       case 'neon':
+        return '#0A0A0A'; // Dark icons on neon for contrast
       case 'danger':
       case 'glass':
         return PALETTE.white;

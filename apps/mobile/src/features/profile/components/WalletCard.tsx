@@ -1,6 +1,13 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedProps,
+  withSpring,
+} from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+const AnimatedText = Animated.createAnimatedComponent(Text);
 
 // Profile dark theme colors
 const WALLET_COLORS = {
@@ -22,6 +29,21 @@ interface WalletCardProps {
 
 const WalletCard: React.FC<WalletCardProps> = memo(
   ({ balance, onPress }) => {
+    const animatedBalance = useSharedValue(0);
+
+    useEffect(() => {
+      animatedBalance.value = withSpring(balance, {
+        damping: 20,
+        stiffness: 90,
+      });
+    }, [balance, animatedBalance]);
+
+    const animatedProps = useAnimatedProps(() => {
+      return {
+        text: `₺${animatedBalance.value.toFixed(2)}`,
+      };
+    });
+
     return (
       <TouchableOpacity
         style={styles.walletCard}
@@ -32,14 +54,17 @@ const WalletCard: React.FC<WalletCardProps> = memo(
         <View style={styles.walletLeft}>
           <View style={styles.walletIconWrapper}>
             <MaterialCommunityIcons
-              name="wallet"
+              name="wallet-outline"
               size={22}
               color={WALLET_COLORS.neon.lime}
             />
           </View>
           <View>
             <Text style={styles.walletLabel}>Cüzdan</Text>
-            <Text style={styles.walletBalance}>₺{balance.toFixed(2)}</Text>
+            <AnimatedText
+              animatedProps={animatedProps}
+              style={styles.walletBalance}
+            />
           </View>
         </View>
         <MaterialCommunityIcons
@@ -68,6 +93,11 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1,
     borderColor: WALLET_COLORS.border,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 2,
   },
   walletLeft: {
     flexDirection: 'row',
@@ -91,7 +121,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: WALLET_COLORS.text.primary,
-    letterSpacing: -0.3,
+    letterSpacing: -0.36,
   },
 });
 

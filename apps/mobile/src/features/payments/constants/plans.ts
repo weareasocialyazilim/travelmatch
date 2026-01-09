@@ -48,7 +48,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     price: 0,
     currency: 'USD',
     interval: 'month',
-    icon: 'sparkles',
+    icon: 'star-four-points',
     color: '#6B7280', // gray
     limits: {
       momentsPerMonth: 3,

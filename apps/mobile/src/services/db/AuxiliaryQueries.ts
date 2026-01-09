@@ -88,7 +88,14 @@ export const notificationsService = {
     try {
       let query = supabase
         .from('notifications')
-        .select('*', { count: 'exact' })
+        .select(
+          `
+          *,
+          sender:users!notifications_sender_id_fkey(id, full_name, avatar_url),
+          moment:moments!notifications_moment_id_fkey(id, image_url, title)
+        `,
+          { count: 'exact' },
+        )
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(options?.limit || 50);
@@ -100,7 +107,17 @@ export const notificationsService = {
       const { data, count, error } = await query;
 
       if (error) throw error;
-      return okList<Tables['notifications']['Row']>(data || [], count);
+
+      // Map the joined data to include related entity fields
+      const enrichedData = (data || []).map((notification: any) => ({
+        ...notification,
+        userName: notification.sender?.full_name,
+        userAvatar: notification.sender?.avatar_url,
+        momentImage: notification.moment?.image_url,
+        momentTitle: notification.moment?.title,
+      }));
+
+      return okList<Tables['notifications']['Row']>(enrichedData, count);
     } catch (error) {
       logger.error('[DB] List notifications error:', error);
       return { data: [], count: 0, error: error as Error };
@@ -412,11 +429,12 @@ export const subscriptionsService = {
           `
           id,
           name,
-          description,
           price,
-          currency,
           interval,
           features,
+          is_popular,
+          color,
+          icon,
           is_active,
           created_at
         `,

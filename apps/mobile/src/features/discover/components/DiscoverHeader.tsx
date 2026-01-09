@@ -28,6 +28,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
+import { useSmartMicrocopy } from '@/hooks/useSmartMicrocopy';
 import type { DiscoverHeaderProps } from './types';
 
 // Enhanced props interface for animated header
@@ -201,9 +202,9 @@ const getGreeting = (): string => {
  * 40+ yaş için okunabilirlik, GenZ için estetik derinlik.
  */
 export const AwwwardsDiscoverHeader: React.FC<AwwwardsDiscoverHeaderProps> = ({
-  userName: _userName,
+  userName,
   userAvatar: _userAvatar,
-  greeting,
+  greeting: _customGreeting,
   notificationCount: _notificationCount = 0,
   activeFiltersCount: _activeFiltersCount = 0,
   onNotificationsPress: _onNotificationsPress,
@@ -211,12 +212,18 @@ export const AwwwardsDiscoverHeader: React.FC<AwwwardsDiscoverHeaderProps> = ({
   onAvatarPress: _onAvatarPress,
 }) => {
   const insets = useSafeAreaInsets();
-  const _displayGreeting = greeting || getGreeting();
+
+  // Smart micro-copy based on context
+  const { greeting, subtext } = useSmartMicrocopy({
+    userName: userName || 'Explorer',
+    city: 'şehir', // TODO: Get from user location
+  });
 
   return (
     <View style={[awwwardsStyles.container, { paddingTop: insets.top + 8 }]}>
-      {/* Center Only - TravelMatch Logo */}
-      <Text style={awwwardsStyles.logoText}>TravelMatch</Text>
+      {/* Smart greeting */}
+      <Text style={awwwardsStyles.greeting}>{greeting}</Text>
+      {subtext && <Text style={awwwardsStyles.subtext}>{subtext}</Text>}
     </View>
   );
 };
@@ -226,8 +233,24 @@ const awwwardsStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
-    paddingBottom: 12,
+    paddingBottom: 16,
     backgroundColor: COLORS.bg.primary,
+  },
+  greeting: {
+    fontSize: 18,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.heading,
+    fontWeight: '600',
+    color: COLORS.text.primary,
+    letterSpacing: -0.3,
+    textAlign: 'center',
+  },
+  subtext: {
+    fontSize: 14,
+    fontFamily: TYPOGRAPHY_SYSTEM.families.body,
+    fontWeight: '400',
+    color: COLORS.text.secondary,
+    marginTop: 4,
+    textAlign: 'center',
   },
   logoText: {
     fontSize: 22,

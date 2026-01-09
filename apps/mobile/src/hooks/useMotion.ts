@@ -25,44 +25,44 @@ import * as Haptics from 'expo-haptics';
 export const SPRING = {
   // Ana spring - her yerde bu kullanılacak
   default: {
-    damping: 15,
+    damping: 20,
     stiffness: 150,
-    mass: 1,
+    mass: 0.8,
   },
 
   // Hızlı response (butonlar)
   snappy: {
-    damping: 20,
-    stiffness: 300,
-    mass: 0.8,
+    damping: 30,
+    stiffness: 350,
+    mass: 0.5,
   },
 
   // Yumuşak (sheets, modals)
   gentle: {
-    damping: 20,
+    damping: 25,
     stiffness: 120,
-    mass: 1,
+    mass: 0.8,
   },
 
-  // Bouncy (celebration, success)
+  // Bouncy (celebration, success) - reduced bounce
   bouncy: {
-    damping: 10,
-    stiffness: 180,
-    mass: 0.9,
+    damping: 25,
+    stiffness: 200,
+    mass: 0.5,
   },
 
   // Heavy (drag, swipe)
   heavy: {
-    damping: 25,
+    damping: 30,
     stiffness: 200,
-    mass: 1.2,
+    mass: 1.0,
   },
 
   // Quick (micro interactions)
   quick: {
-    damping: 18,
+    damping: 25,
     stiffness: 400,
-    mass: 0.6,
+    mass: 0.4,
   },
 } as const;
 

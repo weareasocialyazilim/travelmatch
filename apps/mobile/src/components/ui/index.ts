@@ -47,6 +47,7 @@ export {
 // TMButton - Primary button with gradient, animation, haptics
 // Consolidated master component - replaces Button, HapticButton, AnimatedButton
 export { TMButton } from './TMButton';
+export { MagneticButton } from './MagneticButton';
 export type {
   TMButtonProps,
   ButtonVariant,
@@ -178,6 +179,8 @@ export type {
 // Filter Modals
 // ═══════════════════════════════════════════════════════════════════
 export { BlurFilterModal, type FilterValues } from './BlurFilterModal';
+export { ContentReactiveGlow } from './ContentReactiveGlow';
+export { LocationPermissionPrompt } from './LocationPermissionPrompt';
 
 // ═══════════════════════════════════════════════════════════════════
 // Glass Modals

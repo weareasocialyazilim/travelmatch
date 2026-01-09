@@ -74,7 +74,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                 photoPerMoment: 5,
               },
               popular: apiPlan.is_popular || false,
-              icon: apiPlan.icon || staticPlan?.icon || 'sparkles',
+              icon: apiPlan.icon || staticPlan?.icon || 'star-four-points',
               color: apiPlan.color || staticPlan?.color || COLORS.brand.primary,
             };
           });

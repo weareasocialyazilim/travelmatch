@@ -22,6 +22,7 @@ import {
   Dimensions,
   ImageBackground,
 } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
@@ -31,11 +32,12 @@ import { BlurView } from 'expo-blur';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { TMButton } from '@/components/ui/TMButton';
 
+const AnimatedImage = Animated.createAnimatedComponent(Image);
 const { width: _width, height } = Dimensions.get('window');
 
-export const MomentDetailScreen = ({ navigation, route: _route }: any) => {
+export const MomentDetailScreen = ({ navigation, route }: any) => {
   const insets = useSafeAreaInsets();
-  // route.params'dan data gelir
+  const momentId = route?.params?.momentId;
 
   return (
     <View style={styles.container}>
@@ -45,11 +47,12 @@ export const MomentDetailScreen = ({ navigation, route: _route }: any) => {
       >
         {/* Hero Image */}
         <View style={styles.imageContainer}>
-          <Image
+          <AnimatedImage
             source={{
               uri: 'https://images.unsplash.com/photo-1514362545857-3bc16549766b?q=80&w=800',
             }}
             style={styles.image}
+            sharedTransitionTag={momentId ? `moment-${momentId}` : undefined}
           />
           <LinearGradient
             colors={['transparent', COLORS.background.primary]}
@@ -60,11 +63,21 @@ export const MomentDetailScreen = ({ navigation, route: _route }: any) => {
             onPress={() => navigation.goBack()}
             style={[styles.backBtn, { top: insets.top + 10 }]}
           >
-            <Ionicons name="arrow-back" size={24} color="white" />
+            <Ionicons
+              name="arrow-back"
+              size={24}
+              color="white"
+              style={{ marginRight: 2 }}
+            />
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.shareBtn, { top: insets.top + 10 }]}>
-            <Ionicons name="share-outline" size={24} color="white" />
+            <Ionicons
+              name="share-outline"
+              size={24}
+              color="white"
+              style={{ marginTop: -1, marginLeft: 1 }}
+            />
           </TouchableOpacity>
         </View>
 

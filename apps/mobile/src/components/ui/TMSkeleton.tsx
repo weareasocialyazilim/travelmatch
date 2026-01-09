@@ -268,10 +268,11 @@ const SkeletonBase = memo<SkeletonBaseProps>(function SkeletonBase({
     );
 
     if (shimmer) {
+      // Enhanced flowing shimmer effect (right-to-left)
       translateX.value = withRepeat(
-        withTiming(SCREEN_WIDTH, {
-          duration: 1500,
-          easing: Easing.inOut(Easing.ease),
+        withTiming(SCREEN_WIDTH * 2, {
+          duration: 1800,
+          easing: Easing.bezier(0.4, 0, 0.2, 1),
         }),
         -1,
         false,
@@ -306,7 +307,13 @@ const SkeletonBase = memo<SkeletonBaseProps>(function SkeletonBase({
       {shimmer && (
         <Animated.View style={[styles.shimmerContainer, shimmerStyle]}>
           <LinearGradient
-            colors={['transparent', 'rgba(255, 255, 255, 0.4)', 'transparent']}
+            colors={[
+              'transparent',
+              'rgba(255, 255, 255, 0.15)',
+              'rgba(255, 255, 255, 0.5)',
+              'rgba(255, 255, 255, 0.15)',
+              'transparent',
+            ]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.shimmerGradient}

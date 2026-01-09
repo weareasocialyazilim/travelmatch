@@ -52,29 +52,38 @@ export function initSentry() {
     Sentry.init({
       dsn: SENTRY_DSN,
       debug: false,
-      environment: 'production',
+      environment: isDev ? 'development' : 'production',
 
       // Adds more context data to events
-      sendDefaultPii: true,
+      sendDefaultPii: false, // CHANGED: Never send PII automatically - we manually set safe user context
 
       // Enable Logs
       enableLogs: true,
 
       // Performance Monitoring
-      tracesSampleRate: 0.2,
+      // IMPORTANT: Set to 1.0 for critical screens (Wallet, Discover, Chat)
+      // Lower to 0.1-0.2 for less critical flows
+      tracesSampleRate: 1.0, // CHANGED: 100% sampling for production launch, reduce after baseline established
 
       // Configure Session Replay - only in production
       replaysSessionSampleRate: 0.1,
-      replaysOnErrorSampleRate: 1,
+      replaysOnErrorSampleRate: 1.0, // Always capture replay when error occurs
 
       // Enable offline caching
       enableNativeCrashHandling: true,
       enableAutoSessionTracking: true,
+      enableAutoPerformanceTracing: true, // ADDED: Auto-track navigation and screen load times
 
       // Integrations - add safely in production only
       integrations: [
         Sentry.mobileReplayIntegration(),
         Sentry.feedbackIntegration(),
+        // ADDED: Track app start performance
+        Sentry.reactNativeTracingIntegration({
+          routingInstrumentation: new Sentry.ReactNavigationInstrumentation(),
+          enableUserInteractionTracing: true, // Track button presses, gestures
+          enableNativeFramesTracking: true, // Track slow/frozen frames
+        }),
       ],
 
       // Filter sensitive data - PRIVACY PROTECTION
@@ -134,13 +143,23 @@ export function initSentry() {
 
 /**
  * Set user context (NO PII - only non-sensitive identifiers)
+ * IMPORTANT: Call this on login/session restore
  */
-export function setSentryUser(user: { id: string; username?: string }) {
+export function setSentryUser(user: {
+  id: string;
+  username?: string;
+  kycStatus?: string;
+  accountType?: string;
+}) {
   Sentry.setUser({
     id: user.id,
-    username: user.username || `user_${user.id}`,
+    username: user.username || `user_${user.id.substring(0, 8)}`,
     // IMPORTANT: DO NOT include email, phone, or other PII
   });
+
+  // Add context for analytics
+  Sentry.setTag('user_kyc_status', user.kycStatus || 'unknown');
+  Sentry.setTag('account_type', user.accountType || 'standard');
 }
 
 /**
@@ -320,6 +339,64 @@ export function setTags(tags: Record<string, string>) {
 }
 
 /**
+ * Start performance transaction for critical screens
+ * Usage:
+ *   const transaction = startPerformanceTransaction('WalletScreen', 'screen.load');
+ *   // ... screen load work ...
+ *   transaction?.finish();
+ */
+export function startPerformanceTransaction(
+  name: string,
+  operation: string,
+): ReturnType<typeof Sentry.startInactiveSpan> | undefined {
+  if (!isInitialized) return undefined;
+
+  return Sentry.startInactiveSpan({
+    name,
+    op: operation,
+  });
+}
+
+/**
+ * Measure screen load time
+ * Usage:
+ *   useEffect(() => {
+ *     const end = measureScreenLoad('DiscoverScreen');
+ *     return () => end();
+ *   }, []);
+ */
+export function measureScreenLoad(screenName: string) {
+  const startTime = Date.now();
+
+  return () => {
+    const loadTime = Date.now() - startTime;
+    addBreadcrumb(`Screen loaded: ${screenName}`, 'navigation', 'info', {
+      load_time_ms: loadTime,
+    });
+
+    // Send performance metric
+    Sentry.metrics.distribution('screen.load.time', loadTime, {
+      tags: { screen: screenName },
+      unit: 'millisecond',
+    });
+  };
+}
+
+/**
+ * Track critical user action (e.g., payment, booking, withdrawal)
+ * Usage: trackCriticalAction('withdrawal_initiated', { amount: 100, currency: 'TRY' });
+ */
+export function trackCriticalAction(
+  action: string,
+  metadata?: Record<string, string | number | boolean>,
+) {
+  addBreadcrumb(`Critical action: ${action}`, 'user', 'info', metadata);
+
+  // Set tag for filtering in Sentry UI
+  Sentry.setTag('critical_action', action);
+}
+
+/**
  * Start span for performance monitoring
  * Note: Transaction API is deprecated in Sentry v8, using spans instead
  */
@@ -327,10 +404,7 @@ export function startTransaction(
   name: string,
   operation: string,
 ): ReturnType<typeof Sentry.startInactiveSpan> | undefined {
-  return Sentry.startInactiveSpan({
-    name,
-    op: operation,
-  });
+  return startPerformanceTransaction(name, operation);
 }
 
 // Export Sentry for advanced usage

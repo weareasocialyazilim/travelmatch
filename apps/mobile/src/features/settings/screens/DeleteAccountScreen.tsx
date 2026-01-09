@@ -7,17 +7,20 @@ import {
   TextInput,
   ScrollView,
   Keyboard,
+  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
-import { showConfirmation } from '@/stores/modalStore';
+import { showConfirmation, showToast } from '@/stores/modalStore';
+import { userService } from '@/services/userService';
 
 export const DeleteAccountScreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [confirmText, setConfirmText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
   const CONFIRMATION_KEY = 'DELETE';
 
   const handleDelete = () => {
@@ -25,17 +28,42 @@ export const DeleteAccountScreen = () => {
     Keyboard.dismiss();
 
     showConfirmation({
-      title: 'Final Goodbye',
+      title: 'Hesabını Sil',
       message:
-        'Your account and all associated data will be permanently deleted. This action cannot be undone.',
-      confirmText: 'Delete Forever',
-      cancelText: 'Cancel',
+        'Tüm anıların, mesajların ve cüzdan bakiyen kalıcı olarak silinecek. Bu işlem geri alınamaz.',
+      confirmText: 'Sonsuza Dek Sil',
+      cancelText: 'Vazgeç',
       destructive: true,
-      onConfirm: () =>
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Onboarding' as never }],
-        }),
+      onConfirm: async () => {
+        setIsDeleting(true);
+
+        try {
+          // CRITICAL: Call backend service to delete all user data (KVKK/GDPR compliance)
+          const { success, error } = await userService.deleteAccount();
+
+          if (!success || error) {
+            throw error || new Error('Account deletion failed');
+          }
+
+          // Success - user is already signed out by userService
+          showToast({
+            message: 'Hesabın başarıyla silindi',
+            type: 'success',
+          });
+
+          // Navigate to onboarding
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Onboarding' as never }],
+          });
+        } catch (error) {
+          setIsDeleting(false);
+          showToast({
+            message: 'Hesap silinemedi. Lütfen destekle iletişime geçin.',
+            type: 'error',
+          });
+        }
+      },
     });
   };
 
@@ -83,12 +111,17 @@ export const DeleteAccountScreen = () => {
         <TouchableOpacity
           style={[
             styles.deleteBtn,
-            confirmText !== CONFIRMATION_KEY && styles.disabledBtn,
+            (confirmText !== CONFIRMATION_KEY || isDeleting) &&
+              styles.disabledBtn,
           ]}
-          disabled={confirmText !== CONFIRMATION_KEY}
+          disabled={confirmText !== CONFIRMATION_KEY || isDeleting}
           onPress={handleDelete}
         >
-          <Text style={styles.deleteText}>Permanently Delete Account</Text>
+          {isDeleting ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text style={styles.deleteText}>Permanently Delete Account</Text>
+          )}
         </TouchableOpacity>
 
         <TouchableOpacity

@@ -32,9 +32,10 @@ const MomentsTabs: React.FC<MomentsTabsProps> = memo(
               activeTab === 'active' && styles.tabTextActive,
             ]}
           >
-            Active ({activeMomentsCount})
+            Anlar ({activeMomentsCount})
           </Text>
         </TouchableOpacity>
+        <View style={styles.separator} />
         <TouchableOpacity
           style={[styles.tab, activeTab === 'past' && styles.tabActive]}
           onPress={() => onTabChange('past')}
@@ -53,7 +54,7 @@ const MomentsTabs: React.FC<MomentsTabsProps> = memo(
               activeTab === 'past' && styles.tabTextActive,
             ]}
           >
-            Past ({pastMomentsCount})
+            Pasif ({pastMomentsCount})
           </Text>
         </TouchableOpacity>
       </View>
@@ -70,11 +71,9 @@ MomentsTabs.displayName = 'MomentsTabs';
 const styles = StyleSheet.create({
   tabsContainer: {
     flexDirection: 'row',
-    marginHorizontal: 16,
-    marginTop: 20,
-    backgroundColor: COLORS.surface.base,
-    borderRadius: 12,
-    padding: 4,
+    marginHorizontal: 20,
+    marginTop: 6,
+    alignItems: 'center',
   },
   tab: {
     flex: 1,
@@ -82,25 +81,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    paddingVertical: 12,
-    borderRadius: 10,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+  },
+  separator: {
+    width: 1,
+    height: 20,
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    marginHorizontal: 8,
   },
   tabActive: {
-    backgroundColor: COLORS.utility.white,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderColor: 'rgba(255,255,255,0.25)',
     shadowColor: COLORS.utility.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 4,
   },
   tabText: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: 17,
+    fontWeight: '800',
     color: COLORS.text.secondary,
   },
   tabTextActive: {
     color: COLORS.mint,
-    fontWeight: '600',
+    fontWeight: '900',
   },
 });
 

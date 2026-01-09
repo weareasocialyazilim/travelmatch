@@ -14,6 +14,7 @@ import {
   Dimensions,
   ScrollView,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '../../constants/colors';
@@ -21,11 +22,13 @@ import { COLORS } from '../../constants/colors';
 const { height } = Dimensions.get('window');
 
 export interface FilterValues {
-  priceRange: number;
-  category: string;
-  distance: number;
-  ageRange: [number, number];
-  gender: string;
+  priceRange?: number;
+  price?: [number, number];
+  category?: string;
+  distance?: number;
+  ageRange?: [number, number];
+  age?: [number, number];
+  gender?: string;
 }
 
 interface BlurFilterModalProps {
@@ -148,7 +151,10 @@ export const BlurFilterModal: React.FC<BlurFilterModalProps> = ({
                     styles.optionBtn,
                     distance === opt.value && styles.optionBtnActive,
                   ]}
-                  onPress={() => setDistance(opt.value)}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setDistance(opt.value);
+                  }}
                 >
                   <Text
                     style={[
@@ -174,7 +180,10 @@ export const BlurFilterModal: React.FC<BlurFilterModalProps> = ({
                       ageRange[1] === opt.value[1] &&
                       styles.optionBtnActive,
                   ]}
-                  onPress={() => setAgeRange(opt.value)}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setAgeRange(opt.value);
+                  }}
                 >
                   <Text
                     style={[

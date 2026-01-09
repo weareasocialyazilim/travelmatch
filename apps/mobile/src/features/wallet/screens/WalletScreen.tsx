@@ -38,7 +38,11 @@ import Animated, {
 import { ScreenErrorBoundary } from '@/components/ErrorBoundary';
 import { NetworkGuard } from '@/components/NetworkGuard';
 import { useToast } from '@/context/ToastContext';
+import { useAuth } from '@/hooks/useAuth';
+import { useBiometric } from '@/context/BiometricAuthContext';
 import { logger } from '@/utils/logger';
+import { supabase } from '@/config/supabase';
+import { measureScreenLoad } from '@/config/sentry'; // ADDED: Performance monitoring
 import {
   COLORS as _COLORS,
   primitives,
@@ -118,6 +122,13 @@ const WalletScreen = () => {
   >([]);
   const toast = useToast();
 
+  // Get current user for KYC verification check
+  const { user } = useAuth();
+  const { authenticateForAction, biometricAvailable } = useBiometric();
+
+  // Biometric lock state
+  const [isBiometricLocked, setIsBiometricLocked] = useState(true);
+
   // Use payments hook
   const {
     balance,
@@ -128,15 +139,93 @@ const WalletScreen = () => {
     loadTransactions,
   } = usePayments();
 
+  // ADDED: Performance monitoring
+  useEffect(() => {
+    const endMeasurement = measureScreenLoad('WalletScreen');
+    return endMeasurement;
+  }, []);
+
+  // Handle withdrawal with KYC verification check
+  const handleWithdraw = useCallback(() => {
+    // Check if user is KYC verified
+    if (!user?.kyc || user.kyc !== 'Verified') {
+      toast.show({
+        message: 'Para çekmek için önce kimlik doğrulaması yapmalısınız',
+        type: 'info',
+        duration: 3000,
+      });
+      navigation.navigate('PaymentsKYC');
+      return;
+    }
+
+    // User is verified, proceed to withdrawal
+    navigation.navigate('Withdraw');
+  }, [user, navigation, toast]);
+
   const isLoading = balanceLoading;
+
+  // Biometric authentication on mount
+  useEffect(() => {
+    const authenticateWallet = async () => {
+      if (!biometricAvailable) {
+        // No biometric available, unlock immediately
+        setIsBiometricLocked(false);
+        return;
+      }
+
+      const authenticated = await authenticateForAction('Cüzdanı Görüntüle');
+      if (authenticated) {
+        setIsBiometricLocked(false);
+      } else {
+        // Authentication failed, go back
+        toast.show({
+          message: 'Cüzdan erişimi için kimlik doğrulama gerekli',
+          type: 'error',
+        });
+        navigation.goBack();
+      }
+    };
+
+    authenticateWallet();
+  }, [biometricAvailable, authenticateForAction, navigation, toast]);
 
   // Fetch data on mount
   useEffect(() => {
+    if (isBiometricLocked) return; // Don't fetch if locked
+
     refreshBalance();
     loadTransactions();
     // Fetch pending proof items for the pending badge
     walletService.getPendingProofItems().then(setPendingProofItems);
-  }, [refreshBalance, loadTransactions]);
+  }, [isBiometricLocked, refreshBalance, loadTransactions]);
+
+  // Realtime balance updates - Subscribe to transactions table
+  useEffect(() => {
+    if (!user || isBiometricLocked) return;
+
+    const channel = supabase
+      .channel(`wallet:${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all changes (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'transactions',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          logger.info('[Wallet] Realtime transaction update:', payload);
+          // Refresh balance when transaction changes
+          refreshBalance();
+          loadTransactions();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [user, isBiometricLocked, refreshBalance, loadTransactions]);
 
   // Use API transactions - adapt to display format with proper categorization
   const displayTransactions = useMemo(() => {
@@ -358,6 +447,16 @@ const WalletScreen = () => {
     { key: 'outgoing', label: 'Giden' },
   ];
 
+  // Show locked screen while biometric authentication is pending
+  if (isBiometricLocked) {
+    return (
+      <View style={styles.lockedContainer}>
+        <ActivityIndicator size="large" color={DARK_THEME.accentLime} />
+        <Text style={styles.lockedText}>Doğrulama Bekleniyor...</Text>
+      </View>
+    );
+  }
+
   return (
     <LiquidScreenWrapper
       variant="dark"
@@ -450,7 +549,7 @@ const WalletScreen = () => {
                   <View style={styles.cardActions}>
                     <TouchableOpacity
                       style={styles.actionBtnPrimary}
-                      onPress={() => navigation.navigate('Withdraw')}
+                      onPress={handleWithdraw}
                       accessible={true}
                       accessibilityLabel="Para çek"
                       accessibilityRole="button"
@@ -522,6 +621,20 @@ const WalletScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  // Locked screen styles
+  lockedContainer: {
+    flex: 1,
+    backgroundColor: DARK_THEME.background,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 16,
+  },
+  lockedText: {
+    fontSize: 16,
+    color: DARK_THEME.textSecondary,
+    fontWeight: '500',
+  },
+
   container: {
     flex: 1,
     backgroundColor: DARK_THEME.background,

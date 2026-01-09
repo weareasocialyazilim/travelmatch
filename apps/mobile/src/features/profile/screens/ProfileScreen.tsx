@@ -28,6 +28,7 @@ import Animated, {
   withSpring,
   FadeInDown,
 } from 'react-native-reanimated';
+import { useParallaxHeader } from '@/hooks/useParallaxHeader';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { SkeletonList } from '@/components/ui';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -64,6 +65,22 @@ const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { isConnected, refresh: refreshNetwork } = useNetworkStatus();
   const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
+
+  // Parallax header configuration
+  const {
+    scrollHandler,
+    headerStyle: parallaxHeaderStyle,
+    avatarStyle: parallaxAvatarStyle,
+    titleStyle: parallaxTitleStyle,
+    subtitleStyle: parallaxSubtitleStyle,
+    contentStyle: parallaxContentStyle,
+  } = useParallaxHeader({
+    maxScroll: 200,
+    avatarStartSize: 104,
+    avatarEndSize: 32,
+    headerMinHeight: 60,
+    headerMaxHeight: 280,
+  });
 
   // Get user from auth context
   const { user: authUser, isLoading: _authLoading } = useAuth();
@@ -337,9 +354,11 @@ const ProfileScreen: React.FC = () => {
           </View>
         </View>
 
-        <ScrollView
+        <Animated.ScrollView
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
+          onScroll={scrollHandler}
+          scrollEventThrottle={16}
           refreshControl={
             <RefreshControl
               refreshing={myMomentsLoading}
@@ -360,43 +379,48 @@ const ProfileScreen: React.FC = () => {
             onEditPress={handleEditProfile}
             onTrustGardenPress={handleTrustGarden}
             onSubscriptionPress={handleSubscriptionPress}
+            parallaxAvatarStyle={parallaxAvatarStyle}
+            parallaxTitleStyle={parallaxTitleStyle}
+            parallaxSubtitleStyle={parallaxSubtitleStyle}
+            parallaxContentStyle={parallaxContentStyle}
           />
 
-          {/* Stats Row */}
+          {/* Unified Dashboard - Stats, Trust, Wallet */}
           <Animated.View
             entering={FadeInDown.delay(100).springify()}
-            style={styles.statsSection}
+            style={styles.dashboardSection}
           >
-            <GlassCard intensity={20} style={styles.statsCard} padding={0}>
+            <GlassCard
+              variant="medium"
+              style={styles.dashboardCard}
+              borderColor={PROFILE_COLORS.glass.border}
+            >
+              {/* Stats Row */}
               <StatsRow
                 momentsCount={userData.momentsCount}
                 activeMoments={userData.activeMoments}
                 onMomentsPress={handleMyMoments}
               />
-            </GlassCard>
-          </Animated.View>
 
-          {/* Trust Score Card - Minimal & Elegant Design */}
-          <Animated.View
-            entering={FadeInDown.delay(150).springify()}
-            style={styles.trustSection}
-          >
-            <TouchableOpacity
-              onPress={handleTrustGarden}
-              activeOpacity={0.8}
-              style={styles.trustCard}
-            >
-              <View style={styles.trustCardContent}>
-                <View style={styles.trustIconContainer}>
+              {/* Divider */}
+              <View style={styles.dashboardDivider} />
+
+              {/* Trust Score */}
+              <TouchableOpacity
+                onPress={handleTrustGarden}
+                activeOpacity={0.8}
+                style={styles.dashboardItem}
+              >
+                <View style={styles.dashboardIconContainer}>
                   <Ionicons
-                    name="shield-checkmark"
-                    size={22}
+                    name="shield-checkmark-outline"
+                    size={20}
                     color={PROFILE_COLORS.neon.lime}
                   />
                 </View>
-                <View style={styles.trustCardText}>
-                  <Text style={styles.trustCardTitle}>Güven Durumu</Text>
-                  <Text style={styles.trustCardSubtitle}>
+                <View style={styles.dashboardItemText}>
+                  <Text style={styles.dashboardItemTitle}>Güven Durumu</Text>
+                  <Text style={styles.dashboardItemSubtitle}>
                     {(userData.trustScore || 0) > 0
                       ? `${userData.trustScore} puan • Doğrulamalar`
                       : 'Doğrulama yaparak güven kazan'}
@@ -407,16 +431,37 @@ const ProfileScreen: React.FC = () => {
                   size={18}
                   color={PROFILE_COLORS.text.tertiary}
                 />
-              </View>
-            </TouchableOpacity>
-          </Animated.View>
+              </TouchableOpacity>
 
-          {/* Wallet Card */}
-          <Animated.View entering={FadeInDown.delay(300).springify()}>
-            <WalletCard
-              balance={userData.walletBalance}
-              onPress={handleWallet}
-            />
+              {/* Divider */}
+              <View style={styles.dashboardDivider} />
+
+              {/* Wallet */}
+              <TouchableOpacity
+                onPress={handleWallet}
+                activeOpacity={0.8}
+                style={styles.dashboardItem}
+              >
+                <View style={styles.dashboardIconContainer}>
+                  <Ionicons
+                    name="wallet-outline"
+                    size={20}
+                    color={PROFILE_COLORS.neon.lime}
+                  />
+                </View>
+                <View style={styles.dashboardItemText}>
+                  <Text style={styles.dashboardItemTitle}>Cüzdan</Text>
+                  <Text style={styles.dashboardItemSubtitle}>
+                    {userData.walletBalance.toLocaleString('tr-TR')} TL
+                  </Text>
+                </View>
+                <Ionicons
+                  name="chevron-forward"
+                  size={18}
+                  color={PROFILE_COLORS.text.tertiary}
+                />
+              </TouchableOpacity>
+            </GlassCard>
           </Animated.View>
 
           {/* Quick Links */}
@@ -471,6 +516,7 @@ const ProfileScreen: React.FC = () => {
                       ? 'Moment Oluştur'
                       : undefined
                   }
+                  actionSize="xl"
                   onAction={
                     activeTab === 'active' && isConnected
                       ? () => navigation.navigate('CreateMoment')
@@ -482,7 +528,7 @@ const ProfileScreen: React.FC = () => {
           </View>
 
           <View style={styles.bottomSpacer} />
-        </ScrollView>
+        </Animated.ScrollView>
       </View>
     </LiquidScreenWrapper>
   );
@@ -503,7 +549,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...PROFILE_TYPOGRAPHY.pageTitle,
     color: PROFILE_COLORS.text.primary,
-    fontSize: 28,
+    fontSize: 20,
   },
   headerActions: {
     flexDirection: 'row',
@@ -523,50 +569,46 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  statsSection: {
-    marginHorizontal: PROFILE_SPACING.screenPadding,
-    marginTop: 16,
-  },
-  statsCard: {
-    borderColor: PROFILE_COLORS.glass.border,
-  },
 
-  // Trust Score Card - Minimal & Elegant
-  trustSection: {
+  // Unified Dashboard
+  dashboardSection: {
     marginHorizontal: PROFILE_SPACING.screenPadding,
-    marginTop: 12,
+    marginTop: 10,
   },
-  trustCard: {
-    backgroundColor: PROFILE_COLORS.glass.backgroundMedium,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: PROFILE_COLORS.glass.border,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
+  dashboardCard: {
+    paddingVertical: 8,
   },
-  trustCardContent: {
+  dashboardDivider: {
+    height: 1,
+    backgroundColor: PROFILE_COLORS.glass.border,
+    marginVertical: 12,
+    marginHorizontal: 16,
+  },
+  dashboardItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
     gap: 12,
   },
-  trustIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  dashboardIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: 'rgba(223, 255, 0, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  trustCardText: {
+  dashboardItemText: {
     flex: 1,
   },
-  trustCardTitle: {
+  dashboardItemTitle: {
     fontSize: 14,
     fontWeight: '600',
     color: PROFILE_COLORS.text.primary,
     marginBottom: 2,
   },
-  trustCardSubtitle: {
+  dashboardItemSubtitle: {
     fontSize: 12,
     color: PROFILE_COLORS.text.tertiary,
   },

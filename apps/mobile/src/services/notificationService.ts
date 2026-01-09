@@ -175,8 +175,13 @@ export const notificationService = {
         data: row.data,
         read: row.read || false,
         createdAt: row.created_at,
-        // We might need to fetch related entities if they are not in the row
-        // For now, we'll leave them undefined or extract from data if available
+        // Related entities from joins
+        userId: row.sender_id,
+        userName: row.userName,
+        userAvatar: row.userAvatar,
+        momentId: row.moment_id,
+        momentImage: row.momentImage,
+        requestId: row.request_id,
       }));
 
       return { notifications, total: count, unreadCount: unreadCount || 0 };
@@ -315,6 +320,45 @@ export const notificationService = {
           quietHoursEnabled: false,
         },
       };
+    }
+  },
+
+  /**
+   * Register device token for push notifications
+   * Critical: Links FCM/APNS token to user profile for push delivery
+   */
+  registerDeviceToken: async (token: string): Promise<{ success: boolean }> => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        logger.warn('Cannot register device token: User not authenticated');
+        return { success: false };
+      }
+
+      // Save token to user profile with timestamp
+      const { error } = await supabase
+        .from('users')
+        .update({
+          push_token: token,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id);
+
+      if (error) {
+        logger.error('Failed to register device token:', error);
+        return { success: false };
+      }
+
+      logger.info('Device token registered successfully', {
+        userId: user.id,
+        tokenPrefix: token.substring(0, 20),
+      });
+      return { success: true };
+    } catch (error) {
+      logger.error('Register device token error:', error);
+      return { success: false };
     }
   },
 

@@ -13,7 +13,13 @@
  * Note: FloatingDock navigation is handled by MainTabNavigator
  */
 
-import React, { useRef, useCallback, useMemo, useState } from 'react';
+import React, {
+  useRef,
+  useCallback,
+  useMemo,
+  useState,
+  useEffect,
+} from 'react';
 import {
   View,
   StyleSheet,
@@ -27,6 +33,7 @@ import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { measureScreenLoad } from '@/config/sentry'; // ADDED: Performance monitoring
 import {
   ImmersiveMomentCard,
   AwwwardsDiscoverHeader,
@@ -48,12 +55,16 @@ import {
   BlurFilterModal,
   type FilterValues,
   SubscriptionUpgradeCTA,
+  ContentReactiveGlow,
+  LocationPermissionPrompt,
 } from '@/components/ui';
 import { useSubscription } from '@/features/payments';
 import { showLoginPrompt } from '@/stores/modalStore';
+import { useSearchStore } from '@/stores/searchStore';
 import { logger } from '@/utils/logger';
 import type { NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/routeParams';
+import { useContentReactiveGlow } from '@/hooks/useContentReactiveGlow';
 
 const { height } = Dimensions.get('window');
 
@@ -61,12 +72,25 @@ const DiscoverScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const flatListRef = useRef<FlatList>(null);
 
+  // Search store for filters - connects to useDiscoverMoments
+  const { setFilters } = useSearchStore();
+
+  // Content-reactive glow system
+  const { glowColors, glowOpacity, updateGlowFromImage } =
+    useContentReactiveGlow();
+
   // Filter modal state
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [activeFilters, setActiveFilters] = useState<FilterValues | null>(null);
 
   // StoryViewer state
   const [storyViewerVisible, setStoryViewerVisible] = useState(false);
+
+  // ADDED: Performance monitoring
+  useEffect(() => {
+    const endMeasurement = measureScreenLoad('DiscoverScreen');
+    return endMeasurement;
+  }, []);
   const [selectedStoryUser, setSelectedStoryUser] = useState<UserStory | null>(
     null,
   );
@@ -81,8 +105,8 @@ const DiscoverScreen = () => {
     refresh,
     loadMore,
     hasMore,
-    userLocation: _userLocation,
-    locationPermission: _locationPermission,
+    userLocation,
+    locationPermission,
   } = useDiscoverMoments();
 
   // Cast discovery moments to Moment type for compatibility
@@ -94,6 +118,7 @@ const DiscoverScreen = () => {
   const { subscription } = useSubscription();
   const currentTier =
     (subscription?.tier as 'free' | 'premium' | 'platinum') || 'free';
+  const isPremium = currentTier !== 'free';
 
   // Pending moment for post-login action
   const [_pendingMoment, setPendingMoment] = useState<Moment | null>(null);
@@ -138,16 +163,66 @@ const DiscoverScreen = () => {
     setShowFilterModal(true);
   }, []);
 
-  const handleFilterApply = useCallback((filters: FilterValues) => {
-    setActiveFilters(filters);
-    // TODO: Apply filters to useDiscoverMoments when backend supports it
-    logger.debug('Filters applied:', filters);
-  }, []);
+  const handleFilterApply = useCallback(
+    (filters: FilterValues) => {
+      setActiveFilters(filters);
+
+      // CRITICAL FIX: Apply filters to searchStore which feeds useDiscoverMoments
+      setFilters({
+        maxDistance: filters.distance || 50,
+        ageRange:
+          filters.age || filters.ageRange
+            ? [
+                filters.age?.[0] || filters.ageRange?.[0] || 18,
+                filters.age?.[1] || filters.ageRange?.[1] || 99,
+              ]
+            : [18, 99],
+        gender:
+          filters.gender && filters.gender !== 'all'
+            ? [
+                filters.gender === 'other'
+                  ? 'non-binary'
+                  : (filters.gender as 'male' | 'female'),
+              ]
+            : [],
+        momentCategory: filters.category as
+          | 'gastronomy'
+          | 'nightlife'
+          | 'culture'
+          | 'adventure'
+          | 'wellness'
+          | 'photography'
+          | 'local_secrets'
+          | 'vip_access'
+          | undefined,
+      });
+
+      logger.debug('Filters applied to searchStore:', filters);
+    },
+    [setFilters],
+  );
 
   const handleAvatarPress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     navigation.navigate('Profile');
   }, [navigation]);
+
+  // Location permission handlers
+  const handleRequestLocationPermission = useCallback(async () => {
+    // Re-trigger permission request by refreshing
+    await refresh();
+  }, [refresh]);
+
+  const handleCitySelect = useCallback(
+    (coords: { latitude: number; longitude: number }) => {
+      // Manually set location and refresh
+      // Note: This would require extending useDiscoverMoments to accept manual coords
+      logger.info('City selected:', coords);
+      // For now, just refresh with the hook's logic
+      refresh();
+    },
+    [refresh],
+  );
 
   // Handle subscription upgrade
   const handleSubscriptionUpgrade = useCallback(() => {
@@ -319,24 +394,72 @@ const DiscoverScreen = () => {
     // TODO: Implement share logic using _moment.id
   }, []);
 
+  // Viewability config for content-reactive glow
+  const viewabilityConfig = useMemo(
+    () => ({
+      itemVisiblePercentThreshold: 80, // Card must be 80% visible
+      minimumViewTime: 300, // Must be visible for 300ms
+    }),
+    [],
+  );
+
+  // Handle viewable items change
+  const onViewableItemsChanged = useCallback(
+    ({ viewableItems }: { viewableItems: Array<{ item: Moment }> }) => {
+      if (viewableItems.length > 0) {
+        const visibleMoment = viewableItems[0].item;
+        // Update glow based on moment's first image
+        if (visibleMoment.images && visibleMoment.images.length > 0) {
+          updateGlowFromImage(visibleMoment.images[0]);
+        }
+      }
+    },
+    [updateGlowFromImage],
+  );
+
   // Render each moment card
   const renderItem = useCallback(
-    ({ item }: { item: Moment }) => (
-      <ImmersiveMomentCard
-        item={item}
-        onGiftPress={() => handleGiftPress(item)}
-        onCounterOfferPress={() => handleCounterOffer(item)}
-        onUserPress={() => handleUserPress(item)}
-        onSharePress={() => handleSharePress(item)}
-      />
-    ),
-    [handleGiftPress, handleCounterOffer, handleUserPress, handleSharePress],
+    ({ item, index }: { item: Moment; index: number }) => {
+      // Show inline subscription card every 5 moments
+      const shouldShowSubscription = (index + 1) % 5 === 0 && !isPremium;
+
+      return (
+        <>
+          <ImmersiveMomentCard
+            item={item}
+            onGiftPress={() => handleGiftPress(item)}
+            onCounterOfferPress={() => handleCounterOffer(item)}
+            onUserPress={() => handleUserPress(item)}
+            onSharePress={() => handleSharePress(item)}
+          />
+          {shouldShowSubscription && (
+            <View style={styles.inlineSubscription}>
+              <SubscriptionUpgradeCTA
+                currentTier={currentTier}
+                onUpgrade={handleSubscriptionUpgrade}
+                compact
+              />
+            </View>
+          )}
+        </>
+      );
+    },
+    [
+      handleGiftPress,
+      handleCounterOffer,
+      handleUserPress,
+      handleSharePress,
+      isPremium,
+      navigation,
+    ],
   );
 
   // Handle refresh
   const handleRefresh = useCallback(async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     await refresh();
+    // Success haptic after refresh completes
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }, [refresh]);
 
   // Handle load more
@@ -386,6 +509,18 @@ const DiscoverScreen = () => {
       handleSubscriptionUpgrade,
     ],
   );
+
+  // Location permission denied - Show city selector
+  if (locationPermission === 'denied') {
+    return (
+      <LiquidScreenWrapper variant="twilight" safeAreaTop>
+        <LocationPermissionPrompt
+          onCitySelect={handleCitySelect}
+          onRequestPermission={handleRequestLocationPermission}
+        />
+      </LiquidScreenWrapper>
+    );
+  }
 
   // Loading state
   if (loading && activeMoments.length === 0) {
@@ -449,6 +584,9 @@ const DiscoverScreen = () => {
 
   return (
     <LiquidScreenWrapper variant="twilight" safeAreaTop animated={false}>
+      {/* Content-reactive ambient glow */}
+      <ContentReactiveGlow colors={glowColors} opacity={glowOpacity} />
+
       {/* Awwwards-style Header */}
       <AwwwardsDiscoverHeader
         userName={user?.name || 'Explorer'}
@@ -478,6 +616,8 @@ const DiscoverScreen = () => {
         windowSize={5}
         initialNumToRender={2}
         contentContainerStyle={styles.feedContent}
+        viewabilityConfig={viewabilityConfig}
+        onViewableItemsChanged={onViewableItemsChanged}
       />
 
       {/* Loading more indicator */}
@@ -590,6 +730,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: 24,
+  },
+  inlineSubscription: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   emptyCTAButton: {
     borderRadius: 16,

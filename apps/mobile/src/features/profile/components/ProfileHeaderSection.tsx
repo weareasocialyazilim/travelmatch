@@ -75,6 +75,11 @@ interface ProfileHeaderSectionProps {
   onTrustGardenPress?: () => void;
   onSettingsPress?: () => void;
   onSubscriptionPress?: () => void;
+  // Parallax animation styles
+  parallaxAvatarStyle?: object;
+  parallaxTitleStyle?: object;
+  parallaxSubtitleStyle?: object;
+  parallaxContentStyle?: object;
 }
 
 // ============================================
@@ -89,7 +94,7 @@ interface AnimatedTrustRingProps {
 
 const AnimatedTrustRing: React.FC<AnimatedTrustRingProps> = ({
   score,
-  size = 120,
+  size = 104,
   strokeWidth = 4,
   children,
 }) => {
@@ -249,7 +254,6 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
     user,
     avatarUrl,
     userName,
-    username,
     bio,
     location,
     isVerified,
@@ -262,6 +266,10 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
     onTrustGardenPress,
     onSettingsPress,
     onSubscriptionPress,
+    parallaxAvatarStyle,
+    parallaxTitleStyle,
+    parallaxSubtitleStyle,
+    parallaxContentStyle,
   }) => {
     const insets = useSafeAreaInsets();
     const editButtonScale = useSharedValue(1);
@@ -271,7 +279,6 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
     // Normalize values to support both `user` shape and individual props
     const resolvedAvatar = avatarUrl || user?.avatar || '';
     const resolvedName = userName || user?.name || '';
-    const resolvedUsername = username || user?.username || '';
     const resolvedBio = bio || user?.bio || '';
     const resolvedLocation =
       typeof location === 'string'
@@ -320,7 +327,7 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
     };
 
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={styles.container}>
         {/* Background Gradient - Twilight Zinc Dark Theme */}
         <LinearGradient
           colors={['#18181B', '#27272A', '#3F3F46']}
@@ -353,89 +360,94 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
           )}
         </View>
 
-        {/* Avatar Section */}
-        <Pressable onPress={handleTrustPress} style={styles.avatarSection}>
-          <AnimatedTrustRing score={resolvedTrust}>
-            <TMAvatar
-              testID="profile-avatar"
-              source={resolvedAvatar}
-              name={resolvedName}
-              size="profile"
-              style={styles.avatar}
-            />
-          </AnimatedTrustRing>
-        </Pressable>
-
-        {/* User Info */}
-        <View style={styles.userInfo}>
-          <View style={styles.nameRow}>
-            <Text style={styles.userName}>{resolvedName}</Text>
-            {resolvedVerified && (
-              <View style={styles.verifiedBadgeContainer}>
-                <MaterialCommunityIcons
-                  name="check-decagram"
-                  size={24}
-                  color={COLORS.primary}
+        {/* Hero Card */}
+        <View style={styles.heroCard}>
+          <Reanimated.View style={[parallaxAvatarStyle]}>
+            <Pressable onPress={handleTrustPress} style={styles.avatarSection}>
+              <AnimatedTrustRing score={resolvedTrust}>
+                <TMAvatar
+                  testID="profile-avatar"
+                  source={resolvedAvatar}
+                  name={resolvedName}
+                  size="profile"
+                  style={styles.avatar}
                 />
-              </View>
-            )}
-          </View>
-
-          {/* Subscription Badge - Tinder/Bumble Style */}
-          <View style={styles.subscriptionRow}>
-            <SubscriptionBadge
-              tier={subscriptionTier}
-              size="medium"
-              showLabel
-              onPress={onSubscriptionPress}
-            />
-          </View>
-
-          {resolvedUsername && (
-            <Text style={styles.usernameText}>{resolvedUsername}</Text>
-          )}
-
-          {resolvedBio && <Text style={styles.bioText}>{resolvedBio}</Text>}
-
-          {resolvedLocation && (
-            <View style={styles.locationRow}>
-              <MaterialCommunityIcons
-                name="map-marker-outline"
-                size={16}
-                color="rgba(255,255,255,0.8)"
-              />
-              <Text style={styles.location}>{resolvedLocation}</Text>
-            </View>
-          )}
-        </View>
-
-        {/* Edit Button - Floating */}
-        {onEditPress && (
-          <Reanimated.View
-            style={[styles.editButtonContainer, editButtonAnimatedStyle]}
-          >
-            <Pressable
-              testID="edit-button"
-              onPress={handleEditPress}
-              onPressIn={handleEditPressIn}
-              onPressOut={handleEditPressOut}
-              style={styles.editButton}
-              accessibilityRole="button"
-            >
-              <BlurView
-                intensity={Platform.OS === 'ios' ? 30 : 80}
-                tint="light"
-                style={styles.editButtonBlur}
-              >
-                <MaterialCommunityIcons
-                  name="pencil-outline"
-                  size={20}
-                  color={PALETTE.white}
-                />
-              </BlurView>
+              </AnimatedTrustRing>
             </Pressable>
           </Reanimated.View>
-        )}
+
+          <Reanimated.View style={[styles.userInfo, parallaxContentStyle]}>
+            <Reanimated.View style={[styles.nameRow, parallaxTitleStyle]}>
+              <Text style={styles.userName}>{resolvedName}</Text>
+              {resolvedVerified && (
+                <View style={styles.verifiedBadgeContainer}>
+                  <MaterialCommunityIcons
+                    name="check-decagram"
+                    size={22}
+                    color={COLORS.primary}
+                  />
+                </View>
+              )}
+            </Reanimated.View>
+
+            <Reanimated.View
+              style={[styles.subscriptionRow, parallaxSubtitleStyle]}
+            >
+              <SubscriptionBadge
+                tier={subscriptionTier}
+                size="medium"
+                showLabel
+                onPress={onSubscriptionPress}
+              />
+            </Reanimated.View>
+
+            {resolvedBio && (
+              <Reanimated.Text style={[styles.bioText, parallaxSubtitleStyle]}>
+                {resolvedBio}
+              </Reanimated.Text>
+            )}
+
+            {resolvedLocation && (
+              <Reanimated.View
+                style={[styles.locationRow, parallaxSubtitleStyle]}
+              >
+                <MaterialCommunityIcons
+                  name="map-marker-outline"
+                  size={16}
+                  color="rgba(255,255,255,0.8)"
+                />
+                <Text style={styles.location}>{resolvedLocation}</Text>
+              </Reanimated.View>
+            )}
+          </Reanimated.View>
+
+          {onEditPress && (
+            <Reanimated.View
+              style={[styles.editButtonContainer, editButtonAnimatedStyle]}
+            >
+              <Pressable
+                testID="edit-button"
+                onPress={handleEditPress}
+                onPressIn={handleEditPressIn}
+                onPressOut={handleEditPressOut}
+                style={styles.editButton}
+                accessibilityRole="button"
+              >
+                <BlurView
+                  intensity={Platform.OS === 'ios' ? 30 : 80}
+                  tint="light"
+                  style={styles.editButtonBlur}
+                >
+                  <MaterialCommunityIcons
+                    name="pencil-outline"
+                    size={22}
+                    color={PALETTE.white}
+                  />
+                </BlurView>
+              </Pressable>
+            </Reanimated.View>
+          )}
+        </View>
       </View>
     );
   },
@@ -470,28 +482,37 @@ ProfileHeaderSection.displayName = 'ProfileHeaderSection';
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
-    paddingBottom: 24,
+    paddingBottom: 12,
+  },
+  heroCard: {
+    marginHorizontal: 16,
+    marginTop: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 14,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
   },
   backgroundGradient: {
     ...StyleSheet.absoluteFillObject,
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
+    borderBottomLeftRadius: 14,
+    borderBottomRightRadius: 14,
   },
   headerActions: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 8,
-    height: 44,
+    paddingHorizontal: 14,
+    paddingTop: 0,
+    height: 30,
   },
   headerSpacer: {
-    width: 36,
+    width: 32,
   },
   headerButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     overflow: 'hidden',
   },
   headerButtonBlur: {
@@ -502,7 +523,7 @@ const styles = StyleSheet.create({
   },
   avatarSection: {
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 2,
   },
   trustRingContainer: {
     alignItems: 'center',
@@ -511,12 +532,7 @@ const styles = StyleSheet.create({
   },
   avatarGlow: {
     position: 'absolute',
-    opacity: 0.25,
-    // Neon glow effect
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
-    shadowRadius: 20,
+    opacity: 0,
   },
   avatarWrapper: {
     position: 'absolute',
@@ -558,8 +574,8 @@ const styles = StyleSheet.create({
   // },
   userInfo: {
     alignItems: 'center',
-    marginTop: 16,
-    paddingHorizontal: 20,
+    marginTop: 6,
+    paddingHorizontal: 10,
   },
   nameRow: {
     flexDirection: 'row',
@@ -567,12 +583,13 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   subscriptionRow: {
-    marginTop: 8,
+    marginTop: 6,
     alignItems: 'center',
   },
   userName: {
     ...TYPE_SCALE.display.h2,
     color: PALETTE.white,
+    fontSize: 20,
   },
   verifiedBadgeContainer: {
     // Neon glow on verified badge
@@ -581,19 +598,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.6,
     shadowRadius: 6,
   },
-  usernameText: {
-    ...TYPE_SCALE.body.base,
-    color: COLORS.primary,
-    marginTop: 4,
-    fontWeight: '600',
-  },
   bioText: {
     ...TYPE_SCALE.body.small,
     color: 'rgba(255,255,255,0.8)',
     textAlign: 'center',
-    marginTop: 12,
+    marginTop: 8,
     lineHeight: 20,
-    paddingHorizontal: 20,
+    paddingHorizontal: 12,
   },
   locationRow: {
     flexDirection: 'row',
@@ -639,19 +650,19 @@ const styles = StyleSheet.create({
   },
   editButtonContainer: {
     position: 'absolute',
-    top: 80,
-    right: 20,
+    top: 12,
+    right: 12,
   },
   editButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     overflow: 'hidden',
     shadowColor: PALETTE.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 3,
   },
   editButtonBlur: {
     flex: 1,

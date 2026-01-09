@@ -15,6 +15,7 @@ import { logger } from '../utils/logger';
 import { migrateSensitiveDataToSecure } from '../utils/secureStorage';
 import { validateEnvironment, env } from '../config/env.config';
 import { initializeFeatureFlags } from '../config/featureFlags';
+import { fetchAppConfig, type AppConfig } from './appConfigService';
 
 // Services
 import { analytics } from './analytics';
@@ -25,6 +26,7 @@ import { storageMonitor } from './storageMonitor';
 
 // Types
 export type ServiceName =
+  | 'appConfig'
   | 'environment'
   | 'security'
   | 'session'
@@ -67,6 +69,7 @@ const SERVICE_CONFIG: Record<
   ServiceName,
   { displayName: string; critical: boolean; maxRetries: number }
 > = {
+  appConfig: { displayName: 'App Config', critical: true, maxRetries: 2 },
   environment: { displayName: 'Environment', critical: true, maxRetries: 0 },
   security: { displayName: 'Security Check', critical: false, maxRetries: 1 },
   session: { displayName: 'Session', critical: false, maxRetries: 2 },
@@ -83,6 +86,7 @@ const SERVICE_CONFIG: Record<
 };
 
 const INIT_ORDER: ServiceName[] = [
+  'appConfig',
   'environment',
   'security',
   'session',
@@ -100,6 +104,7 @@ class AppBootstrapService {
   private services: Map<ServiceName, ServiceState> = new Map();
   private progressCallback: ProgressCallback | null = null;
   private isInitialized = false;
+  private appConfig: AppConfig | null = null;
   private pendingTransactionsResult: {
     hasPayments: boolean;
     hasUploads: boolean;
@@ -247,7 +252,26 @@ class AppBootstrapService {
     logger.info('AppBootstrap', '🚀 Starting app initialization...');
     const startTime = Date.now();
 
-    // 1. Environment Validation (critical in production, warning in dev)
+    // 1. App Config Check (maintenance mode & version check)
+    await this.executeWithRetry('appConfig', async () => {
+      this.appConfig = await fetchAppConfig();
+
+      if (this.appConfig.isMaintenanceMode) {
+        logger.warn('AppBootstrap', '🔧 App is in maintenance mode');
+      }
+
+      if (this.appConfig.forceUpdate) {
+        logger.warn('AppBootstrap', '📱 Force update required', {
+          current: this.appConfig.currentVersion,
+          required: this.appConfig.minRequiredVersion,
+        });
+      }
+
+      logger.info('AppBootstrap', '✅ App config loaded');
+      return this.appConfig;
+    });
+
+    // 2. Environment Validation (critical in production, warning in dev)
     const envResult = validateEnvironment();
 
     if (!envResult.isValid) {
@@ -271,7 +295,7 @@ class AppBootstrapService {
       logger.info('AppBootstrap', '✅ Environment validated');
     }
 
-    // 2. Security Check (non-critical)
+    // 3. Security Check (non-critical)
     await this.executeWithRetry('security', async () => {
       const isRooted = await Device.isRootedExperimentalAsync();
       if (isRooted) {
@@ -281,7 +305,7 @@ class AppBootstrapService {
       logger.info('AppBootstrap', '✅ Security check completed');
     });
 
-    // 3. Session Initialization (non-critical but important)
+    // 4. Session Initialization (non-critical but important)
     await this.executeWithRetry('session', async () => {
       const sessionState = await sessionManager.initialize();
       logger.info('AppBootstrap', `✅ Session initialized: ${sessionState}`);
@@ -446,6 +470,27 @@ class AppBootstrapService {
         logger.warn('AppBootstrap', `Retry not supported for ${serviceName}`);
         return false;
     }
+  }
+
+  /**
+   * Get app config (maintenance mode, version check)
+   */
+  public getAppConfig(): AppConfig | null {
+    return this.appConfig;
+  }
+
+  /**
+   * Check if app is in maintenance mode
+   */
+  public isMaintenanceMode(): boolean {
+    return this.appConfig?.isMaintenanceMode ?? false;
+  }
+
+  /**
+   * Check if force update is required
+   */
+  public requiresForceUpdate(): boolean {
+    return this.appConfig?.forceUpdate ?? false;
   }
 
   /**

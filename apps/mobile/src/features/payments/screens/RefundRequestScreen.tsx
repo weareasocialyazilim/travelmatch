@@ -213,7 +213,13 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.08)',
   },
   txLabel: { color: '#888', marginTop: 8, fontSize: 13 },
-  txAmount: { color: 'white', fontSize: 28, fontWeight: '700', marginTop: 4 },
+  txAmount: {
+    color: 'white',
+    fontSize: 28,
+    fontWeight: '700',
+    marginTop: 4,
+    letterSpacing: -0.56,
+  },
   escrowBadge: {
     flexDirection: 'row',
     alignItems: 'center',

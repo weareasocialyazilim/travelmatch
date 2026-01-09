@@ -13,7 +13,7 @@ module.exports = {
     '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { configFile: './babel.config.js' }],
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|react-native-gesture-handler|@react-native|@testing-library|expo|expo-blur|expo-localization|expo/virtual|@expo|@unimodules|react-navigation|@react-navigation|@supabase|@shopify|uuid|i18next|react-i18next)/)',
+    'node_modules/(?!(react-native|react-native-gesture-handler|@react-native|@testing-library|expo|expo-blur|expo-localization|expo/virtual|expo-image-manipulator|expo-av|@expo|@unimodules|react-navigation|@react-navigation|@supabase|@shopify|uuid|i18next|react-i18next)/)',
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: {
@@ -55,6 +55,8 @@ module.exports = {
     '^expo-blur$': '<rootDir>/__mocks__/expo-blur.js',
     '^expo-image$': '<rootDir>/__mocks__/expo-image.js',
     '^expo-localization$': '<rootDir>/__mocks__/expo-localization.js',
+    '^expo-av$': '<rootDir>/__mocks__/expo-av.js',
+    '^expo-image-manipulator$': '<rootDir>/__mocks__/expo-image-manipulator.js',
     '^posthog-react-native$': '<rootDir>/__mocks__/posthog-react-native.js',
     '^@travelmatch/design-system/tokens$': '<rootDir>/__mocks__/design-tokens.js',
     '^@react-native-community/datetimepicker$': '<rootDir>/__mocks__/@react-native-community/datetimepicker.js',

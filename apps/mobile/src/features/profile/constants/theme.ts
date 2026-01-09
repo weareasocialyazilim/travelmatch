@@ -92,10 +92,10 @@ export const PROFILE_SPACING = {
 
 // Animation spring configs
 export const PROFILE_SPRINGS = {
-  snappy: { damping: 20, stiffness: 300, mass: 0.5 },
-  bouncy: { damping: 15, stiffness: 150, mass: 0.5 },
-  gentle: { damping: 20, stiffness: 120, mass: 0.5 },
-  slow: { damping: 25, stiffness: 100, mass: 0.8 },
+  snappy: { damping: 30, stiffness: 400, mass: 0.4 },
+  bouncy: { damping: 25, stiffness: 200, mass: 0.5 },
+  gentle: { damping: 25, stiffness: 150, mass: 0.5 },
+  slow: { damping: 30, stiffness: 120, mass: 0.6 },
 } as const;
 
 // Typography scale for profile

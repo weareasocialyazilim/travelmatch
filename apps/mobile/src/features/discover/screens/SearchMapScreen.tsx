@@ -591,13 +591,13 @@ const SearchMapScreen: React.FC = () => {
           >
             <MaterialCommunityIcons
               name="map-search-outline"
-              size={48}
+              size={40}
               color={COLORS.text.muted}
+              style={styles.emptyIcon}
             />
             <Text style={styles.emptyTitle}>Bu kriterlerde an yok 🗺️</Text>
             <Text style={styles.emptySubtitle}>
-              Mesafe filtresini artırmayı dene{'\n'}veya farklı kategorilere
-              bak!
+              Mesafe filtresini artırmayı dene veya farklı kategorilere bak!
             </Text>
             <TouchableOpacity
               style={styles.emptyCTAButton}
@@ -616,17 +616,15 @@ const SearchMapScreen: React.FC = () => {
           activeOpacity={0.8}
           style={styles.filterButton}
         >
-          <GlassCard
-            intensity={50}
-            tint="dark"
-            padding={0}
-            borderRadius={16}
-            style={styles.filterButtonCard}
-          >
-            <Ionicons name="options" size={20} color={COLORS.primary} />
-            <Text style={styles.filterButtonText}>Filtrele</Text>
+          <View style={styles.filterButtonCard}>
+            <Ionicons
+              name="options-outline"
+              size={24}
+              color={COLORS.primary}
+              style={{ marginLeft: 1 }}
+            />
             {hasActiveFilters && <View style={styles.filterActiveDot} />}
-          </GlassCard>
+          </View>
         </TouchableOpacity>
       </View>
 
@@ -644,15 +642,14 @@ const SearchMapScreen: React.FC = () => {
           onPressOut={handleLocationPressOut}
           activeOpacity={0.9}
         >
-          <GlassCard
-            intensity={40}
-            tint="dark"
-            padding={0}
-            borderRadius={25}
-            style={styles.iconCircle}
-          >
-            <Ionicons name="navigate" size={22} color={COLORS.primary} />
-          </GlassCard>
+          <View style={styles.iconCircle}>
+            <Ionicons
+              name="navigate-outline"
+              size={24}
+              color={COLORS.primary}
+              style={{ marginTop: 1, marginLeft: 2 }}
+            />
+          </View>
         </TouchableOpacity>
       </Animated.View>
 
@@ -771,12 +768,19 @@ const styles = StyleSheet.create({
   filterButtonCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 18,
-    paddingVertical: 14,
-    gap: 10,
+    justifyContent: 'center',
+    width: 48,
+    height: 48,
     borderWidth: 1,
     borderColor: 'rgba(204, 255, 0, 0.3)',
-    backgroundColor: 'rgba(20, 20, 22, 0.85)',
+    backgroundColor: 'rgba(12, 12, 14, 0.88)',
+    borderRadius: 24,
+    overflow: 'visible',
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.14,
+    shadowRadius: 6,
+    elevation: 3,
   },
   filterButtonText: {
     color: COLORS.primary,
@@ -802,10 +806,20 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   iconCircle: {
-    width: 50,
-    height: 50,
+    width: 48,
+    height: 48,
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 24,
+    overflow: 'visible',
+    backgroundColor: 'rgba(12, 12, 14, 0.88)',
+    borderWidth: 1,
+    borderColor: 'rgba(204, 255, 0, 0.3)',
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.14,
+    shadowRadius: 6,
+    elevation: 4,
   },
   // Bottom overlay
   bottomOverlay: {
@@ -930,18 +944,29 @@ const styles = StyleSheet.create({
   emptyCard: {
     alignItems: 'center',
     gap: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+  },
+  emptyIcon: {
+    opacity: 0.4,
+    marginBottom: 12,
   },
   emptyTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: COLORS.text.primary,
-    marginTop: 8,
+    marginTop: 4,
   },
   emptySubtitle: {
     fontSize: 14,
-    color: COLORS.text.secondary,
+    color: 'rgba(255, 255, 255, 0.85)',
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 22,
+    marginTop: 4,
   },
   emptyCTAButton: {
     marginTop: 16,
@@ -951,9 +976,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   emptyCTAText: {
-    color: '#FFFFFF',
+    color: '#0A0A0A',
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
   },
 });
 
