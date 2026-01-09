@@ -818,6 +818,8 @@
   },
   "wallet": {
     "title": "Wallet",
+    "totalBalance": "Total Balance",
+    "recentTransactions": "Recent Transactions",
     "available": "Available",
     "pending": "Pending",
     "withdraw": "Withdraw",
