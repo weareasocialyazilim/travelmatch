@@ -14,7 +14,7 @@ import {
   Dimensions,
   ScrollView,
 } from 'react-native';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -154,7 +154,7 @@ export const BlurFilterModal: React.FC<BlurFilterModalProps> = ({
                     distance === opt.value && styles.optionBtnActive,
                   ]}
                   onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    HapticManager.buttonPress();
                     setDistance(opt.value);
                   }}
                 >
@@ -183,7 +183,7 @@ export const BlurFilterModal: React.FC<BlurFilterModalProps> = ({
                       styles.optionBtnActive,
                   ]}
                   onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    HapticManager.buttonPress();
                     setAgeRange(opt.value);
                   }}
                 >

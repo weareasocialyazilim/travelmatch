@@ -43,7 +43,7 @@ import Animated, {
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as LocalAuthentication from 'expo-local-authentication';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { SacredMoments } from './SacredMoments';
 import { CEREMONY_COLORS } from '@/constants/ceremony';
 import { COLORS, GRADIENTS } from '@/constants/colors';
@@ -211,7 +211,7 @@ export const GiftVault: React.FC<GiftVaultProps> = ({
         // Fallback to simple confirmation
         setIsUnlocked(true);
         setIsAuthenticating(false);
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        HapticManager.giftReceived();
         return;
       }
 
@@ -237,7 +237,7 @@ export const GiftVault: React.FC<GiftVaultProps> = ({
           withTiming(0, { duration: 50 }),
         );
 
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        HapticManager.giftReceived();
 
         setTimeout(() => setIsUnlocked(true), 300);
       }
@@ -249,7 +249,7 @@ export const GiftVault: React.FC<GiftVaultProps> = ({
 
   const lockVault = () => {
     setIsUnlocked(false);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
   };
 
   // Memoized render function for FlashList

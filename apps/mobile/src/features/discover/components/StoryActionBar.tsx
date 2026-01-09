@@ -23,7 +23,7 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { COLORS, primitives, GRADIENTS } from '@/constants/colors';
 
 interface StoryActionBarProps {
@@ -110,7 +110,7 @@ export const StoryActionBar = memo<StoryActionBarProps>(
       );
 
       // Haptic feedback
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      HapticManager.primaryAction();
 
       onLike();
     }, [liked, onLike, heartScale]);
@@ -125,7 +125,7 @@ export const StoryActionBar = memo<StoryActionBarProps>(
         withSpring(1, { damping: 15 }),
       );
 
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.buttonPress();
 
       onSave();
     }, [saved, onSave, saveScale]);
@@ -133,7 +133,7 @@ export const StoryActionBar = memo<StoryActionBarProps>(
     // 🎁 Handle gift with premium animation
     const handleGift = useCallback(() => {
       // Premium haptic feedback - Heavy for gift action
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      HapticManager.destructiveAction();
 
       // Scale bounce animation
       giftScale.value = withSequence(

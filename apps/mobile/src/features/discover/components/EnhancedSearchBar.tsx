@@ -23,7 +23,7 @@ import Animated, {
   interpolate,
   withTiming,
 } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY, FONT_SIZES } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -101,7 +101,7 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
   }, [onSubmit, searchValue]);
 
   const handleFilterPress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     onFilterPress?.();
   }, [onFilterPress]);
 

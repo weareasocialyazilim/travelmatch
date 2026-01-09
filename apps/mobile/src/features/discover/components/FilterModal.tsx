@@ -18,7 +18,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { COLORS, primitives } from '@/constants/colors';
 import type { PriceRange } from './types';
 
@@ -145,7 +145,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
     setAgeRange?.([18, 99]);
     setLocalAgeMin(18);
     setLocalAgeMax(99);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
   };
 
   const handleApply = () => {
@@ -153,18 +153,18 @@ export const FilterModal: React.FC<FilterModalProps> = ({
     if (setAgeRange) {
       setAgeRange([localAgeMin, localAgeMax]);
     }
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    HapticManager.filterApplied();
     onClose();
   };
 
   const handleGenderSelect = (gender: string) => {
     setSelectedGender?.(gender);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
   };
 
   const handleDistanceSelect = (distance: number) => {
     setMaxDistance(distance);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
   };
 
   return (
@@ -241,7 +241,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     onPress={() => {
                       const newMin = Math.max(AGE_MIN, localAgeMin - 1);
                       setLocalAgeMin(newMin);
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      HapticManager.buttonPress();
                     }}
                   >
                     <MaterialCommunityIcons
@@ -256,7 +256,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     onPress={() => {
                       const newMin = Math.min(localAgeMax - 1, localAgeMin + 1);
                       setLocalAgeMin(newMin);
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      HapticManager.buttonPress();
                     }}
                   >
                     <MaterialCommunityIcons
@@ -276,7 +276,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     onPress={() => {
                       const newMax = Math.max(localAgeMin + 1, localAgeMax - 1);
                       setLocalAgeMax(newMax);
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      HapticManager.buttonPress();
                     }}
                   >
                     <MaterialCommunityIcons
@@ -293,7 +293,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     onPress={() => {
                       const newMax = Math.min(AGE_MAX, localAgeMax + 1);
                       setLocalAgeMax(newMax);
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      HapticManager.buttonPress();
                     }}
                   >
                     <MaterialCommunityIcons
@@ -349,7 +349,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     ]}
                     onPress={() => {
                       setSelectedCategory(category.id);
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      HapticManager.buttonPress();
                     }}
                   >
                     <Text style={styles.categoryChipEmoji}>
@@ -389,7 +389,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     ]}
                     onPress={() => {
                       setPriceRange({ min: range.min, max: range.max });
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      HapticManager.buttonPress();
                     }}
                   >
                     <Text
@@ -430,7 +430,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     ]}
                     onPress={() => {
                       setSortBy(option.id);
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      HapticManager.buttonPress();
                     }}
                   >
                     <MaterialCommunityIcons
