@@ -145,7 +145,6 @@ export const LiquidMomentCard: React.FC<LiquidMomentCardProps> = memo(
           }}
           style={styles.backgroundImage}
           imageStyle={styles.imageStyle}
-          sharedTransitionTag={momentId ? `moment-${momentId}` : undefined}
         >
           {/* Top Scrim with Subscription Badge */}
           <LinearGradient

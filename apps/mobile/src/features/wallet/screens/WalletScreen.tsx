@@ -21,6 +21,7 @@ import {
   RefreshControl,
   Dimensions,
   FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import { showAlert } from '@/stores/modalStore';
 import * as Haptics from 'expo-haptics';
@@ -149,11 +150,7 @@ const WalletScreen = () => {
   const handleWithdraw = useCallback(() => {
     // Check if user is KYC verified
     if (!user?.kyc || user.kyc !== 'Verified') {
-      toast.show({
-        message: 'Para çekmek için önce kimlik doğrulaması yapmalısınız',
-        type: 'info',
-        duration: 3000,
-      });
+      toast.info('Para çekmek için önce kimlik doğrulaması yapmalısınız');
       navigation.navigate('PaymentsKYC');
       return;
     }
@@ -178,10 +175,7 @@ const WalletScreen = () => {
         setIsBiometricLocked(false);
       } else {
         // Authentication failed, go back
-        toast.show({
-          message: 'Cüzdan erişimi için kimlik doğrulama gerekli',
-          type: 'error',
-        });
+        toast.error('Cüzdan erişimi için kimlik doğrulama gerekli');
         navigation.goBack();
       }
     };

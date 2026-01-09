@@ -390,11 +390,7 @@ const ProfileScreen: React.FC = () => {
             entering={FadeInDown.delay(100).springify()}
             style={styles.dashboardSection}
           >
-            <GlassCard
-              variant="medium"
-              style={styles.dashboardCard}
-              borderColor={PROFILE_COLORS.glass.border}
-            >
+            <GlassCard style={styles.dashboardCard} hasBorder>
               {/* Stats Row */}
               <StatsRow
                 momentsCount={userData.momentsCount}

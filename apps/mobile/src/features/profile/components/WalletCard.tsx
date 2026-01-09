@@ -62,7 +62,7 @@ const WalletCard: React.FC<WalletCardProps> = memo(
           <View>
             <Text style={styles.walletLabel}>Cüzdan</Text>
             <AnimatedText
-              animatedProps={animatedProps}
+              animatedProps={animatedProps as any}
               style={styles.walletBalance}
             />
           </View>

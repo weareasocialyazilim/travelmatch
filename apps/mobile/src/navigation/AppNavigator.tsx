@@ -389,7 +389,7 @@ const AppNavigator = () => {
         }
         // Fallback to deep link handler for other routes
         else {
-          deepLinkHandler.handleURL(url);
+          deepLinkHandler.handleDeepLink(url);
         }
       } catch (error) {
         logger.error('Failed to handle deep link:', error);

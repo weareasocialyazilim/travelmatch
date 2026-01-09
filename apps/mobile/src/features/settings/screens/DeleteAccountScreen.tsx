@@ -13,12 +13,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
-import { showConfirmation, showToast } from '@/stores/modalStore';
+import { showConfirmation } from '@/stores/modalStore';
+import { useToast } from '@/context/ToastContext';
 import { userService } from '@/services/userService';
 
 export const DeleteAccountScreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const toast = useToast();
   const [confirmText, setConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const CONFIRMATION_KEY = 'DELETE';
@@ -46,22 +48,16 @@ export const DeleteAccountScreen = () => {
           }
 
           // Success - user is already signed out by userService
-          showToast({
-            message: 'Hesabın başarıyla silindi',
-            type: 'success',
-          });
+          toast.success('Hesabın başarıyla silindi');
 
           // Navigate to onboarding
           navigation.reset({
             index: 0,
             routes: [{ name: 'Onboarding' as never }],
           });
-        } catch (error) {
+        } catch (_error) {
           setIsDeleting(false);
-          showToast({
-            message: 'Hesap silinemedi. Lütfen destekle iletişime geçin.',
-            type: 'error',
-          });
+          toast.error('Hesap silinemedi. Lütfen destekle iletişime geçin.');
         }
       },
     });

@@ -158,14 +158,14 @@ const InboxScreen: React.FC = () => {
               <TouchableOpacity
                 style={styles.suggestionCard}
                 onPress={() =>
-                  navigation.navigate('MainTabs', { screen: 'Discover' })
+                  navigation.navigate('MainTabs', { screen: 'Home' })
                 }
                 activeOpacity={0.9}
               >
                 <MaterialCommunityIcons
                   name="compass-outline"
                   size={24}
-                  color={VIBE_ROOM_COLORS.accent.lime}
+                  color={VIBE_ROOM_COLORS.neon.lime}
                 />
                 <Text style={styles.suggestionCardText}>Momentleri Keşfet</Text>
                 <MaterialCommunityIcons
