@@ -21,8 +21,8 @@ CREATE TABLE IF NOT EXISTS escrow_idempotency_keys (
   expires_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() + INTERVAL '30 days')
 );
 
-CREATE INDEX idx_escrow_idempotency_escrow ON escrow_idempotency_keys(escrow_id);
-CREATE INDEX idx_escrow_idempotency_expires ON escrow_idempotency_keys(expires_at);
+CREATE INDEX IF NOT EXISTS idx_escrow_idempotency_escrow ON escrow_idempotency_keys(escrow_id);
+CREATE INDEX IF NOT EXISTS idx_escrow_idempotency_expires ON escrow_idempotency_keys(expires_at);
 
 COMMENT ON TABLE escrow_idempotency_keys IS
 'Stores idempotency keys for escrow operations to prevent duplicate executions.
@@ -32,6 +32,7 @@ Keys expire after 30 days.';
 ALTER TABLE escrow_idempotency_keys ENABLE ROW LEVEL SECURITY;
 
 -- Only system/service role can access
+DROP POLICY IF EXISTS "Service role only" ON escrow_idempotency_keys;
 CREATE POLICY "Service role only" ON escrow_idempotency_keys
 FOR ALL USING (false)
 WITH CHECK (false);
@@ -311,14 +312,15 @@ SELECT cron.schedule(
 -- 5. GRANT PERMISSIONS
 -- ============================================
 
-GRANT EXECUTE ON FUNCTION release_escrow TO authenticated;
-GRANT EXECUTE ON FUNCTION refund_escrow TO authenticated;
-GRANT EXECUTE ON FUNCTION cleanup_expired_idempotency_keys TO service_role;
+-- Use full function signatures to avoid ambiguity with existing function versions
+GRANT EXECUTE ON FUNCTION release_escrow(UUID, UUID, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION refund_escrow(UUID, TEXT, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION cleanup_expired_idempotency_keys() TO service_role;
 
-COMMENT ON FUNCTION release_escrow IS
+COMMENT ON FUNCTION release_escrow(UUID, UUID, TEXT) IS
 'Releases escrow funds to the recipient. Includes idempotency protection via
 FOR UPDATE NOWAIT lock and idempotency key storage. Safe to call multiple times.';
 
-COMMENT ON FUNCTION refund_escrow IS
+COMMENT ON FUNCTION refund_escrow(UUID, TEXT, TEXT) IS
 'Refunds escrow funds to the sender. Includes idempotency protection via
 FOR UPDATE NOWAIT lock and idempotency key storage. Safe to call multiple times.';

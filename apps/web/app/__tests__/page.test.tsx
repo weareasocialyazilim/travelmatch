@@ -80,7 +80,7 @@ jest.mock(
   'next/dynamic',
   () =>
     (
-      loader: () => Promise<{
+      _loader: () => Promise<{
         default: React.ComponentType<{ children?: React.ReactNode }>;
       }>,
     ) => {

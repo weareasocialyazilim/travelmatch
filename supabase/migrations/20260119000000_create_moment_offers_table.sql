@@ -37,19 +37,23 @@ CREATE TABLE IF NOT EXISTS moment_offers (
 
   -- Constraints
   CONSTRAINT different_users CHECK (subscriber_id != host_id),
-  CONSTRAINT valid_offer CHECK (offer_amount <= original_amount * 0.8), -- Max 20% discount
-  CONSTRAINT single_pending_offer UNIQUE (moment_id, subscriber_id, status)
-    WHERE status = 'pending' -- Only one pending offer per user per moment
+  CONSTRAINT valid_offer CHECK (offer_amount <= original_amount * 0.8) -- Max 20% discount
 );
 
+-- Partial unique index: Only one pending offer per user per moment
+CREATE UNIQUE INDEX IF NOT EXISTS idx_single_pending_offer
+  ON moment_offers(moment_id, subscriber_id)
+  WHERE status = 'pending';
+
 -- Indexes for performance
-CREATE INDEX idx_moment_offers_moment ON moment_offers(moment_id);
-CREATE INDEX idx_moment_offers_subscriber ON moment_offers(subscriber_id);
-CREATE INDEX idx_moment_offers_host ON moment_offers(host_id);
-CREATE INDEX idx_moment_offers_status ON moment_offers(status);
-CREATE INDEX idx_moment_offers_expires ON moment_offers(expires_at) WHERE status = 'pending';
+CREATE INDEX IF NOT EXISTS idx_moment_offers_moment ON moment_offers(moment_id);
+CREATE INDEX IF NOT EXISTS idx_moment_offers_subscriber ON moment_offers(subscriber_id);
+CREATE INDEX IF NOT EXISTS idx_moment_offers_host ON moment_offers(host_id);
+CREATE INDEX IF NOT EXISTS idx_moment_offers_status ON moment_offers(status);
+CREATE INDEX IF NOT EXISTS idx_moment_offers_expires ON moment_offers(expires_at) WHERE status = 'pending';
 
 -- Trigger for updated_at
+DROP TRIGGER IF EXISTS update_moment_offers_updated_at ON moment_offers;
 CREATE TRIGGER update_moment_offers_updated_at
   BEFORE UPDATE ON moment_offers
   FOR EACH ROW
@@ -59,18 +63,21 @@ CREATE TRIGGER update_moment_offers_updated_at
 ALTER TABLE moment_offers ENABLE ROW LEVEL SECURITY;
 
 -- Subscribers can view and create their own offers
+DROP POLICY IF EXISTS "subscribers_view_own_offers" ON moment_offers;
 CREATE POLICY "subscribers_view_own_offers"
   ON moment_offers
   FOR SELECT
   TO authenticated
   USING (auth.uid() = subscriber_id);
 
+DROP POLICY IF EXISTS "subscribers_create_offers" ON moment_offers;
 CREATE POLICY "subscribers_create_offers"
   ON moment_offers
   FOR INSERT
   TO authenticated
   WITH CHECK (auth.uid() = subscriber_id);
 
+DROP POLICY IF EXISTS "subscribers_cancel_own_offers" ON moment_offers;
 CREATE POLICY "subscribers_cancel_own_offers"
   ON moment_offers
   FOR UPDATE
@@ -79,12 +86,14 @@ CREATE POLICY "subscribers_cancel_own_offers"
   WITH CHECK (status = 'cancelled');
 
 -- Hosts can view and respond to offers on their moments
+DROP POLICY IF EXISTS "hosts_view_offers" ON moment_offers;
 CREATE POLICY "hosts_view_offers"
   ON moment_offers
   FOR SELECT
   TO authenticated
   USING (auth.uid() = host_id);
 
+DROP POLICY IF EXISTS "hosts_respond_to_offers" ON moment_offers;
 CREATE POLICY "hosts_respond_to_offers"
   ON moment_offers
   FOR UPDATE

@@ -216,12 +216,12 @@ CREATE POLICY "ml_analytics_service_only" ON ml_analytics
 -- AI Anomalies: Admins can view and resolve
 CREATE POLICY "ai_anomalies_admin_select" ON ai_anomalies
     FOR SELECT USING (
-        EXISTS (SELECT 1 FROM admin_users WHERE user_id = auth.uid() AND is_active = TRUE)
+        EXISTS (SELECT 1 FROM admin_users WHERE email = (auth.jwt() ->> 'email') AND is_active = TRUE)
     );
 
 CREATE POLICY "ai_anomalies_admin_update" ON ai_anomalies
     FOR UPDATE USING (
-        EXISTS (SELECT 1 FROM admin_users WHERE user_id = auth.uid() AND is_active = TRUE)
+        EXISTS (SELECT 1 FROM admin_users WHERE email = (auth.jwt() ->> 'email') AND is_active = TRUE)
     );
 
 CREATE POLICY "ai_anomalies_service_insert" ON ai_anomalies
@@ -230,7 +230,7 @@ CREATE POLICY "ai_anomalies_service_insert" ON ai_anomalies
 -- A/B Experiments: Admins can manage
 CREATE POLICY "ab_experiments_admin_all" ON ab_experiments
     FOR ALL USING (
-        EXISTS (SELECT 1 FROM admin_users WHERE user_id = auth.uid() AND is_active = TRUE)
+        EXISTS (SELECT 1 FROM admin_users WHERE email = (auth.jwt() ->> 'email') AND is_active = TRUE)
         OR auth.role() = 'service_role'
     );
 
@@ -275,7 +275,7 @@ CREATE POLICY "price_predictions_cache_service_only" ON price_predictions_cache
 -- Demand Forecasts: Admins can view, service role can manage
 CREATE POLICY "demand_forecasts_admin_select" ON demand_forecasts
     FOR SELECT USING (
-        EXISTS (SELECT 1 FROM admin_users WHERE user_id = auth.uid() AND is_active = TRUE)
+        EXISTS (SELECT 1 FROM admin_users WHERE email = (auth.jwt() ->> 'email') AND is_active = TRUE)
     );
 
 CREATE POLICY "demand_forecasts_service_all" ON demand_forecasts

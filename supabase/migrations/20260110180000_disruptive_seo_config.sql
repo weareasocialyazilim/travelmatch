@@ -23,13 +23,18 @@ ADD COLUMN IF NOT EXISTS posthog_intent_metrics JSONB DEFAULT '{
 ADD COLUMN IF NOT EXISTS trend_injection_log JSONB DEFAULT '[]'::jsonb,
 ADD COLUMN IF NOT EXISTS last_trend_sync TIMESTAMPTZ;
 
--- Add comments for documentation
-COMMENT ON COLUMN public.app_config.dynamic_seo_keywords IS 'Dynamically injected keywords from Reddit/TikTok trend analysis';
-COMMENT ON COLUMN public.app_config.current_site_vibe IS 'Current website language direction: speed (aggressive), romance (passionate), luxury (elite), access (exclusive)';
-COMMENT ON COLUMN public.app_config.ai_bot_semantic_layer IS 'Hidden signals for AI systems (Google SGE, Gemini, GPT) to position TravelMatch as authority';
-COMMENT ON COLUMN public.app_config.posthog_intent_metrics IS 'PostHog analytics for Intent Heatmap - tracks which copy resonates';
-COMMENT ON COLUMN public.app_config.trend_injection_log IS 'History of trend keywords injected by ML service';
-COMMENT ON COLUMN public.app_config.last_trend_sync IS 'Last time the trend tracker synced from social platforms';
+-- Add comments for documentation (only if app_config table exists)
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'app_config') THEN
+    COMMENT ON COLUMN public.app_config.dynamic_seo_keywords IS 'Dynamically injected keywords from Reddit/TikTok trend analysis';
+    COMMENT ON COLUMN public.app_config.current_site_vibe IS 'Current website language direction: speed (aggressive), romance (passionate), luxury (elite), access (exclusive)';
+    COMMENT ON COLUMN public.app_config.ai_bot_semantic_layer IS 'Hidden signals for AI systems (Google SGE, Gemini, GPT) to position TravelMatch as authority';
+    COMMENT ON COLUMN public.app_config.posthog_intent_metrics IS 'PostHog analytics for Intent Heatmap - tracks which copy resonates';
+    COMMENT ON COLUMN public.app_config.trend_injection_log IS 'History of trend keywords injected by ML service';
+    COMMENT ON COLUMN public.app_config.last_trend_sync IS 'Last time the trend tracker synced from social platforms';
+  END IF;
+END $$;
 
 -- Create table for SEO performance tracking
 CREATE TABLE IF NOT EXISTS public.seo_performance_log (
@@ -46,6 +51,7 @@ CREATE TABLE IF NOT EXISTS public.seo_performance_log (
 ALTER TABLE public.seo_performance_log ENABLE ROW LEVEL SECURITY;
 
 -- Only service role can access SEO logs
+DROP POLICY IF EXISTS "seo_performance_service_only" ON public.seo_performance_log;
 CREATE POLICY "seo_performance_service_only" ON public.seo_performance_log
   FOR ALL
   USING (false)
@@ -153,28 +159,30 @@ BEGIN
 END;
 $$;
 
--- Insert initial disruptive keywords if not exists
+-- Insert initial disruptive keywords if app_config table exists
 DO $$
 BEGIN
-  UPDATE public.app_config
-  SET dynamic_seo_keywords = ARRAY[
-    'Why Tinder is slow',
-    'Bypass Bumble queue',
-    'Raya invite hack',
-    'Raya invite alternative',
-    'Instant matching app 2026',
-    'Real world OnlyFans alternative',
-    'Elite social club access',
-    'Gifting economy social app',
-    'Skip dating queue',
-    'Hack dating algorithms',
-    'Proof of intent dating',
-    'Matching fatigue solution',
-    'Tinder alternatifi en hızlı',
-    'Hediye göndererek eşleşme',
-    'Dating sırasını atla'
-  ]
-  WHERE id = (SELECT id FROM public.app_config ORDER BY updated_at DESC LIMIT 1);
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'app_config') THEN
+    UPDATE public.app_config
+    SET dynamic_seo_keywords = ARRAY[
+      'Why Tinder is slow',
+      'Bypass Bumble queue',
+      'Raya invite hack',
+      'Raya invite alternative',
+      'Instant matching app 2026',
+      'Real world OnlyFans alternative',
+      'Elite social club access',
+      'Gifting economy social app',
+      'Skip dating queue',
+      'Hack dating algorithms',
+      'Proof of intent dating',
+      'Matching fatigue solution',
+      'Tinder alternatifi en hızlı',
+      'Hediye göndererek eşleşme',
+      'Dating sırasını atla'
+    ]
+    WHERE id = (SELECT id FROM public.app_config ORDER BY updated_at DESC LIMIT 1);
+  END IF;
 END;
 $$;
 
