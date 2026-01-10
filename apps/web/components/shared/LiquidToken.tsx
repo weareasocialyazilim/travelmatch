@@ -8,7 +8,7 @@ import {
   useSpring,
   AnimatePresence,
 } from 'framer-motion';
-import { Apple, Play, Sparkles, ArrowRight } from 'lucide-react';
+import { Apple, Play, Sparkles, ArrowRight, Download } from 'lucide-react';
 
 interface LiquidTokenProps {
   onInteract?: () => void;
@@ -197,9 +197,9 @@ export const LiquidToken = ({
             <Sparkles size={24} strokeWidth={3} />
           ) : (
             <>
-              <Apple size={20} fill="black" strokeWidth={0} />
-              <span className="text-[8px] font-black tracking-wider">
-                {content.install}
+              <Download size={22} strokeWidth={3} />
+              <span className="text-[7px] font-black tracking-wider">
+                GET APP
               </span>
             </>
           )}
