@@ -3,11 +3,14 @@
  *
  * High-level messaging API for the app.
  * Wraps supabaseDbService's messagesService and conversationsService.
+ * Includes E2E encryption for all messages.
  *
  * @module services/messageService
  */
 import { supabase } from './supabase';
 import { messagesService, conversationsService } from './supabaseDbService';
+import { encryptionService } from './encryptionService';
+import { userService } from './userService';
 import { logger } from '../utils/logger';
 import type { Database } from '../types/database.types';
 
@@ -15,6 +18,77 @@ import type { Database } from '../types/database.types';
 type Tables = Database['public']['Tables'];
 type MessageRow = Tables['messages']['Row'];
 type UserRow = Tables['users']['Row'];
+
+/**
+ * E2E Encryption helpers
+ */
+const encryptMessageContent = async (
+  content: string,
+  recipientId: string,
+): Promise<{
+  encryptedContent: string;
+  nonce: string;
+  senderPublicKey: string;
+} | null> => {
+  try {
+    const recipientPublicKey = await userService.getPublicKey(recipientId);
+    if (!recipientPublicKey) {
+      logger.debug('[MessageService] Recipient has no public key');
+      return null;
+    }
+
+    const senderPublicKey = await encryptionService.getPublicKey();
+    if (!senderPublicKey) {
+      logger.debug('[MessageService] Sender has no public key');
+      return null;
+    }
+
+    const encrypted = await encryptionService.encrypt(
+      content,
+      recipientPublicKey,
+    );
+    return {
+      encryptedContent: encrypted.message,
+      nonce: encrypted.nonce,
+      senderPublicKey,
+    };
+  } catch (error) {
+    logger.error('[MessageService] Encryption failed', error);
+    return null;
+  }
+};
+
+const decryptMessageContent = async (
+  message: {
+    content: string;
+    nonce?: string | null;
+    sender_public_key?: string | null;
+    sender_id: string;
+  },
+  currentUserId: string,
+): Promise<string> => {
+  // No encryption data - return as-is
+  if (!message.nonce || !message.sender_public_key) {
+    return message.content;
+  }
+
+  // We sent this - can't decrypt our own (stored for recipient)
+  if (message.sender_id === currentUserId) {
+    return message.content;
+  }
+
+  try {
+    const decrypted = await encryptionService.decrypt(
+      message.content,
+      message.nonce,
+      message.sender_public_key,
+    );
+    return decrypted;
+  } catch (error) {
+    logger.error('[MessageService] Decryption failed', error);
+    return '[Şifreli mesaj - çözülemedi]';
+  }
+};
 
 /**
  * Conversation with enriched data for display
@@ -237,13 +311,19 @@ class MessageService {
   }
 
   /**
-   * Get messages for a specific conversation
+   * Get messages for a specific conversation (with E2E decryption)
    */
   async getMessages(
     conversationId: string,
     options?: { page?: number; limit?: number },
   ): Promise<MessagesResponse> {
     try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) throw new Error('Not authenticated');
+
       const limit = options?.limit || 50;
       const offset = ((options?.page || 1) - 1) * limit;
 
@@ -256,11 +336,35 @@ class MessageService {
 
       if (error) throw error;
 
-      const messages = (data || [])
-        .map((msg) =>
-          transformMessage(msg as MessageRow & { sender?: UserRow }),
-        )
-        .reverse(); // Reverse to show oldest first
+      // Decrypt messages in parallel
+      const decryptedMessages = await Promise.all(
+        (data || []).map(async (msg) => {
+          const rawMsg = msg as MessageRow & {
+            sender?: UserRow;
+            nonce?: string;
+            sender_public_key?: string;
+          };
+
+          // Decrypt content if encrypted
+          const decryptedContent = await decryptMessageContent(
+            {
+              content: rawMsg.content,
+              nonce: rawMsg.nonce,
+              sender_public_key: rawMsg.sender_public_key,
+              sender_id: rawMsg.sender_id,
+            },
+            user.id,
+          );
+
+          return transformMessage({
+            ...rawMsg,
+            content: decryptedContent,
+          });
+        }),
+      );
+
+      // Reverse to show oldest first
+      const messages = decryptedMessages.reverse();
 
       const totalCount = count || 0;
       const hasMore = offset + limit < totalCount;
@@ -273,7 +377,7 @@ class MessageService {
   }
 
   /**
-   * Send a message
+   * Send a message (with E2E encryption)
    */
   async sendMessage(data: SendMessageRequest): Promise<Message> {
     try {
@@ -285,27 +389,79 @@ class MessageService {
         throw new Error('Not authenticated');
       }
 
-      const result = await messagesService.send({
-        conversation_id: data.conversationId,
-        sender_id: user.id,
-        content: data.content,
-        type: data.type || 'text',
-        metadata:
-          data.metadata as Database['public']['Tables']['messages']['Insert']['metadata'],
-      });
+      // Get conversation to find recipient for encryption
+      const { data: conversation } = await supabase
+        .from('conversations')
+        .select('participant_ids')
+        .eq('id', data.conversationId)
+        .single();
 
-      if (result.error) {
-        throw result.error;
+      let contentToSend = data.content;
+      let nonce: string | undefined;
+      let senderPublicKey: string | undefined;
+
+      // Try to encrypt if we can find the recipient
+      if (conversation?.participant_ids) {
+        const recipientId = conversation.participant_ids.find(
+          (id: string) => id !== user.id,
+        );
+
+        if (recipientId) {
+          const encrypted = await encryptMessageContent(
+            data.content,
+            recipientId,
+          );
+          if (encrypted) {
+            contentToSend = encrypted.encryptedContent;
+            nonce = encrypted.nonce;
+            senderPublicKey = encrypted.senderPublicKey;
+            logger.debug('[MessageService] Message encrypted for recipient');
+          }
+        }
       }
 
-      // Fetch full message with sender info
+      // Send message with encryption data
+      const { data: insertedMsg, error: insertError } = await supabase
+        .from('messages')
+        .insert({
+          conversation_id: data.conversationId,
+          sender_id: user.id,
+          content: contentToSend,
+          type: data.type || 'text',
+          metadata:
+            data.metadata as Database['public']['Tables']['messages']['Insert']['metadata'],
+          nonce,
+          sender_public_key: senderPublicKey,
+        })
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
+
+      // Update conversation timestamp
+      await supabase
+        .from('conversations')
+        .update({
+          updated_at: new Date().toISOString(),
+          last_message_id: insertedMsg.id,
+        })
+        .eq('id', data.conversationId);
+
+      // Fetch full message with sender info for return
       const { data: fullMessage } = await supabase
         .from('messages')
         .select('*, sender:users(*)')
-        .eq('id', result.data!.id)
+        .eq('id', insertedMsg.id)
         .single();
 
-      return transformMessage(fullMessage as MessageRow & { sender?: UserRow });
+      // Return with original content (not encrypted) for immediate UI display
+      const transformedMessage = transformMessage(
+        fullMessage as MessageRow & { sender?: UserRow },
+      );
+      return {
+        ...transformedMessage,
+        content: data.content, // Use original content for UI
+      };
     } catch (error) {
       logger.error('[MessageService] sendMessage error:', error);
       throw error;

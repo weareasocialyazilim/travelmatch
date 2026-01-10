@@ -91,19 +91,24 @@ CREATE TABLE IF NOT EXISTS conversations (
 );
 
 -- ============================================
--- MESSAGES TABLE
+-- MESSAGES TABLE (E2E Encrypted)
 -- ============================================
 CREATE TABLE IF NOT EXISTS messages (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   conversation_id UUID REFERENCES conversations(id) ON DELETE CASCADE NOT NULL,
   sender_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-  content TEXT NOT NULL,
-  nonce TEXT, -- For E2E Encryption
+  content TEXT NOT NULL, -- Encrypted content (Base64) when E2E is active
+  nonce TEXT, -- E2E Encryption nonce (Base64)
+  sender_public_key TEXT, -- Sender's public key for decryption (Base64)
   type TEXT DEFAULT 'text' CHECK (type IN ('text', 'image', 'location', 'system')),
   metadata JSONB,
   read_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
 );
+
+-- Index for faster message lookups
+CREATE INDEX IF NOT EXISTS idx_messages_conversation_id ON messages(conversation_id);
+CREATE INDEX IF NOT EXISTS idx_messages_sender_id ON messages(sender_id);
 
 -- Add foreign key for last_message_id after messages table exists
 ALTER TABLE conversations
