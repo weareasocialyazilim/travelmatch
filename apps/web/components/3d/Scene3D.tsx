@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, ReactNode, useRef, useEffect, useState } from 'react';
+import { Suspense, ReactNode, useRef, useEffect } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import {
   Preload,
@@ -47,7 +47,6 @@ export const Scene3D = ({
   onPerformanceChange,
 }: Scene3DProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isClient, setIsClient] = useState(false);
   const reducedMotion = useReducedMotion();
   const { settings } = useAdaptiveQuality();
 
@@ -74,9 +73,7 @@ export const Scene3D = ({
         }[quality];
 
   // Client-side only rendering
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  const isClient = typeof window !== 'undefined';
 
   // Reduced motion fallback
   if (reducedMotion) {

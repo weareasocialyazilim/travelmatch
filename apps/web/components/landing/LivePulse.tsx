@@ -25,16 +25,86 @@ interface PulseEvent {
 
 // Sample events for demonstration - in production, fetch from Supabase
 const SAMPLE_EVENTS: PulseEvent[] = [
-  { id: '1', city: 'Dubai', action: 'unlocked', moment: 'VIP Desert Safari', timeAgo: '12s', emoji: '🏜️' },
-  { id: '2', city: 'Istanbul', action: 'sent gift', moment: 'Bosphorus Dinner', timeAgo: '28s', emoji: '🌉' },
-  { id: '3', city: 'London', action: 'matched', moment: 'West End Theatre', timeAgo: '45s', emoji: '🎭' },
-  { id: '4', city: 'Tokyo', action: 'unlocked', moment: 'Sakura Moment', timeAgo: '1m', emoji: '🌸' },
-  { id: '5', city: 'Paris', action: 'sent gift', moment: 'Eiffel Sunset', timeAgo: '2m', emoji: '🗼' },
-  { id: '6', city: 'Miami', action: 'matched', moment: 'Yacht Party', timeAgo: '3m', emoji: '🛥️' },
-  { id: '7', city: 'Bali', action: 'unlocked', moment: 'Temple Sunrise', timeAgo: '4m', emoji: '🌅' },
-  { id: '8', city: 'New York', action: 'sent gift', moment: 'Rooftop Cocktails', timeAgo: '5m', emoji: '🍸' },
-  { id: '9', city: 'Berlin', action: 'matched', moment: 'Underground Club', timeAgo: '6m', emoji: '🎵' },
-  { id: '10', city: 'Singapore', action: 'unlocked', moment: 'Marina Bay Night', timeAgo: '7m', emoji: '✨' },
+  {
+    id: '1',
+    city: 'Dubai',
+    action: 'unlocked',
+    moment: 'VIP Desert Safari',
+    timeAgo: '12s',
+    emoji: '🏜️',
+  },
+  {
+    id: '2',
+    city: 'Istanbul',
+    action: 'sent gift',
+    moment: 'Bosphorus Dinner',
+    timeAgo: '28s',
+    emoji: '🌉',
+  },
+  {
+    id: '3',
+    city: 'London',
+    action: 'matched',
+    moment: 'West End Theatre',
+    timeAgo: '45s',
+    emoji: '🎭',
+  },
+  {
+    id: '4',
+    city: 'Tokyo',
+    action: 'unlocked',
+    moment: 'Sakura Moment',
+    timeAgo: '1m',
+    emoji: '🌸',
+  },
+  {
+    id: '5',
+    city: 'Paris',
+    action: 'sent gift',
+    moment: 'Eiffel Sunset',
+    timeAgo: '2m',
+    emoji: '🗼',
+  },
+  {
+    id: '6',
+    city: 'Miami',
+    action: 'matched',
+    moment: 'Yacht Party',
+    timeAgo: '3m',
+    emoji: '🛥️',
+  },
+  {
+    id: '7',
+    city: 'Bali',
+    action: 'unlocked',
+    moment: 'Temple Sunrise',
+    timeAgo: '4m',
+    emoji: '🌅',
+  },
+  {
+    id: '8',
+    city: 'New York',
+    action: 'sent gift',
+    moment: 'Rooftop Cocktails',
+    timeAgo: '5m',
+    emoji: '🍸',
+  },
+  {
+    id: '9',
+    city: 'Berlin',
+    action: 'matched',
+    moment: 'Underground Club',
+    timeAgo: '6m',
+    emoji: '🎵',
+  },
+  {
+    id: '10',
+    city: 'Singapore',
+    action: 'unlocked',
+    moment: 'Marina Bay Night',
+    timeAgo: '7m',
+    emoji: '✨',
+  },
 ];
 
 const TRANSLATIONS = {
@@ -73,10 +143,15 @@ export function LivePulse({ city, lang }: LivePulseProps) {
       if (b.city.toLowerCase() === city.toLowerCase()) return 1;
       return 0;
     });
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Initial data setup on mount/city change
     setEvents(sortedEvents);
   }, [city]);
 
   const currentEvent = events[currentIndex];
+
+  if (!currentEvent) {
+    return null;
+  }
 
   return (
     <>
@@ -94,7 +169,9 @@ export function LivePulse({ city, lang }: LivePulseProps) {
                 <span className="text-pink-400">
                   {t[event.action as keyof typeof t] || event.action}
                 </span>
-                <span className="text-white/60">&quot;{event.moment}&quot;</span>
+                <span className="text-white/60">
+                  &quot;{event.moment}&quot;
+                </span>
                 <span className="text-white/40">({event.timeAgo})</span>
               </span>
             ))}
@@ -118,13 +195,20 @@ export function LivePulse({ city, lang }: LivePulseProps) {
                   <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
                   {t.live}
                 </span>
-                <span className="text-[10px] text-white/40">{currentEvent.timeAgo}</span>
+                <span className="text-[10px] text-white/40">
+                  {currentEvent.timeAgo}
+                </span>
               </div>
               <p className="text-xs text-white/90 truncate">
-                <span className="font-semibold text-pink-400">{currentEvent.city}</span>
+                <span className="font-semibold text-pink-400">
+                  {currentEvent.city}
+                </span>
                 {' - '}
-                {t[currentEvent.action as keyof typeof t] || currentEvent.action}{' '}
-                <span className="text-white/70">&quot;{currentEvent.moment}&quot;</span>
+                {t[currentEvent.action as keyof typeof t] ||
+                  currentEvent.action}{' '}
+                <span className="text-white/70">
+                  &quot;{currentEvent.moment}&quot;
+                </span>
               </p>
             </div>
           </div>

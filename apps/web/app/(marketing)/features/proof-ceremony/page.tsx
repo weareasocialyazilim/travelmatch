@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { CeremonyShowcase } from '@/components/ceremony/CeremonyShowcase';
 import { TrustBadgeDisplay } from '@/components/ceremony/TrustBadgeDisplay';
 
@@ -30,12 +31,12 @@ export default function ProofCeremonyPage() {
             dönüştürdük.
           </p>
           <div className="flex gap-4 justify-center">
-            <a
+            <Link
               href="/download"
               className="px-8 py-4 bg-amber-500 text-white font-semibold rounded-full hover:bg-amber-600 transition"
             >
               Hemen Dene
-            </a>
+            </Link>
             <a
               href="#features"
               className="px-8 py-4 border-2 border-gray-300 font-semibold rounded-full hover:border-gray-400 transition"
@@ -195,18 +196,18 @@ export default function ProofCeremonyPage() {
             uygulamayı indir ve farkı yaşa.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
-            <a
+            <Link
               href="/download"
               className="px-8 py-4 bg-white text-amber-600 font-semibold rounded-full hover:bg-gray-100 transition shadow-lg"
             >
               App Store
-            </a>
-            <a
+            </Link>
+            <Link
               href="/download"
               className="px-8 py-4 bg-white text-amber-600 font-semibold rounded-full hover:bg-gray-100 transition shadow-lg"
             >
               Google Play
-            </a>
+            </Link>
           </div>
         </div>
       </section>

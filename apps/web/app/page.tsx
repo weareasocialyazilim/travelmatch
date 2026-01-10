@@ -554,7 +554,8 @@ const TheStash = ({
       </div>
       <div className="container mx-auto px-6 mt-20">
         <h3 className="text-2xl font-syne font-bold text-white/40 mb-8 tracking-widest">
-          /// COMING SOON
+          {/* COMING SOON */}
+          {'/// COMING SOON'}
         </h3>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           <LockedDrop

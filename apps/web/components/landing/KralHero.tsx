@@ -45,9 +45,16 @@ const INTENT_ICONS: Record<string, typeof Heart> = {
   'direct-connect': Zap,
 };
 
-export function KralHero({ city, citySlug, intent, lang, dictionary }: KralHeroProps) {
+export function KralHero({
+  city,
+  citySlug,
+  intent,
+  lang,
+  dictionary,
+}: KralHeroProps) {
   const IntentIcon = INTENT_ICONS[intent] || Sparkles;
-  const intentTitle = dictionary.intents[intent] || dictionary.intents['dating-match'];
+  const intentTitle =
+    dictionary.intents[intent] || dictionary.intents['dating-match'];
   const deepLink = `travelmatch://explore?city=${citySlug}&intent=${intent}&lang=${lang}&utm_source=hero`;
 
   return (
@@ -67,7 +74,9 @@ export function KralHero({ city, citySlug, intent, lang, dictionary }: KralHeroP
           className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2 mb-8"
         >
           <IntentIcon className="w-4 h-4 text-pink-400" />
-          <span className="text-sm font-medium text-white/80">{intentTitle}</span>
+          <span className="text-sm font-medium text-white/80">
+            {intentTitle}
+          </span>
         </motion.div>
 
         {/* Main Headline */}
@@ -94,14 +103,15 @@ export function KralHero({ city, citySlug, intent, lang, dictionary }: KralHeroP
         >
           {lang === 'tr' ? (
             <>
-              <span className="text-pink-400 font-semibold">{city}</span> konumunda anlık momentların kilidini aç.
-              Hediyeleşme ekonomisiyle bekleme sırasını atla.
+              <span className="text-pink-400 font-semibold">{city}</span>{' '}
+              konumunda anlık momentların kilidini aç. Hediyeleşme ekonomisiyle
+              bekleme sırasını atla.
             </>
           ) : (
             <>
               Unlock instant moments in{' '}
-              <span className="text-pink-400 font-semibold">{city}</span>.
-              Skip the dating queue with our gifting economy.
+              <span className="text-pink-400 font-semibold">{city}</span>. Skip
+              the dating queue with our gifting economy.
             </>
           )}
         </motion.p>
@@ -149,7 +159,7 @@ export function KralHero({ city, citySlug, intent, lang, dictionary }: KralHeroP
             <div className="flex items-center gap-2 text-sm">
               <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
               <span className="text-green-400 font-mono">
-                {Math.floor(Math.random() * 50 + 20)} {lang === 'tr' ? 'aktif moment' : 'active moments'}
+                42 {lang === 'tr' ? 'aktif moment' : 'active moments'}
               </span>
             </div>
           </div>
@@ -184,11 +194,15 @@ export function KralHero({ city, citySlug, intent, lang, dictionary }: KralHeroP
         >
           <div className="flex items-center gap-2">
             <Lock className="w-3 h-3" />
-            <span>{lang === 'tr' ? 'Doğrulanmış Profiller' : 'Verified Profiles'}</span>
+            <span>
+              {lang === 'tr' ? 'Doğrulanmış Profiller' : 'Verified Profiles'}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <Zap className="w-3 h-3" />
-            <span>{lang === 'tr' ? '60sn Altı Eşleşme' : 'Under 60s Matching'}</span>
+            <span>
+              {lang === 'tr' ? '60sn Altı Eşleşme' : 'Under 60s Matching'}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <Sparkles className="w-3 h-3" />

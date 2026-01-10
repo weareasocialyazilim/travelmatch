@@ -460,7 +460,7 @@ export class FPSMonitor {
   }
 }
 
-export default {
+const threeUtils = {
   LIGHTING_PRESETS,
   BRAND_COLORS,
   CAMERA_PRESETS,
@@ -474,3 +474,5 @@ export default {
   springPhysics,
   FPSMonitor,
 };
+
+export default threeUtils;

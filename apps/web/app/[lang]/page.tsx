@@ -35,20 +35,29 @@ const FEATURED_CITIES: Record<string, string[]> = {
   ko: ['seoul', 'tokyo', 'singapore', 'paris', 'london', 'new-york'],
 };
 
-const FEATURED_INTENTS = ['dating-match', 'love-fortune', 'gifting-moment', 'travel-match'];
+const FEATURED_INTENTS = [
+  'dating-match',
+  'love-fortune',
+  'gifting-moment',
+  'travel-match',
+];
 
 // Translations
-const TRANSLATIONS: Record<string, {
-  hero: string;
-  subtitle: string;
-  explore: string;
-  popularCities: string;
-  popularIntents: string;
-  cta: string;
-}> = {
+const TRANSLATIONS: Record<
+  string,
+  {
+    hero: string;
+    subtitle: string;
+    explore: string;
+    popularCities: string;
+    popularIntents: string;
+    cta: string;
+  }
+> = {
   en: {
     hero: 'Hack the Queue',
-    subtitle: 'Unlock exclusive moments through our gifting economy. Match instantly.',
+    subtitle:
+      'Unlock exclusive moments through our gifting economy. Match instantly.',
     explore: 'Explore',
     popularCities: 'Popular Cities',
     popularIntents: 'Trending Categories',
@@ -56,7 +65,8 @@ const TRANSLATIONS: Record<string, {
   },
   tr: {
     hero: 'Sırayı Hackle',
-    subtitle: 'Hediyeleşme ekonomisiyle özel momentların kilidini aç. Anında eşleş.',
+    subtitle:
+      'Hediyeleşme ekonomisiyle özel momentların kilidini aç. Anında eşleş.',
     explore: 'Keşfet',
     popularCities: 'Popüler Şehirler',
     popularIntents: 'Trend Kategoriler',
@@ -80,7 +90,8 @@ const TRANSLATIONS: Record<string, {
   },
   fr: {
     hero: 'Passe la File',
-    subtitle: 'Débloque des moments exclusifs grâce à notre économie de cadeaux.',
+    subtitle:
+      'Débloque des moments exclusifs grâce à notre économie de cadeaux.',
     explore: 'Explorer',
     popularCities: 'Villes Populaires',
     popularIntents: 'Catégories Tendance',
@@ -88,7 +99,8 @@ const TRANSLATIONS: Record<string, {
   },
   es: {
     hero: 'Salta la Cola',
-    subtitle: 'Desbloquea momentos exclusivos a través de nuestra economía de regalos.',
+    subtitle:
+      'Desbloquea momentos exclusivos a través de nuestra economía de regalos.',
     explore: 'Explorar',
     popularCities: 'Ciudades Populares',
     popularIntents: 'Categorías Trending',
@@ -104,7 +116,8 @@ const TRANSLATIONS: Record<string, {
   },
   it: {
     hero: 'Salta la Coda',
-    subtitle: 'Sblocca momenti esclusivi attraverso la nostra economia dei regali.',
+    subtitle:
+      'Sblocca momenti esclusivi attraverso la nostra economia dei regali.',
     explore: 'Esplora',
     popularCities: 'Città Popolari',
     popularIntents: 'Categorie di Tendenza',
@@ -112,7 +125,8 @@ const TRANSLATIONS: Record<string, {
   },
   pt: {
     hero: 'Pule a Fila',
-    subtitle: 'Desbloqueie momentos exclusivos através da nossa economia de presentes.',
+    subtitle:
+      'Desbloqueie momentos exclusivos através da nossa economia de presentes.',
     explore: 'Explorar',
     popularCities: 'Cidades Populares',
     popularIntents: 'Categorias em Alta',
@@ -120,7 +134,8 @@ const TRANSLATIONS: Record<string, {
   },
   ja: {
     hero: '列をスキップ',
-    subtitle: 'ギフトエコノミーで限定モーメントをアンロック。即座にマッチング。',
+    subtitle:
+      'ギフトエコノミーで限定モーメントをアンロック。即座にマッチング。',
     explore: '探索',
     popularCities: '人気の都市',
     popularIntents: 'トレンドカテゴリ',
@@ -140,7 +155,9 @@ export async function generateStaticParams() {
   return SUPPORTED_LANGUAGES.map((lang) => ({ lang }));
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { lang } = await params;
 
   if (!SUPPORTED_LANGUAGES.includes(lang as SupportedLanguage)) {
@@ -165,9 +182,13 @@ export default async function LanguageHubPage({ params }: PageProps) {
     notFound();
   }
 
-  const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
+  const t = TRANSLATIONS[lang] ?? TRANSLATIONS.en;
   const dict = TM_STRATEGY.getDictionary(lang);
-  const cities = FEATURED_CITIES[lang] || FEATURED_CITIES.en;
+  const cities = FEATURED_CITIES[lang] ?? FEATURED_CITIES.en;
+
+  if (!t || !cities) {
+    notFound();
+  }
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -197,7 +218,9 @@ export default async function LanguageHubPage({ params }: PageProps) {
 
       {/* Popular Cities Grid */}
       <section className="container mx-auto px-4 py-16">
-        <h2 className="text-2xl font-bold mb-8 text-center">{t.popularCities}</h2>
+        <h2 className="text-2xl font-bold mb-8 text-center">
+          {t.popularCities}
+        </h2>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {cities.map((city) => (
@@ -219,7 +242,9 @@ export default async function LanguageHubPage({ params }: PageProps) {
 
       {/* Popular Intents */}
       <section className="container mx-auto px-4 py-16">
-        <h2 className="text-2xl font-bold mb-8 text-center">{t.popularIntents}</h2>
+        <h2 className="text-2xl font-bold mb-8 text-center">
+          {t.popularIntents}
+        </h2>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {FEATURED_INTENTS.map((intent) => (
@@ -248,9 +273,7 @@ export default async function LanguageHubPage({ params }: PageProps) {
           <h2 className="text-3xl font-bold mb-4">
             {lang === 'tr' ? 'Şimdi Başla' : 'Start Now'}
           </h2>
-          <p className="text-white/60 mb-8">
-            {dict.descriptions.default}
-          </p>
+          <p className="text-white/60 mb-8">{dict.descriptions.default}</p>
           <Link
             href="/download"
             className="inline-flex items-center gap-2 bg-white text-black font-bold px-8 py-4 rounded-full hover:bg-white/90 transition-colors"

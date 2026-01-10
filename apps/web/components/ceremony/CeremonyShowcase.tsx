@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { FeatureCard } from './FeatureCard';
 import { InteractiveDemo } from './InteractiveDemo';
@@ -67,7 +68,7 @@ export function CeremonyShowcase() {
           viewport={{ once: true }}
           className="text-center mt-16"
         >
-          <a
+          <Link
             href="/download"
             className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-pink-500 text-white font-semibold rounded-full hover:shadow-lg hover:shadow-amber-500/25 transition-all"
           >
@@ -85,7 +86,7 @@ export function CeremonyShowcase() {
                 d="M17 8l4 4m0 0l-4 4m4-4H3"
               />
             </svg>
-          </a>
+          </Link>
         </motion.div>
       </div>
     </section>

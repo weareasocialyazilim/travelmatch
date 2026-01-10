@@ -103,6 +103,7 @@ export const NoiseOverlay = memo(
         );
         cancelAnimationFrame(animationId);
       };
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- grainSize is stable and used in grain callback
     }, [animate, grain]);
 
     if (!isVisible) return null;
