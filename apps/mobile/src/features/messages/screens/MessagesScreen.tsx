@@ -58,8 +58,8 @@ const MessagesScreen: React.FC = () => {
     refreshConversations,
   } = useMessages();
 
-  // Realtime context
-  const { isUserOnline } = useRealtime();
+  // Realtime context - online status removed for privacy
+  const _realtime = useRealtime();
 
   // Track typing users
   const [typingConversations, setTypingConversations] = useState<Set<string>>(
@@ -189,9 +189,6 @@ const MessagesScreen: React.FC = () => {
 
   const renderChatItem = useCallback(
     ({ item }: { item: Conversation }) => {
-      const isOnline = item.participantId
-        ? isUserOnline(item.participantId)
-        : false;
       const isTyping = typingConversations.has(item.id);
 
       return (
@@ -214,7 +211,6 @@ const MessagesScreen: React.FC = () => {
               style={styles.avatar}
               accessibilityLabel={`${item.participantName || 'User'}'s avatar`}
             />
-            {isOnline && <View style={styles.onlineIndicator} />}
           </View>
 
           {/* Content */}
@@ -272,7 +268,7 @@ const MessagesScreen: React.FC = () => {
         </TouchableOpacity>
       );
     },
-    [handleChatPress, isUserOnline, typingConversations],
+    [handleChatPress, typingConversations],
   );
 
   const renderEmptyState = useCallback(
@@ -335,9 +331,7 @@ const MessagesScreen: React.FC = () => {
   return (
     <NetworkGuard
       offlineMessage={
-        conversations.length > 0
-          ? t('messages.cached')
-          : t('messages.offline')
+        conversations.length > 0 ? t('messages.cached') : t('messages.offline')
       }
       onRetry={refreshConversations}
     >

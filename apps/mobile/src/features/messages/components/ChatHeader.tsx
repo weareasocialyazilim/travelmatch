@@ -54,7 +54,6 @@ interface ChatHeaderProps {
     isVerified?: boolean | null;
   };
   linkedMoment?: LinkedMoment;
-  isOnline?: boolean;
   onBack: () => void;
   onUserPress: () => void;
   onMomentPress: () => void;
@@ -65,7 +64,6 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   conversationId,
   otherUser,
   linkedMoment,
-  isOnline = true,
   onBack,
   onUserPress,
   onMomentPress,
@@ -201,7 +199,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
 
   const getStatusText = () => {
     if (isTyping) return null; // Will show typing indicator instead
-    return isOnline ? 'Şu an aktif' : 'Çevrimdışı';
+    return null; // Online status not shown for privacy
   };
 
   const HeaderContent = () => (
@@ -250,18 +248,8 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                 />
               )}
             </View>
-            <View style={styles.statusRow}>
-              <View
-                style={[
-                  styles.statusDot,
-                  {
-                    backgroundColor: isOnline
-                      ? COLORS.success
-                      : COLORS.text.muted,
-                  },
-                ]}
-              />
-              {isTyping ? (
+            {isTyping && (
+              <View style={styles.statusRow}>
                 <Animated.View
                   entering={FadeIn.duration(200)}
                   exiting={FadeOut.duration(200)}
@@ -274,10 +262,8 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                     <Animated.View style={[styles.typingDot, dot3Style]} />
                   </View>
                 </Animated.View>
-              ) : (
-                <Text style={styles.statusText}>{getStatusText()}</Text>
-              )}
-            </View>
+              </View>
+            )}
           </View>
         </TouchableOpacity>
 

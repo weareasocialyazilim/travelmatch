@@ -50,8 +50,8 @@ export const useInbox = (options: UseInboxOptions = {}): UseInboxReturn => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Realtime context
-  const { isUserOnline } = useRealtime();
+  // Realtime context - online status removed for privacy
+  const _realtime = useRealtime();
 
   // Track typing users
   const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set());
@@ -108,7 +108,6 @@ export const useInbox = (options: UseInboxOptions = {}): UseInboxReturn => {
             name: conv.participantName || 'Unknown',
             avatar: conv.participantAvatar || '',
             isVerified: conv.participantVerified || false,
-            isOnline: false, // Will be updated by realtime
           },
           moment: conv.momentId
             ? {
@@ -257,10 +256,6 @@ export const useInbox = (options: UseInboxOptions = {}): UseInboxReturn => {
   const chatsWithTyping = chats.map((chat) => ({
     ...chat,
     isTyping: typingUsers.has(chat.id),
-    user: {
-      ...chat.user,
-      isOnline: chat.user.id ? isUserOnline(chat.user.id) : false,
-    },
   }));
 
   // Computed values

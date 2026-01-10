@@ -66,7 +66,6 @@ export interface UserPreferences {
 
   // Privacy
   showLocation: boolean;
-  showLastActive: boolean;
   allowMessages: 'everyone' | 'followers' | 'none';
 
   // Display
@@ -481,7 +480,6 @@ export const userService = {
       marketingEmails: notifPrefs.marketing ?? false,
 
       showLocation: privacySettings.showLocation ?? true,
-      showLastActive: privacySettings.showLastSeen ?? true,
       allowMessages: privacySettings.allowMessages ?? 'everyone',
 
       language: typedUserData.languages?.[0] || 'en',
@@ -528,8 +526,6 @@ export const userService = {
 
     if (data.showLocation !== undefined)
       currentPrivacy.showLocation = data.showLocation;
-    if (data.showLastActive !== undefined)
-      currentPrivacy.showLastSeen = data.showLastActive;
     if (data.allowMessages !== undefined)
       currentPrivacy.allowMessages = data.allowMessages;
     if (data.timezone !== undefined) currentPrivacy.timezone = data.timezone;
@@ -562,7 +558,6 @@ export const userService = {
       marketingEmails: newNotif.marketing ?? false,
 
       showLocation: newPrivacy.showLocation ?? true,
-      showLastActive: newPrivacy.showLastSeen ?? true,
       allowMessages: newPrivacy.allowMessages ?? 'everyone',
 
       language: typedUpdatedUser?.languages?.[0] || 'en',

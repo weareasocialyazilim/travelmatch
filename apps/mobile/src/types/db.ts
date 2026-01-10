@@ -72,7 +72,6 @@ export type DbRequestUpdate = Tables['requests']['Update'];
 export interface User extends DbUser {
   // Computed display fields
   displayName?: string;
-  isOnline?: boolean;
 
   // Legacy field mappings (for backward compatibility)
   name?: string; // Maps to full_name
@@ -234,7 +233,6 @@ export interface NotificationPreferences {
  */
 export interface PrivacySettings {
   showLocation?: boolean;
-  showLastSeen?: boolean;
   allowMessages?: 'everyone' | 'followers' | 'none';
   timezone?: string;
   autoAcceptRequests?: boolean;

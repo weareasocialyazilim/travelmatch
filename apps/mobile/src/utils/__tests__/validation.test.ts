@@ -584,7 +584,6 @@ describe('validation.ts', () => {
       const result = privacySettingsSchema.safeParse({
         profileVisibility: 'public',
         showLocation: true,
-        showOnlineStatus: true,
         allowMessagesFrom: 'everyone',
         showActivityStatus: true,
       });
@@ -595,7 +594,6 @@ describe('validation.ts', () => {
       const result = privacySettingsSchema.safeParse({
         profileVisibility: 'invalid',
         showLocation: true,
-        showOnlineStatus: true,
         allowMessagesFrom: 'everyone',
         showActivityStatus: true,
       });
