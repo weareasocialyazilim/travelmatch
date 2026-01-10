@@ -1,14 +1,20 @@
+"""
+TravelMatch ML Service
+
+AI-powered verification and analysis for the gift experience platform.
+"""
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Literal
 import logging
 from datetime import datetime
 
 from app.core.config import settings
 from app.core.redis_client import get_redis
-from app.models.match_scoring import MatchScoringModel
-from app.models.recommendations import RecommendationModel
+from app.models.offer_analysis import OfferAnalysisModel, FraudAnalysisModel
+from app.models.recommendations import MomentSuggestionModel, ContentModerationModel
 from app.models.smart_notifications import SmartNotificationModel
 
 # Configure logging
@@ -21,8 +27,8 @@ logger = logging.getLogger(__name__)
 # Initialize FastAPI app
 app = FastAPI(
     title="TravelMatch ML Service",
-    description="Machine Learning inference service for TravelMatch platform",
-    version="1.0.0",
+    description="AI-powered gift verification and analysis for TravelMatch platform",
+    version="2.0.0",
 )
 
 # CORS middleware
@@ -38,33 +44,71 @@ app.add_middleware(
 models: Dict = {}
 
 
+# ═══════════════════════════════════════════════════════════════════
 # Request/Response Models
-class MatchScoreRequest(BaseModel):
-    user_a_id: str = Field(..., description="First user UUID")
-    user_b_id: str = Field(..., description="Second user UUID")
-    context: Optional[Dict] = Field(default=None, description="Additional context")
+# ═══════════════════════════════════════════════════════════════════
+
+# Gift Offer Analysis
+class OfferAnalysisRequest(BaseModel):
+    offer_amount: float = Field(..., description="Amount offered (TRY)")
+    requested_amount: float = Field(..., description="Amount requested for moment (TRY)")
+    sender_tier: Literal["free", "starter", "pro", "platinum"] = Field(..., description="Subscriber tier")
+    sender_history: Optional[Dict] = Field(default=None, description="Sender's gift history")
 
 
-class MatchScoreResponse(BaseModel):
-    score: float = Field(..., ge=0.0, le=1.0, description="Match score (0-1)")
-    confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence (0-1)")
-    factors: Dict[str, float] = Field(..., description="Score breakdown")
-    latency_ms: int = Field(..., description="Inference latency in milliseconds")
+class OfferAnalysisResponse(BaseModel):
+    priority: str = Field(..., description="Notification priority (low/normal/high/critical)")
+    offerScore: float = Field(..., description="Offer quality score (0-100)")
+    valueRatio: float = Field(..., description="Offer to requested ratio")
+    notificationSound: str = Field(..., description="Sound to use for notification")
+    recommendation: str = Field(..., description="Recommendation message")
+    isIrresistible: bool = Field(..., description="Whether this is an irresistible offer")
 
 
-class RecommendationRequest(BaseModel):
+# Fraud Analysis
+class FraudAnalysisRequest(BaseModel):
     user_id: str = Field(..., description="User UUID")
-    limit: int = Field(10, ge=1, le=100, description="Number of recommendations")
-    filters: Optional[Dict] = Field(default=None, description="Filter criteria")
+    action_type: str = Field(..., description="Action type (proof_submission/withdrawal/account_creation)")
+    metadata: Optional[Dict] = Field(default=None, description="Additional context")
 
 
-class RecommendationResponse(BaseModel):
-    recommendations: List[Dict] = Field(..., description="Recommended destinations")
+class FraudAnalysisResponse(BaseModel):
+    riskScore: int = Field(..., description="Risk score (0-100)")
+    riskLevel: str = Field(..., description="Risk level (low/medium/high/critical)")
+    flags: List[str] = Field(..., description="Detected risk flags")
+    recommendation: str = Field(..., description="Recommended action (approve/review/reject)")
 
 
+# Moment Suggestions
+class MomentSuggestionRequest(BaseModel):
+    user_id: str = Field(..., description="User UUID")
+    limit: int = Field(10, ge=1, le=50, description="Number of suggestions")
+    filters: Optional[Dict] = Field(default=None, description="Filter criteria (budget, categories)")
+
+
+class MomentSuggestionResponse(BaseModel):
+    suggestions: List[Dict] = Field(..., description="Suggested moments")
+
+
+# Content Moderation
+class ContentModerationRequest(BaseModel):
+    content_type: Literal["moment", "message", "proof", "profile"] = Field(..., description="Type of content")
+    content_url: Optional[str] = Field(default=None, description="URL of image/video content")
+    text: Optional[str] = Field(default=None, description="Text content")
+    user_id: Optional[str] = Field(default=None, description="User who created content")
+
+
+class ContentModerationResponse(BaseModel):
+    approved: bool = Field(..., description="Whether content is approved")
+    flags: List[str] = Field(..., description="Detected issues")
+    confidence: float = Field(..., description="Confidence score (0-1)")
+    requiresManualReview: bool = Field(..., description="Whether manual review is needed")
+
+
+# Smart Notifications
 class SmartNotificationRequest(BaseModel):
     user_id: str = Field(..., description="User UUID")
-    notification_type: str = Field(..., description="Notification type")
+    notification_type: str = Field(..., description="Type (gift_received/proof_approved/funds_released)")
     urgency: str = Field("medium", description="Urgency level (low/medium/high)")
 
 
@@ -75,136 +119,184 @@ class SmartNotificationResponse(BaseModel):
     reason: str = Field(..., description="Explanation")
 
 
-# Startup event: Load models
+# ═══════════════════════════════════════════════════════════════════
+# Lifecycle Events
+# ═══════════════════════════════════════════════════════════════════
+
 @app.on_event("startup")
 async def load_models():
     """Load ML models into memory on startup"""
     logger.info("Loading ML models...")
-    
+
     try:
         # Initialize models
-        models["match_scoring"] = MatchScoringModel()
-        models["recommendations"] = RecommendationModel()
+        models["offer_analysis"] = OfferAnalysisModel()
+        models["fraud_analysis"] = FraudAnalysisModel()
+        models["moment_suggestions"] = MomentSuggestionModel()
+        models["content_moderation"] = ContentModerationModel()
         models["smart_notifications"] = SmartNotificationModel()
-        
+
         # Load model weights
-        await models["match_scoring"].load()
-        await models["recommendations"].load()
+        await models["offer_analysis"].load()
+        await models["fraud_analysis"].load()
+        await models["moment_suggestions"].load()
+        await models["content_moderation"].load()
         await models["smart_notifications"].load()
-        
+
         logger.info("✓ All models loaded successfully")
     except Exception as e:
         logger.error(f"Failed to load models: {e}")
         raise
 
 
-# Shutdown event: Cleanup
 @app.on_event("shutdown")
 async def shutdown():
     """Cleanup resources on shutdown"""
     logger.info("Shutting down ML service...")
-    
+
     # Close Redis connections
     redis = get_redis()
     if redis:
         await redis.close()
-    
+
     logger.info("✓ Shutdown complete")
 
 
-# Health check endpoint
+# ═══════════════════════════════════════════════════════════════════
+# API Endpoints
+# ═══════════════════════════════════════════════════════════════════
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
     redis = get_redis()
     redis_connected = await redis.ping() if redis else False
-    
+
     return {
         "status": "healthy",
         "timestamp": datetime.now().isoformat(),
         "models_loaded": len(models) > 0,
         "redis_connected": redis_connected,
-        "gpu_available": False,  # TODO: Check GPU availability
+        "gpu_available": False,
     }
 
 
-# Match Scoring endpoint
-@app.post("/match/score", response_model=MatchScoreResponse)
-async def score_match(request: MatchScoreRequest):
+@app.post("/offer/analyze", response_model=OfferAnalysisResponse)
+async def analyze_offer(request: OfferAnalysisRequest):
     """
-    Score user compatibility for travel matching
-    
-    Returns a score between 0-1 indicating how well two users match.
+    Analyze a gift offer for "Reddedilemez Teklif" (Irresistible Offer) algorithm.
+
+    Premium subscribers offering above requested amount get priority notifications.
     """
-    start_time = datetime.now()
-    
     try:
-        model = models.get("match_scoring")
+        model = models.get("offer_analysis")
         if not model:
-            raise HTTPException(status_code=503, detail="Match scoring model not loaded")
-        
-        # Run inference
-        result = await model.predict(
-            user_a_id=request.user_a_id,
-            user_b_id=request.user_b_id,
-            context=request.context or {},
+            raise HTTPException(status_code=503, detail="Offer analysis model not loaded")
+
+        result = await model.analyze_offer(
+            offer_amount=request.offer_amount,
+            requested_amount=request.requested_amount,
+            sender_tier=request.sender_tier,
+            sender_history=request.sender_history,
         )
-        
-        latency_ms = int((datetime.now() - start_time).total_seconds() * 1000)
-        
-        return MatchScoreResponse(
-            score=result["score"],
-            confidence=result["confidence"],
-            factors=result["factors"],
-            latency_ms=latency_ms,
-        )
+
+        return OfferAnalysisResponse(**result)
     except Exception as e:
-        logger.error(f"Match scoring error: {e}")
+        logger.error(f"Offer analysis error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# Recommendations endpoint
-@app.post("/recommend/destinations", response_model=RecommendationResponse)
-async def recommend_destinations(request: RecommendationRequest):
+@app.post("/fraud/analyze", response_model=FraudAnalysisResponse)
+async def analyze_fraud(request: FraudAnalysisRequest):
     """
-    Get personalized destination recommendations for a user
+    Analyze fraud risk for a user action.
+
+    Checks for suspicious patterns in proof submissions, withdrawals, etc.
     """
     try:
-        model = models.get("recommendations")
+        model = models.get("fraud_analysis")
         if not model:
-            raise HTTPException(status_code=503, detail="Recommendation model not loaded")
-        
-        # Run inference
-        result = await model.predict(
+            raise HTTPException(status_code=503, detail="Fraud analysis model not loaded")
+
+        result = await model.analyze_risk(
+            user_id=request.user_id,
+            action_type=request.action_type,
+            metadata=request.metadata,
+        )
+
+        return FraudAnalysisResponse(**result)
+    except Exception as e:
+        logger.error(f"Fraud analysis error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/moments/suggest", response_model=MomentSuggestionResponse)
+async def suggest_moments(request: MomentSuggestionRequest):
+    """
+    Get personalized moment suggestions for a user.
+
+    Returns moments based on user preferences and past behavior.
+    """
+    try:
+        model = models.get("moment_suggestions")
+        if not model:
+            raise HTTPException(status_code=503, detail="Moment suggestion model not loaded")
+
+        result = await model.suggest_moments(
             user_id=request.user_id,
             limit=request.limit,
-            filters=request.filters or {},
+            filters=request.filters,
         )
-        
-        return RecommendationResponse(recommendations=result)
+
+        return MomentSuggestionResponse(suggestions=result)
     except Exception as e:
-        logger.error(f"Recommendation error: {e}")
+        logger.error(f"Moment suggestion error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# Smart Notifications endpoint
+@app.post("/content/moderate", response_model=ContentModerationResponse)
+async def moderate_content(request: ContentModerationRequest):
+    """
+    Moderate user-generated content.
+
+    Checks moments, messages, and proofs for policy violations.
+    """
+    try:
+        model = models.get("content_moderation")
+        if not model:
+            raise HTTPException(status_code=503, detail="Content moderation model not loaded")
+
+        result = await model.moderate(
+            content_type=request.content_type,
+            content_url=request.content_url,
+            text=request.text,
+            user_id=request.user_id,
+        )
+
+        return ContentModerationResponse(**result)
+    except Exception as e:
+        logger.error(f"Content moderation error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/notifications/optimize", response_model=SmartNotificationResponse)
 async def optimize_notification(request: SmartNotificationRequest):
     """
-    Predict optimal timing and channel for sending notifications
+    Predict optimal timing and channel for sending notifications.
+
+    Analyzes user activity patterns to maximize engagement.
     """
     try:
         model = models.get("smart_notifications")
         if not model:
             raise HTTPException(status_code=503, detail="Smart notification model not loaded")
-        
-        # Run inference
+
         result = await model.predict(
             user_id=request.user_id,
             notification_type=request.notification_type,
             urgency=request.urgency,
         )
-        
+
         return SmartNotificationResponse(
             send_at=result["send_at"],
             channel=result["channel"],
@@ -216,17 +308,19 @@ async def optimize_notification(request: SmartNotificationRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# Root endpoint
 @app.get("/")
 async def root():
     """API information"""
     return {
         "service": "TravelMatch ML Service",
-        "version": "1.0.0",
+        "version": "2.0.0",
+        "description": "AI-powered gift verification and analysis",
         "endpoints": {
             "health": "/health",
-            "match_scoring": "/match/score",
-            "recommendations": "/recommend/destinations",
+            "offer_analysis": "/offer/analyze",
+            "fraud_analysis": "/fraud/analyze",
+            "moment_suggestions": "/moments/suggest",
+            "content_moderation": "/content/moderate",
             "smart_notifications": "/notifications/optimize",
         },
     }
@@ -234,7 +328,7 @@ async def root():
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",

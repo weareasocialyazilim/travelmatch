@@ -44,12 +44,12 @@ import {
 } from 'recharts';
 import { formatDate } from '@/lib/utils';
 
-// Mock data
+// Mock data - Gift Platform AI Stats
 const moderationStats = {
   totalProcessed: 45678,
-  autoApproved: 38450,
-  autoRejected: 1234,
-  manualReview: 5994,
+  proofsVerified: 38450,
+  proofsRejected: 1234,
+  pendingReview: 5994,
   accuracy: 97.8,
 };
 
@@ -69,15 +69,19 @@ const churnPredictions = [
     user: 'Elif K.',
     risk: 'high',
     probability: 85,
-    factors: ['7 gündür inaktif', 'Son ayda 0 eşleşme', 'Premium iptal edildi'],
-    suggested_action: 'Kişiselleştirilmiş e-posta gönder',
+    factors: [
+      '7 gündür inaktif',
+      'Son ayda 0 hediye gönderdi',
+      'Premium iptal edildi',
+    ],
+    suggested_action: 'Hediye kampanyası e-postası gönder',
   },
   {
     id: '2',
     user: 'Mehmet Y.',
     risk: 'medium',
     probability: 62,
-    factors: ['Aktivite düştü %50', 'Hiç moment paylaşmadı'],
+    factors: ['Aktivite düştü %50', 'Hiç moment oluşturmadı'],
     suggested_action: 'Push bildirim ile hatırlat',
   },
   {
@@ -85,46 +89,62 @@ const churnPredictions = [
     user: 'Ayşe B.',
     risk: 'medium',
     probability: 58,
-    factors: ['Son giriş 5 gün önce', 'Mesajlara cevap vermiyor'],
-    suggested_action: 'In-app mesaj gönder',
+    factors: ['Bekleyen hediye kanıtı var', 'Son giriş 5 gün önce'],
+    suggested_action: 'Kanıt yükleme hatırlatıcısı gönder',
   },
 ];
 
 const ltvPredictions = [
-  { segment: 'Premium Aktif', users: 12400, avgLTV: 850, trend: 'up' },
-  { segment: 'Premium Pasif', users: 3200, avgLTV: 320, trend: 'down' },
-  { segment: 'Ücretsiz Aktif', users: 45000, avgLTV: 45, trend: 'up' },
-  { segment: 'Ücretsiz Pasif', users: 28000, avgLTV: 5, trend: 'stable' },
+  { segment: 'Platinum Gönderici', users: 2400, avgLTV: 2850, trend: 'up' },
+  { segment: 'Pro Gönderici', users: 8200, avgLTV: 920, trend: 'up' },
+  { segment: 'Starter Gönderici', users: 15000, avgLTV: 245, trend: 'stable' },
+  { segment: 'Ücretsiz Kullanıcı', users: 45000, avgLTV: 35, trend: 'up' },
 ];
 
 const anomalies = [
   {
     id: '1',
-    type: 'traffic_spike',
-    severity: 'warning',
-    message: 'Olağandışı trafik artışı tespit edildi',
-    details: 'Son 1 saatte %250 artış',
+    type: 'proof_fraud',
+    severity: 'critical',
+    message: 'Sahte kanıt tespit edildi',
+    details: '3 kullanıcı aynı fotoğrafı farklı momentler için yükledi',
     detected_at: '2024-12-18T14:30:00Z',
   },
   {
     id: '2',
     type: 'fraud_pattern',
     severity: 'critical',
-    message: 'Potansiyel sahte hesap kümesi',
-    details: '15 hesap benzer davranış gösteriyor',
+    message: 'Potansiyel dolandırıcılık kümesi',
+    details: '15 hesap benzer para çekme davranışı gösteriyor',
     detected_at: '2024-12-18T13:15:00Z',
   },
   {
     id: '3',
-    type: 'content_trend',
+    type: 'gift_trend',
     severity: 'info',
-    message: 'Yeni içerik trendi tespit edildi',
-    details: '"Kış seyahati" konulu momentlerde %180 artış',
+    message: 'Yeni hediye trendi tespit edildi',
+    details: '"Kapadokya Balon Turu" momentlerinde %180 artış',
     detected_at: '2024-12-18T12:00:00Z',
   },
 ];
 
 const aiModels = [
+  {
+    id: 'proof_verification',
+    name: 'Kanıt Doğrulama (KYC)',
+    status: 'active',
+    accuracy: 96.5,
+    lastUpdated: '2024-12-15T00:00:00Z',
+    processedToday: 8450,
+  },
+  {
+    id: 'offer_analysis',
+    name: 'Teklif Analizi',
+    status: 'active',
+    accuracy: 98.2,
+    lastUpdated: '2024-12-18T00:00:00Z',
+    processedToday: 15600,
+  },
   {
     id: 'content_moderation',
     name: 'İçerik Moderasyonu',
@@ -135,42 +155,34 @@ const aiModels = [
   },
   {
     id: 'fraud_detection',
-    name: 'Sahtecilik Tespiti',
+    name: 'Dolandırıcılık Tespiti',
     status: 'active',
     accuracy: 94.2,
     lastUpdated: '2024-12-10T00:00:00Z',
     processedToday: 8900,
   },
   {
-    id: 'churn_prediction',
-    name: 'Churn Tahmini',
+    id: 'smart_notifications',
+    name: 'Akıllı Bildirimler',
     status: 'active',
     accuracy: 88.5,
     lastUpdated: '2024-12-12T00:00:00Z',
-    processedToday: 125000,
+    processedToday: 45000,
   },
   {
-    id: 'recommendation',
-    name: 'Eşleşme Önerileri',
+    id: 'moment_suggestions',
+    name: 'Moment Önerileri',
     status: 'active',
-    accuracy: 76.3,
+    accuracy: 82.3,
     lastUpdated: '2024-12-18T00:00:00Z',
-    processedToday: 340000,
-  },
-  {
-    id: 'spam_detection',
-    name: 'Spam Tespiti',
-    status: 'active',
-    accuracy: 99.1,
-    lastUpdated: '2024-12-14T00:00:00Z',
-    processedToday: 56000,
+    processedToday: 28000,
   },
 ];
 
 const contentDistribution = [
-  { name: 'Onaylanan', value: 84, color: '#22c55e' },
-  { name: 'Reddedilen', value: 3, color: '#ef4444' },
-  { name: 'İnceleme Bekliyor', value: 13, color: '#f59e0b' },
+  { name: 'Kanıt Onaylandı', value: 84, color: '#22c55e' },
+  { name: 'Kanıt Reddedildi', value: 3, color: '#ef4444' },
+  { name: 'Manuel İnceleme', value: 13, color: '#f59e0b' },
 ];
 
 export default function AICenterPage() {
@@ -224,7 +236,7 @@ export default function AICenterPage() {
             AI Command Center
           </h1>
           <p className="text-muted-foreground">
-            Makine öğrenmesi modelleri ve otomatik moderasyon
+            Hediye doğrulama ve kanıt analizi için AI modelleri
           </p>
         </div>
         <Button variant="outline">
@@ -233,7 +245,7 @@ export default function AICenterPage() {
         </Button>
       </div>
 
-      {/* Auto-Moderation Stats */}
+      {/* Proof Verification Stats */}
       <div className="grid gap-4 md:grid-cols-5">
         <Card>
           <CardContent className="pt-6">
@@ -245,7 +257,7 @@ export default function AICenterPage() {
                 <p className="text-2xl font-bold">
                   {moderationStats.totalProcessed.toLocaleString('tr-TR')}
                 </p>
-                <p className="text-sm text-muted-foreground">İşlenen İçerik</p>
+                <p className="text-sm text-muted-foreground">Toplam Kanıt</p>
               </div>
             </div>
           </CardContent>
@@ -258,9 +270,9 @@ export default function AICenterPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">
-                  {moderationStats.autoApproved.toLocaleString('tr-TR')}
+                  {moderationStats.proofsVerified.toLocaleString('tr-TR')}
                 </p>
-                <p className="text-sm text-muted-foreground">Otomatik Onay</p>
+                <p className="text-sm text-muted-foreground">Doğrulanan</p>
               </div>
             </div>
           </CardContent>
@@ -273,9 +285,9 @@ export default function AICenterPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">
-                  {moderationStats.autoRejected.toLocaleString('tr-TR')}
+                  {moderationStats.proofsRejected.toLocaleString('tr-TR')}
                 </p>
-                <p className="text-sm text-muted-foreground">Otomatik Red</p>
+                <p className="text-sm text-muted-foreground">Reddedilen</p>
               </div>
             </div>
           </CardContent>
@@ -288,9 +300,11 @@ export default function AICenterPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">
-                  {moderationStats.manualReview.toLocaleString('tr-TR')}
+                  {moderationStats.pendingReview.toLocaleString('tr-TR')}
                 </p>
-                <p className="text-sm text-muted-foreground">Manuel İnceleme</p>
+                <p className="text-sm text-muted-foreground">
+                  İnceleme Bekliyor
+                </p>
               </div>
             </div>
           </CardContent>
@@ -328,7 +342,7 @@ export default function AICenterPage() {
           </TabsTrigger>
           <TabsTrigger value="quality">
             <BarChart3 className="mr-2 h-4 w-4" />
-            İçerik Kalitesi
+            Kanıt Kalitesi
           </TabsTrigger>
         </TabsList>
 
@@ -575,9 +589,9 @@ export default function AICenterPage() {
             {/* Quality Trend */}
             <Card>
               <CardHeader>
-                <CardTitle>İçerik Kalite Trendi</CardTitle>
+                <CardTitle>Kanıt Doğruluk Trendi</CardTitle>
                 <CardDescription>
-                  Son 7 günlük ortalama kalite skoru
+                  Son 7 günlük ortalama doğrulama skoru
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -604,8 +618,8 @@ export default function AICenterPage() {
             {/* Content Distribution */}
             <Card>
               <CardHeader>
-                <CardTitle>İçerik Dağılımı</CardTitle>
-                <CardDescription>Moderasyon sonuçları</CardDescription>
+                <CardTitle>Kanıt Doğrulama Dağılımı</CardTitle>
+                <CardDescription>AI doğrulama sonuçları</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
