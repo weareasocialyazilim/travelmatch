@@ -43,11 +43,33 @@ const RealtimeStarsField = dynamic(
   { ssr: false },
 );
 
+// Award-winning components (dynamic for performance)
+const LovePortal3D = dynamic(
+  () =>
+    import('@/components/3d/LovePortal3D').then((m) => ({
+      default: m.LovePortal3D,
+    })),
+  { ssr: false },
+);
+const VelvetExperience = dynamic(
+  () =>
+    import('@/components/landing/VelvetExperience').then((m) => ({
+      default: m.VelvetExperience,
+    })),
+  { ssr: false },
+);
+const LiquidAuraCursor = dynamic(
+  () =>
+    import('@/components/ui/LiquidAuraCursor').then((m) => ({
+      default: m.LiquidAuraCursor,
+    })),
+  { ssr: false },
+);
+
 // Regular imports
 import { LiquidToken } from '@/components/shared/LiquidToken';
 import { LockedDrop } from '@/components/stash/LockedDrop';
 import { CinematicOverlay } from '@/components/shared/NoiseOverlay';
-import { GiftCursor } from '@/components/shared/GiftCursor';
 import { useSunsetAtmosphere } from '@/hooks/useSunsetAtmosphere';
 import { useRealtimeStars } from '@/hooks/useRealtimeStars';
 
@@ -974,7 +996,10 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[var(--bg)] text-white selection:bg-[var(--acid)] selection:text-black">
       <CinematicOverlay noiseOpacity={0.03} vignetteIntensity={0.4} />
-      <GiftCursor />
+
+      {/* Award-winning cursor with magnetic snap */}
+      <LiquidAuraCursor />
+
       <Navbar
         onMenuClick={() => setMenuOpen(true)}
         lang={lang}
@@ -1022,19 +1047,22 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      <main>
-        <ImmersiveHero content={c} onNotify={setNotification} />
-        <Marquee />
-        <PowerPillars content={c} />
-        <TheStash
-          onGiftSelect={setSelectedGift}
-          onNotify={setNotification}
-          content={c}
-          lang={lang}
-        />
-        <Manifesto onNotify={setNotification} content={c} />
-        <Footer content={c} />
-      </main>
+      {/* Award-winning scroll experience wrapper */}
+      <VelvetExperience>
+        <main>
+          <ImmersiveHero content={c} onNotify={setNotification} />
+          <Marquee />
+          <PowerPillars content={c} />
+          <TheStash
+            onGiftSelect={setSelectedGift}
+            onNotify={setNotification}
+            content={c}
+            lang={lang}
+          />
+          <Manifesto onNotify={setNotification} content={c} />
+          <Footer content={c} />
+        </main>
+      </VelvetExperience>
 
       <LiquidToken lang={lang} />
 

@@ -17,3 +17,11 @@ export {
   FloatingMomentCard,
   LiquidDivider,
 } from './AwardWinningScroll';
+
+// Ultimate Award Components (God-Mode Quality)
+export {
+  VelvetExperience,
+  LiquidSection,
+  GravityContent,
+  LiquidTransitionDivider,
+} from './VelvetExperience';
