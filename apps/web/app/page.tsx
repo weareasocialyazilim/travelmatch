@@ -21,10 +21,10 @@ import {
 const Scene3D = dynamic(() => import('@/components/3d/Scene3D'), {
   ssr: false,
 });
-const SentientOrb = dynamic(
+const LovePortal3D = dynamic(
   () =>
-    import('@/components/3d/SentientOrb').then((m) => ({
-      default: m.SentientOrb,
+    import('@/components/3d/LovePortal3D').then((m) => ({
+      default: m.LovePortal3D,
     })),
   { ssr: false },
 );
@@ -44,8 +44,6 @@ const RealtimeStarsField = dynamic(
 );
 
 // Award-winning components (dynamic for performance)
-// LovePortal3D reserved for future use
-void import('@/components/3d/LovePortal3D');
 const VelvetExperience = dynamic(
   () =>
     import('@/components/landing/VelvetExperience').then((m) => ({
@@ -287,8 +285,8 @@ const ImmersiveHero = ({
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 z-0">
         <Scene3D className="w-full h-full">
-          <SentientOrb speed={0.8} scale={2.5} intensity={1.2} />
-          <ParticleField count={3000} size={0.01} speed={0.3} />
+          <LovePortal3D />
+          <ParticleField count={2000} size={0.01} speed={0.3} />
           <RealtimeStarsField stars={stars} baseSize={0.08} />
         </Scene3D>
       </div>

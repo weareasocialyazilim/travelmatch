@@ -200,7 +200,7 @@ export const ScanlinesOverlay = ({
  * Combined cinematic overlay
  */
 export const CinematicOverlay = ({
-  noiseOpacity = 0.03,
+  noiseOpacity = 0.08,
   vignetteIntensity = 0.4,
   showScanlines = false,
 }: {
