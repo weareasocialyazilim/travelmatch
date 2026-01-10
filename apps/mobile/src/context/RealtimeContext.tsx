@@ -32,8 +32,6 @@ export type RealtimeEventType =
   | 'review:new'
   | 'moment:like'
   | 'moment:comment'
-  | 'user:online'
-  | 'user:offline'
   | 'user:banned'
   | 'user:suspended'
   | 'user:reinstated'
@@ -71,12 +69,6 @@ export interface RequestEvent {
   receiverId?: string;
 }
 
-export interface UserStatusEvent {
-  userId: string;
-  isOnline: boolean;
-  lastSeen?: string;
-}
-
 export interface UserAccountStatusEvent {
   userId: string;
   status: 'active' | 'suspended' | 'banned' | 'pending' | 'deleted';
@@ -110,10 +102,6 @@ interface RealtimeContextType {
   connectionState: ConnectionState;
   isConnected: boolean;
   connectionHealth: ConnectionHealth | null;
-
-  // Online users (Supabase Presence)
-  onlineUsers: Set<string>;
-  isUserOnline: (userId: string) => boolean;
 
   // Event subscription
   subscribe: <T>(
@@ -150,12 +138,10 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
   // State
   const [connectionState, setConnectionState] =
     useState<ConnectionState>('disconnected');
-  const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
   const [connectionHealth, setConnectionHealth] =
     useState<ConnectionHealth | null>(null);
 
   // Refs for Supabase channels and handlers
-  const presenceChannelRef = useRef<RealtimeChannel | null>(null);
   const notificationChannelRef = useRef<RealtimeChannel | null>(null);
   const userStatusChannelRef = useRef<RealtimeChannel | null>(null);
   const handlersRef = useRef<EventHandlers>(new Map());
@@ -187,63 +173,6 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
       });
     }
   }, []);
-
-  /**
-   * Setup Supabase Presence for online users
-   */
-  const setupPresence = useCallback(() => {
-    if (!user || presenceChannelRef.current) return;
-
-    logger.info('RealtimeContext', 'Setting up presence tracking');
-
-    const channel = supabase.channel('online-users', {
-      config: {
-        presence: {
-          key: user.id,
-        },
-      },
-    });
-
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        const state = channel.presenceState();
-        const online = new Set(Object.keys(state));
-
-        logger.debug('RealtimeContext', `Online users: ${online.size}`);
-        setOnlineUsers(online);
-      })
-      .on('presence', { event: 'join' }, ({ key }) => {
-        logger.debug('RealtimeContext', `User joined: ${key}`);
-        setOnlineUsers((prev) => new Set([...prev, key]));
-
-        emit('user:online', { userId: key, isOnline: true });
-      })
-      .on('presence', { event: 'leave' }, ({ key }) => {
-        logger.debug('RealtimeContext', `User left: ${key}`);
-        setOnlineUsers((prev) => {
-          const next = new Set(prev);
-          next.delete(key);
-          return next;
-        });
-
-        emit('user:offline', {
-          userId: key,
-          isOnline: false,
-          lastSeen: new Date().toISOString(),
-        });
-      })
-      .subscribe(async (status) => {
-        if (status === 'SUBSCRIBED') {
-          // Track own presence
-          await channel.track({
-            online_at: new Date().toISOString(),
-          });
-          logger.info('RealtimeContext', 'Presence tracking active');
-        }
-      });
-
-    presenceChannelRef.current = channel;
-  }, [user, emit]);
 
   /**
    * Subscribe to user notifications
@@ -417,9 +346,6 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
       setConnectionState('connecting');
       logger.info('RealtimeContext', 'Connecting to Supabase Realtime');
 
-      // Setup presence
-      setupPresence();
-
       // Auto-subscribe to notifications
       subscribeToNotifications();
 
@@ -432,24 +358,13 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
       logger.error('RealtimeContext', 'Failed to connect:', error);
       setConnectionState('disconnected');
     }
-  }, [
-    isAuthenticated,
-    user,
-    setupPresence,
-    subscribeToNotifications,
-    subscribeToUserStatus,
-  ]);
+  }, [isAuthenticated, user, subscribeToNotifications, subscribeToUserStatus]);
 
   /**
    * Disconnect from Supabase Realtime
    */
   const disconnect = useCallback(() => {
     logger.info('RealtimeContext', 'Disconnecting from Supabase Realtime');
-
-    if (presenceChannelRef.current) {
-      supabase.removeChannel(presenceChannelRef.current);
-      presenceChannelRef.current = null;
-    }
 
     if (notificationChannelRef.current) {
       supabase.removeChannel(notificationChannelRef.current);
@@ -462,7 +377,6 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
     }
 
     setConnectionState('disconnected');
-    setOnlineUsers(new Set());
   }, []);
 
   /**
@@ -498,16 +412,6 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
       };
     },
     [],
-  );
-
-  /**
-   * Check if user is online
-   */
-  const isUserOnline = useCallback(
-    (userId: string): boolean => {
-      return onlineUsers.has(userId);
-    },
-    [onlineUsers],
   );
 
   /**
@@ -660,10 +564,6 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
       isConnected,
       connectionHealth,
 
-      // Online users
-      onlineUsers,
-      isUserOnline,
-
       // Event subscription
       subscribe,
 
@@ -687,8 +587,6 @@ export const RealtimeProvider: React.FC<{ children: ReactNode }> = ({
       connectionState,
       isConnected,
       connectionHealth,
-      onlineUsers,
-      isUserOnline,
       subscribe,
       sendTypingStart,
       sendTypingStop,

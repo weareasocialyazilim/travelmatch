@@ -571,7 +571,8 @@ export const useMessages = (): UseMessagesReturn => {
     const unsubscribe = realtimeChannelManager.subscribeToTable<DbConversation>(
       'conversations',
       {
-        // TODO: Add filter when user context is available: `participant_ids=cs.{${userId}}`
+        // Note: Supabase realtime filters don't support array containment (cs).
+        // Server-side RLS handles access control; client-side filters at line ~595.
         onInsert: (payload) => {
           if (!mountedRef.current) return;
 
