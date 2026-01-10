@@ -57,9 +57,10 @@ export function VelvetExperience({ children }: VelvetExperienceProps) {
   const smoothX = useSpring(portalX, { stiffness: 80, damping: 25 });
   const smoothY = useSpring(portalY, { stiffness: 80, damping: 25 });
 
-  // Content distortion based on scroll
-  const contentSkewX = useTransform(scrollYProgress, [0, 0.1], [0, -3]);
-  const contentSkewY = useTransform(scrollYProgress, [0, 0.1], [0, 2]);
+  // Content distortion based on scroll - Optimized for readability
+  // Reduced from -3/2 to -1.8 for professional "magazine" feel
+  const contentSkewX = useTransform(scrollYProgress, [0, 0.2], [0, -1.8]);
+  const contentSkewY = useTransform(scrollYProgress, [0, 0.2], [0, 1.2]);
 
   // Track when portal should become follower
   useEffect(() => {
@@ -104,12 +105,13 @@ export function VelvetExperience({ children }: VelvetExperienceProps) {
       {/* Liquid Ripple Effect Layer */}
       <LiquidRippleLayer scrollProgress={scrollYProgress} />
 
-      {/* Content with gravity distortion */}
+      {/* Content with gravity distortion - GPU accelerated */}
       <motion.div
         style={{
           skewX: contentSkewX,
           skewY: contentSkewY,
         }}
+        className="will-change-transform"
       >
         {children}
       </motion.div>
@@ -159,7 +161,7 @@ function seededRandom(seed: number): number {
   return x - Math.floor(x);
 }
 
-// Floating gift particles during scroll
+// Floating gift particles during scroll - Optimized (reduced from 30 to 20)
 function ScrollGiftParticles({
   scrollProgress,
 }: {
@@ -171,7 +173,7 @@ function ScrollGiftParticles({
     [0, 1, 1, 0],
   );
   const types = ['gift', 'heart', 'sparkle', 'star'];
-  const particles = Array.from({ length: 30 }, (_, i) => ({
+  const particles = Array.from({ length: 20 }, (_, i) => ({
     id: i,
     x: seededRandom(i * 5 + 1) * 100,
     delay: seededRandom(i * 5 + 2) * 3,
