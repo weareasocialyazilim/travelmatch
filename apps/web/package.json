@@ -15,12 +15,18 @@
     "validate": "pnpm run type-check && pnpm run lint && pnpm run test:ci"
   },
   "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.5.0",
+    "@react-three/postprocessing": "^3.0.4",
     "@travelmatch/shared": "workspace:*",
     "framer-motion": "^12.23.26",
+    "gsap": "^3.14.2",
+    "leva": "^0.10.1",
     "lucide-react": "^0.561.0",
     "next": "16.0.10",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "three": "^0.182.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
@@ -30,6 +36,7 @@
     "@types/node": "^25.0.3",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.182.0",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9.39.2",
     "eslint-config-next": "16.0.10",

@@ -1,24 +1,128 @@
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
-import Home from '../page';
 
-// Mock Next.js Image component
-jest.mock('next/image', () => {
-  const MockImage = ({
-    src,
-    alt,
-    ...props
-  }: {
+// Mock framer-motion with inline factory
+jest.mock('framer-motion', () => {
+  const React = require('react');
+
+  const createMotionComponent = (tag: string) => {
+    return function MotionComponent({
+      children,
+      ...props
+    }: {
+      children?: React.ReactNode;
+    }) {
+      // Filter out motion-specific props
+      const validProps: Record<string, unknown> = {};
+      const invalidProps = [
+        'whileHover',
+        'whileTap',
+        'whileInView',
+        'animate',
+        'initial',
+        'exit',
+        'variants',
+        'transition',
+        'layout',
+        'layoutId',
+        'drag',
+        'dragConstraints',
+        'onDragEnd',
+        'custom',
+        'inherit',
+      ];
+
+      Object.keys(props).forEach((key) => {
+        if (
+          !invalidProps.includes(key) &&
+          !key.startsWith('on') &&
+          key !== 'style'
+        ) {
+          validProps[key] = (props as Record<string, unknown>)[key];
+        }
+      });
+
+      return React.createElement(tag, validProps, children);
+    };
+  };
+
+  return {
+    motion: {
+      div: createMotionComponent('div'),
+      button: createMotionComponent('button'),
+      h1: createMotionComponent('h1'),
+      h2: createMotionComponent('h2'),
+      h3: createMotionComponent('h3'),
+      h4: createMotionComponent('h4'),
+      p: createMotionComponent('p'),
+      span: createMotionComponent('span'),
+      a: createMotionComponent('a'),
+      nav: createMotionComponent('nav'),
+      ul: createMotionComponent('ul'),
+      li: createMotionComponent('li'),
+      section: createMotionComponent('section'),
+      footer: createMotionComponent('footer'),
+      header: createMotionComponent('header'),
+      article: createMotionComponent('article'),
+      main: createMotionComponent('main'),
+      aside: createMotionComponent('aside'),
+      img: createMotionComponent('img'),
+    },
+    AnimatePresence: ({ children }: { children?: React.ReactNode }) => children,
+    useScroll: () => ({ scrollYProgress: { current: 0 } }),
+    useTransform: () => 1,
+    useSpring: () => 1,
+    useMotionValue: () => ({ set: jest.fn(), get: () => 0 }),
+  };
+});
+
+// Mock next/dynamic
+jest.mock('next/dynamic', () => () => {
+  const MockComponent = () => (
+    <div data-testid="mock-3d-component">3D Component</div>
+  );
+  MockComponent.displayName = 'MockDynamicComponent';
+  return MockComponent;
+});
+
+// Mock the hooks
+jest.mock('@/hooks/useSunsetAtmosphere', () => ({
+  useSunsetAtmosphere: () => ({
+    phase: 'morning',
+    colors: {
+      bg: '#050505',
+      acid: '#CCFF00',
+      neonPink: '#FF0099',
+      electricBlue: '#00F0FF',
+    },
+    isSacredMode: false,
+  }),
+}));
+
+jest.mock('@/hooks/useRealtimeStars', () => ({
+  useRealtimeStars: () => ({
+    stars: [],
+    isConnected: true,
+    stats: { total: 0, active: 0 },
+  }),
+}));
+
+// Mock next/image
+jest.mock('next/image', () => ({
+  __esModule: true,
+  default: (props: {
     src: string;
     alt: string;
-    [key: string]: unknown;
+    fill?: boolean;
+    width?: number;
+    height?: number;
   }) => (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={src} alt={alt} {...props} />
-  );
-  MockImage.displayName = 'MockImage';
-  return MockImage;
-});
+    <img src={props.src} alt={props.alt} />
+  ),
+}));
+
+import Home from '../page';
 
 // Mock window.scrollTo
 Object.defineProperty(window, 'scrollTo', {
@@ -26,47 +130,28 @@ Object.defineProperty(window, 'scrollTo', {
   writable: true,
 });
 
-// Mock window.location
-const originalLocation = window.location;
-beforeAll(() => {
-  Object.defineProperty(window, 'location', {
-    configurable: true,
-    value: { href: '', assign: jest.fn() },
-  });
+// Mock IntersectionObserver
+const mockIntersectionObserver = jest.fn();
+mockIntersectionObserver.mockReturnValue({
+  observe: () => null,
+  unobserve: () => null,
+  disconnect: () => null,
 });
-afterAll(() => {
-  Object.defineProperty(window, 'location', {
-    configurable: true,
-    value: originalLocation,
-  });
-});
+window.IntersectionObserver = mockIntersectionObserver;
 
-describe('Home Page', () => {
+describe('Home Page - Immersive Redesign', () => {
   beforeEach(() => {
     render(<Home />);
   });
 
   describe('Hero Section', () => {
-    it('renders the hero title words', () => {
-      expect(screen.getByText('SEND')).toBeInTheDocument();
-      expect(screen.getByText('REAL')).toBeInTheDocument();
-      expect(screen.getByText('MOMENTS')).toBeInTheDocument();
-    });
-
-    it('renders the beta badge', () => {
-      expect(screen.getByText(/LIVE BETA/i)).toBeInTheDocument();
+    it('renders the hero title', () => {
+      expect(screen.getByText('REALITY')).toBeInTheDocument();
+      expect(screen.getByText('LEAKS.')).toBeInTheDocument();
     });
 
     it('renders the brand name', () => {
       expect(screen.getByText('travelmatch.')).toBeInTheDocument();
-    });
-
-    it('renders the START NOW button', () => {
-      expect(screen.getByText('START NOW')).toBeInTheDocument();
-    });
-
-    it('renders the WATCH DEMO button', () => {
-      expect(screen.getByText('WATCH DEMO')).toBeInTheDocument();
     });
   });
 
@@ -74,14 +159,6 @@ describe('Home Page', () => {
     it('renders THE STASH title', () => {
       expect(screen.getByText('THE')).toBeInTheDocument();
       expect(screen.getByText('STASH')).toBeInTheDocument();
-    });
-
-    it('renders curated drops subtitle', () => {
-      expect(screen.getByText('/// CURATED DROPS')).toBeInTheDocument();
-    });
-
-    it('renders VIEW ALL DROPS button', () => {
-      expect(screen.getByText('VIEW ALL DROPS')).toBeInTheDocument();
     });
 
     it('renders gift items', () => {
@@ -92,47 +169,17 @@ describe('Home Page', () => {
   });
 
   describe('Manifesto Section', () => {
-    it('renders manifesto subtitle', () => {
-      expect(screen.getByText('/// THE MANIFESTO')).toBeInTheDocument();
-    });
-
-    it('renders the manifesto title', () => {
-      expect(screen.getByText(/We reject the/i)).toBeInTheDocument();
-      expect(screen.getByText('Metaverse.')).toBeInTheDocument();
-    });
-
-    it('renders JOIN THE RESISTANCE button', () => {
-      expect(screen.getByText('JOIN THE RESISTANCE')).toBeInTheDocument();
-    });
-
-    it('renders WATCH FILM button', () => {
-      expect(screen.getByText('WATCH FILM')).toBeInTheDocument();
+    it('renders the manifesto content', () => {
+      expect(screen.getAllByText(/We reject the/i)[0]).toBeInTheDocument();
+      expect(screen.getAllByText('Metaverse.')[0]).toBeInTheDocument();
     });
   });
 
   describe('Footer Section', () => {
-    it('renders SPOTS LIMITED badge', () => {
-      expect(screen.getByText('SPOTS LIMITED')).toBeInTheDocument();
-    });
-
-    it('renders SOON heading', () => {
-      // Multiple SOON texts (hero + footer)
-      expect(screen.getAllByText('SOON').length).toBeGreaterThan(0);
-    });
-
-    it('renders email input placeholder', () => {
+    it('renders email input', () => {
       expect(
-        screen.getByPlaceholderText('ENTER YOUR EMAIL...'),
+        screen.getByPlaceholderText(/ENTER YOUR EMAIL/i),
       ).toBeInTheDocument();
-    });
-
-    it('renders JOIN button', () => {
-      expect(screen.getByText('JOIN')).toBeInTheDocument();
-    });
-
-    it('renders app store buttons', () => {
-      expect(screen.getByText('APP STORE')).toBeInTheDocument();
-      expect(screen.getByText('PLAY STORE')).toBeInTheDocument();
     });
 
     it('renders social links', () => {
@@ -140,18 +187,9 @@ describe('Home Page', () => {
       expect(screen.getByText('TikTok')).toBeInTheDocument();
       expect(screen.getByText('Twitter')).toBeInTheDocument();
     });
-
-    it('renders company info', () => {
-      expect(screen.getByText('TravelMatch Inc.')).toBeInTheDocument();
-      expect(screen.getByText('Est. 2025 // Istanbul')).toBeInTheDocument();
-    });
   });
 
   describe('Navigation', () => {
-    it('renders GET THE APP button', () => {
-      expect(screen.getByText('GET THE APP')).toBeInTheDocument();
-    });
-
     it('renders language switcher', () => {
       expect(screen.getByText('EN')).toBeInTheDocument();
       expect(screen.getByText('TR')).toBeInTheDocument();
@@ -160,7 +198,6 @@ describe('Home Page', () => {
 
   describe('City Marquee', () => {
     it('renders city names', () => {
-      // Multiple instances due to marquee animation
       expect(screen.getAllByText(/ISTANBUL/i).length).toBeGreaterThan(0);
       expect(screen.getAllByText(/PARIS/i).length).toBeGreaterThan(0);
       expect(screen.getAllByText(/TOKYO/i).length).toBeGreaterThan(0);
