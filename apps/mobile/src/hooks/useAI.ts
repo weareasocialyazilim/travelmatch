@@ -6,7 +6,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { AIService } from '../services/aiService';
 import type {
   ProofVerificationRequest,
@@ -256,7 +256,6 @@ export function useRecipientRecommendations(momentId: string | undefined) {
 export function useAIChatbot() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
-  const queryClient = useQueryClient();
 
   // Quick actions
   const quickActionsQuery = useQuery({
