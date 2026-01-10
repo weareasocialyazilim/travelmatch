@@ -61,13 +61,32 @@ const CONTENT = {
     },
     hero: {
       badge: 'LIVE BETA V1.0 // WORLDWIDE',
-      title1: 'REALITY',
-      title2: 'LEAKS.',
-      subtitle: 'We reject the Metaverse. Pixels have no taste.',
-      desc: 'Send a real coffee to someone in Paris right now.',
+      title1: 'STOP WAITING.',
+      title2: 'CONNECT INSTANTLY.',
+      subtitle: 'Quit the algorithm loop. Prove your intent with a gift, hack the queue, and teleport to the real world.',
+      desc: 'Not for the scrollers, but for those who live for the moment.',
       ctaStart: 'ENTER THE STASH',
       ctaDemo: 'WATCH DEMO',
       soon: 'SOON',
+    },
+    powerPillars: {
+      subtitle: '/// WHY TRAVELMATCH',
+      title: 'THE POWER PROTOCOL',
+      proofOfIntent: {
+        title: 'PROOF OF INTENT',
+        subtitle: 'Action Over Words',
+        desc: 'Skip the small talk. Move to the front of the line with a simple gesture. Show your intent, get noticed instantly.',
+      },
+      unbufferedMoments: {
+        title: 'UNBUFFERED MOMENTS',
+        subtitle: 'No Filter Reality',
+        desc: 'Stop being a spectator. Real people sharing real moments in real places. Catch a moment and join the scene.',
+      },
+      engineeredLuck: {
+        title: 'ENGINEERED LUCK',
+        subtitle: 'Velocity Controlled',
+        desc: "Luck isn't random; we control the velocity. The shortest path to meeting the right person at the right place. Hack your social life.",
+      },
     },
     stash: {
       subtitle: '/// CURATED DROPS',
@@ -114,13 +133,32 @@ const CONTENT = {
     },
     hero: {
       badge: 'CANLI BETA V1.0 // DÜNYA ÇAPINDA',
-      title1: 'GERÇEKLİK',
-      title2: 'SIZIYOR.',
-      subtitle: "Metaverse'ü reddediyoruz. Piksellerin tadı yok.",
-      desc: "Paris'teki birine şu an gerçek bir kahve gönder.",
+      title1: 'BEKLEMEYİ BIRAK.',
+      title2: 'ANINDA BAĞ KUR.',
+      subtitle: 'Algoritma döngülerinden çık. Niyetini bir hediye ile kanıtla, bekleme sırasını hackle ve gerçek dünyaya ışınlan.',
+      desc: "Tinder'da kaybolanlar için değil, anı yaşayanlar için.",
       ctaStart: "ZULA'YA GİR",
       ctaDemo: 'DEMOYU İZLE',
       soon: 'YAKINDA',
+    },
+    powerPillars: {
+      subtitle: '/// NEDEN TRAVELMATCH',
+      title: 'GÜÇ PROTOKOLÜ',
+      proofOfIntent: {
+        title: 'NİYETİNİ KANITLA',
+        subtitle: 'Laf Değil, Eylem',
+        desc: 'Boş mesajlarla zaman kaybetme. Küçük bir jest ile etkileşim sırasının en önüne geç. Gerçek niyetini göster, anında fark edil.',
+      },
+      unbufferedMoments: {
+        title: 'FİLTRESİZ GERÇEKLİK',
+        subtitle: 'Ekran Yok, Hayat Var',
+        desc: 'Ekranın arkasına saklanma. Gerçek insanlar, gerçek mekanlarda, gerçek anlar paylaşıyor. Bir anı yakala ve o sahneye dahil ol.',
+      },
+      engineeredLuck: {
+        title: 'TASARLANMIŞ ŞANS',
+        subtitle: 'Hız Bizim Elimizde',
+        desc: 'Şans tesadüf değildir, hızı biz ayarlarız. Doğru insanla doğru koordinatta karşılaşmanın en kestirme yolu. Sosyal hayatını hackle.',
+      },
     },
     stash: {
       subtitle: '/// SEÇİLMİŞ DROPLAR',
@@ -297,14 +335,19 @@ const ImmersiveHero = ({
           </span>
         </motion.h1>
 
-        <motion.p
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-          className="font-grotesk text-xl md:text-2xl text-white/60 max-w-2xl mx-auto mb-12"
+          className="max-w-3xl mx-auto mb-12 space-y-4"
         >
-          {content.hero.subtitle}
-        </motion.p>
+          <p className="font-grotesk text-xl md:text-2xl text-white/70">
+            {content.hero.subtitle}
+          </p>
+          <p className="font-mono text-sm md:text-base text-[var(--acid)] tracking-wide">
+            {content.hero.desc}
+          </p>
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -382,6 +425,104 @@ const Marquee = () => {
         ))}
       </div>
     </div>
+  );
+};
+
+// Power Pillars - The Triple Force
+const PowerPillars = ({ content }: { content: ContentType }) => {
+  const pillars = [
+    {
+      key: 'proofOfIntent',
+      icon: '⚡',
+      gradient: 'from-[var(--acid)] to-[var(--electric-blue)]',
+      borderColor: 'border-[var(--acid)]',
+    },
+    {
+      key: 'unbufferedMoments',
+      icon: '🎯',
+      gradient: 'from-[var(--neon-pink)] to-[var(--acid)]',
+      borderColor: 'border-[var(--neon-pink)]',
+    },
+    {
+      key: 'engineeredLuck',
+      icon: '🚀',
+      gradient: 'from-[var(--electric-blue)] to-[var(--neon-pink)]',
+      borderColor: 'border-[var(--electric-blue)]',
+    },
+  ];
+
+  return (
+    <section className="py-32 bg-black relative overflow-hidden">
+      {/* Background Grid */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+          backgroundSize: '50px 50px',
+        }} />
+      </div>
+
+      <div className="container mx-auto px-6 relative z-10">
+        {/* Header */}
+        <div className="text-center mb-20">
+          <span className="text-[var(--acid)] font-mono text-sm tracking-widest bg-black px-4 py-2 border border-[var(--acid)] inline-block mb-6">
+            {content.powerPillars.subtitle}
+          </span>
+          <h2 className="text-5xl md:text-7xl font-syne font-black text-white leading-none">
+            {content.powerPillars.title}
+          </h2>
+        </div>
+
+        {/* Pillars Grid */}
+        <div className="grid md:grid-cols-3 gap-8">
+          {pillars.map((pillar, index) => {
+            const pillarContent = content.powerPillars[pillar.key as keyof typeof content.powerPillars];
+            if (typeof pillarContent === 'string') return null;
+
+            return (
+              <motion.div
+                key={pillar.key}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.2, duration: 0.6 }}
+                whileHover={{ y: -10, scale: 1.02 }}
+                className="group relative"
+              >
+                {/* Card Background Shadow */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${pillar.gradient} translate-x-3 translate-y-3 rounded-[24px] opacity-50`} />
+
+                {/* Main Card */}
+                <div className={`relative bg-[#0a0a0a] border-2 ${pillar.borderColor} rounded-[24px] p-8 h-full transition-all duration-300 group-hover:border-white`}>
+                  {/* Icon */}
+                  <div className="text-6xl mb-6">{pillar.icon}</div>
+
+                  {/* Number Badge */}
+                  <div className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+                    <span className="text-white/40 font-mono text-lg font-bold">0{index + 1}</span>
+                  </div>
+
+                  {/* Content */}
+                  <h3 className="text-2xl md:text-3xl font-syne font-black text-white mb-2 uppercase tracking-tight">
+                    {pillarContent.title}
+                  </h3>
+                  <p className={`text-sm font-mono tracking-widest mb-4 bg-gradient-to-r ${pillar.gradient} bg-clip-text text-transparent`}>
+                    {pillarContent.subtitle}
+                  </p>
+                  <p className="text-gray-400 font-grotesk text-base leading-relaxed">
+                    {pillarContent.desc}
+                  </p>
+
+                  {/* Hover Arrow */}
+                  <div className="absolute bottom-8 right-8 w-10 h-10 rounded-full bg-white/0 border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:bg-white transition-all duration-300">
+                    <ArrowUpRight size={20} className="text-black" />
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
   );
 };
 
@@ -641,7 +782,7 @@ const Manifesto = ({
             src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=1000"
             fill
             className="object-cover opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0"
-            alt="Manifesto"
+            alt="Handheld camera style, grainy cinematic 35mm film stock, a candid shot of a stylish young woman laughing in a dimly lit, high-end Istanbul lounge, blurred Bosphorus lights in background, wearing quiet luxury fashion, authentic Gen Z aesthetic, raw emotions, 8k resolution"
             unoptimized
           />
           <div className="absolute inset-0 flex items-center justify-center">
@@ -883,6 +1024,7 @@ export default function Home() {
       <main>
         <ImmersiveHero content={c} onNotify={setNotification} />
         <Marquee />
+        <PowerPillars content={c} />
         <TheStash
           onGiftSelect={setSelectedGift}
           onNotify={setNotification}

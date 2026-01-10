@@ -1010,6 +1010,135 @@ function generateFAQs(
 }
 
 // ============================================================================
+// DISRUPTIVE SEO - God-Mode Metadata Generator
+// CTR %400 artırmak için psikolojik tetikleyiciler içeren meta veriler
+// ============================================================================
+
+export const generateFinalMeta = (
+  lang: 'tr' | 'en',
+  city: string,
+  intent: string,
+) => {
+  const cityDisplay =
+    CITY_DISPLAY_NAMES[city]?.[lang] || formatCityName(city);
+
+  const content = {
+    tr: {
+      title: `${cityDisplay} | Sırayı Hackle ve Anında Eşleş | TravelMatch`,
+      desc: `${cityDisplay} konumunda bekleme listelerinden kurtul. Hediyeleşme ekonomisiyle gerçek momentların kilidini aç. Sosyal keşfin en hızlı yolu.`,
+      keywords: [
+        `${cityDisplay} hızlı tanışma`,
+        `${cityDisplay} hediye gönder tanış`,
+        `${cityDisplay} anında eşleşme`,
+        'Tinder alternatifi en hızlı',
+        'Raya invite kodu bekleme',
+        'Hediye göndererek eşleşme',
+        'Güvenilir sosyal çevre hack',
+        'dating sırasını atla',
+        'lüks sosyal ağ',
+        'seyahat arkadaşı bul güvenilir',
+      ],
+    },
+    en: {
+      title: `${cityDisplay} | Hack the Queue & Match Instantly | TravelMatch`,
+      desc: `Stop waiting in ${cityDisplay}. Use our gifting economy to unlock exclusive moments and connect in seconds. The ultimate social access protocol.`,
+      keywords: [
+        `${cityDisplay} instant matching`,
+        `${cityDisplay} dating hack`,
+        'Why Tinder is slow',
+        'Bypass Bumble queue',
+        'Raya invite alternative',
+        'Instant matching 2026',
+        'Real world OnlyFans alternative',
+        'Elite social club access',
+        'Gifting economy social app',
+        'hack dating algorithms',
+      ],
+    },
+  };
+
+  return content[lang];
+};
+
+// ============================================================================
+// DISRUPTIVE KEYWORDS - Traffic Hijacking
+// Rakiplerin trafiğini çalmak için yıkıcı anahtar kelimeler
+// ============================================================================
+
+export const DISRUPTIVE_KEYWORDS = {
+  global: [
+    'Why Tinder is slow',
+    'Bypass Bumble queue',
+    'Raya invite hack',
+    'Raya invite alternative',
+    'Instant matching app 2026',
+    'Real world OnlyFans alternative',
+    'Elite social club access',
+    'Gifting economy social app',
+    'Skip dating queue',
+    'Hack dating algorithms',
+    'Fast match no waiting',
+    'Direct access dating',
+    'Proof of intent dating',
+  ],
+  turkish: [
+    'Tinder alternatifi en hızlı',
+    'Raya invite kodu bekleme',
+    'Hediye göndererek eşleşme',
+    'Güvenilir sosyal çevre hack',
+    'Dating sırasını atla',
+    'Anında tanışma uygulaması',
+    'Lüks sosyal çevre',
+    'Seyahat arkadaşı bul güvenilir',
+    'Hediye gönder tanış',
+    'Eşleşme yorgunluğu çözümü',
+  ],
+};
+
+// ============================================================================
+// pSEO ROUTE STRUCTURE - Dynamic URL Generation
+// Sitenin altyapısı için dinamik rota yapısı
+// ============================================================================
+
+export const PSEO_ROUTES = {
+  generateUrl: (lang: string, city: string, intent: string): string => {
+    const intentSlug = INTENT_SLUGS[intent]?.[lang] || intent;
+    return `/${lang}/${city}/${intentSlug}`;
+  },
+  examples: {
+    en: [
+      '/en/london/skip-the-queue',
+      '/en/dubai/moment-unlock',
+      '/en/new-york/instant-match',
+    ],
+    tr: [
+      '/tr/istanbul/sirayi-hackle',
+      '/tr/bodrum/aninda-tanis',
+      '/tr/dubai/hediye-gonder',
+    ],
+  },
+};
+
+const INTENT_SLUGS: Record<string, Record<string, string>> = {
+  'skip-queue': {
+    en: 'skip-the-queue',
+    tr: 'sirayi-hackle',
+  },
+  'instant-access': {
+    en: 'instant-access',
+    tr: 'aninda-tanis',
+  },
+  'unlock-moment': {
+    en: 'moment-unlock',
+    tr: 'ani-ac',
+  },
+  'gifting-moment': {
+    en: 'gift-to-match',
+    tr: 'hediye-gonder',
+  },
+};
+
+// ============================================================================
 // EXPORT CONFIGURATIONS
 // ============================================================================
 
