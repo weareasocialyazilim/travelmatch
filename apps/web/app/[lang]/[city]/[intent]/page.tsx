@@ -19,7 +19,7 @@ import {
   INTENT_CATEGORIES,
   type SupportedLanguage,
 } from '@/lib/seo-engine';
-import { KralHero } from '@/components/landing/KralHero';
+import { ConversionHero } from '@/components/landing/ConversionHero';
 import { LivePulse } from '@/components/landing/LivePulse';
 import { MomentGrid } from '@/components/landing/MomentGrid';
 import { GiftingSchema } from '@/components/seo/GiftingSchema';
@@ -50,8 +50,26 @@ export async function generateStaticParams() {
 
   // Generate all combinations for primary markets (higher priority)
   const primaryLangs = ['en', 'tr', 'ar', 'de', 'fr', 'es'];
-  const primaryCities = ['london', 'new-york', 'dubai', 'paris', 'tokyo', 'istanbul', 'berlin', 'miami', 'bali', 'singapore'];
-  const primaryIntents = ['dating-match', 'love-fortune', 'gifting-moment', 'travel-match', 'instant-love', 'fortune-connection'];
+  const primaryCities = [
+    'london',
+    'new-york',
+    'dubai',
+    'paris',
+    'tokyo',
+    'istanbul',
+    'berlin',
+    'miami',
+    'bali',
+    'singapore',
+  ];
+  const primaryIntents = [
+    'dating-match',
+    'love-fortune',
+    'gifting-moment',
+    'travel-match',
+    'instant-love',
+    'fortune-connection',
+  ];
 
   for (const lang of primaryLangs) {
     for (const city of primaryCities) {
@@ -80,7 +98,9 @@ export const dynamicParams = true;
 // METADATA GENERATION
 // ============================================================================
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { lang, city, intent } = await params;
 
   // Validate params
@@ -104,19 +124,25 @@ function isValidLanguage(lang: string): lang is SupportedLanguage {
 
 function isValidCity(city: string): boolean {
   // Accept all GLOBAL_CITIES plus allow any slugified city name
-  return GLOBAL_CITIES.includes(city as typeof GLOBAL_CITIES[number]) || /^[a-z0-9-]+$/.test(city);
+  return (
+    GLOBAL_CITIES.includes(city as (typeof GLOBAL_CITIES)[number]) ||
+    /^[a-z0-9-]+$/.test(city)
+  );
 }
 
 function isValidIntent(intent: string): boolean {
   // Accept all INTENT_CATEGORIES plus allow any slugified intent
-  return INTENT_CATEGORIES.includes(intent as typeof INTENT_CATEGORIES[number]) || /^[a-z0-9-]+$/.test(intent);
+  return (
+    INTENT_CATEGORIES.includes(intent as (typeof INTENT_CATEGORIES)[number]) ||
+    /^[a-z0-9-]+$/.test(intent)
+  );
 }
 
 // ============================================================================
 // PAGE COMPONENT
 // ============================================================================
 
-export default async function DynamicKralPage({ params }: PageProps) {
+export default async function DynamicConversionPage({ params }: PageProps) {
   const { lang, city, intent } = await params;
 
   // Validate and 404 if invalid
@@ -141,7 +167,7 @@ export default async function DynamicKralPage({ params }: PageProps) {
 
       <main className="relative min-h-screen bg-black text-white pt-12">
         {/* Hero Section with Conversion Focus */}
-        <KralHero
+        <ConversionHero
           city={cityName}
           citySlug={city}
           intent={intent}
@@ -155,8 +181,7 @@ export default async function DynamicKralPage({ params }: PageProps) {
             <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-4">
               <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-purple-600 bg-clip-text text-transparent">
                 {cityName}
-              </span>
-              {' '}
+              </span>{' '}
               {lang === 'tr' ? 'Aktif Momentlar' : 'Active Moments'}
             </h2>
             <p className="text-white/60 max-w-2xl mx-auto">
@@ -212,16 +237,19 @@ export default async function DynamicKralPage({ params }: PageProps) {
           <article>
             <h3>Why TravelMatch Dominates {cityName} Social Scene</h3>
             <p>
-              TravelMatch is the world&apos;s first direct-access gifting economy for social matching.
-              Unlike Tinder&apos;s slow luck-based algorithms or Bumble&apos;s time-limited matches,
-              TravelMatch lets you skip the queue entirely in {cityName}. Our {intent} feature
-              connects you with verified profiles through real-world moments and a transparent
-              gifting system. Find love, fortune, and travel connections instantly.
+              TravelMatch is the world&apos;s first direct-access gifting
+              economy for social matching. Unlike Tinder&apos;s slow luck-based
+              algorithms or Bumble&apos;s time-limited matches, TravelMatch lets
+              you skip the queue entirely in {cityName}. Our {intent} feature
+              connects you with verified profiles through real-world moments and
+              a transparent gifting system. Find love, fortune, and travel
+              connections instantly.
             </p>
             <p>
-              How to match faster in {cityName}? Use TravelMatch gifting to bypass dating algorithms.
-              Why wait for likes when you can unlock moments directly? Elite social networking,
-              premium gifting economy, instant matching - all in one platform.
+              How to match faster in {cityName}? Use TravelMatch gifting to
+              bypass dating algorithms. Why wait for likes when you can unlock
+              moments directly? Elite social networking, premium gifting
+              economy, instant matching - all in one platform.
             </p>
           </article>
         </div>
@@ -245,8 +273,12 @@ function StatItem({
 }) {
   return (
     <div className="flex flex-col items-center">
-      <span className={`text-3xl md:text-4xl font-black ${color}`}>{value}</span>
-      <span className="text-xs uppercase tracking-widest text-white/50 mt-2">{label}</span>
+      <span className={`text-3xl md:text-4xl font-black ${color}`}>
+        {value}
+      </span>
+      <span className="text-xs uppercase tracking-widest text-white/50 mt-2">
+        {label}
+      </span>
     </div>
   );
 }
