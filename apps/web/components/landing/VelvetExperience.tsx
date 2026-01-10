@@ -58,9 +58,9 @@ export function VelvetExperience({ children }: VelvetExperienceProps) {
   const smoothY = useSpring(portalY, { stiffness: 80, damping: 25 });
 
   // Content distortion based on scroll - Optimized for readability
-  // Reduced from -3/2 to -1.8 for professional "magazine" feel
-  const contentSkewX = useTransform(scrollYProgress, [0, 0.2], [0, -1.8]);
-  const contentSkewY = useTransform(scrollYProgress, [0, 0.2], [0, 1.2]);
+  // Reduced from -3/2 to -1.5 for professional "magazine" feel
+  const contentSkewX = useTransform(scrollYProgress, [0, 0.2], [0, -1.5]);
+  const contentSkewY = useTransform(scrollYProgress, [0, 0.2], [0, 1.0]);
 
   // Track when portal should become follower
   useEffect(() => {
