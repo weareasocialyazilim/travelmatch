@@ -139,6 +139,8 @@ export interface Message {
   status?: 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
   imageUrl?: string;
   location?: { lat: number; lng: number };
+  // E2E Encryption status
+  isEncrypted?: boolean;
 }
 
 export interface MessageSender {
@@ -465,6 +467,16 @@ class MessageService {
         .eq('id', insertedMsg.id)
         .single();
 
+      // Determine if message was encrypted
+      const wasEncrypted = !!nonce;
+
+      // Log warning if message was not encrypted (for monitoring)
+      if (!wasEncrypted) {
+        logger.warn(
+          '[MessageService] Message sent without encryption - recipient may not have public key',
+        );
+      }
+
       // Return with original content (not encrypted) for immediate UI display
       const transformedMessage = transformMessage(
         fullMessage as MessageRow & { sender?: UserRow },
@@ -472,6 +484,7 @@ class MessageService {
       return {
         ...transformedMessage,
         content: data.content, // Use original content for UI
+        isEncrypted: wasEncrypted,
       };
     } catch (error) {
       logger.error('[MessageService] sendMessage error:', error);
