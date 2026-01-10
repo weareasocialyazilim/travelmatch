@@ -155,8 +155,9 @@ const NUMBER_WORDS = {
 // =============================================================================
 
 const PII_PATTERNS = {
+  // Email pattern: matches standard emails and obfuscated forms like test[at]example[dot]com
   email:
-    /\b[A-Za-z0-9._%+-]+\s*[@\[at\]]\s*[A-Za-z0-9.-]+\s*[.\[dot\]]\s*[A-Za-z]{2,}\b/gi,
+    /\b[A-Za-z0-9._%+-]+\s*(?:@|\[at\])\s*[A-Za-z0-9.-]+\s*(?:\.|\[dot\])\s*[A-Za-z]{2,}\b/gi,
   tcKimlik: /\b[1-9][0-9]{10}\b/g, // Turkish ID
   ssn: /\b[0-9]{3}[-\s]?[0-9]{2}[-\s]?[0-9]{4}\b/g, // US SSN
   iban: /\b[A-Z]{2}\s*[0-9]{2}\s*[0-9A-Z\s]{12,30}\b/gi,
@@ -308,6 +309,7 @@ class BilingualContentFilter {
 
   /**
    * Build regex that catches leetspeak variations
+   * Uses negative lookbehind to handle special characters like @ properly
    */
   private buildBadWordsRegex(words: string[]): RegExp {
     const patterns = words.map((word) => {
@@ -324,7 +326,9 @@ class BilingualContentFilter {
       return pattern;
     });
 
-    return new RegExp(`\\b(${patterns.join('|')})`, 'gi');
+    // Use negative lookbehind (?<![a-zA-Z0-9]) instead of \b
+    // This handles cases where pattern starts with special chars like @
+    return new RegExp(`(?<![a-zA-Z0-9])(${patterns.join('|')})`, 'gi');
   }
 
   /**
