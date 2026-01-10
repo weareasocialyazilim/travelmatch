@@ -80,6 +80,7 @@ jest.mock(
   'next/dynamic',
   () =>
     (
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       _loader: () => Promise<{
         default: React.ComponentType<{ children?: React.ReactNode }>;
       }>,
