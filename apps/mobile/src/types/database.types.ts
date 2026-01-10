@@ -591,8 +591,10 @@ export type Database = {
           created_at: string | null;
           id: string;
           metadata: Json | null;
+          nonce: string | null; // E2E Encryption nonce
           read_at: string | null;
           sender_id: string;
+          sender_public_key: string | null; // E2E Sender's public key
           type: string | null;
         };
         Insert: {
@@ -601,8 +603,10 @@ export type Database = {
           created_at?: string | null;
           id?: string;
           metadata?: Json | null;
+          nonce?: string | null; // E2E Encryption nonce
           read_at?: string | null;
           sender_id: string;
+          sender_public_key?: string | null; // E2E Sender's public key
           type?: string | null;
         };
         Update: {
@@ -611,7 +615,9 @@ export type Database = {
           created_at?: string | null;
           id?: string;
           metadata?: Json | null;
+          nonce?: string | null; // E2E Encryption nonce
           read_at?: string | null;
+          sender_public_key?: string | null; // E2E Sender's public key
           sender_id?: string;
           type?: string | null;
         };
@@ -1394,6 +1400,7 @@ export type Database = {
           notification_preferences: Json | null;
           phone: string | null;
           privacy_settings: Json | null;
+          public_key: string | null; // E2E Encryption public key
           push_token: string | null;
           rating: number | null;
           reinstated_at: string | null;
@@ -1438,6 +1445,7 @@ export type Database = {
           notification_preferences?: Json | null;
           phone?: string | null;
           privacy_settings?: Json | null;
+          public_key?: string | null; // E2E Encryption public key
           push_token?: string | null;
           rating?: number | null;
           reinstated_at?: string | null;
@@ -1482,6 +1490,7 @@ export type Database = {
           notification_preferences?: Json | null;
           phone?: string | null;
           privacy_settings?: Json | null;
+          public_key?: string | null; // E2E Encryption public key
           push_token?: string | null;
           rating?: number | null;
           reinstated_at?: string | null;

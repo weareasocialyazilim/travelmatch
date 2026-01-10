@@ -25,9 +25,21 @@ export interface MessageLocation {
 }
 
 /**
+ * E2E Encryption fields for messages
+ */
+export interface EncryptedMessageFields {
+  /** Base64 encoded nonce used for encryption */
+  nonce?: string;
+  /** Sender's public key (Base64) for decryption */
+  sender_public_key?: string;
+  /** Whether this message is encrypted */
+  is_encrypted?: boolean;
+}
+
+/**
  * Base message interface - shared properties
  */
-export interface BaseMessage {
+export interface BaseMessage extends EncryptedMessageFields {
   id: string;
   conversation_id: string;
   sender_id: string;
