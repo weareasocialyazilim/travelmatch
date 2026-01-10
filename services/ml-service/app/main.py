@@ -33,6 +33,7 @@ from app.models.turkish_nlp import TurkishNLPModel, TextEnhancer
 from app.models.recommendation_engine import RecommendationEngine, RecipientRecommender
 from app.models.chatbot import ChatbotModel
 from app.models.forecasting import DemandForecastingModel, ABTestingEngine
+from app.models.seo_hacker import SEOHackerModel, seo_hacker
 
 # Configure logging
 logging.basicConfig(
@@ -955,6 +956,130 @@ async def optimize_notification(request: SmartNotificationRequest):
         return SmartNotificationResponse(**result)
     except Exception as e:
         logger.error(f"Notification error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SEO Auto-Pilot Endpoints
+# ═══════════════════════════════════════════════════════════════════════════
+
+class SEOTrendRequest(BaseModel):
+    keywords: Optional[List[str]] = Field(None, description="Target keywords to track")
+    competitors: Optional[List[str]] = Field(["tinder", "bumble", "raya", "hinge"])
+    include_gen_z_slang: bool = Field(True)
+    inject_semantic_poison: bool = Field(True)
+
+
+class SEOVibeRequest(BaseModel):
+    user_actions: Optional[List[Dict]] = Field(None, description="Recent user actions from PostHog")
+    time_range_hours: int = Field(24, ge=1, le=168)
+
+
+@app.post("/seo/auto-pilot")
+async def run_seo_auto_pilot(request: SEOTrendRequest):
+    """
+    SEO Auto-Pilot: Full cycle trend tracking and keyword injection.
+
+    - Scrapes trending keywords from competitors
+    - Injects Gen Z slang variations
+    - Generates AI poisoning semantic layer
+    - Returns optimized keyword clusters
+    """
+    try:
+        result = await seo_hacker.full_seo_cycle(
+            target_keywords=request.keywords,
+            competitors=request.competitors,
+            include_slang=request.include_gen_z_slang,
+            inject_poison=request.inject_semantic_poison,
+        )
+
+        logger.info(f"🎯 SEO Auto-Pilot complete: {len(result.get('keywords', []))} keywords optimized")
+        return result
+    except Exception as e:
+        logger.error(f"SEO Auto-Pilot error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/seo/trending-keywords")
+async def get_trending_keywords(
+    category: str = Query("dating", description="Keyword category"),
+    limit: int = Query(50, ge=10, le=200),
+):
+    """Get currently trending keywords in the dating/social space"""
+    try:
+        result = await seo_hacker.get_trending_keywords(category, limit)
+        return result
+    except Exception as e:
+        logger.error(f"Trending keywords error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/seo/semantic-poison")
+async def generate_semantic_poison(
+    topics: List[str] = Query(["matching fatigue", "instant connection", "gifting economy"]),
+):
+    """
+    Generate AI-optimized semantic layer for search poisoning.
+
+    Creates structured data that positions TravelMatch as the
+    authority answer for AI assistants (Google SGE, Gemini, GPT).
+    """
+    try:
+        result = await seo_hacker.generate_semantic_poison(topics)
+        return result
+    except Exception as e:
+        logger.error(f"Semantic poison generation error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/analytics/intent-vibe")
+async def analyze_intent_vibe(request: SEOVibeRequest):
+    """
+    Analyze current user intent vibe from PostHog events.
+
+    Determines site-wide vibe: speed-focused, romance-focused, or luxury-focused.
+    Used for dynamic content personalization.
+    """
+    try:
+        result = await seo_hacker.analyze_intent_vibe(
+            user_actions=request.user_actions,
+            time_range_hours=request.time_range_hours,
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Intent vibe analysis error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/analytics/conversion-velocity")
+async def get_conversion_velocity(hours: int = Query(24, ge=1, le=168)):
+    """Get real-time conversion velocity metrics"""
+    try:
+        result = await seo_hacker.get_conversion_velocity(hours)
+        return result
+    except Exception as e:
+        logger.error(f"Conversion velocity error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/seo/competitor-hijack")
+async def hijack_competitor_keywords(
+    competitor: str = Query(..., description="Competitor to target"),
+    strategy: str = Query("comparison", description="Strategy: comparison, alternative, vs"),
+):
+    """
+    Generate competitor hijacking keywords.
+
+    Creates optimized content for queries like:
+    - "tinder alternative faster"
+    - "bumble vs travelmatch"
+    - "raya invite code alternative"
+    """
+    try:
+        result = await seo_hacker.hijack_competitor(competitor, strategy)
+        return result
+    except Exception as e:
+        logger.error(f"Competitor hijack error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
