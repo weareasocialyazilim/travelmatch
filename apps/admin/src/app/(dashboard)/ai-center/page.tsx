@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Brain,
   TrendingUp,
@@ -16,6 +16,12 @@ import {
   Eye,
   RefreshCw,
   Settings,
+  Loader2,
+  Bot,
+  DollarSign,
+  MessageSquare,
+  FlaskConical,
+  LineChart as LineChartIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -30,6 +36,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   LineChart,
   Line,
@@ -41,153 +48,141 @@ import {
   PieChart,
   Pie,
   Cell,
+  AreaChart,
+  Area,
 } from 'recharts';
 import { formatDate } from '@/lib/utils';
+import aiServiceAdmin, {
+  type AIModelStats,
+  type ModerationStats,
+  type ChurnPrediction,
+  type LTVPrediction,
+  type Anomaly,
+  type ContentQualityData,
+  type ContentDistribution,
+  type ABExperiment,
+  type CategoryTrend,
+} from '@/lib/ai-service';
+import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
-// Mock data - Gift Platform AI Stats
-const moderationStats = {
-  totalProcessed: 45678,
-  proofsVerified: 38450,
-  proofsRejected: 1234,
-  pendingReview: 5994,
-  accuracy: 97.8,
+// Model icon mapping
+const modelIcons: Record<string, React.ElementType> = {
+  proof_verification: CheckCircle,
+  price_prediction: DollarSign,
+  turkish_nlp: MessageSquare,
+  recommendation_engine: Target,
+  chatbot: Bot,
+  fraud_detection: AlertTriangle,
+  forecasting: LineChartIcon,
 };
 
-const contentQualityData = [
-  { date: '12 Ara', score: 78 },
-  { date: '13 Ara', score: 82 },
-  { date: '14 Ara', score: 79 },
-  { date: '15 Ara', score: 85 },
-  { date: '16 Ara', score: 88 },
-  { date: '17 Ara', score: 84 },
-  { date: '18 Ara', score: 87 },
-];
-
-const churnPredictions = [
-  {
-    id: '1',
-    user: 'Elif K.',
-    risk: 'high',
-    probability: 85,
-    factors: [
-      '7 gündür inaktif',
-      'Son ayda 0 hediye gönderdi',
-      'Premium iptal edildi',
-    ],
-    suggested_action: 'Hediye kampanyası e-postası gönder',
-  },
-  {
-    id: '2',
-    user: 'Mehmet Y.',
-    risk: 'medium',
-    probability: 62,
-    factors: ['Aktivite düştü %50', 'Hiç moment oluşturmadı'],
-    suggested_action: 'Push bildirim ile hatırlat',
-  },
-  {
-    id: '3',
-    user: 'Ayşe B.',
-    risk: 'medium',
-    probability: 58,
-    factors: ['Bekleyen hediye kanıtı var', 'Son giriş 5 gün önce'],
-    suggested_action: 'Kanıt yükleme hatırlatıcısı gönder',
-  },
-];
-
-const ltvPredictions = [
-  { segment: 'Platinum Gönderici', users: 2400, avgLTV: 2850, trend: 'up' },
-  { segment: 'Pro Gönderici', users: 8200, avgLTV: 920, trend: 'up' },
-  { segment: 'Starter Gönderici', users: 15000, avgLTV: 245, trend: 'stable' },
-  { segment: 'Ücretsiz Kullanıcı', users: 45000, avgLTV: 35, trend: 'up' },
-];
-
-const anomalies = [
-  {
-    id: '1',
-    type: 'proof_fraud',
-    severity: 'critical',
-    message: 'Sahte kanıt tespit edildi',
-    details: '3 kullanıcı aynı fotoğrafı farklı momentler için yükledi',
-    detected_at: '2024-12-18T14:30:00Z',
-  },
-  {
-    id: '2',
-    type: 'fraud_pattern',
-    severity: 'critical',
-    message: 'Potansiyel dolandırıcılık kümesi',
-    details: '15 hesap benzer para çekme davranışı gösteriyor',
-    detected_at: '2024-12-18T13:15:00Z',
-  },
-  {
-    id: '3',
-    type: 'gift_trend',
-    severity: 'info',
-    message: 'Yeni hediye trendi tespit edildi',
-    details: '"Kapadokya Balon Turu" momentlerinde %180 artış',
-    detected_at: '2024-12-18T12:00:00Z',
-  },
-];
-
-const aiModels = [
-  {
-    id: 'proof_verification',
-    name: 'Kanıt Doğrulama (KYC)',
-    status: 'active',
-    accuracy: 96.5,
-    lastUpdated: '2024-12-15T00:00:00Z',
-    processedToday: 8450,
-  },
-  {
-    id: 'offer_analysis',
-    name: 'Teklif Analizi',
-    status: 'active',
-    accuracy: 98.2,
-    lastUpdated: '2024-12-18T00:00:00Z',
-    processedToday: 15600,
-  },
-  {
-    id: 'content_moderation',
-    name: 'İçerik Moderasyonu',
-    status: 'active',
-    accuracy: 97.8,
-    lastUpdated: '2024-12-15T00:00:00Z',
-    processedToday: 12450,
-  },
-  {
-    id: 'fraud_detection',
-    name: 'Dolandırıcılık Tespiti',
-    status: 'active',
-    accuracy: 94.2,
-    lastUpdated: '2024-12-10T00:00:00Z',
-    processedToday: 8900,
-  },
-  {
-    id: 'smart_notifications',
-    name: 'Akıllı Bildirimler',
-    status: 'active',
-    accuracy: 88.5,
-    lastUpdated: '2024-12-12T00:00:00Z',
-    processedToday: 45000,
-  },
-  {
-    id: 'moment_suggestions',
-    name: 'Moment Önerileri',
-    status: 'active',
-    accuracy: 82.3,
-    lastUpdated: '2024-12-18T00:00:00Z',
-    processedToday: 28000,
-  },
-];
-
-const contentDistribution = [
-  { name: 'Kanıt Onaylandı', value: 84, color: '#22c55e' },
-  { name: 'Kanıt Reddedildi', value: 3, color: '#ef4444' },
-  { name: 'Manuel İnceleme', value: 13, color: '#f59e0b' },
-];
-
 export default function AICenterPage() {
-  const [_selectedModel, _setSelectedModel] = useState<string | null>(null);
+  // State
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [models, setModels] = useState<AIModelStats[]>([]);
+  const [moderationStats, setModerationStats] =
+    useState<ModerationStats | null>(null);
+  const [churnPredictions, setChurnPredictions] = useState<ChurnPrediction[]>(
+    [],
+  );
+  const [ltvPredictions, setLtvPredictions] = useState<LTVPrediction[]>([]);
+  const [anomalies, setAnomalies] = useState<Anomaly[]>([]);
+  const [qualityTrend, setQualityTrend] = useState<ContentQualityData[]>([]);
+  const [contentDistribution, setContentDistribution] = useState<
+    ContentDistribution[]
+  >([]);
+  const [experiments, setExperiments] = useState<ABExperiment[]>([]);
+  const [categoryTrends, setCategoryTrends] = useState<CategoryTrend[]>([]);
 
+  // Fetch all data
+  const fetchData = useCallback(async () => {
+    try {
+      const [
+        modelsData,
+        statsData,
+        churnData,
+        ltvData,
+        anomaliesData,
+        qualityData,
+        distributionData,
+        experimentsData,
+        trendsData,
+      ] = await Promise.all([
+        aiServiceAdmin.getModelStats(),
+        aiServiceAdmin.getModerationStats(),
+        aiServiceAdmin.getChurnPredictions(),
+        aiServiceAdmin.getLTVPredictions(),
+        aiServiceAdmin.getAnomalies(),
+        aiServiceAdmin.getContentQualityTrend(),
+        aiServiceAdmin.getContentDistribution(),
+        aiServiceAdmin.getExperiments(),
+        aiServiceAdmin.getCategoryTrends(),
+      ]);
+
+      setModels(modelsData);
+      setModerationStats(statsData);
+      setChurnPredictions(churnData);
+      setLtvPredictions(ltvData);
+      setAnomalies(anomaliesData);
+      setQualityTrend(qualityData);
+      setContentDistribution(distributionData);
+      setExperiments(experimentsData);
+      setCategoryTrends(trendsData);
+    } catch (error) {
+      logger.error('Failed to fetch AI data:', error);
+      toast.error('Veriler yüklenirken hata oluştu');
+    }
+  }, []);
+
+  // Initial load
+  useEffect(() => {
+    const load = async () => {
+      setIsLoading(true);
+      await fetchData();
+      setIsLoading(false);
+    };
+    load();
+  }, [fetchData]);
+
+  // Refresh handler
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await fetchData();
+    setIsRefreshing(false);
+    toast.success('Veriler güncellendi');
+  };
+
+  // Toggle model status
+  const handleToggleModel = async (modelId: string, active: boolean) => {
+    try {
+      await aiServiceAdmin.toggleModelStatus(modelId, active);
+      setModels((prev) =>
+        prev.map((m) =>
+          m.id === modelId
+            ? { ...m, status: active ? 'active' : 'inactive' }
+            : m,
+        ),
+      );
+      toast.success(`Model ${active ? 'aktif' : 'pasif'} edildi`);
+    } catch {
+      toast.error('Model durumu değiştirilemedi');
+    }
+  };
+
+  // Resolve anomaly
+  const handleResolveAnomaly = async (anomalyId: string) => {
+    try {
+      await aiServiceAdmin.resolveAnomaly(anomalyId);
+      setAnomalies((prev) => prev.filter((a) => a.id !== anomalyId));
+      toast.success('Anomali çözüldü olarak işaretlendi');
+    } catch {
+      toast.error('Anomali çözülemedi');
+    }
+  };
+
+  // Helper functions
   const getSeverityBadge = (severity: string) => {
     const variants: Record<
       string,
@@ -210,22 +205,61 @@ export default function AICenterPage() {
   const getRiskBadge = (risk: string) => {
     const variants: Record<
       string,
-      { variant: 'default' | 'secondary' | 'destructive'; color: string }
+      { variant: 'default' | 'secondary' | 'destructive' }
     > = {
-      high: { variant: 'destructive', color: 'bg-red-500' },
-      medium: { variant: 'secondary', color: 'bg-yellow-500' },
-      low: { variant: 'default', color: 'bg-green-500' },
+      high: { variant: 'destructive' },
+      medium: { variant: 'secondary' },
+      low: { variant: 'default' },
     };
-    const { variant } = variants[risk] || {
-      variant: 'default',
-      color: 'bg-gray-500',
-    };
+    const { variant } = variants[risk] || { variant: 'default' };
     return (
       <Badge variant={variant}>
         {risk === 'high' ? 'Yüksek' : risk === 'medium' ? 'Orta' : 'Düşük'}
       </Badge>
     );
   };
+
+  const getTrendBadge = (trend: string) => {
+    if (trend === 'rising' || trend === 'up') {
+      return (
+        <Badge variant="default" className="bg-green-100 text-green-800">
+          <TrendingUp className="mr-1 h-3 w-3" />
+          Yükseliyor
+        </Badge>
+      );
+    }
+    if (trend === 'falling' || trend === 'down') {
+      return (
+        <Badge variant="destructive">
+          <TrendingDown className="mr-1 h-3 w-3" />
+          Düşüyor
+        </Badge>
+      );
+    }
+    return (
+      <Badge variant="outline">
+        <Activity className="mr-1 h-3 w-3" />
+        Sabit
+      </Badge>
+    );
+  };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-10 w-64" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <div className="grid gap-4 md:grid-cols-5">
+          {[...Array(5)].map((_, i) => (
+            <Skeleton key={i} className="h-28" />
+          ))}
+        </div>
+        <Skeleton className="h-96" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -239,92 +273,108 @@ export default function AICenterPage() {
             Hediye doğrulama ve kanıt analizi için AI modelleri
           </p>
         </div>
-        <Button variant="outline">
-          <Settings className="mr-2 h-4 w-4" />
-          Model Ayarları
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+          >
+            {isRefreshing ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="mr-2 h-4 w-4" />
+            )}
+            Yenile
+          </Button>
+          <Button variant="outline">
+            <Settings className="mr-2 h-4 w-4" />
+            Model Ayarları
+          </Button>
+        </div>
       </div>
 
       {/* Proof Verification Stats */}
-      <div className="grid gap-4 md:grid-cols-5">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-                <Brain className="h-6 w-6 text-blue-600" />
+      {moderationStats && (
+        <div className="grid gap-4 md:grid-cols-5">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+                  <Brain className="h-6 w-6 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">
+                    {moderationStats.totalProcessed.toLocaleString('tr-TR')}
+                  </p>
+                  <p className="text-sm text-muted-foreground">Toplam Kanıt</p>
+                </div>
               </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {moderationStats.totalProcessed.toLocaleString('tr-TR')}
-                </p>
-                <p className="text-sm text-muted-foreground">Toplam Kanıt</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+                  <CheckCircle className="h-6 w-6 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">
+                    {moderationStats.proofsVerified.toLocaleString('tr-TR')}
+                  </p>
+                  <p className="text-sm text-muted-foreground">Doğrulanan</p>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-                <CheckCircle className="h-6 w-6 text-green-600" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+                  <XCircle className="h-6 w-6 text-red-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">
+                    {moderationStats.proofsRejected.toLocaleString('tr-TR')}
+                  </p>
+                  <p className="text-sm text-muted-foreground">Reddedilen</p>
+                </div>
               </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {moderationStats.proofsVerified.toLocaleString('tr-TR')}
-                </p>
-                <p className="text-sm text-muted-foreground">Doğrulanan</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100">
+                  <Eye className="h-6 w-6 text-yellow-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">
+                    {moderationStats.pendingReview.toLocaleString('tr-TR')}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    İnceleme Bekliyor
+                  </p>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
-                <XCircle className="h-6 w-6 text-red-600" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100">
+                  <Target className="h-6 w-6 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">
+                    %{moderationStats.accuracy.toFixed(1)}
+                  </p>
+                  <p className="text-sm text-muted-foreground">Doğruluk</p>
+                </div>
               </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {moderationStats.proofsRejected.toLocaleString('tr-TR')}
-                </p>
-                <p className="text-sm text-muted-foreground">Reddedilen</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100">
-                <Eye className="h-6 w-6 text-yellow-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {moderationStats.pendingReview.toLocaleString('tr-TR')}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  İnceleme Bekliyor
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100">
-                <Target className="h-6 w-6 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  %{moderationStats.accuracy}
-                </p>
-                <p className="text-sm text-muted-foreground">Doğruluk</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       <Tabs defaultValue="models" className="space-y-4">
         <TabsList>
@@ -340,6 +390,14 @@ export default function AICenterPage() {
             <AlertTriangle className="mr-2 h-4 w-4" />
             Anomaliler
           </TabsTrigger>
+          <TabsTrigger value="experiments">
+            <FlaskConical className="mr-2 h-4 w-4" />
+            A/B Testler
+          </TabsTrigger>
+          <TabsTrigger value="trends">
+            <LineChartIcon className="mr-2 h-4 w-4" />
+            Trendler
+          </TabsTrigger>
           <TabsTrigger value="quality">
             <BarChart3 className="mr-2 h-4 w-4" />
             Kanıt Kalitesi
@@ -349,54 +407,89 @@ export default function AICenterPage() {
         {/* AI Models Tab */}
         <TabsContent value="models" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {aiModels.map((model) => (
-              <Card key={model.id}>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base">{model.name}</CardTitle>
-                    <Badge
-                      variant={
-                        model.status === 'active' ? 'default' : 'secondary'
-                      }
-                    >
-                      {model.status === 'active' ? 'Aktif' : 'Pasif'}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Doğruluk</span>
-                      <span className="font-medium">%{model.accuracy}</span>
+            {models.map((model) => {
+              const IconComponent = modelIcons[model.id] || Brain;
+              return (
+                <Card key={model.id}>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <IconComponent className="h-5 w-5 text-muted-foreground" />
+                        <CardTitle className="text-base">
+                          {model.name}
+                        </CardTitle>
+                      </div>
+                      <Badge
+                        variant={
+                          model.status === 'active' ? 'default' : 'secondary'
+                        }
+                      >
+                        {model.status === 'active' ? 'Aktif' : 'Pasif'}
+                      </Badge>
                     </div>
-                    <Progress value={model.accuracy} className="h-2" />
-                  </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Doğruluk</span>
+                        <span className="font-medium">
+                          %{model.accuracy.toFixed(1)}
+                        </span>
+                      </div>
+                      <Progress value={model.accuracy} className="h-2" />
+                    </div>
 
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Bugün İşlenen</span>
-                    <span className="font-medium">
-                      {model.processedToday.toLocaleString('tr-TR')}
-                    </span>
-                  </div>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">Bugün</span>
+                        <p className="font-medium">
+                          {model.processedToday.toLocaleString('tr-TR')}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Latency</span>
+                        <p className="font-medium">{model.avgLatencyMs}ms</p>
+                      </div>
+                    </div>
 
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      Son Güncelleme
-                    </span>
-                    <span className="text-muted-foreground">
-                      {formatDate(model.lastUpdated)}
-                    </span>
-                  </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Hata Oranı</span>
+                      <span
+                        className={
+                          model.errorRate > 0.05
+                            ? 'text-red-500'
+                            : 'text-green-500'
+                        }
+                      >
+                        %{(model.errorRate * 100).toFixed(2)}
+                      </span>
+                    </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t">
-                    <Label htmlFor={`model-${model.id}`} className="text-sm">
-                      Model Aktif
-                    </Label>
-                    <Switch id={`model-${model.id}`} defaultChecked />
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">
+                        Son Güncelleme
+                      </span>
+                      <span className="text-muted-foreground">
+                        {formatDate(model.lastUpdated)}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between border-t pt-4">
+                      <Label htmlFor={`model-${model.id}`} className="text-sm">
+                        Model Aktif
+                      </Label>
+                      <Switch
+                        id={`model-${model.id}`}
+                        checked={model.status === 'active'}
+                        onCheckedChange={(checked) =>
+                          handleToggleModel(model.id, checked)
+                        }
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </TabsContent>
 
@@ -450,7 +543,7 @@ export default function AICenterPage() {
                       </p>
                       <Button size="sm" variant="outline">
                         <Zap className="mr-2 h-4 w-4" />
-                        {prediction.suggested_action}
+                        {prediction.suggestedAction}
                       </Button>
                     </div>
                   </div>
@@ -484,22 +577,14 @@ export default function AICenterPage() {
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="text-right">
-                        <p className="font-semibold">₺{segment.avgLTV}</p>
+                        <p className="font-semibold">
+                          ₺{segment.avgLTV.toLocaleString('tr-TR')}
+                        </p>
                         <p className="text-xs text-muted-foreground">
                           Ort. LTV
                         </p>
                       </div>
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full">
-                        {segment.trend === 'up' && (
-                          <TrendingUp className="h-5 w-5 text-green-500" />
-                        )}
-                        {segment.trend === 'down' && (
-                          <TrendingDown className="h-5 w-5 text-red-500" />
-                        )}
-                        {segment.trend === 'stable' && (
-                          <Activity className="h-5 w-5 text-gray-500" />
-                        )}
-                      </div>
+                      {getTrendBadge(segment.trend)}
                     </div>
                   </div>
                 ))}
@@ -519,68 +604,253 @@ export default function AICenterPage() {
                     Olağandışı davranışlar ve sistem uyarıları
                   </CardDescription>
                 </div>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={handleRefresh}>
                   <RefreshCw className="mr-2 h-4 w-4" />
                   Yenile
                 </Button>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {anomalies.map((anomaly) => (
-                  <div
-                    key={anomaly.id}
-                    className={`rounded-lg border p-4 ${
-                      anomaly.severity === 'critical'
-                        ? 'border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950'
-                        : anomaly.severity === 'warning'
-                          ? 'border-yellow-200 bg-yellow-50 dark:border-yellow-900 dark:bg-yellow-950'
-                          : ''
-                    }`}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-4">
+              {anomalies.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+                  <CheckCircle className="h-12 w-12 mb-4 text-green-500" />
+                  <p>Aktif anomali bulunmuyor</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {anomalies.map((anomaly) => (
+                    <div
+                      key={anomaly.id}
+                      className={`rounded-lg border p-4 ${
+                        anomaly.severity === 'critical'
+                          ? 'border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950'
+                          : anomaly.severity === 'warning'
+                            ? 'border-yellow-200 bg-yellow-50 dark:border-yellow-900 dark:bg-yellow-950'
+                            : ''
+                      }`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start gap-4">
+                          <div
+                            className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                              anomaly.severity === 'critical'
+                                ? 'bg-red-100'
+                                : anomaly.severity === 'warning'
+                                  ? 'bg-yellow-100'
+                                  : 'bg-blue-100'
+                            }`}
+                          >
+                            <AlertTriangle
+                              className={`h-5 w-5 ${
+                                anomaly.severity === 'critical'
+                                  ? 'text-red-600'
+                                  : anomaly.severity === 'warning'
+                                    ? 'text-yellow-600'
+                                    : 'text-blue-600'
+                              }`}
+                            />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium">{anomaly.message}</p>
+                              {getSeverityBadge(anomaly.severity)}
+                            </div>
+                            <p className="mt-1 text-sm text-muted-foreground">
+                              {anomaly.details}
+                            </p>
+                            <p className="mt-2 text-xs text-muted-foreground">
+                              Tespit: {formatDate(anomaly.detectedAt)}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleResolveAnomaly(anomaly.id)}
+                        >
+                          Çözüldü
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* A/B Experiments Tab */}
+        <TabsContent value="experiments" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>A/B Test Yönetimi</CardTitle>
+                  <CardDescription>
+                    Aktif ve tamamlanmış deneyler
+                  </CardDescription>
+                </div>
+                <Button>
+                  <FlaskConical className="mr-2 h-4 w-4" />
+                  Yeni Deney
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {experiments.map((exp) => (
+                  <div key={exp.id} className="rounded-lg border p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium">{exp.name}</p>
+                          <Badge
+                            variant={
+                              exp.status === 'running'
+                                ? 'default'
+                                : exp.status === 'completed'
+                                  ? 'secondary'
+                                  : 'outline'
+                            }
+                          >
+                            {exp.status === 'running'
+                              ? 'Çalışıyor'
+                              : exp.status === 'completed'
+                                ? 'Tamamlandı'
+                                : 'Taslak'}
+                          </Badge>
+                        </div>
+                        {exp.statisticalSignificance && (
+                          <p className="text-sm text-muted-foreground mt-1">
+                            İstatistiksel anlamlılık: %
+                            {exp.statisticalSignificance.toFixed(1)}
+                          </p>
+                        )}
+                      </div>
+                      {exp.winner && (
+                        <Badge
+                          variant="default"
+                          className="bg-green-100 text-green-800"
+                        >
+                          Kazanan: {exp.winner}
+                        </Badge>
+                      )}
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-3">
+                      {exp.variants.map((variant, i) => (
                         <div
-                          className={`flex h-10 w-10 items-center justify-center rounded-full ${
-                            anomaly.severity === 'critical'
-                              ? 'bg-red-100'
-                              : anomaly.severity === 'warning'
-                                ? 'bg-yellow-100'
-                                : 'bg-blue-100'
+                          key={i}
+                          className={`rounded-lg border p-3 ${
+                            exp.winner === variant.name
+                              ? 'border-green-500 bg-green-50'
+                              : ''
                           }`}
                         >
-                          <AlertTriangle
-                            className={`h-5 w-5 ${
-                              anomaly.severity === 'critical'
-                                ? 'text-red-600'
-                                : anomaly.severity === 'warning'
-                                  ? 'text-yellow-600'
-                                  : 'text-blue-600'
-                            }`}
-                          />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <p className="font-medium">{anomaly.message}</p>
-                            {getSeverityBadge(anomaly.severity)}
+                          <p className="font-medium">{variant.name}</p>
+                          <div className="mt-2 space-y-1 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">
+                                Trafik:
+                              </span>
+                              <span>%{variant.traffic}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">
+                                Dönüşüm:
+                              </span>
+                              <span>
+                                {variant.conversions.toLocaleString('tr-TR')}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">
+                                Oran:
+                              </span>
+                              <span className="font-medium">
+                                %{variant.conversionRate.toFixed(1)}
+                              </span>
+                            </div>
                           </div>
-                          <p className="mt-1 text-sm text-muted-foreground">
-                            {anomaly.details}
-                          </p>
-                          <p className="mt-2 text-xs text-muted-foreground">
-                            Tespit: {formatDate(anomaly.detected_at)}
-                          </p>
                         </div>
-                      </div>
-                      <Button size="sm" variant="outline">
-                        İncele
-                      </Button>
+                      ))}
                     </div>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Trends Tab */}
+        <TabsContent value="trends" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Kategori Trendleri</CardTitle>
+                <CardDescription>
+                  Popüler hediye kategorileri ve değişimler
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {categoryTrends.map((trend, i) => (
+                    <div key={i} className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">{trend.category}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {trend.volume.toLocaleString('tr-TR')} hediye
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={
+                            trend.changePercent > 0
+                              ? 'text-green-500'
+                              : trend.changePercent < 0
+                                ? 'text-red-500'
+                                : ''
+                          }
+                        >
+                          {trend.changePercent > 0 ? '+' : ''}
+                          {trend.changePercent}%
+                        </span>
+                        {getTrendBadge(trend.trend)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Talep Tahmini</CardTitle>
+                <CardDescription>
+                  Önümüzdeki 7 günlük hediye talebi
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={qualityTrend}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip />
+                      <Area
+                        type="monotone"
+                        dataKey="volume"
+                        stroke="#8b5cf6"
+                        fill="#8b5cf680"
+                        strokeWidth={2}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* Content Quality Tab */}
@@ -597,7 +867,7 @@ export default function AICenterPage() {
               <CardContent>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={contentQualityData}>
+                    <LineChart data={qualityTrend}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="date" />
                       <YAxis domain={[60, 100]} />
