@@ -282,13 +282,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: -0.3,
   },
-  onlineDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: VIBE_ROOM_COLORS.neon.emerald,
-    marginLeft: 2,
-  },
   momentTitle: {
     color: VIBE_ROOM_COLORS.text.tertiary,
     fontSize: 12,
@@ -374,7 +367,6 @@ interface AwwwardsInboxChatItemProps {
     lastMessage: string;
     time: string;
     unread: number;
-    isOnline?: boolean;
     isVerified?: boolean;
   };
   onPress: () => void;
@@ -409,7 +401,7 @@ export const AwwwardsInboxChatItem: React.FC<AwwwardsInboxChatItemProps> = memo(
         {/* Avatar with Neon Glow */}
         <View style={awwwardsStyles.avatarContainer}>
           <Image source={{ uri: chat.avatar }} style={awwwardsStyles.avatar} />
-          {hasUnread && <View style={awwwardsStyles.onlineGlow} />}
+          {hasUnread && <View style={awwwardsStyles.unreadGlow} />}
         </View>
 
         {/* Content */}
@@ -483,7 +475,7 @@ const awwwardsStyles = StyleSheet.create({
   },
 
   // Neon glow effect for unread
-  onlineGlow: {
+  unreadGlow: {
     position: 'absolute',
     top: -3,
     left: -3,
@@ -498,19 +490,6 @@ const awwwardsStyles = StyleSheet.create({
     shadowOpacity: 0.6,
     shadowRadius: 8,
     elevation: 4,
-  },
-
-  // Online status dot
-  onlineDot: {
-    position: 'absolute',
-    bottom: 2,
-    right: 2,
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: COLORS.success,
-    borderWidth: 2,
-    borderColor: COLORS.surface.base,
   },
 
   // Content area
