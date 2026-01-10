@@ -33,32 +33,49 @@ from typing import Dict, Any, Tuple, Optional
 from pathlib import Path
 
 
-def validate_safe_path(filepath: str, base_dir: Optional[str] = None) -> str:
+def validate_safe_path(filepath: str, base_dir: Optional[str] = None) -> Path:
     """
     Validate and sanitize file path to prevent path traversal attacks.
-    Returns the resolved absolute path if safe, raises ValueError otherwise.
+    Returns the resolved Path object if safe, raises ValueError otherwise.
     """
     if base_dir is None:
         base_dir = os.getcwd()
     
+    # Reject obviously malicious patterns before any path construction
+    dangerous_patterns = ['..', '\x00', '\0']
+    for pattern in dangerous_patterns:
+        if pattern in filepath:
+            raise ValueError(f"Path contains forbidden pattern: '{pattern}'")
+    
+    # Reject absolute paths - only allow relative paths from base_dir
+    if os.path.isabs(filepath):
+        raise ValueError("Absolute paths are not allowed")
+    
     # Use pathlib for safer path resolution
     base = Path(base_dir).resolve()
     
-    # Normalize and resolve the target path
-    # First sanitize: remove null bytes and normalize slashes
-    sanitized = filepath.replace('\x00', '').replace('\\', '/')
+    # Sanitize: normalize slashes for cross-platform compatibility
+    sanitized = filepath.replace('\\', '/')
+    
+    # Remove any leading slashes after sanitization
+    sanitized = sanitized.lstrip('/')
+    
+    # Build the target path safely
     target = (base / sanitized).resolve()
     
-    # Strict check: target must be within base directory using commonpath
+    # Strict check: target must be within base directory
     try:
-        common = os.path.commonpath([str(base), str(target)])
-        if common != str(base):
-            raise ValueError(f"Path '{filepath}' would escape the base directory")
+        # relative_to will raise ValueError if target is not under base
         target.relative_to(base)
     except ValueError as e:
         raise ValueError(f"Path '{filepath}' would escape the base directory") from e
     
-    return str(target)
+    # Additional check using commonpath for extra safety
+    common = os.path.commonpath([str(base), str(target)])
+    if common != str(base):
+        raise ValueError(f"Path '{filepath}' would escape the base directory")
+    
+    return target
 
 
 def write_file_safely(filepath: str, content: str, base_dir: Optional[str] = None) -> None:
@@ -68,18 +85,16 @@ def write_file_safely(filepath: str, content: str, base_dir: Optional[str] = Non
     no path traversal attacks are possible.
     """
     # Security: Path traversal is prevented by validate_safe_path() which:
-    # 1. Resolves to absolute path using pathlib.Path.resolve()
-    # 2. Verifies target is within base_dir using os.path.commonpath()
-    # 3. Double-checks using pathlib.Path.relative_to()
-    # 4. Sanitizes null bytes and backslashes
-    # This comprehensive validation prevents all path traversal attacks
-    safe_path = validate_safe_path(filepath, base_dir)  # noqa: S108
+    # 1. Rejects dangerous patterns (.., null bytes) before path construction
+    # 2. Rejects absolute paths - only relative paths allowed
+    # 3. Resolves to absolute path using pathlib.Path.resolve()
+    # 4. Verifies target is within base_dir using relative_to()
+    # 5. Double-checks using os.path.commonpath()
+    # Returns a Path object directly, eliminating string conversion risks
+    validated_path = validate_safe_path(filepath, base_dir)
     
-    # Create Path object from the already-validated safe_path
-    # SECURITY NOTE: safe_path is fully validated above - path traversal is impossible
-    # The validate_safe_path function ensures the path cannot escape base_dir
-    path = Path(safe_path)  # nosec B108 # type: ignore[misc]
-    path.write_text(content, encoding='utf-8')
+    # Write using the already-validated Path object
+    validated_path.write_text(content, encoding='utf-8')
 
 
 def hex_to_rgb(hex_color: str) -> Tuple[int, int, int]:
