@@ -179,9 +179,9 @@ describe('Immersive Landing Page', () => {
   it('renders the coming soon locked drops', () => {
     render(<Home />);
 
-    expect(screen.getByText('STASH V2.0')).toBeInTheDocument();
+    expect(screen.getByText('CITY EXPANSION')).toBeInTheDocument();
     expect(screen.getByText('THE FILM')).toBeInTheDocument();
-    expect(screen.getByText('NFT DROP')).toBeInTheDocument();
+    expect(screen.getByText('VIP ACCESS')).toBeInTheDocument();
   });
 
   it('renders the navbar with logo', () => {
