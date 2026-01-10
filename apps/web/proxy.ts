@@ -1,5 +1,5 @@
 /**
- * TravelMatch Bot Tracking Middleware
+ * TravelMatch Bot Tracking Proxy
  *
  * Intercepts all requests to:
  * 1. Track bot visits (Google, Bing, Apple)
@@ -40,7 +40,12 @@ function detectBot(userAgent: string): string | null {
 }
 
 // Extract page info from URL
-function extractPageInfo(pathname: string): { lang?: string; city?: string; intent?: string; type: string } {
+function extractPageInfo(pathname: string): {
+  lang?: string;
+  city?: string;
+  intent?: string;
+  type: string;
+} {
   // Dynamic pSEO pages: /[lang]/[city]/[intent]
   const dynamicMatch = pathname.match(/^\/([a-z]{2})\/([a-z-]+)\/([a-z-]+)$/);
   if (dynamicMatch) {
@@ -53,7 +58,13 @@ function extractPageInfo(pathname: string): { lang?: string; city?: string; inte
   }
 
   // Static pages
-  const staticPages = ['/download', '/partner', '/safety', '/privacy', '/terms'];
+  const staticPages = [
+    '/download',
+    '/partner',
+    '/safety',
+    '/privacy',
+    '/terms',
+  ];
   if (staticPages.includes(pathname)) {
     return { type: 'static' };
   }
@@ -66,7 +77,7 @@ function extractPageInfo(pathname: string): { lang?: string; city?: string; inte
   return { type: 'other' };
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const userAgent = request.headers.get('user-agent') || '';
   const pathname = request.nextUrl.pathname;
 
