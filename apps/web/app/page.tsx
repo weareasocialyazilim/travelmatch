@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,33 +17,10 @@ import {
   Globe,
 } from 'lucide-react';
 
-// Dynamic imports for 3D (client-side only)
+// Dynamic imports for client-side only components
 const Scene3D = dynamic(() => import('@/components/3d/Scene3D'), {
   ssr: false,
 });
-const LovePortal3D = dynamic(
-  () =>
-    import('@/components/3d/LovePortal3D').then((m) => ({
-      default: m.LovePortal3D,
-    })),
-  { ssr: false },
-);
-const ParticleField = dynamic(
-  () =>
-    import('@/components/3d/ParticleField').then((m) => ({
-      default: m.ParticleField,
-    })),
-  { ssr: false },
-);
-const RealtimeStarsField = dynamic(
-  () =>
-    import('@/components/3d/ParticleField').then((m) => ({
-      default: m.RealtimeStarsField,
-    })),
-  { ssr: false },
-);
-
-// Award-winning components (dynamic for performance)
 const VelvetExperience = dynamic(
   () =>
     import('@/components/landing/VelvetExperience').then((m) => ({
@@ -64,7 +41,6 @@ import { LiquidToken } from '@/components/shared/LiquidToken';
 import { LockedDrop } from '@/components/stash/LockedDrop';
 import { CinematicOverlay } from '@/components/shared/NoiseOverlay';
 import { useSunsetAtmosphere } from '@/hooks/useSunsetAtmosphere';
-import { useRealtimeStars } from '@/hooks/useRealtimeStars';
 
 // --- CONTENT ---
 const CONTENT = {
@@ -271,7 +247,7 @@ const Navbar = ({
   </nav>
 );
 
-// Hero with 3D Orb
+// Hero Section (3D effects handled by VelvetExperience wrapper)
 const ImmersiveHero = ({
   content,
   onNotify,
@@ -279,19 +255,10 @@ const ImmersiveHero = ({
   content: ContentType;
   onNotify: (msg: string) => void;
 }) => {
-  const { stars } = useRealtimeStars({ maxStars: 50 });
-
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 z-0">
-        <Scene3D className="w-full h-full">
-          <LovePortal3D />
-          <ParticleField count={2000} size={0.01} speed={0.3} />
-          <RealtimeStarsField stars={stars} baseSize={0.08} />
-        </Scene3D>
-      </div>
-
-      <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/80 z-10 pointer-events-none" />
+      {/* Gradient overlay for text readability */}
+      <div className="absolute inset-0 bg-gradient-radial from-transparent via-black/20 to-black/60 z-10 pointer-events-none" />
 
       <div className="relative z-20 text-center px-4 max-w-6xl mx-auto">
         <motion.div
@@ -972,9 +939,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[var(--bg)] text-white selection:bg-[var(--acid)] selection:text-black">
+      {/* 3D Background - LovePortal3D */}
+      <Scene3D />
+
       <CinematicOverlay noiseOpacity={0.03} vignetteIntensity={0.4} />
 
-      {/* Award-winning cursor with magnetic snap */}
+      {/* Soft aura cursor */}
       <LiquidAuraCursor />
 
       <Navbar
