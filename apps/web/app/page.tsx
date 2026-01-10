@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,40 +17,7 @@ import {
   Globe,
 } from 'lucide-react';
 
-// Dynamic imports for 3D (client-side only)
-const Scene3D = dynamic(() => import('@/components/3d/Scene3D'), {
-  ssr: false,
-});
-const SentientOrb = dynamic(
-  () =>
-    import('@/components/3d/SentientOrb').then((m) => ({
-      default: m.SentientOrb,
-    })),
-  { ssr: false },
-);
-const ParticleField = dynamic(
-  () =>
-    import('@/components/3d/ParticleField').then((m) => ({
-      default: m.ParticleField,
-    })),
-  { ssr: false },
-);
-const RealtimeStarsField = dynamic(
-  () =>
-    import('@/components/3d/ParticleField').then((m) => ({
-      default: m.RealtimeStarsField,
-    })),
-  { ssr: false },
-);
-
 // Award-winning components (dynamic for performance)
-const LovePortal3D = dynamic(
-  () =>
-    import('@/components/3d/LovePortal3D').then((m) => ({
-      default: m.LovePortal3D,
-    })),
-  { ssr: false },
-);
 const VelvetExperience = dynamic(
   () =>
     import('@/components/landing/VelvetExperience').then((m) => ({
@@ -71,7 +38,6 @@ import { LiquidToken } from '@/components/shared/LiquidToken';
 import { LockedDrop } from '@/components/stash/LockedDrop';
 import { CinematicOverlay } from '@/components/shared/NoiseOverlay';
 import { useSunsetAtmosphere } from '@/hooks/useSunsetAtmosphere';
-import { useRealtimeStars } from '@/hooks/useRealtimeStars';
 
 // --- CONTENT ---
 const CONTENT = {
@@ -235,39 +201,6 @@ interface GiftItem {
   img: string;
 }
 
-// Custom Cursor
-const CustomCursor = () => {
-  const cursorRef = useRef<HTMLDivElement>(null);
-  const followerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const move = (e: MouseEvent) => {
-      if (cursorRef.current && followerRef.current) {
-        cursorRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
-        followerRef.current.animate(
-          { transform: `translate3d(${e.clientX}px, ${e.clientY}px, 0)` },
-          { duration: 500, fill: 'forwards' },
-        );
-      }
-    };
-    window.addEventListener('mousemove', move);
-    return () => window.removeEventListener('mousemove', move);
-  }, []);
-
-  return (
-    <div className="hidden md:block">
-      <div
-        ref={followerRef}
-        className="fixed top-0 left-0 w-12 h-12 border-2 border-[var(--acid)] rounded-full pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2 mix-blend-difference opacity-50"
-      />
-      <div
-        ref={cursorRef}
-        className="fixed top-0 left-0 w-3 h-3 bg-[var(--acid)] rounded-full pointer-events-none z-[10000] -translate-x-1/2 -translate-y-1/2 mix-blend-difference"
-      />
-    </div>
-  );
-};
-
 // Navbar
 const Navbar = ({
   onMenuClick,
@@ -309,7 +242,7 @@ const Navbar = ({
   </nav>
 );
 
-// Hero with 3D Orb
+// Hero Section (3D effects handled by VelvetExperience wrapper)
 const ImmersiveHero = ({
   content,
   onNotify,
@@ -317,19 +250,10 @@ const ImmersiveHero = ({
   content: ContentType;
   onNotify: (msg: string) => void;
 }) => {
-  const { stars } = useRealtimeStars({ maxStars: 50 });
-
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 z-0">
-        <Scene3D className="w-full h-full">
-          <SentientOrb speed={0.8} scale={2.5} intensity={1.2} />
-          <ParticleField count={3000} size={0.01} speed={0.3} />
-          <RealtimeStarsField stars={stars} baseSize={0.08} />
-        </Scene3D>
-      </div>
-
-      <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/80 z-10 pointer-events-none" />
+      {/* Gradient overlay for text readability */}
+      <div className="absolute inset-0 bg-gradient-radial from-transparent via-black/20 to-black/60 z-10 pointer-events-none" />
 
       <div className="relative z-20 text-center px-4 max-w-6xl mx-auto">
         <motion.div
