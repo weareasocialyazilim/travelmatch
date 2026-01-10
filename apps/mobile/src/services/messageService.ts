@@ -119,7 +119,6 @@ export interface ConversationParticipant {
   displayName: string;
   avatarUrl: string | null;
   isVerified: boolean;
-  isOnline: boolean;
 }
 
 /**
@@ -258,7 +257,6 @@ class MessageService {
               displayName: u.full_name || 'Unknown User',
               avatarUrl: u.avatar_url,
               isVerified: u.verified || false,
-              isOnline: false, // TODO: Implement online status
             }));
           }
 

@@ -46,7 +46,6 @@ interface VisibilitySettings {
   showTrustScore: boolean;
   showGiftHistory: boolean;
   platinumVitrin: boolean;
-  showOnlineStatus: boolean;
   allowMessageRequests: boolean;
   showLocation: boolean;
 }
@@ -343,7 +342,6 @@ export const VisibilitySettingsScreen: React.FC = () => {
     showTrustScore: true,
     showGiftHistory: true,
     platinumVitrin: false,
-    showOnlineStatus: true,
     allowMessageRequests: true,
     showLocation: true,
   });
@@ -363,7 +361,6 @@ export const VisibilitySettingsScreen: React.FC = () => {
             show_trust_score,
             show_gift_history,
             platinum_vitrin,
-            show_online_status,
             allow_message_requests,
             show_location,
             subscription_tier
@@ -385,8 +382,6 @@ export const VisibilitySettingsScreen: React.FC = () => {
             showTrustScore: (profileData.show_trust_score as boolean) ?? true,
             showGiftHistory: (profileData.show_gift_history as boolean) ?? true,
             platinumVitrin: (profileData.platinum_vitrin as boolean) ?? false,
-            showOnlineStatus:
-              (profileData.show_online_status as boolean) ?? true,
             allowMessageRequests:
               (profileData.allow_message_requests as boolean) ?? true,
             showLocation: (profileData.show_location as boolean) ?? true,
@@ -430,9 +425,6 @@ export const VisibilitySettingsScreen: React.FC = () => {
         }
         if (newSettings.platinumVitrin !== undefined) {
           dbUpdate.platinum_vitrin = newSettings.platinumVitrin;
-        }
-        if (newSettings.showOnlineStatus !== undefined) {
-          dbUpdate.show_online_status = newSettings.showOnlineStatus;
         }
         if (newSettings.allowMessageRequests !== undefined) {
           dbUpdate.allow_message_requests = newSettings.allowMessageRequests;
@@ -663,14 +655,6 @@ export const VisibilitySettingsScreen: React.FC = () => {
                 description="Son hediyeleriniz profilinizde görünsün"
                 value={settings.showGiftHistory}
                 onChange={(value) => saveSettings({ showGiftHistory: value })}
-              />
-
-              <ToggleRow
-                icon="circle"
-                label="Çevrimiçi Durumunu Göster"
-                description="Aktif olduğunuzda gösterge görünsün"
-                value={settings.showOnlineStatus}
-                onChange={(value) => saveSettings({ showOnlineStatus: value })}
               />
 
               <ToggleRow

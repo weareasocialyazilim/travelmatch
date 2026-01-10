@@ -156,7 +156,6 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
                       color={VIBE_ROOM_COLORS.neon.amber}
                     />
                   )}
-                  {chat.user.isOnline && <View style={styles.onlineDot} />}
                 </View>
                 <Text style={styles.momentTitle} numberOfLines={1}>
                   {chat.moment?.emoji || '✨'} {chat.moment?.title || 'Chat'}
@@ -411,7 +410,6 @@ export const AwwwardsInboxChatItem: React.FC<AwwwardsInboxChatItemProps> = memo(
         <View style={awwwardsStyles.avatarContainer}>
           <Image source={{ uri: chat.avatar }} style={awwwardsStyles.avatar} />
           {hasUnread && <View style={awwwardsStyles.onlineGlow} />}
-          {chat.isOnline && <View style={awwwardsStyles.onlineDot} />}
         </View>
 
         {/* Content */}
