@@ -14,7 +14,7 @@ import Animated, {
   interpolate,
   Extrapolation,
 } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import {
   VIBE_ROOM_COLORS,
   INBOX_SPACING,
@@ -34,7 +34,7 @@ const GlassSegmentedControl: React.FC<GlassSegmentedControlProps> = memo(
 
     const handleTabPress = useCallback(
       (tab: InboxTab) => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        HapticManager.tabChanged();
         indicatorPosition.value = withSpring(
           tab === 'active' ? 0 : 1,
           INBOX_SPRINGS.snappy,

@@ -26,7 +26,7 @@ import Animated, {
   interpolate,
   Easing,
 } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { SPACING, RADIUS } from '@/constants/spacing';
@@ -121,7 +121,7 @@ const KYCDocumentCaptureScreen: React.FC = () => {
     if (isCapturing) return;
 
     setIsCapturing(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    HapticManager.photoCaptured();
 
     // Button press animation
     captureScale.value = withSequence(
@@ -147,10 +147,10 @@ const KYCDocumentCaptureScreen: React.FC = () => {
 
       if (side === 'front' && !isPassport) {
         setCaptureSide('back');
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        HapticManager.kycStepCompleted();
       } else {
         // Navigate to next screen
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        HapticManager.kycStepCompleted();
         navigation.navigate('KYCSelfie', {
           data: {
             ...initialData,

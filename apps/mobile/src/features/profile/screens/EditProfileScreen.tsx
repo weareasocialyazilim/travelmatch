@@ -19,8 +19,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
-import * as Haptics from 'expo-haptics';
 import { useForm } from 'react-hook-form';
+import { HapticManager } from '@/services/HapticManager';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { logger } from '@/utils/logger';
 import Animated, {
@@ -124,6 +124,14 @@ const EditProfileScreen = () => {
   // UI state
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
 
+  // Privacy & visibility state
+  const [isDiscoverable, setIsDiscoverable] = useState<boolean>(
+    (user as any)?.is_discoverable ?? true,
+  );
+  const [distancePreference, setDistancePreference] = useState<number>(
+    (user as any)?.distance_preference ?? 50,
+  );
+
   // Check if there are unsaved changes
   const hasChanges = useCallback(() => {
     return avatarUri !== null || formState.isDirty;
@@ -150,7 +158,7 @@ const EditProfileScreen = () => {
         });
 
         if (!result.canceled) {
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          HapticManager.photoCaptured();
           setAvatarUri(result.assets[0].uri);
         }
       } else {
@@ -173,7 +181,7 @@ const EditProfileScreen = () => {
         });
 
         if (!result.canceled) {
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          HapticManager.photoCaptured();
           setAvatarUri(result.assets[0].uri);
         }
       }
@@ -189,26 +197,29 @@ const EditProfileScreen = () => {
     if (!hasChanges()) return;
 
     try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      HapticManager.primaryAction();
 
       // Upload avatar if changed
       if (avatarUri) {
         await userService.updateAvatar(avatarUri);
       }
 
-      // Update profile
+      // Update profile including visibility settings
       await userService.updateProfile({
         fullName: data.fullName,
         bio: data.bio,
         location: data.location
           ? { city: data.location, country: '' }
           : undefined,
+        // Save visibility and discovery preferences
+        is_discoverable: isDiscoverable,
+        distance_preference: distancePreference,
       });
 
       // Refresh user context
       await refreshUser();
 
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      HapticManager.profileUpdated();
       showAlert('Başarılı', 'Profil güncellendi', [
         { text: 'Tamam', onPress: () => navigation.goBack() },
       ]);
@@ -229,7 +240,7 @@ const EditProfileScreen = () => {
   );
 
   const handleChangeAvatar = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
 
     const options = avatarUri
       ? ['İptal', 'Fotoğraf Çek', 'Galeriden Seç', 'Fotoğrafı Kaldır']
@@ -482,16 +493,28 @@ const EditProfileScreen = () => {
                     <View style={styles.toggleTextContainer}>
                       <Text style={styles.toggleLabel}>Keşfet'te Görün</Text>
                       <Text style={styles.toggleDesc}>
-                        Kapatırsan anların haritada ve feedde görünmez
+                        {isDiscoverable
+                          ? 'Anların haritada ve feedde görünür'
+                          : 'Kapatırsan anların haritada ve feedde görünmez'}
                       </Text>
                     </View>
                   </View>
                   <TouchableOpacity
-                    style={[styles.toggleSwitch, styles.toggleSwitchActive]}
+                    style={[
+                      styles.toggleSwitch,
+                      isDiscoverable && styles.toggleSwitchActive,
+                    ]}
                     activeOpacity={0.8}
+                    onPress={() => {
+                      HapticManager.toggle();
+                      setIsDiscoverable(!isDiscoverable);
+                    }}
                   >
                     <View
-                      style={[styles.toggleKnob, styles.toggleKnobActive]}
+                      style={[
+                        styles.toggleKnob,
+                        isDiscoverable && styles.toggleKnobActive,
+                      ]}
                     />
                   </TouchableOpacity>
                 </View>
@@ -509,11 +532,31 @@ const EditProfileScreen = () => {
                     <View style={styles.toggleTextContainer}>
                       <Text style={styles.toggleLabel}>Mesafe Tercihi</Text>
                       <Text style={styles.toggleDesc}>
-                        Maksimum 50km (Premium: 500km)
+                        Maksimum mesafe ayarı
                       </Text>
                     </View>
                   </View>
-                  <Text style={styles.distanceValue}>50 km</Text>
+                  <View style={styles.distanceControls}>
+                    <TouchableOpacity
+                      style={styles.distanceButton}
+                      onPress={() => {
+                        HapticManager.selectionChange();
+                        setDistancePreference(Math.max(5, distancePreference - 5));
+                      }}
+                    >
+                      <MaterialCommunityIcons name="minus" size={18} color={COLORS.text.primary} />
+                    </TouchableOpacity>
+                    <Text style={styles.distanceValue}>{distancePreference} km</Text>
+                    <TouchableOpacity
+                      style={styles.distanceButton}
+                      onPress={() => {
+                        HapticManager.selectionChange();
+                        setDistancePreference(Math.min(500, distancePreference + 5));
+                      }}
+                    >
+                      <MaterialCommunityIcons name="plus" size={18} color={COLORS.text.primary} />
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </GlassCard>
             </View>
@@ -870,6 +913,23 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.body,
     fontWeight: '600',
     color: COLORS.brand?.primary || COLORS.primary,
+    minWidth: 60,
+    textAlign: 'center',
+  },
+  distanceControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
+  distanceButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.surface?.base || '#F5F5F5',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.border?.light || '#E0E0E0',
   },
 
   // Verification

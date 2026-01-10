@@ -9,7 +9,7 @@
 
 import React, { useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { logger } from '@/utils/logger';
 import {
   BaseReportScreen,
@@ -112,7 +112,7 @@ export const ReportMomentScreen: React.FC<ReportMomentScreenProps> = ({
   const handleSubmit = useCallback(
     (reason: ReportReason, details: string) => {
       // Haptic feedback for submission
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      HapticManager.success();
 
       logger.info('Moment report submitted', {
         momentId,

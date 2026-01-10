@@ -32,7 +32,7 @@ import {
   addScreenshotListener,
 } from 'expo-screen-capture';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
   CEREMONY_COLORS,
@@ -99,7 +99,7 @@ export const SacredMoments = memo<SacredMomentsProps>(
       onScreenshotAttempt?.();
 
       // Haptic warning
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      HapticManager.warning();
 
       // Animate blur in
       blurIntensity.value = withTiming(95, {

@@ -4,6 +4,12 @@
  * UPDATED: Replaced Trip terminology with Moment terminology
  * - type: 'traveler' → type: 'moment_host' (Alıcı)
  * - role: 'Traveler' → role: 'Anı Sahibi'
+ *
+ * NOTE: This screen currently uses mock data as the backend
+ * does not yet support archived conversations. Backend work needed:
+ * 1. Add is_archived column to conversations table
+ * 2. Implement archiveConversation API
+ * 3. Add getArchivedConversations query
  */
 
 import React, { useState } from 'react';
@@ -19,14 +25,14 @@ import { showAlert } from '@/stores/modalStore';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as Haptics from 'expo-haptics';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { HapticManager } from '@/services/HapticManager';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
 import { useToast } from '@/context/ToastContext';
-import { useConfirmation } from '@/context/ConfirmationContext';
+import { useTranslation } from 'react-i18next';
 
 interface ArchivedChat {
   id: string;
@@ -44,9 +50,10 @@ interface ArchivedChat {
 
 export const ArchivedChatsScreen: React.FC = () => {
   const { showToast } = useToast();
-  const { showConfirmation: _showConfirmation } = useConfirmation();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { t } = useTranslation();
 
+  // TODO: Replace with real backend data when is_archived column is added
   const [archivedChats, setArchivedChats] = useState<ArchivedChat[]>([
     {
       id: '1',
@@ -72,17 +79,17 @@ export const ArchivedChatsScreen: React.FC = () => {
   ]);
 
   const handleUnarchive = (id: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     showAlert({
-      title: 'Sohbeti Geri Al',
-      message: 'Bu sohbet mesajlar listenize geri yüklenecek.',
+      title: t('messages.archived.unarchiveTitle'),
+      message: t('messages.archived.unarchiveMessage'),
       buttons: [
-        { text: 'İptal', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Geri Al',
+          text: t('messages.archived.unarchive'),
           onPress: () => {
             setArchivedChats((prev) => prev.filter((chat) => chat.id !== id));
-            showToast('Sohbet listenize geri yüklendi.', 'success');
+            showToast(t('messages.archived.unarchiveSuccess'), 'success');
           },
         },
       ],
@@ -90,18 +97,18 @@ export const ArchivedChatsScreen: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.destructiveAction();
     showAlert({
-      title: 'Sohbeti Sil?',
-      message: 'Bu konuşma kalıcı olarak silinecek. Bu işlem geri alınamaz.',
+      title: t('messages.archived.deleteTitle'),
+      message: t('messages.archived.deleteMessage'),
       buttons: [
-        { text: 'İptal', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Sil',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: () => {
             setArchivedChats((prev) => prev.filter((chat) => chat.id !== id));
-            showToast('Sohbet kalıcı olarak silindi.', 'info');
+            showToast(t('messages.archived.deleteSuccess'), 'info');
           },
         },
       ],
@@ -109,7 +116,7 @@ export const ArchivedChatsScreen: React.FC = () => {
   };
 
   const handleOpenChat = (chat: ArchivedChat) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     navigation.navigate('Chat', {
       otherUser: {
         id: chat.id,
@@ -160,7 +167,9 @@ export const ArchivedChatsScreen: React.FC = () => {
             </Text>
           </View>
         )}
-        <Text style={styles.chatDate}>Arşivlendi {chat.archivedAt}</Text>
+        <Text style={styles.chatDate}>
+          {t('messages.archived.archivedAt', { time: chat.archivedAt })}
+        </Text>
       </View>
       <View style={styles.actionButtons}>
         <TouchableOpacity
@@ -200,7 +209,7 @@ export const ArchivedChatsScreen: React.FC = () => {
             color={COLORS.text.primary}
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Arşivlenmiş Sohbetler</Text>
+        <Text style={styles.headerTitle}>{t('messages.archived.title')}</Text>
         <View style={styles.backButton} />
       </View>
 
@@ -212,17 +221,16 @@ export const ArchivedChatsScreen: React.FC = () => {
         {archivedChats.length > 0 ? (
           <>
             <Text style={styles.sectionInfo}>
-              Arşivlenmiş sohbetler ana mesaj listenizden gizlenir. Onlara
-              buradan erişebilirsiniz.
+              {t('messages.archived.info')}
             </Text>
             {archivedChats.map(renderChat)}
           </>
         ) : (
           <EmptyState
             icon="archive-off-outline"
-            title="Arşivlenmiş sohbet yok"
-            description="Arşivlediğiniz sohbetler burada görünecek. Bir sohbeti arşivlemek için üzerine uzun basın."
-            actionLabel="Mesajlara Git"
+            title={t('messages.archived.empty')}
+            description={t('messages.archived.emptyDescription')}
+            actionLabel={t('messages.archived.goToMessages')}
             onAction={() => navigation.navigate('Messages')}
           />
         )}

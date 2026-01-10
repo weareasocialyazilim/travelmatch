@@ -25,7 +25,7 @@ import Animated, {
   SlideOutDown,
 } from 'react-native-reanimated';
 import { COLORS } from '@/constants/colors';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 
 interface LoginPromptModalProps {
   visible: boolean;
@@ -91,17 +91,17 @@ export const LoginPromptModal: React.FC<LoginPromptModalProps> = ({
   const config = ACTION_CONFIG[action];
 
   const handleLogin = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.primaryAction();
     onLogin();
   }, [onLogin]);
 
   const handleRegister = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.primaryAction();
     onRegister();
   }, [onRegister]);
 
   const handleClose = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     onClose();
   }, [onClose]);
 

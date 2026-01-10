@@ -16,6 +16,22 @@ import { conversationsService, messagesService } from '../supabaseDbService';
 jest.mock('../supabase');
 jest.mock('../supabaseDbService');
 jest.mock('../../utils/logger');
+jest.mock('../encryptionService', () => ({
+  encryptionService: {
+    getPublicKey: jest.fn().mockResolvedValue(null),
+    encrypt: jest
+      .fn()
+      .mockResolvedValue({ message: 'encrypted', nonce: 'nonce123' }),
+    decrypt: jest
+      .fn()
+      .mockImplementation((content) => Promise.resolve(content)),
+  },
+}));
+jest.mock('../userService', () => ({
+  userService: {
+    getPublicKey: jest.fn().mockResolvedValue(null),
+  },
+}));
 
 const mockSupabase = supabase as jest.Mocked<typeof supabase>;
 const mockConversationsService = conversationsService as jest.Mocked<
@@ -243,9 +259,30 @@ describe('MessageService', () => {
     });
 
     it('should throw error on send failure', async () => {
-      mockMessagesService.send.mockResolvedValue({
+      // Mock supabase insert to fail
+      const chainMock = createSupabaseChainMock({
         data: null,
         error: new Error('Send failed'),
+      });
+      // Override insert chain to return error
+      chainMock.insert.mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          single: jest.fn().mockResolvedValue({
+            data: null,
+            error: new Error('Send failed'),
+          }),
+        }),
+      });
+
+      (mockSupabase.from as jest.Mock).mockImplementation((table: string) => {
+        if (table === 'messages') {
+          return chainMock;
+        }
+        // Return default chain for conversations lookup
+        return createSupabaseChainMock({
+          data: { participant_ids: ['user-123', 'user-456'] },
+          error: null,
+        });
       });
 
       await expect(

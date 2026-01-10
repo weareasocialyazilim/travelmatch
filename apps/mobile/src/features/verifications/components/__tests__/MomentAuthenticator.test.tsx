@@ -12,19 +12,16 @@ import {
   AuthenticationResult,
 } from '../MomentAuthenticator';
 
-// Mock expo-haptics
-jest.mock('expo-haptics', () => ({
-  impactAsync: jest.fn(),
-  notificationAsync: jest.fn(),
-  ImpactFeedbackStyle: {
-    Light: 'light',
-    Medium: 'medium',
-    Heavy: 'heavy',
-  },
-  NotificationFeedbackType: {
-    Success: 'success',
-    Warning: 'warning',
-    Error: 'error',
+// Mock HapticManager
+jest.mock('@/services/HapticManager', () => ({
+  HapticManager: {
+    buttonPress: jest.fn(),
+    success: jest.fn(),
+    error: jest.fn(),
+    warning: jest.fn(),
+    primaryAction: jest.fn(),
+    proofVerified: jest.fn(),
+    selectionChange: jest.fn(),
   },
 }));
 
@@ -634,7 +631,7 @@ describe('MomentAuthenticator Component', () => {
 
   describe('Haptic Feedback', () => {
     it('triggers success haptic on verified result', async () => {
-      const Haptics = require('expo-haptics');
+      const { HapticManager } = require('@/services/HapticManager');
       mockInvoke.mockResolvedValue(mockVerifiedResponse);
 
       render(<MomentAuthenticator {...defaultProps} testID="authenticator" />);
@@ -643,16 +640,14 @@ describe('MomentAuthenticator Component', () => {
 
       await waitFor(
         () => {
-          expect(Haptics.notificationAsync).toHaveBeenCalledWith(
-            Haptics.NotificationFeedbackType.Success,
-          );
+          expect(HapticManager.success).toHaveBeenCalled();
         },
         { timeout: 2000 },
       );
     });
 
     it('triggers error haptic on rejected result', async () => {
-      const Haptics = require('expo-haptics');
+      const { HapticManager } = require('@/services/HapticManager');
       mockInvoke.mockResolvedValue(mockRejectedResponse);
 
       render(<MomentAuthenticator {...defaultProps} testID="authenticator" />);
@@ -661,16 +656,15 @@ describe('MomentAuthenticator Component', () => {
 
       await waitFor(
         () => {
-          expect(Haptics.notificationAsync).toHaveBeenCalledWith(
-            Haptics.NotificationFeedbackType.Error,
-          );
+          const { HapticManager } = require('@/services/HapticManager');
+          expect(HapticManager.error).toHaveBeenCalled();
         },
         { timeout: 2000 },
       );
     });
 
     it('triggers light haptic on checklist item check', async () => {
-      const Haptics = require('expo-haptics');
+      const { HapticManager } = require('@/services/HapticManager');
       mockInvoke.mockResolvedValue(mockVerifiedResponse);
 
       render(<MomentAuthenticator {...defaultProps} testID="authenticator" />);
@@ -679,9 +673,7 @@ describe('MomentAuthenticator Component', () => {
 
       await waitFor(
         () => {
-          expect(Haptics.impactAsync).toHaveBeenCalledWith(
-            Haptics.ImpactFeedbackStyle.Light,
-          );
+          expect(HapticManager.buttonPress).toHaveBeenCalled();
         },
         { timeout: 2000 },
       );
@@ -838,7 +830,7 @@ describe('MomentAuthenticator Component', () => {
   describe('Full Flow Integration', () => {
     it('completes full verification flow successfully', async () => {
       mockInvoke.mockResolvedValue(mockVerifiedResponse);
-      const Haptics = require('expo-haptics');
+      const { HapticManager } = require('@/services/HapticManager');
 
       const { getByText, getByTestId } = render(
         <MomentAuthenticator {...defaultProps} testID="authenticator" />,
@@ -858,9 +850,7 @@ describe('MomentAuthenticator Component', () => {
             status: 'verified',
             confidence: 0.92,
           });
-          expect(Haptics.notificationAsync).toHaveBeenCalledWith(
-            Haptics.NotificationFeedbackType.Success,
-          );
+          expect(HapticManager.success).toHaveBeenCalled();
         },
         { timeout: 2000 },
       );
@@ -868,7 +858,7 @@ describe('MomentAuthenticator Component', () => {
 
     it('completes full rejection flow', async () => {
       mockInvoke.mockResolvedValue(mockRejectedResponse);
-      const Haptics = require('expo-haptics');
+      const { HapticManager } = require('@/services/HapticManager');
 
       const { getByText, getByTestId, queryByTestId } = render(
         <MomentAuthenticator {...defaultProps} testID="authenticator" />,
@@ -884,9 +874,7 @@ describe('MomentAuthenticator Component', () => {
           expect(getByText(/Öneriler/)).toBeTruthy();
           expect(getByTestId('retry-button')).toBeTruthy();
           expect(queryByTestId('confetti-cannon')).toBeNull();
-          expect(Haptics.notificationAsync).toHaveBeenCalledWith(
-            Haptics.NotificationFeedbackType.Error,
-          );
+          expect(HapticManager.error).toHaveBeenCalled();
         },
         { timeout: 2000 },
       );

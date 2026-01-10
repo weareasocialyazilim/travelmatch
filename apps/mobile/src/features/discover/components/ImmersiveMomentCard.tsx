@@ -20,7 +20,7 @@ import {
   TouchableOpacity,
   Platform,
 } from 'react-native';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -258,9 +258,7 @@ export const ImmersiveMomentCard = memo(
             <TouchableOpacity
               style={styles.giftButton}
               onPress={() => {
-                Haptics.notificationAsync(
-                  Haptics.NotificationFeedbackType.Success,
-                );
+                HapticManager.success();
                 onGiftPress();
               }}
               activeOpacity={0.8}

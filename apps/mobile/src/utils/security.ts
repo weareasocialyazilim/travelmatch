@@ -6,6 +6,7 @@
 import * as Crypto from 'expo-crypto';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
+import { logger } from './logger';
 
 // Device-specific encryption key storage
 const ENCRYPTION_KEY_STORAGE_KEY = 'device_encryption_key';
@@ -150,7 +151,7 @@ export const encryptCredentials = async (
     return `v2:${encryptionSalt}:${ivHex}:${encryptedHex}:${hmacShort}`;
   } catch (error) {
     // DO NOT use plain base64 fallback - fail securely instead
-    console.error('[Security] Encryption failed:', error);
+    logger.error('[Security] Encryption failed', error);
     throw new Error('Encryption failed - cannot store credentials securely');
   }
 };
@@ -254,7 +255,7 @@ export const decryptCredentials = async (
 
     // Handle fallback plain encoding (DEPRECATED - log warning)
     if (salt === 'plain') {
-      console.warn(
+      logger.warn(
         '[Security] Decrypting legacy plain format - re-encrypt with v2',
       );
       return atob(encryptedHex);
@@ -265,7 +266,7 @@ export const decryptCredentials = async (
     }
 
     // Legacy v1 decryption (for migration)
-    console.warn('[Security] Decrypting legacy v1 format - re-encrypt with v2');
+    logger.warn('[Security] Decrypting legacy v1 format - re-encrypt with v2');
     const deviceKey = await getDeviceEncryptionKey();
     const derivedKey = await Crypto.digestStringAsync(
       Crypto.CryptoDigestAlgorithm.SHA256,
@@ -287,7 +288,7 @@ export const decryptCredentials = async (
     const textDecoderLegacy = new TextDecoder();
     return textDecoderLegacy.decode(decryptedBytesLegacy);
   } catch (error) {
-    console.error('[Security] Decryption failed:', error);
+    logger.error('[Security] Decryption failed', error);
     throw new Error('Failed to decrypt credentials');
   }
 };

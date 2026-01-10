@@ -1,4 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import * as ImagePicker from 'expo-image-picker';
+import * as ExpoLocation from 'expo-location';
+import * as ImageManipulator from 'expo-image-manipulator';
 import { showAlert } from '@/stores/modalStore';
 import { useAuth } from '@/context/AuthContext';
 import { useTypingIndicator } from '@/context/RealtimeContext';
@@ -7,6 +10,7 @@ import { useScreenPerformance } from '@/hooks/useScreenPerformance';
 import { logger } from '@/utils/logger';
 import { useToast } from '@/context/ToastContext';
 import { supabase } from '@/config/supabase';
+import { HapticManager } from '@/services/HapticManager';
 
 export interface Message {
   id: string;
@@ -172,6 +176,9 @@ export const useChatScreen = ({
     const trimmedMessage = messageText.trim();
     if (!trimmedMessage || isSending) return;
 
+    // Haptic feedback for message sent
+    HapticManager.messageSent();
+
     // Generate optimistic message ID
     const optimisticId = `optimistic-${Date.now()}`;
     const optimisticMessage: Message = {
@@ -226,19 +233,178 @@ export const useChatScreen = ({
     showToast,
   ]);
 
-  // Handle attachment sheet actions
+  // Compress image before sending
+  const compressImage = useCallback(async (uri: string): Promise<string> => {
+    try {
+      const result = await ImageManipulator.manipulateAsync(
+        uri,
+        [{ resize: { width: 1200 } }],
+        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG },
+      );
+      return result.uri;
+    } catch (error) {
+      logger.error('Image compression failed:', error);
+      return uri; // Return original if compression fails
+    }
+  }, []);
+
+  // Handle sending image message
+  const sendImageMessage = useCallback(
+    async (imageUri: string) => {
+      if (!conversationId) return;
+
+      setIsSending(true);
+      try {
+        // Compress image
+        showToast('Görüntü sıkıştırılıyor...', 'info');
+        const compressedUri = await compressImage(imageUri);
+
+        // Create optimistic message
+        const optimisticId = `optimistic-img-${Date.now()}`;
+        const optimisticMessage: Message = {
+          id: optimisticId,
+          type: 'image',
+          imageUrl: compressedUri,
+          text: 'Fotoğraf gönderildi',
+          user: 'me',
+          timestamp: new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev, optimisticMessage]);
+
+        // Send to server
+        await sendMessage({
+          conversationId,
+          content: 'Fotoğraf gönderildi',
+          type: 'image',
+          imageUrl: compressedUri,
+        });
+
+        showToast('Görüntü gönderildi', 'success');
+      } catch (error) {
+        logger.error('Failed to send image:', error);
+        showToast('Görüntü gönderilemedi', 'error');
+      } finally {
+        setIsSending(false);
+      }
+    },
+    [conversationId, sendMessage, showToast, compressImage],
+  );
+
+  // Handle attachment sheet actions - Camera & Gallery
   const handlePhotoVideo = useCallback(() => {
     setShowAttachmentSheet(false);
     showAlert({
-      title: 'Photo/Video',
-      message: 'Select media to send',
+      title: 'Fotoğraf Gönder',
+      message: 'Kaynağı seçin',
       buttons: [
-        { text: 'Camera', onPress: () => logger.debug('Open camera') },
-        { text: 'Gallery', onPress: () => logger.debug('Open gallery') },
-        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Kamera',
+          onPress: async () => {
+            try {
+              const { status } = await ImagePicker.requestCameraPermissionsAsync();
+              if (status !== 'granted') {
+                showToast('Kamera izni gerekli', 'error');
+                return;
+              }
+              const result = await ImagePicker.launchCameraAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.8,
+              });
+              if (!result.canceled && result.assets[0]) {
+                await sendImageMessage(result.assets[0].uri);
+              }
+            } catch (error) {
+              logger.error('Camera error:', error);
+              showToast('Kamera açılamadı', 'error');
+            }
+          },
+        },
+        {
+          text: 'Galeri',
+          onPress: async () => {
+            try {
+              const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+              if (status !== 'granted') {
+                showToast('Galeri izni gerekli', 'error');
+                return;
+              }
+              const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.8,
+              });
+              if (!result.canceled && result.assets[0]) {
+                await sendImageMessage(result.assets[0].uri);
+              }
+            } catch (error) {
+              logger.error('Gallery error:', error);
+              showToast('Galeri açılamadı', 'error');
+            }
+          },
+        },
+        { text: 'İptal', style: 'cancel' },
       ],
     });
-  }, []);
+  }, [sendImageMessage, showToast]);
+
+  // Handle location sharing
+  const handleLocation = useCallback(async () => {
+    setShowAttachmentSheet(false);
+
+    try {
+      const { status } = await ExpoLocation.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        showToast('Konum izni gerekli', 'error');
+        return;
+      }
+
+      showToast('Konum alınıyor...', 'info');
+      const location = await ExpoLocation.getCurrentPositionAsync({
+        accuracy: ExpoLocation.Accuracy.Balanced,
+      });
+
+      // Reverse geocode to get address
+      const [address] = await ExpoLocation.reverseGeocodeAsync({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+
+      const locationName = address?.name || address?.street || 'Konum';
+      const fullAddress = [address?.street, address?.district, address?.city]
+        .filter(Boolean)
+        .join(', ');
+
+      // Create optimistic message
+      const optimisticId = `optimistic-loc-${Date.now()}`;
+      const optimisticMessage: Message = {
+        id: optimisticId,
+        type: 'text',
+        text: `📍 ${fullAddress || locationName}`,
+        user: 'me',
+        timestamp: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, optimisticMessage]);
+
+      // Send location message
+      setIsSending(true);
+      if (conversationId) {
+        await sendMessage({
+          conversationId,
+          content: `📍 Konum paylaşıldı: ${fullAddress || locationName}`,
+          type: 'location',
+        });
+      }
+      showToast('Konum gönderildi', 'success');
+    } catch (error) {
+      logger.error('Location error:', error);
+      showToast('Konum gönderilemedi', 'error');
+    } finally {
+      setIsSending(false);
+    }
+  }, [conversationId, sendMessage, showToast]);
 
   const handleGift = useCallback(
     (navigation: any) => {
@@ -427,6 +593,7 @@ export const useChatScreen = ({
     setShowChatOptions,
     handleSend,
     handlePhotoVideo,
+    handleLocation,
     handleGift,
     handleChatAction,
     handleAcceptOffer,

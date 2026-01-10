@@ -54,7 +54,6 @@ interface ChatHeaderProps {
     isVerified?: boolean | null;
   };
   linkedMoment?: LinkedMoment;
-  isOnline?: boolean;
   onBack: () => void;
   onUserPress: () => void;
   onMomentPress: () => void;
@@ -65,7 +64,6 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   conversationId,
   otherUser,
   linkedMoment,
-  isOnline = true,
   onBack,
   onUserPress,
   onMomentPress,
@@ -199,11 +197,6 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
       : 'Müzakere edilyor';
   };
 
-  const getStatusText = () => {
-    if (isTyping) return null; // Will show typing indicator instead
-    return isOnline ? 'Şu an aktif' : 'Çevrimdışı';
-  };
-
   const HeaderContent = () => (
     <>
       <View style={[styles.headerTop, { paddingTop: insets.top + 8 }]}>
@@ -250,18 +243,8 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                 />
               )}
             </View>
-            <View style={styles.statusRow}>
-              <View
-                style={[
-                  styles.statusDot,
-                  {
-                    backgroundColor: isOnline
-                      ? COLORS.success
-                      : COLORS.text.muted,
-                  },
-                ]}
-              />
-              {isTyping ? (
+            {isTyping && (
+              <View style={styles.statusRow}>
                 <Animated.View
                   entering={FadeIn.duration(200)}
                   exiting={FadeOut.duration(200)}
@@ -274,10 +257,8 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                     <Animated.View style={[styles.typingDot, dot3Style]} />
                   </View>
                 </Animated.View>
-              ) : (
-                <Text style={styles.statusText}>{getStatusText()}</Text>
-              )}
-            </View>
+              </View>
+            )}
           </View>
         </TouchableOpacity>
 
@@ -413,22 +394,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 2,
-  },
-  statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    marginRight: 6,
-    // Neon glow for online status
-    shadowColor: COLORS.success,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 4,
-  },
-  statusText: {
-    fontSize: FONT_SIZES.tiny,
-    color: COLORS.text.secondary,
-    fontFamily: FONTS.body.regular,
   },
   typingIndicator: {
     flexDirection: 'row',

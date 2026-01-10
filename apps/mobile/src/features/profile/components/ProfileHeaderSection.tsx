@@ -26,7 +26,7 @@ import Reanimated, {
   Easing,
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import Svg, {
   Circle,
   Defs,
@@ -300,17 +300,17 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
     const _resolvedResponse = responseRate ?? user?.responseRate ?? 0;
 
     const handleEditPress = useCallback(() => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.buttonPress();
       onEditPress?.();
     }, [onEditPress]);
 
     const handleTrustPress = useCallback(() => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.buttonPress();
       onTrustGardenPress?.();
     }, [onTrustGardenPress]);
 
     const handleSettingsPress = useCallback(() => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.buttonPress();
       onSettingsPress?.();
     }, [onSettingsPress]);
 

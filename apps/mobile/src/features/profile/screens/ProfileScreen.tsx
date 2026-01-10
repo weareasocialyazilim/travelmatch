@@ -20,6 +20,7 @@ import {
 import { FlashList } from '@shopify/flash-list';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { LiquidScreenWrapper } from '@/components/layout';
 import Animated, {
   useSharedValue,
@@ -50,6 +51,7 @@ import type { NavigationProp } from '@react-navigation/native';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { useNetworkStatus } from '../../../context/NetworkContext';
 import { OfflineState } from '../../../components/OfflineState';
+import { HapticManager } from '@/services/HapticManager';
 import {
   PROFILE_COLORS,
   PROFILE_SPACING,
@@ -60,6 +62,7 @@ import {
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 const ProfileScreen: React.FC = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { isConnected, refresh: refreshNetwork } = useNetworkStatus();
   const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
@@ -160,45 +163,53 @@ const ProfileScreen: React.FC = () => {
     };
   }, [authUser, myMoments, userProfile]);
 
-  // Navigation handlers
-  const handleEditProfile = useCallback(
-    () => navigation.navigate('EditProfile'),
-    [navigation],
-  );
-  const handleMyMoments = useCallback(
-    () => navigation.navigate('MyMoments'),
-    [navigation],
-  );
-  const handleTrustGarden = useCallback(
-    () => navigation.navigate('TrustGardenDetail'),
-    [navigation],
-  );
-  const handleSettings = useCallback(
-    () => navigation.navigate('AppSettings'),
-    [navigation],
-  );
-  const handleWallet = useCallback(
-    () => navigation.navigate('Wallet'),
-    [navigation],
-  );
-  const handleSavedMoments = useCallback(
-    () => navigation.navigate('SavedMoments'),
-    [navigation],
-  );
-  const handleSubscriptionPress = useCallback(
-    () => navigation.navigate('Subscription'),
-    [navigation],
-  );
+  // Navigation handlers with haptic feedback
+  const handleEditProfile = useCallback(() => {
+    HapticManager.buttonPress();
+    navigation.navigate('EditProfile');
+  }, [navigation]);
+
+  const handleMyMoments = useCallback(() => {
+    HapticManager.buttonPress();
+    navigation.navigate('MyMoments');
+  }, [navigation]);
+
+  const handleTrustGarden = useCallback(() => {
+    HapticManager.buttonPress();
+    navigation.navigate('TrustGardenDetail');
+  }, [navigation]);
+
+  const handleSettings = useCallback(() => {
+    HapticManager.buttonPress();
+    navigation.navigate('AppSettings');
+  }, [navigation]);
+
+  const handleWallet = useCallback(() => {
+    HapticManager.buttonPress();
+    navigation.navigate('Wallet');
+  }, [navigation]);
+
+  const handleSavedMoments = useCallback(() => {
+    HapticManager.buttonPress();
+    navigation.navigate('SavedMoments');
+  }, [navigation]);
+
+  const handleSubscriptionPress = useCallback(() => {
+    HapticManager.buttonPress();
+    navigation.navigate('Subscription');
+  }, [navigation]);
+
   const handleShare = useCallback(async () => {
+    HapticManager.buttonPress();
     try {
       await Share.share({
-        message: 'TravelMatch profilime göz at!',
+        message: t('profile.shareMessage'),
         url: `https://travelmatch.app/profile/${authUser?.id}`,
       });
     } catch (_error) {
       // User cancelled or share failed
     }
-  }, [authUser?.id]);
+  }, [authUser?.id, t]);
 
   const activeMomentsList = useMemo(
     () =>
@@ -220,12 +231,12 @@ const ProfileScreen: React.FC = () => {
       {
         icon: 'bookmark-outline',
         color: PROFILE_COLORS.neon.violet,
-        label: 'Kaydedilen Momentler',
+        label: t('profile.savedMoments'),
         count: userData.savedCount,
         onPress: handleSavedMoments,
       },
     ],
-    [userData.savedCount, handleSavedMoments],
+    [userData.savedCount, handleSavedMoments, t],
   );
 
   const handleMomentPress = useCallback(
@@ -315,19 +326,19 @@ const ProfileScreen: React.FC = () => {
           <OfflineState
             compact
             onRetry={refreshNetwork}
-            message="İnternet bağlantısı yok"
+            message={t('profile.offlineTitle')}
           />
         )}
 
         {/* Premium Dark Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Profil</Text>
+          <Text style={styles.headerTitle}>{t('profile.title')}</Text>
           <View style={styles.headerActions}>
             <AnimatedTouchable
               testID="share-button"
               style={[styles.headerButton, shareAnimatedStyle]}
               onPress={handleSharePress}
-              accessibilityLabel="Profili paylaş"
+              accessibilityLabel={t('profile.shareProfile')}
               accessibilityRole="button"
             >
               <Ionicons
@@ -340,7 +351,7 @@ const ProfileScreen: React.FC = () => {
               testID="settings-button"
               style={[styles.headerButton, settingsAnimatedStyle]}
               onPress={handleSettingsPress}
-              accessibilityLabel="Ayarlar"
+              accessibilityLabel={t('settings.title')}
               accessibilityRole="button"
             >
               <Ionicons
@@ -413,11 +424,11 @@ const ProfileScreen: React.FC = () => {
                   />
                 </View>
                 <View style={styles.dashboardItemText}>
-                  <Text style={styles.dashboardItemTitle}>Güven Durumu</Text>
+                  <Text style={styles.dashboardItemTitle}>{t('profile.trustStatus')}</Text>
                   <Text style={styles.dashboardItemSubtitle}>
                     {(userData.trustScore || 0) > 0
-                      ? `${userData.trustScore} puan • Doğrulamalar`
-                      : 'Doğrulama yaparak güven kazan'}
+                      ? t('profile.trustScore.points', { score: userData.trustScore })
+                      : t('profile.trustScore.earnTrust')}
                   </Text>
                 </View>
                 <Ionicons
@@ -444,7 +455,7 @@ const ProfileScreen: React.FC = () => {
                   />
                 </View>
                 <View style={styles.dashboardItemText}>
-                  <Text style={styles.dashboardItemTitle}>Cüzdan</Text>
+                  <Text style={styles.dashboardItemTitle}>{t('wallet.title')}</Text>
                   <Text style={styles.dashboardItemSubtitle}>
                     {userData.walletBalance.toLocaleString('tr-TR')} TL
                   </Text>
@@ -497,17 +508,17 @@ const ProfileScreen: React.FC = () => {
                   icon={activeTab === 'active' ? 'map-marker-plus' : 'history'}
                   title={
                     activeTab === 'active'
-                      ? 'Henüz aktif moment yok'
-                      : 'Geçmiş moment yok'
+                      ? t('profile.moments.noActive')
+                      : t('profile.moments.noPast')
                   }
                   description={
                     activeTab === 'active'
-                      ? 'İlk momentini oluşturarak yolculuğuna başla'
-                      : 'Tamamlanan momentler burada görünecek'
+                      ? t('profile.moments.createFirstDescription')
+                      : t('profile.moments.completedDescription')
                   }
                   actionLabel={
                     activeTab === 'active' && isConnected
-                      ? 'Moment Oluştur'
+                      ? t('moments.createMoment')
                       : undefined
                   }
                   actionSize="xl"

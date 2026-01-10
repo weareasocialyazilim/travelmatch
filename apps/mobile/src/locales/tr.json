@@ -101,7 +101,16 @@
     "momentDeleted": "An başarıyla silindi!",
     "confirmDelete": "Bu anı silmek istediğinizden emin misiniz?",
     "noMomentsFound": "An bulunamadı",
-    "loadMore": "Daha Fazla Yükle"
+    "loadMore": "Daha Fazla Yükle",
+    "card": {
+      "giftFor": "Hediye için",
+      "view": "Görüntüle",
+      "sendGift": "Hediye Gönder",
+      "featured": "Öne Çıkan",
+      "popular": "Popüler",
+      "new": "Yeni",
+      "premium": "Premium"
+    }
   },
   "booking": {
     "bookNow": "Hemen Rezervasyon Yap",
@@ -609,10 +618,47 @@
       "placeholder": "Konuşmaları ara..."
     },
     "archived": {
-      "empty": "Arşivlenmiş sohbet yok"
+      "title": "Arşivlenmiş Sohbetler",
+      "empty": "Arşivlenmiş sohbet yok",
+      "emptyDescription": "Arşivlediğiniz sohbetler burada görünecek. Bir sohbeti arşivlemek için üzerine uzun basın.",
+      "info": "Arşivlenmiş sohbetler ana mesaj listenizden gizlenir. Onlara buradan erişebilirsiniz.",
+      "unarchive": "Geri Al",
+      "unarchiveTitle": "Sohbeti Geri Al",
+      "unarchiveMessage": "Bu sohbet mesajlar listenize geri yüklenecek.",
+      "unarchiveSuccess": "Sohbet listenize geri yüklendi.",
+      "deleteTitle": "Sohbeti Sil?",
+      "deleteMessage": "Bu konuşma kalıcı olarak silinecek. Bu işlem geri alınamaz.",
+      "deleteSuccess": "Sohbet kalıcı olarak silindi.",
+      "archivedAt": "Arşivlendi {{time}}",
+      "goToMessages": "Mesajlara Git"
     },
     "input": {
       "placeholder": "Mesaj..."
+    }
+  },
+  "inbox": {
+    "title": "Gelen Kutusu",
+    "tabs": {
+      "active": "Aktif Eşleşmeler",
+      "requests": "Talepler"
+    },
+    "empty": {
+      "activeTitle": "Henüz mesaj yok",
+      "activeDescription": "Yeni insanlarla tanışmak için bir moment paylaş!",
+      "requestsTitle": "Hediye talebi yok",
+      "requestsDescription": "Birisi momentine katılmak istediğinde burada göreceksin."
+    },
+    "explore": "Keşfet",
+    "suggestions": {
+      "title": "Yakınındaki Anlar",
+      "subtitle": "Bu momentlere göz at ve yeni insanlarla tanış",
+      "cardText": "Momentleri Keşfet"
+    },
+    "time": {
+      "now": "şimdi",
+      "minutesAgo": "{{count}}d önce",
+      "hoursAgo": "{{count}}s önce",
+      "daysAgo": "{{count}}g önce"
     }
   },
   "wishCard": {
@@ -692,6 +738,154 @@
         "reviewDrop": "Drop'u Gözden Geçir",
         "dropMoment": "Moment'ı Drop Et"
       }
+    }
+  },
+  "filter": {
+    "title": "Vibeleri Filtrele",
+    "reset": "Sıfırla",
+    "distance": "Mesafe",
+    "ageRange": "Yaş Aralığı",
+    "gender": "Cinsiyet",
+    "priceRange": "Fiyat Aralığı",
+    "category": "Kategori",
+    "showResults": "{{count}} Vibe Göster",
+    "any": "Hepsi",
+    "categories": {
+      "all": "Tümü",
+      "dining": "Yemek",
+      "nightlife": "Gece Hayatı",
+      "adventure": "Macera",
+      "culture": "Kültür",
+      "relax": "Dinlenme"
+    },
+    "genders": {
+      "all": "Tümü",
+      "female": "Kadın",
+      "male": "Erkek"
+    }
+  },
+  "pendingTransactions": {
+    "title": "Tamamlanmamış İşlemler",
+    "subtitle": "Tamamlanmayan bazı işlemler bulduk. Devam etmek ister misiniz?",
+    "pendingPayments": "Bekleyen Ödemeler",
+    "pendingUploads": "Bekleyen Yüklemeler",
+    "giftPayment": "Hediye Ödemesi",
+    "withdrawal": "Para Çekme",
+    "momentPurchase": "Moment Satın Alma",
+    "payment": "Ödeme",
+    "proofUpload": "Kanıt Yükleme",
+    "momentImage": "Moment Görseli",
+    "profilePicture": "Profil Fotoğrafı",
+    "messageAttachment": "Mesaj Eki",
+    "upload": "Yükleme",
+    "resume": "Devam Et",
+    "retry": "Tekrar Dene",
+    "dismiss": "Kapat",
+    "handleLater": "Sonra halledeceğim",
+    "justNow": "Az önce",
+    "minutesAgo": "{{count}}dk önce",
+    "hoursAgo": "{{count}}sa önce",
+    "failed": "{{count}} kez başarısız oldu"
+  },
+  "emptyState": {
+    "noMomentsNearby": "Bu civarda henüz an yok 🗺️",
+    "tryIncreasingDistance": "Mesafe filtreni artırmayı dene veya\nyeni bir an başlatan ilk sen ol!",
+    "createMoment": "An Oluştur",
+    "discoveringMoments": "Anlar keşfediliyor...",
+    "tapToRetry": "Yeniden denemek için dokun"
+  },
+  "counterOffer": {
+    "title": "Teklif Gönder",
+    "tierFeature": "{{tier}} Özelliği",
+    "momentInfo": {
+      "hostLabel": "Ev sahibi:",
+      "askedPrice": "İstenilen Fiyat:"
+    },
+    "yourOffer": "Teklifiniz",
+    "offerHint": "Host teklifinizi kabul veya reddedebilir.",
+    "messageLabel": "Mesajınız (Opsiyonel)",
+    "messagePlaceholder": "Host'a neden bu teklifi yaptığınızı açıklayın...",
+    "infoText": "{{tier}} üyeliğiniz ile host'lara özel teklif gönderebilirsiniz. Host teklifinizi kabul ederse ödeme ekranına yönlendirilirsiniz.",
+    "submitButton": "Teklif Gönder",
+    "successTitle": "Teklif Gönderildi!",
+    "successSubtitle": "{{hostName}} teklifinizi değerlendirecek. Yanıt bekleyin!",
+    "upgradeRequired": {
+      "title": "Premium Özellik",
+      "description": "Host'lara özel teklif göndermek için Premium veya Platinum üyesi olmanız gerekiyor.",
+      "upgradeButton": "Planları Görüntüle",
+      "maybeLater": "Belki Sonra"
+    }
+  },
+  "wallet": {
+    "title": "Cüzdan",
+    "totalBalance": "Toplam Bakiye",
+    "recentTransactions": "Son İşlemler",
+    "available": "Kullanılabilir",
+    "pending": "Beklemede",
+    "withdraw": "Para Çek",
+    "deposit": "Para Yatır",
+    "transactions": {
+      "paymentReceived": "Ödeme Alındı",
+      "paymentSent": "Ödeme Gönderildi",
+      "withdrawal": "Para Çekimi",
+      "deposit": "Para Yatırma",
+      "refund": "İade",
+      "topup": "Bakiye Yükleme",
+      "transaction": "İşlem"
+    },
+    "filters": {
+      "all": "Tümü",
+      "incoming": "Gelen",
+      "outgoing": "Giden"
+    },
+    "empty": {
+      "title": "Henüz işlem yok",
+      "description": "İlk anını paylaş veya yakınındaki anlara destek ol. Tüm işlemler burada görünecek!",
+      "cta": "Anları Keşfet"
+    },
+    "errors": {
+      "loadFailed": "Cüzdan bilgileri yüklenemedi. Lütfen tekrar deneyin.",
+      "kycRequired": "Para çekmek için önce kimlik doğrulaması yapmalısınız",
+      "biometricRequired": "Cüzdan erişimi için kimlik doğrulama gerekli",
+      "networkRequired": "Cüzdan bilgilerinizi görmek için internet bağlantısı gerekli."
+    },
+    "biometric": {
+      "viewWallet": "Cüzdanı Görüntüle",
+      "verifying": "Doğrulama Bekleniyor..."
+    },
+    "pendingBalance": {
+      "title": "Bekleyen Bakiye",
+      "processing": "Bekleyen bakiyeniz PayTR tarafından işleniyor. 1-3 iş günü içinde çekilebilir hale gelecektir.",
+      "pendingPaymentsTitle": "📦 Bekleyen Ödemeler",
+      "pendingPaymentsDescription": "{{amount}} tutarında bekleyen ödemeniz var.\n\nKanıt yükledikten sonra çekilebilir hale gelecektir:",
+      "andMore": "...ve {{count}} daha",
+      "later": "Daha Sonra",
+      "uploadProof": "Kanıt Yükle",
+      "ok": "Tamam"
+    },
+    "accessibilityLabel": {
+      "transactionIn": "gelen",
+      "transactionOut": "giden",
+      "transactionDetailHint": "İşlem detaylarını görüntüler"
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "shareMessage": "TravelMatch profilime göz at!",
+    "shareProfile": "Profili paylaş",
+    "savedMoments": "Kaydedilen Anlar",
+    "offlineTitle": "İnternet bağlantısı yok",
+    "offlineMessage": "Profili görüntülemek için internet bağlantısı gerekli.",
+    "trustStatus": "Güven Durumu",
+    "trustScore": {
+      "points": "{{score}} puan • Doğrulamalar",
+      "earnTrust": "Doğrulama yaparak güven kazan"
+    },
+    "moments": {
+      "noActive": "Henüz aktif moment yok",
+      "noPast": "Geçmiş moment yok",
+      "createFirstDescription": "İlk momentini oluşturarak yolculuğuna başla",
+      "completedDescription": "Tamamlanan momentler burada görünecek"
     }
   }
 }

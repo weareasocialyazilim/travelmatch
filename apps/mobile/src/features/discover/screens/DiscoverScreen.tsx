@@ -28,10 +28,11 @@ import {
   ActivityIndicator,
   Text,
   TouchableOpacity,
+  Share,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
+import { HapticManager } from '@/services/HapticManager';
 import { LinearGradient } from 'expo-linear-gradient';
 import { measureScreenLoad } from '@/config/sentry'; // ADDED: Performance monitoring
 import {
@@ -50,6 +51,7 @@ import { useStories } from '@/hooks/useStories';
 import { useAuth } from '@/hooks/useAuth';
 import { COLORS } from '@/constants/colors';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
+import { useTranslation } from 'react-i18next';
 import { LiquidScreenWrapper } from '@/components/layout';
 import {
   BlurFilterModal,
@@ -69,6 +71,7 @@ import { useContentReactiveGlow } from '@/hooks/useContentReactiveGlow';
 const { height } = Dimensions.get('window');
 
 const DiscoverScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const flatListRef = useRef<FlatList>(null);
 
@@ -154,12 +157,12 @@ const DiscoverScreen = () => {
 
   // Header actions
   const handleNotificationsPress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     navigation.navigate('Notifications');
   }, [navigation]);
 
   const handleFilterPress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.filterApplied();
     setShowFilterModal(true);
   }, []);
 
@@ -203,7 +206,7 @@ const DiscoverScreen = () => {
   );
 
   const handleAvatarPress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     navigation.navigate('Profile');
   }, [navigation]);
 
@@ -226,13 +229,13 @@ const DiscoverScreen = () => {
 
   // Handle subscription upgrade
   const handleSubscriptionUpgrade = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.primaryAction();
     navigation.navigate('Subscription');
   }, [navigation]);
 
   // Stories actions - Instagram-style fullscreen viewer
   const handleStoryPress = useCallback((story: UserStory, _index: number) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     // Open StoryViewer modal (Instagram-style)
     setSelectedStoryUser(story);
     setCurrentStoryIndex(0);
@@ -302,20 +305,38 @@ const DiscoverScreen = () => {
     [navigation, handleStoryClose, selectedStoryUser],
   );
 
-  const handleStoryShare = useCallback((_story: Story) => {
-    // TODO: Implement share functionality
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-  }, []);
+  const handleStoryShare = useCallback(
+    async (story: Story) => {
+      HapticManager.buttonPress();
+      try {
+        const shareMessage = `🌟 ${story.title || 'Bir hikaye'}\n\n${selectedStoryUser?.name || 'Bir kullanıcı'} TravelMatch'te muhteşem bir an paylaştı!\n\n👉 TravelMatch'te gör: https://travelmatch.app/stories/${story.id}`;
+
+        const result = await Share.share({
+          message: shareMessage,
+          title: story.title || 'TravelMatch Hikayesi',
+        });
+
+        if (result.action === Share.sharedAction) {
+          HapticManager.success();
+          logger.info('Story shared successfully:', story.id);
+        }
+      } catch (error) {
+        logger.error('Story share failed:', error);
+        HapticManager.error();
+      }
+    },
+    [selectedStoryUser],
+  );
 
   const handleCreateStoryPress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.primaryAction();
     navigation.navigate('CreateMoment');
   }, [navigation]);
 
   // Handle Counter-Offer / Subscriber Offer
   const handleCounterOffer = useCallback(
     (moment: Moment) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      HapticManager.primaryAction();
 
       // Guest kullanıcı kontrolü
       if (isGuest || !user) {
@@ -344,7 +365,7 @@ const DiscoverScreen = () => {
   // Handle Gift Press
   const handleGiftPress = useCallback(
     (moment: Moment) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      HapticManager.giftSent();
 
       // Guest kullanıcı kontrolü - showLoginPrompt via modalStore
       if (isGuest || !user) {
@@ -389,9 +410,29 @@ const DiscoverScreen = () => {
   );
 
   // Handle Share Press
-  const handleSharePress = useCallback((_moment: Moment) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    // TODO: Implement share logic using _moment.id
+  const handleSharePress = useCallback(async (moment: Moment) => {
+    HapticManager.buttonPress();
+    try {
+      // Get location display - handle both string and object types
+      const locationDisplay =
+        typeof moment.location === 'string'
+          ? moment.location
+          : moment.location?.city || 'Bir yer';
+      const shareMessage = `🌟 ${moment.title || 'Bir an'}\n\n${moment.description || "TravelMatch'te bu muhteşem anı keşfet!"}\n\n📍 ${locationDisplay}\n💰 ${moment.price || 0} ${moment.currency || 'TRY'}\n\n👉 TravelMatch'te gör: https://travelmatch.app/moments/${moment.id}`;
+
+      const result = await Share.share({
+        message: shareMessage,
+        title: moment.title || 'TravelMatch Anı',
+      });
+
+      if (result.action === Share.sharedAction) {
+        HapticManager.success();
+        logger.info('Moment shared successfully:', moment.id);
+      }
+    } catch (error) {
+      logger.error('Share failed:', error);
+      HapticManager.error();
+    }
   }, []);
 
   // Viewability config for content-reactive glow
@@ -456,10 +497,10 @@ const DiscoverScreen = () => {
 
   // Handle refresh
   const handleRefresh = useCallback(async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.refreshTriggered();
     await refresh();
     // Success haptic after refresh completes
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    HapticManager.success();
   }, [refresh]);
 
   // Handle load more
@@ -528,7 +569,9 @@ const DiscoverScreen = () => {
       <LiquidScreenWrapper variant="twilight" safeAreaTop>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.brand.primary} />
-          <Text style={styles.loadingText}>Discovering moments...</Text>
+          <Text style={styles.loadingText}>
+            {t('emptyState.discoveringMoments')}
+          </Text>
         </View>
       </LiquidScreenWrapper>
     );
@@ -541,14 +584,14 @@ const DiscoverScreen = () => {
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{String(error)}</Text>
           <Text style={styles.retryText} onPress={handleRefresh}>
-            Tap to retry
+            {t('emptyState.tapToRetry')}
           </Text>
         </View>
       </LiquidScreenWrapper>
     );
   }
 
-  // Empty state - Premium Turkish UX
+  // Empty state - Premium UX
   if (!loading && activeMoments.length === 0) {
     return (
       <LiquidScreenWrapper variant="twilight" safeAreaTop>
@@ -559,10 +602,11 @@ const DiscoverScreen = () => {
             color={COLORS.text.muted}
             style={styles.emptyIcon}
           />
-          <Text style={styles.emptyTitle}>Bu civarda henüz an yok 🗺️</Text>
+          <Text style={styles.emptyTitle}>
+            {t('emptyState.noMomentsNearby')}
+          </Text>
           <Text style={styles.emptySubtitle}>
-            Mesafe filtreni artırmayı dene veya{'\n'}yeni bir an başlatan ilk
-            sen ol!
+            {t('emptyState.tryIncreasingDistance')}
           </Text>
           <TouchableOpacity
             style={styles.emptyCTAButton}
@@ -574,7 +618,9 @@ const DiscoverScreen = () => {
               end={{ x: 1, y: 0 }}
               style={styles.emptyCTAGradient}
             >
-              <Text style={styles.emptyCTAText}>An Oluştur</Text>
+              <Text style={styles.emptyCTAText}>
+                {t('emptyState.createMoment')}
+              </Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>

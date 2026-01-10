@@ -24,9 +24,10 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { showAlert } from '@/stores/modalStore';
-import * as Haptics from 'expo-haptics';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { HapticManager } from '@/services/HapticManager';
+import { useTranslation } from 'react-i18next';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LiquidScreenWrapper } from '@/components/layout';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -96,23 +97,27 @@ const TRANSACTION_ICONS: Record<TransactionCategory, IconName> = {
   topup: 'wallet-plus',
 };
 
-// Transaction title mapping (Turkish)
-const getTransactionTitle = (category: TransactionCategory): string => {
-  const titles: Record<TransactionCategory, string> = {
-    payment_received: 'Ödeme Alındı',
-    payment_sent: 'Ödeme Gönderildi',
-    withdrawal: 'Para Çekimi',
-    deposit: 'Para Yatırma',
-    refund: 'İade',
-    topup: 'Bakiye Yükleme',
-  };
-  return titles[category] || 'İşlem';
-};
-
 const WalletScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+
+  // Transaction title mapping with i18n
+  const getTransactionTitle = useCallback(
+    (category: TransactionCategory): string => {
+      const titleKeys: Record<TransactionCategory, string> = {
+        payment_received: 'wallet.transactions.paymentReceived',
+        payment_sent: 'wallet.transactions.paymentSent',
+        withdrawal: 'wallet.transactions.withdrawal',
+        deposit: 'wallet.transactions.deposit',
+        refund: 'wallet.transactions.refund',
+        topup: 'wallet.transactions.topup',
+      };
+      return t(titleKeys[category] || 'wallet.transactions.transaction');
+    },
+    [t],
+  );
   const [pendingProofItems, setPendingProofItems] = useState<
     Array<{
       id: string;
@@ -148,9 +153,11 @@ const WalletScreen = () => {
 
   // Handle withdrawal with KYC verification check
   const handleWithdraw = useCallback(() => {
+    HapticManager.paymentInitiated();
+
     // Check if user is KYC verified
     if (!user?.kyc || user.kyc !== 'Verified') {
-      toast.info('Para çekmek için önce kimlik doğrulaması yapmalısınız');
+      toast.info(t('wallet.errors.kycRequired'));
       navigation.navigate('PaymentsKYC');
       return;
     }
@@ -170,12 +177,12 @@ const WalletScreen = () => {
         return;
       }
 
-      const authenticated = await authenticateForAction('Cüzdanı Görüntüle');
+      const authenticated = await authenticateForAction(t('wallet.biometric.viewWallet'));
       if (authenticated) {
         setIsBiometricLocked(false);
       } else {
         // Authentication failed, go back
-        toast.error('Cüzdan erişimi için kimlik doğrulama gerekli');
+        toast.error(t('wallet.errors.biometricRequired'));
         navigation.goBack();
       }
     };
@@ -192,6 +199,19 @@ const WalletScreen = () => {
     // Fetch pending proof items for the pending badge
     walletService.getPendingProofItems().then(setPendingProofItems);
   }, [isBiometricLocked, refreshBalance, loadTransactions]);
+
+  // Auto-refresh when screen comes back into focus (e.g., after proof flow)
+  useFocusEffect(
+    useCallback(() => {
+      if (isBiometricLocked) return;
+
+      // Refresh balance and pending items when screen gains focus
+      refreshBalance();
+      loadTransactions();
+      walletService.getPendingProofItems().then(setPendingProofItems);
+      logger.info('[Wallet] Screen focused - refreshing data');
+    }, [isBiometricLocked, refreshBalance, loadTransactions]),
+  );
 
   // Realtime balance updates - Subscribe to transactions table
   useEffect(() => {
@@ -252,21 +272,21 @@ const WalletScreen = () => {
   }, [displayTransactions, activeFilter]);
 
   const onRefresh = useCallback(async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.refreshTriggered();
     try {
       await refreshBalance();
       await loadTransactions();
       const proofItems = await walletService.getPendingProofItems();
       setPendingProofItems(proofItems);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      HapticManager.success();
     } catch (refreshError) {
       logger.error('[Wallet] Failed to refresh balance', {
         error: refreshError,
       });
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      toast.error('Cüzdan bilgileri yüklenemedi. Lütfen tekrar deneyin.');
+      HapticManager.error();
+      toast.error(t('wallet.errors.loadFailed'));
     }
-  }, [refreshBalance, loadTransactions, toast]);
+  }, [refreshBalance, loadTransactions, toast, t]);
 
   // Format currency
   const formatCurrency = useCallback((amount: number) => {
@@ -287,13 +307,13 @@ const WalletScreen = () => {
 
   // Handle pending balance tap - Show proof reminder
   const handlePendingTap = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.primaryAction();
 
     if (pendingProofItems.length === 0) {
       showAlert(
-        'Bekleyen Bakiye',
-        'Bekleyen bakiyeniz PayTR tarafından işleniyor. 1-3 iş günü içinde çekilebilir hale gelecektir.',
-        [{ text: 'Tamam' }],
+        t('wallet.pendingBalance.title'),
+        t('wallet.pendingBalance.processing'),
+        [{ text: t('wallet.pendingBalance.ok') }],
       );
       return;
     }
@@ -308,13 +328,17 @@ const WalletScreen = () => {
       .map((item) => `• ${item.senderName}: ${formatCurrency(item.amount)}`)
       .join('\n');
 
+    const andMoreText = pendingProofItems.length > 3
+      ? `\n${t('wallet.pendingBalance.andMore', { count: pendingProofItems.length - 3 })}`
+      : '';
+
     showAlert(
-      '� Bekleyen Ödemeler',
-      `${formatCurrency(totalPending)} tutarında bekleyen ödemeniz var.\n\nKanıt yükledikten sonra çekilebilir hale gelecektir:\n\n${itemsList}${pendingProofItems.length > 3 ? `\n...ve ${pendingProofItems.length - 3} daha` : ''}`,
+      t('wallet.pendingBalance.pendingPaymentsTitle'),
+      `${t('wallet.pendingBalance.pendingPaymentsDescription', { amount: formatCurrency(totalPending) })}\n\n${itemsList}${andMoreText}`,
       [
-        { text: 'Daha Sonra', style: 'cancel' },
+        { text: t('wallet.pendingBalance.later'), style: 'cancel' },
         {
-          text: 'Kanıt Yükle',
+          text: t('wallet.pendingBalance.uploadProof'),
           onPress: () => {
             // Navigate to first pending item's proof upload
             if (pendingProofItems[0]) {
@@ -326,7 +350,7 @@ const WalletScreen = () => {
         },
       ],
     );
-  }, [pendingProofItems, formatCurrency, navigation]);
+  }, [pendingProofItems, formatCurrency, navigation, t]);
 
   // Render transaction item with silk-smooth icons
   const renderTransaction = useCallback(
@@ -353,16 +377,16 @@ const WalletScreen = () => {
           <TouchableOpacity
             style={styles.txItemContent}
             onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              HapticManager.buttonPress();
               navigation.navigate('TransactionDetail', {
                 transactionId: item.id,
               });
             }}
             activeOpacity={0.7}
             accessible={true}
-            accessibilityLabel={`${item.title}, ${isCredit ? 'gelen' : 'giden'} ${formatCurrency(Math.abs(item.amount))}`}
+            accessibilityLabel={`${item.title}, ${isCredit ? t('wallet.accessibilityLabel.transactionIn') : t('wallet.accessibilityLabel.transactionOut')} ${formatCurrency(Math.abs(item.amount))}`}
             accessibilityRole="button"
-            accessibilityHint="İşlem detaylarını görüntüler"
+            accessibilityHint={t('wallet.accessibilityLabel.transactionDetailHint')}
           >
             <View style={styles.txIconContainer}>
               <View style={[styles.txIconBg, { backgroundColor: iconBgColor }]}>
@@ -410,15 +434,12 @@ const WalletScreen = () => {
             color={DARK_THEME.accentLime}
           />
         </View>
-        <Text style={styles.emptyTitle}>Henüz işlem yok</Text>
-        <Text style={styles.emptyText}>
-          İlk anını paylaş veya yakınındaki anlara destek ol. Tüm işlemler
-          burada görünecek!
-        </Text>
+        <Text style={styles.emptyTitle}>{t('wallet.empty.title')}</Text>
+        <Text style={styles.emptyText}>{t('wallet.empty.description')}</Text>
         <TouchableOpacity
           style={styles.emptyCTAButton}
           onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            HapticManager.primaryAction();
             navigation.navigate('MainTabs', { screen: 'Home' });
           }}
           activeOpacity={0.8}
@@ -428,17 +449,17 @@ const WalletScreen = () => {
             size={20}
             color={DARK_THEME.background}
           />
-          <Text style={styles.emptyCTAText}>Anları Keşfet</Text>
+          <Text style={styles.emptyCTAText}>{t('wallet.empty.cta')}</Text>
         </TouchableOpacity>
       </View>
     ),
-    [navigation],
+    [navigation, t],
   );
 
   const filters: { key: FilterType; label: string }[] = [
-    { key: 'all', label: 'Tümü' },
-    { key: 'incoming', label: 'Gelen' },
-    { key: 'outgoing', label: 'Giden' },
+    { key: 'all', label: t('wallet.filters.all') },
+    { key: 'incoming', label: t('wallet.filters.incoming') },
+    { key: 'outgoing', label: t('wallet.filters.outgoing') },
   ];
 
   // Show locked screen while biometric authentication is pending
@@ -446,7 +467,7 @@ const WalletScreen = () => {
     return (
       <View style={styles.lockedContainer}>
         <ActivityIndicator size="large" color={DARK_THEME.accentLime} />
-        <Text style={styles.lockedText}>Doğrulama Bekleniyor...</Text>
+        <Text style={styles.lockedText}>{t('wallet.biometric.verifying')}</Text>
       </View>
     );
   }
@@ -459,7 +480,7 @@ const WalletScreen = () => {
     >
       <View style={styles.container}>
         <NetworkGuard
-          offlineMessage="Cüzdan bilgilerinizi görmek için internet bağlantısı gerekli."
+          offlineMessage={t('wallet.errors.networkRequired')}
           onRetry={onRefresh}
         >
           {/* 1. HEADER & BALANCE CARD */}
@@ -474,18 +495,18 @@ const WalletScreen = () => {
                   style={styles.backButton}
                   hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
                   accessible={true}
-                  accessibilityLabel="Geri dön"
+                  accessibilityLabel={t('common.back')}
                   accessibilityRole="button"
                 >
                   <Ionicons name="arrow-back" size={24} color="white" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Cüzdan</Text>
+                <Text style={styles.headerTitle}>{t('wallet.title')}</Text>
                 <TouchableOpacity
                   style={styles.historyButton}
                   onPress={() => navigation.navigate('TransactionHistory')}
                   hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
                   accessible={true}
-                  accessibilityLabel="İşlem geçmişi"
+                  accessibilityLabel={t('payment.transactionHistory')}
                   accessibilityRole="button"
                 >
                   <MaterialCommunityIcons
@@ -507,7 +528,7 @@ const WalletScreen = () => {
                     style={StyleSheet.absoluteFill}
                   />
                   <View style={styles.cardTop}>
-                    <Text style={styles.balanceLabel}>Toplam Bakiye</Text>
+                    <Text style={styles.balanceLabel}>{t('wallet.totalBalance')}</Text>
                     <View style={styles.currencyBadge}>
                       <Text style={styles.currencyText}>TRY</Text>
                     </View>
@@ -530,7 +551,7 @@ const WalletScreen = () => {
                         color={DARK_THEME.accentAmber}
                       />
                       <Text style={styles.pendingBalance}>
-                        +{formatCurrency(balance?.pending || 0)} beklemede
+                        +{formatCurrency(balance?.pending || 0)} {t('wallet.pending').toLowerCase()}
                       </Text>
                       <MaterialCommunityIcons
                         name="chevron-right"
@@ -545,10 +566,10 @@ const WalletScreen = () => {
                       style={styles.actionBtnPrimary}
                       onPress={handleWithdraw}
                       accessible={true}
-                      accessibilityLabel="Para çek"
+                      accessibilityLabel={t('wallet.withdraw')}
                       accessibilityRole="button"
                     >
-                      <Text style={styles.actionBtnTextPrimary}>Para Çek</Text>
+                      <Text style={styles.actionBtnTextPrimary}>{t('wallet.withdraw')}</Text>
                     </TouchableOpacity>
                   </View>
                 </BlurView>
@@ -558,7 +579,7 @@ const WalletScreen = () => {
 
           {/* 2. TRANSACTIONS */}
           <View style={styles.contentSection}>
-            <Text style={styles.sectionTitle}>Son İşlemler</Text>
+            <Text style={styles.sectionTitle}>{t('wallet.recentTransactions')}</Text>
 
             {/* Filter Pills */}
             <ScrollView
@@ -571,7 +592,7 @@ const WalletScreen = () => {
                 <TouchableOpacity
                   key={filter.key}
                   onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    HapticManager.filterApplied();
                     setActiveFilter(filter.key);
                   }}
                   style={[

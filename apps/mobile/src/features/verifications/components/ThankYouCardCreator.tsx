@@ -37,7 +37,7 @@ import Animated, {
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ViewShot, { captureRef } from 'react-native-view-shot';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import {
   CEREMONY_SIZES,
   CARD_TEMPLATES,
@@ -90,7 +90,7 @@ export const ThankYouCardCreator: React.FC<ThankYouCardCreatorProps> = ({
   const cardScale = useSharedValue(1);
 
   const handleTemplateSelect = (template: CardTemplate) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     setSelectedTemplate(template);
     cardScale.value = withSpring(1.02, {}, () => {
       cardScale.value = withSpring(1);
@@ -98,7 +98,7 @@ export const ThankYouCardCreator: React.FC<ThankYouCardCreatorProps> = ({
   };
 
   const handlePhotoSelect = (photo: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     setSelectedPhoto(photo);
   };
 
@@ -106,7 +106,7 @@ export const ThankYouCardCreator: React.FC<ThankYouCardCreatorProps> = ({
     if (!viewShotRef.current) return;
 
     setIsGenerating(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.primaryAction();
 
     try {
       // Capture the card as image

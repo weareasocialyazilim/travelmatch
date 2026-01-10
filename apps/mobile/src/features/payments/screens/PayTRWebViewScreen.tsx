@@ -29,6 +29,7 @@ import type { RootStackParamList } from '@/navigation/routeParams';
 import { COLORS } from '@/constants/colors';
 import { useScreenSecurity } from '@/hooks/useScreenSecurity';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { usePaymentResume } from '@/hooks/usePaymentResume';
 import { showAlert } from '@/stores/modalStore';
 
 // PayTR iFrame URLs
@@ -78,6 +79,27 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
 
   const { trackEvent } = useAnalytics();
 
+  // Payment resume: Handle app backgrounding during 3D Secure
+  const { savePendingPayment, clearPendingPayment } = usePaymentResume({
+    autoCheck: false, // We'll handle it manually in this screen
+  });
+
+  // Save pending payment on mount (for resume if app is backgrounded)
+  useEffect(() => {
+    savePendingPayment({
+      merchantOid,
+      amount,
+      currency,
+      giftId: _giftId,
+      iframeToken,
+    });
+
+    // Clear on successful navigation or unmount handled elsewhere
+    return () => {
+      // Don't clear here - let the success/failure handlers do it
+    };
+  }, [merchantOid, amount, currency, _giftId, iframeToken, savePendingPayment]);
+
   // Track screen view
   useEffect(() => {
     trackEvent('paytr_webview_opened', {
@@ -106,6 +128,7 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
             text: 'Evet, İptal Et',
             style: 'destructive',
             onPress: () => {
+              clearPendingPayment();
               trackEvent('paytr_payment_cancelled', { merchantOid });
               navigation.navigate('PaymentFailed', {
                 transactionId: merchantOid,
@@ -124,7 +147,7 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
     );
 
     return () => backHandler.remove();
-  }, [canGoBack, merchantOid, navigation, trackEvent]);
+  }, [canGoBack, merchantOid, navigation, trackEvent, clearPendingPayment]);
 
   // Build PayTR iFrame URL
   const paytrUrl = `${isTestMode ? PAYTR_SANDBOX_URL : PAYTR_IFRAME_URL}/${iframeToken}`;
@@ -141,6 +164,8 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
         currentUrl.includes(pattern),
       );
       if (isSuccess) {
+        // Clear pending payment state on success
+        clearPendingPayment();
         trackEvent('paytr_payment_success', { merchantOid, amount });
         navigation.replace('Success', {
           type: 'gift_sent',
@@ -159,6 +184,8 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
         currentUrl.includes(pattern),
       );
       if (isFailure) {
+        // Clear pending payment state on failure
+        clearPendingPayment();
         trackEvent('paytr_payment_failed', { merchantOid });
         navigation.replace('PaymentFailed', {
           transactionId: merchantOid,
@@ -167,7 +194,7 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
         return;
       }
     },
-    [merchantOid, amount, navigation, trackEvent],
+    [merchantOid, amount, navigation, trackEvent, clearPendingPayment],
   );
 
   // Handle WebView messages from injected JS
@@ -177,6 +204,9 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
         const data = JSON.parse(event.nativeEvent.data);
 
         if (data.type === 'paytr_result') {
+          // Clear pending payment on any result
+          clearPendingPayment();
+
           if (data.status === 'success') {
             trackEvent('paytr_payment_success_message', { merchantOid });
             navigation.replace('Success', {
@@ -203,7 +233,7 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
         // Not a JSON message, ignore
       }
     },
-    [merchantOid, amount, navigation, trackEvent],
+    [merchantOid, amount, navigation, trackEvent, clearPendingPayment],
   );
 
   // Handle load errors
@@ -227,13 +257,14 @@ export const PayTRWebViewScreen: React.FC<PayTRWebViewScreenProps> = ({
           text: 'Evet, İptal Et',
           style: 'destructive',
           onPress: () => {
+            clearPendingPayment();
             trackEvent('paytr_payment_cancelled', { merchantOid });
             navigation.goBack();
           },
         },
       ],
     });
-  }, [merchantOid, navigation, trackEvent]);
+  }, [merchantOid, navigation, trackEvent, clearPendingPayment]);
 
   // Handle retry
   const handleRetry = useCallback(() => {

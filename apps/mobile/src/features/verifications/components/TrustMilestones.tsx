@@ -36,7 +36,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Line, Defs, RadialGradient, Stop, G } from 'react-native-svg';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import {
   CEREMONY_COLORS,
   CEREMONY_TIMING,
@@ -143,7 +143,7 @@ export const TrustMilestones: React.FC<TrustMilestonesProps> = ({
 
   const handleMilestonePress = (milestone: TrustMilestone) => {
     if (milestone.verified) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.buttonPress();
     }
     onMilestonePress?.(milestone);
   };

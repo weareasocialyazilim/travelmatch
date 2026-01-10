@@ -20,33 +20,33 @@ interface InfoItem {
 const INFO_ITEMS: InfoItem[] = [
   {
     id: '1',
-    title: 'Escrow Protection',
+    title: 'Escrow Koruması',
     description:
-      'All gift funds are held securely in an escrow account. Funds are only released to the traveler after their proof is approved.',
+      'Tüm hediye fonları güvenli bir escrow hesabında tutulur. Fonlar yalnızca kanıt onaylandıktan sonra alıcıya aktarılır.',
   },
   {
     id: '2',
-    title: 'Proof Requirements',
+    title: 'Kanıt Gereksinimleri',
     description:
-      "To unlock funds, travelers must submit specific proof as outlined in the gift's terms (e.g., geo-tagged photos, ticket stubs).",
+      'Fonların serbest bırakılması için alıcıların hediye şartlarına uygun kanıt sunması gerekir (örn: konum etiketli fotoğraflar, bilet).',
   },
   {
     id: '3',
-    title: 'Identity Verification (KYC)',
+    title: 'Kimlik Doğrulama (KYC)',
     description:
-      'For security and compliance, travelers must complete a one-time identity check before their first withdrawal.',
+      'Güvenlik ve yasal uyum için, ilk para çekme işleminizden önce tek seferlik kimlik doğrulaması gereklidir.',
   },
   {
     id: '4',
-    title: 'Secure Payments',
+    title: 'Güvenli Ödemeler',
     description:
-      'We do not store your full card numbers. All transactions are processed by a PCI-compliant payment provider.',
+      'Kart bilgileriniz bizde saklanmaz. Tüm işlemler PCI-DSS uyumlu PayTR altyapısı üzerinden gerçekleştirilir.',
   },
   {
     id: '5',
-    title: 'KYC Checks May Include',
+    title: 'KYC Kontrolleri',
     description:
-      'Verification of a government-issued photo ID (e.g., passport) and a selfie for biometric comparison.',
+      'Devlet tarafından verilmiş kimlik belgesi (TC Kimlik, Ehliyet veya Pasaport) ve biyometrik karşılaştırma için selfie doğrulaması.',
   },
 ];
 
@@ -75,7 +75,7 @@ export default function PaymentsKYCScreen({
             color={COLORS.utility.white}
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Payments & KYC</Text>
+        <Text style={styles.headerTitle}>Ödemeler ve KYC</Text>
         <View style={styles.backButton} />
       </View>
 
@@ -86,13 +86,13 @@ export default function PaymentsKYCScreen({
         showsVerticalScrollIndicator={false}
       >
         {/* Main Title */}
-        <Text style={styles.mainTitle}>Payments, Escrow & Verification</Text>
+        <Text style={styles.mainTitle}>Ödemeler, Escrow ve Doğrulama</Text>
 
-        {/* Disclaimer */}
+        {/* Trust Badge */}
         <Text style={styles.disclaimer}>
-          Please note: This is placeholder text for illustrative purposes. It
-          will be replaced with official compliance and legal information from
-          our payment and verification partners.
+          TravelMatch, finansal güvenliğinizi en üst düzeyde korur. PayTR
+          altyapısı ile PCI-DSS uyumlu, BDDK lisanslı güvenli ödeme sistemi
+          kullanılmaktadır.
         </Text>
 
         {/* Info Items List */}
