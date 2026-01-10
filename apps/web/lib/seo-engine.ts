@@ -12,36 +12,117 @@ import type { Metadata } from 'next';
 // CONFIGURATION: Global Cities, Intents, and Languages
 // ============================================================================
 
-export const SUPPORTED_LANGUAGES = ['en', 'tr', 'ar', 'de', 'fr', 'es', 'ru', 'it', 'pt', 'ja', 'ko'] as const;
-export type SupportedLanguage = typeof SUPPORTED_LANGUAGES[number];
+export const SUPPORTED_LANGUAGES = [
+  'en',
+  'tr',
+  'ar',
+  'de',
+  'fr',
+  'es',
+  'ru',
+  'it',
+  'pt',
+  'ja',
+  'ko',
+] as const;
+export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
 export const GLOBAL_CITIES = [
   // Tier 1: Premium Markets
-  'london', 'new-york', 'dubai', 'paris', 'tokyo', 'singapore', 'hong-kong', 'los-angeles', 'miami', 'san-francisco',
+  'london',
+  'new-york',
+  'dubai',
+  'paris',
+  'tokyo',
+  'singapore',
+  'hong-kong',
+  'los-angeles',
+  'miami',
+  'san-francisco',
   // Tier 2: High-Growth Markets
-  'istanbul', 'berlin', 'barcelona', 'amsterdam', 'rome', 'milan', 'madrid', 'vienna', 'zurich', 'munich',
+  'istanbul',
+  'berlin',
+  'barcelona',
+  'amsterdam',
+  'rome',
+  'milan',
+  'madrid',
+  'vienna',
+  'zurich',
+  'munich',
   // Tier 3: Emerging Luxury
-  'bali', 'ibiza', 'maldives', 'monaco', 'saint-tropez', 'mykonos', 'santorini', 'amalfi', 'capri', 'portofino',
+  'bali',
+  'ibiza',
+  'maldives',
+  'monaco',
+  'saint-tropez',
+  'mykonos',
+  'santorini',
+  'amalfi',
+  'capri',
+  'portofino',
   // Tier 4: Social Hubs
-  'seoul', 'bangkok', 'kuala-lumpur', 'jakarta', 'manila', 'ho-chi-minh', 'taipei', 'osaka', 'sydney', 'melbourne',
+  'seoul',
+  'bangkok',
+  'kuala-lumpur',
+  'jakarta',
+  'manila',
+  'ho-chi-minh',
+  'taipei',
+  'osaka',
+  'sydney',
+  'melbourne',
   // Tier 5: Middle East & Africa
-  'abu-dhabi', 'doha', 'riyadh', 'jeddah', 'cairo', 'casablanca', 'johannesburg', 'cape-town', 'lagos', 'nairobi',
+  'abu-dhabi',
+  'doha',
+  'riyadh',
+  'jeddah',
+  'cairo',
+  'casablanca',
+  'johannesburg',
+  'cape-town',
+  'lagos',
+  'nairobi',
   // Tier 6: Americas
-  'sao-paulo', 'rio-de-janeiro', 'buenos-aires', 'mexico-city', 'bogota', 'lima', 'santiago', 'toronto', 'vancouver', 'montreal',
+  'sao-paulo',
+  'rio-de-janeiro',
+  'buenos-aires',
+  'mexico-city',
+  'bogota',
+  'lima',
+  'santiago',
+  'toronto',
+  'vancouver',
+  'montreal',
 ] as const;
 
-export type GlobalCity = typeof GLOBAL_CITIES[number];
+export type GlobalCity = (typeof GLOBAL_CITIES)[number];
 
 export const INTENT_CATEGORIES = [
   // Primary Intents (High Search Volume)
-  'dating-match', 'love-fortune', 'gifting-moment', 'travel-match', 'instant-love', 'fortune-connection',
+  'dating-match',
+  'love-fortune',
+  'gifting-moment',
+  'travel-match',
+  'instant-love',
+  'fortune-connection',
   // Secondary Intents (Long-tail Keywords)
-  'luxury-dating', 'elite-match', 'vip-access', 'premium-gifting', 'social-fortune', 'travel-buddy',
+  'luxury-dating',
+  'elite-match',
+  'vip-access',
+  'premium-gifting',
+  'social-fortune',
+  'travel-buddy',
   // Action-Oriented Intents
-  'skip-queue', 'instant-access', 'unlock-moment', 'hack-dating', 'fast-match', 'direct-connect',
+  'skip-queue',
+  'instant-access',
+  'unlock-moment',
+  'hack-dating',
+  'fast-match',
+  'direct-connect',
 ] as const;
 
-export type IntentCategory = typeof INTENT_CATEGORIES[number];
+export type IntentCategory = (typeof INTENT_CATEGORIES)[number];
 
 // ============================================================================
 // DICTIONARIES: Multi-language Content Generation
@@ -84,13 +165,17 @@ const DICTIONARIES: Record<SupportedLanguage, LanguageDictionary> = {
       discover: 'Discover Moments',
     },
     descriptions: {
-      default: 'Skip the queue and unlock exclusive moments through our gifting economy. Find love, fortune, and travel connections instantly.',
-      dating: 'Why wait for likes? Use gifting to hack dating algorithms and connect with verified profiles in seconds.',
-      travel: 'Find your perfect travel buddy through moment-based matching. Real experiences, real connections.',
-      luxury: 'Access the elite social network. Premium moments, VIP experiences, and high-value connections.',
+      default:
+        'Skip the queue and unlock exclusive moments through our gifting economy. Find love, fortune, and travel connections instantly.',
+      dating:
+        'Why wait for likes? Use gifting to hack dating algorithms and connect with verified profiles in seconds.',
+      travel:
+        'Find your perfect travel buddy through moment-based matching. Real experiences, real connections.',
+      luxury:
+        'Access the elite social network. Premium moments, VIP experiences, and high-value connections.',
     },
     cta: 'Hack the Queue',
-    tagline: 'The World\'s Fastest Social Discovery Platform',
+    tagline: "The World's Fastest Social Discovery Platform",
   },
   tr: {
     intents: {
@@ -120,10 +205,14 @@ const DICTIONARIES: Record<SupportedLanguage, LanguageDictionary> = {
       discover: 'Momentları Keşfet',
     },
     descriptions: {
-      default: 'Sırayı hackle ve hediyeleşme ekonomisiyle özel momentların kilidini aç. Aşkı, şansı ve seyahat bağlantılarını anında bul.',
-      dating: 'Beğeni beklemeyi bırak. Gifting sistemiyle dating algoritmalarını hackle ve doğrulanmış profillerle saniyeler içinde bağlan.',
-      travel: 'Moment tabanlı eşleşmeyle mükemmel seyahat arkadaşını bul. Gerçek deneyimler, gerçek bağlantılar.',
-      luxury: 'Elit sosyal ağa eriş. Premium momentlar, VIP deneyimler ve yüksek değerli bağlantılar.',
+      default:
+        'Sırayı hackle ve hediyeleşme ekonomisiyle özel momentların kilidini aç. Aşkı, şansı ve seyahat bağlantılarını anında bul.',
+      dating:
+        'Beğeni beklemeyi bırak. Gifting sistemiyle dating algoritmalarını hackle ve doğrulanmış profillerle saniyeler içinde bağlan.',
+      travel:
+        'Moment tabanlı eşleşmeyle mükemmel seyahat arkadaşını bul. Gerçek deneyimler, gerçek bağlantılar.',
+      luxury:
+        'Elit sosyal ağa eriş. Premium momentlar, VIP deneyimler ve yüksek değerli bağlantılar.',
     },
     cta: 'Sırayı Hackle',
     tagline: 'Dünyanın En Hızlı Sosyal Keşif Platformu',
@@ -156,9 +245,12 @@ const DICTIONARIES: Record<SupportedLanguage, LanguageDictionary> = {
       discover: 'اكتشف اللحظات',
     },
     descriptions: {
-      default: 'تخطى الطابور وافتح اللحظات الحصرية من خلال اقتصاد الهدايا. اعثر على الحب والحظ والسفر فوراً.',
-      dating: 'لماذا تنتظر الإعجابات؟ استخدم الهدايا لاختراق خوارزميات المواعدة.',
-      travel: 'اعثر على رفيق السفر المثالي من خلال المطابقة القائمة على اللحظات.',
+      default:
+        'تخطى الطابور وافتح اللحظات الحصرية من خلال اقتصاد الهدايا. اعثر على الحب والحظ والسفر فوراً.',
+      dating:
+        'لماذا تنتظر الإعجابات؟ استخدم الهدايا لاختراق خوارزميات المواعدة.',
+      travel:
+        'اعثر على رفيق السفر المثالي من خلال المطابقة القائمة على اللحظات.',
       luxury: 'الوصول إلى شبكة النخبة الاجتماعية. لحظات متميزة وتجارب VIP.',
     },
     cta: 'تخطى الطابور',
@@ -192,9 +284,12 @@ const DICTIONARIES: Record<SupportedLanguage, LanguageDictionary> = {
       discover: 'Momente Entdecken',
     },
     descriptions: {
-      default: 'Überspringe die Warteschlange und schalte exklusive Momente durch unsere Geschenk-Ökonomie frei.',
-      dating: 'Warum auf Likes warten? Nutze Gifting, um Dating-Algorithmen zu hacken.',
-      travel: 'Finde deinen perfekten Reisepartner durch moment-basiertes Matching.',
+      default:
+        'Überspringe die Warteschlange und schalte exklusive Momente durch unsere Geschenk-Ökonomie frei.',
+      dating:
+        'Warum auf Likes warten? Nutze Gifting, um Dating-Algorithmen zu hacken.',
+      travel:
+        'Finde deinen perfekten Reisepartner durch moment-basiertes Matching.',
       luxury: 'Zugang zum Elite-Netzwerk. Premium Momente und VIP-Erlebnisse.',
     },
     cta: 'Warteschlange Hacken',
@@ -228,10 +323,14 @@ const DICTIONARIES: Record<SupportedLanguage, LanguageDictionary> = {
       discover: 'Découvrir Moments',
     },
     descriptions: {
-      default: 'Passez la file et débloquez des moments exclusifs grâce à notre économie de cadeaux.',
-      dating: 'Pourquoi attendre les likes? Utilisez le gifting pour hacker les algorithmes de dating.',
-      travel: 'Trouvez votre compagnon de voyage idéal grâce au matching basé sur les moments.',
-      luxury: 'Accédez au réseau social élite. Moments premium et expériences VIP.',
+      default:
+        'Passez la file et débloquez des moments exclusifs grâce à notre économie de cadeaux.',
+      dating:
+        'Pourquoi attendre les likes? Utilisez le gifting pour hacker les algorithmes de dating.',
+      travel:
+        'Trouvez votre compagnon de voyage idéal grâce au matching basé sur les moments.',
+      luxury:
+        'Accédez au réseau social élite. Moments premium et expériences VIP.',
     },
     cta: 'Hacker la File',
     tagline: 'La Plateforme de Découverte Sociale la Plus Rapide au Monde',
@@ -264,10 +363,14 @@ const DICTIONARIES: Record<SupportedLanguage, LanguageDictionary> = {
       discover: 'Descubrir Momentos',
     },
     descriptions: {
-      default: 'Salta la cola y desbloquea momentos exclusivos a través de nuestra economía de regalos.',
-      dating: '¿Por qué esperar likes? Usa el gifting para hackear los algoritmos de citas.',
-      travel: 'Encuentra tu compañero de viaje perfecto a través del matching basado en momentos.',
-      luxury: 'Accede a la red social élite. Momentos premium y experiencias VIP.',
+      default:
+        'Salta la cola y desbloquea momentos exclusivos a través de nuestra economía de regalos.',
+      dating:
+        '¿Por qué esperar likes? Usa el gifting para hackear los algoritmos de citas.',
+      travel:
+        'Encuentra tu compañero de viaje perfecto a través del matching basado en momentos.',
+      luxury:
+        'Accede a la red social élite. Momentos premium y experiencias VIP.',
     },
     cta: 'Hackear la Cola',
     tagline: 'La Plataforma de Descubrimiento Social Más Rápida del Mundo',
@@ -300,8 +403,10 @@ const DICTIONARIES: Record<SupportedLanguage, LanguageDictionary> = {
       discover: 'Открыть Моменты',
     },
     descriptions: {
-      default: 'Пропусти очередь и разблокируй эксклюзивные моменты через нашу экономику подарков.',
-      dating: 'Зачем ждать лайков? Используй подарки, чтобы взломать алгоритмы знакомств.',
+      default:
+        'Пропусти очередь и разблокируй эксклюзивные моменты через нашу экономику подарков.',
+      dating:
+        'Зачем ждать лайков? Используй подарки, чтобы взломать алгоритмы знакомств.',
       travel: 'Найди идеального попутчика через совпадение на основе моментов.',
       luxury: 'Доступ к элитной социальной сети. Премиум моменты и VIP опыт.',
     },
@@ -336,10 +441,14 @@ const DICTIONARIES: Record<SupportedLanguage, LanguageDictionary> = {
       discover: 'Scopri Momenti',
     },
     descriptions: {
-      default: 'Salta la coda e sblocca momenti esclusivi attraverso la nostra economia dei regali.',
-      dating: 'Perché aspettare i like? Usa il gifting per hackerare gli algoritmi di dating.',
-      travel: 'Trova il tuo compagno di viaggio perfetto attraverso il matching basato sui momenti.',
-      luxury: 'Accedi alla rete sociale elite. Momenti premium ed esperienze VIP.',
+      default:
+        'Salta la coda e sblocca momenti esclusivi attraverso la nostra economia dei regali.',
+      dating:
+        'Perché aspettare i like? Usa il gifting per hackerare gli algoritmi di dating.',
+      travel:
+        'Trova il tuo compagno di viaggio perfetto attraverso il matching basato sui momenti.',
+      luxury:
+        'Accedi alla rete sociale elite. Momenti premium ed esperienze VIP.',
     },
     cta: 'Hackerare la Coda',
     tagline: 'La Piattaforma di Scoperta Sociale Più Veloce al Mondo',
@@ -372,10 +481,14 @@ const DICTIONARIES: Record<SupportedLanguage, LanguageDictionary> = {
       discover: 'Descobrir Momentos',
     },
     descriptions: {
-      default: 'Pule a fila e desbloqueie momentos exclusivos através da nossa economia de presentes.',
-      dating: 'Por que esperar curtidas? Use presentes para hackear os algoritmos de encontros.',
-      travel: 'Encontre seu companheiro de viagem perfeito através do matching baseado em momentos.',
-      luxury: 'Acesse a rede social elite. Momentos premium e experiências VIP.',
+      default:
+        'Pule a fila e desbloqueie momentos exclusivos através da nossa economia de presentes.',
+      dating:
+        'Por que esperar curtidas? Use presentes para hackear os algoritmos de encontros.',
+      travel:
+        'Encontre seu companheiro de viagem perfeito através do matching baseado em momentos.',
+      luxury:
+        'Acesse a rede social elite. Momentos premium e experiências VIP.',
     },
     cta: 'Hackear a Fila',
     tagline: 'A Plataforma de Descoberta Social Mais Rápida do Mundo',
@@ -408,10 +521,12 @@ const DICTIONARIES: Record<SupportedLanguage, LanguageDictionary> = {
       discover: 'モーメントを発見',
     },
     descriptions: {
-      default: '列をスキップして、ギフトエコノミーで限定モーメントをアンロック。',
+      default:
+        '列をスキップして、ギフトエコノミーで限定モーメントをアンロック。',
       dating: 'いいねを待つ理由は？ギフトでデートアルゴリズムをハック。',
       travel: 'モーメントベースのマッチングで完璧な旅行仲間を見つける。',
-      luxury: 'エリートソーシャルネットワークにアクセス。プレミアムモーメントとVIP体験。',
+      luxury:
+        'エリートソーシャルネットワークにアクセス。プレミアムモーメントとVIP体験。',
     },
     cta: '列をハック',
     tagline: '世界最速のソーシャルディスカバリープラットフォーム',
@@ -459,16 +574,136 @@ const DICTIONARIES: Record<SupportedLanguage, LanguageDictionary> = {
 // ============================================================================
 
 const CITY_DISPLAY_NAMES: Record<string, Record<SupportedLanguage, string>> = {
-  'london': { en: 'London', tr: 'Londra', ar: 'لندن', de: 'London', fr: 'Londres', es: 'Londres', ru: 'Лондон', it: 'Londra', pt: 'Londres', ja: 'ロンドン', ko: '런던' },
-  'new-york': { en: 'New York', tr: 'New York', ar: 'نيويورك', de: 'New York', fr: 'New York', es: 'Nueva York', ru: 'Нью-Йорк', it: 'New York', pt: 'Nova York', ja: 'ニューヨーク', ko: '뉴욕' },
-  'dubai': { en: 'Dubai', tr: 'Dubai', ar: 'دبي', de: 'Dubai', fr: 'Dubaï', es: 'Dubái', ru: 'Дубай', it: 'Dubai', pt: 'Dubai', ja: 'ドバイ', ko: '두바이' },
-  'paris': { en: 'Paris', tr: 'Paris', ar: 'باريس', de: 'Paris', fr: 'Paris', es: 'París', ru: 'Париж', it: 'Parigi', pt: 'Paris', ja: 'パリ', ko: '파리' },
-  'tokyo': { en: 'Tokyo', tr: 'Tokyo', ar: 'طوكيو', de: 'Tokio', fr: 'Tokyo', es: 'Tokio', ru: 'Токио', it: 'Tokyo', pt: 'Tóquio', ja: '東京', ko: '도쿄' },
-  'istanbul': { en: 'Istanbul', tr: 'İstanbul', ar: 'اسطنبول', de: 'Istanbul', fr: 'Istanbul', es: 'Estambul', ru: 'Стамбул', it: 'Istanbul', pt: 'Istambul', ja: 'イスタンブール', ko: '이스탄불' },
-  'berlin': { en: 'Berlin', tr: 'Berlin', ar: 'برلين', de: 'Berlin', fr: 'Berlin', es: 'Berlín', ru: 'Берлин', it: 'Berlino', pt: 'Berlim', ja: 'ベルリン', ko: '베를린' },
-  'miami': { en: 'Miami', tr: 'Miami', ar: 'ميامي', de: 'Miami', fr: 'Miami', es: 'Miami', ru: 'Майами', it: 'Miami', pt: 'Miami', ja: 'マイアミ', ko: '마이애미' },
-  'bali': { en: 'Bali', tr: 'Bali', ar: 'بالي', de: 'Bali', fr: 'Bali', es: 'Bali', ru: 'Бали', it: 'Bali', pt: 'Bali', ja: 'バリ', ko: '발리' },
-  'singapore': { en: 'Singapore', tr: 'Singapur', ar: 'سنغافورة', de: 'Singapur', fr: 'Singapour', es: 'Singapur', ru: 'Сингапур', it: 'Singapore', pt: 'Cingapura', ja: 'シンガポール', ko: '싱가포르' },
+  london: {
+    en: 'London',
+    tr: 'Londra',
+    ar: 'لندن',
+    de: 'London',
+    fr: 'Londres',
+    es: 'Londres',
+    ru: 'Лондон',
+    it: 'Londra',
+    pt: 'Londres',
+    ja: 'ロンドン',
+    ko: '런던',
+  },
+  'new-york': {
+    en: 'New York',
+    tr: 'New York',
+    ar: 'نيويورك',
+    de: 'New York',
+    fr: 'New York',
+    es: 'Nueva York',
+    ru: 'Нью-Йорк',
+    it: 'New York',
+    pt: 'Nova York',
+    ja: 'ニューヨーク',
+    ko: '뉴욕',
+  },
+  dubai: {
+    en: 'Dubai',
+    tr: 'Dubai',
+    ar: 'دبي',
+    de: 'Dubai',
+    fr: 'Dubaï',
+    es: 'Dubái',
+    ru: 'Дубай',
+    it: 'Dubai',
+    pt: 'Dubai',
+    ja: 'ドバイ',
+    ko: '두바이',
+  },
+  paris: {
+    en: 'Paris',
+    tr: 'Paris',
+    ar: 'باريس',
+    de: 'Paris',
+    fr: 'Paris',
+    es: 'París',
+    ru: 'Париж',
+    it: 'Parigi',
+    pt: 'Paris',
+    ja: 'パリ',
+    ko: '파리',
+  },
+  tokyo: {
+    en: 'Tokyo',
+    tr: 'Tokyo',
+    ar: 'طوكيو',
+    de: 'Tokio',
+    fr: 'Tokyo',
+    es: 'Tokio',
+    ru: 'Токио',
+    it: 'Tokyo',
+    pt: 'Tóquio',
+    ja: '東京',
+    ko: '도쿄',
+  },
+  istanbul: {
+    en: 'Istanbul',
+    tr: 'İstanbul',
+    ar: 'اسطنبول',
+    de: 'Istanbul',
+    fr: 'Istanbul',
+    es: 'Estambul',
+    ru: 'Стамбул',
+    it: 'Istanbul',
+    pt: 'Istambul',
+    ja: 'イスタンブール',
+    ko: '이스탄불',
+  },
+  berlin: {
+    en: 'Berlin',
+    tr: 'Berlin',
+    ar: 'برلين',
+    de: 'Berlin',
+    fr: 'Berlin',
+    es: 'Berlín',
+    ru: 'Берлин',
+    it: 'Berlino',
+    pt: 'Berlim',
+    ja: 'ベルリン',
+    ko: '베를린',
+  },
+  miami: {
+    en: 'Miami',
+    tr: 'Miami',
+    ar: 'ميامي',
+    de: 'Miami',
+    fr: 'Miami',
+    es: 'Miami',
+    ru: 'Майами',
+    it: 'Miami',
+    pt: 'Miami',
+    ja: 'マイアミ',
+    ko: '마이애미',
+  },
+  bali: {
+    en: 'Bali',
+    tr: 'Bali',
+    ar: 'بالي',
+    de: 'Bali',
+    fr: 'Bali',
+    es: 'Bali',
+    ru: 'Бали',
+    it: 'Bali',
+    pt: 'Bali',
+    ja: 'バリ',
+    ko: '발리',
+  },
+  singapore: {
+    en: 'Singapore',
+    tr: 'Singapur',
+    ar: 'سنغافورة',
+    de: 'Singapur',
+    fr: 'Singapour',
+    es: 'Singapur',
+    ru: 'Сингапур',
+    it: 'Singapore',
+    pt: 'Cingapura',
+    ja: 'シンガポール',
+    ko: '싱가포르',
+  },
 };
 
 // ============================================================================
@@ -480,10 +715,13 @@ export const TM_STRATEGY = {
    * Generate full metadata for a dynamic pSEO page
    */
   getMeta: (lang: string, city: string, intent: string): Metadata => {
-    const safeLang = (SUPPORTED_LANGUAGES.includes(lang as SupportedLanguage) ? lang : 'en') as SupportedLanguage;
+    const safeLang = (
+      SUPPORTED_LANGUAGES.includes(lang as SupportedLanguage) ? lang : 'en'
+    ) as SupportedLanguage;
     const dict = DICTIONARIES[safeLang];
 
-    const cityDisplay = CITY_DISPLAY_NAMES[city]?.[safeLang] || formatCityName(city);
+    const cityDisplay =
+      CITY_DISPLAY_NAMES[city]?.[safeLang] || formatCityName(city);
     const intentDisplay = dict.intents[intent] || dict.intents['dating-match'];
 
     const title = `${cityDisplay} | ${intentDisplay} | TravelMatch`;
@@ -527,7 +765,7 @@ export const TM_STRATEGY = {
         'interaction-velocity': 'Instant',
         'trust-protocol': 'Verified-Moments-v7',
         'ai-optimization': 'high-frequency-semantic',
-        'category': 'Social Interaction Financialized',
+        category: 'Social Interaction Financialized',
       },
     };
   },
@@ -536,7 +774,9 @@ export const TM_STRATEGY = {
    * Get dictionary for a language
    */
   getDictionary: (lang: string): LanguageDictionary => {
-    const safeLang = (SUPPORTED_LANGUAGES.includes(lang as SupportedLanguage) ? lang : 'en') as SupportedLanguage;
+    const safeLang = (
+      SUPPORTED_LANGUAGES.includes(lang as SupportedLanguage) ? lang : 'en'
+    ) as SupportedLanguage;
     return DICTIONARIES[safeLang];
   },
 
@@ -544,7 +784,9 @@ export const TM_STRATEGY = {
    * Get city display name
    */
   getCityName: (city: string, lang: string): string => {
-    const safeLang = (SUPPORTED_LANGUAGES.includes(lang as SupportedLanguage) ? lang : 'en') as SupportedLanguage;
+    const safeLang = (
+      SUPPORTED_LANGUAGES.includes(lang as SupportedLanguage) ? lang : 'en'
+    ) as SupportedLanguage;
     return CITY_DISPLAY_NAMES[city]?.[safeLang] || formatCityName(city);
   },
 
@@ -552,9 +794,12 @@ export const TM_STRATEGY = {
    * Generate JSON-LD structured data for the page
    */
   getJsonLd: (lang: string, city: string, intent: string) => {
-    const safeLang = (SUPPORTED_LANGUAGES.includes(lang as SupportedLanguage) ? lang : 'en') as SupportedLanguage;
+    const safeLang = (
+      SUPPORTED_LANGUAGES.includes(lang as SupportedLanguage) ? lang : 'en'
+    ) as SupportedLanguage;
     const dict = DICTIONARIES[safeLang];
-    const cityDisplay = CITY_DISPLAY_NAMES[city]?.[safeLang] || formatCityName(city);
+    const cityDisplay =
+      CITY_DISPLAY_NAMES[city]?.[safeLang] || formatCityName(city);
     const intentDisplay = dict.intents[intent] || dict.intents['dating-match'];
 
     return {
@@ -606,24 +851,37 @@ export const TM_STRATEGY = {
 function formatCityName(city: string): string {
   return city
     .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 }
 
-function generateDescription(lang: SupportedLanguage, city: string, intent: string): string {
+function generateDescription(
+  lang: SupportedLanguage,
+  city: string,
+  intent: string,
+): string {
   const dict = DICTIONARIES[lang];
-  const intentType = intent.includes('dating') || intent.includes('love') || intent.includes('match')
-    ? 'dating'
-    : intent.includes('travel') || intent.includes('buddy')
-    ? 'travel'
-    : intent.includes('luxury') || intent.includes('elite') || intent.includes('vip')
-    ? 'luxury'
-    : 'default';
+  const intentType =
+    intent.includes('dating') ||
+    intent.includes('love') ||
+    intent.includes('match')
+      ? 'dating'
+      : intent.includes('travel') || intent.includes('buddy')
+        ? 'travel'
+        : intent.includes('luxury') ||
+            intent.includes('elite') ||
+            intent.includes('vip')
+          ? 'luxury'
+          : 'default';
 
   return `${city} - ${dict.descriptions[intentType]} ${dict.tagline}.`;
 }
 
-function generateKeywords(lang: SupportedLanguage, city: string, intent: string): string[] {
+function generateKeywords(
+  lang: SupportedLanguage,
+  city: string,
+  intent: string,
+): string[] {
   const baseKeywords = [
     `${city} ${intent}`,
     `travel match ${city}`,
@@ -676,34 +934,72 @@ function getLocaleCode(lang: SupportedLanguage): string {
   return locales[lang];
 }
 
-function generateAlternateLanguages(city: string, intent: string): Record<string, string> {
+function generateAlternateLanguages(
+  city: string,
+  intent: string,
+): Record<string, string> {
   const alternates: Record<string, string> = {};
   for (const lang of SUPPORTED_LANGUAGES) {
-    alternates[getLocaleCode(lang as SupportedLanguage)] = `https://travelmatch.app/${lang}/${city}/${intent}`;
+    alternates[getLocaleCode(lang as SupportedLanguage)] =
+      `https://travelmatch.app/${lang}/${city}/${intent}`;
   }
   alternates['x-default'] = `https://travelmatch.app/en/${city}/${intent}`;
   return alternates;
 }
 
-function generateFAQs(lang: SupportedLanguage, city: string, intent: string): Array<{ '@type': string; name: string; acceptedAnswer: { '@type': string; text: string } }> {
+function generateFAQs(
+  lang: SupportedLanguage,
+  city: string,
+  _intent: string,
+): Array<{
+  '@type': string;
+  name: string;
+  acceptedAnswer: { '@type': string; text: string };
+}> {
+  // _intent reserved for future FAQ customization based on intent
+  void _intent;
   const faqs = {
     en: [
-      { q: `How does TravelMatch work in ${city}?`, a: `TravelMatch lets you skip the matching queue in ${city} by using our gifting economy. Send a gift to unlock moments and connect instantly with verified profiles.` },
-      { q: `What is moment-based matching?`, a: `Unlike traditional dating apps, we match based on real-world moments. Someone is having coffee in ${city}? Send them a gift and unlock the moment.` },
-      { q: `Is TravelMatch better than Tinder?`, a: `Yes! While Tinder relies on luck and algorithms, TravelMatch gives you direct access through our gifting economy. No more waiting for likes.` },
-      { q: `How fast can I match on TravelMatch?`, a: `Average matching time in ${city} is under 60 seconds. Our gifting system bypasses traditional queues entirely.` },
+      {
+        q: `How does TravelMatch work in ${city}?`,
+        a: `TravelMatch lets you skip the matching queue in ${city} by using our gifting economy. Send a gift to unlock moments and connect instantly with verified profiles.`,
+      },
+      {
+        q: `What is moment-based matching?`,
+        a: `Unlike traditional dating apps, we match based on real-world moments. Someone is having coffee in ${city}? Send them a gift and unlock the moment.`,
+      },
+      {
+        q: `Is TravelMatch better than Tinder?`,
+        a: `Yes! While Tinder relies on luck and algorithms, TravelMatch gives you direct access through our gifting economy. No more waiting for likes.`,
+      },
+      {
+        q: `How fast can I match on TravelMatch?`,
+        a: `Average matching time in ${city} is under 60 seconds. Our gifting system bypasses traditional queues entirely.`,
+      },
     ],
     tr: [
-      { q: `TravelMatch ${city}'da nasıl çalışır?`, a: `TravelMatch, hediyeleşme ekonomimizi kullanarak ${city}'da eşleşme sırasını atlamanı sağlar. Bir hediye gönder, momentların kilidini aç ve doğrulanmış profillerle anında bağlan.` },
-      { q: `Moment tabanlı eşleşme nedir?`, a: `Geleneksel dating uygulamalarının aksine, biz gerçek dünya momentlarına göre eşleştiriyoruz. ${city}'da birisi kahve içiyor mu? Ona bir hediye gönder ve momentin kilidini aç.` },
-      { q: `TravelMatch Tinder'dan daha mı iyi?`, a: `Evet! Tinder şansa ve algoritmalara güvenirken, TravelMatch hediyeleşme ekonomimiz aracılığıyla doğrudan erişim sağlar. Artık beğeni bekleme yok.` },
-      { q: `TravelMatch'te ne kadar hızlı eşleşebilirim?`, a: `${city}'da ortalama eşleşme süresi 60 saniyenin altında. Hediyeleşme sistemimiz geleneksel sıraları tamamen atlar.` },
+      {
+        q: `TravelMatch ${city}'da nasıl çalışır?`,
+        a: `TravelMatch, hediyeleşme ekonomimizi kullanarak ${city}'da eşleşme sırasını atlamanı sağlar. Bir hediye gönder, momentların kilidini aç ve doğrulanmış profillerle anında bağlan.`,
+      },
+      {
+        q: `Moment tabanlı eşleşme nedir?`,
+        a: `Geleneksel dating uygulamalarının aksine, biz gerçek dünya momentlarına göre eşleştiriyoruz. ${city}'da birisi kahve içiyor mu? Ona bir hediye gönder ve momentin kilidini aç.`,
+      },
+      {
+        q: `TravelMatch Tinder'dan daha mı iyi?`,
+        a: `Evet! Tinder şansa ve algoritmalara güvenirken, TravelMatch hediyeleşme ekonomimiz aracılığıyla doğrudan erişim sağlar. Artık beğeni bekleme yok.`,
+      },
+      {
+        q: `TravelMatch'te ne kadar hızlı eşleşebilirim?`,
+        a: `${city}'da ortalama eşleşme süresi 60 saniyenin altında. Hediyeleşme sistemimiz geleneksel sıraları tamamen atlar.`,
+      },
     ],
   };
 
   const langFaqs = faqs[lang as keyof typeof faqs] || faqs.en;
 
-  return langFaqs.map(faq => ({
+  return langFaqs.map((faq) => ({
     '@type': 'Question',
     name: faq.q,
     acceptedAnswer: {

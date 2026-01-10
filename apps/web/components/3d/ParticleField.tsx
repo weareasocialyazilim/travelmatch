@@ -5,6 +5,15 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { RealtimeStar } from '@/hooks/useRealtimeStars';
 
+// Seeded random number generator for consistent results
+function seededRandom(seed: number): () => number {
+  let s = seed;
+  return () => {
+    s = Math.sin(s) * 10000;
+    return s - Math.floor(s);
+  };
+}
+
 interface ParticleFieldProps {
   count?: number;
   size?: number;
@@ -24,6 +33,7 @@ export const ParticleField = ({
   const particles = useMemo(() => {
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
+    const random = seededRandom(42); // Fixed seed for consistent renders
 
     const colorPalette = [
       new THREE.Color('#CCFF00'),
@@ -33,16 +43,15 @@ export const ParticleField = ({
     ];
 
     for (let i = 0; i < count; i++) {
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      const radius = 3 + Math.random() * 10;
+      const theta = random() * Math.PI * 2;
+      const phi = Math.acos(2 * random() - 1);
+      const radius = 3 + random() * 10;
 
       positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
       positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
       positions[i * 3 + 2] = radius * Math.cos(phi);
 
-      const colorChoice =
-        Math.random() > 0.9 ? Math.floor(Math.random() * 3) : 3;
+      const colorChoice = random() > 0.9 ? Math.floor(random() * 3) : 3;
       const particleColor = colorPalette[colorChoice] ?? colorPalette[3]!;
       colors[i * 3] = particleColor.r;
       colors[i * 3 + 1] = particleColor.g;

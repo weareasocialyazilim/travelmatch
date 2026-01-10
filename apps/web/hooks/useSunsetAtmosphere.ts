@@ -200,9 +200,6 @@ export const useSunsetAtmosphere = (
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // Initial update
-    updateTheme();
-
     // Update every minute to catch phase changes
     const interval = setInterval(updateTheme, 60000);
 

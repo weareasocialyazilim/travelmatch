@@ -37,7 +37,8 @@ const SAMPLE_MOMENTS: Moment[] = [
     price: '$85',
     likes: 234,
     timeAgo: '2h',
-    image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&auto=format&fit=crop&q=60',
+    image:
+      'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&auto=format&fit=crop&q=60',
     category: 'dining',
     isVip: true,
   },
@@ -48,7 +49,8 @@ const SAMPLE_MOMENTS: Moment[] = [
     price: '$25',
     likes: 156,
     timeAgo: '4h',
-    image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&auto=format&fit=crop&q=60',
+    image:
+      'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&auto=format&fit=crop&q=60',
     category: 'coffee',
     isVip: false,
   },
@@ -59,7 +61,8 @@ const SAMPLE_MOMENTS: Moment[] = [
     price: '$250',
     likes: 412,
     timeAgo: '1h',
-    image: 'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?w=400&auto=format&fit=crop&q=60',
+    image:
+      'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?w=400&auto=format&fit=crop&q=60',
     category: 'nightlife',
     isVip: true,
   },
@@ -70,7 +73,8 @@ const SAMPLE_MOMENTS: Moment[] = [
     price: '$180',
     likes: 328,
     timeAgo: '30m',
-    image: 'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=400&auto=format&fit=crop&q=60',
+    image:
+      'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=400&auto=format&fit=crop&q=60',
     category: 'adventure',
     isVip: true,
   },
@@ -81,7 +85,8 @@ const SAMPLE_MOMENTS: Moment[] = [
     price: '$120',
     likes: 189,
     timeAgo: '3h',
-    image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&auto=format&fit=crop&q=60',
+    image:
+      'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&auto=format&fit=crop&q=60',
     category: 'wellness',
     isVip: false,
   },
@@ -92,7 +97,8 @@ const SAMPLE_MOMENTS: Moment[] = [
     price: '$300',
     likes: 567,
     timeAgo: '5h',
-    image: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=400&auto=format&fit=crop&q=60',
+    image:
+      'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=400&auto=format&fit=crop&q=60',
     category: 'dining',
     isVip: true,
   },
@@ -113,7 +119,14 @@ const TRANSLATIONS = {
   },
 };
 
-export function MomentGrid({ city, intent, lang }: MomentGridProps) {
+export function MomentGrid({
+  city: _city,
+  intent: _intent,
+  lang,
+}: MomentGridProps) {
+  // _city and _intent reserved for future use with dynamic content
+  void _city;
+  void _intent;
   const t = TRANSLATIONS[lang as keyof typeof TRANSLATIONS] || TRANSLATIONS.en;
 
   return (
@@ -140,14 +153,18 @@ export function MomentGrid({ city, intent, lang }: MomentGridProps) {
             {moment.isVip && (
               <div className="absolute top-3 right-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full px-3 py-1 flex items-center gap-1">
                 <Sparkles className="w-3 h-3 text-white" />
-                <span className="text-[10px] font-bold text-white uppercase">{t.vip}</span>
+                <span className="text-[10px] font-bold text-white uppercase">
+                  {t.vip}
+                </span>
               </div>
             )}
 
             {/* Active Indicator */}
             <div className="absolute top-3 left-3 bg-green-500/20 backdrop-blur-md border border-green-500/30 rounded-full px-3 py-1 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-[10px] text-green-400 font-medium">{t.active}</span>
+              <span className="text-[10px] text-green-400 font-medium">
+                {t.active}
+              </span>
             </div>
 
             {/* Lock Overlay */}
@@ -180,16 +197,22 @@ export function MomentGrid({ city, intent, lang }: MomentGridProps) {
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1">
                     <Heart className="w-3.5 h-3.5 text-pink-400" />
-                    <span className="text-xs text-white/70">{moment.likes}</span>
+                    <span className="text-xs text-white/70">
+                      {moment.likes}
+                    </span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5 text-white/40" />
-                    <span className="text-xs text-white/50">{moment.timeAgo}</span>
+                    <span className="text-xs text-white/50">
+                      {moment.timeAgo}
+                    </span>
                   </div>
                 </div>
 
                 <div className="bg-white/10 backdrop-blur-md rounded-full px-3 py-1">
-                  <span className="text-sm font-bold text-white blur-[3px]">{moment.price}</span>
+                  <span className="text-sm font-bold text-white blur-[3px]">
+                    {moment.price}
+                  </span>
                 </div>
               </div>
             </div>

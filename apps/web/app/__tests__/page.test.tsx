@@ -1,10 +1,9 @@
+import * as React from 'react';
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 
 // Mock framer-motion with inline factory
 jest.mock('framer-motion', () => {
-  const React = require('react');
-
   const createMotionComponent = (tag: string) => {
     return function MotionComponent({
       children,

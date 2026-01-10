@@ -39,7 +39,7 @@ export const usePerformanceMonitor = (
   });
 
   const fpsHistoryRef = useRef<number[]>([]);
-  const lastTimeRef = useRef<number>(performance.now());
+  const lastTimeRef = useRef<number>(0);
   const frameCountRef = useRef<number>(0);
   const lowPerformanceTriggeredRef = useRef<boolean>(false);
 
@@ -77,6 +77,7 @@ export const usePerformanceMonitor = (
     };
 
     const gpuTier = detectGPU() as 'low' | 'medium' | 'high';
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- GPU detection only runs once on mount
     setMetrics((prev) => ({ ...prev, gpuTier }));
   }, []);
 
@@ -171,16 +172,19 @@ export const useAdaptiveQuality = () => {
   );
 
   useEffect(() => {
-    if (performance.isLowPerformance || performance.gpuTier === 'low') {
-      setQualityLevel('low');
-    } else if (
-      performance.shouldReduceQuality ||
-      performance.gpuTier === 'medium'
-    ) {
-      setQualityLevel('medium');
-    } else {
-      setQualityLevel('high');
-    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Quality level update based on performance metrics
+    setQualityLevel(() => {
+      if (performance.isLowPerformance || performance.gpuTier === 'low') {
+        return 'low';
+      } else if (
+        performance.shouldReduceQuality ||
+        performance.gpuTier === 'medium'
+      ) {
+        return 'medium';
+      } else {
+        return 'high';
+      }
+    });
   }, [performance]);
 
   // Return quality-based settings
@@ -220,13 +224,15 @@ export const useAdaptiveQuality = () => {
 
 // Hook for reduced motion preference
 export const useReducedMotion = (): boolean => {
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return false;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  });
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return;
 
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReducedMotion(mediaQuery.matches);
 
     const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
     mediaQuery.addEventListener('change', handler);

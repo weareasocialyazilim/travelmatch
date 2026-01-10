@@ -167,6 +167,7 @@ export const SentientOrb = ({
   const mesh = useRef<THREE.Mesh>(null!);
   const { mouse, viewport } = useThree();
 
+  // Create uniforms with useMemo - values are updated in useFrame
   const uniforms = useMemo(
     () => ({
       uTime: { value: 0 },
@@ -179,7 +180,9 @@ export const SentientOrb = ({
       uOpacity: { value: 0.85 },
       uChromaticIntensity: { value: 0.8 },
     }),
-    [colorA, colorB, colorC, intensity],
+    // Empty deps - we update values imperatively in useFrame
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
   );
 
   useFrame((state, delta) => {

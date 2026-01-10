@@ -9,22 +9,18 @@
  */
 
 import { MetadataRoute } from 'next';
-import {
-  SUPPORTED_LANGUAGES,
-  GLOBAL_CITIES,
-  INTENT_CATEGORIES,
-} from '@/lib/seo-engine';
+import { SUPPORTED_LANGUAGES, GLOBAL_CITIES } from '@/lib/seo-engine';
 
 const BASE_URL = 'https://travelmatch.app';
 
 // Priority tiers for different page types
 const PRIORITY_TIERS = {
   home: 1.0,
-  primaryMarket: 0.9,    // en, tr - major cities
-  secondaryMarket: 0.8,  // de, fr, es - major cities
-  tertiaryMarket: 0.7,   // ar, ru, it - major cities
-  expandedMarket: 0.6,   // all languages - secondary cities
-  staticPages: 0.5,      // privacy, terms, etc.
+  primaryMarket: 0.9, // en, tr - major cities
+  secondaryMarket: 0.8, // de, fr, es - major cities
+  tertiaryMarket: 0.7, // ar, ru, it - major cities
+  expandedMarket: 0.6, // all languages - secondary cities
+  staticPages: 0.5, // privacy, terms, etc.
 };
 
 // Tier 1 Languages (highest priority)
@@ -36,29 +32,61 @@ const TIER3_LANGS = ['ru', 'it', 'pt', 'ja', 'ko'];
 
 // Primary cities (pre-rendered, highest priority)
 const PRIMARY_CITIES = [
-  'london', 'new-york', 'dubai', 'paris', 'tokyo',
-  'istanbul', 'berlin', 'miami', 'singapore', 'los-angeles',
+  'london',
+  'new-york',
+  'dubai',
+  'paris',
+  'tokyo',
+  'istanbul',
+  'berlin',
+  'miami',
+  'singapore',
+  'los-angeles',
 ];
 
 // Secondary cities (important markets)
 const SECONDARY_CITIES = [
-  'barcelona', 'amsterdam', 'rome', 'milan', 'madrid',
-  'vienna', 'zurich', 'munich', 'bali', 'ibiza',
-  'hong-kong', 'san-francisco', 'seoul', 'bangkok', 'sydney',
+  'barcelona',
+  'amsterdam',
+  'rome',
+  'milan',
+  'madrid',
+  'vienna',
+  'zurich',
+  'munich',
+  'bali',
+  'ibiza',
+  'hong-kong',
+  'san-francisco',
+  'seoul',
+  'bangkok',
+  'sydney',
 ];
 
 // Primary intents (most searched)
 const PRIMARY_INTENTS = [
-  'dating-match', 'love-fortune', 'gifting-moment',
-  'travel-match', 'instant-love', 'fortune-connection',
+  'dating-match',
+  'love-fortune',
+  'gifting-moment',
+  'travel-match',
+  'instant-love',
+  'fortune-connection',
 ];
 
 // Secondary intents (long-tail keywords)
 const SECONDARY_INTENTS = [
-  'luxury-dating', 'elite-match', 'vip-access',
-  'premium-gifting', 'social-fortune', 'travel-buddy',
-  'skip-queue', 'instant-access', 'unlock-moment',
-  'hack-dating', 'fast-match', 'direct-connect',
+  'luxury-dating',
+  'elite-match',
+  'vip-access',
+  'premium-gifting',
+  'social-fortune',
+  'travel-buddy',
+  'skip-queue',
+  'instant-access',
+  'unlock-moment',
+  'hack-dating',
+  'fast-match',
+  'direct-connect',
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -70,13 +98,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // ============================================================================
 
   const staticPages = [
-    { url: '', priority: PRIORITY_TIERS.home, changeFrequency: 'daily' as const },
+    {
+      url: '',
+      priority: PRIORITY_TIERS.home,
+      changeFrequency: 'daily' as const,
+    },
     { url: '/download', priority: 0.9, changeFrequency: 'weekly' as const },
-    { url: '/features/proof-ceremony', priority: 0.8, changeFrequency: 'monthly' as const },
+    {
+      url: '/features/proof-ceremony',
+      priority: 0.8,
+      changeFrequency: 'monthly' as const,
+    },
     { url: '/partner', priority: 0.7, changeFrequency: 'monthly' as const },
     { url: '/safety', priority: 0.6, changeFrequency: 'monthly' as const },
-    { url: '/privacy', priority: PRIORITY_TIERS.staticPages, changeFrequency: 'yearly' as const },
-    { url: '/terms', priority: PRIORITY_TIERS.staticPages, changeFrequency: 'yearly' as const },
+    {
+      url: '/privacy',
+      priority: PRIORITY_TIERS.staticPages,
+      changeFrequency: 'yearly' as const,
+    },
+    {
+      url: '/terms',
+      priority: PRIORITY_TIERS.staticPages,
+      changeFrequency: 'yearly' as const,
+    },
   ];
 
   for (const page of staticPages) {
@@ -182,12 +226,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // ============================================================================
 
   const remainingCities = GLOBAL_CITIES.filter(
-    city => !PRIMARY_CITIES.includes(city) && !SECONDARY_CITIES.includes(city)
+    (city) =>
+      !PRIMARY_CITIES.includes(city) && !SECONDARY_CITIES.includes(city),
   );
 
   for (const lang of ['en', 'tr', 'ar']) {
     for (const city of remainingCities) {
-      for (const intent of PRIMARY_INTENTS.slice(0, 3)) { // Top 3 intents only
+      for (const intent of PRIMARY_INTENTS.slice(0, 3)) {
+        // Top 3 intents only
         entries.push({
           url: `${BASE_URL}/${lang}/${city}/${intent}`,
           lastModified: now,
@@ -219,16 +265,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 // ============================================================================
 
 export function getSitemapStats() {
-  const tier1Count = TIER1_LANGS.length * PRIMARY_CITIES.length * PRIMARY_INTENTS.length;
-  const tier2Count = TIER2_LANGS.length * PRIMARY_CITIES.length * PRIMARY_INTENTS.length;
-  const tier3Count = TIER3_LANGS.length * PRIMARY_CITIES.length * PRIMARY_INTENTS.length;
-  const tier4Count = SUPPORTED_LANGUAGES.length * SECONDARY_CITIES.length * PRIMARY_INTENTS.length;
-  const tier5Count = TIER1_LANGS.length * PRIMARY_CITIES.length * SECONDARY_INTENTS.length;
+  const tier1Count =
+    TIER1_LANGS.length * PRIMARY_CITIES.length * PRIMARY_INTENTS.length;
+  const tier2Count =
+    TIER2_LANGS.length * PRIMARY_CITIES.length * PRIMARY_INTENTS.length;
+  const tier3Count =
+    TIER3_LANGS.length * PRIMARY_CITIES.length * PRIMARY_INTENTS.length;
+  const tier4Count =
+    SUPPORTED_LANGUAGES.length *
+    SECONDARY_CITIES.length *
+    PRIMARY_INTENTS.length;
+  const tier5Count =
+    TIER1_LANGS.length * PRIMARY_CITIES.length * SECONDARY_INTENTS.length;
 
-  const remainingCitiesCount = GLOBAL_CITIES.length - PRIMARY_CITIES.length - SECONDARY_CITIES.length;
+  const remainingCitiesCount =
+    GLOBAL_CITIES.length - PRIMARY_CITIES.length - SECONDARY_CITIES.length;
   const tier6Count = 3 * remainingCitiesCount * 3; // 3 langs, remaining cities, 3 intents
 
-  const totalDynamicPages = tier1Count + tier2Count + tier3Count + tier4Count + tier5Count + tier6Count;
+  const totalDynamicPages =
+    tier1Count + tier2Count + tier3Count + tier4Count + tier5Count + tier6Count;
   const staticPagesCount = 7;
   const languageHubsCount = SUPPORTED_LANGUAGES.length;
 
