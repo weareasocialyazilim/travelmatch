@@ -309,7 +309,7 @@ const DiscoverScreen = () => {
     async (story: Story) => {
       HapticManager.buttonPress();
       try {
-        const shareMessage = `🌟 ${story.title || 'Bir hikaye'}\n\n${selectedStoryUser?.name || 'Bir kullanıcı'} TravelMatch\'te muhteşem bir an paylaştı!\n\n👉 TravelMatch\'te gör: https://travelmatch.app/stories/${story.id}`;
+        const shareMessage = `🌟 ${story.title || 'Bir hikaye'}\n\n${selectedStoryUser?.name || 'Bir kullanıcı'} TravelMatch'te muhteşem bir an paylaştı!\n\n👉 TravelMatch'te gör: https://travelmatch.app/stories/${story.id}`;
 
         const result = await Share.share({
           message: shareMessage,
@@ -418,7 +418,7 @@ const DiscoverScreen = () => {
         typeof moment.location === 'string'
           ? moment.location
           : moment.location?.city || 'Bir yer';
-      const shareMessage = `🌟 ${moment.title || 'Bir an'}\n\n${moment.description || "TravelMatch'te bu muhteşem anı keşfet!"}\n\n📍 ${locationDisplay}\n💰 ${moment.price || 0} ${moment.currency || 'TRY'}\n\n👉 TravelMatch\'te gör: https://travelmatch.app/moments/${moment.id}`;
+      const shareMessage = `🌟 ${moment.title || 'Bir an'}\n\n${moment.description || "TravelMatch'te bu muhteşem anı keşfet!"}\n\n📍 ${locationDisplay}\n💰 ${moment.price || 0} ${moment.currency || 'TRY'}\n\n👉 TravelMatch'te gör: https://travelmatch.app/moments/${moment.id}`;
 
       const result = await Share.share({
         message: shareMessage,
