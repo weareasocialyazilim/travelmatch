@@ -147,6 +147,7 @@ const decryptMessageIfNeeded = async (
     nonce?: string | null;
     sender_public_key?: string | null;
     sender_id: string;
+    metadata?: { _senderContent?: string } | null;
   },
   currentUserId: string,
 ): Promise<string> => {
@@ -155,12 +156,10 @@ const decryptMessageIfNeeded = async (
     return message.content;
   }
 
-  // Only decrypt if we're the recipient (not the sender)
+  // We sent this message - use stored original content from metadata
   if (message.sender_id === currentUserId) {
-    // We sent this message - it's stored encrypted but we can't decrypt our own
-    // In a proper E2E system, we'd store a copy encrypted to ourselves
-    // For now, we'll need to handle this differently
-    return message.content;
+    // Return original content if available in metadata
+    return message.metadata?._senderContent || message.content;
   }
 
   // Decrypt the message
@@ -355,6 +354,7 @@ export const messagesApi = {
               nonce: message.nonce,
               sender_public_key: message.sender_public_key,
               sender_id: message.sender_id,
+              metadata: message.metadata as { _senderContent?: string } | null,
             },
             user.id,
           );
@@ -411,6 +411,7 @@ export const messagesApi = {
       content: string;
       nonce?: string;
       sender_public_key?: string;
+      metadata?: { _senderContent?: string };
     } = {
       conversation_id: conversationId,
       sender_id: user.id,
@@ -421,11 +422,13 @@ export const messagesApi = {
       const encrypted = await encryptMessage(content, recipientId);
       if (encrypted) {
         // Store encrypted content with encryption metadata
+        // Also store original content in metadata for sender to read later
         messageData = {
           ...messageData,
           content: encrypted.encryptedContent,
           nonce: encrypted.nonce,
           sender_public_key: encrypted.senderPublicKey,
+          metadata: { _senderContent: content },
         };
         logger.debug('[Messages] Message encrypted successfully');
       } else {
