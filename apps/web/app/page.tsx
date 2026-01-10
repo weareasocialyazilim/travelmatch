@@ -17,7 +17,8 @@ import {
   Globe,
 } from 'lucide-react';
 
-// Award-winning components (dynamic for performance)
+// Dynamic imports for client-side only components
+const Scene3D = dynamic(() => import('@/components/3d/Scene3D'), { ssr: false });
 const VelvetExperience = dynamic(
   () =>
     import('@/components/landing/VelvetExperience').then((m) => ({
@@ -919,9 +920,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[var(--bg)] text-white selection:bg-[var(--acid)] selection:text-black">
+      {/* 3D Background - LovePortal3D */}
+      <Scene3D />
+
       <CinematicOverlay noiseOpacity={0.03} vignetteIntensity={0.4} />
 
-      {/* Award-winning cursor with magnetic snap */}
+      {/* Soft aura cursor */}
       <LiquidAuraCursor />
 
       <Navbar
