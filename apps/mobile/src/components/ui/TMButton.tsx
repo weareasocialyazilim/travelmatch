@@ -398,14 +398,7 @@ export const TMButton: React.FC<TMButtonProps> = ({
           <View
             style={[
               styles.androidNeonGlowBackdrop,
-              {
-                borderRadius: neonRadius + 4,
-                // Position slightly larger behind the button
-                top: -2,
-                left: -2,
-                right: -2,
-                bottom: -2,
-              },
+              { borderRadius: neonRadius + 4 },
             ]}
           />
         )}
@@ -503,11 +496,7 @@ export const TMButton: React.FC<TMButtonProps> = ({
             </View>
           ) : (
             // iOS: Full blur effect
-            <BlurView
-              intensity={20}
-              tint="light"
-              style={glassContentStyle}
-            >
+            <BlurView intensity={20} tint="light" style={glassContentStyle}>
               {renderContent()}
             </BlurView>
           )}
@@ -611,6 +600,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 215, 0, 0.25)', // Gold/neon color at 25% opacity
     // Blur effect simulation using multiple semi-transparent layers
     elevation: 0,
+    // Position slightly larger behind the button
+    top: -2,
+    left: -2,
+    right: -2,
+    bottom: -2,
   },
   glowOverlay: {
     ...StyleSheet.absoluteFillObject,

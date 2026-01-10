@@ -250,7 +250,7 @@ export const SkeletonCard: React.FC<{
       {/* Avatar + name row */}
       <View style={styles.cardHeader}>
         <LiquidSkeleton variant="avatar-small" animated={animated} />
-        <View style={{ flex: 1, gap: 4 }}>
+        <View style={styles.flexColumnGap4}>
           <LiquidSkeleton
             variant="text-small"
             width="50%"
@@ -332,7 +332,7 @@ export const SkeletonMomentCard: React.FC<{
           borderRadius={4}
           animated={animated}
         />
-        <View style={{ flexDirection: 'row', gap: 8 }}>
+        <View style={styles.flexRowGap8}>
           <LiquidSkeleton
             width={70}
             height={32}
@@ -359,7 +359,7 @@ export const SkeletonListItem: React.FC<{
 }> = ({ animated = true, showAvatar = true, style }) => (
   <View style={[styles.listItemContainer, style]}>
     {showAvatar && <LiquidSkeleton variant="avatar" animated={animated} />}
-    <View style={{ flex: 1, gap: SPACING.xs }}>
+    <View style={styles.flexColumnGapXs}>
       <LiquidSkeleton variant="text" width="60%" animated={animated} />
       <LiquidSkeleton variant="text-small" width="40%" animated={animated} />
     </View>
@@ -446,6 +446,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: SPACING.md,
     padding: SPACING.md,
+  },
+  // Flex container styles to avoid inline styles
+  flexColumnGap4: {
+    flex: 1,
+    gap: 4,
+  },
+  flexRowGap8: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  flexColumnGapXs: {
+    flex: 1,
+    gap: SPACING.xs,
   },
 });
 
