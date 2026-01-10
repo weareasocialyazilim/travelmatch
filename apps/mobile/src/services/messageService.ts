@@ -64,6 +64,7 @@ const decryptMessageContent = async (
     nonce?: string | null;
     sender_public_key?: string | null;
     sender_id: string;
+    metadata?: { _senderContent?: string } | null;
   },
   currentUserId: string,
 ): Promise<string> => {
@@ -72,9 +73,10 @@ const decryptMessageContent = async (
     return message.content;
   }
 
-  // We sent this - can't decrypt our own (stored for recipient)
+  // We sent this - use stored original content from metadata
   if (message.sender_id === currentUserId) {
-    return message.content;
+    // Return original content if available, otherwise encrypted content
+    return message.metadata?._senderContent || message.content;
   }
 
   try {
@@ -345,13 +347,14 @@ class MessageService {
             sender_public_key?: string;
           };
 
-          // Decrypt content if encrypted
+          // Decrypt content if encrypted (pass metadata for sender's own messages)
           const decryptedContent = await decryptMessageContent(
             {
               content: rawMsg.content,
               nonce: rawMsg.nonce,
               sender_public_key: rawMsg.sender_public_key,
               sender_id: rawMsg.sender_id,
+              metadata: rawMsg.metadata as { _senderContent?: string } | null,
             },
             user.id,
           );
@@ -420,6 +423,14 @@ class MessageService {
         }
       }
 
+      // Build metadata with original content for sender (when encrypted)
+      // This allows sender to see their own messages when fetched from DB
+      const messageMetadata = {
+        ...(data.metadata || {}),
+        // Store original content only if message was encrypted
+        ...(nonce ? { _senderContent: data.content } : {}),
+      };
+
       // Send message with encryption data
       const { data: insertedMsg, error: insertError } = await supabase
         .from('messages')
@@ -429,7 +440,7 @@ class MessageService {
           content: contentToSend,
           type: data.type || 'text',
           metadata:
-            data.metadata as Database['public']['Tables']['messages']['Insert']['metadata'],
+            messageMetadata as Database['public']['Tables']['messages']['Insert']['metadata'],
           nonce,
           sender_public_key: senderPublicKey,
         })
