@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * KralHero Component - Psychological Conversion Hero
+ * ConversionHero Component - Psychological Conversion Hero
  *
  * The main hero section that creates urgency and drives app downloads.
  * Features blurred "locked" content that teases users to unlock via app.
@@ -11,7 +11,7 @@ import { motion } from 'framer-motion';
 import { Lock, Sparkles, Zap, Gift, Heart, Crown } from 'lucide-react';
 import { UnlockButton } from './UnlockButton';
 
-interface KralHeroProps {
+interface ConversionHeroProps {
   city: string;
   citySlug: string;
   intent: string;
@@ -45,13 +45,13 @@ const INTENT_ICONS: Record<string, typeof Heart> = {
   'direct-connect': Zap,
 };
 
-export function KralHero({
+export function ConversionHero({
   city,
   citySlug,
   intent,
   lang,
   dictionary,
-}: KralHeroProps) {
+}: ConversionHeroProps) {
   const IntentIcon = INTENT_ICONS[intent] || Sparkles;
   const intentTitle =
     dictionary.intents[intent] || dictionary.intents['dating-match'];
@@ -230,4 +230,4 @@ export function KralHero({
   );
 }
 
-export default KralHero;
+export default ConversionHero;

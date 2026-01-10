@@ -4,6 +4,6 @@
  */
 
 export { LivePulse } from './LivePulse';
-export { KralHero } from './KralHero';
+export { ConversionHero } from './ConversionHero';
 export { MomentGrid } from './MomentGrid';
 export { UnlockButton, StoreBadges } from './UnlockButton';
