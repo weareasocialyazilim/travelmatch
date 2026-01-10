@@ -75,14 +75,26 @@ jest.mock('framer-motion', () => {
   };
 });
 
-// Mock next/dynamic
-jest.mock('next/dynamic', () => () => {
-  const MockComponent = () => (
-    <div data-testid="mock-3d-component">3D Component</div>
-  );
-  MockComponent.displayName = 'MockDynamicComponent';
-  return MockComponent;
-});
+// Mock next/dynamic to render children when available
+jest.mock(
+  'next/dynamic',
+  () =>
+    (
+      loader: () => Promise<{
+        default: React.ComponentType<{ children?: React.ReactNode }>;
+      }>,
+    ) => {
+      const MockComponent = ({ children }: { children?: React.ReactNode }) => {
+        // For wrapper components like VelvetExperience, render children
+        if (children) {
+          return <>{children}</>;
+        }
+        return <div data-testid="mock-3d-component">3D Component</div>;
+      };
+      MockComponent.displayName = 'MockDynamicComponent';
+      return MockComponent;
+    },
+);
 
 // Mock the hooks
 jest.mock('@/hooks/useSunsetAtmosphere', () => ({
@@ -145,8 +157,8 @@ describe('Home Page - Immersive Redesign', () => {
 
   describe('Hero Section', () => {
     it('renders the hero title', () => {
-      expect(screen.getByText('REALITY')).toBeInTheDocument();
-      expect(screen.getByText('LEAKS.')).toBeInTheDocument();
+      expect(screen.getByText('STOP WAITING.')).toBeInTheDocument();
+      expect(screen.getByText('CONNECT INSTANTLY.')).toBeInTheDocument();
     });
 
     it('renders the brand name', () => {
