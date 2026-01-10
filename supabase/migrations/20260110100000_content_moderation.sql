@@ -95,7 +95,7 @@ CREATE POLICY "moderation_logs_service_insert" ON moderation_logs
 CREATE POLICY "moderation_logs_admin_select" ON moderation_logs
     FOR SELECT USING (
         auth.role() = 'service_role' OR
-        EXISTS (SELECT 1 FROM admin_users WHERE user_id = auth.uid() AND is_active = TRUE)
+        EXISTS (SELECT 1 FROM admin_users WHERE email = (auth.jwt() ->> 'email') AND is_active = TRUE)
     );
 
 -- Blocked Content: Users can see their own, admins can see all
@@ -105,7 +105,7 @@ CREATE POLICY "blocked_content_user_select" ON blocked_content
 CREATE POLICY "blocked_content_admin_all" ON blocked_content
     FOR ALL USING (
         auth.role() = 'service_role' OR
-        EXISTS (SELECT 1 FROM admin_users WHERE user_id = auth.uid() AND is_active = TRUE)
+        EXISTS (SELECT 1 FROM admin_users WHERE email = (auth.jwt() ->> 'email') AND is_active = TRUE)
     );
 
 CREATE POLICY "blocked_content_service_insert" ON blocked_content
@@ -122,14 +122,14 @@ CREATE POLICY "user_warnings_user_acknowledge" ON user_moderation_warnings
 CREATE POLICY "user_warnings_admin_all" ON user_moderation_warnings
     FOR ALL USING (
         auth.role() = 'service_role' OR
-        EXISTS (SELECT 1 FROM admin_users WHERE user_id = auth.uid() AND is_active = TRUE)
+        EXISTS (SELECT 1 FROM admin_users WHERE email = (auth.jwt() ->> 'email') AND is_active = TRUE)
     );
 
 -- Moderation Dictionary: Admins only
 CREATE POLICY "moderation_dictionary_admin_all" ON moderation_dictionary
     FOR ALL USING (
         auth.role() = 'service_role' OR
-        EXISTS (SELECT 1 FROM admin_users WHERE user_id = auth.uid() AND is_active = TRUE)
+        EXISTS (SELECT 1 FROM admin_users WHERE email = (auth.jwt() ->> 'email') AND is_active = TRUE)
     );
 
 -- =============================================================================

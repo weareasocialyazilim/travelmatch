@@ -25,11 +25,13 @@ ON CONFLICT (platform) DO NOTHING;
 ALTER TABLE app_config ENABLE ROW LEVEL SECURITY;
 
 -- Policy: Allow anyone to read app config (public access)
+DROP POLICY IF EXISTS "Allow public read on app_config" ON app_config;
 CREATE POLICY "Allow public read on app_config"
   ON app_config FOR SELECT
   USING (true);
 
 -- Policy: Only authenticated admins can update config
+DROP POLICY IF EXISTS "Only admins can update app_config" ON app_config;
 CREATE POLICY "Only admins can update app_config"
   ON app_config FOR UPDATE
   USING (
@@ -50,6 +52,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Trigger to auto-update timestamp
+DROP TRIGGER IF EXISTS app_config_updated_at ON app_config;
 CREATE TRIGGER app_config_updated_at
   BEFORE UPDATE ON app_config
   FOR EACH ROW
