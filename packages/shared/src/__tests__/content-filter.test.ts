@@ -19,13 +19,13 @@ describe('BilingualContentFilter', () => {
         expect(result.isBlocked).toBe(true);
         expect(result.severity).toBe('critical');
         expect(result.violations.length).toBeGreaterThan(0);
-        expect(result.violations[0].type).toBe('bad_word');
+        expect(result.violations[0]?.type).toBe('bad_word');
       });
 
       it('should detect moderate Turkish bad words', () => {
         const result = filterContent('Bu adam çok salak');
         expect(result.isBlocked).toBe(true);
-        expect(result.violations[0].type).toBe('bad_word');
+        expect(result.violations[0]?.type).toBe('bad_word');
       });
 
       it('should detect leetspeak variations', () => {
@@ -52,11 +52,9 @@ describe('BilingualContentFilter', () => {
       });
 
       it('should detect leetspeak English variations', () => {
-        const result = filterContent('fvck you');
-        // This might not be detected as we don't have v->u mapping
-        // But @ss should work
-        const result2 = filterContent('you @ss');
-        expect(result2.isBlocked).toBe(true);
+        // @ss should work with @ -> a mapping
+        const result = filterContent('you @ss');
+        expect(result.isBlocked).toBe(true);
       });
     });
 
@@ -73,7 +71,7 @@ describe('BilingualContentFilter', () => {
       it('should detect standard Turkish mobile format', () => {
         const result = filterContent('Beni ara: 0532 123 45 67');
         expect(result.isBlocked).toBe(true);
-        expect(result.violations[0].type).toBe('phone_number');
+        expect(result.violations[0]?.type).toBe('phone_number');
       });
 
       it('should detect Turkish mobile without leading zero', () => {
@@ -106,7 +104,7 @@ describe('BilingualContentFilter', () => {
           'Numaram beş üç iki bir iki üç dört beş altı yedi',
         );
         expect(result.isBlocked).toBe(true);
-        expect(result.violations[0].message).toContain('Yazıyla');
+        expect(result.violations[0]?.message).toContain('Yazıyla');
       });
     });
 
@@ -233,8 +231,7 @@ describe('BilingualContentFilter', () => {
     describe('Turkish spam patterns', () => {
       it('should detect "kazandın" spam', () => {
         const result = filterContent('Tebrikler! 1000 TL kazandın!');
-        expect(result.warnings.length).toBeGreaterThan(0) ||
-          expect(result.violations.some((v) => v.type === 'spam')).toBe(true);
+        expect(result.violations.some((v) => v.type === 'spam')).toBe(true);
       });
 
       it('should detect "ücretsiz hediye" spam', () => {
@@ -343,19 +340,19 @@ describe('BilingualContentFilter', () => {
     it('should provide Turkish messages for Turkish content', () => {
       const filter = createContentFilter({ language: 'tr' });
       const result = filter.filter('Sen aptal bir salaksın');
-      expect(result.violations[0].message).toBe(MESSAGES.tr.badWord);
+      expect(result.violations[0]?.message).toBe(MESSAGES.tr.badWord);
     });
 
     it('should provide English messages for English content', () => {
       const filter = createContentFilter({ language: 'en' });
       const result = filter.filter('You are an idiot');
-      expect(result.violations[0].message).toBe(MESSAGES.en.badWord);
+      expect(result.violations[0]?.message).toBe(MESSAGES.en.badWord);
     });
 
     it('should include English message in messageEn field', () => {
       const filter = createContentFilter({ language: 'tr' });
       const result = filter.filter('Sen salak');
-      expect(result.violations[0].messageEn).toBe(MESSAGES.en.badWord);
+      expect(result.violations[0]?.messageEn).toBe(MESSAGES.en.badWord);
     });
   });
 
