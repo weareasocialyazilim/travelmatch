@@ -79,7 +79,7 @@ export function ConversionHero({
           </span>
         </motion.div>
 
-        {/* Main Headline */}
+        {/* Main Headline - Disruptive Messaging */}
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -87,34 +87,41 @@ export function ConversionHero({
           className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6"
         >
           <span className="block text-white">
-            {lang === 'tr' ? 'SIRAYI' : 'HACK THE'}
+            {lang === 'tr' ? 'BEKLEMEYİ BIRAK.' : 'STOP WAITING.'}
           </span>
           <span className="block bg-gradient-to-r from-purple-400 via-pink-500 to-purple-600 bg-clip-text text-transparent">
-            {lang === 'tr' ? 'HACKLE' : 'QUEUE'}
+            {lang === 'tr' ? 'ANINDA BAĞ KUR.' : 'CONNECT INSTANTLY.'}
           </span>
         </motion.h1>
 
-        {/* Subheadline with City */}
-        <motion.p
+        {/* Subheadline with City - Enhanced Copy */}
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-xl md:text-2xl text-white/70 mb-12 max-w-2xl mx-auto"
+          className="mb-12 max-w-2xl mx-auto space-y-3"
         >
-          {lang === 'tr' ? (
-            <>
-              <span className="text-pink-400 font-semibold">{city}</span>{' '}
-              konumunda anlık momentların kilidini aç. Hediyeleşme ekonomisiyle
-              bekleme sırasını atla.
-            </>
-          ) : (
-            <>
-              Unlock instant moments in{' '}
-              <span className="text-pink-400 font-semibold">{city}</span>. Skip
-              the dating queue with our gifting economy.
-            </>
-          )}
-        </motion.p>
+          <p className="text-xl md:text-2xl text-white/70">
+            {lang === 'tr' ? (
+              <>
+                <span className="text-pink-400 font-semibold">{city}</span>{' '}
+                konumunda algoritma döngüsünden çık. Niyetini bir hediye ile kanıtla,
+                bekleme sırasını hackle ve gerçek dünyaya ışınlan.
+              </>
+            ) : (
+              <>
+                Quit the algorithm loop in{' '}
+                <span className="text-pink-400 font-semibold">{city}</span>.
+                Prove your intent with a gift, hack the queue, and teleport to the real world.
+              </>
+            )}
+          </p>
+          <p className="text-sm font-mono text-purple-400 tracking-wide">
+            {lang === 'tr'
+              ? "Tinder'da kaybolanlar için değil, anı yaşayanlar için."
+              : 'Not for the scrollers, but for those who live for the moment.'}
+          </p>
+        </motion.div>
 
         {/* Blurred Preview Card */}
         <motion.div
@@ -130,6 +137,8 @@ export function ConversionHero({
             style={{
               backgroundImage: `url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&auto=format&fit=crop&q=60')`,
             }}
+            role="img"
+            aria-label="Close-up of a hand holding a dark-mode iPhone 16 Pro, the screen shows a minimal UI with a Moment Unlocked: Champagne Sent notification, reflection of city lights on the screen glass, high-speed train window background, motion blur, authentic and high-energy"
           />
 
           {/* Overlay */}
@@ -146,13 +155,13 @@ export function ConversionHero({
             </motion.div>
 
             <h3 className="text-2xl md:text-3xl font-black mb-3 italic">
-              {lang === 'tr' ? 'ERİŞİLEMEYENİ AÇ' : 'UNLOCK THE EXCLUSIVE'}
+              {lang === 'tr' ? 'NİYETİNİ KANITLA' : 'PROVE YOUR INTENT'}
             </h3>
 
             <p className="text-white/70 mb-6 max-w-xs text-sm">
               {lang === 'tr'
-                ? 'Bu moment bir hediye bekliyor. Sırayı hackle ve kilidi aç.'
-                : 'This moment is waiting for a gift. Hack the queue and unlock.'}
+                ? 'Laf değil, eylem. Küçük bir jest ile sıranın en önüne geç ve anında fark edil.'
+                : 'Action over words. Skip the small talk, move to the front with a simple gesture.'}
             </p>
 
             {/* Active Moments Counter */}

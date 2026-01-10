@@ -75,14 +75,26 @@ jest.mock('framer-motion', () => {
   };
 });
 
-// Mock next/dynamic
-jest.mock('next/dynamic', () => () => {
-  const MockComponent = () => (
-    <div data-testid="mock-3d-component">3D Component</div>
-  );
-  MockComponent.displayName = 'MockDynamicComponent';
-  return MockComponent;
-});
+// Mock next/dynamic to render children when available
+jest.mock(
+  'next/dynamic',
+  () =>
+    (
+      loader: () => Promise<{
+        default: React.ComponentType<{ children?: React.ReactNode }>;
+      }>,
+    ) => {
+      const MockComponent = ({ children }: { children?: React.ReactNode }) => {
+        // For wrapper components like VelvetExperience, render children
+        if (children) {
+          return <>{children}</>;
+        }
+        return <div data-testid="mock-3d-component">3D Component</div>;
+      };
+      MockComponent.displayName = 'MockDynamicComponent';
+      return MockComponent;
+    },
+);
 
 // Mock the hooks
 jest.mock('@/hooks/useSunsetAtmosphere', () => ({
@@ -142,8 +154,8 @@ describe('Immersive Landing Page', () => {
   it('renders the hero section with correct title', () => {
     render(<Home />);
 
-    expect(screen.getByText('REALITY')).toBeInTheDocument();
-    expect(screen.getByText('LEAKS.')).toBeInTheDocument();
+    expect(screen.getByText('STOP WAITING.')).toBeInTheDocument();
+    expect(screen.getByText('CONNECT INSTANTLY.')).toBeInTheDocument();
   });
 
   it('renders the stash section', () => {
@@ -167,13 +179,13 @@ describe('Immersive Landing Page', () => {
     const langButton = screen.getByRole('button', { name: /EN.*TR/i });
 
     // Check initial state (English)
-    expect(screen.getByText('REALITY')).toBeInTheDocument();
+    expect(screen.getByText('STOP WAITING.')).toBeInTheDocument();
 
     // Click to switch to Turkish
     fireEvent.click(langButton);
 
     // Should now show Turkish content
-    expect(screen.getByText('GERÇEKLİK')).toBeInTheDocument();
+    expect(screen.getByText('BEKLEMEYİ BIRAK.')).toBeInTheDocument();
   });
 
   it('renders the coming soon locked drops', () => {
@@ -279,8 +291,8 @@ describe('Turkish Language Support', () => {
     fireEvent.click(langButton);
 
     // Check Turkish content
-    expect(screen.getByText('GERÇEKLİK')).toBeInTheDocument();
-    expect(screen.getByText('SIZIYOR.')).toBeInTheDocument();
+    expect(screen.getByText('BEKLEMEYİ BIRAK.')).toBeInTheDocument();
+    expect(screen.getByText('ANINDA BAĞ KUR.')).toBeInTheDocument();
     expect(screen.getByText("ZULA'YA GİR")).toBeInTheDocument();
   });
 });
