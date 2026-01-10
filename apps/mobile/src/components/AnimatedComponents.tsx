@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
 import type { ViewStyle } from 'react-native';
 import { StyleSheet, Pressable, View, Text } from 'react-native';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -85,7 +85,7 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
 
   const handlePress = useCallback(() => {
     if (haptic) {
-      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.buttonPress();
     }
     onPress();
   }, [haptic, onPress]);
@@ -207,7 +207,7 @@ export const ScaleOnPress: React.FC<ScaleOnPressProps> = ({
 
   const handlePress = useCallback(() => {
     if (haptic) {
-      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.buttonPress();
     }
     onPress?.();
   }, [haptic, onPress]);

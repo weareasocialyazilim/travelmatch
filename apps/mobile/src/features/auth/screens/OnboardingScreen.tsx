@@ -29,10 +29,10 @@ import {
   type GestureResponderEvent,
   type PanResponderGestureState,
 } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import * as Haptics from 'expo-haptics';
 import type { StackScreenProps } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
@@ -42,6 +42,10 @@ import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
 import { TMButton } from '@/components/ui/TMButton';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useOnboarding } from '@/hooks/useOnboarding';
+import { useGyroscopeParallax } from '@/hooks/useGyroscopeParallax';
+import { useMagneticEffect } from '@/hooks/useMagneticEffect';
+import { HapticManager } from '@/services/HapticManager';
+import { GestureDetector } from 'react-native-gesture-handler';
 import { logger } from '../../../utils/logger';
 import type { RootStackParamList } from '@/navigation/routeParams';
 
@@ -93,25 +97,29 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
   const analytics = useAnalytics();
   const { completeOnboarding } = useOnboarding();
 
+  // Spatial depth effect - gyroscope parallax for premium feel
+  const { parallaxStyle } = useGyroscopeParallax({ range: 5, enabled: true });
+
+  // Magnetic physics for CTA button - Apple Vision Pro style
+  const { magneticStyle, glowStyle, panGestureHandler, setButtonCenter } =
+    useMagneticEffect({
+      attractionRadius: 80,
+      maxPull: 4,
+      enableGlow: true,
+      enableHaptics: true,
+    });
+
   // Swipe gesture handler for navigating between slides
   const handleSwipe = useCallback(
     (direction: 'left' | 'right') => {
       if (direction === 'left' && activeIndex < SLIDES.length - 1) {
         // Swipe left = next slide
         setActiveIndex(activeIndex + 1);
-        try {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        } catch (_e) {
-          // ignore haptics error
-        }
+        HapticManager.swipe();
       } else if (direction === 'right' && activeIndex > 0) {
         // Swipe right = previous slide
         setActiveIndex(activeIndex - 1);
-        try {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        } catch (_e) {
-          // ignore haptics error
-        }
+        HapticManager.swipe();
       }
     },
     [activeIndex],
@@ -151,15 +159,8 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
       totalSlides: SLIDES.length,
     });
 
-    // Haptics - wrap in try/catch to prevent crashes
-    try {
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch (hapticError) {
-      // Haptics may fail on simulator, ignore
-      logger.debug('Haptics failed (expected on simulator)', {
-        error: hapticError,
-      });
-    }
+    // Haptic feedback for button press
+    HapticManager.buttonPress();
 
     if (activeIndex < SLIDES.length - 1) {
       const nextIndex = activeIndex + 1;
@@ -257,11 +258,11 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
         {/* Spacer to push content down */}
         <View style={styles.spacer} />
 
-        {/* Text Content */}
-        <View style={styles.textContainer}>
+        {/* Text Content with Gyroscope Parallax */}
+        <Animated.View style={[styles.textContainer, parallaxStyle]}>
           <Text style={styles.title}>{currentSlide.title}</Text>
           <Text style={styles.desc}>{currentSlide.desc}</Text>
-        </View>
+        </Animated.View>
 
         {/* Footer Actions */}
         <View style={styles.footer}>
@@ -275,29 +276,39 @@ export const OnboardingScreen: React.FC<Partial<OnboardingScreenProps>> = ({
             ))}
           </View>
 
-          {/* Next Button - Simple Pressable with direct onPress */}
-          <Pressable
-            onPress={() => {
-              logger.info('🔘 BUTTON PRESSED!', { activeIndex });
-              try {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              } catch (_e) {
-                // ignore haptics error
-              }
-              handleNext();
-            }}
-            style={({ pressed }) => [
-              styles.nextButton,
-              pressed && styles.nextButtonPressed,
-            ]}
-          >
-            <LinearGradient
-              colors={[COLORS.brand.primary, '#A2FF00']}
-              style={styles.nextButtonGradient}
+          {/* Next Button with Magnetic Physics - Apple Vision Pro style */}
+          <GestureDetector gesture={panGestureHandler}>
+            <Animated.View
+              style={[styles.magneticButtonContainer, magneticStyle]}
+              onLayout={(event) => {
+                const { x, y, width: w, height: h } = event.nativeEvent.layout;
+                // Set button center for magnetic attraction calculations
+                setButtonCenter(x + w / 2, y + h / 2);
+              }}
             >
-              <Ionicons name="arrow-forward" size={24} color="black" />
-            </LinearGradient>
-          </Pressable>
+              {/* Glow layer - appears when finger approaches */}
+              <Animated.View style={[styles.buttonGlow, glowStyle]} />
+
+              <Pressable
+                onPress={() => {
+                  logger.info('🔘 BUTTON PRESSED!', { activeIndex });
+                  HapticManager.primaryAction();
+                  handleNext();
+                }}
+                style={({ pressed }) => [
+                  styles.nextButton,
+                  pressed && styles.nextButtonPressed,
+                ]}
+              >
+                <LinearGradient
+                  colors={[COLORS.brand.primary, '#A2FF00']}
+                  style={styles.nextButtonGradient}
+                >
+                  <Ionicons name="arrow-forward" size={24} color="black" />
+                </LinearGradient>
+              </Pressable>
+            </Animated.View>
+          </GestureDetector>
         </View>
       </View>
     </View>
@@ -376,6 +387,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  magneticButtonContainer: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonGlow: {
+    position: 'absolute',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: COLORS.brand.primary,
+    shadowColor: COLORS.brand.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowRadius: 20,
+    shadowOpacity: 0.8,
+  },
   backgroundFallback: {
     backgroundColor: '#1a1a2e',
   },
@@ -442,7 +469,7 @@ export const AwwwardsOnboardingScreen: React.FC<
   const flatListRef = useRef<FlatList>(null);
 
   const handleContinue = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
 
     if (currentIndex < AWWWARDS_SLIDES.length - 1) {
       flatListRef.current?.scrollToIndex({ index: currentIndex + 1 });
@@ -453,7 +480,7 @@ export const AwwwardsOnboardingScreen: React.FC<
   };
 
   const handleSkip = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     await completeOnboarding();
     navigation.replace('Welcome');
   };

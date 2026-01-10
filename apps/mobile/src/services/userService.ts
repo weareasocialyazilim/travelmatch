@@ -66,7 +66,6 @@ export interface UserPreferences {
 
   // Privacy
   showLocation: boolean;
-  showLastActive: boolean;
   allowMessages: 'everyone' | 'followers' | 'none';
 
   // Display
@@ -116,26 +115,77 @@ type DBUserRowLike = Partial<{
 // User Service
 export const userService = {
   /**
-   * Initialize and sync encryption keys
+   * Initialize and sync E2E encryption keys
+   * - Generates keypair if not exists (stored in SecureStore)
+   * - Syncs public key to database for other users to encrypt messages
    */
-  syncKeys: async () => {
+  syncKeys: async (): Promise<{ publicKey: string | null }> => {
     try {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) return { publicKey: null };
 
-      // 1. Ensure local keys exist
-      await encryptionService.initializeKeys();
+      // 1. Ensure local keys exist (generates if not present)
+      const keyPair = await encryptionService.initializeKeys();
+      const localPublicKey = keyPair.publicKey;
 
-      // 2. Check remote key
-      const { data: _profile } = await dbUsersService.getById(user.id);
+      // 2. Check if remote public key matches local
+      const { data: profile } = await supabase
+        .from('users')
+        .select('public_key')
+        .eq('id', user.id)
+        .single();
 
-      // TODO: Upload public key when column is added to database
-      // Currently skipping public_key sync as column doesn't exist
-      logger.debug('[User] Skipping public_key sync (column not in database)');
+      const remotePublicKey = profile?.public_key;
+
+      // 3. Sync public key to database if different or missing
+      if (remotePublicKey !== localPublicKey) {
+        const { error: updateError } = await supabase
+          .from('users')
+          .update({ public_key: localPublicKey })
+          .eq('id', user.id);
+
+        if (updateError) {
+          logger.error(
+            '[User] Failed to sync public key to database',
+            updateError,
+          );
+        } else {
+          logger.info('[User] Public key synced to database');
+        }
+      } else {
+        logger.debug('[User] Public key already synced');
+      }
+
+      return { publicKey: localPublicKey };
     } catch (error) {
       logger.error('[User] Failed to sync keys', error);
+      return { publicKey: null };
+    }
+  },
+
+  /**
+   * Get a user's public key for E2E encryption
+   * @param userId - The user ID to get public key for
+   */
+  getPublicKey: async (userId: string): Promise<string | null> => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('public_key')
+        .eq('id', userId)
+        .single();
+
+      if (error || !data?.public_key) {
+        logger.warn(`[User] No public key found for user ${userId}`);
+        return null;
+      }
+
+      return data.public_key;
+    } catch (error) {
+      logger.error('[User] Failed to get public key', error);
+      return null;
     }
   },
 
@@ -430,7 +480,6 @@ export const userService = {
       marketingEmails: notifPrefs.marketing ?? false,
 
       showLocation: privacySettings.showLocation ?? true,
-      showLastActive: privacySettings.showLastSeen ?? true,
       allowMessages: privacySettings.allowMessages ?? 'everyone',
 
       language: typedUserData.languages?.[0] || 'en',
@@ -477,8 +526,6 @@ export const userService = {
 
     if (data.showLocation !== undefined)
       currentPrivacy.showLocation = data.showLocation;
-    if (data.showLastActive !== undefined)
-      currentPrivacy.showLastSeen = data.showLastActive;
     if (data.allowMessages !== undefined)
       currentPrivacy.allowMessages = data.allowMessages;
     if (data.timezone !== undefined) currentPrivacy.timezone = data.timezone;
@@ -511,7 +558,6 @@ export const userService = {
       marketingEmails: newNotif.marketing ?? false,
 
       showLocation: newPrivacy.showLocation ?? true,
-      showLastActive: newPrivacy.showLastSeen ?? true,
       allowMessages: newPrivacy.allowMessages ?? 'everyone',
 
       language: typedUpdatedUser?.languages?.[0] || 'en',

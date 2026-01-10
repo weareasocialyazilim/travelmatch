@@ -35,11 +35,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { Ionicons } from '@expo/vector-icons';
 import { walletService, type WalletBalance } from '@/services/walletService';
 import { useAuth } from '@/hooks/useAuth';
+import { useScreenSecurity } from '@/hooks/useScreenSecurity';
 import { showAlert } from '@/stores/modalStore';
+import { logger } from '@/utils/logger';
 
 // ═══════════════════════════════════════════════════════════════════
 // KYC LEVELS & REQUIREMENTS
@@ -350,7 +352,7 @@ const AmountInput: React.FC<{
   const handleQuickAmount = (percentage: number) => {
     const amount = Math.floor(maxAmount * percentage);
     onChange(amount.toString());
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
   };
 
   return (
@@ -398,6 +400,9 @@ const WithdrawScreen: React.FC = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
 
+  // Security: Prevent screenshots during withdrawal
+  useScreenSecurity();
+
   // KYC Level - get from user profile or default to 'none'
   // In production, this would come from user.kyc_level or a profile service
   const userKYCLevel: KYCLevel = (user as any)?.kyc_level || 'none';
@@ -439,7 +444,7 @@ const WithdrawScreen: React.FC = () => {
         setSelectedAccount(accounts[0].id);
       }
     } catch (err) {
-      console.error('[WithdrawScreen] Fetch error:', err);
+      logger.error('[WithdrawScreen] Fetch error:', { error: err });
       setError('Bakiye bilgisi alınamadı. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);
@@ -505,7 +510,7 @@ const WithdrawScreen: React.FC = () => {
     const validationError = validateAmount();
     if (validationError) {
       setError(validationError);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.error();
       return;
     }
 
@@ -531,9 +536,7 @@ const WithdrawScreen: React.FC = () => {
               });
 
               // Success haptic feedback
-              Haptics.notificationAsync(
-                Haptics.NotificationFeedbackType.Success,
-              );
+              HapticManager.success();
 
               showAlert(
                 'Talep Oluşturuldu ✓',
@@ -546,8 +549,8 @@ const WithdrawScreen: React.FC = () => {
                 ],
               );
             } catch (err: any) {
-              console.error('[WithdrawScreen] Settlement error:', err);
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+              logger.error('[WithdrawScreen] Settlement error:', { error: err });
+              HapticManager.error();
               setError(
                 err.message ||
                   'Çekim talebi oluşturulamadı. Lütfen tekrar deneyin.',
@@ -672,7 +675,7 @@ const WithdrawScreen: React.FC = () => {
                     isSelected={selectedAccount === account.id}
                     onSelect={() => {
                       setSelectedAccount(account.id);
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      HapticManager.buttonPress();
                     }}
                   />
                 ))

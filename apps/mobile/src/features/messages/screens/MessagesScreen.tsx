@@ -11,8 +11,8 @@ import {
 import { FlashList } from '@shopify/flash-list';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import * as Haptics from 'expo-haptics';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { HapticManager } from '@/services/HapticManager';
 import { ErrorState, EmptyState } from '@/components';
 import { SkeletonList } from '@/components/ui';
 import { FadeInView as _FadeInView } from '@/components/AnimatedComponents';
@@ -58,8 +58,8 @@ const MessagesScreen: React.FC = () => {
     refreshConversations,
   } = useMessages();
 
-  // Realtime context
-  const { isUserOnline } = useRealtime();
+  // Realtime context - online status removed for privacy
+  const _realtime = useRealtime();
 
   // Track typing users
   const [typingConversations, setTypingConversations] = useState<Set<string>>(
@@ -164,13 +164,13 @@ const MessagesScreen: React.FC = () => {
   );
 
   const onRefresh = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.refreshTriggered();
     refreshConversations();
   }, [refreshConversations]);
 
   const handleChatPress = useCallback(
     (conversation: Conversation) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.buttonPress();
       navigation.navigate('Chat', {
         otherUser: {
           id: conversation.participantId || '',
@@ -189,9 +189,6 @@ const MessagesScreen: React.FC = () => {
 
   const renderChatItem = useCallback(
     ({ item }: { item: Conversation }) => {
-      const isOnline = item.participantId
-        ? isUserOnline(item.participantId)
-        : false;
       const isTyping = typingConversations.has(item.id);
 
       return (
@@ -214,7 +211,6 @@ const MessagesScreen: React.FC = () => {
               style={styles.avatar}
               accessibilityLabel={`${item.participantName || 'User'}'s avatar`}
             />
-            {isOnline && <View style={styles.onlineIndicator} />}
           </View>
 
           {/* Content */}
@@ -272,7 +268,7 @@ const MessagesScreen: React.FC = () => {
         </TouchableOpacity>
       );
     },
-    [handleChatPress, isUserOnline, typingConversations],
+    [handleChatPress, typingConversations],
   );
 
   const renderEmptyState = useCallback(
@@ -335,9 +331,7 @@ const MessagesScreen: React.FC = () => {
   return (
     <NetworkGuard
       offlineMessage={
-        conversations.length > 0
-          ? 'Son yüklenen mesajları gösteriyorsunuz'
-          : 'Mesajları görmek için internet bağlantısı gerekli'
+        conversations.length > 0 ? t('messages.cached') : t('messages.offline')
       }
       onRetry={refreshConversations}
     >
@@ -457,17 +451,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     gap: 4,
-  },
-  onlineIndicator: {
-    backgroundColor: COLORS.greenBright,
-    borderColor: COLORS.utility.white,
-    borderRadius: 6,
-    borderWidth: 2,
-    bottom: 2,
-    height: 12,
-    position: 'absolute',
-    right: 2,
-    width: 12,
   },
   personName: {
     color: COLORS.text.primary,

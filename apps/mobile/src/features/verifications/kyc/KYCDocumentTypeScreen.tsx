@@ -16,7 +16,7 @@ import Animated, {
   withTiming,
   runOnJS,
 } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { SPACING, RADIUS } from '@/constants/spacing';
@@ -83,7 +83,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   }, [isSelected, borderOpacity]);
 
   const triggerHaptic = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
   }, []);
 
   const handlePressIn = useCallback(() => {
@@ -201,7 +201,7 @@ const KYCDocumentTypeScreen: React.FC = () => {
   const handleContinue = () => {
     if (!selectedType) return;
 
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.primaryAction();
     navigation.navigate('KYCDocumentCapture', {
       data: {
         ...data,

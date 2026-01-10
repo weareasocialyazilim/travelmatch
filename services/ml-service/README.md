@@ -1,441 +1,192 @@
-# ML Service - Containerized Machine Learning Inference
+# ML Service - AI-Powered Gift Verification
 
 ## Overview
 
-Isolated containerized service for ML inference, separating compute-intensive operations from Edge
-Functions.
+TravelMatch ML Service provides AI-powered verification and analysis for the gift experience
+platform. When someone gifts a travel experience, the recipient must prove they completed it before
+funds are released from escrow.
 
-## Why Separate ML Service?
+## What is TravelMatch?
 
-### Problems with Edge Functions for ML:
+TravelMatch is a **gift platform for travel experiences**:
 
-- ❌ **Limited CPU/Memory**: Edge Functions have strict resource limits
-- ❌ **Cold Starts**: Loading ML models on every request
-- ❌ **Timeout Risk**: Inference can take > 10s for complex models
-- ❌ **No GPU Support**: Can't use GPUs for acceleration
-- ❌ **Large Bundle Size**: ML libraries exceed Edge Function limits
+1. **Create a Moment** — Define a travel experience you want to gift
+2. **Gift & Send** — Send it to someone with funds held in escrow
+3. **Prove It** — Recipient uploads proof (photos, location, receipts)
+4. **Release Funds** — AI verifies the proof, money transfers automatically
 
-### Benefits of Containerized ML Service:
+## ML Service Capabilities
 
-- ✅ **Dedicated Resources**: CPU/GPU optimized containers
-- ✅ **Model Caching**: Models stay loaded in memory
-- ✅ **No Timeout**: Long-running inference supported
-- ✅ **Horizontal Scaling**: Scale workers independently
-- ✅ **Better Libraries**: Use PyTorch, TensorFlow, scikit-learn
+### 1. Proof Verification (KYC & Experience)
 
-## Architecture
+**Purpose**: Verify user identity and experience completion
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    Edge Functions                        │
-│  (Lightweight request handlers)                          │
-└─────────────────────────────────────────────────────────┘
-                         │
-                         ▼ gRPC/HTTP
-┌─────────────────────────────────────────────────────────┐
-│                   ML Service (FastAPI)                   │
-│  • Model Inference (travel matching, recommendations)    │
-│  • Feature Engineering                                   │
-│  • Smart Notifications                                   │
-│  • GPU Acceleration (optional)                           │
-└─────────────────────────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────┐
-│              Models (Mounted Volume/S3)                  │
-│  • TravelMatch Model                                     │
-│  • Recommendation Model                                  │
-│  • Notification Timing Model                             │
-└─────────────────────────────────────────────────────────┘
-```
+POST /proof/verify
 
-## Services
-
-### 1. Match Scoring Service
-
-**Purpose**: Score user compatibility for travel matching
-
-**Input**:
-
-```json
-{
-  "user_a_id": "uuid",
-  "user_b_id": "uuid",
-  "context": {
-    "destination": "Paris",
-    "dates": "2024-07-15",
-    "interests": ["art", "food"]
-  }
+Input: {
+  "imageUrl": "https://storage.../proof.jpg",
+  "proofType": "selfie_with_id" | "experience_photo" | "receipt",
+  "userId": "uuid",
+  "momentId": "uuid"  // Optional, for experience proofs
 }
-```
 
-**Output**:
+AI Processing:
+├── Face Detection (MediaPipe)
+├── ID Card Detection (Edge detection + OCR)
+├── Location Verification (EXIF metadata)
+├── Image Quality Assessment (blur, brightness)
+└── Fraud Detection (manipulation checks)
 
-```json
-{
-  "score": 0.87,
-  "confidence": 0.92,
-  "factors": {
-    "interest_overlap": 0.9,
-    "travel_style": 0.85,
-    "personality": 0.86
+Output: {
+  "overall": 85,
+  "approved": true,
+  "breakdown": {
+    "faceQuality": 90,
+    "idQuality": 80,
+    "locationMatch": 95,
+    "imageAuthenticity": 88
   },
-  "latency_ms": 45
+  "issues": [],
+  "suggestions": []
 }
 ```
 
-### 2. Recommendation Service
+### 2. Gift Offer Analysis
 
-**Purpose**: Personalized travel recommendations
+**Purpose**: Analyze premium subscriber offers for "Reddedilemez Teklif" (Irresistible Offer)
+notifications
 
-**Input**:
+```
+POST /offer/analyze
 
-```json
-{
-  "user_id": "uuid",
-  "limit": 10,
-  "filters": {
-    "budget": "medium",
-    "duration": "week"
+Input: {
+  "offerAmount": 1500,
+  "requestedAmount": 1000,
+  "senderTier": "platinum",
+  "senderHistory": {
+    "completedGifts": 12,
+    "avgRating": 4.8
   }
 }
-```
 
-**Output**:
-
-```json
-{
-  "recommendations": [
-    {
-      "destination": "Tokyo",
-      "score": 0.95,
-      "reason": "Based on your interest in cuisine and culture"
-    }
-  ]
+Output: {
+  "priority": "critical",
+  "offerScore": 92.5,
+  "valueRatio": 1.5,
+  "notificationSound": "liquid_shine",
+  "recommendation": "🔥 Yüksek değerli Platinum teklif! 50% fazla sunuluyor.",
+  "isIrresistible": true
 }
 ```
 
-### 3. Smart Notifications Service
+### 3. Content Moderation
 
-**Purpose**: Predict optimal notification timing
+**Purpose**: Auto-moderate user-generated content (moments, messages, proofs)
 
-**Input**:
+```
+POST /content/moderate
 
-```json
-{
-  "user_id": "uuid",
-  "notification_type": "match_found",
-  "urgency": "medium"
+Input: {
+  "contentType": "moment" | "message" | "proof",
+  "contentUrl": "https://...",
+  "text": "Optional text content"
+}
+
+Output: {
+  "approved": true,
+  "flags": [],
+  "confidence": 0.95,
+  "requiresManualReview": false
 }
 ```
 
-**Output**:
+### 4. Smart Notifications
 
-```json
-{
-  "send_at": "2024-07-15T14:30:00Z",
+**Purpose**: Predict optimal notification timing for each user
+
+```
+POST /notifications/optimize
+
+Input: {
+  "userId": "uuid",
+  "notificationType": "gift_received" | "proof_approved" | "funds_released",
+  "urgency": "low" | "medium" | "high"
+}
+
+Output: {
+  "sendAt": "2024-07-15T14:30:00Z",
   "channel": "push",
   "confidence": 0.88,
   "reason": "User most active at 2-3pm on weekdays"
 }
 ```
 
+### 5. Fraud Detection
+
+**Purpose**: Detect fraudulent activities (fake proofs, suspicious accounts)
+
+```
+POST /fraud/analyze
+
+Input: {
+  "userId": "uuid",
+  "actionType": "proof_submission" | "withdrawal" | "account_creation",
+  "metadata": { ... }
+}
+
+Output: {
+  "riskScore": 15,
+  "riskLevel": "low",
+  "flags": [],
+  "recommendation": "approve"
+}
+```
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Mobile App / Admin                        │
+└─────────────────────────────────────────────────────────────┘
+                         │
+                         ▼ HTTP/gRPC
+┌─────────────────────────────────────────────────────────────┐
+│              Supabase Edge Functions                         │
+│  (Lightweight request handlers)                              │
+└─────────────────────────────────────────────────────────────┘
+                         │
+                         ▼ Internal HTTP
+┌─────────────────────────────────────────────────────────────┐
+│                   ML Service (FastAPI)                       │
+│  • Proof Verification (KYC + Experience)                     │
+│  • Gift Offer Analysis                                       │
+│  • Content Moderation                                        │
+│  • Fraud Detection                                           │
+│  • Smart Notifications                                       │
+└─────────────────────────────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────────┐
+│              ML Models (Local / S3)                          │
+│  • Face Detection (MediaPipe)                                │
+│  • ID Card Detection (YOLOv8)                                │
+│  • Image Quality (BRISQUE)                                   │
+│  • Text Moderation (Transformers)                            │
+└─────────────────────────────────────────────────────────────┘
+```
+
 ## Tech Stack
 
-- **Framework**: FastAPI 0.115+ (async Python, production-ready)
-- **ML Core**: PyTorch 2.5.1, scikit-learn 1.6, NumPy 2.2
-- **NLP**: Transformers 4.47, Sentence-Transformers 3.3
-- **Inference**: ONNX Runtime 1.20 (optimized cross-platform)
-- **Computer Vision**: OpenCV (headless), MediaPipe, Pillow
-- **Cache**: Redis 5.2 + hiredis (feature store, prediction cache)
+- **Framework**: FastAPI 0.115+ (async Python)
+- **ML Core**: PyTorch 2.5.1, scikit-learn 1.6
+- **Computer Vision**: OpenCV, MediaPipe, Pillow
+- **NLP**: Transformers 4.47 (content moderation)
+- **Inference**: ONNX Runtime 1.20 (optimized)
+- **Cache**: Redis 5.2 (prediction cache)
 - **Monitoring**: Prometheus, OpenTelemetry
-- **Data**: Pandas, PyArrow (efficient serialization)
-- **Python**: 3.13+ compatible, all dependencies pinned
-- **Deployment**: Docker + GPU support (CUDA 12.1)
 
 ## Quick Start
-
-### Installation
-
-```bash
-# CPU-only (recommended for development)
-cd services/ml-service
-pip install -r requirements.txt
-
-# GPU version (production with NVIDIA GPUs)
-pip install -r requirements.txt
-pip install -r requirements-gpu.txt  # Overrides with CUDA versions
-```
-
-### Start ML Service
-
-```bash
-# CPU-only
-docker-compose up ml-service -d
-
-# With GPU (requires NVIDIA Docker Runtime)
-docker-compose -f docker-compose.gpu.yml up ml-service -d
-
-# Or using CLI
-tm docker up ml-service
-```
-
-### Call from Edge Function
-
-```typescript
-// supabase/functions/match-users/index.ts
-const response = await fetch('http://ml-service:8000/match/score', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    user_a_id: userA.id,
-    user_b_id: userB.id,
-    context: { destination: 'Paris' },
-  }),
-});
-
-const prediction = await response.json();
-console.log('Match score:', prediction.score); // 0.87
-```
-
-## API Reference
-
-### Match Scoring
-
-**Endpoint**: `POST /match/score`
-
-**Request**:
-
-```json
-{
-  "user_a_id": "uuid",
-  "user_b_id": "uuid",
-  "context": {
-    "destination": "string",
-    "dates": "string",
-    "interests": ["string"]
-  }
-}
-```
-
-**Response**:
-
-```json
-{
-  "score": 0.87,
-  "confidence": 0.92,
-  "factors": {
-    "interest_overlap": 0.9,
-    "travel_style": 0.85,
-    "personality": 0.86
-  },
-  "latency_ms": 45
-}
-```
-
-### Recommendations
-
-**Endpoint**: `POST /recommend/destinations`
-
-**Request**:
-
-```json
-{
-  "user_id": "uuid",
-  "limit": 10,
-  "filters": {
-    "budget": "low|medium|high",
-    "duration": "weekend|week|month"
-  }
-}
-```
-
-**Response**:
-
-```json
-{
-  "recommendations": [
-    {
-      "destination": "Tokyo",
-      "score": 0.95,
-      "reason": "Based on your interests"
-    }
-  ]
-}
-```
-
-### Smart Notifications
-
-**Endpoint**: `POST /notifications/optimize`
-
-**Request**:
-
-```json
-{
-  "user_id": "uuid",
-  "notification_type": "match_found|message|reminder",
-  "urgency": "low|medium|high"
-}
-```
-
-**Response**:
-
-```json
-{
-  "send_at": "2024-07-15T14:30:00Z",
-  "channel": "push|email|sms",
-  "confidence": 0.88,
-  "reason": "User most active at 2-3pm on weekdays"
-}
-```
-
-### Health Check
-
-**Endpoint**: `GET /health`
-
-**Response**:
-
-```json
-{
-  "status": "healthy",
-  "models_loaded": true,
-  "redis_connected": true,
-  "gpu_available": false
-}
-```
-
-## Performance
-
-### Latency Targets
-
-- Match Scoring: < 100ms (p95)
-- Recommendations: < 200ms (p95)
-- Smart Notifications: < 50ms (p95)
-
-### Throughput
-
-- Requests/sec: 100+ (CPU), 500+ (GPU)
-- Concurrent requests: 50
-- Model batch size: 32 (for batching multiple requests)
-
-### Optimization
-
-- **Model Quantization**: INT8 (4x smaller, 2-4x faster)
-- **ONNX Runtime**: 2-3x faster than native PyTorch
-- **Response Caching**: Redis cache for repeated predictions
-- **Feature Caching**: Pre-computed user features
-- **GPU Batching**: Batch multiple requests for GPU efficiency
-
-## Environment Variables
-
-```bash
-# Service Configuration
-ML_SERVICE_PORT=8000
-ML_WORKERS=4
-
-# Redis (Feature Store + Cache)
-REDIS_URL=redis://redis:6379
-
-# Supabase (Fetch user data)
-SUPABASE_URL=http://kong:8000
-SUPABASE_SERVICE_KEY=your-service-key
-
-# Model Storage
-MODEL_STORAGE=local  # or 's3'
-MODEL_PATH=/models
-S3_BUCKET=travelmatch-models
-S3_REGION=us-east-1
-
-# Performance
-ENABLE_GPU=false
-BATCH_SIZE=32
-CACHE_TTL=3600  # 1 hour
-
-# Monitoring
-PROMETHEUS_PORT=9090
-LOG_LEVEL=info
-```
-
-## Scaling
-
-### Horizontal Scaling
-
-```bash
-# Scale to 5 replicas
-docker-compose up --scale ml-service=5 -d
-
-# Auto-scaling (Kubernetes)
-kubectl autoscale deployment ml-service \
-  --min=2 --max=20 \
-  --cpu-percent=70
-```
-
-### Vertical Scaling
-
-```yaml
-# docker-compose.yml
-ml-service:
-  deploy:
-    resources:
-      limits:
-        cpus: '4'
-        memory: 8G
-      reservations:
-        cpus: '2'
-        memory: 4G
-```
-
-### GPU Scaling
-
-```yaml
-# docker-compose.gpu.yml
-ml-service:
-  deploy:
-    resources:
-      reservations:
-        devices:
-          - driver: nvidia
-            count: 1
-            capabilities: [gpu]
-```
-
-## Monitoring
-
-### Prometheus Metrics
-
-```
-# Request metrics
-ml_inference_requests_total
-ml_inference_duration_seconds
-ml_inference_errors_total
-
-# Model metrics
-ml_model_load_time_seconds
-ml_model_memory_bytes
-ml_prediction_batch_size
-
-# Cache metrics
-ml_cache_hits_total
-ml_cache_misses_total
-```
-
-### Grafana Dashboard
-
-```
-http://localhost:3001/d/ml-service
-
-Panels:
-- Request Rate (req/sec)
-- Latency (p50, p95, p99)
-- Error Rate (%)
-- Model Memory Usage
-- Cache Hit Rate
-- GPU Utilization (if available)
-```
-
-## Development
-
-### Local Development
 
 ```bash
 # Install dependencies
@@ -445,111 +196,74 @@ pip install -r requirements.txt
 # Run locally
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
-# Test endpoint
-curl -X POST http://localhost:8000/match/score \
-  -H "Content-Type: application/json" \
-  -d '{"user_a_id":"uuid","user_b_id":"uuid"}'
+# Docker
+docker-compose up ml-service -d
 ```
 
-### Add New Model
+## API Endpoints
 
-```python
-# app/models/new_model.py
-from app.core.base_model import BaseModel
+| Endpoint                  | Method | Description                    |
+| ------------------------- | ------ | ------------------------------ |
+| `/proof/verify`           | POST   | Verify KYC or experience proof |
+| `/offer/analyze`          | POST   | Analyze gift offer priority    |
+| `/content/moderate`       | POST   | Moderate user content          |
+| `/notifications/optimize` | POST   | Get optimal notification time  |
+| `/fraud/analyze`          | POST   | Analyze fraud risk             |
+| `/health`                 | GET    | Health check                   |
 
-class NewModel(BaseModel):
-    def load(self):
-        # Load model from disk/S3
-        pass
+## Performance Targets
 
-    def predict(self, features):
-        # Run inference
-        pass
+| Operation                 | Target Latency (p95) |
+| ------------------------- | -------------------- |
+| Proof Verification        | < 500ms              |
+| Offer Analysis            | < 50ms               |
+| Content Moderation        | < 200ms              |
+| Fraud Analysis            | < 100ms              |
+| Notification Optimization | < 50ms               |
+
+## Environment Variables
+
+```bash
+# Service
+ML_SERVICE_PORT=8000
+ML_WORKERS=4
+
+# Redis
+REDIS_URL=redis://redis:6379
+
+# Supabase
+SUPABASE_URL=http://kong:8000
+SUPABASE_SERVICE_KEY=your-service-key
+
+# Models
+MODEL_STORAGE=local
+MODEL_PATH=/models
+
+# Monitoring
+LOG_LEVEL=info
 ```
 
-### Register Model
+## Gift Platform Flow
 
-```python
-# app/main.py
-from app.models.new_model import NewModel
-
-@app.on_event("startup")
-async def load_models():
-    models['new_model'] = NewModel()
-    await models['new_model'].load()
 ```
-
-## Migration from Edge Functions
-
-### Before (Edge Function - BAD)
-
-```typescript
-// supabase/functions/match-users/index.ts
-import { someHeavyMLLibrary } from 'npm:heavy-ml-lib'; // Too large!
-
-serve(async (req) => {
-  // This is slow and resource-intensive
-  const model = await loadModel(); // Cold start!
-  const score = await model.predict(features); // Slow!
-  return Response.json({ score });
-});
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│   Gifter     │────▶│   Moment     │────▶│   Recipient  │
+│  (Gönderen)  │     │   (Escrow)   │     │   (Alıcı)    │
+└──────────────┘     └──────────────┘     └──────────────┘
+       │                    │                    │
+       │                    │                    │
+       ▼                    ▼                    ▼
+  KYC Verify          Funds Held           Submit Proof
+       │                    │                    │
+       │                    │                    ▼
+       │                    │            ┌──────────────┐
+       │                    │            │  ML Service  │
+       │                    │            │   Verify     │
+       │                    │            └──────────────┘
+       │                    │                    │
+       │                    ▼                    ▼
+       │              Funds Released ◀──── Proof Approved
+       │                    │
+       ▼                    ▼
+   Gift Sent          Memory Created ✨
 ```
-
-### After (ML Service - GOOD)
-
-```typescript
-// supabase/functions/match-users/index.ts
-serve(async (req) => {
-  // Lightweight request handler
-  const response = await fetch('http://ml-service:8000/match/score', {
-    method: 'POST',
-    body: JSON.stringify({ user_a_id, user_b_id }),
-  });
-
-  const prediction = await response.json();
-  return Response.json(prediction);
-});
-```
-
-## Best Practices
-
-1. **Cache Predictions**: Cache results for 1-24 hours
-2. **Batch Requests**: Batch multiple predictions for GPU efficiency
-3. **Feature Store**: Pre-compute and cache user features
-4. **Model Versioning**: Version models (v1, v2) for A/B testing
-5. **Fallback**: Return cached/default predictions on error
-6. **Monitoring**: Track latency, error rate, cache hit rate
-7. **Timeouts**: Set request timeout (5s) with retry
-8. **Quantization**: Use INT8/FP16 models for faster inference
-
-## Troubleshooting
-
-### High Latency?
-
-- Check model size (quantize if > 1GB)
-- Enable prediction caching
-- Use GPU if available
-- Reduce batch size
-- Pre-compute features
-
-### Out of Memory?
-
-- Reduce model size (quantization)
-- Lower batch size
-- Scale horizontally (more replicas)
-- Use model sharding
-
-### Low Throughput?
-
-- Increase worker count
-- Enable GPU
-- Batch requests
-- Optimize model (ONNX)
-
----
-
-**Files Created**:
-
-- `services/ml-service/` - FastAPI ML inference service
-- Dockerfile with GPU support
-- Updated docker-compose.yml

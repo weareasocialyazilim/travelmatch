@@ -35,7 +35,6 @@ export interface ChatUser {
   name: string;
   avatar: string;
   isVerified?: boolean;
-  isOnline?: boolean;
   trustScore?: number;
 }
 

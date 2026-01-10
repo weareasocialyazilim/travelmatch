@@ -231,7 +231,6 @@ export const notificationSettingsSchema = z.object({
 export const privacySettingsSchema = z.object({
   profileVisibility: z.enum(['public', 'friends', 'private']),
   showLocation: z.boolean(),
-  showOnlineStatus: z.boolean(),
   allowMessagesFrom: z.enum(['everyone', 'friends', 'none']),
   showActivityStatus: z.boolean(),
 });

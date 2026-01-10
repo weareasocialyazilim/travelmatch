@@ -29,7 +29,7 @@ export { SuccessConfirmationScreen } from './screens/SuccessConfirmationScreen';
 export { ProofReviewScreen } from './screens/ProofReviewScreen';
 export { PayTRWebViewScreen } from './screens/PayTRWebViewScreen';
 export { default as PromoCodeScreen } from './screens/PromoCodeScreen';
-export { default as BulkThankYouScreen } from './screens/BulkThankYouScreen';
+// REMOVED: BulkThankYouScreen - orphan screen, never registered in navigation
 export { default as UnifiedGiftFlowScreen } from './screens/UnifiedGiftFlowScreen';
 export { default as SubscriberOfferModal } from './screens/SubscriberOfferModal';
 

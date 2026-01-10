@@ -2,18 +2,56 @@
  * useMessages Hook
  * Real-time messaging with conversations and messages
  * Optimized with centralized channel manager for better performance
+ * Includes E2E encryption support for real-time messages
  */
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { messageService } from '../services/messageService';
 import { logger } from '../utils/logger';
 import { ErrorHandler, retryWithErrorHandling } from '../utils/errorHandler';
 import { realtimeChannelManager } from '../services/realtimeChannelManager';
+import { encryptionService } from '../services/encryptionService';
+import { supabase } from '../services/supabase';
 import type {
   Conversation,
   Message,
   SendMessageRequest,
 } from '../services/messageService';
 import type { MessageType, MessageStatus } from '../types/message.types';
+
+/**
+ * Decrypt a real-time message if it's encrypted
+ * Returns decrypted content or original if not encrypted/sender's own message
+ */
+const decryptRealtimeMessage = async (
+  content: string,
+  senderId: string,
+  currentUserId: string,
+  nonce?: string | null,
+  senderPublicKey?: string | null,
+  metadata?: { _senderContent?: string } | null,
+): Promise<string> => {
+  // No encryption data - return as-is
+  if (!nonce || !senderPublicKey) {
+    return content;
+  }
+
+  // We sent this message - use stored original content from metadata
+  if (senderId === currentUserId) {
+    return metadata?._senderContent || content;
+  }
+
+  try {
+    const decrypted = await encryptionService.decrypt(
+      content,
+      nonce,
+      senderPublicKey,
+    );
+    return decrypted;
+  } catch (error) {
+    logger.error('[useMessages] Realtime decryption failed', error);
+    return '[Şifreli mesaj - çözülemedi]';
+  }
+};
 
 interface UseMessagesReturn {
   // Conversations
@@ -44,6 +82,9 @@ export const useMessages = (): UseMessagesReturn => {
   // Mount tracking ref to prevent memory leaks
   const mountedRef = useRef(true);
 
+  // Current user ID for decryption
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
   // Conversations state
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [conversationsLoading, setConversationsLoading] = useState(true);
@@ -61,9 +102,20 @@ export const useMessages = (): UseMessagesReturn => {
   const [messagePage, setMessagePage] = useState(1);
   const currentConversationIdRef = useRef<string | null>(null);
 
-  // Track mounted state for cleanup
+  // Counter for unique temp IDs to avoid race conditions
+  const tempIdCounterRef = useRef(0);
+
+  // Track mounted state and fetch current user for decryption
   useEffect(() => {
     mountedRef.current = true;
+
+    // Get current user ID for decryption
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user && mountedRef.current) {
+        setCurrentUserId(user.id);
+      }
+    });
+
     return () => {
       mountedRef.current = false;
     };
@@ -188,12 +240,14 @@ export const useMessages = (): UseMessagesReturn => {
    */
   const sendMessage = useCallback(
     async (data: SendMessageRequest): Promise<Message | null> => {
-      // Create optimistic message with temporary ID
-      const tempId = `temp-${Date.now()}`;
+      // Create optimistic message with unique temporary ID
+      // Using counter + timestamp to avoid race conditions when sending rapidly
+      tempIdCounterRef.current += 1;
+      const tempId = `temp-${Date.now()}-${tempIdCounterRef.current}`;
       const optimisticMessage: Message = {
         id: tempId,
         conversationId: data.conversationId,
-        senderId: 'current-user', // Will be updated with real sender
+        senderId: currentUserId || 'current-user',
         content: data.content || '',
         type: data.type || 'text',
         metadata: null,
@@ -381,6 +435,10 @@ export const useMessages = (): UseMessagesReturn => {
       location?: { lat: number; lng: number; name: string } | null;
       created_at: string;
       read_at?: string;
+      // E2E Encryption fields
+      nonce?: string | null;
+      sender_public_key?: string | null;
+      metadata?: { _senderContent?: string } | null;
       [key: string]: unknown; // Index signature for Supabase realtime
     }
 
@@ -401,28 +459,46 @@ export const useMessages = (): UseMessagesReturn => {
           )
             return;
 
-          const newMessage: Message = {
-            id: String(dbMessage.id || ''),
-            conversationId: String(dbMessage.conversation_id || ''),
-            senderId: String(dbMessage.sender_id || ''),
-            content: String(dbMessage.content || ''),
-            type: (dbMessage.type as MessageType) || 'text',
-            metadata: null,
-            readAt: dbMessage.read_at ? String(dbMessage.read_at) : null,
-            imageUrl: dbMessage.image_url
-              ? String(dbMessage.image_url)
-              : undefined,
-            location: dbMessage.location ?? undefined,
-            createdAt: String(dbMessage.created_at || new Date().toISOString()),
-            status: 'sent' as MessageStatus,
+          // Decrypt message content if encrypted (async operation)
+          const processMessage = async () => {
+            const decryptedContent = await decryptRealtimeMessage(
+              String(dbMessage.content || ''),
+              String(dbMessage.sender_id || ''),
+              currentUserId || '',
+              dbMessage.nonce,
+              dbMessage.sender_public_key,
+              dbMessage.metadata,
+            );
+
+            const newMessage: Message = {
+              id: String(dbMessage.id || ''),
+              conversationId: String(dbMessage.conversation_id || ''),
+              senderId: String(dbMessage.sender_id || ''),
+              content: decryptedContent,
+              type: (dbMessage.type as MessageType) || 'text',
+              metadata: null,
+              readAt: dbMessage.read_at ? String(dbMessage.read_at) : null,
+              imageUrl: dbMessage.image_url
+                ? String(dbMessage.image_url)
+                : undefined,
+              location: dbMessage.location ?? undefined,
+              createdAt: String(
+                dbMessage.created_at || new Date().toISOString(),
+              ),
+              status: 'sent' as MessageStatus,
+            };
+
+            if (!mountedRef.current) return;
+
+            // Add message if not already in list (avoid duplicates)
+            setMessages((prev) => {
+              const exists = prev.some((msg) => msg.id === newMessage.id);
+              if (exists) return prev;
+              return [newMessage, ...prev];
+            });
           };
 
-          // Add message if not already in list (avoid duplicates)
-          setMessages((prev) => {
-            const exists = prev.some((msg) => msg.id === newMessage.id);
-            if (exists) return prev;
-            return [newMessage, ...prev];
-          });
+          void processMessage();
         },
         onUpdate: (payload) => {
           if (!mountedRef.current) return;
@@ -437,18 +513,36 @@ export const useMessages = (): UseMessagesReturn => {
           )
             return;
 
-          setMessages((prev) =>
-            prev.map((msg) => {
-              if (msg.id === String(dbMessage.id || '')) {
-                return {
-                  ...msg,
-                  content: String(dbMessage.content || msg.content),
-                  readAt: dbMessage.read_at ? String(dbMessage.read_at) : null,
-                };
-              }
-              return msg;
-            }),
-          );
+          // Decrypt updated message content if encrypted
+          const processUpdate = async () => {
+            const decryptedContent = await decryptRealtimeMessage(
+              String(dbMessage.content || ''),
+              String(dbMessage.sender_id || ''),
+              currentUserId || '',
+              dbMessage.nonce,
+              dbMessage.sender_public_key,
+              dbMessage.metadata,
+            );
+
+            if (!mountedRef.current) return;
+
+            setMessages((prev) =>
+              prev.map((msg) => {
+                if (msg.id === String(dbMessage.id || '')) {
+                  return {
+                    ...msg,
+                    content: decryptedContent,
+                    readAt: dbMessage.read_at
+                      ? String(dbMessage.read_at)
+                      : null,
+                  };
+                }
+                return msg;
+              }),
+            );
+          };
+
+          void processUpdate();
         },
       },
     );
@@ -458,7 +552,7 @@ export const useMessages = (): UseMessagesReturn => {
       logger.info('useMessages', 'Unsubscribing from message updates');
       unsubscribe();
     };
-  }, [activeConversationId]);
+  }, [activeConversationId, currentUserId]);
 
   // Real-time subscription for conversation updates (new conversations, unread counts)
   // Note: For optimal performance, add user_id filter when user context is available
@@ -477,7 +571,8 @@ export const useMessages = (): UseMessagesReturn => {
     const unsubscribe = realtimeChannelManager.subscribeToTable<DbConversation>(
       'conversations',
       {
-        // TODO: Add filter when user context is available: `participant_ids=cs.{${userId}}`
+        // Note: Supabase realtime filters don't support array containment (cs).
+        // Server-side RLS handles access control; client-side filters at line ~595.
         onInsert: (payload) => {
           if (!mountedRef.current) return;
 

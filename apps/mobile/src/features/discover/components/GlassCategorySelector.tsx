@@ -18,7 +18,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import Animated, {
   useAnimatedStyle,
   withSpring,
@@ -140,7 +140,7 @@ export const GlassCategorySelector: React.FC<GlassCategorySelectorProps> = ({
 
   const handleSelect = useCallback(
     (categoryKey: string) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.buttonPress();
 
       if (multiSelect && onMultiSelect) {
         const newKeys = selectedKeys.includes(categoryKey)

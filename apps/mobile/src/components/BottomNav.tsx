@@ -25,7 +25,7 @@ import Reanimated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 
 import { COLORS, GRADIENTS, PALETTE } from '../constants/colors';
 import { TYPE_SCALE } from '../theme/typography';
@@ -121,7 +121,7 @@ const TabItem: React.FC<TabItemProps> = memo(
     }, []);
 
     const handlePress = useCallback(() => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.buttonPress();
       onPress();
     }, [onPress]);
 
@@ -186,7 +186,7 @@ const CreateButton: React.FC<CreateButtonProps> = memo(
     }, []);
 
     const handlePress = useCallback(() => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      HapticManager.primaryAction();
       onPress();
     }, [onPress]);
 

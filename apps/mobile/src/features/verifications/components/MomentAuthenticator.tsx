@@ -36,7 +36,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { logger } from '@/utils/logger';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ConfettiCannon from 'react-native-confetti-cannon';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import {
   CEREMONY_COLORS,
   CEREMONY_TIMING,
@@ -250,7 +250,7 @@ export const MomentAuthenticator = memo<MomentAuthenticatorProps>(
             confidence: apiResult.confidence,
           };
           setShowConfetti(true);
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          HapticManager.success();
         } else if (apiResult.needsReview) {
           finalResult = {
             status: 'needs_review',
@@ -262,7 +262,7 @@ export const MomentAuthenticator = memo<MomentAuthenticatorProps>(
             reasons: apiResult.reasons,
             suggestions: apiResult.suggestions,
           };
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          HapticManager.error();
         }
 
         setResult(finalResult);
@@ -635,7 +635,7 @@ const ChecklistItem = memo<ChecklistItemProps>(
     useEffect(() => {
       if (checked) {
         checkScale.value = withSpring(1, { damping: 8 });
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        HapticManager.buttonPress();
       }
       return () => {
         checkScale.value = 0;
@@ -737,7 +737,7 @@ interface SuccessViewProps {
 
 const SuccessView = memo<SuccessViewProps>(({ confidence }) => {
   useEffect(() => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    HapticManager.success();
   }, []);
 
   return (

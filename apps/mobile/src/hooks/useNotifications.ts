@@ -1,10 +1,12 @@
 /**
  * useNotifications Hook
  * Real-time notifications with badge count
+ * Integrates with RealtimeContext for Supabase Realtime subscriptions
  */
 import { useState, useEffect, useCallback } from 'react';
 import { notificationService } from '../services/notificationService';
 import { logger } from '../utils/logger';
+import { useRealtime, type NotificationEvent } from '../context/RealtimeContext';
 import type {
   Notification,
   NotificationPreferences,
@@ -41,6 +43,9 @@ interface UseNotificationsReturn {
 const DEFAULT_PAGE_SIZE = 20;
 
 export const useNotifications = (): UseNotificationsReturn => {
+  // Realtime context for Supabase subscriptions
+  const { subscribe, isConnected } = useRealtime();
+
   // State
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
@@ -230,23 +235,47 @@ export const useNotifications = (): UseNotificationsReturn => {
     void fetchNotifications(1, false);
   }, [currentFilter, fetchNotifications]);
 
-  // Real-time subscription for new notifications
+  // Real-time subscription for new notifications via RealtimeContext
   useEffect(() => {
-    // Real-time notifications are handled through Supabase Realtime
-    // The notificationService doesn't expose subscribeToNotifications
-    // For now, we rely on polling via refresh() or push notifications
-    // If real-time is needed, it should be added to notificationService
+    if (!isConnected) {
+      logger.debug('[useNotifications] Waiting for realtime connection...');
+      return;
+    }
 
-    // Placeholder for future real-time implementation:
-    // const channel = supabase
-    //   .channel('notifications')
-    //   .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, callback)
-    //   .subscribe();
+    logger.info('[useNotifications] Subscribing to real-time notifications');
+
+    // Subscribe to notification:new events from RealtimeContext
+    const unsubscribe = subscribe<NotificationEvent>(
+      'notification:new',
+      (newNotification) => {
+        logger.info('[useNotifications] Received new notification:', newNotification.id);
+
+        // Transform NotificationEvent to Notification type
+        const notification: Notification = {
+          id: newNotification.id,
+          type: newNotification.type as NotificationType,
+          title: newNotification.title,
+          body: newNotification.body,
+          read: false,
+          createdAt: new Date().toISOString(),
+          data: newNotification.data,
+        };
+
+        // Add to beginning of list if it matches current filter (or no filter)
+        if (!currentFilter || notification.type === currentFilter) {
+          setNotifications((prev) => [notification, ...prev]);
+        }
+
+        // Update unread count
+        setUnreadCount((prev) => prev + 1);
+      },
+    );
 
     return () => {
-      // Cleanup would go here
+      logger.debug('[useNotifications] Unsubscribing from real-time notifications');
+      unsubscribe();
     };
-  }, []);
+  }, [isConnected, subscribe, currentFilter]);
 
   return {
     // Notifications

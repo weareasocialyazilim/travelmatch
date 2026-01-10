@@ -38,7 +38,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ViewShot, { captureRef } from 'react-native-view-shot';
 import * as MediaLibrary from 'expo-media-library';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { CEREMONY_SIZES } from '@/constants/ceremony';
 import { COLORS, GRADIENTS } from '@/constants/colors';
 import { SPACING } from '@/constants/spacing';
@@ -121,7 +121,7 @@ export const MemoryCard: React.FC<MemoryCardProps> = ({
   }, []);
 
   const handleShare = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.primaryAction();
     const uri = await captureCard();
 
     if (uri) {
@@ -138,7 +138,7 @@ export const MemoryCard: React.FC<MemoryCardProps> = ({
   };
 
   const handleSave = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.primaryAction();
     const uri = await captureCard();
 
     if (uri) {
@@ -146,7 +146,7 @@ export const MemoryCard: React.FC<MemoryCardProps> = ({
         const { status } = await MediaLibrary.requestPermissionsAsync();
         if (status === 'granted') {
           await MediaLibrary.saveToLibraryAsync(uri);
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          HapticManager.success();
           onSave?.(uri);
         }
       } catch (error) {

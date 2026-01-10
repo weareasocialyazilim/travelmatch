@@ -127,7 +127,7 @@ export type RootStackParamList = {
 
   // Communication
   Chat: { otherUser: User; conversationId?: string };
-  ChatDetail: { conversationId: string; otherUser: User };
+  // REMOVED: ChatDetail - duplicate route, use Chat instead
 
   // Transactions
   TransactionDetail: { transactionId: string };
@@ -408,19 +408,7 @@ export type RootStackParamList = {
   // Share Profile Preview
   SharePreview: undefined;
 
-  // Bulk Thank You (thank donors for a moment)
-  BulkThankYou: {
-    momentId: string;
-    momentTitle: string;
-    donors: Array<{
-      id: string;
-      name: string;
-      avatar: string;
-      totalAmount: number;
-      giftCount: number;
-      hasChatAccess: boolean;
-    }>;
-  };
+  // REMOVED: BulkThankYou - orphan screen, never registered in navigation
 
   // REMOVED: GiftSelection - use UnifiedGiftFlow instead
   // GiftSelection was consolidated into UnifiedGiftFlow for all gift initiation flows

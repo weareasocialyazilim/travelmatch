@@ -101,7 +101,16 @@
     "momentDeleted": "Moment deleted successfully!",
     "confirmDelete": "Are you sure you want to delete this moment?",
     "noMomentsFound": "No moments found",
-    "loadMore": "Load More"
+    "loadMore": "Load More",
+    "card": {
+      "giftFor": "Gift for",
+      "view": "View",
+      "sendGift": "Send Gift",
+      "featured": "Featured",
+      "popular": "Popular",
+      "new": "New",
+      "premium": "Premium"
+    }
   },
   "booking": {
     "bookNow": "Book Now",
@@ -609,10 +618,47 @@
       "placeholder": "Search conversations..."
     },
     "archived": {
-      "empty": "No archived chats"
+      "title": "Archived Chats",
+      "empty": "No archived chats",
+      "emptyDescription": "Chats you archive will appear here. Long press a chat to archive it.",
+      "info": "Archived chats are hidden from your main message list. You can access them here.",
+      "unarchive": "Unarchive",
+      "unarchiveTitle": "Unarchive Chat",
+      "unarchiveMessage": "This chat will be restored to your message list.",
+      "unarchiveSuccess": "Chat restored to your list.",
+      "deleteTitle": "Delete Chat?",
+      "deleteMessage": "This conversation will be permanently deleted. This action cannot be undone.",
+      "deleteSuccess": "Chat permanently deleted.",
+      "archivedAt": "Archived {{time}}",
+      "goToMessages": "Go to Messages"
     },
     "input": {
       "placeholder": "Message..."
+    }
+  },
+  "inbox": {
+    "title": "Inbox",
+    "tabs": {
+      "active": "Active Matches",
+      "requests": "Requests"
+    },
+    "empty": {
+      "activeTitle": "No messages yet",
+      "activeDescription": "Share a moment to meet new people!",
+      "requestsTitle": "No gift requests",
+      "requestsDescription": "You'll see requests here when someone wants to join your moment."
+    },
+    "explore": "Explore",
+    "suggestions": {
+      "title": "Nearby Moments",
+      "subtitle": "Check out these moments and meet new people",
+      "cardText": "Explore Moments"
+    },
+    "time": {
+      "now": "now",
+      "minutesAgo": "{{count}}m ago",
+      "hoursAgo": "{{count}}h ago",
+      "daysAgo": "{{count}}d ago"
     }
   },
   "wishCard": {
@@ -692,6 +738,154 @@
         "reviewDrop": "Review Drop",
         "dropMoment": "Drop Moment"
       }
+    }
+  },
+  "filter": {
+    "title": "Filter Vibes",
+    "reset": "Reset",
+    "distance": "Distance",
+    "ageRange": "Age Range",
+    "gender": "Gender",
+    "priceRange": "Price Range",
+    "category": "Category",
+    "showResults": "Show {{count}} Vibes",
+    "any": "Any",
+    "categories": {
+      "all": "All",
+      "dining": "Dining",
+      "nightlife": "Nightlife",
+      "adventure": "Adventure",
+      "culture": "Culture",
+      "relax": "Relax"
+    },
+    "genders": {
+      "all": "All",
+      "female": "Female",
+      "male": "Male"
+    }
+  },
+  "pendingTransactions": {
+    "title": "Incomplete Actions",
+    "subtitle": "We found some actions that didn't complete. Would you like to continue?",
+    "pendingPayments": "Pending Payments",
+    "pendingUploads": "Pending Uploads",
+    "giftPayment": "Gift Payment",
+    "withdrawal": "Withdrawal",
+    "momentPurchase": "Moment Purchase",
+    "payment": "Payment",
+    "proofUpload": "Proof Upload",
+    "momentImage": "Moment Image",
+    "profilePicture": "Profile Picture",
+    "messageAttachment": "Message Attachment",
+    "upload": "Upload",
+    "resume": "Resume",
+    "retry": "Retry",
+    "dismiss": "Dismiss",
+    "handleLater": "I'll handle this later",
+    "justNow": "Just now",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "failed": "Failed {{count}} time(s)"
+  },
+  "emptyState": {
+    "noMomentsNearby": "No moments nearby 🗺️",
+    "tryIncreasingDistance": "Try increasing your distance filter or\nbe the first to create a moment!",
+    "createMoment": "Create Moment",
+    "discoveringMoments": "Discovering moments...",
+    "tapToRetry": "Tap to retry"
+  },
+  "counterOffer": {
+    "title": "Send Offer",
+    "tierFeature": "{{tier}} Feature",
+    "momentInfo": {
+      "hostLabel": "Host:",
+      "askedPrice": "Asked Price:"
+    },
+    "yourOffer": "Your Offer",
+    "offerHint": "The host can accept or decline your offer.",
+    "messageLabel": "Message (Optional)",
+    "messagePlaceholder": "Explain why you're making this offer...",
+    "infoText": "With your {{tier}} membership, you can send custom offers to hosts. If the host accepts, you'll be directed to the payment screen.",
+    "submitButton": "Send Offer",
+    "successTitle": "Offer Sent!",
+    "successSubtitle": "{{hostName}} will review your offer. Please wait for a response!",
+    "upgradeRequired": {
+      "title": "Premium Feature",
+      "description": "You need to be a Premium or Platinum member to send custom offers to hosts.",
+      "upgradeButton": "View Plans",
+      "maybeLater": "Maybe Later"
+    }
+  },
+  "wallet": {
+    "title": "Wallet",
+    "totalBalance": "Total Balance",
+    "recentTransactions": "Recent Transactions",
+    "available": "Available",
+    "pending": "Pending",
+    "withdraw": "Withdraw",
+    "deposit": "Deposit",
+    "transactions": {
+      "paymentReceived": "Payment Received",
+      "paymentSent": "Payment Sent",
+      "withdrawal": "Withdrawal",
+      "deposit": "Deposit",
+      "refund": "Refund",
+      "topup": "Top Up",
+      "transaction": "Transaction"
+    },
+    "filters": {
+      "all": "All",
+      "incoming": "Incoming",
+      "outgoing": "Outgoing"
+    },
+    "empty": {
+      "title": "No transactions yet",
+      "description": "Share your first moment or support nearby moments. All transactions will appear here!",
+      "cta": "Discover Moments"
+    },
+    "errors": {
+      "loadFailed": "Failed to load wallet. Please try again.",
+      "kycRequired": "Please complete identity verification to withdraw funds",
+      "biometricRequired": "Authentication required to access wallet",
+      "networkRequired": "Internet connection required to view wallet."
+    },
+    "biometric": {
+      "viewWallet": "View Wallet",
+      "verifying": "Verifying..."
+    },
+    "pendingBalance": {
+      "title": "Pending Balance",
+      "processing": "Your pending balance is being processed by PayTR. It will become available within 1-3 business days.",
+      "pendingPaymentsTitle": "📦 Pending Payments",
+      "pendingPaymentsDescription": "You have {{amount}} in pending payments.\n\nThey will become available after uploading proof:",
+      "andMore": "...and {{count}} more",
+      "later": "Later",
+      "uploadProof": "Upload Proof",
+      "ok": "OK"
+    },
+    "accessibilityLabel": {
+      "transactionIn": "incoming",
+      "transactionOut": "outgoing",
+      "transactionDetailHint": "View transaction details"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "shareMessage": "Check out my TravelMatch profile!",
+    "shareProfile": "Share profile",
+    "savedMoments": "Saved Moments",
+    "offlineTitle": "No internet connection",
+    "offlineMessage": "Internet connection required to view profile.",
+    "trustStatus": "Trust Status",
+    "trustScore": {
+      "points": "{{score}} points • Verifications",
+      "earnTrust": "Earn trust through verifications"
+    },
+    "moments": {
+      "noActive": "No active moments yet",
+      "noPast": "No past moments",
+      "createFirstDescription": "Start your journey by creating your first moment",
+      "completedDescription": "Completed moments will appear here"
     }
   }
 }

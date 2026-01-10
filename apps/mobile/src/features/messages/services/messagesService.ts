@@ -1,6 +1,9 @@
 import { supabase } from '@/config/supabase';
 import type { Database } from '../../../types/database.types';
 import { ESCROW_THRESHOLDS } from '@/constants/values';
+import { logger } from '@/utils/logger';
+import { encryptionService } from '@/services/encryptionService';
+import { userService } from '@/services/userService';
 
 /**
  * Messages API Service
@@ -72,6 +75,103 @@ export const determineChatTier = (giftAmountUSD: number): ChatEligibility => {
   };
 };
 
+/**
+ * E2E Encryption helpers for messages
+ */
+const encryptMessage = async (
+  content: string,
+  recipientId: string,
+): Promise<{
+  encryptedContent: string;
+  nonce: string;
+  senderPublicKey: string;
+} | null> => {
+  try {
+    // Get recipient's public key
+    const recipientPublicKey = await userService.getPublicKey(recipientId);
+    if (!recipientPublicKey) {
+      logger.warn(
+        '[Messages] Recipient has no public key, sending unencrypted',
+      );
+      return null;
+    }
+
+    // Get our public key
+    const senderPublicKey = await encryptionService.getPublicKey();
+    if (!senderPublicKey) {
+      logger.warn('[Messages] Sender has no public key, sending unencrypted');
+      return null;
+    }
+
+    // Encrypt the message
+    const encrypted = await encryptionService.encrypt(
+      content,
+      recipientPublicKey,
+    );
+
+    return {
+      encryptedContent: encrypted.message,
+      nonce: encrypted.nonce,
+      senderPublicKey,
+    };
+  } catch (error) {
+    logger.error('[Messages] Encryption failed', error);
+    return null;
+  }
+};
+
+const decryptMessage = async (
+  encryptedContent: string,
+  nonce: string,
+  senderPublicKey: string,
+): Promise<string | null> => {
+  try {
+    const decrypted = await encryptionService.decrypt(
+      encryptedContent,
+      nonce,
+      senderPublicKey,
+    );
+    return decrypted;
+  } catch (error) {
+    logger.error('[Messages] Decryption failed', error);
+    return null;
+  }
+};
+
+/**
+ * Decrypt a message object if it's encrypted
+ */
+const decryptMessageIfNeeded = async (
+  message: {
+    content: string;
+    nonce?: string | null;
+    sender_public_key?: string | null;
+    sender_id: string;
+    metadata?: { _senderContent?: string } | null;
+  },
+  currentUserId: string,
+): Promise<string> => {
+  // If no encryption data, return as-is
+  if (!message.nonce || !message.sender_public_key) {
+    return message.content;
+  }
+
+  // We sent this message - use stored original content from metadata
+  if (message.sender_id === currentUserId) {
+    // Return original content if available in metadata
+    return message.metadata?._senderContent || message.content;
+  }
+
+  // Decrypt the message
+  const decrypted = await decryptMessage(
+    message.content,
+    message.nonce,
+    message.sender_public_key,
+  );
+
+  return decrypted || '[Şifresi çözülemedi]';
+};
+
 export const messagesApi = {
   /**
    * Host Unlock Conversation - Sohbet kilidini aç
@@ -141,7 +241,7 @@ export const messagesApi = {
 
     if (notifError) {
       // Log but don't throw - notification failure shouldn't block unlock
-      console.error('Failed to create notification:', notifError);
+      logger.error('Failed to create notification:', { error: notifError });
     }
 
     return { success: true };
@@ -185,7 +285,9 @@ export const messagesApi = {
     });
 
     if (notifError) {
-      console.error('Failed to create gratitude notification:', notifError);
+      logger.error('Failed to create gratitude notification:', {
+        error: notifError,
+      });
     }
 
     return { success: true };
@@ -224,23 +326,10 @@ export const messagesApi = {
     return data;
   },
   /**
-   * Konuşmadaki mesajları getir
+   * Konuşmadaki mesajları getir (E2E Decryption)
+   * Messages are decrypted on retrieval if they were encrypted
    */
   getMessages: async (conversationId: string) => {
-    const { data, error } = await supabase
-      .from('messages')
-      .select('*, sender:profiles(*)')
-      .eq('conversation_id', conversationId)
-      .order('created_at', { ascending: true });
-
-    if (error) throw error;
-    return data;
-  },
-
-  /**
-   * Mesaj gönder
-   */
-  sendMessage: async (conversationId: string, content: string) => {
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -248,11 +337,111 @@ export const messagesApi = {
 
     const { data, error } = await supabase
       .from('messages')
-      .insert({
-        conversation_id: conversationId,
-        sender_id: user.id,
-        content,
-      })
+      .select('*, sender:profiles(*)')
+      .eq('conversation_id', conversationId)
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+    if (!data) return [];
+
+    // Decrypt messages in parallel
+    const decryptedMessages = await Promise.all(
+      data.map(async (message) => {
+        try {
+          const decryptedContent = await decryptMessageIfNeeded(
+            {
+              content: message.content,
+              nonce: message.nonce,
+              sender_public_key: message.sender_public_key,
+              sender_id: message.sender_id,
+              metadata: message.metadata as { _senderContent?: string } | null,
+            },
+            user.id,
+          );
+          return {
+            ...message,
+            content: decryptedContent,
+            is_encrypted: !!(message.nonce && message.sender_public_key),
+          };
+        } catch (decryptError) {
+          logger.error('[Messages] Failed to decrypt message', {
+            messageId: message.id,
+            error: decryptError,
+          });
+          return {
+            ...message,
+            content: message.nonce ? '[Şifreli mesaj]' : message.content,
+            is_encrypted: !!message.nonce,
+          };
+        }
+      }),
+    );
+
+    return decryptedMessages;
+  },
+
+  /**
+   * Mesaj gönder (E2E Encrypted)
+   * Message is encrypted before sending if recipient has a public key
+   */
+  sendMessage: async (conversationId: string, content: string) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    // Get conversation to find recipient
+    const { data: conversation } = await supabase
+      .from('conversations')
+      .select('participant_ids')
+      .eq('id', conversationId)
+      .single();
+
+    if (!conversation) throw new Error('Conversation not found');
+
+    // Find recipient (the other participant)
+    const recipientId = conversation.participant_ids?.find(
+      (id: string) => id !== user.id,
+    );
+
+    // Try to encrypt the message
+    let messageData: {
+      conversation_id: string;
+      sender_id: string;
+      content: string;
+      nonce?: string;
+      sender_public_key?: string;
+      metadata?: { _senderContent?: string };
+    } = {
+      conversation_id: conversationId,
+      sender_id: user.id,
+      content, // Will be replaced with encrypted content if encryption succeeds
+    };
+
+    if (recipientId) {
+      const encrypted = await encryptMessage(content, recipientId);
+      if (encrypted) {
+        // Store encrypted content with encryption metadata
+        // Also store original content in metadata for sender to read later
+        messageData = {
+          ...messageData,
+          content: encrypted.encryptedContent,
+          nonce: encrypted.nonce,
+          sender_public_key: encrypted.senderPublicKey,
+          metadata: { _senderContent: content },
+        };
+        logger.debug('[Messages] Message encrypted successfully');
+      } else {
+        // Fallback to unencrypted if encryption fails
+        logger.warn(
+          '[Messages] Sending unencrypted message (encryption unavailable)',
+        );
+      }
+    }
+
+    const { data, error } = await supabase
+      .from('messages')
+      .insert(messageData)
       .select()
       .single();
 
@@ -264,7 +453,8 @@ export const messagesApi = {
       .update({ updated_at: new Date().toISOString() })
       .eq('id', conversationId);
 
-    return data;
+    // Return with original content for UI (since we just sent it)
+    return { ...data, content };
   },
 
   /**

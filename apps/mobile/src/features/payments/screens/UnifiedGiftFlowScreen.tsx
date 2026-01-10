@@ -30,7 +30,7 @@ import {
 import type { NavigationProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { COLORS, GRADIENTS } from '@/constants/colors';
 import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -73,12 +73,12 @@ const UnifiedGiftFlowScreen: React.FC = () => {
   };
 
   const handleBack = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     navigation.goBack();
   }, [navigation]);
 
   const handleProceedToPayment = useCallback(async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.buttonPress();
     setIsProcessing(true);
 
     try {
@@ -92,7 +92,7 @@ const UnifiedGiftFlowScreen: React.FC = () => {
       });
     } catch (error) {
       logger.error('UnifiedGiftFlow', 'Payment navigation failed', { error });
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.error();
       navigation.navigate('PaymentFailed', {
         error: 'Ödeme işlemi başlatılamadı. Lütfen tekrar deneyin.',
       });

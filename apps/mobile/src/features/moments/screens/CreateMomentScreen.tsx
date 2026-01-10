@@ -17,7 +17,7 @@
  * - requested_amount zorunlu alan (min: 1)
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -39,7 +39,7 @@ import Animated, {
   SlideOutDown,
 } from 'react-native-reanimated';
 import * as ImagePicker from 'expo-image-picker';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import type { NavigationProp } from '@react-navigation/native';
@@ -194,9 +194,10 @@ const CreateMomentScreen: React.FC = () => {
   const [showAsStory, setShowAsStory] = useState(true); // Default: show as story for 24h
 
   // 1. Media Selection - Story format (9:16)
+  // NOTE: All hooks must be defined before any conditional returns (React rules of hooks)
   const pickImage = useCallback(async () => {
     // Liquid interaction haptic
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
@@ -206,7 +207,7 @@ const CreateMomentScreen: React.FC = () => {
     });
 
     if (!result.canceled) {
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      HapticManager.buttonPress();
       setImageUri(result.assets[0].uri);
       setStep('details');
     }
@@ -215,7 +216,7 @@ const CreateMomentScreen: React.FC = () => {
   // Handle location selection with haptic feedback
   const handleLocationSelect = useCallback((location: Location) => {
     // Silky haptic feedback on location selection
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     setLocationName(location.name || location.address);
     setLocationCoords({ lat: location.latitude, lng: location.longitude });
     setShowLocationPicker(false);
@@ -230,7 +231,7 @@ const CreateMomentScreen: React.FC = () => {
     }
 
     if (!title || !selectedCategory || !imageUri || !locationName) {
-      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.error();
       showAlert({
         title: t('screens.createMoment.missingInfoTitle'),
         message: t('screens.createMoment.missingInfoMessage'),
@@ -241,7 +242,7 @@ const CreateMomentScreen: React.FC = () => {
     // Validate requested amount (min: 1)
     const amount = parseFloat(requestedAmount);
     if (!amount || amount < 1) {
-      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.error();
       showAlert({
         title: 'Geçersiz Miktar',
         message: 'Fiyat en az 1 olmalıdır.',
@@ -250,7 +251,7 @@ const CreateMomentScreen: React.FC = () => {
     }
 
     setIsSubmitting(true);
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.buttonPress();
 
     try {
       const momentData = {
@@ -276,9 +277,7 @@ const CreateMomentScreen: React.FC = () => {
       const createdMoment = await createMoment(momentData);
 
       if (createdMoment) {
-        await Haptics.notificationAsync(
-          Haptics.NotificationFeedbackType.Success,
-        );
+        HapticManager.success();
 
         // Navigate to Profile after successful creation
         showAlert({
@@ -293,14 +292,14 @@ const CreateMomentScreen: React.FC = () => {
           ],
         });
       } else {
-        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        HapticManager.error();
         showToast('Could not create moment. Please try again.', 'error');
       }
     } catch (createMomentError) {
       logger.error('[CreateMoment] Failed to create moment', {
         error: createMomentError,
       });
-      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.error();
       showToast('Something went wrong. Please try again.', 'error');
     } finally {
       setIsSubmitting(false);
@@ -324,7 +323,7 @@ const CreateMomentScreen: React.FC = () => {
 
   // Navigate back - UPDATED for new step flow
   const handleBack = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     if (step === 'details') {
       setStep('media');
     } else if (step === 'location') {
@@ -353,12 +352,55 @@ const CreateMomentScreen: React.FC = () => {
         'review',
       ];
       if (stepIndex < STEP_INDEX_MAP[step]) {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        HapticManager.buttonPress();
         setStep(stepKeys[stepIndex]);
       }
     },
     [step],
   );
+
+  // GUEST LOOP FIX: Block guests at component mount
+  // This prevents guests from filling out the entire form before being asked to login
+  useEffect(() => {
+    if (isGuest || !user) {
+      // Show login prompt immediately when guest tries to create a moment
+      showLoginPrompt({
+        action: 'create_moment',
+        onSuccess: () => {
+          // User logged in successfully, form will render
+        },
+      });
+    }
+  }, [isGuest, user]);
+
+  // If guest, don't render the form - waiting for login redirect
+  // NOTE: This conditional return must come AFTER all hooks are defined
+  if (isGuest || !user) {
+    return (
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <LinearGradient
+          colors={[...GRADIENTS.dark] as [string, string, ...string[]]}
+          style={StyleSheet.absoluteFill}
+        />
+        <View style={styles.guestBlockContainer}>
+          <MaterialCommunityIcons
+            name="account-lock"
+            size={64}
+            color={COLORS.brand.primary}
+          />
+          <Text style={styles.guestBlockTitle}>
+            {t('screens.createMoment.loginRequired', 'Giriş Yapın')}
+          </Text>
+          <Text style={styles.guestBlockSubtitle}>
+            {t(
+              'screens.createMoment.loginRequiredMessage',
+              'Anı oluşturmak için giriş yapmanız gerekiyor.',
+            )}
+          </Text>
+        </View>
+      </View>
+    );
+  }
 
   // Step 1: Media Selection - Clean upload UI
   const renderMediaStep = () => (
@@ -487,7 +529,7 @@ const CreateMomentScreen: React.FC = () => {
                       selectedCategory === cat.id && styles.categoryPillActive,
                     ]}
                     onPress={() => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      HapticManager.buttonPress();
                       setSelectedCategory(cat.id);
                     }}
                     accessibilityLabel={cat.label}
@@ -520,7 +562,7 @@ const CreateMomentScreen: React.FC = () => {
                   (!title || !selectedCategory) && styles.nextButtonDisabled,
                 ]}
                 onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  HapticManager.buttonPress();
                   setStep('location');
                 }}
                 disabled={!title || !selectedCategory}
@@ -549,7 +591,7 @@ const CreateMomentScreen: React.FC = () => {
                 <TouchableOpacity
                   style={styles.locationSelected}
                   onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    HapticManager.buttonPress();
                     setShowLocationPicker(true);
                   }}
                 >
@@ -569,7 +611,7 @@ const CreateMomentScreen: React.FC = () => {
                 <TouchableOpacity
                   style={styles.locationButton}
                   onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    HapticManager.buttonPress();
                     setShowLocationPicker(true);
                   }}
                 >
@@ -588,7 +630,7 @@ const CreateMomentScreen: React.FC = () => {
                   !locationName && styles.nextButtonDisabled,
                 ]}
                 onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  HapticManager.buttonPress();
                   setStep('price');
                 }}
                 disabled={!locationName}
@@ -616,7 +658,7 @@ const CreateMomentScreen: React.FC = () => {
                 <TouchableOpacity
                   style={styles.currencyButton}
                   onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    HapticManager.buttonPress();
                     setShowCurrencySheet(true);
                   }}
                   accessibilityLabel={t('screens.createMoment.a11y.currency')}
@@ -718,7 +760,7 @@ const CreateMomentScreen: React.FC = () => {
                     styles.nextButtonDisabled,
                 ]}
                 onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  HapticManager.buttonPress();
                   setStep('review');
                 }}
                 disabled={!requestedAmount || parseFloat(requestedAmount) < 1}
@@ -737,7 +779,7 @@ const CreateMomentScreen: React.FC = () => {
             onClose={() => setShowCurrencySheet(false)}
             selectedCurrency={currency}
             onCurrencyChange={(newCurrency) => {
-              Haptics.selectionAsync();
+              HapticManager.buttonPress();
               setCurrency(newCurrency);
             }}
           />
@@ -930,6 +972,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.backgroundDark,
+  },
+  // Guest block screen - shown when unauthenticated user tries to create moment
+  guestBlockContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 40,
+    gap: 16,
+  },
+  guestBlockTitle: {
+    fontSize: FONT_SIZES.h2,
+    fontFamily: FONTS.display.bold,
+    fontWeight: '800',
+    color: COLORS.white,
+    textAlign: 'center',
+    marginTop: 16,
+  },
+  guestBlockSubtitle: {
+    fontSize: FONT_SIZES.body,
+    fontFamily: FONTS.body.regular,
+    color: 'rgba(255,255,255,0.7)',
+    textAlign: 'center',
+    lineHeight: 22,
   },
   background: {
     flex: 1,

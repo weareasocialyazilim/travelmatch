@@ -15,27 +15,23 @@ import {
   type SunsetPhase,
 } from '@/constants/ceremony';
 
-// Mock expo-haptics - use inline jest.fn() to avoid hoisting issues
-jest.mock('expo-haptics', () => ({
-  notificationAsync: jest.fn().mockResolvedValue(undefined),
-  impactAsync: jest.fn().mockResolvedValue(undefined),
-  selectionAsync: jest.fn().mockResolvedValue(undefined),
-  NotificationFeedbackType: {
-    Success: 'success',
-    Warning: 'warning',
-    Error: 'error',
-  },
-  ImpactFeedbackStyle: {
-    Light: 'light',
-    Medium: 'medium',
-    Heavy: 'heavy',
+// Mock HapticManager
+jest.mock('@/services/HapticManager', () => ({
+  HapticManager: {
+    buttonPress: jest.fn().mockResolvedValue(undefined),
+    success: jest.fn().mockResolvedValue(undefined),
+    error: jest.fn().mockResolvedValue(undefined),
+    warning: jest.fn().mockResolvedValue(undefined),
+    primaryAction: jest.fn().mockResolvedValue(undefined),
+    countdownTick: jest.fn().mockResolvedValue(undefined),
+    urgentWarning: jest.fn().mockResolvedValue(undefined),
   },
 }));
 
 // Get a reference to the mocked functions after the mock is applied
-const Haptics = require('expo-haptics');
-const mockNotificationAsync = Haptics.notificationAsync;
-const mockImpactAsync = Haptics.impactAsync;
+const { HapticManager } = require('@/services/HapticManager');
+const mockButtonPress = HapticManager.buttonPress;
+const mockCountdownTick = HapticManager.countdownTick;
 
 // react-native-reanimated is mocked globally via moduleNameMapper
 
@@ -380,7 +376,7 @@ describe('SunsetClock Component', () => {
           testID="sunset-clock"
         />,
       );
-      expect(mockNotificationAsync).not.toHaveBeenCalled();
+      expect(HapticManager.warning).not.toHaveBeenCalled();
     });
 
     it('triggers warning haptic on warning phase change', () => {
@@ -482,7 +478,7 @@ describe('SunsetClock Component', () => {
         jest.advanceTimersByTime(30000);
       });
 
-      expect(mockImpactAsync).toHaveBeenCalledWith('light');
+      expect(mockCountdownTick).toHaveBeenCalled();
     });
 
     it('does not trigger pulse haptic outside twilight phase', () => {
@@ -500,7 +496,7 @@ describe('SunsetClock Component', () => {
         jest.advanceTimersByTime(30000);
       });
 
-      expect(mockImpactAsync).not.toHaveBeenCalled();
+      expect(mockCountdownTick).not.toHaveBeenCalled();
     });
 
     it('does not trigger pulse haptic when haptics disabled', () => {
@@ -518,7 +514,7 @@ describe('SunsetClock Component', () => {
         jest.advanceTimersByTime(30000);
       });
 
-      expect(mockImpactAsync).not.toHaveBeenCalled();
+      expect(mockCountdownTick).not.toHaveBeenCalled();
     });
   });
 

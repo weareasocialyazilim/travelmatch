@@ -24,7 +24,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import Reanimated, {
   useAnimatedStyle,
   useSharedValue,
@@ -219,12 +219,12 @@ export const UnifiedAuthScreen: React.FC = () => {
     const type = detectIdentifierType(identifier);
 
     if (!type) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.error();
       showToast('Geçerli bir e-posta veya telefon numarası girin', 'error');
       return;
     }
 
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
 
     if (type === 'phone') {
       // Phone flow - go to OTP
@@ -235,7 +235,7 @@ export const UnifiedAuthScreen: React.FC = () => {
         });
 
         if (error) {
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          HapticManager.error();
           showToast(error.message || 'SMS gönderilemedi', 'error');
         } else {
           setStep('otp');
@@ -264,7 +264,7 @@ export const UnifiedAuthScreen: React.FC = () => {
   // Handle login
   const handleLogin = async () => {
     if (!identifier || !password) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.error();
       showToast('Lütfen tüm alanları doldurun', 'error');
       return;
     }
@@ -276,17 +276,17 @@ export const UnifiedAuthScreen: React.FC = () => {
       const result = await login({ email: identifier, password });
 
       if (result.success) {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        HapticManager.success();
         navigation.reset({
           index: 0,
           routes: [{ name: 'MainTabs' as never }],
         });
       } else {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        HapticManager.error();
         showToast(result.error || 'Giriş başarısız', 'error');
       }
     } catch (error) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.error();
       logger.error('[UnifiedAuth] Login error:', error);
       showToast('Giriş yapılırken bir hata oluştu', 'error');
     } finally {
@@ -297,19 +297,19 @@ export const UnifiedAuthScreen: React.FC = () => {
   // Handle register
   const handleRegister = async () => {
     if (!identifier || !password || !name) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.error();
       showToast('Lütfen tüm alanları doldurun', 'error');
       return;
     }
 
     if (password !== confirmPassword) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.error();
       showToast('Şifreler eşleşmiyor', 'error');
       return;
     }
 
     if (password.length < 8) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.error();
       showToast('Şifre en az 8 karakter olmalı', 'error');
       return;
     }
@@ -325,18 +325,18 @@ export const UnifiedAuthScreen: React.FC = () => {
       });
 
       if (result.success) {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        HapticManager.success();
         showToast('Hesap oluşturuldu!', 'success');
         navigation.reset({
           index: 0,
           routes: [{ name: 'CompleteProfile' as never }],
         });
       } else {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        HapticManager.error();
         showToast(result.error || 'Kayıt başarısız', 'error');
       }
     } catch (error) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      HapticManager.error();
       logger.error('[UnifiedAuth] Register error:', error);
       showToast('Kayıt olurken bir hata oluştu', 'error');
     } finally {
@@ -346,13 +346,13 @@ export const UnifiedAuthScreen: React.FC = () => {
 
   // Handle forgot password
   const handleForgotPassword = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     navigation.navigate('ForgotPassword' as never);
   };
 
   // Handle back
   const handleBack = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     if (step === 'identifier') {
       navigation.goBack();
     } else {
@@ -365,13 +365,13 @@ export const UnifiedAuthScreen: React.FC = () => {
 
   // Switch to register mode
   const switchToRegister = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     setStep('register');
   };
 
   // Switch to login mode
   const switchToLogin = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     setStep('password');
   };
 

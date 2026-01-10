@@ -93,9 +93,10 @@ const TrustGardenDetailScreen: React.FC = () => {
       {
         id: '4',
         name: t('trust.factors.response'),
+        // FIX: Scale response rate percentage (0-100) to maxValue (15)
+        // Previous bug: value was 95 with maxValue 15, causing 633% overflow
         value: Math.round(
-          TRUST_GARDEN_DEFAULTS.RESPONSE_RATE_PERCENTAGE *
-            (TRUST_GARDEN_DEFAULTS.MAX_SCORE / 100),
+          (TRUST_GARDEN_DEFAULTS.RESPONSE_RATE_PERCENTAGE / 100) * 15,
         ),
         maxValue: 15,
         color: primitives.amber[500],

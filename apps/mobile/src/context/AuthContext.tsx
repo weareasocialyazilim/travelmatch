@@ -40,6 +40,7 @@ import {
   StorageKeys,
 } from '../utils/secureStorage';
 import { logger } from '../utils/logger';
+import { userService } from '../services/userService';
 import type { User, KYCStatus, Role } from '../types/index';
 import { setSentryUser, clearSentryUser } from '../config/sentry'; // ADDED: Sentry integration
 
@@ -356,6 +357,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
               setUser(parsedUser);
               setAuthState('authenticated');
               logger.info('[Auth] Session refreshed successfully');
+
+              // Sync E2E encryption public key to database
+              // This ensures other users can encrypt messages for us
+              void userService
+                .syncKeys()
+                .then(({ publicKey }) => {
+                  if (publicKey) {
+                    logger.info('[Auth] E2E encryption key synced');
+                  }
+                })
+                .catch((err) => {
+                  logger.warn(
+                    '[Auth] Failed to sync E2E keys, messaging may be unencrypted',
+                    err,
+                  );
+                });
             } else {
               // Session invalid, clear data
               logger.info('[Auth] Session invalid, clearing auth data');
@@ -439,6 +456,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         accountType: newUser.role,
       });
 
+      // Sync E2E encryption public key to database
+      void userService
+        .syncKeys()
+        .then(({ publicKey }) => {
+          if (publicKey) {
+            logger.info('[Auth] E2E encryption key synced after login');
+          }
+        })
+        .catch((err) => {
+          logger.warn('[Auth] Failed to sync E2E keys after login', err);
+        });
+
       return { success: true };
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Login failed';
@@ -483,6 +512,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         await saveTokens(newTokens);
         await saveUser(newUser);
         setAuthState('authenticated');
+
+        // Sync E2E encryption public key to database for new users
+        void userService
+          .syncKeys()
+          .then(({ publicKey }) => {
+            if (publicKey) {
+              logger.info(
+                '[Auth] E2E encryption key synced after registration',
+              );
+            }
+          })
+          .catch((err) => {
+            logger.warn(
+              '[Auth] Failed to sync E2E keys after registration',
+              err,
+            );
+          });
       }
 
       return { success: true };

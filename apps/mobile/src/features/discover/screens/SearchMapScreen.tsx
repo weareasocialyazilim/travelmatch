@@ -29,7 +29,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import * as Location from 'expo-location';
 import Animated, {
   useAnimatedStyle,
@@ -52,6 +52,7 @@ import { NeonPulseMarker } from '../components';
 // Using useDiscoverMoments for PostGIS-based location discovery
 import { useDiscoverMoments } from '@/hooks/useDiscoverMoments';
 import { useSubscription } from '@/features/payments/hooks/usePayments';
+import { useNetwork } from '@/context/NetworkContext';
 import { supabase } from '@/config/supabase';
 import TrustBadge from '@/components/ui/TMBadge';
 import { logger } from '@/utils/logger';
@@ -104,8 +105,10 @@ interface MomentMarker {
   lng: number;
   price: string;
   numericPrice: number;
+  currency?: string;
   title: string;
   category?: string;
+  hostId?: string;
   hostName?: string;
   hostAvatar?: string;
   hostTrustScore?: number;
@@ -183,6 +186,14 @@ const SearchMapScreen: React.FC = () => {
   const moments = discoveryMoments;
   const { subscription } = useSubscription();
   const userTier = subscription?.tier || 'free';
+
+  // Network status for offline handling
+  const { isConnected, status: networkStatus } = useNetwork();
+  // Handle null case - treat null as "unknown" (assume connected)
+  const isOffline =
+    !isConnected ||
+    (networkStatus.isInternetReachable !== null &&
+      networkStatus.isInternetReachable === false);
 
   // State
   const [userLocation, setUserLocation] = useState<MapLocation | null>(null);
@@ -362,7 +373,7 @@ const SearchMapScreen: React.FC = () => {
   // Handle marker selection - Subscription-based zoom
   const handleMarkerPress = useCallback(
     (marker: MomentMarker) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      HapticManager.buttonPress();
       setSelectedMoment(marker);
 
       // Dynamic zoom based on subscription tier
@@ -384,22 +395,25 @@ const SearchMapScreen: React.FC = () => {
 
   // Close preview card
   const handleClosePreview = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     setSelectedMoment(null);
   }, []);
 
   // Navigate to moment detail or subscriber offer flow
   const handleViewDetails = useCallback(() => {
     if (selectedMoment) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      HapticManager.buttonPress();
 
       // If user is subscriber (premium/platinum), open offer flow directly
       if (['premium', 'platinum'].includes(userTier)) {
         navigation.navigate('SubscriberOfferModal', {
           momentId: selectedMoment.id,
           momentTitle: selectedMoment.title,
-          hostName: selectedMoment.hostName,
-          currentPrice: selectedMoment.numericPrice,
+          momentCategory: selectedMoment.category || 'experience',
+          targetValue: selectedMoment.numericPrice,
+          targetCurrency: selectedMoment.currency || 'TRY',
+          hostId: selectedMoment.hostId || selectedMoment.id, // Fallback to moment ID if hostId missing
+          hostName: selectedMoment.hostName || 'Host',
         });
       } else {
         // Regular navigation to moment detail
@@ -414,7 +428,7 @@ const SearchMapScreen: React.FC = () => {
   // Center on user location
   const handleCenterOnUser = useCallback(() => {
     if (userLocation && cameraRef.current) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.buttonPress();
       cameraRef.current.setCamera({
         centerCoordinate: [userLocation.longitude, userLocation.latitude],
         zoomLevel: 14,
@@ -425,7 +439,7 @@ const SearchMapScreen: React.FC = () => {
 
   // Handle filter press
   const handleFilterPress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     setShowFilterModal(true);
   }, []);
 
@@ -449,6 +463,40 @@ const SearchMapScreen: React.FC = () => {
     transform: [{ scale: locationButtonScale.value }],
   }));
 
+  // Show offline fallback UI
+  if (isOffline) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.fallbackContainer}>
+          <MaterialCommunityIcons
+            name="wifi-off"
+            size={64}
+            color={COLORS.text.muted}
+          />
+          <Text style={styles.fallbackTitle}>Çevrimdışı Mod</Text>
+          <Text style={styles.fallbackSubtitle}>
+            Haritayı görüntülemek için internet bağlantısı gerekiyor. Lütfen
+            bağlantınızı kontrol edin.
+          </Text>
+          <TouchableOpacity
+            style={styles.offlineRetryButton}
+            onPress={() => {
+              // Force re-render by toggling a state
+              HapticManager.buttonPress();
+            }}
+          >
+            <MaterialCommunityIcons
+              name="refresh"
+              size={20}
+              color={COLORS.primary}
+            />
+            <Text style={styles.offlineRetryText}>Tekrar Dene</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
   // Show fallback UI if Mapbox is not configured or has error
   if (!isMapboxConfigured || mapError) {
     return (
@@ -459,10 +507,10 @@ const SearchMapScreen: React.FC = () => {
             size={64}
             color={COLORS.text.muted}
           />
-          <Text style={styles.fallbackTitle}>Map Unavailable</Text>
+          <Text style={styles.fallbackTitle}>Harita Kullanılamıyor</Text>
           <Text style={styles.fallbackSubtitle}>
             {mapError ||
-              'Map service is not configured. Please add your Mapbox token to .env file.'}
+              'Harita servisi yapılandırılmamış. Lütfen Mapbox token ekleyin.'}
           </Text>
         </View>
       </View>
@@ -920,6 +968,25 @@ const styles = StyleSheet.create({
     color: COLORS.text.secondary,
     textAlign: 'center',
     marginTop: 8,
+    lineHeight: 22,
+    paddingHorizontal: 20,
+  },
+  offlineRetryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 24,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    backgroundColor: 'rgba(204, 255, 0, 0.1)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(204, 255, 0, 0.3)',
+  },
+  offlineRetryText: {
+    color: COLORS.primary,
+    fontSize: 15,
+    fontWeight: '600',
   },
   // Empty state overlay
   emptyOverlay: {

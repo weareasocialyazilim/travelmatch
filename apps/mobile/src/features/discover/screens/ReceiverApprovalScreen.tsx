@@ -18,7 +18,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -156,7 +156,7 @@ export const ReceiverApprovalScreen: React.FC<
 
   // Handle decline
   const handleDecline = useCallback(async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    HapticManager.buttonPress();
 
     if (currentIndex < candidates.length - 1) {
       setCurrentIndex((prev) => prev + 1);
@@ -169,7 +169,7 @@ export const ReceiverApprovalScreen: React.FC<
   const handleApprove = useCallback(async () => {
     if (!currentCandidate) return;
 
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    HapticManager.success();
     setLoading(true);
 
     try {

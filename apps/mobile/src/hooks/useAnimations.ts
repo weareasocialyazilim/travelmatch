@@ -19,7 +19,7 @@ import {
   Extrapolation,
   SharedValue,
 } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 
 // ============================================
 // 1. SPRING CONFIGURATIONS
@@ -83,7 +83,7 @@ export const usePressAnimation = (
 
   const onPressIn = useCallback(() => {
     scale.value = withSpring(scaleValue, springConfig);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
   }, [scale, scaleValue, springConfig]);
 
   const onPressOut = useCallback(() => {
@@ -356,7 +356,7 @@ export const useShake = () => {
       withTiming(6, { duration: 100 }),
       withTiming(0, { duration: 50 }),
     );
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    HapticManager.error();
   }, [translateX]);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -378,7 +378,7 @@ export const useSuccessBounce = () => {
       withSpring(0.9, SPRINGS.snappy),
       withSpring(1, SPRINGS.bouncy),
     );
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    HapticManager.success();
   }, [scale]);
 
   const animatedStyle = useAnimatedStyle(() => ({

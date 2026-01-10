@@ -37,7 +37,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
+import { HapticManager } from '@/services/HapticManager';
 import {
   CEREMONY_COLORS,
   CEREMONY_TIMING,
@@ -166,11 +166,11 @@ export const SunsetClock: React.FC<SunsetClockProps> = ({
         // Haptic feedback on phase change
         if (enableHaptics) {
           if (newPhase === 'warning') {
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+            HapticManager.warning();
           } else if (newPhase === 'urgent' || newPhase === 'twilight') {
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+            HapticManager.error();
           } else if (newPhase === 'expired') {
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+            HapticManager.error();
             onExpire?.();
           }
         }
@@ -196,7 +196,7 @@ export const SunsetClock: React.FC<SunsetClockProps> = ({
     if (!enableHaptics || phase !== 'twilight') return;
 
     const pulseInterval = setInterval(() => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.countdownTick();
     }, 30000); // Every 30 seconds
 
     return () => clearInterval(pulseInterval);

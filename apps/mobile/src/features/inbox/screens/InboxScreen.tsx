@@ -30,8 +30,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
-import * as Haptics from 'expo-haptics';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
+import { HapticManager } from '@/services/HapticManager';
+import { useTranslation } from 'react-i18next';
 
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 
@@ -53,6 +54,7 @@ import type { NavigationProp } from '@react-navigation/native';
 const InboxScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   // Use the inbox hook for real data
   const {
@@ -72,14 +74,14 @@ const InboxScreen: React.FC = () => {
 
   // Handle refresh with haptic feedback
   const handleRefresh = useCallback(async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.refreshTriggered();
     await refreshInbox();
   }, [refreshInbox]);
 
   // Handle chat press
   const handleChatPress = useCallback(
     (chat: InboxChat) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      HapticManager.buttonPress();
       navigation.navigate('Chat', {
         otherUser: {
           id: chat.user.id,
@@ -98,7 +100,7 @@ const InboxScreen: React.FC = () => {
 
   // Handle archive button
   const handleArchive = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    HapticManager.buttonPress();
     navigation.navigate('ArchivedChats');
   }, [navigation]);
 
@@ -124,12 +126,14 @@ const InboxScreen: React.FC = () => {
           />
         </View>
         <Text style={styles.emptyTitle}>
-          {activeTab === 'active' ? 'Henüz mesaj yok' : 'Hediye talebi yok'}
+          {activeTab === 'active'
+            ? t('inbox.empty.activeTitle')
+            : t('inbox.empty.requestsTitle')}
         </Text>
         <Text style={styles.emptyDescription}>
           {activeTab === 'active'
-            ? 'Yeni insanlarla tanışmak için bir moment paylaş!'
-            : 'Birisi momentine katılmak istediğinde burada göreceksin.'}
+            ? t('inbox.empty.activeDescription')
+            : t('inbox.empty.requestsDescription')}
         </Text>
         {activeTab === 'active' && (
           <>
@@ -146,14 +150,16 @@ const InboxScreen: React.FC = () => {
                 end={{ x: 1, y: 1 }}
                 style={styles.emptyButtonGradient}
               >
-                <Text style={styles.emptyButtonText}>Keşfet</Text>
+                <Text style={styles.emptyButtonText}>{t('inbox.explore')}</Text>
               </LinearGradient>
             </TouchableOpacity>
             {/* Smart suggestion: Popular moments */}
             <View style={styles.suggestionSection}>
-              <Text style={styles.suggestionTitle}>Yakınındaki Anlar</Text>
+              <Text style={styles.suggestionTitle}>
+                {t('inbox.suggestions.title')}
+              </Text>
               <Text style={styles.suggestionSubtitle}>
-                Bu momentlere göz at ve yeni insanlarla tanış
+                {t('inbox.suggestions.subtitle')}
               </Text>
               <TouchableOpacity
                 style={styles.suggestionCard}
@@ -167,7 +173,9 @@ const InboxScreen: React.FC = () => {
                   size={24}
                   color={VIBE_ROOM_COLORS.neon.lime}
                 />
-                <Text style={styles.suggestionCardText}>Momentleri Keşfet</Text>
+                <Text style={styles.suggestionCardText}>
+                  {t('inbox.suggestions.cardText')}
+                </Text>
                 <MaterialCommunityIcons
                   name="chevron-right"
                   size={20}
@@ -192,7 +200,7 @@ const InboxScreen: React.FC = () => {
         style={[styles.header, { paddingTop: insets.top + 8 }]}
       >
         <View style={styles.headerContent}>
-          <Text style={styles.pageTitle}>Gelen Kutusu</Text>
+          <Text style={styles.pageTitle}>{t('inbox.title')}</Text>
           {totalUnread > 0 && (
             <View style={styles.unreadBadge}>
               <Text style={styles.unreadBadgeText}>
@@ -205,7 +213,7 @@ const InboxScreen: React.FC = () => {
           style={styles.archiveButton}
           onPress={handleArchive}
           activeOpacity={0.7}
-          accessibilityLabel="Arşivlenmiş sohbetler"
+          accessibilityLabel={t('messages.archived.title')}
           accessibilityRole="button"
         >
           <MaterialCommunityIcons
