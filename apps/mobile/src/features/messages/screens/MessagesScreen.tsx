@@ -452,17 +452,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 4,
   },
-  onlineIndicator: {
-    backgroundColor: COLORS.greenBright,
-    borderColor: COLORS.utility.white,
-    borderRadius: 6,
-    borderWidth: 2,
-    bottom: 2,
-    height: 12,
-    position: 'absolute',
-    right: 2,
-    width: 12,
-  },
   personName: {
     color: COLORS.text.primary,
     ...TYPOGRAPHY.bodyLarge,

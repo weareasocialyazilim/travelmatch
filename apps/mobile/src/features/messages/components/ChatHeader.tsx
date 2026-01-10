@@ -197,11 +197,6 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
       : 'Müzakere edilyor';
   };
 
-  const getStatusText = () => {
-    if (isTyping) return null; // Will show typing indicator instead
-    return null; // Online status not shown for privacy
-  };
-
   const HeaderContent = () => (
     <>
       <View style={[styles.headerTop, { paddingTop: insets.top + 8 }]}>
@@ -399,22 +394,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 2,
-  },
-  statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    marginRight: 6,
-    // Neon glow for online status
-    shadowColor: COLORS.success,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 4,
-  },
-  statusText: {
-    fontSize: FONT_SIZES.tiny,
-    color: COLORS.text.secondary,
-    fontFamily: FONTS.body.regular,
   },
   typingIndicator: {
     flexDirection: 'row',
