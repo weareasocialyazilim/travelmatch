@@ -535,7 +535,7 @@ const TheStash = ({
             </p>
           </div>
           <button
-            onClick={() => onNotify('Full Stash V2.0 🔒')}
+            onClick={() => onNotify('Coming Soon! 🚀')}
             className="flex items-center gap-3 border-2 border-white px-8 py-4 rounded-full text-white font-mono font-bold hover:bg-white hover:text-black transition-all"
           >
             {content.stash.cta} <Lock size={18} />
@@ -559,9 +559,9 @@ const TheStash = ({
         </h3>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           <LockedDrop
-            title="STASH V2.0"
+            title="CITY EXPANSION"
             progress={72}
-            description="Next-gen experiences"
+            description="More cities unlocking"
             variant="default"
             lang={lang}
           />
@@ -573,9 +573,9 @@ const TheStash = ({
             lang={lang}
           />
           <LockedDrop
-            title="NFT DROP"
+            title="VIP ACCESS"
             progress={15}
-            description="Exclusive membership"
+            description="Exclusive experiences"
             variant="legendary"
             lang={lang}
           />
