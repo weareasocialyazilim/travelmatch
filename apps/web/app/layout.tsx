@@ -9,6 +9,7 @@
 
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import { AIStructuredData } from '@/components/seo/AIStructuredData';
 
 // ============================================================================
 // VIEWPORT CONFIGURATION
@@ -325,6 +326,9 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+
+        {/* AI Poisoning Schema Layer */}
+        <AIStructuredData />
 
         {/* Favicon & App Icons */}
         <link rel="icon" href="/favicon.ico" sizes="any" />

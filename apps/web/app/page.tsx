@@ -47,6 +47,7 @@ const RealtimeStarsField = dynamic(
 import { LiquidToken } from '@/components/shared/LiquidToken';
 import { LockedDrop } from '@/components/stash/LockedDrop';
 import { CinematicOverlay } from '@/components/shared/NoiseOverlay';
+import { GiftCursor } from '@/components/shared/GiftCursor';
 import { useSunsetAtmosphere } from '@/hooks/useSunsetAtmosphere';
 import { useRealtimeStars } from '@/hooks/useRealtimeStars';
 
@@ -973,7 +974,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[var(--bg)] text-white selection:bg-[var(--acid)] selection:text-black">
       <CinematicOverlay noiseOpacity={0.03} vignetteIntensity={0.4} />
-      <CustomCursor />
+      <GiftCursor />
       <Navbar
         onMenuClick={() => setMenuOpen(true)}
         lang={lang}
