@@ -48,11 +48,36 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  reactCompiler: true,
-
   // Production optimizations
   output: 'standalone',
+
+  // Transpile packages for optimization
+  transpilePackages: [
+    'three',
+    '@react-three/fiber',
+    '@react-three/drei',
+    'framer-motion',
+  ],
+
+  // Optimize package imports
+  experimental: {
+    optimizePackageImports: [
+      'lucide-react',
+      'framer-motion',
+      '@react-three/drei',
+    ],
+  },
+
+  // Image optimization
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.supabase.co',
+      },
+    ],
+  },
 
   // Security headers for all routes
   async headers() {
