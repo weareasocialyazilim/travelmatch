@@ -14,7 +14,6 @@ import {
   AlertTriangle,
   DollarSign,
   Settings,
-  Shield,
   BarChart3,
   MessageSquare,
   ChevronLeft,
@@ -26,7 +25,6 @@ import {
   Gift,
   UserCog,
   Globe,
-  TrendingUp,
   Activity,
   Star,
   UsersRound,
@@ -53,10 +51,14 @@ import {
   AlertCircle,
   Search,
   FileText,
+  Crown,
+  Eye,
+  Scale,
+  Receipt,
+  PiggyBank,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Tooltip,
   TooltipContent,
@@ -101,6 +103,12 @@ const managementNavItems: NavItem[] = [
   },
   { title: 'Creators', href: '/creators', icon: Star, resource: 'users' },
   {
+    title: 'VIP Yonetimi',
+    href: '/vip-management',
+    icon: Crown,
+    resource: 'users',
+  },
+  {
     title: 'Ceremony',
     href: '/ceremony-management',
     icon: Sparkles,
@@ -128,6 +136,12 @@ const operationsNavItems: NavItem[] = [
     resource: 'transactions',
   },
   {
+    title: 'Fiyatlandirma',
+    href: '/pricing',
+    icon: Receipt,
+    resource: 'transactions',
+  },
+  {
     title: 'Escrow Islemleri',
     href: '/escrow-operations',
     icon: Lock,
@@ -138,6 +152,12 @@ const operationsNavItems: NavItem[] = [
     href: '/proof-center',
     icon: Camera,
     resource: 'transactions',
+  },
+  {
+    title: 'Moderasyon',
+    href: '/moderation',
+    icon: Eye,
+    resource: 'reports',
   },
   {
     title: 'Safety Hub',
@@ -164,6 +184,12 @@ const analyticsNavItems: NavItem[] = [
     title: 'Analitik',
     href: '/analytics',
     icon: BarChart3,
+    resource: 'analytics',
+  },
+  {
+    title: 'Gelir Analizi',
+    href: '/revenue',
+    icon: PiggyBank,
     resource: 'analytics',
   },
   {
@@ -266,6 +292,12 @@ const settingsNavItems: NavItem[] = [
     title: 'Audit Logs',
     href: '/audit-logs',
     icon: History,
+    resource: 'admin_users',
+  },
+  {
+    title: 'Uyumluluk (KVKK)',
+    href: '/compliance',
+    icon: Scale,
     resource: 'admin_users',
   },
   { title: 'Ayarlar', href: '/settings', icon: Settings, resource: 'settings' },

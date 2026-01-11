@@ -5,6 +5,7 @@
 
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import { CustomCursor } from '@/components/ui/CustomCursor';
 import { Atmosphere } from '@/components/3d/Atmosphere';
 
 // ============================================================================
@@ -184,6 +185,9 @@ export default function RootLayout({
       <body className="antialiased bg-black text-white selection:bg-[#ccff00] selection:text-black">
         {/* 3D Atmosphere Background */}
         <Atmosphere />
+
+        {/* Custom Cursor */}
+        <CustomCursor />
 
         {/* Noise Overlay */}
         <div className="noise-overlay" />
