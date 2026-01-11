@@ -37,6 +37,22 @@ import {
   LogOut,
   Moon,
   Sparkles,
+  Zap,
+  Lock,
+  Camera,
+  Compass,
+  Heart,
+  Wifi,
+  Wallet,
+  CreditCard,
+  Send,
+  ShieldCheck,
+  UserCheck,
+  Server,
+  Coffee,
+  AlertCircle,
+  Search,
+  FileText,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -67,6 +83,9 @@ interface NavItem {
 
 // Navigation sections
 const mainNavItems: NavItem[] = [
+  { title: 'CEO Briefing', href: '/ceo-briefing', icon: Coffee },
+  { title: 'Command Center', href: '/command-center', icon: Zap },
+  { title: 'Alerts', href: '/alerts', icon: AlertCircle, badge: 4 },
   { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { title: 'Is Kuyrugu', href: '/queue', icon: ListTodo, badge: 0 },
 ];
@@ -97,15 +116,39 @@ const operationsNavItems: NavItem[] = [
     resource: 'transactions',
   },
   {
-    title: 'Gelir Analizi',
-    href: '/revenue',
-    icon: TrendingUp,
+    title: 'Wallet & Payouts',
+    href: '/wallet-operations',
+    icon: Wallet,
     resource: 'transactions',
   },
   {
-    title: 'Guvenlik',
-    href: '/trust-safety',
-    icon: Shield,
+    title: 'Abonelikler',
+    href: '/subscription-management',
+    icon: CreditCard,
+    resource: 'transactions',
+  },
+  {
+    title: 'Escrow Islemleri',
+    href: '/escrow-operations',
+    icon: Lock,
+    resource: 'transactions',
+  },
+  {
+    title: 'Proof Merkezi',
+    href: '/proof-center',
+    icon: Camera,
+    resource: 'transactions',
+  },
+  {
+    title: 'Safety Hub',
+    href: '/safety-hub',
+    icon: ShieldCheck,
+    resource: 'reports',
+  },
+  {
+    title: 'Fraud Sorusturma',
+    href: '/fraud-investigation',
+    icon: Search,
     resource: 'reports',
   },
   {
@@ -121,6 +164,24 @@ const analyticsNavItems: NavItem[] = [
     title: 'Analitik',
     href: '/analytics',
     icon: BarChart3,
+    resource: 'analytics',
+  },
+  {
+    title: 'User Lifecycle',
+    href: '/user-lifecycle',
+    icon: UserCheck,
+    resource: 'analytics',
+  },
+  {
+    title: 'Kesif & Eslesme',
+    href: '/discovery-analytics',
+    icon: Compass,
+    resource: 'analytics',
+  },
+  {
+    title: 'Chat Analitik',
+    href: '/chat-analytics',
+    icon: Heart,
     resource: 'analytics',
   },
   {
@@ -145,6 +206,12 @@ const growthNavItems: NavItem[] = [
     resource: 'users',
   },
   {
+    title: 'Kampanya Builder',
+    href: '/campaign-builder',
+    icon: Send,
+    resource: 'users',
+  },
+  {
     title: 'Kampanyalar',
     href: '/campaigns',
     icon: Megaphone,
@@ -161,6 +228,24 @@ const techNavItems: NavItem[] = [
     resource: 'analytics',
   },
   {
+    title: 'AI Insights',
+    href: '/ai-insights',
+    icon: Sparkles,
+    resource: 'analytics',
+  },
+  {
+    title: 'Sistem Sagligi',
+    href: '/system-health',
+    icon: Server,
+    resource: 'settings',
+  },
+  {
+    title: 'Entegrasyonlar',
+    href: '/integrations-monitor',
+    icon: Wifi,
+    resource: 'settings',
+  },
+  {
     title: 'Feature Flags',
     href: '/feature-flags',
     icon: Flag,
@@ -171,6 +256,12 @@ const techNavItems: NavItem[] = [
 
 const settingsNavItems: NavItem[] = [
   { title: 'Ekip', href: '/team', icon: UsersRound, resource: 'admin_users' },
+  {
+    title: 'Audit Trail',
+    href: '/audit-trail',
+    icon: FileText,
+    resource: 'admin_users',
+  },
   {
     title: 'Audit Logs',
     href: '/audit-logs',
