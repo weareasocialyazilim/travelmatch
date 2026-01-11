@@ -84,42 +84,30 @@ export function useAuth() {
     async (email: string, password: string) => {
       setLoading(true);
       try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
+        // Use API route for login to set admin_session cookie
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
         });
 
-        if (error) throw error;
+        const result = await response.json();
 
-        // Check if user is an admin
-        const { data: adminUser, error: adminError } = await supabase
-          .from('admin_users')
-          .select('*')
-          .eq('email', email)
-          .eq('is_active', true)
-          .single();
-
-        if (adminError || !adminUser) {
-          await supabase.auth.signOut();
-          throw new Error(
-            'Bu hesap admin paneline erişim yetkisine sahip değil.',
-          );
+        if (!response.ok) {
+          throw new Error(result.error || 'Giriş başarısız');
         }
 
-        setUser(adminUser as AdminUser);
-
-        // If 2FA is required and enabled, redirect to 2FA page
-        if (adminUser.requires_2fa && adminUser.totp_enabled) {
+        // If 2FA is required
+        if (result.requires_2fa) {
+          // Store temp token for 2FA verification
+          sessionStorage.setItem('2fa_temp_token', result.temp_token);
+          sessionStorage.setItem('2fa_admin_id', result.admin_id);
           set2FAVerified(false);
           return { success: true, requires2FA: true };
         }
 
-        // If 2FA is required but not set up, redirect to setup
-        if (adminUser.requires_2fa && !adminUser.totp_enabled) {
-          set2FAVerified(false);
-          return { success: true, requires2FASetup: true };
-        }
-
+        // Set user from response
+        setUser(result.user as AdminUser);
         set2FAVerified(true);
         return { success: true };
       } catch (error) {
@@ -127,7 +115,7 @@ export function useAuth() {
         throw error;
       }
     },
-    [supabase, setUser, setLoading, set2FAVerified],
+    [setUser, setLoading, set2FAVerified],
   );
 
   const verify2FA = useCallback(
@@ -154,6 +142,8 @@ export function useAuth() {
   );
 
   const logout = useCallback(async () => {
+    // Call logout API to clear session cookie
+    await fetch('/api/auth/logout', { method: 'POST' });
     await supabase.auth.signOut();
     logoutStore();
     router.push('/login');

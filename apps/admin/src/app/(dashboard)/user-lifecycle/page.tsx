@@ -63,7 +63,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { AdminAreaChart, AdminBarChart } from '@/components/charts';
+import { AdminAreaChart, AdminBarChart } from '@/components/common/admin-chart';
 import { cn } from '@/lib/utils';
 
 // Lifecycle stage stats

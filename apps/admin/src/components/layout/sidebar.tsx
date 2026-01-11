@@ -5,6 +5,7 @@
  * "Cinematic Travel + Trust Jewelry" Design
  */
 
+import { useRef, useEffect, useCallback, memo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -32,8 +33,6 @@ import {
   History,
   Flag,
   MapPin,
-  LogOut,
-  Moon,
   Sparkles,
   Zap,
   Lock,
@@ -64,14 +63,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { useUIStore } from '@/stores/ui-store';
 import { usePermission } from '@/hooks/use-permission';
 
@@ -307,90 +298,42 @@ export function Sidebar() {
   const pathname = usePathname();
   const { sidebarCollapsed, setSidebarCollapsed } = useUIStore();
   const { can } = usePermission();
+  const navRef = useRef<HTMLDivElement>(null);
+  const lastScrolledPath = useRef<string | null>(null);
 
-  const NavLink = ({ item }: { item: NavItem }) => {
-    const isActive =
-      pathname === item.href || pathname.startsWith(item.href + '/');
+  // Scroll to active item only on initial mount or when navigating to a different section
+  const scrollToActiveItem = useCallback(() => {
+    const nav = navRef.current;
+    if (!nav) return;
 
-    if (item.resource && !can(item.resource as never, 'view')) {
-      return null;
+    // Find the active link
+    const activeLink = nav.querySelector('[data-active="true"]') as HTMLElement;
+    if (!activeLink) return;
+
+    const navRect = nav.getBoundingClientRect();
+    const itemRect = activeLink.getBoundingClientRect();
+
+    // Check if item is outside visible area
+    const isAbove = itemRect.top < navRect.top + 20;
+    const isBelow = itemRect.bottom > navRect.bottom - 20;
+
+    if (isAbove || isBelow) {
+      activeLink.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
     }
+  }, []);
 
-    const content = (
-      <Link
-        href={item.href}
-        className={cn(
-          'admin-sidebar-item',
-          isActive && 'admin-sidebar-item-active',
-          sidebarCollapsed && 'justify-center px-2',
-        )}
-      >
-        <item.icon className="admin-sidebar-item-icon" />
-        {!sidebarCollapsed && (
-          <>
-            <span className="flex-1">{item.title}</span>
-            {item.badge !== undefined && item.badge > 0 && (
-              <span className="admin-sidebar-badge">{item.badge}</span>
-            )}
-          </>
-        )}
-      </Link>
-    );
-
-    if (sidebarCollapsed) {
-      return (
-        <Tooltip delayDuration={0}>
-          <TooltipTrigger asChild>
-            <Link
-              href={item.href}
-              className={cn(
-                'admin-sidebar-item',
-                isActive && 'admin-sidebar-item-active',
-                'justify-center px-2',
-              )}
-            >
-              <item.icon className="admin-sidebar-item-icon" />
-            </Link>
-          </TooltipTrigger>
-          <TooltipContent side="right" className="flex items-center gap-2">
-            {item.title}
-            {item.badge !== undefined && item.badge > 0 && (
-              <span className="admin-sidebar-badge">{item.badge}</span>
-            )}
-          </TooltipContent>
-        </Tooltip>
-      );
+  // Only scroll on initial mount
+  useEffect(() => {
+    if (lastScrolledPath.current === null) {
+      // Small delay for initial render
+      const timer = setTimeout(scrollToActiveItem, 100);
+      lastScrolledPath.current = pathname;
+      return () => clearTimeout(timer);
     }
-
-    return content;
-  };
-
-  const NavSection = ({
-    title,
-    items,
-  }: {
-    title: string;
-    items: NavItem[];
-  }) => {
-    const visibleItems = items.filter(
-      (item) => !item.resource || can(item.resource as never, 'view'),
-    );
-
-    if (visibleItems.length === 0) return null;
-
-    return (
-      <div className="admin-sidebar-section">
-        {!sidebarCollapsed && (
-          <h4 className="admin-sidebar-section-title">{title}</h4>
-        )}
-        <div className="space-y-1">
-          {visibleItems.map((item) => (
-            <NavLink key={item.href} item={item} />
-          ))}
-        </div>
-      </div>
-    );
-  };
+  }, [pathname, scrollToActiveItem]);
 
   return (
     <aside className={cn('admin-sidebar', sidebarCollapsed ? 'w-16' : 'w-64')}>
@@ -437,64 +380,156 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <div className="admin-sidebar-nav flex-1 overflow-y-auto">
-        <NavSection title="Ana Menu" items={mainNavItems} />
-        <NavSection title="Yonetim" items={managementNavItems} />
-        <NavSection title="Operasyon" items={operationsNavItems} />
-        <NavSection title="Analitik" items={analyticsNavItems} />
-        <NavSection title="Buyume" items={growthNavItems} />
-        <NavSection title="Teknoloji" items={techNavItems} />
-        <NavSection title="Sistem" items={settingsNavItems} />
-      </div>
-
-      {/* User Section */}
-      <div className="border-t p-3">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              className={cn(
-                'flex w-full items-center gap-3 rounded-lg p-2 text-sm transition-colors hover:bg-muted',
-                sidebarCollapsed && 'justify-center',
-              )}
-            >
-              <Avatar className="h-8 w-8 border-2 border-primary/20">
-                <AvatarImage src="/avatars/admin.jpg" />
-                <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
-                  KY
-                </AvatarFallback>
-              </Avatar>
-              {!sidebarCollapsed && (
-                <div className="flex-1 text-left">
-                  <p className="font-medium text-sm">Kemal Y.</p>
-                  <p className="text-xs text-muted-foreground">Super Admin</p>
-                </div>
-              )}
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <div className="px-2 py-1.5">
-              <p className="font-medium text-sm">Kemal Y.</p>
-              <p className="text-xs text-muted-foreground">
-                kemal@travelmatch.app
-              </p>
-            </div>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <UserCog className="mr-2 h-4 w-4" />
-              Profil Ayarlari
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Moon className="mr-2 h-4 w-4" />
-              Karanlik Mod
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
-              <LogOut className="mr-2 h-4 w-4" />
-              Cikis Yap
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      <nav ref={navRef} className="admin-sidebar-nav flex-1 overflow-y-auto">
+        <NavSection
+          title="Ana Menu"
+          items={mainNavItems}
+          pathname={pathname}
+          collapsed={sidebarCollapsed}
+          can={can}
+        />
+        <NavSection
+          title="Yonetim"
+          items={managementNavItems}
+          pathname={pathname}
+          collapsed={sidebarCollapsed}
+          can={can}
+        />
+        <NavSection
+          title="Operasyon"
+          items={operationsNavItems}
+          pathname={pathname}
+          collapsed={sidebarCollapsed}
+          can={can}
+        />
+        <NavSection
+          title="Analitik"
+          items={analyticsNavItems}
+          pathname={pathname}
+          collapsed={sidebarCollapsed}
+          can={can}
+        />
+        <NavSection
+          title="Buyume"
+          items={growthNavItems}
+          pathname={pathname}
+          collapsed={sidebarCollapsed}
+          can={can}
+        />
+        <NavSection
+          title="Teknoloji"
+          items={techNavItems}
+          pathname={pathname}
+          collapsed={sidebarCollapsed}
+          can={can}
+        />
+        <NavSection
+          title="Sistem"
+          items={settingsNavItems}
+          pathname={pathname}
+          collapsed={sidebarCollapsed}
+          can={can}
+        />
+      </nav>
     </aside>
   );
 }
+
+// Memoized NavLink component to prevent unnecessary re-renders
+const NavLink = memo(function NavLink({
+  item,
+  isActive,
+  collapsed,
+}: {
+  item: NavItem;
+  isActive: boolean;
+  collapsed: boolean;
+}) {
+  if (collapsed) {
+    return (
+      <Tooltip delayDuration={0}>
+        <TooltipTrigger asChild>
+          <span>
+            <Link
+              href={item.href}
+              scroll={false}
+              data-active={isActive}
+              className={cn(
+                'admin-sidebar-item',
+                isActive && 'admin-sidebar-item-active',
+                'justify-center px-2',
+              )}
+            >
+              <item.icon className="admin-sidebar-item-icon" />
+            </Link>
+          </span>
+        </TooltipTrigger>
+        <TooltipContent side="right" className="flex items-center gap-2">
+          {item.title}
+          {item.badge !== undefined && item.badge > 0 && (
+            <span className="admin-sidebar-badge">{item.badge}</span>
+          )}
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return (
+    <Link
+      href={item.href}
+      scroll={false}
+      data-active={isActive}
+      className={cn(
+        'admin-sidebar-item',
+        isActive && 'admin-sidebar-item-active',
+      )}
+    >
+      <item.icon className="admin-sidebar-item-icon" />
+      <span className="flex-1">{item.title}</span>
+      {item.badge !== undefined && item.badge > 0 && (
+        <span className="admin-sidebar-badge">{item.badge}</span>
+      )}
+    </Link>
+  );
+});
+
+// Memoized NavSection component
+const NavSection = memo(function NavSection({
+  title,
+  items,
+  pathname,
+  collapsed,
+  can,
+}: {
+  title: string;
+  items: NavItem[];
+  pathname: string;
+  collapsed: boolean;
+  can: (resource: never, action: string) => boolean;
+}) {
+  const visibleItems = items.filter(
+    (item) => !item.resource || can(item.resource as never, 'view'),
+  );
+
+  if (visibleItems.length === 0) return null;
+
+  return (
+    <div className="admin-sidebar-section">
+      {!collapsed && <h4 className="admin-sidebar-section-title">{title}</h4>}
+      <div className="space-y-1">
+        {visibleItems.map((item) => {
+          const isActive =
+            pathname === item.href || pathname.startsWith(item.href + '/');
+          return (
+            <NavLink
+              key={item.href}
+              item={item}
+              isActive={isActive}
+              collapsed={collapsed}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+});

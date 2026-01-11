@@ -5,7 +5,7 @@
  * "Cinematic Travel + Trust Jewelry" Design
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -23,7 +23,6 @@ import {
 import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,7 +65,6 @@ export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
-  const [searchFocused, setSearchFocused] = useState(false);
 
   const user = useAuthStore((state: AuthState) => state.user);
   const { setCommandPaletteOpen } = useUIStore();
@@ -99,10 +97,6 @@ export function Header() {
     await logout();
   }, [logout]);
 
-  const handleSearchClick = () => {
-    setCommandPaletteOpen(true);
-  };
-
   return (
     <header className="admin-header">
       {/* Breadcrumbs */}
@@ -133,29 +127,21 @@ export function Header() {
       {/* Right Section */}
       <div className="admin-header-actions">
         {/* Search */}
-        <div
+        <button
+          type="button"
+          onClick={() => setCommandPaletteOpen(true)}
           className={cn(
             'admin-header-search cursor-pointer',
-            searchFocused && 'ring-2 ring-primary/50',
+            'flex items-center gap-2 transition-all',
+            'hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary/50',
           )}
-          onClick={handleSearchClick}
         >
           <Search className="h-4 w-4 text-muted-foreground" />
-          <Input
-            type="text"
-            placeholder="Ara... (⌘K)"
-            className="border-0 bg-transparent p-0 h-auto focus-visible:ring-0 w-40 text-sm cursor-pointer"
-            onFocus={() => {
-              setSearchFocused(true);
-              setCommandPaletteOpen(true);
-            }}
-            onBlur={() => setSearchFocused(false)}
-            readOnly
-          />
+          <span className="text-sm text-muted-foreground">Ara... (⌘K)</span>
           <kbd className="hidden sm:inline-flex items-center gap-1 rounded border bg-muted px-1.5 text-[10px] font-medium text-muted-foreground">
             <Command className="h-3 w-3" />K
           </kbd>
-        </div>
+        </button>
 
         {/* Help */}
         <Button variant="ghost" size="icon" className="h-9 w-9">
@@ -274,10 +260,6 @@ export function Header() {
               </p>
             </div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push('/settings/profile')}>
-              <User className="mr-2 h-4 w-4" />
-              Profil
-            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => router.push('/settings')}>
               <Settings className="mr-2 h-4 w-4" />
               Ayarlar
