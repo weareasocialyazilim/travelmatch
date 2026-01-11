@@ -60,7 +60,7 @@ export default function DashboardError({ error, reset }: ErrorProps) {
               Tekrar Dene
             </Button>
             <Button
-              variant="outline"
+              variant="default"
               onClick={() => (window.location.href = '/queue')}
               className="flex-1"
             >

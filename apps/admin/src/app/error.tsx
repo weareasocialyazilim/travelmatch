@@ -55,7 +55,7 @@ export default function Error({ error, reset }: ErrorProps) {
               Tekrar Dene
             </Button>
             <Button
-              variant="outline"
+              variant="default"
               onClick={() => (window.location.href = '/queue')}
               className="flex-1"
             >

@@ -216,16 +216,20 @@ export default function UsersPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={fetchUsers} disabled={loading}>
+          <CanvaButton
+            variant="primary"
+            onClick={fetchUsers}
+            disabled={loading}
+          >
             <RefreshCw
               className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`}
             />
             Yenile
-          </Button>
-          <Button>
+          </CanvaButton>
+          <CanvaButton>
             <Download className="mr-2 h-4 w-4" />
             Dışa Aktar
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
@@ -386,14 +390,14 @@ export default function UsersPage() {
                   <div className="text-sm text-muted-foreground truncate">
                     {user.email}
                   </div>
-                  <Badge variant={statusConfig[status].variant}>
+                  <CanvaBadge variant={statusConfig[status].variant}>
                     {statusConfig[status].label}
-                  </Badge>
-                  <Badge
+                  </CanvaBadge>
+                  <CanvaBadge
                     variant={kycStatusConfig[kycStatus]?.variant || 'secondary'}
                   >
                     {kycStatusConfig[kycStatus]?.label || kycStatus}
-                  </Badge>
+                  </CanvaBadge>
                   <div className="text-sm font-medium">
                     {formatCurrency(user.balance || 0)}
                   </div>
@@ -403,9 +407,9 @@ export default function UsersPage() {
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
+                      <CanvaButton variant="ghost" size="sm" iconOnly>
                         <MoreHorizontal className="h-4 w-4" />
-                      </Button>
+                      </CanvaButton>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>İşlemler</DropdownMenuLabel>
@@ -450,22 +454,22 @@ export default function UsersPage() {
                 {total} kullanıcı
               </p>
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
+                <CanvaButton
+                  variant="default"
                   size="sm"
                   onClick={() => setPage((p) => p - 1)}
                   disabled={page === 0}
                 >
                   Önceki
-                </Button>
-                <Button
-                  variant="outline"
+                </CanvaButton>
+                <CanvaButton
+                  variant="default"
                   size="sm"
                   onClick={() => setPage((p) => p + 1)}
                   disabled={(page + 1) * limit >= total}
                 >
                   Sonraki
-                </Button>
+                </CanvaButton>
               </div>
             </div>
           )}

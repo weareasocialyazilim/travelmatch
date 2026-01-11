@@ -106,7 +106,8 @@ const healthIcons = {
 
 export default function DashboardPage() {
   // Real-time dashboard data
-  const { data, isLoading, error, refresh, isFetching } = useRealtimeDashboard();
+  const { data, isLoading, error, refresh, isFetching } =
+    useRealtimeDashboard();
 
   // Get status icon
   const getStatusIcon = (status: string) => {
@@ -145,7 +146,9 @@ export default function DashboardPage() {
             <AlertTriangle className="h-8 w-8 text-red-500" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Bağlantı Hatası</h2>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Bağlantı Hatası
+            </h2>
             <p className="text-gray-500 mt-1">
               Dashboard verileri yüklenemedi. Lütfen tekrar deneyin.
             </p>
@@ -160,16 +163,18 @@ export default function DashboardPage() {
   }
 
   // Transform chart data for components
-  const userActivityChartData = data?.charts.userActivity.labels.map((label, index) => ({
-    date: label,
-    users: data.charts.userActivity.datasets[0]?.data[index] || 0,
-    moments: data.charts.userActivity.datasets[1]?.data[index] || 0,
-  })) || [];
+  const userActivityChartData =
+    data?.charts.userActivity.labels.map((label, index) => ({
+      date: label,
+      users: data.charts.userActivity.datasets[0]?.data[index] || 0,
+      moments: data.charts.userActivity.datasets[1]?.data[index] || 0,
+    })) || [];
 
-  const revenueChartData = data?.charts.revenue.labels.map((label, index) => ({
-    date: label,
-    revenue: data.charts.revenue.datasets[0]?.data[index] || 0,
-  })) || [];
+  const revenueChartData =
+    data?.charts.revenue.labels.map((label, index) => ({
+      date: label,
+      revenue: data.charts.revenue.datasets[0]?.data[index] || 0,
+    })) || [];
 
   return (
     <div className="space-y-8 pb-8">
@@ -186,16 +191,19 @@ export default function DashboardPage() {
         <div className="flex items-center gap-3">
           {data?.meta.generatedAt && (
             <span className="text-xs text-gray-400">
-              Son güncelleme: {new Date(data.meta.generatedAt).toLocaleTimeString('tr-TR')}
+              Son güncelleme:{' '}
+              {new Date(data.meta.generatedAt).toLocaleTimeString('tr-TR')}
             </span>
           )}
           <CanvaButton
-            variant="outline"
+            variant="default"
             size="sm"
             onClick={refresh}
             disabled={isFetching}
           >
-            <RefreshCw className={cn('h-4 w-4', isFetching && 'animate-spin')} />
+            <RefreshCw
+              className={cn('h-4 w-4', isFetching && 'animate-spin')}
+            />
             Yenile
           </CanvaButton>
         </div>
@@ -206,7 +214,11 @@ export default function DashboardPage() {
         {/* Total Users */}
         <CanvaStatCard
           label="Toplam Kullanıcı"
-          value={isLoading ? '...' : (data?.metrics.totalUsers || 0).toLocaleString('tr-TR')}
+          value={
+            isLoading
+              ? '...'
+              : (data?.metrics.totalUsers || 0).toLocaleString('tr-TR')
+          }
           icon={<Users className="h-5 w-5" />}
           change={
             data?.metrics.userGrowth
@@ -218,7 +230,11 @@ export default function DashboardPage() {
         {/* Active Users */}
         <CanvaStatCard
           label="Aktif Kullanıcı (24s)"
-          value={isLoading ? '...' : (data?.metrics.activeUsers24h || 0).toLocaleString('tr-TR')}
+          value={
+            isLoading
+              ? '...'
+              : (data?.metrics.activeUsers24h || 0).toLocaleString('tr-TR')
+          }
           icon={<Activity className="h-5 w-5" />}
           change={
             data?.metrics.engagementRate
@@ -230,7 +246,11 @@ export default function DashboardPage() {
         {/* Total Revenue */}
         <CanvaStatCard
           label="Toplam Gelir"
-          value={isLoading ? '...' : formatCurrency(data?.metrics.totalRevenue || 0, 'TRY')}
+          value={
+            isLoading
+              ? '...'
+              : formatCurrency(data?.metrics.totalRevenue || 0, 'TRY')
+          }
           icon={<DollarSign className="h-5 w-5" />}
           change={{ value: 12.5, label: 'bu ay' }}
         />
@@ -238,7 +258,11 @@ export default function DashboardPage() {
         {/* Total Moments */}
         <CanvaStatCard
           label="Toplam Moment"
-          value={isLoading ? '...' : (data?.metrics.totalMoments || 0).toLocaleString('tr-TR')}
+          value={
+            isLoading
+              ? '...'
+              : (data?.metrics.totalMoments || 0).toLocaleString('tr-TR')
+          }
           icon={<Camera className="h-5 w-5" />}
           change={{ value: 8.3, label: 'bu hafta' }}
         />
@@ -288,7 +312,10 @@ export default function DashboardPage() {
                       color: CHART_COLORS.trust,
                     },
                   ]}
-                  formatter={(value, name) => [value.toLocaleString('tr-TR'), name]}
+                  formatter={(value, name) => [
+                    value.toLocaleString('tr-TR'),
+                    name,
+                  ]}
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center h-[280px] text-gray-400">
@@ -335,7 +362,10 @@ export default function DashboardPage() {
                     },
                   ]}
                   yAxisFormatter={(value) => `₺${(value / 1000).toFixed(0)}K`}
-                  formatter={(value, name) => [formatCurrency(value, 'TRY'), name]}
+                  formatter={(value, name) => [
+                    formatCurrency(value, 'TRY'),
+                    name,
+                  ]}
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center h-[250px] text-gray-400">
@@ -374,18 +404,24 @@ export default function DashboardPage() {
                       key={task.id}
                       className={cn(
                         'flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors',
-                        task.priority === 'urgent' && 'border-l-4 border-l-red-500',
-                        task.priority === 'high' && 'border-l-4 border-l-amber-500'
+                        task.priority === 'urgent' &&
+                          'border-l-4 border-l-red-500',
+                        task.priority === 'high' &&
+                          'border-l-4 border-l-amber-500',
                       )}
                     >
                       <div className="flex items-center gap-3">
                         <div
                           className={cn(
                             'flex h-9 w-9 items-center justify-center rounded-xl',
-                            task.priority === 'urgent' && 'bg-red-50 text-red-600',
-                            task.priority === 'high' && 'bg-amber-50 text-amber-600',
-                            task.priority === 'medium' && 'bg-blue-50 text-blue-600',
-                            task.priority === 'low' && 'bg-gray-100 text-gray-600'
+                            task.priority === 'urgent' &&
+                              'bg-red-50 text-red-600',
+                            task.priority === 'high' &&
+                              'bg-amber-50 text-amber-600',
+                            task.priority === 'medium' &&
+                              'bg-blue-50 text-blue-600',
+                            task.priority === 'low' &&
+                              'bg-gray-100 text-gray-600',
                           )}
                         >
                           <AlertTriangle className="h-4 w-4" />
@@ -395,7 +431,9 @@ export default function DashboardPage() {
                             {task.title}
                           </p>
                           <p className="text-xs text-gray-500">
-                            {new Date(task.created_at).toLocaleDateString('tr-TR')}
+                            {new Date(task.created_at).toLocaleDateString(
+                              'tr-TR',
+                            )}
                           </p>
                         </div>
                       </div>
@@ -404,16 +442,16 @@ export default function DashboardPage() {
                           task.priority === 'urgent'
                             ? 'error'
                             : task.priority === 'high'
-                            ? 'warning'
-                            : 'default'
+                              ? 'warning'
+                              : 'primary'
                         }
                         size="sm"
                       >
                         {task.priority === 'urgent'
                           ? 'Acil'
                           : task.priority === 'high'
-                          ? 'Yüksek'
-                          : 'Normal'}
+                            ? 'Yüksek'
+                            : 'Normal'}
                       </CanvaBadge>
                     </div>
                   ))}
@@ -421,7 +459,9 @@ export default function DashboardPage() {
               ) : (
                 <div className="flex flex-col items-center justify-center py-8 text-gray-400">
                   <CheckCircle2 className="h-12 w-12 mb-3 text-emerald-500" />
-                  <p className="text-gray-600 font-medium">Tüm görevler tamamlandı!</p>
+                  <p className="text-gray-600 font-medium">
+                    Tüm görevler tamamlandı!
+                  </p>
                   <p className="text-sm">Bekleyen görev yok</p>
                 </div>
               )}
@@ -464,17 +504,29 @@ export default function DashboardPage() {
                   {/* Individual Services */}
                   <div className="space-y-3">
                     {Object.entries(data?.systemHealth || {})
-                      .filter(([key]) => ['database', 'api', 'payments', 'storage'].includes(key))
+                      .filter(([key]) =>
+                        ['database', 'api', 'payments', 'storage'].includes(
+                          key,
+                        ),
+                      )
                       .map(([key, value]) => {
-                        const Icon = healthIcons[key as keyof typeof healthIcons] || Server;
-                        const status = typeof value === 'string' ? value : 'unknown';
+                        const Icon =
+                          healthIcons[key as keyof typeof healthIcons] ||
+                          Server;
+                        const status =
+                          typeof value === 'string' ? value : 'unknown';
                         return (
-                          <div key={key} className="flex items-center justify-between">
+                          <div
+                            key={key}
+                            className="flex items-center justify-between"
+                          >
                             <div className="flex items-center gap-3">
-                              <div className={cn(
-                                'w-2 h-2 rounded-full',
-                                getStatusColor(status)
-                              )} />
+                              <div
+                                className={cn(
+                                  'w-2 h-2 rounded-full',
+                                  getStatusColor(status),
+                                )}
+                              />
                               <Icon className="h-4 w-4 text-gray-400" />
                               <span className="text-sm font-medium text-gray-700 capitalize">
                                 {key}
@@ -519,13 +571,19 @@ export default function DashboardPage() {
               ) : (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">Aktif Bağlantılar</span>
+                    <span className="text-sm text-gray-500">
+                      Aktif Bağlantılar
+                    </span>
                     <span className="text-sm font-semibold text-gray-900">
-                      {(data?.systemHealth.activeConnections || 0).toLocaleString('tr-TR')}
+                      {(
+                        data?.systemHealth.activeConnections || 0
+                      ).toLocaleString('tr-TR')}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">Etkileşim Oranı</span>
+                    <span className="text-sm text-gray-500">
+                      Etkileşim Oranı
+                    </span>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-semibold text-gray-900">
                         {data?.metrics.engagementRate || 0}%
@@ -538,7 +596,9 @@ export default function DashboardPage() {
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">Bekleyen Görevler</span>
+                    <span className="text-sm text-gray-500">
+                      Bekleyen Görevler
+                    </span>
                     <CanvaBadge
                       variant={
                         (data?.metrics.pendingTasks || 0) > 10
@@ -561,15 +621,12 @@ export default function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-4">
         {quickLinks.map((link) => (
           <Link key={link.href} href={link.href}>
-            <CanvaCard
-              interactive
-              className="group h-full"
-            >
+            <CanvaCard interactive className="group h-full">
               <div className="p-5 flex items-center gap-4">
                 <div
                   className={cn(
                     'flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br text-white shrink-0',
-                    link.gradient
+                    link.gradient,
                   )}
                 >
                   <link.icon className="h-6 w-6" />

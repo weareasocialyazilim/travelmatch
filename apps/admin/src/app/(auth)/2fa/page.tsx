@@ -127,20 +127,20 @@ export default function TwoFactorPage() {
               ))}
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <CanvaButton type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Doğrula
-            </Button>
+            </CanvaButton>
           </form>
 
           <div className="mt-6 text-center">
-            <Button
+            <CanvaButton
               variant="link"
               className="text-muted-foreground"
               onClick={() => router.push('/login')}
             >
               Farklı bir hesapla giriş yap
-            </Button>
+            </CanvaButton>
           </div>
         </CardContent>
       </Card>

@@ -161,12 +161,12 @@ export default function DisputesPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Badge variant="error" className="h-8 px-3 text-sm">
+          <CanvaBadge variant="error" className="h-8 px-3 text-sm">
             {pendingCount} açık
-          </Badge>
-          <Badge variant="warning" className="h-8 px-3 text-sm">
+          </CanvaBadge>
+          <CanvaBadge variant="warning" className="h-8 px-3 text-sm">
             {underReviewCount} inceleniyor
-          </Badge>
+          </CanvaBadge>
         </div>
       </div>
 
@@ -319,9 +319,9 @@ export default function DisputesPage() {
                           <span className={`font-medium ${typeInfo.color}`}>
                             {typeInfo.label}
                           </span>
-                          <Badge variant={statusInfo.variant}>
+                          <CanvaBadge variant={statusInfo.variant}>
                             {statusInfo.label}
-                          </Badge>
+                          </CanvaBadge>
                         </div>
                         <p className="mb-2 text-sm text-muted-foreground line-clamp-1">
                           {dispute.description || dispute.reason}
@@ -366,17 +366,17 @@ export default function DisputesPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button size="sm" variant="outline">
+                      <CanvaButton size="sm" variant="primary">
                         <Eye className="mr-1 h-4 w-4" />
                         İncele
-                      </Button>
+                      </CanvaButton>
                       {(dispute.status === 'pending' ||
                         dispute.status === 'under_review') && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button size="sm" variant="ghost">
+                            <CanvaButton size="sm" variant="ghost">
                               <MoreHorizontal className="h-4 w-4" />
-                            </Button>
+                            </CanvaButton>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>İşlemler</DropdownMenuLabel>

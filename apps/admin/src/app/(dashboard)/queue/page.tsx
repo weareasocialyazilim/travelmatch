@@ -44,10 +44,17 @@ const priorityConfig = {
   low: { label: 'Düşük', variant: 'success' as const },
 };
 
-const typeConfig: Record<string, { icon: typeof Users; label: string; href: string }> = {
+const typeConfig: Record<
+  string,
+  { icon: typeof Users; label: string; href: string }
+> = {
   kyc_verification: { icon: Users, label: 'KYC', href: '/users' },
   payout_approval: { icon: DollarSign, label: 'Ödeme', href: '/finance' },
-  dispute_review: { icon: AlertTriangle, label: 'Anlaşmazlık', href: '/disputes' },
+  dispute_review: {
+    icon: AlertTriangle,
+    label: 'Anlaşmazlık',
+    href: '/disputes',
+  },
   content_moderation: { icon: Image, label: 'İçerik', href: '/moments' },
   report_review: { icon: AlertCircle, label: 'Şikayet', href: '/disputes' },
   general: { icon: ListTodo, label: 'Genel', href: '/queue' },
@@ -76,7 +83,9 @@ export default function QueuePage() {
             <AlertTriangle className="h-8 w-8 text-red-500" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Veri Yüklenemedi</h2>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Veri Yüklenemedi
+            </h2>
             <p className="text-gray-500 mt-1">Görev listesi alınamadı.</p>
           </div>
           <CanvaButton variant="primary" onClick={() => refetch()}>
@@ -101,7 +110,7 @@ export default function QueuePage() {
           </p>
         </div>
         <CanvaButton
-          variant="outline"
+          variant="default"
           onClick={() => refetch()}
           disabled={isFetching}
         >
@@ -215,8 +224,12 @@ export default function QueuePage() {
               ) : tasks.length > 0 ? (
                 <div className="divide-y divide-gray-100">
                   {tasks.map((task) => {
-                    const typeInfo = typeConfig[task.type] || typeConfig.general;
-                    const priorityInfo = priorityConfig[task.priority as keyof typeof priorityConfig] || priorityConfig.medium;
+                    const typeInfo =
+                      typeConfig[task.type] || typeConfig.general;
+                    const priorityInfo =
+                      priorityConfig[
+                        task.priority as keyof typeof priorityConfig
+                      ] || priorityConfig.medium;
                     const TypeIcon = typeInfo.icon;
 
                     return (
@@ -224,26 +237,37 @@ export default function QueuePage() {
                         key={task.id}
                         className={cn(
                           'flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors',
-                          task.priority === 'urgent' && 'border-l-4 border-l-red-500',
-                          task.priority === 'high' && 'border-l-4 border-l-amber-500'
+                          task.priority === 'urgent' &&
+                            'border-l-4 border-l-red-500',
+                          task.priority === 'high' &&
+                            'border-l-4 border-l-amber-500',
                         )}
                       >
                         <div className="flex items-center gap-4">
                           <div
                             className={cn(
                               'flex h-10 w-10 items-center justify-center rounded-xl',
-                              task.priority === 'urgent' && 'bg-red-50 text-red-600',
-                              task.priority === 'high' && 'bg-amber-50 text-amber-600',
-                              task.priority === 'medium' && 'bg-blue-50 text-blue-600',
-                              task.priority === 'low' && 'bg-gray-100 text-gray-600'
+                              task.priority === 'urgent' &&
+                                'bg-red-50 text-red-600',
+                              task.priority === 'high' &&
+                                'bg-amber-50 text-amber-600',
+                              task.priority === 'medium' &&
+                                'bg-blue-50 text-blue-600',
+                              task.priority === 'low' &&
+                                'bg-gray-100 text-gray-600',
                             )}
                           >
                             <TypeIcon className="h-5 w-5" />
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <h4 className="font-medium text-gray-900">{task.title}</h4>
-                              <CanvaBadge variant={priorityInfo.variant} size="sm">
+                              <h4 className="font-medium text-gray-900">
+                                {task.title}
+                              </h4>
+                              <CanvaBadge
+                                variant={priorityInfo.variant}
+                                size="sm"
+                              >
                                 {priorityInfo.label}
                               </CanvaBadge>
                               <CanvaBadge variant="default" size="sm">
@@ -258,7 +282,10 @@ export default function QueuePage() {
                             <p className="text-xs text-gray-400 mt-1">
                               {formatRelativeDate(task.created_at)}
                               {task.assignee && (
-                                <span> • Atanan: {task.assignee.full_name}</span>
+                                <span>
+                                  {' '}
+                                  • Atanan: {task.assignee.full_name}
+                                </span>
                               )}
                             </p>
                           </div>
@@ -276,7 +303,7 @@ export default function QueuePage() {
                             </CanvaButton>
                           )}
                           <Link href={`${typeInfo.href}/${task.id}`}>
-                            <CanvaButton variant="outline" size="sm">
+                            <CanvaButton variant="primary" size="sm">
                               Detay
                               <ArrowRight className="h-4 w-4" />
                             </CanvaButton>
@@ -289,7 +316,9 @@ export default function QueuePage() {
               ) : (
                 <div className="py-12 text-center">
                   <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-500" />
-                  <h3 className="mt-4 text-lg font-semibold text-gray-900">Tebrikler!</h3>
+                  <h3 className="mt-4 text-lg font-semibold text-gray-900">
+                    Tebrikler!
+                  </h3>
                   <p className="text-gray-500">
                     Tüm görevler tamamlandı. Şimdilik yapılacak bir şey yok.
                   </p>
@@ -305,9 +334,10 @@ export default function QueuePage() {
               ) : (
                 <div className="divide-y divide-gray-100">
                   {tasks
-                    .filter(t => t.priority === 'urgent')
+                    .filter((t) => t.priority === 'urgent')
                     .map((task) => {
-                      const typeInfo = typeConfig[task.type] || typeConfig.general;
+                      const typeInfo =
+                        typeConfig[task.type] || typeConfig.general;
                       const TypeIcon = typeInfo.icon;
 
                       return (
@@ -320,7 +350,9 @@ export default function QueuePage() {
                               <TypeIcon className="h-5 w-5" />
                             </div>
                             <div>
-                              <h4 className="font-medium text-gray-900">{task.title}</h4>
+                              <h4 className="font-medium text-gray-900">
+                                {task.title}
+                              </h4>
                               <p className="text-xs text-gray-400">
                                 {formatRelativeDate(task.created_at)}
                               </p>
@@ -333,10 +365,13 @@ export default function QueuePage() {
                         </div>
                       );
                     })}
-                  {tasks.filter(t => t.priority === 'urgent').length === 0 && (
+                  {tasks.filter((t) => t.priority === 'urgent').length ===
+                    0 && (
                     <div className="py-12 text-center">
                       <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-500" />
-                      <p className="mt-4 text-gray-500">Acil görev bulunmuyor.</p>
+                      <p className="mt-4 text-gray-500">
+                        Acil görev bulunmuyor.
+                      </p>
                     </div>
                   )}
                 </div>
@@ -351,10 +386,14 @@ export default function QueuePage() {
               ) : (
                 <div className="divide-y divide-gray-100">
                   {tasks
-                    .filter(t => t.status === 'pending')
+                    .filter((t) => t.status === 'pending')
                     .map((task) => {
-                      const typeInfo = typeConfig[task.type] || typeConfig.general;
-                      const priorityInfo = priorityConfig[task.priority as keyof typeof priorityConfig] || priorityConfig.medium;
+                      const typeInfo =
+                        typeConfig[task.type] || typeConfig.general;
+                      const priorityInfo =
+                        priorityConfig[
+                          task.priority as keyof typeof priorityConfig
+                        ] || priorityConfig.medium;
                       const TypeIcon = typeInfo.icon;
 
                       return (
@@ -368,8 +407,13 @@ export default function QueuePage() {
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
-                                <h4 className="font-medium text-gray-900">{task.title}</h4>
-                                <CanvaBadge variant={priorityInfo.variant} size="sm">
+                                <h4 className="font-medium text-gray-900">
+                                  {task.title}
+                                </h4>
+                                <CanvaBadge
+                                  variant={priorityInfo.variant}
+                                  size="sm"
+                                >
                                   {priorityInfo.label}
                                 </CanvaBadge>
                               </div>
@@ -389,10 +433,12 @@ export default function QueuePage() {
                         </div>
                       );
                     })}
-                  {tasks.filter(t => t.status === 'pending').length === 0 && (
+                  {tasks.filter((t) => t.status === 'pending').length === 0 && (
                     <div className="py-12 text-center">
                       <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-500" />
-                      <p className="mt-4 text-gray-500">Bekleyen görev bulunmuyor.</p>
+                      <p className="mt-4 text-gray-500">
+                        Bekleyen görev bulunmuyor.
+                      </p>
                     </div>
                   )}
                 </div>

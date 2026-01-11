@@ -180,15 +180,15 @@ export default function TeamPage() {
   const getRoleBadge = (role: string) => {
     switch (role) {
       case 'manager':
-        return <Badge className="bg-purple-500">Yönetici</Badge>;
+        return <CanvaBadge className="bg-purple-500">Yönetici</CanvaBadge>;
       case 'moderator':
-        return <Badge className="bg-blue-500">Moderatör</Badge>;
+        return <CanvaBadge className="bg-blue-500">Moderatör</CanvaBadge>;
       case 'support':
-        return <Badge className="bg-green-500">Destek</Badge>;
+        return <CanvaBadge className="bg-green-500">Destek</CanvaBadge>;
       case 'finance':
-        return <Badge className="bg-emerald-500">Finans</Badge>;
+        return <CanvaBadge className="bg-emerald-500">Finans</CanvaBadge>;
       default:
-        return <Badge variant="outline">{role}</Badge>;
+        return <CanvaBadge variant="default">{role}</CanvaBadge>;
     }
   };
 
@@ -206,10 +206,10 @@ export default function TeamPage() {
             Ekip yönetimi ve performans takibi
           </p>
         </div>
-        <Button>
+        <CanvaButton>
           <Calendar className="mr-2 h-4 w-4" />
           Vardiya Planla
-        </Button>
+        </CanvaButton>
       </div>
 
       {/* Stats */}
@@ -369,14 +369,14 @@ export default function TeamPage() {
                   </div>
 
                   <div className="mt-4 flex gap-2">
-                    <Button size="sm" variant="outline" className="flex-1">
+                    <CanvaButton size="sm" variant="primary" className="flex-1">
                       <MessageSquare className="mr-2 h-4 w-4" />
                       Mesaj
-                    </Button>
-                    <Button size="sm" variant="outline" className="flex-1">
+                    </CanvaButton>
+                    <CanvaButton size="sm" variant="primary" className="flex-1">
                       <BarChart3 className="mr-2 h-4 w-4" />
                       İstatistik
-                    </Button>
+                    </CanvaButton>
                   </div>
                 </CardContent>
               </Card>

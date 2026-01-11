@@ -46,7 +46,11 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { formatRelativeDate, getInitials, cn } from '@/lib/utils';
-import { useSupport, useUpdateTicket, type SupportTicket } from '@/hooks/use-support';
+import {
+  useSupport,
+  useUpdateTicket,
+  type SupportTicket,
+} from '@/hooks/use-support';
 import { toast } from 'sonner';
 
 // Fallback mock ticket data
@@ -208,7 +212,7 @@ export default function SupportPage() {
   // Use API data if available, otherwise fall back to mock data
   const tickets = useMemo(() => {
     if (data?.tickets && data.tickets.length > 0) {
-      return data.tickets.map(ticket => ({
+      return data.tickets.map((ticket) => ({
         id: ticket.id,
         subject: ticket.subject,
         user: {
@@ -232,7 +236,9 @@ export default function SupportPage() {
   const cannedResponses = data?.cannedResponses || mockCannedResponses;
   const stats = data?.stats || { open: 0, pending: 0, resolved: 0, total: 0 };
 
-  const [selectedTicket, setSelectedTicket] = useState<(typeof mockTickets)[0] | null>(null);
+  const [selectedTicket, setSelectedTicket] = useState<
+    (typeof mockTickets)[0] | null
+  >(null);
 
   // Set initial selected ticket when data loads
   useMemo(() => {
@@ -241,8 +247,10 @@ export default function SupportPage() {
     }
   }, [tickets, selectedTicket]);
 
-  const openTickets = stats.open || tickets.filter((t) => t.status === 'open').length;
-  const pendingTickets = stats.pending || tickets.filter((t) => t.status === 'pending').length;
+  const openTickets =
+    stats.open || tickets.filter((t) => t.status === 'open').length;
+  const pendingTickets =
+    stats.pending || tickets.filter((t) => t.status === 'pending').length;
 
   const filteredTickets = tickets.filter((ticket) => {
     const matchesSearch =
@@ -272,7 +280,7 @@ export default function SupportPage() {
         onError: () => {
           toast.error('İşlem başarısız oldu');
         },
-      }
+      },
     );
   };
 
@@ -312,7 +320,11 @@ export default function SupportPage() {
         <p className="text-gray-500 max-w-md">
           Destek talepleri yüklenemedi. Lütfen tekrar deneyin.
         </p>
-        <CanvaButton variant="outline" onClick={() => refetch()} leftIcon={<RefreshCw className="h-4 w-4" />}>
+        <CanvaButton
+          variant="primary"
+          onClick={() => refetch()}
+          leftIcon={<RefreshCw className="h-4 w-4" />}
+        >
           Tekrar Dene
         </CanvaButton>
       </div>
@@ -333,7 +345,13 @@ export default function SupportPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <CanvaButton variant="outline" size="sm" onClick={() => refetch()} loading={isLoading} leftIcon={<RefreshCw className="h-4 w-4" />}>
+          <CanvaButton
+            variant="primary"
+            size="sm"
+            onClick={() => refetch()}
+            loading={isLoading}
+            leftIcon={<RefreshCw className="h-4 w-4" />}
+          >
             Yenile
           </CanvaButton>
           <CanvaBadge variant="error" size="lg">
@@ -433,7 +451,17 @@ export default function SupportPage() {
                           </p>
                         </div>
                       </div>
-                      <CanvaBadge variant={statusInfo.variant === 'error' ? 'error' : statusInfo.variant === 'warning' ? 'warning' : 'success'} size="sm" icon={<StatusIcon className="h-3 w-3" />}>
+                      <CanvaBadge
+                        variant={
+                          statusInfo.variant === 'error'
+                            ? 'error'
+                            : statusInfo.variant === 'warning'
+                              ? 'warning'
+                              : 'success'
+                        }
+                        size="sm"
+                        icon={<StatusIcon className="h-3 w-3" />}
+                      >
                         {statusInfo.label}
                       </CanvaBadge>
                     </div>
@@ -458,32 +486,66 @@ export default function SupportPage() {
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <CanvaCardTitle>
-                        {selectedTicket.subject}
-                      </CanvaCardTitle>
+                      <CanvaCardTitle>{selectedTicket.subject}</CanvaCardTitle>
                       <CanvaBadge
                         variant={
-                          statusConfig[selectedTicket.status as keyof typeof statusConfig].variant === 'error' ? 'error' :
-                          statusConfig[selectedTicket.status as keyof typeof statusConfig].variant === 'warning' ? 'warning' : 'success'
+                          statusConfig[
+                            selectedTicket.status as keyof typeof statusConfig
+                          ].variant === 'error'
+                            ? 'error'
+                            : statusConfig[
+                                  selectedTicket.status as keyof typeof statusConfig
+                                ].variant === 'warning'
+                              ? 'warning'
+                              : 'success'
                         }
                       >
-                        {statusConfig[selectedTicket.status as keyof typeof statusConfig].label}
+                        {
+                          statusConfig[
+                            selectedTicket.status as keyof typeof statusConfig
+                          ].label
+                        }
                       </CanvaBadge>
                     </div>
                     <CanvaCardSubtitle>
                       {selectedTicket.id} •{' '}
-                      {categoryConfig[selectedTicket.category as keyof typeof categoryConfig]}{' '}
+                      {
+                        categoryConfig[
+                          selectedTicket.category as keyof typeof categoryConfig
+                        ]
+                      }{' '}
                       •{' '}
-                      <span className={priorityConfig[selectedTicket.priority as keyof typeof priorityConfig].color}>
-                        {priorityConfig[selectedTicket.priority as keyof typeof priorityConfig].label} öncelik
+                      <span
+                        className={
+                          priorityConfig[
+                            selectedTicket.priority as keyof typeof priorityConfig
+                          ].color
+                        }
+                      >
+                        {
+                          priorityConfig[
+                            selectedTicket.priority as keyof typeof priorityConfig
+                          ].label
+                        }{' '}
+                        öncelik
                       </span>
                     </CanvaCardSubtitle>
                   </div>
                   <div className="flex gap-2">
-                    <CanvaButton size="sm" variant="outline" leftIcon={<Archive className="h-4 w-4" />}>
+                    <CanvaButton
+                      size="sm"
+                      variant="primary"
+                      leftIcon={<Archive className="h-4 w-4" />}
+                    >
                       Arşivle
                     </CanvaButton>
-                    <CanvaButton size="sm" variant="success" onClick={handleResolveTicket} loading={updateTicket.isPending} leftIcon={<CheckCircle className="h-4 w-4" />}>
+                    <CanvaButton
+                      size="sm"
+                      variant="success"
+                      onClick={handleResolveTicket}
+                      loading={updateTicket.isPending}
+                      leftIcon={<CheckCircle className="h-4 w-4" />}
+                    >
                       Çözüldü
                     </CanvaButton>
                   </div>
@@ -552,7 +614,10 @@ export default function SupportPage() {
                           >
                             {message.sender === 'admin' && (
                               <span>
-                                {(message as { admin_name?: string }).admin_name}
+                                {
+                                  (message as { admin_name?: string })
+                                    .admin_name
+                                }
                               </span>
                             )}
                             <span>
@@ -575,7 +640,7 @@ export default function SupportPage() {
                       <CanvaButton
                         key={response.id}
                         size="xs"
-                        variant="outline"
+                        variant="default"
                         className="shrink-0"
                         onClick={() => setReplyText(response.content)}
                       >
@@ -599,7 +664,11 @@ export default function SupportPage() {
                     <CanvaButton size="md" variant="ghost" iconOnly>
                       <Paperclip className="h-4 w-4" />
                     </CanvaButton>
-                    <CanvaButton variant="primary" onClick={handleSendReply} leftIcon={<Send className="h-4 w-4" />}>
+                    <CanvaButton
+                      variant="primary"
+                      onClick={handleSendReply}
+                      leftIcon={<Send className="h-4 w-4" />}
+                    >
                       Gönder
                     </CanvaButton>
                   </div>
@@ -610,7 +679,9 @@ export default function SupportPage() {
             <div className="flex h-full items-center justify-center p-8 text-center">
               <div>
                 <MessageSquare className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-4 text-lg font-semibold text-gray-900">Talep Seçin</h3>
+                <h3 className="mt-4 text-lg font-semibold text-gray-900">
+                  Talep Seçin
+                </h3>
                 <p className="text-gray-500">
                   Detayları görüntülemek için bir talep seçin
                 </p>

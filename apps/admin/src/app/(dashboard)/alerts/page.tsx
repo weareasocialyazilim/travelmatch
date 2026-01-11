@@ -228,9 +228,11 @@ export default function AlertsPage() {
       low: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
     };
     return (
-      <Badge className={styles[severity as keyof typeof styles] || styles.low}>
+      <CanvaBadge
+        className={styles[severity as keyof typeof styles] || styles.low}
+      >
         {severity.toUpperCase()}
-      </Badge>
+      </CanvaBadge>
     );
   };
 
@@ -274,7 +276,7 @@ export default function AlertsPage() {
         </div>
         <div className="flex items-center gap-3">
           <CanvaButton
-            variant="outline"
+            variant="default"
             size="sm"
             onClick={() => setSoundEnabled(!soundEnabled)}
           >
@@ -287,7 +289,7 @@ export default function AlertsPage() {
           </CanvaButton>
           <Dialog>
             <DialogTrigger asChild>
-              <CanvaButton variant="outline" size="sm">
+              <CanvaButton variant="primary" size="sm">
                 <Settings className="h-4 w-4 mr-2" />
                 Kuralları Yönet
               </CanvaButton>
@@ -470,10 +472,10 @@ export default function AlertsPage() {
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold">{alert.title}</h3>
                           {getSeverityBadge(alert.severity)}
-                          <Badge variant="outline" className="text-xs">
+                          <CanvaBadge variant="default" className="text-xs">
                             {getCategoryIcon(alert.category)}
                             <span className="ml-1">{alert.category}</span>
-                          </Badge>
+                          </CanvaBadge>
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">
                           {alert.description}
@@ -495,7 +497,7 @@ export default function AlertsPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <CanvaButton variant="outline" size="sm">
+                      <CanvaButton variant="primary" size="sm">
                         <Eye className="h-4 w-4 mr-1" />
                         Onayla
                       </CanvaButton>

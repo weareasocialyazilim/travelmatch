@@ -171,7 +171,7 @@ export default function AnalyticsPage() {
               <SelectItem value="90d">Son 90 gün</SelectItem>
             </SelectContent>
           </Select>
-          <CanvaButton variant="outline">
+          <CanvaButton variant="primary">
             <Download className="mr-2 h-4 w-4" />
             Rapor İndir
           </CanvaButton>

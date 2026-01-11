@@ -229,9 +229,9 @@ export default function NotificationsPage() {
   const getStatusBadge = (status: string) => {
     const variants: Record<
       string,
-      { variant: 'default' | 'secondary' | 'outline'; label: string }
+      { variant: 'primary' | 'secondary' | 'outline'; label: string }
     > = {
-      sent: { variant: 'default', label: 'Gönderildi' },
+      sent: { variant: 'primary', label: 'Gönderildi' },
       scheduled: { variant: 'secondary', label: 'Zamanlandı' },
       draft: { variant: 'outline', label: 'Taslak' },
       failed: { variant: 'outline', label: 'Başarısız' },
@@ -240,7 +240,7 @@ export default function NotificationsPage() {
       variant: 'outline',
       label: status,
     };
-    return <Badge variant={variant}>{label}</Badge>;
+    return <CanvaBadge variant={variant}>{label}</CanvaBadge>;
   };
 
   // Loading Skeleton
@@ -336,7 +336,7 @@ export default function NotificationsPage() {
                   {mockTemplates.map((template) => (
                     <CanvaButton
                       key={template.id}
-                      variant="outline"
+                      variant="default"
                       size="sm"
                       onClick={() => applyTemplate(template)}
                     >
@@ -464,7 +464,7 @@ export default function NotificationsPage() {
             </div>
 
             <DialogFooter className="gap-2">
-              <CanvaButton variant="outline" onClick={handleSaveDraft}>
+              <CanvaButton variant="primary" onClick={handleSaveDraft}>
                 Taslak Kaydet
               </CanvaButton>
               {scheduleEnabled ? (
@@ -558,7 +558,7 @@ export default function NotificationsPage() {
           </TabsList>
           <div className="flex items-center gap-2">
             <CanvaInput placeholder="Ara..." className="w-64" />
-            <CanvaButton variant="outline" size="sm" iconOnly>
+            <CanvaButton variant="primary" size="sm" iconOnly>
               <Filter className="h-4 w-4" />
             </CanvaButton>
           </div>

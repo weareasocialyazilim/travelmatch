@@ -194,7 +194,7 @@ export default function PromosPage() {
   // Use API data if available, otherwise fall back to mock data
   const promoCodes = useMemo(() => {
     if (data?.promo_codes && data.promo_codes.length > 0) {
-      return data.promo_codes.map(promo => ({
+      return data.promo_codes.map((promo) => ({
         id: promo.id,
         code: promo.code,
         type: promo.discount_type,
@@ -217,9 +217,12 @@ export default function PromosPage() {
   // Stats calculation
   const stats = useMemo(() => {
     const total = promoCodes.length;
-    const active = promoCodes.filter(p => p.status === 'active').length;
+    const active = promoCodes.filter((p) => p.status === 'active').length;
     const totalUsage = promoCodes.reduce((sum, p) => sum + p.usage.current, 0);
-    const totalRevenue = promoCodes.reduce((sum, p) => sum + p.revenue_impact, 0);
+    const totalRevenue = promoCodes.reduce(
+      (sum, p) => sum + p.revenue_impact,
+      0,
+    );
     return {
       totalCodes: total || promoStats.totalCodes,
       activeCodes: active || promoStats.activeCodes,
@@ -249,7 +252,7 @@ export default function PromosPage() {
         onError: (error) => {
           toast.error(error.message || 'Promo oluşturulamadı');
         },
-      }
+      },
     );
   };
 
@@ -277,11 +280,11 @@ export default function PromosPage() {
     const variants: Record<
       string,
       {
-        variant: 'default' | 'secondary' | 'outline' | 'destructive';
+        variant: 'primary' | 'secondary' | 'outline' | 'destructive';
         label: string;
       }
     > = {
-      active: { variant: 'default', label: 'Aktif' },
+      active: { variant: 'primary', label: 'Aktif' },
       scheduled: { variant: 'secondary', label: 'Zamanlandı' },
       expired: { variant: 'outline', label: 'Süresi Doldu' },
       disabled: { variant: 'destructive', label: 'Devre Dışı' },
@@ -290,7 +293,7 @@ export default function PromosPage() {
       variant: 'outline',
       label: status,
     };
-    return <Badge variant={variant}>{label}</Badge>;
+    return <CanvaBadge variant={variant}>{label}</CanvaBadge>;
   };
 
   const copyCode = (code: string) => {
@@ -338,9 +341,14 @@ export default function PromosPage() {
         </div>
         <h2 className="text-xl font-semibold text-gray-900">Bir hata oluştu</h2>
         <p className="text-gray-500 max-w-md">
-          Promosyon verileri yüklenemedi. Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin.
+          Promosyon verileri yüklenemedi. Lütfen sayfayı yenileyin veya daha
+          sonra tekrar deneyin.
         </p>
-        <CanvaButton variant="outline" onClick={() => refetch()} leftIcon={<RefreshCw className="h-4 w-4" />}>
+        <CanvaButton
+          variant="primary"
+          onClick={() => refetch()}
+          leftIcon={<RefreshCw className="h-4 w-4" />}
+        >
           Tekrar Dene
         </CanvaButton>
       </div>
@@ -354,9 +362,17 @@ export default function PromosPage() {
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
           <Gift className="h-6 w-6 text-gray-400" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900">Henüz promosyon yok</h3>
-        <p className="text-sm text-gray-500">İlk promosyon kodunuzu oluşturarak başlayın.</p>
-        <CanvaButton variant="primary" onClick={() => setIsCreatePromoOpen(true)} leftIcon={<Plus className="h-4 w-4" />}>
+        <h3 className="text-lg font-medium text-gray-900">
+          Henüz promosyon yok
+        </h3>
+        <p className="text-sm text-gray-500">
+          İlk promosyon kodunuzu oluşturarak başlayın.
+        </p>
+        <CanvaButton
+          variant="primary"
+          onClick={() => setIsCreatePromoOpen(true)}
+          leftIcon={<Plus className="h-4 w-4" />}
+        >
           Promosyon Oluştur
         </CanvaButton>
       </div>
@@ -379,152 +395,167 @@ export default function PromosPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <CanvaButton variant="outline" onClick={() => refetch()} loading={isLoading} leftIcon={<RefreshCw className="h-4 w-4" />}>
+          <CanvaButton
+            variant="primary"
+            onClick={() => refetch()}
+            loading={isLoading}
+            leftIcon={<RefreshCw className="h-4 w-4" />}
+          >
             Yenile
           </CanvaButton>
-        <Dialog open={isCreatePromoOpen} onOpenChange={setIsCreatePromoOpen}>
-          <DialogTrigger asChild>
-            <CanvaButton variant="primary" leftIcon={<Plus className="h-4 w-4" />}>
-              Yeni Promosyon
-            </CanvaButton>
-          </DialogTrigger>
-          <DialogContent className="max-w-lg">
-            <DialogHeader>
-              <DialogTitle>Yeni Promosyon Kodu</DialogTitle>
-              <DialogDescription>
-                İndirim veya hediye için promosyon kodu oluşturun
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="space-y-4">
-              {/* Code */}
-              <div className="space-y-2">
-                <Label htmlFor="code">Promosyon Kodu</Label>
-                <div className="flex gap-2">
-                  <CanvaInput
-                    id="code"
-                    placeholder="YILBASI30"
-                    className="uppercase"
-                    value={newPromoCode}
-                    onChange={(e) => setNewPromoCode(e.target.value.toUpperCase())}
-                  />
-                  <CanvaButton
-                    variant="outline"
-                    onClick={() => {
-                      const code = generateCode();
-                      setNewPromoCode(code);
-                      toast.info(`Kod oluşturuldu: ${code}`);
-                    }}
-                  >
-                    Oluştur
-                  </CanvaButton>
-                </div>
-              </div>
-
-              {/* Type */}
-              <div className="space-y-2">
-                <Label>İndirim Tipi</Label>
-                <Select value={promoType} onValueChange={setPromoType}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="percentage">
-                      Yüzde İndirim (%)
-                    </SelectItem>
-                    <SelectItem value="fixed">Sabit İndirim (₺)</SelectItem>
-                    <SelectItem value="free_trial">Ücretsiz Deneme</SelectItem>
-                    <SelectItem value="gift">Hediye</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Value */}
-              <div className="space-y-2">
-                <Label htmlFor="value">Değer</Label>
-                <div className="flex items-center gap-2">
-                  <CanvaInput
-                    id="value"
-                    type="number"
-                    placeholder={promoType === 'percentage' ? '30' : '50'}
-                    value={newPromoValue}
-                    onChange={(e) => setNewPromoValue(e.target.value)}
-                  />
-                  <span className="text-gray-500">
-                    {promoType === 'percentage' ? '%' : '₺'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Description */}
-              <CanvaInput
-                label="Açıklama"
-                placeholder="Kampanya açıklaması..."
-                value={newPromoDescription}
-                onChange={(e) => setNewPromoDescription(e.target.value)}
-              />
-
-              {/* Applicable To */}
-              <div className="space-y-2">
-                <Label>Geçerli Olduğu Ürün</Label>
-                <Select value={newPromoApplicableTo} onValueChange={setNewPromoApplicableTo}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seçin" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Tüm Ürünler</SelectItem>
-                    <SelectItem value="premium_subscription">
-                      Premium Abonelik
-                    </SelectItem>
-                    <SelectItem value="boost">Boost</SelectItem>
-                    <SelectItem value="super_like">Super Like</SelectItem>
-                    <SelectItem value="first_purchase">
-                      İlk Satın Alma
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Usage Limit */}
-              <CanvaInput
-                label="Kullanım Limiti (Opsiyonel)"
-                type="number"
-                placeholder="Sınırsız için boş bırakın"
-                value={newPromoLimit}
-                onChange={(e) => setNewPromoLimit(e.target.value)}
-              />
-
-              {/* Date Range */}
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Başlangıç Tarihi</Label>
-                  <Input type="datetime-local" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Bitiş Tarihi</Label>
-                  <Input type="datetime-local" />
-                </div>
-              </div>
-            </div>
-
-            <DialogFooter>
-              <CanvaButton
-                variant="outline"
-                onClick={() => setIsCreatePromoOpen(false)}
-              >
-                İptal
-              </CanvaButton>
+          <Dialog open={isCreatePromoOpen} onOpenChange={setIsCreatePromoOpen}>
+            <DialogTrigger asChild>
               <CanvaButton
                 variant="primary"
-                onClick={handleCreatePromo}
-                disabled={!newPromoCode || !newPromoValue}
-                loading={createPromo.isPending}
+                leftIcon={<Plus className="h-4 w-4" />}
               >
-                Oluştur
+                Yeni Promosyon
               </CanvaButton>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent className="max-w-lg">
+              <DialogHeader>
+                <DialogTitle>Yeni Promosyon Kodu</DialogTitle>
+                <DialogDescription>
+                  İndirim veya hediye için promosyon kodu oluşturun
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                {/* Code */}
+                <div className="space-y-2">
+                  <Label htmlFor="code">Promosyon Kodu</Label>
+                  <div className="flex gap-2">
+                    <CanvaInput
+                      id="code"
+                      placeholder="YILBASI30"
+                      className="uppercase"
+                      value={newPromoCode}
+                      onChange={(e) =>
+                        setNewPromoCode(e.target.value.toUpperCase())
+                      }
+                    />
+                    <CanvaButton
+                      variant="default"
+                      onClick={() => {
+                        const code = generateCode();
+                        setNewPromoCode(code);
+                        toast.info(`Kod oluşturuldu: ${code}`);
+                      }}
+                    >
+                      Oluştur
+                    </CanvaButton>
+                  </div>
+                </div>
+
+                {/* Type */}
+                <div className="space-y-2">
+                  <Label>İndirim Tipi</Label>
+                  <Select value={promoType} onValueChange={setPromoType}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="percentage">
+                        Yüzde İndirim (%)
+                      </SelectItem>
+                      <SelectItem value="fixed">Sabit İndirim (₺)</SelectItem>
+                      <SelectItem value="free_trial">
+                        Ücretsiz Deneme
+                      </SelectItem>
+                      <SelectItem value="gift">Hediye</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Value */}
+                <div className="space-y-2">
+                  <Label htmlFor="value">Değer</Label>
+                  <div className="flex items-center gap-2">
+                    <CanvaInput
+                      id="value"
+                      type="number"
+                      placeholder={promoType === 'percentage' ? '30' : '50'}
+                      value={newPromoValue}
+                      onChange={(e) => setNewPromoValue(e.target.value)}
+                    />
+                    <span className="text-gray-500">
+                      {promoType === 'percentage' ? '%' : '₺'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <CanvaInput
+                  label="Açıklama"
+                  placeholder="Kampanya açıklaması..."
+                  value={newPromoDescription}
+                  onChange={(e) => setNewPromoDescription(e.target.value)}
+                />
+
+                {/* Applicable To */}
+                <div className="space-y-2">
+                  <Label>Geçerli Olduğu Ürün</Label>
+                  <Select
+                    value={newPromoApplicableTo}
+                    onValueChange={setNewPromoApplicableTo}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seçin" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Tüm Ürünler</SelectItem>
+                      <SelectItem value="premium_subscription">
+                        Premium Abonelik
+                      </SelectItem>
+                      <SelectItem value="boost">Boost</SelectItem>
+                      <SelectItem value="super_like">Super Like</SelectItem>
+                      <SelectItem value="first_purchase">
+                        İlk Satın Alma
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Usage Limit */}
+                <CanvaInput
+                  label="Kullanım Limiti (Opsiyonel)"
+                  type="number"
+                  placeholder="Sınırsız için boş bırakın"
+                  value={newPromoLimit}
+                  onChange={(e) => setNewPromoLimit(e.target.value)}
+                />
+
+                {/* Date Range */}
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Başlangıç Tarihi</Label>
+                    <Input type="datetime-local" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Bitiş Tarihi</Label>
+                    <Input type="datetime-local" />
+                  </div>
+                </div>
+              </div>
+
+              <DialogFooter>
+                <CanvaButton
+                  variant="default"
+                  onClick={() => setIsCreatePromoOpen(false)}
+                >
+                  İptal
+                </CanvaButton>
+                <CanvaButton
+                  variant="primary"
+                  onClick={handleCreatePromo}
+                  disabled={!newPromoCode || !newPromoValue}
+                  loading={createPromo.isPending}
+                >
+                  Oluştur
+                </CanvaButton>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -791,14 +822,22 @@ export default function PromosPage() {
                 <div className="space-y-2">
                   <Label>Referrer Ödülü</Label>
                   <div className="flex items-center gap-2">
-                    <CanvaInput type="number" defaultValue="30" className="w-24" />
+                    <CanvaInput
+                      type="number"
+                      defaultValue="30"
+                      className="w-24"
+                    />
                     <span className="text-gray-500">₺</span>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label>Referred Ödülü</Label>
                   <div className="flex items-center gap-2">
-                    <CanvaInput type="number" defaultValue="20" className="w-24" />
+                    <CanvaInput
+                      type="number"
+                      defaultValue="20"
+                      className="w-24"
+                    />
                     <span className="text-gray-500">₺</span>
                   </div>
                 </div>
@@ -810,7 +849,10 @@ export default function PromosPage() {
                     Kötüye kullanım tespiti ve otomatik engelleme
                   </p>
                 </div>
-                <CanvaBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>
+                <CanvaBadge
+                  variant="success"
+                  icon={<CheckCircle className="h-3 w-3" />}
+                >
                   Aktif
                 </CanvaBadge>
               </div>
