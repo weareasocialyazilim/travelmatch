@@ -229,10 +229,10 @@ export default function NotificationsPage() {
   const getStatusBadge = (status: string) => {
     const variants: Record<
       string,
-      { variant: 'primary' | 'secondary' | 'outline'; label: string }
+      { variant: 'primary' | 'default' | 'outline'; label: string }
     > = {
       sent: { variant: 'primary', label: 'Gönderildi' },
-      scheduled: { variant: 'secondary', label: 'Zamanlandı' },
+      scheduled: { variant: 'default', label: 'Zamanlandı' },
       draft: { variant: 'outline', label: 'Taslak' },
       failed: { variant: 'outline', label: 'Başarısız' },
     };
@@ -336,7 +336,7 @@ export default function NotificationsPage() {
                   {mockTemplates.map((template) => (
                     <CanvaButton
                       key={template.id}
-                      variant="default"
+                      variant="primary"
                       size="sm"
                       onClick={() => applyTemplate(template)}
                     >

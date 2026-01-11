@@ -280,14 +280,14 @@ export default function PromosPage() {
     const variants: Record<
       string,
       {
-        variant: 'primary' | 'secondary' | 'outline' | 'destructive';
+        variant: 'primary' | 'default' | 'outline' | 'error';
         label: string;
       }
     > = {
       active: { variant: 'primary', label: 'Aktif' },
-      scheduled: { variant: 'secondary', label: 'Zamanlandı' },
+      scheduled: { variant: 'default', label: 'Zamanlandı' },
       expired: { variant: 'outline', label: 'Süresi Doldu' },
-      disabled: { variant: 'destructive', label: 'Devre Dışı' },
+      disabled: { variant: 'error', label: 'Devre Dışı' },
     };
     const { variant, label } = variants[status] || {
       variant: 'outline',
@@ -435,7 +435,7 @@ export default function PromosPage() {
                       }
                     />
                     <CanvaButton
-                      variant="default"
+                      variant="primary"
                       onClick={() => {
                         const code = generateCode();
                         setNewPromoCode(code);
@@ -540,7 +540,7 @@ export default function PromosPage() {
 
               <DialogFooter>
                 <CanvaButton
-                  variant="default"
+                  variant="primary"
                   onClick={() => setIsCreatePromoOpen(false)}
                 >
                   İptal

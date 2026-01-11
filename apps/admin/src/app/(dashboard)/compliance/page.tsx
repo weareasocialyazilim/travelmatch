@@ -153,7 +153,7 @@ const getStatusBadge = (status: string) => {
     case 'pending':
       return <CanvaBadge variant="warning">Bekliyor</CanvaBadge>;
     case 'investigating':
-      return <CanvaBadge variant="default">İnceleniyor</CanvaBadge>;
+      return <CanvaBadge variant="primary">İnceleniyor</CanvaBadge>;
     case 'escalated':
       return <CanvaBadge variant="error">Yükseltildi</CanvaBadge>;
     case 'reported':
@@ -429,11 +429,11 @@ export default function CompliancePage() {
         fetchStats();
         setSelectedSar(null);
       } else {
-        toast({ title: 'Güncelleme başarısız', variant: 'destructive' });
+        toast({ title: 'Güncelleme başarısız', variant: 'error' });
       }
     } catch (error) {
       logger.error('Failed to update SAR', error);
-      toast({ title: 'Bir hata oluştu', variant: 'destructive' });
+      toast({ title: 'Bir hata oluştu', variant: 'error' });
     }
   };
 
@@ -460,11 +460,11 @@ export default function CompliancePage() {
         fetchStats();
         setSelectedProfile(null);
       } else {
-        toast({ title: 'İşlem başarısız', variant: 'destructive' });
+        toast({ title: 'İşlem başarısız', variant: 'error' });
       }
     } catch (error) {
       logger.error('Failed to toggle block', error);
-      toast({ title: 'Bir hata oluştu', variant: 'destructive' });
+      toast({ title: 'Bir hata oluştu', variant: 'error' });
     }
   };
 
@@ -502,7 +502,7 @@ export default function CompliancePage() {
           Uyumluluk verileri yüklenemedi. Lütfen tekrar deneyin.
         </p>
         <CanvaButton
-          variant="default"
+          variant="primary"
           onClick={() => {
             fetchStats();
             fetchSarReports();
@@ -532,7 +532,7 @@ export default function CompliancePage() {
         </div>
         <div className="flex gap-2">
           <CanvaButton
-            variant="default"
+            variant="primary"
             onClick={() => {
               fetchStats();
               fetchSarReports();
@@ -711,7 +711,7 @@ export default function CompliancePage() {
                               {sar.report_number}
                             </span>
                             {getStatusBadge(sar.status)}
-                            <CanvaBadge variant="default">
+                            <CanvaBadge variant="primary">
                               {sar.report_type.toUpperCase()}
                             </CanvaBadge>
                           </div>
@@ -722,14 +722,14 @@ export default function CompliancePage() {
                             {sar.triggered_rules?.slice(0, 3).map((rule, i) => (
                               <CanvaBadge
                                 key={i}
-                                variant="default"
+                                variant="primary"
                                 className="text-xs"
                               >
                                 {rule}
                               </CanvaBadge>
                             ))}
                             {sar.triggered_rules?.length > 3 && (
-                              <CanvaBadge variant="default" className="text-xs">
+                              <CanvaBadge variant="primary" className="text-xs">
                                 +{sar.triggered_rules.length - 3}
                               </CanvaBadge>
                             )}
@@ -744,7 +744,7 @@ export default function CompliancePage() {
                       <div className="flex items-center gap-2">
                         <CanvaButton
                           size="sm"
-                          variant="default"
+                          variant="primary"
                           onClick={() => {
                             setSelectedSar(sar);
                             setInvestigationNotes(
@@ -883,7 +883,7 @@ export default function CompliancePage() {
                               {profile.flags.slice(0, 3).map((flag, i) => (
                                 <CanvaBadge
                                   key={i}
-                                  variant="default"
+                                  variant="primary"
                                   className="text-xs"
                                 >
                                   {flag}
@@ -896,7 +896,7 @@ export default function CompliancePage() {
                       <div className="flex items-center gap-2">
                         <CanvaButton
                           size="sm"
-                          variant="default"
+                          variant="primary"
                           onClick={() => setSelectedProfile(profile)}
                         >
                           <Eye className="mr-1 h-4 w-4" />
@@ -905,7 +905,7 @@ export default function CompliancePage() {
                         {profile.is_blocked ? (
                           <CanvaButton
                             size="sm"
-                            variant="default"
+                            variant="primary"
                             onClick={() =>
                               toggleUserBlock(profile.user_id, false)
                             }
@@ -916,7 +916,7 @@ export default function CompliancePage() {
                         ) : (
                           <CanvaButton
                             size="sm"
-                            variant="error"
+                            variant="danger"
                             onClick={() =>
                               toggleUserBlock(
                                 profile.user_id,
@@ -1114,14 +1114,14 @@ export default function CompliancePage() {
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="font-medium">{rule.name}</span>
-                          <CanvaBadge variant="default">{rule.type}</CanvaBadge>
+                          <CanvaBadge variant="primary">{rule.type}</CanvaBadge>
                           <CanvaBadge
                             variant={
                               rule.action === 'block'
                                 ? 'error'
                                 : rule.action === 'challenge'
                                   ? 'warning'
-                                  : 'secondary'
+                                  : 'default'
                             }
                           >
                             {rule.action === 'block'
@@ -1189,7 +1189,7 @@ export default function CompliancePage() {
                 <h4 className="mb-2 font-medium">Tetiklenen Kurallar</h4>
                 <div className="flex flex-wrap gap-2">
                   {selectedSar.triggered_rules?.map((rule, i) => (
-                    <CanvaBadge key={i} variant="default">
+                    <CanvaBadge key={i} variant="primary">
                       <AlertTriangle className="mr-1 h-3 w-3 text-orange-500" />
                       {rule}
                     </CanvaBadge>
@@ -1214,7 +1214,7 @@ export default function CompliancePage() {
               Kapat
             </CanvaButton>
             <CanvaButton
-              variant="default"
+              variant="primary"
               onClick={() =>
                 selectedSar &&
                 updateSarStatus(
@@ -1239,7 +1239,7 @@ export default function CompliancePage() {
               Temiz
             </CanvaButton>
             <CanvaButton
-              variant="error"
+              variant="danger"
               onClick={() =>
                 selectedSar &&
                 updateSarStatus(selectedSar.id, 'confirmed', investigationNotes)
@@ -1314,7 +1314,7 @@ export default function CompliancePage() {
           )}
           <DialogFooter>
             <CanvaButton
-              variant="default"
+              variant="primary"
               onClick={() => setSelectedProfile(null)}
             >
               Kapat
@@ -1331,7 +1331,7 @@ export default function CompliancePage() {
               </CanvaButton>
             ) : (
               <CanvaButton
-                variant="error"
+                variant="danger"
                 onClick={() =>
                   selectedProfile &&
                   toggleUserBlock(selectedProfile.user_id, true, 'Manuel engel')

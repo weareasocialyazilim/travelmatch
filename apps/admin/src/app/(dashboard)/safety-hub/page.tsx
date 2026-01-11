@@ -291,7 +291,7 @@ export default function SafetyHubPage() {
           </CanvaBadge>
         );
       default:
-        return <CanvaBadge variant="default">{priority}</CanvaBadge>;
+        return <CanvaBadge variant="primary">{priority}</CanvaBadge>;
     }
   };
 
@@ -348,7 +348,7 @@ export default function SafetyHubPage() {
             </div>
           </div>
           <CanvaButton
-            variant="default"
+            variant="primary"
             size="sm"
             className="border-red-500/30 text-red-500"
           >
@@ -445,7 +445,7 @@ export default function SafetyHubPage() {
           <TabsTrigger value="queue">
             <Flag className="h-4 w-4 mr-2" />
             Rapor Kuyruğu
-            <CanvaBadge variant="default" className="ml-2">
+            <CanvaBadge variant="primary" className="ml-2">
               {safetyStats.pendingReports}
             </CanvaBadge>
           </TabsTrigger>
@@ -777,7 +777,7 @@ export default function SafetyHubPage() {
                       </div>
                     </div>
                     <CanvaBadge
-                      variant="default"
+                      variant="primary"
                       className="bg-green-500/10 text-green-500 border-green-500/20"
                     >
                       {model.accuracy}%
@@ -880,7 +880,7 @@ export default function SafetyHubPage() {
                       <div className="w-2 h-2 rounded-full bg-green-500" />
                       <span className="font-medium">{measure.name}</span>
                     </div>
-                    <CanvaBadge variant="default">
+                    <CanvaBadge variant="primary">
                       {measure.blocked} engelleme
                     </CanvaBadge>
                   </div>
@@ -1008,7 +1008,7 @@ export default function SafetyHubPage() {
                         {account.email}
                       </TableCell>
                       <TableCell>
-                        <CanvaBadge variant="default">
+                        <CanvaBadge variant="primary">
                           {account.reason}
                         </CanvaBadge>
                       </TableCell>

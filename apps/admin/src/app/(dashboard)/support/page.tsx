@@ -640,7 +640,7 @@ export default function SupportPage() {
                       <CanvaButton
                         key={response.id}
                         size="xs"
-                        variant="default"
+                        variant="primary"
                         className="shrink-0"
                         onClick={() => setReplyText(response.content)}
                       >

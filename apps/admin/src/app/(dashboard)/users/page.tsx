@@ -82,14 +82,14 @@ const statusConfig = {
   active: { label: 'Aktif', variant: 'success' as const },
   suspended: { label: 'Askıya Alındı', variant: 'warning' as const },
   banned: { label: 'Yasaklandı', variant: 'error' as const },
-  pending: { label: 'Beklemede', variant: 'secondary' as const },
+  pending: { label: 'Beklemede', variant: 'default' as const },
 };
 
 const kycStatusConfig: Record<
   string,
-  { label: string; variant: 'secondary' | 'warning' | 'success' | 'error' }
+  { label: string; variant: 'default' | 'warning' | 'success' | 'error' }
 > = {
-  not_started: { label: 'Başlamadı', variant: 'secondary' },
+  not_started: { label: 'Başlamadı', variant: 'default' },
   pending: { label: 'Bekliyor', variant: 'warning' },
   verified: { label: 'Doğrulandı', variant: 'success' },
   rejected: { label: 'Reddedildi', variant: 'error' },
@@ -394,7 +394,7 @@ export default function UsersPage() {
                     {statusConfig[status].label}
                   </CanvaBadge>
                   <CanvaBadge
-                    variant={kycStatusConfig[kycStatus]?.variant || 'secondary'}
+                    variant={kycStatusConfig[kycStatus]?.variant || 'default'}
                   >
                     {kycStatusConfig[kycStatus]?.label || kycStatus}
                   </CanvaBadge>
@@ -455,7 +455,7 @@ export default function UsersPage() {
               </p>
               <div className="flex gap-2">
                 <CanvaButton
-                  variant="default"
+                  variant="primary"
                   size="sm"
                   onClick={() => setPage((p) => p - 1)}
                   disabled={page === 0}
@@ -463,7 +463,7 @@ export default function UsersPage() {
                   Önceki
                 </CanvaButton>
                 <CanvaButton
-                  variant="default"
+                  variant="primary"
                   size="sm"
                   onClick={() => setPage((p) => p + 1)}
                   disabled={(page + 1) * limit >= total}

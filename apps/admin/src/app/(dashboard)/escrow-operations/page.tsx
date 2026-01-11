@@ -345,7 +345,7 @@ export default function EscrowOperationsPage() {
       case 'awaiting_proof':
         return (
           <CanvaBadge
-            variant="default"
+            variant="primary"
             className="bg-amber-500/10 text-amber-600 border-amber-500/30"
           >
             <Timer className="h-3 w-3 mr-1" />
@@ -355,7 +355,7 @@ export default function EscrowOperationsPage() {
       case 'proof_submitted':
         return (
           <CanvaBadge
-            variant="default"
+            variant="primary"
             className="bg-blue-500/10 text-blue-600 border-blue-500/30"
           >
             <Eye className="h-3 w-3 mr-1" />
@@ -365,7 +365,7 @@ export default function EscrowOperationsPage() {
       case 'ready_to_release':
         return (
           <CanvaBadge
-            variant="default"
+            variant="primary"
             className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
           >
             <CheckCircle2 className="h-3 w-3 mr-1" />
@@ -375,7 +375,7 @@ export default function EscrowOperationsPage() {
       case 'disputed':
         return (
           <CanvaBadge
-            variant="default"
+            variant="primary"
             className="bg-red-500/10 text-red-600 border-red-500/30"
           >
             <AlertTriangle className="h-3 w-3 mr-1" />
@@ -385,7 +385,7 @@ export default function EscrowOperationsPage() {
       case 'released':
         return (
           <CanvaBadge
-            variant="default"
+            variant="primary"
             className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
           >
             <Unlock className="h-3 w-3 mr-1" />
@@ -395,7 +395,7 @@ export default function EscrowOperationsPage() {
       case 'refunded':
         return (
           <CanvaBadge
-            variant="default"
+            variant="primary"
             className="bg-gray-500/10 text-gray-600 border-gray-500/30"
           >
             <ArrowDownRight className="h-3 w-3 mr-1" />
@@ -403,7 +403,7 @@ export default function EscrowOperationsPage() {
           </CanvaBadge>
         );
       default:
-        return <CanvaBadge variant="default">{status}</CanvaBadge>;
+        return <CanvaBadge variant="primary">{status}</CanvaBadge>;
     }
   };
 
@@ -449,7 +449,7 @@ export default function EscrowOperationsPage() {
           </CanvaBadge>
         );
       default:
-        return <CanvaBadge variant="default">{status}</CanvaBadge>;
+        return <CanvaBadge variant="primary">{status}</CanvaBadge>;
     }
   };
 
@@ -586,7 +586,7 @@ export default function EscrowOperationsPage() {
                   <p className="text-xs text-muted-foreground mt-1">
                     {tier.description}
                   </p>
-                  <CanvaBadge variant="default" className="mt-2 text-xs">
+                  <CanvaBadge variant="primary" className="mt-2 text-xs">
                     {tier.escrow}
                   </CanvaBadge>
                 </div>
@@ -1063,7 +1063,7 @@ export default function EscrowOperationsPage() {
           </DialogHeader>
           <DialogFooter>
             <CanvaButton
-              variant="default"
+              variant="primary"
               onClick={() =>
                 setActionDialog({ open: false, action: '', escrow: null })
               }
@@ -1071,9 +1071,7 @@ export default function EscrowOperationsPage() {
               Iptal
             </CanvaButton>
             <CanvaButton
-              variant={
-                actionDialog.action === 'dispute' ? 'destructive' : 'primary'
-              }
+              variant={actionDialog.action === 'dispute' ? 'danger' : 'primary'}
               onClick={() => {
                 // Handle action
                 setActionDialog({ open: false, action: '', escrow: null });

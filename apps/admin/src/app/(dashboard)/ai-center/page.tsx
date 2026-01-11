@@ -198,12 +198,12 @@ export default function AICenterPage() {
     const variants: Record<
       string,
       {
-        variant: 'primary' | 'secondary' | 'destructive' | 'outline';
+        variant: 'primary' | 'default' | 'error' | 'outline';
         label: string;
       }
     > = {
-      critical: { variant: 'destructive', label: 'Kritik' },
-      warning: { variant: 'secondary', label: 'Uyarı' },
+      critical: { variant: 'error', label: 'Kritik' },
+      warning: { variant: 'default', label: 'Uyarı' },
       info: { variant: 'outline', label: 'Bilgi' },
     };
     const { variant, label } = variants[severity] || {
@@ -216,10 +216,10 @@ export default function AICenterPage() {
   const getRiskBadge = (risk: string) => {
     const variants: Record<
       string,
-      { variant: 'primary' | 'secondary' | 'destructive' }
+      { variant: 'primary' | 'default' | 'error' }
     > = {
-      high: { variant: 'destructive' },
-      medium: { variant: 'secondary' },
+      high: { variant: 'error' },
+      medium: { variant: 'default' },
       low: { variant: 'primary' },
     };
     const { variant } = variants[risk] || { variant: 'primary' };
@@ -248,7 +248,7 @@ export default function AICenterPage() {
       );
     }
     return (
-      <CanvaBadge variant="default">
+      <CanvaBadge variant="primary">
         <Activity className="mr-1 h-3 w-3" />
         Sabit
       </CanvaBadge>
@@ -286,7 +286,7 @@ export default function AICenterPage() {
         </div>
         <div className="flex gap-2">
           <CanvaButton
-            variant="default"
+            variant="primary"
             onClick={handleRefresh}
             disabled={isRefreshing}
           >
@@ -432,7 +432,7 @@ export default function AICenterPage() {
                       </div>
                       <CanvaBadge
                         variant={
-                          model.status === 'active' ? 'primary' : 'secondary'
+                          model.status === 'active' ? 'primary' : 'default'
                         }
                       >
                         {model.status === 'active' ? 'Aktif' : 'Pasif'}
@@ -539,7 +539,7 @@ export default function AICenterPage() {
                           {prediction.factors.map((factor, i) => (
                             <CanvaBadge
                               key={i}
-                              variant="default"
+                              variant="primary"
                               className="text-xs"
                             >
                               {factor}
@@ -680,7 +680,7 @@ export default function AICenterPage() {
                         </div>
                         <CanvaButton
                           size="sm"
-                          variant="default"
+                          variant="primary"
                           onClick={() => handleResolveAnomaly(anomaly.id)}
                         >
                           Çözüldü
@@ -724,7 +724,7 @@ export default function AICenterPage() {
                               exp.status === 'running'
                                 ? 'primary'
                                 : exp.status === 'completed'
-                                  ? 'secondary'
+                                  ? 'default'
                                   : 'outline'
                             }
                           >

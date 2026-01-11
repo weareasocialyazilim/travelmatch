@@ -196,7 +196,7 @@ export default function DashboardPage() {
             </span>
           )}
           <CanvaButton
-            variant="default"
+            variant="primary"
             size="sm"
             onClick={refresh}
             disabled={isFetching}

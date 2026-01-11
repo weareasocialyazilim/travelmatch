@@ -15,6 +15,7 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
+import { CanvaButton } from '@/components/canva/CanvaButton';
 import Image from 'next/image';
 
 interface SetupData {
@@ -212,7 +213,7 @@ export default function TwoFactorSetupPage() {
                     </code>
                     <CanvaButton
                       type="button"
-                      variant="default"
+                      variant="primary"
                       size="sm"
                       iconOnly
                       onClick={copySecret}

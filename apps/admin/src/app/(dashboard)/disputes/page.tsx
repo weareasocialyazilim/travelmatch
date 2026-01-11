@@ -60,7 +60,7 @@ const statusConfig = {
   pending: { label: 'Açık', variant: 'error' as const },
   under_review: { label: 'İnceleniyor', variant: 'warning' as const },
   resolved: { label: 'Çözüldü', variant: 'success' as const },
-  rejected: { label: 'Reddedildi', variant: 'secondary' as const },
+  rejected: { label: 'Reddedildi', variant: 'default' as const },
 };
 
 const typeConfig = {

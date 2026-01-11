@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
+import { CanvaButton } from '@/components/canva/CanvaButton';
 
 export default function TwoFactorPage() {
   const router = useRouter();
@@ -135,7 +136,7 @@ export default function TwoFactorPage() {
 
           <div className="mt-6 text-center">
             <CanvaButton
-              variant="link"
+              variant="ghost"
               className="text-muted-foreground"
               onClick={() => router.push('/login')}
             >

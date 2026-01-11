@@ -412,7 +412,7 @@ export default function MomentsPage() {
                       <div className="mt-3 flex gap-2">
                         <CanvaButton
                           size="sm"
-                          variant="default"
+                          variant="primary"
                           className="flex-1"
                           onClick={() => setSelectedMoment(moment)}
                         >
@@ -437,7 +437,7 @@ export default function MomentsPage() {
                             </CanvaButton>
                             <CanvaButton
                               size="sm"
-                              variant="error"
+                              variant="danger"
                               onClick={() => handleReject(moment.id)}
                               disabled={rejectMoment.isPending}
                             >
@@ -526,7 +526,7 @@ export default function MomentsPage() {
             {selectedMoment?.status === 'pending' && (
               <>
                 <CanvaButton
-                  variant="error"
+                  variant="danger"
                   onClick={() =>
                     selectedMoment && handleReject(selectedMoment.id)
                   }

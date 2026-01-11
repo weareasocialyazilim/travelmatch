@@ -600,7 +600,7 @@ export default function ModerationPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <CanvaBadge variant="default">
+                      <CanvaBadge variant="primary">
                         {log.content_type}
                       </CanvaBadge>
                     </TableCell>
@@ -614,14 +614,14 @@ export default function ModerationPage() {
                         {log.violations?.slice(0, 2).map((v, i) => (
                           <CanvaBadge
                             key={i}
-                            variant="default"
+                            variant="primary"
                             className="text-xs"
                           >
                             {v.type}
                           </CanvaBadge>
                         ))}
                         {log.violations?.length > 2 && (
-                          <CanvaBadge variant="default" className="text-xs">
+                          <CanvaBadge variant="primary" className="text-xs">
                             +{log.violations.length - 2}
                           </CanvaBadge>
                         )}
@@ -670,7 +670,7 @@ export default function ModerationPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <CanvaBadge variant="default">
+                      <CanvaBadge variant="primary">
                         {item.content_type}
                       </CanvaBadge>
                     </TableCell>
@@ -679,7 +679,7 @@ export default function ModerationPage() {
                         {item.violation_reasons?.map((reason, i) => (
                           <CanvaBadge
                             key={i}
-                            variant="default"
+                            variant="primary"
                             className="text-xs"
                           >
                             {reason}
@@ -710,14 +710,14 @@ export default function ModerationPage() {
                         <div className="flex gap-2">
                           <CanvaButton
                             size="sm"
-                            variant="default"
+                            variant="primary"
                             onClick={() => handleApproveAppeal(item.id)}
                           >
                             <CheckCircle className="h-4 w-4" />
                           </CanvaButton>
                           <CanvaButton
                             size="sm"
-                            variant="default"
+                            variant="primary"
                             onClick={() => handleRejectAppeal(item.id)}
                           >
                             <XCircle className="h-4 w-4" />
@@ -761,7 +761,7 @@ export default function ModerationPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <CanvaBadge variant="default">
+                      <CanvaBadge variant="primary">
                         {warning.warning_type}
                       </CanvaBadge>
                     </TableCell>
@@ -874,7 +874,7 @@ export default function ModerationPage() {
                 </div>
                 <DialogFooter>
                   <CanvaButton
-                    variant="default"
+                    variant="primary"
                     onClick={() => setShowAddWord(false)}
                   >
                     Cancel
@@ -908,13 +908,13 @@ export default function ModerationPage() {
                       </CanvaBadge>
                     </TableCell>
                     <TableCell>
-                      <CanvaBadge variant="default">{item.category}</CanvaBadge>
+                      <CanvaBadge variant="primary">{item.category}</CanvaBadge>
                     </TableCell>
                     <TableCell>
                       {item.is_regex ? (
-                        <CanvaBadge variant="default">Regex</CanvaBadge>
+                        <CanvaBadge variant="primary">Regex</CanvaBadge>
                       ) : (
-                        <CanvaBadge variant="default">Exact</CanvaBadge>
+                        <CanvaBadge variant="primary">Exact</CanvaBadge>
                       )}
                     </TableCell>
                     <TableCell>
@@ -935,7 +935,7 @@ export default function ModerationPage() {
                       <div className="flex gap-2">
                         <CanvaButton
                           size="sm"
-                          variant="default"
+                          variant="primary"
                           onClick={() =>
                             handleToggleWord(item.id, item.is_active)
                           }
@@ -948,7 +948,7 @@ export default function ModerationPage() {
                         </CanvaButton>
                         <CanvaButton
                           size="sm"
-                          variant="default"
+                          variant="primary"
                           className="text-red-500"
                           onClick={() => handleDeleteWord(item.id)}
                         >
