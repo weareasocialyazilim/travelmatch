@@ -37,6 +37,12 @@ import {
   LogOut,
   Moon,
   Sparkles,
+  Zap,
+  Lock,
+  Camera,
+  Compass,
+  Heart,
+  Wifi,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -67,6 +73,7 @@ interface NavItem {
 
 // Navigation sections
 const mainNavItems: NavItem[] = [
+  { title: 'Command Center', href: '/command-center', icon: Zap },
   { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { title: 'Is Kuyrugu', href: '/queue', icon: ListTodo, badge: 0 },
 ];
@@ -97,6 +104,18 @@ const operationsNavItems: NavItem[] = [
     resource: 'transactions',
   },
   {
+    title: 'Escrow Islemleri',
+    href: '/escrow-operations',
+    icon: Lock,
+    resource: 'transactions',
+  },
+  {
+    title: 'Proof Merkezi',
+    href: '/proof-center',
+    icon: Camera,
+    resource: 'transactions',
+  },
+  {
     title: 'Gelir Analizi',
     href: '/revenue',
     icon: TrendingUp,
@@ -121,6 +140,18 @@ const analyticsNavItems: NavItem[] = [
     title: 'Analitik',
     href: '/analytics',
     icon: BarChart3,
+    resource: 'analytics',
+  },
+  {
+    title: 'Kesif & Eslesme',
+    href: '/discovery-analytics',
+    icon: Compass,
+    resource: 'analytics',
+  },
+  {
+    title: 'Chat Analitik',
+    href: '/chat-analytics',
+    icon: Heart,
     resource: 'analytics',
   },
   {
@@ -159,6 +190,18 @@ const techNavItems: NavItem[] = [
     href: '/ai-center',
     icon: Brain,
     resource: 'analytics',
+  },
+  {
+    title: 'AI Insights',
+    href: '/ai-insights',
+    icon: Sparkles,
+    resource: 'analytics',
+  },
+  {
+    title: 'Entegrasyonlar',
+    href: '/integrations-monitor',
+    icon: Wifi,
+    resource: 'settings',
   },
   {
     title: 'Feature Flags',
