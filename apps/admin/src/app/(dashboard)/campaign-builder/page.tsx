@@ -75,6 +75,17 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Switch } from '@/components/ui/switch';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { cn } from '@/lib/utils';
 
 // Campaign stats

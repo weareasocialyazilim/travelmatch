@@ -79,6 +79,17 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { formatCurrency, cn } from '@/lib/utils';
 import {
   AdminAreaChart,

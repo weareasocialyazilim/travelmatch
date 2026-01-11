@@ -66,6 +66,17 @@ import {
 } from '@/components/common/admin-chart';
 import { formatCurrency, cn } from '@/lib/utils';
 import { useStats } from '@/hooks/use-stats';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 
 // Executive KPI Data
 const executiveKPIs = {
