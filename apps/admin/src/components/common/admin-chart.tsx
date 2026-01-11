@@ -38,6 +38,7 @@ export const CHART_COLORS = {
   purple: '#8B5CF6', // Purple - Additional
   destructive: '#EF4444', // Red - Negative values
   muted: '#94A3B8', // Slate - Muted data
+  amber: '#F59E0B', // Amber - Same as primary for compatibility
 };
 
 // Color array for multi-series charts

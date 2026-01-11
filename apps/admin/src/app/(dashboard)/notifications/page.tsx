@@ -284,8 +284,12 @@ export default function NotificationsPage() {
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
           <Bell className="h-6 w-6 text-gray-400" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900">Henüz bildirim yok</h3>
-        <p className="text-sm text-gray-500">İlk push bildiriminizi göndererek başlayın.</p>
+        <h3 className="text-lg font-medium text-gray-900">
+          Henüz bildirim yok
+        </h3>
+        <p className="text-sm text-gray-500">
+          İlk push bildiriminizi göndererek başlayın.
+        </p>
         <CanvaButton variant="primary" onClick={() => setIsCreateOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Bildirim Oluştur
@@ -554,7 +558,7 @@ export default function NotificationsPage() {
           </TabsList>
           <div className="flex items-center gap-2">
             <CanvaInput placeholder="Ara..." className="w-64" />
-            <CanvaButton variant="outline" size="icon">
+            <CanvaButton variant="outline" size="sm" iconOnly>
               <Filter className="h-4 w-4" />
             </CanvaButton>
           </div>
@@ -642,7 +646,7 @@ export default function NotificationsPage() {
                     )}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <CanvaButton variant="ghost" size="icon">
+                        <CanvaButton variant="ghost" size="sm" iconOnly>
                           <MoreHorizontal className="h-4 w-4" />
                         </CanvaButton>
                       </DropdownMenuTrigger>

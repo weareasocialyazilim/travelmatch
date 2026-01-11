@@ -201,7 +201,9 @@ export default function SecurityPage() {
       }
     } catch {
       // Mock for development
-      setQrCode('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==');
+      setQrCode(
+        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+      );
       setSecret('JBSWY3DPEHPK3PXP');
       setSetupStep(1);
       setIs2FASetupOpen(true);
@@ -227,13 +229,15 @@ export default function SecurityPage() {
 
       if (res.ok) {
         const data = await res.json();
-        setBackupCodes(data.backup_codes || [
-          'XXXX-XXXX-XXXX',
-          'YYYY-YYYY-YYYY',
-          'ZZZZ-ZZZZ-ZZZZ',
-          'AAAA-AAAA-AAAA',
-          'BBBB-BBBB-BBBB',
-        ]);
+        setBackupCodes(
+          data.backup_codes || [
+            'XXXX-XXXX-XXXX',
+            'YYYY-YYYY-YYYY',
+            'ZZZZ-ZZZZ-ZZZZ',
+            'AAAA-AAAA-AAAA',
+            'BBBB-BBBB-BBBB',
+          ],
+        );
         setSetupStep(3);
         setIs2FAEnabled(true);
         toast.success('2FA etkinleştirildi');
@@ -295,7 +299,7 @@ export default function SecurityPage() {
     setIsLoading(true);
     try {
       // TODO: API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       toast.success('Şifre değiştirildi');
       setIsPasswordChangeOpen(false);
       setPasswords({ current: '', new: '', confirm: '' });
@@ -308,13 +312,13 @@ export default function SecurityPage() {
 
   // Revoke session
   const revokeSession = async (sessionId: string) => {
-    setSessions(prev => prev.filter(s => s.id !== sessionId));
+    setSessions((prev) => prev.filter((s) => s.id !== sessionId));
     toast.success('Oturum sonlandırıldı');
   };
 
   // Logout all sessions
   const logoutAllSessions = async () => {
-    setSessions(prev => prev.filter(s => s.is_current));
+    setSessions((prev) => prev.filter((s) => s.is_current));
     setIsLogoutAllOpen(false);
     toast.success('Tüm diğer oturumlar sonlandırıldı');
   };
@@ -340,8 +344,8 @@ export default function SecurityPage() {
   // Stats
   const stats = {
     activeSessions: sessions.length,
-    failedLogins: loginHistory.filter(l => l.status === 'failed').length,
-    lastLogin: loginHistory.find(l => l.status === 'success')?.created_at,
+    failedLogins: loginHistory.filter((l) => l.status === 'failed').length,
+    lastLogin: loginHistory.find((l) => l.status === 'success')?.created_at,
   };
 
   return (
@@ -349,7 +353,9 @@ export default function SecurityPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Güvenlik Merkezi</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Güvenlik Merkezi
+          </h1>
           <p className="text-muted-foreground">
             Hesap güvenliğinizi yönetin ve oturumlarınızı kontrol edin
           </p>
@@ -368,7 +374,13 @@ export default function SecurityPage() {
         <CanvaStatCard
           label="2FA Durumu"
           value={is2FAEnabled ? 'Aktif' : 'Kapalı'}
-          icon={is2FAEnabled ? <ShieldCheck className="h-4 w-4 text-green-600" /> : <ShieldOff className="h-4 w-4 text-red-600" />}
+          icon={
+            is2FAEnabled ? (
+              <ShieldCheck className="h-4 w-4 text-green-600" />
+            ) : (
+              <ShieldOff className="h-4 w-4 text-red-600" />
+            )
+          }
         />
         <CanvaStatCard
           label="Aktif Oturumlar"
@@ -419,10 +431,12 @@ export default function SecurityPage() {
             <CanvaCardBody>
               <div className="flex items-center justify-between p-4 rounded-lg border">
                 <div className="flex items-center gap-4">
-                  <div className={cn(
-                    'flex h-12 w-12 items-center justify-center rounded-full',
-                    is2FAEnabled ? 'bg-green-100' : 'bg-gray-100'
-                  )}>
+                  <div
+                    className={cn(
+                      'flex h-12 w-12 items-center justify-center rounded-full',
+                      is2FAEnabled ? 'bg-green-100' : 'bg-gray-100',
+                    )}
+                  >
                     {is2FAEnabled ? (
                       <ShieldCheck className="h-6 w-6 text-green-600" />
                     ) : (
@@ -441,11 +455,18 @@ export default function SecurityPage() {
                   </div>
                 </div>
                 {is2FAEnabled ? (
-                  <CanvaButton variant="outline" onClick={() => setIs2FASetupOpen(true)}>
+                  <CanvaButton
+                    variant="outline"
+                    onClick={() => setIs2FASetupOpen(true)}
+                  >
                     Ayarlar
                   </CanvaButton>
                 ) : (
-                  <CanvaButton variant="primary" onClick={start2FASetup} loading={isLoading}>
+                  <CanvaButton
+                    variant="primary"
+                    onClick={start2FASetup}
+                    loading={isLoading}
+                  >
                     Etkinleştir
                   </CanvaButton>
                 )}
@@ -456,9 +477,12 @@ export default function SecurityPage() {
                   <div className="flex items-start gap-3">
                     <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
                     <div>
-                      <h4 className="font-medium text-amber-800">Yedek Kodlarınızı Saklayın</h4>
+                      <h4 className="font-medium text-amber-800">
+                        Yedek Kodlarınızı Saklayın
+                      </h4>
                       <p className="text-sm text-amber-700 mt-1">
-                        Telefonunuza erişiminizi kaybetmeniz durumunda yedek kodlarınızı güvenli bir yerde saklayın.
+                        Telefonunuza erişiminizi kaybetmeniz durumunda yedek
+                        kodlarınızı güvenli bir yerde saklayın.
                       </p>
                       <CanvaButton
                         variant="outline"
@@ -563,10 +587,14 @@ export default function SecurityPage() {
                     className="flex items-center justify-between p-4 hover:bg-gray-50"
                   >
                     <div className="flex items-center gap-4">
-                      <div className={cn(
-                        'flex h-10 w-10 items-center justify-center rounded-full',
-                        login.status === 'success' ? 'bg-green-100' : 'bg-red-100'
-                      )}>
+                      <div
+                        className={cn(
+                          'flex h-10 w-10 items-center justify-center rounded-full',
+                          login.status === 'success'
+                            ? 'bg-green-100'
+                            : 'bg-red-100',
+                        )}
+                      >
                         {login.status === 'success' ? (
                           <CheckCircle className="h-5 w-5 text-green-600" />
                         ) : (
@@ -576,10 +604,14 @@ export default function SecurityPage() {
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="font-medium">
-                            {login.status === 'success' ? 'Başarılı Giriş' : 'Başarısız Giriş'}
+                            {login.status === 'success'
+                              ? 'Başarılı Giriş'
+                              : 'Başarısız Giriş'}
                           </span>
                           {login.status === 'failed' && login.reason && (
-                            <CanvaBadge variant="error">{login.reason}</CanvaBadge>
+                            <CanvaBadge variant="error">
+                              {login.reason}
+                            </CanvaBadge>
                           )}
                         </div>
                         <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
@@ -617,14 +649,25 @@ export default function SecurityPage() {
                     label="Mevcut Şifre"
                     type={showPasswords.current ? 'text' : 'password'}
                     value={passwords.current}
-                    onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
+                    onChange={(e) =>
+                      setPasswords({ ...passwords, current: e.target.value })
+                    }
                   />
                   <button
                     type="button"
                     className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
-                    onClick={() => setShowPasswords({ ...showPasswords, current: !showPasswords.current })}
+                    onClick={() =>
+                      setShowPasswords({
+                        ...showPasswords,
+                        current: !showPasswords.current,
+                      })
+                    }
                   >
-                    {showPasswords.current ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPasswords.current ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
                 <div className="relative">
@@ -632,15 +675,26 @@ export default function SecurityPage() {
                     label="Yeni Şifre"
                     type={showPasswords.new ? 'text' : 'password'}
                     value={passwords.new}
-                    onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
+                    onChange={(e) =>
+                      setPasswords({ ...passwords, new: e.target.value })
+                    }
                     helperText="En az 8 karakter, büyük/küçük harf ve rakam içermeli"
                   />
                   <button
                     type="button"
                     className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
-                    onClick={() => setShowPasswords({ ...showPasswords, new: !showPasswords.new })}
+                    onClick={() =>
+                      setShowPasswords({
+                        ...showPasswords,
+                        new: !showPasswords.new,
+                      })
+                    }
                   >
-                    {showPasswords.new ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPasswords.new ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
                 <div className="relative">
@@ -648,22 +702,41 @@ export default function SecurityPage() {
                     label="Yeni Şifre (Tekrar)"
                     type={showPasswords.confirm ? 'text' : 'password'}
                     value={passwords.confirm}
-                    onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
-                    error={passwords.confirm && passwords.new !== passwords.confirm ? 'Şifreler eşleşmiyor' : undefined}
+                    onChange={(e) =>
+                      setPasswords({ ...passwords, confirm: e.target.value })
+                    }
+                    errorText={
+                      passwords.confirm && passwords.new !== passwords.confirm
+                        ? 'Şifreler eşleşmiyor'
+                        : undefined
+                    }
                   />
                   <button
                     type="button"
                     className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
-                    onClick={() => setShowPasswords({ ...showPasswords, confirm: !showPasswords.confirm })}
+                    onClick={() =>
+                      setShowPasswords({
+                        ...showPasswords,
+                        confirm: !showPasswords.confirm,
+                      })
+                    }
                   >
-                    {showPasswords.confirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPasswords.confirm ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
                 <CanvaButton
                   variant="primary"
                   onClick={handlePasswordChange}
                   loading={isLoading}
-                  disabled={!passwords.current || !passwords.new || passwords.new !== passwords.confirm}
+                  disabled={
+                    !passwords.current ||
+                    !passwords.new ||
+                    passwords.new !== passwords.confirm
+                  }
                 >
                   Şifreyi Değiştir
                 </CanvaButton>
@@ -683,7 +756,8 @@ export default function SecurityPage() {
               {setupStep === 3 && 'Yedek Kodlarınız'}
             </DialogTitle>
             <DialogDescription>
-              {setupStep === 1 && 'Google Authenticator veya benzer bir uygulama ile QR kodu tarayın'}
+              {setupStep === 1 &&
+                'Google Authenticator veya benzer bir uygulama ile QR kodu tarayın'}
               {setupStep === 2 && 'Uygulamada görünen 6 haneli kodu girin'}
               {setupStep === 3 && 'Bu kodları güvenli bir yerde saklayın'}
             </DialogDescription>
@@ -727,7 +801,11 @@ export default function SecurityPage() {
                 label="Doğrulama Kodu"
                 placeholder="000000"
                 value={verificationCode}
-                onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                onChange={(e) =>
+                  setVerificationCode(
+                    e.target.value.replace(/\D/g, '').slice(0, 6),
+                  )
+                }
                 className="text-center text-2xl tracking-widest"
               />
             </div>
@@ -767,7 +845,10 @@ export default function SecurityPage() {
           <DialogFooter>
             {setupStep === 1 && (
               <>
-                <CanvaButton variant="outline" onClick={() => setIs2FASetupOpen(false)}>
+                <CanvaButton
+                  variant="outline"
+                  onClick={() => setIs2FASetupOpen(false)}
+                >
                   İptal
                 </CanvaButton>
                 <CanvaButton variant="primary" onClick={() => setSetupStep(2)}>
@@ -809,12 +890,16 @@ export default function SecurityPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Tüm Oturumları Kapat</AlertDialogTitle>
             <AlertDialogDescription>
-              Bu cihaz hariç tüm aktif oturumlar kapatılacak. Diğer cihazlarda tekrar giriş yapmanız gerekecek.
+              Bu cihaz hariç tüm aktif oturumlar kapatılacak. Diğer cihazlarda
+              tekrar giriş yapmanız gerekecek.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>İptal</AlertDialogCancel>
-            <AlertDialogAction onClick={logoutAllSessions} className="bg-red-600 hover:bg-red-700">
+            <AlertDialogAction
+              onClick={logoutAllSessions}
+              className="bg-red-600 hover:bg-red-700"
+            >
               Tümünü Kapat
             </AlertDialogAction>
           </AlertDialogFooter>

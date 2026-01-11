@@ -273,7 +273,7 @@ export default function AlertsPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button
+          <CanvaButton
             variant="outline"
             size="sm"
             onClick={() => setSoundEnabled(!soundEnabled)}
@@ -284,13 +284,13 @@ export default function AlertsPage() {
               <VolumeX className="h-4 w-4 mr-2" />
             )}
             Ses {soundEnabled ? 'Açık' : 'Kapalı'}
-          </Button>
+          </CanvaButton>
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
+              <CanvaButton variant="outline" size="sm">
                 <Settings className="h-4 w-4 mr-2" />
                 Kuralları Yönet
-              </Button>
+              </CanvaButton>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
@@ -341,9 +341,9 @@ export default function AlertsPage() {
                 </p>
               </div>
             </div>
-            <Button variant="destructive" size="sm">
+            <CanvaButton variant="danger" size="sm">
               Hepsini Gör
-            </Button>
+            </CanvaButton>
           </div>
         </div>
       )}
@@ -495,14 +495,14 @@ export default function AlertsPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm">
+                      <CanvaButton variant="outline" size="sm">
                         <Eye className="h-4 w-4 mr-1" />
                         Onayla
-                      </Button>
-                      <Button variant="default" size="sm">
+                      </CanvaButton>
+                      <CanvaButton variant="primary" size="sm">
                         Çöz
                         <ChevronRight className="h-4 w-4 ml-1" />
-                      </Button>
+                      </CanvaButton>
                     </div>
                   </div>
                 </CardContent>
@@ -533,9 +533,9 @@ export default function AlertsPage() {
                         </p>
                       </div>
                     </div>
-                    <Button variant="default" size="sm">
+                    <CanvaButton variant="primary" size="sm">
                       Çöz
-                    </Button>
+                    </CanvaButton>
                   </div>
                 </CardContent>
               </Card>
