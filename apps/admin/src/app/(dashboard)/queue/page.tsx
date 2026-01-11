@@ -110,7 +110,7 @@ export default function QueuePage() {
           </p>
         </div>
         <CanvaButton
-          variant="default"
+          variant="primary"
           onClick={() => refetch()}
           disabled={isFetching}
         >
@@ -270,7 +270,7 @@ export default function QueuePage() {
                               >
                                 {priorityInfo.label}
                               </CanvaBadge>
-                              <CanvaBadge variant="default" size="sm">
+                              <CanvaBadge variant="primary" size="sm">
                                 {typeInfo.label}
                               </CanvaBadge>
                             </div>

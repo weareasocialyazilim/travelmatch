@@ -201,7 +201,7 @@ export default function CeremonyManagementPage() {
                           variant={
                             proof.aiAnalysis.confidence >= 0.7
                               ? 'primary'
-                              : 'destructive'
+                              : 'error'
                           }
                         >
                           {(proof.aiAnalysis.confidence * 100).toFixed(0)}%

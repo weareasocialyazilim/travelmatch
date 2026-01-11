@@ -316,7 +316,7 @@ export default function CampaignBuilderPage() {
           </CanvaBadge>
         );
       default:
-        return <CanvaBadge variant="default">{status}</CanvaBadge>;
+        return <CanvaBadge variant="primary">{status}</CanvaBadge>;
     }
   };
 
@@ -443,7 +443,7 @@ export default function CampaignBuilderPage() {
             </div>
             <DialogFooter>
               <CanvaButton
-                variant="default"
+                variant="primary"
                 onClick={() => setShowNewCampaign(false)}
               >
                 İptal
@@ -674,7 +674,7 @@ export default function CampaignBuilderPage() {
                           <span className="font-medium">{campaign.name}</span>
                           {campaign.abTest && (
                             <CanvaBadge
-                              variant="default"
+                              variant="primary"
                               className="text-xs bg-purple-500/10 text-purple-500 border-purple-500/20"
                             >
                               A/B
@@ -840,7 +840,7 @@ export default function CampaignBuilderPage() {
                       <TableCell>{formatNumber(template.usage)}</TableCell>
                       <TableCell>
                         <CanvaBadge
-                          variant="default"
+                          variant="primary"
                           className={cn(
                             template.openRate > 70
                               ? 'bg-green-500/10 text-green-500'

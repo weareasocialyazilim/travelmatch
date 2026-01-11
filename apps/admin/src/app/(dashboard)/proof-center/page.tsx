@@ -513,7 +513,7 @@ export default function ProofCenterPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <CanvaBadge
-                        variant="default"
+                        variant="primary"
                         className="text-xs font-mono"
                       >
                         {proof.id}
@@ -534,7 +534,7 @@ export default function ProofCenterPage() {
                     <Camera className="h-8 w-8 text-muted-foreground" />
                     <CanvaButton
                       size="sm"
-                      variant="default"
+                      variant="primary"
                       className="absolute bottom-2 right-2"
                     >
                       <ZoomIn className="h-3 w-3 mr-1" />
@@ -646,7 +646,7 @@ export default function ProofCenterPage() {
                       {proof.flags.map((flag) => (
                         <CanvaBadge
                           key={flag}
-                          variant="default"
+                          variant="primary"
                           className="text-xs bg-red-500/10 text-red-600 border-red-500/30"
                         >
                           {flag.replace(/_/g, ' ')}
@@ -667,7 +667,7 @@ export default function ProofCenterPage() {
                     </CanvaButton>
                     <CanvaButton
                       size="sm"
-                      variant="error"
+                      variant="danger"
                       className="flex-1"
                       onClick={() => handleReject(proof)}
                     >
@@ -893,7 +893,7 @@ export default function ProofCenterPage() {
                   {selectedProof.flags.map((flag) => (
                     <CanvaBadge
                       key={flag}
-                      variant="default"
+                      variant="primary"
                       className="text-xs bg-red-500/10 text-red-600"
                     >
                       {flag.replace(/_/g, ' ')}
@@ -919,7 +919,10 @@ export default function ProofCenterPage() {
             >
               Iptal
             </CanvaButton>
-            <CanvaButton variant="error" onClick={() => setReviewDialog(false)}>
+            <CanvaButton
+              variant="danger"
+              onClick={() => setReviewDialog(false)}
+            >
               <ThumbsDown className="h-4 w-4 mr-1" />
               Reddet
             </CanvaButton>

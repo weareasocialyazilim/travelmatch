@@ -386,7 +386,7 @@ export default function IntegrationsMonitorPage() {
           </CanvaBadge>
         );
       default:
-        return <CanvaBadge variant="default">{status}</CanvaBadge>;
+        return <CanvaBadge variant="primary">{status}</CanvaBadge>;
     }
   };
 
@@ -435,7 +435,7 @@ export default function IntegrationsMonitorPage() {
             Son guncelleme: {lastUpdate.toLocaleTimeString('tr-TR')}
           </span>
           <CanvaButton
-            variant="default"
+            variant="primary"
             size="sm"
             onClick={handleRefresh}
             disabled={isRefreshing}
@@ -548,7 +548,7 @@ export default function IntegrationsMonitorPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <CanvaBadge variant="default" className="text-amber-600">
+                    <CanvaBadge variant="primary" className="text-amber-600">
                       {incident.status}
                     </CanvaBadge>
                     <p className="text-xs text-muted-foreground mt-1">

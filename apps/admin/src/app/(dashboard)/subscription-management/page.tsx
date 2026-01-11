@@ -355,7 +355,7 @@ export default function SubscriptionManagementPage() {
           </CanvaBadge>
         );
       default:
-        return <CanvaBadge variant="default">{action}</CanvaBadge>;
+        return <CanvaBadge variant="primary">{action}</CanvaBadge>;
     }
   };
 
@@ -376,9 +376,9 @@ export default function SubscriptionManagementPage() {
           </CanvaBadge>
         );
       case 'free':
-        return <CanvaBadge variant="default">Free</CanvaBadge>;
+        return <CanvaBadge variant="primary">Free</CanvaBadge>;
       default:
-        return <CanvaBadge variant="default">-</CanvaBadge>;
+        return <CanvaBadge variant="primary">-</CanvaBadge>;
     }
   };
 
@@ -737,7 +737,7 @@ export default function SubscriptionManagementPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <CanvaBadge variant="default">
+                        <CanvaBadge variant="primary">
                           {promo.type === 'percentage'
                             ? `%${promo.value}`
                             : formatCurrency(promo.value, 'TRY')}
@@ -745,7 +745,7 @@ export default function SubscriptionManagementPage() {
                       </TableCell>
                       <TableCell>
                         {promo.targetPlan === 'all' ? (
-                          <CanvaBadge variant="default">Tumu</CanvaBadge>
+                          <CanvaBadge variant="primary">Tumu</CanvaBadge>
                         ) : (
                           getPlanBadge(promo.targetPlan)
                         )}
@@ -777,7 +777,7 @@ export default function SubscriptionManagementPage() {
                             Aktif
                           </CanvaBadge>
                         ) : (
-                          <CanvaBadge variant="default">Pasif</CanvaBadge>
+                          <CanvaBadge variant="primary">Pasif</CanvaBadge>
                         )}
                       </TableCell>
                       <TableCell>

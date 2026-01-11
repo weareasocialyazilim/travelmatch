@@ -628,7 +628,7 @@ export default function FeatureFlagsPage() {
               </div>
               <DialogFooter>
                 <CanvaButton
-                  variant="default"
+                  variant="primary"
                   onClick={() => setIsCreateDialogOpen(false)}
                 >
                   İptal

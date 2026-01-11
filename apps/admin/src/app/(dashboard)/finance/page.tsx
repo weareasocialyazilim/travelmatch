@@ -69,7 +69,7 @@ const statusConfig = {
   approved: { label: 'Onaylandı', variant: 'success' as const },
   processing: { label: 'İşleniyor', variant: 'info' as const },
   failed: { label: 'Başarısız', variant: 'error' as const },
-  cancelled: { label: 'İptal', variant: 'secondary' as const },
+  cancelled: { label: 'İptal', variant: 'default' as const },
 };
 
 export default function FinancePage() {
@@ -318,7 +318,7 @@ export default function FinancePage() {
                     };
                     const statusInfo = statusConfig[
                       tx.status as keyof typeof statusConfig
-                    ] || { label: tx.status, variant: 'secondary' as const };
+                    ] || { label: tx.status, variant: 'default' as const };
                     const TypeIcon = typeInfo.icon;
 
                     return (
@@ -392,7 +392,7 @@ export default function FinancePage() {
                       payout.status as keyof typeof statusConfig
                     ] || {
                       label: payout.status,
-                      variant: 'secondary' as const,
+                      variant: 'default' as const,
                     };
 
                     return (
@@ -432,7 +432,7 @@ export default function FinancePage() {
                             <div className="flex gap-2">
                               <CanvaButton
                                 size="sm"
-                                variant="default"
+                                variant="primary"
                                 onClick={() =>
                                   toast.info('İade işlemi henüz bağlı değil')
                                 }

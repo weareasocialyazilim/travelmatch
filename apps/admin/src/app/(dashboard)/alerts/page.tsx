@@ -276,7 +276,7 @@ export default function AlertsPage() {
         </div>
         <div className="flex items-center gap-3">
           <CanvaButton
-            variant="default"
+            variant="primary"
             size="sm"
             onClick={() => setSoundEnabled(!soundEnabled)}
           >
@@ -472,7 +472,7 @@ export default function AlertsPage() {
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold">{alert.title}</h3>
                           {getSeverityBadge(alert.severity)}
-                          <CanvaBadge variant="default" className="text-xs">
+                          <CanvaBadge variant="primary" className="text-xs">
                             {getCategoryIcon(alert.category)}
                             <span className="ml-1">{alert.category}</span>
                           </CanvaBadge>

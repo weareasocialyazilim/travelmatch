@@ -536,7 +536,7 @@ export default function AuditLogsPage() {
                       <TableCell>
                         <CanvaBadge
                           className={actionInfo.color}
-                          variant="default"
+                          variant="primary"
                         >
                           <ActionIcon className="mr-1 h-3 w-3" />
                           {actionInfo.label}
@@ -604,7 +604,7 @@ export default function AuditLogsPage() {
                                 </h4>
                                 <CanvaBadge
                                   className={actionInfo.color}
-                                  variant="default"
+                                  variant="primary"
                                 >
                                   <ActionIcon className="mr-1 h-3 w-3" />
                                   {actionInfo.label}
@@ -703,7 +703,7 @@ export default function AuditLogsPage() {
               </p>
               <div className="flex items-center gap-2">
                 <CanvaButton
-                  variant="default"
+                  variant="primary"
                   size="sm"
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
@@ -714,7 +714,7 @@ export default function AuditLogsPage() {
                   {currentPage} / {totalPages}
                 </span>
                 <CanvaButton
-                  variant="default"
+                  variant="primary"
                   size="sm"
                   onClick={() =>
                     setCurrentPage((p) => Math.min(totalPages, p + 1))

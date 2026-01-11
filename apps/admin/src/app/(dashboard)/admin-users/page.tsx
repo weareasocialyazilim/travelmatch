@@ -407,7 +407,7 @@ export default function AdminUsersPage() {
           Admin kullanıcıları yüklenemedi. Lütfen tekrar deneyin.
         </p>
         <CanvaButton
-          variant="default"
+          variant="primary"
           onClick={() => refetch()}
           leftIcon={<RefreshCw className="h-4 w-4" />}
         >
@@ -454,7 +454,7 @@ export default function AdminUsersPage() {
         </div>
         <div className="flex gap-2">
           <CanvaButton
-            variant="default"
+            variant="primary"
             onClick={() => refetch()}
             leftIcon={<RefreshCw className="h-4 w-4" />}
           >
@@ -599,7 +599,7 @@ export default function AdminUsersPage() {
                         </CanvaBadge>
                       ) : (
                         <CanvaBadge
-                          variant="default"
+                          variant="primary"
                           icon={<ShieldOff className="h-3 w-3" />}
                         >
                           Kapalı
@@ -748,7 +748,7 @@ export default function AdminUsersPage() {
           </div>
           <DialogFooter>
             <CanvaButton
-              variant="default"
+              variant="primary"
               onClick={() => setIsCreateOpen(false)}
             >
               İptal

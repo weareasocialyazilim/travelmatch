@@ -251,13 +251,13 @@ export default function UserDetailPage() {
     const variants: Record<
       string,
       {
-        variant: 'primary' | 'secondary' | 'destructive' | 'outline';
+        variant: 'primary' | 'default' | 'error' | 'outline';
         label: string;
       }
     > = {
       active: { variant: 'primary', label: 'Aktif' },
-      suspended: { variant: 'secondary', label: 'Askıya Alındı' },
-      banned: { variant: 'destructive', label: 'Yasaklandı' },
+      suspended: { variant: 'default', label: 'Askıya Alındı' },
+      banned: { variant: 'error', label: 'Yasaklandı' },
       inactive: { variant: 'outline', label: 'Pasif' },
     };
     const { variant, label } = variants[status] || {
@@ -271,7 +271,7 @@ export default function UserDetailPage() {
     const variants: Record<
       string,
       {
-        variant: 'primary' | 'secondary' | 'destructive' | 'outline';
+        variant: 'primary' | 'default' | 'error' | 'outline';
         label: string;
         icon: React.ReactNode;
       }
@@ -282,12 +282,12 @@ export default function UserDetailPage() {
         icon: <CheckCircle className="h-3 w-3" />,
       },
       pending: {
-        variant: 'secondary',
+        variant: 'default',
         label: 'Bekliyor',
         icon: <Clock className="h-3 w-3" />,
       },
       rejected: {
-        variant: 'destructive',
+        variant: 'error',
         label: 'Reddedildi',
         icon: <XCircle className="h-3 w-3" />,
       },
@@ -351,7 +351,7 @@ export default function UserDetailPage() {
             Kullanıcı bilgileri yüklenemedi.
           </p>
           <CanvaButton
-            variant="default"
+            variant="primary"
             className="mt-4"
             onClick={() => router.back()}
           >
@@ -456,7 +456,7 @@ export default function UserDetailPage() {
                   {getStatusBadge(user.status)}
                   {user.subscription.plan === 'premium' && (
                     <CanvaBadge
-                      variant="default"
+                      variant="primary"
                       className="bg-amber-100 text-amber-800"
                     >
                       Premium
@@ -480,7 +480,7 @@ export default function UserDetailPage() {
                   <div className="flex-1">
                     <p className="text-sm">{user.email}</p>
                     {user.verification.email_verified && (
-                      <CanvaBadge variant="default" className="mt-1 text-xs">
+                      <CanvaBadge variant="primary" className="mt-1 text-xs">
                         <CheckCircle className="mr-1 h-3 w-3 text-green-500" />
                         Doğrulandı
                       </CanvaBadge>
@@ -493,7 +493,7 @@ export default function UserDetailPage() {
                   <div className="flex-1">
                     <p className="text-sm">{user.phone}</p>
                     {user.verification.phone_verified && (
-                      <CanvaBadge variant="default" className="mt-1 text-xs">
+                      <CanvaBadge variant="primary" className="mt-1 text-xs">
                         <CheckCircle className="mr-1 h-3 w-3 text-green-500" />
                         Doğrulandı
                       </CanvaBadge>
@@ -566,7 +566,7 @@ export default function UserDetailPage() {
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
                 {user.flags.map((flag) => (
-                  <CanvaBadge key={flag} variant="default" className="text-xs">
+                  <CanvaBadge key={flag} variant="primary" className="text-xs">
                     {flag === 'high_spender' && 'Yüksek Harcama'}
                     {flag === 'verified_user' && 'Doğrulanmış'}
                   </CanvaBadge>
@@ -584,7 +584,7 @@ export default function UserDetailPage() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Plan</span>
                 <CanvaBadge
-                  variant="default"
+                  variant="primary"
                   className="bg-amber-100 text-amber-800"
                 >
                   {user.subscription.plan === 'premium'
@@ -719,9 +719,7 @@ export default function UserDetailPage() {
                           </p>
                           <CanvaBadge
                             variant={
-                              txn.status === 'completed'
-                                ? 'primary'
-                                : 'secondary'
+                              txn.status === 'completed' ? 'primary' : 'default'
                             }
                             className="text-xs"
                           >
@@ -748,7 +746,7 @@ export default function UserDetailPage() {
                         Kullanıcının paylaştığı içerikler
                       </CardDescription>
                     </div>
-                    <CanvaBadge variant="default">
+                    <CanvaBadge variant="primary">
                       {user.stats.total_moments} Moment
                     </CanvaBadge>
                   </div>
@@ -769,8 +767,8 @@ export default function UserDetailPage() {
                               moment.status === 'active'
                                 ? 'primary'
                                 : moment.status === 'pending_review'
-                                  ? 'secondary'
-                                  : 'destructive'
+                                  ? 'default'
+                                  : 'error'
                             }
                           >
                             {moment.status === 'active'
@@ -841,8 +839,8 @@ export default function UserDetailPage() {
                               report.status === 'resolved'
                                 ? 'primary'
                                 : report.status === 'dismissed'
-                                  ? 'secondary'
-                                  : 'destructive'
+                                  ? 'default'
+                                  : 'error'
                             }
                           >
                             {report.status === 'resolved'
@@ -973,7 +971,7 @@ export default function UserDetailPage() {
               İptal
             </CanvaButton>
             <CanvaButton
-              variant={actionDialog === 'ban' ? 'destructive' : 'primary'}
+              variant={actionDialog === 'ban' ? 'error' : 'primary'}
               onClick={() => handleAction(actionDialog!)}
             >
               Onayla

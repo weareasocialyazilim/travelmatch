@@ -338,7 +338,7 @@ export default function WalletOperationsPage() {
           </CanvaBadge>
         );
       default:
-        return <CanvaBadge variant="default">{status}</CanvaBadge>;
+        return <CanvaBadge variant="primary">{status}</CanvaBadge>;
     }
   };
 
@@ -379,7 +379,7 @@ export default function WalletOperationsPage() {
           </CanvaBadge>
         );
       default:
-        return <CanvaBadge variant="default">{status}</CanvaBadge>;
+        return <CanvaBadge variant="primary">{status}</CanvaBadge>;
     }
   };
 
@@ -799,7 +799,7 @@ export default function WalletOperationsPage() {
                           </p>
                           <div className="flex items-center gap-2 mt-1">
                             <CanvaBadge
-                              variant="default"
+                              variant="primary"
                               className="text-xs capitalize"
                             >
                               {kyc.documentType.replace('_', ' ')}
@@ -1002,7 +1002,7 @@ export default function WalletOperationsPage() {
           )}
           <DialogFooter>
             <CanvaButton
-              variant="default"
+              variant="primary"
               onClick={() =>
                 setActionDialog({ open: false, action: '', item: null })
               }
@@ -1010,9 +1010,7 @@ export default function WalletOperationsPage() {
               Iptal
             </CanvaButton>
             <CanvaButton
-              variant={
-                actionDialog.action === 'reject' ? 'destructive' : 'primary'
-              }
+              variant={actionDialog.action === 'reject' ? 'error' : 'primary'}
               className={
                 actionDialog.action === 'approve'
                   ? 'bg-emerald-600 hover:bg-emerald-700'

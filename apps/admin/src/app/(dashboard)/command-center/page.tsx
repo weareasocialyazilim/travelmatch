@@ -390,7 +390,7 @@ export default function CommandCenterPage() {
             Son guncelleme: {lastUpdate.toLocaleTimeString('tr-TR')}
           </span>
           <CanvaButton
-            variant="default"
+            variant="primary"
             size="sm"
             onClick={handleRefresh}
             disabled={isRefreshing}
@@ -418,7 +418,7 @@ export default function CommandCenterPage() {
             </div>
           </div>
           <CanvaButton
-            variant="default"
+            variant="primary"
             size="sm"
             className="border-amber-500/50 text-amber-600"
           >
@@ -701,7 +701,7 @@ export default function CommandCenterPage() {
                   <Activity className="h-5 w-5 text-primary animate-pulse" />
                   Canli Aktivite
                 </CardTitle>
-                <CanvaBadge variant="default" className="text-xs">
+                <CanvaBadge variant="primary" className="text-xs">
                   CANLI
                 </CanvaBadge>
               </div>
@@ -767,7 +767,7 @@ export default function CommandCenterPage() {
                       <span className="text-sm font-medium">
                         {insight.title}
                       </span>
-                      <CanvaBadge variant="default" className="text-xs">
+                      <CanvaBadge variant="primary" className="text-xs">
                         %{insight.confidence} guven
                       </CanvaBadge>
                     </div>
@@ -827,7 +827,7 @@ export default function CommandCenterPage() {
             </CardHeader>
             <CardContent className="space-y-2">
               <CanvaButton
-                variant="default"
+                variant="primary"
                 className="w-full justify-start"
                 size="sm"
               >
@@ -835,7 +835,7 @@ export default function CommandCenterPage() {
                 Kampanya Gonder
               </CanvaButton>
               <CanvaButton
-                variant="default"
+                variant="primary"
                 className="w-full justify-start"
                 size="sm"
               >
@@ -843,7 +843,7 @@ export default function CommandCenterPage() {
                 Toplu Bildirim
               </CanvaButton>
               <CanvaButton
-                variant="default"
+                variant="primary"
                 className="w-full justify-start"
                 size="sm"
               >
@@ -851,7 +851,7 @@ export default function CommandCenterPage() {
                 Rapor Olustur
               </CanvaButton>
               <CanvaButton
-                variant="default"
+                variant="primary"
                 className="w-full justify-start"
                 size="sm"
               >

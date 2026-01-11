@@ -149,16 +149,16 @@ export default function CampaignsPage() {
     const variants: Record<
       string,
       {
-        variant: 'primary' | 'secondary' | 'outline' | 'destructive';
+        variant: 'primary' | 'default' | 'outline' | 'error';
         label: string;
       }
     > = {
       active: { variant: 'primary', label: 'Aktif' },
-      scheduled: { variant: 'secondary', label: 'Zamanlandı' },
+      scheduled: { variant: 'default', label: 'Zamanlandı' },
       paused: { variant: 'outline', label: 'Duraklatıldı' },
       completed: { variant: 'outline', label: 'Tamamlandı' },
       draft: { variant: 'outline', label: 'Taslak' },
-      cancelled: { variant: 'destructive', label: 'İptal' },
+      cancelled: { variant: 'error', label: 'İptal' },
     };
     const { variant, label } = variants[status] || {
       variant: 'outline',

@@ -104,7 +104,7 @@ export default function RevenuePage() {
             </SelectContent>
           </Select>
           <CanvaButton
-            variant="default"
+            variant="primary"
             onClick={() => refetch()}
             disabled={isFetching}
           >

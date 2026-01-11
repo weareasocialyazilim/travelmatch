@@ -127,7 +127,7 @@ const tierConfig = {
   },
   partner: {
     label: 'Partner',
-    variant: 'secondary' as const,
+    variant: 'default' as const,
     icon: CheckCircle,
     description: 'İş ortağı - Özel anlaşma',
   },
@@ -847,7 +847,7 @@ export default function VIPManagementPage() {
               </p>
               <div className="flex gap-2">
                 <CanvaButton
-                  variant="default"
+                  variant="primary"
                   size="sm"
                   onClick={() => setPage((p) => p - 1)}
                   disabled={page === 0}
@@ -855,7 +855,7 @@ export default function VIPManagementPage() {
                   Önceki
                 </CanvaButton>
                 <CanvaButton
-                  variant="default"
+                  variant="primary"
                   size="sm"
                   onClick={() => setPage((p) => p + 1)}
                   disabled={(page + 1) * limit >= total}
