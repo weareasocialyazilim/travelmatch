@@ -23,16 +23,17 @@ import {
   Unlock,
   RefreshCw,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -472,7 +473,7 @@ export default function CompliancePage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button
+          <CanvaButton
             variant="outline"
             onClick={() => {
               fetchStats();
@@ -482,7 +483,7 @@ export default function CompliancePage() {
           >
             <RefreshCw className="mr-2 h-4 w-4" />
             Yenile
-          </Button>
+          </CanvaButton>
           {stats?.sar.pending ? (
             <Badge variant="error" className="h-8 px-3 text-sm">
               <AlertCircle className="mr-1 h-4 w-4" />
@@ -597,7 +598,7 @@ export default function CompliancePage() {
               <div className="mb-6 flex items-center gap-4">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
+                  <CanvaInput
                     placeholder="Rapor numarası veya kullanıcı ara..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -683,7 +684,7 @@ export default function CompliancePage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button
+                        <CanvaButton
                           size="sm"
                           variant="outline"
                           onClick={() => {
@@ -695,12 +696,12 @@ export default function CompliancePage() {
                         >
                           <Eye className="mr-1 h-4 w-4" />
                           İncele
-                        </Button>
+                        </CanvaButton>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button size="sm" variant="ghost">
+                            <CanvaButton size="sm" variant="ghost">
                               <MoreHorizontal className="h-4 w-4" />
-                            </Button>
+                            </CanvaButton>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>İşlemler</DropdownMenuLabel>
@@ -835,16 +836,16 @@ export default function CompliancePage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button
+                        <CanvaButton
                           size="sm"
                           variant="outline"
                           onClick={() => setSelectedProfile(profile)}
                         >
                           <Eye className="mr-1 h-4 w-4" />
                           Detay
-                        </Button>
+                        </CanvaButton>
                         {profile.is_blocked ? (
-                          <Button
+                          <CanvaButton
                             size="sm"
                             variant="outline"
                             onClick={() =>
@@ -853,9 +854,9 @@ export default function CompliancePage() {
                           >
                             <Unlock className="mr-1 h-4 w-4 text-green-600" />
                             Aç
-                          </Button>
+                          </CanvaButton>
                         ) : (
-                          <Button
+                          <CanvaButton
                             size="sm"
                             variant="destructive"
                             onClick={() =>
@@ -868,7 +869,7 @@ export default function CompliancePage() {
                           >
                             <Lock className="mr-1 h-4 w-4" />
                             Engelle
-                          </Button>
+                          </CanvaButton>
                         )}
                       </div>
                     </div>
@@ -1151,10 +1152,10 @@ export default function CompliancePage() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setSelectedSar(null)}>
+            <CanvaButton variant="outline" onClick={() => setSelectedSar(null)}>
               Kapat
-            </Button>
-            <Button
+            </CanvaButton>
+            <CanvaButton
               variant="outline"
               onClick={() =>
                 selectedSar &&
@@ -1167,8 +1168,8 @@ export default function CompliancePage() {
             >
               <Clock className="mr-2 h-4 w-4" />
               Kaydet
-            </Button>
-            <Button
+            </CanvaButton>
+            <CanvaButton
               variant="default"
               className="bg-green-600 hover:bg-green-700"
               onClick={() =>
@@ -1178,8 +1179,8 @@ export default function CompliancePage() {
             >
               <CheckCircle className="mr-2 h-4 w-4" />
               Temiz
-            </Button>
-            <Button
+            </CanvaButton>
+            <CanvaButton
               variant="destructive"
               onClick={() =>
                 selectedSar &&
@@ -1188,7 +1189,7 @@ export default function CompliancePage() {
             >
               <XCircle className="mr-2 h-4 w-4" />
               Onayla
-            </Button>
+            </CanvaButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1254,11 +1255,11 @@ export default function CompliancePage() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setSelectedProfile(null)}>
+            <CanvaButton variant="outline" onClick={() => setSelectedProfile(null)}>
               Kapat
-            </Button>
+            </CanvaButton>
             {selectedProfile?.is_blocked ? (
-              <Button
+              <CanvaButton
                 onClick={() =>
                   selectedProfile &&
                   toggleUserBlock(selectedProfile.user_id, false)
@@ -1266,9 +1267,9 @@ export default function CompliancePage() {
               >
                 <Unlock className="mr-2 h-4 w-4" />
                 Engeli Kaldır
-              </Button>
+              </CanvaButton>
             ) : (
-              <Button
+              <CanvaButton
                 variant="destructive"
                 onClick={() =>
                   selectedProfile &&
@@ -1277,7 +1278,7 @@ export default function CompliancePage() {
               >
                 <Lock className="mr-2 h-4 w-4" />
                 Engelle
-              </Button>
+              </CanvaButton>
             )}
           </DialogFooter>
         </DialogContent>
