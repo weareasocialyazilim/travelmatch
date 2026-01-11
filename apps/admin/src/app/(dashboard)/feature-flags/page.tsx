@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Flag,
   Plus,
@@ -25,6 +25,8 @@ import {
   Zap,
   Shield,
   TrendingUp,
+  RefreshCw,
+  Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -79,6 +81,13 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import { formatDate } from '@/lib/utils';
+import {
+  useFeatureFlags,
+  useCreateFeatureFlag,
+  useUpdateFeatureFlag,
+  useDeleteFeatureFlag,
+  useToggleFeatureFlag,
+} from '@/hooks/use-feature-flags';
 
 interface FeatureFlag {
   id: string;
@@ -261,12 +270,43 @@ const platformIcons: Record<string, React.ElementType> = {
 };
 
 export default function FeatureFlagsPage() {
-  const [flags, setFlags] = useState<FeatureFlag[]>(mockFlags);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [environmentFilter, setEnvironmentFilter] = useState<string>('all');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingFlag, setEditingFlag] = useState<FeatureFlag | null>(null);
+
+  // Use real API data
+  const { data, isLoading, error, refetch } = useFeatureFlags();
+  const createFlag = useCreateFeatureFlag();
+  const updateFlag = useUpdateFeatureFlag();
+  const deleteFlag = useDeleteFeatureFlag();
+  const toggleFlag = useToggleFeatureFlag();
+
+  // Use API data if available, otherwise fall back to mock data
+  const flags = useMemo(() => {
+    if (data?.flags && data.flags.length > 0) {
+      return data.flags.map(flag => ({
+        id: flag.id,
+        key: flag.name.toLowerCase().replace(/\s+/g, '_'),
+        name: flag.name,
+        description: flag.description || '',
+        enabled: flag.enabled,
+        rollout_percentage: flag.rollout_percentage,
+        environment: (flag.environments?.[0] || 'production') as 'production' | 'staging' | 'development',
+        platforms: ['ios', 'android', 'web'] as ('ios' | 'android' | 'web')[],
+        targeting: { type: 'all' as const },
+        created_at: flag.created_at,
+        updated_at: flag.updated_at,
+        created_by: 'Admin',
+        category: flag.category as FeatureFlag['category'],
+        tags: [],
+      }));
+    }
+    return mockFlags;
+  }, [data?.flags]);
+
+  const apiStats = data?.stats;
 
   // New flag form state
   const [newFlag, setNewFlag] = useState({
@@ -296,22 +336,19 @@ export default function FeatureFlagsPage() {
   });
 
   // Stats
-  const stats = {
+  const stats = apiStats || {
     total: flags.length,
     enabled: flags.filter((f) => f.enabled).length,
-    experiments: flags.filter((f) => f.category === 'experiment').length,
-    killSwitches: flags.filter((f) => f.category === 'kill_switch').length,
+    disabled: flags.filter((f) => !f.enabled).length,
+    beta: 0,
   };
+
+  const experiments = flags.filter((f) => f.category === 'experiment').length;
+  const killSwitches = flags.filter((f) => f.category === 'kill_switch').length;
 
   // Toggle flag
   const handleToggle = (flagId: string, enabled: boolean) => {
-    setFlags((prev) =>
-      prev.map((f) =>
-        f.id === flagId
-          ? { ...f, enabled, updated_at: new Date().toISOString() }
-          : f,
-      ),
-    );
+    toggleFlag.mutate(flagId, enabled);
     const flag = flags.find((f) => f.id === flagId);
     toast.success(
       `${flag?.name} ${enabled ? 'etkinleştirildi' : 'devre dışı bırakıldı'}`,
@@ -320,49 +357,58 @@ export default function FeatureFlagsPage() {
 
   // Update rollout percentage
   const handleRolloutChange = (flagId: string, percentage: number) => {
-    setFlags((prev) =>
-      prev.map((f) =>
-        f.id === flagId
-          ? {
-              ...f,
-              rollout_percentage: percentage,
-              updated_at: new Date().toISOString(),
-            }
-          : f,
-      ),
+    updateFlag.mutate(
+      { id: flagId, rollout_percentage: percentage },
+      {
+        onError: () => {
+          toast.error('Rollout güncellenemedi');
+        },
+      }
     );
   };
 
   // Create new flag
   const handleCreateFlag = () => {
-    const flag: FeatureFlag = {
-      id: `ff_${Date.now()}`,
-      ...newFlag,
-      enabled: false,
-      targeting: { type: 'all' },
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      created_by: 'Current Admin',
-      tags: [],
-    };
-    setFlags((prev) => [flag, ...prev]);
-    setIsCreateDialogOpen(false);
-    setNewFlag({
-      key: '',
-      name: '',
-      description: '',
-      category: 'feature',
-      environment: 'staging',
-      platforms: ['ios', 'android', 'web'],
-      rollout_percentage: 0,
-    });
-    toast.success('Feature flag oluşturuldu');
+    createFlag.mutate(
+      {
+        name: newFlag.name,
+        description: newFlag.description,
+        enabled: false,
+        category: newFlag.category,
+        rollout_percentage: newFlag.rollout_percentage,
+        environments: [newFlag.environment],
+      },
+      {
+        onSuccess: () => {
+          setIsCreateDialogOpen(false);
+          setNewFlag({
+            key: '',
+            name: '',
+            description: '',
+            category: 'feature',
+            environment: 'staging',
+            platforms: ['ios', 'android', 'web'],
+            rollout_percentage: 0,
+          });
+          toast.success('Feature flag oluşturuldu');
+        },
+        onError: () => {
+          toast.error('Flag oluşturulamadı');
+        },
+      }
+    );
   };
 
   // Delete flag
   const handleDeleteFlag = (flagId: string) => {
-    setFlags((prev) => prev.filter((f) => f.id !== flagId));
-    toast.success('Feature flag silindi');
+    deleteFlag.mutate(flagId, {
+      onSuccess: () => {
+        toast.success('Feature flag silindi');
+      },
+      onError: () => {
+        toast.error('Flag silinemedi');
+      },
+    });
   };
 
   // Copy flag key
@@ -381,6 +427,15 @@ export default function FeatureFlagsPage() {
             Özellikleri kontrollü şekilde yayınlayın ve yönetin
           </p>
         </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => refetch()} disabled={isLoading}>
+            {isLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="mr-2 h-4 w-4" />
+            )}
+            Yenile
+          </Button>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button>
@@ -508,6 +563,7 @@ export default function FeatureFlagsPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {/* Stats */}
@@ -529,7 +585,7 @@ export default function FeatureFlagsPage() {
           <CardContent>
             <div className="text-2xl font-bold">{stats.enabled}</div>
             <p className="text-xs text-muted-foreground">
-              {Math.round((stats.enabled / stats.total) * 100)}% etkin
+              {stats.total > 0 ? Math.round((stats.enabled / stats.total) * 100) : 0}% etkin
             </p>
           </CardContent>
         </Card>
@@ -539,7 +595,7 @@ export default function FeatureFlagsPage() {
             <TrendingUp className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.experiments}</div>
+            <div className="text-2xl font-bold">{experiments}</div>
             <p className="text-xs text-muted-foreground">
               A/B test devam ediyor
             </p>
@@ -551,7 +607,7 @@ export default function FeatureFlagsPage() {
             <Shield className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.killSwitches}</div>
+            <div className="text-2xl font-bold">{killSwitches}</div>
             <p className="text-xs text-muted-foreground">
               Acil durum kontrolleri
             </p>
