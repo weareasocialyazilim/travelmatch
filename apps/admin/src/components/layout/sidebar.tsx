@@ -43,6 +43,12 @@ import {
   Compass,
   Heart,
   Wifi,
+  Wallet,
+  CreditCard,
+  Send,
+  ShieldCheck,
+  UserCheck,
+  Server,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -104,6 +110,18 @@ const operationsNavItems: NavItem[] = [
     resource: 'transactions',
   },
   {
+    title: 'Wallet & Payouts',
+    href: '/wallet-operations',
+    icon: Wallet,
+    resource: 'transactions',
+  },
+  {
+    title: 'Abonelikler',
+    href: '/subscription-management',
+    icon: CreditCard,
+    resource: 'transactions',
+  },
+  {
     title: 'Escrow Islemleri',
     href: '/escrow-operations',
     icon: Lock,
@@ -116,15 +134,9 @@ const operationsNavItems: NavItem[] = [
     resource: 'transactions',
   },
   {
-    title: 'Gelir Analizi',
-    href: '/revenue',
-    icon: TrendingUp,
-    resource: 'transactions',
-  },
-  {
-    title: 'Guvenlik',
-    href: '/trust-safety',
-    icon: Shield,
+    title: 'Safety Hub',
+    href: '/safety-hub',
+    icon: ShieldCheck,
     resource: 'reports',
   },
   {
@@ -140,6 +152,12 @@ const analyticsNavItems: NavItem[] = [
     title: 'Analitik',
     href: '/analytics',
     icon: BarChart3,
+    resource: 'analytics',
+  },
+  {
+    title: 'User Lifecycle',
+    href: '/user-lifecycle',
+    icon: UserCheck,
     resource: 'analytics',
   },
   {
@@ -176,6 +194,12 @@ const growthNavItems: NavItem[] = [
     resource: 'users',
   },
   {
+    title: 'Kampanya Builder',
+    href: '/campaign-builder',
+    icon: Send,
+    resource: 'users',
+  },
+  {
     title: 'Kampanyalar',
     href: '/campaigns',
     icon: Megaphone,
@@ -196,6 +220,12 @@ const techNavItems: NavItem[] = [
     href: '/ai-insights',
     icon: Sparkles,
     resource: 'analytics',
+  },
+  {
+    title: 'Sistem Sagligi',
+    href: '/system-health',
+    icon: Server,
+    resource: 'settings',
   },
   {
     title: 'Entegrasyonlar',
