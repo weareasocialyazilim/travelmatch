@@ -50,7 +50,7 @@ import {
   Users,
   XCircle,
 } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import { getClient } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 
 // =============================================================================
@@ -147,7 +147,7 @@ export default function ModerationPage() {
     category: 'profanity',
   });
 
-  const supabase = createClient();
+  const supabase = getClient();
 
   useEffect(() => {
     loadData();

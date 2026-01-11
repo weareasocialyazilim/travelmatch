@@ -192,6 +192,8 @@
 
 .admin-sidebar-nav {
   @apply px-3 py-4;
+  scroll-behavior: smooth;
+  overflow-anchor: none;
 }
 
 .admin-sidebar-section {
@@ -221,6 +223,23 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════
+   ADMIN HEADER STYLES
+   ═══════════════════════════════════════════════════════════════════ */
+
+.admin-header {
+  @apply flex items-center justify-between h-16 px-6 border-b bg-card/80 backdrop-blur-sm;
+}
+
+.admin-header-actions {
+  @apply flex items-center gap-2;
+}
+
+.admin-header-search {
+  @apply flex items-center gap-2 px-3 py-2 rounded-lg border bg-muted/50 transition-all;
+  @apply hover:bg-muted focus-within:ring-2 focus-within:ring-primary/50;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    TRAVELMATCH DASHBOARD - Tranzacta Inspired
    ═══════════════════════════════════════════════════════════════════ */
 
@@ -240,15 +259,27 @@
 }
 
 .stat-card-chart-income {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, #0d0d0f 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(16, 185, 129, 0.12) 0%,
+    #0d0d0f 100%
+  );
 }
 
 .stat-card-chart-expense {
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.12) 0%, #0d0d0f 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(236, 72, 153, 0.12) 0%,
+    #0d0d0f 100%
+  );
 }
 
 .stat-card-chart-savings {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, #0d0d0f 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.12) 0%,
+    #0d0d0f 100%
+  );
 }
 
 /* Bar Chart */
@@ -366,10 +397,18 @@
   @apply w-2 h-2 rounded-full mt-2 shrink-0;
 }
 
-.notification-dot-info { @apply bg-blue-500; }
-.notification-dot-warning { @apply bg-amber-500; }
-.notification-dot-error { @apply bg-rose-500; }
-.notification-dot-success { @apply bg-emerald-500; }
+.notification-dot-info {
+  @apply bg-blue-500;
+}
+.notification-dot-warning {
+  @apply bg-amber-500;
+}
+.notification-dot-error {
+  @apply bg-rose-500;
+}
+.notification-dot-success {
+  @apply bg-emerald-500;
+}
 
 /* Progress Bar */
 .progress-bar-mini {
@@ -380,9 +419,15 @@
   @apply h-full rounded-full transition-all duration-500;
 }
 
-.progress-bar-fill-emerald { @apply bg-gradient-to-r from-emerald-500 to-emerald-400; }
-.progress-bar-fill-amber { @apply bg-gradient-to-r from-amber-500 to-amber-400; }
-.progress-bar-fill-magenta { @apply bg-gradient-to-r from-pink-500 to-pink-400; }
+.progress-bar-fill-emerald {
+  @apply bg-gradient-to-r from-emerald-500 to-emerald-400;
+}
+.progress-bar-fill-amber {
+  @apply bg-gradient-to-r from-amber-500 to-amber-400;
+}
+.progress-bar-fill-magenta {
+  @apply bg-gradient-to-r from-pink-500 to-pink-400;
+}
 
 /* Badge Gradients */
 .badge-gradient-amber {
@@ -426,31 +471,60 @@
 }
 
 @keyframes pulse-green {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
-  50% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
 }
 
 @keyframes pulse-amber {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
-  50% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(245, 158, 11, 0);
+  }
 }
 
 @keyframes pulse-red {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
-  50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+  }
 }
 
 /* Animations */
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in-up {
   animation: fadeInUp 0.4s ease-out forwards;
 }
 
-.stagger-1 { animation-delay: 0.05s; }
-.stagger-2 { animation-delay: 0.1s; }
-.stagger-3 { animation-delay: 0.15s; }
-.stagger-4 { animation-delay: 0.2s; }
+.stagger-1 {
+  animation-delay: 0.05s;
+}
+.stagger-2 {
+  animation-delay: 0.1s;
+}
+.stagger-3 {
+  animation-delay: 0.15s;
+}
+.stagger-4 {
+  animation-delay: 0.2s;
+}

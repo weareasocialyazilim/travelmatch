@@ -106,8 +106,8 @@ const reportQueue = [
     id: 'rep-001',
     type: 'content',
     category: 'Uygunsuz İçerik',
-    reporter: { name: 'Ayşe K.', avatar: '/avatars/user1.jpg' },
-    reported: { name: 'Mehmet Y.', avatar: '/avatars/user2.jpg' },
+    reporter: { name: 'Ayşe K.', avatar: null },
+    reported: { name: 'Mehmet Y.', avatar: null },
     contentType: 'image',
     priority: 'high',
     aiScore: 0.89,
@@ -118,7 +118,7 @@ const reportQueue = [
     id: 'rep-002',
     type: 'user',
     category: 'Sahte Profil',
-    reporter: { name: 'Can B.', avatar: '/avatars/user3.jpg' },
+    reporter: { name: 'Can B.', avatar: null },
     reported: { name: 'Unknown User', avatar: null },
     contentType: 'profile',
     priority: 'high',
@@ -130,8 +130,8 @@ const reportQueue = [
     id: 'rep-003',
     type: 'message',
     category: 'Spam',
-    reporter: { name: 'Zeynep A.', avatar: '/avatars/user4.jpg' },
-    reported: { name: 'Ali R.', avatar: '/avatars/user5.jpg' },
+    reporter: { name: 'Zeynep A.', avatar: null },
+    reported: { name: 'Ali R.', avatar: null },
     contentType: 'chat',
     priority: 'medium',
     aiScore: 0.72,
@@ -143,7 +143,7 @@ const reportQueue = [
     type: 'fraud',
     category: 'Ödeme Dolandırıcılığı',
     reporter: { name: 'Sistem', avatar: null },
-    reported: { name: 'Hasan K.', avatar: '/avatars/user6.jpg' },
+    reported: { name: 'Hasan K.', avatar: null },
     contentType: 'transaction',
     priority: 'critical',
     aiScore: 0.97,
@@ -154,8 +154,8 @@ const reportQueue = [
     id: 'rep-005',
     type: 'content',
     category: 'Telif Hakkı',
-    reporter: { name: 'Fatma S.', avatar: '/avatars/user7.jpg' },
-    reported: { name: 'Emre T.', avatar: '/avatars/user8.jpg' },
+    reporter: { name: 'Fatma S.', avatar: null },
+    reported: { name: 'Emre T.', avatar: null },
     contentType: 'image',
     priority: 'low',
     aiScore: 0.45,
@@ -517,7 +517,9 @@ export default function SafetyHubPage() {
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Avatar className="h-6 w-6">
-                            <AvatarImage src={report.reporter.avatar || ''} />
+                            {report.reporter.avatar && (
+                              <AvatarImage src={report.reporter.avatar} />
+                            )}
                             <AvatarFallback className="text-xs">
                               {report.reporter.name.slice(0, 2)}
                             </AvatarFallback>
@@ -530,7 +532,9 @@ export default function SafetyHubPage() {
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Avatar className="h-6 w-6">
-                            <AvatarImage src={report.reported.avatar || ''} />
+                            {report.reported.avatar && (
+                              <AvatarImage src={report.reported.avatar} />
+                            )}
                             <AvatarFallback className="text-xs">
                               {report.reported.name.slice(0, 2)}
                             </AvatarFallback>

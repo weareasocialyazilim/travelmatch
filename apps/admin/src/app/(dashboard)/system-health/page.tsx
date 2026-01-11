@@ -56,7 +56,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Switch } from '@/components/ui/switch';
-import { AdminAreaChart, AdminLineChart } from '@/components/charts';
+import {
+  AdminAreaChart,
+  AdminLineChart,
+} from '@/components/common/admin-chart';
 import { cn } from '@/lib/utils';
 
 // System overview metrics
