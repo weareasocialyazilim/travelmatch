@@ -1,1 +1,0 @@
-export { GiftingSchema } from './GiftingSchema';
