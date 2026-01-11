@@ -1,5 +1,5 @@
 # Run lint-staged for code quality checks
-npx lint-staged
+pnpm exec lint-staged
 
 # Run type checking with Turbo (only changed packages)
 pnpm turbo run type-check --filter="[HEAD^1]"
