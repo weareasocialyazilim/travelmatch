@@ -180,10 +180,10 @@ export default function CreatorsPage() {
     const config = tierConfig[tier as keyof typeof tierConfig];
     const Icon = config.icon;
     return (
-      <Badge className={`${config.color} text-white`}>
+      <CanvaBadge className={`${config.color} text-white`}>
         <Icon className="mr-1 h-3 w-3" />
         {tier.charAt(0).toUpperCase() + tier.slice(1)}
-      </Badge>
+      </CanvaBadge>
     );
   };
 
@@ -203,10 +203,10 @@ export default function CreatorsPage() {
             İçerik üreticilerini yönet ve takip et
           </p>
         </div>
-        <Button>
+        <CanvaButton>
           <Sparkles className="mr-2 h-4 w-4" />
           Yeni Creator Ekle
-        </Button>
+        </CanvaButton>
       </div>
 
       {/* Stats */}
@@ -283,7 +283,9 @@ export default function CreatorsPage() {
           <TabsTrigger value="creators">Creatorlar</TabsTrigger>
           <TabsTrigger value="applications">
             Başvurular
-            <Badge className="ml-2 bg-orange-500">{applications.length}</Badge>
+            <CanvaBadge className="ml-2 bg-orange-500">
+              {applications.length}
+            </CanvaBadge>
           </TabsTrigger>
           <TabsTrigger value="tiers">Tier Sistemi</TabsTrigger>
           <TabsTrigger value="payouts">Ödemeler</TabsTrigger>
@@ -340,9 +342,9 @@ export default function CreatorsPage() {
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
+                        <CanvaButton variant="ghost" size="sm" iconOnly>
                           <MoreHorizontal className="h-4 w-4" />
-                        </Button>
+                        </CanvaButton>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem>Profili Görüntüle</DropdownMenuItem>
@@ -376,10 +378,10 @@ export default function CreatorsPage() {
                     </div>
                   </div>
 
-                  <Button variant="outline" className="mt-4 w-full">
+                  <CanvaButton variant="primary" className="mt-4 w-full">
                     Detayları Gör
                     <ChevronRight className="ml-2 h-4 w-4" />
-                  </Button>
+                  </CanvaButton>
                 </CardContent>
               </Card>
             ))}
@@ -428,14 +430,14 @@ export default function CreatorsPage() {
                         </p>
                       </div>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
+                        <CanvaButton size="sm" variant="primary">
                           <XCircle className="mr-1 h-4 w-4" />
                           Reddet
-                        </Button>
-                        <Button size="sm">
+                        </CanvaButton>
+                        <CanvaButton size="sm">
                           <CheckCircle className="mr-1 h-4 w-4" />
                           Onayla
-                        </Button>
+                        </CanvaButton>
                       </div>
                     </div>
                   </div>
@@ -570,7 +572,7 @@ export default function CreatorsPage() {
                         <p className="font-medium">
                           ₺{(creator.earnings * 0.2).toLocaleString('tr-TR')}
                         </p>
-                        <Button size="sm">Öde</Button>
+                        <CanvaButton size="sm">Öde</CanvaButton>
                       </div>
                     </div>
                   ))}

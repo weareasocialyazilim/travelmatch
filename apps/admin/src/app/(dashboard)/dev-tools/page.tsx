@@ -224,14 +224,17 @@ export default function DevToolsPage() {
                       placeholder="/api/endpoint"
                       className="flex-1 font-mono"
                     />
-                    <Button onClick={handleSendRequest} disabled={isLoading}>
+                    <CanvaButton
+                      onClick={handleSendRequest}
+                      disabled={isLoading}
+                    >
                       {isLoading ? (
                         <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
                       ) : (
                         <Send className="mr-2 h-4 w-4" />
                       )}
                       Gönder
-                    </Button>
+                    </CanvaButton>
                   </div>
 
                   {['POST', 'PATCH', 'PUT'].includes(selectedMethod) && (
@@ -251,7 +254,7 @@ export default function DevToolsPage() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <Label>Response</Label>
-                        <Button
+                        <CanvaButton
                           size="sm"
                           variant="ghost"
                           onClick={() => handleCopy(response)}
@@ -261,7 +264,7 @@ export default function DevToolsPage() {
                           ) : (
                             <Copy className="h-4 w-4" />
                           )}
-                        </Button>
+                        </CanvaButton>
                       </div>
                       <div className="relative rounded-lg bg-muted p-4 overflow-auto max-h-96">
                         <pre className="text-sm font-mono text-green-600">
@@ -291,11 +294,11 @@ export default function DevToolsPage() {
                       }}
                       className="w-full flex items-center gap-2 rounded-lg border p-3 text-left hover:bg-muted transition-colors"
                     >
-                      <Badge
+                      <CanvaBadge
                         className={`${getMethodColor(endpoint.method)} text-white text-xs`}
                       >
                         {endpoint.method}
-                      </Badge>
+                      </CanvaBadge>
                       <div className="flex-1 min-w-0">
                         <p className="font-mono text-sm truncate">
                           {endpoint.path}
@@ -349,10 +352,12 @@ export default function DevToolsPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline">{webhook.duration}</Badge>
-                        <Button size="sm" variant="ghost">
+                        <CanvaBadge variant="default">
+                          {webhook.duration}
+                        </CanvaBadge>
+                        <CanvaButton size="sm" variant="ghost">
                           <FileJson className="h-4 w-4" />
-                        </Button>
+                        </CanvaButton>
                       </div>
                     </div>
                   ))}
@@ -382,23 +387,23 @@ export default function DevToolsPage() {
                       readOnly
                       className="font-mono"
                     />
-                    <Button variant="outline" size="icon">
+                    <CanvaButton variant="primary" size="sm" iconOnly>
                       <RefreshCw className="h-4 w-4" />
-                    </Button>
+                    </CanvaButton>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label>Aktif Eventler</Label>
                   <div className="flex flex-wrap gap-2">
-                    <Badge>user.created</Badge>
-                    <Badge>user.updated</Badge>
-                    <Badge>payment.completed</Badge>
-                    <Badge>moment.created</Badge>
-                    <Badge>match.created</Badge>
-                    <Badge variant="outline">+ Ekle</Badge>
+                    <CanvaBadge>user.created</CanvaBadge>
+                    <CanvaBadge>user.updated</CanvaBadge>
+                    <CanvaBadge>payment.completed</CanvaBadge>
+                    <CanvaBadge>moment.created</CanvaBadge>
+                    <CanvaBadge>match.created</CanvaBadge>
+                    <CanvaBadge variant="default">+ Ekle</CanvaBadge>
                   </div>
                 </div>
-                <Button className="w-full">Kaydet</Button>
+                <CanvaButton className="w-full">Kaydet</CanvaButton>
               </CardContent>
             </Card>
           </div>
@@ -423,10 +428,10 @@ export default function DevToolsPage() {
                   <AlertTriangle className="inline h-4 w-4 mr-1" />
                   Sadece SELECT sorguları çalıştırılabilir
                 </p>
-                <Button>
+                <CanvaButton>
                   <Play className="mr-2 h-4 w-4" />
                   Çalıştır
-                </Button>
+                </CanvaButton>
               </div>
             </CardContent>
           </Card>
@@ -485,9 +490,11 @@ export default function DevToolsPage() {
                     >
                       <code className="text-sm">{env.key}</code>
                       {env.status === 'set' ? (
-                        <Badge className="bg-green-500">Ayarlandı</Badge>
+                        <CanvaBadge className="bg-green-500">
+                          Ayarlandı
+                        </CanvaBadge>
                       ) : (
-                        <Badge variant="destructive">Eksik</Badge>
+                        <CanvaBadge variant="error">Eksik</CanvaBadge>
                       )}
                     </div>
                   ))}
@@ -516,7 +523,7 @@ export default function DevToolsPage() {
                   </div>
                   <div className="flex items-center justify-between rounded-lg border p-3">
                     <span className="text-sm">Environment</span>
-                    <Badge>Production</Badge>
+                    <CanvaBadge>Production</CanvaBadge>
                   </div>
                   <div className="flex items-center justify-between rounded-lg border p-3">
                     <span className="text-sm">Uptime</span>

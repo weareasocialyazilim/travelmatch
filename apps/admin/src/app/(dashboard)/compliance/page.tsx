@@ -151,19 +151,19 @@ const getRiskLevelColor = (level: string) => {
 const getStatusBadge = (status: string) => {
   switch (status) {
     case 'pending':
-      return <Badge variant="warning">Bekliyor</Badge>;
+      return <CanvaBadge variant="warning">Bekliyor</CanvaBadge>;
     case 'investigating':
-      return <Badge variant="secondary">İnceleniyor</Badge>;
+      return <CanvaBadge variant="default">İnceleniyor</CanvaBadge>;
     case 'escalated':
-      return <Badge variant="error">Yükseltildi</Badge>;
+      return <CanvaBadge variant="error">Yükseltildi</CanvaBadge>;
     case 'reported':
-      return <Badge variant="info">Bildirildi</Badge>;
+      return <CanvaBadge variant="info">Bildirildi</CanvaBadge>;
     case 'cleared':
-      return <Badge variant="success">Temiz</Badge>;
+      return <CanvaBadge variant="success">Temiz</CanvaBadge>;
     case 'confirmed':
-      return <Badge variant="error">Onaylandı</Badge>;
+      return <CanvaBadge variant="error">Onaylandı</CanvaBadge>;
     default:
-      return <Badge>{status}</Badge>;
+      return <CanvaBadge>{status}</CanvaBadge>;
   }
 };
 
@@ -502,7 +502,7 @@ export default function CompliancePage() {
           Uyumluluk verileri yüklenemedi. Lütfen tekrar deneyin.
         </p>
         <CanvaButton
-          variant="outline"
+          variant="default"
           onClick={() => {
             fetchStats();
             fetchSarReports();
@@ -532,7 +532,7 @@ export default function CompliancePage() {
         </div>
         <div className="flex gap-2">
           <CanvaButton
-            variant="outline"
+            variant="default"
             onClick={() => {
               fetchStats();
               fetchSarReports();
@@ -543,10 +543,10 @@ export default function CompliancePage() {
             Yenile
           </CanvaButton>
           {stats?.sar.pending ? (
-            <Badge variant="error" className="h-8 px-3 text-sm">
+            <CanvaBadge variant="error" className="h-8 px-3 text-sm">
               <AlertCircle className="mr-1 h-4 w-4" />
               {stats.sar.pending} bekleyen SAR
-            </Badge>
+            </CanvaBadge>
           ) : null}
         </div>
       </div>
@@ -623,9 +623,9 @@ export default function CompliancePage() {
             <FileText className="mr-2 h-4 w-4" />
             SAR Raporları
             {stats?.sar.pending ? (
-              <Badge variant="error" className="ml-2">
+              <CanvaBadge variant="error" className="ml-2">
                 {stats.sar.pending}
-              </Badge>
+              </CanvaBadge>
             ) : null}
           </TabsTrigger>
           <TabsTrigger value="risk">
@@ -711,27 +711,27 @@ export default function CompliancePage() {
                               {sar.report_number}
                             </span>
                             {getStatusBadge(sar.status)}
-                            <Badge variant="outline">
+                            <CanvaBadge variant="default">
                               {sar.report_type.toUpperCase()}
-                            </Badge>
+                            </CanvaBadge>
                           </div>
                           <p className="text-sm text-muted-foreground">
                             {sar.user?.email || 'Bilinmeyen kullanıcı'}
                           </p>
                           <div className="mt-1 flex flex-wrap gap-1">
                             {sar.triggered_rules?.slice(0, 3).map((rule, i) => (
-                              <Badge
+                              <CanvaBadge
                                 key={i}
-                                variant="outline"
+                                variant="default"
                                 className="text-xs"
                               >
                                 {rule}
-                              </Badge>
+                              </CanvaBadge>
                             ))}
                             {sar.triggered_rules?.length > 3 && (
-                              <Badge variant="outline" className="text-xs">
+                              <CanvaBadge variant="default" className="text-xs">
                                 +{sar.triggered_rules.length - 3}
-                              </Badge>
+                              </CanvaBadge>
                             )}
                           </div>
                           <p className="mt-1 text-xs text-muted-foreground">
@@ -744,7 +744,7 @@ export default function CompliancePage() {
                       <div className="flex items-center gap-2">
                         <CanvaButton
                           size="sm"
-                          variant="outline"
+                          variant="default"
                           onClick={() => {
                             setSelectedSar(sar);
                             setInvestigationNotes(
@@ -860,16 +860,16 @@ export default function CompliancePage() {
                             <span className="font-medium">
                               {profile.user?.email || 'Bilinmeyen'}
                             </span>
-                            <Badge
+                            <CanvaBadge
                               className={getRiskLevelColor(profile.risk_level)}
                             >
                               {profile.risk_level.toUpperCase()}
-                            </Badge>
+                            </CanvaBadge>
                             {profile.is_blocked && (
-                              <Badge variant="error">
+                              <CanvaBadge variant="error">
                                 <Lock className="mr-1 h-3 w-3" />
                                 Engelli
-                              </Badge>
+                              </CanvaBadge>
                             )}
                           </div>
                           <p className="text-sm text-muted-foreground">
@@ -881,13 +881,13 @@ export default function CompliancePage() {
                           {profile.flags?.length > 0 && (
                             <div className="mt-1 flex flex-wrap gap-1">
                               {profile.flags.slice(0, 3).map((flag, i) => (
-                                <Badge
+                                <CanvaBadge
                                   key={i}
-                                  variant="outline"
+                                  variant="default"
                                   className="text-xs"
                                 >
                                   {flag}
-                                </Badge>
+                                </CanvaBadge>
                               ))}
                             </div>
                           )}
@@ -896,7 +896,7 @@ export default function CompliancePage() {
                       <div className="flex items-center gap-2">
                         <CanvaButton
                           size="sm"
-                          variant="outline"
+                          variant="default"
                           onClick={() => setSelectedProfile(profile)}
                         >
                           <Eye className="mr-1 h-4 w-4" />
@@ -905,7 +905,7 @@ export default function CompliancePage() {
                         {profile.is_blocked ? (
                           <CanvaButton
                             size="sm"
-                            variant="outline"
+                            variant="default"
                             onClick={() =>
                               toggleUserBlock(profile.user_id, false)
                             }
@@ -916,7 +916,7 @@ export default function CompliancePage() {
                         ) : (
                           <CanvaButton
                             size="sm"
-                            variant="danger"
+                            variant="error"
                             onClick={() =>
                               toggleUserBlock(
                                 profile.user_id,
@@ -957,15 +957,15 @@ export default function CompliancePage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>Tek işlem bildirimi</span>
-                      <Badge variant="error">₺75,000</Badge>
+                      <CanvaBadge variant="error">₺75,000</CanvaBadge>
                     </div>
                     <div className="flex justify-between">
                       <span>KYC zorunlu</span>
-                      <Badge variant="warning">₺25,000</Badge>
+                      <CanvaBadge variant="warning">₺25,000</CanvaBadge>
                     </div>
                     <div className="flex justify-between">
                       <span>Günlük hacim</span>
-                      <Badge variant="error">₺100,000</Badge>
+                      <CanvaBadge variant="error">₺100,000</CanvaBadge>
                     </div>
                   </div>
                 </div>
@@ -977,11 +977,11 @@ export default function CompliancePage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>FIU bildirimi</span>
-                      <Badge variant="error">€10,000</Badge>
+                      <CanvaBadge variant="error">€10,000</CanvaBadge>
                     </div>
                     <div className="flex justify-between">
                       <span>KYC zorunlu</span>
-                      <Badge variant="warning">€3,000</Badge>
+                      <CanvaBadge variant="warning">€3,000</CanvaBadge>
                     </div>
                   </div>
                 </div>
@@ -993,11 +993,11 @@ export default function CompliancePage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>SAR bildirimi</span>
-                      <Badge variant="error">$10,000</Badge>
+                      <CanvaBadge variant="error">$10,000</CanvaBadge>
                     </div>
                     <div className="flex justify-between">
                       <span>KYC zorunlu</span>
-                      <Badge variant="warning">$3,000</Badge>
+                      <CanvaBadge variant="warning">$3,000</CanvaBadge>
                     </div>
                   </div>
                 </div>
@@ -1009,11 +1009,11 @@ export default function CompliancePage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>NCA bildirimi</span>
-                      <Badge variant="error">£8,000</Badge>
+                      <CanvaBadge variant="error">£8,000</CanvaBadge>
                     </div>
                     <div className="flex justify-between">
                       <span>KYC zorunlu</span>
-                      <Badge variant="warning">£2,500</Badge>
+                      <CanvaBadge variant="warning">£2,500</CanvaBadge>
                     </div>
                   </div>
                 </div>
@@ -1114,8 +1114,8 @@ export default function CompliancePage() {
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="font-medium">{rule.name}</span>
-                          <Badge variant="outline">{rule.type}</Badge>
-                          <Badge
+                          <CanvaBadge variant="default">{rule.type}</CanvaBadge>
+                          <CanvaBadge
                             variant={
                               rule.action === 'block'
                                 ? 'error'
@@ -1129,7 +1129,7 @@ export default function CompliancePage() {
                               : rule.action === 'challenge'
                                 ? '2FA İste'
                                 : 'İşaretle'}
-                          </Badge>
+                          </CanvaBadge>
                         </div>
                         <p className="text-sm text-muted-foreground">
                           {rule.desc}
@@ -1189,10 +1189,10 @@ export default function CompliancePage() {
                 <h4 className="mb-2 font-medium">Tetiklenen Kurallar</h4>
                 <div className="flex flex-wrap gap-2">
                   {selectedSar.triggered_rules?.map((rule, i) => (
-                    <Badge key={i} variant="outline">
+                    <CanvaBadge key={i} variant="default">
                       <AlertTriangle className="mr-1 h-3 w-3 text-orange-500" />
                       {rule}
-                    </Badge>
+                    </CanvaBadge>
                   ))}
                 </div>
               </div>
@@ -1210,11 +1210,11 @@ export default function CompliancePage() {
             </div>
           )}
           <DialogFooter>
-            <CanvaButton variant="outline" onClick={() => setSelectedSar(null)}>
+            <CanvaButton variant="primary" onClick={() => setSelectedSar(null)}>
               Kapat
             </CanvaButton>
             <CanvaButton
-              variant="outline"
+              variant="default"
               onClick={() =>
                 selectedSar &&
                 updateSarStatus(
@@ -1239,7 +1239,7 @@ export default function CompliancePage() {
               Temiz
             </CanvaButton>
             <CanvaButton
-              variant="danger"
+              variant="error"
               onClick={() =>
                 selectedSar &&
                 updateSarStatus(selectedSar.id, 'confirmed', investigationNotes)
@@ -1314,7 +1314,7 @@ export default function CompliancePage() {
           )}
           <DialogFooter>
             <CanvaButton
-              variant="outline"
+              variant="default"
               onClick={() => setSelectedProfile(null)}
             >
               Kapat
@@ -1331,7 +1331,7 @@ export default function CompliancePage() {
               </CanvaButton>
             ) : (
               <CanvaButton
-                variant="danger"
+                variant="error"
                 onClick={() =>
                   selectedProfile &&
                   toggleUserBlock(selectedProfile.user_id, true, 'Manuel engel')

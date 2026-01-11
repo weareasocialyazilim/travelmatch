@@ -59,20 +59,62 @@ async function fetchCEOBriefing() {
       percentToGoal: 84.2,
     },
     kpis: [
-      { id: 'gmv', label: 'Daily GMV', value: 284500, prefix: '₺', change: 12.5, status: 'up' },
+      {
+        id: 'gmv',
+        label: 'Daily GMV',
+        value: 284500,
+        prefix: '₺',
+        change: 12.5,
+        status: 'up',
+      },
       { id: 'dau', label: 'DAU', value: 45200, change: 8.3, status: 'up' },
-      { id: 'completion', label: 'Completion Rate', value: 87.2, suffix: '%', change: 2.1, status: 'up' },
-      { id: 'fraud', label: 'Fraud Rate', value: 0.32, suffix: '%', change: -15.2, status: 'down', inverse: true },
+      {
+        id: 'completion',
+        label: 'Completion Rate',
+        value: 87.2,
+        suffix: '%',
+        change: 2.1,
+        status: 'up',
+      },
+      {
+        id: 'fraud',
+        label: 'Fraud Rate',
+        value: 0.32,
+        suffix: '%',
+        change: -15.2,
+        status: 'down',
+        inverse: true,
+      },
     ],
     alerts: [
-      { id: '1', severity: 'critical', title: 'PayTR Gateway Slowdown', subtitle: 'Response time 320ms (normal: 85ms)', action: 'View Details', href: '/system-health' },
-      { id: '2', severity: 'warning', title: '23 Pending KYC Verifications', subtitle: 'High-value transactions waiting', action: 'Review', href: '/wallet-operations' },
+      {
+        id: '1',
+        severity: 'critical',
+        title: 'PayTR Gateway Slowdown',
+        subtitle: 'Response time 320ms (normal: 85ms)',
+        action: 'View Details',
+        href: '/system-health',
+      },
+      {
+        id: '2',
+        severity: 'warning',
+        title: '23 Pending KYC Verifications',
+        subtitle: 'High-value transactions waiting',
+        action: 'Review',
+        href: '/wallet-operations',
+      },
     ],
     weeklyGoals: [
       { id: 'users', label: 'New Users', current: 3420, target: 4000 },
       { id: 'gmv', label: 'GMV', current: 1.85, target: 2.0, unit: 'M' },
       { id: 'nps', label: 'NPS Score', current: 48, target: 50 },
-      { id: 'resolution', label: 'Dispute Resolution', current: 92, target: 95, unit: '%' },
+      {
+        id: 'resolution',
+        label: 'Dispute Resolution',
+        current: 92,
+        target: 95,
+        unit: '%',
+      },
     ],
   };
 }
@@ -142,14 +184,26 @@ export default function CEOBriefingPage() {
             size="sm"
             onClick={() => refetch()}
             disabled={isFetching}
-            leftIcon={<RefreshCw className={cn('w-4 h-4', isFetching && 'animate-spin')} />}
+            leftIcon={
+              <RefreshCw
+                className={cn('w-4 h-4', isFetching && 'animate-spin')}
+              />
+            }
           >
             {formatTime(currentTime)}
           </CanvaButton>
-          <CanvaButton variant="outline" size="sm" leftIcon={<Mail className="w-4 h-4" />}>
+          <CanvaButton
+            variant="primary"
+            size="sm"
+            leftIcon={<Mail className="w-4 h-4" />}
+          >
             E-posta
           </CanvaButton>
-          <CanvaButton variant="outline" size="sm" leftIcon={<Download className="w-4 h-4" />}>
+          <CanvaButton
+            variant="primary"
+            size="sm"
+            leftIcon={<Download className="w-4 h-4" />}
+          >
             PDF İndir
           </CanvaButton>
         </div>
@@ -163,17 +217,25 @@ export default function CEOBriefingPage() {
             <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
               Şirket Sağlığı
             </span>
-            <span className={cn(
-              'flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full',
-              data?.systemStatus === 'operational'
-                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                : 'bg-red-50 text-red-700'
-            )}>
-              <span className={cn(
-                'w-1.5 h-1.5 rounded-full',
-                data?.systemStatus === 'operational' ? 'bg-emerald-500' : 'bg-red-500'
-              )} />
-              {data?.systemStatus === 'operational' ? 'Tüm Sistemler Aktif' : 'Sorun Tespit Edildi'}
+            <span
+              className={cn(
+                'flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full',
+                data?.systemStatus === 'operational'
+                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                  : 'bg-red-50 text-red-700',
+              )}
+            >
+              <span
+                className={cn(
+                  'w-1.5 h-1.5 rounded-full',
+                  data?.systemStatus === 'operational'
+                    ? 'bg-emerald-500'
+                    : 'bg-red-500',
+                )}
+              />
+              {data?.systemStatus === 'operational'
+                ? 'Tüm Sistemler Aktif'
+                : 'Sorun Tespit Edildi'}
             </span>
           </div>
 
@@ -216,7 +278,9 @@ export default function CEOBriefingPage() {
         <div className="col-span-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl p-6 text-white">
           <div className="flex items-center gap-2 mb-4">
             <Sparkles className="w-5 h-5 opacity-80" />
-            <span className="text-sm font-medium opacity-80">Kuzey Yıldızı Metriği</span>
+            <span className="text-sm font-medium opacity-80">
+              Kuzey Yıldızı Metriği
+            </span>
           </div>
 
           <div className="grid grid-cols-2 gap-8">
@@ -230,18 +294,27 @@ export default function CEOBriefingPage() {
                 </span>
                 <span className="flex items-center gap-1 text-sm font-medium bg-white/20 px-2 py-1 rounded-full">
                   <ArrowUpRight className="w-4 h-4" />
-                  {((((data?.northStar.current || 0) - (data?.northStar.previousPeriod || 0)) / (data?.northStar.previousPeriod || 1)) * 100).toFixed(1)}%
+                  {(
+                    (((data?.northStar.current || 0) -
+                      (data?.northStar.previousPeriod || 0)) /
+                      (data?.northStar.previousPeriod || 1)) *
+                    100
+                  ).toFixed(1)}
+                  %
                 </span>
               </div>
               <p className="text-sm opacity-70 mt-2">
-                geçen hafta: {data?.northStar.previousPeriod.toLocaleString('tr-TR')}
+                geçen hafta:{' '}
+                {data?.northStar.previousPeriod.toLocaleString('tr-TR')}
               </p>
             </div>
 
             <div className="flex flex-col justify-center">
               <div className="flex items-center justify-between text-sm mb-2">
                 <span className="opacity-70">Hedefe İlerleme</span>
-                <span className="font-semibold">%{data?.northStar.percentToGoal}</span>
+                <span className="font-semibold">
+                  %{data?.northStar.percentToGoal}
+                </span>
               </div>
               <div className="h-3 bg-white/20 rounded-full overflow-hidden">
                 <div
@@ -268,21 +341,34 @@ export default function CEOBriefingPage() {
               {kpi.label}
             </span>
             <div className="mt-2 flex items-baseline gap-1">
-              {kpi.prefix && <span className="text-lg text-gray-500">{kpi.prefix}</span>}
+              {kpi.prefix && (
+                <span className="text-lg text-gray-500">{kpi.prefix}</span>
+              )}
               <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                {typeof kpi.value === 'number' ? kpi.value.toLocaleString() : kpi.value}
+                {typeof kpi.value === 'number'
+                  ? kpi.value.toLocaleString()
+                  : kpi.value}
               </span>
-              {kpi.suffix && <span className="text-lg text-gray-500">{kpi.suffix}</span>}
+              {kpi.suffix && (
+                <span className="text-lg text-gray-500">{kpi.suffix}</span>
+              )}
             </div>
             <div className="mt-2">
-              <span className={cn(
-                'inline-flex items-center gap-1 text-sm font-medium px-2 py-0.5 rounded-full',
-                (kpi.inverse ? kpi.status === 'down' : kpi.status === 'up')
-                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                  : 'bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300'
-              )}>
-                {kpi.status === 'up' ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
-                {kpi.change > 0 ? '+' : ''}{kpi.change}%
+              <span
+                className={cn(
+                  'inline-flex items-center gap-1 text-sm font-medium px-2 py-0.5 rounded-full',
+                  (kpi.inverse ? kpi.status === 'down' : kpi.status === 'up')
+                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                    : 'bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300',
+                )}
+              >
+                {kpi.status === 'up' ? (
+                  <TrendingUp className="w-3.5 h-3.5" />
+                ) : (
+                  <TrendingDown className="w-3.5 h-3.5" />
+                )}
+                {kpi.change > 0 ? '+' : ''}
+                {kpi.change}%
               </span>
             </div>
           </div>
@@ -308,14 +394,18 @@ export default function CEOBriefingPage() {
                   key={alert.id}
                   className={cn(
                     'px-6 py-4 flex items-center justify-between',
-                    'hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors'
+                    'hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors',
                   )}
                 >
                   <div className="flex items-start gap-4">
-                    <div className={cn(
-                      'w-2 h-2 rounded-full mt-2',
-                      alert.severity === 'critical' ? 'bg-red-500' : 'bg-amber-500'
-                    )} />
+                    <div
+                      className={cn(
+                        'w-2 h-2 rounded-full mt-2',
+                        alert.severity === 'critical'
+                          ? 'bg-red-500'
+                          : 'bg-amber-500',
+                      )}
+                    />
                     <div>
                       <h3 className="font-medium text-gray-900 dark:text-white">
                         {alert.title}
@@ -326,8 +416,16 @@ export default function CEOBriefingPage() {
                     </div>
                   </div>
                   <Link href={alert.href}>
-                    <CanvaButton variant="ghost" size="sm" rightIcon={<ChevronRight className="w-4 h-4" />}>
-                      {alert.action === 'View Details' ? 'Detaylar' : alert.action === 'Review' ? 'İncele' : alert.action}
+                    <CanvaButton
+                      variant="ghost"
+                      size="sm"
+                      rightIcon={<ChevronRight className="w-4 h-4" />}
+                    >
+                      {alert.action === 'View Details'
+                        ? 'Detaylar'
+                        : alert.action === 'Review'
+                          ? 'İncele'
+                          : alert.action}
                     </CanvaButton>
                   </Link>
                 </div>
@@ -352,7 +450,12 @@ export default function CEOBriefingPage() {
         <div className="grid grid-cols-4 gap-8">
           {data?.weeklyGoals.map((goal) => {
             const progress = (goal.current / goal.target) * 100;
-            const progressColor = progress >= 90 ? 'bg-emerald-500' : progress >= 70 ? 'bg-amber-500' : 'bg-red-500';
+            const progressColor =
+              progress >= 90
+                ? 'bg-emerald-500'
+                : progress >= 70
+                  ? 'bg-amber-500'
+                  : 'bg-red-500';
 
             return (
               <div key={goal.id}>
@@ -361,12 +464,17 @@ export default function CEOBriefingPage() {
                     {goal.label}
                   </span>
                   <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                    {goal.current}{goal.unit} / {goal.target}{goal.unit}
+                    {goal.current}
+                    {goal.unit} / {goal.target}
+                    {goal.unit}
                   </span>
                 </div>
                 <div className="h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                   <div
-                    className={cn('h-full rounded-full transition-all duration-500', progressColor)}
+                    className={cn(
+                      'h-full rounded-full transition-all duration-500',
+                      progressColor,
+                    )}
                     style={{ width: `${Math.min(progress, 100)}%` }}
                   />
                 </div>
@@ -380,9 +488,21 @@ export default function CEOBriefingPage() {
       <div className="grid grid-cols-4 gap-4">
         {[
           { label: 'Finans Özeti', href: '/finance', metric: '₺284K bugün' },
-          { label: 'Kullanıcı Büyümesi', href: '/analytics', metric: '+%8.3 DAU' },
-          { label: 'Moderasyon Kuyruğu', href: '/moderation', metric: '12 bekliyor' },
-          { label: 'Sistem Durumu', href: '/system-health', metric: '%99.9 uptime' },
+          {
+            label: 'Kullanıcı Büyümesi',
+            href: '/analytics',
+            metric: '+%8.3 DAU',
+          },
+          {
+            label: 'Moderasyon Kuyruğu',
+            href: '/moderation',
+            metric: '12 bekliyor',
+          },
+          {
+            label: 'Sistem Durumu',
+            href: '/system-health',
+            metric: '%99.9 uptime',
+          },
         ].map((action) => (
           <Link
             key={action.label}
@@ -390,7 +510,7 @@ export default function CEOBriefingPage() {
             className={cn(
               'bg-white dark:bg-gray-950 rounded-xl border border-gray-200 dark:border-gray-800',
               'p-4 flex items-center justify-between',
-              'hover:border-violet-300 dark:hover:border-violet-700 hover:shadow-sm transition-all'
+              'hover:border-violet-300 dark:hover:border-violet-700 hover:shadow-sm transition-all',
             )}
           >
             <div>

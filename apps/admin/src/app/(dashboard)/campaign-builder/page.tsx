@@ -289,34 +289,34 @@ export default function CampaignBuilderPage() {
     switch (status) {
       case 'active':
         return (
-          <Badge className="bg-green-500/10 text-green-500 border-green-500/20">
+          <CanvaBadge className="bg-green-500/10 text-green-500 border-green-500/20">
             <Play className="h-3 w-3 mr-1" />
             Aktif
-          </Badge>
+          </CanvaBadge>
         );
       case 'paused':
         return (
-          <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">
+          <CanvaBadge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">
             <Pause className="h-3 w-3 mr-1" />
             Duraklatıldı
-          </Badge>
+          </CanvaBadge>
         );
       case 'scheduled':
         return (
-          <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20">
+          <CanvaBadge className="bg-blue-500/10 text-blue-500 border-blue-500/20">
             <Calendar className="h-3 w-3 mr-1" />
             Zamanlandı
-          </Badge>
+          </CanvaBadge>
         );
       case 'completed':
         return (
-          <Badge className="bg-gray-500/10 text-gray-500 border-gray-500/20">
+          <CanvaBadge className="bg-gray-500/10 text-gray-500 border-gray-500/20">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             Tamamlandı
-          </Badge>
+          </CanvaBadge>
         );
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <CanvaBadge variant="default">{status}</CanvaBadge>;
     }
   };
 
@@ -347,10 +347,10 @@ export default function CampaignBuilderPage() {
         </div>
         <Dialog open={showNewCampaign} onOpenChange={setShowNewCampaign}>
           <DialogTrigger asChild>
-            <Button>
+            <CanvaButton>
               <Plus className="h-4 w-4 mr-2" />
               Yeni Kampanya
-            </Button>
+            </CanvaButton>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
@@ -442,16 +442,16 @@ export default function CampaignBuilderPage() {
               </div>
             </div>
             <DialogFooter>
-              <Button
-                variant="outline"
+              <CanvaButton
+                variant="default"
                 onClick={() => setShowNewCampaign(false)}
               >
                 İptal
-              </Button>
-              <Button>
+              </CanvaButton>
+              <CanvaButton>
                 <Send className="h-4 w-4 mr-2" />
                 Kampanya Oluştur
-              </Button>
+              </CanvaButton>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -644,10 +644,10 @@ export default function CampaignBuilderPage() {
               <div className="flex items-center justify-between">
                 <CardTitle>Aktif ve Zamanlanmış Kampanyalar</CardTitle>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
+                  <CanvaButton variant="primary" size="sm">
                     <Filter className="h-4 w-4 mr-2" />
                     Filtrele
-                  </Button>
+                  </CanvaButton>
                 </div>
               </div>
             </CardHeader>
@@ -673,12 +673,12 @@ export default function CampaignBuilderPage() {
                         <div className="flex items-center gap-2">
                           <span className="font-medium">{campaign.name}</span>
                           {campaign.abTest && (
-                            <Badge
-                              variant="outline"
+                            <CanvaBadge
+                              variant="default"
                               className="text-xs bg-purple-500/10 text-purple-500 border-purple-500/20"
                             >
                               A/B
-                            </Badge>
+                            </CanvaBadge>
                           )}
                         </div>
                       </TableCell>
@@ -714,21 +714,21 @@ export default function CampaignBuilderPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          <Button variant="ghost" size="icon">
+                          <CanvaButton variant="ghost" size="sm" iconOnly>
                             <BarChart3 className="h-4 w-4" />
-                          </Button>
+                          </CanvaButton>
                           {campaign.status === 'active' ? (
-                            <Button variant="ghost" size="icon">
+                            <CanvaButton variant="ghost" size="sm" iconOnly>
                               <Pause className="h-4 w-4" />
-                            </Button>
+                            </CanvaButton>
                           ) : (
-                            <Button variant="ghost" size="icon">
+                            <CanvaButton variant="ghost" size="sm" iconOnly>
                               <Play className="h-4 w-4" />
-                            </Button>
+                            </CanvaButton>
                           )}
-                          <Button variant="ghost" size="icon">
+                          <CanvaButton variant="ghost" size="sm" iconOnly>
                             <Edit className="h-4 w-4" />
-                          </Button>
+                          </CanvaButton>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -757,10 +757,10 @@ export default function CampaignBuilderPage() {
                         </p>
                       </div>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <CanvaButton variant="primary" size="sm">
                       <Send className="h-3 w-3 mr-1" />
                       Kampanya
-                    </Button>
+                    </CanvaButton>
                   </div>
                 </CardContent>
               </Card>
@@ -771,10 +771,10 @@ export default function CampaignBuilderPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Özel Segment Oluştur</CardTitle>
-                <Button>
+                <CanvaButton>
                   <Plus className="h-4 w-4 mr-2" />
                   Yeni Segment
-                </Button>
+                </CanvaButton>
               </div>
             </CardHeader>
             <CardContent>
@@ -808,10 +808,10 @@ export default function CampaignBuilderPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Mesaj Şablonları</CardTitle>
-                <Button>
+                <CanvaButton>
                   <Plus className="h-4 w-4 mr-2" />
                   Yeni Şablon
-                </Button>
+                </CanvaButton>
               </div>
             </CardHeader>
             <CardContent>
@@ -839,8 +839,8 @@ export default function CampaignBuilderPage() {
                       </TableCell>
                       <TableCell>{formatNumber(template.usage)}</TableCell>
                       <TableCell>
-                        <Badge
-                          variant="outline"
+                        <CanvaBadge
+                          variant="default"
                           className={cn(
                             template.openRate > 70
                               ? 'bg-green-500/10 text-green-500'
@@ -850,19 +850,19 @@ export default function CampaignBuilderPage() {
                           )}
                         >
                           {template.openRate}%
-                        </Badge>
+                        </CanvaBadge>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          <Button variant="ghost" size="icon">
+                          <CanvaButton variant="ghost" size="sm" iconOnly>
                             <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon">
+                          </CanvaButton>
+                          <CanvaButton variant="ghost" size="sm" iconOnly>
                             <Copy className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon">
+                          </CanvaButton>
+                          <CanvaButton variant="ghost" size="sm" iconOnly>
                             <Edit className="h-4 w-4" />
-                          </Button>
+                          </CanvaButton>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -892,10 +892,10 @@ export default function CampaignBuilderPage() {
                         Güven Düzeyi: {test.confidence}%
                       </p>
                     </div>
-                    <Badge className="bg-green-500/10 text-green-500 border-green-500/20">
+                    <CanvaBadge className="bg-green-500/10 text-green-500 border-green-500/20">
                       <CheckCircle2 className="h-3 w-3 mr-1" />
                       Kazanan: Varyant {test.winner}
-                    </Badge>
+                    </CanvaBadge>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div

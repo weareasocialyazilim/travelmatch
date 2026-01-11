@@ -216,10 +216,10 @@ export default function PricingPage() {
             />
             <Label>Dinamik Fiyatlandırma</Label>
           </div>
-          <Button>
+          <CanvaButton>
             <Plus className="mr-2 h-4 w-4" />
             Yeni Kural
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
@@ -306,9 +306,9 @@ export default function PricingPage() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle>{plan.name}</CardTitle>
-                    <Button variant="ghost" size="icon">
+                    <CanvaButton variant="ghost" size="sm" iconOnly>
                       <Edit className="h-4 w-4" />
-                    </Button>
+                    </CanvaButton>
                   </div>
                   <CardDescription>
                     {plan.subscribers.toLocaleString('tr-TR')} abone
@@ -363,7 +363,9 @@ export default function PricingPage() {
                         className="mt-1"
                       />
                     </div>
-                    <Button className="w-full mt-4">Save Changes</Button>
+                    <CanvaButton className="w-full mt-4">
+                      Save Changes
+                    </CanvaButton>
                   </div>
                 </CardContent>
               </Card>
@@ -397,7 +399,7 @@ export default function PricingPage() {
                       <TableCell className="font-medium">{rule.name}</TableCell>
                       <TableCell>{rule.trigger}</TableCell>
                       <TableCell>
-                        <Badge
+                        <CanvaBadge
                           className={
                             rule.adjustment.startsWith('+')
                               ? 'bg-green-500'
@@ -405,24 +407,30 @@ export default function PricingPage() {
                           }
                         >
                           {rule.adjustment}
-                        </Badge>
+                        </CanvaBadge>
                       </TableCell>
                       <TableCell>
                         {rule.status === 'active' ? (
-                          <Badge className="bg-green-500">Aktif</Badge>
+                          <CanvaBadge className="bg-green-500">
+                            Aktif
+                          </CanvaBadge>
                         ) : rule.status === 'paused' ? (
-                          <Badge variant="secondary">Duraklatıldı</Badge>
+                          <CanvaBadge variant="default">
+                            Duraklatıldı
+                          </CanvaBadge>
                         ) : (
-                          <Badge className="bg-blue-500">Planlandı</Badge>
+                          <CanvaBadge className="bg-blue-500">
+                            Planlandı
+                          </CanvaBadge>
                         )}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {rule.impact}
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="icon">
+                        <CanvaButton variant="ghost" size="sm" iconOnly>
                           <Settings className="h-4 w-4" />
-                        </Button>
+                        </CanvaButton>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -470,12 +478,12 @@ export default function PricingPage() {
                         {region.premiumPlus}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Badge variant="outline">{region.ppp}x</Badge>
+                        <CanvaBadge variant="default">{region.ppp}x</CanvaBadge>
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="icon">
+                        <CanvaButton variant="ghost" size="sm" iconOnly>
                           <Edit className="h-4 w-4" />
-                        </Button>
+                        </CanvaButton>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -525,7 +533,7 @@ export default function PricingPage() {
                       <span className="font-medium">
                         Premium Yıllık Fiyat Testi
                       </span>
-                      <Badge className="bg-green-500">Aktif</Badge>
+                      <CanvaBadge className="bg-green-500">Aktif</CanvaBadge>
                     </div>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>

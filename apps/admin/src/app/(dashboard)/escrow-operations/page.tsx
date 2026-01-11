@@ -344,66 +344,66 @@ export default function EscrowOperationsPage() {
     switch (status) {
       case 'awaiting_proof':
         return (
-          <Badge
-            variant="outline"
+          <CanvaBadge
+            variant="default"
             className="bg-amber-500/10 text-amber-600 border-amber-500/30"
           >
             <Timer className="h-3 w-3 mr-1" />
             Proof Bekleniyor
-          </Badge>
+          </CanvaBadge>
         );
       case 'proof_submitted':
         return (
-          <Badge
-            variant="outline"
+          <CanvaBadge
+            variant="default"
             className="bg-blue-500/10 text-blue-600 border-blue-500/30"
           >
             <Eye className="h-3 w-3 mr-1" />
             Inceleniyor
-          </Badge>
+          </CanvaBadge>
         );
       case 'ready_to_release':
         return (
-          <Badge
-            variant="outline"
+          <CanvaBadge
+            variant="default"
             className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
           >
             <CheckCircle2 className="h-3 w-3 mr-1" />
             Serbest Birakilabilir
-          </Badge>
+          </CanvaBadge>
         );
       case 'disputed':
         return (
-          <Badge
-            variant="outline"
+          <CanvaBadge
+            variant="default"
             className="bg-red-500/10 text-red-600 border-red-500/30"
           >
             <AlertTriangle className="h-3 w-3 mr-1" />
             Anlasmazlik
-          </Badge>
+          </CanvaBadge>
         );
       case 'released':
         return (
-          <Badge
-            variant="outline"
+          <CanvaBadge
+            variant="default"
             className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
           >
             <Unlock className="h-3 w-3 mr-1" />
             Serbest
-          </Badge>
+          </CanvaBadge>
         );
       case 'refunded':
         return (
-          <Badge
-            variant="outline"
+          <CanvaBadge
+            variant="default"
             className="bg-gray-500/10 text-gray-600 border-gray-500/30"
           >
             <ArrowDownRight className="h-3 w-3 mr-1" />
             Iade Edildi
-          </Badge>
+          </CanvaBadge>
         );
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <CanvaBadge variant="default">{status}</CanvaBadge>;
     }
   };
 
@@ -426,30 +426,30 @@ export default function EscrowOperationsPage() {
     switch (status) {
       case 'completed':
         return (
-          <Badge className="bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20">
+          <CanvaBadge className="bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20">
             Tamamlandi
-          </Badge>
+          </CanvaBadge>
         );
       case 'processing':
         return (
-          <Badge className="bg-blue-500/10 text-blue-600 hover:bg-blue-500/20">
+          <CanvaBadge className="bg-blue-500/10 text-blue-600 hover:bg-blue-500/20">
             Isleniyor
-          </Badge>
+          </CanvaBadge>
         );
       case 'pending_kyc':
         return (
-          <Badge className="bg-amber-500/10 text-amber-600 hover:bg-amber-500/20">
+          <CanvaBadge className="bg-amber-500/10 text-amber-600 hover:bg-amber-500/20">
             KYC Bekliyor
-          </Badge>
+          </CanvaBadge>
         );
       case 'failed':
         return (
-          <Badge className="bg-red-500/10 text-red-600 hover:bg-red-500/20">
+          <CanvaBadge className="bg-red-500/10 text-red-600 hover:bg-red-500/20">
             Basarisiz
-          </Badge>
+          </CanvaBadge>
         );
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <CanvaBadge variant="default">{status}</CanvaBadge>;
     }
   };
 
@@ -474,14 +474,14 @@ export default function EscrowOperationsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
+          <CanvaButton variant="primary" size="sm">
             <Download className="h-4 w-4 mr-2" />
             Rapor Indir
-          </Button>
-          <Button size="sm">
+          </CanvaButton>
+          <CanvaButton size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             Yenile
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
@@ -586,9 +586,9 @@ export default function EscrowOperationsPage() {
                   <p className="text-xs text-muted-foreground mt-1">
                     {tier.description}
                   </p>
-                  <Badge variant="outline" className="mt-2 text-xs">
+                  <CanvaBadge variant="default" className="mt-2 text-xs">
                     {tier.escrow}
-                  </Badge>
+                  </CanvaBadge>
                 </div>
               </div>
             ))}
@@ -639,9 +639,9 @@ export default function EscrowOperationsPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>Son Islemler</CardTitle>
-                  <Button variant="ghost" size="sm">
+                  <CanvaButton variant="ghost" size="sm">
                     Tumunu Gor
-                  </Button>
+                  </CanvaButton>
                 </div>
               </CardHeader>
               <CardContent>
@@ -838,9 +838,9 @@ export default function EscrowOperationsPage() {
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
+                          <CanvaButton variant="ghost" size="sm">
                             <MoreHorizontal className="h-4 w-4" />
-                          </Button>
+                          </CanvaButton>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
@@ -959,10 +959,10 @@ export default function EscrowOperationsPage() {
                     KYC dogrulanmis kullanicilara odeme yapilacak
                   </CardDescription>
                 </div>
-                <Button size="sm">
+                <CanvaButton size="sm">
                   <Send className="h-4 w-4 mr-2" />
                   Toplu Odeme Yap
-                </Button>
+                </CanvaButton>
               </div>
             </CardHeader>
             <CardContent>
@@ -1002,26 +1002,26 @@ export default function EscrowOperationsPage() {
                       </TableCell>
                       <TableCell>
                         {payout.kycStatus === 'verified' ? (
-                          <Badge className="bg-emerald-500/10 text-emerald-600">
+                          <CanvaBadge className="bg-emerald-500/10 text-emerald-600">
                             <UserCheck className="h-3 w-3 mr-1" />
                             Dogrulandi
-                          </Badge>
+                          </CanvaBadge>
                         ) : (
-                          <Badge className="bg-amber-500/10 text-amber-600">
+                          <CanvaBadge className="bg-amber-500/10 text-amber-600">
                             <Clock className="h-3 w-3 mr-1" />
                             Bekliyor
-                          </Badge>
+                          </CanvaBadge>
                         )}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {payout.requestedAt}
                       </TableCell>
                       <TableCell>
-                        <Button
+                        <CanvaButton
                           size="sm"
                           variant={
                             payout.kycStatus === 'verified'
-                              ? 'default'
+                              ? 'primary'
                               : 'outline'
                           }
                           disabled={payout.kycStatus !== 'verified'}
@@ -1029,7 +1029,7 @@ export default function EscrowOperationsPage() {
                           {payout.kycStatus === 'verified'
                             ? 'Odeme Yap'
                             : 'KYC Bekliyor'}
-                        </Button>
+                        </CanvaButton>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -1062,17 +1062,17 @@ export default function EscrowOperationsPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button
-              variant="outline"
+            <CanvaButton
+              variant="default"
               onClick={() =>
                 setActionDialog({ open: false, action: '', escrow: null })
               }
             >
               Iptal
-            </Button>
-            <Button
+            </CanvaButton>
+            <CanvaButton
               variant={
-                actionDialog.action === 'dispute' ? 'destructive' : 'default'
+                actionDialog.action === 'dispute' ? 'destructive' : 'primary'
               }
               onClick={() => {
                 // Handle action
@@ -1082,7 +1082,7 @@ export default function EscrowOperationsPage() {
               {actionDialog.action === 'release' && 'Serbest Birak'}
               {actionDialog.action === 'refund' && 'Iade Et'}
               {actionDialog.action === 'dispute' && 'Anlasmazlik Ac'}
-            </Button>
+            </CanvaButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>

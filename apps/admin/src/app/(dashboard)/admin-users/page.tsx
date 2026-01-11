@@ -407,7 +407,7 @@ export default function AdminUsersPage() {
           Admin kullanıcıları yüklenemedi. Lütfen tekrar deneyin.
         </p>
         <CanvaButton
-          variant="outline"
+          variant="default"
           onClick={() => refetch()}
           leftIcon={<RefreshCw className="h-4 w-4" />}
         >
@@ -454,7 +454,7 @@ export default function AdminUsersPage() {
         </div>
         <div className="flex gap-2">
           <CanvaButton
-            variant="outline"
+            variant="default"
             onClick={() => refetch()}
             leftIcon={<RefreshCw className="h-4 w-4" />}
           >
@@ -748,7 +748,7 @@ export default function AdminUsersPage() {
           </div>
           <DialogFooter>
             <CanvaButton
-              variant="outline"
+              variant="default"
               onClick={() => setIsCreateOpen(false)}
             >
               İptal
@@ -826,7 +826,7 @@ export default function AdminUsersPage() {
             </div>
           </div>
           <DialogFooter>
-            <CanvaButton variant="outline" onClick={() => setIsEditOpen(false)}>
+            <CanvaButton variant="primary" onClick={() => setIsEditOpen(false)}>
               İptal
             </CanvaButton>
             <CanvaButton

@@ -302,14 +302,14 @@ export default function AuditLogsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => refetch()}>
+          <CanvaButton variant="primary" size="sm" onClick={() => refetch()}>
             <RefreshCw className="mr-2 h-4 w-4" />
             Yenile
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleExportCSV}>
+          </CanvaButton>
+          <CanvaButton variant="primary" size="sm" onClick={handleExportCSV}>
             <Download className="mr-2 h-4 w-4" />
             CSV İndir
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
@@ -425,17 +425,21 @@ export default function AuditLogsPage() {
                 {selectedLogs.length} kayıt seçildi
               </span>
               <div className="flex items-center gap-2">
-                <Button size="sm" variant="outline" onClick={handleExportCSV}>
+                <CanvaButton
+                  size="sm"
+                  variant="primary"
+                  onClick={handleExportCSV}
+                >
                   <Download className="mr-2 h-4 w-4" />
                   Seçilenleri İndir
-                </Button>
-                <Button
+                </CanvaButton>
+                <CanvaButton
                   size="sm"
                   variant="ghost"
                   onClick={() => setSelectedLogs([])}
                 >
                   Seçimi Temizle
-                </Button>
+                </CanvaButton>
               </div>
             </div>
           </CardContent>
@@ -530,10 +534,13 @@ export default function AuditLogsPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge className={actionInfo.color} variant="secondary">
+                        <CanvaBadge
+                          className={actionInfo.color}
+                          variant="default"
+                        >
                           <ActionIcon className="mr-1 h-3 w-3" />
                           {actionInfo.label}
-                        </Badge>
+                        </CanvaBadge>
                       </TableCell>
                       <TableCell>
                         {log.resource_type ? (
@@ -558,9 +565,9 @@ export default function AuditLogsPage() {
                       <TableCell className="text-right">
                         <Dialog>
                           <DialogTrigger asChild>
-                            <Button variant="ghost" size="sm">
+                            <CanvaButton variant="ghost" size="sm">
                               <Eye className="h-4 w-4" />
-                            </Button>
+                            </CanvaButton>
                           </DialogTrigger>
                           <DialogContent className="max-w-2xl">
                             <DialogHeader>
@@ -595,13 +602,13 @@ export default function AuditLogsPage() {
                                 <h4 className="text-sm font-medium mb-2">
                                   İşlem
                                 </h4>
-                                <Badge
+                                <CanvaBadge
                                   className={actionInfo.color}
-                                  variant="secondary"
+                                  variant="default"
                                 >
                                   <ActionIcon className="mr-1 h-3 w-3" />
                                   {actionInfo.label}
-                                </Badge>
+                                </CanvaBadge>
                               </div>
 
                               {/* Resource */}
@@ -695,19 +702,19 @@ export default function AuditLogsPage() {
                 {filteredLogs.length}
               </p>
               <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
+                <CanvaButton
+                  variant="default"
                   size="sm"
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
                 >
                   <ChevronLeft className="h-4 w-4" />
-                </Button>
+                </CanvaButton>
                 <span className="text-sm">
                   {currentPage} / {totalPages}
                 </span>
-                <Button
-                  variant="outline"
+                <CanvaButton
+                  variant="default"
                   size="sm"
                   onClick={() =>
                     setCurrentPage((p) => Math.min(totalPages, p + 1))
@@ -715,7 +722,7 @@ export default function AuditLogsPage() {
                   disabled={currentPage === totalPages}
                 >
                   <ChevronRight className="h-4 w-4" />
-                </Button>
+                </CanvaButton>
               </div>
             </div>
           )}

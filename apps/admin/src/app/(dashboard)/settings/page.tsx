@@ -154,9 +154,9 @@ export default function SettingsPage() {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <Button type="button" variant="outline" size="sm">
+                    <CanvaButton type="button" variant="primary" size="sm">
                       Fotoğraf Değiştir
-                    </Button>
+                    </CanvaButton>
                     <p className="mt-1 text-xs text-muted-foreground">
                       JPG, PNG veya GIF. Maksimum 2MB.
                     </p>
@@ -205,10 +205,10 @@ export default function SettingsPage() {
                   </p>
                 </div>
 
-                <Button type="submit">
+                <CanvaButton type="submit">
                   <Save className="mr-2 h-4 w-4" />
                   Kaydet
-                </Button>
+                </CanvaButton>
               </form>
             </CardContent>
           </Card>
@@ -238,10 +238,11 @@ export default function SettingsPage() {
                       {...passwordForm.register('currentPassword')}
                       error={!!passwordForm.formState.errors.currentPassword}
                     />
-                    <Button
+                    <CanvaButton
                       type="button"
                       variant="ghost"
-                      size="icon"
+                      size="sm"
+                      iconOnly
                       className="absolute right-0 top-0 h-full px-3"
                       onClick={() =>
                         setShowCurrentPassword(!showCurrentPassword)
@@ -252,7 +253,7 @@ export default function SettingsPage() {
                       ) : (
                         <Eye className="h-4 w-4" />
                       )}
-                    </Button>
+                    </CanvaButton>
                   </div>
                 </div>
 
@@ -265,10 +266,11 @@ export default function SettingsPage() {
                       {...passwordForm.register('newPassword')}
                       error={!!passwordForm.formState.errors.newPassword}
                     />
-                    <Button
+                    <CanvaButton
                       type="button"
                       variant="ghost"
-                      size="icon"
+                      size="sm"
+                      iconOnly
                       className="absolute right-0 top-0 h-full px-3"
                       onClick={() => setShowNewPassword(!showNewPassword)}
                     >
@@ -277,7 +279,7 @@ export default function SettingsPage() {
                       ) : (
                         <Eye className="h-4 w-4" />
                       )}
-                    </Button>
+                    </CanvaButton>
                   </div>
                   {passwordForm.formState.errors.newPassword && (
                     <p className="text-sm text-destructive">
@@ -301,10 +303,10 @@ export default function SettingsPage() {
                   )}
                 </div>
 
-                <Button type="submit">
+                <CanvaButton type="submit">
                   <Key className="mr-2 h-4 w-4" />
                   Şifreyi Güncelle
-                </Button>
+                </CanvaButton>
               </form>
             </CardContent>
           </Card>
@@ -357,9 +359,9 @@ export default function SettingsPage() {
                   </div>
                 </div>
               </div>
-              <Button variant="outline" className="mt-4 w-full">
+              <CanvaButton variant="primary" className="mt-4 w-full">
                 Diğer Tüm Oturumları Sonlandır
-              </Button>
+              </CanvaButton>
             </CardContent>
           </Card>
         </TabsContent>

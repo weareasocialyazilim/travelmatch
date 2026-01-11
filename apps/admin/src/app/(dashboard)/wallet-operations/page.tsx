@@ -304,50 +304,52 @@ export default function WalletOperationsPage() {
     switch (status) {
       case 'pending':
         return (
-          <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/30">
+          <CanvaBadge className="bg-amber-500/10 text-amber-600 border-amber-500/30">
             <Timer className="h-3 w-3 mr-1" />
             Bekliyor
-          </Badge>
+          </CanvaBadge>
         );
       case 'processing':
         return (
-          <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/30">
+          <CanvaBadge className="bg-blue-500/10 text-blue-600 border-blue-500/30">
             <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
             Isleniyor
-          </Badge>
+          </CanvaBadge>
         );
       case 'completed':
         return (
-          <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
+          <CanvaBadge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             Tamamlandi
-          </Badge>
+          </CanvaBadge>
         );
       case 'blocked':
         return (
-          <Badge className="bg-red-500/10 text-red-600 border-red-500/30">
+          <CanvaBadge className="bg-red-500/10 text-red-600 border-red-500/30">
             <Ban className="h-3 w-3 mr-1" />
             Engellendi
-          </Badge>
+          </CanvaBadge>
         );
       case 'rejected':
         return (
-          <Badge className="bg-red-500/10 text-red-600 border-red-500/30">
+          <CanvaBadge className="bg-red-500/10 text-red-600 border-red-500/30">
             <XCircle className="h-3 w-3 mr-1" />
             Reddedildi
-          </Badge>
+          </CanvaBadge>
         );
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <CanvaBadge variant="default">{status}</CanvaBadge>;
     }
   };
 
   const getPriorityBadge = (priority: string) => {
     switch (priority) {
       case 'urgent':
-        return <Badge variant="destructive">Acil</Badge>;
+        return <CanvaBadge variant="error">Acil</CanvaBadge>;
       case 'high':
-        return <Badge className="bg-amber-500 text-white">Yuksek</Badge>;
+        return (
+          <CanvaBadge className="bg-amber-500 text-white">Yuksek</CanvaBadge>
+        );
       default:
         return null;
     }
@@ -357,27 +359,27 @@ export default function WalletOperationsPage() {
     switch (status) {
       case 'verified':
         return (
-          <Badge className="bg-emerald-500/10 text-emerald-600">
+          <CanvaBadge className="bg-emerald-500/10 text-emerald-600">
             <UserCheck className="h-3 w-3 mr-1" />
             Dogrulandi
-          </Badge>
+          </CanvaBadge>
         );
       case 'pending':
         return (
-          <Badge className="bg-amber-500/10 text-amber-600">
+          <CanvaBadge className="bg-amber-500/10 text-amber-600">
             <Clock className="h-3 w-3 mr-1" />
             Bekliyor
-          </Badge>
+          </CanvaBadge>
         );
       case 'rejected':
         return (
-          <Badge className="bg-red-500/10 text-red-600">
+          <CanvaBadge className="bg-red-500/10 text-red-600">
             <XCircle className="h-3 w-3 mr-1" />
             Reddedildi
-          </Badge>
+          </CanvaBadge>
         );
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <CanvaBadge variant="default">{status}</CanvaBadge>;
     }
   };
 
@@ -402,14 +404,14 @@ export default function WalletOperationsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
+          <CanvaButton variant="primary" size="sm">
             <Download className="h-4 w-4 mr-2" />
             Rapor
-          </Button>
-          <Button size="sm">
+          </CanvaButton>
+          <CanvaButton size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             Yenile
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
@@ -534,12 +536,12 @@ export default function WalletOperationsPage() {
                         </p>
                       </div>
                     </div>
-                    <Button
+                    <CanvaButton
                       size="sm"
                       onClick={() => handlePayoutAction('approve', payout)}
                     >
                       Hemen Onayla
-                    </Button>
+                    </CanvaButton>
                   </div>
                 ))}
             </div>
@@ -578,10 +580,10 @@ export default function WalletOperationsPage() {
                 <SelectItem value="blocked">Engellenen</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline" size="sm">
+            <CanvaButton variant="primary" size="sm">
               <Send className="h-4 w-4 mr-2" />
               Toplu Odeme
-            </Button>
+            </CanvaButton>
           </div>
 
           {/* Payout Table */}
@@ -664,9 +666,9 @@ export default function WalletOperationsPage() {
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
+                          <CanvaButton variant="ghost" size="sm">
                             <MoreHorizontal className="h-4 w-4" />
-                          </Button>
+                          </CanvaButton>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
@@ -796,12 +798,12 @@ export default function WalletOperationsPage() {
                             {kyc.user.email}
                           </p>
                           <div className="flex items-center gap-2 mt-1">
-                            <Badge
-                              variant="outline"
+                            <CanvaBadge
+                              variant="default"
                               className="text-xs capitalize"
                             >
                               {kyc.documentType.replace('_', ' ')}
-                            </Badge>
+                            </CanvaBadge>
                             <span className="text-xs text-muted-foreground">
                               {kyc.submittedAt}
                             </span>
@@ -835,32 +837,32 @@ export default function WalletOperationsPage() {
                         {kyc.flags && kyc.flags.length > 0 && (
                           <div className="flex flex-wrap gap-1 justify-end mb-2">
                             {kyc.flags.map((flag) => (
-                              <Badge
+                              <CanvaBadge
                                 key={flag}
-                                variant="destructive"
+                                variant="error"
                                 className="text-xs"
                               >
                                 {flag.replace('_', ' ')}
-                              </Badge>
+                              </CanvaBadge>
                             ))}
                           </div>
                         )}
                         <div className="flex items-center gap-2">
-                          <Button size="sm" variant="outline">
+                          <CanvaButton size="sm" variant="primary">
                             <Eye className="h-3 w-3 mr-1" />
                             Incele
-                          </Button>
-                          <Button
+                          </CanvaButton>
+                          <CanvaButton
                             size="sm"
                             className="bg-emerald-600 hover:bg-emerald-700"
                           >
                             <CheckCircle2 className="h-3 w-3 mr-1" />
                             Onayla
-                          </Button>
-                          <Button size="sm" variant="destructive">
+                          </CanvaButton>
+                          <CanvaButton size="sm" variant="danger">
                             <XCircle className="h-3 w-3 mr-1" />
                             Reddet
-                          </Button>
+                          </CanvaButton>
                         </div>
                       </div>
                     </div>
@@ -927,9 +929,9 @@ export default function WalletOperationsPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="sm">
+                        <CanvaButton variant="ghost" size="sm">
                           <Eye className="h-4 w-4" />
-                        </Button>
+                        </CanvaButton>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -999,17 +1001,17 @@ export default function WalletOperationsPage() {
             </div>
           )}
           <DialogFooter>
-            <Button
-              variant="outline"
+            <CanvaButton
+              variant="default"
               onClick={() =>
                 setActionDialog({ open: false, action: '', item: null })
               }
             >
               Iptal
-            </Button>
-            <Button
+            </CanvaButton>
+            <CanvaButton
               variant={
-                actionDialog.action === 'reject' ? 'destructive' : 'default'
+                actionDialog.action === 'reject' ? 'destructive' : 'primary'
               }
               className={
                 actionDialog.action === 'approve'
@@ -1022,7 +1024,7 @@ export default function WalletOperationsPage() {
             >
               {actionDialog.action === 'approve' && 'Onayla ve Gonder'}
               {actionDialog.action === 'reject' && 'Reddet'}
-            </Button>
+            </CanvaButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>

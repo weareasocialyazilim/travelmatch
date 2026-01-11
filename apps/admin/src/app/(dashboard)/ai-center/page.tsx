@@ -198,7 +198,7 @@ export default function AICenterPage() {
     const variants: Record<
       string,
       {
-        variant: 'default' | 'secondary' | 'destructive' | 'outline';
+        variant: 'primary' | 'secondary' | 'destructive' | 'outline';
         label: string;
       }
     > = {
@@ -210,48 +210,48 @@ export default function AICenterPage() {
       variant: 'outline',
       label: severity,
     };
-    return <Badge variant={variant}>{label}</Badge>;
+    return <CanvaBadge variant={variant}>{label}</CanvaBadge>;
   };
 
   const getRiskBadge = (risk: string) => {
     const variants: Record<
       string,
-      { variant: 'default' | 'secondary' | 'destructive' }
+      { variant: 'primary' | 'secondary' | 'destructive' }
     > = {
       high: { variant: 'destructive' },
       medium: { variant: 'secondary' },
-      low: { variant: 'default' },
+      low: { variant: 'primary' },
     };
-    const { variant } = variants[risk] || { variant: 'default' };
+    const { variant } = variants[risk] || { variant: 'primary' };
     return (
-      <Badge variant={variant}>
+      <CanvaBadge variant={variant}>
         {risk === 'high' ? 'Yüksek' : risk === 'medium' ? 'Orta' : 'Düşük'}
-      </Badge>
+      </CanvaBadge>
     );
   };
 
   const getTrendBadge = (trend: string) => {
     if (trend === 'rising' || trend === 'up') {
       return (
-        <Badge variant="default" className="bg-green-100 text-green-800">
+        <CanvaBadge variant="primary" className="bg-green-100 text-green-800">
           <TrendingUp className="mr-1 h-3 w-3" />
           Yükseliyor
-        </Badge>
+        </CanvaBadge>
       );
     }
     if (trend === 'falling' || trend === 'down') {
       return (
-        <Badge variant="destructive">
+        <CanvaBadge variant="error">
           <TrendingDown className="mr-1 h-3 w-3" />
           Düşüyor
-        </Badge>
+        </CanvaBadge>
       );
     }
     return (
-      <Badge variant="outline">
+      <CanvaBadge variant="default">
         <Activity className="mr-1 h-3 w-3" />
         Sabit
-      </Badge>
+      </CanvaBadge>
     );
   };
 
@@ -285,8 +285,8 @@ export default function AICenterPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
+          <CanvaButton
+            variant="default"
             onClick={handleRefresh}
             disabled={isRefreshing}
           >
@@ -296,11 +296,11 @@ export default function AICenterPage() {
               <RefreshCw className="mr-2 h-4 w-4" />
             )}
             Yenile
-          </Button>
-          <Button variant="outline">
+          </CanvaButton>
+          <CanvaButton variant="primary">
             <Settings className="mr-2 h-4 w-4" />
             Model Ayarları
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
@@ -430,13 +430,13 @@ export default function AICenterPage() {
                           {model.name}
                         </CardTitle>
                       </div>
-                      <Badge
+                      <CanvaBadge
                         variant={
-                          model.status === 'active' ? 'default' : 'secondary'
+                          model.status === 'active' ? 'primary' : 'secondary'
                         }
                       >
                         {model.status === 'active' ? 'Aktif' : 'Pasif'}
-                      </Badge>
+                      </CanvaBadge>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -537,13 +537,13 @@ export default function AICenterPage() {
                         </div>
                         <div className="flex flex-wrap gap-2 mt-2">
                           {prediction.factors.map((factor, i) => (
-                            <Badge
+                            <CanvaBadge
                               key={i}
-                              variant="outline"
+                              variant="default"
                               className="text-xs"
                             >
                               {factor}
-                            </Badge>
+                            </CanvaBadge>
                           ))}
                         </div>
                       </div>
@@ -552,10 +552,10 @@ export default function AICenterPage() {
                       <p className="text-sm text-muted-foreground mb-2">
                         Önerilen Aksiyon
                       </p>
-                      <Button size="sm" variant="outline">
+                      <CanvaButton size="sm" variant="primary">
                         <Zap className="mr-2 h-4 w-4" />
                         {prediction.suggestedAction}
-                      </Button>
+                      </CanvaButton>
                     </div>
                   </div>
                 ))}
@@ -615,10 +615,14 @@ export default function AICenterPage() {
                     Olağandışı davranışlar ve sistem uyarıları
                   </CardDescription>
                 </div>
-                <Button variant="outline" size="sm" onClick={handleRefresh}>
+                <CanvaButton
+                  variant="primary"
+                  size="sm"
+                  onClick={handleRefresh}
+                >
                   <RefreshCw className="mr-2 h-4 w-4" />
                   Yenile
-                </Button>
+                </CanvaButton>
               </div>
             </CardHeader>
             <CardContent>
@@ -674,13 +678,13 @@ export default function AICenterPage() {
                             </p>
                           </div>
                         </div>
-                        <Button
+                        <CanvaButton
                           size="sm"
-                          variant="outline"
+                          variant="default"
                           onClick={() => handleResolveAnomaly(anomaly.id)}
                         >
                           Çözüldü
-                        </Button>
+                        </CanvaButton>
                       </div>
                     </div>
                   ))}
@@ -701,10 +705,10 @@ export default function AICenterPage() {
                     Aktif ve tamamlanmış deneyler
                   </CardDescription>
                 </div>
-                <Button>
+                <CanvaButton>
                   <FlaskConical className="mr-2 h-4 w-4" />
                   Yeni Deney
-                </Button>
+                </CanvaButton>
               </div>
             </CardHeader>
             <CardContent>
@@ -715,10 +719,10 @@ export default function AICenterPage() {
                       <div>
                         <div className="flex items-center gap-2">
                           <p className="font-medium">{exp.name}</p>
-                          <Badge
+                          <CanvaBadge
                             variant={
                               exp.status === 'running'
-                                ? 'default'
+                                ? 'primary'
                                 : exp.status === 'completed'
                                   ? 'secondary'
                                   : 'outline'
@@ -729,7 +733,7 @@ export default function AICenterPage() {
                               : exp.status === 'completed'
                                 ? 'Tamamlandı'
                                 : 'Taslak'}
-                          </Badge>
+                          </CanvaBadge>
                         </div>
                         {exp.statisticalSignificance && (
                           <p className="text-sm text-muted-foreground mt-1">
@@ -739,12 +743,12 @@ export default function AICenterPage() {
                         )}
                       </div>
                       {exp.winner && (
-                        <Badge
-                          variant="default"
+                        <CanvaBadge
+                          variant="primary"
                           className="bg-green-100 text-green-800"
                         >
                           Kazanan: {exp.winner}
-                        </Badge>
+                        </CanvaBadge>
                       )}
                     </div>
 

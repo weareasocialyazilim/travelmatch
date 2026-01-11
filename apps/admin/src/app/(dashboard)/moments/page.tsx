@@ -233,13 +233,13 @@ export default function MomentsPage() {
             Kullanıcı paylaşımlarını inceleyin ve yönetin
           </p>
         </div>
-        <Badge variant="warning" className="h-8 px-3 text-sm">
+        <CanvaBadge variant="warning" className="h-8 px-3 text-sm">
           {isLoading ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
             `${pendingCount} onay bekliyor`
           )}
-        </Badge>
+        </CanvaBadge>
       </div>
 
       {/* Stats */}
@@ -380,10 +380,10 @@ export default function MomentsPage() {
                         }
                       />
                       <div className="absolute right-2 top-2">
-                        <Badge variant={statusInfo.variant}>
+                        <CanvaBadge variant={statusInfo.variant}>
                           <StatusIcon className="mr-1 h-3 w-3" />
                           {statusInfo.label}
-                        </Badge>
+                        </CanvaBadge>
                       </div>
                     </div>
                     <CardContent className="p-4">
@@ -410,20 +410,20 @@ export default function MomentsPage() {
                         </span>
                       </div>
                       <div className="mt-3 flex gap-2">
-                        <Button
+                        <CanvaButton
                           size="sm"
-                          variant="outline"
+                          variant="default"
                           className="flex-1"
                           onClick={() => setSelectedMoment(moment)}
                         >
                           <Eye className="mr-1 h-4 w-4" />
                           İncele
-                        </Button>
+                        </CanvaButton>
                         {moment.status === 'pending' && (
                           <>
-                            <Button
+                            <CanvaButton
                               size="sm"
-                              variant="default"
+                              variant="primary"
                               className="flex-1"
                               onClick={() => handleApprove(moment.id)}
                               disabled={approveMoment.isPending}
@@ -434,10 +434,10 @@ export default function MomentsPage() {
                                 <CheckCircle className="mr-1 h-4 w-4" />
                               )}
                               Onayla
-                            </Button>
-                            <Button
+                            </CanvaButton>
+                            <CanvaButton
                               size="sm"
-                              variant="destructive"
+                              variant="error"
                               onClick={() => handleReject(moment.id)}
                               disabled={rejectMoment.isPending}
                             >
@@ -446,7 +446,7 @@ export default function MomentsPage() {
                               ) : (
                                 <XCircle className="h-4 w-4" />
                               )}
-                            </Button>
+                            </CanvaButton>
                           </>
                         )}
                       </div>
@@ -517,13 +517,16 @@ export default function MomentsPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setSelectedMoment(null)}>
+            <CanvaButton
+              variant="primary"
+              onClick={() => setSelectedMoment(null)}
+            >
               Kapat
-            </Button>
+            </CanvaButton>
             {selectedMoment?.status === 'pending' && (
               <>
-                <Button
-                  variant="destructive"
+                <CanvaButton
+                  variant="error"
                   onClick={() =>
                     selectedMoment && handleReject(selectedMoment.id)
                   }
@@ -535,8 +538,8 @@ export default function MomentsPage() {
                     <XCircle className="mr-2 h-4 w-4" />
                   )}
                   Reddet
-                </Button>
-                <Button
+                </CanvaButton>
+                <CanvaButton
                   onClick={() =>
                     selectedMoment && handleApprove(selectedMoment.id)
                   }
@@ -548,7 +551,7 @@ export default function MomentsPage() {
                     <CheckCircle className="mr-2 h-4 w-4" />
                   )}
                   Onayla
-                </Button>
+                </CanvaButton>
               </>
             )}
           </DialogFooter>

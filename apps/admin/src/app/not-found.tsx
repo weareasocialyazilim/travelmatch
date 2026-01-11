@@ -36,7 +36,7 @@ export default function NotFound() {
               </Link>
             </Button>
             <Button
-              variant="outline"
+              variant="default"
               onClick={() => window.history.back()}
               className="flex-1"
             >

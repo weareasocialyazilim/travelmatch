@@ -361,7 +361,7 @@ export default function SecurityPage() {
           </p>
         </div>
         <CanvaButton
-          variant="outline"
+          variant="default"
           onClick={() => window.location.reload()}
           leftIcon={<RefreshCw className="h-4 w-4" />}
         >
@@ -456,7 +456,7 @@ export default function SecurityPage() {
                 </div>
                 {is2FAEnabled ? (
                   <CanvaButton
-                    variant="outline"
+                    variant="default"
                     onClick={() => setIs2FASetupOpen(true)}
                   >
                     Ayarlar
@@ -485,7 +485,7 @@ export default function SecurityPage() {
                         kodlarınızı güvenli bir yerde saklayın.
                       </p>
                       <CanvaButton
-                        variant="outline"
+                        variant="default"
                         size="sm"
                         className="mt-2"
                         leftIcon={<Download className="h-4 w-4" />}
@@ -512,7 +512,7 @@ export default function SecurityPage() {
                   </CanvaCardSubtitle>
                 </div>
                 <CanvaButton
-                  variant="outline"
+                  variant="default"
                   onClick={() => setIsLogoutAllOpen(true)}
                   leftIcon={<LogOut className="h-4 w-4" />}
                 >
@@ -824,7 +824,7 @@ export default function SecurityPage() {
                 ))}
               </div>
               <CanvaButton
-                variant="outline"
+                variant="default"
                 className="w-full"
                 leftIcon={<Download className="h-4 w-4" />}
                 onClick={() => {
@@ -846,7 +846,7 @@ export default function SecurityPage() {
             {setupStep === 1 && (
               <>
                 <CanvaButton
-                  variant="outline"
+                  variant="default"
                   onClick={() => setIs2FASetupOpen(false)}
                 >
                   İptal
@@ -858,7 +858,7 @@ export default function SecurityPage() {
             )}
             {setupStep === 2 && (
               <>
-                <CanvaButton variant="outline" onClick={() => setSetupStep(1)}>
+                <CanvaButton variant="primary" onClick={() => setSetupStep(1)}>
                   Geri
                 </CanvaButton>
                 <CanvaButton

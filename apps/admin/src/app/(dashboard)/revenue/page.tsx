@@ -61,7 +61,9 @@ export default function RevenuePage() {
             <AlertTriangle className="h-8 w-8 text-red-500" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Veri Yüklenemedi</h2>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Veri Yüklenemedi
+            </h2>
             <p className="text-gray-500 mt-1">Gelir verileri alınamadı.</p>
           </div>
           <CanvaButton variant="primary" onClick={() => refetch()}>
@@ -102,14 +104,16 @@ export default function RevenuePage() {
             </SelectContent>
           </Select>
           <CanvaButton
-            variant="outline"
+            variant="default"
             onClick={() => refetch()}
             disabled={isFetching}
           >
-            <RefreshCw className={cn('h-4 w-4', isFetching && 'animate-spin')} />
+            <RefreshCw
+              className={cn('h-4 w-4', isFetching && 'animate-spin')}
+            />
             Yenile
           </CanvaButton>
-          <CanvaButton variant="secondary">
+          <CanvaButton variant="primary">
             <Download className="h-4 w-4" />
             Rapor İndir
           </CanvaButton>
@@ -120,7 +124,11 @@ export default function RevenuePage() {
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
         <CanvaStatCard
           label="Toplam Gelir"
-          value={isLoading ? '...' : formatCurrency(overview?.totalRevenue || 0, 'TRY')}
+          value={
+            isLoading
+              ? '...'
+              : formatCurrency(overview?.totalRevenue || 0, 'TRY')
+          }
           icon={<DollarSign className="h-5 w-5" />}
           change={
             overview?.growthRate
@@ -140,12 +148,20 @@ export default function RevenuePage() {
         />
         <CanvaStatCard
           label="Aktif Abonelik"
-          value={isLoading ? '...' : (overview?.activeSubscriptions || 0).toLocaleString('tr-TR')}
+          value={
+            isLoading
+              ? '...'
+              : (overview?.activeSubscriptions || 0).toLocaleString('tr-TR')
+          }
           icon={<Users className="h-5 w-5" />}
         />
         <CanvaStatCard
           label="Ort. Abonelik"
-          value={isLoading ? '...' : formatCurrency(overview?.avgSubscriptionValue || 0, 'TRY')}
+          value={
+            isLoading
+              ? '...'
+              : formatCurrency(overview?.avgSubscriptionValue || 0, 'TRY')
+          }
           icon={<TrendingUp className="h-5 w-5" />}
         />
         <CanvaCard>
@@ -154,10 +170,14 @@ export default function RevenuePage() {
               <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Büyüme
               </span>
-              <div className={cn(
-                'flex h-8 w-8 items-center justify-center rounded-lg',
-                (overview?.growthRate || 0) >= 0 ? 'bg-emerald-50' : 'bg-red-50'
-              )}>
+              <div
+                className={cn(
+                  'flex h-8 w-8 items-center justify-center rounded-lg',
+                  (overview?.growthRate || 0) >= 0
+                    ? 'bg-emerald-50'
+                    : 'bg-red-50',
+                )}
+              >
                 {(overview?.growthRate || 0) >= 0 ? (
                   <TrendingUp className="h-4 w-4 text-emerald-600" />
                 ) : (
@@ -165,11 +185,17 @@ export default function RevenuePage() {
                 )}
               </div>
             </div>
-            <div className={cn(
-              'text-3xl font-bold mt-2',
-              (overview?.growthRate || 0) >= 0 ? 'text-emerald-600' : 'text-red-600'
-            )}>
-              {isLoading ? '...' : `${(overview?.growthRate || 0) >= 0 ? '+' : ''}${overview?.growthRate || 0}%`}
+            <div
+              className={cn(
+                'text-3xl font-bold mt-2',
+                (overview?.growthRate || 0) >= 0
+                  ? 'text-emerald-600'
+                  : 'text-red-600',
+              )}
+            >
+              {isLoading
+                ? '...'
+                : `${(overview?.growthRate || 0) >= 0 ? '+' : ''}${overview?.growthRate || 0}%`}
             </div>
           </div>
         </CanvaCard>
@@ -187,7 +213,9 @@ export default function RevenuePage() {
           <CanvaCard>
             <CanvaCardHeader>
               <CanvaCardTitle>Gelir Trendi</CanvaCardTitle>
-              <p className="text-sm text-gray-500 mt-1">Aylık gelir performansı</p>
+              <p className="text-sm text-gray-500 mt-1">
+                Aylık gelir performansı
+              </p>
             </CanvaCardHeader>
             <CanvaCardBody>
               {isLoading ? (
@@ -201,12 +229,17 @@ export default function RevenuePage() {
                       <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                       <XAxis dataKey="month" stroke="#94a3b8" fontSize={12} />
                       <YAxis
-                        tickFormatter={(value) => `₺${(value / 1000).toFixed(0)}K`}
+                        tickFormatter={(value) =>
+                          `₺${(value / 1000).toFixed(0)}K`
+                        }
                         stroke="#94a3b8"
                         fontSize={12}
                       />
                       <Tooltip
-                        formatter={(value: number) => [formatCurrency(value, 'TRY'), 'Gelir']}
+                        formatter={(value: number) => [
+                          formatCurrency(value, 'TRY'),
+                          'Gelir',
+                        ]}
                         contentStyle={{
                           backgroundColor: 'white',
                           border: '1px solid #e2e8f0',
@@ -223,9 +256,23 @@ export default function RevenuePage() {
                         name="Gelir"
                       />
                       <defs>
-                        <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
-                          <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                        <linearGradient
+                          id="colorRevenue"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="5%"
+                            stopColor="#8b5cf6"
+                            stopOpacity={0.3}
+                          />
+                          <stop
+                            offset="95%"
+                            stopColor="#8b5cf6"
+                            stopOpacity={0}
+                          />
                         </linearGradient>
                       </defs>
                     </AreaChart>
@@ -247,7 +294,9 @@ export default function RevenuePage() {
             <CanvaCard>
               <CanvaCardHeader>
                 <CanvaCardTitle>Ürün Dağılımı</CanvaCardTitle>
-                <p className="text-sm text-gray-500 mt-1">Gelir kaynaklarının dağılımı</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Gelir kaynaklarının dağılımı
+                </p>
               </CanvaCardHeader>
               <CanvaCardBody>
                 {isLoading ? (
@@ -272,7 +321,10 @@ export default function RevenuePage() {
                           ))}
                         </Pie>
                         <Tooltip
-                          formatter={(value: number) => [formatCurrency(value, 'TRY'), '']}
+                          formatter={(value: number) => [
+                            formatCurrency(value, 'TRY'),
+                            '',
+                          ]}
                           contentStyle={{
                             backgroundColor: 'white',
                             border: '1px solid #e2e8f0',
@@ -303,8 +355,14 @@ export default function RevenuePage() {
                 ) : revenueByProduct.length > 0 ? (
                   <div className="space-y-4">
                     {revenueByProduct.map((product) => {
-                      const total = revenueByProduct.reduce((sum, p) => sum + p.value, 0);
-                      const percentage = total > 0 ? Math.round((product.value / total) * 100) : 0;
+                      const total = revenueByProduct.reduce(
+                        (sum, p) => sum + p.value,
+                        0,
+                      );
+                      const percentage =
+                        total > 0
+                          ? Math.round((product.value / total) * 100)
+                          : 0;
                       return (
                         <div key={product.name} className="space-y-2">
                           <div className="flex items-center justify-between">
@@ -313,7 +371,9 @@ export default function RevenuePage() {
                                 className="h-3 w-3 rounded-full"
                                 style={{ backgroundColor: product.color }}
                               />
-                              <span className="font-medium text-gray-900">{product.name}</span>
+                              <span className="font-medium text-gray-900">
+                                {product.name}
+                              </span>
                             </div>
                             <span className="text-sm font-medium text-gray-700">
                               {formatCurrency(product.value, 'TRY')}
@@ -343,7 +403,9 @@ export default function RevenuePage() {
           <CanvaCard>
             <CanvaCardHeader>
               <CanvaCardTitle>Son Ödemeler</CanvaCardTitle>
-              <p className="text-sm text-gray-500 mt-1">En son tamamlanan ödemeler</p>
+              <p className="text-sm text-gray-500 mt-1">
+                En son tamamlanan ödemeler
+              </p>
             </CanvaCardHeader>
             <CanvaCardBody className="p-0">
               {isLoading ? (
@@ -363,17 +425,25 @@ export default function RevenuePage() {
                         </div>
                         <div>
                           <p className="text-sm font-medium text-gray-900">
-                            {payment.type === 'subscription' ? 'Abonelik' :
-                             payment.type === 'gift' ? 'Hediye' : 'Ödeme'}
+                            {payment.type === 'subscription'
+                              ? 'Abonelik'
+                              : payment.type === 'gift'
+                                ? 'Hediye'
+                                : 'Ödeme'}
                           </p>
                           <p className="text-xs text-gray-500">
-                            {new Date(payment.created_at).toLocaleString('tr-TR')}
+                            {new Date(payment.created_at).toLocaleString(
+                              'tr-TR',
+                            )}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-semibold text-gray-900">
-                          {formatCurrency(payment.amount, payment.currency || 'TRY')}
+                          {formatCurrency(
+                            payment.amount,
+                            payment.currency || 'TRY',
+                          )}
                         </p>
                         <CanvaBadge variant="success" size="sm">
                           {payment.status}

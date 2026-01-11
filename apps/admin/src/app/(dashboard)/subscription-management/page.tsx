@@ -321,41 +321,41 @@ export default function SubscriptionManagementPage() {
     switch (action) {
       case 'new':
         return (
-          <Badge className="bg-emerald-500/10 text-emerald-600">
+          <CanvaBadge className="bg-emerald-500/10 text-emerald-600">
             <Plus className="h-3 w-3 mr-1" />
             Yeni
-          </Badge>
+          </CanvaBadge>
         );
       case 'upgrade':
         return (
-          <Badge className="bg-blue-500/10 text-blue-600">
+          <CanvaBadge className="bg-blue-500/10 text-blue-600">
             <ArrowUpRight className="h-3 w-3 mr-1" />
             Yukseltme
-          </Badge>
+          </CanvaBadge>
         );
       case 'downgrade':
         return (
-          <Badge className="bg-amber-500/10 text-amber-600">
+          <CanvaBadge className="bg-amber-500/10 text-amber-600">
             <ArrowDownRight className="h-3 w-3 mr-1" />
             Dusurme
-          </Badge>
+          </CanvaBadge>
         );
       case 'renewal':
         return (
-          <Badge className="bg-purple-500/10 text-purple-600">
+          <CanvaBadge className="bg-purple-500/10 text-purple-600">
             <RefreshCw className="h-3 w-3 mr-1" />
             Yenileme
-          </Badge>
+          </CanvaBadge>
         );
       case 'cancel':
         return (
-          <Badge className="bg-red-500/10 text-red-600">
+          <CanvaBadge className="bg-red-500/10 text-red-600">
             <XCircle className="h-3 w-3 mr-1" />
             Iptal
-          </Badge>
+          </CanvaBadge>
         );
       default:
-        return <Badge variant="outline">{action}</Badge>;
+        return <CanvaBadge variant="default">{action}</CanvaBadge>;
     }
   };
 
@@ -363,22 +363,22 @@ export default function SubscriptionManagementPage() {
     switch (plan) {
       case 'platinum':
         return (
-          <Badge className="bg-amber-500 text-white">
+          <CanvaBadge className="bg-amber-500 text-white">
             <Crown className="h-3 w-3 mr-1" />
             Platinum
-          </Badge>
+          </CanvaBadge>
         );
       case 'premium':
         return (
-          <Badge className="bg-purple-500 text-white">
+          <CanvaBadge className="bg-purple-500 text-white">
             <Star className="h-3 w-3 mr-1" />
             Premium
-          </Badge>
+          </CanvaBadge>
         );
       case 'free':
-        return <Badge variant="outline">Free</Badge>;
+        return <CanvaBadge variant="default">Free</CanvaBadge>;
       default:
-        return <Badge variant="outline">-</Badge>;
+        return <CanvaBadge variant="default">-</CanvaBadge>;
     }
   };
 
@@ -396,14 +396,14 @@ export default function SubscriptionManagementPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
+          <CanvaButton variant="primary" size="sm">
             <Download className="h-4 w-4 mr-2" />
             Rapor
-          </Button>
-          <Button size="sm" onClick={() => setPromoDialog(true)}>
+          </CanvaButton>
+          <CanvaButton size="sm" onClick={() => setPromoDialog(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Yeni Promo
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
@@ -544,10 +544,10 @@ export default function SubscriptionManagementPage() {
                   </li>
                 ))}
               </ul>
-              <Button variant="outline" className="w-full" size="sm">
+              <CanvaButton variant="primary" className="w-full" size="sm">
                 <Edit className="h-4 w-4 mr-2" />
                 Plani Duzenle
-              </Button>
+              </CanvaButton>
             </CardContent>
           </Card>
         ))}
@@ -700,10 +700,10 @@ export default function SubscriptionManagementPage() {
                     Aktif ve gecmis promosyonlar
                   </CardDescription>
                 </div>
-                <Button size="sm" onClick={() => setPromoDialog(true)}>
+                <CanvaButton size="sm" onClick={() => setPromoDialog(true)}>
                   <Plus className="h-4 w-4 mr-2" />
                   Yeni Promo
-                </Button>
+                </CanvaButton>
               </div>
             </CardHeader>
             <CardContent>
@@ -727,25 +727,25 @@ export default function SubscriptionManagementPage() {
                           <code className="px-2 py-1 bg-muted rounded font-mono text-sm">
                             {promo.code}
                           </code>
-                          <Button
+                          <CanvaButton
                             variant="ghost"
                             size="sm"
                             className="h-6 w-6 p-0"
                           >
                             <Copy className="h-3 w-3" />
-                          </Button>
+                          </CanvaButton>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">
+                        <CanvaBadge variant="default">
                           {promo.type === 'percentage'
                             ? `%${promo.value}`
                             : formatCurrency(promo.value, 'TRY')}
-                        </Badge>
+                        </CanvaBadge>
                       </TableCell>
                       <TableCell>
                         {promo.targetPlan === 'all' ? (
-                          <Badge variant="outline">Tumu</Badge>
+                          <CanvaBadge variant="default">Tumu</CanvaBadge>
                         ) : (
                           getPlanBadge(promo.targetPlan)
                         )}
@@ -773,29 +773,29 @@ export default function SubscriptionManagementPage() {
                       </TableCell>
                       <TableCell>
                         {promo.isActive ? (
-                          <Badge className="bg-emerald-500/10 text-emerald-600">
+                          <CanvaBadge className="bg-emerald-500/10 text-emerald-600">
                             Aktif
-                          </Badge>
+                          </CanvaBadge>
                         ) : (
-                          <Badge variant="outline">Pasif</Badge>
+                          <CanvaBadge variant="default">Pasif</CanvaBadge>
                         )}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
-                          <Button
+                          <CanvaButton
                             variant="ghost"
                             size="sm"
                             className="h-8 w-8 p-0"
                           >
                             <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
+                          </CanvaButton>
+                          <CanvaButton
                             variant="ghost"
                             size="sm"
                             className="h-8 w-8 p-0 text-red-600"
                           >
                             <Trash2 className="h-4 w-4" />
-                          </Button>
+                          </CanvaButton>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -958,10 +958,15 @@ export default function SubscriptionManagementPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setPromoDialog(false)}>
+            <CanvaButton
+              variant="primary"
+              onClick={() => setPromoDialog(false)}
+            >
               Iptal
-            </Button>
-            <Button onClick={() => setPromoDialog(false)}>Olustur</Button>
+            </CanvaButton>
+            <CanvaButton onClick={() => setPromoDialog(false)}>
+              Olustur
+            </CanvaButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>

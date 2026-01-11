@@ -160,8 +160,8 @@ export default function OpsCenterPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant={isLive ? 'default' : 'outline'}
+          <CanvaButton
+            variant={isLive ? 'primary' : 'outline'}
             size="sm"
             onClick={() => setIsLive(!isLive)}
           >
@@ -169,10 +169,10 @@ export default function OpsCenterPage() {
               className={`mr-2 h-2 w-2 ${isLive ? 'fill-red-500 text-red-500 animate-pulse' : 'fill-gray-500 text-gray-500'}`}
             />
             {isLive ? 'Canlı' : 'Duraklatıldı'}
-          </Button>
-          <Button variant="outline" size="icon">
+          </CanvaButton>
+          <CanvaButton variant="primary" size="sm" iconOnly>
             <RefreshCw className="h-4 w-4" />
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
@@ -366,10 +366,10 @@ export default function OpsCenterPage() {
                 </CardDescription>
               </div>
               {isLive && (
-                <Badge variant="outline" className="gap-1">
+                <CanvaBadge variant="default" className="gap-1">
                   <Circle className="h-2 w-2 fill-red-500 text-red-500 animate-pulse" />
                   Canlı
-                </Badge>
+                </CanvaBadge>
               )}
             </div>
           </CardHeader>
