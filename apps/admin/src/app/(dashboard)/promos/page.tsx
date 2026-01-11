@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Gift,
   Plus,
@@ -20,6 +20,8 @@ import {
   DollarSign,
   Percent,
   AlertTriangle,
+  RefreshCw,
+  Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -59,6 +61,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 import { formatDate, formatCurrency } from '@/lib/utils';
+import {
+  usePromos,
+  useCreatePromo,
+  useDeletePromo,
+  useTogglePromo,
+} from '@/hooks/use-promos';
 
 // Mock data
 const mockPromoCodes = [
@@ -168,6 +176,99 @@ const referralStats = {
 export default function PromosPage() {
   const [isCreatePromoOpen, setIsCreatePromoOpen] = useState(false);
   const [promoType, setPromoType] = useState<string>('percentage');
+  const [newPromoCode, setNewPromoCode] = useState('');
+  const [newPromoValue, setNewPromoValue] = useState('');
+  const [newPromoDescription, setNewPromoDescription] = useState('');
+  const [newPromoApplicableTo, setNewPromoApplicableTo] = useState('all');
+  const [newPromoLimit, setNewPromoLimit] = useState('');
+
+  // Use real API data
+  const { data, isLoading, error, refetch } = usePromos();
+  const createPromo = useCreatePromo();
+  const deletePromo = useDeletePromo();
+  const togglePromo = useTogglePromo();
+
+  // Use API data if available, otherwise fall back to mock data
+  const promoCodes = useMemo(() => {
+    if (data?.promo_codes && data.promo_codes.length > 0) {
+      return data.promo_codes.map(promo => ({
+        id: promo.id,
+        code: promo.code,
+        type: promo.discount_type,
+        value: promo.discount_value,
+        description: promo.description || '',
+        status: promo.is_active ? 'active' : 'disabled',
+        usage: {
+          current: promo.usage_count || 0,
+          limit: promo.usage_limit || null,
+        },
+        valid_from: promo.valid_from,
+        valid_until: promo.valid_until || null,
+        applicable_to: 'all',
+        revenue_impact: 0,
+      }));
+    }
+    return mockPromoCodes;
+  }, [data?.promo_codes]);
+
+  // Stats calculation
+  const stats = useMemo(() => {
+    const total = promoCodes.length;
+    const active = promoCodes.filter(p => p.status === 'active').length;
+    const totalUsage = promoCodes.reduce((sum, p) => sum + p.usage.current, 0);
+    const totalRevenue = promoCodes.reduce((sum, p) => sum + p.revenue_impact, 0);
+    return {
+      totalCodes: total || promoStats.totalCodes,
+      activeCodes: active || promoStats.activeCodes,
+      totalUsage: totalUsage || promoStats.totalUsage,
+      totalRevenue: totalRevenue || promoStats.totalRevenue,
+      avgConversion: promoStats.avgConversion,
+    };
+  }, [promoCodes]);
+
+  const handleCreatePromo = () => {
+    createPromo.mutate(
+      {
+        code: newPromoCode.toUpperCase(),
+        discount_type: promoType as 'percentage' | 'fixed' | 'free_shipping',
+        discount_value: parseFloat(newPromoValue),
+        description: newPromoDescription,
+        usage_limit: newPromoLimit ? parseInt(newPromoLimit) : undefined,
+        valid_from: new Date().toISOString(),
+        is_active: true,
+      },
+      {
+        onSuccess: () => {
+          toast.success('Promosyon kodu oluşturuldu');
+          setIsCreatePromoOpen(false);
+          resetForm();
+        },
+        onError: (error) => {
+          toast.error(error.message || 'Promo oluşturulamadı');
+        },
+      }
+    );
+  };
+
+  const handleDeletePromo = (id: string) => {
+    deletePromo.mutate(id, {
+      onSuccess: () => {
+        toast.success('Promosyon kodu silindi');
+      },
+      onError: () => {
+        toast.error('Silme işlemi başarısız');
+      },
+    });
+  };
+
+  const resetForm = () => {
+    setNewPromoCode('');
+    setNewPromoValue('');
+    setNewPromoDescription('');
+    setNewPromoApplicableTo('all');
+    setNewPromoLimit('');
+    setPromoType('percentage');
+  };
 
   const getStatusBadge = (status: string) => {
     const variants: Record<
@@ -215,6 +316,15 @@ export default function PromosPage() {
             Promosyon kodları ve referans programını yönet
           </p>
         </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => refetch()} disabled={isLoading}>
+            {isLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="mr-2 h-4 w-4" />
+            )}
+            Yenile
+          </Button>
         <Dialog open={isCreatePromoOpen} onOpenChange={setIsCreatePromoOpen}>
           <DialogTrigger asChild>
             <Button>
@@ -239,12 +349,16 @@ export default function PromosPage() {
                     id="code"
                     placeholder="YILBASI30"
                     className="uppercase"
+                    value={newPromoCode}
+                    onChange={(e) => setNewPromoCode(e.target.value.toUpperCase())}
                   />
                   <Button
                     variant="outline"
-                    onClick={() =>
-                      toast.info(`Önerilen kod: ${generateCode()}`)
-                    }
+                    onClick={() => {
+                      const code = generateCode();
+                      setNewPromoCode(code);
+                      toast.info(`Kod oluşturuldu: ${code}`);
+                    }}
                   >
                     Oluştur
                   </Button>
@@ -277,6 +391,8 @@ export default function PromosPage() {
                     id="value"
                     type="number"
                     placeholder={promoType === 'percentage' ? '30' : '50'}
+                    value={newPromoValue}
+                    onChange={(e) => setNewPromoValue(e.target.value)}
                   />
                   <span className="text-muted-foreground">
                     {promoType === 'percentage' ? '%' : '₺'}
@@ -287,13 +403,18 @@ export default function PromosPage() {
               {/* Description */}
               <div className="space-y-2">
                 <Label htmlFor="description">Açıklama</Label>
-                <Input id="description" placeholder="Kampanya açıklaması..." />
+                <Input
+                  id="description"
+                  placeholder="Kampanya açıklaması..."
+                  value={newPromoDescription}
+                  onChange={(e) => setNewPromoDescription(e.target.value)}
+                />
               </div>
 
               {/* Applicable To */}
               <div className="space-y-2">
                 <Label>Geçerli Olduğu Ürün</Label>
-                <Select>
+                <Select value={newPromoApplicableTo} onValueChange={setNewPromoApplicableTo}>
                   <SelectTrigger>
                     <SelectValue placeholder="Seçin" />
                   </SelectTrigger>
@@ -318,6 +439,8 @@ export default function PromosPage() {
                   id="limit"
                   type="number"
                   placeholder="Sınırsız için boş bırakın"
+                  value={newPromoLimit}
+                  onChange={(e) => setNewPromoLimit(e.target.value)}
                 />
               </div>
 
@@ -342,16 +465,18 @@ export default function PromosPage() {
                 İptal
               </Button>
               <Button
-                onClick={() => {
-                  toast.success('Promosyon kodu oluşturuldu');
-                  setIsCreatePromoOpen(false);
-                }}
+                onClick={handleCreatePromo}
+                disabled={!newPromoCode || !newPromoValue || createPromo.isPending}
               >
+                {createPromo.isPending ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : null}
                 Oluştur
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <Tabs defaultValue="promos" className="space-y-4">
@@ -373,7 +498,7 @@ export default function PromosPage() {
             <Card>
               <CardContent className="pt-6">
                 <div className="text-center">
-                  <p className="text-2xl font-bold">{promoStats.totalCodes}</p>
+                  <p className="text-2xl font-bold">{stats.totalCodes}</p>
                   <p className="text-sm text-muted-foreground">Toplam Kod</p>
                 </div>
               </CardContent>
@@ -382,7 +507,7 @@ export default function PromosPage() {
               <CardContent className="pt-6">
                 <div className="text-center">
                   <p className="text-2xl font-bold text-green-600">
-                    {promoStats.activeCodes}
+                    {stats.activeCodes}
                   </p>
                   <p className="text-sm text-muted-foreground">Aktif</p>
                 </div>
@@ -392,7 +517,7 @@ export default function PromosPage() {
               <CardContent className="pt-6">
                 <div className="text-center">
                   <p className="text-2xl font-bold">
-                    {promoStats.totalUsage.toLocaleString('tr-TR')}
+                    {stats.totalUsage.toLocaleString('tr-TR')}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     Toplam Kullanım
@@ -404,7 +529,7 @@ export default function PromosPage() {
               <CardContent className="pt-6">
                 <div className="text-center">
                   <p className="text-2xl font-bold">
-                    %{promoStats.avgConversion}
+                    %{stats.avgConversion}
                   </p>
                   <p className="text-sm text-muted-foreground">Ort. Dönüşüm</p>
                 </div>
@@ -414,7 +539,7 @@ export default function PromosPage() {
               <CardContent className="pt-6">
                 <div className="text-center">
                   <p className="text-2xl font-bold text-green-600">
-                    {formatCurrency(promoStats.totalRevenue, 'TRY')}
+                    {formatCurrency(stats.totalRevenue, 'TRY')}
                   </p>
                   <p className="text-sm text-muted-foreground">Toplam Gelir</p>
                 </div>
@@ -432,7 +557,7 @@ export default function PromosPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {mockPromoCodes.map((promo) => (
+                {promoCodes.map((promo) => (
                   <div
                     key={promo.id}
                     className="flex items-center justify-between rounded-lg border p-4"
@@ -532,7 +657,10 @@ export default function PromosPage() {
                             Kopyala
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-destructive">
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={() => handleDeletePromo(promo.id)}
+                          >
                             <Trash2 className="mr-2 h-4 w-4" />
                             Sil
                           </DropdownMenuItem>

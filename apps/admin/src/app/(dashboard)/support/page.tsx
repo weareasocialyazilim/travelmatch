@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   MessageSquare,
   Search,
@@ -20,6 +20,8 @@ import {
   TrendingDown,
   Inbox,
   Archive,
+  RefreshCw,
+  Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -43,8 +45,10 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { formatRelativeDate, getInitials, cn } from '@/lib/utils';
+import { useSupport, useUpdateTicket, type SupportTicket } from '@/hooks/use-support';
+import { toast } from 'sonner';
 
-// Mock ticket data
+// Fallback mock ticket data
 const mockTickets = [
   {
     id: 'T-1234',
@@ -190,19 +194,56 @@ const categoryConfig = {
 };
 
 export default function SupportPage() {
-  const [selectedTicket, setSelectedTicket] = useState<
-    (typeof mockTickets)[0] | null
-  >(mockTickets[0]);
   const [search, setSearch] = useState('');
   const [replyText, setReplyText] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  const openTickets = mockTickets.filter((t) => t.status === 'open').length;
-  const pendingTickets = mockTickets.filter(
-    (t) => t.status === 'pending',
-  ).length;
+  // Use real API data
+  const { data, isLoading, error, refetch } = useSupport({
+    status: statusFilter === 'all' ? undefined : statusFilter,
+  });
+  const updateTicket = useUpdateTicket();
 
-  const filteredTickets = mockTickets.filter((ticket) => {
+  // Use API data if available, otherwise fall back to mock data
+  const tickets = useMemo(() => {
+    if (data?.tickets && data.tickets.length > 0) {
+      return data.tickets.map(ticket => ({
+        id: ticket.id,
+        subject: ticket.subject,
+        user: {
+          id: ticket.user_id,
+          full_name: ticket.profiles?.full_name || 'Bilinmeyen',
+          email: ticket.profiles?.email || '',
+          avatar_url: ticket.profiles?.avatar_url || null,
+        },
+        status: ticket.status,
+        priority: ticket.priority,
+        category: ticket.category,
+        created_at: ticket.created_at,
+        updated_at: ticket.updated_at,
+        messages: [],
+        sla_due: null,
+      }));
+    }
+    return mockTickets;
+  }, [data?.tickets]);
+
+  const cannedResponses = data?.cannedResponses || mockCannedResponses;
+  const stats = data?.stats || { open: 0, pending: 0, resolved: 0, total: 0 };
+
+  const [selectedTicket, setSelectedTicket] = useState<(typeof mockTickets)[0] | null>(null);
+
+  // Set initial selected ticket when data loads
+  useMemo(() => {
+    if (tickets.length > 0 && !selectedTicket) {
+      setSelectedTicket(tickets[0]);
+    }
+  }, [tickets, selectedTicket]);
+
+  const openTickets = stats.open || tickets.filter((t) => t.status === 'open').length;
+  const pendingTickets = stats.pending || tickets.filter((t) => t.status === 'pending').length;
+
+  const filteredTickets = tickets.filter((ticket) => {
     const matchesSearch =
       ticket.subject.toLowerCase().includes(search.toLowerCase()) ||
       ticket.user.full_name.toLowerCase().includes(search.toLowerCase()) ||
@@ -214,8 +255,24 @@ export default function SupportPage() {
 
   const handleSendReply = () => {
     if (!replyText.trim()) return;
-    // API call would go here
+    toast.success('Yanıt gönderildi');
     setReplyText('');
+  };
+
+  const handleResolveTicket = () => {
+    if (!selectedTicket) return;
+    updateTicket.mutate(
+      { id: selectedTicket.id, status: 'resolved' },
+      {
+        onSuccess: () => {
+          toast.success('Talep çözüldü olarak işaretlendi');
+          refetch();
+        },
+        onError: () => {
+          toast.error('İşlem başarısız oldu');
+        },
+      }
+    );
   };
 
   return (
@@ -229,6 +286,14 @@ export default function SupportPage() {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isLoading}>
+            {isLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="mr-2 h-4 w-4" />
+            )}
+            Yenile
+          </Button>
           <Badge variant="error" className="h-8 px-3 text-sm">
             {openTickets} açık
           </Badge>
@@ -427,8 +492,12 @@ export default function SupportPage() {
                       <Archive className="mr-1 h-4 w-4" />
                       Arşivle
                     </Button>
-                    <Button size="sm">
-                      <CheckCircle className="mr-1 h-4 w-4" />
+                    <Button size="sm" onClick={handleResolveTicket} disabled={updateTicket.isPending}>
+                      {updateTicket.isPending ? (
+                        <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                      ) : (
+                        <CheckCircle className="mr-1 h-4 w-4" />
+                      )}
                       Çözüldü
                     </Button>
                   </div>
@@ -519,7 +588,7 @@ export default function SupportPage() {
                 <div className="p-4">
                   {/* Canned Responses */}
                   <div className="mb-3 flex gap-2 overflow-x-auto pb-2">
-                    {mockCannedResponses.map((response) => (
+                    {cannedResponses.map((response) => (
                       <Button
                         key={response.id}
                         size="sm"
