@@ -34,6 +34,17 @@ import {
   TrendingUp,
   TrendingDown,
 } from 'lucide-react';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import {
   Card,
   CardContent,
@@ -41,9 +52,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
