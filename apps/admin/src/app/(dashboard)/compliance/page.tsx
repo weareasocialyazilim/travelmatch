@@ -501,11 +501,15 @@ export default function CompliancePage() {
         <p className="text-gray-500 max-w-md">
           Uyumluluk verileri yüklenemedi. Lütfen tekrar deneyin.
         </p>
-        <CanvaButton variant="outline" onClick={() => {
-          fetchStats();
-          fetchSarReports();
-          fetchRiskProfiles();
-        }} leftIcon={<RefreshCw className="h-4 w-4" />}>
+        <CanvaButton
+          variant="outline"
+          onClick={() => {
+            fetchStats();
+            fetchSarReports();
+            fetchRiskProfiles();
+          }}
+          leftIcon={<RefreshCw className="h-4 w-4" />}
+        >
           Tekrar Dene
         </CanvaButton>
       </div>
@@ -912,7 +916,7 @@ export default function CompliancePage() {
                         ) : (
                           <CanvaButton
                             size="sm"
-                            variant="destructive"
+                            variant="danger"
                             onClick={() =>
                               toggleUserBlock(
                                 profile.user_id,
@@ -1224,7 +1228,7 @@ export default function CompliancePage() {
               Kaydet
             </CanvaButton>
             <CanvaButton
-              variant="default"
+              variant="primary"
               className="bg-green-600 hover:bg-green-700"
               onClick={() =>
                 selectedSar &&
@@ -1235,7 +1239,7 @@ export default function CompliancePage() {
               Temiz
             </CanvaButton>
             <CanvaButton
-              variant="destructive"
+              variant="danger"
               onClick={() =>
                 selectedSar &&
                 updateSarStatus(selectedSar.id, 'confirmed', investigationNotes)
@@ -1309,7 +1313,10 @@ export default function CompliancePage() {
             </div>
           )}
           <DialogFooter>
-            <CanvaButton variant="outline" onClick={() => setSelectedProfile(null)}>
+            <CanvaButton
+              variant="outline"
+              onClick={() => setSelectedProfile(null)}
+            >
               Kapat
             </CanvaButton>
             {selectedProfile?.is_blocked ? (
@@ -1324,7 +1331,7 @@ export default function CompliancePage() {
               </CanvaButton>
             ) : (
               <CanvaButton
-                variant="destructive"
+                variant="danger"
                 onClick={() =>
                   selectedProfile &&
                   toggleUserBlock(selectedProfile.user_id, true, 'Manuel engel')

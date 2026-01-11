@@ -101,19 +101,69 @@ import {
   useDeleteAdminUser,
 } from '@/hooks/use-admin-users';
 
+// Admin tipi tanımı - API ve mock data uyumlu
+interface AdminUserData {
+  id: string;
+  email: string;
+  name: string;
+  avatar_url?: string | null;
+  role: string;
+  is_active: boolean;
+  requires_2fa: boolean;
+  totp_enabled: boolean;
+  last_login_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 // Rol tanımlamaları
 const ROLES = [
-  { value: 'super_admin', label: 'Süper Admin', color: 'bg-red-100 text-red-800', icon: ShieldCheck },
-  { value: 'manager', label: 'Yönetici', color: 'bg-purple-100 text-purple-800', icon: Shield },
-  { value: 'moderator', label: 'Moderatör', color: 'bg-blue-100 text-blue-800', icon: Users },
-  { value: 'finance', label: 'Finans', color: 'bg-green-100 text-green-800', icon: Key },
-  { value: 'marketing', label: 'Pazarlama', color: 'bg-orange-100 text-orange-800', icon: Mail },
-  { value: 'support', label: 'Destek', color: 'bg-cyan-100 text-cyan-800', icon: Users },
-  { value: 'viewer', label: 'İzleyici', color: 'bg-gray-100 text-gray-800', icon: Eye },
+  {
+    value: 'super_admin',
+    label: 'Süper Admin',
+    color: 'bg-red-100 text-red-800',
+    icon: ShieldCheck,
+  },
+  {
+    value: 'manager',
+    label: 'Yönetici',
+    color: 'bg-purple-100 text-purple-800',
+    icon: Shield,
+  },
+  {
+    value: 'moderator',
+    label: 'Moderatör',
+    color: 'bg-blue-100 text-blue-800',
+    icon: Users,
+  },
+  {
+    value: 'finance',
+    label: 'Finans',
+    color: 'bg-green-100 text-green-800',
+    icon: Key,
+  },
+  {
+    value: 'marketing',
+    label: 'Pazarlama',
+    color: 'bg-orange-100 text-orange-800',
+    icon: Mail,
+  },
+  {
+    value: 'support',
+    label: 'Destek',
+    color: 'bg-cyan-100 text-cyan-800',
+    icon: Users,
+  },
+  {
+    value: 'viewer',
+    label: 'İzleyici',
+    color: 'bg-gray-100 text-gray-800',
+    icon: Eye,
+  },
 ];
 
 const getRoleInfo = (role: string) => {
-  return ROLES.find(r => r.value === role) || ROLES[ROLES.length - 1];
+  return ROLES.find((r) => r.value === role) || ROLES[ROLES.length - 1];
 };
 
 // Mock data for development
@@ -192,7 +242,9 @@ export default function AdminUsersPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [selectedAdmin, setSelectedAdmin] = useState<typeof mockAdmins[0] | null>(null);
+  const [selectedAdmin, setSelectedAdmin] = useState<AdminUserData | null>(
+    null,
+  );
 
   // Form state
   const [formData, setFormData] = useState({
@@ -218,12 +270,14 @@ export default function AdminUsersPage() {
   const admins = data?.admins || mockAdmins;
 
   // Filter admins
-  const filteredAdmins = admins.filter(admin => {
-    const matchesSearch = !search ||
+  const filteredAdmins = admins.filter((admin) => {
+    const matchesSearch =
+      !search ||
       admin.name.toLowerCase().includes(search.toLowerCase()) ||
       admin.email.toLowerCase().includes(search.toLowerCase());
     const matchesRole = roleFilter === 'all' || admin.role === roleFilter;
-    const matchesStatus = statusFilter === 'all' ||
+    const matchesStatus =
+      statusFilter === 'all' ||
       (statusFilter === 'active' ? admin.is_active : !admin.is_active);
     return matchesSearch && matchesRole && matchesStatus;
   });
@@ -231,9 +285,9 @@ export default function AdminUsersPage() {
   // Stats
   const stats = {
     total: admins.length,
-    active: admins.filter(a => a.is_active).length,
-    with2fa: admins.filter(a => a.totp_enabled).length,
-    superAdmins: admins.filter(a => a.role === 'super_admin').length,
+    active: admins.filter((a) => a.is_active).length,
+    with2fa: admins.filter((a) => a.totp_enabled).length,
+    superAdmins: admins.filter((a) => a.role === 'super_admin').length,
   };
 
   // Handlers
@@ -286,13 +340,15 @@ export default function AdminUsersPage() {
     }
   };
 
-  const handleToggleStatus = async (admin: typeof mockAdmins[0]) => {
+  const handleToggleStatus = async (admin: AdminUserData) => {
     try {
       await updateAdmin.mutateAsync({
         id: admin.id,
         data: { is_active: !admin.is_active },
       });
-      toast.success(admin.is_active ? 'Admin pasifleştirildi' : 'Admin aktifleştirildi');
+      toast.success(
+        admin.is_active ? 'Admin pasifleştirildi' : 'Admin aktifleştirildi',
+      );
     } catch (err) {
       toast.error('Durum değiştirilemedi');
     }
@@ -308,7 +364,7 @@ export default function AdminUsersPage() {
     });
   };
 
-  const openEdit = (admin: typeof mockAdmins[0]) => {
+  const openEdit = (admin: AdminUserData) => {
     setSelectedAdmin(admin);
     setFormData({
       name: admin.name,
@@ -350,7 +406,11 @@ export default function AdminUsersPage() {
         <p className="text-gray-500 max-w-md">
           Admin kullanıcıları yüklenemedi. Lütfen tekrar deneyin.
         </p>
-        <CanvaButton variant="outline" onClick={() => refetch()} leftIcon={<RefreshCw className="h-4 w-4" />}>
+        <CanvaButton
+          variant="outline"
+          onClick={() => refetch()}
+          leftIcon={<RefreshCw className="h-4 w-4" />}
+        >
           Tekrar Dene
         </CanvaButton>
       </div>
@@ -365,8 +425,14 @@ export default function AdminUsersPage() {
           <Users className="h-6 w-6 text-gray-400" />
         </div>
         <h3 className="text-lg font-medium text-gray-900">Henüz admin yok</h3>
-        <p className="text-sm text-gray-500">İlk admin kullanıcınızı oluşturun.</p>
-        <CanvaButton variant="primary" onClick={() => setIsCreateOpen(true)} leftIcon={<UserPlus className="h-4 w-4" />}>
+        <p className="text-sm text-gray-500">
+          İlk admin kullanıcınızı oluşturun.
+        </p>
+        <CanvaButton
+          variant="primary"
+          onClick={() => setIsCreateOpen(true)}
+          leftIcon={<UserPlus className="h-4 w-4" />}
+        >
           Admin Oluştur
         </CanvaButton>
       </div>
@@ -415,7 +481,10 @@ export default function AdminUsersPage() {
           label="Aktif"
           value={stats.active}
           icon={<CheckCircle className="h-4 w-4" />}
-          change={{ value: Math.round((stats.active / stats.total) * 100), label: 'aktif' }}
+          change={{
+            value: Math.round((stats.active / stats.total) * 100),
+            label: 'aktif',
+          }}
         />
         <CanvaStatCard
           label="2FA Etkin"
@@ -446,7 +515,7 @@ export default function AdminUsersPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tüm Roller</SelectItem>
-              {ROLES.map(role => (
+              {ROLES.map((role) => (
                 <SelectItem key={role.value} value={role.value}>
                   {role.label}
                 </SelectItem>
@@ -499,26 +568,40 @@ export default function AdminUsersPage() {
                         </Avatar>
                         <div>
                           <p className="font-medium">{admin.name}</p>
-                          <p className="text-sm text-muted-foreground">{admin.email}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {admin.email}
+                          </p>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <CanvaBadge className={roleInfo.color} icon={<RoleIcon className="h-3 w-3" />}>
+                      <CanvaBadge
+                        className={roleInfo.color}
+                        icon={<RoleIcon className="h-3 w-3" />}
+                      >
                         {roleInfo.label}
                       </CanvaBadge>
                     </TableCell>
                     <TableCell>
                       {admin.totp_enabled ? (
-                        <CanvaBadge variant="success" icon={<ShieldCheck className="h-3 w-3" />}>
+                        <CanvaBadge
+                          variant="success"
+                          icon={<ShieldCheck className="h-3 w-3" />}
+                        >
                           Aktif
                         </CanvaBadge>
                       ) : admin.requires_2fa ? (
-                        <CanvaBadge variant="warning" icon={<ShieldOff className="h-3 w-3" />}>
+                        <CanvaBadge
+                          variant="warning"
+                          icon={<ShieldOff className="h-3 w-3" />}
+                        >
                           Bekliyor
                         </CanvaBadge>
                       ) : (
-                        <CanvaBadge variant="default" icon={<ShieldOff className="h-3 w-3" />}>
+                        <CanvaBadge
+                          variant="default"
+                          icon={<ShieldOff className="h-3 w-3" />}
+                        >
                           Kapalı
                         </CanvaBadge>
                       )}
@@ -552,7 +635,9 @@ export default function AdminUsersPage() {
                             <Edit className="mr-2 h-4 w-4" />
                             Düzenle
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleToggleStatus(admin)}>
+                          <DropdownMenuItem
+                            onClick={() => handleToggleStatus(admin)}
+                          >
                             {admin.is_active ? (
                               <>
                                 <Lock className="mr-2 h-4 w-4" />
@@ -605,14 +690,18 @@ export default function AdminUsersPage() {
               label="İsim"
               placeholder="Admin adı"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
             />
             <CanvaInput
               label="E-posta"
               type="email"
               placeholder="admin@example.com"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
             />
             <div className="space-y-2">
               <Label>Rol</Label>
@@ -624,7 +713,7 @@ export default function AdminUsersPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {ROLES.map(role => (
+                  {ROLES.map((role) => (
                     <SelectItem key={role.value} value={role.value}>
                       {role.label}
                     </SelectItem>
@@ -637,7 +726,9 @@ export default function AdminUsersPage() {
               type="password"
               placeholder="••••••••"
               value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
               helperText="Kullanıcı ilk girişte şifresini değiştirecek"
             />
             <div className="flex items-center justify-between">
@@ -649,12 +740,17 @@ export default function AdminUsersPage() {
               </div>
               <Switch
                 checked={formData.requires_2fa}
-                onCheckedChange={(checked) => setFormData({ ...formData, requires_2fa: checked })}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, requires_2fa: checked })
+                }
               />
             </div>
           </div>
           <DialogFooter>
-            <CanvaButton variant="outline" onClick={() => setIsCreateOpen(false)}>
+            <CanvaButton
+              variant="outline"
+              onClick={() => setIsCreateOpen(false)}
+            >
               İptal
             </CanvaButton>
             <CanvaButton
@@ -683,14 +779,18 @@ export default function AdminUsersPage() {
               label="İsim"
               placeholder="Admin adı"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
             />
             <CanvaInput
               label="E-posta"
               type="email"
               placeholder="admin@example.com"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
             />
             <div className="space-y-2">
               <Label>Rol</Label>
@@ -702,7 +802,7 @@ export default function AdminUsersPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {ROLES.map(role => (
+                  {ROLES.map((role) => (
                     <SelectItem key={role.value} value={role.value}>
                       {role.label}
                     </SelectItem>
@@ -719,7 +819,9 @@ export default function AdminUsersPage() {
               </div>
               <Switch
                 checked={formData.requires_2fa}
-                onCheckedChange={(checked) => setFormData({ ...formData, requires_2fa: checked })}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, requires_2fa: checked })
+                }
               />
             </div>
           </div>
@@ -744,8 +846,8 @@ export default function AdminUsersPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Admin Sil</AlertDialogTitle>
             <AlertDialogDescription>
-              <strong>{selectedAdmin?.name}</strong> kullanıcısını silmek istediğinizden emin misiniz?
-              Bu işlem geri alınamaz.
+              <strong>{selectedAdmin?.name}</strong> kullanıcısını silmek
+              istediğinizden emin misiniz? Bu işlem geri alınamaz.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
