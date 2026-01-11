@@ -8,24 +8,11 @@ import {
   CreditCard,
   Users,
   Target,
-  Calendar,
   Download,
   RefreshCw,
-  ArrowUp,
-  ArrowDown,
-  Percent,
+  Loader2,
+  AlertTriangle,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
 import {
   Select,
   SelectContent,
@@ -33,6 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
 import {
   LineChart,
   Line,
@@ -41,141 +30,62 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  BarChart,
-  Bar,
   PieChart,
   Pie,
   Cell,
   Area,
   AreaChart,
 } from 'recharts';
-import { formatCurrency } from '@/lib/utils';
-
-// Mock data
-const revenueOverview = {
-  totalRevenue: 4850000,
-  monthlyRecurring: 380000,
-  avgRevenuePerUser: 38.8,
-  lifetimeValue: 156,
-  growthRate: 12.5,
-  churnRate: 3.2,
-};
-
-const revenueByMonth = [
-  { month: 'Oca', revenue: 320000, target: 300000, subscriptions: 8500 },
-  { month: 'Şub', revenue: 340000, target: 320000, subscriptions: 9200 },
-  { month: 'Mar', revenue: 380000, target: 350000, subscriptions: 10100 },
-  { month: 'Nis', revenue: 360000, target: 380000, subscriptions: 9800 },
-  { month: 'May', revenue: 420000, target: 400000, subscriptions: 11200 },
-  { month: 'Haz', revenue: 450000, target: 420000, subscriptions: 12000 },
-  { month: 'Tem', revenue: 480000, target: 450000, subscriptions: 12800 },
-  { month: 'Ağu', revenue: 520000, target: 480000, subscriptions: 13500 },
-  { month: 'Eyl', revenue: 490000, target: 500000, subscriptions: 13100 },
-  { month: 'Eki', revenue: 530000, target: 520000, subscriptions: 14200 },
-  { month: 'Kas', revenue: 580000, target: 550000, subscriptions: 15400 },
-  { month: 'Ara', revenue: 380000, target: 580000, subscriptions: 10200 },
-];
-
-const revenueByProduct = [
-  { name: 'Premium Aylık', value: 45, revenue: 2180000, color: '#3b82f6' },
-  { name: 'Premium Yıllık', value: 25, revenue: 1210000, color: '#22c55e' },
-  { name: 'Boost', value: 15, revenue: 730000, color: '#f59e0b' },
-  { name: 'Super Like', value: 10, revenue: 485000, color: '#8b5cf6' },
-  { name: 'Diğer', value: 5, revenue: 245000, color: '#6b7280' },
-];
-
-const cohortData = [
-  { month: 'Oca', m0: 100, m1: 75, m2: 62, m3: 55, m4: 50, m5: 46, m6: 42 },
-  { month: 'Şub', m0: 100, m1: 72, m2: 58, m3: 51, m4: 46, m5: 42, m6: null },
-  { month: 'Mar', m0: 100, m1: 78, m2: 65, m3: 58, m4: 52, m5: null, m6: null },
-  {
-    month: 'Nis',
-    m0: 100,
-    m1: 74,
-    m2: 60,
-    m3: 53,
-    m4: null,
-    m5: null,
-    m6: null,
-  },
-  {
-    month: 'May',
-    m0: 100,
-    m1: 76,
-    m2: 63,
-    m3: null,
-    m4: null,
-    m5: null,
-    m6: null,
-  },
-  {
-    month: 'Haz',
-    m0: 100,
-    m1: 80,
-    m2: null,
-    m3: null,
-    m4: null,
-    m5: null,
-    m6: null,
-  },
-  {
-    month: 'Tem',
-    m0: 100,
-    m1: null,
-    m2: null,
-    m3: null,
-    m4: null,
-    m5: null,
-    m6: null,
-  },
-];
-
-const forecastData = [
-  { month: 'Ara 24', actual: 580000, forecast: null },
-  { month: 'Oca 25', actual: null, forecast: 620000 },
-  { month: 'Şub 25', actual: null, forecast: 650000 },
-  { month: 'Mar 25', actual: null, forecast: 690000 },
-  { month: 'Nis 25', actual: null, forecast: 720000 },
-  { month: 'May 25', actual: null, forecast: 780000 },
-];
-
-const pricingTiers = [
-  {
-    name: 'Premium Aylık',
-    currentPrice: 149.99,
-    suggestedPrice: 169.99,
-    conversionRate: 4.2,
-    suggestedConversion: 3.8,
-    revenueImpact: '+8.5%',
-  },
-  {
-    name: 'Premium Yıllık',
-    currentPrice: 899.99,
-    suggestedPrice: 999.99,
-    conversionRate: 2.1,
-    suggestedConversion: 1.9,
-    revenueImpact: '+6.2%',
-  },
-  {
-    name: 'Boost (24h)',
-    currentPrice: 29.99,
-    suggestedPrice: 34.99,
-    conversionRate: 8.5,
-    suggestedConversion: 7.2,
-    revenueImpact: '+12.3%',
-  },
-];
+import { formatCurrency, cn } from '@/lib/utils';
+import { useRevenue } from '@/hooks/use-revenue';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 
 export default function RevenuePage() {
   const [dateRange, setDateRange] = useState('12m');
+  const { data, isLoading, error, refetch, isFetching } = useRevenue();
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex h-[60vh] items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="mx-auto w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+            <AlertTriangle className="h-8 w-8 text-red-500" />
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">Veri Yüklenemedi</h2>
+            <p className="text-gray-500 mt-1">Gelir verileri alınamadı.</p>
+          </div>
+          <CanvaButton variant="primary" onClick={() => refetch()}>
+            <RefreshCw className="h-4 w-4" />
+            Tekrar Dene
+          </CanvaButton>
+        </div>
+      </div>
+    );
+  }
+
+  const overview = data?.overview;
+  const monthlyRevenue = data?.monthlyRevenue || [];
+  const revenueByProduct = data?.revenueByProduct || [];
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Gelir Analitiği</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+            Gelir Analitiği
+          </h1>
+          <p className="text-gray-500 mt-1">
             Gelir metrikleri, tahminler ve fiyatlandırma optimizasyonu
           </p>
         </div>
@@ -191,457 +101,295 @@ export default function RevenuePage() {
               <SelectItem value="all">Tüm zamanlar</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline">
-            <Download className="mr-2 h-4 w-4" />
+          <CanvaButton
+            variant="outline"
+            onClick={() => refetch()}
+            disabled={isFetching}
+          >
+            <RefreshCw className={cn('h-4 w-4', isFetching && 'animate-spin')} />
+            Yenile
+          </CanvaButton>
+          <CanvaButton variant="secondary">
+            <Download className="h-4 w-4" />
             Rapor İndir
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
       {/* Key Metrics */}
-      <div className="grid gap-4 md:grid-cols-6">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Toplam Gelir</p>
-                <p className="text-2xl font-bold">
-                  {formatCurrency(revenueOverview.totalRevenue, 'TRY')}
-                </p>
-              </div>
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
-                <DollarSign className="h-5 w-5 text-green-600" />
-              </div>
-            </div>
-            <div className="mt-2 flex items-center gap-1 text-sm text-green-600">
-              <TrendingUp className="h-4 w-4" />+{revenueOverview.growthRate}%
-              büyüme
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">MRR</p>
-                <p className="text-2xl font-bold">
-                  {formatCurrency(revenueOverview.monthlyRecurring, 'TRY')}
-                </p>
-              </div>
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-                <CreditCard className="h-5 w-5 text-blue-600" />
-              </div>
-            </div>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Aylık tekrarlayan
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">ARPU</p>
-                <p className="text-2xl font-bold">
-                  ₺{revenueOverview.avgRevenuePerUser}
-                </p>
-              </div>
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
-                <Users className="h-5 w-5 text-purple-600" />
+      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+        <CanvaStatCard
+          label="Toplam Gelir"
+          value={isLoading ? '...' : formatCurrency(overview?.totalRevenue || 0, 'TRY')}
+          icon={<DollarSign className="h-5 w-5" />}
+          change={
+            overview?.growthRate
+              ? { value: overview.growthRate, label: 'büyüme' }
+              : undefined
+          }
+        />
+        <CanvaStatCard
+          label="MRR"
+          value={isLoading ? '...' : formatCurrency(overview?.mrr || 0, 'TRY')}
+          icon={<CreditCard className="h-5 w-5" />}
+        />
+        <CanvaStatCard
+          label="ARR"
+          value={isLoading ? '...' : formatCurrency(overview?.arr || 0, 'TRY')}
+          icon={<Target className="h-5 w-5" />}
+        />
+        <CanvaStatCard
+          label="Aktif Abonelik"
+          value={isLoading ? '...' : (overview?.activeSubscriptions || 0).toLocaleString('tr-TR')}
+          icon={<Users className="h-5 w-5" />}
+        />
+        <CanvaStatCard
+          label="Ort. Abonelik"
+          value={isLoading ? '...' : formatCurrency(overview?.avgSubscriptionValue || 0, 'TRY')}
+          icon={<TrendingUp className="h-5 w-5" />}
+        />
+        <CanvaCard>
+          <div className="p-5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Büyüme
+              </span>
+              <div className={cn(
+                'flex h-8 w-8 items-center justify-center rounded-lg',
+                (overview?.growthRate || 0) >= 0 ? 'bg-emerald-50' : 'bg-red-50'
+              )}>
+                {(overview?.growthRate || 0) >= 0 ? (
+                  <TrendingUp className="h-4 w-4 text-emerald-600" />
+                ) : (
+                  <TrendingDown className="h-4 w-4 text-red-600" />
+                )}
               </div>
             </div>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Kullanıcı başına
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">LTV</p>
-                <p className="text-2xl font-bold">
-                  ₺{revenueOverview.lifetimeValue}
-                </p>
-              </div>
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100">
-                <Target className="h-5 w-5 text-orange-600" />
-              </div>
+            <div className={cn(
+              'text-3xl font-bold mt-2',
+              (overview?.growthRate || 0) >= 0 ? 'text-emerald-600' : 'text-red-600'
+            )}>
+              {isLoading ? '...' : `${(overview?.growthRate || 0) >= 0 ? '+' : ''}${overview?.growthRate || 0}%`}
             </div>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Yaşam boyu değer
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Büyüme</p>
-                <p className="text-2xl font-bold text-green-600">
-                  +{revenueOverview.growthRate}%
-                </p>
-              </div>
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
-                <TrendingUp className="h-5 w-5 text-green-600" />
-              </div>
-            </div>
-            <p className="mt-2 text-sm text-muted-foreground">Aylık</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Churn</p>
-                <p className="text-2xl font-bold text-red-600">
-                  {revenueOverview.churnRate}%
-                </p>
-              </div>
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
-                <TrendingDown className="h-5 w-5 text-red-600" />
-              </div>
-            </div>
-            <p className="mt-2 text-sm text-muted-foreground">Aylık kayıp</p>
-          </CardContent>
-        </Card>
+          </div>
+        </CanvaCard>
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Genel Bakış</TabsTrigger>
           <TabsTrigger value="products">Ürün Bazlı</TabsTrigger>
-          <TabsTrigger value="forecast">Tahmin</TabsTrigger>
-          <TabsTrigger value="pricing">Fiyatlandırma</TabsTrigger>
-          <TabsTrigger value="cohort">Kohort Analizi</TabsTrigger>
+          <TabsTrigger value="payments">Son Ödemeler</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Gelir Trendi</CardTitle>
-              <CardDescription>
-                Aylık gelir ve hedef karşılaştırması
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[400px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={revenueByMonth}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis
-                      tickFormatter={(value) =>
-                        `₺${(value / 1000).toFixed(0)}K`
-                      }
-                    />
-                    <Tooltip
-                      formatter={(value: number) => [
-                        formatCurrency(value, 'TRY'),
-                        '',
-                      ]}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="target"
-                      stackId="1"
-                      stroke="#e5e7eb"
-                      fill="#f3f4f6"
-                      name="Hedef"
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="revenue"
-                      stackId="2"
-                      stroke="#3b82f6"
-                      fill="#93c5fd"
-                      name="Gelir"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Gelir Trendi</CanvaCardTitle>
+              <p className="text-sm text-gray-500 mt-1">Aylık gelir performansı</p>
+            </CanvaCardHeader>
+            <CanvaCardBody>
+              {isLoading ? (
+                <div className="flex items-center justify-center h-[400px]">
+                  <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+                </div>
+              ) : monthlyRevenue.length > 0 ? (
+                <div className="h-[400px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={monthlyRevenue}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                      <XAxis dataKey="month" stroke="#94a3b8" fontSize={12} />
+                      <YAxis
+                        tickFormatter={(value) => `₺${(value / 1000).toFixed(0)}K`}
+                        stroke="#94a3b8"
+                        fontSize={12}
+                      />
+                      <Tooltip
+                        formatter={(value: number) => [formatCurrency(value, 'TRY'), 'Gelir']}
+                        contentStyle={{
+                          backgroundColor: 'white',
+                          border: '1px solid #e2e8f0',
+                          borderRadius: '12px',
+                          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                        }}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="revenue"
+                        stroke="#8b5cf6"
+                        strokeWidth={2}
+                        fill="url(#colorRevenue)"
+                        name="Gelir"
+                      />
+                      <defs>
+                        <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-[400px] text-gray-400">
+                  <DollarSign className="h-12 w-12 mb-3" />
+                  <p>Henüz gelir verisi yok</p>
+                </div>
+              )}
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Products Tab */}
         <TabsContent value="products" className="space-y-4">
           <div className="grid gap-4 lg:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Ürün Dağılımı</CardTitle>
-                <CardDescription>Gelir kaynaklarının dağılımı</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={revenueByProduct}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={100}
-                        paddingAngle={5}
-                        dataKey="value"
-                      >
-                        {revenueByProduct.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Ürün Dağılımı</CanvaCardTitle>
+                <p className="text-sm text-gray-500 mt-1">Gelir kaynaklarının dağılımı</p>
+              </CanvaCardHeader>
+              <CanvaCardBody>
+                {isLoading ? (
+                  <div className="flex items-center justify-center h-[300px]">
+                    <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+                  </div>
+                ) : revenueByProduct.length > 0 ? (
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={revenueByProduct}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={100}
+                          paddingAngle={5}
+                          dataKey="value"
+                        >
+                          {revenueByProduct.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          formatter={(value: number) => [formatCurrency(value, 'TRY'), '']}
+                          contentStyle={{
+                            backgroundColor: 'white',
+                            border: '1px solid #e2e8f0',
+                            borderRadius: '12px',
+                          }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-[300px] text-gray-400">
+                    <DollarSign className="h-12 w-12 mb-3" />
+                    <p>Henüz ürün verisi yok</p>
+                  </div>
+                )}
+              </CanvaCardBody>
+            </CanvaCard>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Ürün Performansı</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {revenueByProduct.map((product) => (
-                    <div key={product.name} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="h-3 w-3 rounded-full"
-                            style={{ backgroundColor: product.color }}
-                          />
-                          <span className="font-medium">{product.name}</span>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Ürün Performansı</CanvaCardTitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
+                {isLoading ? (
+                  <div className="flex items-center justify-center h-[300px]">
+                    <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+                  </div>
+                ) : revenueByProduct.length > 0 ? (
+                  <div className="space-y-4">
+                    {revenueByProduct.map((product) => {
+                      const total = revenueByProduct.reduce((sum, p) => sum + p.value, 0);
+                      const percentage = total > 0 ? Math.round((product.value / total) * 100) : 0;
+                      return (
+                        <div key={product.name} className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="h-3 w-3 rounded-full"
+                                style={{ backgroundColor: product.color }}
+                              />
+                              <span className="font-medium text-gray-900">{product.name}</span>
+                            </div>
+                            <span className="text-sm font-medium text-gray-700">
+                              {formatCurrency(product.value, 'TRY')}
+                            </span>
+                          </div>
+                          <Progress value={percentage} className="h-2" />
+                          <p className="text-xs text-gray-500 text-right">
+                            {percentage}% pay
+                          </p>
                         </div>
-                        <span className="text-sm font-medium">
-                          {formatCurrency(product.revenue, 'TRY')}
-                        </span>
-                      </div>
-                      <Progress value={product.value} className="h-2" />
-                      <p className="text-xs text-muted-foreground text-right">
-                        {product.value}% pay
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-[300px] text-gray-400">
+                    <DollarSign className="h-12 w-12 mb-3" />
+                    <p>Henüz ürün verisi yok</p>
+                  </div>
+                )}
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
         </TabsContent>
 
-        {/* Forecast Tab */}
-        <TabsContent value="forecast" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Gelir Tahmini</CardTitle>
-              <CardDescription>
-                6 aylık gelir projeksiyonu (ML bazlı)
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[400px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={forecastData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis
-                      tickFormatter={(value) =>
-                        `₺${(value / 1000).toFixed(0)}K`
-                      }
-                    />
-                    <Tooltip
-                      formatter={(value: number) => [
-                        formatCurrency(value, 'TRY'),
-                        '',
-                      ]}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="actual"
-                      stroke="#3b82f6"
-                      strokeWidth={2}
-                      dot={{ fill: '#3b82f6' }}
-                      name="Gerçekleşen"
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="forecast"
-                      stroke="#22c55e"
-                      strokeWidth={2}
-                      strokeDasharray="5 5"
-                      dot={{ fill: '#22c55e' }}
-                      name="Tahmin"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="mt-4 flex items-center justify-center gap-6">
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-8 rounded bg-blue-500" />
-                  <span className="text-sm text-muted-foreground">
-                    Gerçekleşen
-                  </span>
+        {/* Payments Tab */}
+        <TabsContent value="payments" className="space-y-4">
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Son Ödemeler</CanvaCardTitle>
+              <p className="text-sm text-gray-500 mt-1">En son tamamlanan ödemeler</p>
+            </CanvaCardHeader>
+            <CanvaCardBody className="p-0">
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-8 rounded border-2 border-dashed border-green-500" />
-                  <span className="text-sm text-muted-foreground">Tahmin</span>
+              ) : (data?.recentPayments?.length || 0) > 0 ? (
+                <div className="divide-y divide-gray-100">
+                  {data?.recentPayments.slice(0, 10).map((payment) => (
+                    <div
+                      key={payment.id}
+                      className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
+                          <DollarSign className="h-5 w-5 text-emerald-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            {payment.type === 'subscription' ? 'Abonelik' :
+                             payment.type === 'gift' ? 'Hediye' : 'Ödeme'}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {new Date(payment.created_at).toLocaleString('tr-TR')}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-semibold text-gray-900">
+                          {formatCurrency(payment.amount, payment.currency || 'TRY')}
+                        </p>
+                        <CanvaBadge variant="success" size="sm">
+                          {payment.status}
+                        </CanvaBadge>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Pricing Tab */}
-        <TabsContent value="pricing" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Fiyat Optimizasyonu</CardTitle>
-              <CardDescription>
-                AI destekli fiyat önerileri ve potansiyel etki analizi
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {pricingTiers.map((tier) => (
-                  <div key={tier.name} className="rounded-lg border p-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-semibold">{tier.name}</h3>
-                      <Badge
-                        variant={
-                          tier.revenueImpact.startsWith('+')
-                            ? 'default'
-                            : 'destructive'
-                        }
-                      >
-                        {tier.revenueImpact} gelir etkisi
-                      </Badge>
-                    </div>
-                    <div className="grid gap-4 md:grid-cols-4">
-                      <div>
-                        <p className="text-sm text-muted-foreground">
-                          Mevcut Fiyat
-                        </p>
-                        <p className="text-xl font-semibold">
-                          {formatCurrency(tier.currentPrice, 'TRY')}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">
-                          Önerilen Fiyat
-                        </p>
-                        <p className="text-xl font-semibold text-green-600">
-                          {formatCurrency(tier.suggestedPrice, 'TRY')}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">
-                          Mevcut Dönüşüm
-                        </p>
-                        <p className="text-xl font-semibold">
-                          %{tier.conversionRate}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">
-                          Tahmini Dönüşüm
-                        </p>
-                        <p className="text-xl font-semibold text-orange-600">
-                          %{tier.suggestedConversion}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="mt-4 flex justify-end">
-                      <Button size="sm">Fiyatı Uygula</Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Cohort Tab */}
-        <TabsContent value="cohort" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Kohort Analizi</CardTitle>
-              <CardDescription>
-                Aylık premium tutundurma oranları (%)
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr>
-                      <th className="p-2 text-left text-sm font-medium text-muted-foreground">
-                        Kohort
-                      </th>
-                      <th className="p-2 text-center text-sm font-medium text-muted-foreground">
-                        M0
-                      </th>
-                      <th className="p-2 text-center text-sm font-medium text-muted-foreground">
-                        M1
-                      </th>
-                      <th className="p-2 text-center text-sm font-medium text-muted-foreground">
-                        M2
-                      </th>
-                      <th className="p-2 text-center text-sm font-medium text-muted-foreground">
-                        M3
-                      </th>
-                      <th className="p-2 text-center text-sm font-medium text-muted-foreground">
-                        M4
-                      </th>
-                      <th className="p-2 text-center text-sm font-medium text-muted-foreground">
-                        M5
-                      </th>
-                      <th className="p-2 text-center text-sm font-medium text-muted-foreground">
-                        M6
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {cohortData.map((row) => (
-                      <tr key={row.month}>
-                        <td className="p-2 text-sm font-medium">{row.month}</td>
-                        {['m0', 'm1', 'm2', 'm3', 'm4', 'm5', 'm6'].map(
-                          (col) => {
-                            const value = row[col as keyof typeof row] as
-                              | number
-                              | null;
-                            if (value === null) {
-                              return (
-                                <td key={col} className="p-1">
-                                  <div className="flex h-10 w-full items-center justify-center rounded bg-gray-100 text-xs text-gray-400">
-                                    -
-                                  </div>
-                                </td>
-                              );
-                            }
-                            const intensity = value / 100;
-                            return (
-                              <td key={col} className="p-1">
-                                <div
-                                  className="flex h-10 w-full items-center justify-center rounded text-xs font-medium"
-                                  style={{
-                                    backgroundColor: `rgba(34, 197, 94, ${intensity})`,
-                                    color:
-                                      intensity > 0.5 ? 'white' : 'inherit',
-                                  }}
-                                >
-                                  {value}%
-                                </div>
-                              </td>
-                            );
-                          },
-                        )}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+                  <CreditCard className="h-12 w-12 mb-3" />
+                  <p>Henüz ödeme yok</p>
+                </div>
+              )}
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
       </Tabs>
     </div>

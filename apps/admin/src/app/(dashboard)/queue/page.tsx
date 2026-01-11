@@ -13,16 +13,10 @@ import {
   AlertTriangle,
   DollarSign,
   RefreshCw,
+  Loader2,
+  ListTodo,
+  Zap,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
@@ -32,186 +26,148 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn, formatRelativeDate } from '@/lib/utils';
-
-// Mock data for demonstration
-const mockStats = {
-  urgent: 5,
-  pending: 12,
-  completedToday: 47,
-  platformHealth: 92,
-};
-
-const mockTasks = [
-  {
-    id: '1',
-    type: 'kyc_verification',
-    title: 'KYC Doğrulama Bekliyor',
-    description: 'Kullanıcı Ali Veli kimlik doğrulaması için bekliyor',
-    priority: 'urgent' as const,
-    resource_type: 'users',
-    resource_id: 'user-123',
-    created_at: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-  },
-  {
-    id: '2',
-    type: 'payout_approval',
-    title: 'Ödeme Onayı Gerekli',
-    description: '₺2,500 tutarında ödeme onay bekliyor',
-    priority: 'high' as const,
-    resource_type: 'payouts',
-    resource_id: 'payout-456',
-    created_at: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-  },
-  {
-    id: '3',
-    type: 'dispute_review',
-    title: 'Şikayet İncelemesi',
-    description: 'Kullanıcı dolandırıcılık şikayeti bildirdi',
-    priority: 'high' as const,
-    resource_type: 'disputes',
-    resource_id: 'dispute-789',
-    created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-  },
-  {
-    id: '4',
-    type: 'content_moderation',
-    title: 'İçerik Onayı',
-    description: 'Yeni paylaşılan moment inceleme bekliyor',
-    priority: 'medium' as const,
-    resource_type: 'moments',
-    resource_id: 'moment-101',
-    created_at: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-  },
-  {
-    id: '5',
-    type: 'report_review',
-    title: 'Şikayet Bildirimi',
-    description: 'Uygunsuz içerik bildirimi yapıldı',
-    priority: 'medium' as const,
-    resource_type: 'reports',
-    resource_id: 'report-202',
-    created_at: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
-  },
-];
+import { useQueue, useCompleteTask } from '@/hooks/use-queue';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 
 const priorityConfig = {
-  urgent: { label: 'Acil', color: 'bg-red-500', badge: 'error' as const },
-  high: { label: 'Yüksek', color: 'bg-orange-500', badge: 'warning' as const },
-  medium: { label: 'Orta', color: 'bg-yellow-500', badge: 'warning' as const },
-  low: { label: 'Düşük', color: 'bg-green-500', badge: 'success' as const },
+  urgent: { label: 'Acil', variant: 'error' as const },
+  high: { label: 'Yüksek', variant: 'warning' as const },
+  medium: { label: 'Orta', variant: 'info' as const },
+  low: { label: 'Düşük', variant: 'success' as const },
 };
 
-const typeConfig = {
+const typeConfig: Record<string, { icon: typeof Users; label: string; href: string }> = {
   kyc_verification: { icon: Users, label: 'KYC', href: '/users' },
   payout_approval: { icon: DollarSign, label: 'Ödeme', href: '/finance' },
-  dispute_review: {
-    icon: AlertTriangle,
-    label: 'Anlaşmazlık',
-    href: '/disputes',
-  },
+  dispute_review: { icon: AlertTriangle, label: 'Anlaşmazlık', href: '/disputes' },
   content_moderation: { icon: Image, label: 'İçerik', href: '/moments' },
   report_review: { icon: AlertCircle, label: 'Şikayet', href: '/disputes' },
+  general: { icon: ListTodo, label: 'Genel', href: '/queue' },
 };
 
 export default function QueuePage() {
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('pending');
 
-  const filteredTasks = mockTasks.filter(
-    (task) => priorityFilter === 'all' || task.priority === priorityFilter,
-  );
+  const { data, isLoading, error, refetch, isFetching } = useQueue({
+    status: statusFilter !== 'all' ? statusFilter : undefined,
+    priority: priorityFilter !== 'all' ? priorityFilter : undefined,
+  });
+
+  const completeTask = useCompleteTask();
+
+  const tasks = data?.tasks || [];
+  const stats = data?.stats;
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex h-[60vh] items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="mx-auto w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+            <AlertTriangle className="h-8 w-8 text-red-500" />
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">Veri Yüklenemedi</h2>
+            <p className="text-gray-500 mt-1">Görev listesi alınamadı.</p>
+          </div>
+          <CanvaButton variant="primary" onClick={() => refetch()}>
+            <RefreshCw className="h-4 w-4" />
+            Tekrar Dene
+          </CanvaButton>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
             Bugün ne yapmalıyım?
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-gray-500 mt-1">
             İş kuyruğundaki görevleri öncelik sırasına göre tamamlayın
           </p>
         </div>
-        <Button variant="outline" size="sm">
-          <RefreshCw className="mr-2 h-4 w-4" />
+        <CanvaButton
+          variant="outline"
+          onClick={() => refetch()}
+          disabled={isFetching}
+        >
+          <RefreshCw className={cn('h-4 w-4', isFetching && 'animate-spin')} />
           Yenile
-        </Button>
+        </CanvaButton>
       </div>
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="border-l-4 border-l-red-500">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Acil</CardTitle>
-            <AlertCircle className="h-4 w-4 text-red-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{mockStats.urgent}</div>
-            <p className="text-xs text-muted-foreground">
-              Hemen ilgilenilmesi gereken
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-l-4 border-l-yellow-500">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Bekleyen</CardTitle>
-            <Clock className="h-4 w-4 text-yellow-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{mockStats.pending}</div>
-            <p className="text-xs text-muted-foreground">
-              Sırada bekleyen görevler
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-l-4 border-l-green-500">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Bugün Tamamlanan
-            </CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{mockStats.completedToday}</div>
-            <p className="text-xs text-muted-foreground">
-              Başarıyla çözülen görevler
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-l-4 border-l-primary">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Platform Sağlığı
-            </CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              %{mockStats.platformHealth}
-            </div>
-            <p className="text-xs text-muted-foreground">Sağlıklı çalışıyor</p>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          label="Acil"
+          value={isLoading ? '...' : (stats?.urgent || 0).toString()}
+          icon={<Zap className="h-5 w-5 text-red-500" />}
+        />
+        <CanvaStatCard
+          label="Bekleyen"
+          value={isLoading ? '...' : (stats?.pending || 0).toString()}
+          icon={<Clock className="h-5 w-5 text-amber-500" />}
+        />
+        <CanvaStatCard
+          label="Devam Eden"
+          value={isLoading ? '...' : (stats?.inProgress || 0).toString()}
+          icon={<ListTodo className="h-5 w-5 text-blue-500" />}
+        />
+        <CanvaStatCard
+          label="Tamamlanan"
+          value={isLoading ? '...' : (stats?.completed || 0).toString()}
+          icon={<CheckCircle2 className="h-5 w-5 text-emerald-500" />}
+        />
       </div>
 
+      {/* Overdue Warning */}
+      {(stats?.overdue || 0) > 0 && (
+        <CanvaCard className="border-l-4 border-l-red-500">
+          <div className="p-4 flex items-center gap-4">
+            <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center">
+              <AlertTriangle className="h-5 w-5 text-red-500" />
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900">
+                {stats?.overdue} görev süresi geçmiş!
+              </p>
+              <p className="text-sm text-gray-500">
+                Bu görevlere hemen dikkat etmeniz gerekiyor.
+              </p>
+            </div>
+          </div>
+        </CanvaCard>
+      )}
+
       {/* Task Queue */}
-      <Card>
-        <CardHeader>
+      <CanvaCard>
+        <CanvaCardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>İş Kuyruğu</CardTitle>
-              <CardDescription>
+              <CanvaCardTitle>İş Kuyruğu</CanvaCardTitle>
+              <p className="text-sm text-gray-500 mt-1">
                 Öncelik sırasına göre sıralanmış görevler
-              </CardDescription>
+              </p>
             </div>
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-muted-foreground" />
+              <Filter className="h-4 w-4 text-gray-400" />
               <Select value={priorityFilter} onValueChange={setPriorityFilter}>
                 <SelectTrigger className="w-32">
-                  <SelectValue placeholder="Filtrele" />
+                  <SelectValue placeholder="Öncelik" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tümü</SelectItem>
@@ -221,92 +177,230 @@ export default function QueuePage() {
                   <SelectItem value="low">Düşük</SelectItem>
                 </SelectContent>
               </Select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-32">
+                  <SelectValue placeholder="Durum" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tümü</SelectItem>
+                  <SelectItem value="pending">Bekleyen</SelectItem>
+                  <SelectItem value="in_progress">Devam Eden</SelectItem>
+                  <SelectItem value="completed">Tamamlanan</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
+        </CanvaCardHeader>
+        <CanvaCardBody className="p-0">
           <Tabs defaultValue="all" className="w-full">
-            <TabsList className="mb-4">
-              <TabsTrigger value="all">Tümü ({mockTasks.length})</TabsTrigger>
-              <TabsTrigger value="mine">Bana Atanan (3)</TabsTrigger>
-              <TabsTrigger value="unassigned">Atanmamış (2)</TabsTrigger>
-            </TabsList>
+            <div className="px-6 pt-4">
+              <TabsList>
+                <TabsTrigger value="all">
+                  Tümü ({stats?.total || 0})
+                </TabsTrigger>
+                <TabsTrigger value="urgent">
+                  Acil ({stats?.urgent || 0})
+                </TabsTrigger>
+                <TabsTrigger value="pending">
+                  Bekleyen ({stats?.pending || 0})
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
-            <TabsContent value="all" className="space-y-3">
-              {filteredTasks.map((task) => {
-                const typeInfo =
-                  typeConfig[task.type as keyof typeof typeConfig];
-                const priorityInfo = priorityConfig[task.priority];
-                const TypeIcon = typeInfo?.icon || AlertCircle;
+            <TabsContent value="all" className="mt-0">
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+                </div>
+              ) : tasks.length > 0 ? (
+                <div className="divide-y divide-gray-100">
+                  {tasks.map((task) => {
+                    const typeInfo = typeConfig[task.type] || typeConfig.general;
+                    const priorityInfo = priorityConfig[task.priority as keyof typeof priorityConfig] || priorityConfig.medium;
+                    const TypeIcon = typeInfo.icon;
 
-                return (
-                  <div
-                    key={task.id}
-                    className={cn(
-                      'flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-accent/50',
-                      `priority-${task.priority}`,
-                    )}
-                  >
-                    <div className="flex items-center gap-4">
+                    return (
                       <div
+                        key={task.id}
                         className={cn(
-                          'flex h-10 w-10 items-center justify-center rounded-lg',
-                          'bg-muted',
+                          'flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors',
+                          task.priority === 'urgent' && 'border-l-4 border-l-red-500',
+                          task.priority === 'high' && 'border-l-4 border-l-amber-500'
                         )}
                       >
-                        <TypeIcon className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-medium">{task.title}</h4>
-                          <Badge variant={priorityInfo.badge}>
-                            {priorityInfo.label}
-                          </Badge>
-                          <Badge variant="outline">{typeInfo?.label}</Badge>
+                        <div className="flex items-center gap-4">
+                          <div
+                            className={cn(
+                              'flex h-10 w-10 items-center justify-center rounded-xl',
+                              task.priority === 'urgent' && 'bg-red-50 text-red-600',
+                              task.priority === 'high' && 'bg-amber-50 text-amber-600',
+                              task.priority === 'medium' && 'bg-blue-50 text-blue-600',
+                              task.priority === 'low' && 'bg-gray-100 text-gray-600'
+                            )}
+                          >
+                            <TypeIcon className="h-5 w-5" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-medium text-gray-900">{task.title}</h4>
+                              <CanvaBadge variant={priorityInfo.variant} size="sm">
+                                {priorityInfo.label}
+                              </CanvaBadge>
+                              <CanvaBadge variant="default" size="sm">
+                                {typeInfo.label}
+                              </CanvaBadge>
+                            </div>
+                            {task.description && (
+                              <p className="text-sm text-gray-500 mt-0.5">
+                                {task.description}
+                              </p>
+                            )}
+                            <p className="text-xs text-gray-400 mt-1">
+                              {formatRelativeDate(task.created_at)}
+                              {task.assignee && (
+                                <span> • Atanan: {task.assignee.full_name}</span>
+                              )}
+                            </p>
+                          </div>
                         </div>
-                        <p className="text-sm text-muted-foreground">
-                          {task.description}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {formatRelativeDate(task.created_at)}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          {task.status === 'pending' && (
+                            <CanvaButton
+                              variant="success"
+                              size="sm"
+                              onClick={() => completeTask.mutate(task.id)}
+                              loading={completeTask.isPending}
+                            >
+                              <CheckCircle2 className="h-4 w-4" />
+                              Tamamla
+                            </CanvaButton>
+                          )}
+                          <Link href={`${typeInfo.href}/${task.id}`}>
+                            <CanvaButton variant="outline" size="sm">
+                              Detay
+                              <ArrowRight className="h-4 w-4" />
+                            </CanvaButton>
+                          </Link>
+                        </div>
                       </div>
-                    </div>
-                    <Link href={`${typeInfo?.href}/${task.resource_id}`}>
-                      <Button size="sm">
-                        Çöz
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </Link>
-                  </div>
-                );
-              })}
-
-              {filteredTasks.length === 0 && (
+                    );
+                  })}
+                </div>
+              ) : (
                 <div className="py-12 text-center">
-                  <CheckCircle2 className="mx-auto h-12 w-12 text-green-500" />
-                  <h3 className="mt-4 text-lg font-semibold">Tebrikler!</h3>
-                  <p className="text-muted-foreground">
+                  <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-500" />
+                  <h3 className="mt-4 text-lg font-semibold text-gray-900">Tebrikler!</h3>
+                  <p className="text-gray-500">
                     Tüm görevler tamamlandı. Şimdilik yapılacak bir şey yok.
                   </p>
                 </div>
               )}
             </TabsContent>
 
-            <TabsContent value="mine">
-              <div className="py-8 text-center text-muted-foreground">
-                Size atanan görevler burada görünecek
-              </div>
+            <TabsContent value="urgent" className="mt-0">
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+                </div>
+              ) : (
+                <div className="divide-y divide-gray-100">
+                  {tasks
+                    .filter(t => t.priority === 'urgent')
+                    .map((task) => {
+                      const typeInfo = typeConfig[task.type] || typeConfig.general;
+                      const TypeIcon = typeInfo.icon;
+
+                      return (
+                        <div
+                          key={task.id}
+                          className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors border-l-4 border-l-red-500"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-600">
+                              <TypeIcon className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-gray-900">{task.title}</h4>
+                              <p className="text-xs text-gray-400">
+                                {formatRelativeDate(task.created_at)}
+                              </p>
+                            </div>
+                          </div>
+                          <CanvaButton variant="danger" size="sm">
+                            Hemen Çöz
+                            <ArrowRight className="h-4 w-4" />
+                          </CanvaButton>
+                        </div>
+                      );
+                    })}
+                  {tasks.filter(t => t.priority === 'urgent').length === 0 && (
+                    <div className="py-12 text-center">
+                      <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-500" />
+                      <p className="mt-4 text-gray-500">Acil görev bulunmuyor.</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </TabsContent>
 
-            <TabsContent value="unassigned">
-              <div className="py-8 text-center text-muted-foreground">
-                Atanmamış görevler burada görünecek
-              </div>
+            <TabsContent value="pending" className="mt-0">
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+                </div>
+              ) : (
+                <div className="divide-y divide-gray-100">
+                  {tasks
+                    .filter(t => t.status === 'pending')
+                    .map((task) => {
+                      const typeInfo = typeConfig[task.type] || typeConfig.general;
+                      const priorityInfo = priorityConfig[task.priority as keyof typeof priorityConfig] || priorityConfig.medium;
+                      const TypeIcon = typeInfo.icon;
+
+                      return (
+                        <div
+                          key={task.id}
+                          className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-100">
+                              <TypeIcon className="h-5 w-5 text-gray-600" />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h4 className="font-medium text-gray-900">{task.title}</h4>
+                                <CanvaBadge variant={priorityInfo.variant} size="sm">
+                                  {priorityInfo.label}
+                                </CanvaBadge>
+                              </div>
+                              <p className="text-xs text-gray-400">
+                                {formatRelativeDate(task.created_at)}
+                              </p>
+                            </div>
+                          </div>
+                          <CanvaButton
+                            variant="primary"
+                            size="sm"
+                            onClick={() => completeTask.mutate(task.id)}
+                          >
+                            Başla
+                            <ArrowRight className="h-4 w-4" />
+                          </CanvaButton>
+                        </div>
+                      );
+                    })}
+                  {tasks.filter(t => t.status === 'pending').length === 0 && (
+                    <div className="py-12 text-center">
+                      <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-500" />
+                      <p className="mt-4 text-gray-500">Bekleyen görev bulunmuyor.</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </TabsContent>
           </Tabs>
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
     </div>
   );
 }
