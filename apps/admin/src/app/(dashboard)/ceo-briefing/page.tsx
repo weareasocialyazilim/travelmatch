@@ -30,7 +30,13 @@ import {
   ChevronRight,
   Sparkles,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardBody,
+} from '@/components/canva/CanvaCard';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
@@ -87,14 +93,30 @@ export default function CEOBriefingPage() {
     return () => clearInterval(timer);
   }, []);
 
-  // Loading state
+  // Loading Skeleton
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-violet-500 mb-4" />
-          <p className="text-gray-500">Loading briefing...</p>
+      <div className="max-w-6xl mx-auto space-y-8 pb-12 animate-pulse">
+        <div className="flex items-start justify-between">
+          <div className="space-y-2">
+            <div className="h-4 w-48 bg-gray-200 rounded" />
+            <div className="h-8 w-64 bg-gray-200 rounded" />
+          </div>
+          <div className="flex gap-2">
+            <div className="h-9 w-24 bg-gray-200 rounded" />
+            <div className="h-9 w-24 bg-gray-200 rounded" />
+          </div>
         </div>
+        <div className="grid grid-cols-12 gap-6">
+          <div className="col-span-4 h-48 bg-gray-100 rounded-2xl" />
+          <div className="col-span-8 h-48 bg-violet-100 rounded-2xl" />
+        </div>
+        <div className="grid grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-28 bg-gray-100 rounded-xl" />
+          ))}
+        </div>
+        <div className="h-40 bg-gray-100 rounded-2xl" />
       </div>
     );
   }
@@ -115,24 +137,21 @@ export default function CEOBriefingPage() {
           </h1>
         </div>
         <div className="flex items-center gap-2">
-          <Button
+          <CanvaButton
             variant="ghost"
             size="sm"
             onClick={() => refetch()}
             disabled={isFetching}
-            className="text-gray-500"
+            leftIcon={<RefreshCw className={cn('w-4 h-4', isFetching && 'animate-spin')} />}
           >
-            <RefreshCw className={cn('w-4 h-4 mr-2', isFetching && 'animate-spin')} />
             {formatTime(currentTime)}
-          </Button>
-          <Button variant="outline" size="sm">
-            <Mail className="w-4 h-4 mr-2" />
-            Email
-          </Button>
-          <Button variant="outline" size="sm">
-            <Download className="w-4 h-4 mr-2" />
-            PDF
-          </Button>
+          </CanvaButton>
+          <CanvaButton variant="outline" size="sm" leftIcon={<Mail className="w-4 h-4" />}>
+            E-posta
+          </CanvaButton>
+          <CanvaButton variant="outline" size="sm" leftIcon={<Download className="w-4 h-4" />}>
+            PDF İndir
+          </CanvaButton>
         </div>
       </header>
 
@@ -142,7 +161,7 @@ export default function CEOBriefingPage() {
         <div className="col-span-4 bg-white dark:bg-gray-950 rounded-2xl border border-gray-200 dark:border-gray-800 p-6">
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Company Health
+              Şirket Sağlığı
             </span>
             <span className={cn(
               'flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full',
@@ -154,7 +173,7 @@ export default function CEOBriefingPage() {
                 'w-1.5 h-1.5 rounded-full',
                 data?.systemStatus === 'operational' ? 'bg-emerald-500' : 'bg-red-500'
               )} />
-              {data?.systemStatus === 'operational' ? 'All Systems Go' : 'Issues Detected'}
+              {data?.systemStatus === 'operational' ? 'Tüm Sistemler Aktif' : 'Sorun Tespit Edildi'}
             </span>
           </div>
 
@@ -193,21 +212,21 @@ export default function CEOBriefingPage() {
           </div>
         </div>
 
-        {/* North Star Metric */}
+        {/* Kuzey Yıldızı Metriği */}
         <div className="col-span-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl p-6 text-white">
           <div className="flex items-center gap-2 mb-4">
             <Sparkles className="w-5 h-5 opacity-80" />
-            <span className="text-sm font-medium opacity-80">North Star Metric</span>
+            <span className="text-sm font-medium opacity-80">Kuzey Yıldızı Metriği</span>
           </div>
 
           <div className="grid grid-cols-2 gap-8">
             <div>
               <h2 className="text-lg font-medium opacity-90 mb-2">
-                {data?.northStar.name}
+                Haftalık Aktif Hediyeleşenler
               </h2>
               <div className="flex items-baseline gap-3">
                 <span className="text-5xl font-bold">
-                  {data?.northStar.current.toLocaleString()}
+                  {data?.northStar.current.toLocaleString('tr-TR')}
                 </span>
                 <span className="flex items-center gap-1 text-sm font-medium bg-white/20 px-2 py-1 rounded-full">
                   <ArrowUpRight className="w-4 h-4" />
@@ -215,14 +234,14 @@ export default function CEOBriefingPage() {
                 </span>
               </div>
               <p className="text-sm opacity-70 mt-2">
-                vs {data?.northStar.previousPeriod.toLocaleString()} last week
+                geçen hafta: {data?.northStar.previousPeriod.toLocaleString('tr-TR')}
               </p>
             </div>
 
             <div className="flex flex-col justify-center">
               <div className="flex items-center justify-between text-sm mb-2">
-                <span className="opacity-70">Progress to Goal</span>
-                <span className="font-semibold">{data?.northStar.percentToGoal}%</span>
+                <span className="opacity-70">Hedefe İlerleme</span>
+                <span className="font-semibold">%{data?.northStar.percentToGoal}</span>
               </div>
               <div className="h-3 bg-white/20 rounded-full overflow-hidden">
                 <div
@@ -231,7 +250,7 @@ export default function CEOBriefingPage() {
                 />
               </div>
               <p className="text-sm opacity-70 mt-2">
-                Target: {data?.northStar.target.toLocaleString()}
+                Hedef: {data?.northStar.target.toLocaleString('tr-TR')}
               </p>
             </div>
           </div>
@@ -270,62 +289,63 @@ export default function CEOBriefingPage() {
         ))}
       </div>
 
-      {/* Alerts Section - What needs attention */}
+      {/* Uyarılar - Dikkat Gerektiren Konular */}
       {data?.alerts && data.alerts.length > 0 && (
-        <div className="bg-white dark:bg-gray-950 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
-            <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+        <CanvaCard>
+          <CanvaCardHeader>
+            <CanvaCardTitle className="flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-amber-500" />
-              Needs Attention
+              Dikkat Gerektiriyor
               <span className="ml-2 text-xs font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">
                 {data.alerts.length}
               </span>
-            </h2>
-          </div>
-          <div className="divide-y divide-gray-100 dark:divide-gray-800">
-            {data.alerts.map((alert) => (
-              <div
-                key={alert.id}
-                className={cn(
-                  'px-6 py-4 flex items-center justify-between',
-                  'hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors'
-                )}
-              >
-                <div className="flex items-start gap-4">
-                  <div className={cn(
-                    'w-2 h-2 rounded-full mt-2',
-                    alert.severity === 'critical' ? 'bg-red-500' : 'bg-amber-500'
-                  )} />
-                  <div>
-                    <h3 className="font-medium text-gray-900 dark:text-white">
-                      {alert.title}
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                      {alert.subtitle}
-                    </p>
+            </CanvaCardTitle>
+          </CanvaCardHeader>
+          <CanvaCardBody className="p-0">
+            <div className="divide-y divide-gray-100 dark:divide-gray-800">
+              {data.alerts.map((alert) => (
+                <div
+                  key={alert.id}
+                  className={cn(
+                    'px-6 py-4 flex items-center justify-between',
+                    'hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors'
+                  )}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className={cn(
+                      'w-2 h-2 rounded-full mt-2',
+                      alert.severity === 'critical' ? 'bg-red-500' : 'bg-amber-500'
+                    )} />
+                    <div>
+                      <h3 className="font-medium text-gray-900 dark:text-white">
+                        {alert.title}
+                      </h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                        {alert.subtitle}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <Button variant="ghost" size="sm" asChild>
                   <Link href={alert.href}>
-                    {alert.action}
-                    <ChevronRight className="w-4 h-4 ml-1" />
+                    <CanvaButton variant="ghost" size="sm" rightIcon={<ChevronRight className="w-4 h-4" />}>
+                      {alert.action === 'View Details' ? 'Detaylar' : alert.action === 'Review' ? 'İncele' : alert.action}
+                    </CanvaButton>
                   </Link>
-                </Button>
-              </div>
-            ))}
-          </div>
-        </div>
+                </div>
+              ))}
+            </div>
+          </CanvaCardBody>
+        </CanvaCard>
       )}
 
-      {/* Weekly Goals */}
-      <div className="bg-white dark:bg-gray-950 rounded-2xl border border-gray-200 dark:border-gray-800 p-6">
+      {/* Haftalık Hedefler */}
+      <CanvaCard padding="lg">
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
             <Target className="w-5 h-5 text-violet-500" />
-            Weekly Goals
+            Haftalık Hedefler
           </h2>
           <span className="text-sm text-gray-500">
-            Week {getWeekNumber(currentTime)}
+            {getWeekNumber(currentTime)}. Hafta
           </span>
         </div>
 
@@ -354,15 +374,15 @@ export default function CEOBriefingPage() {
             );
           })}
         </div>
-      </div>
+      </CanvaCard>
 
-      {/* Quick Actions */}
+      {/* Hızlı Erişim */}
       <div className="grid grid-cols-4 gap-4">
         {[
-          { label: 'Finance Overview', href: '/finance', metric: '₺284K today' },
-          { label: 'User Growth', href: '/analytics', metric: '+8.3% DAU' },
-          { label: 'Moderation Queue', href: '/moderation', metric: '12 pending' },
-          { label: 'System Health', href: '/system-health', metric: '99.9% uptime' },
+          { label: 'Finans Özeti', href: '/finance', metric: '₺284K bugün' },
+          { label: 'Kullanıcı Büyümesi', href: '/analytics', metric: '+%8.3 DAU' },
+          { label: 'Moderasyon Kuyruğu', href: '/moderation', metric: '12 bekliyor' },
+          { label: 'Sistem Durumu', href: '/system-health', metric: '%99.9 uptime' },
         ].map((action) => (
           <Link
             key={action.label}
@@ -392,13 +412,13 @@ export default function CEOBriefingPage() {
 // Helper functions
 function getGreeting() {
   const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 18) return 'Good afternoon';
-  return 'Good evening';
+  if (hour < 12) return 'Günaydın';
+  if (hour < 18) return 'İyi günler';
+  return 'İyi akşamlar';
 }
 
 function formatDate(date: Date) {
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString('tr-TR', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -407,7 +427,7 @@ function formatDate(date: Date) {
 }
 
 function formatTime(date: Date) {
-  return date.toLocaleTimeString('en-US', {
+  return date.toLocaleTimeString('tr-TR', {
     hour: '2-digit',
     minute: '2-digit',
   });
