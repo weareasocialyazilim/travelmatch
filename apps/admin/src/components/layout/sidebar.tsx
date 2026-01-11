@@ -49,6 +49,10 @@ import {
   ShieldCheck,
   UserCheck,
   Server,
+  Coffee,
+  AlertCircle,
+  Search,
+  FileText,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -79,7 +83,9 @@ interface NavItem {
 
 // Navigation sections
 const mainNavItems: NavItem[] = [
+  { title: 'CEO Briefing', href: '/ceo-briefing', icon: Coffee },
   { title: 'Command Center', href: '/command-center', icon: Zap },
+  { title: 'Alerts', href: '/alerts', icon: AlertCircle, badge: 4 },
   { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { title: 'Is Kuyrugu', href: '/queue', icon: ListTodo, badge: 0 },
 ];
@@ -137,6 +143,12 @@ const operationsNavItems: NavItem[] = [
     title: 'Safety Hub',
     href: '/safety-hub',
     icon: ShieldCheck,
+    resource: 'reports',
+  },
+  {
+    title: 'Fraud Sorusturma',
+    href: '/fraud-investigation',
+    icon: Search,
     resource: 'reports',
   },
   {
@@ -244,6 +256,12 @@ const techNavItems: NavItem[] = [
 
 const settingsNavItems: NavItem[] = [
   { title: 'Ekip', href: '/team', icon: UsersRound, resource: 'admin_users' },
+  {
+    title: 'Audit Trail',
+    href: '/audit-trail',
+    icon: FileText,
+    resource: 'admin_users',
+  },
   {
     title: 'Audit Logs',
     href: '/audit-logs',
