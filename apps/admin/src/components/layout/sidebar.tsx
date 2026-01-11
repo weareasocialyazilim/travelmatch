@@ -272,6 +272,18 @@ const techNavItems: NavItem[] = [
 ];
 
 const settingsNavItems: NavItem[] = [
+  {
+    title: 'Admin Yönetimi',
+    href: '/admin-users',
+    icon: UserCog,
+    resource: 'admin_users',
+  },
+  {
+    title: 'Güvenlik',
+    href: '/security',
+    icon: Lock,
+    resource: 'admin_users',
+  },
   { title: 'Ekip', href: '/team', icon: UsersRound, resource: 'admin_users' },
   {
     title: 'Audit Trail',
