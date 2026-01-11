@@ -23,17 +23,18 @@ import {
   RefreshCw,
   Loader2,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
 import { Label } from '@/components/ui/label';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import {
@@ -317,20 +318,14 @@ export default function PromosPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => refetch()} disabled={isLoading}>
-            {isLoading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCw className="mr-2 h-4 w-4" />
-            )}
+          <CanvaButton variant="outline" onClick={() => refetch()} loading={isLoading} leftIcon={<RefreshCw className="h-4 w-4" />}>
             Yenile
-          </Button>
+          </CanvaButton>
         <Dialog open={isCreatePromoOpen} onOpenChange={setIsCreatePromoOpen}>
           <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
+            <CanvaButton variant="primary" leftIcon={<Plus className="h-4 w-4" />}>
               Yeni Promosyon
-            </Button>
+            </CanvaButton>
           </DialogTrigger>
           <DialogContent className="max-w-lg">
             <DialogHeader>
@@ -345,14 +340,14 @@ export default function PromosPage() {
               <div className="space-y-2">
                 <Label htmlFor="code">Promosyon Kodu</Label>
                 <div className="flex gap-2">
-                  <Input
+                  <CanvaInput
                     id="code"
                     placeholder="YILBASI30"
                     className="uppercase"
                     value={newPromoCode}
                     onChange={(e) => setNewPromoCode(e.target.value.toUpperCase())}
                   />
-                  <Button
+                  <CanvaButton
                     variant="outline"
                     onClick={() => {
                       const code = generateCode();
@@ -361,7 +356,7 @@ export default function PromosPage() {
                     }}
                   >
                     Oluştur
-                  </Button>
+                  </CanvaButton>
                 </div>
               </div>
 
@@ -387,29 +382,26 @@ export default function PromosPage() {
               <div className="space-y-2">
                 <Label htmlFor="value">Değer</Label>
                 <div className="flex items-center gap-2">
-                  <Input
+                  <CanvaInput
                     id="value"
                     type="number"
                     placeholder={promoType === 'percentage' ? '30' : '50'}
                     value={newPromoValue}
                     onChange={(e) => setNewPromoValue(e.target.value)}
                   />
-                  <span className="text-muted-foreground">
+                  <span className="text-gray-500">
                     {promoType === 'percentage' ? '%' : '₺'}
                   </span>
                 </div>
               </div>
 
               {/* Description */}
-              <div className="space-y-2">
-                <Label htmlFor="description">Açıklama</Label>
-                <Input
-                  id="description"
-                  placeholder="Kampanya açıklaması..."
-                  value={newPromoDescription}
-                  onChange={(e) => setNewPromoDescription(e.target.value)}
-                />
-              </div>
+              <CanvaInput
+                label="Açıklama"
+                placeholder="Kampanya açıklaması..."
+                value={newPromoDescription}
+                onChange={(e) => setNewPromoDescription(e.target.value)}
+              />
 
               {/* Applicable To */}
               <div className="space-y-2">
@@ -433,16 +425,13 @@ export default function PromosPage() {
               </div>
 
               {/* Usage Limit */}
-              <div className="space-y-2">
-                <Label htmlFor="limit">Kullanım Limiti (Opsiyonel)</Label>
-                <Input
-                  id="limit"
-                  type="number"
-                  placeholder="Sınırsız için boş bırakın"
-                  value={newPromoLimit}
-                  onChange={(e) => setNewPromoLimit(e.target.value)}
-                />
-              </div>
+              <CanvaInput
+                label="Kullanım Limiti (Opsiyonel)"
+                type="number"
+                placeholder="Sınırsız için boş bırakın"
+                value={newPromoLimit}
+                onChange={(e) => setNewPromoLimit(e.target.value)}
+              />
 
               {/* Date Range */}
               <div className="grid gap-4 md:grid-cols-2">
@@ -458,21 +447,20 @@ export default function PromosPage() {
             </div>
 
             <DialogFooter>
-              <Button
+              <CanvaButton
                 variant="outline"
                 onClick={() => setIsCreatePromoOpen(false)}
               >
                 İptal
-              </Button>
-              <Button
+              </CanvaButton>
+              <CanvaButton
+                variant="primary"
                 onClick={handleCreatePromo}
-                disabled={!newPromoCode || !newPromoValue || createPromo.isPending}
+                disabled={!newPromoCode || !newPromoValue}
+                loading={createPromo.isPending}
               >
-                {createPromo.isPending ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : null}
                 Oluştur
-              </Button>
+              </CanvaButton>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -495,67 +483,42 @@ export default function PromosPage() {
         <TabsContent value="promos" className="space-y-6">
           {/* Promo Stats */}
           <div className="grid gap-4 md:grid-cols-5">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <p className="text-2xl font-bold">{stats.totalCodes}</p>
-                  <p className="text-sm text-muted-foreground">Toplam Kod</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-green-600">
-                    {stats.activeCodes}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Aktif</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <p className="text-2xl font-bold">
-                    {stats.totalUsage.toLocaleString('tr-TR')}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Toplam Kullanım
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <p className="text-2xl font-bold">
-                    %{stats.avgConversion}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Ort. Dönüşüm</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-green-600">
-                    {formatCurrency(stats.totalRevenue, 'TRY')}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Toplam Gelir</p>
-                </div>
-              </CardContent>
-            </Card>
+            <CanvaStatCard
+              label="Toplam Kod"
+              value={stats.totalCodes}
+              icon={<Tag className="h-4 w-4" />}
+            />
+            <CanvaStatCard
+              label="Aktif"
+              value={stats.activeCodes}
+              icon={<CheckCircle className="h-4 w-4" />}
+            />
+            <CanvaStatCard
+              label="Toplam Kullanım"
+              value={stats.totalUsage.toLocaleString('tr-TR')}
+              icon={<Users className="h-4 w-4" />}
+            />
+            <CanvaStatCard
+              label="Ort. Dönüşüm"
+              value={`%${stats.avgConversion}`}
+              icon={<TrendingUp className="h-4 w-4" />}
+            />
+            <CanvaStatCard
+              label="Toplam Gelir"
+              value={formatCurrency(stats.totalRevenue, 'TRY')}
+              icon={<DollarSign className="h-4 w-4" />}
+            />
           </div>
 
           {/* Promo Codes List */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Promosyon Kodları</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Promosyon Kodları</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Aktif ve geçmiş promosyon kodları
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-4">
                 {promoCodes.map((promo) => (
                   <div
@@ -575,14 +538,14 @@ export default function PromosPage() {
                           <code className="rounded bg-muted px-2 py-1 font-mono text-sm font-semibold">
                             {promo.code}
                           </code>
-                          <Button
+                          <CanvaButton
                             variant="ghost"
-                            size="icon"
-                            className="h-6 w-6"
+                            size="xs"
+                            iconOnly
                             onClick={() => copyCode(promo.code)}
                           >
                             <Copy className="h-3 w-3" />
-                          </Button>
+                          </CanvaButton>
                           {getStatusBadge(promo.status)}
                         </div>
                         <p className="text-sm text-muted-foreground">
@@ -639,9 +602,9 @@ export default function PromosPage() {
                       {/* Actions */}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
+                          <CanvaButton variant="ghost" size="sm" iconOnly>
                             <MoreHorizontal className="h-4 w-4" />
-                          </Button>
+                          </CanvaButton>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem>
@@ -670,79 +633,50 @@ export default function PromosPage() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Referrals Tab */}
         <TabsContent value="referrals" className="space-y-6">
           {/* Referral Stats */}
           <div className="grid gap-4 md:grid-cols-5">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <p className="text-2xl font-bold">
-                    {referralStats.totalReferrers.toLocaleString('tr-TR')}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Toplam Referrer
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-green-600">
-                    {referralStats.activeReferrers.toLocaleString('tr-TR')}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Aktif</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <p className="text-2xl font-bold">
-                    {referralStats.totalReferrals.toLocaleString('tr-TR')}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Toplam Referans
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <p className="text-2xl font-bold">
-                    %{referralStats.successRate}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Başarı Oranı</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-green-600">
-                    {formatCurrency(referralStats.totalPayout, 'TRY')}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Toplam Ödeme</p>
-                </div>
-              </CardContent>
-            </Card>
+            <CanvaStatCard
+              label="Toplam Referrer"
+              value={referralStats.totalReferrers.toLocaleString('tr-TR')}
+              icon={<Users className="h-4 w-4" />}
+            />
+            <CanvaStatCard
+              label="Aktif"
+              value={referralStats.activeReferrers.toLocaleString('tr-TR')}
+              icon={<CheckCircle className="h-4 w-4" />}
+            />
+            <CanvaStatCard
+              label="Toplam Referans"
+              value={referralStats.totalReferrals.toLocaleString('tr-TR')}
+              icon={<Share2 className="h-4 w-4" />}
+            />
+            <CanvaStatCard
+              label="Başarı Oranı"
+              value={`%${referralStats.successRate}`}
+              icon={<TrendingUp className="h-4 w-4" />}
+            />
+            <CanvaStatCard
+              label="Toplam Ödeme"
+              value={formatCurrency(referralStats.totalPayout, 'TRY')}
+              icon={<DollarSign className="h-4 w-4" />}
+            />
           </div>
 
           {/* Top Referrers */}
-          <Card>
-            <CardHeader>
-              <CardTitle>En İyi Referrer\'lar</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>En İyi Referrer'lar</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 En çok referans yapan kullanıcılar
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-4">
                 {mockReferrals.map((referral, index) => (
                   <div
@@ -780,48 +714,47 @@ export default function PromosPage() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
 
           {/* Referral Program Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Referans Programı Ayarları</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Referans Programı Ayarları</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Referans ödül ve kurallarını yapılandırın
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label>Referrer Ödülü</Label>
                   <div className="flex items-center gap-2">
-                    <Input type="number" defaultValue="30" className="w-24" />
-                    <span className="text-muted-foreground">₺</span>
+                    <CanvaInput type="number" defaultValue="30" className="w-24" />
+                    <span className="text-gray-500">₺</span>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label>Referred Ödülü</Label>
                   <div className="flex items-center gap-2">
-                    <Input type="number" defaultValue="20" className="w-24" />
-                    <span className="text-muted-foreground">₺</span>
+                    <CanvaInput type="number" defaultValue="20" className="w-24" />
+                    <span className="text-gray-500">₺</span>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center justify-between rounded-lg border p-4">
+              <div className="flex items-center justify-between rounded-lg border border-gray-200 p-4">
                 <div className="space-y-1">
-                  <p className="font-medium">Abuse Detection</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-medium text-gray-900">Abuse Detection</p>
+                  <p className="text-sm text-gray-500">
                     Kötüye kullanım tespiti ve otomatik engelleme
                   </p>
                 </div>
-                <Badge variant="default" className="gap-1">
-                  <CheckCircle className="h-3 w-3" />
+                <CanvaBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>
                   Aktif
-                </Badge>
+                </CanvaBadge>
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
       </Tabs>
     </div>
