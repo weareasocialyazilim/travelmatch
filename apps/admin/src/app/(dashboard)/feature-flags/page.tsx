@@ -28,18 +28,19 @@ import {
   RefreshCw,
   Loader2,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -428,20 +429,14 @@ export default function FeatureFlagsPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => refetch()} disabled={isLoading}>
-            {isLoading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCw className="mr-2 h-4 w-4" />
-            )}
+          <CanvaButton variant="outline" onClick={() => refetch()} loading={isLoading} leftIcon={<RefreshCw className="h-4 w-4" />}>
             Yenile
-          </Button>
+          </CanvaButton>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
+            <CanvaButton variant="primary" leftIcon={<Plus className="h-4 w-4" />}>
               Yeni Flag
-            </Button>
+            </CanvaButton>
           </DialogTrigger>
           <DialogContent className="max-w-lg">
             <DialogHeader>
@@ -451,34 +446,26 @@ export default function FeatureFlagsPage() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="key">Key</Label>
-                <Input
-                  id="key"
-                  placeholder="feature_key"
-                  value={newFlag.key}
-                  onChange={(e) =>
-                    setNewFlag({
-                      ...newFlag,
-                      key: e.target.value.toLowerCase().replace(/\s+/g, '_'),
-                    })
-                  }
-                />
-                <p className="text-xs text-muted-foreground">
-                  Kodda kullanılacak benzersiz tanımlayıcı
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="name">İsim</Label>
-                <Input
-                  id="name"
-                  placeholder="Özellik Adı"
-                  value={newFlag.name}
-                  onChange={(e) =>
-                    setNewFlag({ ...newFlag, name: e.target.value })
-                  }
-                />
-              </div>
+              <CanvaInput
+                label="Key"
+                placeholder="feature_key"
+                value={newFlag.key}
+                onChange={(e) =>
+                  setNewFlag({
+                    ...newFlag,
+                    key: e.target.value.toLowerCase().replace(/\s+/g, '_'),
+                  })
+                }
+                helperText="Kodda kullanılacak benzersiz tanımlayıcı"
+              />
+              <CanvaInput
+                label="İsim"
+                placeholder="Özellik Adı"
+                value={newFlag.name}
+                onChange={(e) =>
+                  setNewFlag({ ...newFlag, name: e.target.value })
+                }
+              />
               <div className="space-y-2">
                 <Label htmlFor="description">Açıklama</Label>
                 <Textarea
@@ -548,18 +535,19 @@ export default function FeatureFlagsPage() {
               </div>
             </div>
             <DialogFooter>
-              <Button
+              <CanvaButton
                 variant="outline"
                 onClick={() => setIsCreateDialogOpen(false)}
               >
                 İptal
-              </Button>
-              <Button
+              </CanvaButton>
+              <CanvaButton
+                variant="primary"
                 onClick={handleCreateFlag}
                 disabled={!newFlag.key || !newFlag.name}
               >
                 Oluştur
-              </Button>
+              </CanvaButton>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -568,97 +556,68 @@ export default function FeatureFlagsPage() {
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Toplam Flag</CardTitle>
-            <Flag className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Aktif</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.enabled}</div>
-            <p className="text-xs text-muted-foreground">
-              {stats.total > 0 ? Math.round((stats.enabled / stats.total) * 100) : 0}% etkin
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Deneyler</CardTitle>
-            <TrendingUp className="h-4 w-4 text-purple-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{experiments}</div>
-            <p className="text-xs text-muted-foreground">
-              A/B test devam ediyor
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Kill Switches</CardTitle>
-            <Shield className="h-4 w-4 text-red-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{killSwitches}</div>
-            <p className="text-xs text-muted-foreground">
-              Acil durum kontrolleri
-            </p>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          label="Toplam Flag"
+          value={stats.total}
+          icon={<Flag className="h-4 w-4" />}
+        />
+        <CanvaStatCard
+          label="Aktif"
+          value={stats.enabled}
+          icon={<CheckCircle className="h-4 w-4" />}
+          change={{ value: stats.total > 0 ? Math.round((stats.enabled / stats.total) * 100) : 0, label: 'etkin' }}
+        />
+        <CanvaStatCard
+          label="Deneyler"
+          value={experiments}
+          icon={<TrendingUp className="h-4 w-4" />}
+        />
+        <CanvaStatCard
+          label="Kill Switches"
+          value={killSwitches}
+          icon={<Shield className="h-4 w-4" />}
+        />
       </div>
 
       {/* Filters */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-wrap gap-4">
-            <div className="flex-1 min-w-[200px]">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Flag ara..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-            </div>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Kategori" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tüm Kategoriler</SelectItem>
-                <SelectItem value="feature">Özellik</SelectItem>
-                <SelectItem value="experiment">Deney</SelectItem>
-                <SelectItem value="operational">Operasyonel</SelectItem>
-                <SelectItem value="kill_switch">Kill Switch</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select
-              value={environmentFilter}
-              onValueChange={setEnvironmentFilter}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Environment" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tüm Env</SelectItem>
-                <SelectItem value="production">Production</SelectItem>
-                <SelectItem value="staging">Staging</SelectItem>
-                <SelectItem value="development">Development</SelectItem>
-              </SelectContent>
-            </Select>
+      <CanvaCard padding="md">
+        <div className="flex flex-wrap gap-4">
+          <div className="flex-1 min-w-[200px]">
+            <CanvaInput
+              placeholder="Flag ara..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              leftIcon={<Search className="h-4 w-4" />}
+            />
           </div>
-        </CardContent>
-      </Card>
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Kategori" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tüm Kategoriler</SelectItem>
+              <SelectItem value="feature">Özellik</SelectItem>
+              <SelectItem value="experiment">Deney</SelectItem>
+              <SelectItem value="operational">Operasyonel</SelectItem>
+              <SelectItem value="kill_switch">Kill Switch</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select
+            value={environmentFilter}
+            onValueChange={setEnvironmentFilter}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Environment" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tüm Env</SelectItem>
+              <SelectItem value="production">Production</SelectItem>
+              <SelectItem value="staging">Staging</SelectItem>
+              <SelectItem value="development">Development</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </CanvaCard>
 
       {/* Flags List */}
       <Tabs defaultValue="all" className="space-y-4">
@@ -737,32 +696,26 @@ function FlagCard({
   const CategoryIcon = categoryInfo.icon;
 
   return (
-    <Card className={flag.category === 'kill_switch' ? 'border-red-200' : ''}>
-      <CardContent className="pt-6">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <h3 className="text-lg font-semibold">{flag.name}</h3>
-              <Badge className={categoryInfo.color} variant="secondary">
-                <CategoryIcon className="mr-1 h-3 w-3" />
-                {categoryInfo.label}
-              </Badge>
-              <Badge
-                variant="outline"
-                className={
-                  flag.environment === 'production'
-                    ? 'border-green-500 text-green-700'
-                    : flag.environment === 'staging'
-                      ? 'border-yellow-500 text-yellow-700'
-                      : 'border-gray-500 text-gray-700'
-                }
-              >
-                {flag.environment}
-              </Badge>
-            </div>
-            <p className="text-sm text-muted-foreground mb-3">
-              {flag.description}
-            </p>
+    <CanvaCard className={flag.category === 'kill_switch' ? 'border-red-200' : ''} padding="md">
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <div className="flex items-center gap-3 mb-2">
+            <h3 className="text-lg font-semibold text-gray-900">{flag.name}</h3>
+            <CanvaBadge className={categoryInfo.color} icon={<CategoryIcon className="h-3 w-3" />}>
+              {categoryInfo.label}
+            </CanvaBadge>
+            <CanvaBadge
+              variant={
+                flag.environment === 'production' ? 'success' :
+                flag.environment === 'staging' ? 'warning' : 'default'
+              }
+            >
+              {flag.environment}
+            </CanvaBadge>
+          </div>
+          <p className="text-sm text-gray-500 mb-3">
+            {flag.description}
+          </p>
             <div className="flex items-center gap-4 text-sm">
               <button
                 onClick={() => onCopyKey(flag.key)}
@@ -820,9 +773,9 @@ function FlagCard({
             {/* Actions */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
+                <CanvaButton variant="ghost" size="sm" iconOnly>
                   <MoreHorizontal className="h-4 w-4" />
-                </Button>
+                </CanvaButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => onCopyKey(flag.key)}>
@@ -871,10 +824,10 @@ function FlagCard({
 
         {/* Progress bar for rollout */}
         {flag.enabled && flag.rollout_percentage < 100 && (
-          <div className="mt-4 pt-4 border-t">
+          <div className="mt-4 pt-4 border-t border-gray-100">
             <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-muted-foreground">Kullanıcı Dağılımı</span>
-              <span>
+              <span className="text-gray-500">Kullanıcı Dağılımı</span>
+              <span className="text-gray-900">
                 ~
                 {Math.round(
                   (flag.rollout_percentage / 100) * 125000,
@@ -885,7 +838,6 @@ function FlagCard({
             <Progress value={flag.rollout_percentage} className="h-2" />
           </div>
         )}
-      </CardContent>
-    </Card>
+    </CanvaCard>
   );
 }

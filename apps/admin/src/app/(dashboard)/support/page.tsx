@@ -23,16 +23,17 @@ import {
   RefreshCw,
   Loader2,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -286,86 +287,52 @@ export default function SupportPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isLoading}>
-            {isLoading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCw className="mr-2 h-4 w-4" />
-            )}
+          <CanvaButton variant="outline" size="sm" onClick={() => refetch()} loading={isLoading} leftIcon={<RefreshCw className="h-4 w-4" />}>
             Yenile
-          </Button>
-          <Badge variant="error" className="h-8 px-3 text-sm">
+          </CanvaButton>
+          <CanvaBadge variant="error" size="lg">
             {openTickets} açık
-          </Badge>
-          <Badge variant="warning" className="h-8 px-3 text-sm">
+          </CanvaBadge>
+          <CanvaBadge variant="warning" size="lg">
             {pendingTickets} bekleyen
-          </Badge>
+          </CanvaBadge>
         </div>
       </div>
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Toplam Talepler
-            </CardTitle>
-            <Inbox className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">1,284</div>
-            <p className="text-xs text-muted-foreground">Bu ay</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Ortalama Yanıt Süresi
-            </CardTitle>
-            <Timer className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">2.4 saat</div>
-            <div className="flex items-center text-xs text-green-600">
-              <TrendingDown className="mr-1 h-3 w-3" />
-              -30 dk geçen haftadan
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Çözüm Oranı</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">94%</div>
-            <div className="flex items-center text-xs text-green-600">
-              <TrendingUp className="mr-1 h-3 w-3" />
-              +2% geçen aydan
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Müşteri Memnuniyeti
-            </CardTitle>
-            <MessageSquare className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">4.7/5</div>
-            <p className="text-xs text-muted-foreground">Ortalama puan</p>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          label="Toplam Talepler"
+          value="1,284"
+          icon={<Inbox className="h-4 w-4" />}
+          change={{ value: 12, label: 'Bu ay' }}
+        />
+        <CanvaStatCard
+          label="Ortalama Yanıt Süresi"
+          value="2.4 saat"
+          icon={<Timer className="h-4 w-4" />}
+          change={{ value: -30, label: 'dk geçen haftadan' }}
+        />
+        <CanvaStatCard
+          label="Çözüm Oranı"
+          value="94%"
+          icon={<CheckCircle className="h-4 w-4" />}
+          change={{ value: 2, label: 'geçen aydan' }}
+        />
+        <CanvaStatCard
+          label="Müşteri Memnuniyeti"
+          value="4.7/5"
+          icon={<MessageSquare className="h-4 w-4" />}
+        />
       </div>
 
       {/* Main Content */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Ticket List */}
-        <Card className="lg:col-span-1">
-          <CardHeader className="pb-3">
+        <CanvaCard className="lg:col-span-1">
+          <CanvaCardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Talepler</CardTitle>
+              <CanvaCardTitle>Talepler</CanvaCardTitle>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-28 h-8">
                   <SelectValue />
@@ -378,17 +345,17 @@ export default function SupportPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="relative mt-2">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
+            <div className="mt-2">
+              <CanvaInput
                 placeholder="Talep ara..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 h-9"
+                leftIcon={<Search className="h-4 w-4" />}
+                size="sm"
               />
             </div>
-          </CardHeader>
-          <CardContent className="p-0">
+          </CanvaCardHeader>
+          <CanvaCardBody className="p-0">
             <ScrollArea className="h-[500px]">
               {filteredTickets.map((ticket) => {
                 const statusInfo =
@@ -420,10 +387,9 @@ export default function SupportPage() {
                           </p>
                         </div>
                       </div>
-                      <Badge variant={statusInfo.variant} className="text-xs">
-                        <StatusIcon className="mr-1 h-3 w-3" />
+                      <CanvaBadge variant={statusInfo.variant === 'error' ? 'error' : statusInfo.variant === 'warning' ? 'warning' : 'success'} size="sm" icon={<StatusIcon className="h-3 w-3" />}>
                         {statusInfo.label}
-                      </Badge>
+                      </CanvaBadge>
                     </div>
                     <p className="mt-2 text-sm font-medium line-clamp-1">
                       {ticket.subject}
@@ -435,76 +401,50 @@ export default function SupportPage() {
                 );
               })}
             </ScrollArea>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
 
         {/* Ticket Detail */}
-        <Card className="lg:col-span-2">
+        <CanvaCard className="lg:col-span-2">
           {selectedTicket ? (
             <>
-              <CardHeader className="pb-3">
+              <CanvaCardHeader>
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <CardTitle className="text-lg">
+                      <CanvaCardTitle>
                         {selectedTicket.subject}
-                      </CardTitle>
-                      <Badge
+                      </CanvaCardTitle>
+                      <CanvaBadge
                         variant={
-                          statusConfig[
-                            selectedTicket.status as keyof typeof statusConfig
-                          ].variant
+                          statusConfig[selectedTicket.status as keyof typeof statusConfig].variant === 'error' ? 'error' :
+                          statusConfig[selectedTicket.status as keyof typeof statusConfig].variant === 'warning' ? 'warning' : 'success'
                         }
                       >
-                        {
-                          statusConfig[
-                            selectedTicket.status as keyof typeof statusConfig
-                          ].label
-                        }
-                      </Badge>
+                        {statusConfig[selectedTicket.status as keyof typeof statusConfig].label}
+                      </CanvaBadge>
                     </div>
-                    <CardDescription className="mt-1">
+                    <CanvaCardSubtitle>
                       {selectedTicket.id} •{' '}
-                      {
-                        categoryConfig[
-                          selectedTicket.category as keyof typeof categoryConfig
-                        ]
-                      }{' '}
+                      {categoryConfig[selectedTicket.category as keyof typeof categoryConfig]}{' '}
                       •{' '}
-                      <span
-                        className={
-                          priorityConfig[
-                            selectedTicket.priority as keyof typeof priorityConfig
-                          ].color
-                        }
-                      >
-                        {
-                          priorityConfig[
-                            selectedTicket.priority as keyof typeof priorityConfig
-                          ].label
-                        }{' '}
-                        öncelik
+                      <span className={priorityConfig[selectedTicket.priority as keyof typeof priorityConfig].color}>
+                        {priorityConfig[selectedTicket.priority as keyof typeof priorityConfig].label} öncelik
                       </span>
-                    </CardDescription>
+                    </CanvaCardSubtitle>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline">
-                      <Archive className="mr-1 h-4 w-4" />
+                    <CanvaButton size="sm" variant="outline" leftIcon={<Archive className="h-4 w-4" />}>
                       Arşivle
-                    </Button>
-                    <Button size="sm" onClick={handleResolveTicket} disabled={updateTicket.isPending}>
-                      {updateTicket.isPending ? (
-                        <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-                      ) : (
-                        <CheckCircle className="mr-1 h-4 w-4" />
-                      )}
+                    </CanvaButton>
+                    <CanvaButton size="sm" variant="success" onClick={handleResolveTicket} loading={updateTicket.isPending} leftIcon={<CheckCircle className="h-4 w-4" />}>
                       Çözüldü
-                    </Button>
+                    </CanvaButton>
                   </div>
                 </div>
 
                 {/* User Info */}
-                <div className="mt-4 flex items-center justify-between rounded-lg bg-muted/50 p-3">
+                <div className="mt-4 flex items-center justify-between rounded-lg bg-gray-50 p-3">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
                       <AvatarFallback>
@@ -515,26 +455,26 @@ export default function SupportPage() {
                       <p className="font-medium">
                         {selectedTicket.user.full_name}
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-gray-500">
                         {selectedTicket.user.email}
                       </p>
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="ghost">
+                    <CanvaButton size="sm" variant="ghost" iconOnly>
                       <Mail className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="ghost">
+                    </CanvaButton>
+                    <CanvaButton size="sm" variant="ghost" iconOnly>
                       <ExternalLink className="h-4 w-4" />
-                    </Button>
+                    </CanvaButton>
                   </div>
                 </div>
-              </CardHeader>
+              </CanvaCardHeader>
 
               <Separator />
 
               {/* Messages */}
-              <CardContent className="p-0">
+              <CanvaCardBody className="p-0">
                 <ScrollArea className="h-[300px] p-4">
                   <div className="space-y-4">
                     {selectedTicket.messages.map((message) => (
@@ -549,10 +489,10 @@ export default function SupportPage() {
                       >
                         <div
                           className={cn(
-                            'max-w-[80%] rounded-lg p-3',
+                            'max-w-[80%] rounded-2xl p-3',
                             message.sender === 'admin'
-                              ? 'bg-primary text-primary-foreground'
-                              : 'bg-muted',
+                              ? 'bg-violet-500 text-white'
+                              : 'bg-gray-100',
                           )}
                         >
                           <p className="text-sm">{message.content}</p>
@@ -560,16 +500,13 @@ export default function SupportPage() {
                             className={cn(
                               'mt-1 flex items-center gap-2 text-xs',
                               message.sender === 'admin'
-                                ? 'text-primary-foreground/70'
-                                : 'text-muted-foreground',
+                                ? 'text-white/70'
+                                : 'text-gray-500',
                             )}
                           >
                             {message.sender === 'admin' && (
                               <span>
-                                {
-                                  (message as { admin_name?: string })
-                                    .admin_name
-                                }
+                                {(message as { admin_name?: string }).admin_name}
                               </span>
                             )}
                             <span>
@@ -589,20 +526,20 @@ export default function SupportPage() {
                   {/* Canned Responses */}
                   <div className="mb-3 flex gap-2 overflow-x-auto pb-2">
                     {cannedResponses.map((response) => (
-                      <Button
+                      <CanvaButton
                         key={response.id}
-                        size="sm"
+                        size="xs"
                         variant="outline"
-                        className="shrink-0 text-xs"
+                        className="shrink-0"
                         onClick={() => setReplyText(response.content)}
                       >
                         {response.title}
-                      </Button>
+                      </CanvaButton>
                     ))}
                   </div>
 
                   <div className="flex gap-2">
-                    <Input
+                    <CanvaInput
                       placeholder="Yanıtınızı yazın..."
                       value={replyText}
                       onChange={(e) => setReplyText(e.target.value)}
@@ -613,28 +550,28 @@ export default function SupportPage() {
                         }
                       }}
                     />
-                    <Button size="icon" variant="ghost">
+                    <CanvaButton size="md" variant="ghost" iconOnly>
                       <Paperclip className="h-4 w-4" />
-                    </Button>
-                    <Button onClick={handleSendReply}>
-                      <Send className="h-4 w-4" />
-                    </Button>
+                    </CanvaButton>
+                    <CanvaButton variant="primary" onClick={handleSendReply} leftIcon={<Send className="h-4 w-4" />}>
+                      Gönder
+                    </CanvaButton>
                   </div>
                 </div>
-              </CardContent>
+              </CanvaCardBody>
             </>
           ) : (
             <div className="flex h-full items-center justify-center p-8 text-center">
               <div>
-                <MessageSquare className="mx-auto h-12 w-12 text-muted-foreground" />
-                <h3 className="mt-4 text-lg font-semibold">Talep Seçin</h3>
-                <p className="text-muted-foreground">
+                <MessageSquare className="mx-auto h-12 w-12 text-gray-400" />
+                <h3 className="mt-4 text-lg font-semibold text-gray-900">Talep Seçin</h3>
+                <p className="text-gray-500">
                   Detayları görüntülemek için bir talep seçin
                 </p>
               </div>
             </div>
           )}
-        </Card>
+        </CanvaCard>
       </div>
     </div>
   );
