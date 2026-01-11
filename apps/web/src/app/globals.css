@@ -324,16 +324,6 @@
     animation: marquee-reverse 80s linear infinite;
   }
 
-  /* Cursor spin animation */
-  @keyframes cursor-spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-
   /* Slide in animation for notifications */
   @keyframes slideIn {
     0% {
