@@ -34,6 +34,14 @@ import {
   CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
+import { Badge } from '@/components/ui/badge';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
@@ -234,6 +242,60 @@ export default function NotificationsPage() {
     };
     return <Badge variant={variant}>{label}</Badge>;
   };
+
+  // Loading Skeleton
+  const LoadingSkeleton = () => (
+    <div className="space-y-6 animate-pulse">
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <div className="h-8 w-64 bg-gray-200 rounded" />
+          <div className="h-4 w-48 bg-gray-100 rounded" />
+        </div>
+        <div className="h-10 w-36 bg-gray-200 rounded" />
+      </div>
+      <div className="grid gap-4 md:grid-cols-4">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-24 bg-gray-100 rounded-lg" />
+        ))}
+      </div>
+      <div className="h-96 bg-gray-100 rounded-lg" />
+    </div>
+  );
+
+  // Error State
+  const ErrorState = () => (
+    <div className="flex h-[50vh] items-center justify-center">
+      <div className="text-center space-y-4">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+          <AlertTriangle className="h-8 w-8 text-red-600" />
+        </div>
+        <h2 className="text-xl font-semibold text-gray-900">Bir hata oluştu</h2>
+        <p className="text-gray-500 max-w-md">
+          Bildirim verileri yüklenemedi. Lütfen tekrar deneyin.
+        </p>
+      </div>
+    </div>
+  );
+
+  // Empty State
+  const EmptyState = () => (
+    <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-gray-200">
+      <div className="text-center space-y-3">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+          <Bell className="h-6 w-6 text-gray-400" />
+        </div>
+        <h3 className="text-lg font-medium text-gray-900">Henüz bildirim yok</h3>
+        <p className="text-sm text-gray-500">İlk push bildiriminizi göndererek başlayın.</p>
+        <CanvaButton variant="primary" onClick={() => setIsCreateOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Bildirim Oluştur
+        </CanvaButton>
+      </div>
+    </div>
+  );
+
+  if (isLoading) return <LoadingSkeleton />;
+  if (error) return <ErrorState />;
 
   return (
     <div className="space-y-6">

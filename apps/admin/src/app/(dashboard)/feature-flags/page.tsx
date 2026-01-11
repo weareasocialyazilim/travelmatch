@@ -418,6 +418,70 @@ export default function FeatureFlagsPage() {
     toast.success('Key kopyalandı');
   };
 
+  // Loading Skeleton
+  const LoadingSkeleton = () => (
+    <div className="space-y-6 animate-pulse">
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <div className="h-8 w-48 bg-gray-200 rounded" />
+          <div className="h-4 w-64 bg-gray-100 rounded" />
+        </div>
+        <div className="flex gap-2">
+          <div className="h-10 w-24 bg-gray-200 rounded" />
+          <div className="h-10 w-32 bg-gray-200 rounded" />
+        </div>
+      </div>
+      <div className="grid gap-4 md:grid-cols-4">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-24 bg-gray-100 rounded-lg" />
+        ))}
+      </div>
+      <div className="h-16 bg-gray-100 rounded-lg" />
+      <div className="space-y-4">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="h-32 bg-gray-100 rounded-lg" />
+        ))}
+      </div>
+    </div>
+  );
+
+  // Error State
+  const ErrorState = () => (
+    <div className="flex h-[50vh] items-center justify-center">
+      <div className="text-center space-y-4">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+          <AlertTriangle className="h-8 w-8 text-red-600" />
+        </div>
+        <h2 className="text-xl font-semibold text-gray-900">Bir hata oluştu</h2>
+        <p className="text-gray-500 max-w-md">
+          Feature flag verileri yüklenemedi. Lütfen tekrar deneyin.
+        </p>
+        <CanvaButton variant="outline" onClick={() => refetch()} leftIcon={<RefreshCw className="h-4 w-4" />}>
+          Tekrar Dene
+        </CanvaButton>
+      </div>
+    </div>
+  );
+
+  // Empty State
+  const EmptyState = () => (
+    <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-gray-200">
+      <div className="text-center space-y-3">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+          <Flag className="h-6 w-6 text-gray-400" />
+        </div>
+        <h3 className="text-lg font-medium text-gray-900">Henüz feature flag yok</h3>
+        <p className="text-sm text-gray-500">İlk feature flag'inizi oluşturarak başlayın.</p>
+        <CanvaButton variant="primary" onClick={() => setIsCreateDialogOpen(true)} leftIcon={<Plus className="h-4 w-4" />}>
+          Yeni Flag Oluştur
+        </CanvaButton>
+      </div>
+    </div>
+  );
+
+  if (isLoading) return <LoadingSkeleton />;
+  if (error) return <ErrorState />;
+
   return (
     <div className="space-y-6">
       {/* Header */}

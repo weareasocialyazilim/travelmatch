@@ -276,6 +276,52 @@ export default function SupportPage() {
     );
   };
 
+  // Loading Skeleton
+  const LoadingSkeleton = () => (
+    <div className="space-y-6 animate-pulse">
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <div className="h-8 w-48 bg-gray-200 rounded" />
+          <div className="h-4 w-64 bg-gray-100 rounded" />
+        </div>
+        <div className="flex gap-2">
+          <div className="h-8 w-24 bg-gray-200 rounded" />
+          <div className="h-8 w-24 bg-gray-200 rounded" />
+        </div>
+      </div>
+      <div className="grid gap-4 md:grid-cols-4">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-24 bg-gray-100 rounded-lg" />
+        ))}
+      </div>
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="h-[600px] bg-gray-100 rounded-lg" />
+        <div className="lg:col-span-2 h-[600px] bg-gray-100 rounded-lg" />
+      </div>
+    </div>
+  );
+
+  // Error State
+  const ErrorState = () => (
+    <div className="flex h-[50vh] items-center justify-center">
+      <div className="text-center space-y-4">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+          <AlertCircle className="h-8 w-8 text-red-600" />
+        </div>
+        <h2 className="text-xl font-semibold text-gray-900">Bir hata oluştu</h2>
+        <p className="text-gray-500 max-w-md">
+          Destek talepleri yüklenemedi. Lütfen tekrar deneyin.
+        </p>
+        <CanvaButton variant="outline" onClick={() => refetch()} leftIcon={<RefreshCw className="h-4 w-4" />}>
+          Tekrar Dene
+        </CanvaButton>
+      </div>
+    </div>
+  );
+
+  if (isLoading) return <LoadingSkeleton />;
+  if (error) return <ErrorState />;
+
   return (
     <div className="space-y-6">
       {/* Header */}
