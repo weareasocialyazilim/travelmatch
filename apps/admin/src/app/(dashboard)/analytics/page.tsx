@@ -36,15 +36,16 @@ import {
   Area,
   AreaChart,
 } from 'recharts';
-import { Button } from '@/components/ui/button';
+import { CanvaButton } from '@/components/canva/CanvaButton';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
@@ -163,10 +164,10 @@ export default function AnalyticsPage() {
               <SelectItem value="90d">Son 90 gün</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline">
+          <CanvaButton variant="outline">
             <Download className="mr-2 h-4 w-4" />
             Rapor İndir
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 

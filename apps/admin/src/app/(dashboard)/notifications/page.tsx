@@ -22,17 +22,18 @@ import {
   XCircle,
   TrendingUp,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
 import { Label } from '@/components/ui/label';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
@@ -248,10 +249,10 @@ export default function NotificationsPage() {
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <CanvaButton>
               <Plus className="mr-2 h-4 w-4" />
               Yeni Bildirim
-            </Button>
+            </CanvaButton>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
@@ -267,14 +268,14 @@ export default function NotificationsPage() {
                 <Label>Hazır Şablon</Label>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {mockTemplates.map((template) => (
-                    <Button
+                    <CanvaButton
                       key={template.id}
                       variant="outline"
                       size="sm"
                       onClick={() => applyTemplate(template)}
                     >
                       {template.name}
-                    </Button>
+                    </CanvaButton>
                   ))}
                 </div>
               </div>
@@ -283,7 +284,7 @@ export default function NotificationsPage() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="title">Başlık</Label>
-                  <Input
+                  <CanvaInput
                     id="title"
                     placeholder="Bildirim başlığı..."
                     value={notificationTitle}
@@ -372,11 +373,11 @@ export default function NotificationsPage() {
                   <div className="flex gap-4">
                     <div className="flex-1 space-y-2">
                       <Label>Tarih</Label>
-                      <Input type="date" />
+                      <CanvaInput type="date" />
                     </div>
                     <div className="flex-1 space-y-2">
                       <Label>Saat</Label>
-                      <Input type="time" />
+                      <CanvaInput type="time" />
                     </div>
                   </div>
                 )}
@@ -397,19 +398,19 @@ export default function NotificationsPage() {
             </div>
 
             <DialogFooter className="gap-2">
-              <Button variant="outline" onClick={handleSaveDraft}>
+              <CanvaButton variant="outline" onClick={handleSaveDraft}>
                 Taslak Kaydet
-              </Button>
+              </CanvaButton>
               {scheduleEnabled ? (
-                <Button onClick={handleSchedule}>
+                <CanvaButton onClick={handleSchedule}>
                   <Clock className="mr-2 h-4 w-4" />
                   Zamanla
-                </Button>
+                </CanvaButton>
               ) : (
-                <Button onClick={handleSend}>
+                <CanvaButton onClick={handleSend}>
                   <Send className="mr-2 h-4 w-4" />
                   Gönder
-                </Button>
+                </CanvaButton>
               )}
             </DialogFooter>
           </DialogContent>
@@ -490,10 +491,10 @@ export default function NotificationsPage() {
             <TabsTrigger value="drafts">Taslaklar</TabsTrigger>
           </TabsList>
           <div className="flex items-center gap-2">
-            <Input placeholder="Ara..." className="w-64" />
-            <Button variant="outline" size="icon">
+            <CanvaInput placeholder="Ara..." className="w-64" />
+            <CanvaButton variant="outline" size="icon">
               <Filter className="h-4 w-4" />
-            </Button>
+            </CanvaButton>
           </div>
         </div>
 
@@ -579,9 +580,9 @@ export default function NotificationsPage() {
                     )}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
+                        <CanvaButton variant="ghost" size="icon">
                           <MoreHorizontal className="h-4 w-4" />
-                        </Button>
+                        </CanvaButton>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem>
