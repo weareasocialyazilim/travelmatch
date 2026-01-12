@@ -38,6 +38,7 @@ export const CHART_COLORS = {
   purple: '#8B5CF6', // Purple - Additional
   destructive: '#EF4444', // Red - Negative values
   muted: '#94A3B8', // Slate - Muted data
+  amber: '#F59E0B', // Amber - Same as primary for compatibility
 };
 
 // Color array for multi-series charts
@@ -520,9 +521,9 @@ export function AdminPieChart({
           dataKey="value"
           label={
             showLabels
-              ? ({ name, percent }: { name: string; percent?: number }) =>
-                  `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
-              : false
+              ? ((({ name, percent }: { name: string; percent?: number }) =>
+                  `${name} ${((percent ?? 0) * 100).toFixed(0)}%`) as any)
+              : undefined
           }
         >
           {dataWithColors.map((entry, index) => (

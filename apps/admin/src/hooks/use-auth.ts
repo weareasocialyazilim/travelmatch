@@ -32,10 +32,11 @@ export function useAuth() {
 
         if (session?.user) {
           // Fetch admin user profile
-          const { data: adminUser } = await supabase
-            .from('admin_users')
+          const { data: adminUser } = await (
+            supabase.from('admin_users') as any
+          )
             .select('*')
-            .eq('email', session.user.email)
+            .eq('email', session.user.email || '')
             .eq('is_active', true)
             .single();
 
@@ -43,10 +44,9 @@ export function useAuth() {
             setUser(adminUser as AdminUser);
 
             // Update last login
-            await supabase
-              .from('admin_users')
+            await (supabase.from('admin_users') as any)
               .update({ last_login_at: new Date().toISOString() })
-              .eq('id', adminUser.id);
+              .eq('id', (adminUser as any).id);
           } else {
             // User exists in auth but not admin_users
             await supabase.auth.signOut();

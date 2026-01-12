@@ -15,6 +15,7 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
+import { CanvaButton } from '@/components/canva/CanvaButton';
 import Image from 'next/image';
 
 interface SetupData {
@@ -210,10 +211,11 @@ export default function TwoFactorSetupPage() {
                     <code className="flex-1 rounded-md bg-muted px-3 py-2 text-sm font-mono break-all">
                       {setupData.secret}
                     </code>
-                    <Button
+                    <CanvaButton
                       type="button"
-                      variant="outline"
-                      size="icon"
+                      variant="primary"
+                      size="sm"
+                      iconOnly
                       onClick={copySecret}
                     >
                       {copied ? (
@@ -221,12 +223,12 @@ export default function TwoFactorSetupPage() {
                       ) : (
                         <Copy className="h-4 w-4" />
                       )}
-                    </Button>
+                    </CanvaButton>
                   </div>
                 </div>
               </div>
 
-              <Button
+              <CanvaButton
                 onClick={() => {
                   setStep('verify');
                   setTimeout(() => inputRefs.current[0]?.focus(), 100);
@@ -234,7 +236,7 @@ export default function TwoFactorSetupPage() {
                 className="w-full"
               >
                 Devam Et
-              </Button>
+              </CanvaButton>
             </>
           )}
 
@@ -260,7 +262,11 @@ export default function TwoFactorSetupPage() {
                 ))}
               </div>
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <CanvaButton
+                type="submit"
+                className="w-full"
+                disabled={isLoading}
+              >
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -269,9 +275,9 @@ export default function TwoFactorSetupPage() {
                 ) : (
                   '2FA Aktifleştir'
                 )}
-              </Button>
+              </CanvaButton>
 
-              <Button
+              <CanvaButton
                 type="button"
                 variant="ghost"
                 className="w-full"
@@ -279,7 +285,7 @@ export default function TwoFactorSetupPage() {
                 disabled={isLoading}
               >
                 QR Kodu Tekrar Göster
-              </Button>
+              </CanvaButton>
             </form>
           )}
         </CardContent>

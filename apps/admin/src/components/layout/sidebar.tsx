@@ -65,13 +65,14 @@ import {
 } from '@/components/ui/tooltip';
 import { useUIStore } from '@/stores/ui-store';
 import { usePermission } from '@/hooks/use-permission';
+import type { Resource, Action } from '@/types/admin';
 
 interface NavItem {
   title: string;
   href: string;
   icon: React.ElementType;
   badge?: number;
-  resource?: string;
+  resource?: Resource;
 }
 
 // Navigation sections
@@ -272,6 +273,18 @@ const techNavItems: NavItem[] = [
 ];
 
 const settingsNavItems: NavItem[] = [
+  {
+    title: 'Admin Yönetimi',
+    href: '/admin-users',
+    icon: UserCog,
+    resource: 'admin_users',
+  },
+  {
+    title: 'Güvenlik',
+    href: '/security',
+    icon: Lock,
+    resource: 'admin_users',
+  },
   { title: 'Ekip', href: '/team', icon: UsersRound, resource: 'admin_users' },
   {
     title: 'Audit Trail',
@@ -505,10 +518,10 @@ const NavSection = memo(function NavSection({
   items: NavItem[];
   pathname: string;
   collapsed: boolean;
-  can: (resource: never, action: string) => boolean;
+  can: (resource: Resource, action: Action) => boolean;
 }) {
   const visibleItems = items.filter(
-    (item) => !item.resource || can(item.resource as never, 'view'),
+    (item) => !item.resource || can(item.resource, 'view'),
   );
 
   if (visibleItems.length === 0) return null;

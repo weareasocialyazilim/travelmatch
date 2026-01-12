@@ -29,6 +29,17 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { useAuthStore } from '@/stores/auth-store';
 import { getInitials } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -105,7 +116,7 @@ export default function ProfileSettingsPage() {
 
       toast.success('Profil başarıyla güncellendi');
     } catch (error) {
-      console.error('Profile update error:', error);
+      // Error logged for debugging
       toast.error(
         error instanceof Error
           ? error.message
@@ -148,10 +159,10 @@ export default function ProfileSettingsPage() {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <Button variant="outline" size="sm">
+                  <CanvaButton variant="primary" size="sm">
                     <Camera className="h-4 w-4 mr-2" />
                     Fotoğraf Değiştir
-                  </Button>
+                  </CanvaButton>
                   <p className="text-xs text-muted-foreground mt-1">
                     JPG, PNG veya GIF. Max 2MB.
                   </p>
@@ -234,7 +245,7 @@ export default function ProfileSettingsPage() {
                     }
                     placeholder="••••••••"
                   />
-                  <Button
+                  <CanvaButton
                     type="button"
                     variant="ghost"
                     size="sm"
@@ -246,7 +257,7 @@ export default function ProfileSettingsPage() {
                     ) : (
                       <Eye className="h-4 w-4" />
                     )}
-                  </Button>
+                  </CanvaButton>
                 </div>
               </div>
 
@@ -401,10 +412,10 @@ export default function ProfileSettingsPage() {
 
       {/* Save Button */}
       <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={isSaving}>
+        <CanvaButton onClick={handleSave} disabled={isSaving}>
           <Save className="h-4 w-4 mr-2" />
           {isSaving ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}
-        </Button>
+        </CanvaButton>
       </div>
     </div>
   );

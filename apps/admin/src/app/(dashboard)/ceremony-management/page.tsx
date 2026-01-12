@@ -14,6 +14,17 @@ import {
   CheckCircleIcon,
 } from '@heroicons/react/24/outline';
 import { PageHeader } from '@/components/common/page-header';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -139,9 +150,9 @@ export default function CeremonyManagementPage() {
             <ClockIcon className="w-4 h-4" />
             Bekleyen İncelemeler
             {mockPendingProofs.length > 0 && (
-              <Badge variant="secondary" className="ml-1">
+              <CanvaBadge variant="default" className="ml-1">
                 {mockPendingProofs.length}
-              </Badge>
+              </CanvaBadge>
             )}
           </TabsTrigger>
           <TabsTrigger value="history" className="gap-2">
@@ -186,15 +197,15 @@ export default function CeremonyManagementPage() {
                             {proof.momentTitle}
                           </p>
                         </div>
-                        <Badge
+                        <CanvaBadge
                           variant={
                             proof.aiAnalysis.confidence >= 0.7
-                              ? 'default'
-                              : 'destructive'
+                              ? 'primary'
+                              : 'error'
                           }
                         >
                           {(proof.aiAnalysis.confidence * 100).toFixed(0)}%
-                        </Badge>
+                        </CanvaBadge>
                       </div>
                       <div className="flex gap-2 mt-2">
                         {proof.aiAnalysis.flags.slice(0, 2).map((flag, i) => (

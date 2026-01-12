@@ -13,6 +13,17 @@ import {
   Loader2,
   AlertCircle,
 } from 'lucide-react';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -71,14 +82,14 @@ const statusConfig = {
   active: { label: 'Aktif', variant: 'success' as const },
   suspended: { label: 'Askıya Alındı', variant: 'warning' as const },
   banned: { label: 'Yasaklandı', variant: 'error' as const },
-  pending: { label: 'Beklemede', variant: 'secondary' as const },
+  pending: { label: 'Beklemede', variant: 'default' as const },
 };
 
 const kycStatusConfig: Record<
   string,
-  { label: string; variant: 'secondary' | 'warning' | 'success' | 'error' }
+  { label: string; variant: 'default' | 'warning' | 'success' | 'error' }
 > = {
-  not_started: { label: 'Başlamadı', variant: 'secondary' },
+  not_started: { label: 'Başlamadı', variant: 'default' },
   pending: { label: 'Bekliyor', variant: 'warning' },
   verified: { label: 'Doğrulandı', variant: 'success' },
   rejected: { label: 'Reddedildi', variant: 'error' },
@@ -205,16 +216,20 @@ export default function UsersPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={fetchUsers} disabled={loading}>
+          <CanvaButton
+            variant="primary"
+            onClick={fetchUsers}
+            disabled={loading}
+          >
             <RefreshCw
               className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`}
             />
             Yenile
-          </Button>
-          <Button>
+          </CanvaButton>
+          <CanvaButton>
             <Download className="mr-2 h-4 w-4" />
             Dışa Aktar
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
@@ -375,14 +390,14 @@ export default function UsersPage() {
                   <div className="text-sm text-muted-foreground truncate">
                     {user.email}
                   </div>
-                  <Badge variant={statusConfig[status].variant}>
+                  <CanvaBadge variant={statusConfig[status].variant}>
                     {statusConfig[status].label}
-                  </Badge>
-                  <Badge
-                    variant={kycStatusConfig[kycStatus]?.variant || 'secondary'}
+                  </CanvaBadge>
+                  <CanvaBadge
+                    variant={kycStatusConfig[kycStatus]?.variant || 'default'}
                   >
                     {kycStatusConfig[kycStatus]?.label || kycStatus}
-                  </Badge>
+                  </CanvaBadge>
                   <div className="text-sm font-medium">
                     {formatCurrency(user.balance || 0)}
                   </div>
@@ -392,9 +407,9 @@ export default function UsersPage() {
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
+                      <CanvaButton variant="ghost" size="sm" iconOnly>
                         <MoreHorizontal className="h-4 w-4" />
-                      </Button>
+                      </CanvaButton>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>İşlemler</DropdownMenuLabel>
@@ -439,22 +454,22 @@ export default function UsersPage() {
                 {total} kullanıcı
               </p>
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
+                <CanvaButton
+                  variant="primary"
                   size="sm"
                   onClick={() => setPage((p) => p - 1)}
                   disabled={page === 0}
                 >
                   Önceki
-                </Button>
-                <Button
-                  variant="outline"
+                </CanvaButton>
+                <CanvaButton
+                  variant="primary"
                   size="sm"
                   onClick={() => setPage((p) => p + 1)}
                   disabled={(page + 1) * limit >= total}
                 >
                   Sonraki
-                </Button>
+                </CanvaButton>
               </div>
             </div>
           )}

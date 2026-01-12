@@ -26,6 +26,17 @@ import {
   Loader2,
   AlertTriangle,
 } from 'lucide-react';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -138,22 +149,22 @@ export default function CampaignsPage() {
     const variants: Record<
       string,
       {
-        variant: 'default' | 'secondary' | 'outline' | 'destructive';
+        variant: 'primary' | 'default' | 'info' | 'error';
         label: string;
       }
     > = {
-      active: { variant: 'default', label: 'Aktif' },
-      scheduled: { variant: 'secondary', label: 'Zamanlandı' },
-      paused: { variant: 'outline', label: 'Duraklatıldı' },
-      completed: { variant: 'outline', label: 'Tamamlandı' },
-      draft: { variant: 'outline', label: 'Taslak' },
-      cancelled: { variant: 'destructive', label: 'İptal' },
+      active: { variant: 'primary', label: 'Aktif' },
+      scheduled: { variant: 'default', label: 'Zamanlandı' },
+      paused: { variant: 'info', label: 'Duraklatıldı' },
+      completed: { variant: 'info', label: 'Tamamlandı' },
+      draft: { variant: 'info', label: 'Taslak' },
+      cancelled: { variant: 'error', label: 'İptal' },
     };
     const { variant, label } = variants[status] || {
-      variant: 'outline',
+      variant: 'info',
       label: status,
     };
-    return <Badge variant={variant}>{label}</Badge>;
+    return <CanvaBadge variant={variant}>{label}</CanvaBadge>;
   };
 
   const getChannelIcon = (channel: string) => {
@@ -262,10 +273,10 @@ export default function CampaignsPage() {
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <CanvaButton>
               <Plus className="mr-2 h-4 w-4" />
               Yeni Kampanya
-            </Button>
+            </CanvaButton>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
@@ -347,10 +358,13 @@ export default function CampaignsPage() {
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
+              <CanvaButton
+                variant="primary"
+                onClick={() => setIsCreateOpen(false)}
+              >
                 İptal
-              </Button>
-              <Button
+              </CanvaButton>
+              <CanvaButton
                 onClick={handleCreateCampaign}
                 disabled={createCampaign.isPending}
               >
@@ -359,7 +373,7 @@ export default function CampaignsPage() {
                 )}
                 <ChevronRight className="mr-2 h-4 w-4" />
                 Oluştur
-              </Button>
+              </CanvaButton>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -494,9 +508,9 @@ export default function CampaignsPage() {
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold">{campaign.name}</h3>
                           {getStatusBadge(campaign.status)}
-                          <Badge variant="outline">
+                          <CanvaBadge variant="default">
                             {getCampaignTypeLabel(campaign.type)}
-                          </Badge>
+                          </CanvaBadge>
                         </div>
 
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -567,9 +581,9 @@ export default function CampaignsPage() {
                       {/* Actions */}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
+                          <CanvaButton variant="ghost" size="sm" iconOnly>
                             <MoreHorizontal className="h-4 w-4" />
-                          </Button>
+                          </CanvaButton>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem>

@@ -43,8 +43,8 @@ export async function GET(request: NextRequest) {
 
     const supabase = createServiceClient();
 
-    let query = supabase
-      .from('user_commission_settings')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let query = (supabase.from('user_commission_settings') as any)
       .select(
         `
         *,
@@ -157,8 +157,8 @@ export async function POST(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Check if user exists
-    const { data: existingUser } = await supabase
-      .from('users')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: existingUser } = await (supabase.from('users') as any)
       .select('id')
       .eq('id', userId)
       .single();
@@ -171,8 +171,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if already VIP
-    const { data: existingVIP } = await supabase
-      .from('user_commission_settings')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: existingVIP } = await (
+      supabase.from('user_commission_settings') as any
+    )
       .select('id')
       .eq('user_id', userId)
       .single();
@@ -185,7 +187,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Add VIP status using the admin function
-    const { data, error } = await supabase.rpc('admin_set_user_vip', {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any).rpc('admin_set_user_vip', {
       p_user_id: userId,
       p_tier: tier,
       p_commission_override: commission,

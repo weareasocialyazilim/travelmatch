@@ -57,6 +57,31 @@ import {
   CHART_COLORS,
 } from '@/components/common/admin-chart';
 import { cn } from '@/lib/utils';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
+
+// Base service type
+interface BaseService {
+  id: string;
+  name: string;
+  description: string;
+  status: string;
+  uptime: number;
+  latency: number;
+  requests_today: number;
+  errors_today: number;
+  lastCheck: string;
+  metrics: Record<string, unknown>;
+}
 
 // Integration Categories
 const integrations = {
@@ -355,27 +380,27 @@ export default function IntegrationsMonitorPage() {
     switch (status) {
       case 'healthy':
         return (
-          <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
+          <CanvaBadge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             Saglikli
-          </Badge>
+          </CanvaBadge>
         );
       case 'degraded':
         return (
-          <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/30 animate-pulse">
+          <CanvaBadge className="bg-amber-500/10 text-amber-600 border-amber-500/30 animate-pulse">
             <AlertTriangle className="h-3 w-3 mr-1" />
             Yavaslamis
-          </Badge>
+          </CanvaBadge>
         );
       case 'down':
         return (
-          <Badge className="bg-red-500/10 text-red-600 border-red-500/30 animate-pulse">
+          <CanvaBadge className="bg-red-500/10 text-red-600 border-red-500/30 animate-pulse">
             <XCircle className="h-3 w-3 mr-1" />
             Erisim Yok
-          </Badge>
+          </CanvaBadge>
         );
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <CanvaBadge variant="primary">{status}</CanvaBadge>;
     }
   };
 
@@ -395,16 +420,24 @@ export default function IntegrationsMonitorPage() {
 
   // Calculate overall stats
   const allServices = Object.values(integrations).flatMap(
-    (cat) => cat.services,
+    (cat) => cat.services as BaseService[],
   );
-  const healthyCount = allServices.filter((s) => s.status === 'healthy').length;
-  const degradedCount = allServices.filter(
-    (s) => s.status === 'degraded',
+  const healthyCount = allServices.filter(
+    (s: BaseService) => s.status === 'healthy',
   ).length;
-  const downCount = allServices.filter((s) => s.status === 'down').length;
+  const degradedCount = allServices.filter(
+    (s: BaseService) => s.status === 'degraded',
+  ).length;
+  const downCount = allServices.filter(
+    (s: BaseService) => s.status === 'down',
+  ).length;
   const avgUptime =
-    allServices.reduce((acc, s) => acc + s.uptime, 0) / allServices.length;
-  const totalErrors = allServices.reduce((acc, s) => acc + s.errors_today, 0);
+    allServices.reduce((acc: number, s: BaseService) => acc + s.uptime, 0) /
+    allServices.length;
+  const totalErrors = allServices.reduce(
+    (acc: number, s: BaseService) => acc + s.errors_today,
+    0,
+  );
 
   return (
     <div className="admin-content space-y-6">
@@ -423,8 +456,8 @@ export default function IntegrationsMonitorPage() {
           <span className="text-sm text-muted-foreground">
             Son guncelleme: {lastUpdate.toLocaleTimeString('tr-TR')}
           </span>
-          <Button
-            variant="outline"
+          <CanvaButton
+            variant="primary"
             size="sm"
             onClick={handleRefresh}
             disabled={isRefreshing}
@@ -433,7 +466,7 @@ export default function IntegrationsMonitorPage() {
               className={cn('h-4 w-4 mr-2', isRefreshing && 'animate-spin')}
             />
             Yenile
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
@@ -537,9 +570,9 @@ export default function IntegrationsMonitorPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <Badge variant="outline" className="text-amber-600">
+                    <CanvaBadge variant="primary" className="text-amber-600">
                       {incident.status}
-                    </Badge>
+                    </CanvaBadge>
                     <p className="text-xs text-muted-foreground mt-1">
                       Basladi: {incident.startedAt}
                     </p>
@@ -661,9 +694,13 @@ export default function IntegrationsMonitorPage() {
 
                       <div className="flex items-center justify-between text-xs text-muted-foreground pt-2">
                         <span>Son kontrol: {service.lastCheck}</span>
-                        <Button variant="ghost" size="sm" className="h-6 px-2">
+                        <CanvaButton
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2"
+                        >
                           <ExternalLink className="h-3 w-3" />
-                        </Button>
+                        </CanvaButton>
                       </div>
                     </CardContent>
                   </Card>
@@ -756,9 +793,9 @@ export default function IntegrationsMonitorPage() {
                           </div>
                         </div>
                       </div>
-                      <Badge
+                      <CanvaBadge
                         variant={
-                          incident.status === 'resolved' ? 'outline' : 'default'
+                          incident.status === 'resolved' ? 'info' : 'primary'
                         }
                         className={
                           incident.status === 'resolved'
@@ -769,7 +806,7 @@ export default function IntegrationsMonitorPage() {
                         {incident.status === 'resolved'
                           ? 'Cozuldu'
                           : 'Inceleniyor'}
-                      </Badge>
+                      </CanvaBadge>
                     </div>
                   </div>
                 ))}

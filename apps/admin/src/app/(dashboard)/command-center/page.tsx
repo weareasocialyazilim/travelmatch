@@ -66,6 +66,17 @@ import {
 } from '@/components/common/admin-chart';
 import { formatCurrency, cn } from '@/lib/utils';
 import { useStats } from '@/hooks/use-stats';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 
 // Executive KPI Data
 const executiveKPIs = {
@@ -378,8 +389,8 @@ export default function CommandCenterPage() {
           <span className="text-sm text-muted-foreground">
             Son guncelleme: {lastUpdate.toLocaleTimeString('tr-TR')}
           </span>
-          <Button
-            variant="outline"
+          <CanvaButton
+            variant="primary"
             size="sm"
             onClick={handleRefresh}
             disabled={isRefreshing}
@@ -388,7 +399,7 @@ export default function CommandCenterPage() {
               className={cn('h-4 w-4 mr-2', isRefreshing && 'animate-spin')}
             />
             Yenile
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
@@ -406,13 +417,13 @@ export default function CommandCenterPage() {
               </p>
             </div>
           </div>
-          <Button
-            variant="outline"
+          <CanvaButton
+            variant="primary"
             size="sm"
             className="border-amber-500/50 text-amber-600"
           >
             Incele
-          </Button>
+          </CanvaButton>
         </div>
       )}
 
@@ -690,9 +701,9 @@ export default function CommandCenterPage() {
                   <Activity className="h-5 w-5 text-primary animate-pulse" />
                   Canli Aktivite
                 </CardTitle>
-                <Badge variant="outline" className="text-xs">
+                <CanvaBadge variant="primary" className="text-xs">
                   CANLI
-                </Badge>
+                </CanvaBadge>
               </div>
             </CardHeader>
             <CardContent>
@@ -756,9 +767,9 @@ export default function CommandCenterPage() {
                       <span className="text-sm font-medium">
                         {insight.title}
                       </span>
-                      <Badge variant="outline" className="text-xs">
+                      <CanvaBadge variant="primary" className="text-xs">
                         %{insight.confidence} guven
-                      </Badge>
+                      </CanvaBadge>
                     </div>
                     <p className="text-xs text-muted-foreground">
                       {insight.message}
@@ -815,38 +826,38 @@ export default function CommandCenterPage() {
               <CardTitle>Hizli Islemler</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <Button
-                variant="outline"
+              <CanvaButton
+                variant="primary"
                 className="w-full justify-start"
                 size="sm"
               >
                 <Send className="h-4 w-4 mr-2" />
                 Kampanya Gonder
-              </Button>
-              <Button
-                variant="outline"
+              </CanvaButton>
+              <CanvaButton
+                variant="primary"
                 className="w-full justify-start"
                 size="sm"
               >
                 <Bell className="h-4 w-4 mr-2" />
                 Toplu Bildirim
-              </Button>
-              <Button
-                variant="outline"
+              </CanvaButton>
+              <CanvaButton
+                variant="primary"
                 className="w-full justify-start"
                 size="sm"
               >
                 <Eye className="h-4 w-4 mr-2" />
                 Rapor Olustur
-              </Button>
-              <Button
-                variant="outline"
+              </CanvaButton>
+              <CanvaButton
+                variant="primary"
                 className="w-full justify-start"
                 size="sm"
               >
                 <Shield className="h-4 w-4 mr-2" />
                 Guvenlik Taramasi
-              </Button>
+              </CanvaButton>
             </CardContent>
           </Card>
         </div>

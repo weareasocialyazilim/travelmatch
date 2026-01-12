@@ -35,8 +35,8 @@ export async function GET(request: NextRequest) {
 
     // Different queries based on type
     if (type === 'sar') {
-      let query = supabase
-        .from('suspicious_activity_reports')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let query = (supabase.from('suspicious_activity_reports') as any)
         .select(
           `
           *,
@@ -72,8 +72,8 @@ export async function GET(request: NextRequest) {
     }
 
     if (type === 'risk_profiles') {
-      let query = supabase
-        .from('user_risk_profiles')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let query = (supabase.from('user_risk_profiles') as any)
         .select(
           `
           *,
@@ -109,8 +109,10 @@ export async function GET(request: NextRequest) {
     }
 
     if (type === 'aml_thresholds') {
-      const { data: thresholds, error } = await supabase
-        .from('aml_thresholds')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: thresholds, error } = await (
+        supabase.from('aml_thresholds') as any
+      )
         .select('*')
         .order('currency', { ascending: true })
         .order('risk_score', { ascending: false });
@@ -127,8 +129,8 @@ export async function GET(request: NextRequest) {
     }
 
     if (type === 'fraud_rules') {
-      const { data: rules, error } = await supabase
-        .from('fraud_rules')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: rules, error } = await (supabase.from('fraud_rules') as any)
         .select('*')
         .order('rule_type', { ascending: true })
         .order('risk_score', { ascending: false });
@@ -181,8 +183,10 @@ export async function POST(request: NextRequest) {
         currency,
       } = data;
 
-      const { data: sar, error } = await supabase
-        .from('suspicious_activity_reports')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: sar, error } = await (
+        supabase.from('suspicious_activity_reports') as any
+      )
         .insert({
           user_id,
           report_type: report_type || 'sar',
@@ -221,7 +225,10 @@ export async function POST(request: NextRequest) {
     if (action === 'block_user') {
       const { user_id, block_reason } = data;
 
-      const { error } = await supabase.from('user_risk_profiles').upsert({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (
+        supabase.from('user_risk_profiles') as any
+      ).upsert({
         user_id,
         is_blocked: true,
         block_reason,
@@ -253,8 +260,8 @@ export async function POST(request: NextRequest) {
     if (action === 'unblock_user') {
       const { user_id } = data;
 
-      const { error } = await supabase
-        .from('user_risk_profiles')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.from('user_risk_profiles') as any)
         .update({
           is_blocked: false,
           block_reason: null,
@@ -316,8 +323,10 @@ export async function PATCH(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Get current state
-    const { data: currentSar } = await supabase
-      .from('suspicious_activity_reports')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: currentSar } = await (
+      supabase.from('suspicious_activity_reports') as any
+    )
       .select('*')
       .eq('id', id)
       .single();
@@ -344,8 +353,10 @@ export async function PATCH(request: NextRequest) {
       updateData.reported_to = reported_to;
     }
 
-    const { data: sar, error } = await supabase
-      .from('suspicious_activity_reports')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: sar, error } = await (
+      supabase.from('suspicious_activity_reports') as any
+    )
       .update(updateData)
       .eq('id', id)
       .select()

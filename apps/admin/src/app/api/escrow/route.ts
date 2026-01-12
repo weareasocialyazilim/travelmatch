@@ -22,8 +22,8 @@ export async function GET(request: NextRequest) {
 
     const supabase = createServiceClient();
 
-    let query = supabase
-      .from('escrow_transactions')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let query = (supabase.from('escrow_transactions') as any)
       .select(
         `
         *,
@@ -132,8 +132,10 @@ export async function POST(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Get current escrow transaction
-    const { data: escrow, error: fetchError } = await supabase
-      .from('escrow_transactions')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: escrow, error: fetchError } = await (
+      supabase.from('escrow_transactions') as any
+    )
       .select('*')
       .eq('id', escrow_id)
       .single();
@@ -188,8 +190,10 @@ export async function POST(request: NextRequest) {
         break;
     }
 
-    const { data: updated, error: updateError } = await supabase
-      .from('escrow_transactions')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: updated, error: updateError } = await (
+      supabase.from('escrow_transactions') as any
+    )
       .update(updates)
       .eq('id', escrow_id)
       .select()

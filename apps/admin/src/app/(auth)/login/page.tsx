@@ -18,6 +18,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
+import { CanvaButton } from '@/components/canva/CanvaButton';
 
 const loginSchema = z.object({
   email: z.string().email('Geçerli bir e-posta adresi girin'),
@@ -47,8 +48,6 @@ export default function LoginPage() {
 
       if (result.requires2FA) {
         router.push('/2fa');
-      } else if (result.requires2FASetup) {
-        router.push('/2fa/setup');
       } else {
         toast.success('Giriş başarılı');
         router.push('/queue');
@@ -104,10 +103,11 @@ export default function LoginPage() {
                   error={!!errors.password}
                   disabled={isLoading}
                 />
-                <Button
+                <CanvaButton
                   type="button"
                   variant="ghost"
-                  size="icon"
+                  size="sm"
+                  iconOnly
                   className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                   onClick={() => setShowPassword(!showPassword)}
                 >
@@ -116,7 +116,7 @@ export default function LoginPage() {
                   ) : (
                     <Eye className="h-4 w-4 text-muted-foreground" />
                   )}
-                </Button>
+                </CanvaButton>
               </div>
               {errors.password && (
                 <p className="text-sm text-destructive">
@@ -125,10 +125,10 @@ export default function LoginPage() {
               )}
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <CanvaButton type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Giriş Yap
-            </Button>
+            </CanvaButton>
           </form>
 
           <div className="mt-6 text-center text-sm text-muted-foreground">

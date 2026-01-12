@@ -29,6 +29,8 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import {
   Card,
   CardContent,
@@ -239,70 +241,101 @@ export default function UserDetailPage() {
   const [actionReason, setActionReason] = useState('');
 
   // Use real API data
-  const { data: userData, isLoading, error } = useUser(params.id as string);
+  const { data: apiResponse, isLoading, error } = useUser(params.id as string);
   const suspendUser = useSuspendUser();
   const banUser = useBanUser();
   const verifyUser = useVerifyUser();
 
   // Fallback to mock data while loading or if no data
-  const user = userData || mockUser;
+  // API returns { user: UserDetails } so we extract and merge with mockUser structure
+  const user = apiResponse?.user
+    ? {
+        ...mockUser,
+        id: apiResponse.user.id,
+        email: apiResponse.user.email || mockUser.email,
+        full_name: apiResponse.user.display_name || mockUser.full_name,
+        avatar_url: apiResponse.user.avatar_url || mockUser.avatar_url,
+        bio: apiResponse.user.bio || mockUser.bio,
+        created_at: apiResponse.user.created_at || mockUser.created_at,
+        last_active_at:
+          apiResponse.user.last_active_at || mockUser.last_active_at,
+        status: apiResponse.user.is_banned
+          ? 'banned'
+          : apiResponse.user.is_suspended
+            ? 'suspended'
+            : apiResponse.user.is_active
+              ? 'active'
+              : 'inactive',
+        verification: {
+          ...mockUser.verification,
+          kyc_status: apiResponse.user.is_verified ? 'verified' : 'pending',
+        },
+        stats: {
+          ...mockUser.stats,
+          total_moments:
+            apiResponse.user.stats?.moments ?? mockUser.stats.total_moments,
+          total_matches:
+            apiResponse.user.stats?.matches ?? mockUser.stats.total_matches,
+        },
+      }
+    : mockUser;
 
   const getStatusBadge = (status: string) => {
     const variants: Record<
       string,
       {
-        variant: 'default' | 'secondary' | 'destructive' | 'outline';
+        variant: 'primary' | 'default' | 'error' | 'info';
         label: string;
       }
     > = {
-      active: { variant: 'default', label: 'Aktif' },
-      suspended: { variant: 'secondary', label: 'Askıya Alındı' },
-      banned: { variant: 'destructive', label: 'Yasaklandı' },
-      inactive: { variant: 'outline', label: 'Pasif' },
+      active: { variant: 'primary', label: 'Aktif' },
+      suspended: { variant: 'default', label: 'Askıya Alındı' },
+      banned: { variant: 'error', label: 'Yasaklandı' },
+      inactive: { variant: 'info', label: 'Pasif' },
     };
     const { variant, label } = variants[status] || {
-      variant: 'outline',
+      variant: 'info',
       label: status,
     };
-    return <Badge variant={variant}>{label}</Badge>;
+    return <CanvaBadge variant={variant}>{label}</CanvaBadge>;
   };
 
   const getKycBadge = (status: string) => {
     const variants: Record<
       string,
       {
-        variant: 'default' | 'secondary' | 'destructive' | 'outline';
+        variant: 'primary' | 'default' | 'error' | 'info';
         label: string;
         icon: React.ReactNode;
       }
     > = {
       verified: {
-        variant: 'default',
+        variant: 'primary',
         label: 'Doğrulandı',
         icon: <CheckCircle className="h-3 w-3" />,
       },
       pending: {
-        variant: 'secondary',
+        variant: 'default',
         label: 'Bekliyor',
         icon: <Clock className="h-3 w-3" />,
       },
       rejected: {
-        variant: 'destructive',
+        variant: 'error',
         label: 'Reddedildi',
         icon: <XCircle className="h-3 w-3" />,
       },
-      not_submitted: { variant: 'outline', label: 'Gönderilmedi', icon: null },
+      not_submitted: { variant: 'info', label: 'Gönderilmedi', icon: null },
     };
     const { variant, label, icon } = variants[status] || {
-      variant: 'outline',
+      variant: 'info',
       label: status,
       icon: null,
     };
     return (
-      <Badge variant={variant} className="gap-1">
+      <CanvaBadge variant={variant} className="gap-1">
         {icon}
         {label}
-      </Badge>
+      </CanvaBadge>
     );
   };
 
@@ -310,10 +343,10 @@ export default function UserDetailPage() {
     const userId = params.id as string;
     try {
       if (action === 'suspend') {
-        await suspendUser.mutateAsync({ id: userId, reason: actionReason });
+        await suspendUser.mutateAsync(userId, actionReason);
         toast.success('Kullanıcı askıya alındı');
       } else if (action === 'ban') {
-        await banUser.mutateAsync({ id: userId, reason: actionReason });
+        await banUser.mutateAsync(userId, actionReason);
         toast.success('Kullanıcı yasaklandı');
       } else if (action === 'verify_kyc') {
         await verifyUser.mutateAsync(userId);
@@ -350,14 +383,14 @@ export default function UserDetailPage() {
           <p className="text-muted-foreground">
             Kullanıcı bilgileri yüklenemedi.
           </p>
-          <Button
-            variant="outline"
+          <CanvaButton
+            variant="primary"
             className="mt-4"
             onClick={() => router.back()}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Geri Dön
-          </Button>
+          </CanvaButton>
         </div>
       </div>
     );
@@ -378,9 +411,14 @@ export default function UserDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
+        <CanvaButton
+          variant="ghost"
+          size="sm"
+          iconOnly
+          onClick={() => router.back()}
+        >
           <ArrowLeft className="h-5 w-5" />
-        </Button>
+        </CanvaButton>
         <div className="flex-1">
           <h1 className="text-3xl font-bold tracking-tight">
             Kullanıcı Detayı
@@ -388,19 +426,19 @@ export default function UserDetailPage() {
           <p className="text-muted-foreground">ID: {params.id}</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
+          <CanvaButton variant="primary" size="sm">
             <Eye className="mr-2 h-4 w-4" />
             Profili Görüntüle
-          </Button>
-          <Button variant="outline" size="sm">
+          </CanvaButton>
+          <CanvaButton variant="primary" size="sm">
             <Send className="mr-2 h-4 w-4" />
             Mesaj Gönder
-          </Button>
+          </CanvaButton>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
+              <CanvaButton variant="primary" size="sm" iconOnly>
                 <MoreHorizontal className="h-4 w-4" />
-              </Button>
+              </CanvaButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setActionDialog('suspend')}>
@@ -450,12 +488,12 @@ export default function UserDetailPage() {
                 <div className="mt-2 flex items-center gap-2">
                   {getStatusBadge(user.status)}
                   {user.subscription.plan === 'premium' && (
-                    <Badge
-                      variant="secondary"
+                    <CanvaBadge
+                      variant="primary"
                       className="bg-amber-100 text-amber-800"
                     >
                       Premium
-                    </Badge>
+                    </CanvaBadge>
                   )}
                 </div>
                 <div className="mt-4 flex items-center gap-1 text-sm">
@@ -475,10 +513,10 @@ export default function UserDetailPage() {
                   <div className="flex-1">
                     <p className="text-sm">{user.email}</p>
                     {user.verification.email_verified && (
-                      <Badge variant="outline" className="mt-1 text-xs">
+                      <CanvaBadge variant="primary" className="mt-1 text-xs">
                         <CheckCircle className="mr-1 h-3 w-3 text-green-500" />
                         Doğrulandı
-                      </Badge>
+                      </CanvaBadge>
                     )}
                   </div>
                 </div>
@@ -488,10 +526,10 @@ export default function UserDetailPage() {
                   <div className="flex-1">
                     <p className="text-sm">{user.phone}</p>
                     {user.verification.phone_verified && (
-                      <Badge variant="outline" className="mt-1 text-xs">
+                      <CanvaBadge variant="primary" className="mt-1 text-xs">
                         <CheckCircle className="mr-1 h-3 w-3 text-green-500" />
                         Doğrulandı
-                      </Badge>
+                      </CanvaBadge>
                     )}
                   </div>
                 </div>
@@ -561,10 +599,10 @@ export default function UserDetailPage() {
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
                 {user.flags.map((flag) => (
-                  <Badge key={flag} variant="outline" className="text-xs">
+                  <CanvaBadge key={flag} variant="primary" className="text-xs">
                     {flag === 'high_spender' && 'Yüksek Harcama'}
                     {flag === 'verified_user' && 'Doğrulanmış'}
-                  </Badge>
+                  </CanvaBadge>
                 ))}
               </div>
             </CardContent>
@@ -578,14 +616,14 @@ export default function UserDetailPage() {
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Plan</span>
-                <Badge
-                  variant="secondary"
+                <CanvaBadge
+                  variant="primary"
                   className="bg-amber-100 text-amber-800"
                 >
                   {user.subscription.plan === 'premium'
                     ? 'Premium'
                     : 'Ücretsiz'}
-                </Badge>
+                </CanvaBadge>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Başlangıç</span>
@@ -597,11 +635,11 @@ export default function UserDetailPage() {
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Otomatik Yenileme</span>
-                <Badge
-                  variant={user.subscription.auto_renew ? 'default' : 'outline'}
+                <CanvaBadge
+                  variant={user.subscription.auto_renew ? 'primary' : 'info'}
                 >
                   {user.subscription.auto_renew ? 'Aktif' : 'Kapalı'}
-                </Badge>
+                </CanvaBadge>
               </div>
             </CardContent>
           </Card>
@@ -712,18 +750,16 @@ export default function UserDetailPage() {
                             {txn.amount > 0 ? '+' : ''}
                             {formatCurrency(txn.amount, txn.currency)}
                           </p>
-                          <Badge
+                          <CanvaBadge
                             variant={
-                              txn.status === 'completed'
-                                ? 'default'
-                                : 'secondary'
+                              txn.status === 'completed' ? 'primary' : 'default'
                             }
                             className="text-xs"
                           >
                             {txn.status === 'completed'
                               ? 'Tamamlandı'
                               : 'Bekliyor'}
-                          </Badge>
+                          </CanvaBadge>
                         </div>
                       </div>
                     ))}
@@ -743,9 +779,9 @@ export default function UserDetailPage() {
                         Kullanıcının paylaştığı içerikler
                       </CardDescription>
                     </div>
-                    <Badge variant="secondary">
+                    <CanvaBadge variant="primary">
                       {user.stats.total_moments} Moment
-                    </Badge>
+                    </CanvaBadge>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -759,13 +795,13 @@ export default function UserDetailPage() {
                               {formatDate(moment.created_at)}
                             </p>
                           </div>
-                          <Badge
+                          <CanvaBadge
                             variant={
                               moment.status === 'active'
-                                ? 'default'
+                                ? 'primary'
                                 : moment.status === 'pending_review'
-                                  ? 'secondary'
-                                  : 'destructive'
+                                  ? 'default'
+                                  : 'error'
                             }
                           >
                             {moment.status === 'active'
@@ -773,7 +809,7 @@ export default function UserDetailPage() {
                               : moment.status === 'pending_review'
                                 ? 'İncelemede'
                                 : moment.status}
-                          </Badge>
+                          </CanvaBadge>
                         </div>
                         <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
@@ -831,13 +867,13 @@ export default function UserDetailPage() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <Badge
+                          <CanvaBadge
                             variant={
                               report.status === 'resolved'
-                                ? 'default'
+                                ? 'primary'
                                 : report.status === 'dismissed'
-                                  ? 'secondary'
-                                  : 'destructive'
+                                  ? 'default'
+                                  : 'error'
                             }
                           >
                             {report.status === 'resolved'
@@ -845,7 +881,7 @@ export default function UserDetailPage() {
                               : report.status === 'dismissed'
                                 ? 'Reddedildi'
                                 : report.status}
-                          </Badge>
+                          </CanvaBadge>
                           <p className="mt-1 text-xs text-muted-foreground">
                             {report.type === 'received'
                               ? 'Alınan'
@@ -961,15 +997,18 @@ export default function UserDetailPage() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setActionDialog(null)}>
+            <CanvaButton
+              variant="primary"
+              onClick={() => setActionDialog(null)}
+            >
               İptal
-            </Button>
-            <Button
-              variant={actionDialog === 'ban' ? 'destructive' : 'default'}
+            </CanvaButton>
+            <CanvaButton
+              variant={actionDialog === 'ban' ? 'danger' : 'primary'}
               onClick={() => handleAction(actionDialog!)}
             >
               Onayla
-            </Button>
+            </CanvaButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>

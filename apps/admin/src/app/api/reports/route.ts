@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'Invalid filter parameters',
-          details: filterResult.error.errors,
+          details: filterResult.error.issues,
         },
         { status: 400 },
       );
@@ -72,8 +72,8 @@ export async function GET(request: NextRequest) {
 
     const { status, type, priority } = filterResult.data;
 
-    let query = supabase
-      .from('reports')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let query = (supabase.from('reports') as any)
       .select(
         `
         *,
@@ -132,15 +132,15 @@ export async function POST(request: NextRequest) {
     const parseResult = createReportSchema.safeParse(body);
     if (!parseResult.success) {
       return NextResponse.json(
-        { error: 'Invalid request body', details: parseResult.error.errors },
+        { error: 'Invalid request body', details: parseResult.error.issues },
         { status: 400 },
       );
     }
 
     const validatedData = parseResult.data;
 
-    const { data, error } = await supabase
-      .from('reports')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.from('reports') as any)
       .insert({
         reporter_id: validatedData.reporter_id,
         reported_id: validatedData.reported_id,
@@ -164,7 +164,9 @@ export async function POST(request: NextRequest) {
       data.id,
       null,
       data,
-      request.headers.get('x-forwarded-for') || request.ip || 'unknown',
+      request.headers.get('x-forwarded-for') ||
+        request.headers.get('x-real-ip') ||
+        'unknown',
       request.headers.get('user-agent') || 'unknown',
     );
 
