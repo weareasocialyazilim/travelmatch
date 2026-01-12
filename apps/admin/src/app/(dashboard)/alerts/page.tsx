@@ -63,6 +63,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 // Alert types and thresholds
 const alertRules = [
@@ -198,6 +199,21 @@ export default function AlertsPage() {
   const [activeTab, setActiveTab] = useState('active');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [alerts, setAlerts] = useState(activeAlerts);
+
+  const handleAcknowledge = (alertId: string) => {
+    setAlerts(prev => prev.map(alert =>
+      alert.id === alertId
+        ? { ...alert, status: 'acknowledged', acknowledgedBy: 'Admin' }
+        : alert
+    ));
+    toast.success('Alert onaylandı');
+  };
+
+  const handleResolve = (alertId: string) => {
+    setAlerts(prev => prev.filter(alert => alert.id !== alertId));
+    toast.success('Alert çözüldü ve kapatıldı');
+  };
 
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
@@ -249,10 +265,10 @@ export default function AlertsPage() {
     return date.toLocaleDateString('tr-TR');
   };
 
-  const criticalCount = activeAlerts.filter(
+  const criticalCount = alerts.filter(
     (a) => a.severity === 'critical',
   ).length;
-  const highCount = activeAlerts.filter((a) => a.severity === 'high').length;
+  const highCount = alerts.filter((a) => a.severity === 'high').length;
 
   return (
     <div className="space-y-6">
@@ -351,12 +367,12 @@ export default function AlertsPage() {
         />
         <CanvaStatCard
           label="Toplam Aktif"
-          value={activeAlerts.length}
+          value={alerts.length}
           icon={<Bell className="h-5 w-5 text-gray-400" />}
         />
         <CanvaStatCard
           label="Onaylandı"
-          value={activeAlerts.filter((a) => a.status === 'acknowledged').length}
+          value={alerts.filter((a) => a.status === 'acknowledged').length}
           icon={<CheckCircle2 className="h-5 w-5 text-green-500" />}
           className="border-l-4 border-l-green-500"
         />
@@ -398,7 +414,7 @@ export default function AlertsPage() {
         </div>
 
         <TabsContent value="active" className="space-y-3 mt-4">
-          {activeAlerts
+          {alerts
             .filter((a) => a.status === 'active')
             .sort((a, b) => {
               const order = { critical: 0, high: 1, medium: 2, low: 3 };
@@ -451,10 +467,10 @@ export default function AlertsPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <CanvaButton variant="outline" size="sm" leftIcon={<Eye className="h-4 w-4" />}>
+                      <CanvaButton variant="outline" size="sm" leftIcon={<Eye className="h-4 w-4" />} onClick={() => handleAcknowledge(alert.id)}>
                         Onayla
                       </CanvaButton>
-                      <CanvaButton variant="primary" size="sm" rightIcon={<ChevronRight className="h-4 w-4" />}>
+                      <CanvaButton variant="primary" size="sm" rightIcon={<ChevronRight className="h-4 w-4" />} onClick={() => handleResolve(alert.id)}>
                         Çöz
                       </CanvaButton>
                     </div>
@@ -465,7 +481,7 @@ export default function AlertsPage() {
         </TabsContent>
 
         <TabsContent value="acknowledged" className="space-y-3 mt-4">
-          {activeAlerts
+          {alerts
             .filter((a) => a.status === 'acknowledged')
             .map((alert) => (
               <CanvaCard
@@ -487,7 +503,7 @@ export default function AlertsPage() {
                         </p>
                       </div>
                     </div>
-                    <CanvaButton variant="primary" size="sm">
+                    <CanvaButton variant="primary" size="sm" onClick={() => handleResolve(alert.id)}>
                       Çöz
                     </CanvaButton>
                   </div>

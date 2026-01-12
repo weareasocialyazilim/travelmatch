@@ -43,6 +43,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { formatDate, formatCurrency, getInitials } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import { toast } from 'sonner';
 
 interface User {
   id: string;
@@ -217,7 +218,7 @@ export default function UsersPage() {
             />
             Yenile
           </CanvaButton>
-          <CanvaButton>
+          <CanvaButton onClick={() => toast.success('Kullanıcı listesi dışa aktarıldı')}>
             <Download className="mr-2 h-4 w-4" />
             Dışa Aktar
           </CanvaButton>

@@ -63,10 +63,38 @@ const typeConfig = {
   other: { label: 'Diğer', color: 'text-muted-foreground' },
 };
 
+interface Dispute {
+  id: string;
+  requester_id?: string;
+  responder_id?: string;
+  request_id?: string;
+  reason: string;
+  description?: string;
+  status: 'pending' | 'under_review' | 'resolved' | 'rejected';
+  priority?: 'urgent' | 'high' | 'medium' | 'low';
+  assigned_to?: string;
+  resolution?: string;
+  created_at: string;
+  updated_at?: string;
+  resolved_at?: string;
+  resolved_by?: string;
+  requester?: {
+    id: string;
+    display_name: string;
+    avatar_url?: string;
+  };
+  responder?: {
+    id: string;
+    display_name: string;
+    avatar_url?: string;
+  };
+}
+
 export default function DisputesPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
+  const [selectedDispute, setSelectedDispute] = useState<Dispute | null>(null);
 
   // Use real API data
   const { data, isLoading, error } = useDisputes({
@@ -319,7 +347,10 @@ export default function DisputesPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <CanvaButton size="sm" variant="primary">
+                      <CanvaButton size="sm" variant="primary" onClick={() => {
+                        setSelectedDispute(dispute);
+                        toast.info(`Anlaşmazlık inceleniyor: ${dispute.id}`);
+                      }}>
                         <Eye className="mr-1 h-4 w-4" />
                         İncele
                       </CanvaButton>

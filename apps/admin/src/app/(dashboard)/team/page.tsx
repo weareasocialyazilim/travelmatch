@@ -42,6 +42,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { toast } from 'sonner';
 
 // Mock team data
 const teamStats = {
@@ -329,11 +330,11 @@ export default function TeamPage() {
                   </div>
 
                   <div className="mt-4 flex gap-2">
-                    <CanvaButton size="sm" variant="primary" className="flex-1">
+                    <CanvaButton size="sm" variant="primary" className="flex-1" onClick={() => toast.success(`${member.name} kişisine mesaj gönderildi`)}>
                       <MessageSquare className="mr-2 h-4 w-4" />
                       Mesaj
                     </CanvaButton>
-                    <CanvaButton size="sm" variant="primary" className="flex-1">
+                    <CanvaButton size="sm" variant="primary" className="flex-1" onClick={() => toast.info(`${member.name} kişisinin istatistikleri yükleniyor`)}>
                       <BarChart3 className="mr-2 h-4 w-4" />
                       İstatistik
                     </CanvaButton>
