@@ -24,7 +24,7 @@ interface CursorState {
 }
 
 export function CustomCursor() {
-  const [mounted, setMounted] = useState(false);
+  const mounted = true;
   const [state, setState] = useState<CursorState>({
     isHovering: false,
     isClicking: false,
@@ -88,8 +88,13 @@ export function CustomCursor() {
       const target = e.target as HTMLElement;
 
       // Check for specific cursor variants
-      const cursorVariant = target.closest('[data-cursor]')?.getAttribute('data-cursor') as CursorState['cursorVariant'] | null;
-      const cursorText = target.closest('[data-cursor-text]')?.getAttribute('data-cursor-text') || '';
+      const cursorVariant = target
+        .closest('[data-cursor]')
+        ?.getAttribute('data-cursor') as CursorState['cursorVariant'] | null;
+      const cursorText =
+        target
+          .closest('[data-cursor-text]')
+          ?.getAttribute('data-cursor-text') || '';
 
       if (cursorVariant) {
         setState((prev) => ({
@@ -158,7 +163,11 @@ export function CustomCursor() {
     document.addEventListener('mouseover', handleElementHover);
     document.addEventListener('mouseout', (e) => {
       const relatedTarget = e.relatedTarget as HTMLElement | null;
-      if (!relatedTarget?.closest('a, button, [role="button"], input, textarea, select, [data-cursor], [data-magnetic]')) {
+      if (
+        !relatedTarget?.closest(
+          'a, button, [role="button"], input, textarea, select, [data-cursor], [data-magnetic]',
+        )
+      ) {
         handleElementLeave();
       }
     });
@@ -171,14 +180,16 @@ export function CustomCursor() {
       document.removeEventListener('mouseup', handleMouseUp);
       document.removeEventListener('mouseover', handleElementHover);
     };
-  }, [mounted, handleMouseMove, handleMouseEnter, handleMouseLeave, handleMouseDown, handleMouseUp]);
+  }, [
+    mounted,
+    handleMouseMove,
+    handleMouseEnter,
+    handleMouseLeave,
+    handleMouseDown,
+    handleMouseUp,
+  ]);
 
-  // Check for touch device on mount
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Don't render on mobile or before mount
+  // Don't render on mobile
   if (!mounted) return null;
 
   if (
@@ -238,7 +249,11 @@ export function CustomCursor() {
         }}
         animate={{
           scale: state.isClicking ? 0.9 : 1,
-          opacity: state.isHidden ? 0 : state.cursorVariant === 'text' ? 0 : 0.5,
+          opacity: state.isHidden
+            ? 0
+            : state.cursorVariant === 'text'
+              ? 0
+              : 0.5,
         }}
         transition={{ duration: 0.2 }}
       >

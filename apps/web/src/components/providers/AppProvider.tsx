@@ -23,11 +23,7 @@ interface AppProviderProps {
 
 export function AppProvider({ children }: AppProviderProps) {
   const [isLoading, setIsLoading] = useState(true);
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const isMounted = true;
 
   // Prevent scroll during loading
   useEffect(() => {
