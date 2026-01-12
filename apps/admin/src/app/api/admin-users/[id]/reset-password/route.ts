@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getClient } from '@/lib/supabase';
-import { getCurrentAdmin, createAuditLog } from '@/lib/auth';
+import { getAdminSession, createAuditLog } from '@/lib/auth';
 import { logger } from '@/lib/logger';
-import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+
+// Simple password hashing using Node.js crypto
+async function hashPassword(password: string): Promise<string> {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const hash = crypto
+    .pbkdf2Sync(password, salt, 100000, 64, 'sha512')
+    .toString('hex');
+  return `${salt}:${hash}`;
+}
 
 /**
  * POST /api/admin-users/[id]/reset-password
@@ -14,13 +22,10 @@ export async function POST(
   { params }: { params: { id: string } },
 ) {
   try {
-    const admin = await getCurrentAdmin(request);
+    const admin = await getAdminSession();
 
     if (!admin) {
-      return NextResponse.json(
-        { error: 'Yetkisiz erişim' },
-        { status: 401 },
-      );
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
     }
 
     // Sadece super_admin şifre sıfırlayabilir
@@ -37,8 +42,9 @@ export async function POST(
 
     // Hedef admini kontrol et
     const supabase = getClient();
-    const { data: targetAdmin, error: fetchError } = await supabase
-      .from('admin_users')
+    const { data: targetAdmin, error: fetchError } = await (
+      supabase.from('admin_users') as any
+    )
       .select('id, email, name')
       .eq('id', id)
       .single();
@@ -51,7 +57,7 @@ export async function POST(
     }
 
     // Kendini sıfırlayamaz (güvenlik için)
-    if (targetAdmin.id === admin.id) {
+    if ((targetAdmin as any).id === admin.id) {
       return NextResponse.json(
         { error: 'Kendi şifrenizi ayarlar sayfasından değiştirin' },
         { status: 400 },
@@ -60,11 +66,10 @@ export async function POST(
 
     // Şifre oluştur veya kullan
     const password = new_password || generateSecurePassword();
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const hashedPassword = await hashPassword(password);
 
     // Şifreyi güncelle ve force_password_change flag'ini set et
-    const { error: updateError } = await supabase
-      .from('admin_users')
+    const { error: updateError } = await (supabase.from('admin_users') as any)
       .update({
         password_hash: hashedPassword,
         force_password_change: true,
@@ -73,7 +78,10 @@ export async function POST(
       .eq('id', id);
 
     if (updateError) {
-      logger.error('Failed to reset password', { error: updateError, adminId: id });
+      logger.error('Failed to reset password', {
+        error: updateError,
+        adminId: id,
+      });
       return NextResponse.json(
         { error: 'Şifre sıfırlanamadı' },
         { status: 500 },
@@ -81,21 +89,16 @@ export async function POST(
     }
 
     // Audit log
-    await createAuditLog(
-      admin.id,
-      'admin.password_reset',
-      'admin_user',
-      id,
-      null,
-      { reset_by: admin.email, target: targetAdmin.email },
-      request,
-    );
+    await createAuditLog(admin.id, 'admin.password_reset', {
+      reset_by: admin.email,
+      target: (targetAdmin as any).email,
+    });
 
     // E-posta gönder (opsiyonel)
     if (send_email) {
       // TODO: E-posta servisi entegrasyonu
       logger.info('Password reset email would be sent', {
-        to: targetAdmin.email,
+        to: (targetAdmin as any).email,
         from: admin.email,
       });
     }
@@ -108,17 +111,15 @@ export async function POST(
     });
   } catch (error) {
     logger.error('Password reset error', { error });
-    return NextResponse.json(
-      { error: 'Sunucu hatası' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Sunucu hatası' }, { status: 500 });
   }
 }
 
 // Güvenli rastgele şifre oluştur
 function generateSecurePassword(): string {
   const length = 16;
-  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+  const charset =
+    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
   let password = '';
 
   // Crypto ile güvenli rastgele
@@ -140,5 +141,8 @@ function generateSecurePassword(): string {
   password += special[crypto.randomInt(special.length)];
 
   // Karıştır
-  return password.split('').sort(() => Math.random() - 0.5).join('');
+  return password
+    .split('')
+    .sort(() => Math.random() - 0.5)
+    .join('');
 }

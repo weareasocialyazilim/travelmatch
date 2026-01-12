@@ -48,8 +48,6 @@ export default function LoginPage() {
 
       if (result.requires2FA) {
         router.push('/2fa');
-      } else if (result.requires2FASetup) {
-        router.push('/2fa/setup');
       } else {
         toast.success('Giriş başarılı');
         router.push('/queue');

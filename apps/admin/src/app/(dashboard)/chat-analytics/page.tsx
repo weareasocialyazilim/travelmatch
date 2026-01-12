@@ -668,7 +668,7 @@ export default function ChatAnalyticsPage() {
                       <div className="text-right">
                         <CanvaBadge
                           variant={
-                            msg.status === 'actioned' ? 'outline' : 'primary'
+                            msg.status === 'actioned' ? 'info' : 'primary'
                           }
                         >
                           {msg.status === 'pending' && 'Bekliyor'}

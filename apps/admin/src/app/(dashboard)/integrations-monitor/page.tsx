@@ -69,6 +69,20 @@ import {
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 
+// Base service type
+interface BaseService {
+  id: string;
+  name: string;
+  description: string;
+  status: string;
+  uptime: number;
+  latency: number;
+  requests_today: number;
+  errors_today: number;
+  lastCheck: string;
+  metrics: Record<string, unknown>;
+}
+
 // Integration Categories
 const integrations = {
   payment: {
@@ -406,16 +420,24 @@ export default function IntegrationsMonitorPage() {
 
   // Calculate overall stats
   const allServices = Object.values(integrations).flatMap(
-    (cat) => cat.services,
+    (cat) => cat.services as BaseService[],
   );
-  const healthyCount = allServices.filter((s) => s.status === 'healthy').length;
-  const degradedCount = allServices.filter(
-    (s) => s.status === 'degraded',
+  const healthyCount = allServices.filter(
+    (s: BaseService) => s.status === 'healthy',
   ).length;
-  const downCount = allServices.filter((s) => s.status === 'down').length;
+  const degradedCount = allServices.filter(
+    (s: BaseService) => s.status === 'degraded',
+  ).length;
+  const downCount = allServices.filter(
+    (s: BaseService) => s.status === 'down',
+  ).length;
   const avgUptime =
-    allServices.reduce((acc, s) => acc + s.uptime, 0) / allServices.length;
-  const totalErrors = allServices.reduce((acc, s) => acc + s.errors_today, 0);
+    allServices.reduce((acc: number, s: BaseService) => acc + s.uptime, 0) /
+    allServices.length;
+  const totalErrors = allServices.reduce(
+    (acc: number, s: BaseService) => acc + s.errors_today,
+    0,
+  );
 
   return (
     <div className="admin-content space-y-6">
@@ -773,7 +795,7 @@ export default function IntegrationsMonitorPage() {
                       </div>
                       <CanvaBadge
                         variant={
-                          incident.status === 'resolved' ? 'outline' : 'primary'
+                          incident.status === 'resolved' ? 'info' : 'primary'
                         }
                         className={
                           incident.status === 'resolved'

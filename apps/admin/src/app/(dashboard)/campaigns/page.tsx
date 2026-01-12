@@ -149,19 +149,19 @@ export default function CampaignsPage() {
     const variants: Record<
       string,
       {
-        variant: 'primary' | 'default' | 'outline' | 'error';
+        variant: 'primary' | 'default' | 'info' | 'error';
         label: string;
       }
     > = {
       active: { variant: 'primary', label: 'Aktif' },
       scheduled: { variant: 'default', label: 'Zamanlandı' },
-      paused: { variant: 'outline', label: 'Duraklatıldı' },
-      completed: { variant: 'outline', label: 'Tamamlandı' },
-      draft: { variant: 'outline', label: 'Taslak' },
+      paused: { variant: 'info', label: 'Duraklatıldı' },
+      completed: { variant: 'info', label: 'Tamamlandı' },
+      draft: { variant: 'info', label: 'Taslak' },
       cancelled: { variant: 'error', label: 'İptal' },
     };
     const { variant, label } = variants[status] || {
-      variant: 'outline',
+      variant: 'info',
       label: status,
     };
     return <CanvaBadge variant={variant}>{label}</CanvaBadge>;

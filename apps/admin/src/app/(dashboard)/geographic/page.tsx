@@ -518,8 +518,8 @@ export default function GeographicPage() {
                     <XAxis type="number" />
                     <YAxis dataKey="name" type="category" width={100} />
                     <Tooltip
-                      formatter={(value: number) => [
-                        value.toLocaleString('tr-TR'),
+                      formatter={(value: number | undefined) => [
+                        (value ?? 0).toLocaleString('tr-TR'),
                         'Kullanıcı',
                       ]}
                     />

@@ -198,16 +198,16 @@ export default function AICenterPage() {
     const variants: Record<
       string,
       {
-        variant: 'primary' | 'default' | 'error' | 'outline';
+        variant: 'primary' | 'default' | 'error' | 'info' | 'warning';
         label: string;
       }
     > = {
       critical: { variant: 'error', label: 'Kritik' },
-      warning: { variant: 'default', label: 'Uyarı' },
-      info: { variant: 'outline', label: 'Bilgi' },
+      warning: { variant: 'warning', label: 'Uyarı' },
+      info: { variant: 'info', label: 'Bilgi' },
     };
     const { variant, label } = variants[severity] || {
-      variant: 'outline',
+      variant: 'info',
       label: severity,
     };
     return <CanvaBadge variant={variant}>{label}</CanvaBadge>;
@@ -725,7 +725,7 @@ export default function AICenterPage() {
                                 ? 'primary'
                                 : exp.status === 'completed'
                                   ? 'default'
-                                  : 'outline'
+                                  : 'info'
                             }
                           >
                             {exp.status === 'running'
@@ -911,7 +911,12 @@ export default function AICenterPage() {
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={contentDistribution}
+                        data={
+                          contentDistribution as unknown as Record<
+                            string,
+                            unknown
+                          >[]
+                        }
                         cx="50%"
                         cy="50%"
                         innerRadius={60}

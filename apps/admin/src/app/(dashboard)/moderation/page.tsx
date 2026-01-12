@@ -205,7 +205,7 @@ export default function ModerationPage() {
     // Calculate severity breakdown
     const severityBreakdown = { critical: 0, high: 0, medium: 0, low: 0 };
     if (logsResult.data) {
-      logsResult.data.forEach((log) => {
+      (logsResult.data as Array<{ severity: string }>).forEach((log) => {
         const severity = log.severity as keyof typeof severityBreakdown;
         if (severity in severityBreakdown) {
           severityBreakdown[severity]++;
@@ -297,8 +297,7 @@ export default function ModerationPage() {
   }
 
   async function handleApproveAppeal(id: string) {
-    const { error } = await supabase
-      .from('blocked_content')
+    const { error } = await (supabase.from('blocked_content') as any)
       .update({
         appeal_status: 'approved',
         reviewed_at: new Date().toISOString(),
@@ -314,8 +313,7 @@ export default function ModerationPage() {
   }
 
   async function handleRejectAppeal(id: string) {
-    const { error } = await supabase
-      .from('blocked_content')
+    const { error } = await (supabase.from('blocked_content') as any)
       .update({
         appeal_status: 'rejected',
         reviewed_at: new Date().toISOString(),
@@ -333,7 +331,9 @@ export default function ModerationPage() {
   async function handleAddWord() {
     if (!newWord.word.trim()) return;
 
-    const { error } = await supabase.from('moderation_dictionary').insert({
+    const { error } = await (
+      supabase.from('moderation_dictionary') as any
+    ).insert({
       word: newWord.word.toLowerCase().trim(),
       severity: newWord.severity,
       category: newWord.category,
@@ -352,8 +352,7 @@ export default function ModerationPage() {
   }
 
   async function handleToggleWord(id: string, isActive: boolean) {
-    const { error } = await supabase
-      .from('moderation_dictionary')
+    const { error } = await (supabase.from('moderation_dictionary') as any)
       .update({ is_active: !isActive })
       .eq('id', id);
 
