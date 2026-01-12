@@ -1,36 +1,109 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TravelMatch Web App - Award-Winning Landing Experience
 
-## Getting Started
+> This application was completely redesigned in January 2026 with "Site of the Year" vision.
+> Legacy travel/passport architecture has been removed under "Zero-Legacy" cleanup policy.
+
+## 🏆 What's Here Now
+
+This is a premium Next.js app showcasing the **Gifting Protocol** - where travel becomes ceremony.
+
+### Key Features
+
+- **Editorial Scrollytelling** - SectionWrapper with silky blur + scale transitions
+- **Live Activity Pulse** - Real-time social feed simulation (GenZ aesthetic)
+- **Theme Switching** - CelestialToggle for dark/light mode experiences
+- **3D Atmosphere** - SacredAtmosphere particle system (desktop-only, mobile-optimized)
+- **Sacred Moments** - Bento grid showcase with kinetic animations
+- **Neural Match Simulator** - ML-powered matching demo
+- **Identity Pulse** - Futuristic verification card
+
+### Architecture
+
+```
+src/
+├── app/
+│   ├── page.tsx          # Main landing (section-based reveal)
+│   ├── layout.tsx        # Root layout with font optimization
+│   └── globals.css       # Soft-Future color palette + light mode
+├── components/
+│   ├── landing/          # Active landing components (no orphans)
+│   ├── 3d/              # Three.js particle systems
+│   ├── ui/              # SectionWrapper, CelestialToggle, etc.
+│   ├── layout/          # Navbar, Footer
+│   └── shared/          # Shared utilities
+└── hooks/
+    └── useSoundEffect   # Interactive sound effects
+```
+
+### Design System
+
+**Dark Mode (Default)**
+- Primary: #facc15 (Warm Golden)
+- Secondary: #ff6b6b (Sunset Red)
+- Background: #08080a (Soft Dark)
+
+**Light Mode**
+- Primary: #8b5cf6 (Noble Purple)
+- Secondary: #f59e0b (Warm Amber)
+- Background: #f5f5f7 (Editorial Soft)
+
+## 🚀 Getting Started
 
 First, run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm dev --filter @travelmatch/web
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to see the landing.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🧹 Zero-Legacy Cleanup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Removed in January 2026:
+- ❌ Legacy landing components (CTA, Features, HowItWorks, etc.)
+- ❌ Boilerplate SVG icons (file, globe, next, window, vercel)
+- ❌ Unused export clutter in components/landing/index.ts
 
-## Learn More
+Active components only (Champions League roster):
+- ✅ Hero, TrustRing, MatchSimulator
+- ✅ IdentityPulse, SacredMoments, RitualSection
+- ✅ CinematicReveal, LiveHeartbeat, ActivityPulse
+- ✅ Manifesto
 
-To learn more about Next.js, take a look at the following resources:
+## 📱 Optimization Details
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Font Loading**: Next.js local fonts (Inter, Space Grotesk) - no external requests
+- **Mobile 3D**: SacredAtmosphere disabled on mobile (<768px) for performance
+- **Image Optimization**: WebP/Avif conversion configured in next.config
+- **CSS Variables**: Light/dark mode via `data-theme` attribute
+- **Smooth Transitions**: Framer Motion scroll-driven animations
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🎯 Performance Notes
 
-## Deploy on Vercel
+- Lighthouse targets: SEO 100, Accessibility 100
+- Mobile Check: No jank on SacredMoments card swipes
+- "Satisfying" Test: Click sounds + fluid cursor animations active
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📚 Tech Stack
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Framework**: Next.js 16 + TypeScript
+- **Animations**: Framer Motion + React Three Fiber
+- **Styling**: Tailwind CSS v4
+- **3D**: Three.js with particle systems
+- **Icons**: Lucide React
+- **Real-time**: Supabase integration
+
+## 🚢 Deployment
+
+Production build:
+```bash
+pnpm --filter @travelmatch/web build
+```
+
+Ready for Vercel, Netlify, or any Node.js hosting.
+
+---
+
+**Redesigned by**: AI + Human Vision (January 2026)  
+**Philosophy**: "No Passports, Just Rituals"
+
