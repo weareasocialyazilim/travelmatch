@@ -5,7 +5,7 @@
  * "Cinematic Travel + Trust Jewelry" Design
  */
 
-import { useRef, useEffect, useCallback, memo } from 'react';
+import { useRef, useEffect, useCallback, memo, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -19,6 +19,7 @@ import {
   MessageSquare,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   ListTodo,
   Bell,
   Megaphone,
@@ -400,6 +401,7 @@ export function Sidebar() {
           pathname={pathname}
           collapsed={sidebarCollapsed}
           can={can}
+          defaultExpanded={true}
         />
         <NavSection
           title="Yonetim"
@@ -407,6 +409,7 @@ export function Sidebar() {
           pathname={pathname}
           collapsed={sidebarCollapsed}
           can={can}
+          defaultExpanded={true}
         />
         <NavSection
           title="Operasyon"
@@ -414,6 +417,7 @@ export function Sidebar() {
           pathname={pathname}
           collapsed={sidebarCollapsed}
           can={can}
+          defaultExpanded={false}
         />
         <NavSection
           title="Analitik"
@@ -421,6 +425,7 @@ export function Sidebar() {
           pathname={pathname}
           collapsed={sidebarCollapsed}
           can={can}
+          defaultExpanded={false}
         />
         <NavSection
           title="Buyume"
@@ -428,6 +433,7 @@ export function Sidebar() {
           pathname={pathname}
           collapsed={sidebarCollapsed}
           can={can}
+          defaultExpanded={false}
         />
         <NavSection
           title="Teknoloji"
@@ -435,6 +441,7 @@ export function Sidebar() {
           pathname={pathname}
           collapsed={sidebarCollapsed}
           can={can}
+          defaultExpanded={false}
         />
         <NavSection
           title="Sistem"
@@ -442,6 +449,7 @@ export function Sidebar() {
           pathname={pathname}
           collapsed={sidebarCollapsed}
           can={can}
+          defaultExpanded={false}
         />
       </nav>
     </aside>
@@ -506,30 +514,65 @@ const NavLink = memo(function NavLink({
   );
 });
 
-// Memoized NavSection component
+// Memoized NavSection component with collapsible feature
 const NavSection = memo(function NavSection({
   title,
   items,
   pathname,
   collapsed,
   can,
+  defaultExpanded = true,
 }: {
   title: string;
   items: NavItem[];
   pathname: string;
   collapsed: boolean;
   can: (resource: Resource, action: Action) => boolean;
+  defaultExpanded?: boolean;
 }) {
   const visibleItems = items.filter(
     (item) => !item.resource || can(item.resource, 'view'),
   );
 
+  // Auto-expand if any item in this section is active
+  const hasActiveItem = visibleItems.some(
+    (item) => pathname === item.href || pathname.startsWith(item.href + '/'),
+  );
+
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded || hasActiveItem);
+
+  // Auto-expand when navigating to an item in this section
+  useEffect(() => {
+    if (hasActiveItem && !isExpanded) {
+      setIsExpanded(true);
+    }
+  }, [hasActiveItem, isExpanded]);
+
   if (visibleItems.length === 0) return null;
 
   return (
     <div className="admin-sidebar-section">
-      {!collapsed && <h4 className="admin-sidebar-section-title">{title}</h4>}
-      <div className="space-y-1">
+      {!collapsed && (
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="admin-sidebar-section-title w-full flex items-center justify-between pr-3 hover:text-foreground transition-colors cursor-pointer"
+        >
+          <span>{title}</span>
+          <ChevronDown
+            className={cn(
+              'h-3 w-3 transition-transform duration-200',
+              !isExpanded && '-rotate-90',
+            )}
+          />
+        </button>
+      )}
+      <div
+        className={cn(
+          'space-y-1 overflow-hidden transition-all duration-200',
+          !collapsed && !isExpanded && 'max-h-0 opacity-0',
+          (!collapsed && isExpanded) || collapsed ? 'max-h-[1000px] opacity-100' : '',
+        )}
+      >
         {visibleItems.map((item) => {
           const isActive =
             pathname === item.href || pathname.startsWith(item.href + '/');
