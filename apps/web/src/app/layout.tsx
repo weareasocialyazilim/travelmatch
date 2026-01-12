@@ -1,11 +1,12 @@
 /**
- * TravelMatch V2 Root Layout
- * Clean, modern, performant
+ * TravelMatch - Premium Root Layout
+ * Awwwards-Ready Foundation
  */
 
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { CustomCursor } from '@/components/ui/CustomCursor';
+import { Navbar } from '@/components/layout/Navbar';
 import { Atmosphere } from '@/components/3d/Atmosphere';
 
 // ============================================================================
@@ -13,7 +14,7 @@ import { Atmosphere } from '@/components/3d/Atmosphere';
 // ============================================================================
 
 export const viewport: Viewport = {
-  themeColor: '#000000',
+  themeColor: '#020202',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -26,20 +27,20 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: 'TravelMatch | Anı Hediye Et - Gerçek Bağlantılar Kur',
+    default: 'TravelMatch | Unlock Sacred Moments',
     template: '%s | TravelMatch',
   },
   description:
-    "Bir kahve gönder, gerçek hayatta tanış. TravelMatch ile anlamlı bağlantılar kur. Swipe'lamayı bırak, samimi ol.",
+    'Experience the world through gifting. No passports, just human connection. Send a gift, meet in real life.',
   keywords: [
-    'tanışma uygulaması',
-    'hediye gönder',
-    'gerçek buluşma',
-    'kahve ısmarla',
-    'dating app',
     'gift a moment',
     'real connections',
     'meet in real life',
+    'dating app',
+    'social gifting',
+    'experience sharing',
+    'tanışma uygulaması',
+    'hediye gönder',
   ],
   authors: [{ name: 'TravelMatch Inc.' }],
   creator: 'TravelMatch',
@@ -58,23 +59,23 @@ export const metadata: Metadata = {
     alternateLocale: ['tr_TR'],
     url: 'https://travelmatch.app',
     siteName: 'TravelMatch',
-    title: 'TravelMatch | Anı Hediye Et',
+    title: 'TravelMatch | Unlock Sacred Moments',
     description:
-      'Bir kahve gönder, gerçek hayatta tanış. Gerçek bağlantılar samimi jestlerle başlar.',
+      'Experience the world through gifting. No passports, just human connection.',
     images: [
       {
         url: '/og-image.svg',
         width: 1200,
         height: 630,
-        alt: 'TravelMatch - Anı Hediye Et',
+        alt: 'TravelMatch - Unlock Sacred Moments',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TravelMatch | Anı Hediye Et',
+    title: 'TravelMatch | Unlock Sacred Moments',
     description:
-      'Bir kahve gönder, gerçek hayatta tanış. Gerçek bağlantılar samimi jestlerle başlar.',
+      'Experience the world through gifting. No passports, just human connection.',
     images: ['/og-image.svg'],
     creator: '@travelmatch',
     site: '@travelmatch',
@@ -121,7 +122,7 @@ const jsonLd = {
         'https://tiktok.com/@travelmatchapp',
         'https://x.com/travelmatchapp',
       ],
-      description: 'Gerçek bağlantılar, samimi jestlerle başlar.',
+      description: 'Real connections start with genuine gestures.',
     },
     {
       '@type': 'MobileApplication',
@@ -130,17 +131,17 @@ const jsonLd = {
       operatingSystem: ['iOS', 'Android'],
       applicationCategory: 'SocialNetworkingApplication',
       description:
-        'Bir kahve gönder, gerçek hayatta tanış. Anlamlı bağlantılar kur.',
+        'Send a gift, meet in real life. Build meaningful connections.',
       offers: {
         '@type': 'Offer',
         price: '0',
         priceCurrency: 'USD',
       },
       featureList: [
-        'Hediye göndererek tanış',
-        'Yakınındaki kişileri keşfet',
-        'Güvenli buluşma',
-        'Deneyim asistanı',
+        'Gift-first matching',
+        'Discover people nearby',
+        'Safe meetups',
+        'Experience assistant',
       ],
     },
   ],
@@ -165,10 +166,6 @@ export default function RootLayout({
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Grotesk:wght@300;400;500;700&display=swap"
-          rel="stylesheet"
-        />
 
         {/* JSON-LD Structured Data */}
         <script
@@ -182,18 +179,20 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
       </head>
 
-      <body className="antialiased bg-black text-white selection:bg-[#ccff00] selection:text-black">
+      <body className="font-inter antialiased">
         {/* 3D Atmosphere Background */}
         <Atmosphere />
 
-        {/* Custom Cursor */}
+        {/* Custom Cursor (Desktop Only) */}
         <CustomCursor />
 
-        {/* Noise Overlay */}
-        <div className="noise-overlay" />
+        {/* Navigation */}
+        <Navbar />
 
         {/* Main Content */}
-        {children}
+        <main>{children}</main>
+
+        {/* Footer will be added per-page or as a shared component */}
       </body>
     </html>
   );
