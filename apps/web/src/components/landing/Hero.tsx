@@ -1,10 +1,19 @@
 'use client';
 
 import { Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { GiftOrbScene } from '@/components/3d/GiftOrb';
 import { MagneticButton, PremiumButton } from '@/components/ui/MagneticButton';
+
+// Prevent Canvas from rendering on server (SSR fix for Hydration mismatch)
+const Canvas = dynamic(
+  () => import('@react-three/fiber').then((mod) => mod.Canvas),
+  {
+    ssr: false,
+    loading: () => <div className="absolute inset-0 bg-background" />,
+  },
+);
 
 /**
  * Hero Section - "Unlock Sacred Moments"
@@ -21,7 +30,7 @@ const HERO_CONTENT = {
     badge: 'The Future of Human Connection',
     headline: ['Unlock', 'Sacred', 'Moments'],
     subheadline:
-      "Not just an app, a gifting revolution. No passports, just human stories and locked trust.",
+      'Not just an app, a gifting revolution. No passports, just human stories and locked trust.',
     cta: {
       primary: 'Join the Movement',
       secondary: 'How it Works',
@@ -170,8 +179,10 @@ export function Hero() {
                 transition={{ duration: 0.5, delay: 1 + index * 0.1 }}
                 className="text-center group"
               >
-                <div className="text-fluid-3xl font-clash font-black text-primary
-                                group-hover:text-glow transition-all duration-300">
+                <div
+                  className="text-fluid-3xl font-clash font-black text-primary
+                                group-hover:text-glow transition-all duration-300"
+                >
                   {stat.value}
                 </div>
                 <div className="text-fluid-xs text-muted uppercase tracking-wider mt-1">

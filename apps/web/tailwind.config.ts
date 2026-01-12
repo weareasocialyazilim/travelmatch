@@ -58,8 +58,8 @@ const config: Config = {
       },
 
       fontFamily: {
-        clash: ['var(--font-clash)', 'system-ui', 'sans-serif'],
-        inter: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        clash: ['Clash Display', 'system-ui', 'sans-serif'],
+        inter: ['Inter', 'system-ui', 'sans-serif'],
         syne: ['Syne', 'system-ui', 'sans-serif'],
         grotesk: ['Space Grotesk', 'system-ui', 'sans-serif'],
       },
@@ -89,15 +89,15 @@ const config: Config = {
 
       animation: {
         'pulse-slow': 'pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'float': 'float 3s ease-in-out infinite',
+        float: 'float 3s ease-in-out infinite',
         'float-delayed': 'float 3s ease-in-out infinite 1.5s',
-        'glow': 'glow 2s ease-in-out infinite',
-        'shimmer': 'shimmer 2s linear infinite',
+        glow: 'glow 2s ease-in-out infinite',
+        shimmer: 'shimmer 2s linear infinite',
         'gradient-shift': 'gradient-shift 8s ease infinite',
         'fade-in': 'fadeIn 0.6s ease-out forwards',
         'slide-up': 'slideUp 0.6s ease-out forwards',
         'scale-in': 'scaleIn 0.4s ease-out forwards',
-        'marquee': 'marquee 30s linear infinite',
+        marquee: 'marquee 30s linear infinite',
         'marquee-slow': 'marquee 60s linear infinite',
         'marquee-reverse': 'marquee-reverse 40s linear infinite',
       },
@@ -156,14 +156,17 @@ const config: Config = {
 
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-        'gradient-premium': 'linear-gradient(135deg, #00FF88 0%, #8B5CF6 50%, #FACC15 100%)',
+        'gradient-conic':
+          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        'gradient-premium':
+          'linear-gradient(135deg, #00FF88 0%, #8B5CF6 50%, #FACC15 100%)',
         'gradient-dark': 'linear-gradient(180deg, #020202 0%, #0a0a0a 100%)',
-        'noise': "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")",
+        noise:
+          "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")",
       },
 
       transitionTimingFunction: {
-        'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        smooth: 'cubic-bezier(0.4, 0, 0.2, 1)',
         'bounce-soft': 'cubic-bezier(0.34, 1.56, 0.64, 1)',
       },
 
