@@ -65,17 +65,6 @@ import {
   CHART_COLORS,
 } from '@/components/common/admin-chart';
 import { formatCurrency, cn } from '@/lib/utils';
-import { CanvaButton } from '@/components/canva/CanvaButton';
-import { CanvaInput } from '@/components/canva/CanvaInput';
-import {
-  CanvaCard,
-  CanvaCardHeader,
-  CanvaCardTitle,
-  CanvaCardSubtitle,
-  CanvaCardBody,
-  CanvaStatCard,
-} from '@/components/canva/CanvaCard';
-import { CanvaBadge } from '@/components/canva/CanvaBadge';
 
 // Chat Stats Overview
 const chatStats = {
@@ -230,18 +219,12 @@ export default function ChatAnalyticsPage() {
     switch (tier) {
       case 'tier_3':
         return (
-          <CanvaBadge className="bg-purple-500/10 text-purple-600">
-            Premium
-          </CanvaBadge>
+          <Badge className="bg-purple-500/10 text-purple-600">Premium</Badge>
         );
       case 'tier_2':
-        return (
-          <CanvaBadge className="bg-blue-500/10 text-blue-600">
-            Standard
-          </CanvaBadge>
-        );
+        return <Badge className="bg-blue-500/10 text-blue-600">Standard</Badge>;
       default:
-        return <CanvaBadge variant="default">Basic</CanvaBadge>;
+        return <Badge variant="outline">Basic</Badge>;
     }
   };
 
@@ -249,20 +232,20 @@ export default function ChatAnalyticsPage() {
     switch (status) {
       case 'active':
         return (
-          <CanvaBadge className="bg-emerald-500/10 text-emerald-600">
+          <Badge className="bg-emerald-500/10 text-emerald-600">
             <Activity className="h-3 w-3 mr-1" />
             Aktif
-          </CanvaBadge>
+          </Badge>
         );
       case 'idle':
         return (
-          <CanvaBadge className="bg-amber-500/10 text-amber-600">
+          <Badge className="bg-amber-500/10 text-amber-600">
             <Clock className="h-3 w-3 mr-1" />
             Beklemede
-          </CanvaBadge>
+          </Badge>
         );
       default:
-        return <CanvaBadge variant="default">{status}</CanvaBadge>;
+        return <Badge variant="outline">{status}</Badge>;
     }
   };
 
@@ -279,10 +262,10 @@ export default function ChatAnalyticsPage() {
             Mesajlasma sistemi metrikleri ve izleme
           </p>
         </div>
-        <CanvaButton size="sm">
+        <Button size="sm">
           <RefreshCw className="h-4 w-4 mr-2" />
           Yenile
-        </CanvaButton>
+        </Button>
       </div>
 
       {/* Key Metrics */}
@@ -396,12 +379,12 @@ export default function ChatAnalyticsPage() {
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-medium">{tier.tier}</h4>
                   {index === 0 ? (
-                    <CanvaBadge variant="default">
+                    <Badge variant="outline">
                       <Lock className="h-3 w-3 mr-1" />
                       Kilitli
-                    </CanvaBadge>
+                    </Badge>
                   ) : (
-                    <CanvaBadge
+                    <Badge
                       className={
                         index === 2
                           ? 'bg-purple-500/10 text-purple-600'
@@ -410,7 +393,7 @@ export default function ChatAnalyticsPage() {
                     >
                       <Unlock className="h-3 w-3 mr-1" />
                       Acilabilir
-                    </CanvaBadge>
+                    </Badge>
                   )}
                 </div>
                 <p className="text-sm text-muted-foreground mb-4">
@@ -641,10 +624,10 @@ export default function ChatAnalyticsPage() {
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="flex items-center gap-2 mb-2">
-                          <CanvaBadge variant="default" className="font-mono">
+                          <Badge variant="outline" className="font-mono">
                             {msg.id}
-                          </CanvaBadge>
-                          <CanvaBadge
+                          </Badge>
+                          <Badge
                             className={cn(
                               msg.reason === 'potential_spam' &&
                                 'bg-amber-500/10 text-amber-600',
@@ -655,7 +638,7 @@ export default function ChatAnalyticsPage() {
                             )}
                           >
                             {msg.reason.replace(/_/g, ' ')}
-                          </CanvaBadge>
+                          </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground mb-1">
                           <span className="font-medium">{msg.sender}</span> in{' '}
@@ -666,15 +649,15 @@ export default function ChatAnalyticsPage() {
                         </p>
                       </div>
                       <div className="text-right">
-                        <CanvaBadge
+                        <Badge
                           variant={
-                            msg.status === 'actioned' ? 'info' : 'primary'
+                            msg.status === 'actioned' ? 'outline' : 'default'
                           }
                         >
                           {msg.status === 'pending' && 'Bekliyor'}
                           {msg.status === 'reviewing' && 'Inceleniyor'}
                           {msg.status === 'actioned' && 'Islem Yapildi'}
-                        </CanvaBadge>
+                        </Badge>
                         <p className="text-xs text-muted-foreground mt-1">
                           {msg.flaggedAt}
                         </p>
@@ -682,16 +665,16 @@ export default function ChatAnalyticsPage() {
                     </div>
                     {msg.status !== 'actioned' && (
                       <div className="flex items-center gap-2 mt-3 pt-3 border-t">
-                        <CanvaButton size="sm" variant="primary">
+                        <Button size="sm" variant="outline">
                           <Eye className="h-3 w-3 mr-1" />
                           Incele
-                        </CanvaButton>
-                        <CanvaButton size="sm" variant="danger">
+                        </Button>
+                        <Button size="sm" variant="destructive">
                           Sil
-                        </CanvaButton>
-                        <CanvaButton size="sm" variant="primary">
+                        </Button>
+                        <Button size="sm" variant="outline">
                           Onayla
-                        </CanvaButton>
+                        </Button>
                       </div>
                     )}
                   </div>

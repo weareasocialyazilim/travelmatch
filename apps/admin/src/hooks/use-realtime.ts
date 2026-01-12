@@ -389,3 +389,300 @@ interface AuditLogEntry {
   created_at: string;
   [key: string]: unknown;
 }
+
+// ============================================
+// NEW: Extended Real-time Subscriptions
+// ============================================
+
+/**
+ * Hook for real-time new user registrations
+ */
+export function useRealtimeUsers(
+  onNewUser?: (user: RealtimeUser) => void,
+  onUserUpdate?: (user: RealtimeUser) => void,
+) {
+  return useRealtimeSubscription<RealtimeUser>({
+    table: 'users',
+    event: '*',
+    onInsert: (user) => {
+      onNewUser?.(user);
+      toast.success('Yeni kullanıcı kaydı', {
+        description: `${user.full_name || user.email}`,
+      });
+    },
+    onUpdate: ({ new: user }) => onUserUpdate?.(user),
+  });
+}
+
+interface RealtimeUser {
+  id: string;
+  email: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  kyc_status: string;
+  created_at: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Hook for real-time moment submissions (moderation queue)
+ */
+export function useRealtimeMoments(
+  onNewMoment?: (moment: RealtimeMoment) => void,
+  onMomentUpdate?: (moment: RealtimeMoment) => void,
+) {
+  return useRealtimeSubscription<RealtimeMoment>({
+    table: 'moments',
+    event: '*',
+    onInsert: (moment) => {
+      onNewMoment?.(moment);
+      if (moment.status === 'active') {
+        toast.info('Yeni moment yayınlandı', {
+          description: moment.title,
+        });
+      }
+    },
+    onUpdate: ({ new: moment }) => onMomentUpdate?.(moment),
+  });
+}
+
+interface RealtimeMoment {
+  id: string;
+  user_id: string;
+  title: string;
+  status: string;
+  category: string | null;
+  created_at: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Hook for real-time proof submissions (verification queue)
+ */
+export function useRealtimeProofs(
+  onNewProof?: (proof: RealtimeProof) => void,
+  onProofUpdate?: (proof: RealtimeProof) => void,
+) {
+  return useRealtimeSubscription<RealtimeProof>({
+    table: 'proofs',
+    event: '*',
+    onInsert: (proof) => {
+      onNewProof?.(proof);
+      toast.info('Yeni proof doğrulama bekliyor', {
+        description: `Proof #${proof.id.slice(0, 8)}`,
+      });
+    },
+    onUpdate: ({ new: proof }) => {
+      onProofUpdate?.(proof);
+      if (proof.status === 'verified') {
+        toast.success('Proof doğrulandı', {
+          description: `Proof #${proof.id.slice(0, 8)}`,
+        });
+      } else if (proof.status === 'rejected') {
+        toast.error('Proof reddedildi', {
+          description: `Proof #${proof.id.slice(0, 8)}`,
+        });
+      }
+    },
+  });
+}
+
+interface RealtimeProof {
+  id: string;
+  moment_id: string;
+  user_id: string;
+  type: string;
+  status: string;
+  ai_score: number | null;
+  created_at: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Hook for real-time KYC submissions
+ */
+export function useRealtimeKYC(
+  onNewKYC?: (kyc: RealtimeKYC) => void,
+  onKYCUpdate?: (kyc: RealtimeKYC) => void,
+) {
+  // KYC status changes are tracked in users table
+  return useRealtimeSubscription<RealtimeKYC>({
+    table: 'users',
+    event: 'UPDATE',
+    filter: 'kyc_status=neq.not_started',
+    onUpdate: ({ old: oldUser, new: newUser }) => {
+      // Only trigger when kyc_status changes
+      if (oldUser.kyc_status !== newUser.kyc_status) {
+        if (newUser.kyc_status === 'pending') {
+          onNewKYC?.(newUser);
+          toast.info('Yeni KYC başvurusu', {
+            description: newUser.full_name || newUser.email,
+          });
+        } else {
+          onKYCUpdate?.(newUser);
+        }
+      }
+    },
+  });
+}
+
+interface RealtimeKYC {
+  id: string;
+  email: string;
+  full_name: string | null;
+  kyc_status: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Hook for real-time transaction alerts (high-value)
+ */
+export function useRealtimeTransactions(options?: {
+  minAmount?: number;
+  onNewTransaction?: (tx: RealtimeTransaction) => void;
+  onTransactionUpdate?: (tx: RealtimeTransaction) => void;
+}) {
+  const minAmount = options?.minAmount ?? 1000; // Default 1000 TRY threshold
+
+  return useRealtimeSubscription<RealtimeTransaction>({
+    table: 'transactions',
+    event: '*',
+    onInsert: (tx) => {
+      if (tx.amount >= minAmount) {
+        options?.onNewTransaction?.(tx);
+        toast.warning('Yüksek tutarlı işlem', {
+          description: `${tx.amount} ${tx.currency} - ${tx.type}`,
+        });
+      }
+    },
+    onUpdate: ({ new: tx }) => {
+      if (tx.status === 'failed' || tx.status === 'refunded') {
+        options?.onTransactionUpdate?.(tx);
+        toast.error(
+          `İşlem ${tx.status === 'failed' ? 'başarısız' : 'iade edildi'}`,
+          {
+            description: `${tx.amount} ${tx.currency}`,
+          },
+        );
+      }
+    },
+  });
+}
+
+interface RealtimeTransaction {
+  id: string;
+  user_id: string;
+  amount: number;
+  currency: string;
+  type: string;
+  status: string;
+  created_at: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Hook for real-time reports/flags
+ */
+export function useRealtimeReports(
+  onNewReport?: (report: RealtimeReport) => void,
+) {
+  return useRealtimeSubscription<RealtimeReport>({
+    table: 'reports',
+    event: 'INSERT',
+    onInsert: (report) => {
+      onNewReport?.(report);
+      toast.warning('Yeni rapor/şikayet', {
+        description: `Sebep: ${report.reason}`,
+      });
+    },
+  });
+}
+
+interface RealtimeReport {
+  id: string;
+  reporter_id: string;
+  reported_user_id: string | null;
+  reported_moment_id: string | null;
+  reason: string;
+  status: string;
+  created_at: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Combined hook for Command Center real-time updates
+ */
+export function useCommandCenterRealtime() {
+  const [counters, setCounters] = useState({
+    newUsers: 0,
+    newMoments: 0,
+    pendingProofs: 0,
+    pendingKYC: 0,
+    activeDisputes: 0,
+    highValueTx: 0,
+  });
+
+  // Users
+  useRealtimeUsers(() =>
+    setCounters((prev) => ({ ...prev, newUsers: prev.newUsers + 1 })),
+  );
+
+  // Moments
+  useRealtimeMoments(() =>
+    setCounters((prev) => ({ ...prev, newMoments: prev.newMoments + 1 })),
+  );
+
+  // Proofs
+  useRealtimeProofs(
+    () =>
+      setCounters((prev) => ({
+        ...prev,
+        pendingProofs: prev.pendingProofs + 1,
+      })),
+    (proof) => {
+      if (proof.status !== 'pending') {
+        setCounters((prev) => ({
+          ...prev,
+          pendingProofs: Math.max(0, prev.pendingProofs - 1),
+        }));
+      }
+    },
+  );
+
+  // Disputes
+  useRealtimeDisputes(
+    () =>
+      setCounters((prev) => ({
+        ...prev,
+        activeDisputes: prev.activeDisputes + 1,
+      })),
+    (dispute) => {
+      if (dispute.status === 'resolved' || dispute.status === 'dismissed') {
+        setCounters((prev) => ({
+          ...prev,
+          activeDisputes: Math.max(0, prev.activeDisputes - 1),
+        }));
+      }
+    },
+  );
+
+  // High value transactions
+  useRealtimeTransactions({
+    minAmount: 5000,
+    onNewTransaction: () =>
+      setCounters((prev) => ({ ...prev, highValueTx: prev.highValueTx + 1 })),
+  });
+
+  const resetCounters = useCallback(() => {
+    setCounters({
+      newUsers: 0,
+      newMoments: 0,
+      pendingProofs: 0,
+      pendingKYC: 0,
+      activeDisputes: 0,
+      highValueTx: 0,
+    });
+  }, []);
+
+  return { counters, resetCounters };
+}

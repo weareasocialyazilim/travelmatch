@@ -65,17 +65,6 @@ import {
   CHART_COLORS,
 } from '@/components/common/admin-chart';
 import { formatCurrency, cn } from '@/lib/utils';
-import { CanvaButton } from '@/components/canva/CanvaButton';
-import { CanvaInput } from '@/components/canva/CanvaInput';
-import {
-  CanvaCard,
-  CanvaCardHeader,
-  CanvaCardTitle,
-  CanvaCardSubtitle,
-  CanvaCardBody,
-  CanvaStatCard,
-} from '@/components/canva/CanvaCard';
-import { CanvaBadge } from '@/components/canva/CanvaBadge';
 
 // Discovery Stats
 const discoveryStats = {
@@ -339,10 +328,10 @@ export default function DiscoveryAnalyticsPage() {
               <SelectItem value="90d">Son 90 Gun</SelectItem>
             </SelectContent>
           </Select>
-          <CanvaButton size="sm">
+          <Button size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             Yenile
-          </CanvaButton>
+          </Button>
         </div>
       </div>
 
@@ -686,7 +675,7 @@ export default function DiscoveryAnalyticsPage() {
                         {cat.matches}
                       </TableCell>
                       <TableCell>
-                        <CanvaBadge
+                        <Badge
                           className={cn(
                             cat.conversion >= 15
                               ? 'bg-emerald-500/10 text-emerald-600'
@@ -696,7 +685,7 @@ export default function DiscoveryAnalyticsPage() {
                           )}
                         >
                           %{cat.conversion}
-                        </CanvaBadge>
+                        </Badge>
                       </TableCell>
                       <TableCell>
                         {formatCurrency(cat.avgPrice, 'TRY')}
@@ -772,9 +761,7 @@ export default function DiscoveryAnalyticsPage() {
                       </TableCell>
                       <TableCell>{moment.host}</TableCell>
                       <TableCell>
-                        <CanvaBadge variant="default">
-                          {moment.category}
-                        </CanvaBadge>
+                        <Badge variant="outline">{moment.category}</Badge>
                       </TableCell>
                       <TableCell>
                         {moment.discoveries.toLocaleString()}
@@ -783,9 +770,9 @@ export default function DiscoveryAnalyticsPage() {
                         {moment.matches}
                       </TableCell>
                       <TableCell>
-                        <CanvaBadge className="bg-emerald-500/10 text-emerald-600">
+                        <Badge className="bg-emerald-500/10 text-emerald-600">
                           %{moment.conversion}
-                        </CanvaBadge>
+                        </Badge>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">

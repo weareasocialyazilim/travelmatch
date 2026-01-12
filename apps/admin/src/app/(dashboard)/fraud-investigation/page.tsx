@@ -40,17 +40,6 @@ import {
   XCircle,
   AlertCircle,
 } from 'lucide-react';
-import { CanvaButton } from '@/components/canva/CanvaButton';
-import { CanvaInput } from '@/components/canva/CanvaInput';
-import {
-  CanvaCard,
-  CanvaCardHeader,
-  CanvaCardTitle,
-  CanvaCardSubtitle,
-  CanvaCardBody,
-  CanvaStatCard,
-} from '@/components/canva/CanvaCard';
-import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import {
   Card,
   CardContent,
@@ -294,9 +283,9 @@ export default function FraudInvestigationPage() {
       escalated: 'Eskale Edildi',
     };
     return (
-      <CanvaBadge className={styles[status as keyof typeof styles]}>
+      <Badge className={styles[status as keyof typeof styles]}>
         {labels[status as keyof typeof labels]}
-      </CanvaBadge>
+      </Badge>
     );
   };
 
@@ -308,9 +297,9 @@ export default function FraudInvestigationPage() {
       low: 'bg-blue-500 text-white',
     };
     return (
-      <CanvaBadge className={styles[severity as keyof typeof styles]}>
+      <Badge className={styles[severity as keyof typeof styles]}>
         {severity.toUpperCase()}
-      </CanvaBadge>
+      </Badge>
     );
   };
 
@@ -331,14 +320,14 @@ export default function FraudInvestigationPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <CanvaButton variant="primary">
+          <Button variant="outline">
             <Download className="h-4 w-4 mr-2" />
             Rapor
-          </CanvaButton>
-          <CanvaButton>
+          </Button>
+          <Button>
             <Flag className="h-4 w-4 mr-2" />
             Yeni Case
-          </CanvaButton>
+          </Button>
         </div>
       </div>
 
@@ -374,7 +363,7 @@ export default function FraudInvestigationPage() {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base">Aktif Case'ler</CardTitle>
-              <CanvaBadge variant="default">{fraudCases.length}</CanvaBadge>
+              <Badge variant="secondary">{fraudCases.length}</Badge>
             </div>
             <div className="relative mt-2">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -429,16 +418,16 @@ export default function FraudInvestigationPage() {
                 <CardDescription>Multi-Account Fraud Ring</CardDescription>
               </div>
               <div className="flex gap-2">
-                <CanvaButton variant="primary" size="sm">
+                <Button variant="outline" size="sm">
                   <Share2 className="h-4 w-4 mr-1" />
                   Paylaş
-                </CanvaButton>
+                </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <CanvaButton variant="primary" size="sm">
+                    <Button variant="outline" size="sm">
                       Aksiyon
                       <ChevronDown className="h-4 w-4 ml-1" />
-                    </CanvaButton>
+                    </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem>
@@ -497,9 +486,9 @@ export default function FraudInvestigationPage() {
                               {indicator.value}
                             </span>
                           </div>
-                          <CanvaBadge variant="default">
+                          <Badge variant="outline">
                             {indicator.confidence}%
-                          </CanvaBadge>
+                          </Badge>
                         </div>
                       ),
                     )}
@@ -539,9 +528,9 @@ export default function FraudInvestigationPage() {
                     placeholder="Notlarınızı buraya ekleyin..."
                     className="min-h-[100px]"
                   />
-                  <CanvaButton size="sm" className="mt-2">
+                  <Button size="sm" className="mt-2">
                     Not Ekle
-                  </CanvaButton>
+                  </Button>
                 </div>
               </TabsContent>
 
@@ -574,9 +563,9 @@ export default function FraudInvestigationPage() {
                               </p>
                             </div>
                             {user.isPrimary && (
-                              <CanvaBadge variant="default" className="ml-2">
+                              <Badge variant="outline" className="ml-2">
                                 Primary
-                              </CanvaBadge>
+                              </Badge>
                             )}
                           </div>
                         </TableCell>
@@ -602,9 +591,9 @@ export default function FraudInvestigationPage() {
                         </TableCell>
                         <TableCell>{user.createdAt}</TableCell>
                         <TableCell className="text-right">
-                          <CanvaButton variant="ghost" size="sm">
+                          <Button variant="ghost" size="sm">
                             <Eye className="h-4 w-4" />
-                          </CanvaButton>
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -639,9 +628,7 @@ export default function FraudInvestigationPage() {
                         <TableCell>{txn.date}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <CanvaBadge variant="default">
-                              {txn.status}
-                            </CanvaBadge>
+                            <Badge variant="outline">{txn.status}</Badge>
                             {txn.suspicious && (
                               <AlertTriangle className="h-4 w-4 text-red-500" />
                             )}

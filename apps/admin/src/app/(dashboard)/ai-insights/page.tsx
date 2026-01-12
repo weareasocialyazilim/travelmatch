@@ -57,17 +57,6 @@ import {
   CHART_COLORS,
 } from '@/components/common/admin-chart';
 import { cn } from '@/lib/utils';
-import { CanvaButton } from '@/components/canva/CanvaButton';
-import { CanvaInput } from '@/components/canva/CanvaInput';
-import {
-  CanvaCard,
-  CanvaCardHeader,
-  CanvaCardTitle,
-  CanvaCardSubtitle,
-  CanvaCardBody,
-  CanvaStatCard,
-} from '@/components/canva/CanvaCard';
-import { CanvaBadge } from '@/components/canva/CanvaBadge';
 
 // AI Models Overview
 const aiModels = [
@@ -326,27 +315,27 @@ export default function AIInsightsPage() {
     switch (status) {
       case 'active':
         return (
-          <CanvaBadge className="bg-emerald-500/10 text-emerald-600">
+          <Badge className="bg-emerald-500/10 text-emerald-600">
             <Activity className="h-3 w-3 mr-1 animate-pulse" />
             Aktif
-          </CanvaBadge>
+          </Badge>
         );
       case 'training':
         return (
-          <CanvaBadge className="bg-blue-500/10 text-blue-600">
+          <Badge className="bg-blue-500/10 text-blue-600">
             <RotateCcw className="h-3 w-3 mr-1 animate-spin" />
             Egitiliyor
-          </CanvaBadge>
+          </Badge>
         );
       case 'paused':
         return (
-          <CanvaBadge className="bg-amber-500/10 text-amber-600">
+          <Badge className="bg-amber-500/10 text-amber-600">
             <Pause className="h-3 w-3 mr-1" />
             Durduruldu
-          </CanvaBadge>
+          </Badge>
         );
       default:
-        return <CanvaBadge variant="default">{status}</CanvaBadge>;
+        return <Badge variant="outline">{status}</Badge>;
     }
   };
 
@@ -377,17 +366,13 @@ export default function AIInsightsPage() {
   const getImpactBadge = (impact: string) => {
     switch (impact) {
       case 'critical':
-        return <CanvaBadge variant="error">Kritik</CanvaBadge>;
+        return <Badge variant="destructive">Kritik</Badge>;
       case 'high':
-        return (
-          <CanvaBadge className="bg-amber-500/10 text-amber-600">
-            Yuksek
-          </CanvaBadge>
-        );
+        return <Badge className="bg-amber-500/10 text-amber-600">Yuksek</Badge>;
       case 'medium':
-        return <CanvaBadge variant="default">Orta</CanvaBadge>;
+        return <Badge variant="secondary">Orta</Badge>;
       default:
-        return <CanvaBadge variant="default">Dusuk</CanvaBadge>;
+        return <Badge variant="outline">Dusuk</Badge>;
     }
   };
 
@@ -405,14 +390,14 @@ export default function AIInsightsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <CanvaButton variant="primary" size="sm">
+          <Button variant="outline" size="sm">
             <Settings className="h-4 w-4 mr-2" />
             Model Ayarlari
-          </CanvaButton>
-          <CanvaButton size="sm">
+          </Button>
+          <Button size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             Yenile
-          </CanvaButton>
+          </Button>
         </div>
       </div>
 
@@ -561,14 +546,14 @@ export default function AIInsightsPage() {
 
                   <div className="flex flex-wrap gap-1">
                     {model.features.slice(0, 2).map((f) => (
-                      <CanvaBadge key={f} variant="default" className="text-xs">
+                      <Badge key={f} variant="outline" className="text-xs">
                         {f}
-                      </CanvaBadge>
+                      </Badge>
                     ))}
                     {model.features.length > 2 && (
-                      <CanvaBadge variant="default" className="text-xs">
+                      <Badge variant="outline" className="text-xs">
                         +{model.features.length - 2}
-                      </CanvaBadge>
+                      </Badge>
                     )}
                   </div>
                 </CardContent>
@@ -674,11 +659,11 @@ export default function AIInsightsPage() {
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <CanvaButton size="sm" variant="primary">
+                              <Button size="sm" variant="outline">
                                 <Eye className="h-3 w-3 mr-1" />
                                 Detay
-                              </CanvaButton>
-                              <CanvaButton size="sm">Uygula</CanvaButton>
+                              </Button>
+                              <Button size="sm">Uygula</Button>
                             </div>
                           </div>
                         </div>
@@ -857,15 +842,15 @@ export default function AIInsightsPage() {
                       <CardTitle className="flex items-center gap-2">
                         {test.name}
                         {test.status === 'running' ? (
-                          <CanvaBadge className="bg-blue-500/10 text-blue-600">
+                          <Badge className="bg-blue-500/10 text-blue-600">
                             <Activity className="h-3 w-3 mr-1 animate-pulse" />
                             Devam Ediyor
-                          </CanvaBadge>
+                          </Badge>
                         ) : (
-                          <CanvaBadge className="bg-emerald-500/10 text-emerald-600">
+                          <Badge className="bg-emerald-500/10 text-emerald-600">
                             <CheckCircle2 className="h-3 w-3 mr-1" />
                             Tamamlandi
-                          </CanvaBadge>
+                          </Badge>
                         )}
                       </CardTitle>
                       <CardDescription>
@@ -874,9 +859,9 @@ export default function AIInsightsPage() {
                       </CardDescription>
                     </div>
                     {test.winner && (
-                      <CanvaBadge className="bg-emerald-500 text-white">
+                      <Badge className="bg-emerald-500 text-white">
                         Kazanan: {test.winner}
-                      </CanvaBadge>
+                      </Badge>
                     )}
                   </div>
                 </CardHeader>
@@ -907,9 +892,9 @@ export default function AIInsightsPage() {
                       </span>
                     </div>
                     {test.status === 'running' && (
-                      <CanvaButton size="sm" variant="primary">
+                      <Button size="sm" variant="outline">
                         Deneyi Bitir
-                      </CanvaButton>
+                      </Button>
                     )}
                   </div>
                 </CardContent>

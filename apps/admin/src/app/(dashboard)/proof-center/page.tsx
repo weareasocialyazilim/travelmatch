@@ -76,17 +76,6 @@ import {
   AdminBarChart,
   CHART_COLORS,
 } from '@/components/common/admin-chart';
-import { CanvaButton } from '@/components/canva/CanvaButton';
-import { CanvaInput } from '@/components/canva/CanvaInput';
-import {
-  CanvaCard,
-  CanvaCardHeader,
-  CanvaCardTitle,
-  CanvaCardSubtitle,
-  CanvaCardBody,
-  CanvaStatCard,
-} from '@/components/canva/CanvaCard';
-import { CanvaBadge } from '@/components/canva/CanvaBadge';
 
 // Proof Stats
 const proofStats = {
@@ -258,24 +247,24 @@ export default function ProofCenterPage() {
   const getVerdictBadge = (verdict: string, score: number) => {
     if (verdict === 'approved' || score >= 85) {
       return (
-        <CanvaBadge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
+        <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
           <CheckCircle2 className="h-3 w-3 mr-1" />
           AI Onayladi
-        </CanvaBadge>
+        </Badge>
       );
     } else if (verdict === 'needs_review' || (score >= 60 && score < 85)) {
       return (
-        <CanvaBadge className="bg-amber-500/10 text-amber-600 border-amber-500/30">
+        <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/30">
           <Eye className="h-3 w-3 mr-1" />
           Inceleme Gerekli
-        </CanvaBadge>
+        </Badge>
       );
     } else {
       return (
-        <CanvaBadge className="bg-red-500/10 text-red-600 border-red-500/30">
+        <Badge className="bg-red-500/10 text-red-600 border-red-500/30">
           <XCircle className="h-3 w-3 mr-1" />
           AI Reddetti
-        </CanvaBadge>
+        </Badge>
       );
     }
   };
@@ -316,14 +305,14 @@ export default function ProofCenterPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <CanvaButton variant="primary" size="sm">
+          <Button variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
             Rapor
-          </CanvaButton>
-          <CanvaButton size="sm">
+          </Button>
+          <Button size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             Yenile
-          </CanvaButton>
+          </Button>
         </div>
       </div>
 
@@ -512,17 +501,14 @@ export default function ProofCenterPage() {
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <CanvaBadge
-                        variant="primary"
-                        className="text-xs font-mono"
-                      >
+                      <Badge variant="outline" className="text-xs font-mono">
                         {proof.id}
-                      </CanvaBadge>
+                      </Badge>
                       {proof.flags.length > 0 && (
-                        <CanvaBadge variant="error" className="text-xs">
+                        <Badge variant="destructive" className="text-xs">
                           <Flag className="h-3 w-3 mr-1" />
                           {proof.flags.length}
-                        </CanvaBadge>
+                        </Badge>
                       )}
                     </div>
                     {getVerdictBadge(proof.aiVerdict, proof.aiScore)}
@@ -532,14 +518,14 @@ export default function ProofCenterPage() {
                   {/* Proof Preview */}
                   <div className="relative aspect-video bg-muted rounded-lg flex items-center justify-center">
                     <Camera className="h-8 w-8 text-muted-foreground" />
-                    <CanvaButton
+                    <Button
                       size="sm"
-                      variant="primary"
+                      variant="secondary"
                       className="absolute bottom-2 right-2"
                     >
                       <ZoomIn className="h-3 w-3 mr-1" />
                       {proof.images.length} gorsel
-                    </CanvaButton>
+                    </Button>
                   </div>
 
                   {/* Info */}
@@ -644,39 +630,39 @@ export default function ProofCenterPage() {
                   {proof.flags.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                       {proof.flags.map((flag) => (
-                        <CanvaBadge
+                        <Badge
                           key={flag}
-                          variant="primary"
+                          variant="outline"
                           className="text-xs bg-red-500/10 text-red-600 border-red-500/30"
                         >
                           {flag.replace(/_/g, ' ')}
-                        </CanvaBadge>
+                        </Badge>
                       ))}
                     </div>
                   )}
 
                   {/* Actions */}
                   <div className="flex items-center gap-2 pt-2">
-                    <CanvaButton
+                    <Button
                       size="sm"
                       className="flex-1 bg-emerald-600 hover:bg-emerald-700"
                       onClick={() => handleApprove(proof)}
                     >
                       <ThumbsUp className="h-4 w-4 mr-1" />
                       Onayla
-                    </CanvaButton>
-                    <CanvaButton
+                    </Button>
+                    <Button
                       size="sm"
-                      variant="danger"
+                      variant="destructive"
                       className="flex-1"
                       onClick={() => handleReject(proof)}
                     >
                       <ThumbsDown className="h-4 w-4 mr-1" />
                       Reddet
-                    </CanvaButton>
-                    <CanvaButton size="sm" variant="primary">
+                    </Button>
+                    <Button size="sm" variant="outline">
                       <Eye className="h-4 w-4" />
-                    </CanvaButton>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -891,13 +877,13 @@ export default function ProofCenterPage() {
               {selectedProof?.flags.length ? (
                 <div className="flex flex-wrap gap-1">
                   {selectedProof.flags.map((flag) => (
-                    <CanvaBadge
+                    <Badge
                       key={flag}
-                      variant="primary"
+                      variant="outline"
                       className="text-xs bg-red-500/10 text-red-600"
                     >
                       {flag.replace(/_/g, ' ')}
-                    </CanvaBadge>
+                    </Badge>
                   ))}
                 </div>
               ) : null}
@@ -913,26 +899,23 @@ export default function ProofCenterPage() {
             </div>
           </div>
           <DialogFooter>
-            <CanvaButton
-              variant="primary"
-              onClick={() => setReviewDialog(false)}
-            >
+            <Button variant="outline" onClick={() => setReviewDialog(false)}>
               Iptal
-            </CanvaButton>
-            <CanvaButton
-              variant="danger"
+            </Button>
+            <Button
+              variant="destructive"
               onClick={() => setReviewDialog(false)}
             >
               <ThumbsDown className="h-4 w-4 mr-1" />
               Reddet
-            </CanvaButton>
-            <CanvaButton
+            </Button>
+            <Button
               className="bg-emerald-600 hover:bg-emerald-700"
               onClick={() => setReviewDialog(false)}
             >
               <ThumbsUp className="h-4 w-4 mr-1" />
               Onayla
-            </CanvaButton>
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

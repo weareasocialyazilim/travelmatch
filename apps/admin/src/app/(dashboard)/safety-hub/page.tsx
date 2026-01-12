@@ -86,17 +86,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { CanvaButton } from '@/components/canva/CanvaButton';
-import { CanvaInput } from '@/components/canva/CanvaInput';
-import {
-  CanvaCard,
-  CanvaCardHeader,
-  CanvaCardTitle,
-  CanvaCardSubtitle,
-  CanvaCardBody,
-  CanvaStatCard,
-} from '@/components/canva/CanvaCard';
-import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { cn } from '@/lib/utils';
 
 // Safety stats
@@ -117,8 +106,8 @@ const reportQueue = [
     id: 'rep-001',
     type: 'content',
     category: 'Uygunsuz İçerik',
-    reporter: { name: 'Ayşe K.', avatar: null },
-    reported: { name: 'Mehmet Y.', avatar: null },
+    reporter: { name: 'Ayşe K.', avatar: '/avatars/user1.jpg' },
+    reported: { name: 'Mehmet Y.', avatar: '/avatars/user2.jpg' },
     contentType: 'image',
     priority: 'high',
     aiScore: 0.89,
@@ -129,7 +118,7 @@ const reportQueue = [
     id: 'rep-002',
     type: 'user',
     category: 'Sahte Profil',
-    reporter: { name: 'Can B.', avatar: null },
+    reporter: { name: 'Can B.', avatar: '/avatars/user3.jpg' },
     reported: { name: 'Unknown User', avatar: null },
     contentType: 'profile',
     priority: 'high',
@@ -141,8 +130,8 @@ const reportQueue = [
     id: 'rep-003',
     type: 'message',
     category: 'Spam',
-    reporter: { name: 'Zeynep A.', avatar: null },
-    reported: { name: 'Ali R.', avatar: null },
+    reporter: { name: 'Zeynep A.', avatar: '/avatars/user4.jpg' },
+    reported: { name: 'Ali R.', avatar: '/avatars/user5.jpg' },
     contentType: 'chat',
     priority: 'medium',
     aiScore: 0.72,
@@ -154,7 +143,7 @@ const reportQueue = [
     type: 'fraud',
     category: 'Ödeme Dolandırıcılığı',
     reporter: { name: 'Sistem', avatar: null },
-    reported: { name: 'Hasan K.', avatar: null },
+    reported: { name: 'Hasan K.', avatar: '/avatars/user6.jpg' },
     contentType: 'transaction',
     priority: 'critical',
     aiScore: 0.97,
@@ -165,8 +154,8 @@ const reportQueue = [
     id: 'rep-005',
     type: 'content',
     category: 'Telif Hakkı',
-    reporter: { name: 'Fatma S.', avatar: null },
-    reported: { name: 'Emre T.', avatar: null },
+    reporter: { name: 'Fatma S.', avatar: '/avatars/user7.jpg' },
+    reported: { name: 'Emre T.', avatar: '/avatars/user8.jpg' },
     contentType: 'image',
     priority: 'low',
     aiScore: 0.45,
@@ -264,34 +253,34 @@ export default function SafetyHubPage() {
     switch (priority) {
       case 'critical':
         return (
-          <CanvaBadge className="bg-red-500/10 text-red-500 border-red-500/20">
+          <Badge className="bg-red-500/10 text-red-500 border-red-500/20">
             <AlertTriangle className="h-3 w-3 mr-1" />
             Kritik
-          </CanvaBadge>
+          </Badge>
         );
       case 'high':
         return (
-          <CanvaBadge className="bg-orange-500/10 text-orange-500 border-orange-500/20">
+          <Badge className="bg-orange-500/10 text-orange-500 border-orange-500/20">
             <AlertCircle className="h-3 w-3 mr-1" />
             Yüksek
-          </CanvaBadge>
+          </Badge>
         );
       case 'medium':
         return (
-          <CanvaBadge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">
+          <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">
             <Clock className="h-3 w-3 mr-1" />
             Orta
-          </CanvaBadge>
+          </Badge>
         );
       case 'low':
         return (
-          <CanvaBadge className="bg-blue-500/10 text-blue-500 border-blue-500/20">
+          <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20">
             <Flag className="h-3 w-3 mr-1" />
             Düşük
-          </CanvaBadge>
+          </Badge>
         );
       default:
-        return <CanvaBadge variant="primary">{priority}</CanvaBadge>;
+        return <Badge variant="outline">{priority}</Badge>;
     }
   };
 
@@ -321,14 +310,14 @@ export default function SafetyHubPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <CanvaButton variant="primary">
+          <Button variant="outline">
             <Activity className="h-4 w-4 mr-2" />
             Canlı İzleme
-          </CanvaButton>
-          <CanvaButton>
+          </Button>
+          <Button>
             <Shield className="h-4 w-4 mr-2" />
             Güvenlik Raporu
-          </CanvaButton>
+          </Button>
         </div>
       </div>
 
@@ -347,13 +336,13 @@ export default function SafetyHubPage() {
               </p>
             </div>
           </div>
-          <CanvaButton
-            variant="primary"
+          <Button
+            variant="outline"
             size="sm"
             className="border-red-500/30 text-red-500"
           >
             Detayları Gör
-          </CanvaButton>
+          </Button>
         </div>
       )}
 
@@ -445,9 +434,9 @@ export default function SafetyHubPage() {
           <TabsTrigger value="queue">
             <Flag className="h-4 w-4 mr-2" />
             Rapor Kuyruğu
-            <CanvaBadge variant="primary" className="ml-2">
+            <Badge variant="secondary" className="ml-2">
               {safetyStats.pendingReports}
-            </CanvaBadge>
+            </Badge>
           </TabsTrigger>
           <TabsTrigger value="ai-moderation">
             <Brain className="h-4 w-4 mr-2" />
@@ -528,9 +517,7 @@ export default function SafetyHubPage() {
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Avatar className="h-6 w-6">
-                            {report.reporter.avatar && (
-                              <AvatarImage src={report.reporter.avatar} />
-                            )}
+                            <AvatarImage src={report.reporter.avatar || ''} />
                             <AvatarFallback className="text-xs">
                               {report.reporter.name.slice(0, 2)}
                             </AvatarFallback>
@@ -543,9 +530,7 @@ export default function SafetyHubPage() {
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Avatar className="h-6 w-6">
-                            {report.reported.avatar && (
-                              <AvatarImage src={report.reported.avatar} />
-                            )}
+                            <AvatarImage src={report.reported.avatar || ''} />
                             <AvatarFallback className="text-xs">
                               {report.reported.name.slice(0, 2)}
                             </AvatarFallback>
@@ -579,37 +564,30 @@ export default function SafetyHubPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          <CanvaButton
-                            variant="ghost"
-                            size="sm"
-                            iconOnly
-                            title="İncele"
-                          >
+                          <Button variant="ghost" size="icon" title="İncele">
                             <Eye className="h-4 w-4" />
-                          </CanvaButton>
-                          <CanvaButton
+                          </Button>
+                          <Button
                             variant="ghost"
-                            size="sm"
-                            iconOnly
+                            size="icon"
                             className="text-green-500"
                             title="Onayla"
                           >
                             <CheckCircle2 className="h-4 w-4" />
-                          </CanvaButton>
-                          <CanvaButton
+                          </Button>
+                          <Button
                             variant="ghost"
-                            size="sm"
-                            iconOnly
+                            size="icon"
                             className="text-red-500"
                             title="Kaldır"
                           >
                             <XCircle className="h-4 w-4" />
-                          </CanvaButton>
+                          </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <CanvaButton variant="ghost" size="sm" iconOnly>
+                              <Button variant="ghost" size="icon">
                                 <MoreHorizontal className="h-4 w-4" />
-                              </CanvaButton>
+                              </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem>
@@ -776,12 +754,12 @@ export default function SafetyHubPage() {
                         </p>
                       </div>
                     </div>
-                    <CanvaBadge
-                      variant="primary"
+                    <Badge
+                      variant="outline"
                       className="bg-green-500/10 text-green-500 border-green-500/20"
                     >
                       {model.accuracy}%
-                    </CanvaBadge>
+                    </Badge>
                   </div>
                 ))}
               </CardContent>
@@ -880,9 +858,7 @@ export default function SafetyHubPage() {
                       <div className="w-2 h-2 rounded-full bg-green-500" />
                       <span className="font-medium">{measure.name}</span>
                     </div>
-                    <CanvaBadge variant="primary">
-                      {measure.blocked} engelleme
-                    </CanvaBadge>
+                    <Badge variant="outline">{measure.blocked} engelleme</Badge>
                   </div>
                 ))}
               </CardContent>
@@ -943,7 +919,7 @@ export default function SafetyHubPage() {
                       <TableCell>{attempt.user}</TableCell>
                       <TableCell>{attempt.detail}</TableCell>
                       <TableCell>
-                        <CanvaBadge
+                        <Badge
                           className={cn(
                             attempt.risk > 0.9
                               ? 'bg-red-500/10 text-red-500'
@@ -951,19 +927,19 @@ export default function SafetyHubPage() {
                           )}
                         >
                           {(attempt.risk * 100).toFixed(0)}%
-                        </CanvaBadge>
+                        </Badge>
                       </TableCell>
                       <TableCell>
-                        <CanvaBadge className="bg-green-500/10 text-green-500 border-green-500/20">
+                        <Badge className="bg-green-500/10 text-green-500 border-green-500/20">
                           <Shield className="h-3 w-3 mr-1" />
                           Engellendi
-                        </CanvaBadge>
+                        </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        <CanvaButton variant="ghost" size="sm">
+                        <Button variant="ghost" size="sm">
                           Detay
                           <ChevronRight className="h-4 w-4 ml-1" />
-                        </CanvaButton>
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -979,10 +955,10 @@ export default function SafetyHubPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Askıya Alınan Hesaplar</CardTitle>
-                <CanvaButton variant="primary">
+                <Button variant="outline">
                   <Filter className="h-4 w-4 mr-2" />
                   Filtrele
-                </CanvaButton>
+                </Button>
               </div>
             </CardHeader>
             <CardContent>
@@ -1008,13 +984,11 @@ export default function SafetyHubPage() {
                         {account.email}
                       </TableCell>
                       <TableCell>
-                        <CanvaBadge variant="primary">
-                          {account.reason}
-                        </CanvaBadge>
+                        <Badge variant="outline">{account.reason}</Badge>
                       </TableCell>
                       <TableCell>{account.suspendedAt}</TableCell>
                       <TableCell>
-                        <CanvaBadge
+                        <Badge
                           className={cn(
                             account.duration === 'Kalıcı'
                               ? 'bg-red-500/10 text-red-500'
@@ -1022,28 +996,22 @@ export default function SafetyHubPage() {
                           )}
                         >
                           {account.duration}
-                        </CanvaBadge>
+                        </Badge>
                       </TableCell>
                       <TableCell>{account.reports}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          <CanvaButton
-                            variant="ghost"
-                            size="sm"
-                            iconOnly
-                            title="İncele"
-                          >
+                          <Button variant="ghost" size="icon" title="İncele">
                             <Eye className="h-4 w-4" />
-                          </CanvaButton>
-                          <CanvaButton
+                          </Button>
+                          <Button
                             variant="ghost"
-                            size="sm"
-                            iconOnly
+                            size="icon"
                             title="Askıyı Kaldır"
                             className="text-green-500"
                           >
                             <Unlock className="h-4 w-4" />
-                          </CanvaButton>
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -1107,9 +1075,9 @@ export default function SafetyHubPage() {
                     <div className="p-2 rounded-lg bg-primary/10">
                       <policy.icon className="h-5 w-5 text-primary" />
                     </div>
-                    <CanvaButton variant="ghost" size="sm" iconOnly>
+                    <Button variant="ghost" size="icon">
                       <ExternalLink className="h-4 w-4" />
-                    </CanvaButton>
+                    </Button>
                   </div>
                   <CardTitle className="text-base">{policy.title}</CardTitle>
                   <CardDescription>{policy.description}</CardDescription>
