@@ -220,12 +220,12 @@ export default function ChatAnalyticsPage() {
     switch (tier) {
       case 'tier_3':
         return (
-          <Badge className="bg-purple-500/10 text-purple-600">Premium</Badge>
+          <CanvaBadge className="bg-purple-500/10 text-purple-600">Premium</CanvaBadge>
         );
       case 'tier_2':
-        return <Badge className="bg-blue-500/10 text-blue-600">Standard</Badge>;
+        return <CanvaBadge className="bg-blue-500/10 text-blue-600">Standard</CanvaBadge>;
       default:
-        return <Badge variant="outline">Basic</Badge>;
+        return <CanvaBadge variant="outline">Basic</CanvaBadge>;
     }
   };
 
@@ -233,20 +233,20 @@ export default function ChatAnalyticsPage() {
     switch (status) {
       case 'active':
         return (
-          <Badge className="bg-emerald-500/10 text-emerald-600">
+          <CanvaBadge className="bg-emerald-500/10 text-emerald-600">
             <Activity className="h-3 w-3 mr-1" />
             Aktif
-          </Badge>
+          </CanvaBadge>
         );
       case 'idle':
         return (
-          <Badge className="bg-amber-500/10 text-amber-600">
+          <CanvaBadge className="bg-amber-500/10 text-amber-600">
             <Clock className="h-3 w-3 mr-1" />
             Beklemede
-          </Badge>
+          </CanvaBadge>
         );
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <CanvaBadge variant="outline">{status}</CanvaBadge>;
     }
   };
 
@@ -263,109 +263,109 @@ export default function ChatAnalyticsPage() {
             Mesajlasma sistemi metrikleri ve izleme
           </p>
         </div>
-        <Button size="sm">
+        <CanvaButton size="sm">
           <RefreshCw className="h-4 w-4 mr-2" />
           Yenile
-        </Button>
+        </CanvaButton>
       </div>
 
       {/* Key Metrics */}
       <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-8">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
+        <CanvaCard>
+          <CanvaCardHeader className="pb-2">
+            <CanvaCardSubtitle className="flex items-center gap-1">
               <MessageSquare className="h-3 w-3" />
               Bugun Mesaj
-            </CardDescription>
-            <CardTitle className="text-xl font-bold">
+            </CanvaCardSubtitle>
+            <CanvaCardTitle className="text-xl font-bold">
               {chatStats.messagestoday.toLocaleString()}
-            </CardTitle>
-          </CardHeader>
-        </Card>
+            </CanvaCardTitle>
+          </CanvaCardHeader>
+        </CanvaCard>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
+        <CanvaCard>
+          <CanvaCardHeader className="pb-2">
+            <CanvaCardSubtitle className="flex items-center gap-1">
               <Users className="h-3 w-3" />
               Aktif Sohbet
-            </CardDescription>
-            <CardTitle className="text-xl font-bold text-purple-600">
+            </CanvaCardSubtitle>
+            <CanvaCardTitle className="text-xl font-bold text-purple-600">
               {chatStats.activeToday.toLocaleString()}
-            </CardTitle>
-          </CardHeader>
-        </Card>
+            </CanvaCardTitle>
+          </CanvaCardHeader>
+        </CanvaCard>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
+        <CanvaCard>
+          <CanvaCardHeader className="pb-2">
+            <CanvaCardSubtitle className="flex items-center gap-1">
               <Clock className="h-3 w-3" />
               Ort. Yanit
-            </CardDescription>
-            <CardTitle className="text-xl font-bold">
+            </CanvaCardSubtitle>
+            <CanvaCardTitle className="text-xl font-bold">
               {chatStats.avgResponseTime} dk
-            </CardTitle>
-          </CardHeader>
-        </Card>
+            </CanvaCardTitle>
+          </CanvaCardHeader>
+        </CanvaCard>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
+        <CanvaCard>
+          <CanvaCardHeader className="pb-2">
+            <CanvaCardSubtitle className="flex items-center gap-1">
               <Unlock className="h-3 w-3" />
               Chat Acilma
-            </CardDescription>
-            <CardTitle className="text-xl font-bold text-emerald-600">
+            </CanvaCardSubtitle>
+            <CanvaCardTitle className="text-xl font-bold text-emerald-600">
               %{chatStats.chatLockRate}
-            </CardTitle>
-          </CardHeader>
-        </Card>
+            </CanvaCardTitle>
+          </CanvaCardHeader>
+        </CanvaCard>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
+        <CanvaCard>
+          <CanvaCardHeader className="pb-2">
+            <CanvaCardSubtitle className="flex items-center gap-1">
               <BarChart3 className="h-3 w-3" />
               Mesaj/Sohbet
-            </CardDescription>
-            <CardTitle className="text-xl font-bold">
+            </CanvaCardSubtitle>
+            <CanvaCardTitle className="text-xl font-bold">
               {chatStats.avgMessagesPerConvo}
-            </CardTitle>
-          </CardHeader>
-        </Card>
+            </CanvaCardTitle>
+          </CanvaCardHeader>
+        </CanvaCard>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
+        <CanvaCard>
+          <CanvaCardHeader className="pb-2">
+            <CanvaCardSubtitle className="flex items-center gap-1">
               <Send className="h-3 w-3" />
               Media
-            </CardDescription>
-            <CardTitle className="text-xl font-bold">
+            </CanvaCardSubtitle>
+            <CanvaCardTitle className="text-xl font-bold">
               {chatStats.mediaShared.toLocaleString()}
-            </CardTitle>
-          </CardHeader>
-        </Card>
+            </CanvaCardTitle>
+          </CanvaCardHeader>
+        </CanvaCard>
 
-        <Card className="col-span-2">
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
+        <CanvaCard className="col-span-2">
+          <CanvaCardHeader className="pb-2">
+            <CanvaCardSubtitle className="flex items-center gap-1">
               <Shield className="h-3 w-3" />
               E2E Sifreleme
-            </CardDescription>
-            <CardTitle className="text-xl font-bold text-emerald-600 flex items-center gap-2">
+            </CanvaCardSubtitle>
+            <CanvaCardTitle className="text-xl font-bold text-emerald-600 flex items-center gap-2">
               <Lock className="h-4 w-4" />%{chatStats.e2eEncrypted} Guvenli
-            </CardTitle>
-          </CardHeader>
-        </Card>
+            </CanvaCardTitle>
+          </CanvaCardHeader>
+        </CanvaCard>
       </div>
 
       {/* Chat Lock Tiers */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <CanvaCard>
+        <CanvaCardHeader>
+          <CanvaCardTitle className="flex items-center gap-2">
             <Lock className="h-5 w-5 text-amber-500" />
             Chat Lock Sistemi Analizi
-          </CardTitle>
-          <CardDescription>Tier bazli chat acilma oranlari</CardDescription>
-        </CardHeader>
-        <CardContent>
+          </CanvaCardTitle>
+          <CanvaCardSubtitle>Tier bazli chat acilma oranlari</CanvaCardSubtitle>
+        </CanvaCardHeader>
+        <CanvaCardBody>
           <div className="grid gap-4 md:grid-cols-3">
             {chatLockTiers.map((tier, index) => (
               <div
@@ -380,12 +380,12 @@ export default function ChatAnalyticsPage() {
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-medium">{tier.tier}</h4>
                   {index === 0 ? (
-                    <Badge variant="outline">
+                    <CanvaBadge variant="outline">
                       <Lock className="h-3 w-3 mr-1" />
                       Kilitli
-                    </Badge>
+                    </CanvaBadge>
                   ) : (
-                    <Badge
+                    <CanvaBadge
                       className={
                         index === 2
                           ? 'bg-purple-500/10 text-purple-600'
@@ -394,7 +394,7 @@ export default function ChatAnalyticsPage() {
                     >
                       <Unlock className="h-3 w-3 mr-1" />
                       Acilabilir
-                    </Badge>
+                    </CanvaBadge>
                   )}
                 </div>
                 <p className="text-sm text-muted-foreground mb-4">
@@ -444,8 +444,8 @@ export default function ChatAnalyticsPage() {
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
 
       {/* Main Tabs */}
       <Tabs value={selectedTab} onValueChange={setSelectedTab}>
@@ -459,12 +459,12 @@ export default function ChatAnalyticsPage() {
         <TabsContent value="overview" className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Hourly Volume */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Saatlik Mesaj Hacmi</CardTitle>
-                <CardDescription>Gun icindeki mesaj dagilimi</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Saatlik Mesaj Hacmi</CanvaCardTitle>
+                <CanvaCardSubtitle>Gun icindeki mesaj dagilimi</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <AdminAreaChart
                   data={hourlyMessageData}
                   xAxisKey="hour"
@@ -477,16 +477,16 @@ export default function ChatAnalyticsPage() {
                     },
                   ]}
                 />
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
             {/* Response Time Distribution */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Yanit Suresi Dagilimi</CardTitle>
-                <CardDescription>Host yanit sureleri</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Yanit Suresi Dagilimi</CanvaCardTitle>
+                <CanvaCardSubtitle>Host yanit sureleri</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="space-y-4">
                   {responseTimeData.map((item) => (
                     <div key={item.range} className="space-y-2">
@@ -500,17 +500,17 @@ export default function ChatAnalyticsPage() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
 
           {/* Weekly Trend */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Haftalik Trend</CardTitle>
-              <CardDescription>Mesaj ve sohbet trendi</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Haftalik Trend</CanvaCardTitle>
+              <CanvaCardSubtitle>Mesaj ve sohbet trendi</CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <AdminLineChart
                 data={weeklyTrendData}
                 xAxisKey="date"
@@ -528,8 +528,8 @@ export default function ChatAnalyticsPage() {
                   },
                 ]}
               />
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Active Conversations Tab */}
@@ -551,7 +551,7 @@ export default function ChatAnalyticsPage() {
             </Select>
           </div>
 
-          <Card>
+          <CanvaCard>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -593,22 +593,22 @@ export default function ChatAnalyticsPage() {
                 ))}
               </TableBody>
             </Table>
-          </Card>
+          </CanvaCard>
         </TabsContent>
 
         {/* Moderation Tab */}
         <TabsContent value="moderation" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-amber-500" />
                 Isaretlenen Mesajlar
-              </CardTitle>
-              <CardDescription>
+              </CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Otomatik moderasyon tarafindan tespit edilen mesajlar
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-4">
                 {flaggedMessages.map((msg) => (
                   <div
@@ -625,10 +625,10 @@ export default function ChatAnalyticsPage() {
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="flex items-center gap-2 mb-2">
-                          <Badge variant="outline" className="font-mono">
+                          <CanvaBadge variant="outline" className="font-mono">
                             {msg.id}
-                          </Badge>
-                          <Badge
+                          </CanvaBadge>
+                          <CanvaBadge
                             className={cn(
                               msg.reason === 'potential_spam' &&
                                 'bg-amber-500/10 text-amber-600',
@@ -639,7 +639,7 @@ export default function ChatAnalyticsPage() {
                             )}
                           >
                             {msg.reason.replace(/_/g, ' ')}
-                          </Badge>
+                          </CanvaBadge>
                         </div>
                         <p className="text-sm text-muted-foreground mb-1">
                           <span className="font-medium">{msg.sender}</span> in{' '}
@@ -650,7 +650,7 @@ export default function ChatAnalyticsPage() {
                         </p>
                       </div>
                       <div className="text-right">
-                        <Badge
+                        <CanvaBadge
                           variant={
                             msg.status === 'actioned' ? 'outline' : 'default'
                           }
@@ -658,7 +658,7 @@ export default function ChatAnalyticsPage() {
                           {msg.status === 'pending' && 'Bekliyor'}
                           {msg.status === 'reviewing' && 'Inceleniyor'}
                           {msg.status === 'actioned' && 'Islem Yapildi'}
-                        </Badge>
+                        </CanvaBadge>
                         <p className="text-xs text-muted-foreground mt-1">
                           {msg.flaggedAt}
                         </p>
@@ -666,23 +666,23 @@ export default function ChatAnalyticsPage() {
                     </div>
                     {msg.status !== 'actioned' && (
                       <div className="flex items-center gap-2 mt-3 pt-3 border-t">
-                        <Button size="sm" variant="outline">
+                        <CanvaButton size="sm" variant="outline">
                           <Eye className="h-3 w-3 mr-1" />
                           Incele
-                        </Button>
-                        <Button size="sm" variant="destructive">
+                        </CanvaButton>
+                        <CanvaButton size="sm" variant="danger">
                           Sil
-                        </Button>
-                        <Button size="sm" variant="outline">
+                        </CanvaButton>
+                        <CanvaButton size="sm" variant="outline">
                           Onayla
-                        </Button>
+                        </CanvaButton>
                       </div>
                     )}
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
       </Tabs>
     </div>

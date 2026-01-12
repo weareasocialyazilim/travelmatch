@@ -645,8 +645,8 @@ export default function NotificationsPage() {
           {mockNotifications
             .filter((n) => n.status === 'sent')
             .map((notification) => (
-              <Card key={notification.id}>
-                <CardContent className="p-6">
+              <CanvaCard key={notification.id}>
+                <CanvaCardBody className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-semibold">{notification.title}</h3>
@@ -656,8 +656,8 @@ export default function NotificationsPage() {
                     </div>
                     {getStatusBadge(notification.status)}
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))}
         </TabsContent>
 
@@ -665,8 +665,8 @@ export default function NotificationsPage() {
           {mockNotifications
             .filter((n) => n.status === 'scheduled')
             .map((notification) => (
-              <Card key={notification.id}>
-                <CardContent className="p-6">
+              <CanvaCard key={notification.id}>
+                <CanvaCardBody className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-semibold">{notification.title}</h3>
@@ -676,8 +676,8 @@ export default function NotificationsPage() {
                     </div>
                     {getStatusBadge(notification.status)}
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))}
         </TabsContent>
 
@@ -685,8 +685,8 @@ export default function NotificationsPage() {
           {mockNotifications
             .filter((n) => n.status === 'draft')
             .map((notification) => (
-              <Card key={notification.id}>
-                <CardContent className="p-6">
+              <CanvaCard key={notification.id}>
+                <CanvaCardBody className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-semibold">{notification.title}</h3>
@@ -696,8 +696,8 @@ export default function NotificationsPage() {
                     </div>
                     {getStatusBadge(notification.status)}
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))}
         </TabsContent>
       </Tabs>
