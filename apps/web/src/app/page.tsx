@@ -28,9 +28,12 @@ import { IdentityPulse } from '@/components/landing/IdentityPulse';
 import { LiveTrustCounter } from '@/components/landing/LiveTrustCounter';
 import { SacredMoments } from '@/components/landing/SacredMoments';
 import { RitualSection } from '@/components/landing/RitualSection';
+import { Manifesto } from '@/components/landing/Manifesto';
+import { ActivityPulse } from '@/components/landing/ActivityPulse';
 import { Footer } from '@/components/layout/Footer';
 import { LiveHeartbeat } from '@/components/landing/LiveHeartbeat';
 import { NeuralChat } from '@/components/shared/NeuralChat';
+import { SectionWrapper } from '@/components/ui/SectionWrapper';
 
 export default function HomePage() {
   return (
@@ -40,6 +43,7 @@ export default function HomePage() {
           Bottom corners, minimalist, appear/hide on interaction
       ═══════════════════════════════════════════════════════════ */}
       <LiveHeartbeat />
+      <ActivityPulse />
       <NeuralChat />
 
       {/* ═══════════════════════════════════════════════════════════
@@ -49,44 +53,49 @@ export default function HomePage() {
       ═══════════════════════════════════════════════════════════ */}
 
       {/* Chapter 01: Hero & 3D Atmosphere */}
-      <section className="relative min-h-screen overflow-hidden">
+      <SectionWrapper>
         <Hero />
-      </section>
+      </SectionWrapper>
+
+      {/* Chapter 01.5: Manifesto - Philosophy & Kinetic Typography */}
+      <SectionWrapper>
+        <Manifesto />
+      </SectionWrapper>
 
       {/* Chapter 02: Trust Ring Scrollytelling */}
-      <section className="relative overflow-hidden bg-black">
+      <SectionWrapper className="bg-black">
         <TrustRing />
-      </section>
+      </SectionWrapper>
 
       {/* Chapter 03: Cinematic Reveal - Apple-style text mask */}
-      <section className="relative overflow-hidden">
+      <SectionWrapper>
         <CinematicReveal />
-      </section>
+      </SectionWrapper>
 
       {/* Chapter 04: ML Neural Match Simulator */}
-      <section className="relative overflow-hidden">
+      <SectionWrapper>
         <MatchSimulator />
-      </section>
+      </SectionWrapper>
 
       {/* Chapter 05: Identity Pulse - Futuristic ID Card */}
-      <section className="relative overflow-hidden bg-[#050505]">
+      <SectionWrapper className="bg-[#050505]">
         <IdentityPulse />
-      </section>
+      </SectionWrapper>
 
       {/* Chapter 06: Live Trust Counter - Real-time Platform Stats */}
-      <section className="relative overflow-hidden">
+      <SectionWrapper>
         <LiveTrustCounter />
-      </section>
+      </SectionWrapper>
 
       {/* Chapter 07: Sacred Moments Bento Grid */}
-      <section className="relative overflow-hidden">
+      <SectionWrapper>
         <SacredMoments />
-      </section>
+      </SectionWrapper>
 
       {/* Chapter 08: The Ritual of Gifting Process */}
-      <section className="relative overflow-hidden bg-black">
+      <SectionWrapper className="bg-black">
         <RitualSection />
-      </section>
+      </SectionWrapper>
 
       {/* Chapter 09: Grand Finale Footer */}
       <Footer />

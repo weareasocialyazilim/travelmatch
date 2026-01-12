@@ -15,32 +15,32 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Deep Space Palette
-        background: '#020202',
+        // Soft-Future Palette (Warm Editorial Social)
+        background: '#08080a',
         foreground: '#ffffff',
 
-        // Primary: Cyber Mint (Nvidia Vibe)
+        // Primary: Warm Golden Yellow
         primary: {
-          DEFAULT: '#00FF88',
-          glow: 'rgba(0, 255, 136, 0.3)',
-          dark: '#00CC6E',
-          light: '#33FF9F',
+          DEFAULT: '#facc15',
+          glow: 'rgba(250, 204, 21, 0.25)',
+          dark: '#eab308',
+          light: '#fde047',
         },
 
-        // Secondary: Electric Purple
+        // Secondary: Sunset Red
         secondary: {
-          DEFAULT: '#8B5CF6',
-          glow: 'rgba(139, 92, 246, 0.3)',
-          dark: '#7C3AED',
-          light: '#A78BFA',
+          DEFAULT: '#ff6b6b',
+          glow: 'rgba(255, 107, 107, 0.25)',
+          dark: '#fa5252',
+          light: '#ff8787',
         },
 
-        // Accent: Liquid Gold
+        // Accent: Soft Terracotta (complementary warmth)
         accent: {
-          DEFAULT: '#FACC15',
-          glow: 'rgba(250, 204, 21, 0.3)',
-          dark: '#EAB308',
-          light: '#FDE047',
+          DEFAULT: '#ff8a65',
+          glow: 'rgba(255, 138, 101, 0.25)',
+          dark: '#ff6e40',
+          light: '#ffab91',
         },
 
         // UI Colors
@@ -50,11 +50,11 @@ const config: Config = {
         'border-hover': 'rgba(255, 255, 255, 0.15)',
         muted: 'rgba(255, 255, 255, 0.5)',
 
-        // Legacy support
-        acid: '#00FF88',
-        'neon-pink': '#ff0099',
-        'electric-blue': '#00f0ff',
-        'deep-purple': '#140024',
+        // Legacy support (updated to Soft-Future)
+        acid: '#facc15',
+        'neon-pink': '#ff6b6b',
+        'electric-blue': '#ff8a65',
+        'deep-purple': '#08080a',
       },
 
       fontFamily: {
@@ -159,8 +159,8 @@ const config: Config = {
         'gradient-conic':
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
         'gradient-premium':
-          'linear-gradient(135deg, #00FF88 0%, #8B5CF6 50%, #FACC15 100%)',
-        'gradient-dark': 'linear-gradient(180deg, #020202 0%, #0a0a0a 100%)',
+          'linear-gradient(135deg, #facc15 0%, #ff6b6b 50%, #ff8a65 100%)',
+        'gradient-dark': 'linear-gradient(180deg, #08080a 0%, #0f0f11 100%)',
         noise:
           "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")",
       },

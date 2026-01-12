@@ -1,10 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useMotionValueEvent,
+} from 'framer-motion';
 import { Menu, X, Globe } from 'lucide-react';
 import Link from 'next/link';
 import { MagneticButton } from '@/components/ui/MagneticButton';
+import { CelestialToggle } from '@/components/ui/CelestialToggle';
 
 /**
  * TravelMatch Premium Navbar
@@ -117,8 +123,10 @@ export function Navbar() {
                            uppercase tracking-wider relative group"
               >
                 {item.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary
-                                 transition-all duration-300 group-hover:w-full" />
+                <span
+                  className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary
+                                 transition-all duration-300 group-hover:w-full"
+                />
               </motion.a>
             ))}
 
@@ -136,6 +144,15 @@ export function Navbar() {
               <span className="text-border">|</span>
               <span className={lang === 'tr' ? 'text-foreground' : ''}>TR</span>
             </motion.button>
+
+            {/* Theme Toggle */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3, delay: 0.35 }}
+            >
+              <CelestialToggle />
+            </motion.div>
 
             {/* CTA Button */}
             <MagneticButton strength={0.3}>
