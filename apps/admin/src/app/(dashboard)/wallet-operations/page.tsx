@@ -51,13 +51,7 @@ import {
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { CanvaButton } from '@/components/canva/CanvaButton';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+// Card components replaced with Canva versions
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -301,50 +295,45 @@ export default function WalletOperationsPage() {
     switch (status) {
       case 'pending':
         return (
-          <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/30">
-            <Timer className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="warning" icon={<Timer className="h-3 w-3" />}>
             Bekliyor
-          </Badge>
+          </CanvaBadge>
         );
       case 'processing':
         return (
-          <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/30">
-            <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+          <CanvaBadge variant="info" icon={<RefreshCw className="h-3 w-3 animate-spin" />}>
             Isleniyor
-          </Badge>
+          </CanvaBadge>
         );
       case 'completed':
         return (
-          <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
-            <CheckCircle2 className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="success" icon={<CheckCircle2 className="h-3 w-3" />}>
             Tamamlandi
-          </Badge>
+          </CanvaBadge>
         );
       case 'blocked':
         return (
-          <Badge className="bg-red-500/10 text-red-600 border-red-500/30">
-            <Ban className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="danger" icon={<Ban className="h-3 w-3" />}>
             Engellendi
-          </Badge>
+          </CanvaBadge>
         );
       case 'rejected':
         return (
-          <Badge className="bg-red-500/10 text-red-600 border-red-500/30">
-            <XCircle className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="danger" icon={<XCircle className="h-3 w-3" />}>
             Reddedildi
-          </Badge>
+          </CanvaBadge>
         );
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <CanvaBadge variant="secondary">{status}</CanvaBadge>;
     }
   };
 
   const getPriorityBadge = (priority: string) => {
     switch (priority) {
       case 'urgent':
-        return <Badge variant="destructive">Acil</Badge>;
+        return <CanvaBadge variant="danger">Acil</CanvaBadge>;
       case 'high':
-        return <Badge className="bg-amber-500 text-white">Yuksek</Badge>;
+        return <CanvaBadge variant="warning">Yuksek</CanvaBadge>;
       default:
         return null;
     }
@@ -354,27 +343,24 @@ export default function WalletOperationsPage() {
     switch (status) {
       case 'verified':
         return (
-          <Badge className="bg-emerald-500/10 text-emerald-600">
-            <UserCheck className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="success" icon={<UserCheck className="h-3 w-3" />}>
             Dogrulandi
-          </Badge>
+          </CanvaBadge>
         );
       case 'pending':
         return (
-          <Badge className="bg-amber-500/10 text-amber-600">
-            <Clock className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="warning" icon={<Clock className="h-3 w-3" />}>
             Bekliyor
-          </Badge>
+          </CanvaBadge>
         );
       case 'rejected':
         return (
-          <Badge className="bg-red-500/10 text-red-600">
-            <XCircle className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="danger" icon={<XCircle className="h-3 w-3" />}>
             Reddedildi
-          </Badge>
+          </CanvaBadge>
         );
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <CanvaBadge variant="secondary">{status}</CanvaBadge>;
     }
   };
 
@@ -399,126 +385,90 @@ export default function WalletOperationsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
+          <CanvaButton variant="ghost" size="sm">
             <Download className="h-4 w-4 mr-2" />
             Rapor
-          </Button>
-          <Button size="sm">
+          </CanvaButton>
+          <CanvaButton variant="primary" size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             Yenile
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
       {/* PayTR Info Banner */}
-      <Card className="border-blue-500/30 bg-blue-500/5">
-        <CardContent className="py-3">
+      <CanvaCard className="border-blue-500/30 bg-blue-500/5">
+        <CanvaCardBody className="py-3">
           <div className="flex items-center gap-2 text-sm text-blue-700">
             <Shield className="h-4 w-4" />
             <span className="font-medium">
               Tum odemeler PayTR uzerinden gerceklestirilmektedir. Banka hesap bilgileri sistemimizde saklanmaz.
             </span>
           </div>
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
 
       {/* Stats Overview */}
       <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-8">
-        <Card className="col-span-2">
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <PiggyBank className="h-3 w-3" />
-              PayTR Havuz Bakiyesi
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-emerald-600">
-              {formatCurrency(walletStats.paytrPoolBalance, 'TRY')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">
-              PayTR'da tutulan toplam bakiye
-            </p>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          className="col-span-2"
+          title="PayTR Havuz Bakiyesi"
+          value={formatCurrency(walletStats.paytrPoolBalance, 'TRY')}
+          description="PayTR'da tutulan toplam bakiye"
+          icon={<PiggyBank className="h-5 w-5" />}
+          trend="up"
+          accentColor="emerald"
+        />
 
-        <Card className="col-span-2">
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Send className="h-3 w-3" />
-              Bekleyen Odemeler
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-amber-600">
-              {formatCurrency(walletStats.pendingPayouts, 'TRY')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">
-              {payoutRequests.filter((p) => p.status === 'pending').length}{' '}
-              talep bekliyor
-            </p>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          className="col-span-2"
+          title="Bekleyen Odemeler"
+          value={formatCurrency(walletStats.pendingPayouts, 'TRY')}
+          description={`${payoutRequests.filter((p) => p.status === 'pending').length} talep bekliyor`}
+          icon={<Send className="h-5 w-5" />}
+          accentColor="amber"
+        />
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <CheckCircle2 className="h-3 w-3" />
-              Bugun Islenen
-            </CardDescription>
-            <CardTitle className="text-xl font-bold">
-              {formatCurrency(walletStats.processedToday, 'TRY')}
-            </CardTitle>
-          </CardHeader>
-        </Card>
+        <CanvaStatCard
+          title="Bugun Islenen"
+          value={formatCurrency(walletStats.processedToday, 'TRY')}
+          icon={<CheckCircle2 className="h-5 w-5" />}
+          trend="up"
+        />
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              Ort. Sure
-            </CardDescription>
-            <CardTitle className="text-xl font-bold">
-              {walletStats.avgPayoutTime} saat
-            </CardTitle>
-          </CardHeader>
-        </Card>
+        <CanvaStatCard
+          title="Ort. Sure"
+          value={`${walletStats.avgPayoutTime} saat`}
+          icon={<Clock className="h-5 w-5" />}
+        />
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Shield className="h-3 w-3" />
-              KYC Bekleyen
-            </CardDescription>
-            <CardTitle className="text-xl font-bold text-amber-600">
-              {walletStats.kycPending}
-            </CardTitle>
-          </CardHeader>
-        </Card>
+        <CanvaStatCard
+          title="KYC Bekleyen"
+          value={walletStats.kycPending.toString()}
+          icon={<Shield className="h-5 w-5" />}
+          accentColor="amber"
+        />
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <TrendingUp className="h-3 w-3" />
-              Basari Orani
-            </CardDescription>
-            <CardTitle className="text-xl font-bold text-emerald-600">
-              %{walletStats.payoutSuccessRate}
-            </CardTitle>
-          </CardHeader>
-        </Card>
+        <CanvaStatCard
+          title="Basari Orani"
+          value={`%${walletStats.payoutSuccessRate}`}
+          icon={<TrendingUp className="h-5 w-5" />}
+          trend="up"
+          accentColor="emerald"
+        />
       </div>
 
       {/* Urgent Payouts Alert */}
       {payoutRequests.filter((p) => p.priority === 'urgent').length > 0 && (
-        <Card className="border-red-500/30 bg-red-500/5">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-red-600">
+        <CanvaCard className="border-red-500/30 bg-red-500/5">
+          <CanvaCardHeader>
+            <CanvaCardTitle className="flex items-center gap-2 text-red-600">
               <AlertTriangle className="h-5 w-5" />
               Acil Odeme Talepleri (
               {payoutRequests.filter((p) => p.priority === 'urgent').length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+            </CanvaCardTitle>
+          </CanvaCardHeader>
+          <CanvaCardBody>
             <div className="space-y-2">
               {payoutRequests
                 .filter((p) => p.priority === 'urgent')
@@ -543,17 +493,18 @@ export default function WalletOperationsPage() {
                         </p>
                       </div>
                     </div>
-                    <Button
+                    <CanvaButton
                       size="sm"
+                      variant="primary"
                       onClick={() => handlePayoutAction('approve', payout)}
                     >
                       Hemen Onayla
-                    </Button>
+                    </CanvaButton>
                   </div>
                 ))}
             </div>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
       )}
 
       {/* Main Tabs */}
@@ -587,14 +538,14 @@ export default function WalletOperationsPage() {
                 <SelectItem value="blocked">Engellenen</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline" size="sm">
+            <CanvaButton variant="ghost" size="sm">
               <Send className="h-4 w-4 mr-2" />
               Toplu Odeme
-            </Button>
+            </CanvaButton>
           </div>
 
           {/* Payout Table */}
-          <Card>
+          <CanvaCard>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -673,9 +624,9 @@ export default function WalletOperationsPage() {
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
+                          <CanvaButton variant="ghost" size="sm">
                             <MoreHorizontal className="h-4 w-4" />
-                          </Button>
+                          </CanvaButton>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
@@ -722,61 +673,43 @@ export default function WalletOperationsPage() {
                 ))}
               </TableBody>
             </Table>
-          </Card>
+          </CanvaCard>
         </TabsContent>
 
         {/* KYC Tab */}
         <TabsContent value="kyc" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-3">
-            <Card className="bg-amber-500/5 border-amber-500/30">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-amber-500" />
-                    Bekleyen
-                  </CardTitle>
-                  <span className="text-2xl font-bold text-amber-600">
-                    {walletStats.kycPending}
-                  </span>
-                </div>
-              </CardHeader>
-            </Card>
-            <Card className="bg-emerald-500/5 border-emerald-500/30">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                    Onaylanan
-                  </CardTitle>
-                  <span className="text-2xl font-bold text-emerald-600">
-                    {walletStats.kycApproved}
-                  </span>
-                </div>
-              </CardHeader>
-            </Card>
-            <Card className="bg-red-500/5 border-red-500/30">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <XCircle className="h-4 w-4 text-red-500" />
-                    Reddedilen
-                  </CardTitle>
-                  <span className="text-2xl font-bold text-red-600">
-                    {walletStats.kycRejected}
-                  </span>
-                </div>
-              </CardHeader>
-            </Card>
+            <CanvaStatCard
+              title="Bekleyen"
+              value={walletStats.kycPending.toString()}
+              icon={<Clock className="h-5 w-5" />}
+              accentColor="amber"
+              className="bg-amber-500/5 border-amber-500/30"
+            />
+            <CanvaStatCard
+              title="Onaylanan"
+              value={walletStats.kycApproved.toString()}
+              icon={<CheckCircle2 className="h-5 w-5" />}
+              accentColor="emerald"
+              className="bg-emerald-500/5 border-emerald-500/30"
+            />
+            <CanvaStatCard
+              title="Reddedilen"
+              value={walletStats.kycRejected.toString()}
+              icon={<XCircle className="h-5 w-5" />}
+              accentColor="red"
+              className="bg-red-500/5 border-red-500/30"
+            />
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>KYC Dogrulama Kuyrugu</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>KYC Dogrulama Kuyrugu</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Para cekme icin kimlik dogrulama bekleyenler
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-4">
                 {kycQueue.map((kyc) => (
                   <div
@@ -805,12 +738,9 @@ export default function WalletOperationsPage() {
                             {kyc.user.email}
                           </p>
                           <div className="flex items-center gap-2 mt-1">
-                            <Badge
-                              variant="outline"
-                              className="text-xs capitalize"
-                            >
+                            <CanvaBadge variant="secondary" className="text-xs capitalize">
                               {kyc.documentType.replace('_', ' ')}
-                            </Badge>
+                            </CanvaBadge>
                             <span className="text-xs text-muted-foreground">
                               {kyc.submittedAt}
                             </span>
@@ -844,52 +774,49 @@ export default function WalletOperationsPage() {
                         {kyc.flags && kyc.flags.length > 0 && (
                           <div className="flex flex-wrap gap-1 justify-end mb-2">
                             {kyc.flags.map((flag) => (
-                              <Badge
+                              <CanvaBadge
                                 key={flag}
-                                variant="destructive"
+                                variant="danger"
                                 className="text-xs"
                               >
                                 {flag.replace('_', ' ')}
-                              </Badge>
+                              </CanvaBadge>
                             ))}
                           </div>
                         )}
                         <div className="flex items-center gap-2">
-                          <Button size="sm" variant="outline">
+                          <CanvaButton size="sm" variant="ghost">
                             <Eye className="h-3 w-3 mr-1" />
                             Incele
-                          </Button>
-                          <Button
-                            size="sm"
-                            className="bg-emerald-600 hover:bg-emerald-700"
-                          >
+                          </CanvaButton>
+                          <CanvaButton size="sm" variant="success">
                             <CheckCircle2 className="h-3 w-3 mr-1" />
                             Onayla
-                          </Button>
-                          <Button size="sm" variant="destructive">
+                          </CanvaButton>
+                          <CanvaButton size="sm" variant="danger">
                             <XCircle className="h-3 w-3 mr-1" />
                             Reddet
-                          </Button>
+                          </CanvaButton>
                         </div>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Wallets Tab */}
         <TabsContent value="wallets" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle className="flex items-center gap-2">
                 <Wallet className="h-5 w-5 text-emerald-500" />
                 En Yuksek Bakiyeli Cuzdanlar
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardTitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -936,26 +863,26 @@ export default function WalletOperationsPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="sm">
+                        <CanvaButton variant="ghost" size="sm">
                           <Eye className="h-4 w-4" />
-                        </Button>
+                        </CanvaButton>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Analytics Tab */}
         <TabsContent value="analytics" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Haftalik Odeme Hacmi</CardTitle>
-              <CardDescription>Gunluk islem tutari ve adedi</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Haftalik Odeme Hacmi</CanvaCardTitle>
+              <CanvaCardSubtitle>Gunluk islem tutari ve adedi</CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <AdminAreaChart
                 data={dailyPayoutData}
                 xAxisKey="date"
@@ -972,8 +899,8 @@ export default function WalletOperationsPage() {
                   name,
                 ]}
               />
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
       </Tabs>
 
@@ -1008,30 +935,23 @@ export default function WalletOperationsPage() {
             </div>
           )}
           <DialogFooter>
-            <Button
-              variant="outline"
+            <CanvaButton
+              variant="ghost"
               onClick={() =>
                 setActionDialog({ open: false, action: '', item: null })
               }
             >
               Iptal
-            </Button>
-            <Button
-              variant={
-                actionDialog.action === 'reject' ? 'destructive' : 'default'
-              }
-              className={
-                actionDialog.action === 'approve'
-                  ? 'bg-emerald-600 hover:bg-emerald-700'
-                  : ''
-              }
+            </CanvaButton>
+            <CanvaButton
+              variant={actionDialog.action === 'reject' ? 'danger' : 'success'}
               onClick={() =>
                 setActionDialog({ open: false, action: '', item: null })
               }
             >
               {actionDialog.action === 'approve' && 'Onayla ve Gonder'}
               {actionDialog.action === 'reject' && 'Reddet'}
-            </Button>
+            </CanvaButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>
