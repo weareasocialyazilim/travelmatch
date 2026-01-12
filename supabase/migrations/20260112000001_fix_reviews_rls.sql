@@ -24,14 +24,6 @@ CREATE POLICY "reviews_select_secure"
     -- Reviewed user can see reviews about them
     auth.uid() = reviewed_id
     OR
-    -- Reviews for completed/verified requests are publicly viewable
-    -- (allows potential guests to see host reputation)
-    EXISTS (
-      SELECT 1 FROM requests r
-      WHERE r.id = reviews.request_id
-      AND r.status IN ('completed', 'verified')
-    )
-    OR
     -- Moment owners can see reviews on their moments
     EXISTS (
       SELECT 1 FROM moments m
@@ -43,7 +35,6 @@ CREATE POLICY "reviews_select_secure"
 -- Create index to improve RLS policy performance
 CREATE INDEX IF NOT EXISTS idx_reviews_reviewer_id ON public.reviews(reviewer_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_reviewed_id ON public.reviews(reviewed_id);
-CREATE INDEX IF NOT EXISTS idx_reviews_request_id ON public.reviews(request_id) WHERE request_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_reviews_moment_id ON public.reviews(moment_id) WHERE moment_id IS NOT NULL;
 
 -- ============================================
