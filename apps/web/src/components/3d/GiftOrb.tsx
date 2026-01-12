@@ -32,7 +32,7 @@ export function GiftOrb({
   roughness = 0.1,
 }: GiftOrbProps) {
   const sphereRef = useRef<THREE.Mesh>(null);
-  const materialRef = useRef<THREE.MeshStandardMaterial>(null);
+  const materialRef = useRef<any>(null);
 
   useFrame((state) => {
     if (sphereRef.current) {
@@ -40,12 +40,12 @@ export function GiftOrb({
       sphereRef.current.rotation.x = THREE.MathUtils.lerp(
         sphereRef.current.rotation.x,
         state.mouse.y * 0.3,
-        0.05
+        0.05,
       );
       sphereRef.current.rotation.y = THREE.MathUtils.lerp(
         sphereRef.current.rotation.y,
         state.mouse.x * 0.3,
-        0.05
+        0.05,
       );
 
       // Subtle breathing scale effect
@@ -78,11 +78,7 @@ export function GiftOrb({
 
       {/* Inner glow core */}
       <Sphere args={[0.8, 32, 32]} scale={scale * 0.4}>
-        <meshBasicMaterial
-          color={color}
-          transparent
-          opacity={0.3}
-        />
+        <meshBasicMaterial color={color} transparent opacity={0.3} />
       </Sphere>
     </Float>
   );
