@@ -13,6 +13,94 @@
 import { createHmac, timingSafeEqual } from 'https://deno.land/std@0.177.0/node/crypto.ts';
 
 // =============================================================================
+// CONSTANTS
+// =============================================================================
+
+const PAYTR_API_TIMEOUT = 30000; // 30 seconds
+const MAX_RETRIES = 3;
+const INITIAL_BACKOFF_MS = 1000; // 1 second
+
+// =============================================================================
+// RETRY UTILITY
+// =============================================================================
+
+interface RetryOptions {
+  maxRetries?: number;
+  initialBackoff?: number;
+  maxBackoff?: number;
+  retryOn?: (error: Error) => boolean;
+}
+
+/**
+ * Execute a function with exponential backoff retry
+ */
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  options: RetryOptions = {}
+): Promise<T> {
+  const {
+    maxRetries = MAX_RETRIES,
+    initialBackoff = INITIAL_BACKOFF_MS,
+    maxBackoff = 16000,
+    retryOn = (e) => e.message.includes('network') || e.message.includes('timeout'),
+  } = options;
+
+  let lastError: Error | null = null;
+  let backoff = initialBackoff;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+
+      // Don't retry on non-retryable errors
+      if (!retryOn(lastError)) {
+        throw lastError;
+      }
+
+      // Don't sleep after the last attempt
+      if (attempt < maxRetries) {
+        // Add jitter to prevent thundering herd
+        const jitter = Math.random() * 0.3 * backoff;
+        await new Promise((resolve) => setTimeout(resolve, backoff + jitter));
+        backoff = Math.min(backoff * 2, maxBackoff);
+      }
+    }
+  }
+
+  throw lastError || new Error('Max retries exceeded');
+}
+
+/**
+ * Make a fetch request with timeout
+ */
+async function fetchWithTimeout(
+  url: string,
+  options: RequestInit & { timeout?: number } = {}
+): Promise<Response> {
+  const { timeout = PAYTR_API_TIMEOUT, ...fetchOptions } = options;
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const response = await fetch(url, {
+      ...fetchOptions,
+      signal: controller.signal,
+    });
+    return response;
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      throw new Error('Request timeout - PayTR API did not respond in time');
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+// =============================================================================
 // TYPES
 // =============================================================================
 
@@ -311,25 +399,35 @@ export async function getPaymentToken(
     formData.append('utoken', request.userToken);
   }
 
-  // Make request
-  const response = await fetch(`${PAYTR_API_BASE}/odeme/api/get-token`, {
-    method: 'POST',
-    body: formData,
-  });
+  // Make request with retry and timeout
+  return withRetry(
+    async () => {
+      const response = await fetchWithTimeout(`${PAYTR_API_BASE}/odeme/api/get-token`, {
+        method: 'POST',
+        body: formData,
+      });
 
-  const result = await response.json();
+      const result = await response.json();
 
-  if (result.status === 'success') {
-    return {
-      status: 'success',
-      token: result.token,
-    };
-  } else {
-    return {
-      status: 'failed',
-      reason: result.reason || 'Unknown error',
-    };
-  }
+      if (result.status === 'success') {
+        return {
+          status: 'success' as const,
+          token: result.token,
+        };
+      } else {
+        // Don't retry on business logic errors
+        const error = new Error(result.reason || 'Unknown error');
+        (error as any).noRetry = true;
+        throw error;
+      }
+    },
+    {
+      retryOn: (e) => !(e as any).noRetry && (e.message.includes('timeout') || e.message.includes('network')),
+    }
+  ).catch((error) => ({
+    status: 'failed' as const,
+    reason: error.message,
+  }));
 }
 
 /**
@@ -354,18 +452,32 @@ export async function initiateTransfer(
   formData.append('account_holder_name', request.accountHolderName);
   formData.append('paytr_token', hash);
 
-  const response = await fetch(`${PAYTR_API_BASE}/odeme/platform/transfer`, {
-    method: 'POST',
-    body: formData,
-  });
+  // Make request with retry and timeout
+  return withRetry(
+    async () => {
+      const response = await fetchWithTimeout(`${PAYTR_API_BASE}/odeme/platform/transfer`, {
+        method: 'POST',
+        body: formData,
+      });
 
-  const result = await response.json();
+      const result = await response.json();
 
-  if (result.status === 'success') {
-    return { success: true };
-  } else {
-    return { success: false, error: result.err_msg || 'Transfer failed' };
-  }
+      if (result.status === 'success') {
+        return { success: true };
+      } else {
+        // Don't retry on business logic errors (insufficient funds, invalid iban, etc)
+        const error = new Error(result.err_msg || 'Transfer failed');
+        (error as any).noRetry = true;
+        throw error;
+      }
+    },
+    {
+      retryOn: (e) => !(e as any).noRetry && (e.message.includes('timeout') || e.message.includes('network')),
+    }
+  ).catch((error) => ({
+    success: false,
+    error: error.message,
+  }));
 }
 
 /**
@@ -398,18 +510,32 @@ export async function chargeSavedCard(
     formData.append('cvc', request.cvv);
   }
 
-  const response = await fetch(`${PAYTR_API_BASE}/odeme/api/charge`, {
-    method: 'POST',
-    body: formData,
-  });
+  // Make request with retry and timeout
+  return withRetry(
+    async () => {
+      const response = await fetchWithTimeout(`${PAYTR_API_BASE}/odeme/api/charge`, {
+        method: 'POST',
+        body: formData,
+      });
 
-  const result = await response.json();
+      const result = await response.json();
 
-  if (result.status === 'success') {
-    return { success: true };
-  } else {
-    return { success: false, error: result.err_msg || 'Charge failed' };
-  }
+      if (result.status === 'success') {
+        return { success: true };
+      } else {
+        // Don't retry on business logic errors (declined, invalid card, etc)
+        const error = new Error(result.err_msg || 'Charge failed');
+        (error as any).noRetry = true;
+        throw error;
+      }
+    },
+    {
+      retryOn: (e) => !(e as any).noRetry && (e.message.includes('timeout') || e.message.includes('network')),
+    }
+  ).catch((error) => ({
+    success: false,
+    error: error.message,
+  }));
 }
 
 /**
@@ -433,18 +559,32 @@ export async function refundPayment(
   formData.append('return_amount', amount.toString());
   formData.append('paytr_token', hash);
 
-  const response = await fetch(`${PAYTR_API_BASE}/odeme/iade`, {
-    method: 'POST',
-    body: formData,
-  });
+  // Make request with retry and timeout
+  return withRetry(
+    async () => {
+      const response = await fetchWithTimeout(`${PAYTR_API_BASE}/odeme/iade`, {
+        method: 'POST',
+        body: formData,
+      });
 
-  const result = await response.json();
+      const result = await response.json();
 
-  if (result.status === 'success') {
-    return { success: true };
-  } else {
-    return { success: false, error: result.err_msg || 'Refund failed' };
-  }
+      if (result.status === 'success') {
+        return { success: true };
+      } else {
+        // Don't retry on business logic errors (already refunded, invalid oid, etc)
+        const error = new Error(result.err_msg || 'Refund failed');
+        (error as any).noRetry = true;
+        throw error;
+      }
+    },
+    {
+      retryOn: (e) => !(e as any).noRetry && (e.message.includes('timeout') || e.message.includes('network')),
+    }
+  ).catch((error) => ({
+    success: false,
+    error: error.message,
+  }));
 }
 
 // =============================================================================
