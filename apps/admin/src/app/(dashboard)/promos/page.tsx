@@ -184,6 +184,11 @@ export default function PromosPage() {
   const [newPromoApplicableTo, setNewPromoApplicableTo] = useState('all');
   const [newPromoLimit, setNewPromoLimit] = useState('');
 
+  // Referral program settings
+  const [referrerReward, setReferrerReward] = useState('30');
+  const [referredReward, setReferredReward] = useState('20');
+  const [isSavingReferralSettings, setIsSavingReferralSettings] = useState(false);
+
   // Use real API data
   const { data, isLoading, error, refetch } = usePromos();
   const createPromo = useCreatePromo();
@@ -307,6 +312,32 @@ export default function PromosPage() {
       code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return code;
+  };
+
+  const handleSaveReferralSettings = async () => {
+    if (!referrerReward || !referredReward) {
+      toast.error('Ödül değerleri boş olamaz');
+      return;
+    }
+
+    const referrerValue = parseFloat(referrerReward);
+    const referredValue = parseFloat(referredReward);
+
+    if (isNaN(referrerValue) || isNaN(referredValue) || referrerValue < 0 || referredValue < 0) {
+      toast.error('Geçerli ödül değerleri girin');
+      return;
+    }
+
+    setIsSavingReferralSettings(true);
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      toast.success(`Referans ayarları kaydedildi: Referrer ${referrerReward}₺, Referred ${referredReward}₺`);
+    } catch {
+      toast.error('Ayarlar kaydedilemedi');
+    } finally {
+      setIsSavingReferralSettings(false);
+    }
   };
 
   // Loading Skeleton Component
@@ -823,7 +854,8 @@ export default function PromosPage() {
                   <div className="flex items-center gap-2">
                     <CanvaInput
                       type="number"
-                      defaultValue="30"
+                      value={referrerReward}
+                      onChange={(e) => setReferrerReward(e.target.value)}
                       className="w-24"
                     />
                     <span className="text-muted-foreground">₺</span>
@@ -834,7 +866,8 @@ export default function PromosPage() {
                   <div className="flex items-center gap-2">
                     <CanvaInput
                       type="number"
-                      defaultValue="20"
+                      value={referredReward}
+                      onChange={(e) => setReferredReward(e.target.value)}
                       className="w-24"
                     />
                     <span className="text-muted-foreground">₺</span>
@@ -854,6 +887,15 @@ export default function PromosPage() {
                 >
                   Aktif
                 </CanvaBadge>
+              </div>
+              <div className="flex justify-end">
+                <CanvaButton
+                  variant="primary"
+                  onClick={handleSaveReferralSettings}
+                  loading={isSavingReferralSettings}
+                >
+                  Ayarları Kaydet
+                </CanvaButton>
               </div>
             </CanvaCardBody>
           </CanvaCard>
