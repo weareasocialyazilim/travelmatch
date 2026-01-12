@@ -5,8 +5,8 @@
   "main": "index.ts",
   "private": true,
   "scripts": {
-    "dev": "infisical run --env=dev -- pnpm exec expo start",
-    "start": "infisical run --env=dev -- pnpm exec expo start",
+    "dev": "infisical run --projectId=fa0ed450-40e2-4063-b4f4-ce5cca83a57e --env=dev -- pnpm exec expo start",
+    "start": "infisical run --projectId=fa0ed450-40e2-4063-b4f4-ce5cca83a57e --env=dev -- pnpm exec expo start",
     "android": "infisical run --projectId=fa0ed450-40e2-4063-b4f4-ce5cca83a57e --env=dev -- pnpm exec expo run:android",
     "ios": "infisical run --projectId=fa0ed450-40e2-4063-b4f4-ce5cca83a57e --env=dev -- pnpm exec expo run:ios",
     "web": "infisical run --projectId=fa0ed450-40e2-4063-b4f4-ce5cca83a57e --env=dev -- pnpm exec expo start --web",
