@@ -50,15 +50,6 @@ import {
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { CanvaButton } from '@/components/canva/CanvaButton';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -263,34 +254,30 @@ export default function SafetyHubPage() {
     switch (priority) {
       case 'critical':
         return (
-          <Badge className="bg-red-500/10 text-red-500 border-red-500/20">
-            <AlertTriangle className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="error" icon={<AlertTriangle className="h-3 w-3" />}>
             Kritik
-          </Badge>
+          </CanvaBadge>
         );
       case 'high':
         return (
-          <Badge className="bg-orange-500/10 text-orange-500 border-orange-500/20">
-            <AlertCircle className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="warning" icon={<AlertCircle className="h-3 w-3" />}>
             Yüksek
-          </Badge>
+          </CanvaBadge>
         );
       case 'medium':
         return (
-          <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">
-            <Clock className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="warning" icon={<Clock className="h-3 w-3" />}>
             Orta
-          </Badge>
+          </CanvaBadge>
         );
       case 'low':
         return (
-          <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20">
-            <Flag className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="info" icon={<Flag className="h-3 w-3" />}>
             Düşük
-          </Badge>
+          </CanvaBadge>
         );
       default:
-        return <Badge variant="outline">{priority}</Badge>;
+        return <CanvaBadge variant="default">{priority}</CanvaBadge>;
     }
   };
 
@@ -320,14 +307,12 @@ export default function SafetyHubPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
-            <Activity className="h-4 w-4 mr-2" />
+          <CanvaButton variant="outline" leftIcon={<Activity className="h-4 w-4" />}>
             Canlı İzleme
-          </Button>
-          <Button>
-            <Shield className="h-4 w-4 mr-2" />
+          </CanvaButton>
+          <CanvaButton variant="primary" leftIcon={<Shield className="h-4 w-4" />}>
             Güvenlik Raporu
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
@@ -346,96 +331,43 @@ export default function SafetyHubPage() {
               </p>
             </div>
           </div>
-          <Button
+          <CanvaButton
             variant="outline"
             size="sm"
             className="border-red-500/30 text-red-500"
           >
             Detayları Gör
-          </Button>
+          </CanvaButton>
         </div>
       )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-4 gap-4">
-        <Card className="admin-card border-l-4 border-l-orange-500">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Bekleyen Raporlar
-                </p>
-                <p className="text-3xl font-bold">
-                  {safetyStats.pendingReports}
-                </p>
-              </div>
-              <div className="p-3 rounded-lg bg-orange-500/10">
-                <Clock className="h-6 w-6 text-orange-500" />
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              Ort. Çözüm: {safetyStats.avgResolutionTime}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="admin-card border-l-4 border-l-green-500">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Bugün Çözülen</p>
-                <p className="text-3xl font-bold">
-                  {safetyStats.resolvedToday}
-                </p>
-              </div>
-              <div className="p-3 rounded-lg bg-green-500/10">
-                <CheckCircle2 className="h-6 w-6 text-green-500" />
-              </div>
-            </div>
-            <div className="flex items-center gap-1 text-xs text-green-500 mt-2">
-              <TrendingUp className="h-3 w-3" />
-              <span>+18% dünden</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="admin-card border-l-4 border-l-red-500">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Dolandırıcılık</p>
-                <p className="text-3xl font-bold">
-                  {safetyStats.fraudAttempts}
-                </p>
-              </div>
-              <div className="p-3 rounded-lg bg-red-500/10">
-                <AlertTriangle className="h-6 w-6 text-red-500" />
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              {safetyStats.accountsSuspended} hesap askıya alındı
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="admin-card border-l-4 border-l-purple-500">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">AI Tespitleri</p>
-                <p className="text-3xl font-bold">
-                  {safetyStats.aiDetectedThreats}
-                </p>
-              </div>
-              <div className="p-3 rounded-lg bg-purple-500/10">
-                <Brain className="h-6 w-6 text-purple-500" />
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              %{safetyStats.falsePositiveRate} yanlış pozitif
-            </p>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          label="Bekleyen Raporlar"
+          value={safetyStats.pendingReports}
+          icon={<Clock className="h-5 w-5 text-orange-500" />}
+          className="border-l-4 border-l-orange-500"
+        />
+        <CanvaStatCard
+          label="Bugün Çözülen"
+          value={safetyStats.resolvedToday}
+          change={{ value: 18, label: 'dünden' }}
+          icon={<CheckCircle2 className="h-5 w-5 text-green-500" />}
+          className="border-l-4 border-l-green-500"
+        />
+        <CanvaStatCard
+          label="Dolandırıcılık"
+          value={safetyStats.fraudAttempts}
+          icon={<AlertTriangle className="h-5 w-5 text-red-500" />}
+          className="border-l-4 border-l-red-500"
+        />
+        <CanvaStatCard
+          label="AI Tespitleri"
+          value={safetyStats.aiDetectedThreats}
+          icon={<Brain className="h-5 w-5 text-purple-500" />}
+          className="border-l-4 border-l-purple-500"
+        />
       </div>
 
       {/* Main Content */}
@@ -444,9 +376,9 @@ export default function SafetyHubPage() {
           <TabsTrigger value="queue">
             <Flag className="h-4 w-4 mr-2" />
             Rapor Kuyruğu
-            <Badge variant="secondary" className="ml-2">
+            <CanvaBadge variant="default" size="sm" className="ml-2">
               {safetyStats.pendingReports}
-            </Badge>
+            </CanvaBadge>
           </TabsTrigger>
           <TabsTrigger value="ai-moderation">
             <Brain className="h-4 w-4 mr-2" />
@@ -468,10 +400,10 @@ export default function SafetyHubPage() {
 
         {/* Report Queue Tab */}
         <TabsContent value="queue" className="space-y-4">
-          <Card className="admin-card">
-            <CardHeader>
+          <CanvaCard>
+            <CanvaCardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Bekleyen Raporlar</CardTitle>
+                <CanvaCardTitle>Bekleyen Raporlar</CanvaCardTitle>
                 <div className="flex gap-2">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -492,8 +424,8 @@ export default function SafetyHubPage() {
                   </Select>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -574,30 +506,32 @@ export default function SafetyHubPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          <Button variant="ghost" size="icon" title="İncele">
+                          <CanvaButton variant="ghost" size="sm" iconOnly title="İncele">
                             <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
+                          </CanvaButton>
+                          <CanvaButton
                             variant="ghost"
-                            size="icon"
+                            size="sm"
+                            iconOnly
                             className="text-green-500"
                             title="Onayla"
                           >
                             <CheckCircle2 className="h-4 w-4" />
-                          </Button>
-                          <Button
+                          </CanvaButton>
+                          <CanvaButton
                             variant="ghost"
-                            size="icon"
+                            size="sm"
+                            iconOnly
                             className="text-red-500"
                             title="Kaldır"
                           >
                             <XCircle className="h-4 w-4" />
-                          </Button>
+                          </CanvaButton>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
+                              <CanvaButton variant="ghost" size="sm" iconOnly>
                                 <MoreHorizontal className="h-4 w-4" />
-                              </Button>
+                              </CanvaButton>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem>

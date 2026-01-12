@@ -26,16 +26,8 @@ import {
   CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -135,12 +127,12 @@ export default function SettingsPage() {
 
         {/* Profile Tab */}
         <TabsContent value="profile">
-          <Card>
-            <CardHeader>
-              <CardTitle>Profil Bilgileri</CardTitle>
-              <CardDescription>Hesap bilgilerinizi güncelleyin</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Profil Bilgileri</CanvaCardTitle>
+              <CanvaCardSubtitle>Hesap bilgilerinizi güncelleyin</CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <form
                 onSubmit={profileForm.handleSubmit(onProfileSubmit)}
                 className="space-y-6"
@@ -210,21 +202,21 @@ export default function SettingsPage() {
                   Kaydet
                 </CanvaButton>
               </form>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Security Tab */}
         <TabsContent value="security" className="space-y-6">
           {/* Password Change */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Şifre Değiştir</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Şifre Değiştir</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Hesap güvenliğiniz için şifrenizi düzenli olarak güncelleyin
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <form
                 onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}
                 className="space-y-4"
@@ -308,18 +300,18 @@ export default function SettingsPage() {
                   Şifreyi Güncelle
                 </CanvaButton>
               </form>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
 
           {/* 2FA */}
-          <Card>
-            <CardHeader>
-              <CardTitle>İki Faktörlü Doğrulama (2FA)</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>İki Faktörlü Doğrulama (2FA)</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Hesabınıza ekstra güvenlik katmanı ekleyin
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <div className="font-medium">2FA Durumu</div>
@@ -331,18 +323,18 @@ export default function SettingsPage() {
                 </div>
                 <Switch checked={user?.totp_enabled} />
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
 
           {/* Active Sessions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Aktif Oturumlar</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Aktif Oturumlar</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Hesabınıza bağlı cihazları yönetin
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-4">
                 <div className="flex items-center justify-between rounded-lg border p-4">
                   <div>
@@ -362,20 +354,20 @@ export default function SettingsPage() {
               <CanvaButton variant="primary" className="mt-4 w-full">
                 Diğer Tüm Oturumları Sonlandır
               </CanvaButton>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Notifications Tab */}
         <TabsContent value="notifications">
-          <Card>
-            <CardHeader>
-              <CardTitle>Bildirim Ayarları</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Bildirim Ayarları</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Hangi bildirimleri almak istediğinizi seçin
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody className="space-y-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <div className="font-medium">Acil Görevler</div>
@@ -415,20 +407,20 @@ export default function SettingsPage() {
                 </div>
                 <Switch defaultChecked />
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Appearance Tab */}
         <TabsContent value="appearance">
-          <Card>
-            <CardHeader>
-              <CardTitle>Görünüm Ayarları</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Görünüm Ayarları</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Uygulama görünümünü özelleştirin
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody className="space-y-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <div className="font-medium">Karanlık Mod</div>
@@ -458,8 +450,8 @@ export default function SettingsPage() {
                 </div>
                 <Switch defaultChecked />
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
       </Tabs>
     </div>

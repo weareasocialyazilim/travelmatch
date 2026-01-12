@@ -7,7 +7,6 @@ import {
   TrendingUp,
   TrendingDown,
   DollarSign,
-  Eye,
   Calendar,
   Download,
   ArrowUpRight,
@@ -17,7 +16,6 @@ import {
   Repeat,
   UserPlus,
   Clock,
-  Map,
 } from 'lucide-react';
 import {
   LineChart,
@@ -46,13 +44,6 @@ import {
   CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
@@ -61,7 +52,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { formatCurrency, formatNumber, cn } from '@/lib/utils';
+import { formatCurrency, formatNumber } from '@/lib/utils';
 import {
   useAnalytics,
   useUserMetrics,
@@ -183,78 +174,38 @@ export default function AnalyticsPage() {
 
       {/* Key Metrics */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Günlük Aktif Kullanıcı
-            </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                formatNumber(userMetrics.activeUsers || 4521)
-              )}
-            </div>
-            <div className="flex items-center text-xs">
-              <ArrowUpRight className="mr-1 h-3 w-3 text-green-600" />
-              <span className="text-green-600">+12.5%</span>
-              <span className="ml-1 text-muted-foreground">geçen haftadan</span>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Günlük Gelir</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                formatCurrency(revenueMetrics.totalRevenue / 30 || 24500)
-              )}
-            </div>
-            <div className="flex items-center text-xs">
-              <ArrowUpRight className="mr-1 h-3 w-3 text-green-600" />
-              <span className="text-green-600">+23.7%</span>
-              <span className="ml-1 text-muted-foreground">geçen haftadan</span>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Dönüşüm Oranı</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">3.2%</div>
-            <div className="flex items-center text-xs">
-              <ArrowDownRight className="mr-1 h-3 w-3 text-red-600" />
-              <span className="text-red-600">-0.4%</span>
-              <span className="ml-1 text-muted-foreground">geçen haftadan</span>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Retention (D7)
-            </CardTitle>
-            <Repeat className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">58%</div>
-            <div className="flex items-center text-xs">
-              <ArrowUpRight className="mr-1 h-3 w-3 text-green-600" />
-              <span className="text-green-600">+5%</span>
-              <span className="ml-1 text-muted-foreground">geçen aydan</span>
-            </div>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          title="Günlük Aktif Kullanıcı"
+          value={isLoading ? '-' : formatNumber(userMetrics.activeUsers || 4521)}
+          icon={Users}
+          change="+12.5%"
+          changeLabel="geçen haftadan"
+          trend="up"
+        />
+        <CanvaStatCard
+          title="Günlük Gelir"
+          value={isLoading ? '-' : formatCurrency(revenueMetrics.totalRevenue / 30 || 24500)}
+          icon={DollarSign}
+          change="+23.7%"
+          changeLabel="geçen haftadan"
+          trend="up"
+        />
+        <CanvaStatCard
+          title="Dönüşüm Oranı"
+          value="3.2%"
+          icon={Target}
+          change="-0.4%"
+          changeLabel="geçen haftadan"
+          trend="down"
+        />
+        <CanvaStatCard
+          title="Retention (D7)"
+          value="58%"
+          icon={Repeat}
+          change="+5%"
+          changeLabel="geçen aydan"
+          trend="up"
+        />
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
@@ -269,12 +220,12 @@ export default function AnalyticsPage() {
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             {/* DAU/MAU Chart */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Aktif Kullanıcılar</CardTitle>
-                <CardDescription>DAU ve MAU trendi</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Aktif Kullanıcılar</CanvaCardTitle>
+                <CanvaCardSubtitle>DAU ve MAU trendi</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={dailyActiveUsers}>
@@ -311,16 +262,16 @@ export default function AnalyticsPage() {
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
             {/* Revenue Chart */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Gelir</CardTitle>
-                <CardDescription>Günlük gelir ve işlem sayısı</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Gelir</CanvaCardTitle>
+                <CanvaCardSubtitle>Günlük gelir ve işlem sayısı</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={revenueData}>
@@ -356,18 +307,18 @@ export default function AnalyticsPage() {
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
 
           <div className="grid gap-4 md:grid-cols-3">
             {/* User Acquisition */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Kullanıcı Kazanımı</CardTitle>
-                <CardDescription>Kaynak dağılımı</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Kullanıcı Kazanımı</CanvaCardTitle>
+                <CanvaCardSubtitle>Kaynak dağılımı</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="h-[200px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -401,16 +352,16 @@ export default function AnalyticsPage() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
             {/* Retention Curve */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Retention Eğrisi</CardTitle>
-                <CardDescription>Kullanıcı tutma oranları</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Retention Eğrisi</CanvaCardTitle>
+                <CanvaCardSubtitle>Kullanıcı tutma oranları</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="h-[200px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={retentionData}>
@@ -437,16 +388,16 @@ export default function AnalyticsPage() {
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
             {/* Top Cities */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Popüler Şehirler</CardTitle>
-                <CardDescription>Kullanıcı dağılımı</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Popüler Şehirler</CanvaCardTitle>
+                <CanvaCardSubtitle>Kullanıcı dağılımı</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="space-y-4">
                   {topCities.map((city, index) => (
                     <div key={city.city} className="space-y-1">
@@ -470,110 +421,70 @@ export default function AnalyticsPage() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
         </TabsContent>
 
         {/* Users Tab */}
         <TabsContent value="users" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Yeni Kayıtlar
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">234</div>
-                <p className="text-xs text-muted-foreground">Bugün</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Aktif Oturumlar
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">1,847</div>
-                <p className="text-xs text-muted-foreground">Şu an</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Ort. Oturum Süresi
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">12.4 dk</div>
-                <p className="text-xs text-muted-foreground">Bugün</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Churn Oranı
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">2.3%</div>
-                <p className="text-xs text-muted-foreground">Bu ay</p>
-              </CardContent>
-            </Card>
+            <CanvaStatCard
+              title="Yeni Kayıtlar"
+              value="234"
+              icon={UserPlus}
+              changeLabel="Bugün"
+            />
+            <CanvaStatCard
+              title="Aktif Oturumlar"
+              value="1,847"
+              icon={Activity}
+              changeLabel="Şu an"
+            />
+            <CanvaStatCard
+              title="Ort. Oturum Süresi"
+              value="12.4 dk"
+              icon={Clock}
+              changeLabel="Bugün"
+            />
+            <CanvaStatCard
+              title="Churn Oranı"
+              value="2.3%"
+              icon={TrendingDown}
+              changeLabel="Bu ay"
+            />
           </div>
         </TabsContent>
 
         {/* Revenue Tab */}
         <TabsContent value="revenue" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Aylık Gelir
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {formatCurrency(324500)}
-                </div>
-                <p className="text-xs text-green-600">+18% geçen aydan</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">ARPU</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{formatCurrency(24.5)}</div>
-                <p className="text-xs text-muted-foreground">
-                  Kullanıcı başına
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">LTV</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{formatCurrency(156)}</div>
-                <p className="text-xs text-muted-foreground">
-                  Yaşam boyu değer
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">
-                  İade Oranı
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">1.8%</div>
-                <p className="text-xs text-muted-foreground">Bu ay</p>
-              </CardContent>
-            </Card>
+            <CanvaStatCard
+              title="Aylık Gelir"
+              value={formatCurrency(324500)}
+              icon={DollarSign}
+              change="+18%"
+              changeLabel="geçen aydan"
+              trend="up"
+            />
+            <CanvaStatCard
+              title="ARPU"
+              value={formatCurrency(24.5)}
+              icon={Users}
+              changeLabel="Kullanıcı başına"
+            />
+            <CanvaStatCard
+              title="LTV"
+              value={formatCurrency(156)}
+              icon={TrendingUp}
+              changeLabel="Yaşam boyu değer"
+            />
+            <CanvaStatCard
+              title="İade Oranı"
+              value="1.8%"
+              icon={TrendingDown}
+              changeLabel="Bu ay"
+            />
           </div>
         </TabsContent>
 
@@ -581,30 +492,14 @@ export default function AnalyticsPage() {
         <TabsContent value="content" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-4">
             {contentStats.map((stat) => (
-              <Card key={stat.metric}>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {stat.metric}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stat.value}</div>
-                  <div className="flex items-center text-xs">
-                    {stat.trend === 'up' ? (
-                      <ArrowUpRight className="mr-1 h-3 w-3 text-green-600" />
-                    ) : (
-                      <ArrowDownRight className="mr-1 h-3 w-3 text-red-600" />
-                    )}
-                    <span
-                      className={
-                        stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
-                      }
-                    >
-                      {stat.change}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
+              <CanvaStatCard
+                key={stat.metric}
+                title={stat.metric}
+                value={stat.value}
+                icon={BarChart3}
+                change={stat.change}
+                trend={stat.trend as 'up' | 'down'}
+              />
             ))}
           </div>
         </TabsContent>

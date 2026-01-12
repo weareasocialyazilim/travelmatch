@@ -22,16 +22,7 @@ import {
   CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Select,
@@ -172,81 +163,43 @@ export default function DisputesPage() {
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Açık Şikayetler
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                pendingCount
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">Acil ilgi bekliyor</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">İncelenen</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">
-              {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                underReviewCount
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Değerlendirme altında
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Toplam</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                data?.total || 0
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">Tüm anlaşmazlıklar</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Ort. Çözüm Süresi
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">4.2</div>
-            <p className="text-xs text-muted-foreground">saat</p>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          title="Açık Şikayetler"
+          value={isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : pendingCount}
+          subtitle="Acil ilgi bekliyor"
+          valueClassName="text-red-600"
+        />
+        <CanvaStatCard
+          title="İncelenen"
+          value={isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : underReviewCount}
+          subtitle="Değerlendirme altında"
+          valueClassName="text-yellow-600"
+        />
+        <CanvaStatCard
+          title="Toplam"
+          value={isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : (data?.total || 0)}
+          subtitle="Tüm anlaşmazlıklar"
+        />
+        <CanvaStatCard
+          title="Ort. Çözüm Süresi"
+          value="4.2"
+          subtitle="saat"
+        />
       </div>
 
       {/* Dispute List */}
-      <Card>
-        <CardHeader>
+      <CanvaCard>
+        <CanvaCardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Şikayet Listesi</CardTitle>
-              <CardDescription>
+              <CanvaCardTitle>Şikayet Listesi</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Tüm kullanıcı şikayetlerini görüntüleyin ve yönetin
-              </CardDescription>
+              </CanvaCardSubtitle>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
+        </CanvaCardHeader>
+        <CanvaCardBody>
           {/* Filters */}
           <div className="mb-6 flex flex-wrap items-center gap-4">
             <div className="relative flex-1 min-w-[200px]">
@@ -424,8 +377,8 @@ export default function DisputesPage() {
               </p>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
     </div>
   );
 }

@@ -24,16 +24,7 @@ import {
   CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Select,
@@ -235,65 +226,39 @@ export default function UsersPage() {
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Toplam Kullanıcı
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {stats?.totalUsers?.toLocaleString('tr-TR') || '-'}
-            </div>
-            <p className="text-xs text-muted-foreground">Kayıtlı kullanıcı</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Aktif Kullanıcı
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {stats?.activeUsers?.toLocaleString('tr-TR') || '-'}
-            </div>
-            <p className="text-xs text-muted-foreground">Aktif hesaplar</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">KYC Bekleyen</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.pendingKYC || 0}</div>
-            <p className="text-xs text-muted-foreground">Onay bekliyor</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Askıya Alınan</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {stats?.suspendedUsers || 0}
-            </div>
-            <p className="text-xs text-muted-foreground">Askıdaki hesaplar</p>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          title="Toplam Kullanıcı"
+          value={stats?.totalUsers?.toLocaleString('tr-TR') || '-'}
+          subtitle="Kayıtlı kullanıcı"
+        />
+        <CanvaStatCard
+          title="Aktif Kullanıcı"
+          value={stats?.activeUsers?.toLocaleString('tr-TR') || '-'}
+          subtitle="Aktif hesaplar"
+        />
+        <CanvaStatCard
+          title="KYC Bekleyen"
+          value={stats?.pendingKYC || 0}
+          subtitle="Onay bekliyor"
+        />
+        <CanvaStatCard
+          title="Askıya Alınan"
+          value={stats?.suspendedUsers || 0}
+          subtitle="Askıdaki hesaplar"
+        />
       </div>
 
       {/* User List */}
-      <Card>
-        <CardHeader>
+      <CanvaCard>
+        <CanvaCardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Kullanıcı Listesi</CardTitle>
-              <CardDescription>{total} kullanıcı bulundu</CardDescription>
+              <CanvaCardTitle>Kullanıcı Listesi</CanvaCardTitle>
+              <CanvaCardSubtitle>{total} kullanıcı bulundu</CanvaCardSubtitle>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
+        </CanvaCardHeader>
+        <CanvaCardBody>
           {/* Filters */}
           <div className="mb-6 flex items-center gap-4">
             <div className="relative flex-1">
@@ -473,8 +438,8 @@ export default function UsersPage() {
               </div>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
     </div>
   );
 }

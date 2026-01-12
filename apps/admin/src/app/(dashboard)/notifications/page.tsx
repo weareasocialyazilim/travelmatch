@@ -34,14 +34,6 @@ import {
   CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
-import { Badge } from '@/components/ui/badge';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
@@ -485,66 +477,31 @@ export default function NotificationsPage() {
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-                <Send className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {mockCampaignStats.totalSent.toLocaleString('tr-TR')}
-                </p>
-                <p className="text-sm text-muted-foreground">Toplam Gönderim</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-                <CheckCircle className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  %{mockCampaignStats.avgDeliveryRate}
-                </p>
-                <p className="text-sm text-muted-foreground">Teslimat Oranı</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100">
-                <Eye className="h-6 w-6 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  %{mockCampaignStats.avgOpenRate}
-                </p>
-                <p className="text-sm text-muted-foreground">Açılma Oranı</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-orange-100">
-                <TrendingUp className="h-6 w-6 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  %{mockCampaignStats.avgClickRate}
-                </p>
-                <p className="text-sm text-muted-foreground">Tıklama Oranı</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          title="Toplam Gönderim"
+          value={mockCampaignStats.totalSent.toLocaleString('tr-TR')}
+          icon={<Send className="h-5 w-5" />}
+          accentColor="blue"
+        />
+        <CanvaStatCard
+          title="Teslimat Oranı"
+          value={`%${mockCampaignStats.avgDeliveryRate}`}
+          icon={<CheckCircle className="h-5 w-5" />}
+          accentColor="emerald"
+          trend="up"
+        />
+        <CanvaStatCard
+          title="Açılma Oranı"
+          value={`%${mockCampaignStats.avgOpenRate}`}
+          icon={<Eye className="h-5 w-5" />}
+          accentColor="violet"
+        />
+        <CanvaStatCard
+          title="Tıklama Oranı"
+          value={`%${mockCampaignStats.avgClickRate}`}
+          icon={<TrendingUp className="h-5 w-5" />}
+          accentColor="amber"
+        />
       </div>
 
       {/* Notifications List */}
@@ -566,8 +523,8 @@ export default function NotificationsPage() {
 
         <TabsContent value="all" className="space-y-4">
           {mockNotifications.map((notification) => (
-            <Card key={notification.id}>
-              <CardContent className="p-6">
+            <CanvaCard key={notification.id}>
+              <CanvaCardBody className="p-6">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4">
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
@@ -679,8 +636,8 @@ export default function NotificationsPage() {
                     </DropdownMenu>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           ))}
         </TabsContent>
 
@@ -746,14 +703,14 @@ export default function NotificationsPage() {
       </Tabs>
 
       {/* Segments Overview */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Kullanıcı Segmentleri</CardTitle>
-          <CardDescription>
+      <CanvaCard>
+        <CanvaCardHeader>
+          <CanvaCardTitle>Kullanıcı Segmentleri</CanvaCardTitle>
+          <CanvaCardSubtitle>
             Hedef kitle segmentleri ve kullanıcı sayıları
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+          </CanvaCardSubtitle>
+        </CanvaCardHeader>
+        <CanvaCardBody>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {mockSegments.slice(0, 8).map((segment) => (
               <div
@@ -772,8 +729,8 @@ export default function NotificationsPage() {
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
     </div>
   );
 }

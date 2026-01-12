@@ -47,15 +47,6 @@ import {
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { CanvaButton } from '@/components/canva/CanvaButton';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -275,20 +266,20 @@ export default function UserLifecyclePage() {
               <SelectItem value="90d">90 Gün</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline">
+          <CanvaButton variant="ghost">
             <Download className="h-4 w-4 mr-2" />
             Rapor
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
       {/* Lifecycle Stage Cards */}
       <div className="grid grid-cols-5 gap-4">
-        <Card className="admin-card border-l-4 border-l-blue-500">
-          <CardContent className="p-4">
+        <CanvaCard className="admin-card border-l-4 border-l-blue-500">
+          <CanvaCardBody className="p-4">
             <div className="flex items-center justify-between">
               <UserPlus className="h-5 w-5 text-blue-500" />
-              <Badge
+              <CanvaBadge
                 variant="outline"
                 className={cn(
                   lifecycleStats.newUsers.change > 0
@@ -298,7 +289,7 @@ export default function UserLifecyclePage() {
               >
                 {lifecycleStats.newUsers.change > 0 ? '+' : ''}
                 {lifecycleStats.newUsers.change}%
-              </Badge>
+              </CanvaBadge>
             </div>
             <p className="text-2xl font-bold mt-2">
               {formatNumber(lifecycleStats.newUsers.count)}
@@ -306,16 +297,16 @@ export default function UserLifecyclePage() {
             <p className="text-xs text-muted-foreground">
               Yeni Kullanıcı ({lifecycleStats.newUsers.period})
             </p>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
 
-        <Card className="admin-card border-l-4 border-l-green-500">
-          <CardContent className="p-4">
+        <CanvaCard className="admin-card border-l-4 border-l-green-500">
+          <CanvaCardBody className="p-4">
             <div className="flex items-center justify-between">
               <UserCheck className="h-5 w-5 text-green-500" />
-              <Badge variant="outline" className="text-green-500">
+              <CanvaBadge variant="outline" className="text-green-500">
                 +{lifecycleStats.activeUsers.change}%
-              </Badge>
+              </CanvaBadge>
             </div>
             <p className="text-2xl font-bold mt-2">
               {formatNumber(lifecycleStats.activeUsers.count)}
@@ -323,16 +314,16 @@ export default function UserLifecyclePage() {
             <p className="text-xs text-muted-foreground">
               Aktif ({lifecycleStats.activeUsers.period})
             </p>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
 
-        <Card className="admin-card border-l-4 border-l-yellow-500">
-          <CardContent className="p-4">
+        <CanvaCard className="admin-card border-l-4 border-l-yellow-500">
+          <CanvaCardBody className="p-4">
             <div className="flex items-center justify-between">
               <AlertTriangle className="h-5 w-5 text-yellow-500" />
-              <Badge variant="outline" className="text-green-500">
+              <CanvaBadge variant="outline" className="text-green-500">
                 {lifecycleStats.atRiskUsers.change}%
-              </Badge>
+              </CanvaBadge>
             </div>
             <p className="text-2xl font-bold mt-2">
               {formatNumber(lifecycleStats.atRiskUsers.count)}
@@ -340,16 +331,16 @@ export default function UserLifecyclePage() {
             <p className="text-xs text-muted-foreground">
               Risk Altında ({lifecycleStats.atRiskUsers.period})
             </p>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
 
-        <Card className="admin-card border-l-4 border-l-red-500">
-          <CardContent className="p-4">
+        <CanvaCard className="admin-card border-l-4 border-l-red-500">
+          <CanvaCardBody className="p-4">
             <div className="flex items-center justify-between">
               <UserX className="h-5 w-5 text-red-500" />
-              <Badge variant="outline" className="text-red-500">
+              <CanvaBadge variant="outline" className="text-red-500">
                 +{lifecycleStats.churnedUsers.change}%
-              </Badge>
+              </CanvaBadge>
             </div>
             <p className="text-2xl font-bold mt-2">
               {formatNumber(lifecycleStats.churnedUsers.count)}
@@ -357,16 +348,16 @@ export default function UserLifecyclePage() {
             <p className="text-xs text-muted-foreground">
               Churn ({lifecycleStats.churnedUsers.period})
             </p>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
 
-        <Card className="admin-card border-l-4 border-l-purple-500">
-          <CardContent className="p-4">
+        <CanvaCard className="admin-card border-l-4 border-l-purple-500">
+          <CanvaCardBody className="p-4">
             <div className="flex items-center justify-between">
               <RotateCcw className="h-5 w-5 text-purple-500" />
-              <Badge variant="outline" className="text-green-500">
+              <CanvaBadge variant="outline" className="text-green-500">
                 +{lifecycleStats.reactivatedUsers.change}%
-              </Badge>
+              </CanvaBadge>
             </div>
             <p className="text-2xl font-bold mt-2">
               {formatNumber(lifecycleStats.reactivatedUsers.count)}
@@ -374,8 +365,8 @@ export default function UserLifecyclePage() {
             <p className="text-xs text-muted-foreground">
               Reaktivasyon ({lifecycleStats.reactivatedUsers.period})
             </p>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
       </div>
 
       {/* Main Content */}
@@ -406,12 +397,12 @@ export default function UserLifecyclePage() {
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <Card className="admin-card">
-              <CardHeader>
-                <CardTitle>Aktif Kullanıcı Trendi</CardTitle>
-                <CardDescription>DAU / WAU / MAU</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <CanvaCard className="admin-card">
+              <CanvaCardHeader>
+                <CanvaCardTitle>Aktif Kullanıcı Trendi</CanvaCardTitle>
+                <CanvaCardSubtitle>DAU / WAU / MAU</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <AdminAreaChart
                   data={dauTrend}
                   xAxisKey="date"
@@ -421,15 +412,15 @@ export default function UserLifecyclePage() {
                   ]}
                   height={250}
                 />
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
-            <Card className="admin-card">
-              <CardHeader>
-                <CardTitle>Kullanıcı Sağlık Metrikleri</CardTitle>
-                <CardDescription>Platform sağlık göstergeleri</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <CanvaCard className="admin-card">
+              <CanvaCardHeader>
+                <CanvaCardTitle>Kullanıcı Sağlık Metrikleri</CanvaCardTitle>
+                <CanvaCardSubtitle>Platform sağlık göstergeleri</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody className="space-y-4">
                 {healthMetrics.map((metric) => (
                   <div key={metric.metric} className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
@@ -453,19 +444,19 @@ export default function UserLifecyclePage() {
                     />
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
 
           {/* User Flow Visualization */}
-          <Card className="admin-card">
-            <CardHeader>
-              <CardTitle>Kullanıcı Akışı</CardTitle>
-              <CardDescription>
+          <CanvaCard className="admin-card">
+            <CanvaCardHeader>
+              <CanvaCardTitle>Kullanıcı Akışı</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Yaşam döngüsü aşamaları arası geçişler
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="flex items-center justify-between gap-4">
                 {[
                   {
@@ -524,18 +515,18 @@ export default function UserLifecyclePage() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Onboarding Tab */}
         <TabsContent value="onboarding" className="space-y-4">
-          <Card className="admin-card">
-            <CardHeader>
-              <CardTitle>Onboarding Hunisi</CardTitle>
-              <CardDescription>Kayıttan ilk rezervasyona</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <CanvaCard className="admin-card">
+            <CanvaCardHeader>
+              <CanvaCardTitle>Onboarding Hunisi</CanvaCardTitle>
+              <CanvaCardSubtitle>Kayıttan ilk rezervasyona</CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-3">
                 {onboardingFunnel.map((step, i) => (
                   <div key={step.stage} className="flex items-center gap-4">
@@ -567,8 +558,8 @@ export default function UserLifecyclePage() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
 
           <div className="grid grid-cols-3 gap-4">
             {[
@@ -594,34 +585,34 @@ export default function UserLifecyclePage() {
                 trend: '28%',
               },
             ].map((stat) => (
-              <Card key={stat.title} className="admin-card">
-                <CardContent className="p-4">
+              <CanvaCard key={stat.title} className="admin-card">
+                <CanvaCardBody className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="p-2 rounded-lg bg-primary/10">
                       <stat.icon className="h-5 w-5 text-primary" />
                     </div>
-                    <Badge variant="outline" className="text-green-500">
+                    <CanvaBadge variant="outline" className="text-green-500">
                       {stat.trend}
-                    </Badge>
+                    </CanvaBadge>
                   </div>
                   <p className="text-2xl font-bold mt-2">{stat.value}</p>
                   <p className="text-xs text-muted-foreground">
                     {stat.description}
                   </p>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))}
           </div>
         </TabsContent>
 
         {/* Retention Tab */}
         <TabsContent value="retention" className="space-y-4">
-          <Card className="admin-card">
-            <CardHeader>
-              <CardTitle>Haftalık Retention Kohortları</CardTitle>
-              <CardDescription>Ocak 2026 kohort analizi</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <CanvaCard className="admin-card">
+            <CanvaCardHeader>
+              <CanvaCardTitle>Haftalık Retention Kohortları</CanvaCardTitle>
+              <CanvaCardSubtitle>Ocak 2026 kohort analizi</CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <AdminBarChart
                 data={retentionData}
                 xAxisKey="week"
@@ -630,8 +621,8 @@ export default function UserLifecyclePage() {
                 ]}
                 height={300}
               />
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
 
           <div className="grid grid-cols-4 gap-4">
             {[
@@ -640,8 +631,8 @@ export default function UserLifecyclePage() {
               { period: 'D30', rate: 28, benchmark: 25 },
               { period: 'D90', rate: 18, benchmark: 15 },
             ].map((item) => (
-              <Card key={item.period} className="admin-card">
-                <CardContent className="p-4">
+              <CanvaCard key={item.period} className="admin-card">
+                <CanvaCardBody className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium">{item.period} Retention</span>
                     {item.rate > item.benchmark ? (
@@ -658,8 +649,8 @@ export default function UserLifecyclePage() {
                     value={(item.rate / 100) * 100}
                     className="h-2 mt-2"
                   />
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))}
           </div>
         </TabsContent>
@@ -667,8 +658,8 @@ export default function UserLifecyclePage() {
         {/* At-Risk Tab */}
         <TabsContent value="at-risk" className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
-            <Card className="admin-card">
-              <CardContent className="p-4">
+            <CanvaCard className="admin-card">
+              <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-yellow-500/10">
                     <AlertTriangle className="h-5 w-5 text-yellow-500" />
@@ -682,10 +673,10 @@ export default function UserLifecyclePage() {
                     </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-            <Card className="admin-card">
-              <CardContent className="p-4">
+              </CanvaCardBody>
+            </CanvaCard>
+            <CanvaCard className="admin-card">
+              <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-purple-500/10">
                     <Brain className="h-5 w-5 text-purple-500" />
@@ -697,10 +688,10 @@ export default function UserLifecyclePage() {
                     </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-            <Card className="admin-card">
-              <CardContent className="p-4">
+              </CanvaCardBody>
+            </CanvaCard>
+            <CanvaCard className="admin-card">
+              <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-green-500/10">
                     <RotateCcw className="h-5 w-5 text-green-500" />
@@ -712,21 +703,21 @@ export default function UserLifecyclePage() {
                     </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
 
-          <Card className="admin-card">
-            <CardHeader>
+          <CanvaCard className="admin-card">
+            <CanvaCardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Yüksek Riskli Kullanıcılar</CardTitle>
-                <Button>
+                <CanvaCardTitle>Yüksek Riskli Kullanıcılar</CanvaCardTitle>
+                <CanvaButton>
                   <Bell className="h-4 w-4 mr-2" />
                   Toplu Kampanya
-                </Button>
+                </CanvaButton>
               </div>
-            </CardHeader>
-            <CardContent>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -751,7 +742,7 @@ export default function UserLifecyclePage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{user.segment}</Badge>
+                        <CanvaBadge variant="outline">{user.segment}</CanvaBadge>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
@@ -778,52 +769,52 @@ export default function UserLifecyclePage() {
                         {formatCurrency(user.ltv)}
                       </TableCell>
                       <TableCell>
-                        <Badge
+                        <CanvaBadge
                           variant="outline"
                           className="bg-yellow-500/10 text-yellow-700"
                         >
                           {user.reason}
-                        </Badge>
+                        </CanvaBadge>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          <Button
+                          <CanvaButton
                             variant="ghost"
                             size="icon"
                             title="Push Gönder"
                           >
                             <Bell className="h-4 w-4" />
-                          </Button>
-                          <Button
+                          </CanvaButton>
+                          <CanvaButton
                             variant="ghost"
                             size="icon"
                             title="Email Gönder"
                           >
                             <Mail className="h-4 w-4" />
-                          </Button>
-                          <Button
+                          </CanvaButton>
+                          <CanvaButton
                             variant="ghost"
                             size="icon"
                             title="Hediye Gönder"
                           >
                             <Gift className="h-4 w-4" />
-                          </Button>
+                          </CanvaButton>
                         </div>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Segments Tab */}
         <TabsContent value="segments" className="space-y-4">
           <div className="grid grid-cols-5 gap-4">
             {userSegments.map((segment) => (
-              <Card key={segment.name} className="admin-card">
-                <CardContent className="p-4">
+              <CanvaCard key={segment.name} className="admin-card">
+                <CanvaCardBody className="p-4">
                   <div
                     className={cn('w-3 h-3 rounded-full mb-2', segment.color)}
                   />
@@ -840,22 +831,22 @@ export default function UserLifecyclePage() {
                       {formatCurrency(segment.avgLTV)}
                     </p>
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))}
           </div>
 
-          <Card className="admin-card">
-            <CardHeader>
+          <CanvaCard className="admin-card">
+            <CanvaCardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Segment Detayları</CardTitle>
-                <Button variant="outline">
+                <CanvaCardTitle>Segment Detayları</CanvaCardTitle>
+                <CanvaButton variant="ghost">
                   <Filter className="h-4 w-4 mr-2" />
                   Özel Segment Oluştur
-                </Button>
+                </CanvaButton>
               </div>
-            </CardHeader>
-            <CardContent>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -888,17 +879,17 @@ export default function UserLifecyclePage() {
                         {segment.description}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">
+                        <CanvaButton variant="ghost" size="sm">
                           Kampanya
                           <ChevronRight className="h-4 w-4 ml-1" />
-                        </Button>
+                        </CanvaButton>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
       </Tabs>
     </div>

@@ -44,15 +44,6 @@ import {
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { CanvaButton } from '@/components/canva/CanvaButton';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -222,16 +213,16 @@ export default function AlertsPage() {
   };
 
   const getSeverityBadge = (severity: string) => {
-    const styles = {
-      critical: 'bg-red-500/10 text-red-500 border-red-500/20',
-      high: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
-      medium: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
-      low: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-    };
+    const variantMap = {
+      critical: 'error',
+      high: 'warning',
+      medium: 'warning',
+      low: 'info',
+    } as const;
     return (
-      <Badge className={styles[severity as keyof typeof styles] || styles.low}>
+      <CanvaBadge variant={variantMap[severity as keyof typeof variantMap] || 'info'}>
         {severity.toUpperCase()}
-      </Badge>
+      </CanvaBadge>
     );
   };
 
@@ -274,24 +265,19 @@ export default function AlertsPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button
+          <CanvaButton
             variant="outline"
             size="sm"
             onClick={() => setSoundEnabled(!soundEnabled)}
+            leftIcon={soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
           >
-            {soundEnabled ? (
-              <Volume2 className="h-4 w-4 mr-2" />
-            ) : (
-              <VolumeX className="h-4 w-4 mr-2" />
-            )}
             Ses {soundEnabled ? 'Açık' : 'Kapalı'}
-          </Button>
+          </CanvaButton>
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Settings className="h-4 w-4 mr-2" />
+              <CanvaButton variant="outline" size="sm" leftIcon={<Settings className="h-4 w-4" />}>
                 Kuralları Yönet
-              </Button>
+              </CanvaButton>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
@@ -342,68 +328,38 @@ export default function AlertsPage() {
                 </p>
               </div>
             </div>
-            <Button variant="destructive" size="sm">
+            <CanvaButton variant="danger" size="sm">
               Hepsini Gör
-            </Button>
+            </CanvaButton>
           </div>
         </div>
       )}
 
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4">
-        <Card className="admin-card">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-3xl font-bold text-red-500">
-                  {criticalCount}
-                </p>
-                <p className="text-sm text-muted-foreground">Kritik</p>
-              </div>
-              <AlertTriangle className="h-8 w-8 text-red-500/20" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="admin-card">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-3xl font-bold text-orange-500">
-                  {highCount}
-                </p>
-                <p className="text-sm text-muted-foreground">Yüksek</p>
-              </div>
-              <AlertCircle className="h-8 w-8 text-orange-500/20" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="admin-card">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-3xl font-bold">{activeAlerts.length}</p>
-                <p className="text-sm text-muted-foreground">Toplam Aktif</p>
-              </div>
-              <Bell className="h-8 w-8 text-muted-foreground/20" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="admin-card">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-3xl font-bold text-green-500">
-                  {
-                    activeAlerts.filter((a) => a.status === 'acknowledged')
-                      .length
-                  }
-                </p>
-                <p className="text-sm text-muted-foreground">Onaylandı</p>
-              </div>
-              <CheckCircle2 className="h-8 w-8 text-green-500/20" />
-            </div>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          label="Kritik"
+          value={criticalCount}
+          icon={<AlertTriangle className="h-5 w-5 text-red-500" />}
+          className="border-l-4 border-l-red-500"
+        />
+        <CanvaStatCard
+          label="Yüksek"
+          value={highCount}
+          icon={<AlertCircle className="h-5 w-5 text-orange-500" />}
+          className="border-l-4 border-l-orange-500"
+        />
+        <CanvaStatCard
+          label="Toplam Aktif"
+          value={activeAlerts.length}
+          icon={<Bell className="h-5 w-5 text-gray-400" />}
+        />
+        <CanvaStatCard
+          label="Onaylandı"
+          value={activeAlerts.filter((a) => a.status === 'acknowledged').length}
+          icon={<CheckCircle2 className="h-5 w-5 text-green-500" />}
+          className="border-l-4 border-l-green-500"
+        />
       </div>
 
       {/* Main Content */}
@@ -452,10 +408,10 @@ export default function AlertsPage() {
               );
             })
             .map((alert) => (
-              <Card
+              <CanvaCard
                 key={alert.id}
                 className={cn(
-                  'admin-card border-l-4',
+                  'border-l-4',
                   alert.severity === 'critical'
                     ? 'border-l-red-500 bg-red-500/5'
                     : alert.severity === 'high'
@@ -463,7 +419,7 @@ export default function AlertsPage() {
                       : 'border-l-yellow-500 bg-yellow-500/5',
                 )}
               >
-                <CardContent className="p-4">
+                <CanvaCardBody className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-4">
                       {getSeverityIcon(alert.severity)}
@@ -471,10 +427,9 @@ export default function AlertsPage() {
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold">{alert.title}</h3>
                           {getSeverityBadge(alert.severity)}
-                          <Badge variant="outline" className="text-xs">
-                            {getCategoryIcon(alert.category)}
-                            <span className="ml-1">{alert.category}</span>
-                          </Badge>
+                          <CanvaBadge variant="default" size="sm" icon={getCategoryIcon(alert.category)}>
+                            {alert.category}
+                          </CanvaBadge>
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">
                           {alert.description}
@@ -496,18 +451,16 @@ export default function AlertsPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm">
-                        <Eye className="h-4 w-4 mr-1" />
+                      <CanvaButton variant="outline" size="sm" leftIcon={<Eye className="h-4 w-4" />}>
                         Onayla
-                      </Button>
-                      <Button variant="default" size="sm">
+                      </CanvaButton>
+                      <CanvaButton variant="primary" size="sm" rightIcon={<ChevronRight className="h-4 w-4" />}>
                         Çöz
-                        <ChevronRight className="h-4 w-4 ml-1" />
-                      </Button>
+                      </CanvaButton>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))}
         </TabsContent>
 
@@ -515,11 +468,11 @@ export default function AlertsPage() {
           {activeAlerts
             .filter((a) => a.status === 'acknowledged')
             .map((alert) => (
-              <Card
+              <CanvaCard
                 key={alert.id}
-                className="admin-card border-l-4 border-l-blue-500"
+                className="border-l-4 border-l-blue-500"
               >
-                <CardContent className="p-4">
+                <CanvaCardBody className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-4">
                       <Eye className="h-5 w-5 text-blue-500" />
@@ -534,19 +487,19 @@ export default function AlertsPage() {
                         </p>
                       </div>
                     </div>
-                    <Button variant="default" size="sm">
+                    <CanvaButton variant="primary" size="sm">
                       Çöz
-                    </Button>
+                    </CanvaButton>
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))}
         </TabsContent>
 
         <TabsContent value="history" className="space-y-3 mt-4">
           {alertHistory.map((alert) => (
-            <Card key={alert.id} className="admin-card opacity-75">
-              <CardContent className="p-4">
+            <CanvaCard key={alert.id} className="opacity-75">
+              <CanvaCardBody className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <CheckCircle2 className="h-5 w-5 text-green-500" />
@@ -560,8 +513,8 @@ export default function AlertsPage() {
                   </div>
                   {getSeverityBadge(alert.severity)}
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           ))}
         </TabsContent>
       </Tabs>

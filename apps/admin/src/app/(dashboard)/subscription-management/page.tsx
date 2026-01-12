@@ -51,15 +51,6 @@ import {
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { CanvaButton } from '@/components/canva/CanvaButton';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
@@ -320,41 +311,36 @@ export default function SubscriptionManagementPage() {
     switch (action) {
       case 'new':
         return (
-          <Badge className="bg-emerald-500/10 text-emerald-600">
-            <Plus className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="success" icon={<Plus className="h-3 w-3" />}>
             Yeni
-          </Badge>
+          </CanvaBadge>
         );
       case 'upgrade':
         return (
-          <Badge className="bg-blue-500/10 text-blue-600">
-            <ArrowUpRight className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="info" icon={<ArrowUpRight className="h-3 w-3" />}>
             Yukseltme
-          </Badge>
+          </CanvaBadge>
         );
       case 'downgrade':
         return (
-          <Badge className="bg-amber-500/10 text-amber-600">
-            <ArrowDownRight className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="warning" icon={<ArrowDownRight className="h-3 w-3" />}>
             Dusurme
-          </Badge>
+          </CanvaBadge>
         );
       case 'renewal':
         return (
-          <Badge className="bg-purple-500/10 text-purple-600">
-            <RefreshCw className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="primary" icon={<RefreshCw className="h-3 w-3" />}>
             Yenileme
-          </Badge>
+          </CanvaBadge>
         );
       case 'cancel':
         return (
-          <Badge className="bg-red-500/10 text-red-600">
-            <XCircle className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="error" icon={<XCircle className="h-3 w-3" />}>
             Iptal
-          </Badge>
+          </CanvaBadge>
         );
       default:
-        return <Badge variant="outline">{action}</Badge>;
+        return <CanvaBadge>{action}</CanvaBadge>;
     }
   };
 
@@ -362,22 +348,20 @@ export default function SubscriptionManagementPage() {
     switch (plan) {
       case 'platinum':
         return (
-          <Badge className="bg-amber-500 text-white">
-            <Crown className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="warning" icon={<Crown className="h-3 w-3" />}>
             Platinum
-          </Badge>
+          </CanvaBadge>
         );
       case 'premium':
         return (
-          <Badge className="bg-purple-500 text-white">
-            <Star className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="primary" icon={<Star className="h-3 w-3" />}>
             Premium
-          </Badge>
+          </CanvaBadge>
         );
       case 'free':
-        return <Badge variant="outline">Free</Badge>;
+        return <CanvaBadge>Free</CanvaBadge>;
       default:
-        return <Badge variant="outline">-</Badge>;
+        return <CanvaBadge>-</CanvaBadge>;
     }
   };
 
@@ -395,91 +379,54 @@ export default function SubscriptionManagementPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
+          <CanvaButton variant="outline" size="sm" leftIcon={<Download className="h-4 w-4" />}>
             Rapor
-          </Button>
-          <Button size="sm" onClick={() => setPromoDialog(true)}>
-            <Plus className="h-4 w-4 mr-2" />
+          </CanvaButton>
+          <CanvaButton size="sm" leftIcon={<Plus className="h-4 w-4" />} onClick={() => setPromoDialog(true)}>
             Yeni Promo
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
       {/* Key Metrics */}
       <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-6">
-        <Card className="col-span-2 bg-gradient-to-br from-emerald-500/10 to-transparent">
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <DollarSign className="h-3 w-3" />
-              MRR (Aylik Gelir)
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-emerald-600">
-              {formatCurrency(subscriptionStats.mrr, 'TRY')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-1 text-sm">
-              <ArrowUpRight className="h-4 w-4 text-emerald-500" />
-              <span className="text-emerald-600 font-medium">+12.3%</span>
-              <span className="text-muted-foreground">vs gecen ay</span>
-            </div>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          className="col-span-2"
+          label="MRR (Aylik Gelir)"
+          value={formatCurrency(subscriptionStats.mrr, 'TRY')}
+          change={{ value: 12.3, label: 'vs gecen ay' }}
+          icon={<DollarSign className="h-4 w-4" />}
+        />
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Users className="h-3 w-3" />
-              Toplam Abone
-            </CardDescription>
-            <CardTitle className="text-xl font-bold">
-              {subscriptionStats.totalSubscribers.toLocaleString()}
-            </CardTitle>
-          </CardHeader>
-        </Card>
+        <CanvaStatCard
+          label="Toplam Abone"
+          value={subscriptionStats.totalSubscribers}
+          icon={<Users className="h-4 w-4" />}
+        />
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Target className="h-3 w-3" />
-              Donusum Orani
-            </CardDescription>
-            <CardTitle className="text-xl font-bold text-purple-600">
-              %{subscriptionStats.conversionRate}
-            </CardTitle>
-          </CardHeader>
-        </Card>
+        <CanvaStatCard
+          label="Donusum Orani"
+          value={`%${subscriptionStats.conversionRate}`}
+          icon={<Target className="h-4 w-4" />}
+        />
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <AlertTriangle className="h-3 w-3" />
-              Churn Orani
-            </CardDescription>
-            <CardTitle className="text-xl font-bold text-amber-600">
-              %{subscriptionStats.churnRate}
-            </CardTitle>
-          </CardHeader>
-        </Card>
+        <CanvaStatCard
+          label="Churn Orani"
+          value={`%${subscriptionStats.churnRate}`}
+          icon={<AlertTriangle className="h-4 w-4" />}
+        />
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Award className="h-3 w-3" />
-              LTV
-            </CardDescription>
-            <CardTitle className="text-xl font-bold">
-              {formatCurrency(subscriptionStats.ltv, 'TRY')}
-            </CardTitle>
-          </CardHeader>
-        </Card>
+        <CanvaStatCard
+          label="LTV"
+          value={formatCurrency(subscriptionStats.ltv, 'TRY')}
+          icon={<Award className="h-4 w-4" />}
+        />
       </div>
 
       {/* Subscription Plans */}
       <div className="grid gap-4 md:grid-cols-3">
         {subscriptionPlans.map((plan) => (
-          <Card
+          <CanvaCard
             key={plan.id}
             className={cn(
               'relative overflow-hidden',
@@ -490,9 +437,9 @@ export default function SubscriptionManagementPage() {
             <div
               className={cn('absolute top-0 left-0 w-full h-1', plan.color)}
             />
-            <CardHeader>
+            <CanvaCardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
+                <CanvaCardTitle className="flex items-center gap-2">
                   {plan.id === 'platinum' && (
                     <Crown className="h-5 w-5 text-amber-500" />
                   )}
@@ -500,10 +447,10 @@ export default function SubscriptionManagementPage() {
                     <Star className="h-5 w-5 text-purple-500" />
                   )}
                   {plan.name}
-                </CardTitle>
+                </CanvaCardTitle>
                 <Switch checked={plan.active} />
               </div>
-              <CardDescription>
+              <CanvaCardSubtitle>
                 {plan.price > 0 ? (
                   <span className="text-2xl font-bold text-foreground">
                     {formatCurrency(plan.price, plan.currency)}
@@ -516,9 +463,9 @@ export default function SubscriptionManagementPage() {
                     Ucretsiz
                   </span>
                 )}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody className="space-y-4">
               <div className="flex items-center justify-between py-2 border-t border-b">
                 <span className="text-sm text-muted-foreground">
                   Aktif Kullanici
@@ -543,12 +490,11 @@ export default function SubscriptionManagementPage() {
                   </li>
                 ))}
               </ul>
-              <Button variant="outline" className="w-full" size="sm">
-                <Edit className="h-4 w-4 mr-2" />
+              <CanvaButton variant="outline" fullWidth size="sm" leftIcon={<Edit className="h-4 w-4" />}>
                 Plani Duzenle
-              </Button>
-            </CardContent>
-          </Card>
+              </CanvaButton>
+            </CanvaCardBody>
+          </CanvaCard>
         ))}
       </div>
 
@@ -565,12 +511,12 @@ export default function SubscriptionManagementPage() {
         <TabsContent value="overview" className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Revenue Chart */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Plan Bazli Gelir</CardTitle>
-                <CardDescription>Haftalik abonelik geliri</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Plan Bazli Gelir</CanvaCardTitle>
+                <CanvaCardSubtitle>Haftalik abonelik geliri</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <AdminAreaChart
                   data={revenueByPlanData}
                   xAxisKey="date"
@@ -592,16 +538,16 @@ export default function SubscriptionManagementPage() {
                     name,
                   ]}
                 />
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
             {/* Conversion Funnel */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Donusum Hunisi</CardTitle>
-                <CardDescription>Free'den Premium'a yolculuk</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Donusum Hunisi</CanvaCardTitle>
+                <CanvaCardSubtitle>Free'den Premium'a yolculuk</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="space-y-4">
                   {conversionFunnel.map((stage, index) => (
                     <div key={stage.stage} className="space-y-2">
@@ -620,92 +566,55 @@ export default function SubscriptionManagementPage() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
 
           {/* Quick Stats */}
           <div className="grid gap-4 md:grid-cols-4">
-            <Card className="bg-gradient-to-br from-emerald-500/10 to-transparent">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Bugun Yukseltme
-                    </p>
-                    <p className="text-2xl font-bold text-emerald-600">
-                      {subscriptionStats.upgrades}
-                    </p>
-                  </div>
-                  <ArrowUpRight className="h-8 w-8 text-emerald-500/50" />
-                </div>
-              </CardContent>
-            </Card>
+            <CanvaStatCard
+              label="Bugun Yukseltme"
+              value={subscriptionStats.upgrades}
+              icon={<ArrowUpRight className="h-4 w-4" />}
+            />
 
-            <Card className="bg-gradient-to-br from-amber-500/10 to-transparent">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Bugun Dusurme
-                    </p>
-                    <p className="text-2xl font-bold text-amber-600">
-                      {subscriptionStats.downgrades}
-                    </p>
-                  </div>
-                  <ArrowDownRight className="h-8 w-8 text-amber-500/50" />
-                </div>
-              </CardContent>
-            </Card>
+            <CanvaStatCard
+              label="Bugun Dusurme"
+              value={subscriptionStats.downgrades}
+              icon={<ArrowDownRight className="h-4 w-4" />}
+            />
 
-            <Card className="bg-gradient-to-br from-red-500/10 to-transparent">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Bugun Iptal</p>
-                    <p className="text-2xl font-bold text-red-600">
-                      {subscriptionStats.cancellations}
-                    </p>
-                  </div>
-                  <XCircle className="h-8 w-8 text-red-500/50" />
-                </div>
-              </CardContent>
-            </Card>
+            <CanvaStatCard
+              label="Bugun Iptal"
+              value={subscriptionStats.cancellations}
+              icon={<XCircle className="h-4 w-4" />}
+            />
 
-            <Card className="bg-gradient-to-br from-purple-500/10 to-transparent">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">ARR</p>
-                    <p className="text-2xl font-bold text-purple-600">
-                      {formatCurrency(subscriptionStats.arr, 'TRY')}
-                    </p>
-                  </div>
-                  <TrendingUp className="h-8 w-8 text-purple-500/50" />
-                </div>
-              </CardContent>
-            </Card>
+            <CanvaStatCard
+              label="ARR"
+              value={formatCurrency(subscriptionStats.arr, 'TRY')}
+              icon={<TrendingUp className="h-4 w-4" />}
+            />
           </div>
         </TabsContent>
 
         {/* Promo Codes Tab */}
         <TabsContent value="promos" className="space-y-4">
-          <Card>
-            <CardHeader>
+          <CanvaCard>
+            <CanvaCardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Promo Kodlari</CardTitle>
-                  <CardDescription>
+                  <CanvaCardTitle>Promo Kodlari</CanvaCardTitle>
+                  <CanvaCardSubtitle>
                     Aktif ve gecmis promosyonlar
-                  </CardDescription>
+                  </CanvaCardSubtitle>
                 </div>
-                <Button size="sm" onClick={() => setPromoDialog(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
+                <CanvaButton size="sm" leftIcon={<Plus className="h-4 w-4" />} onClick={() => setPromoDialog(true)}>
                   Yeni Promo
-                </Button>
+                </CanvaButton>
               </div>
-            </CardHeader>
-            <CardContent>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -726,25 +635,25 @@ export default function SubscriptionManagementPage() {
                           <code className="px-2 py-1 bg-muted rounded font-mono text-sm">
                             {promo.code}
                           </code>
-                          <Button
+                          <CanvaButton
                             variant="ghost"
-                            size="sm"
-                            className="h-6 w-6 p-0"
+                            size="xs"
+                            iconOnly
                           >
                             <Copy className="h-3 w-3" />
-                          </Button>
+                          </CanvaButton>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">
+                        <CanvaBadge>
                           {promo.type === 'percentage'
                             ? `%${promo.value}`
                             : formatCurrency(promo.value, 'TRY')}
-                        </Badge>
+                        </CanvaBadge>
                       </TableCell>
                       <TableCell>
                         {promo.targetPlan === 'all' ? (
-                          <Badge variant="outline">Tumu</Badge>
+                          <CanvaBadge>Tumu</CanvaBadge>
                         ) : (
                           getPlanBadge(promo.targetPlan)
                         )}
@@ -772,47 +681,48 @@ export default function SubscriptionManagementPage() {
                       </TableCell>
                       <TableCell>
                         {promo.isActive ? (
-                          <Badge className="bg-emerald-500/10 text-emerald-600">
+                          <CanvaBadge variant="success">
                             Aktif
-                          </Badge>
+                          </CanvaBadge>
                         ) : (
-                          <Badge variant="outline">Pasif</Badge>
+                          <CanvaBadge>Pasif</CanvaBadge>
                         )}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
-                          <Button
+                          <CanvaButton
                             variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0"
+                            size="xs"
+                            iconOnly
                           >
                             <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
+                          </CanvaButton>
+                          <CanvaButton
                             variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 text-red-600"
+                            size="xs"
+                            iconOnly
+                            className="text-red-600"
                           >
                             <Trash2 className="h-4 w-4" />
-                          </Button>
+                          </CanvaButton>
                         </div>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Activity Tab */}
         <TabsContent value="activity" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Son Abonelik Aktiviteleri</CardTitle>
-              <CardDescription>Yukseltme, dusurme ve iptaller</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Son Abonelik Aktiviteleri</CanvaCardTitle>
+              <CanvaCardSubtitle>Yukseltme, dusurme ve iptaller</CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-4">
                 {recentSubscriptions.map((sub, index) => (
                   <div
@@ -867,8 +777,8 @@ export default function SubscriptionManagementPage() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Churn Tab */}

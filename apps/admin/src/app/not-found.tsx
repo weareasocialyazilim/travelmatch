@@ -4,27 +4,27 @@ import Link from 'next/link';
 import { FileQuestion, Home, ArrowLeft } from 'lucide-react';
 import { CanvaButton } from '@/components/canva/CanvaButton';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+  CanvaCard,
+  CanvaCardBody,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+} from '@/components/canva/CanvaCard';
 
 export default function NotFound() {
   return (
     <div className="flex h-screen w-full items-center justify-center bg-background p-4">
-      <Card className="max-w-md w-full">
-        <CardHeader className="text-center">
+      <CanvaCard className="max-w-md w-full">
+        <CanvaCardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
             <FileQuestion className="h-8 w-8 text-muted-foreground" />
           </div>
-          <CardTitle className="text-4xl font-bold">404</CardTitle>
-          <CardDescription className="text-lg">
+          <CanvaCardTitle className="text-4xl font-bold">404</CanvaCardTitle>
+          <CanvaCardSubtitle className="text-lg">
             Sayfa Bulunamadı
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </CanvaCardSubtitle>
+        </CanvaCardHeader>
+        <CanvaCardBody className="space-y-4">
           <p className="text-center text-muted-foreground">
             Aradığınız sayfa mevcut değil veya taşınmış olabilir.
           </p>
@@ -44,8 +44,8 @@ export default function NotFound() {
               Geri Dön
             </CanvaButton>
           </div>
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
     </div>
   );
 }

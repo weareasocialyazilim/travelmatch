@@ -28,17 +28,16 @@ import {
   Download,
   RefreshCw,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { CanvaButton } from '@/components/canva/CanvaButton';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
@@ -474,8 +473,8 @@ export default function UserDetailPage() {
         {/* Left Column - User Info */}
         <div className="space-y-6">
           {/* Profile Card */}
-          <Card>
-            <CardContent className="pt-6">
+          <CanvaCard>
+            <CanvaCardBody className="pt-6">
               <div className="flex flex-col items-center text-center">
                 <Avatar className="h-24 w-24">
                   <AvatarImage src={user.avatar_url || undefined} />
@@ -572,15 +571,15 @@ export default function UserDetailPage() {
                   {getKycBadge(user.verification.kyc_status)}
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
 
           {/* Risk Assessment */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Risk Değerlendirmesi</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle className="text-base">Risk Değerlendirmesi</CanvaCardTitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">
                   Risk Skoru
@@ -605,15 +604,15 @@ export default function UserDetailPage() {
                   </CanvaBadge>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
 
           {/* Subscription */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Abonelik</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle className="text-base">Abonelik</CanvaCardTitle>
+            </CanvaCardHeader>
+            <CanvaCardBody className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Plan</span>
                 <CanvaBadge
@@ -641,8 +640,8 @@ export default function UserDetailPage() {
                   {user.subscription.auto_renew ? 'Aktif' : 'Kapalı'}
                 </CanvaBadge>
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </div>
 
         {/* Right Column - Tabs */}
@@ -669,14 +668,14 @@ export default function UserDetailPage() {
 
             {/* Activity Tab */}
             <TabsContent value="activity">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Son Aktiviteler</CardTitle>
-                  <CardDescription>
+              <CanvaCard>
+                <CanvaCardHeader>
+                  <CanvaCardTitle>Son Aktiviteler</CanvaCardTitle>
+                  <CanvaCardSubtitle>
                     Kullanıcının son 30 günlük aktiviteleri
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
+                  </CanvaCardSubtitle>
+                </CanvaCardHeader>
+                <CanvaCardBody>
                   <div className="space-y-4">
                     {mockActivity.map((activity) => (
                       <div key={activity.id} className="flex items-start gap-4">
@@ -692,20 +691,20 @@ export default function UserDetailPage() {
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             </TabsContent>
 
             {/* Transactions Tab */}
             <TabsContent value="transactions">
-              <Card>
-                <CardHeader>
+              <CanvaCard>
+                <CanvaCardHeader>
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle>İşlem Geçmişi</CardTitle>
-                      <CardDescription>
+                      <CanvaCardTitle>İşlem Geçmişi</CanvaCardTitle>
+                      <CanvaCardSubtitle>
                         Tüm ödeme ve iadeleri görüntüle
-                      </CardDescription>
+                      </CanvaCardSubtitle>
                     </div>
                     <div className="text-right">
                       <p className="text-sm text-muted-foreground">
@@ -716,8 +715,8 @@ export default function UserDetailPage() {
                       </p>
                     </div>
                   </div>
-                </CardHeader>
-                <CardContent>
+                </CanvaCardHeader>
+                <CanvaCardBody>
                   <div className="space-y-4">
                     {mockTransactions.map((txn) => (
                       <div
@@ -764,27 +763,27 @@ export default function UserDetailPage() {
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             </TabsContent>
 
             {/* Moments Tab */}
             <TabsContent value="moments">
-              <Card>
-                <CardHeader>
+              <CanvaCard>
+                <CanvaCardHeader>
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle>Momentler</CardTitle>
-                      <CardDescription>
+                      <CanvaCardTitle>Momentler</CanvaCardTitle>
+                      <CanvaCardSubtitle>
                         Kullanıcının paylaştığı içerikler
-                      </CardDescription>
+                      </CanvaCardSubtitle>
                     </div>
                     <CanvaBadge variant="primary">
                       {user.stats.total_moments} Moment
                     </CanvaBadge>
                   </div>
-                </CardHeader>
-                <CardContent>
+                </CanvaCardHeader>
+                <CanvaCardBody>
                   <div className="grid gap-4 sm:grid-cols-2">
                     {mockMoments.map((moment) => (
                       <div key={moment.id} className="rounded-lg border p-4">
@@ -824,20 +823,20 @@ export default function UserDetailPage() {
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             </TabsContent>
 
             {/* Reports Tab */}
             <TabsContent value="reports">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Raporlar & Şikayetler</CardTitle>
-                  <CardDescription>
+              <CanvaCard>
+                <CanvaCardHeader>
+                  <CanvaCardTitle>Raporlar & Şikayetler</CanvaCardTitle>
+                  <CanvaCardSubtitle>
                     Alınan ve gönderilen raporlar
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
+                  </CanvaCardSubtitle>
+                </CanvaCardHeader>
+                <CanvaCardBody>
                   <div className="space-y-4">
                     {mockReports.map((report) => (
                       <div
@@ -891,75 +890,37 @@ export default function UserDetailPage() {
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             </TabsContent>
           </Tabs>
 
           {/* Stats Overview */}
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-                    <Camera className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">
-                      {user.stats.total_moments}
-                    </p>
-                    <p className="text-sm text-muted-foreground">Moment</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-pink-100">
-                    <Heart className="h-6 w-6 text-pink-600" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">
-                      {user.stats.total_matches}
-                    </p>
-                    <p className="text-sm text-muted-foreground">Eşleşme</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100">
-                    <MessageSquare className="h-6 w-6 text-purple-600" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">
-                      {user.stats.total_messages}
-                    </p>
-                    <p className="text-sm text-muted-foreground">Mesaj</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-                    <CreditCard className="h-6 w-6 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">
-                      {formatCurrency(user.stats.total_spent, 'TRY')}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Toplam Harcama
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <CanvaStatCard
+              title="Moment"
+              value={user.stats.total_moments}
+              icon={<Camera className="h-6 w-6 text-blue-600" />}
+              iconBgColor="bg-blue-100"
+            />
+            <CanvaStatCard
+              title="Eşleşme"
+              value={user.stats.total_matches}
+              icon={<Heart className="h-6 w-6 text-pink-600" />}
+              iconBgColor="bg-pink-100"
+            />
+            <CanvaStatCard
+              title="Mesaj"
+              value={user.stats.total_messages}
+              icon={<MessageSquare className="h-6 w-6 text-purple-600" />}
+              iconBgColor="bg-purple-100"
+            />
+            <CanvaStatCard
+              title="Toplam Harcama"
+              value={formatCurrency(user.stats.total_spent, 'TRY')}
+              icon={<CreditCard className="h-6 w-6 text-green-600" />}
+              iconBgColor="bg-green-100"
+            />
           </div>
         </div>
       </div>

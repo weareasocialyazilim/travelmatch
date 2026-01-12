@@ -24,15 +24,6 @@ import {
   CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import {
@@ -231,71 +222,31 @@ export default function GeographicPage() {
 
       {/* Global Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-                <Globe className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {overallStats.totalCountries}
-                </p>
-                <p className="text-sm text-muted-foreground">Ülke</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-                <MapPin className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{overallStats.totalCities}</p>
-                <p className="text-sm text-muted-foreground">Şehir</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100">
-                <Users className="h-6 w-6 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {countryStats
-                    .reduce((sum, c) => sum + c.users, 0)
-                    .toLocaleString('tr-TR')}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Toplam Kullanıcı
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-                <DollarSign className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {formatCurrency(
-                    countryStats.reduce((sum, c) => sum + c.revenue, 0),
-                    'TRY',
-                  )}
-                </p>
-                <p className="text-sm text-muted-foreground">Toplam Gelir</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          title="Ülke"
+          value={overallStats.totalCountries.toString()}
+          icon={<Globe className="h-5 w-5" />}
+        />
+        <CanvaStatCard
+          title="Şehir"
+          value={overallStats.totalCities.toString()}
+          icon={<MapPin className="h-5 w-5" />}
+        />
+        <CanvaStatCard
+          title="Toplam Kullanıcı"
+          value={countryStats
+            .reduce((sum, c) => sum + c.users, 0)
+            .toLocaleString('tr-TR')}
+          icon={<Users className="h-5 w-5" />}
+        />
+        <CanvaStatCard
+          title="Toplam Gelir"
+          value={formatCurrency(
+            countryStats.reduce((sum, c) => sum + c.revenue, 0),
+            'TRY',
+          )}
+          icon={<DollarSign className="h-5 w-5" />}
+        />
       </div>
 
       <Tabs defaultValue="countries" className="space-y-4">
@@ -319,14 +270,14 @@ export default function GeographicPage() {
           <div className="grid gap-4 lg:grid-cols-3">
             {/* Country List */}
             <div className="lg:col-span-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Ülke Performansı</CardTitle>
-                  <CardDescription>
+              <CanvaCard>
+                <CanvaCardHeader>
+                  <CanvaCardTitle>Ülke Performansı</CanvaCardTitle>
+                  <CanvaCardSubtitle>
                     Kullanıcı ve gelir bazlı ülke sıralaması
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
+                  </CanvaCardSubtitle>
+                </CanvaCardHeader>
+                <CanvaCardBody>
                   <div className="space-y-4">
                     {countryStats.map((country, index) => (
                       <div
@@ -384,17 +335,17 @@ export default function GeographicPage() {
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             </div>
 
             {/* Region Distribution */}
             <div className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Bölge Dağılımı</CardTitle>
-                </CardHeader>
-                <CardContent>
+              <CanvaCard>
+                <CanvaCardHeader>
+                  <CanvaCardTitle>Bölge Dağılımı</CanvaCardTitle>
+                </CanvaCardHeader>
+                <CanvaCardBody>
                   <div className="h-[200px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
@@ -434,22 +385,22 @@ export default function GeographicPage() {
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
 
               {/* Selected Country Details */}
               {selectedCountry && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>
+                <CanvaCard>
+                  <CanvaCardHeader>
+                    <CanvaCardTitle>
                       {
                         countryStats.find((c) => c.code === selectedCountry)
                           ?.name
                       }
-                    </CardTitle>
-                    <CardDescription>Detaylı bilgiler</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+                    </CanvaCardTitle>
+                    <CanvaCardSubtitle>Detaylı bilgiler</CanvaCardSubtitle>
+                  </CanvaCardHeader>
+                  <CanvaCardBody className="space-y-4">
                     {(() => {
                       const country = countryStats.find(
                         (c) => c.code === selectedCountry,
@@ -496,8 +447,8 @@ export default function GeographicPage() {
                         </>
                       );
                     })()}
-                  </CardContent>
-                </Card>
+                  </CanvaCardBody>
+                </CanvaCard>
               )}
             </div>
           </div>
@@ -505,12 +456,12 @@ export default function GeographicPage() {
 
         {/* Cities Tab */}
         <TabsContent value="cities" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Şehir Performansı</CardTitle>
-              <CardDescription>En aktif şehirler ve metrikleri</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Şehir Performansı</CanvaCardTitle>
+              <CanvaCardSubtitle>En aktif şehirler ve metrikleri</CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={cityStats} layout="vertical">
@@ -527,13 +478,13 @@ export default function GeographicPage() {
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {cityStats.slice(0, 4).map((city) => (
-              <Card key={city.name}>
-                <CardContent className="pt-6">
+              <CanvaCard key={city.name}>
+                <CanvaCardBody>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold">{city.name}</h3>
@@ -568,23 +519,23 @@ export default function GeographicPage() {
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))}
           </div>
         </TabsContent>
 
         {/* Heatmap Tab */}
         <TabsContent value="heatmap" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Aktivite Haritası</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Aktivite Haritası</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Haftalık aktivite yoğunluğu (saat bazlı ortalama aktif
                 kullanıcı)
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
@@ -647,8 +598,8 @@ export default function GeographicPage() {
                   </tbody>
                 </table>
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
       </Tabs>
     </div>
