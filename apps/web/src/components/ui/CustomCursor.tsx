@@ -1,39 +1,51 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 
 /**
- * CustomCursor - Gen Z Style Interactive Cursor
+ * TravelMatch Premium Custom Cursor
  *
  * Features:
- * - z-[9999] ensures visibility on all backgrounds
- * - mix-blend-difference for visibility on both light and dark surfaces
- * - Smooth spring animations
- * - Scale on hover effects
- * - Hidden on mobile devices
+ * - Smooth spring physics
+ * - Hover states for interactive elements
+ * - Click feedback
+ * - Text cursor mode for inputs
+ * - Magnetic attraction hint
+ * - Hidden on mobile/touch devices
  */
 
 interface CursorState {
   isHovering: boolean;
   isClicking: boolean;
   isHidden: boolean;
+  cursorText: string;
+  cursorVariant: 'default' | 'text' | 'link' | 'button' | 'magnetic';
 }
 
 export function CustomCursor() {
+  const [mounted, setMounted] = useState(false);
   const [state, setState] = useState<CursorState>({
     isHovering: false,
     isClicking: false,
     isHidden: true,
+    cursorText: '',
+    cursorVariant: 'default',
   });
 
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
+  const cursorRef = useRef<HTMLDivElement>(null);
 
   // Smooth spring animation for cursor movement
-  const springConfig = { damping: 25, stiffness: 400, mass: 0.5 };
+  const springConfig = { damping: 25, stiffness: 300, mass: 0.5 };
   const cursorXSpring = useSpring(cursorX, springConfig);
   const cursorYSpring = useSpring(cursorY, springConfig);
+
+  // Outer ring has slightly slower spring for trail effect
+  const outerSpringConfig = { damping: 20, stiffness: 200, mass: 0.8 };
+  const outerXSpring = useSpring(cursorX, outerSpringConfig);
+  const outerYSpring = useSpring(cursorY, outerSpringConfig);
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
@@ -63,35 +75,92 @@ export function CustomCursor() {
     setState((prev) => ({ ...prev, isClicking: false }));
   }, []);
 
+  // Setup cursor variant detection
   useEffect(() => {
-    // Check if device is touch-enabled (mobile/tablet)
+    if (!mounted) return;
+
     const isTouchDevice =
       'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-    if (isTouchDevice) {
-      return; // Don't show custom cursor on touch devices
-    }
+    if (isTouchDevice) return;
 
-    // Add event listeners
+    const handleElementHover = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+
+      // Check for specific cursor variants
+      const cursorVariant = target.closest('[data-cursor]')?.getAttribute('data-cursor') as CursorState['cursorVariant'] | null;
+      const cursorText = target.closest('[data-cursor-text]')?.getAttribute('data-cursor-text') || '';
+
+      if (cursorVariant) {
+        setState((prev) => ({
+          ...prev,
+          isHovering: true,
+          cursorVariant,
+          cursorText,
+        }));
+        return;
+      }
+
+      // Check for interactive elements
+      const isButton = target.closest('button, [role="button"]');
+      const isLink = target.closest('a');
+      const isInput = target.closest('input, textarea, select');
+      const isMagnetic = target.closest('[data-magnetic]');
+
+      if (isMagnetic) {
+        setState((prev) => ({
+          ...prev,
+          isHovering: true,
+          cursorVariant: 'magnetic',
+          cursorText: '',
+        }));
+      } else if (isButton) {
+        setState((prev) => ({
+          ...prev,
+          isHovering: true,
+          cursorVariant: 'button',
+          cursorText: '',
+        }));
+      } else if (isLink) {
+        setState((prev) => ({
+          ...prev,
+          isHovering: true,
+          cursorVariant: 'link',
+          cursorText: '',
+        }));
+      } else if (isInput) {
+        setState((prev) => ({
+          ...prev,
+          isHovering: true,
+          cursorVariant: 'text',
+          cursorText: '',
+        }));
+      }
+    };
+
+    const handleElementLeave = () => {
+      setState((prev) => ({
+        ...prev,
+        isHovering: false,
+        cursorVariant: 'default',
+        cursorText: '',
+      }));
+    };
+
+    // Event listeners
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseenter', handleMouseEnter);
     document.addEventListener('mouseleave', handleMouseLeave);
     document.addEventListener('mousedown', handleMouseDown);
     document.addEventListener('mouseup', handleMouseUp);
 
-    // Add hover detection for interactive elements
-    const interactiveElements = document.querySelectorAll(
-      'a, button, [role="button"], input, textarea, select, [data-cursor-hover]',
-    );
-
-    const handleHoverStart = () =>
-      setState((prev) => ({ ...prev, isHovering: true }));
-    const handleHoverEnd = () =>
-      setState((prev) => ({ ...prev, isHovering: false }));
-
-    interactiveElements.forEach((el) => {
-      el.addEventListener('mouseenter', handleHoverStart);
-      el.addEventListener('mouseleave', handleHoverEnd);
+    // Hover detection with event delegation
+    document.addEventListener('mouseover', handleElementHover);
+    document.addEventListener('mouseout', (e) => {
+      const relatedTarget = e.relatedTarget as HTMLElement | null;
+      if (!relatedTarget?.closest('a, button, [role="button"], input, textarea, select, [data-cursor], [data-magnetic]')) {
+        handleElementLeave();
+      }
     });
 
     return () => {
@@ -100,44 +169,18 @@ export function CustomCursor() {
       document.removeEventListener('mouseleave', handleMouseLeave);
       document.removeEventListener('mousedown', handleMouseDown);
       document.removeEventListener('mouseup', handleMouseUp);
-
-      interactiveElements.forEach((el) => {
-        el.removeEventListener('mouseenter', handleHoverStart);
-        el.removeEventListener('mouseleave', handleHoverEnd);
-      });
+      document.removeEventListener('mouseover', handleElementHover);
     };
-  }, [
-    handleMouseMove,
-    handleMouseEnter,
-    handleMouseLeave,
-    handleMouseDown,
-    handleMouseUp,
-  ]);
+  }, [mounted, handleMouseMove, handleMouseEnter, handleMouseLeave, handleMouseDown, handleMouseUp]);
 
-  // Re-query interactive elements on DOM changes
+  // Check for touch device on mount
   useEffect(() => {
-    const observer = new MutationObserver(() => {
-      const interactiveElements = document.querySelectorAll(
-        'a, button, [role="button"], input, textarea, select, [data-cursor-hover]',
-      );
-
-      const handleHoverStart = () =>
-        setState((prev) => ({ ...prev, isHovering: true }));
-      const handleHoverEnd = () =>
-        setState((prev) => ({ ...prev, isHovering: false }));
-
-      interactiveElements.forEach((el) => {
-        el.addEventListener('mouseenter', handleHoverStart);
-        el.addEventListener('mouseleave', handleHoverEnd);
-      });
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    return () => observer.disconnect();
+    setMounted(true);
   }, []);
 
-  // Don't render on mobile
+  // Don't render on mobile or before mount
+  if (!mounted) return null;
+
   if (
     typeof window !== 'undefined' &&
     ('ontouchstart' in window || navigator.maxTouchPoints > 0)
@@ -145,11 +188,23 @@ export function CustomCursor() {
     return null;
   }
 
+  // Cursor sizes based on state
+  const getCursorSize = () => {
+    if (state.cursorVariant === 'text') return { dot: 2, ring: 0 };
+    if (state.cursorVariant === 'magnetic') return { dot: 8, ring: 80 };
+    if (state.isClicking) return { dot: 6, ring: 30 };
+    if (state.isHovering) return { dot: 10, ring: 60 };
+    return { dot: 8, ring: 40 };
+  };
+
+  const sizes = getCursorSize();
+
   return (
     <>
       {/* Main cursor dot */}
       <motion.div
-        className="fixed pointer-events-none z-[9999] mix-blend-difference"
+        ref={cursorRef}
+        className="fixed pointer-events-none z-[9999]"
         style={{
           x: cursorXSpring,
           y: cursorYSpring,
@@ -157,43 +212,64 @@ export function CustomCursor() {
           translateY: '-50%',
         }}
         animate={{
-          scale: state.isClicking ? 0.8 : state.isHovering ? 1.5 : 1,
+          scale: state.isClicking ? 0.8 : 1,
           opacity: state.isHidden ? 0 : 1,
         }}
         transition={{ duration: 0.15 }}
       >
-        <div
-          className="rounded-full bg-white"
-          style={{
-            width: 'clamp(12px, 2vw, 20px)',
-            height: 'clamp(12px, 2vw, 20px)',
+        <motion.div
+          className="rounded-full bg-primary mix-blend-difference"
+          animate={{
+            width: sizes.dot,
+            height: sizes.dot,
           }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
         />
       </motion.div>
 
       {/* Outer ring */}
       <motion.div
-        className="fixed pointer-events-none z-[9998] mix-blend-difference"
+        className="fixed pointer-events-none z-[9998]"
         style={{
-          x: cursorXSpring,
-          y: cursorYSpring,
+          x: outerXSpring,
+          y: outerYSpring,
           translateX: '-50%',
           translateY: '-50%',
         }}
         animate={{
-          scale: state.isClicking ? 1.2 : state.isHovering ? 2 : 1,
-          opacity: state.isHidden ? 0 : 0.5,
+          scale: state.isClicking ? 0.9 : 1,
+          opacity: state.isHidden ? 0 : state.cursorVariant === 'text' ? 0 : 0.5,
         }}
-        transition={{ duration: 0.2, delay: 0.05 }}
+        transition={{ duration: 0.2 }}
       >
-        <div
-          className="rounded-full border-2 border-white"
-          style={{
-            width: 'clamp(32px, 4vw, 48px)',
-            height: 'clamp(32px, 4vw, 48px)',
+        <motion.div
+          className="rounded-full border border-primary/50 mix-blend-difference"
+          animate={{
+            width: sizes.ring,
+            height: sizes.ring,
+            borderWidth: state.cursorVariant === 'magnetic' ? 2 : 1,
           }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
         />
       </motion.div>
+
+      {/* Cursor text (for special interactions) */}
+      {state.cursorText && (
+        <motion.div
+          className="fixed pointer-events-none z-[9999] text-xs font-bold uppercase tracking-wider text-background"
+          style={{
+            x: cursorXSpring,
+            y: cursorYSpring,
+            translateX: '-50%',
+            translateY: '-50%',
+          }}
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.5 }}
+        >
+          {state.cursorText}
+        </motion.div>
+      )}
     </>
   );
 }
