@@ -29,6 +29,8 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import {
   Card,
   CardContent,

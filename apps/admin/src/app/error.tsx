@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { CanvaButton } from '@/components/canva/CanvaButton';
 import {
   Card,
   CardContent,
@@ -50,18 +50,18 @@ export default function Error({ error, reset }: ErrorProps) {
             </div>
           )}
           <div className="flex gap-2">
-            <Button onClick={reset} className="flex-1">
+            <CanvaButton onClick={reset} className="flex-1">
               <RefreshCw className="mr-2 h-4 w-4" />
               Tekrar Dene
-            </Button>
-            <Button
-              variant="default"
+            </CanvaButton>
+            <CanvaButton
+              variant="primary"
               onClick={() => (window.location.href = '/queue')}
               className="flex-1"
             >
               <Home className="mr-2 h-4 w-4" />
               Ana Sayfa
-            </Button>
+            </CanvaButton>
           </div>
         </CardContent>
       </Card>
