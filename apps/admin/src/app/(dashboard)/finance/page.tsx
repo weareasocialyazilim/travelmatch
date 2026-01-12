@@ -432,7 +432,7 @@ export default function FinancePage() {
                             <div className="flex gap-2">
                               <CanvaButton
                                 size="sm"
-                                variant="primary"
+                                variant="danger"
                                 onClick={() =>
                                   toast.info('İade işlemi henüz bağlı değil')
                                 }
@@ -442,6 +442,7 @@ export default function FinancePage() {
                               </CanvaButton>
                               <CanvaButton
                                 size="sm"
+                                variant="success"
                                 onClick={() =>
                                   toast.info('Onay işlemi henüz bağlı değil')
                                 }
