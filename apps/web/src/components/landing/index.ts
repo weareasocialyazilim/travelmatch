@@ -5,13 +5,12 @@
  */
 
 export { Hero } from './Hero';
-export { TrustRing } from './TrustRing';
-export { MatchSimulator } from './MatchSimulator';
-export { IdentityPulse } from './IdentityPulse';
-export { SacredMoments } from './SacredMoments';
-export { RitualSection } from './RitualSection';
-export { CinematicReveal } from './CinematicReveal';
+export { GlobalPulse } from './GlobalPulse';
+export { MomentDeck } from './MomentDeck';
+export { GoldenGlow } from './GoldenGlow';
+export { ProofCeremony } from './ProofCeremony';
+export { DemoApplication } from './DemoApplication';
+export { WhisperUI } from './WhisperUI';
 export { LiveHeartbeat } from './LiveHeartbeat';
-export { ActivityPulse } from './ActivityPulse';
 export { Manifesto } from './Manifesto';
-export { LiveTrustCounter } from './LiveTrustCounter';
+export { LiquidCard } from './LiquidCard';

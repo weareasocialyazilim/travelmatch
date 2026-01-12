@@ -1,26 +1,62 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
 :root {
-  --background: #ffffff;
-  --foreground: #111111;
-  --accent: #e63946;
+  /* Gen Z Neon & Deep Vibe Palette */
+  --bg-deep: #050505;
+  --neon-pink: #ff007a;
+  --neon-purple: #8b5cf6;
+  --neon-cyan: #00f2ff;
+  --neon-blue: #3b82f6;
+  --neon-orange: #f97316;
+  --neon-green: #ccff00;
+  --acid-green: #ccff00;
+  --warm-coffee: #f59e0b;
+  --foreground: #ffffff;
 }
 
-body {
-  background-color: var(--background);
-  color: var(--foreground);
-  letter-spacing: -0.02em;
-  font-smoothing: antialiased;
-  -webkit-font-smoothing: antialiased;
+@layer base {
+  body {
+    @apply bg-[var(--bg-deep)] text-white overflow-x-hidden;
+    /* Noise Overlay */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 150px;
+  }
 }
 
-html {
-  scroll-behavior: smooth;
+.text-liquid {
+  filter: url('#goo');
 }
 
-::selection {
-  background-color: var(--accent);
-  color: white;
+.gift-glow {
+  box-shadow: 0 0 50px -10px var(--neon-pink);
+  border: 1px solid rgba(255, 0, 122, 0.3);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.custom-cursor {
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+
+.text-stroke {
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
+  color: transparent;
+}
+
+@layer utilities {
+  .text-fluid-hero {
+    font-size: clamp(
+      3.5rem,
+      12vw,
+      12rem
+    ); /* Mobilde devasa, masaüstünde sınırsız */
+    line-height: 0.85;
+    letter-spacing: -0.05em;
+  }
 }
