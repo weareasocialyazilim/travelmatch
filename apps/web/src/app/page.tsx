@@ -1,104 +1,54 @@
-/**
- * TravelMatch - Awwwards-Ready Landing Page
- *
- * Section-Based Reveal Architecture:
- * Each section owns its viewport - no cognitive overload
- *
- * Premium design with:
- * - Hero with 3D GiftOrb
- * - TrustRing scrollytelling
- * - CinematicReveal Apple-style text mask
- * - MatchSimulator ML demo (connected to Neural Nexus API)
- * - IdentityPulse futuristic card
- * - LiveTrustCounter real-time platform stats
- * - SacredMoments Bento Grid
- * - RitualSection process steps
- * - Grand Footer finale
- *
- * Fixed Overlays (don't interfere with flow):
- * - LiveHeartbeat (bottom-right) - Real-time social proof
- * - NeuralChat (bottom-left) - AI vibe assistant
- */
+'use client';
 
-import { Hero } from '@/components/landing/Hero';
-import { TrustRing } from '@/components/landing/TrustRing';
-import { CinematicReveal } from '@/components/landing/CinematicReveal';
-import { MatchSimulator } from '@/components/landing/MatchSimulator';
-import { IdentityPulse } from '@/components/landing/IdentityPulse';
-import { LiveTrustCounter } from '@/components/landing/LiveTrustCounter';
-import { SacredMoments } from '@/components/landing/SacredMoments';
-import { RitualSection } from '@/components/landing/RitualSection';
-import { Manifesto } from '@/components/landing/Manifesto';
-import { ActivityPulse } from '@/components/landing/ActivityPulse';
-import { Footer } from '@/components/layout/Footer';
-import { LiveHeartbeat } from '@/components/landing/LiveHeartbeat';
-import { NeuralChat } from '@/components/shared/NeuralChat';
-import { SectionWrapper } from '@/components/ui/SectionWrapper';
+import { motion } from 'framer-motion';
 
-export default function HomePage() {
+export default function Home() {
   return (
-    <div className="flex flex-col w-full bg-background selection:bg-primary selection:text-background">
-      {/* ═══════════════════════════════════════════════════════════
-          FIXED OVERLAYS - These don't interfere with page flow
-          Bottom corners, minimalist, appear/hide on interaction
-      ═══════════════════════════════════════════════════════════ */}
-      <LiveHeartbeat />
-      <ActivityPulse />
-      <NeuralChat />
+    <main className="w-full">
+      {/* Hero Section */}
+      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-black">
+        {/* Arka Plan: Samimi bir anın görselliği */}
+        <div className="absolute inset-0 opacity-60">
+          <div
+            className="w-full h-full bg-cover bg-center"
+            style={{
+              backgroundImage: `url('https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=1200&h=1200&fit=crop')`,
+            }}
+          />
+        </div>
 
-      {/* ═══════════════════════════════════════════════════════════
-          MAIN FLOW (CHAPTERS) - Section-Based Reveal
-          Each section is 'relative' and 'overflow-hidden'
-          viewport={{ once: true, amount: 0.5 }} triggers animations
-      ═══════════════════════════════════════════════════════════ */}
+        <div className="relative z-10 text-center px-6">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-7xl md:text-[12vw] font-light italic text-white leading-none tracking-tighter"
+          >
+            Sacred <br /> Moments.
+          </motion.h1>
 
-      {/* Chapter 01: Hero & 3D Atmosphere */}
-      <SectionWrapper>
-        <Hero />
-      </SectionWrapper>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+            className="mt-10 text-white/70 text-lg md:text-xl max-w-xl mx-auto font-medium"
+          >
+            Pasaportları unuttuk. Güveni ritüele dönüştürdük. Geleceğin deneyim
+            hediyeleşme protokolü burada başlıyor.
+          </motion.p>
 
-      {/* Chapter 01.5: Manifesto - Philosophy & Kinetic Typography */}
-      <SectionWrapper>
-        <Manifesto />
-      </SectionWrapper>
-
-      {/* Chapter 02: Trust Ring Scrollytelling */}
-      <SectionWrapper className="bg-black">
-        <TrustRing />
-      </SectionWrapper>
-
-      {/* Chapter 03: Cinematic Reveal - Apple-style text mask */}
-      <SectionWrapper>
-        <CinematicReveal />
-      </SectionWrapper>
-
-      {/* Chapter 04: ML Neural Match Simulator */}
-      <SectionWrapper>
-        <MatchSimulator />
-      </SectionWrapper>
-
-      {/* Chapter 05: Identity Pulse - Futuristic ID Card */}
-      <SectionWrapper className="bg-[#050505]">
-        <IdentityPulse />
-      </SectionWrapper>
-
-      {/* Chapter 06: Live Trust Counter - Real-time Platform Stats */}
-      <SectionWrapper>
-        <LiveTrustCounter />
-      </SectionWrapper>
-
-      {/* Chapter 07: Sacred Moments Bento Grid */}
-      <SectionWrapper>
-        <SacredMoments />
-      </SectionWrapper>
-
-      {/* Chapter 08: The Ritual of Gifting Process */}
-      <SectionWrapper className="bg-black">
-        <RitualSection />
-      </SectionWrapper>
-
-      {/* Chapter 09: Grand Finale Footer */}
-      <Footer />
-    </div>
+          <motion.button
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 1, duration: 0.8 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="mt-12 px-10 py-4 bg-white text-black font-bold uppercase text-xs tracking-[0.3em] rounded-full hover:bg-gray-100 transition-colors"
+          >
+            Harekete Katıl
+          </motion.button>
+        </div>
+      </section>
+    </main>
   );
 }
