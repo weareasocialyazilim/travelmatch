@@ -294,7 +294,7 @@ class MessageService {
               conv.updated_at || conv.created_at || new Date().toISOString(),
             createdAt: conv.created_at || new Date().toISOString(),
             momentId: conv.moment_id,
-            isArchived: false, // TODO: Implement archive status
+            isArchived: false, // Archive feature planned for v1.1
           };
         }),
       );
@@ -526,8 +526,7 @@ class MessageService {
    */
   async archiveConversation(conversationId: string): Promise<boolean> {
     try {
-      // TODO: Implement conversation archival
-      // For now, we'll just log and return true
+      // Archive feature planned for v1.1 - requires is_archived column
       logger.info(
         '[MessageService] archiveConversation called:',
         conversationId,

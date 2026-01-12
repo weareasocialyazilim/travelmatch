@@ -114,11 +114,20 @@ function FloatingBlobs() {
   );
 }
 
+// Seeded pseudo-random number generator for deterministic particle positions
+function seededRandom(seed: number): () => number {
+  return () => {
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return seed / 0x7fffffff;
+  };
+}
+
 function ParticleField() {
   const particlesRef = useRef<THREE.Points>(null);
   const particleCount = 200;
 
   const [positions, colors] = useMemo(() => {
+    const random = seededRandom(42); // Fixed seed for consistent visuals
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
 
@@ -129,11 +138,11 @@ function ParticleField() {
     ];
 
     for (let i = 0; i < particleCount; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 20;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 20 - 5;
+      positions[i * 3] = (random() - 0.5) * 20;
+      positions[i * 3 + 1] = (random() - 0.5) * 20;
+      positions[i * 3 + 2] = (random() - 0.5) * 20 - 5;
 
-      const colorIndex = Math.floor(Math.random() * colorPalette.length);
+      const colorIndex = Math.floor(random() * colorPalette.length);
       const color = colorPalette[colorIndex]!;
       colors[i * 3] = color.r;
       colors[i * 3 + 1] = color.g;

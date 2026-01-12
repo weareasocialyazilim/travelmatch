@@ -1,4 +1,14 @@
-import React, { useState } from 'react';
+/**
+ * EditMomentScreen - Edit existing moment
+ *
+ * Allows users to edit their own moments:
+ * - Title
+ * - Price
+ * - Image (future)
+ * - Status
+ */
+
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,34 +18,162 @@ import {
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
-import { showAlert } from '@/stores/modalStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
+import { useMoments } from '@/hooks/useMoments';
+import { logger } from '@/utils/logger';
+import type { RouteProp } from '@react-navigation/native';
+import type { RootStackParamList } from '@/navigation/routeParams';
 
-export const EditMomentScreen = ({ navigation }: any) => {
+type EditMomentScreenRouteProp = RouteProp<RootStackParamList, 'EditMoment'>;
+
+interface EditMomentScreenProps {
+  navigation: any;
+  route: EditMomentScreenRouteProp;
+}
+
+export const EditMomentScreen = ({
+  navigation,
+  route,
+}: EditMomentScreenProps) => {
   const insets = useSafeAreaInsets();
+  const { momentId } = route.params;
+  const { getMoment, updateMoment } = useMoments();
 
-  // Mock Data (Normalde route.params ile gelir)
-  const [title, setTitle] = useState('Dinner at Hotel Costes');
-  const [price, setPrice] = useState('150');
-  const [image, _setImage] = useState(
-    'https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=600',
-  );
+  // Loading states
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = () => {
-    showAlert({
-      title: 'Changes Saved',
-      message: 'Your moment has been updated successfully.',
-      buttons: [{ text: 'OK', onPress: () => navigation.goBack() }],
-    });
-  };
+  // Form data
+  const [title, setTitle] = useState('');
+  const [price, setPrice] = useState('');
+  const [image, setImage] = useState('');
+  const [originalData, setOriginalData] = useState<{
+    title: string;
+    price: string;
+  } | null>(null);
+
+  // Fetch moment data on mount
+  useEffect(() => {
+    const fetchMoment = async () => {
+      setIsLoading(true);
+      try {
+        const moment = await getMoment(momentId);
+        if (moment) {
+          setTitle(moment.title);
+          setPrice(String(moment.pricePerGuest || moment.price || 0));
+          setImage(moment.images?.[0] || moment.image || '');
+          setOriginalData({
+            title: moment.title,
+            price: String(moment.pricePerGuest || moment.price || 0),
+          });
+        } else {
+          Alert.alert('Hata', 'Moment bulunamadı', [
+            { text: 'Tamam', onPress: () => navigation.goBack() },
+          ]);
+        }
+      } catch (error) {
+        logger.error('[EditMoment] Failed to fetch moment', {
+          error,
+          momentId,
+        });
+        Alert.alert('Hata', 'Moment yüklenemedi', [
+          { text: 'Tamam', onPress: () => navigation.goBack() },
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMoment();
+  }, [momentId, getMoment, navigation]);
+
+  // Check if there are changes
+  const hasChanges = useCallback(() => {
+    if (!originalData) return false;
+    return title !== originalData.title || price !== originalData.price;
+  }, [title, price, originalData]);
+
+  // Handle save
+  const handleSave = useCallback(async () => {
+    if (!hasChanges()) {
+      navigation.goBack();
+      return;
+    }
+
+    // Validate
+    if (!title.trim()) {
+      Alert.alert('Hata', 'Başlık gerekli');
+      return;
+    }
+
+    const priceNum = parseFloat(price);
+    if (isNaN(priceNum) || priceNum < 1) {
+      Alert.alert('Hata', 'Fiyat en az 1 olmalıdır');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const updatedMoment = await updateMoment(momentId, {
+        title: title.trim(),
+        pricePerGuest: priceNum,
+      });
+
+      if (updatedMoment) {
+        Alert.alert('Başarılı', 'Moment güncellendi', [
+          { text: 'Tamam', onPress: () => navigation.goBack() },
+        ]);
+      } else {
+        Alert.alert('Hata', 'Moment güncellenemedi. Lütfen tekrar deneyin.');
+      }
+    } catch (error) {
+      logger.error('[EditMoment] Failed to update moment', { error, momentId });
+      Alert.alert('Hata', 'Bir şeyler yanlış gitti. Lütfen tekrar deneyin.');
+    } finally {
+      setIsSaving(false);
+    }
+  }, [momentId, title, price, hasChanges, updateMoment, navigation]);
+
+  // Handle close with unsaved changes check
+  const handleClose = useCallback(() => {
+    if (hasChanges()) {
+      Alert.alert(
+        'Değişiklikleri Kaydet?',
+        'Kaydedilmemiş değişiklikleriniz var.',
+        [
+          { text: 'Vazgeç', style: 'cancel' },
+          {
+            text: 'Kaydetmeden Çık',
+            style: 'destructive',
+            onPress: () => navigation.goBack(),
+          },
+          { text: 'Kaydet', onPress: handleSave },
+        ],
+      );
+    } else {
+      navigation.goBack();
+    }
+  }, [hasChanges, handleSave, navigation]);
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <ActivityIndicator size="large" color={COLORS.brand.primary} />
+        <Text style={styles.loadingText}>Moment yükleniyor...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={{ uri: image }}
+        source={image ? { uri: image } : undefined}
         style={styles.bgImage}
         blurRadius={10}
       >
@@ -43,14 +181,29 @@ export const EditMomentScreen = ({ navigation }: any) => {
 
         <View style={[styles.header, { paddingTop: insets.top }]}>
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
+            onPress={handleClose}
             style={styles.iconBtn}
+            disabled={isSaving}
           >
             <Ionicons name="close" size={24} color="white" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Edit Moment</Text>
-          <TouchableOpacity onPress={handleSave} style={styles.iconBtn}>
-            <Ionicons name="checkmark" size={24} color={COLORS.brand.primary} />
+          <Text style={styles.headerTitle}>Moment Düzenle</Text>
+          <TouchableOpacity
+            onPress={handleSave}
+            style={styles.iconBtn}
+            disabled={isSaving || !hasChanges()}
+          >
+            {isSaving ? (
+              <ActivityIndicator size="small" color={COLORS.brand.primary} />
+            ) : (
+              <Ionicons
+                name="checkmark"
+                size={24}
+                color={
+                  hasChanges() ? COLORS.brand.primary : COLORS.text.secondary
+                }
+              />
+            )}
           </TouchableOpacity>
         </View>
 
@@ -58,45 +211,60 @@ export const EditMomentScreen = ({ navigation }: any) => {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.content}
         >
-          <View style={styles.imagePreviewContainer}>
-            <ImageBackground
-              source={{ uri: image }}
-              style={styles.imagePreview}
-              imageStyle={styles.imagePreviewBorderRadius}
-            >
-              <TouchableOpacity style={styles.changePhotoBtn}>
-                <MaterialCommunityIcons
-                  name="camera-flip"
-                  size={24}
-                  color="white"
-                />
-                <Text style={styles.changePhotoText}>Change Photo</Text>
-              </TouchableOpacity>
-            </ImageBackground>
-          </View>
+          {/* Image Preview */}
+          {image ? (
+            <View style={styles.imagePreviewContainer}>
+              <ImageBackground
+                source={{ uri: image }}
+                style={styles.imagePreview}
+                imageStyle={styles.imagePreviewBorderRadius}
+              >
+                <TouchableOpacity style={styles.changePhotoBtn}>
+                  <MaterialCommunityIcons
+                    name="camera-flip"
+                    size={24}
+                    color="white"
+                  />
+                  <Text style={styles.changePhotoText}>Fotoğraf Değiştir</Text>
+                </TouchableOpacity>
+              </ImageBackground>
+            </View>
+          ) : null}
 
           <View style={styles.form}>
+            {/* Title Input */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>TITLE</Text>
+              <Text style={styles.label}>BAŞLIK</Text>
               <TextInput
                 style={styles.inputTitle}
                 value={title}
                 onChangeText={setTitle}
                 placeholderTextColor="rgba(255,255,255,0.5)"
+                placeholder="Moment başlığı"
+                maxLength={60}
+                editable={!isSaving}
               />
             </View>
 
+            {/* Price Input */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>PRICE ($)</Text>
+              <Text style={styles.label}>FİYAT (₺)</Text>
               <TextInput
                 style={styles.inputPrice}
                 value={price}
-                onChangeText={setPrice}
+                onChangeText={(text) => {
+                  const numericValue = text.replace(/[^0-9]/g, '');
+                  setPrice(numericValue);
+                }}
                 keyboardType="numeric"
                 placeholderTextColor="rgba(255,255,255,0.5)"
+                placeholder="0"
+                maxLength={5}
+                editable={!isSaving}
               />
             </View>
 
+            {/* Info Box */}
             <View style={styles.infoBox}>
               <Ionicons
                 name="information-circle-outline"
@@ -104,14 +272,26 @@ export const EditMomentScreen = ({ navigation }: any) => {
                 color={COLORS.text.secondary}
               />
               <Text style={styles.infoText}>
-                Major changes (like title or image) will require re-approval
-                from our team.
+                Başlık veya fiyat değişiklikleri anında yansır. Fotoğraf
+                değişikliği yakında eklenecek.
               </Text>
             </View>
           </View>
 
-          <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-            <Text style={styles.saveBtnText}>Update Moment</Text>
+          {/* Save Button */}
+          <TouchableOpacity
+            style={[
+              styles.saveBtn,
+              (!hasChanges() || isSaving) && styles.saveBtnDisabled,
+            ]}
+            onPress={handleSave}
+            disabled={!hasChanges() || isSaving}
+          >
+            {isSaving ? (
+              <ActivityIndicator size="small" color="black" />
+            ) : (
+              <Text style={styles.saveBtnText}>Değişiklikleri Kaydet</Text>
+            )}
           </TouchableOpacity>
         </KeyboardAvoidingView>
       </ImageBackground>
@@ -121,6 +301,15 @@ export const EditMomentScreen = ({ navigation }: any) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'black' },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: COLORS.text.secondary,
+    marginTop: 16,
+    fontSize: 14,
+  },
   bgImage: { flex: 1, width: '100%', height: '100%' },
   overlay: {
     ...StyleSheet.absoluteFillObject,
@@ -146,7 +335,7 @@ const styles = StyleSheet.create({
   imagePreviewContainer: { alignItems: 'center', marginBottom: 30 },
   imagePreview: {
     width: '100%',
-    height: 250,
+    height: 200,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 20,
@@ -212,6 +401,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 20,
   },
+  saveBtnDisabled: {
+    opacity: 0.5,
+  },
   saveBtnText: { color: 'black', fontWeight: 'bold', fontSize: 16 },
   imagePreviewBorderRadius: { borderRadius: 20 },
 });
+
+export default EditMomentScreen;
