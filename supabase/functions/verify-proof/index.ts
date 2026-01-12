@@ -430,9 +430,14 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         verification: finalResult
+      }),
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  } catch (error) {
+    logger.error('Verification failed:', error);
     return new Response(
-      JSON.stringify({ 
-        error: 'Verification failed', 
+      JSON.stringify({
+        error: 'Verification failed',
         details: error instanceof Error ? error.message : 'Unknown error'
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
