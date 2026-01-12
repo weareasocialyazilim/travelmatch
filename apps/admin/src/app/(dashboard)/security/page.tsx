@@ -192,14 +192,20 @@ export default function SecurityPage() {
       const res = await fetch('/api/auth/setup-2fa');
       if (res.ok) {
         const data = await res.json();
-        // Ensure QR code is a data URL for security
-        const qrCodeUrl = data.qr_code?.startsWith('data:')
-          ? data.qr_code
-          : `data:image/png;base64,${data.qr_code}`;
-        setQrCode(qrCodeUrl);
-        setSecret(data.secret);
-        setSetupStep(1);
-        setIs2FASetupOpen(true);
+        // Validate QR code is a data URL only - block external URLs for XSS prevention
+        if (
+          typeof data.qr_code === 'string' &&
+          data.qr_code.startsWith('data:image/')
+        ) {
+          setQrCode(data.qr_code);
+          setSecret(data.secret);
+          setSetupStep(1);
+          setIs2FASetupOpen(true);
+        } else {
+          // Invalid QR code format - reject
+          console.error('Invalid QR code format received');
+          toast.error('QR kodu doğrulanamadı');
+        }
       } else {
         toast.error('2FA kurulumu başlatılamadı');
       }
@@ -771,17 +777,7 @@ export default function SecurityPage() {
             <div className="space-y-4">
               <div className="flex justify-center p-4 bg-white rounded-lg border">
                 {qrCode ? (
-                  <img
-                    src={qrCode}
-                    alt="QR Code"
-                    className="w-48 h-48"
-                    onError={(e) => {
-                      if (!qrCode.startsWith('data:')) {
-                        console.warn('Invalid QR code source');
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }
-                    }}
-                  />
+                  <img src={qrCode} alt="QR Code" className="w-48 h-48" />
                 ) : (
                   <div className="w-48 h-48 bg-gray-100 rounded flex items-center justify-center">
                     <QrCode className="h-12 w-12 text-gray-400" />
