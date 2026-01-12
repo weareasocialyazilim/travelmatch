@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { act } from '@testing-library/react';
 
 // Reset modules before importing to get fresh store state

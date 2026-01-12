@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 
 /**
@@ -8,7 +9,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
+    const supabase = createClient();
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
     const type = searchParams.get('type');
@@ -16,9 +17,10 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get('limit') || '50');
 
     // Build query
-    let query = supabase
-      .from('tasks')
-      .select(`
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let query = (supabase.from('tasks') as any)
+      .select(
+        `
         id,
         title,
         description,
@@ -35,7 +37,8 @@ export async function GET(request: Request) {
           full_name,
           avatar_url
         )
-      `)
+      `,
+      )
       .order('priority', { ascending: false })
       .order('created_at', { ascending: false })
       .limit(limit);
@@ -53,7 +56,7 @@ export async function GET(request: Request) {
     const { data: tasks, error: tasksError } = await query;
 
     if (tasksError) {
-      console.error('Tasks fetch error:', tasksError);
+      logger.error('Tasks fetch error:', tasksError);
     }
 
     // Get stats
@@ -64,22 +67,30 @@ export async function GET(request: Request) {
       urgentCount,
       overdueCount,
     ] = await Promise.all([
-      supabase.from('tasks').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-      supabase.from('tasks').select('*', { count: 'exact', head: true }).eq('status', 'in_progress'),
-      supabase.from('tasks').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
-      supabase.from('tasks').select('*', { count: 'exact', head: true }).eq('priority', 'urgent'),
-      supabase.from('tasks').select('*', { count: 'exact', head: true })
+      (supabase.from('tasks') as any)
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending'),
+      (supabase.from('tasks') as any)
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'in_progress'),
+      (supabase.from('tasks') as any)
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'completed'),
+      (supabase.from('tasks') as any)
+        .select('*', { count: 'exact', head: true })
+        .eq('priority', 'urgent'),
+      (supabase.from('tasks') as any)
+        .select('*', { count: 'exact', head: true })
         .eq('status', 'pending')
         .lt('due_date', new Date().toISOString()),
     ]);
 
     // Get task types for filter
-    const { data: taskTypes } = await supabase
-      .from('tasks')
+    const { data: taskTypes } = await (supabase.from('tasks') as any)
       .select('type')
       .not('type', 'is', null);
 
-    const uniqueTypes = [...new Set(taskTypes?.map(t => t.type) || [])];
+    const uniqueTypes = [...new Set(taskTypes?.map((t: any) => t.type) || [])];
 
     return NextResponse.json({
       tasks: tasks || [],
@@ -89,7 +100,10 @@ export async function GET(request: Request) {
         completed: completedCount.count || 0,
         urgent: urgentCount.count || 0,
         overdue: overdueCount.count || 0,
-        total: (pendingCount.count || 0) + (inProgressCount.count || 0) + (completedCount.count || 0),
+        total:
+          (pendingCount.count || 0) +
+          (inProgressCount.count || 0) +
+          (completedCount.count || 0),
       },
       taskTypes: uniqueTypes,
       meta: {
@@ -97,26 +111,35 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error('Queue API Error:', error);
-    return NextResponse.json({
-      tasks: [],
-      stats: { pending: 0, inProgress: 0, completed: 0, urgent: 0, overdue: 0, total: 0 },
-      taskTypes: [],
-      meta: {
-        generatedAt: new Date().toISOString(),
-        error: 'Failed to fetch queue data',
+    logger.error('Queue API Error:', error);
+    return NextResponse.json(
+      {
+        tasks: [],
+        stats: {
+          pending: 0,
+          inProgress: 0,
+          completed: 0,
+          urgent: 0,
+          overdue: 0,
+          total: 0,
+        },
+        taskTypes: [],
+        meta: {
+          generatedAt: new Date().toISOString(),
+          error: 'Failed to fetch queue data',
+        },
       },
-    }, { status: 500 });
+      { status: 500 },
+    );
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
+    const supabase = createClient();
     const body = await request.json();
 
-    const { data, error } = await supabase
-      .from('tasks')
+    const { data, error } = await (supabase.from('tasks') as any)
       .insert({
         title: body.title,
         description: body.description,
@@ -136,19 +159,21 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ task: data });
   } catch (error) {
-    console.error('Create task error:', error);
-    return NextResponse.json({ error: 'Failed to create task' }, { status: 500 });
+    logger.error('Create task error:', error);
+    return NextResponse.json(
+      { error: 'Failed to create task' },
+      { status: 500 },
+    );
   }
 }
 
 export async function PATCH(request: Request) {
   try {
-    const supabase = await createClient();
+    const supabase = createClient();
     const body = await request.json();
     const { id, ...updates } = body;
 
-    const { data, error } = await supabase
-      .from('tasks')
+    const { data, error } = await (supabase.from('tasks') as any)
       .update({
         ...updates,
         updated_at: new Date().toISOString(),
@@ -163,14 +188,17 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json({ task: data });
   } catch (error) {
-    console.error('Update task error:', error);
-    return NextResponse.json({ error: 'Failed to update task' }, { status: 500 });
+    logger.error('Update task error:', error);
+    return NextResponse.json(
+      { error: 'Failed to update task' },
+      { status: 500 },
+    );
   }
 }
 
 export async function DELETE(request: Request) {
   try {
-    const supabase = await createClient();
+    const supabase = createClient();
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 
@@ -178,8 +206,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'Task ID required' }, { status: 400 });
     }
 
-    const { error } = await supabase
-      .from('tasks')
+    const { error } = await (supabase.from('tasks') as any)
       .delete()
       .eq('id', id);
 
@@ -189,7 +216,10 @@ export async function DELETE(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Delete task error:', error);
-    return NextResponse.json({ error: 'Failed to delete task' }, { status: 500 });
+    logger.error('Delete task error:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete task' },
+      { status: 500 },
+    );
   }
 }

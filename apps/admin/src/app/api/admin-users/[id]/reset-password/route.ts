@@ -22,14 +22,14 @@ export async function POST(
   { params }: { params: { id: string } },
 ) {
   try {
-    const admin = await getAdminSession();
+    const session = await getAdminSession();
 
-    if (!admin) {
+    if (!session) {
       return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
     }
 
     // Sadece super_admin şifre sıfırlayabilir
-    if (admin.role !== 'super_admin') {
+    if (session.admin.role !== 'super_admin') {
       return NextResponse.json(
         { error: 'Bu işlem için yetkiniz yok' },
         { status: 403 },
@@ -57,7 +57,7 @@ export async function POST(
     }
 
     // Kendini sıfırlayamaz (güvenlik için)
-    if ((targetAdmin as any).id === admin.id) {
+    if ((targetAdmin as any).id === session.admin.id) {
       return NextResponse.json(
         { error: 'Kendi şifrenizi ayarlar sayfasından değiştirin' },
         { status: 400 },
@@ -89,17 +89,21 @@ export async function POST(
     }
 
     // Audit log
-    await createAuditLog(admin.id, 'admin.password_reset', {
-      reset_by: admin.email,
-      target: (targetAdmin as any).email,
-    });
+    await createAuditLog(
+      session.admin.id,
+      'admin.password_reset',
+      'admin_user',
+      id,
+      null,
+      { reset_by: session.admin.email, target: (targetAdmin as any).email },
+    );
 
     // E-posta gönder (opsiyonel)
     if (send_email) {
       // TODO: E-posta servisi entegrasyonu
       logger.info('Password reset email would be sent', {
         to: (targetAdmin as any).email,
-        from: admin.email,
+        from: session.admin.email,
       });
     }
 

@@ -42,6 +42,7 @@ import {
 } from '@/components/ui/tooltip';
 import { useUIStore } from '@/stores/ui-store';
 import { usePermission } from '@/hooks/use-permission';
+import type { Resource } from '@/types/admin';
 
 // Simplified navigation structure - Maximum clarity
 const navigation = {
@@ -156,7 +157,7 @@ export function EnterpriseSidebar() {
 
   const isActive = useCallback(
     (href: string) => pathname === href || pathname.startsWith(href + '/'),
-    [pathname]
+    [pathname],
   );
 
   return (
@@ -164,7 +165,7 @@ export function EnterpriseSidebar() {
       className={cn(
         'flex flex-col h-screen bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800',
         'transition-all duration-200 ease-in-out',
-        sidebarCollapsed ? 'w-16' : 'w-60'
+        sidebarCollapsed ? 'w-16' : 'w-60',
       )}
     >
       {/* Logo */}
@@ -199,7 +200,7 @@ export function EnterpriseSidebar() {
               'w-full flex items-center gap-2 px-3 py-2 text-sm',
               'bg-gray-100 dark:bg-gray-900 rounded-lg',
               'text-gray-500 dark:text-gray-400',
-              'hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors'
+              'hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors',
             )}
           >
             <Search className="w-4 h-4" />
@@ -215,7 +216,10 @@ export function EnterpriseSidebar() {
       <nav className="flex-1 overflow-y-auto px-3 py-2">
         {Object.entries(navigation).map(([section, items]) => {
           const visibleItems = items.filter(
-            (item) => !item.resource || can(item.resource as never, 'view')
+            (item) =>
+              !('resource' in item) ||
+              !item.resource ||
+              can(item.resource as Resource, 'view'),
           );
 
           if (visibleItems.length === 0) return null;
@@ -250,7 +254,7 @@ export function EnterpriseSidebar() {
           size="sm"
           className={cn(
             'w-full justify-start text-gray-500 hover:text-gray-900 dark:hover:text-white',
-            sidebarCollapsed && 'justify-center px-2'
+            sidebarCollapsed && 'justify-center px-2',
           )}
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
         >
@@ -310,10 +314,15 @@ const NavItem = memo(function NavItem({
         active
           ? 'bg-violet-50 dark:bg-violet-950 text-violet-700 dark:text-violet-300'
           : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 hover:text-gray-900 dark:hover:text-white',
-        collapsed && 'justify-center px-2'
+        collapsed && 'justify-center px-2',
       )}
     >
-      <Icon className={cn('w-5 h-5 flex-shrink-0', active && 'text-violet-600 dark:text-violet-400')} />
+      <Icon
+        className={cn(
+          'w-5 h-5 flex-shrink-0',
+          active && 'text-violet-600 dark:text-violet-400',
+        )}
+      />
       {!collapsed && (
         <>
           <span className="flex-1">{item.label}</span>

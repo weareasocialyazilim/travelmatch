@@ -2,7 +2,7 @@
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useCallback } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { getClient } from '@/lib/supabase';
 
 /**
  * Dashboard Data Hook
@@ -136,7 +136,7 @@ export function useRealtimeDashboard() {
   const dashboard = useDashboard();
 
   useEffect(() => {
-    const supabase = createClient();
+    const supabase = getClient();
 
     // Subscribe to profiles changes (new users)
     const profilesChannel = supabase
@@ -146,7 +146,7 @@ export function useRealtimeDashboard() {
         { event: '*', schema: 'public', table: 'profiles' },
         () => {
           queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-        }
+        },
       )
       .subscribe();
 
@@ -158,7 +158,7 @@ export function useRealtimeDashboard() {
         { event: '*', schema: 'public', table: 'moments' },
         () => {
           queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-        }
+        },
       )
       .subscribe();
 
@@ -170,7 +170,7 @@ export function useRealtimeDashboard() {
         { event: '*', schema: 'public', table: 'payments' },
         () => {
           queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-        }
+        },
       )
       .subscribe();
 
@@ -182,7 +182,7 @@ export function useRealtimeDashboard() {
         { event: '*', schema: 'public', table: 'tasks' },
         () => {
           queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-        }
+        },
       )
       .subscribe();
 

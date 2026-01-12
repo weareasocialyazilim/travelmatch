@@ -65,7 +65,10 @@ export async function POST(request: NextRequest) {
       await (supabase as any).from('admin_sessions').insert({
         admin_id: adminUser.id,
         token_hash: tokenHash,
-        ip_address: request.headers.get('x-forwarded-for') || request.ip,
+        ip_address:
+          request.headers.get('x-forwarded-for') ||
+          request.headers.get('x-real-ip') ||
+          'unknown',
         user_agent: request.headers.get('user-agent'),
         expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(), // 5 minutes for 2FA
       });
@@ -89,7 +92,10 @@ export async function POST(request: NextRequest) {
     await (supabase as any).from('admin_sessions').insert({
       admin_id: adminUser.id,
       token_hash: sessionHash,
-      ip_address: request.headers.get('x-forwarded-for') || request.ip,
+      ip_address:
+        request.headers.get('x-forwarded-for') ||
+        request.headers.get('x-real-ip') ||
+        'unknown',
       user_agent: request.headers.get('user-agent'),
       expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours
     });

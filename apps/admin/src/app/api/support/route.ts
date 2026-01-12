@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 
 /**
@@ -8,16 +9,17 @@ import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
+    const supabase = createClient();
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
     const priority = searchParams.get('priority');
     const limit = parseInt(searchParams.get('limit') || '50');
 
     // Build query
-    let query = supabase
-      .from('support_tickets')
-      .select(`
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let query = (supabase.from('support_tickets') as any)
+      .select(
+        `
         id,
         subject,
         description,
@@ -34,7 +36,8 @@ export async function GET(request: Request) {
           avatar_url,
           email
         )
-      `)
+      `,
+      )
       .order('created_at', { ascending: false })
       .limit(limit);
 
@@ -48,20 +51,31 @@ export async function GET(request: Request) {
     const { data: tickets, error: ticketsError } = await query;
 
     if (ticketsError) {
-      console.error('Tickets fetch error:', ticketsError);
+      logger.error('Tickets fetch error:', ticketsError);
     }
 
     // Get ticket stats
-    const [openCount, pendingCount, resolvedCount, totalCount] = await Promise.all([
-      supabase.from('support_tickets').select('*', { count: 'exact', head: true }).eq('status', 'open'),
-      supabase.from('support_tickets').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-      supabase.from('support_tickets').select('*', { count: 'exact', head: true }).eq('status', 'resolved'),
-      supabase.from('support_tickets').select('*', { count: 'exact', head: true }),
-    ]);
+    const [openCount, pendingCount, resolvedCount, totalCount] =
+      await Promise.all([
+        (supabase.from('support_tickets') as any)
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'open'),
+        (supabase.from('support_tickets') as any)
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'pending'),
+        (supabase.from('support_tickets') as any)
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'resolved'),
+        (supabase.from('support_tickets') as any).select('*', {
+          count: 'exact',
+          head: true,
+        }),
+      ]);
 
     // Get canned responses
-    const { data: cannedResponses } = await supabase
-      .from('canned_responses')
+    const { data: cannedResponses } = await (
+      supabase.from('canned_responses') as any
+    )
       .select('id, title, content, category')
       .order('title');
 
@@ -79,26 +93,28 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error('Support API Error:', error);
-    return NextResponse.json({
-      tickets: [],
-      stats: { open: 0, pending: 0, resolved: 0, total: 0 },
-      cannedResponses: [],
-      meta: {
-        generatedAt: new Date().toISOString(),
-        error: 'Failed to fetch support data',
+    logger.error('Support API Error:', error);
+    return NextResponse.json(
+      {
+        tickets: [],
+        stats: { open: 0, pending: 0, resolved: 0, total: 0 },
+        cannedResponses: [],
+        meta: {
+          generatedAt: new Date().toISOString(),
+          error: 'Failed to fetch support data',
+        },
       },
-    }, { status: 500 });
+      { status: 500 },
+    );
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
+    const supabase = createClient();
     const body = await request.json();
 
-    const { data, error } = await supabase
-      .from('support_tickets')
+    const { data, error } = await (supabase.from('support_tickets') as any)
       .insert({
         subject: body.subject,
         description: body.description,
@@ -116,19 +132,21 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ticket: data });
   } catch (error) {
-    console.error('Create ticket error:', error);
-    return NextResponse.json({ error: 'Failed to create ticket' }, { status: 500 });
+    logger.error('Create ticket error:', error);
+    return NextResponse.json(
+      { error: 'Failed to create ticket' },
+      { status: 500 },
+    );
   }
 }
 
 export async function PATCH(request: Request) {
   try {
-    const supabase = await createClient();
+    const supabase = createClient();
     const body = await request.json();
     const { id, ...updates } = body;
 
-    const { data, error } = await supabase
-      .from('support_tickets')
+    const { data, error } = await (supabase.from('support_tickets') as any)
       .update({
         ...updates,
         updated_at: new Date().toISOString(),
@@ -143,7 +161,10 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json({ ticket: data });
   } catch (error) {
-    console.error('Update ticket error:', error);
-    return NextResponse.json({ error: 'Failed to update ticket' }, { status: 500 });
+    logger.error('Update ticket error:', error);
+    return NextResponse.json(
+      { error: 'Failed to update ticket' },
+      { status: 500 },
+    );
   }
 }
