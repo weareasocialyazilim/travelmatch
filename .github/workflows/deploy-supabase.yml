@@ -49,9 +49,10 @@ jobs:
           node-version: '20'
 
       - name: 🔐 Import secrets from Infisical
-        uses: Infisical/secrets-action@v1
+        uses: infisical/secrets-action@v1
         with:
-          method: universal-auth          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          method: universal-auth
+          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
           project-id: fa0ed450-40e2-4063-b4f4-ce5cca83a57e
           environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
