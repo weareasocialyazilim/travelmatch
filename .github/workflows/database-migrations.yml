@@ -110,7 +110,7 @@ jobs:
         with:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          project-id: 261defa2-bcaf-4905-9230-35c1acc3b026
+          project-id: fa0ed450-40e2-4063-b4f4-ce5cca83a57e
           env-slug: dev
 
       - name: Setup Supabase CLI
@@ -152,7 +152,7 @@ jobs:
         with:
           client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          project-id: 261defa2-bcaf-4905-9230-35c1acc3b026
+          project-id: fa0ed450-40e2-4063-b4f4-ce5cca83a57e
           env-slug: prod
 
       - name: Setup Supabase CLI
