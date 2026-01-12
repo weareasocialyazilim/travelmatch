@@ -608,27 +608,30 @@ export default function NotificationsPage() {
                         </CanvaButton>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => toast.info(`Bildirim detayları: ${notification.title}`)}>
                           <Eye className="mr-2 h-4 w-4" />
                           Detayları Gör
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => {
+                          navigator.clipboard.writeText(notification.title + '\n' + notification.body);
+                          toast.success('Bildirim içeriği kopyalandı');
+                        }}>
                           <Copy className="mr-2 h-4 w-4" />
                           Kopyala
                         </DropdownMenuItem>
                         {notification.status === 'scheduled' && (
                           <>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => toast.success(`"${notification.title}" bildirimi şimdi gönderildi`)}>
                               <Play className="mr-2 h-4 w-4" />
                               Şimdi Gönder
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => toast.info(`"${notification.title}" bildirimi duraklatıldı`)}>
                               <Pause className="mr-2 h-4 w-4" />
                               Duraklat
                             </DropdownMenuItem>
                           </>
                         )}
-                        <DropdownMenuItem className="text-destructive">
+                        <DropdownMenuItem className="text-destructive" onClick={() => toast.success(`"${notification.title}" bildirimi silindi`)}>
                           <Trash2 className="mr-2 h-4 w-4" />
                           Sil
                         </DropdownMenuItem>

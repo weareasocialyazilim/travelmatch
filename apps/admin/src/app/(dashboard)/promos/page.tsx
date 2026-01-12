@@ -698,15 +698,15 @@ export default function PromosPage() {
                           </CanvaButton>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => toast.info('Yakında: Detaylar özelliği')}>
                             <Eye className="mr-2 h-4 w-4" />
                             Detaylar
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => toast.info('Yakında: Düzenleme özelliği')}>
                             <Edit className="mr-2 h-4 w-4" />
                             Düzenle
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => copyCode(promo.code)}>
                             <Copy className="mr-2 h-4 w-4" />
                             Kopyala
                           </DropdownMenuItem>
