@@ -874,7 +874,7 @@ class RecommendationEngine(BaseModel):
         """Generate cache key for recommendations"""
         filter_str = json.dumps(filters or {}, sort_keys=True)
         key_data = f"{user_id}:{rec_type.value}:{filter_str}"
-        return f"reco:{hashlib.md5(key_data.encode()).hexdigest()[:16]}"
+        return f"reco:{hashlib.sha256(key_data.encode()).hexdigest()[:16]}"
 
 
 class RecipientRecommender:

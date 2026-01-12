@@ -442,7 +442,7 @@ class PricePredictionModel(BaseModel):
     ) -> str:
         """Generate cache key for price prediction"""
         key_data = f"{category}:{location}:{duration}:{group_size}"
-        return f"price_pred:{hashlib.md5(key_data.encode()).hexdigest()[:16]}"
+        return f"price_pred:{hashlib.sha256(key_data.encode()).hexdigest()[:16]}"
 
 
 class DynamicPricingEngine:
