@@ -30,17 +30,8 @@ import {
   CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import {
@@ -194,14 +185,14 @@ export default function DevToolsPage() {
           <div className="grid gap-6 lg:grid-cols-3">
             {/* Request Builder */}
             <div className="lg:col-span-2 space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>API İsteği</CardTitle>
-                  <CardDescription>
+              <CanvaCard>
+                <CanvaCardHeader>
+                  <CanvaCardTitle>API İsteği</CanvaCardTitle>
+                  <CanvaCardSubtitle>
                     API uç noktalarını test edin
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
+                  </CanvaCardSubtitle>
+                </CanvaCardHeader>
+                <CanvaCardBody className="space-y-4">
                   <div className="flex gap-2">
                     <Select
                       value={selectedMethod}
@@ -273,17 +264,17 @@ export default function DevToolsPage() {
                       </div>
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             </div>
 
             {/* Endpoints List */}
-            <Card>
-              <CardHeader>
-                <CardTitle>API Uç Noktaları</CardTitle>
-                <CardDescription>Mevcut endpointler</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>API Uç Noktaları</CanvaCardTitle>
+                <CanvaCardSubtitle>Mevcut endpointler</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="space-y-2">
                   {apiEndpoints.map((endpoint, i) => (
                     <button
@@ -310,19 +301,19 @@ export default function DevToolsPage() {
                     </button>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
         </TabsContent>
 
         <TabsContent value="webhooks" className="space-y-4">
           <div className="grid gap-6 lg:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Webhook Logları</CardTitle>
-                <CardDescription>Son gelen webhook istekleri</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Webhook Logları</CanvaCardTitle>
+                <CanvaCardSubtitle>Son gelen webhook istekleri</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="space-y-3">
                   {recentWebhooks.map((webhook) => (
                     <div
@@ -362,15 +353,15 @@ export default function DevToolsPage() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Webhook Yapılandırması</CardTitle>
-                <CardDescription>Webhook endpoint ayarları</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Webhook Yapılandırması</CanvaCardTitle>
+                <CanvaCardSubtitle>Webhook endpoint ayarları</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody className="space-y-4">
                 <div className="space-y-2">
                   <Label>Webhook URL</Label>
                   <Input
@@ -404,21 +395,21 @@ export default function DevToolsPage() {
                   </div>
                 </div>
                 <CanvaButton className="w-full">Kaydet</CanvaButton>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
         </TabsContent>
 
         <TabsContent value="database" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>SQL Sorgusu</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>SQL Sorgusu</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Veritabanı üzerinde salt okunur sorgular çalıştırın (SELECT
                 only)
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody className="space-y-4">
               <Textarea
                 placeholder="SELECT * FROM profiles LIMIT 10;"
                 className="font-mono h-32"
@@ -433,48 +424,32 @@ export default function DevToolsPage() {
                   Çalıştır
                 </CanvaButton>
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Tablo İstatistikleri</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Tablo İstatistikleri</CanvaCardTitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="grid gap-4 md:grid-cols-4">
-                <div className="rounded-lg border p-4">
-                  <p className="text-sm text-muted-foreground">profiles</p>
-                  <p className="text-2xl font-bold">24,589</p>
-                  <p className="text-xs text-muted-foreground">satır</p>
-                </div>
-                <div className="rounded-lg border p-4">
-                  <p className="text-sm text-muted-foreground">moments</p>
-                  <p className="text-2xl font-bold">89,432</p>
-                  <p className="text-xs text-muted-foreground">satır</p>
-                </div>
-                <div className="rounded-lg border p-4">
-                  <p className="text-sm text-muted-foreground">matches</p>
-                  <p className="text-2xl font-bold">156,789</p>
-                  <p className="text-xs text-muted-foreground">satır</p>
-                </div>
-                <div className="rounded-lg border p-4">
-                  <p className="text-sm text-muted-foreground">transactions</p>
-                  <p className="text-2xl font-bold">45,231</p>
-                  <p className="text-xs text-muted-foreground">satır</p>
-                </div>
+                <CanvaStatCard label="profiles" value="24,589" />
+                <CanvaStatCard label="moments" value="89,432" />
+                <CanvaStatCard label="matches" value="156,789" />
+                <CanvaStatCard label="transactions" value="45,231" />
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         <TabsContent value="debug" className="space-y-4">
           <div className="grid gap-6 lg:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Ortam Değişkenleri</CardTitle>
-                <CardDescription>Yapılandırma durumu</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Ortam Değişkenleri</CanvaCardTitle>
+                <CanvaCardSubtitle>Yapılandırma durumu</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="space-y-3">
                   {[
                     { key: 'NEXT_PUBLIC_SUPABASE_URL', status: 'set' },
@@ -499,15 +474,15 @@ export default function DevToolsPage() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Sistem Bilgisi</CardTitle>
-                <CardDescription>Uygulama durumu</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Sistem Bilgisi</CanvaCardTitle>
+                <CanvaCardSubtitle>Uygulama durumu</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between rounded-lg border p-3">
                     <span className="text-sm">Node.js Version</span>
@@ -530,8 +505,8 @@ export default function DevToolsPage() {
                     <code className="text-sm">3d 14h 22m</code>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
         </TabsContent>
       </Tabs>

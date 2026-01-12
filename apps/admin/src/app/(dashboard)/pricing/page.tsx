@@ -29,15 +29,6 @@ import {
   CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -225,70 +216,29 @@ export default function PricingPage() {
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Aylık Gelir (MRR)
-                </p>
-                <p className="text-2xl font-bold">
-                  ₺{pricingStats.current_mrr.toLocaleString('tr-TR')}
-                </p>
-              </div>
-              <DollarSign className="h-8 w-8 text-emerald-500" />
-            </div>
-            <div className="mt-2 flex items-center gap-1 text-sm text-green-600">
-              <TrendingUp className="h-4 w-4" />
-              +12% geçen aya göre
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Ortalama ARPU</p>
-                <p className="text-2xl font-bold">₺{pricingStats.avg_arpu}</p>
-              </div>
-              <TrendingUp className="h-8 w-8 text-blue-500" />
-            </div>
-            <div className="mt-2 flex items-center gap-1 text-sm text-green-600">
-              <TrendingUp className="h-4 w-4" />
-              +5% geçen aya göre
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Dönüşüm Oranı</p>
-                <p className="text-2xl font-bold">
-                  {pricingStats.conversion_rate}%
-                </p>
-              </div>
-              <Percent className="h-8 w-8 text-purple-500" />
-            </div>
-            <div className="mt-2 flex items-center gap-1 text-sm text-green-600">
-              <TrendingUp className="h-4 w-4" />
-              +0.3% geçen aya göre
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Aktif Promosyon</p>
-                <p className="text-2xl font-bold">
-                  {pricingStats.active_promos}
-                </p>
-              </div>
-              <Zap className="h-8 w-8 text-yellow-500" />
-            </div>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          title="Aylık Gelir (MRR)"
+          value={`₺${pricingStats.current_mrr.toLocaleString('tr-TR')}`}
+          icon={<DollarSign className="h-5 w-5" />}
+          trend={{ value: 12, direction: 'up', label: 'geçen aya göre' }}
+        />
+        <CanvaStatCard
+          title="Ortalama ARPU"
+          value={`₺${pricingStats.avg_arpu}`}
+          icon={<TrendingUp className="h-5 w-5" />}
+          trend={{ value: 5, direction: 'up', label: 'geçen aya göre' }}
+        />
+        <CanvaStatCard
+          title="Dönüşüm Oranı"
+          value={`${pricingStats.conversion_rate}%`}
+          icon={<Percent className="h-5 w-5" />}
+          trend={{ value: 0.3, direction: 'up', label: 'geçen aya göre' }}
+        />
+        <CanvaStatCard
+          title="Aktif Promosyon"
+          value={pricingStats.active_promos.toString()}
+          icon={<Zap className="h-5 w-5" />}
+        />
       </div>
 
       <Tabs defaultValue="plans" className="space-y-4">
@@ -302,19 +252,19 @@ export default function PricingPage() {
         <TabsContent value="plans" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-3">
             {subscriptionPlans.map((plan) => (
-              <Card key={plan.id}>
-                <CardHeader>
+              <CanvaCard key={plan.id}>
+                <CanvaCardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle>{plan.name}</CardTitle>
+                    <CanvaCardTitle>{plan.name}</CanvaCardTitle>
                     <CanvaButton variant="ghost" size="sm" iconOnly>
                       <Edit className="h-4 w-4" />
                     </CanvaButton>
                   </div>
-                  <CardDescription>
+                  <CanvaCardSubtitle>
                     {plan.subscribers.toLocaleString('tr-TR')} abone
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
+                  </CanvaCardSubtitle>
+                </CanvaCardHeader>
+                <CanvaCardBody>
                   <div className="space-y-4">
                     <div>
                       <div className="flex items-baseline gap-1">
@@ -367,21 +317,21 @@ export default function PricingPage() {
                       Save Changes
                     </CanvaButton>
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))}
           </div>
         </TabsContent>
 
         <TabsContent value="dynamic" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Dinamik Fiyatlandırma Kuralları</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Dinamik Fiyatlandırma Kuralları</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Otomatik fiyat ayarlaması kuralları
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -436,19 +386,19 @@ export default function PricingPage() {
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         <TabsContent value="regional" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Bölgesel Fiyatlandırma</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Bölgesel Fiyatlandırma</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Ülkelere göre satın alma gücü paritesi (PPP) fiyatları
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -489,20 +439,20 @@ export default function PricingPage() {
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Fiyat Elastikiyeti</CardTitle>
-                <CardDescription>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Fiyat Elastikiyeti</CanvaCardTitle>
+                <CanvaCardSubtitle>
                   Fiyat değişikliklerinin etkisi
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+                </CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span>Premium (%10 artış senaryosu)</span>
@@ -519,14 +469,14 @@ export default function PricingPage() {
                     <p className="text-2xl font-bold">₺44.99 - ₺54.99</p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>A/B Test Sonuçları</CardTitle>
-                <CardDescription>Aktif fiyat testleri</CardDescription>
-              </CardHeader>
-              <CardContent>
+              </CanvaCardBody>
+            </CanvaCard>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>A/B Test Sonuçları</CanvaCardTitle>
+                <CanvaCardSubtitle>Aktif fiyat testleri</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="space-y-4">
                   <div className="rounded-lg border p-4">
                     <div className="flex items-center justify-between mb-2">
@@ -556,8 +506,8 @@ export default function PricingPage() {
                     </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
         </TabsContent>
       </Tabs>

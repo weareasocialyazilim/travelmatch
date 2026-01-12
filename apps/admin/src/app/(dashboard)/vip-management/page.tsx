@@ -27,16 +27,7 @@ import {
   CheckCircle,
   Download,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Select,
@@ -613,77 +604,43 @@ export default function VIPManagementPage() {
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Crown className="h-4 w-4 text-yellow-500" />
-              VIP Kullanıcılar
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {stats?.totalVIP?.toLocaleString('tr-TR') || '-'}
-            </div>
-            <p className="text-xs text-muted-foreground">%0 komisyon</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Star className="h-4 w-4 text-green-500" />
-              Influencerlar
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {stats?.totalInfluencer?.toLocaleString('tr-TR') || '-'}
-            </div>
-            <p className="text-xs text-muted-foreground">Özel komisyon</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-blue-500" />
-              Partnerlar
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {stats?.totalPartner?.toLocaleString('tr-TR') || '-'}
-            </div>
-            <p className="text-xs text-muted-foreground">İş ortakları</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Tasarruf Edilen Komisyon
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {stats?.commissionSaved?.toLocaleString('tr-TR', {
-                style: 'currency',
-                currency: 'TRY',
-              }) || '-'}
-            </div>
-            <p className="text-xs text-muted-foreground">Bu ay</p>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          label="VIP Kullanıcılar"
+          value={stats?.totalVIP?.toLocaleString('tr-TR') || '-'}
+          icon={<Crown className="h-5 w-5 text-yellow-500" />}
+        />
+        <CanvaStatCard
+          label="Influencerlar"
+          value={stats?.totalInfluencer?.toLocaleString('tr-TR') || '-'}
+          icon={<Star className="h-5 w-5 text-green-500" />}
+        />
+        <CanvaStatCard
+          label="Partnerlar"
+          value={stats?.totalPartner?.toLocaleString('tr-TR') || '-'}
+          icon={<CheckCircle className="h-5 w-5 text-blue-500" />}
+        />
+        <CanvaStatCard
+          label="Tasarruf Edilen Komisyon"
+          value={
+            stats?.commissionSaved?.toLocaleString('tr-TR', {
+              style: 'currency',
+              currency: 'TRY',
+            }) || '-'
+          }
+        />
       </div>
 
       {/* VIP User List */}
-      <Card>
-        <CardHeader>
+      <CanvaCard>
+        <CanvaCardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>VIP Kullanıcı Listesi</CardTitle>
-              <CardDescription>{total} kullanıcı bulundu</CardDescription>
+              <CanvaCardTitle>VIP Kullanıcı Listesi</CanvaCardTitle>
+              <CanvaCardSubtitle>{total} kullanıcı bulundu</CanvaCardSubtitle>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
+        </CanvaCardHeader>
+        <CanvaCardBody>
           {/* Filters */}
           <div className="mb-6 flex items-center gap-4">
             <div className="relative flex-1">
@@ -865,8 +822,8 @@ export default function VIPManagementPage() {
               </div>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
 
       {/* Add VIP Dialog */}
       <AddVIPDialog

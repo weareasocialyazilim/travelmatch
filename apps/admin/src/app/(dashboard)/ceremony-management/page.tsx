@@ -25,10 +25,7 @@ import {
   CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { ProofReviewPanel } from '@/components/ceremony/ProofReviewPanel';
 import { CeremonyAnalytics } from '@/components/ceremony/CeremonyAnalytics';
 
@@ -172,11 +169,11 @@ export default function CeremonyManagementPage() {
         <TabsContent value="pending" className="mt-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Pending list */}
-            <Card className="lg:col-span-1">
-              <CardHeader>
-                <CardTitle className="text-lg">Bekleyen Prooflar</CardTitle>
-              </CardHeader>
-              <CardContent>
+            <CanvaCard className="lg:col-span-1">
+              <CanvaCardHeader>
+                <CanvaCardTitle className="text-lg">Bekleyen Prooflar</CanvaCardTitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="space-y-2">
                   {mockPendingProofs.map((proof) => (
                     <button
@@ -227,8 +224,8 @@ export default function CeremonyManagementPage() {
                     </div>
                   )}
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
             {/* Review panel */}
             <div className="lg:col-span-2">
@@ -249,16 +246,16 @@ export default function CeremonyManagementPage() {
         </TabsContent>
 
         <TabsContent value="history" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>İnceleme Geçmişi</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>İnceleme Geçmişi</CanvaCardTitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="text-center py-8 text-gray-500">
                 <p>Geçmiş incelemeler burada listelenecek</p>
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
       </Tabs>
     </div>
