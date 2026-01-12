@@ -203,12 +203,12 @@ export function ProofReviewPanel({
 
           {/* Flags */}
           {proof.aiAnalysis.flags.length > 0 && (
-            <div className="mt-3 p-3 bg-red-50 rounded-lg">
-              <p className="text-red-700 font-medium flex items-center gap-1">
+            <div className="mt-3 p-3 bg-red-500/10 dark:bg-red-500/20 rounded-lg">
+              <p className="text-red-700 dark:text-red-400 font-medium flex items-center gap-1">
                 <ExclamationTriangleIcon className="w-4 h-4" />
                 Uyarılar:
               </p>
-              <ul className="text-red-600 text-sm mt-1 space-y-1">
+              <ul className="text-red-600 dark:text-red-400 text-sm mt-1 space-y-1">
                 {proof.aiAnalysis.flags.map((flag, i) => (
                   <li key={i}>• {flag}</li>
                 ))}
@@ -220,25 +220,25 @@ export function ProofReviewPanel({
 
       {/* Expected vs Actual */}
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="p-4 bg-blue-50 rounded-lg">
-          <h4 className="font-medium text-blue-700 text-sm">Beklenen</h4>
-          <p className="text-blue-900 font-medium mt-1">
+        <div className="p-4 bg-blue-500/10 dark:bg-blue-500/20 rounded-lg">
+          <h4 className="font-medium text-blue-700 dark:text-blue-400 text-sm">Beklenen</h4>
+          <p className="text-blue-900 dark:text-blue-300 font-medium mt-1">
             {expectedMoment.title}
           </p>
           {expectedMoment.location && (
-            <p className="text-blue-600 text-sm mt-1 flex items-center gap-1">
+            <p className="text-blue-600 dark:text-blue-400 text-sm mt-1 flex items-center gap-1">
               <MapPinIcon className="w-3 h-3" />
               {expectedMoment.location}
             </p>
           )}
         </div>
-        <div className="p-4 bg-green-50 rounded-lg">
-          <h4 className="font-medium text-green-700 text-sm">Tespit Edilen</h4>
-          <p className="text-green-900 font-medium mt-1">
+        <div className="p-4 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-lg">
+          <h4 className="font-medium text-emerald-700 dark:text-emerald-400 text-sm">Tespit Edilen</h4>
+          <p className="text-emerald-900 dark:text-emerald-300 font-medium mt-1">
             {proof.aiAnalysis.sceneAnalysis}
           </p>
           {proof.location && (
-            <p className="text-green-600 text-sm mt-1 flex items-center gap-1">
+            <p className="text-emerald-600 dark:text-emerald-400 text-sm mt-1 flex items-center gap-1">
               <MapPinIcon className="w-3 h-3" />
               {proof.location.name}
             </p>
@@ -258,7 +258,7 @@ export function ProofReviewPanel({
         </CanvaButton>
         <CanvaButton
           variant="outline"
-          className="border-amber-500 text-amber-600 hover:bg-amber-50"
+          className="border-amber-500 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 dark:hover:bg-amber-500/20"
           onClick={() => setShowInfoModal(true)}
         >
           <QuestionMarkCircleIcon className="w-5 h-5 mr-2" />
