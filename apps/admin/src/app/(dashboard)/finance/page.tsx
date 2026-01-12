@@ -26,16 +26,7 @@ import {
   CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Select,
@@ -152,91 +143,34 @@ export default function FinancePage() {
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Toplam Gelir</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                formatCurrency(summary.totalRevenue)
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Son{' '}
-              {period === '7d'
-                ? '7 gün'
-                : period === '30d'
-                  ? '30 gün'
-                  : '90 gün'}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Abonelik Geliri
-            </CardTitle>
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                formatCurrency(summary.subscriptionRevenue)
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Toplam gelirin %
-              {summary.totalRevenue > 0
-                ? Math.round(
-                    (summary.subscriptionRevenue / summary.totalRevenue) * 100,
-                  )
-                : 0}
-              'i
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Bekleyen İşlemler
-            </CardTitle>
-            <Clock className="h-4 w-4 text-yellow-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">
-              {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                pendingPayoutsCount
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Toplam {formatCurrency(pendingPayoutsTotal)}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Toplam İşlem</CardTitle>
-            <Wallet className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                summary.transactionCount
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">Bu dönem</p>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          title="Toplam Gelir"
+          value={isLoading ? '...' : formatCurrency(summary.totalRevenue)}
+          description={`Son ${period === '7d' ? '7 gün' : period === '30d' ? '30 gün' : '90 gün'}`}
+          icon={<DollarSign className="h-5 w-5" />}
+          accentColor="emerald"
+          trend="up"
+        />
+        <CanvaStatCard
+          title="Abonelik Geliri"
+          value={isLoading ? '...' : formatCurrency(summary.subscriptionRevenue)}
+          description={`Toplam gelirin %${summary.totalRevenue > 0 ? Math.round((summary.subscriptionRevenue / summary.totalRevenue) * 100) : 0}'i`}
+          icon={<CreditCard className="h-5 w-5" />}
+          accentColor="violet"
+        />
+        <CanvaStatCard
+          title="Bekleyen İşlemler"
+          value={isLoading ? '...' : pendingPayoutsCount.toString()}
+          description={`Toplam ${formatCurrency(pendingPayoutsTotal)}`}
+          icon={<Clock className="h-5 w-5" />}
+          accentColor="amber"
+        />
+        <CanvaStatCard
+          title="Toplam İşlem"
+          value={isLoading ? '...' : summary.transactionCount.toString()}
+          description="Bu dönem"
+          icon={<Wallet className="h-5 w-5" />}
+        />
       </div>
 
       {/* Tabs */}
@@ -255,18 +189,14 @@ export default function FinancePage() {
 
         {/* Transactions Tab */}
         <TabsContent value="transactions">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>İşlem Geçmişi</CardTitle>
-                  <CardDescription>
-                    Tüm finansal işlemleri görüntüleyin
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>İşlem Geçmişi</CanvaCardTitle>
+              <CanvaCardSubtitle>
+                Tüm finansal işlemleri görüntüleyin
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               {/* Filters */}
               <div className="mb-6 flex items-center gap-4">
                 <div className="relative flex-1">
@@ -367,20 +297,20 @@ export default function FinancePage() {
                   </p>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Payouts Tab */}
         <TabsContent value="payouts">
-          <Card>
-            <CardHeader>
-              <CardTitle>Bekleyen Ödemeler</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Bekleyen Ödemeler</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Kullanıcı çekim taleplerini inceleyin ve onaylayın
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               {isLoading ? (
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -470,8 +400,8 @@ export default function FinancePage() {
                   </p>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
       </Tabs>
     </div>

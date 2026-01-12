@@ -45,15 +45,6 @@ import {
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { CanvaButton } from '@/components/canva/CanvaButton';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -298,9 +289,9 @@ export default function AuditTrailPage() {
       support: 'Support',
     };
     return (
-      <Badge className={styles[role] || 'bg-gray-500/10 text-gray-500'}>
+      <CanvaBadge className={styles[role] || 'bg-gray-500/10 text-gray-500'}>
         {labels[role] || role}
-      </Badge>
+      </CanvaBadge>
     );
   };
 
@@ -327,38 +318,38 @@ export default function AuditTrailPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
+          <CanvaButton variant="ghost">
             <Download className="h-4 w-4 mr-2" />
             Export
-          </Button>
-          <Button variant="outline">
+          </CanvaButton>
+          <CanvaButton variant="ghost">
             <Calendar className="h-4 w-4 mr-2" />
             Son 7 Gün
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-5 gap-4">
         {actionCategories.map((cat) => (
-          <Card key={cat.key} className="admin-card">
-            <CardContent className="p-4">
+          <CanvaCard key={cat.key} className="admin-card">
+            <CanvaCardBody className="p-4">
               <div className="flex items-center justify-between">
                 <cat.icon className="h-5 w-5 text-muted-foreground" />
                 <span className="text-2xl font-bold">{cat.count}</span>
               </div>
               <p className="text-sm text-muted-foreground mt-1">{cat.label}</p>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         ))}
       </div>
 
       <div className="grid grid-cols-4 gap-6">
         {/* Main Log Table */}
-        <Card className="admin-card col-span-3">
-          <CardHeader className="pb-3">
+        <CanvaCard className="admin-card col-span-3">
+          <CanvaCardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle>Aksiyon Logları</CardTitle>
+              <CanvaCardTitle>Aksiyon Logları</CanvaCardTitle>
               <div className="flex items-center gap-2">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -394,8 +385,8 @@ export default function AuditTrailPage() {
                 </Select>
               </div>
             </div>
-          </CardHeader>
-          <CardContent>
+          </CanvaCardHeader>
+          <CanvaCardBody>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -460,38 +451,38 @@ export default function AuditTrailPage() {
                       </TableCell>
                       <TableCell>
                         {log.status === 'success' ? (
-                          <Badge className="bg-green-500/10 text-green-500">
+                          <CanvaBadge className="bg-green-500/10 text-green-500">
                             <CheckCircle2 className="h-3 w-3 mr-1" />
                             Başarılı
-                          </Badge>
+                          </CanvaBadge>
                         ) : (
-                          <Badge className="bg-red-500/10 text-red-500">
+                          <CanvaBadge className="bg-red-500/10 text-red-500">
                             <XCircle className="h-3 w-3 mr-1" />
                             Başarısız
-                          </Badge>
+                          </CanvaBadge>
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">
+                        <CanvaButton variant="ghost" size="sm">
                           <ChevronRight className="h-4 w-4" />
-                        </Button>
+                        </CanvaButton>
                       </TableCell>
                     </TableRow>
                   );
                 })}
               </TableBody>
             </Table>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
 
         {/* Side Panel */}
         <div className="space-y-4">
           {/* Admin Activity */}
-          <Card className="admin-card">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Admin Aktivitesi</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <CanvaCard className="admin-card">
+            <CanvaCardHeader className="pb-2">
+              <CanvaCardTitle className="text-base">Admin Aktivitesi</CanvaCardTitle>
+            </CanvaCardHeader>
+            <CanvaCardBody className="space-y-3">
               {adminActivity.map((admin) => (
                 <div
                   key={admin.admin}
@@ -510,28 +501,28 @@ export default function AuditTrailPage() {
                       </p>
                     </div>
                   </div>
-                  <Badge variant="secondary">{admin.actions}</Badge>
+                  <CanvaBadge variant="secondary">{admin.actions}</CanvaBadge>
                 </div>
               ))}
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
 
           {/* Selected Log Detail */}
           {selectedLog && (
-            <Card className="admin-card">
-              <CardHeader className="pb-2">
+            <CanvaCard className="admin-card">
+              <CanvaCardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">Log Detayı</CardTitle>
-                  <Button
+                  <CanvaCardTitle className="text-base">Log Detayı</CanvaCardTitle>
+                  <CanvaButton
                     variant="ghost"
                     size="sm"
                     onClick={() => setSelectedLog(null)}
                   >
                     <XCircle className="h-4 w-4" />
-                  </Button>
+                  </CanvaButton>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm">
+              </CanvaCardHeader>
+              <CanvaCardBody className="space-y-3 text-sm">
                 <div>
                   <p className="text-muted-foreground">ID</p>
                   <p className="font-mono">{selectedLog.id}</p>
@@ -569,8 +560,8 @@ export default function AuditTrailPage() {
                     <p className="text-xs">{selectedLog.error}</p>
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           )}
         </div>
       </div>

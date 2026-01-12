@@ -16,14 +16,6 @@ import {
   Save,
   Camera,
 } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -141,17 +133,17 @@ export default function ProfileSettingsPage() {
         {/* Profile Info */}
         <div className="lg:col-span-2 space-y-6">
           {/* Basic Info */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle className="flex items-center gap-2">
                 <User className="h-5 w-5" />
                 Kişisel Bilgiler
-              </CardTitle>
-              <CardDescription>
+              </CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Temel profil bilgilerinizi güncelleyin
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody className="space-y-4">
               <div className="flex items-center gap-4">
                 <Avatar className="h-20 w-20 border-2 border-primary/20">
                   <AvatarFallback className="bg-primary/10 text-primary text-xl font-semibold">
@@ -215,21 +207,21 @@ export default function ProfileSettingsPage() {
                   />
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
 
           {/* Security */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle className="flex items-center gap-2">
                 <Key className="h-5 w-5" />
                 Şifre Değiştir
-              </CardTitle>
-              <CardDescription>
+              </CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Hesap güvenliğiniz için güçlü bir şifre kullanın
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="currentPassword">Mevcut Şifre</Label>
                 <div className="relative">
@@ -295,21 +287,21 @@ export default function ProfileSettingsPage() {
                 Şifreniz en az 8 karakter, bir büyük harf, bir rakam ve bir özel
                 karakter içermelidir.
               </p>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Account Status */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5" />
                 Hesap Durumu
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+              </CanvaCardTitle>
+            </CanvaCardHeader>
+            <CanvaCardBody className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm">İki Faktörlü Doğrulama</span>
                 <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
@@ -328,18 +320,18 @@ export default function ProfileSettingsPage() {
                   1 Ocak 2026
                 </span>
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
 
           {/* Notifications */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5" />
                 Bildirim Tercihleri
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+              </CanvaCardTitle>
+            </CanvaCardHeader>
+            <CanvaCardBody className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium">E-posta Bildirimleri</p>
@@ -405,8 +397,8 @@ export default function ProfileSettingsPage() {
                   }
                 />
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </div>
       </div>
 

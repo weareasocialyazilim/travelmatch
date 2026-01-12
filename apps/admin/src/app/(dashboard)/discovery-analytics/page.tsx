@@ -41,15 +41,6 @@ import {
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { CanvaButton } from '@/components/canva/CanvaButton';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -338,118 +329,75 @@ export default function DiscoveryAnalyticsPage() {
               <SelectItem value="90d">Son 90 Gun</SelectItem>
             </SelectContent>
           </Select>
-          <Button size="sm">
+          <CanvaButton size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             Yenile
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
       {/* Key Metrics */}
       <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-8">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Camera className="h-3 w-3" />
-              Toplam Moment
-            </CardDescription>
-            <CardTitle className="text-xl font-bold">
-              {discoveryStats.totalMoments.toLocaleString()}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-emerald-600">
-              {discoveryStats.activeMoments.toLocaleString()} aktif
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Search className="h-3 w-3" />
-              Bugun Kesif
-            </CardDescription>
-            <CardTitle className="text-xl font-bold text-blue-600">
-              {discoveryStats.discoveriesToday.toLocaleString()}
-            </CardTitle>
-          </CardHeader>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Heart className="h-3 w-3" />
-              Bugun Eslesme
-            </CardDescription>
-            <CardTitle className="text-xl font-bold text-pink-600">
-              {discoveryStats.matchesToday}
-            </CardTitle>
-          </CardHeader>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Target className="h-3 w-3" />
-              Donusum
-            </CardDescription>
-            <CardTitle className="text-xl font-bold text-emerald-600">
-              %{discoveryStats.conversionRate}
-            </CardTitle>
-          </CardHeader>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              Ort. Sure
-            </CardDescription>
-            <CardTitle className="text-xl font-bold">
-              {discoveryStats.avgDiscoveryToMatch} gun
-            </CardTitle>
-          </CardHeader>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Navigation className="h-3 w-3" />
-              Ort. Radius
-            </CardDescription>
-            <CardTitle className="text-xl font-bold">
-              {discoveryStats.avgSearchRadius} km
-            </CardTitle>
-          </CardHeader>
-        </Card>
-
-        <Card className="col-span-2">
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
+        <CanvaStatCard
+          title="Toplam Moment"
+          value={discoveryStats.totalMoments.toLocaleString()}
+          icon={<Camera className="h-4 w-4" />}
+          subtitle={`${discoveryStats.activeMoments.toLocaleString()} aktif`}
+        />
+        <CanvaStatCard
+          title="Bugun Kesif"
+          value={discoveryStats.discoveriesToday.toLocaleString()}
+          icon={<Search className="h-4 w-4" />}
+          variant="info"
+        />
+        <CanvaStatCard
+          title="Bugun Eslesme"
+          value={discoveryStats.matchesToday}
+          icon={<Heart className="h-4 w-4" />}
+          variant="error"
+        />
+        <CanvaStatCard
+          title="Donusum"
+          value={`%${discoveryStats.conversionRate}`}
+          icon={<Target className="h-4 w-4" />}
+          variant="success"
+        />
+        <CanvaStatCard
+          title="Ort. Sure"
+          value={`${discoveryStats.avgDiscoveryToMatch} gun`}
+          icon={<Clock className="h-4 w-4" />}
+        />
+        <CanvaStatCard
+          title="Ort. Radius"
+          value={`${discoveryStats.avgSearchRadius} km`}
+          icon={<Navigation className="h-4 w-4" />}
+        />
+        <CanvaCard className="col-span-2">
+          <CanvaCardHeader className="pb-2">
+            <CanvaCardSubtitle className="flex items-center gap-1">
               <Zap className="h-3 w-3" />
               En Populer
-            </CardDescription>
-            <CardTitle className="text-xl font-bold flex items-center gap-2">
+            </CanvaCardSubtitle>
+            <CanvaCardTitle className="text-xl font-bold flex items-center gap-2">
               <Award className="h-4 w-4 text-amber-500" />
               {discoveryStats.popularCategory}
-            </CardTitle>
-          </CardHeader>
-        </Card>
+            </CanvaCardTitle>
+          </CanvaCardHeader>
+        </CanvaCard>
       </div>
 
       {/* Discovery Funnel */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <CanvaCard>
+        <CanvaCardHeader>
+          <CanvaCardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5 text-emerald-500" />
             Kesif Donusum Hunisi
-          </CardTitle>
-          <CardDescription>
+          </CanvaCardTitle>
+          <CanvaCardSubtitle>
             Kesiften eslemeye kullanici yolculugu
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+          </CanvaCardSubtitle>
+        </CanvaCardHeader>
+        <CanvaCardBody>
           <div className="space-y-4">
             {discoveryFunnel.map((stage, index) => (
               <div key={stage.stage} className="space-y-2">
@@ -468,8 +416,8 @@ export default function DiscoveryAnalyticsPage() {
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
 
       {/* Main Tabs */}
       <Tabs value={selectedTab} onValueChange={setSelectedTab}>
@@ -484,12 +432,12 @@ export default function DiscoveryAnalyticsPage() {
         <TabsContent value="overview" className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Hourly Activity */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Saatlik Aktivite</CardTitle>
-                <CardDescription>Kesif ve eslesme dagilimi</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Saatlik Aktivite</CanvaCardTitle>
+                <CanvaCardSubtitle>Kesif ve eslesme dagilimi</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <AdminAreaChart
                   data={hourlyDiscoveryData}
                   xAxisKey="hour"
@@ -507,21 +455,21 @@ export default function DiscoveryAnalyticsPage() {
                     },
                   ]}
                 />
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
             {/* Search Filters Usage */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle className="flex items-center gap-2">
                   <Filter className="h-5 w-5 text-blue-500" />
                   Filtre Kullanimi
-                </CardTitle>
-                <CardDescription>
+                </CanvaCardTitle>
+                <CanvaCardSubtitle>
                   En cok kullanilan arama filtreleri
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+                </CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="space-y-4">
                   {searchFilters.map((filter) => (
                     <div key={filter.filter} className="space-y-2">
@@ -535,17 +483,17 @@ export default function DiscoveryAnalyticsPage() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
 
           {/* Weekly Trend */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Haftalik Trend</CardTitle>
-              <CardDescription>Kesif ve eslesme trendi</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Haftalik Trend</CanvaCardTitle>
+              <CanvaCardSubtitle>Kesif ve eslesme trendi</CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <AdminLineChart
                 data={weeklyTrendData}
                 xAxisKey="date"
@@ -563,21 +511,21 @@ export default function DiscoveryAnalyticsPage() {
                   },
                 ]}
               />
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Geography Tab */}
         <TabsContent value="geography" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle className="flex items-center gap-2">
                 <Globe className="h-5 w-5 text-emerald-500" />
                 Cografi Hotspotlar
-              </CardTitle>
-              <CardDescription>PostGIS tabanlı konum analitiği</CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardTitle>
+              <CanvaCardSubtitle>PostGIS tabanlı konum analitiği</CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-4">
                 {geoHotspots.map((spot, index) => (
                   <div
@@ -647,20 +595,20 @@ export default function DiscoveryAnalyticsPage() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Categories Tab */}
         <TabsContent value="categories" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Kategori Performansi</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Kategori Performansi</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Kategori bazli kesif ve eslesme metrikleri
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -685,7 +633,7 @@ export default function DiscoveryAnalyticsPage() {
                         {cat.matches}
                       </TableCell>
                       <TableCell>
-                        <Badge
+                        <CanvaBadge
                           className={cn(
                             cat.conversion >= 15
                               ? 'bg-emerald-500/10 text-emerald-600'
@@ -695,7 +643,7 @@ export default function DiscoveryAnalyticsPage() {
                           )}
                         >
                           %{cat.conversion}
-                        </Badge>
+                        </CanvaBadge>
                       </TableCell>
                       <TableCell>
                         {formatCurrency(cat.avgPrice, 'TRY')}
@@ -721,23 +669,23 @@ export default function DiscoveryAnalyticsPage() {
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Top Moments Tab */}
         <TabsContent value="moments" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle className="flex items-center gap-2">
                 <Star className="h-5 w-5 text-amber-500" />
                 En Iyi Performans Gosteren Momentler
-              </CardTitle>
-              <CardDescription>
+              </CanvaCardTitle>
+              <CanvaCardSubtitle>
                 En yuksek donusum oranina sahip momentler
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -771,7 +719,7 @@ export default function DiscoveryAnalyticsPage() {
                       </TableCell>
                       <TableCell>{moment.host}</TableCell>
                       <TableCell>
-                        <Badge variant="outline">{moment.category}</Badge>
+                        <CanvaBadge variant="outline">{moment.category}</CanvaBadge>
                       </TableCell>
                       <TableCell>
                         {moment.discoveries.toLocaleString()}
@@ -780,9 +728,9 @@ export default function DiscoveryAnalyticsPage() {
                         {moment.matches}
                       </TableCell>
                       <TableCell>
-                        <Badge className="bg-emerald-500/10 text-emerald-600">
+                        <CanvaBadge className="bg-emerald-500/10 text-emerald-600">
                           %{moment.conversion}
-                        </Badge>
+                        </CanvaBadge>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
@@ -794,8 +742,8 @@ export default function DiscoveryAnalyticsPage() {
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
       </Tabs>
     </div>

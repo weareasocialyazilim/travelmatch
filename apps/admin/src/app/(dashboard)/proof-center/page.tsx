@@ -51,15 +51,6 @@ import {
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { CanvaButton } from '@/components/canva/CanvaButton';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -257,24 +248,24 @@ export default function ProofCenterPage() {
   const getVerdictBadge = (verdict: string, score: number) => {
     if (verdict === 'approved' || score >= 85) {
       return (
-        <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
+        <CanvaBadge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
           <CheckCircle2 className="h-3 w-3 mr-1" />
           AI Onayladi
-        </Badge>
+        </CanvaBadge>
       );
     } else if (verdict === 'needs_review' || (score >= 60 && score < 85)) {
       return (
-        <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/30">
+        <CanvaBadge className="bg-amber-500/10 text-amber-600 border-amber-500/30">
           <Eye className="h-3 w-3 mr-1" />
           Inceleme Gerekli
-        </Badge>
+        </CanvaBadge>
       );
     } else {
       return (
-        <Badge className="bg-red-500/10 text-red-600 border-red-500/30">
+        <CanvaBadge className="bg-red-500/10 text-red-600 border-red-500/30">
           <XCircle className="h-3 w-3 mr-1" />
           AI Reddetti
-        </Badge>
+        </CanvaBadge>
       );
     }
   };
@@ -315,122 +306,68 @@ export default function ProofCenterPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
+          <CanvaButton variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
             Rapor
-          </Button>
-          <Button size="sm">
+          </CanvaButton>
+          <CanvaButton size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             Yenile
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
       {/* Stats Overview */}
       <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-6">
-        <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-amber-500/10 rounded-bl-full" />
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              Bekleyen
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-amber-600">
-              {proofStats.pendingReview}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">Inceleme bekliyor</p>
-          </CardContent>
-        </Card>
-
-        <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/10 rounded-bl-full" />
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <CheckCircle2 className="h-3 w-3" />
-              Onaylanan
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-emerald-600">
-              {proofStats.approvedToday}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">Bugun onaylandi</p>
-          </CardContent>
-        </Card>
-
-        <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-red-500/10 rounded-bl-full" />
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <XCircle className="h-3 w-3" />
-              Reddedilen
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-red-600">
-              {proofStats.rejectedToday}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">Bugun reddedildi</p>
-          </CardContent>
-        </Card>
-
-        <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-cyan-500/10 rounded-bl-full" />
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Brain className="h-3 w-3" />
-              AI Skoru
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-cyan-600">
-              %{proofStats.avgAIScore}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">Ortalama skor</p>
-          </CardContent>
-        </Card>
-
-        <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-purple-500/10 rounded-bl-full" />
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Target className="h-3 w-3" />
-              AI Dogruluk
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-purple-600">
-              %{proofStats.aiAccuracy}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">Dogrulama orani</p>
-          </CardContent>
-        </Card>
-
-        <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-blue-500/10 rounded-bl-full" />
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Zap className="h-3 w-3" />
-              Ort. Sure
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-blue-600">
-              {proofStats.avgReviewTime} dk
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">Inceleme suresi</p>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          title="Bekleyen"
+          value={proofStats.pendingReview}
+          icon={<Clock className="h-4 w-4" />}
+          subtitle="Inceleme bekliyor"
+          variant="warning"
+        />
+        <CanvaStatCard
+          title="Onaylanan"
+          value={proofStats.approvedToday}
+          icon={<CheckCircle2 className="h-4 w-4" />}
+          subtitle="Bugun onaylandi"
+          variant="success"
+        />
+        <CanvaStatCard
+          title="Reddedilen"
+          value={proofStats.rejectedToday}
+          icon={<XCircle className="h-4 w-4" />}
+          subtitle="Bugun reddedildi"
+          variant="error"
+        />
+        <CanvaStatCard
+          title="AI Skoru"
+          value={`%${proofStats.avgAIScore}`}
+          icon={<Brain className="h-4 w-4" />}
+          subtitle="Ortalama skor"
+          variant="info"
+        />
+        <CanvaStatCard
+          title="AI Dogruluk"
+          value={`%${proofStats.aiAccuracy}`}
+          icon={<Target className="h-4 w-4" />}
+          subtitle="Dogrulama orani"
+        />
+        <CanvaStatCard
+          title="Ort. Sure"
+          value={`${proofStats.avgReviewTime} dk`}
+          icon={<Zap className="h-4 w-4" />}
+          subtitle="Inceleme suresi"
+          variant="info"
+        />
       </div>
 
       {/* Proof Types Distribution */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">Bekleyen Proof Turleri</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <CanvaCard>
+        <CanvaCardHeader className="pb-3">
+          <CanvaCardTitle className="text-base">Bekleyen Proof Turleri</CanvaCardTitle>
+        </CanvaCardHeader>
+        <CanvaCardBody>
           <div className="flex gap-4 flex-wrap">
             {proofTypes.map((type) => (
               <div
@@ -449,8 +386,8 @@ export default function ProofCenterPage() {
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
 
       {/* Main Tabs */}
       <Tabs value={selectedTab} onValueChange={setSelectedTab}>
@@ -500,7 +437,7 @@ export default function ProofCenterPage() {
           {/* Proof Cards */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {pendingProofs.map((proof) => (
-              <Card
+              <CanvaCard
                 key={proof.id}
                 className={cn(
                   'cursor-pointer hover:shadow-md transition-all',
@@ -508,34 +445,34 @@ export default function ProofCenterPage() {
                   proof.aiVerdict === 'needs_review' && 'border-amber-500/30',
                 )}
               >
-                <CardHeader className="pb-3">
+                <CanvaCardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-xs font-mono">
+                      <CanvaBadge variant="outline" className="text-xs font-mono">
                         {proof.id}
-                      </Badge>
+                      </CanvaBadge>
                       {proof.flags.length > 0 && (
-                        <Badge variant="destructive" className="text-xs">
+                        <CanvaBadge variant="destructive" className="text-xs">
                           <Flag className="h-3 w-3 mr-1" />
                           {proof.flags.length}
-                        </Badge>
+                        </CanvaBadge>
                       )}
                     </div>
                     {getVerdictBadge(proof.aiVerdict, proof.aiScore)}
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
+                </CanvaCardHeader>
+                <CanvaCardBody className="space-y-4">
                   {/* Proof Preview */}
                   <div className="relative aspect-video bg-muted rounded-lg flex items-center justify-center">
                     <Camera className="h-8 w-8 text-muted-foreground" />
-                    <Button
+                    <CanvaButton
                       size="sm"
                       variant="secondary"
                       className="absolute bottom-2 right-2"
                     >
                       <ZoomIn className="h-3 w-3 mr-1" />
                       {proof.images.length} gorsel
-                    </Button>
+                    </CanvaButton>
                   </div>
 
                   {/* Info */}
@@ -640,28 +577,28 @@ export default function ProofCenterPage() {
                   {proof.flags.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                       {proof.flags.map((flag) => (
-                        <Badge
+                        <CanvaBadge
                           key={flag}
                           variant="outline"
                           className="text-xs bg-red-500/10 text-red-600 border-red-500/30"
                         >
                           {flag.replace(/_/g, ' ')}
-                        </Badge>
+                        </CanvaBadge>
                       ))}
                     </div>
                   )}
 
                   {/* Actions */}
                   <div className="flex items-center gap-2 pt-2">
-                    <Button
+                    <CanvaButton
                       size="sm"
                       className="flex-1 bg-emerald-600 hover:bg-emerald-700"
                       onClick={() => handleApprove(proof)}
                     >
                       <ThumbsUp className="h-4 w-4 mr-1" />
                       Onayla
-                    </Button>
-                    <Button
+                    </CanvaButton>
+                    <CanvaButton
                       size="sm"
                       variant="destructive"
                       className="flex-1"
@@ -669,13 +606,13 @@ export default function ProofCenterPage() {
                     >
                       <ThumbsDown className="h-4 w-4 mr-1" />
                       Reddet
-                    </Button>
-                    <Button size="sm" variant="outline">
+                    </CanvaButton>
+                    <CanvaButton size="sm" variant="outline">
                       <Eye className="h-4 w-4" />
-                    </Button>
+                    </CanvaButton>
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))}
           </div>
         </TabsContent>
@@ -684,17 +621,17 @@ export default function ProofCenterPage() {
         <TabsContent value="ai-analysis" className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
             {/* AI Components Performance */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle className="flex items-center gap-2">
                   <Brain className="h-5 w-5 text-cyan-500" />
                   AI Bilesenleri Performansi
-                </CardTitle>
-                <CardDescription>
+                </CanvaCardTitle>
+                <CanvaCardSubtitle>
                   Proof dogrulama AI modellerinin basari oranlari
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+                </CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody className="space-y-4">
                 {Object.entries(aiBreakdown).map(([key, value]) => (
                   <div key={key} className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
@@ -708,21 +645,21 @@ export default function ProofCenterPage() {
                     <Progress value={value} className="h-2" />
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
             {/* Error Rates */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle className="flex items-center gap-2">
                   <Target className="h-5 w-5 text-purple-500" />
                   Hata Oranlari
-                </CardTitle>
-                <CardDescription>
+                </CanvaCardTitle>
+                <CanvaCardSubtitle>
                   False positive ve false negative oranlari
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+                </CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="grid gap-4">
                   <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
                     <div className="flex items-center justify-between mb-2">
@@ -776,24 +713,24 @@ export default function ProofCenterPage() {
                     />
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
         </TabsContent>
 
         {/* Landmarks Tab */}
         <TabsContent value="landmarks" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle className="flex items-center gap-2">
                 <MapPin className="h-5 w-5 text-emerald-500" />
                 Turkiye Landmark Tespiti
-              </CardTitle>
-              <CardDescription>
+              </CanvaCardTitle>
+              <CanvaCardSubtitle>
                 AI'in tespit ettigi Turkiye'deki onemli mekanlar
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-4">
                 {turkishLandmarks.map((landmark) => (
                   <div
@@ -825,20 +762,20 @@ export default function ProofCenterPage() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Performance Tab */}
         <TabsContent value="performance" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Haftalik Proof Performansi</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Haftalik Proof Performansi</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Son 7 gunluk proof islem istatistikleri
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <AdminAreaChart
                 data={dailyPerformanceData}
                 xAxisKey="date"
@@ -857,8 +794,8 @@ export default function ProofCenterPage() {
                 ]}
                 formatter={(value, name) => [`${value} proof`, name]}
               />
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
       </Tabs>
 
@@ -887,13 +824,13 @@ export default function ProofCenterPage() {
               {selectedProof?.flags.length ? (
                 <div className="flex flex-wrap gap-1">
                   {selectedProof.flags.map((flag) => (
-                    <Badge
+                    <CanvaBadge
                       key={flag}
                       variant="outline"
                       className="text-xs bg-red-500/10 text-red-600"
                     >
                       {flag.replace(/_/g, ' ')}
-                    </Badge>
+                    </CanvaBadge>
                   ))}
                 </div>
               ) : null}
@@ -909,23 +846,23 @@ export default function ProofCenterPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setReviewDialog(false)}>
+            <CanvaButton variant="outline" onClick={() => setReviewDialog(false)}>
               Iptal
-            </Button>
-            <Button
+            </CanvaButton>
+            <CanvaButton
               variant="destructive"
               onClick={() => setReviewDialog(false)}
             >
               <ThumbsDown className="h-4 w-4 mr-1" />
               Reddet
-            </Button>
-            <Button
+            </CanvaButton>
+            <CanvaButton
               className="bg-emerald-600 hover:bg-emerald-700"
               onClick={() => setReviewDialog(false)}
             >
               <ThumbsUp className="h-4 w-4 mr-1" />
               Onayla
-            </Button>
+            </CanvaButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>

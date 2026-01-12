@@ -32,15 +32,6 @@ import {
   CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
@@ -214,69 +205,38 @@ export default function TeamPage() {
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Toplam Üye</p>
-                <p className="text-2xl font-bold">{teamStats.total_members}</p>
-              </div>
-              <Users className="h-8 w-8 text-blue-500" />
+        <CanvaStatCard
+          title="Toplam Üye"
+          value={teamStats.total_members}
+          icon={<Users className="h-8 w-8 text-blue-500" />}
+        />
+        <CanvaStatCard
+          title="Şu An Çevrimiçi"
+          value={teamStats.online_now}
+          valueClassName="text-green-600"
+          icon={
+            <div className="flex h-8 w-8 items-center justify-center">
+              <div className="h-3 w-3 rounded-full bg-green-500 animate-pulse" />
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Şu An Çevrimiçi</p>
-                <p className="text-2xl font-bold text-green-600">
-                  {teamStats.online_now}
-                </p>
-              </div>
-              <div className="flex h-8 w-8 items-center justify-center">
-                <div className="h-3 w-3 rounded-full bg-green-500 animate-pulse" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Bugün Tamamlanan
-                </p>
-                <p className="text-2xl font-bold">
-                  {teamStats.tasks_completed_today}
-                </p>
-              </div>
-              <CheckCircle className="h-8 w-8 text-green-500" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Ort. Yanıt Süresi
-                </p>
-                <p className="text-2xl font-bold">
-                  {teamStats.avg_response_time}
-                </p>
-              </div>
-              <Clock className="h-8 w-8 text-orange-500" />
-            </div>
-          </CardContent>
-        </Card>
+          }
+        />
+        <CanvaStatCard
+          title="Bugün Tamamlanan"
+          value={teamStats.tasks_completed_today}
+          icon={<CheckCircle className="h-8 w-8 text-green-500" />}
+        />
+        <CanvaStatCard
+          title="Ort. Yanıt Süresi"
+          value={teamStats.avg_response_time}
+          icon={<Clock className="h-8 w-8 text-orange-500" />}
+        />
       </div>
 
       {/* Shifts Overview */}
       <div className="grid gap-4 md:grid-cols-3">
         {shifts.map((shift) => (
-          <Card key={shift.name} className={shift.color}>
-            <CardContent className="pt-6">
+          <CanvaCard key={shift.name} className={shift.color}>
+            <CanvaCardBody className="pt-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white">
@@ -294,8 +254,8 @@ export default function TeamPage() {
                   <p className="text-sm text-muted-foreground">kişi</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         ))}
       </div>
 
@@ -325,8 +285,8 @@ export default function TeamPage() {
           {/* Team Members Grid */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredMembers.map((member) => (
-              <Card key={member.id}>
-                <CardContent className="pt-6">
+              <CanvaCard key={member.id}>
+                <CanvaCardBody className="pt-6">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <div className="relative">
@@ -378,8 +338,8 @@ export default function TeamPage() {
                       İstatistik
                     </CanvaButton>
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))}
           </div>
         </TabsContent>
@@ -387,17 +347,17 @@ export default function TeamPage() {
         <TabsContent value="performance" className="space-y-4">
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Leaderboard */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle className="flex items-center gap-2">
                   <Award className="h-5 w-5 text-yellow-500" />
                   Bu Hafta Liderlik Tablosu
-                </CardTitle>
-                <CardDescription>
+                </CanvaCardTitle>
+                <CanvaCardSubtitle>
                   En çok görev tamamlayan ekip üyeleri
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+                </CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="space-y-4">
                   {leaderboard.map((item) => (
                     <div
@@ -432,19 +392,19 @@ export default function TeamPage() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
             {/* Team Goals */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle className="flex items-center gap-2">
                   <Target className="h-5 w-5 text-blue-500" />
                   Haftalık Hedefler
-                </CardTitle>
-                <CardDescription>Ekip performans hedefleri</CardDescription>
-              </CardHeader>
-              <CardContent>
+                </CanvaCardTitle>
+                <CanvaCardSubtitle>Ekip performans hedefleri</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="space-y-6">
                   <div>
                     <div className="flex items-center justify-between mb-2">
@@ -503,20 +463,20 @@ export default function TeamPage() {
                     </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
         </TabsContent>
 
         <TabsContent value="schedule" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Vardiya Takvimi</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Vardiya Takvimi</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Bu hafta için planlanan vardiyalar
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="rounded-lg border">
                 <div className="grid grid-cols-8 border-b">
                   <div className="p-3 font-medium text-muted-foreground"></div>
@@ -566,8 +526,8 @@ export default function TeamPage() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
       </Tabs>
     </div>

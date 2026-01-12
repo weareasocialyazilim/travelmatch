@@ -18,10 +18,7 @@ import {
   CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
@@ -51,14 +48,12 @@ import {
   AlertTriangle,
   Ban,
   CheckCircle,
-  Eye,
   FileText,
   MessageSquare,
   Plus,
   Search,
   Shield,
   Trash2,
-  Users,
   XCircle,
 } from 'lucide-react';
 import { getClient } from '@/lib/supabase';
@@ -451,79 +446,54 @@ export default function ModerationPage() {
       {/* Stats Cards */}
       {stats && (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="p-4">
-            <div className="flex items-center gap-4">
-              <div className="rounded-lg bg-blue-100 p-3">
-                <FileText className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total Logs</p>
-                <p className="text-2xl font-bold">{stats.totalLogs}</p>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-4">
-            <div className="flex items-center gap-4">
-              <div className="rounded-lg bg-red-100 p-3">
-                <Ban className="h-6 w-6 text-red-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Blocked Today</p>
-                <p className="text-2xl font-bold">{stats.blockedToday}</p>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-4">
-            <div className="flex items-center gap-4">
-              <div className="rounded-lg bg-yellow-100 p-3">
-                <AlertTriangle className="h-6 w-6 text-yellow-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Active Warnings</p>
-                <p className="text-2xl font-bold">{stats.activeWarnings}</p>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-4">
-            <div className="flex items-center gap-4">
-              <div className="rounded-lg bg-purple-100 p-3">
-                <MessageSquare className="h-6 w-6 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Pending Appeals</p>
-                <p className="text-2xl font-bold">{stats.pendingAppeals}</p>
-              </div>
-            </div>
-          </Card>
+          <CanvaStatCard
+            title="Total Logs"
+            value={stats.totalLogs.toString()}
+            icon={FileText}
+          />
+          <CanvaStatCard
+            title="Blocked Today"
+            value={stats.blockedToday.toString()}
+            icon={Ban}
+          />
+          <CanvaStatCard
+            title="Active Warnings"
+            value={stats.activeWarnings.toString()}
+            icon={AlertTriangle}
+          />
+          <CanvaStatCard
+            title="Pending Appeals"
+            value={stats.pendingAppeals.toString()}
+            icon={MessageSquare}
+          />
         </div>
       )}
 
       {/* Severity Breakdown */}
       {stats && (
-        <Card className="p-4">
-          <h3 className="mb-4 font-semibold">Severity Breakdown</h3>
-          <div className="flex gap-4">
-            <div className="flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full bg-red-500" />
-              <span>Critical: {stats.severityBreakdown.critical}</span>
+        <CanvaCard>
+          <CanvaCardBody>
+            <h3 className="mb-4 font-semibold">Severity Breakdown</h3>
+            <div className="flex gap-4">
+              <div className="flex items-center gap-2">
+                <div className="h-3 w-3 rounded-full bg-red-500" />
+                <span>Critical: {stats.severityBreakdown.critical}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-3 w-3 rounded-full bg-orange-500" />
+                <span>High: {stats.severityBreakdown.high}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-3 w-3 rounded-full bg-yellow-500" />
+                <span>Medium: {stats.severityBreakdown.medium}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-3 w-3 rounded-full bg-blue-500" />
+                <span>Low: {stats.severityBreakdown.low}</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full bg-orange-500" />
-              <span>High: {stats.severityBreakdown.high}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full bg-yellow-500" />
-              <span>Medium: {stats.severityBreakdown.medium}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full bg-blue-500" />
-              <span>Low: {stats.severityBreakdown.low}</span>
-            </div>
-          </div>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
       )}
 
       {/* Tabs */}
@@ -573,78 +543,81 @@ export default function ModerationPage() {
             </Select>
           </div>
 
-          <Card>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>User</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Severity</TableHead>
-                  <TableHead>Violations</TableHead>
-                  <TableHead>Action</TableHead>
-                  <TableHead>Date</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredLogs.map((log) => (
-                  <TableRow key={log.id}>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">
-                          {log.user?.full_name || 'Unknown'}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          @{log.user?.username || 'unknown'}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <CanvaBadge variant="primary">
-                        {log.content_type}
-                      </CanvaBadge>
-                    </TableCell>
-                    <TableCell>
-                      <CanvaBadge className={getSeverityColor(log.severity)}>
-                        {log.severity}
-                      </CanvaBadge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {log.violations?.slice(0, 2).map((v, i) => (
-                          <CanvaBadge
-                            key={i}
-                            variant="primary"
-                            className="text-xs"
-                          >
-                            {v.type}
-                          </CanvaBadge>
-                        ))}
-                        {log.violations?.length > 2 && (
-                          <CanvaBadge variant="primary" className="text-xs">
-                            +{log.violations.length - 2}
-                          </CanvaBadge>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <CanvaBadge className={getActionColor(log.action_taken)}>
-                        {log.action_taken}
-                      </CanvaBadge>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {formatDate(log.created_at)}
-                    </TableCell>
+          <CanvaCard>
+            <CanvaCardBody className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>User</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Severity</TableHead>
+                    <TableHead>Violations</TableHead>
+                    <TableHead>Action</TableHead>
+                    <TableHead>Date</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Card>
+                </TableHeader>
+                <TableBody>
+                  {filteredLogs.map((log) => (
+                    <TableRow key={log.id}>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">
+                            {log.user?.full_name || 'Unknown'}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            @{log.user?.username || 'unknown'}
+                          </p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <CanvaBadge variant="primary">
+                          {log.content_type}
+                        </CanvaBadge>
+                      </TableCell>
+                      <TableCell>
+                        <CanvaBadge className={getSeverityColor(log.severity)}>
+                          {log.severity}
+                        </CanvaBadge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {log.violations?.slice(0, 2).map((v, i) => (
+                            <CanvaBadge
+                              key={i}
+                              variant="primary"
+                              className="text-xs"
+                            >
+                              {v.type}
+                            </CanvaBadge>
+                          ))}
+                          {log.violations?.length > 2 && (
+                            <CanvaBadge variant="primary" className="text-xs">
+                              +{log.violations.length - 2}
+                            </CanvaBadge>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <CanvaBadge className={getActionColor(log.action_taken)}>
+                          {log.action_taken}
+                        </CanvaBadge>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {formatDate(log.created_at)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Blocked Content & Appeals */}
         <TabsContent value="blocked" className="space-y-4">
-          <Card>
-            <Table>
+          <CanvaCard>
+            <CanvaCardBody className="p-0">
+              <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>User</TableHead>
@@ -716,7 +689,7 @@ export default function ModerationPage() {
                           </CanvaButton>
                           <CanvaButton
                             size="sm"
-                            variant="primary"
+                            variant="danger"
                             onClick={() => handleRejectAppeal(item.id)}
                           >
                             <XCircle className="h-4 w-4" />
@@ -728,13 +701,15 @@ export default function ModerationPage() {
                 ))}
               </TableBody>
             </Table>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* User Warnings */}
         <TabsContent value="warnings" className="space-y-4">
-          <Card>
-            <Table>
+          <CanvaCard>
+            <CanvaCardBody className="p-0">
+              <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>User</TableHead>
@@ -799,7 +774,8 @@ export default function ModerationPage() {
                 ))}
               </TableBody>
             </Table>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Dictionary */}
@@ -873,93 +849,94 @@ export default function ModerationPage() {
                 </div>
                 <DialogFooter>
                   <CanvaButton
-                    variant="primary"
+                    variant="ghost"
                     onClick={() => setShowAddWord(false)}
                   >
                     Cancel
                   </CanvaButton>
-                  <CanvaButton onClick={handleAddWord}>Add Word</CanvaButton>
+                  <CanvaButton variant="primary" onClick={handleAddWord}>Add Word</CanvaButton>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
           </div>
 
-          <Card>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Word/Pattern</TableHead>
-                  <TableHead>Severity</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Date Added</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {dictionary.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-mono">{item.word}</TableCell>
-                    <TableCell>
-                      <CanvaBadge className={getSeverityColor(item.severity)}>
-                        {item.severity}
-                      </CanvaBadge>
-                    </TableCell>
-                    <TableCell>
-                      <CanvaBadge variant="primary">{item.category}</CanvaBadge>
-                    </TableCell>
-                    <TableCell>
-                      {item.is_regex ? (
-                        <CanvaBadge variant="primary">Regex</CanvaBadge>
-                      ) : (
-                        <CanvaBadge variant="primary">Exact</CanvaBadge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {item.is_active ? (
-                        <CanvaBadge className="bg-green-100 text-green-800">
-                          Active
-                        </CanvaBadge>
-                      ) : (
-                        <CanvaBadge className="bg-gray-100 text-gray-800">
-                          Disabled
-                        </CanvaBadge>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {formatDate(item.created_at)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <CanvaButton
-                          size="sm"
-                          variant="primary"
-                          onClick={() =>
-                            handleToggleWord(item.id, item.is_active)
-                          }
-                        >
-                          {item.is_active ? (
-                            <XCircle className="h-4 w-4" />
-                          ) : (
-                            <CheckCircle className="h-4 w-4" />
-                          )}
-                        </CanvaButton>
-                        <CanvaButton
-                          size="sm"
-                          variant="primary"
-                          className="text-red-500"
-                          onClick={() => handleDeleteWord(item.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </CanvaButton>
-                      </div>
-                    </TableCell>
+          <CanvaCard>
+            <CanvaCardBody className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Word/Pattern</TableHead>
+                    <TableHead>Severity</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Date Added</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Card>
+                </TableHeader>
+                <TableBody>
+                  {dictionary.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-mono">{item.word}</TableCell>
+                      <TableCell>
+                        <CanvaBadge className={getSeverityColor(item.severity)}>
+                          {item.severity}
+                        </CanvaBadge>
+                      </TableCell>
+                      <TableCell>
+                        <CanvaBadge variant="primary">{item.category}</CanvaBadge>
+                      </TableCell>
+                      <TableCell>
+                        {item.is_regex ? (
+                          <CanvaBadge variant="primary">Regex</CanvaBadge>
+                        ) : (
+                          <CanvaBadge variant="primary">Exact</CanvaBadge>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {item.is_active ? (
+                          <CanvaBadge className="bg-green-100 text-green-800">
+                            Active
+                          </CanvaBadge>
+                        ) : (
+                          <CanvaBadge className="bg-gray-100 text-gray-800">
+                            Disabled
+                          </CanvaBadge>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {formatDate(item.created_at)}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <CanvaButton
+                            size="sm"
+                            variant="ghost"
+                            onClick={() =>
+                              handleToggleWord(item.id, item.is_active)
+                            }
+                          >
+                            {item.is_active ? (
+                              <XCircle className="h-4 w-4" />
+                            ) : (
+                              <CheckCircle className="h-4 w-4" />
+                            )}
+                          </CanvaButton>
+                          <CanvaButton
+                            size="sm"
+                            variant="danger"
+                            onClick={() => handleDeleteWord(item.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </CanvaButton>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
       </Tabs>
     </div>

@@ -31,16 +31,7 @@ import {
   CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
@@ -211,71 +202,31 @@ export default function CreatorsPage() {
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-5">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Toplam Creator</p>
-                <p className="text-2xl font-bold">
-                  {creatorStats.total_creators.toLocaleString('tr-TR')}
-                </p>
-              </div>
-              <Users className="h-8 w-8 text-blue-500" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Onaylı</p>
-                <p className="text-2xl font-bold">
-                  {creatorStats.verified_creators}
-                </p>
-              </div>
-              <CheckCircle className="h-8 w-8 text-green-500" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Bekleyen</p>
-                <p className="text-2xl font-bold text-orange-600">
-                  {creatorStats.pending_applications}
-                </p>
-              </div>
-              <Clock className="h-8 w-8 text-orange-500" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Toplam Kazanç</p>
-                <p className="text-2xl font-bold">
-                  ₺{creatorStats.total_earnings.toLocaleString('tr-TR')}
-                </p>
-              </div>
-              <DollarSign className="h-8 w-8 text-emerald-500" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Ort. Etkileşim</p>
-                <p className="text-2xl font-bold">
-                  {creatorStats.avg_engagement}%
-                </p>
-              </div>
-              <TrendingUp className="h-8 w-8 text-pink-500" />
-            </div>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          label="Toplam Creator"
+          value={creatorStats.total_creators.toLocaleString('tr-TR')}
+          icon={<Users className="h-6 w-6 text-blue-500" />}
+        />
+        <CanvaStatCard
+          label="Onaylı"
+          value={creatorStats.verified_creators}
+          icon={<CheckCircle className="h-6 w-6 text-green-500" />}
+        />
+        <CanvaStatCard
+          label="Bekleyen"
+          value={creatorStats.pending_applications}
+          icon={<Clock className="h-6 w-6 text-orange-500" />}
+        />
+        <CanvaStatCard
+          label="Toplam Kazanç"
+          value={`₺${creatorStats.total_earnings.toLocaleString('tr-TR')}`}
+          icon={<DollarSign className="h-6 w-6 text-emerald-500" />}
+        />
+        <CanvaStatCard
+          label="Ort. Etkileşim"
+          value={`${creatorStats.avg_engagement}%`}
+          icon={<TrendingUp className="h-6 w-6 text-pink-500" />}
+        />
       </div>
 
       <Tabs defaultValue="creators" className="space-y-4">
@@ -320,8 +271,8 @@ export default function CreatorsPage() {
           {/* Creators Grid */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {creators.map((creator) => (
-              <Card key={creator.id} className="overflow-hidden">
-                <CardContent className="p-6">
+              <CanvaCard key={creator.id}>
+                <CanvaCardBody>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-12 w-12">
@@ -382,19 +333,19 @@ export default function CreatorsPage() {
                     Detayları Gör
                     <ChevronRight className="ml-2 h-4 w-4" />
                   </CanvaButton>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))}
           </div>
         </TabsContent>
 
         <TabsContent value="applications" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Creator Başvuruları</CardTitle>
-              <CardDescription>İnceleme bekleyen başvurular</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Creator Başvuruları</CanvaCardTitle>
+              <CanvaCardSubtitle>İnceleme bekleyen başvurular</CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-4">
                 {applications.map((app) => (
                   <div
@@ -443,23 +394,23 @@ export default function CreatorsPage() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         <TabsContent value="tiers" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {Object.entries(tierConfig).map(([tier, config]) => (
-              <Card key={tier}>
-                <CardHeader>
+              <CanvaCard key={tier}>
+                <CanvaCardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="capitalize">{tier}</CardTitle>
+                    <CanvaCardTitle className="capitalize">{tier}</CanvaCardTitle>
                     <div className={`rounded-full p-2 ${config.color}`}>
                       <config.icon className="h-5 w-5 text-white" />
                     </div>
                   </div>
-                </CardHeader>
-                <CardContent>
+                </CanvaCardHeader>
+                <CanvaCardBody>
                   <div className="space-y-4">
                     <div>
                       <p className="text-sm text-muted-foreground">
@@ -509,19 +460,19 @@ export default function CreatorsPage() {
                       </ul>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))}
           </div>
         </TabsContent>
 
         <TabsContent value="payouts" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Ödeme Özeti</CardTitle>
-              <CardDescription>Bu ayki creator ödemeleri</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Ödeme Özeti</CanvaCardTitle>
+              <CanvaCardSubtitle>Bu ayki creator ödemeleri</CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-6">
                 <div className="grid gap-4 md:grid-cols-3">
                   <div className="rounded-lg border p-4">
@@ -578,8 +529,8 @@ export default function CreatorsPage() {
                   ))}
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
       </Tabs>
     </div>

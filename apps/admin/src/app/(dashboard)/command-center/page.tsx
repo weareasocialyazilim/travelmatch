@@ -55,15 +55,6 @@ import {
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { CanvaButton } from '@/components/canva/CanvaButton';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -388,9 +379,9 @@ export default function CommandCenterPage() {
           <span className="text-sm text-muted-foreground">
             Son guncelleme: {lastUpdate.toLocaleTimeString('tr-TR')}
           </span>
-          <Button
-            variant="outline"
-            size="sm"
+          <CanvaButton
+            variant="secondary"
+            size="small"
             onClick={handleRefresh}
             disabled={isRefreshing}
           >
@@ -398,7 +389,7 @@ export default function CommandCenterPage() {
               className={cn('h-4 w-4 mr-2', isRefreshing && 'animate-spin')}
             />
             Yenile
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
@@ -416,148 +407,71 @@ export default function CommandCenterPage() {
               </p>
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
+          <CanvaButton
+            variant="secondary"
+            size="small"
             className="border-amber-500/50 text-amber-600"
           >
             Incele
-          </Button>
+          </CanvaButton>
         </div>
       )}
 
       {/* Executive KPIs - 6 Column Grid */}
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
         {/* Gunluk Gelir */}
-        <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-bl-full" />
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <DollarSign className="h-3 w-3" />
-              Gunluk Gelir
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-emerald-600">
-              {formatCurrency(executiveKPIs.dailyRevenue, 'TRY')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-1 text-sm">
-              <ArrowUpRight className="h-4 w-4 text-emerald-500" />
-              <span className="text-emerald-600 font-medium">
-                +{executiveKPIs.dailyRevenueChange}%
-              </span>
-              <span className="text-muted-foreground">vs dun</span>
-            </div>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          title="Gunluk Gelir"
+          value={formatCurrency(executiveKPIs.dailyRevenue, 'TRY')}
+          icon={<DollarSign className="h-4 w-4" />}
+          trend={{ value: executiveKPIs.dailyRevenueChange, isPositive: true }}
+          variant="success"
+        />
 
         {/* Aktif Kullanici */}
-        <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/10 rounded-bl-full" />
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Users className="h-3 w-3" />
-              Aktif Simdi
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-blue-600">
-              {executiveKPIs.activeToday.toLocaleString('tr-TR')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-1 text-sm">
-              <Activity className="h-4 w-4 text-blue-500" />
-              <span className="text-blue-600 font-medium">
-                +{executiveKPIs.newToday}
-              </span>
-              <span className="text-muted-foreground">bugun</span>
-            </div>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          title="Aktif Simdi"
+          value={executiveKPIs.activeToday.toLocaleString('tr-TR')}
+          icon={<Users className="h-4 w-4" />}
+          subtitle={`+${executiveKPIs.newToday} bugun`}
+          variant="info"
+        />
 
         {/* Eslesmeler */}
-        <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-pink-500/10 rounded-bl-full" />
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Heart className="h-3 w-3" />
-              Bugun Eslesme
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-pink-600">
-              {executiveKPIs.matchesToday}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-1 text-sm">
-              <TrendingUp className="h-4 w-4 text-pink-500" />
-              <span className="text-pink-600 font-medium">%12.3</span>
-              <span className="text-muted-foreground">artis</span>
-            </div>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          title="Bugun Eslesme"
+          value={executiveKPIs.matchesToday.toString()}
+          icon={<Heart className="h-4 w-4" />}
+          trend={{ value: 12.3, isPositive: true }}
+          variant="default"
+        />
 
         {/* Escrow */}
-        <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-purple-500/10 rounded-bl-full" />
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Lock className="h-3 w-3" />
-              Escrow Bakiye
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-purple-600">
-              {formatCurrency(executiveKPIs.escrowBalance, 'TRY')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-1 text-sm">
-              <Wallet className="h-4 w-4 text-purple-500" />
-              <span className="text-purple-600 font-medium">{89}</span>
-              <span className="text-muted-foreground">bekleyen</span>
-            </div>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          title="Escrow Bakiye"
+          value={formatCurrency(executiveKPIs.escrowBalance, 'TRY')}
+          icon={<Lock className="h-4 w-4" />}
+          subtitle="89 bekleyen"
+          variant="default"
+        />
 
         {/* Premium Oran */}
-        <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-amber-500/10 rounded-bl-full" />
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Star className="h-3 w-3" />
-              Premium Oran
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-amber-600">
-              %{executiveKPIs.premiumConversion}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-1 text-sm">
-              <Award className="h-4 w-4 text-amber-500" />
-              <span className="text-amber-600 font-medium">
-                {executiveKPIs.premiumUsers.toLocaleString()}
-              </span>
-              <span className="text-muted-foreground">premium</span>
-            </div>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          title="Premium Oran"
+          value={`%${executiveKPIs.premiumConversion}`}
+          icon={<Star className="h-4 w-4" />}
+          subtitle={`${executiveKPIs.premiumUsers.toLocaleString()} premium`}
+          variant="warning"
+        />
 
         {/* AI Dogruluk */}
-        <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-cyan-500/10 rounded-bl-full" />
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Brain className="h-3 w-3" />
-              AI Dogruluk
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-cyan-600">
-              %{executiveKPIs.aiVerificationAccuracy}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-1 text-sm">
-              <Target className="h-4 w-4 text-cyan-500" />
-              <span className="text-cyan-600 font-medium">Excellent</span>
-            </div>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          title="AI Dogruluk"
+          value={`%${executiveKPIs.aiVerificationAccuracy}`}
+          icon={<Brain className="h-4 w-4" />}
+          subtitle="Excellent"
+          variant="success"
+        />
       </div>
 
       {/* Main Content Grid */}

@@ -37,17 +37,8 @@ import {
   CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import {
@@ -382,89 +373,42 @@ export default function CampaignsPage() {
 
       {/* Overall Stats */}
       <div className="grid gap-4 md:grid-cols-6">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-2xl font-bold">
-                {isLoading ? (
-                  <Loader2 className="mx-auto h-6 w-6 animate-spin" />
-                ) : (
-                  overallStats.totalCampaigns
-                )}
-              </p>
-              <p className="text-sm text-muted-foreground">Toplam Kampanya</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-green-600">
-                {isLoading ? (
-                  <Loader2 className="mx-auto h-6 w-6 animate-spin" />
-                ) : (
-                  overallStats.activeCampaigns
-                )}
-              </p>
-              <p className="text-sm text-muted-foreground">Aktif</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-2xl font-bold">
-                {isLoading ? (
-                  <Loader2 className="mx-auto h-6 w-6 animate-spin" />
-                ) : (
-                  `${(overallStats.totalReach / 1000).toFixed(0)}K`
-                )}
-              </p>
-              <p className="text-sm text-muted-foreground">Toplam Erişim</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-2xl font-bold">
-                {isLoading ? (
-                  <Loader2 className="mx-auto h-6 w-6 animate-spin" />
-                ) : (
-                  overallStats.totalConversions.toLocaleString('tr-TR')
-                )}
-              </p>
-              <p className="text-sm text-muted-foreground">Dönüşüm</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-2xl font-bold">
-                %{overallStats.avgConversionRate}
-              </p>
-              <p className="text-sm text-muted-foreground">Ort. Dönüşüm</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-green-600">
-                {isLoading ? (
-                  <Loader2 className="mx-auto h-6 w-6 animate-spin" />
-                ) : (
-                  formatCurrency(
-                    campaigns.reduce((sum, c) => sum + (c.spent || 0), 0),
-                    'TRY',
-                  )
-                )}
-              </p>
-              <p className="text-sm text-muted-foreground">Harcama</p>
-            </div>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          title="Toplam Kampanya"
+          value={isLoading ? '...' : overallStats.totalCampaigns.toString()}
+          icon={<Megaphone className="h-5 w-5" />}
+        />
+        <CanvaStatCard
+          title="Aktif"
+          value={isLoading ? '...' : overallStats.activeCampaigns.toString()}
+          icon={<Play className="h-5 w-5" />}
+          accentColor="emerald"
+        />
+        <CanvaStatCard
+          title="Toplam Erişim"
+          value={isLoading ? '...' : `${(overallStats.totalReach / 1000).toFixed(0)}K`}
+          icon={<Users className="h-5 w-5" />}
+          accentColor="blue"
+        />
+        <CanvaStatCard
+          title="Dönüşüm"
+          value={isLoading ? '...' : overallStats.totalConversions.toLocaleString('tr-TR')}
+          icon={<Target className="h-5 w-5" />}
+          accentColor="violet"
+        />
+        <CanvaStatCard
+          title="Ort. Dönüşüm"
+          value={`%${overallStats.avgConversionRate}`}
+          icon={<TrendingUp className="h-5 w-5" />}
+          accentColor="amber"
+        />
+        <CanvaStatCard
+          title="Harcama"
+          value={isLoading ? '...' : formatCurrency(campaigns.reduce((sum, c) => sum + (c.spent || 0), 0), 'TRY')}
+          icon={<DollarSign className="h-5 w-5" />}
+          accentColor="emerald"
+          trend="up"
+        />
       </div>
 
       {/* Campaigns List */}
@@ -498,8 +442,8 @@ export default function CampaignsPage() {
             </div>
           ) : (
             campaigns.map((campaign) => (
-              <Card key={campaign.id}>
-                <CardContent className="p-6">
+              <CanvaCard key={campaign.id}>
+                <CanvaCardBody className="p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-4">
                       <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
@@ -628,8 +572,8 @@ export default function CampaignsPage() {
                       </DropdownMenu>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))
           )}
         </TabsContent>

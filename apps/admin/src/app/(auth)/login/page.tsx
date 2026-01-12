@@ -7,18 +7,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
 import { CanvaButton } from '@/components/canva/CanvaButton';
+import {
+  CanvaCard,
+  CanvaCardBody,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+} from '@/components/canva/CanvaCard';
 
 const loginSchema = z.object({
   email: z.string().email('Geçerli bir e-posta adresi girin'),
@@ -61,19 +60,19 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 text-center">
+      <CanvaCard className="w-full max-w-md">
+        <CanvaCardHeader className="space-y-1 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
             <span className="text-xl font-bold text-primary-foreground">
               TM
             </span>
           </div>
-          <CardTitle className="text-2xl">Admin Girişi</CardTitle>
-          <CardDescription>
+          <CanvaCardTitle className="text-2xl">Admin Girişi</CanvaCardTitle>
+          <CanvaCardSubtitle>
             TravelMatch yönetim paneline giriş yapın
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+          </CanvaCardSubtitle>
+        </CanvaCardHeader>
+        <CanvaCardBody>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">E-posta</Label>
@@ -142,8 +141,8 @@ export default function LoginPage() {
               </a>
             </p>
           </div>
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
     </div>
   );
 }
