@@ -23,10 +23,12 @@ export async function GET(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Get SAR counts by status
-    const { data: sarCounts } = await supabase
-      .from('suspicious_activity_reports')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: sarCounts } = await (
+      supabase.from('suspicious_activity_reports') as any
+    )
       .select('status')
-      .then(({ data }) => {
+      .then(({ data }: { data: Array<{ status: string }> | null }) => {
         const counts = {
           pending: 0,
           investigating: 0,
@@ -35,67 +37,84 @@ export async function GET(request: NextRequest) {
           cleared: 0,
           confirmed: 0,
         };
-        data?.forEach((item) => {
+        data?.forEach((item: { status: string }) => {
           counts[item.status as keyof typeof counts]++;
         });
         return { data: counts };
       });
 
     // Get risk profile counts by level
-    const { data: riskCounts } = await supabase
-      .from('user_risk_profiles')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: riskCounts } = await (
+      supabase.from('user_risk_profiles') as any
+    )
       .select('risk_level, is_blocked')
-      .then(({ data }) => {
-        const counts = {
-          low: 0,
-          medium: 0,
-          high: 0,
-          critical: 0,
-          blocked: 0,
-        };
-        data?.forEach((item) => {
-          if (item.is_blocked) {
-            counts.blocked++;
-          } else {
-            counts[item.risk_level as keyof typeof counts]++;
-          }
-        });
-        return { data: counts };
-      });
+      .then(
+        ({
+          data,
+        }: {
+          data: Array<{ risk_level: string; is_blocked: boolean }> | null;
+        }) => {
+          const counts = {
+            low: 0,
+            medium: 0,
+            high: 0,
+            critical: 0,
+            blocked: 0,
+          };
+          data?.forEach((item: { risk_level: string; is_blocked: boolean }) => {
+            if (item.is_blocked) {
+              counts.blocked++;
+            } else {
+              counts[item.risk_level as keyof typeof counts]++;
+            }
+          });
+          return { data: counts };
+        },
+      );
 
     // Get recent high-risk transactions (last 24h)
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
 
-    const { data: recentAlerts, count: alertCount } = await supabase
-      .from('suspicious_activity_reports')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: recentAlerts, count: alertCount } = await (
+      supabase.from('suspicious_activity_reports') as any
+    )
       .select('*', { count: 'exact' })
       .gte('created_at', yesterday.toISOString())
       .order('created_at', { ascending: false })
       .limit(10);
 
     // Get blocked users
-    const { count: blockedCount } = await supabase
-      .from('user_risk_profiles')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { count: blockedCount } = await (
+      supabase.from('user_risk_profiles') as any
+    )
       .select('*', { count: 'exact', head: true })
       .eq('is_blocked', true);
 
     // Get AML thresholds summary
-    const { data: amlThresholds } = await supabase
-      .from('aml_thresholds')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: amlThresholds } = await (
+      supabase.from('aml_thresholds') as any
+    )
       .select('currency, threshold_type, amount, action')
       .eq('is_active', true)
       .in('action', ['report_masak', 'report_fiu', 'block']);
 
     // Get fraud rules summary
-    const { data: fraudRules, count: activeRulesCount } = await supabase
-      .from('fraud_rules')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: fraudRules, count: activeRulesCount } = await (
+      supabase.from('fraud_rules') as any
+    )
       .select('rule_type, action', { count: 'exact' })
       .eq('is_active', true);
 
     // Calculate fraud rule type counts
     const ruleTypeCounts: Record<string, number> = {};
-    fraudRules?.forEach((rule) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    fraudRules?.forEach((rule: any) => {
       ruleTypeCounts[rule.rule_type] =
         (ruleTypeCounts[rule.rule_type] || 0) + 1;
     });
@@ -128,10 +147,16 @@ export async function GET(request: NextRequest) {
       },
       thresholds: {
         masak:
-          amlThresholds?.filter((t) => t.action === 'report_masak').length || 0,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          amlThresholds?.filter((t: any) => t.action === 'report_masak')
+            .length || 0,
         fiu:
-          amlThresholds?.filter((t) => t.action === 'report_fiu').length || 0,
-        block: amlThresholds?.filter((t) => t.action === 'block').length || 0,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          amlThresholds?.filter((t: any) => t.action === 'report_fiu').length ||
+          0,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        block:
+          amlThresholds?.filter((t: any) => t.action === 'block').length || 0,
       },
       fraudRules: {
         total: activeRulesCount || 0,

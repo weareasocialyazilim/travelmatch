@@ -521,9 +521,9 @@ export function AdminPieChart({
           dataKey="value"
           label={
             showLabels
-              ? ({ name, percent }: { name: string; percent?: number }) =>
-                  `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
-              : false
+              ? ((({ name, percent }: { name: string; percent?: number }) =>
+                  `${name} ${((percent ?? 0) * 100).toFixed(0)}%`) as any)
+              : undefined
           }
         >
           {dataWithColors.map((entry, index) => (

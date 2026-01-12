@@ -22,8 +22,8 @@ export async function GET(request: NextRequest) {
 
     const supabase = createServiceClient();
 
-    let query = supabase
-      .from('kyc_submissions')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let query = (supabase.from('kyc_submissions') as any)
       .select(
         `
         *,
@@ -59,8 +59,8 @@ export async function GET(request: NextRequest) {
     if (error) {
       logger.error('KYC query error:', error);
       // If table doesn't exist, query users for KYC status
-      const usersQuery = supabase
-        .from('users')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const usersQuery = (supabase.from('users') as any)
         .select(
           'id, display_name, avatar_url, email, phone, kyc_status, kyc_submitted_at, kyc_reviewed_at, created_at',
           { count: 'exact' },
@@ -186,8 +186,10 @@ export async function PUT(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Get current user data
-    const { data: profile, error: fetchError } = await supabase
-      .from('users')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: profile, error: fetchError } = await (
+      supabase.from('users') as any
+    )
       .select('*')
       .eq('id', user_id)
       .single();
@@ -215,8 +217,10 @@ export async function PUT(request: NextRequest) {
       updates.kyc_admin_notes = notes;
     }
 
-    const { data: updated, error: updateError } = await supabase
-      .from('users')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: updated, error: updateError } = await (
+      supabase.from('users') as any
+    )
       .update(updates)
       .eq('id', user_id)
       .select()
@@ -231,8 +235,8 @@ export async function PUT(request: NextRequest) {
     }
 
     // Try to update kyc_submissions table if it exists
-    await supabase
-      .from('kyc_submissions')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase.from('kyc_submissions') as any)
       .update({
         status: action === 'approve' ? 'approved' : 'rejected',
         reviewed_by: session.admin.id,
