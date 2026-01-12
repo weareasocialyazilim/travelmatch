@@ -153,6 +153,8 @@ export default function NotificationsPage() {
   const [notificationTitle, setNotificationTitle] = useState('');
   const [notificationBody, setNotificationBody] = useState('');
   const [scheduleEnabled, setScheduleEnabled] = useState(false);
+  const [scheduleDate, setScheduleDate] = useState('');
+  const [scheduleTime, setScheduleTime] = useState('');
   const [abTestEnabled, setAbTestEnabled] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string | undefined>(
     undefined,
@@ -194,9 +196,36 @@ export default function NotificationsPage() {
   };
 
   const handleSchedule = () => {
-    toast.success('Bildirim zamanlandı');
-    setIsCreateOpen(false);
-    resetForm();
+    if (!notificationTitle || !notificationBody) {
+      toast.error('Başlık ve içerik gerekli');
+      return;
+    }
+    if (!scheduleDate || !scheduleTime) {
+      toast.error('Tarih ve saat seçimi gerekli');
+      return;
+    }
+
+    const scheduledDateTime = `${scheduleDate}T${scheduleTime}`;
+    createNotification.mutate(
+      {
+        title: notificationTitle,
+        message: notificationBody,
+        type: 'push',
+        target_audience: { segment: selectedSegment },
+        status: 'scheduled',
+        scheduled_for: scheduledDateTime,
+      },
+      {
+        onSuccess: () => {
+          toast.success(`Bildirim ${scheduleDate} ${scheduleTime} için zamanlandı`);
+          setIsCreateOpen(false);
+          resetForm();
+        },
+        onError: (error) => {
+          toast.error(error.message || 'Bildirim zamanlanamadı');
+        },
+      },
+    );
   };
 
   const handleSaveDraft = () => {
@@ -210,6 +239,8 @@ export default function NotificationsPage() {
     setNotificationBody('');
     setSelectedSegment('all');
     setScheduleEnabled(false);
+    setScheduleDate('');
+    setScheduleTime('');
     setAbTestEnabled(false);
   };
 
@@ -431,11 +462,19 @@ export default function NotificationsPage() {
                   <div className="flex gap-4">
                     <div className="flex-1 space-y-2">
                       <Label>Tarih</Label>
-                      <CanvaInput type="date" />
+                      <CanvaInput
+                        type="date"
+                        value={scheduleDate}
+                        onChange={(e) => setScheduleDate(e.target.value)}
+                      />
                     </div>
                     <div className="flex-1 space-y-2">
                       <Label>Saat</Label>
-                      <CanvaInput type="time" />
+                      <CanvaInput
+                        type="time"
+                        value={scheduleTime}
+                        onChange={(e) => setScheduleTime(e.target.value)}
+                      />
                     </div>
                   </div>
                 )}
