@@ -19,7 +19,7 @@ const SPRING_CONFIG = {
   mass: 0.5,
 };
 
-// TODO: Use timing config for alternative animation styles
+// Alternative timing config available for future animation styles
 // const TIMING_CONFIG = {
 //   duration: 200,
 //   easing: Easing.bezier(0.25, 0.1, 0.25, 1),
