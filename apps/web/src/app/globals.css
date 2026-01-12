@@ -1,10 +1,7 @@
 /**
  * TravelMatch - Premium Awwwards-Ready Global Styles
- * Deep Space Aesthetics | Grainy Texture | Fluid Typography
+ * Soft-Future Aesthetics | Warm Golden & Sunset Red | Grainy Texture | Fluid Typography
  */
-
-/* Google Fonts - Clash Display + Inter */
-@import url('https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -15,19 +12,19 @@
    ============================================================================ */
 
 :root {
-  /* Font Variables - Direct Google Fonts names */
-  --font-clash: 'Clash Display', system-ui, -apple-system, sans-serif;
-  --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
+  /* Font Variables - Next.js local fonts via CSS variables */
+  --font-inter: var(--font-inter);
+  --font-grotesk: var(--font-grotesk);
 
-  /* Premium Color Palette */
-  --background: #020202;
+  /* Soft-Future Color Palette (Dark Mode) */
+  --background: #08080a;
   --foreground: #ffffff;
-  --primary: #00ff88;
-  --primary-glow: rgba(0, 255, 136, 0.3);
-  --secondary: #8b5cf6;
-  --secondary-glow: rgba(139, 92, 246, 0.3);
-  --accent: #facc15;
-  --accent-glow: rgba(250, 204, 21, 0.3);
+  --primary: #facc15;
+  --primary-glow: rgba(250, 204, 21, 0.25);
+  --secondary: #ff6b6b;
+  --secondary-glow: rgba(255, 107, 107, 0.25);
+  --accent: #ff8a65;
+  --accent-glow: rgba(255, 138, 101, 0.25);
   --card: rgba(255, 255, 255, 0.03);
   --border: rgba(255, 255, 255, 0.08);
   --muted: rgba(255, 255, 255, 0.5);
@@ -38,6 +35,21 @@
   /* Transitions */
   --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   --transition-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Light Mode - Soft Editorial Aesthetic */
+[data-theme='light'] {
+  --background: #f5f5f7;
+  --foreground: #1d1d1f;
+  --primary: #8b5cf6; /* Noble purple for light mode */
+  --primary-glow: rgba(139, 92, 246, 0.15);
+  --secondary: #f59e0b; /* Warm amber */
+  --secondary-glow: rgba(245, 158, 11, 0.15);
+  --accent: #ec4899; /* Soft pink */
+  --accent-glow: rgba(236, 72, 153, 0.15);
+  --card: rgba(0, 0, 0, 0.03);
+  --border: rgba(0, 0, 0, 0.08);
+  --muted: rgba(0, 0, 0, 0.5);
 }
 
 /* ============================================================================

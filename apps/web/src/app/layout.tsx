@@ -4,9 +4,26 @@
  */
 
 import type { Metadata, Viewport } from 'next';
+import { Inter, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { AppProvider } from '@/components/providers/AppProvider';
-import { Atmosphere } from '@/components/3d/Atmosphere';
+import { SacredAtmosphere } from '@/components/3d/SacredAtmosphere';
+
+// ============================================================================
+// FONT OPTIMIZATION - Local Font Loading (No External Requests)
+// ============================================================================
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-grotesk',
+});
 
 // ============================================================================
 // VIEWPORT CONFIGURATION
@@ -167,14 +184,6 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
-        {/* Preconnect for Performance */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-
         {/* JSON-LD Structured Data */}
         <script
           type="application/ld+json"
@@ -187,9 +196,11 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
       </head>
 
-      <body className="font-inter antialiased">
-        {/* 3D Atmosphere Background (Always visible) */}
-        <Atmosphere />
+      <body
+        className={`${inter.variable} ${spaceGrotesk.variable} font-inter antialiased`}
+      >
+        {/* Sacred Atmosphere - Minimalist particle flow background */}
+        <SacredAtmosphere />
 
         {/* App Provider: Preloader + Smooth Scroll + Cursor + Navbar */}
         <AppProvider>{children}</AppProvider>
