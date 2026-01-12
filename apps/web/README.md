@@ -1,7 +1,7 @@
 # TravelMatch Web App - Award-Winning Landing Experience
 
-> This application was completely redesigned in January 2026 with "Site of the Year" vision.
-> Legacy travel/passport architecture has been removed under "Zero-Legacy" cleanup policy.
+> This application was completely redesigned in January 2026 with "Site of the Year" vision. Legacy
+> travel/passport architecture has been removed under "Zero-Legacy" cleanup policy.
 
 ## 🏆 What's Here Now
 
@@ -38,11 +38,13 @@ src/
 ### Design System
 
 **Dark Mode (Default)**
+
 - Primary: #facc15 (Warm Golden)
 - Secondary: #ff6b6b (Sunset Red)
 - Background: #08080a (Soft Dark)
 
 **Light Mode**
+
 - Primary: #8b5cf6 (Noble Purple)
 - Secondary: #f59e0b (Warm Amber)
 - Background: #f5f5f7 (Editorial Soft)
@@ -60,11 +62,13 @@ Open [http://localhost:3000](http://localhost:3000) to see the landing.
 ## 🧹 Zero-Legacy Cleanup
 
 Removed in January 2026:
+
 - ❌ Legacy landing components (CTA, Features, HowItWorks, etc.)
 - ❌ Boilerplate SVG icons (file, globe, next, window, vercel)
 - ❌ Unused export clutter in components/landing/index.ts
 
 Active components only (Champions League roster):
+
 - ✅ Hero, TrustRing, MatchSimulator
 - ✅ IdentityPulse, SacredMoments, RitualSection
 - ✅ CinematicReveal, LiveHeartbeat, ActivityPulse
@@ -96,6 +100,7 @@ Active components only (Champions League roster):
 ## 🚢 Deployment
 
 Production build:
+
 ```bash
 pnpm --filter @travelmatch/web build
 ```
@@ -106,4 +111,3 @@ Ready for Vercel, Netlify, or any Node.js hosting.
 
 **Redesigned by**: AI + Human Vision (January 2026)  
 **Philosophy**: "No Passports, Just Rituals"
-
