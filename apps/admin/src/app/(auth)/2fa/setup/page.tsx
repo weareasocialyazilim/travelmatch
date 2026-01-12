@@ -4,18 +4,17 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Loader2, ShieldCheck, Copy, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
 import { CanvaButton } from '@/components/canva/CanvaButton';
+import {
+  CanvaCard,
+  CanvaCardBody,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardFooter,
+} from '@/components/canva/CanvaCard';
 import Image from 'next/image';
 
 interface SetupData {
@@ -160,34 +159,34 @@ export default function TwoFactorSetupPage() {
   if (step === 'loading') {
     return (
       <div className="flex min-h-screen items-center justify-center bg-muted/50">
-        <Card className="w-full max-w-md">
-          <CardContent className="flex flex-col items-center justify-center py-12">
+        <CanvaCard className="w-full max-w-md">
+          <CanvaCardBody className="flex flex-col items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <p className="mt-4 text-muted-foreground">
               2FA kurulumu hazırlanıyor...
             </p>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 text-center">
+      <CanvaCard className="w-full max-w-md">
+        <CanvaCardHeader className="space-y-1 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
             <ShieldCheck className="h-6 w-6 text-primary-foreground" />
           </div>
-          <CardTitle className="text-2xl">2FA Kurulumu</CardTitle>
-          <CardDescription>
+          <CanvaCardTitle className="text-2xl">2FA Kurulumu</CanvaCardTitle>
+          <CanvaCardSubtitle>
             {step === 'scan'
               ? 'Authenticator uygulamanızla QR kodu tarayın'
               : 'Uygulamadaki 6 haneli kodu girin'}
-          </CardDescription>
-        </CardHeader>
+          </CanvaCardSubtitle>
+        </CanvaCardHeader>
 
-        <CardContent className="space-y-6">
+        <CanvaCardBody className="space-y-6">
           {step === 'scan' && setupData && (
             <>
               {/* QR Code */}
@@ -288,15 +287,15 @@ export default function TwoFactorSetupPage() {
               </CanvaButton>
             </form>
           )}
-        </CardContent>
+        </CanvaCardBody>
 
-        <CardFooter className="flex justify-center">
+        <CanvaCardFooter className="flex justify-center">
           <p className="text-xs text-muted-foreground text-center">
             Google Authenticator, Authy veya benzer bir <br />
             TOTP uygulaması kullanın
           </p>
-        </CardFooter>
-      </Card>
+        </CanvaCardFooter>
+      </CanvaCard>
     </div>
   );
 }
