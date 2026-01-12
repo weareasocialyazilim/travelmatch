@@ -35,7 +35,9 @@ export function MagneticButton({
   size = 'md',
   as = 'button',
 }: MagneticButtonProps) {
-  const ref = useRef<HTMLButtonElement | HTMLDivElement | HTMLSpanElement>(null);
+  const ref = useRef<HTMLButtonElement | HTMLDivElement | HTMLSpanElement>(
+    null,
+  );
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
 
@@ -108,7 +110,7 @@ export function MagneticButton({
     onClick: disabled ? undefined : onClick,
     animate: { x: position.x, y: position.y },
     transition: {
-      type: 'spring',
+      type: 'spring' as const,
       stiffness: 150,
       damping: 15,
       mass: 0.1,
@@ -121,7 +123,9 @@ export function MagneticButton({
       ${sizeStyles}
       ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
       ${className}
-    `.trim().replace(/\s+/g, ' '),
+    `
+      .trim()
+      .replace(/\s+/g, ' '),
     'data-magnetic': true,
   };
 
@@ -205,7 +209,9 @@ export function PremiumButton({
         transition-shadow duration-300
         ${glow ? 'hover:shadow-[0_0_30px_rgba(0,255,136,0.4)]' : ''}
         ${className}
-      `.trim().replace(/\s+/g, ' ')}
+      `
+        .trim()
+        .replace(/\s+/g, ' ')}
       data-magnetic
     >
       <span className="relative z-10">{children}</span>
