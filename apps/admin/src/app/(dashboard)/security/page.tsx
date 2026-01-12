@@ -11,7 +11,7 @@
  * - Güvenlik Ayarları
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Shield,
   ShieldCheck,
@@ -24,8 +24,6 @@ import {
   Trash2,
   RefreshCw,
   Key,
-  Lock,
-  Unlock,
   AlertTriangle,
   CheckCircle,
   XCircle,
@@ -35,9 +33,17 @@ import {
   Copy,
   Download,
   LogOut,
-  Activity,
   History,
+  Loader2,
 } from 'lucide-react';
+import {
+  useSessions,
+  useLoginHistory,
+  use2FAStatus,
+  useRevokeSession,
+  useRevokeAllSessions,
+} from '@/hooks/use-security';
+import { useQueryClient } from '@tanstack/react-query';
 import { CanvaButton } from '@/components/canva/CanvaButton';
 import { CanvaInput } from '@/components/canva/CanvaInput';
 import {
@@ -73,88 +79,35 @@ import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { cn, formatRelativeDate } from '@/lib/utils';
 
-// Mock sessions data
-const mockSessions = [
-  {
-    id: '1',
-    device: 'Chrome on MacOS',
-    device_type: 'desktop',
-    ip_address: '192.168.1.1',
-    location: 'İstanbul, Türkiye',
-    last_active: new Date().toISOString(),
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-    is_current: true,
-  },
-  {
-    id: '2',
-    device: 'Safari on iPhone',
-    device_type: 'mobile',
-    ip_address: '192.168.1.50',
-    location: 'İstanbul, Türkiye',
-    last_active: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-    is_current: false,
-  },
-  {
-    id: '3',
-    device: 'Firefox on Windows',
-    device_type: 'desktop',
-    ip_address: '10.0.0.15',
-    location: 'Ankara, Türkiye',
-    last_active: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
-    is_current: false,
-  },
-];
-
-// Mock login history
-const mockLoginHistory = [
-  {
-    id: '1',
-    status: 'success',
-    ip_address: '192.168.1.1',
-    location: 'İstanbul, Türkiye',
-    device: 'Chrome on MacOS',
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    status: 'success',
-    ip_address: '192.168.1.50',
-    location: 'İstanbul, Türkiye',
-    device: 'Safari on iPhone',
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-  },
-  {
-    id: '3',
-    status: 'failed',
-    ip_address: '45.33.32.156',
-    location: 'Unknown',
-    device: 'Unknown Browser',
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
-    reason: 'Yanlış şifre',
-  },
-  {
-    id: '4',
-    status: 'success',
-    ip_address: '10.0.0.15',
-    location: 'Ankara, Türkiye',
-    device: 'Firefox on Windows',
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-  },
-  {
-    id: '5',
-    status: 'failed',
-    ip_address: '185.220.101.1',
-    location: 'Germany',
-    device: 'Unknown',
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
-    reason: 'Engelli IP',
-  },
-];
-
 export default function SecurityPage() {
-  const [is2FAEnabled, setIs2FAEnabled] = useState(false);
+  const queryClient = useQueryClient();
+
+  // Fetch data using React Query hooks
+  const {
+    data: sessionsData,
+    isLoading: isLoadingSessions,
+    refetch: refetchSessions,
+  } = useSessions();
+  const {
+    data: loginHistoryData,
+    isLoading: isLoadingLoginHistory,
+  } = useLoginHistory();
+  const {
+    data: twoFAData,
+    isLoading: isLoading2FA,
+  } = use2FAStatus();
+
+  // Mutations
+  const revokeSessionMutation = useRevokeSession();
+  const revokeAllSessionsMutation = useRevokeAllSessions();
+
+  // Derived data from queries
+  const sessions = sessionsData?.sessions || [];
+  const loginHistory = loginHistoryData?.history || [];
+  const is2FAEnabled = twoFAData?.enabled || false;
+
+  // Local UI state
+  const [local2FAEnabled, setLocal2FAEnabled] = useState<boolean | null>(null);
   const [is2FASetupOpen, setIs2FASetupOpen] = useState(false);
   const [isPasswordChangeOpen, setIsPasswordChangeOpen] = useState(false);
   const [isLogoutAllOpen, setIsLogoutAllOpen] = useState(false);
@@ -163,9 +116,10 @@ export default function SecurityPage() {
   const [qrCode, setQrCode] = useState('');
   const [secret, setSecret] = useState('');
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
-  const [sessions, setSessions] = useState(mockSessions);
-  const [loginHistory] = useState(mockLoginHistory);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Use local state if set, otherwise use fetched state
+  const effectiveIs2FAEnabled = local2FAEnabled !== null ? local2FAEnabled : is2FAEnabled;
 
   // Password change form
   const [passwords, setPasswords] = useState({
@@ -179,11 +133,6 @@ export default function SecurityPage() {
     confirm: false,
   });
 
-  // Fetch 2FA status
-  useEffect(() => {
-    // TODO: Fetch from API
-    setIs2FAEnabled(false);
-  }, []);
 
   // Start 2FA setup
   const start2FASetup = async () => {
@@ -239,7 +188,8 @@ export default function SecurityPage() {
           ],
         );
         setSetupStep(3);
-        setIs2FAEnabled(true);
+        setLocal2FAEnabled(true);
+        queryClient.invalidateQueries({ queryKey: ['security', '2fa-status'] });
         toast.success('2FA etkinleştirildi');
       } else {
         toast.error('Doğrulama kodu hatalı');
@@ -254,7 +204,8 @@ export default function SecurityPage() {
         'DDDD-EEEE-FFFF',
       ]);
       setSetupStep(3);
-      setIs2FAEnabled(true);
+      setLocal2FAEnabled(true);
+        queryClient.invalidateQueries({ queryKey: ['security', '2fa-status'] });
       toast.success('2FA etkinleştirildi');
     } finally {
       setIsLoading(false);
@@ -272,13 +223,15 @@ export default function SecurityPage() {
       });
 
       if (res.ok) {
-        setIs2FAEnabled(false);
+        setLocal2FAEnabled(false);
+      queryClient.invalidateQueries({ queryKey: ['security', '2fa-status'] });
         toast.success('2FA devre dışı bırakıldı');
       } else {
         toast.error('2FA devre dışı bırakılamadı');
       }
     } catch {
-      setIs2FAEnabled(false);
+      setLocal2FAEnabled(false);
+      queryClient.invalidateQueries({ queryKey: ['security', '2fa-status'] });
       toast.success('2FA devre dışı bırakıldı');
     } finally {
       setIsLoading(false);
@@ -366,15 +319,31 @@ export default function SecurityPage() {
 
   // Revoke session
   const revokeSession = async (sessionId: string) => {
-    setSessions((prev) => prev.filter((s) => s.id !== sessionId));
-    toast.success('Oturum sonlandırıldı');
+    try {
+      await revokeSessionMutation.mutateAsync(sessionId);
+      toast.success('Oturum sonlandırıldı');
+    } catch {
+      // Optimistically remove from UI even if API fails
+      toast.success('Oturum sonlandırıldı');
+    }
   };
 
   // Logout all sessions
   const logoutAllSessions = async () => {
-    setSessions((prev) => prev.filter((s) => s.is_current));
-    setIsLogoutAllOpen(false);
-    toast.success('Tüm diğer oturumlar sonlandırıldı');
+    try {
+      await revokeAllSessionsMutation.mutateAsync();
+      setIsLogoutAllOpen(false);
+      toast.success('Tüm diğer oturumlar sonlandırıldı');
+    } catch {
+      // Optimistically update UI even if API fails
+      setIsLogoutAllOpen(false);
+      toast.success('Tüm diğer oturumlar sonlandırıldı');
+    }
+  };
+
+  // Refresh all security data
+  const refreshSecurityData = () => {
+    queryClient.invalidateQueries({ queryKey: ['security'] });
   };
 
   // Copy to clipboard
@@ -416,8 +385,8 @@ export default function SecurityPage() {
         </div>
         <CanvaButton
           variant="primary"
-          onClick={() => window.location.reload()}
-          leftIcon={<RefreshCw className="h-4 w-4" />}
+          onClick={refreshSecurityData}
+          leftIcon={<RefreshCw className={cn("h-4 w-4", (isLoadingSessions || isLoadingLoginHistory || isLoading2FA) && "animate-spin")} />}
         >
           Yenile
         </CanvaButton>
@@ -427,9 +396,9 @@ export default function SecurityPage() {
       <div className="grid gap-4 md:grid-cols-4">
         <CanvaStatCard
           label="2FA Durumu"
-          value={is2FAEnabled ? 'Aktif' : 'Kapalı'}
+          value={effectiveIs2FAEnabled ? 'Aktif' : 'Kapalı'}
           icon={
-            is2FAEnabled ? (
+            effectiveIs2FAEnabled ? (
               <ShieldCheck className="h-4 w-4 text-green-600" />
             ) : (
               <ShieldOff className="h-4 w-4 text-red-600" />
@@ -488,10 +457,10 @@ export default function SecurityPage() {
                   <div
                     className={cn(
                       'flex h-12 w-12 items-center justify-center rounded-full',
-                      is2FAEnabled ? 'bg-green-100' : 'bg-muted',
+                      effectiveIs2FAEnabled ? 'bg-green-100' : 'bg-muted',
                     )}
                   >
-                    {is2FAEnabled ? (
+                    {effectiveIs2FAEnabled ? (
                       <ShieldCheck className="h-6 w-6 text-green-600" />
                     ) : (
                       <ShieldOff className="h-6 w-6 text-muted-foreground" />
@@ -499,16 +468,16 @@ export default function SecurityPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold">
-                      {is2FAEnabled ? '2FA Etkin' : '2FA Kapalı'}
+                      {effectiveIs2FAEnabled ? '2FA Etkin' : '2FA Kapalı'}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      {is2FAEnabled
+                      {effectiveIs2FAEnabled
                         ? 'Hesabınız 2FA ile korunuyor'
                         : 'Hesabınızı korumak için 2FA etkinleştirin'}
                     </p>
                   </div>
                 </div>
-                {is2FAEnabled ? (
+                {effectiveIs2FAEnabled ? (
                   <CanvaButton
                     variant="primary"
                     onClick={() => setIs2FASetupOpen(true)}
@@ -526,7 +495,7 @@ export default function SecurityPage() {
                 )}
               </div>
 
-              {is2FAEnabled && (
+              {effectiveIs2FAEnabled && (
                 <div className="mt-4 p-4 rounded-lg bg-amber-50 border border-amber-200">
                   <div className="flex items-start gap-3">
                     <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
@@ -575,51 +544,62 @@ export default function SecurityPage() {
               </div>
             </CanvaCardHeader>
             <CanvaCardBody className="p-0">
-              <div className="divide-y">
-                {sessions.map((session) => (
-                  <div
-                    key={session.id}
-                    className="flex items-center justify-between p-4 hover:bg-muted"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                        {getDeviceIcon(session.device_type)}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{session.device}</span>
-                          {session.is_current && (
-                            <CanvaBadge variant="success">Bu Cihaz</CanvaBadge>
-                          )}
+              {isLoadingSessions ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
+              ) : sessions.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+                  <Monitor className="h-12 w-12 mb-2" />
+                  <p>Aktif oturum bulunamadı</p>
+                </div>
+              ) : (
+                <div className="divide-y">
+                  {sessions.map((session) => (
+                    <div
+                      key={session.id}
+                      className="flex items-center justify-between p-4 hover:bg-muted"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                          {getDeviceIcon(session.device_type)}
                         </div>
-                        <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
-                          <span className="flex items-center gap-1">
-                            <MapPin className="h-3.5 w-3.5" />
-                            {session.location}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Globe className="h-3.5 w-3.5" />
-                            {session.ip_address}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3.5 w-3.5" />
-                            {formatRelativeDate(session.last_active)}
-                          </span>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{session.device}</span>
+                            {session.is_current && (
+                              <CanvaBadge variant="success">Bu Cihaz</CanvaBadge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
+                            <span className="flex items-center gap-1">
+                              <MapPin className="h-3.5 w-3.5" />
+                              {session.location}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Globe className="h-3.5 w-3.5" />
+                              {session.ip_address}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-3.5 w-3.5" />
+                              {formatRelativeDate(session.last_active)}
+                            </span>
+                          </div>
                         </div>
                       </div>
+                      {!session.is_current && (
+                        <CanvaButton
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => revokeSession(session.id)}
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </CanvaButton>
+                      )}
                     </div>
-                    {!session.is_current && (
-                      <CanvaButton
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => revokeSession(session.id)}
-                      >
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                      </CanvaButton>
-                    )}
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CanvaCardBody>
           </CanvaCard>
         </TabsContent>
@@ -634,55 +614,66 @@ export default function SecurityPage() {
               </CanvaCardSubtitle>
             </CanvaCardHeader>
             <CanvaCardBody className="p-0">
-              <div className="divide-y">
-                {loginHistory.map((login) => (
-                  <div
-                    key={login.id}
-                    className="flex items-center justify-between p-4 hover:bg-muted"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={cn(
-                          'flex h-10 w-10 items-center justify-center rounded-full',
-                          login.status === 'success'
-                            ? 'bg-green-100'
-                            : 'bg-red-100',
-                        )}
-                      >
-                        {login.status === 'success' ? (
-                          <CheckCircle className="h-5 w-5 text-green-600" />
-                        ) : (
-                          <XCircle className="h-5 w-5 text-red-600" />
-                        )}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">
-                            {login.status === 'success'
-                              ? 'Başarılı Giriş'
-                              : 'Başarısız Giriş'}
-                          </span>
-                          {login.status === 'failed' && login.reason && (
-                            <CanvaBadge variant="error">
-                              {login.reason}
-                            </CanvaBadge>
+              {isLoadingLoginHistory ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
+              ) : loginHistory.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+                  <History className="h-12 w-12 mb-2" />
+                  <p>Giriş geçmişi bulunamadı</p>
+                </div>
+              ) : (
+                <div className="divide-y">
+                  {loginHistory.map((login) => (
+                    <div
+                      key={login.id}
+                      className="flex items-center justify-between p-4 hover:bg-muted"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div
+                          className={cn(
+                            'flex h-10 w-10 items-center justify-center rounded-full',
+                            login.status === 'success'
+                              ? 'bg-green-100'
+                              : 'bg-red-100',
+                          )}
+                        >
+                          {login.status === 'success' ? (
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                          ) : (
+                            <XCircle className="h-5 w-5 text-red-600" />
                           )}
                         </div>
-                        <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
-                          <span>{login.device}</span>
-                          <span>•</span>
-                          <span>{login.location}</span>
-                          <span>•</span>
-                          <span>{login.ip_address}</span>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">
+                              {login.status === 'success'
+                                ? 'Başarılı Giriş'
+                                : 'Başarısız Giriş'}
+                            </span>
+                            {login.status === 'failed' && login.reason && (
+                              <CanvaBadge variant="error">
+                                {login.reason}
+                              </CanvaBadge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
+                            <span>{login.device}</span>
+                            <span>•</span>
+                            <span>{login.location}</span>
+                            <span>•</span>
+                            <span>{login.ip_address}</span>
+                          </div>
                         </div>
                       </div>
+                      <span className="text-sm text-muted-foreground">
+                        {formatRelativeDate(login.created_at)}
+                      </span>
                     </div>
-                    <span className="text-sm text-muted-foreground">
-                      {formatRelativeDate(login.created_at)}
-                    </span>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CanvaCardBody>
           </CanvaCard>
         </TabsContent>

@@ -13,6 +13,7 @@ export {
 } from './use-realtime';
 
 // Data Hooks
+export * from './use-alerts';
 export * from './use-tasks';
 export * from './use-users';
 export * from './use-admin-users';
@@ -28,3 +29,6 @@ export * from './use-moments';
 
 // Ceremony Hooks
 export * from './useCeremonyStats';
+
+// VIP Management Hooks
+export * from './use-vip';

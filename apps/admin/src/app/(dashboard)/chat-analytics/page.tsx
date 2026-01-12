@@ -2,7 +2,7 @@
 
 /**
  * TravelMatch Chat & Messaging Analytics
- * Mesajlasma sisteminin analitiği ve izlenmesi
+ * Mesajlasma sisteminin analitigi ve izlenmesi
  *
  * Chat lock sistemi, E2E encryption, response metrikleri
  */
@@ -14,21 +14,14 @@ import {
   Unlock,
   Users,
   Clock,
-  TrendingUp,
-  TrendingDown,
   Shield,
   Eye,
-  EyeOff,
   Send,
-  CheckCheck,
   AlertTriangle,
   BarChart3,
   Activity,
-  Heart,
-  Zap,
   RefreshCw,
   Search,
-  Filter,
 } from 'lucide-react';
 import {
   CanvaCard,
@@ -36,14 +29,12 @@ import {
   CanvaCardTitle,
   CanvaCardSubtitle,
   CanvaCardBody,
-  CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { CanvaButton } from '@/components/canva/CanvaButton';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Select,
   SelectContent,
@@ -61,160 +52,27 @@ import {
 } from '@/components/ui/table';
 import {
   AdminAreaChart,
-  AdminBarChart,
   AdminLineChart,
   CHART_COLORS,
 } from '@/components/common/admin-chart';
 import { formatCurrency, cn } from '@/lib/utils';
-
-// Chat Stats Overview
-const chatStats = {
-  totalConversations: 12456,
-  activeToday: 3421,
-  messagestoday: 23456,
-  avgResponseTime: 4.2, // dakika
-  chatLockRate: 67.8, // % of eligible getting chat unlocked
-  e2eEncrypted: 100, // tum mesajlar sifreli
-  avgMessagesPerConvo: 12.3,
-  mediaShared: 1234,
-};
-
-// Chat Lock Tiers Analysis
-const chatLockTiers = [
-  {
-    tier: 'Tier 1 (0-30 USD)',
-    description: 'Chat yok, toplu tesekkur',
-    conversions: 45678,
-    chatEligible: 0,
-    chatUnlocked: 0,
-    unlockRate: 0,
-  },
-  {
-    tier: 'Tier 2 (30-100 USD)',
-    description: 'Host onayı ile chat',
-    conversions: 12345,
-    chatEligible: 12345,
-    chatUnlocked: 8234,
-    unlockRate: 66.7,
-  },
-  {
-    tier: 'Tier 3 (100+ USD)',
-    description: 'Premium - Host onayı ile chat',
-    conversions: 5678,
-    chatEligible: 5678,
-    chatUnlocked: 4123,
-    unlockRate: 72.6,
-  },
-];
-
-// Response Time Distribution
-const responseTimeData = [
-  { range: '0-1 dk', count: 2345, percentage: 32 },
-  { range: '1-5 dk', count: 3456, percentage: 45 },
-  { range: '5-15 dk', count: 1234, percentage: 16 },
-  { range: '15-60 dk', count: 456, percentage: 5 },
-  { range: '1+ saat', count: 123, percentage: 2 },
-];
-
-// Hourly Message Volume
-const hourlyMessageData = [
-  { hour: '00', messages: 456, conversations: 89 },
-  { hour: '04', messages: 234, conversations: 45 },
-  { hour: '08', messages: 1234, conversations: 234 },
-  { hour: '12', messages: 2345, conversations: 456 },
-  { hour: '16', messages: 3456, conversations: 678 },
-  { hour: '20', messages: 4567, conversations: 890 },
-  { hour: '24', messages: 2345, conversations: 456 },
-];
-
-// Weekly Trend Data
-const weeklyTrendData = [
-  { date: 'Pzt', messages: 18500, conversations: 2345, unlockRate: 65 },
-  { date: 'Sal', messages: 21200, conversations: 2678, unlockRate: 67 },
-  { date: 'Car', messages: 19800, conversations: 2456, unlockRate: 66 },
-  { date: 'Per', messages: 24500, conversations: 3123, unlockRate: 68 },
-  { date: 'Cum', messages: 28900, conversations: 3678, unlockRate: 70 },
-  { date: 'Cmt', messages: 32400, conversations: 4123, unlockRate: 72 },
-  { date: 'Paz', messages: 23456, conversations: 3421, unlockRate: 67 },
-];
-
-// Active Conversations (Monitored)
-const activeConversations = [
-  {
-    id: 'CONV-001',
-    participants: ['Ahmet K.', 'Ayse M.'],
-    moment: 'Kapadokya Balloon Tour',
-    giftAmount: 2450,
-    messages: 24,
-    lastActivity: '2 dk once',
-    status: 'active',
-    tier: 'tier_3',
-  },
-  {
-    id: 'CONV-002',
-    participants: ['Mehmet S.', 'Zeynep A.'],
-    moment: 'Bosphorus Dinner',
-    giftAmount: 1800,
-    messages: 18,
-    lastActivity: '5 dk once',
-    status: 'active',
-    tier: 'tier_2',
-  },
-  {
-    id: 'CONV-003',
-    participants: ['Can B.', 'Deniz K.'],
-    moment: 'Istanbul Food Tour',
-    giftAmount: 950,
-    messages: 12,
-    lastActivity: '12 dk once',
-    status: 'active',
-    tier: 'tier_2',
-  },
-  {
-    id: 'CONV-004',
-    participants: ['Elif T.', 'Burak Y.'],
-    moment: 'Luxury Yacht',
-    giftAmount: 5600,
-    messages: 45,
-    lastActivity: '1 saat once',
-    status: 'idle',
-    tier: 'tier_3',
-  },
-];
-
-// Flagged Messages (Content Moderation)
-const flaggedMessages = [
-  {
-    id: 'MSG-001',
-    conversation: 'CONV-089',
-    sender: 'User123',
-    reason: 'potential_spam',
-    snippet: 'Hey check out this external link...',
-    flaggedAt: '10 dk once',
-    status: 'pending',
-  },
-  {
-    id: 'MSG-002',
-    conversation: 'CONV-145',
-    sender: 'User456',
-    reason: 'contact_sharing',
-    snippet: 'My phone number is +90...',
-    flaggedAt: '25 dk once',
-    status: 'reviewing',
-  },
-  {
-    id: 'MSG-003',
-    conversation: 'CONV-234',
-    sender: 'User789',
-    reason: 'inappropriate',
-    snippet: '[Content removed]',
-    flaggedAt: '1 saat once',
-    status: 'actioned',
-  },
-];
+import { useChatAnalytics } from '@/hooks/use-chat-analytics';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function ChatAnalyticsPage() {
   const [selectedTab, setSelectedTab] = useState('overview');
+
+  const {
+    chatStats,
+    chatLockTiers,
+    responseTimeData,
+    hourlyMessageData,
+    weeklyTrendData,
+    activeConversations,
+    flaggedMessages,
+    isLoading,
+    refresh,
+  } = useChatAnalytics();
 
   const getTierBadge = (tier: string) => {
     switch (tier) {
@@ -263,9 +121,9 @@ export default function ChatAnalyticsPage() {
             Mesajlasma sistemi metrikleri ve izleme
           </p>
         </div>
-        <CanvaButton size="sm">
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Yenile
+        <CanvaButton size="sm" onClick={refresh} disabled={isLoading}>
+          <RefreshCw className={cn('h-4 w-4 mr-2', isLoading && 'animate-spin')} />
+          {isLoading ? 'Yukleniyor...' : 'Yenile'}
         </CanvaButton>
       </div>
 
@@ -278,7 +136,7 @@ export default function ChatAnalyticsPage() {
               Bugun Mesaj
             </CanvaCardSubtitle>
             <CanvaCardTitle className="text-xl font-bold">
-              {chatStats.messagestoday.toLocaleString()}
+              {isLoading ? <Skeleton className="h-6 w-16" /> : chatStats.messagestoday.toLocaleString()}
             </CanvaCardTitle>
           </CanvaCardHeader>
         </CanvaCard>
@@ -290,7 +148,7 @@ export default function ChatAnalyticsPage() {
               Aktif Sohbet
             </CanvaCardSubtitle>
             <CanvaCardTitle className="text-xl font-bold text-purple-600">
-              {chatStats.activeToday.toLocaleString()}
+              {isLoading ? <Skeleton className="h-6 w-16" /> : chatStats.activeToday.toLocaleString()}
             </CanvaCardTitle>
           </CanvaCardHeader>
         </CanvaCard>
@@ -302,7 +160,7 @@ export default function ChatAnalyticsPage() {
               Ort. Yanit
             </CanvaCardSubtitle>
             <CanvaCardTitle className="text-xl font-bold">
-              {chatStats.avgResponseTime} dk
+              {isLoading ? <Skeleton className="h-6 w-16" /> : `${chatStats.avgResponseTime} dk`}
             </CanvaCardTitle>
           </CanvaCardHeader>
         </CanvaCard>
@@ -314,7 +172,7 @@ export default function ChatAnalyticsPage() {
               Chat Acilma
             </CanvaCardSubtitle>
             <CanvaCardTitle className="text-xl font-bold text-emerald-600">
-              %{chatStats.chatLockRate}
+              {isLoading ? <Skeleton className="h-6 w-16" /> : `%${chatStats.chatLockRate}`}
             </CanvaCardTitle>
           </CanvaCardHeader>
         </CanvaCard>
@@ -326,7 +184,7 @@ export default function ChatAnalyticsPage() {
               Mesaj/Sohbet
             </CanvaCardSubtitle>
             <CanvaCardTitle className="text-xl font-bold">
-              {chatStats.avgMessagesPerConvo}
+              {isLoading ? <Skeleton className="h-6 w-16" /> : chatStats.avgMessagesPerConvo}
             </CanvaCardTitle>
           </CanvaCardHeader>
         </CanvaCard>
@@ -338,7 +196,7 @@ export default function ChatAnalyticsPage() {
               Media
             </CanvaCardSubtitle>
             <CanvaCardTitle className="text-xl font-bold">
-              {chatStats.mediaShared.toLocaleString()}
+              {isLoading ? <Skeleton className="h-6 w-16" /> : chatStats.mediaShared.toLocaleString()}
             </CanvaCardTitle>
           </CanvaCardHeader>
         </CanvaCard>
@@ -350,7 +208,13 @@ export default function ChatAnalyticsPage() {
               E2E Sifreleme
             </CanvaCardSubtitle>
             <CanvaCardTitle className="text-xl font-bold text-emerald-600 flex items-center gap-2">
-              <Lock className="h-4 w-4" />%{chatStats.e2eEncrypted} Guvenli
+              {isLoading ? (
+                <Skeleton className="h-6 w-24" />
+              ) : (
+                <>
+                  <Lock className="h-4 w-4" />%{chatStats.e2eEncrypted} Guvenli
+                </>
+              )}
             </CanvaCardTitle>
           </CanvaCardHeader>
         </CanvaCard>
