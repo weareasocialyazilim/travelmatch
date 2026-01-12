@@ -291,18 +291,18 @@ const CreateMomentScreen: React.FC = () => {
       if (createdMoment) {
         HapticManager.success();
 
-        // Navigate to Profile after successful creation
-        showAlert({
-          title: t('screens.createMoment.successTitle'),
-          message: t('screens.createMoment.successMessage'),
-          buttons: [
-            {
-              text: t('screens.createMoment.successButton'),
-              onPress: () =>
-                navigation.navigate('MainTabs', { screen: 'Profile' }),
-            },
-          ],
-        });
+        // Navigate to Profile first, then show success toast
+        // Using setTimeout to avoid modal conflict with navigation
+        navigation.navigate('MainTabs', { screen: 'Profile' });
+
+        // Show toast after navigation completes
+        setTimeout(() => {
+          showToast(
+            t('screens.createMoment.successMessage') ||
+              'Moment başarıyla yayınlandı!',
+            'success',
+          );
+        }, 300);
       } else {
         HapticManager.error();
         showToast('Could not create moment. Please try again.', 'error');
