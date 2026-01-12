@@ -16,21 +16,21 @@ const Canvas = dynamic(
 );
 
 /**
- * Hero Section - "Unlock Sacred Moments"
+ * Hero Section - "The Soft-Future"
  *
- * Awwwards-ready design with:
- * - Interactive 3D GiftOrb background
- * - Fluid typography (Clash Display)
- * - Magnetic interactions
- * - Tesla/Nvidia aesthetic
+ * Editorial warmth instead of tech coldness:
+ * - Warm golden yellow (#facc15) for gifting essence
+ * - Sunset red (#ff6b6b) for human warmth
+ * - Soft organic gradients (no harsh neon)
+ * - GenZ-friendly vibe (energy & aesthetic, not tech)
  */
 
 const HERO_CONTENT = {
   en: {
-    badge: 'The Future of Human Connection',
-    headline: ['Unlock', 'Sacred', 'Moments'],
+    badge: 'A New Era of Human Connection',
+    headline: ['GIFT THE', 'UNFORGETTABLE'],
     subheadline:
-      'Not just an app, a gifting revolution. No passports, just human stories and locked trust.',
+      "Passports don't talk here. Just human stories, locked trust, and Sacred Moments that change lives.",
     cta: {
       primary: 'Join the Movement',
       secondary: 'How it Works',
@@ -42,10 +42,10 @@ const HERO_CONTENT = {
     ],
   },
   tr: {
-    badge: 'İnsan Bağlantısının Geleceği',
-    headline: ['Kutsal', 'Anları', 'Keşfet'],
+    badge: 'İnsan Bağlantısının Yeni Çağı',
+    headline: ['KUTSAL', 'ANLARI KAR'],
     subheadline:
-      'Sadece bir uygulama değil, bir hediyeleşme devrimi. Pasaport yok, sadece insan hikayeleri ve kilitli güven.',
+      'Pasaportlar konuşmaz burada. Sadece insan hikayeleri, kilitli güven, ve hayatı değiştiren Kutsal Anlar.',
     cta: {
       primary: 'Harekete Katıl',
       secondary: 'Nasıl Çalışır?',
