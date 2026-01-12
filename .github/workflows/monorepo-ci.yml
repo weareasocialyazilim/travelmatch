@@ -32,8 +32,19 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: 🔐 Import secrets from Infisical
+        uses: Infisical/secrets-action@v1.0.15
+        with:
+          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          project-id: fa0ed450-40e2-4063-b4f4-ce5cca83a57e
+          env-slug: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
+
       - name: Build packages
-        run: pnpm turbo run build
+        run: |
+          # Use build:ci for admin (no Infisical CLI), regular build for others
+          cd apps/admin && pnpm build:ci && cd ../..
+          pnpm turbo run build --filter=!@travelmatch/admin
 
       - name: Type check
         run: pnpm turbo run type-check
@@ -43,15 +54,6 @@ jobs:
 
       - name: Test
         run: pnpm turbo run test
-
-      - name: 🔐 Import secrets from Infisical
-        uses: Infisical/secrets-action@v1.0.15
-        with:
-          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
-          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          project-id: fa0ed450-40e2-4063-b4f4-ce5cca83a57e
-          env-slug: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
-        continue-on-error: true
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
