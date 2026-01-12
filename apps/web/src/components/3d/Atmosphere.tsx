@@ -6,12 +6,12 @@ import { Float, MeshDistortMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 
 /**
- * Atmosphere - Gen Z Ambient Background
+ * TravelMatch Premium Atmosphere
  *
  * Features:
- * - Soft, dreamy floating blobs
- * - Subtle color gradients (acid green, neon pink, electric blue)
- * - Slow, hypnotic movement
+ * - Floating gradient blobs (Cyber Mint, Electric Purple, Liquid Gold)
+ * - Particle field with premium colors
+ * - Smooth, hypnotic movement
  * - Performance optimized
  */
 
@@ -45,7 +45,7 @@ function Blob({ position, color, scale, speed, distort }: BlobProps) {
         <MeshDistortMaterial
           color={color}
           transparent
-          opacity={0.3}
+          opacity={0.25}
           distort={distort}
           speed={speed * 0.5}
           roughness={0.4}
@@ -57,46 +57,53 @@ function Blob({ position, color, scale, speed, distort }: BlobProps) {
 }
 
 function FloatingBlobs() {
+  // Premium color palette blobs
   const blobs = useMemo(
     () => [
+      // Cyber Mint (Primary)
       {
         position: [-4, 2, -5] as [number, number, number],
-        color: '#ccff00',
+        color: '#00FF88',
         scale: 2,
         speed: 0.5,
         distort: 0.4,
       },
+      // Electric Purple (Secondary)
       {
         position: [4, -1, -6] as [number, number, number],
-        color: '#ff0099',
+        color: '#8B5CF6',
         scale: 1.5,
         speed: 0.7,
         distort: 0.5,
       },
+      // Liquid Gold (Accent)
       {
         position: [0, 3, -8] as [number, number, number],
-        color: '#00f0ff',
+        color: '#FACC15',
         scale: 2.5,
         speed: 0.3,
         distort: 0.3,
       },
+      // More Cyber Mint
       {
         position: [-3, -2, -4] as [number, number, number],
-        color: '#ff0099',
+        color: '#00FF88',
         scale: 1,
         speed: 0.8,
         distort: 0.6,
       },
+      // Electric Purple
       {
         position: [3, 1, -7] as [number, number, number],
-        color: '#ccff00',
+        color: '#8B5CF6',
         scale: 1.8,
         speed: 0.4,
         distort: 0.35,
       },
+      // Liquid Gold
       {
         position: [0, -3, -5] as [number, number, number],
-        color: '#00f0ff',
+        color: '#FACC15',
         scale: 1.2,
         speed: 0.6,
         distort: 0.45,
@@ -124,17 +131,18 @@ function seededRandom(seed: number): () => number {
 
 function ParticleField() {
   const particlesRef = useRef<THREE.Points>(null);
-  const particleCount = 200;
+  const particleCount = 150; // Slightly reduced for performance
 
   const [positions, colors] = useMemo(() => {
-    const random = seededRandom(42); // Fixed seed for consistent visuals
+    const random = seededRandom(42);
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
 
+    // Premium color palette
     const colorPalette = [
-      new THREE.Color('#ccff00'),
-      new THREE.Color('#ff0099'),
-      new THREE.Color('#00f0ff'),
+      new THREE.Color('#00FF88'), // Cyber Mint
+      new THREE.Color('#8B5CF6'), // Electric Purple
+      new THREE.Color('#FACC15'), // Liquid Gold
     ];
 
     for (let i = 0; i < particleCount; i++) {
@@ -167,9 +175,9 @@ function ParticleField() {
         <bufferAttribute attach="attributes-color" args={[colors, 3]} />
       </bufferGeometry>
       <pointsMaterial
-        size={0.05}
+        size={0.04}
         transparent
-        opacity={0.6}
+        opacity={0.5}
         vertexColors
         sizeAttenuation
         blending={THREE.AdditiveBlending}
@@ -181,9 +189,10 @@ function ParticleField() {
 function Scene() {
   return (
     <>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} intensity={0.5} color="#ccff00" />
-      <pointLight position={[-10, -10, -10]} intensity={0.3} color="#ff0099" />
+      <ambientLight intensity={0.4} />
+      <pointLight position={[10, 10, 10]} intensity={0.4} color="#00FF88" />
+      <pointLight position={[-10, -10, -10]} intensity={0.3} color="#8B5CF6" />
+      <pointLight position={[0, 10, -5]} intensity={0.2} color="#FACC15" />
 
       <FloatingBlobs />
       <ParticleField />
@@ -197,7 +206,7 @@ export function Atmosphere() {
       className="fixed inset-0 -z-10 pointer-events-none"
       style={{
         background:
-          'linear-gradient(135deg, #050505 0%, #0a0a0a 50%, #050505 100%)',
+          'linear-gradient(180deg, #020202 0%, #050508 50%, #020202 100%)',
       }}
     >
       <Suspense fallback={null}>
@@ -220,7 +229,15 @@ export function Atmosphere() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'radial-gradient(ellipse at center, transparent 0%, rgba(5,5,5,0.8) 100%)',
+            'radial-gradient(ellipse at center, transparent 0%, rgba(2,2,2,0.7) 100%)',
+        }}
+      />
+
+      {/* Vignette effect */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          boxShadow: 'inset 0 0 200px 100px rgba(0,0,0,0.5)',
         }}
       />
     </div>
