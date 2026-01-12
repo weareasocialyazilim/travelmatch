@@ -19,12 +19,12 @@ import { cn } from '@/lib/utils';
 
 const canvaInputVariants = cva(
   [
-    'w-full font-sans text-gray-900 bg-white',
+    'w-full font-sans text-foreground bg-background',
     'border rounded-lg',
     'transition-all duration-150 ease-out',
-    'placeholder:text-gray-400',
+    'placeholder:text-muted-foreground',
     'focus:outline-none',
-    'disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-70',
+    'disabled:bg-muted disabled:cursor-not-allowed disabled:opacity-70',
   ],
   {
     variants: {
@@ -35,17 +35,20 @@ const canvaInputVariants = cva(
       },
       state: {
         default: [
-          'border-gray-300',
-          'hover:border-gray-400',
-          'focus:border-violet-500 focus:ring-[3px] focus:ring-violet-100',
+          'border-border',
+          'hover:border-border/80',
+          'focus:border-violet-500 focus:ring-[3px] focus:ring-violet-500/20',
+          'dark:focus:ring-violet-500/30',
         ],
         error: [
           'border-red-500',
-          'focus:border-red-500 focus:ring-[3px] focus:ring-red-100',
+          'focus:border-red-500 focus:ring-[3px] focus:ring-red-500/20',
+          'dark:focus:ring-red-500/30',
         ],
         success: [
           'border-emerald-500',
-          'focus:border-emerald-500 focus:ring-[3px] focus:ring-emerald-100',
+          'focus:border-emerald-500 focus:ring-[3px] focus:ring-emerald-500/20',
+          'dark:focus:ring-emerald-500/30',
         ],
       },
     },
@@ -93,7 +96,7 @@ export const CanvaInput = React.forwardRef<HTMLInputElement, CanvaInputProps>(
           <label
             htmlFor={inputId}
             className={cn(
-              'text-sm font-medium text-gray-700',
+              'text-sm font-medium text-foreground',
               required && "after:content-['_*'] after:text-red-500"
             )}
           >
@@ -103,7 +106,7 @@ export const CanvaInput = React.forwardRef<HTMLInputElement, CanvaInputProps>(
 
         <div className="relative">
           {leftIcon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
               {leftIcon}
             </div>
           )}
@@ -121,7 +124,7 @@ export const CanvaInput = React.forwardRef<HTMLInputElement, CanvaInputProps>(
           />
 
           {rightIcon && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
               {rightIcon}
             </div>
           )}
@@ -131,7 +134,7 @@ export const CanvaInput = React.forwardRef<HTMLInputElement, CanvaInputProps>(
           <p
             className={cn(
               'text-xs',
-              errorText ? 'text-red-500' : 'text-gray-500'
+              errorText ? 'text-red-500 dark:text-red-400' : 'text-muted-foreground'
             )}
           >
             {errorText || helperText}
@@ -166,7 +169,7 @@ export const CanvaTextarea = React.forwardRef<
         <label
           htmlFor={inputId}
           className={cn(
-            'text-sm font-medium text-gray-700',
+            'text-sm font-medium text-foreground',
             required && "after:content-['_*'] after:text-red-500"
           )}
         >
@@ -179,14 +182,14 @@ export const CanvaTextarea = React.forwardRef<
         id={inputId}
         className={cn(
           'w-full min-h-[100px] px-3 py-2.5 text-sm',
-          'text-gray-900 bg-white border rounded-lg resize-y',
-          'placeholder:text-gray-400',
+          'text-foreground bg-background border rounded-lg resize-y',
+          'placeholder:text-muted-foreground',
           'transition-all duration-150 ease-out',
           'focus:outline-none',
-          'disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-70',
+          'disabled:bg-muted disabled:cursor-not-allowed disabled:opacity-70',
           hasError
-            ? 'border-red-500 focus:border-red-500 focus:ring-[3px] focus:ring-red-100'
-            : 'border-gray-300 hover:border-gray-400 focus:border-violet-500 focus:ring-[3px] focus:ring-violet-100',
+            ? 'border-red-500 focus:border-red-500 focus:ring-[3px] focus:ring-red-500/20 dark:focus:ring-red-500/30'
+            : 'border-border hover:border-border/80 focus:border-violet-500 focus:ring-[3px] focus:ring-violet-500/20 dark:focus:ring-violet-500/30',
           className
         )}
         {...props}
@@ -196,7 +199,7 @@ export const CanvaTextarea = React.forwardRef<
         <p
           className={cn(
             'text-xs',
-            errorText ? 'text-red-500' : 'text-gray-500'
+            errorText ? 'text-red-500 dark:text-red-400' : 'text-muted-foreground'
           )}
         >
           {errorText || helperText}
