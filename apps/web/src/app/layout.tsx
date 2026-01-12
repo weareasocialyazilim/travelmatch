@@ -1,7 +1,12 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
+export const viewport: Viewport = {
+  themeColor: '#050505',
+};
+
 export const metadata: Metadata = {
+  metadataBase: new URL('https://travelmatch.app'),
   title: 'The Night Journey | TravelMatch',
   description:
     'Access the 15 Global Hubs. A ritual of connection. Dubai. Tokyo. NYC. Enter the frequency.',
@@ -21,7 +26,6 @@ export const metadata: Metadata = {
     locale: 'en_US',
     type: 'website',
   },
-  themeColor: '#050505',
 };
 
 export default function RootLayout({
