@@ -1,12 +1,11 @@
 /**
  * TravelMatch - Premium Root Layout
- * Awwwards-Ready Foundation
+ * Awwwards-Ready Foundation with Preloader & Smooth Scroll
  */
 
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import { CustomCursor } from '@/components/ui/CustomCursor';
-import { Navbar } from '@/components/layout/Navbar';
+import { AppProvider } from '@/components/providers/AppProvider';
 import { Atmosphere } from '@/components/3d/Atmosphere';
 
 // ============================================================================
@@ -27,20 +26,20 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: 'TravelMatch | Unlock Sacred Moments',
+    default: 'TravelMatch | The Social Gifting Protocol',
     template: '%s | TravelMatch',
   },
   description:
-    'Experience the world through gifting. No passports, just human connection. Send a gift, meet in real life.',
+    'Identity Pulse and Sacred Moments exchange. No passports, no boundaries. Experience the world through human connection.',
   keywords: [
     'gift a moment',
     'real connections',
     'meet in real life',
-    'dating app',
     'social gifting',
     'experience sharing',
-    'tanışma uygulaması',
-    'hediye gönder',
+    'identity pulse',
+    'sacred moments',
+    'escrow protocol',
   ],
   authors: [{ name: 'TravelMatch Inc.' }],
   creator: 'TravelMatch',
@@ -59,24 +58,23 @@ export const metadata: Metadata = {
     alternateLocale: ['tr_TR'],
     url: 'https://travelmatch.app',
     siteName: 'TravelMatch',
-    title: 'TravelMatch | Unlock Sacred Moments',
+    title: 'TravelMatch | The Social Gifting Protocol',
     description:
-      'Experience the world through gifting. No passports, just human connection.',
+      'The future of human experience exchange. No passports, no boundaries.',
     images: [
       {
-        url: '/og-image.svg',
+        url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'TravelMatch - Unlock Sacred Moments',
+        alt: 'TravelMatch - The Social Gifting Protocol',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TravelMatch | Unlock Sacred Moments',
-    description:
-      'Experience the world through gifting. No passports, just human connection.',
-    images: ['/og-image.svg'],
+    title: 'TravelMatch Protocol',
+    description: 'Experience the world through gifting.',
+    images: ['/og-image.png'],
     creator: '@travelmatch',
     site: '@travelmatch',
   },
@@ -113,7 +111,7 @@ const jsonLd = {
       url: 'https://travelmatch.app',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://travelmatch.app/og-image.svg',
+        url: 'https://travelmatch.app/og-image.png',
         width: 1200,
         height: 630,
       },
@@ -131,7 +129,7 @@ const jsonLd = {
       operatingSystem: ['iOS', 'Android'],
       applicationCategory: 'SocialNetworkingApplication',
       description:
-        'Send a gift, meet in real life. Build meaningful connections.',
+        'Send a gift, meet in real life. Build meaningful connections through the Social Gifting Protocol.',
       offers: {
         '@type': 'Offer',
         price: '0',
@@ -139,9 +137,9 @@ const jsonLd = {
       },
       featureList: [
         'Gift-first matching',
-        'Discover people nearby',
-        'Safe meetups',
-        'Experience assistant',
+        'Identity Pulse verification',
+        'Escrow-protected exchanges',
+        'Sacred Moments gallery',
       ],
     },
   ],
@@ -157,7 +155,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         {/* Preconnect for Performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -180,19 +178,11 @@ export default function RootLayout({
       </head>
 
       <body className="font-inter antialiased">
-        {/* 3D Atmosphere Background */}
+        {/* 3D Atmosphere Background (Always visible) */}
         <Atmosphere />
 
-        {/* Custom Cursor (Desktop Only) */}
-        <CustomCursor />
-
-        {/* Navigation */}
-        <Navbar />
-
-        {/* Main Content */}
-        <main>{children}</main>
-
-        {/* Footer will be added per-page or as a shared component */}
+        {/* App Provider: Preloader + Smooth Scroll + Cursor + Navbar */}
+        <AppProvider>{children}</AppProvider>
       </body>
     </html>
   );
