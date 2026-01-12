@@ -34,14 +34,6 @@ import {
   CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
-import { Badge } from '@/components/ui/badge';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -553,68 +545,40 @@ export default function CompliancePage() {
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-5">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Toplam SAR</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.sar.total || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              {stats?.sar.pending || 0} bekliyor
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Yüksek Risk</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-orange-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">
-              {(stats?.risk.high || 0) + (stats?.risk.critical || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {stats?.risk.critical || 0} kritik
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Engellenen</CardTitle>
-            <Ban className="h-4 w-4 text-red-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              {stats?.risk.blocked || 0}
-            </div>
-            <p className="text-xs text-muted-foreground">kullanıcı</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">24h Uyarı</CardTitle>
-            <Activity className="h-4 w-4 text-yellow-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">
-              {stats?.recent.alerts24h || 0}
-            </div>
-            <p className="text-xs text-muted-foreground">yeni uyarı</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Çözülen</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {stats?.sar.resolved || 0}
-            </div>
-            <p className="text-xs text-muted-foreground">SAR raporu</p>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          label="Toplam SAR"
+          value={stats?.sar.total || 0}
+          subtitle={`${stats?.sar.pending || 0} bekliyor`}
+          icon={<FileText className="h-4 w-4" />}
+        />
+        <CanvaStatCard
+          label="Yüksek Risk"
+          value={(stats?.risk.high || 0) + (stats?.risk.critical || 0)}
+          subtitle={`${stats?.risk.critical || 0} kritik`}
+          icon={<AlertTriangle className="h-4 w-4 text-orange-500" />}
+          className="[&_[data-stat-value]]:text-orange-600"
+        />
+        <CanvaStatCard
+          label="Engellenen"
+          value={stats?.risk.blocked || 0}
+          subtitle="kullanıcı"
+          icon={<Ban className="h-4 w-4 text-red-500" />}
+          className="[&_[data-stat-value]]:text-red-600"
+        />
+        <CanvaStatCard
+          label="24h Uyarı"
+          value={stats?.recent.alerts24h || 0}
+          subtitle="yeni uyarı"
+          icon={<Activity className="h-4 w-4 text-yellow-500" />}
+          className="[&_[data-stat-value]]:text-yellow-600"
+        />
+        <CanvaStatCard
+          label="Çözülen"
+          value={stats?.sar.resolved || 0}
+          subtitle="SAR raporu"
+          icon={<CheckCircle className="h-4 w-4 text-green-500" />}
+          className="[&_[data-stat-value]]:text-green-600"
+        />
       </div>
 
       <Tabs defaultValue="sar" className="space-y-4">
@@ -644,14 +608,14 @@ export default function CompliancePage() {
 
         {/* SAR Reports Tab */}
         <TabsContent value="sar">
-          <Card>
-            <CardHeader>
-              <CardTitle>Şüpheli Aktivite Raporları (SAR)</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Şüpheli Aktivite Raporları (SAR)</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 AML ve fraud tespitinden oluşan otomatik raporlar
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               {/* Filters */}
               <div className="mb-6 flex items-center gap-4">
                 <div className="relative flex-1">
@@ -804,20 +768,20 @@ export default function CompliancePage() {
                   ))
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Risk Profiles Tab */}
         <TabsContent value="risk">
-          <Card>
-            <CardHeader>
-              <CardTitle>Kullanıcı Risk Profilleri</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Kullanıcı Risk Profilleri</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Risk skoruna göre sıralanmış kullanıcılar
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               {/* Filters */}
               <div className="mb-6 flex items-center gap-4">
                 <Select value={riskFilter} onValueChange={setRiskFilter}>
@@ -934,20 +898,20 @@ export default function CompliancePage() {
                   ))
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* AML Thresholds Tab */}
         <TabsContent value="thresholds">
-          <Card>
-            <CardHeader>
-              <CardTitle>AML Eşikleri</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>AML Eşikleri</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 MASAK, EU AML, FinCEN ve NCA uyumlu eşikler
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="rounded-lg border p-4">
                   <div className="flex items-center gap-2 mb-3">
@@ -1018,20 +982,20 @@ export default function CompliancePage() {
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Fraud Rules Tab */}
         <TabsContent value="rules">
-          <Card>
-            <CardHeader>
-              <CardTitle>Fraud Tespit Kuralları</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Fraud Tespit Kuralları</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Aktif fraud tespit ve önleme kuralları
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-3">
                 {[
                   {
@@ -1145,8 +1109,8 @@ export default function CompliancePage() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
       </Tabs>
 

@@ -32,16 +32,7 @@ import {
   CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Select,
@@ -315,78 +306,34 @@ export default function AuditLogsPage() {
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Bugün</CardTitle>
-            <History className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                todayLogs.length
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">işlem kaydı</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Bu Hafta</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                weekLogs.length
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">işlem kaydı</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Aktif Admin</CardTitle>
-            <User className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                activeAdmins
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">bugün işlem yaptı</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Toplam</CardTitle>
-            <Shield className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                data?.total || logs.length
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">kayıt</p>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          label="Bugün"
+          value={isLoading ? '...' : todayLogs.length}
+          icon={<History className="h-4 w-4" />}
+        />
+        <CanvaStatCard
+          label="Bu Hafta"
+          value={isLoading ? '...' : weekLogs.length}
+          icon={<Calendar className="h-4 w-4" />}
+        />
+        <CanvaStatCard
+          label="Aktif Admin"
+          value={isLoading ? '...' : activeAdmins}
+          icon={<User className="h-4 w-4" />}
+        />
+        <CanvaStatCard
+          label="Toplam"
+          value={isLoading ? '...' : (data?.total || logs.length)}
+          icon={<Shield className="h-4 w-4" />}
+        />
       </div>
 
       {/* Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Filtreler</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <CanvaCard>
+        <CanvaCardHeader>
+          <CanvaCardTitle>Filtreler</CanvaCardTitle>
+        </CanvaCardHeader>
+        <CanvaCardBody>
           <div className="flex flex-wrap gap-4">
             <div className="flex-1 min-w-[200px]">
               <div className="relative">
@@ -413,13 +360,13 @@ export default function AuditLogsPage() {
               </SelectContent>
             </Select>
           </div>
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
 
       {/* Bulk Actions */}
       {selectedLogs.length > 0 && (
-        <Card className="border-primary">
-          <CardContent className="py-3">
+        <CanvaCard className="border-primary">
+          <CanvaCardBody className="py-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">
                 {selectedLogs.length} kayıt seçildi
@@ -442,17 +389,17 @@ export default function AuditLogsPage() {
                 </CanvaButton>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
       )}
 
       {/* Logs Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>İşlem Kayıtları</CardTitle>
-          <CardDescription>{filteredLogs.length} kayıt bulundu</CardDescription>
-        </CardHeader>
-        <CardContent>
+      <CanvaCard>
+        <CanvaCardHeader>
+          <CanvaCardTitle>İşlem Kayıtları</CanvaCardTitle>
+          <CanvaCardSubtitle>{filteredLogs.length} kayıt bulundu</CanvaCardSubtitle>
+        </CanvaCardHeader>
+        <CanvaCardBody>
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -726,8 +673,8 @@ export default function AuditLogsPage() {
               </div>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
     </div>
   );
 }

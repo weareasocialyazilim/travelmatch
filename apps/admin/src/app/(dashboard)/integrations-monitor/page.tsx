@@ -48,15 +48,6 @@ import {
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { CanvaButton } from '@/components/canva/CanvaButton';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -365,27 +356,27 @@ export default function IntegrationsMonitorPage() {
     switch (status) {
       case 'healthy':
         return (
-          <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
+          <CanvaBadge variant="success">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             Saglikli
-          </Badge>
+          </CanvaBadge>
         );
       case 'degraded':
         return (
-          <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/30 animate-pulse">
+          <CanvaBadge variant="warning" className="animate-pulse">
             <AlertTriangle className="h-3 w-3 mr-1" />
             Yavaslamis
-          </Badge>
+          </CanvaBadge>
         );
       case 'down':
         return (
-          <Badge className="bg-red-500/10 text-red-600 border-red-500/30 animate-pulse">
+          <CanvaBadge variant="error" className="animate-pulse">
             <XCircle className="h-3 w-3 mr-1" />
             Erisim Yok
-          </Badge>
+          </CanvaBadge>
         );
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <CanvaBadge variant="neutral">{status}</CanvaBadge>;
     }
   };
 
@@ -433,9 +424,9 @@ export default function IntegrationsMonitorPage() {
           <span className="text-sm text-muted-foreground">
             Son guncelleme: {lastUpdate.toLocaleTimeString('tr-TR')}
           </span>
-          <Button
-            variant="outline"
-            size="sm"
+          <CanvaButton
+            variant="secondary"
+            size="small"
             onClick={handleRefresh}
             disabled={isRefreshing}
           >
@@ -443,13 +434,13 @@ export default function IntegrationsMonitorPage() {
               className={cn('h-4 w-4 mr-2', isRefreshing && 'animate-spin')}
             />
             Yenile
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
       {/* Overall Status */}
       <div className="grid gap-4 md:grid-cols-5">
-        <Card
+        <CanvaCard
           className={cn(
             healthyCount === allServices.length
               ? 'border-emerald-500/30 bg-emerald-500/5'
@@ -458,9 +449,9 @@ export default function IntegrationsMonitorPage() {
                 : 'border-red-500/30 bg-red-500/5',
           )}
         >
-          <CardHeader className="pb-2">
-            <CardDescription>Genel Durum</CardDescription>
-            <CardTitle className="text-xl flex items-center gap-2">
+          <CanvaCardHeader>
+            <CanvaCardSubtitle>Genel Durum</CanvaCardSubtitle>
+            <CanvaCardTitle className="text-xl flex items-center gap-2">
               {healthyCount === allServices.length ? (
                 <>
                   <CheckCircle2 className="h-5 w-5 text-emerald-500" />
@@ -477,62 +468,45 @@ export default function IntegrationsMonitorPage() {
                   Sorun Var
                 </>
               )}
-            </CardTitle>
-          </CardHeader>
-        </Card>
+            </CanvaCardTitle>
+          </CanvaCardHeader>
+        </CanvaCard>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Saglikli</CardDescription>
-            <CardTitle className="text-2xl text-emerald-600">
-              {healthyCount}/{allServices.length}
-            </CardTitle>
-          </CardHeader>
-        </Card>
+        <CanvaStatCard
+          title="Saglikli"
+          value={`${healthyCount}/${allServices.length}`}
+          variant="success"
+        />
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Yavaslamis</CardDescription>
-            <CardTitle className="text-2xl text-amber-600">
-              {degradedCount}
-            </CardTitle>
-          </CardHeader>
-        </Card>
+        <CanvaStatCard
+          title="Yavaslamis"
+          value={degradedCount.toString()}
+          variant="warning"
+        />
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Ort. Uptime</CardDescription>
-            <CardTitle className={cn('text-2xl', getUptimeColor(avgUptime))}>
-              %{avgUptime.toFixed(2)}
-            </CardTitle>
-          </CardHeader>
-        </Card>
+        <CanvaStatCard
+          title="Ort. Uptime"
+          value={`%${avgUptime.toFixed(2)}`}
+          variant={avgUptime >= 99.9 ? 'success' : avgUptime >= 99 ? 'info' : 'warning'}
+        />
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Bugun Hata</CardDescription>
-            <CardTitle
-              className={cn(
-                'text-2xl',
-                totalErrors > 10 ? 'text-red-600' : 'text-emerald-600',
-              )}
-            >
-              {totalErrors}
-            </CardTitle>
-          </CardHeader>
-        </Card>
+        <CanvaStatCard
+          title="Bugun Hata"
+          value={totalErrors.toString()}
+          variant={totalErrors > 10 ? 'error' : 'success'}
+        />
       </div>
 
       {/* Active Incidents */}
       {recentIncidents.filter((i) => i.status !== 'resolved').length > 0 && (
-        <Card className="border-amber-500/30 bg-amber-500/5">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-amber-600">
+        <CanvaCard className="border-amber-500/30 bg-amber-500/5">
+          <CanvaCardHeader>
+            <CanvaCardTitle className="flex items-center gap-2 text-amber-600">
               <AlertTriangle className="h-5 w-5" />
               Aktif Olaylar
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+            </CanvaCardTitle>
+          </CanvaCardHeader>
+          <CanvaCardBody>
             {recentIncidents
               .filter((i) => i.status !== 'resolved')
               .map((incident) => (
@@ -547,17 +521,17 @@ export default function IntegrationsMonitorPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <Badge variant="outline" className="text-amber-600">
+                    <CanvaBadge variant="warning">
                       {incident.status}
-                    </Badge>
+                    </CanvaBadge>
                     <p className="text-xs text-muted-foreground mt-1">
                       Basladi: {incident.startedAt}
                     </p>
                   </div>
                 </div>
               ))}
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
       )}
 
       {/* Main Tabs */}
@@ -578,7 +552,7 @@ export default function IntegrationsMonitorPage() {
               </div>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {category.services.map((service) => (
-                  <Card
+                  <CanvaCard
                     key={service.id}
                     className={cn(
                       'hover:shadow-md transition-all',
@@ -586,16 +560,16 @@ export default function IntegrationsMonitorPage() {
                       service.status === 'down' && 'border-red-500/30',
                     )}
                   >
-                    <CardHeader className="pb-3">
+                    <CanvaCardHeader>
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-base">
+                        <CanvaCardTitle className="text-base">
                           {service.name}
-                        </CardTitle>
+                        </CanvaCardTitle>
                         {getStatusBadge(service.status)}
                       </div>
-                      <CardDescription>{service.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
+                      <CanvaCardSubtitle>{service.description}</CanvaCardSubtitle>
+                    </CanvaCardHeader>
+                    <CanvaCardBody className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <p className="text-xs text-muted-foreground">
@@ -671,12 +645,12 @@ export default function IntegrationsMonitorPage() {
 
                       <div className="flex items-center justify-between text-xs text-muted-foreground pt-2">
                         <span>Son kontrol: {service.lastCheck}</span>
-                        <Button variant="ghost" size="sm" className="h-6 px-2">
+                        <CanvaButton variant="tertiary" size="small" className="h-6 px-2">
                           <ExternalLink className="h-3 w-3" />
-                        </Button>
+                        </CanvaButton>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </CanvaCardBody>
+                  </CanvaCard>
                 ))}
               </div>
             </div>
@@ -685,14 +659,14 @@ export default function IntegrationsMonitorPage() {
 
         {/* Latency Tab */}
         <TabsContent value="latency" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Gunluk Latency Trendi</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Gunluk Latency Trendi</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Ana servislerin response time degisimi
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <AdminLineChart
                 data={latencyHistoryData}
                 xAxisKey="time"
@@ -721,20 +695,20 @@ export default function IntegrationsMonitorPage() {
                 ]}
                 yAxisFormatter={(value) => `${value}ms`}
               />
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Incidents Tab */}
         <TabsContent value="incidents" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Son Olaylar</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Son Olaylar</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Tum entegrasyon olaylari ve cozumleri
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-4">
                 {recentIncidents.map((incident) => (
                   <div
@@ -766,26 +740,21 @@ export default function IntegrationsMonitorPage() {
                           </div>
                         </div>
                       </div>
-                      <Badge
+                      <CanvaBadge
                         variant={
-                          incident.status === 'resolved' ? 'outline' : 'default'
-                        }
-                        className={
-                          incident.status === 'resolved'
-                            ? 'text-emerald-600'
-                            : 'bg-amber-500 text-white'
+                          incident.status === 'resolved' ? 'success' : 'warning'
                         }
                       >
                         {incident.status === 'resolved'
                           ? 'Cozuldu'
                           : 'Inceleniyor'}
-                      </Badge>
+                      </CanvaBadge>
                     </div>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
       </Tabs>
     </div>

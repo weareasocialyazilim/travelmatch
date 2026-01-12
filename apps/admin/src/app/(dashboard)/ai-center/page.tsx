@@ -34,15 +34,6 @@ import {
   CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Switch } from '@/components/ui/switch';
@@ -307,83 +298,36 @@ export default function AICenterPage() {
       {/* Proof Verification Stats */}
       {moderationStats && (
         <div className="grid gap-4 md:grid-cols-5">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-                  <Brain className="h-6 w-6 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">
-                    {moderationStats.totalProcessed.toLocaleString('tr-TR')}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Toplam Kanıt</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-                  <CheckCircle className="h-6 w-6 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">
-                    {moderationStats.proofsVerified.toLocaleString('tr-TR')}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Doğrulanan</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
-                  <XCircle className="h-6 w-6 text-red-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">
-                    {moderationStats.proofsRejected.toLocaleString('tr-TR')}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Reddedilen</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100">
-                  <Eye className="h-6 w-6 text-yellow-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">
-                    {moderationStats.pendingReview.toLocaleString('tr-TR')}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    İnceleme Bekliyor
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100">
-                  <Target className="h-6 w-6 text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">
-                    %{moderationStats.accuracy.toFixed(1)}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Doğruluk</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <CanvaStatCard
+            title="Toplam Kanıt"
+            value={moderationStats.totalProcessed.toLocaleString('tr-TR')}
+            icon={Brain}
+            color="blue"
+          />
+          <CanvaStatCard
+            title="Doğrulanan"
+            value={moderationStats.proofsVerified.toLocaleString('tr-TR')}
+            icon={CheckCircle}
+            color="green"
+          />
+          <CanvaStatCard
+            title="Reddedilen"
+            value={moderationStats.proofsRejected.toLocaleString('tr-TR')}
+            icon={XCircle}
+            color="red"
+          />
+          <CanvaStatCard
+            title="İnceleme Bekliyor"
+            value={moderationStats.pendingReview.toLocaleString('tr-TR')}
+            icon={Eye}
+            color="yellow"
+          />
+          <CanvaStatCard
+            title="Doğruluk"
+            value={`%${moderationStats.accuracy.toFixed(1)}`}
+            icon={Target}
+            color="purple"
+          />
         </div>
       )}
 
@@ -421,14 +365,14 @@ export default function AICenterPage() {
             {models.map((model) => {
               const IconComponent = modelIcons[model.id] || Brain;
               return (
-                <Card key={model.id}>
-                  <CardHeader className="pb-3">
+                <CanvaCard key={model.id}>
+                  <CanvaCardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <IconComponent className="h-5 w-5 text-muted-foreground" />
-                        <CardTitle className="text-base">
+                        <CanvaCardTitle className="text-base">
                           {model.name}
-                        </CardTitle>
+                        </CanvaCardTitle>
                       </div>
                       <CanvaBadge
                         variant={
@@ -438,8 +382,8 @@ export default function AICenterPage() {
                         {model.status === 'active' ? 'Aktif' : 'Pasif'}
                       </CanvaBadge>
                     </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+                  </CanvaCardHeader>
+                  <CanvaCardBody className="space-y-4">
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Doğruluk</span>
@@ -497,8 +441,8 @@ export default function AICenterPage() {
                         }
                       />
                     </div>
-                  </CardContent>
-                </Card>
+                  </CanvaCardBody>
+                </CanvaCard>
               );
             })}
           </div>
@@ -507,14 +451,14 @@ export default function AICenterPage() {
         {/* Predictions Tab */}
         <TabsContent value="predictions" className="space-y-6">
           {/* Churn Predictions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Churn Risk Tahminleri</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Churn Risk Tahminleri</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Ayrılma riski yüksek kullanıcılar ve önerilen aksiyonlar
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-4">
                 {churnPredictions.map((prediction) => (
                   <div
@@ -560,18 +504,18 @@ export default function AICenterPage() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
 
           {/* LTV Predictions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>LTV Tahminleri</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>LTV Tahminleri</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Segment bazlı yaşam boyu değer tahminleri
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-4">
                 {ltvPredictions.map((segment, index) => (
                   <div
@@ -600,20 +544,20 @@ export default function AICenterPage() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Anomalies Tab */}
         <TabsContent value="anomalies" className="space-y-4">
-          <Card>
-            <CardHeader>
+          <CanvaCard>
+            <CanvaCardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Anomali Tespiti</CardTitle>
-                  <CardDescription>
+                  <CanvaCardTitle>Anomali Tespiti</CanvaCardTitle>
+                  <CanvaCardSubtitle>
                     Olağandışı davranışlar ve sistem uyarıları
-                  </CardDescription>
+                  </CanvaCardSubtitle>
                 </div>
                 <CanvaButton
                   variant="primary"
@@ -624,8 +568,8 @@ export default function AICenterPage() {
                   Yenile
                 </CanvaButton>
               </div>
-            </CardHeader>
-            <CardContent>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               {anomalies.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
                   <CheckCircle className="h-12 w-12 mb-4 text-green-500" />
@@ -690,28 +634,28 @@ export default function AICenterPage() {
                   ))}
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* A/B Experiments Tab */}
         <TabsContent value="experiments" className="space-y-4">
-          <Card>
-            <CardHeader>
+          <CanvaCard>
+            <CanvaCardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>A/B Test Yönetimi</CardTitle>
-                  <CardDescription>
+                  <CanvaCardTitle>A/B Test Yönetimi</CanvaCardTitle>
+                  <CanvaCardSubtitle>
                     Aktif ve tamamlanmış deneyler
-                  </CardDescription>
+                  </CanvaCardSubtitle>
                 </div>
                 <CanvaButton>
                   <FlaskConical className="mr-2 h-4 w-4" />
                   Yeni Deney
                 </CanvaButton>
               </div>
-            </CardHeader>
-            <CardContent>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-6">
                 {experiments.map((exp) => (
                   <div key={exp.id} className="rounded-lg border p-4">
@@ -793,21 +737,21 @@ export default function AICenterPage() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Trends Tab */}
         <TabsContent value="trends" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Kategori Trendleri</CardTitle>
-                <CardDescription>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Kategori Trendleri</CanvaCardTitle>
+                <CanvaCardSubtitle>
                   Popüler hediye kategorileri ve değişimler
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+                </CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="space-y-4">
                   {categoryTrends.map((trend, i) => (
                     <div key={i} className="flex items-center justify-between">
@@ -835,17 +779,17 @@ export default function AICenterPage() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Talep Tahmini</CardTitle>
-                <CardDescription>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Talep Tahmini</CanvaCardTitle>
+                <CanvaCardSubtitle>
                   Önümüzdeki 7 günlük hediye talebi
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+                </CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={qualityTrend}>
@@ -863,8 +807,8 @@ export default function AICenterPage() {
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
         </TabsContent>
 
@@ -872,14 +816,14 @@ export default function AICenterPage() {
         <TabsContent value="quality" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             {/* Quality Trend */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Kanıt Doğruluk Trendi</CardTitle>
-                <CardDescription>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Kanıt Doğruluk Trendi</CanvaCardTitle>
+                <CanvaCardSubtitle>
                   Son 7 günlük ortalama doğrulama skoru
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+                </CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={qualityTrend}>
@@ -897,16 +841,16 @@ export default function AICenterPage() {
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
             {/* Content Distribution */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Kanıt Doğrulama Dağılımı</CardTitle>
-                <CardDescription>AI doğrulama sonuçları</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Kanıt Doğrulama Dağılımı</CanvaCardTitle>
+                <CanvaCardSubtitle>AI doğrulama sonuçları</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -945,8 +889,8 @@ export default function AICenterPage() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
         </TabsContent>
       </Tabs>

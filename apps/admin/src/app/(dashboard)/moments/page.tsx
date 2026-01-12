@@ -22,16 +22,7 @@ import {
   CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Select,
@@ -244,81 +235,44 @@ export default function MomentsPage() {
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Toplam Moment</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                data?.total || 0
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">Tüm momentler</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Onay Bekleyen</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">
-              {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                pendingCount
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">İnceleme bekliyor</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Onaylanan</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                moments.filter((m: Moment) => m.status === 'approved').length
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">Yayında</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Reddedilen</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                moments.filter((m: Moment) => m.status === 'rejected').length
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">Bu dönem</p>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          title="Toplam Moment"
+          value={isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : (data?.total || 0)}
+          subtitle="Tüm momentler"
+        />
+        <CanvaStatCard
+          title="Onay Bekleyen"
+          value={isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : pendingCount}
+          subtitle="İnceleme bekliyor"
+          valueClassName="text-yellow-600"
+        />
+        <CanvaStatCard
+          title="Onaylanan"
+          value={isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : moments.filter((m: Moment) => m.status === 'approved').length}
+          subtitle="Yayında"
+          valueClassName="text-green-600"
+        />
+        <CanvaStatCard
+          title="Reddedilen"
+          value={isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : moments.filter((m: Moment) => m.status === 'rejected').length}
+          subtitle="Bu dönem"
+          valueClassName="text-red-600"
+        />
       </div>
 
       {/* Moment List */}
-      <Card>
-        <CardHeader>
+      <CanvaCard>
+        <CanvaCardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>İçerik Moderasyonu</CardTitle>
-              <CardDescription>
+              <CanvaCardTitle>İçerik Moderasyonu</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Paylaşımları inceleyin, onaylayın veya reddedin
-              </CardDescription>
+              </CanvaCardSubtitle>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
+        </CanvaCardHeader>
+        <CanvaCardBody>
           {/* Filters */}
           <div className="mb-6 flex items-center gap-4">
             <div className="relative flex-1">
@@ -366,7 +320,7 @@ export default function MomentsPage() {
                 );
 
                 return (
-                  <Card key={moment.id} className="overflow-hidden">
+                  <CanvaCard key={moment.id} className="overflow-hidden">
                     {/* Image - Using SafeImage component for XSS protection */}
                     <div className="relative aspect-video bg-muted">
                       <SafeImage
@@ -386,7 +340,7 @@ export default function MomentsPage() {
                         </CanvaBadge>
                       </div>
                     </div>
-                    <CardContent className="p-4">
+                    <CanvaCardBody className="p-4">
                       <div className="mb-2 flex items-center gap-2">
                         <Avatar className="h-6 w-6">
                           <AvatarImage src={safeAvatarUrl} />
@@ -450,8 +404,8 @@ export default function MomentsPage() {
                           </>
                         )}
                       </div>
-                    </CardContent>
-                  </Card>
+                    </CanvaCardBody>
+                  </CanvaCard>
                 );
               })}
             </div>
@@ -466,8 +420,8 @@ export default function MomentsPage() {
               </p>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
 
       {/* Detail Dialog */}
       <Dialog
