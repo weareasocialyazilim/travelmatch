@@ -275,9 +275,9 @@ const techNavItems: NavItem[] = [
 const settingsNavItems: NavItem[] = [
   {
     title: 'Admin Yönetimi',
-    href: '/admin-users',
+    href: '/users',
     icon: UserCog,
-    resource: 'admin_users',
+    resource: 'users',
   },
   {
     title: 'Güvenlik',

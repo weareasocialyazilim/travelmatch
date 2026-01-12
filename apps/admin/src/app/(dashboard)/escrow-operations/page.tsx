@@ -82,17 +82,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { CanvaButton } from '@/components/canva/CanvaButton';
-import { CanvaInput } from '@/components/canva/CanvaInput';
-import {
-  CanvaCard,
-  CanvaCardHeader,
-  CanvaCardTitle,
-  CanvaCardSubtitle,
-  CanvaCardBody,
-  CanvaStatCard,
-} from '@/components/canva/CanvaCard';
-import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { formatCurrency, cn } from '@/lib/utils';
 import { AdminAreaChart, CHART_COLORS } from '@/components/common/admin-chart';
 
@@ -344,66 +333,66 @@ export default function EscrowOperationsPage() {
     switch (status) {
       case 'awaiting_proof':
         return (
-          <CanvaBadge
-            variant="primary"
+          <Badge
+            variant="outline"
             className="bg-amber-500/10 text-amber-600 border-amber-500/30"
           >
             <Timer className="h-3 w-3 mr-1" />
             Proof Bekleniyor
-          </CanvaBadge>
+          </Badge>
         );
       case 'proof_submitted':
         return (
-          <CanvaBadge
-            variant="primary"
+          <Badge
+            variant="outline"
             className="bg-blue-500/10 text-blue-600 border-blue-500/30"
           >
             <Eye className="h-3 w-3 mr-1" />
             Inceleniyor
-          </CanvaBadge>
+          </Badge>
         );
       case 'ready_to_release':
         return (
-          <CanvaBadge
-            variant="primary"
+          <Badge
+            variant="outline"
             className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
           >
             <CheckCircle2 className="h-3 w-3 mr-1" />
             Serbest Birakilabilir
-          </CanvaBadge>
+          </Badge>
         );
       case 'disputed':
         return (
-          <CanvaBadge
-            variant="primary"
+          <Badge
+            variant="outline"
             className="bg-red-500/10 text-red-600 border-red-500/30"
           >
             <AlertTriangle className="h-3 w-3 mr-1" />
             Anlasmazlik
-          </CanvaBadge>
+          </Badge>
         );
       case 'released':
         return (
-          <CanvaBadge
-            variant="primary"
+          <Badge
+            variant="outline"
             className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
           >
             <Unlock className="h-3 w-3 mr-1" />
             Serbest
-          </CanvaBadge>
+          </Badge>
         );
       case 'refunded':
         return (
-          <CanvaBadge
-            variant="primary"
+          <Badge
+            variant="outline"
             className="bg-gray-500/10 text-gray-600 border-gray-500/30"
           >
             <ArrowDownRight className="h-3 w-3 mr-1" />
             Iade Edildi
-          </CanvaBadge>
+          </Badge>
         );
       default:
-        return <CanvaBadge variant="primary">{status}</CanvaBadge>;
+        return <Badge variant="outline">{status}</Badge>;
     }
   };
 
@@ -426,30 +415,30 @@ export default function EscrowOperationsPage() {
     switch (status) {
       case 'completed':
         return (
-          <CanvaBadge className="bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20">
+          <Badge className="bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20">
             Tamamlandi
-          </CanvaBadge>
+          </Badge>
         );
       case 'processing':
         return (
-          <CanvaBadge className="bg-blue-500/10 text-blue-600 hover:bg-blue-500/20">
+          <Badge className="bg-blue-500/10 text-blue-600 hover:bg-blue-500/20">
             Isleniyor
-          </CanvaBadge>
+          </Badge>
         );
       case 'pending_kyc':
         return (
-          <CanvaBadge className="bg-amber-500/10 text-amber-600 hover:bg-amber-500/20">
+          <Badge className="bg-amber-500/10 text-amber-600 hover:bg-amber-500/20">
             KYC Bekliyor
-          </CanvaBadge>
+          </Badge>
         );
       case 'failed':
         return (
-          <CanvaBadge className="bg-red-500/10 text-red-600 hover:bg-red-500/20">
+          <Badge className="bg-red-500/10 text-red-600 hover:bg-red-500/20">
             Basarisiz
-          </CanvaBadge>
+          </Badge>
         );
       default:
-        return <CanvaBadge variant="primary">{status}</CanvaBadge>;
+        return <Badge variant="outline">{status}</Badge>;
     }
   };
 
@@ -474,14 +463,14 @@ export default function EscrowOperationsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <CanvaButton variant="primary" size="sm">
+          <Button variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
             Rapor Indir
-          </CanvaButton>
-          <CanvaButton size="sm">
+          </Button>
+          <Button size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             Yenile
-          </CanvaButton>
+          </Button>
         </div>
       </div>
 
@@ -586,9 +575,9 @@ export default function EscrowOperationsPage() {
                   <p className="text-xs text-muted-foreground mt-1">
                     {tier.description}
                   </p>
-                  <CanvaBadge variant="primary" className="mt-2 text-xs">
+                  <Badge variant="outline" className="mt-2 text-xs">
                     {tier.escrow}
-                  </CanvaBadge>
+                  </Badge>
                 </div>
               </div>
             ))}
@@ -639,9 +628,9 @@ export default function EscrowOperationsPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>Son Islemler</CardTitle>
-                  <CanvaButton variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm">
                     Tumunu Gor
-                  </CanvaButton>
+                  </Button>
                 </div>
               </CardHeader>
               <CardContent>
@@ -838,9 +827,9 @@ export default function EscrowOperationsPage() {
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <CanvaButton variant="ghost" size="sm">
+                          <Button variant="ghost" size="sm">
                             <MoreHorizontal className="h-4 w-4" />
-                          </CanvaButton>
+                          </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
@@ -959,10 +948,10 @@ export default function EscrowOperationsPage() {
                     KYC dogrulanmis kullanicilara odeme yapilacak
                   </CardDescription>
                 </div>
-                <CanvaButton size="sm">
+                <Button size="sm">
                   <Send className="h-4 w-4 mr-2" />
                   Toplu Odeme Yap
-                </CanvaButton>
+                </Button>
               </div>
             </CardHeader>
             <CardContent>
@@ -1002,34 +991,34 @@ export default function EscrowOperationsPage() {
                       </TableCell>
                       <TableCell>
                         {payout.kycStatus === 'verified' ? (
-                          <CanvaBadge className="bg-emerald-500/10 text-emerald-600">
+                          <Badge className="bg-emerald-500/10 text-emerald-600">
                             <UserCheck className="h-3 w-3 mr-1" />
                             Dogrulandi
-                          </CanvaBadge>
+                          </Badge>
                         ) : (
-                          <CanvaBadge className="bg-amber-500/10 text-amber-600">
+                          <Badge className="bg-amber-500/10 text-amber-600">
                             <Clock className="h-3 w-3 mr-1" />
                             Bekliyor
-                          </CanvaBadge>
+                          </Badge>
                         )}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {payout.requestedAt}
                       </TableCell>
                       <TableCell>
-                        <CanvaButton
+                        <Button
                           size="sm"
                           variant={
                             payout.kycStatus === 'verified'
-                              ? 'primary'
-                              : 'secondary'
+                              ? 'default'
+                              : 'outline'
                           }
                           disabled={payout.kycStatus !== 'verified'}
                         >
                           {payout.kycStatus === 'verified'
                             ? 'Odeme Yap'
                             : 'KYC Bekliyor'}
-                        </CanvaButton>
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -1062,16 +1051,18 @@ export default function EscrowOperationsPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <CanvaButton
-              variant="primary"
+            <Button
+              variant="outline"
               onClick={() =>
                 setActionDialog({ open: false, action: '', escrow: null })
               }
             >
               Iptal
-            </CanvaButton>
-            <CanvaButton
-              variant={actionDialog.action === 'dispute' ? 'danger' : 'primary'}
+            </Button>
+            <Button
+              variant={
+                actionDialog.action === 'dispute' ? 'destructive' : 'default'
+              }
               onClick={() => {
                 // Handle action
                 setActionDialog({ open: false, action: '', escrow: null });
@@ -1080,7 +1071,7 @@ export default function EscrowOperationsPage() {
               {actionDialog.action === 'release' && 'Serbest Birak'}
               {actionDialog.action === 'refund' && 'Iade Et'}
               {actionDialog.action === 'dispute' && 'Anlasmazlik Ac'}
-            </CanvaButton>
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

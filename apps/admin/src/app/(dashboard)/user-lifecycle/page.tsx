@@ -63,19 +63,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { AdminAreaChart, AdminBarChart } from '@/components/common/admin-chart';
+import { AdminAreaChart, AdminBarChart } from '@/components/charts';
 import { cn } from '@/lib/utils';
-import { CanvaButton } from '@/components/canva/CanvaButton';
-import { CanvaInput } from '@/components/canva/CanvaInput';
-import {
-  CanvaCard,
-  CanvaCardHeader,
-  CanvaCardTitle,
-  CanvaCardSubtitle,
-  CanvaCardBody,
-  CanvaStatCard,
-} from '@/components/canva/CanvaCard';
-import { CanvaBadge } from '@/components/canva/CanvaBadge';
 
 // Lifecycle stage stats
 const lifecycleStats = {
@@ -276,10 +265,10 @@ export default function UserLifecyclePage() {
               <SelectItem value="90d">90 Gün</SelectItem>
             </SelectContent>
           </Select>
-          <CanvaButton variant="primary">
+          <Button variant="outline">
             <Download className="h-4 w-4 mr-2" />
             Rapor
-          </CanvaButton>
+          </Button>
         </div>
       </div>
 
@@ -289,8 +278,8 @@ export default function UserLifecyclePage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <UserPlus className="h-5 w-5 text-blue-500" />
-              <CanvaBadge
-                variant="default"
+              <Badge
+                variant="outline"
                 className={cn(
                   lifecycleStats.newUsers.change > 0
                     ? 'text-green-500'
@@ -299,7 +288,7 @@ export default function UserLifecyclePage() {
               >
                 {lifecycleStats.newUsers.change > 0 ? '+' : ''}
                 {lifecycleStats.newUsers.change}%
-              </CanvaBadge>
+              </Badge>
             </div>
             <p className="text-2xl font-bold mt-2">
               {formatNumber(lifecycleStats.newUsers.count)}
@@ -314,9 +303,9 @@ export default function UserLifecyclePage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <UserCheck className="h-5 w-5 text-green-500" />
-              <CanvaBadge variant="default" className="text-green-500">
+              <Badge variant="outline" className="text-green-500">
                 +{lifecycleStats.activeUsers.change}%
-              </CanvaBadge>
+              </Badge>
             </div>
             <p className="text-2xl font-bold mt-2">
               {formatNumber(lifecycleStats.activeUsers.count)}
@@ -331,9 +320,9 @@ export default function UserLifecyclePage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <AlertTriangle className="h-5 w-5 text-yellow-500" />
-              <CanvaBadge variant="default" className="text-green-500">
+              <Badge variant="outline" className="text-green-500">
                 {lifecycleStats.atRiskUsers.change}%
-              </CanvaBadge>
+              </Badge>
             </div>
             <p className="text-2xl font-bold mt-2">
               {formatNumber(lifecycleStats.atRiskUsers.count)}
@@ -348,9 +337,9 @@ export default function UserLifecyclePage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <UserX className="h-5 w-5 text-red-500" />
-              <CanvaBadge variant="default" className="text-red-500">
+              <Badge variant="outline" className="text-red-500">
                 +{lifecycleStats.churnedUsers.change}%
-              </CanvaBadge>
+              </Badge>
             </div>
             <p className="text-2xl font-bold mt-2">
               {formatNumber(lifecycleStats.churnedUsers.count)}
@@ -365,9 +354,9 @@ export default function UserLifecyclePage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <RotateCcw className="h-5 w-5 text-purple-500" />
-              <CanvaBadge variant="default" className="text-green-500">
+              <Badge variant="outline" className="text-green-500">
                 +{lifecycleStats.reactivatedUsers.change}%
-              </CanvaBadge>
+              </Badge>
             </div>
             <p className="text-2xl font-bold mt-2">
               {formatNumber(lifecycleStats.reactivatedUsers.count)}
@@ -416,9 +405,9 @@ export default function UserLifecyclePage() {
                 <AdminAreaChart
                   data={dauTrend}
                   xAxisKey="date"
-                  areas={[
-                    { dataKey: 'dau', name: 'DAU', color: '#3b82f6' },
-                    { dataKey: 'wau', name: 'WAU', color: '#10b981' },
+                  series={[
+                    { key: 'dau', name: 'DAU', color: '#3b82f6' },
+                    { key: 'wau', name: 'WAU', color: '#10b981' },
                   ]}
                   height={250}
                 />
@@ -601,9 +590,9 @@ export default function UserLifecyclePage() {
                     <div className="p-2 rounded-lg bg-primary/10">
                       <stat.icon className="h-5 w-5 text-primary" />
                     </div>
-                    <CanvaBadge variant="default" className="text-green-500">
+                    <Badge variant="outline" className="text-green-500">
                       {stat.trend}
-                    </CanvaBadge>
+                    </Badge>
                   </div>
                   <p className="text-2xl font-bold mt-2">{stat.value}</p>
                   <p className="text-xs text-muted-foreground">
@@ -626,12 +615,8 @@ export default function UserLifecyclePage() {
               <AdminBarChart
                 data={retentionData}
                 xAxisKey="week"
-                bars={[
-                  {
-                    dataKey: 'retention',
-                    name: 'Retention %',
-                    color: '#3b82f6',
-                  },
+                series={[
+                  { key: 'retention', name: 'Retention %', color: '#3b82f6' },
                 ]}
                 height={300}
               />
@@ -725,10 +710,10 @@ export default function UserLifecyclePage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Yüksek Riskli Kullanıcılar</CardTitle>
-                <CanvaButton>
+                <Button>
                   <Bell className="h-4 w-4 mr-2" />
                   Toplu Kampanya
-                </CanvaButton>
+                </Button>
               </div>
             </CardHeader>
             <CardContent>
@@ -756,9 +741,7 @@ export default function UserLifecyclePage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <CanvaBadge variant="default">
-                          {user.segment}
-                        </CanvaBadge>
+                        <Badge variant="outline">{user.segment}</Badge>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
@@ -785,39 +768,36 @@ export default function UserLifecyclePage() {
                         {formatCurrency(user.ltv)}
                       </TableCell>
                       <TableCell>
-                        <CanvaBadge
-                          variant="default"
+                        <Badge
+                          variant="outline"
                           className="bg-yellow-500/10 text-yellow-700"
                         >
                           {user.reason}
-                        </CanvaBadge>
+                        </Badge>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          <CanvaButton
+                          <Button
                             variant="ghost"
-                            size="sm"
-                            iconOnly
+                            size="icon"
                             title="Push Gönder"
                           >
                             <Bell className="h-4 w-4" />
-                          </CanvaButton>
-                          <CanvaButton
+                          </Button>
+                          <Button
                             variant="ghost"
-                            size="sm"
-                            iconOnly
+                            size="icon"
                             title="Email Gönder"
                           >
                             <Mail className="h-4 w-4" />
-                          </CanvaButton>
-                          <CanvaButton
+                          </Button>
+                          <Button
                             variant="ghost"
-                            size="sm"
-                            iconOnly
+                            size="icon"
                             title="Hediye Gönder"
                           >
                             <Gift className="h-4 w-4" />
-                          </CanvaButton>
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -859,10 +839,10 @@ export default function UserLifecyclePage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Segment Detayları</CardTitle>
-                <CanvaButton variant="primary">
+                <Button variant="outline">
                   <Filter className="h-4 w-4 mr-2" />
                   Özel Segment Oluştur
-                </CanvaButton>
+                </Button>
               </div>
             </CardHeader>
             <CardContent>
@@ -898,10 +878,10 @@ export default function UserLifecyclePage() {
                         {segment.description}
                       </TableCell>
                       <TableCell className="text-right">
-                        <CanvaButton variant="ghost" size="sm">
+                        <Button variant="ghost" size="sm">
                           Kampanya
                           <ChevronRight className="h-4 w-4 ml-1" />
-                        </CanvaButton>
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
