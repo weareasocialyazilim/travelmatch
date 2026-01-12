@@ -20,8 +20,8 @@ import {
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
+import { CanvaButton } from '@/components/canva/CanvaButton';
 import {
   Dialog,
   DialogContent,
@@ -113,11 +113,11 @@ export function ProofReviewPanel({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
+    <div className="bg-card rounded-xl shadow-lg p-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold text-gray-900">Proof İnceleme</h2>
-        <Badge variant={getStatusVariant(proof.status) as any}>
+        <h2 className="text-xl font-bold text-foreground">Proof İnceleme</h2>
+        <CanvaBadge variant={getStatusVariant(proof.status) as any}>
           {proof.status === 'needs_review'
             ? 'İnceleme Bekliyor'
             : proof.status === 'verified'
@@ -125,7 +125,7 @@ export function ProofReviewPanel({
               : proof.status === 'rejected'
                 ? 'Reddedildi'
                 : 'Beklemede'}
-        </Badge>
+        </CanvaBadge>
       </div>
 
       {/* Media gallery */}
@@ -147,7 +147,7 @@ export function ProofReviewPanel({
       </div>
 
       {/* AI Analysis */}
-      <div className="bg-gray-50 rounded-lg p-4 mb-6">
+      <div className="bg-muted rounded-lg p-4 mb-6">
         <h3 className="font-semibold mb-3 flex items-center gap-2">
           <SparklesIcon className="w-5 h-5 text-amber-500" />
           AI Analizi
@@ -156,7 +156,7 @@ export function ProofReviewPanel({
         <div className="space-y-3">
           {/* Confidence Score */}
           <div className="flex justify-between items-center">
-            <span className="text-gray-600">Güven Skoru:</span>
+            <span className="text-muted-foreground">Güven Skoru:</span>
             <span
               className={cn(
                 'font-bold',
@@ -169,7 +169,7 @@ export function ProofReviewPanel({
 
           {/* Location Match */}
           <div className="flex justify-between items-center">
-            <span className="text-gray-600 flex items-center gap-1">
+            <span className="text-muted-foreground flex items-center gap-1">
               <MapPinIcon className="w-4 h-4" />
               Konum Eşleşmesi:
             </span>
@@ -182,7 +182,7 @@ export function ProofReviewPanel({
 
           {/* Date Match */}
           <div className="flex justify-between items-center">
-            <span className="text-gray-600 flex items-center gap-1">
+            <span className="text-muted-foreground flex items-center gap-1">
               <CalendarIcon className="w-4 h-4" />
               Tarih Doğrulaması:
             </span>
@@ -194,9 +194,9 @@ export function ProofReviewPanel({
           </div>
 
           {/* Scene Analysis */}
-          <div className="pt-2 border-t border-gray-200">
-            <span className="text-gray-600 text-sm">Sahne Analizi:</span>
-            <p className="text-gray-800 mt-1">
+          <div className="pt-2 border-t border-border">
+            <span className="text-muted-foreground text-sm">Sahne Analizi:</span>
+            <p className="text-foreground mt-1">
               {proof.aiAnalysis.sceneAnalysis}
             </p>
           </div>
@@ -248,26 +248,26 @@ export function ProofReviewPanel({
 
       {/* Actions */}
       <div className="flex gap-3">
-        <Button
+        <CanvaButton
           variant="default"
           className="flex-1 bg-emerald-500 hover:bg-emerald-600"
           onClick={onApprove}
         >
           <CheckIcon className="w-5 h-5 mr-2" />
           Onayla
-        </Button>
-        <Button
+        </CanvaButton>
+        <CanvaButton
           variant="outline"
           className="border-amber-500 text-amber-600 hover:bg-amber-50"
           onClick={() => setShowInfoModal(true)}
         >
           <QuestionMarkCircleIcon className="w-5 h-5 mr-2" />
           Daha Fazla Bilgi
-        </Button>
-        <Button variant="destructive" onClick={() => setShowRejectModal(true)}>
+        </CanvaButton>
+        <CanvaButton variant="danger" onClick={() => setShowRejectModal(true)}>
           <XMarkIcon className="w-5 h-5 mr-2" />
           Reddet
-        </Button>
+        </CanvaButton>
       </div>
 
       {/* Reject Modal */}
@@ -277,7 +277,7 @@ export function ProofReviewPanel({
             <DialogTitle>Proof'u Reddet</DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-foreground">
               Red Nedeni
             </label>
             <Textarea
@@ -291,12 +291,12 @@ export function ProofReviewPanel({
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowRejectModal(false)}>
+            <CanvaButton variant="outline" onClick={() => setShowRejectModal(false)}>
               İptal
-            </Button>
-            <Button variant="destructive" onClick={handleReject}>
+            </CanvaButton>
+            <CanvaButton variant="danger" onClick={handleReject}>
               Reddet
-            </Button>
+            </CanvaButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -308,7 +308,7 @@ export function ProofReviewPanel({
             <DialogTitle>Daha Fazla Bilgi İste</DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-foreground">
               Mesajınız
             </label>
             <Textarea
@@ -322,10 +322,10 @@ export function ProofReviewPanel({
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowInfoModal(false)}>
+            <CanvaButton variant="outline" onClick={() => setShowInfoModal(false)}>
               İptal
-            </Button>
-            <Button onClick={handleRequestInfo}>Gönder</Button>
+            </CanvaButton>
+            <CanvaButton onClick={handleRequestInfo}>Gönder</CanvaButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>

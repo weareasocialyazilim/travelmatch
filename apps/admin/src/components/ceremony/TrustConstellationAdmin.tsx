@@ -1,6 +1,11 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  CanvaCard,
+  CanvaCardBody,
+  CanvaCardHeader,
+  CanvaCardTitle,
+} from '@/components/canva/CanvaCard';
 import { useQuery } from '@tanstack/react-query';
 import { getClient } from '@/lib/supabase';
 
@@ -65,11 +70,11 @@ export function TrustConstellationAdmin() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       {/* Trust Score Distribution */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Trust Score Dagilimi</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <CanvaCard>
+        <CanvaCardHeader>
+          <CanvaCardTitle>Trust Score Dagilimi</CanvaCardTitle>
+        </CanvaCardHeader>
+        <CanvaCardBody>
           <div className="space-y-4">
             {tiers.map((tier) => {
               const count =
@@ -85,7 +90,7 @@ export function TrustConstellationAdmin() {
                     </span>
                     <span className="font-medium">{count} kullanici</span>
                   </div>
-                  <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-3 bg-muted rounded-full overflow-hidden">
                     <div
                       className={`h-full ${tier.color} transition-all`}
                       style={{ width: `${percentage}%` }}
@@ -95,15 +100,15 @@ export function TrustConstellationAdmin() {
               );
             })}
           </div>
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
 
       {/* Milestone Completion Rates */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Milestone Tamamlama Oranlari</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <CanvaCard>
+        <CanvaCardHeader>
+          <CanvaCardTitle>Milestone Tamamlama Oranlari</CanvaCardTitle>
+        </CanvaCardHeader>
+        <CanvaCardBody>
           <div className="space-y-4">
             {milestoneStats.map((milestone) => (
               <div key={milestone.id}>
@@ -111,7 +116,7 @@ export function TrustConstellationAdmin() {
                   <span>{milestone.label}</span>
                   <span className="font-medium">{milestone.percentage}%</span>
                 </div>
-                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-3 bg-muted rounded-full overflow-hidden">
                   <div
                     className={`h-full ${milestone.color} transition-all`}
                     style={{ width: `${milestone.percentage}%` }}
@@ -120,15 +125,15 @@ export function TrustConstellationAdmin() {
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
 
       {/* Constellation Visual Preview */}
-      <Card className="lg:col-span-2">
-        <CardHeader>
-          <CardTitle>Constellation Onizleme</CardTitle>
-        </CardHeader>
-        <CardContent className="flex justify-center py-8">
+      <CanvaCard className="lg:col-span-2">
+        <CanvaCardHeader>
+          <CanvaCardTitle>Constellation Onizleme</CanvaCardTitle>
+        </CanvaCardHeader>
+        <CanvaCardBody className="flex justify-center py-8">
           <div className="relative w-64 h-64">
             {/* SVG Constellation visualization */}
             <svg viewBox="0 0 200 200" className="w-full h-full">
@@ -211,8 +216,8 @@ export function TrustConstellationAdmin() {
               ID
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
     </div>
   );
 }
