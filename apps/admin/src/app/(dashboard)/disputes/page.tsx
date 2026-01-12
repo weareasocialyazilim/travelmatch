@@ -60,7 +60,7 @@ const typeConfig = {
   inappropriate: { label: 'Uygunsuz İçerik', color: 'text-yellow-600' },
   spam: { label: 'Spam', color: 'text-blue-600' },
   payment: { label: 'Ödeme', color: 'text-purple-600' },
-  other: { label: 'Diğer', color: 'text-gray-600' },
+  other: { label: 'Diğer', color: 'text-muted-foreground' },
 };
 
 export default function DisputesPage() {

@@ -384,22 +384,22 @@ export default function ModerationPage() {
       case 'low':
         return 'bg-blue-500';
       default:
-        return 'bg-gray-500';
+        return 'bg-muted-foreground';
     }
   }
 
   function getActionColor(action: string) {
     switch (action) {
       case 'blocked':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
       case 'allowed':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
       case 'flagged':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
       case 'sanitized':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
     }
   }
 
@@ -663,12 +663,12 @@ export default function ModerationPage() {
                       <CanvaBadge
                         className={
                           item.appeal_status === 'pending'
-                            ? 'bg-yellow-100 text-yellow-800'
+                            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
                             : item.appeal_status === 'approved'
-                              ? 'bg-green-100 text-green-800'
+                              ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                               : item.appeal_status === 'rejected'
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-gray-100 text-gray-800'
+                                ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                                : 'bg-muted text-foreground'
                         }
                       >
                         {item.appeal_status}
@@ -759,7 +759,7 @@ export default function ModerationPage() {
                       {warning.acknowledged ? (
                         <CheckCircle className="h-4 w-4 text-green-500" />
                       ) : (
-                        <XCircle className="h-4 w-4 text-gray-400" />
+                        <XCircle className="h-4 w-4 text-muted-foreground" />
                       )}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
@@ -895,11 +895,11 @@ export default function ModerationPage() {
                       </TableCell>
                       <TableCell>
                         {item.is_active ? (
-                          <CanvaBadge className="bg-green-100 text-green-800">
+                          <CanvaBadge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
                             Active
                           </CanvaBadge>
                         ) : (
-                          <CanvaBadge className="bg-gray-100 text-gray-800">
+                          <CanvaBadge className="bg-muted text-foreground">
                             Disabled
                           </CanvaBadge>
                         )}

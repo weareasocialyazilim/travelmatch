@@ -240,17 +240,17 @@ export default function NotificationsPage() {
     <div className="space-y-6 animate-pulse">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
-          <div className="h-8 w-64 bg-gray-200 rounded" />
-          <div className="h-4 w-48 bg-gray-100 rounded" />
+          <div className="h-8 w-64 bg-muted rounded" />
+          <div className="h-4 w-48 bg-muted rounded" />
         </div>
-        <div className="h-10 w-36 bg-gray-200 rounded" />
+        <div className="h-10 w-36 bg-muted rounded" />
       </div>
       <div className="grid gap-4 md:grid-cols-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-24 bg-gray-100 rounded-lg" />
+          <div key={i} className="h-24 bg-muted rounded-lg" />
         ))}
       </div>
-      <div className="h-96 bg-gray-100 rounded-lg" />
+      <div className="h-96 bg-muted rounded-lg" />
     </div>
   );
 
@@ -261,8 +261,8 @@ export default function NotificationsPage() {
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
           <AlertTriangle className="h-8 w-8 text-red-600" />
         </div>
-        <h2 className="text-xl font-semibold text-gray-900">Bir hata oluştu</h2>
-        <p className="text-gray-500 max-w-md">
+        <h2 className="text-xl font-semibold text-foreground">Bir hata oluştu</h2>
+        <p className="text-muted-foreground max-w-md">
           Bildirim verileri yüklenemedi. Lütfen tekrar deneyin.
         </p>
       </div>
@@ -271,15 +271,15 @@ export default function NotificationsPage() {
 
   // Empty State
   const EmptyState = () => (
-    <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-gray-200">
+    <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-border">
       <div className="text-center space-y-3">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-          <Bell className="h-6 w-6 text-gray-400" />
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+          <Bell className="h-6 w-6 text-muted-foreground" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900">
+        <h3 className="text-lg font-medium text-foreground">
           Henüz bildirim yok
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           İlk push bildiriminizi göndererek başlayın.
         </p>
         <CanvaButton variant="primary" onClick={() => setIsCreateOpen(true)}>
@@ -373,7 +373,7 @@ export default function NotificationsPage() {
               {/* Preview */}
               <div>
                 <Label>Önizleme</Label>
-                <div className="mt-2 rounded-lg border bg-gray-50 p-4 dark:bg-gray-900">
+                <div className="mt-2 rounded-lg border bg-muted p-4">
                   <div className="flex items-start gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
                       <Smartphone className="h-5 w-5 text-primary-foreground" />

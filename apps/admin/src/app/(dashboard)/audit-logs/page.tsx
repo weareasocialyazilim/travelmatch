@@ -431,7 +431,7 @@ export default function AuditLogsPage() {
                 {paginatedLogs.map((log) => {
                   const actionInfo = actionLabels[log.action] || {
                     label: log.action,
-                    color: 'bg-gray-100 text-gray-800',
+                    color: 'bg-muted text-foreground',
                     icon: History,
                   };
                   const ActionIcon = actionInfo.icon;

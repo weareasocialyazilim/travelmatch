@@ -251,7 +251,7 @@ export default function AuditTrailPage() {
       return <CheckCircle2 className="h-4 w-4 text-green-500" />;
     if (action.includes('release') || action.includes('refund'))
       return <DollarSign className="h-4 w-4 text-purple-500" />;
-    return <Activity className="h-4 w-4 text-gray-500" />;
+    return <Activity className="h-4 w-4 text-muted-foreground" />;
   };
 
   const getActionLabel = (action: string) => {
@@ -289,7 +289,7 @@ export default function AuditTrailPage() {
       support: 'Support',
     };
     return (
-      <CanvaBadge className={styles[role] || 'bg-gray-500/10 text-gray-500'}>
+      <CanvaBadge className={styles[role] || 'bg-muted text-muted-foreground'}>
         {labels[role] || role}
       </CanvaBadge>
     );

@@ -134,7 +134,7 @@ export default function OpsCenterPage() {
       case 'down':
         return 'bg-red-500';
       default:
-        return 'bg-gray-500';
+        return 'bg-muted-foreground';
     }
   };
 
@@ -157,7 +157,7 @@ export default function OpsCenterPage() {
             onClick={() => setIsLive(!isLive)}
           >
             <Circle
-              className={`mr-2 h-2 w-2 ${isLive ? 'fill-red-500 text-red-500 animate-pulse' : 'fill-gray-500 text-gray-500'}`}
+              className={`mr-2 h-2 w-2 ${isLive ? 'fill-red-500 text-red-500 animate-pulse' : 'fill-muted-foreground text-muted-foreground'}`}
             />
             {isLive ? 'Canlı' : 'Duraklatıldı'}
           </CanvaButton>
@@ -316,7 +316,7 @@ export default function OpsCenterPage() {
                     }`}
                   >
                     <div
-                      className={`flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 ${activity.color}`}
+                      className={`flex h-8 w-8 items-center justify-center rounded-full bg-muted ${activity.color}`}
                     >
                       <activity.icon className="h-4 w-4" />
                     </div>

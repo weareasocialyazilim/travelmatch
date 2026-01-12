@@ -314,20 +314,20 @@ export default function PromosPage() {
     <div className="space-y-6 animate-pulse">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
-          <div className="h-8 w-64 bg-gray-200 rounded" />
-          <div className="h-4 w-48 bg-gray-100 rounded" />
+          <div className="h-8 w-64 bg-muted rounded" />
+          <div className="h-4 w-48 bg-muted rounded" />
         </div>
         <div className="flex gap-2">
-          <div className="h-10 w-24 bg-gray-200 rounded" />
-          <div className="h-10 w-36 bg-gray-200 rounded" />
+          <div className="h-10 w-24 bg-muted rounded" />
+          <div className="h-10 w-36 bg-muted rounded" />
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-5">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-24 bg-gray-100 rounded-lg" />
+          <div key={i} className="h-24 bg-muted rounded-lg" />
         ))}
       </div>
-      <div className="h-96 bg-gray-100 rounded-lg" />
+      <div className="h-96 bg-muted rounded-lg" />
     </div>
   );
 
@@ -338,8 +338,8 @@ export default function PromosPage() {
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
           <AlertTriangle className="h-8 w-8 text-red-600" />
         </div>
-        <h2 className="text-xl font-semibold text-gray-900">Bir hata oluştu</h2>
-        <p className="text-gray-500 max-w-md">
+        <h2 className="text-xl font-semibold text-foreground">Bir hata oluştu</h2>
+        <p className="text-muted-foreground max-w-md">
           Promosyon verileri yüklenemedi. Lütfen sayfayı yenileyin veya daha
           sonra tekrar deneyin.
         </p>
@@ -356,15 +356,15 @@ export default function PromosPage() {
 
   // Empty State Component
   const EmptyState = () => (
-    <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-gray-200">
+    <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-border">
       <div className="text-center space-y-3">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-          <Gift className="h-6 w-6 text-gray-400" />
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+          <Gift className="h-6 w-6 text-muted-foreground" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900">
+        <h3 className="text-lg font-medium text-foreground">
           Henüz promosyon yok
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           İlk promosyon kodunuzu oluşturarak başlayın.
         </p>
         <CanvaButton
@@ -477,7 +477,7 @@ export default function PromosPage() {
                       value={newPromoValue}
                       onChange={(e) => setNewPromoValue(e.target.value)}
                     />
-                    <span className="text-gray-500">
+                    <span className="text-muted-foreground">
                       {promoType === 'percentage' ? '%' : '₺'}
                     </span>
                   </div>
@@ -826,7 +826,7 @@ export default function PromosPage() {
                       defaultValue="30"
                       className="w-24"
                     />
-                    <span className="text-gray-500">₺</span>
+                    <span className="text-muted-foreground">₺</span>
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -837,14 +837,14 @@ export default function PromosPage() {
                       defaultValue="20"
                       className="w-24"
                     />
-                    <span className="text-gray-500">₺</span>
+                    <span className="text-muted-foreground">₺</span>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center justify-between rounded-lg border border-gray-200 p-4">
+              <div className="flex items-center justify-between rounded-lg border border-border p-4">
                 <div className="space-y-1">
-                  <p className="font-medium text-gray-900">Abuse Detection</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="font-medium text-foreground">Abuse Detection</p>
+                  <p className="text-sm text-muted-foreground">
                     Kötüye kullanım tespiti ve otomatik engelleme
                   </p>
                 </div>

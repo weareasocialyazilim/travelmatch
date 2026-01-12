@@ -239,7 +239,7 @@ export default function TeamPage() {
             <CanvaCardBody className="pt-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-card">
                     <shift.icon className="h-5 w-5" />
                   </div>
                   <div>
@@ -370,7 +370,7 @@ export default function TeamPage() {
                             item.rank === 1
                               ? 'bg-yellow-100 text-yellow-600'
                               : item.rank === 2
-                                ? 'bg-gray-100 text-gray-600'
+                                ? 'bg-muted text-muted-foreground'
                                 : item.rank === 3
                                   ? 'bg-orange-100 text-orange-600'
                                   : 'bg-muted text-muted-foreground'

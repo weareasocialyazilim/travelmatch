@@ -465,20 +465,20 @@ export default function CompliancePage() {
     <div className="space-y-6 animate-pulse">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
-          <div className="h-8 w-48 bg-gray-200 rounded" />
-          <div className="h-4 w-64 bg-gray-100 rounded" />
+          <div className="h-8 w-48 bg-muted rounded" />
+          <div className="h-4 w-64 bg-muted rounded" />
         </div>
         <div className="flex gap-2">
-          <div className="h-10 w-24 bg-gray-200 rounded" />
-          <div className="h-8 w-32 bg-gray-200 rounded" />
+          <div className="h-10 w-24 bg-muted rounded" />
+          <div className="h-8 w-32 bg-muted rounded" />
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-5">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-28 bg-gray-100 rounded-lg" />
+          <div key={i} className="h-28 bg-muted rounded-lg" />
         ))}
       </div>
-      <div className="h-96 bg-gray-100 rounded-lg" />
+      <div className="h-96 bg-muted rounded-lg" />
     </div>
   );
 
@@ -489,8 +489,8 @@ export default function CompliancePage() {
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
           <AlertTriangle className="h-8 w-8 text-red-600" />
         </div>
-        <h2 className="text-xl font-semibold text-gray-900">Bir hata oluştu</h2>
-        <p className="text-gray-500 max-w-md">
+        <h2 className="text-xl font-semibold text-foreground">Bir hata oluştu</h2>
+        <p className="text-muted-foreground max-w-md">
           Uyumluluk verileri yüklenemedi. Lütfen tekrar deneyin.
         </p>
         <CanvaButton
@@ -1065,13 +1065,13 @@ export default function CompliancePage() {
                           'flex h-10 w-10 items-center justify-center rounded-full',
                           rule.active
                             ? 'bg-green-100 dark:bg-green-900/30'
-                            : 'bg-gray-100 dark:bg-gray-900/30',
+                            : 'bg-muted dark:bg-muted/30',
                         )}
                       >
                         <Shield
                           className={cn(
                             'h-5 w-5',
-                            rule.active ? 'text-green-600' : 'text-gray-400',
+                            rule.active ? 'text-green-600' : 'text-muted-foreground',
                           )}
                         />
                       </div>

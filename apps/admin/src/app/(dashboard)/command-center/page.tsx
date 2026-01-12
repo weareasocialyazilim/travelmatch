@@ -309,7 +309,7 @@ export default function CommandCenterPage() {
       case 'down':
         return 'text-red-500';
       default:
-        return 'text-gray-500';
+        return 'text-muted-foreground';
     }
   };
 

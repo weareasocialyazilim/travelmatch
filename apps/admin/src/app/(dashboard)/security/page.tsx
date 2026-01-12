@@ -434,13 +434,13 @@ export default function SecurityPage() {
                   <div
                     className={cn(
                       'flex h-12 w-12 items-center justify-center rounded-full',
-                      is2FAEnabled ? 'bg-green-100' : 'bg-gray-100',
+                      is2FAEnabled ? 'bg-green-100' : 'bg-muted',
                     )}
                   >
                     {is2FAEnabled ? (
                       <ShieldCheck className="h-6 w-6 text-green-600" />
                     ) : (
-                      <ShieldOff className="h-6 w-6 text-gray-400" />
+                      <ShieldOff className="h-6 w-6 text-muted-foreground" />
                     )}
                   </div>
                   <div>
@@ -525,10 +525,10 @@ export default function SecurityPage() {
                 {sessions.map((session) => (
                   <div
                     key={session.id}
-                    className="flex items-center justify-between p-4 hover:bg-gray-50"
+                    className="flex items-center justify-between p-4 hover:bg-muted"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
                         {getDeviceIcon(session.device_type)}
                       </div>
                       <div>
@@ -584,7 +584,7 @@ export default function SecurityPage() {
                 {loginHistory.map((login) => (
                   <div
                     key={login.id}
-                    className="flex items-center justify-between p-4 hover:bg-gray-50"
+                    className="flex items-center justify-between p-4 hover:bg-muted"
                   >
                     <div className="flex items-center gap-4">
                       <div
@@ -655,7 +655,7 @@ export default function SecurityPage() {
                   />
                   <button
                     type="button"
-                    className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-9 text-muted-foreground hover:text-foreground"
                     onClick={() =>
                       setShowPasswords({
                         ...showPasswords,
@@ -682,7 +682,7 @@ export default function SecurityPage() {
                   />
                   <button
                     type="button"
-                    className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-9 text-muted-foreground hover:text-foreground"
                     onClick={() =>
                       setShowPasswords({
                         ...showPasswords,
@@ -713,7 +713,7 @@ export default function SecurityPage() {
                   />
                   <button
                     type="button"
-                    className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-9 text-muted-foreground hover:text-foreground"
                     onClick={() =>
                       setShowPasswords({
                         ...showPasswords,
@@ -765,12 +765,12 @@ export default function SecurityPage() {
 
           {setupStep === 1 && (
             <div className="space-y-4">
-              <div className="flex justify-center p-4 bg-white rounded-lg border">
+              <div className="flex justify-center p-4 bg-card rounded-lg border">
                 {qrCode ? (
                   <img src={qrCode} alt="QR Code" className="w-48 h-48" />
                 ) : (
-                  <div className="w-48 h-48 bg-gray-100 rounded flex items-center justify-center">
-                    <QrCode className="h-12 w-12 text-gray-400" />
+                  <div className="w-48 h-48 bg-muted rounded flex items-center justify-center">
+                    <QrCode className="h-12 w-12 text-muted-foreground" />
                   </div>
                 )}
               </div>
@@ -779,7 +779,7 @@ export default function SecurityPage() {
                   Veya manuel olarak girin:
                 </p>
                 <div className="flex items-center justify-center gap-2">
-                  <code className="bg-gray-100 px-3 py-1 rounded font-mono text-sm">
+                  <code className="bg-muted px-3 py-1 rounded font-mono text-sm">
                     {secret}
                   </code>
                   <CanvaButton
@@ -817,7 +817,7 @@ export default function SecurityPage() {
                 {backupCodes.map((code, i) => (
                   <div
                     key={i}
-                    className="bg-gray-100 px-3 py-2 rounded font-mono text-sm text-center"
+                    className="bg-muted px-3 py-2 rounded font-mono text-sm text-center"
                   >
                     {code}
                   </div>

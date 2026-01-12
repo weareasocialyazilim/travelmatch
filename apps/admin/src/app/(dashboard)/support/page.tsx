@@ -289,22 +289,22 @@ export default function SupportPage() {
     <div className="space-y-6 animate-pulse">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
-          <div className="h-8 w-48 bg-gray-200 rounded" />
-          <div className="h-4 w-64 bg-gray-100 rounded" />
+          <div className="h-8 w-48 bg-muted rounded" />
+          <div className="h-4 w-64 bg-muted rounded" />
         </div>
         <div className="flex gap-2">
-          <div className="h-8 w-24 bg-gray-200 rounded" />
-          <div className="h-8 w-24 bg-gray-200 rounded" />
+          <div className="h-8 w-24 bg-muted rounded" />
+          <div className="h-8 w-24 bg-muted rounded" />
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-24 bg-gray-100 rounded-lg" />
+          <div key={i} className="h-24 bg-muted rounded-lg" />
         ))}
       </div>
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="h-[600px] bg-gray-100 rounded-lg" />
-        <div className="lg:col-span-2 h-[600px] bg-gray-100 rounded-lg" />
+        <div className="h-[600px] bg-muted rounded-lg" />
+        <div className="lg:col-span-2 h-[600px] bg-muted rounded-lg" />
       </div>
     </div>
   );
@@ -316,8 +316,8 @@ export default function SupportPage() {
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
           <AlertCircle className="h-8 w-8 text-red-600" />
         </div>
-        <h2 className="text-xl font-semibold text-gray-900">Bir hata oluştu</h2>
-        <p className="text-gray-500 max-w-md">
+        <h2 className="text-xl font-semibold text-foreground">Bir hata oluştu</h2>
+        <p className="text-muted-foreground max-w-md">
           Destek talepleri yüklenemedi. Lütfen tekrar deneyin.
         </p>
         <CanvaButton
@@ -552,7 +552,7 @@ export default function SupportPage() {
                 </div>
 
                 {/* User Info */}
-                <div className="mt-4 flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                <div className="mt-4 flex items-center justify-between rounded-lg bg-muted p-3">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
                       <AvatarFallback>
@@ -569,7 +569,7 @@ export default function SupportPage() {
                           ? selectedTicket.user.full_name
                           : selectedTicket.profiles?.full_name || 'Kullanıcı'}
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-muted-foreground">
                         {'user' in selectedTicket
                           ? selectedTicket.user.email
                           : selectedTicket.profiles?.email || ''}
@@ -617,7 +617,7 @@ export default function SupportPage() {
                               'max-w-[80%] rounded-2xl p-3',
                               message.sender === 'admin'
                                 ? 'bg-violet-500 text-white'
-                                : 'bg-gray-100',
+                                : 'bg-muted',
                             )}
                           >
                             <p className="text-sm">{message.content}</p>
@@ -626,7 +626,7 @@ export default function SupportPage() {
                                 'mt-1 flex items-center gap-2 text-xs',
                                 message.sender === 'admin'
                                   ? 'text-white/70'
-                                  : 'text-gray-500',
+                                  : 'text-muted-foreground',
                               )}
                             >
                               {message.sender === 'admin' && (
@@ -696,11 +696,11 @@ export default function SupportPage() {
           ) : (
             <div className="flex h-full items-center justify-center p-8 text-center">
               <div>
-                <MessageSquare className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-4 text-lg font-semibold text-gray-900">
+                <MessageSquare className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-4 text-lg font-semibold text-foreground">
                   Talep Seçin
                 </h3>
-                <p className="text-gray-500">
+                <p className="text-muted-foreground">
                   Detayları görüntülemek için bir talep seçin
                 </p>
               </div>

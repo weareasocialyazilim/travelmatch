@@ -466,8 +466,8 @@ export default function AICenterPage() {
                     className="flex items-start justify-between rounded-lg border p-4"
                   >
                     <div className="flex items-start gap-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100">
-                        <Users className="h-5 w-5 text-gray-600" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                        <Users className="h-5 w-5 text-muted-foreground" />
                       </div>
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
