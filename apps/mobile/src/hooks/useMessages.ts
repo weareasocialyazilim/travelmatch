@@ -459,43 +459,55 @@ export const useMessages = (): UseMessagesReturn => {
           )
             return;
 
-          // Decrypt message content if encrypted (async operation)
+          // Decrypt message content if encrypted (async operation with error handling)
           const processMessage = async () => {
-            const decryptedContent = await decryptRealtimeMessage(
-              String(dbMessage.content || ''),
-              String(dbMessage.sender_id || ''),
-              currentUserId || '',
-              dbMessage.nonce,
-              dbMessage.sender_public_key,
-              dbMessage.metadata,
-            );
+            try {
+              // Early exit if unmounted before async work
+              if (!mountedRef.current) return;
 
-            const newMessage: Message = {
-              id: String(dbMessage.id || ''),
-              conversationId: String(dbMessage.conversation_id || ''),
-              senderId: String(dbMessage.sender_id || ''),
-              content: decryptedContent,
-              type: (dbMessage.type as MessageType) || 'text',
-              metadata: null,
-              readAt: dbMessage.read_at ? String(dbMessage.read_at) : null,
-              imageUrl: dbMessage.image_url
-                ? String(dbMessage.image_url)
-                : undefined,
-              location: dbMessage.location ?? undefined,
-              createdAt: String(
-                dbMessage.created_at || new Date().toISOString(),
-              ),
-              status: 'sent' as MessageStatus,
-            };
+              const decryptedContent = await decryptRealtimeMessage(
+                String(dbMessage.content || ''),
+                String(dbMessage.sender_id || ''),
+                currentUserId || '',
+                dbMessage.nonce,
+                dbMessage.sender_public_key,
+                dbMessage.metadata,
+              );
 
-            if (!mountedRef.current) return;
+              // Check again after async work
+              if (!mountedRef.current) return;
 
-            // Add message if not already in list (avoid duplicates)
-            setMessages((prev) => {
-              const exists = prev.some((msg) => msg.id === newMessage.id);
-              if (exists) return prev;
-              return [newMessage, ...prev];
-            });
+              const newMessage: Message = {
+                id: String(dbMessage.id || ''),
+                conversationId: String(dbMessage.conversation_id || ''),
+                senderId: String(dbMessage.sender_id || ''),
+                content: decryptedContent,
+                type: (dbMessage.type as MessageType) || 'text',
+                metadata: null,
+                readAt: dbMessage.read_at ? String(dbMessage.read_at) : null,
+                imageUrl: dbMessage.image_url
+                  ? String(dbMessage.image_url)
+                  : undefined,
+                location: dbMessage.location ?? undefined,
+                createdAt: String(
+                  dbMessage.created_at || new Date().toISOString(),
+                ),
+                status: 'sent' as MessageStatus,
+              };
+
+              // Add message if not already in list (avoid duplicates)
+              setMessages((prev) => {
+                const exists = prev.some((msg) => msg.id === newMessage.id);
+                if (exists) return prev;
+                return [newMessage, ...prev];
+              });
+            } catch (error) {
+              logger.error(
+                'useMessages',
+                'Failed to process realtime message',
+                { error },
+              );
+            }
           };
 
           void processMessage();
@@ -513,33 +525,43 @@ export const useMessages = (): UseMessagesReturn => {
           )
             return;
 
-          // Decrypt updated message content if encrypted
+          // Decrypt updated message content if encrypted (with error handling)
           const processUpdate = async () => {
-            const decryptedContent = await decryptRealtimeMessage(
-              String(dbMessage.content || ''),
-              String(dbMessage.sender_id || ''),
-              currentUserId || '',
-              dbMessage.nonce,
-              dbMessage.sender_public_key,
-              dbMessage.metadata,
-            );
+            try {
+              // Early exit if unmounted
+              if (!mountedRef.current) return;
 
-            if (!mountedRef.current) return;
+              const decryptedContent = await decryptRealtimeMessage(
+                String(dbMessage.content || ''),
+                String(dbMessage.sender_id || ''),
+                currentUserId || '',
+                dbMessage.nonce,
+                dbMessage.sender_public_key,
+                dbMessage.metadata,
+              );
 
-            setMessages((prev) =>
-              prev.map((msg) => {
-                if (msg.id === String(dbMessage.id || '')) {
-                  return {
-                    ...msg,
-                    content: decryptedContent,
-                    readAt: dbMessage.read_at
-                      ? String(dbMessage.read_at)
-                      : null,
-                  };
-                }
-                return msg;
-              }),
-            );
+              // Check again after async work
+              if (!mountedRef.current) return;
+
+              setMessages((prev) =>
+                prev.map((msg) => {
+                  if (msg.id === String(dbMessage.id || '')) {
+                    return {
+                      ...msg,
+                      content: decryptedContent,
+                      readAt: dbMessage.read_at
+                        ? String(dbMessage.read_at)
+                        : null,
+                    };
+                  }
+                  return msg;
+                }),
+              );
+            } catch (error) {
+              logger.error('useMessages', 'Failed to process message update', {
+                error,
+              });
+            }
           };
 
           void processUpdate();

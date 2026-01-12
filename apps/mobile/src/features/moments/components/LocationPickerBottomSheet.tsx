@@ -97,10 +97,14 @@ export const LocationPickerBottomSheet: React.FC<
         // Use proximity parameter to sort results by distance from selected location
         const proximityParam = `&proximity=${selectedLocation.longitude},${selectedLocation.latitude}`;
 
+        // Focus search on Turkey for better local results
+        // Use bbox for Turkey bounds: SW (25.6, 35.8) to NE (44.8, 42.1)
+        const turkeyBbox = '&bbox=25.6,35.8,44.8,42.1';
+
         // Search for POIs (restaurants, cafes, bars, hotels) and places
         const response = await fetch(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?` +
-            `types=poi,place,address,locality&limit=10&language=tr,en${proximityParam}&access_token=${MAPBOX_ACCESS_TOKEN}`,
+            `types=poi,place,address,locality&limit=10&language=tr,en${proximityParam}${turkeyBbox}&access_token=${MAPBOX_ACCESS_TOKEN}`,
         );
 
         if (!response.ok) {

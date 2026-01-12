@@ -53,6 +53,8 @@ interface UsePaymentsReturn {
   balance: WalletBalance | null;
   /** Whether balance is currently loading */
   balanceLoading: boolean;
+  /** Error message if balance loading failed */
+  balanceError: string | null;
   /** Refresh the wallet balance */
   refreshBalance: () => Promise<void>;
 
@@ -148,6 +150,7 @@ export const usePayments = (): UsePaymentsReturn => {
   // Wallet state
   const [balance, setBalance] = useState<WalletBalance | null>(null);
   const [balanceLoading, setBalanceLoading] = useState(true);
+  const [balanceError, setBalanceError] = useState<string | null>(null);
 
   // Transactions state
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -174,6 +177,7 @@ export const usePayments = (): UsePaymentsReturn => {
   const refreshBalance = useCallback(async () => {
     try {
       setBalanceLoading(true);
+      setBalanceError(null);
       const response = await retryWithErrorHandling(
         () => walletService.getBalance(),
         { context: 'refreshBalance', maxRetries: 2 },
@@ -186,6 +190,7 @@ export const usePayments = (): UsePaymentsReturn => {
     } catch (error) {
       const standardizedError = ErrorHandler.handle(error, 'refreshBalance');
       logger.error('Failed to fetch balance:', standardizedError);
+      setBalanceError('Bakiye yüklenemedi. Lütfen tekrar deneyin.');
     } finally {
       setBalanceLoading(false);
     }
@@ -480,6 +485,7 @@ export const usePayments = (): UsePaymentsReturn => {
     // Wallet
     balance,
     balanceLoading,
+    balanceError,
     refreshBalance,
 
     // Transactions

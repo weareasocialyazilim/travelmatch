@@ -53,7 +53,7 @@ export const ArchivedChatsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { t } = useTranslation();
 
-  // TODO: Replace with real backend data when is_archived column is added
+  // Archive feature planned for v1.1 - using placeholder data for now
   const [archivedChats, setArchivedChats] = useState<ArchivedChat[]>([
     {
       id: '1',

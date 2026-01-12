@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -15,7 +16,8 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { SkeletonList } from '@/components/ui';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { COLORS } from '@/constants/colors';
-import { useMoments } from '@/hooks/useMoments';
+import { useMoments, type Moment } from '@/hooks/useMoments';
+import { DeleteMomentDialog } from '@/features/moments/components/DeleteMomentDialog';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { Moment as MomentType } from '../types';
 import type { NavigationProp } from '@react-navigation/native';
@@ -27,7 +29,19 @@ const MyMomentsScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('active');
   const { props: a11y } = useAccessibility();
 
-  const { myMoments, myMomentsLoading, loadMyMoments } = useMoments();
+  const {
+    myMoments,
+    myMomentsLoading,
+    loadMyMoments,
+    deleteMoment,
+    pauseMoment,
+    activateMoment,
+  } = useMoments();
+
+  // Delete dialog state
+  const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
+  const [momentToDelete, setMomentToDelete] = useState<Moment | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     loadMyMoments();
@@ -132,6 +146,56 @@ const MyMomentsScreen: React.FC = () => {
   const handleCreateMoment = () => {
     navigation.navigate('CreateMoment');
   };
+
+  // Handle edit moment
+  const handleEditMoment = useCallback(
+    (moment: Moment) => {
+      navigation.navigate('EditMoment', { momentId: moment.id });
+    },
+    [navigation],
+  );
+
+  // Handle delete moment - show confirmation dialog
+  const handleDeleteMoment = useCallback((moment: Moment) => {
+    setMomentToDelete(moment);
+    setDeleteDialogVisible(true);
+  }, []);
+
+  // Confirm delete
+  const confirmDelete = useCallback(async () => {
+    if (!momentToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      const success = await deleteMoment(momentToDelete.id);
+      if (success) {
+        setDeleteDialogVisible(false);
+        setMomentToDelete(null);
+      } else {
+        Alert.alert('Hata', 'Moment silinemedi. Lütfen tekrar deneyin.');
+      }
+    } finally {
+      setIsDeleting(false);
+    }
+  }, [momentToDelete, deleteMoment]);
+
+  // Handle pause/activate moment
+  const handleToggleStatus = useCallback(
+    async (moment: Moment) => {
+      if (moment.status === 'active') {
+        const success = await pauseMoment(moment.id);
+        if (!success) {
+          Alert.alert('Hata', 'Moment duraklatılamadı.');
+        }
+      } else if (moment.status === 'paused') {
+        const success = await activateMoment(moment.id);
+        if (!success) {
+          Alert.alert('Hata', 'Moment aktifleştirilemedi.');
+        }
+      }
+    },
+    [pauseMoment, activateMoment],
+  );
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -239,62 +303,122 @@ const MyMomentsScreen: React.FC = () => {
           />
         ) : (
           moments.map((moment) => (
-            <TouchableOpacity
-              key={moment.id}
-              style={styles.momentCard}
-              onPress={() => handleMomentPress(moment)}
-              activeOpacity={0.7}
-            >
-              <Image
-                source={{ uri: moment.image || moment.images?.[0] }}
-                style={styles.momentImage}
-              />
-              <View style={styles.momentContent}>
-                <View style={styles.momentHeader}>
-                  <Text style={styles.momentTitle} numberOfLines={1}>
-                    {moment.title}
-                  </Text>
-                  {getStatusBadge(moment.status, moment.requestCount)}
-                </View>
-                <View style={styles.momentLocation}>
-                  <MaterialCommunityIcons
-                    name="map-marker"
-                    size={14}
-                    color={COLORS.text.secondary}
-                  />
-                  <Text style={styles.momentLocationText}>
-                    {typeof moment.location === 'string'
-                      ? moment.location
-                      : `${moment.location.city}, ${moment.location.country}`}
-                  </Text>
-                </View>
-                <View style={styles.momentFooter}>
-                  <Text style={styles.momentPrice}>
-                    ${moment.price ?? moment.pricePerGuest}
-                  </Text>
-                  {moment.status === 'completed' && moment.rating && (
-                    <View style={styles.ratingContainer}>
-                      <MaterialCommunityIcons
-                        name="star"
-                        size={14}
-                        color={COLORS.softOrange}
-                      />
-                      <Text style={styles.ratingText}>{moment.rating}.0</Text>
-                    </View>
-                  )}
-                  {moment.status === 'completed' && moment.completedDate && (
-                    <Text style={styles.completedDate}>
-                      {moment.completedDate}
+            <View key={moment.id} style={styles.momentCardContainer}>
+              <TouchableOpacity
+                style={styles.momentCard}
+                onPress={() => handleMomentPress(moment)}
+                activeOpacity={0.7}
+              >
+                <Image
+                  source={{ uri: moment.image || moment.images?.[0] }}
+                  style={styles.momentImage}
+                />
+                <View style={styles.momentContent}>
+                  <View style={styles.momentHeader}>
+                    <Text style={styles.momentTitle} numberOfLines={1}>
+                      {moment.title}
                     </Text>
-                  )}
+                    {getStatusBadge(moment.status, moment.requestCount)}
+                  </View>
+                  <View style={styles.momentLocation}>
+                    <MaterialCommunityIcons
+                      name="map-marker"
+                      size={14}
+                      color={COLORS.text.secondary}
+                    />
+                    <Text style={styles.momentLocationText}>
+                      {typeof moment.location === 'string'
+                        ? moment.location
+                        : `${moment.location.city}, ${moment.location.country}`}
+                    </Text>
+                  </View>
+                  <View style={styles.momentFooter}>
+                    <Text style={styles.momentPrice}>
+                      ${moment.price ?? moment.pricePerGuest}
+                    </Text>
+                    {moment.status === 'completed' && moment.rating && (
+                      <View style={styles.ratingContainer}>
+                        <MaterialCommunityIcons
+                          name="star"
+                          size={14}
+                          color={COLORS.softOrange}
+                        />
+                        <Text style={styles.ratingText}>{moment.rating}.0</Text>
+                      </View>
+                    )}
+                    {moment.status === 'completed' && moment.completedDate && (
+                      <Text style={styles.completedDate}>
+                        {moment.completedDate}
+                      </Text>
+                    )}
+                  </View>
                 </View>
-              </View>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={20}
-                color={COLORS.softGray}
-              />
-            </TouchableOpacity>
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={20}
+                  color={COLORS.softGray}
+                />
+              </TouchableOpacity>
+
+              {/* Action Buttons - only for active/paused/draft moments */}
+              {['active', 'paused', 'draft'].includes(moment.status) && (
+                <View style={styles.actionButtons}>
+                  {/* Pause/Activate Toggle */}
+                  {(moment.status === 'active' ||
+                    moment.status === 'paused') && (
+                    <TouchableOpacity
+                      style={[styles.actionButton, styles.toggleButton]}
+                      onPress={() => handleToggleStatus(moment)}
+                    >
+                      <MaterialCommunityIcons
+                        name={moment.status === 'active' ? 'pause' : 'play'}
+                        size={16}
+                        color={COLORS.text.secondary}
+                      />
+                      <Text style={styles.actionButtonText}>
+                        {moment.status === 'active'
+                          ? 'Duraklat'
+                          : 'Aktifleştir'}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+
+                  {/* Edit Button */}
+                  <TouchableOpacity
+                    style={[styles.actionButton, styles.editButton]}
+                    onPress={() => handleEditMoment(moment)}
+                  >
+                    <MaterialCommunityIcons
+                      name="pencil"
+                      size={16}
+                      color={COLORS.brand.secondary}
+                    />
+                    <Text
+                      style={[styles.actionButtonText, styles.editButtonText]}
+                    >
+                      Düzenle
+                    </Text>
+                  </TouchableOpacity>
+
+                  {/* Delete Button */}
+                  <TouchableOpacity
+                    style={[styles.actionButton, styles.deleteButton]}
+                    onPress={() => handleDeleteMoment(moment)}
+                  >
+                    <MaterialCommunityIcons
+                      name="trash-can-outline"
+                      size={16}
+                      color={COLORS.feedback.error}
+                    />
+                    <Text
+                      style={[styles.actionButtonText, styles.deleteButtonText]}
+                    >
+                      Sil
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
           ))
         )}
 
@@ -323,6 +447,18 @@ const MyMomentsScreen: React.FC = () => {
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteMomentDialog
+        visible={deleteDialogVisible}
+        onClose={() => {
+          setDeleteDialogVisible(false);
+          setMomentToDelete(null);
+        }}
+        onConfirm={confirmDelete}
+        momentTitle={momentToDelete?.title || ''}
+        isDeleting={isDeleting}
+      />
     </SafeAreaView>
   );
 };
@@ -538,6 +674,48 @@ const styles = StyleSheet.create({
 
   bottomSpacer: {
     height: 40,
+  },
+
+  // Moment card container for action buttons
+  momentCardContainer: {
+    marginBottom: 16,
+  },
+
+  // Action buttons row
+  actionButtons: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 8,
+    marginTop: 8,
+    paddingHorizontal: 4,
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    gap: 4,
+  },
+  toggleButton: {
+    backgroundColor: COLORS.surface.base,
+  },
+  editButton: {
+    backgroundColor: COLORS.brand.secondaryTransparent,
+  },
+  deleteButton: {
+    backgroundColor: COLORS.feedback.error + '15',
+  },
+  actionButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.text.secondary,
+  },
+  editButtonText: {
+    color: COLORS.brand.secondary,
+  },
+  deleteButtonText: {
+    color: COLORS.feedback.error,
   },
 });
 

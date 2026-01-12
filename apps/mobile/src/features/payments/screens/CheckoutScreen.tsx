@@ -12,7 +12,7 @@
  * - Aesthetic for GenZ (glass effects, neon accents)
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -20,6 +20,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -36,6 +37,7 @@ import { usePayments } from '@/hooks/usePayments';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { PaymentSecurityBadge } from '../components/PaymentSecurityBadge';
+import { NetworkGuard } from '@/components/NetworkGuard';
 import { logger } from '@/utils/logger';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { NavigationProp } from '@react-navigation/native';
@@ -65,7 +67,18 @@ const CheckoutScreen: React.FC = () => {
     title: momentTitle,
   } = route.params || {};
 
-  const { cards, createPaymentIntent, confirmPayment } = usePayments();
+  const {
+    cards,
+    balance,
+    refreshBalance,
+    createPaymentIntent,
+    confirmPayment,
+  } = usePayments();
+
+  // Refresh balance on mount for wallet payments
+  useEffect(() => {
+    refreshBalance();
+  }, [refreshBalance]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('tr-TR', {
@@ -105,19 +118,96 @@ const CheckoutScreen: React.FC = () => {
       : []),
   ];
 
+  // Double-tap protection ref - prevents multiple submissions even if state update is slow
+  const isSubmittingRef = useRef(false);
+
+  // Payment timeout constant (30 seconds)
+  const PAYMENT_TIMEOUT_MS = 30000;
+
+  // Helper to create timeout promise
+  const withTimeout = <T,>(promise: Promise<T>, ms: number): Promise<T> => {
+    return Promise.race([
+      promise,
+      new Promise<T>((_, reject) =>
+        setTimeout(() => reject(new Error('TIMEOUT')), ms),
+      ),
+    ]);
+  };
+
+  // Get user-friendly error message based on error type
+  const getErrorMessage = (error: unknown): string => {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    if (errorMessage === 'TIMEOUT') {
+      return 'İşlem zaman aşımına uğradı. Lütfen internet bağlantınızı kontrol edip tekrar deneyin.';
+    }
+    if (
+      errorMessage.toLowerCase().includes('insufficient') ||
+      errorMessage.toLowerCase().includes('yetersiz')
+    ) {
+      return 'Yetersiz bakiye. Lütfen cüzdanınıza para yükleyin.';
+    }
+    if (
+      errorMessage.toLowerCase().includes('network') ||
+      errorMessage.toLowerCase().includes('fetch')
+    ) {
+      return 'Bağlantı hatası. Lütfen internet bağlantınızı kontrol edin.';
+    }
+    if (
+      errorMessage.toLowerCase().includes('declined') ||
+      errorMessage.toLowerCase().includes('reddedildi')
+    ) {
+      return 'Ödeme reddedildi. Lütfen farklı bir ödeme yöntemi deneyin.';
+    }
+    return 'Ödeme başarısız oldu. Lütfen tekrar deneyin.';
+  };
+
   const handlePayment = useCallback(async () => {
+    // Double-tap protection: check ref immediately before any async work
+    if (isSubmittingRef.current) {
+      logger.warn('[Checkout] Double-tap prevented');
+      return;
+    }
     if (!selectedMethod || isProcessing || !momentId) return;
 
+    // Pre-validation: Check wallet balance if wallet is selected
+    if (selectedMethod === 'wallet') {
+      const walletBalance = balance?.available ?? 0;
+      const paymentAmount = amount ?? 0;
+
+      if (walletBalance < paymentAmount) {
+        HapticManager.error();
+        Alert.alert(
+          'Yetersiz Bakiye',
+          `Cüzdan bakiyeniz (${formatCurrency(walletBalance)}) ödeme tutarından (${formatCurrency(paymentAmount)}) az. Lütfen cüzdanınıza para yükleyin veya farklı bir ödeme yöntemi seçin.`,
+          [{ text: 'Tamam', style: 'default' }],
+        );
+        return;
+      }
+    }
+
+    // Lock submission immediately
+    isSubmittingRef.current = true;
     setIsProcessing(true);
     HapticManager.buttonPress();
 
     try {
-      const paymentIntent = await createPaymentIntent(momentId, amount || 0);
+      // Create payment intent with timeout protection
+      const paymentIntent = await withTimeout(
+        createPaymentIntent(momentId, amount || 0),
+        PAYMENT_TIMEOUT_MS,
+      );
+
       if (!paymentIntent) {
         throw new Error('Failed to create payment intent');
       }
 
-      const success = await confirmPayment(paymentIntent.id, selectedMethod);
+      // Confirm payment with timeout protection
+      const success = await withTimeout(
+        confirmPayment(paymentIntent.id, selectedMethod),
+        PAYMENT_TIMEOUT_MS,
+      );
+
       if (!success) {
         throw new Error('Payment confirmation failed');
       }
@@ -135,171 +225,184 @@ const CheckoutScreen: React.FC = () => {
         amount,
       });
       HapticManager.error();
+
+      const userFriendlyMessage = getErrorMessage(paymentError);
       navigation.navigate('PaymentFailed', {
-        error: 'Ödeme başarısız oldu. Lütfen tekrar deneyin.',
+        error: userFriendlyMessage,
       });
     } finally {
       setIsProcessing(false);
+      isSubmittingRef.current = false; // Release lock
     }
   }, [
     selectedMethod,
     amount,
     momentId,
+    balance,
     createPaymentIntent,
     confirmPayment,
     navigation,
     isProcessing,
+    formatCurrency,
   ]);
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Ionicons name="chevron-back" size={28} color={COLORS.text.primary} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Ödeme Detayları</Text>
-        <View style={styles.headerSpacer} />
-      </View>
-
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Moment Summary Card - Liquid Glass */}
-        <GlassCard intensity={15} tint="light" style={styles.momentSummary}>
-          <Text style={styles.summaryLabel}>DENEYİM</Text>
-          <Text style={styles.summaryTitle}>
-            {momentTitle || recipientName || 'Premium Moment'}
-          </Text>
-          <View style={styles.divider} />
-          <View style={styles.priceRow}>
-            <Text style={styles.summaryLabel}>TOPLAM TUTAR</Text>
-            <Text style={styles.totalPrice}>{formatCurrency(amount || 0)}</Text>
-          </View>
-        </GlassCard>
-
-        {/* Security Badge - Trust Indicator */}
-        <View style={styles.section}>
-          <PaymentSecurityBadge mode="ESCROW" />
-        </View>
-
-        {/* Payment Method Selection */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>ÖDEME YÖNTEMİ</Text>
-
-          {methods.map((method) => (
-            <TouchableOpacity
-              key={method.id}
-              style={[
-                styles.methodSelector,
-                selectedMethod === method.id && styles.methodSelectorActive,
-              ]}
-              onPress={() => setSelectedMethod(method.id)}
-              activeOpacity={0.7}
-            >
-              <View style={styles.methodLeft}>
-                <View
-                  style={[
-                    styles.cardIcon,
-                    selectedMethod === method.id && styles.cardIconActive,
-                  ]}
-                >
-                  <Ionicons
-                    name={method.icon}
-                    size={20}
-                    color={
-                      selectedMethod === method.id
-                        ? COLORS.primary
-                        : COLORS.text.secondary
-                    }
-                  />
-                </View>
-                <View>
-                  <Text style={styles.methodText}>{method.name}</Text>
-                  {method.last4 && (
-                    <Text style={styles.methodSubtext}>
-                      •••• {method.last4}
-                    </Text>
-                  )}
-                </View>
-              </View>
-
-              {/* Radio Button */}
-              <View
-                style={[
-                  styles.radioButton,
-                  selectedMethod === method.id && styles.radioButtonActive,
-                ]}
-              >
-                {selectedMethod === method.id && (
-                  <View style={styles.radioButtonInner} />
-                )}
-              </View>
-            </TouchableOpacity>
-          ))}
-
-          {/* Add New Method */}
+    <NetworkGuard offlineMessage="Ödeme yapmak için internet bağlantısı gerekli">
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
           <TouchableOpacity
-            style={styles.addMethodButton}
-            onPress={() => navigation.navigate('PaymentMethods')}
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
           >
             <Ionicons
-              name="add-circle-outline"
-              size={20}
-              color={COLORS.primary}
+              name="chevron-back"
+              size={28}
+              color={COLORS.text.primary}
             />
-            <Text style={styles.addMethodText}>Yeni Yöntem Ekle</Text>
           </TouchableOpacity>
+          <Text style={styles.headerTitle}>Ödeme Detayları</Text>
+          <View style={styles.headerSpacer} />
         </View>
 
-        {/* Legal Note */}
-        <Text style={styles.legalNote}>
-          "Öde" butonuna basarak Kullanım Koşullarını ve İptal Politikasını
-          kabul etmiş sayılırsınız.
-        </Text>
-      </ScrollView>
-
-      {/* Footer - Pay Button */}
-      <View style={[styles.footer, { paddingBottom: insets.bottom + 20 }]}>
-        <TouchableOpacity
-          style={[styles.payButton, isProcessing && styles.payButtonDisabled]}
-          onPress={handlePayment}
-          disabled={isProcessing}
-          activeOpacity={0.9}
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
         >
-          <LinearGradient
-            colors={GRADIENTS.gift as readonly [string, string, ...string[]]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.payButtonGradient}
-          >
-            {isProcessing ? (
-              <ActivityIndicator color={COLORS.white} size="small" />
-            ) : (
-              <>
-                <Ionicons name="lock-closed" size={20} color={COLORS.white} />
-                <Text style={styles.payButtonText}>
-                  Şimdi Öde • {formatCurrency(amount || 0)}
-                </Text>
-              </>
-            )}
-          </LinearGradient>
-        </TouchableOpacity>
+          {/* Moment Summary Card - Liquid Glass */}
+          <GlassCard intensity={15} tint="light" style={styles.momentSummary}>
+            <Text style={styles.summaryLabel}>DENEYİM</Text>
+            <Text style={styles.summaryTitle}>
+              {momentTitle || recipientName || 'Premium Moment'}
+            </Text>
+            <View style={styles.divider} />
+            <View style={styles.priceRow}>
+              <Text style={styles.summaryLabel}>TOPLAM TUTAR</Text>
+              <Text style={styles.totalPrice}>
+                {formatCurrency(amount || 0)}
+              </Text>
+            </View>
+          </GlassCard>
 
-        <Text style={styles.securityText}>
-          <Ionicons
-            name="shield-checkmark"
-            size={12}
-            color={COLORS.trust.primary}
-          />{' '}
-          256-bit SSL ile şifrelenmiş güvenli ödeme
-        </Text>
+          {/* Security Badge - Trust Indicator */}
+          <View style={styles.section}>
+            <PaymentSecurityBadge mode="ESCROW" />
+          </View>
+
+          {/* Payment Method Selection */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>ÖDEME YÖNTEMİ</Text>
+
+            {methods.map((method) => (
+              <TouchableOpacity
+                key={method.id}
+                style={[
+                  styles.methodSelector,
+                  selectedMethod === method.id && styles.methodSelectorActive,
+                ]}
+                onPress={() => setSelectedMethod(method.id)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.methodLeft}>
+                  <View
+                    style={[
+                      styles.cardIcon,
+                      selectedMethod === method.id && styles.cardIconActive,
+                    ]}
+                  >
+                    <Ionicons
+                      name={method.icon}
+                      size={20}
+                      color={
+                        selectedMethod === method.id
+                          ? COLORS.primary
+                          : COLORS.text.secondary
+                      }
+                    />
+                  </View>
+                  <View>
+                    <Text style={styles.methodText}>{method.name}</Text>
+                    {method.last4 && (
+                      <Text style={styles.methodSubtext}>
+                        •••• {method.last4}
+                      </Text>
+                    )}
+                  </View>
+                </View>
+
+                {/* Radio Button */}
+                <View
+                  style={[
+                    styles.radioButton,
+                    selectedMethod === method.id && styles.radioButtonActive,
+                  ]}
+                >
+                  {selectedMethod === method.id && (
+                    <View style={styles.radioButtonInner} />
+                  )}
+                </View>
+              </TouchableOpacity>
+            ))}
+
+            {/* Add New Method */}
+            <TouchableOpacity
+              style={styles.addMethodButton}
+              onPress={() => navigation.navigate('PaymentMethods')}
+            >
+              <Ionicons
+                name="add-circle-outline"
+                size={20}
+                color={COLORS.primary}
+              />
+              <Text style={styles.addMethodText}>Yeni Yöntem Ekle</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Legal Note */}
+          <Text style={styles.legalNote}>
+            "Öde" butonuna basarak Kullanım Koşullarını ve İptal Politikasını
+            kabul etmiş sayılırsınız.
+          </Text>
+        </ScrollView>
+
+        {/* Footer - Pay Button */}
+        <View style={[styles.footer, { paddingBottom: insets.bottom + 20 }]}>
+          <TouchableOpacity
+            style={[styles.payButton, isProcessing && styles.payButtonDisabled]}
+            onPress={handlePayment}
+            disabled={isProcessing}
+            activeOpacity={0.9}
+          >
+            <LinearGradient
+              colors={GRADIENTS.gift as readonly [string, string, ...string[]]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.payButtonGradient}
+            >
+              {isProcessing ? (
+                <ActivityIndicator color={COLORS.white} size="small" />
+              ) : (
+                <>
+                  <Ionicons name="lock-closed" size={20} color={COLORS.white} />
+                  <Text style={styles.payButtonText}>
+                    Şimdi Öde • {formatCurrency(amount || 0)}
+                  </Text>
+                </>
+              )}
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <Text style={styles.securityText}>
+            <Ionicons
+              name="shield-checkmark"
+              size={12}
+              color={COLORS.trust.primary}
+            />{' '}
+            256-bit SSL ile şifrelenmiş güvenli ödeme
+          </Text>
+        </View>
       </View>
-    </View>
+    </NetworkGuard>
   );
 };
 

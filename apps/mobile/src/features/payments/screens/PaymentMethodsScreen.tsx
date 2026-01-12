@@ -250,7 +250,7 @@ const PaymentMethodsScreen = () => {
           setSelectedWallet(null);
         }}
         onSetDefault={() => {
-          // TODO: Implement set default wallet
+          // Feature planned for v1.1 - default wallet selection
           setIsWalletOptionsVisible(false);
         }}
         onConfigure={() => {
