@@ -1,27 +1,38 @@
-import { Logger } from '..//_shared/logger.ts';
-const logger = new Logger();
-
 /**
  * SendGrid Email Edge Function
  *
  * Handles transactional emails via SendGrid
  *
+ * SECURITY:
+ * - Requires authentication for most endpoints
+ * - Rate limited: 10 emails per minute per user
+ * - Verification/password-reset endpoints are service-role only
+ *
  * Endpoints:
- * - POST /send - Send email
- * - POST /template - Send template email
- * - POST /verification - Send verification code
- * - POST /password-reset - Send password reset
+ * - POST /send - Send email (auth required)
+ * - POST /template - Send template email (auth required)
+ * - POST /verification - Send verification code (service-role only)
+ * - POST /password-reset - Send password reset (service-role only)
+ * - POST /welcome - Send welcome email (service-role only)
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { corsHeaders } from '../_shared/cors.ts';
+import { createAdminClient, getAuthUser } from '../_shared/supabase.ts';
+import { getCorsHeaders } from '../_shared/cors.ts';
+import { Logger } from '../_shared/logger.ts';
+
+const logger = new Logger();
 
 const SENDGRID_API_KEY = Deno.env.get('SENDGRID_API_KEY');
 const SENDGRID_FROM_EMAIL =
   Deno.env.get('SENDGRID_FROM_EMAIL') || 'noreply@travelmatch.app';
 const SENDGRID_FROM_NAME = Deno.env.get('SENDGRID_FROM_NAME') || 'TravelMatch';
-
 const SENDGRID_API_BASE = 'https://api.sendgrid.com/v3';
+
+// Rate limiting: Track requests per user
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT = 10; // emails per minute
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
 
 interface EmailRecipient {
   email: string;
@@ -35,7 +46,27 @@ interface SendGridResponse {
 }
 
 /**
- * Make authenticated request to SendGrid API
+ * Check rate limit for user
+ */
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const userLimit = rateLimitMap.get(userId);
+
+  if (!userLimit || now > userLimit.resetAt) {
+    rateLimitMap.set(userId, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+
+  if (userLimit.count >= RATE_LIMIT) {
+    return false;
+  }
+
+  userLimit.count++;
+  return true;
+}
+
+/**
+ * Make authenticated request to SendGrid API with timeout
  */
 async function sendgridRequest(
   endpoint: string,
@@ -46,6 +77,9 @@ async function sendgridRequest(
     return { success: false, error: 'SendGrid API key not configured' };
   }
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
   try {
     const response = await fetch(`${SENDGRID_API_BASE}${endpoint}`, {
       method,
@@ -54,7 +88,10 @@ async function sendgridRequest(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     // SendGrid returns 202 for successful sends
     if (response.status === 202 || response.ok) {
@@ -71,6 +108,10 @@ async function sendgridRequest(
           ?.message || `SendGrid error: ${response.status}`,
     };
   } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      return { success: false, error: 'Request timed out' };
+    }
     logger.error('[SendGrid] Request error:', error);
     return {
       success: false,
@@ -208,7 +249,23 @@ async function sendWelcomeEmail(
   return sendEmail([to], "TravelMatch'a Hoş Geldiniz! 🎉", { html });
 }
 
+/**
+ * Check if request is from service role (internal calls)
+ */
+function isServiceRole(req: Request): boolean {
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader) return false;
+
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  if (!serviceRoleKey) return false;
+
+  return authHeader === `Bearer ${serviceRoleKey}`;
+}
+
 serve(async (req) => {
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -226,8 +283,56 @@ serve(async (req) => {
       });
     }
 
-    const body = await req.json();
+    // Check if this is a service-role-only endpoint
+    const serviceOnlyEndpoints = ['verification', 'password-reset', 'welcome'];
+    const isServiceEndpoint = serviceOnlyEndpoints.includes(path || '');
 
+    // For service-role-only endpoints, verify service role
+    if (isServiceEndpoint) {
+      if (!isServiceRole(req)) {
+        return new Response(
+          JSON.stringify({ error: 'This endpoint requires service role access' }),
+          {
+            status: 403,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          },
+        );
+      }
+    } else {
+      // For user endpoints, require authentication and apply rate limiting
+      const adminClient = createAdminClient();
+      const user = await getAuthUser(adminClient);
+
+      if (!user) {
+        return new Response(
+          JSON.stringify({ error: 'Authentication required' }),
+          {
+            status: 401,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          },
+        );
+      }
+
+      // Check rate limit
+      if (!checkRateLimit(user.id)) {
+        return new Response(
+          JSON.stringify({
+            error: 'Rate limit exceeded. Please try again in a minute.',
+            retryAfter: 60
+          }),
+          {
+            status: 429,
+            headers: {
+              ...corsHeaders,
+              'Content-Type': 'application/json',
+              'Retry-After': '60'
+            },
+          },
+        );
+      }
+    }
+
+    const body = await req.json();
     let result: SendGridResponse;
 
     switch (path) {
