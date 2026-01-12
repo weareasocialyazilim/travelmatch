@@ -49,15 +49,7 @@ import {
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { CanvaButton } from '@/components/canva/CanvaButton';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+// Card, Badge, Button replaced with Canva versions
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -343,66 +335,42 @@ export default function EscrowOperationsPage() {
     switch (status) {
       case 'awaiting_proof':
         return (
-          <Badge
-            variant="outline"
-            className="bg-amber-500/10 text-amber-600 border-amber-500/30"
-          >
-            <Timer className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="warning" icon={<Timer className="h-3 w-3" />}>
             Proof Bekleniyor
-          </Badge>
+          </CanvaBadge>
         );
       case 'proof_submitted':
         return (
-          <Badge
-            variant="outline"
-            className="bg-blue-500/10 text-blue-600 border-blue-500/30"
-          >
-            <Eye className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="info" icon={<Eye className="h-3 w-3" />}>
             Inceleniyor
-          </Badge>
+          </CanvaBadge>
         );
       case 'ready_to_release':
         return (
-          <Badge
-            variant="outline"
-            className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
-          >
-            <CheckCircle2 className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="success" icon={<CheckCircle2 className="h-3 w-3" />}>
             Serbest Birakilabilir
-          </Badge>
+          </CanvaBadge>
         );
       case 'disputed':
         return (
-          <Badge
-            variant="outline"
-            className="bg-red-500/10 text-red-600 border-red-500/30"
-          >
-            <AlertTriangle className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="danger" icon={<AlertTriangle className="h-3 w-3" />}>
             Anlasmazlik
-          </Badge>
+          </CanvaBadge>
         );
       case 'released':
         return (
-          <Badge
-            variant="outline"
-            className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
-          >
-            <Unlock className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="success" icon={<Unlock className="h-3 w-3" />}>
             Serbest
-          </Badge>
+          </CanvaBadge>
         );
       case 'refunded':
         return (
-          <Badge
-            variant="outline"
-            className="bg-gray-500/10 text-gray-600 border-gray-500/30"
-          >
-            <ArrowDownRight className="h-3 w-3 mr-1" />
+          <CanvaBadge variant="secondary" icon={<ArrowDownRight className="h-3 w-3" />}>
             Iade Edildi
-          </Badge>
+          </CanvaBadge>
         );
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <CanvaBadge variant="secondary">{status}</CanvaBadge>;
     }
   };
 
@@ -424,31 +392,15 @@ export default function EscrowOperationsPage() {
   const getTransactionStatus = (status: string) => {
     switch (status) {
       case 'completed':
-        return (
-          <Badge className="bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20">
-            Tamamlandi
-          </Badge>
-        );
+        return <CanvaBadge variant="success">Tamamlandi</CanvaBadge>;
       case 'processing':
-        return (
-          <Badge className="bg-blue-500/10 text-blue-600 hover:bg-blue-500/20">
-            Isleniyor
-          </Badge>
-        );
+        return <CanvaBadge variant="info">Isleniyor</CanvaBadge>;
       case 'pending_kyc':
-        return (
-          <Badge className="bg-amber-500/10 text-amber-600 hover:bg-amber-500/20">
-            KYC Bekliyor
-          </Badge>
-        );
+        return <CanvaBadge variant="warning">KYC Bekliyor</CanvaBadge>;
       case 'failed':
-        return (
-          <Badge className="bg-red-500/10 text-red-600 hover:bg-red-500/20">
-            Basarisiz
-          </Badge>
-        );
+        return <CanvaBadge variant="danger">Basarisiz</CanvaBadge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <CanvaBadge variant="secondary">{status}</CanvaBadge>;
     }
   };
 
@@ -473,20 +425,20 @@ export default function EscrowOperationsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
+          <CanvaButton variant="ghost" size="sm">
             <Download className="h-4 w-4 mr-2" />
             Rapor Indir
-          </Button>
-          <Button size="sm">
+          </CanvaButton>
+          <CanvaButton variant="primary" size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             Yenile
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
       {/* PayTR Security Info */}
-      <Card className="border-purple-500/30 bg-purple-500/5">
-        <CardContent className="py-3">
+      <CanvaCard className="border-purple-500/30 bg-purple-500/5">
+        <CanvaCardBody className="py-3">
           <div className="flex items-center gap-2 text-sm text-purple-700">
             <Shield className="h-4 w-4" />
             <span className="font-medium">
@@ -494,92 +446,61 @@ export default function EscrowOperationsPage() {
               banka hesap bilgileri (IBAN) sistemde hash'lenmis ve maskelenmis olarak saklanir.
             </span>
           </div>
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
 
       {/* Stats Overview */}
       <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-8">
         {/* Escrow Stats */}
-        <Card className="col-span-2">
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Lock className="h-3 w-3" />
-              Toplam Escrow
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-purple-600">
-              {formatCurrency(escrowStats.totalEscrow, 'TRY')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-              <span>{escrowStats.activeTransactions} aktif islem</span>
-            </div>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          className="col-span-2"
+          title="Toplam Escrow"
+          value={formatCurrency(escrowStats.totalEscrow, 'TRY')}
+          description={`${escrowStats.activeTransactions} aktif islem`}
+          icon={<Lock className="h-5 w-5" />}
+          accentColor="violet"
+        />
 
-        <Card className="col-span-2">
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              Serbest Birakilacak
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-amber-600">
-              {formatCurrency(escrowStats.pendingRelease, 'TRY')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-              <span>Ort. {escrowStats.avgEscrowDuration} gun</span>
-            </div>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          className="col-span-2"
+          title="Serbest Birakilacak"
+          value={formatCurrency(escrowStats.pendingRelease, 'TRY')}
+          description={`Ort. ${escrowStats.avgEscrowDuration} gun`}
+          icon={<Clock className="h-5 w-5" />}
+          accentColor="amber"
+        />
 
         {/* Payment Stats */}
-        <Card className="col-span-2">
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <CreditCard className="h-3 w-3" />
-              Bugunun Hacmi
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-emerald-600">
-              {formatCurrency(paymentStats.todayVolume, 'TRY')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-              <span>{paymentStats.todayTransactions} islem</span>
-            </div>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          className="col-span-2"
+          title="Bugunun Hacmi"
+          value={formatCurrency(paymentStats.todayVolume, 'TRY')}
+          description={`${paymentStats.todayTransactions} islem`}
+          icon={<CreditCard className="h-5 w-5" />}
+          accentColor="emerald"
+          trend="up"
+        />
 
-        <Card className="col-span-2">
-          <CardHeader className="pb-2">
-            <CardDescription className="flex items-center gap-1">
-              <CheckCircle2 className="h-3 w-3" />
-              Basari Orani
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-emerald-600">
-              %{paymentStats.successRate}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-1 text-sm text-red-500">
-              <XCircle className="h-3 w-3" />
-              <span>{paymentStats.failedTransactions} basarisiz</span>
-            </div>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          className="col-span-2"
+          title="Basari Orani"
+          value={`%${paymentStats.successRate}`}
+          description={`${paymentStats.failedTransactions} basarisiz`}
+          icon={<CheckCircle2 className="h-5 w-5" />}
+          accentColor="emerald"
+          trend="up"
+        />
       </div>
 
       {/* Escrow Tiers Info */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">Escrow Katmanlari</CardTitle>
-          <CardDescription>
+      <CanvaCard>
+        <CanvaCardHeader>
+          <CanvaCardTitle>Escrow Katmanlari</CanvaCardTitle>
+          <CanvaCardSubtitle>
             PayTR entegrasyonu ile guvenli odeme sistemi
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+          </CanvaCardSubtitle>
+        </CanvaCardHeader>
+        <CanvaCardBody>
           <div className="grid gap-4 md:grid-cols-3">
             {escrowTiers.map((tier) => (
               <div
@@ -598,15 +519,15 @@ export default function EscrowOperationsPage() {
                   <p className="text-xs text-muted-foreground mt-1">
                     {tier.description}
                   </p>
-                  <Badge variant="outline" className="mt-2 text-xs">
+                  <CanvaBadge variant="secondary" className="mt-2 text-xs">
                     {tier.escrow}
-                  </Badge>
+                  </CanvaBadge>
                 </div>
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
 
       {/* Main Tabs */}
       <Tabs value={selectedTab} onValueChange={setSelectedTab}>
@@ -621,12 +542,12 @@ export default function EscrowOperationsPage() {
         <TabsContent value="overview" className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Volume Chart */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Gunluk Islem Hacmi</CardTitle>
-                <CardDescription>Son 7 gunluk odeme hacmi</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Gunluk Islem Hacmi</CanvaCardTitle>
+                <CanvaCardSubtitle>Son 7 gunluk odeme hacmi</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <AdminAreaChart
                   data={dailyVolumeData}
                   xAxisKey="date"
@@ -643,20 +564,20 @@ export default function EscrowOperationsPage() {
                     name,
                   ]}
                 />
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
             {/* Recent Transactions */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>Son Islemler</CardTitle>
-                  <Button variant="ghost" size="sm">
+            <CanvaCard>
+              <CanvaCardHeader>
+                <div className="flex items-center justify-between w-full">
+                  <CanvaCardTitle>Son Islemler</CanvaCardTitle>
+                  <CanvaButton variant="ghost" size="sm">
                     Tumunu Gor
-                  </Button>
+                  </CanvaButton>
                 </div>
-              </CardHeader>
-              <CardContent>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <ScrollArea className="h-[280px]">
                   <div className="space-y-3">
                     {recentTransactions.map((tx) => (
@@ -695,71 +616,43 @@ export default function EscrowOperationsPage() {
                     ))}
                   </div>
                 </ScrollArea>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
 
           {/* Quick Stats */}
           <div className="grid gap-4 md:grid-cols-4">
-            <Card className="bg-gradient-to-br from-emerald-500/10 to-transparent">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Bugun Serbest
-                    </p>
-                    <p className="text-xl font-bold">
-                      {formatCurrency(escrowStats.releasedToday, 'TRY')}
-                    </p>
-                  </div>
-                  <Unlock className="h-8 w-8 text-emerald-500/50" />
-                </div>
-              </CardContent>
-            </Card>
+            <CanvaStatCard
+              title="Bugun Serbest"
+              value={formatCurrency(escrowStats.releasedToday, 'TRY')}
+              icon={<Unlock className="h-5 w-5" />}
+              accentColor="emerald"
+              className="bg-gradient-to-br from-emerald-500/10 to-transparent"
+            />
 
-            <Card className="bg-gradient-to-br from-amber-500/10 to-transparent">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Bugun Iade</p>
-                    <p className="text-xl font-bold">
-                      {formatCurrency(escrowStats.refundedToday, 'TRY')}
-                    </p>
-                  </div>
-                  <ArrowDownRight className="h-8 w-8 text-amber-500/50" />
-                </div>
-              </CardContent>
-            </Card>
+            <CanvaStatCard
+              title="Bugun Iade"
+              value={formatCurrency(escrowStats.refundedToday, 'TRY')}
+              icon={<ArrowDownRight className="h-5 w-5" />}
+              accentColor="amber"
+              className="bg-gradient-to-br from-amber-500/10 to-transparent"
+            />
 
-            <Card className="bg-gradient-to-br from-purple-500/10 to-transparent">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Abonelik</p>
-                    <p className="text-xl font-bold">
-                      {formatCurrency(paymentStats.subscriptionRevenue, 'TRY')}
-                    </p>
-                  </div>
-                  <Receipt className="h-8 w-8 text-purple-500/50" />
-                </div>
-              </CardContent>
-            </Card>
+            <CanvaStatCard
+              title="Abonelik"
+              value={formatCurrency(paymentStats.subscriptionRevenue, 'TRY')}
+              icon={<Receipt className="h-5 w-5" />}
+              accentColor="violet"
+              className="bg-gradient-to-br from-purple-500/10 to-transparent"
+            />
 
-            <Card className="bg-gradient-to-br from-pink-500/10 to-transparent">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Hediye Geliri
-                    </p>
-                    <p className="text-xl font-bold">
-                      {formatCurrency(paymentStats.giftRevenue, 'TRY')}
-                    </p>
-                  </div>
-                  <CreditCard className="h-8 w-8 text-pink-500/50" />
-                </div>
-              </CardContent>
-            </Card>
+            <CanvaStatCard
+              title="Hediye Geliri"
+              value={formatCurrency(paymentStats.giftRevenue, 'TRY')}
+              icon={<CreditCard className="h-5 w-5" />}
+              accentColor="pink"
+              className="bg-gradient-to-br from-pink-500/10 to-transparent"
+            />
           </div>
         </TabsContent>
 
@@ -793,7 +686,7 @@ export default function EscrowOperationsPage() {
           </div>
 
           {/* Escrow Table */}
-          <Card>
+          <CanvaCard>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -850,9 +743,9 @@ export default function EscrowOperationsPage() {
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
+                          <CanvaButton variant="ghost" size="sm">
                             <MoreHorizontal className="h-4 w-4" />
-                          </Button>
+                          </CanvaButton>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
@@ -898,17 +791,17 @@ export default function EscrowOperationsPage() {
                 ))}
               </TableBody>
             </Table>
-          </Card>
+          </CanvaCard>
         </TabsContent>
 
         {/* Transactions Tab */}
         <TabsContent value="transactions" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Tum Islemler</CardTitle>
-              <CardDescription>Odeme, payout ve iade islemleri</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Tum Islemler</CanvaCardTitle>
+              <CanvaCardSubtitle>Odeme, payout ve iade islemleri</CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -956,28 +849,28 @@ export default function EscrowOperationsPage() {
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Pending Payouts Tab */}
         <TabsContent value="payouts" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
+          <CanvaCard>
+            <CanvaCardHeader>
+              <div className="flex items-center justify-between w-full">
                 <div>
-                  <CardTitle>Bekleyen Odemeler</CardTitle>
-                  <CardDescription>
+                  <CanvaCardTitle>Bekleyen Odemeler</CanvaCardTitle>
+                  <CanvaCardSubtitle>
                     KYC dogrulanmis kullanicilara odeme yapilacak
-                  </CardDescription>
+                  </CanvaCardSubtitle>
                 </div>
-                <Button size="sm">
+                <CanvaButton variant="primary" size="sm">
                   <Send className="h-4 w-4 mr-2" />
                   Toplu Odeme Yap
-                </Button>
+                </CanvaButton>
               </div>
-            </CardHeader>
-            <CardContent>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -1014,41 +907,39 @@ export default function EscrowOperationsPage() {
                       </TableCell>
                       <TableCell>
                         {payout.kycStatus === 'verified' ? (
-                          <Badge className="bg-emerald-500/10 text-emerald-600">
-                            <UserCheck className="h-3 w-3 mr-1" />
+                          <CanvaBadge variant="success" icon={<UserCheck className="h-3 w-3" />}>
                             Dogrulandi
-                          </Badge>
+                          </CanvaBadge>
                         ) : (
-                          <Badge className="bg-amber-500/10 text-amber-600">
-                            <Clock className="h-3 w-3 mr-1" />
+                          <CanvaBadge variant="warning" icon={<Clock className="h-3 w-3" />}>
                             Bekliyor
-                          </Badge>
+                          </CanvaBadge>
                         )}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {payout.requestedAt}
                       </TableCell>
                       <TableCell>
-                        <Button
+                        <CanvaButton
                           size="sm"
                           variant={
                             payout.kycStatus === 'verified'
-                              ? 'default'
-                              : 'outline'
+                              ? 'primary'
+                              : 'ghost'
                           }
                           disabled={payout.kycStatus !== 'verified'}
                         >
                           {payout.kycStatus === 'verified'
                             ? 'Odeme Yap'
                             : 'KYC Bekliyor'}
-                        </Button>
+                        </CanvaButton>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
       </Tabs>
 
@@ -1074,17 +965,17 @@ export default function EscrowOperationsPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button
-              variant="outline"
+            <CanvaButton
+              variant="ghost"
               onClick={() =>
                 setActionDialog({ open: false, action: '', escrow: null })
               }
             >
               Iptal
-            </Button>
-            <Button
+            </CanvaButton>
+            <CanvaButton
               variant={
-                actionDialog.action === 'dispute' ? 'destructive' : 'default'
+                actionDialog.action === 'dispute' ? 'danger' : 'primary'
               }
               onClick={() => {
                 // Handle action
@@ -1094,7 +985,7 @@ export default function EscrowOperationsPage() {
               {actionDialog.action === 'release' && 'Serbest Birak'}
               {actionDialog.action === 'refund' && 'Iade Et'}
               {actionDialog.action === 'dispute' && 'Anlasmazlik Ac'}
-            </Button>
+            </CanvaButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>
