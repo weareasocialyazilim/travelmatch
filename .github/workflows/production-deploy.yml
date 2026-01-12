@@ -35,11 +35,11 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: 🔐 Import secrets from Infisical
-        uses: Infisical/secrets-action@v1.0.15
+        uses: Infisical/secrets-action@v1
         with:
-          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          method: universal-auth          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          workspaceId: fa0ed450-40e2-4063-b4f4-ce5cca83a57e
+          project-id: fa0ed450-40e2-4063-b4f4-ce5cca83a57e
           env-slug: prod
 
       - name: Setup pnpm
@@ -78,11 +78,11 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: 🔐 Import secrets from Infisical
-        uses: Infisical/secrets-action@v1.0.15
+        uses: Infisical/secrets-action@v1
         with:
-          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          method: universal-auth          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          workspaceId: fa0ed450-40e2-4063-b4f4-ce5cca83a57e
+          project-id: fa0ed450-40e2-4063-b4f4-ce5cca83a57e
           env-slug: prod
 
       - name: Setup pnpm
@@ -120,11 +120,11 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: 🔐 Import secrets from Infisical
-        uses: Infisical/secrets-action@v1.0.15
+        uses: Infisical/secrets-action@v1
         with:
-          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          method: universal-auth          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          workspaceId: fa0ed450-40e2-4063-b4f4-ce5cca83a57e
+          project-id: fa0ed450-40e2-4063-b4f4-ce5cca83a57e
           env-slug: prod
 
       - name: Setup pnpm
@@ -162,11 +162,11 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: 🔐 Import secrets from Infisical
-        uses: Infisical/secrets-action@v1.0.15
+        uses: Infisical/secrets-action@v1
         with:
-          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          method: universal-auth          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          workspaceId: fa0ed450-40e2-4063-b4f4-ce5cca83a57e
+          project-id: fa0ed450-40e2-4063-b4f4-ce5cca83a57e
           env-slug: prod
 
       - name: Setup EAS
@@ -191,11 +191,11 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: 🔐 Import secrets from Infisical
-        uses: Infisical/secrets-action@v1.0.15
+        uses: Infisical/secrets-action@v1
         with:
-          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          method: universal-auth          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
           client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          workspaceId: fa0ed450-40e2-4063-b4f4-ce5cca83a57e
+          project-id: fa0ed450-40e2-4063-b4f4-ce5cca83a57e
           env-slug: prod
 
       - name: Setup EAS
