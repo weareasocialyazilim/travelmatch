@@ -1,38 +1,22 @@
 <svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background gradient -->
+  <rect width="1200" height="630" fill="#050505"/>
+  <rect width="1200" height="630" fill="url(#paint0_radial)"/>
+  <path d="M600 280C600 280 620 280 620 250C620 220 600 220 600 220C600 220 580 220 580 250C580 280 600 280 600 280Z" fill="#FF007A" filter="url(#filter0_f)"/>
   <defs>
-    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#F59E0B" />
-      <stop offset="100%" style="stop-color:#EC4899" />
-    </linearGradient>
-    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#F59E0B" />
-      <stop offset="100%" style="stop-color:#EC4899" />
-    </linearGradient>
+    <radialGradient id="paint0_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(600 315) rotate(90) scale(400 600)">
+      <stop stop-color="#8B5CF6" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#050505" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="filter0_f" x="500" y="150" width="200" height="200" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+      <feGaussianBlur stdDeviation="30" result="effect1_foregroundBlur"/>
+    </filter>
   </defs>
-
-  <!-- Background -->
-  <rect width="1200" height="630" fill="url(#bgGradient)" />
-
-  <!-- Decorative circles -->
-  <circle cx="100" cy="100" r="200" fill="white" fill-opacity="0.1" />
-  <circle cx="1100" cy="530" r="250" fill="white" fill-opacity="0.1" />
-
-  <!-- Logo icon -->
-  <g transform="translate(540, 150)">
-    <rect x="0" y="0" width="120" height="120" rx="24" fill="white" />
-    <path d="M60 35C48.954 35 40 43.954 40 55C40 72.142 60 85 60 85C60 85 80 72.142 80 55C80 43.954 71.046 35 60 35ZM60 63C55.582 63 52 59.418 52 55C52 50.582 55.582 47 60 47C64.418 47 68 50.582 68 55C68 59.418 64.418 63 60 63Z" fill="url(#bgGradient)" />
-  </g>
-
-  <!-- Brand name -->
-  <text x="600" y="340" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="bold" fill="white">TravelMatch</text>
-
-  <!-- Tagline -->
-  <text x="600" y="420" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="36" fill="white" fill-opacity="0.9">Give a moment. See it happen.</text>
-
-  <!-- Description -->
-  <text x="600" y="500" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="white" fill-opacity="0.8">Gift real travel experiences with verified proof</text>
-
-  <!-- URL -->
-  <text x="600" y="580" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="white" fill-opacity="0.6">travelmatch.app</text>
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="80" fill="white" letter-spacing="4">
+    I REQUESTED THE RITUAL
+  </text>
+  <text x="50%" y="65%" dominant-baseline="middle" text-anchor="middle" font-family="Courier New, monospace" font-size="24" fill="#FF007A" letter-spacing="8">
+    TRAVELMATCH
+  </text>
 </svg>
