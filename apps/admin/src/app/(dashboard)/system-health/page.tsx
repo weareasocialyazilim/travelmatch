@@ -46,15 +46,6 @@ import {
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { CanvaButton } from '@/components/canva/CanvaButton';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -289,56 +280,56 @@ export default function SystemHealthPage() {
     switch (status) {
       case 'healthy':
         return (
-          <Badge className="bg-green-500/10 text-green-500 border-green-500/20">
+          <CanvaBadge className="bg-green-500/10 text-green-500 border-green-500/20">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             Sağlıklı
-          </Badge>
+          </CanvaBadge>
         );
       case 'degraded':
         return (
-          <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">
+          <CanvaBadge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">
             <AlertTriangle className="h-3 w-3 mr-1" />
             Yavaşlama
-          </Badge>
+          </CanvaBadge>
         );
       case 'down':
         return (
-          <Badge className="bg-red-500/10 text-red-500 border-red-500/20">
+          <CanvaBadge className="bg-red-500/10 text-red-500 border-red-500/20">
             <XCircle className="h-3 w-3 mr-1" />
             Kesinti
-          </Badge>
+          </CanvaBadge>
         );
       case 'investigating':
         return (
-          <Badge className="bg-orange-500/10 text-orange-500 border-orange-500/20">
+          <CanvaBadge className="bg-orange-500/10 text-orange-500 border-orange-500/20">
             <Eye className="h-3 w-3 mr-1" />
             İnceleniyor
-          </Badge>
+          </CanvaBadge>
         );
       case 'resolved':
         return (
-          <Badge className="bg-green-500/10 text-green-500 border-green-500/20">
+          <CanvaBadge className="bg-green-500/10 text-green-500 border-green-500/20">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             Çözüldü
-          </Badge>
+          </CanvaBadge>
         );
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <CanvaBadge variant="outline">{status}</CanvaBadge>;
     }
   };
 
   const getSeverityBadge = (severity: string) => {
     switch (severity) {
       case 'critical':
-        return <Badge className="bg-red-500">Kritik</Badge>;
+        return <CanvaBadge className="bg-red-500">Kritik</CanvaBadge>;
       case 'high':
-        return <Badge className="bg-orange-500">Yüksek</Badge>;
+        return <CanvaBadge className="bg-orange-500">Yüksek</CanvaBadge>;
       case 'medium':
-        return <Badge className="bg-yellow-500">Orta</Badge>;
+        return <CanvaBadge className="bg-yellow-500">Orta</CanvaBadge>;
       case 'low':
-        return <Badge className="bg-blue-500">Düşük</Badge>;
+        return <CanvaBadge className="bg-blue-500">Düşük</CanvaBadge>;
       default:
-        return <Badge variant="outline">{severity}</Badge>;
+        return <CanvaBadge variant="outline">{severity}</CanvaBadge>;
     }
   };
 
@@ -361,16 +352,16 @@ export default function SystemHealthPage() {
             <span className="text-sm">Otomatik Yenile</span>
             <Switch checked={autoRefresh} onCheckedChange={setAutoRefresh} />
           </div>
-          <Button variant="outline" size="sm">
+          <CanvaButton variant="ghost" size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             Yenile
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
       {/* Overall Status Banner */}
-      <Card className="admin-card border-l-4 border-l-green-500 bg-green-500/5">
-        <CardContent className="p-4">
+      <CanvaCard className="admin-card border-l-4 border-l-green-500 bg-green-500/5">
+        <CanvaCardBody className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-lg bg-green-500/10">
@@ -413,13 +404,13 @@ export default function SystemHealthPage() {
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
 
       {/* Quick Stats */}
       <div className="grid grid-cols-4 gap-4">
-        <Card className="admin-card">
-          <CardContent className="p-4">
+        <CanvaCard className="admin-card">
+          <CanvaCardBody className="p-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Cpu className="h-5 w-5 text-blue-500" />
@@ -434,11 +425,11 @@ export default function SystemHealthPage() {
             <p className="text-xs text-muted-foreground mt-1">
               Ort: {serverMetrics.cpu.avg}% | Max: {serverMetrics.cpu.max}%
             </p>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
 
-        <Card className="admin-card">
-          <CardContent className="p-4">
+        <CanvaCard className="admin-card">
+          <CanvaCardBody className="p-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <MemoryStick className="h-5 w-5 text-purple-500" />
@@ -462,11 +453,11 @@ export default function SystemHealthPage() {
               Ort: {serverMetrics.memory.avg}% | Max: {serverMetrics.memory.max}
               %
             </p>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
 
-        <Card className="admin-card">
-          <CardContent className="p-4">
+        <CanvaCard className="admin-card">
+          <CanvaCardBody className="p-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <HardDrive className="h-5 w-5 text-green-500" />
@@ -485,11 +476,11 @@ export default function SystemHealthPage() {
               ).toFixed(0)}
               GB kullanımda
             </p>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
 
-        <Card className="admin-card">
-          <CardContent className="p-4">
+        <CanvaCard className="admin-card">
+          <CanvaCardBody className="p-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Network className="h-5 w-5 text-orange-500" />
@@ -513,8 +504,8 @@ export default function SystemHealthPage() {
                 <p className="text-xs text-muted-foreground">Mbps giden</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
       </div>
 
       {/* Main Content */}
@@ -545,12 +536,12 @@ export default function SystemHealthPage() {
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <Card className="admin-card">
-              <CardHeader>
-                <CardTitle>Sistem Metrikleri</CardTitle>
-                <CardDescription>Son 30 dakika</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <CanvaCard className="admin-card">
+              <CanvaCardHeader>
+                <CanvaCardTitle>Sistem Metrikleri</CanvaCardTitle>
+                <CanvaCardSubtitle>Son 30 dakika</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <AdminLineChart
                   data={realtimeMetrics}
                   xAxisKey="time"
@@ -560,15 +551,15 @@ export default function SystemHealthPage() {
                   ]}
                   height={250}
                 />
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
-            <Card className="admin-card">
-              <CardHeader>
-                <CardTitle>İstek Trafiği</CardTitle>
-                <CardDescription>Dakika başına istek</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <CanvaCard className="admin-card">
+              <CanvaCardHeader>
+                <CanvaCardTitle>İstek Trafiği</CanvaCardTitle>
+                <CanvaCardSubtitle>Dakika başına istek</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
                 <AdminAreaChart
                   data={realtimeMetrics}
                   xAxisKey="time"
@@ -577,15 +568,15 @@ export default function SystemHealthPage() {
                   ]}
                   height={250}
                 />
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
 
-          <Card className="admin-card">
-            <CardHeader>
-              <CardTitle>Aktif Olaylar</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <CanvaCard className="admin-card">
+            <CanvaCardHeader>
+              <CanvaCardTitle>Aktif Olaylar</CanvaCardTitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               {recentIncidents.filter((i) => i.status !== 'resolved').length >
               0 ? (
                 <div className="space-y-3">
@@ -619,23 +610,23 @@ export default function SystemHealthPage() {
                   Aktif olay bulunmuyor
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Services Tab */}
         <TabsContent value="services" className="space-y-4">
-          <Card className="admin-card">
-            <CardHeader>
+          <CanvaCard className="admin-card">
+            <CanvaCardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Servis Durumları</CardTitle>
-                <Button variant="outline" size="sm">
+                <CanvaCardTitle>Servis Durumları</CanvaCardTitle>
+                <CanvaButton variant="ghost" size="sm">
                   <ExternalLink className="h-4 w-4 mr-2" />
                   Status Page
-                </Button>
+                </CanvaButton>
               </div>
-            </CardHeader>
-            <CardContent>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -693,21 +684,21 @@ export default function SystemHealthPage() {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{service.region}</Badge>
+                        <CanvaBadge variant="outline">{service.region}</CanvaBadge>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Database Tab */}
         <TabsContent value="database" className="space-y-4">
           <div className="grid grid-cols-4 gap-4">
-            <Card className="admin-card">
-              <CardContent className="p-4">
+            <CanvaCard className="admin-card">
+              <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Database className="h-5 w-5 text-blue-500" />
                   <span className="font-medium">Bağlantılar</span>
@@ -727,11 +718,11 @@ export default function SystemHealthPage() {
                 <p className="text-xs text-muted-foreground mt-1">
                   {databaseStats.connections.idle} boşta
                 </p>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
-            <Card className="admin-card">
-              <CardContent className="p-4">
+            <CanvaCard className="admin-card">
+              <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Zap className="h-5 w-5 text-yellow-500" />
                   <span className="font-medium">Sorgular</span>
@@ -745,11 +736,11 @@ export default function SystemHealthPage() {
                 <p className="text-xs text-red-500">
                   {databaseStats.queries.slowQueries} yavaş sorgu
                 </p>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
-            <Card className="admin-card">
-              <CardContent className="p-4">
+            <CanvaCard className="admin-card">
+              <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <HardDrive className="h-5 w-5 text-green-500" />
                   <span className="font-medium">Depolama</span>
@@ -768,11 +759,11 @@ export default function SystemHealthPage() {
                   {databaseStats.storage.tables} tablo •{' '}
                   {databaseStats.storage.indexes} index
                 </p>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
-            <Card className="admin-card">
-              <CardContent className="p-4">
+            <CanvaCard className="admin-card">
+              <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <RefreshCw className="h-5 w-5 text-purple-500" />
                   <span className="font-medium">Replikasyon</span>
@@ -783,15 +774,15 @@ export default function SystemHealthPage() {
                 <p className="text-sm text-muted-foreground mt-2">
                   Gecikme: {databaseStats.replication.lag}ms
                 </p>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
 
-          <Card className="admin-card">
-            <CardHeader>
-              <CardTitle>Yavaş Sorgular</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <CanvaCard className="admin-card">
+            <CanvaCardHeader>
+              <CanvaCardTitle>Yavaş Sorgular</CanvaCardTitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -827,7 +818,7 @@ export default function SystemHealthPage() {
                         {q.query}
                       </TableCell>
                       <TableCell>
-                        <Badge
+                        <CanvaBadge
                           className={cn(
                             q.duration > 300
                               ? 'bg-red-500/10 text-red-500'
@@ -835,7 +826,7 @@ export default function SystemHealthPage() {
                           )}
                         >
                           {q.duration}ms
-                        </Badge>
+                        </CanvaBadge>
                       </TableCell>
                       <TableCell>{q.calls}</TableCell>
                       <TableCell>{q.table}</TableCell>
@@ -843,18 +834,18 @@ export default function SystemHealthPage() {
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* API Performance Tab */}
         <TabsContent value="api" className="space-y-4">
-          <Card className="admin-card">
-            <CardHeader>
-              <CardTitle>Endpoint Performansı</CardTitle>
-              <CardDescription>Son 1 saat</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <CanvaCard className="admin-card">
+            <CanvaCardHeader>
+              <CanvaCardTitle>Endpoint Performansı</CanvaCardTitle>
+              <CanvaCardSubtitle>Son 1 saat</CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -875,7 +866,7 @@ export default function SystemHealthPage() {
                         {endpoint.endpoint}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{endpoint.method}</Badge>
+                        <CanvaBadge variant="outline">{endpoint.method}</CanvaBadge>
                       </TableCell>
                       <TableCell className="text-green-500">
                         {endpoint.p50}ms
@@ -912,23 +903,23 @@ export default function SystemHealthPage() {
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Incidents Tab */}
         <TabsContent value="incidents" className="space-y-4">
-          <Card className="admin-card">
-            <CardHeader>
+          <CanvaCard className="admin-card">
+            <CanvaCardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Olay Geçmişi</CardTitle>
-                <Button>
+                <CanvaCardTitle>Olay Geçmişi</CanvaCardTitle>
+                <CanvaButton>
                   <Bell className="h-4 w-4 mr-2" />
                   Olay Oluştur
-                </Button>
+                </CanvaButton>
               </div>
-            </CardHeader>
-            <CardContent>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -955,17 +946,17 @@ export default function SystemHealthPage() {
                       <TableCell>{incident.duration}</TableCell>
                       <TableCell>{incident.affected}</TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">
+                        <CanvaButton variant="ghost" size="sm">
                           Detay
                           <ChevronRight className="h-4 w-4 ml-1" />
-                        </Button>
+                        </CanvaButton>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
       </Tabs>
     </div>

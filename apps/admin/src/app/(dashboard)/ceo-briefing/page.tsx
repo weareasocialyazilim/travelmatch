@@ -42,15 +42,6 @@ import {
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { CanvaButton } from '@/components/canva/CanvaButton';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 
@@ -188,29 +179,29 @@ export default function CEOBriefingPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm">
+          <CanvaButton variant="ghost" size="sm">
             <Mail className="h-4 w-4 mr-2" />
             Raporu Gönder
-          </Button>
-          <Button variant="outline" size="sm">
+          </CanvaButton>
+          <CanvaButton variant="ghost" size="sm">
             <Download className="h-4 w-4 mr-2" />
             PDF İndir
-          </Button>
-          <Button variant="ghost" size="sm">
+          </CanvaButton>
+          <CanvaButton variant="ghost" size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             {lastUpdated.toLocaleTimeString('tr-TR', {
               hour: '2-digit',
               minute: '2-digit',
             })}
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
       {/* Şirket Sağlık Skoru + North Star */}
       <div className="grid grid-cols-3 gap-6">
         {/* Health Score */}
-        <Card className="admin-card col-span-1 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-          <CardContent className="p-6 text-center">
+        <CanvaCard className="admin-card col-span-1 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+          <CanvaCardBody className="p-6 text-center">
             <p className="text-sm text-muted-foreground mb-2">
               Şirket Sağlık Skoru
             </p>
@@ -251,21 +242,21 @@ export default function CEOBriefingPage() {
               <CheckCircle2 className="h-4 w-4 text-green-500" />
               <span className="text-sm">Tüm sistemler operasyonel</span>
             </div>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
 
         {/* North Star Metric */}
-        <Card className="admin-card col-span-2">
-          <CardHeader className="pb-2">
+        <CanvaCard className="admin-card col-span-2">
+          <CanvaCardHeader className="pb-2">
             <div className="flex items-center gap-2">
               <Star className="h-5 w-5 text-yellow-500" />
-              <CardTitle>North Star: {northStar.name}</CardTitle>
+              <CanvaCardTitle>North Star: {northStar.name}</CanvaCardTitle>
             </div>
-            <CardDescription>
+            <CanvaCardSubtitle>
               Haftalık hedef: {northStar.target.toLocaleString()}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+            </CanvaCardSubtitle>
+          </CanvaCardHeader>
+          <CanvaCardBody>
             <div className="flex items-end gap-4">
               <div>
                 <p className="text-5xl font-bold">
@@ -273,7 +264,7 @@ export default function CEOBriefingPage() {
                 </p>
                 <div className="flex items-center gap-2 mt-1">
                   {northStar.trend === 'up' ? (
-                    <Badge className="bg-green-500/10 text-green-500">
+                    <CanvaBadge className="bg-green-500/10 text-green-500">
                       <ArrowUpRight className="h-3 w-3 mr-1" />+
                       {(
                         ((northStar.current - northStar.lastWeek) /
@@ -281,12 +272,12 @@ export default function CEOBriefingPage() {
                         100
                       ).toFixed(1)}
                       %
-                    </Badge>
+                    </CanvaBadge>
                   ) : (
-                    <Badge className="bg-red-500/10 text-red-500">
+                    <CanvaBadge className="bg-red-500/10 text-red-500">
                       <ArrowDownRight className="h-3 w-3 mr-1" />
                       Düşüş
-                    </Badge>
+                    </CanvaBadge>
                   )}
                   <span className="text-sm text-muted-foreground">
                     vs geçen hafta
@@ -306,18 +297,18 @@ export default function CEOBriefingPage() {
                 </p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
       </div>
 
       {/* Kritik KPI'lar */}
       <div className="grid grid-cols-4 gap-4">
         {criticalKPIs.map((kpi) => (
-          <Card key={kpi.name} className="admin-card">
-            <CardContent className="p-4">
+          <CanvaCard key={kpi.name} className="admin-card">
+            <CanvaCardBody className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <kpi.icon className="h-5 w-5 text-muted-foreground" />
-                <Badge
+                <CanvaBadge
                   variant="outline"
                   className={cn(
                     kpi.trend === 'up' && kpi.name !== 'Fraud Oranı'
@@ -329,28 +320,28 @@ export default function CEOBriefingPage() {
                 >
                   {kpi.trend === 'up' ? '+' : ''}
                   {kpi.change}%
-                </Badge>
+                </CanvaBadge>
               </div>
               <p className="text-2xl font-bold">{kpi.value}</p>
               <p className="text-xs text-muted-foreground">{kpi.name}</p>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         ))}
       </div>
 
       <div className="grid grid-cols-3 gap-6">
         {/* Acil Dikkat */}
-        <Card className="admin-card col-span-2">
-          <CardHeader>
+        <CanvaCard className="admin-card col-span-2">
+          <CanvaCardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
+              <CanvaCardTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5" />
                 Dikkat Gerektiren Konular
-              </CardTitle>
-              <Badge variant="outline">{attentionItems.length} aktif</Badge>
+              </CanvaCardTitle>
+              <CanvaBadge variant="outline">{attentionItems.length} aktif</CanvaBadge>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
+          </CanvaCardHeader>
+          <CanvaCardBody className="space-y-3">
             {attentionItems.map((item, i) => (
               <div
                 key={i}
@@ -381,23 +372,23 @@ export default function CEOBriefingPage() {
                     </p>
                   </div>
                 </div>
-                <Button variant="ghost" size="sm">
+                <CanvaButton variant="ghost" size="sm">
                   <ChevronRight className="h-4 w-4" />
-                </Button>
+                </CanvaButton>
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
 
         {/* Bugünün Takvimi */}
-        <Card className="admin-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+        <CanvaCard className="admin-card">
+          <CanvaCardHeader>
+            <CanvaCardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
               Bugün
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
+            </CanvaCardTitle>
+          </CanvaCardHeader>
+          <CanvaCardBody className="space-y-3">
             {todayEvents.map((event, i) => (
               <div
                 key={i}
@@ -411,19 +402,19 @@ export default function CEOBriefingPage() {
                 </div>
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
       </div>
 
       {/* Haftalık Hedefler */}
-      <Card className="admin-card">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <CanvaCard className="admin-card">
+        <CanvaCardHeader>
+          <CanvaCardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5" />
             Bu Hafta Hedefler
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+          </CanvaCardTitle>
+        </CanvaCardHeader>
+        <CanvaCardBody>
           <div className="grid grid-cols-4 gap-6">
             {weeklyGoals.map((goal) => (
               <div key={goal.name} className="space-y-2">
@@ -449,8 +440,8 @@ export default function CEOBriefingPage() {
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
 
       {/* Quick Links */}
       <div className="grid grid-cols-4 gap-4">
@@ -480,20 +471,20 @@ export default function CEOBriefingPage() {
             count: null,
           },
         ].map((link) => (
-          <Card
+          <CanvaCard
             key={link.label}
             className="admin-card hover:border-primary/50 cursor-pointer transition-colors"
           >
-            <CardContent className="p-4 flex items-center justify-between">
+            <CanvaCardBody className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <link.icon className="h-5 w-5 text-primary" />
                 <span className="font-medium">{link.label}</span>
               </div>
               {link.count !== null && (
-                <Badge variant="secondary">{link.count}</Badge>
+                <CanvaBadge variant="secondary">{link.count}</CanvaBadge>
               )}
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         ))}
       </div>
     </div>

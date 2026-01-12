@@ -4,12 +4,12 @@ import { useEffect } from 'react';
 import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
 import { CanvaButton } from '@/components/canva/CanvaButton';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+} from '@/components/canva/CanvaCard';
 import { logger } from '@/lib/logger';
 
 interface ErrorProps {
@@ -25,17 +25,17 @@ export default function DashboardError({ error, reset }: ErrorProps) {
 
   return (
     <div className="flex h-full w-full items-center justify-center p-6">
-      <Card className="max-w-lg w-full">
-        <CardHeader className="text-center">
+      <CanvaCard className="max-w-lg w-full">
+        <CanvaCardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
             <AlertTriangle className="h-8 w-8 text-destructive" />
           </div>
-          <CardTitle className="text-xl">Sayfa Yüklenemedi</CardTitle>
-          <CardDescription>
+          <CanvaCardTitle className="text-xl">Sayfa Yüklenemedi</CanvaCardTitle>
+          <CanvaCardSubtitle>
             Bu sayfayı yüklerken bir hata oluştu. Lütfen tekrar deneyin.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </CanvaCardSubtitle>
+        </CanvaCardHeader>
+        <CanvaCardBody className="space-y-4">
           {process.env.NODE_ENV === 'development' && (
             <div className="rounded-lg bg-muted p-4">
               <div className="flex items-center gap-2 mb-2">
@@ -68,8 +68,8 @@ export default function DashboardError({ error, reset }: ErrorProps) {
               Ana Sayfa
             </CanvaButton>
           </div>
-        </CardContent>
-      </Card>
+        </CanvaCardBody>
+      </CanvaCard>
     </div>
   );
 }
