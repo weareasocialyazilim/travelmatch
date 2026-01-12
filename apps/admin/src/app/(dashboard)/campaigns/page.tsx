@@ -359,19 +359,20 @@ export default function CampaignsPage() {
 
             <DialogFooter>
               <CanvaButton
-                variant="primary"
+                variant="ghost"
                 onClick={() => setIsCreateOpen(false)}
               >
                 İptal
               </CanvaButton>
               <CanvaButton
+                variant="primary"
                 onClick={handleCreateCampaign}
                 disabled={createCampaign.isPending}
               >
                 {createCampaign.isPending && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                <ChevronRight className="mr-2 h-4 w-4" />
+                <Plus className="mr-2 h-4 w-4" />
                 Oluştur
               </CanvaButton>
             </DialogFooter>
