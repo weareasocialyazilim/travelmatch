@@ -776,7 +776,8 @@ export default function SecurityPage() {
           {setupStep === 1 && (
             <div className="space-y-4">
               <div className="flex justify-center p-4 bg-white rounded-lg border">
-                {qrCode ? (
+                {/* XSS Prevention: QR code validated as data URL format at source */}
+                {qrCode && qrCode.startsWith('data:') ? (
                   <img src={qrCode} alt="QR Code" className="w-48 h-48" />
                 ) : (
                   <div className="w-48 h-48 bg-gray-100 rounded flex items-center justify-center">

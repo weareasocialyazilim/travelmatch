@@ -644,7 +644,7 @@ class ABTestingEngine:
 
         # Consistent hash for variant assignment
         hash_input = f"{experiment_id}:{user_id}"
-        hash_value = int(hashlib.md5(hash_input.encode()).hexdigest(), 16)
+        hash_value = int(hashlib.sha256(hash_input.encode()).hexdigest(), 16)
 
         # Weighted random selection
         variants = experiment["variants"]

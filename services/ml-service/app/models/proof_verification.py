@@ -242,7 +242,7 @@ class ObjectDetector:
         category_matches = {}
 
         # For demo, extract features from image hash
-        image_hash = hashlib.md5(image_data).hexdigest()
+        image_hash = hashlib.sha256(image_data).hexdigest()
 
         for category, objects in self.EXPERIENCE_OBJECTS.items():
             # Simulate detection based on image characteristics
@@ -251,7 +251,7 @@ class ObjectDetector:
 
             for obj in objects:
                 # Simulate confidence score
-                obj_hash = hashlib.md5(f"{image_hash}:{obj}".encode()).hexdigest()
+                obj_hash = hashlib.sha256(f"{image_hash}:{obj}".encode()).hexdigest()
                 confidence = int(obj_hash[:2], 16) / 255.0
 
                 if confidence > 0.6:
@@ -319,7 +319,7 @@ class FaceAnalyzer:
             Face analysis results
         """
         # Generate face embedding (simulated)
-        image_hash = hashlib.md5(image_data).hexdigest()
+        image_hash = hashlib.sha256(image_data).hexdigest()
 
         # Simulate face detection
         face_detected = int(image_hash[0], 16) > 5
@@ -407,7 +407,7 @@ class ImageAuthenticityAnalyzer:
         Returns:
             Authenticity analysis results
         """
-        image_hash = hashlib.md5(image_data).hexdigest()
+        image_hash = hashlib.sha256(image_data).hexdigest()
 
         # ELA (Error Level Analysis) simulation
         ela_score = 0.85 + (int(image_hash[0:2], 16) / 255.0) * 0.15
@@ -504,7 +504,7 @@ class ImageQualityAnalyzer:
             Quality analysis results
         """
         width, height = image_dimensions
-        image_hash = hashlib.md5(image_data).hexdigest()
+        image_hash = hashlib.sha256(image_data).hexdigest()
 
         # Resolution score
         resolution_score = min(1.0, (width * height) / (1920 * 1080))
@@ -658,7 +658,7 @@ class ProofVerificationModel(BaseModel):
 
         # Check cache first
         redis = await get_redis()
-        cache_key = f"proof_verify:{hashlib.md5(image_url.encode()).hexdigest()}"
+        cache_key = f"proof_verify:{hashlib.sha256(image_url.encode()).hexdigest()}"
 
         cached = await redis.get(cache_key)
         if cached:
@@ -888,12 +888,12 @@ class ProofVerificationModel(BaseModel):
     async def _fetch_image(self, url: str) -> bytes:
         """Fetch image from URL (simulated)"""
         # In production, use aiohttp to download
-        return hashlib.md5(url.encode()).digest() * 100
+        return hashlib.sha256(url.encode()).digest() * 100
 
     async def _extract_exif(self, image_data: bytes) -> Dict[str, Any]:
         """Extract EXIF metadata from image"""
         # In production, use PIL or exifread
-        image_hash = hashlib.md5(image_data).hexdigest()
+        image_hash = hashlib.sha256(image_data).hexdigest()
 
         # Simulate EXIF data
         has_gps = int(image_hash[0], 16) > 7
@@ -911,7 +911,7 @@ class ProofVerificationModel(BaseModel):
     async def _extract_visual_features(self, image_data: bytes) -> Dict[str, float]:
         """Extract visual features for landmark detection"""
         # In production, use CNN feature extractor
-        image_hash = hashlib.md5(image_data).hexdigest()
+        image_hash = hashlib.sha256(image_data).hexdigest()
 
         features = {}
         feature_names = [
@@ -1013,7 +1013,7 @@ class DuplicateProofDetector:
     def _calculate_phash(self, image_data: bytes) -> str:
         """Calculate perceptual hash (simulated)"""
         # In production, use imagehash.phash()
-        return hashlib.md5(image_data).hexdigest()[:16]
+        return hashlib.sha256(image_data).hexdigest()[:16]
 
     def _hamming_similarity(self, hash1: str, hash2: str) -> float:
         """Calculate similarity based on Hamming distance"""

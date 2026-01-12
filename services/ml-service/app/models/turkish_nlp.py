@@ -191,7 +191,7 @@ class TurkishNLPModel(BaseModel):
 
         # Check cache
         redis = await get_redis()
-        cache_key = f"nlp_analysis:{hashlib.md5(text.encode()).hexdigest()[:16]}"
+        cache_key = f"nlp_analysis:{hashlib.sha256(text.encode()).hexdigest()[:16]}"
 
         cached = await redis.get(cache_key)
         if cached:
