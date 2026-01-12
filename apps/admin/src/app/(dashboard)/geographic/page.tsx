@@ -13,6 +13,17 @@ import {
   Download,
   RefreshCw,
 } from 'lucide-react';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -208,13 +219,13 @@ export default function GeographicPage() {
               <SelectItem value="1y">Son 1 yıl</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="icon">
+          <CanvaButton variant="primary" size="sm" iconOnly>
             <RefreshCw className="h-4 w-4" />
-          </Button>
-          <Button variant="outline">
+          </CanvaButton>
+          <CanvaButton variant="primary">
             <Download className="mr-2 h-4 w-4" />
             Dışa Aktar
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
@@ -334,7 +345,9 @@ export default function GeographicPage() {
                           <div>
                             <div className="flex items-center gap-2">
                               <p className="font-semibold">{country.name}</p>
-                              <Badge variant="outline">{country.code}</Badge>
+                              <CanvaBadge variant="default">
+                                {country.code}
+                              </CanvaBadge>
                             </div>
                             <p className="text-sm text-muted-foreground">
                               {country.users.toLocaleString('tr-TR')} kullanıcı
@@ -474,9 +487,9 @@ export default function GeographicPage() {
                             </p>
                             <div className="flex flex-wrap gap-2">
                               {country.topCities.map((city) => (
-                                <Badge key={city} variant="secondary">
+                                <CanvaBadge key={city} variant="default">
                                   {city}
-                                </Badge>
+                                </CanvaBadge>
                               ))}
                             </div>
                           </div>
@@ -505,8 +518,8 @@ export default function GeographicPage() {
                     <XAxis type="number" />
                     <YAxis dataKey="name" type="category" width={100} />
                     <Tooltip
-                      formatter={(value: number) => [
-                        value.toLocaleString('tr-TR'),
+                      formatter={(value: number | undefined) => [
+                        (value ?? 0).toLocaleString('tr-TR'),
                         'Kullanıcı',
                       ]}
                     />

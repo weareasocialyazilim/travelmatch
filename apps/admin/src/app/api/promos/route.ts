@@ -21,8 +21,8 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
     const offset = Math.max(parseInt(searchParams.get('offset') || '0'), 0);
 
-    let query = supabase
-      .from('promo_codes')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let query = (supabase.from('promo_codes') as any)
       .select('*, campaign:marketing_campaigns(id, name)', { count: 'exact' })
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
@@ -103,8 +103,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if code already exists
-    const { data: existingCode } = await supabase
-      .from('promo_codes')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: existingCode } = await (supabase.from('promo_codes') as any)
       .select('id')
       .eq('code', body.code.toUpperCase())
       .single();
@@ -116,8 +116,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data, error } = await supabase
-      .from('promo_codes')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.from('promo_codes') as any)
       .insert({
         code: body.code.toUpperCase(),
         campaign_id: body.campaign_id,
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
         valid_until: body.valid_until,
         is_active: body.is_active !== false,
         applicable_to: body.applicable_to || {},
-        created_by: session.admin_id,
+        created_by: session.admin.id,
       })
       .select()
       .single();
@@ -194,8 +194,8 @@ export async function PATCH(request: NextRequest) {
     if (body.applicable_to !== undefined)
       updateData.applicable_to = body.applicable_to;
 
-    const { data, error } = await supabase
-      .from('promo_codes')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.from('promo_codes') as any)
       .update(updateData)
       .eq('id', body.id)
       .select()
@@ -236,8 +236,8 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Soft delete - just deactivate the code
-    const { error } = await supabase
-      .from('promo_codes')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.from('promo_codes') as any)
       .update({ is_active: false })
       .eq('id', id);
 

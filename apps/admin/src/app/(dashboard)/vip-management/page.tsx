@@ -65,6 +65,17 @@ import {
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { formatDate, getInitials } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 
@@ -116,7 +127,7 @@ const tierConfig = {
   },
   partner: {
     label: 'Partner',
-    variant: 'secondary' as const,
+    variant: 'default' as const,
     icon: CheckCircle,
     description: 'İş ortağı - Özel anlaşma',
   },
@@ -204,13 +215,13 @@ function AddVIPDialog({ open, onOpenChange, onAdd }: AddVIPDialogProps) {
                     {selectedUser.email}
                   </p>
                 </div>
-                <Button
+                <CanvaButton
                   variant="ghost"
                   size="sm"
                   onClick={() => setSelectedUser(null)}
                 >
                   Değiştir
-                </Button>
+                </CanvaButton>
               </div>
             ) : (
               <div className="relative">
@@ -326,10 +337,13 @@ function AddVIPDialog({ open, onOpenChange, onAdd }: AddVIPDialogProps) {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <CanvaButton variant="primary" onClick={() => onOpenChange(false)}>
             İptal
-          </Button>
-          <Button onClick={handleSubmit} disabled={!selectedUser || loading}>
+          </CanvaButton>
+          <CanvaButton
+            onClick={handleSubmit}
+            disabled={!selectedUser || loading}
+          >
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -341,7 +355,7 @@ function AddVIPDialog({ open, onOpenChange, onAdd }: AddVIPDialogProps) {
                 VIP Ekle
               </>
             )}
-          </Button>
+          </CanvaButton>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -576,20 +590,24 @@ export default function VIPManagementPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={fetchVIPUsers} disabled={loading}>
+          <CanvaButton
+            variant="primary"
+            onClick={fetchVIPUsers}
+            disabled={loading}
+          >
             <RefreshCw
               className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`}
             />
             Yenile
-          </Button>
-          <Button variant="outline">
+          </CanvaButton>
+          <CanvaButton variant="primary">
             <Download className="mr-2 h-4 w-4" />
             Dışa Aktar
-          </Button>
-          <Button onClick={() => setAddDialogOpen(true)}>
+          </CanvaButton>
+          <CanvaButton onClick={() => setAddDialogOpen(true)}>
             <UserPlus className="mr-2 h-4 w-4" />
             VIP Ekle
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
@@ -746,10 +764,10 @@ export default function VIPManagementPage() {
                       </p>
                     </div>
                   </div>
-                  <Badge variant={tierConfig[vipUser.tier].variant}>
+                  <CanvaBadge variant={tierConfig[vipUser.tier].variant}>
                     <TierIcon className="mr-1 h-3 w-3" />
                     {tierConfig[vipUser.tier].label}
-                  </Badge>
+                  </CanvaBadge>
                   <div className="text-sm">
                     <span className="font-medium">
                       %{vipUser.commission_override}
@@ -763,9 +781,9 @@ export default function VIPManagementPage() {
                       <div>
                         <p>{formatDate(vipUser.valid_until)}</p>
                         {isExpired && (
-                          <Badge variant="error" className="text-xs">
+                          <CanvaBadge variant="error" className="text-xs">
                             Süresi Doldu
-                          </Badge>
+                          </CanvaBadge>
                         )}
                       </div>
                     ) : (
@@ -778,9 +796,9 @@ export default function VIPManagementPage() {
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
+                      <CanvaButton variant="ghost" size="sm" iconOnly>
                         <MoreHorizontal className="h-4 w-4" />
-                      </Button>
+                      </CanvaButton>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>İşlemler</DropdownMenuLabel>
@@ -810,10 +828,13 @@ export default function VIPManagementPage() {
               <p className="mt-2 text-muted-foreground">
                 Henüz VIP statüsü verilmiş kullanıcı bulunmuyor.
               </p>
-              <Button className="mt-4" onClick={() => setAddDialogOpen(true)}>
+              <CanvaButton
+                className="mt-4"
+                onClick={() => setAddDialogOpen(true)}
+              >
                 <UserPlus className="mr-2 h-4 w-4" />
                 İlk VIP'i Ekle
-              </Button>
+              </CanvaButton>
             </div>
           )}
 
@@ -825,22 +846,22 @@ export default function VIPManagementPage() {
                 {total} kullanıcı
               </p>
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
+                <CanvaButton
+                  variant="primary"
                   size="sm"
                   onClick={() => setPage((p) => p - 1)}
                   disabled={page === 0}
                 >
                   Önceki
-                </Button>
-                <Button
-                  variant="outline"
+                </CanvaButton>
+                <CanvaButton
+                  variant="primary"
                   size="sm"
                   onClick={() => setPage((p) => p + 1)}
                   disabled={(page + 1) * limit >= total}
                 >
                   Sonraki
-                </Button>
+                </CanvaButton>
               </div>
             </div>
           )}

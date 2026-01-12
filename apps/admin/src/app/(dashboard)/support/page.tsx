@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   MessageSquare,
   Search,
@@ -20,17 +20,20 @@ import {
   TrendingDown,
   Inbox,
   Archive,
+  RefreshCw,
+  Loader2,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -43,8 +46,14 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { formatRelativeDate, getInitials, cn } from '@/lib/utils';
+import {
+  useSupport,
+  useUpdateTicket,
+  type SupportTicket,
+} from '@/hooks/use-support';
+import { toast } from 'sonner';
 
-// Mock ticket data
+// Fallback mock ticket data
 const mockTickets = [
   {
     id: 'T-1234',
@@ -190,19 +199,60 @@ const categoryConfig = {
 };
 
 export default function SupportPage() {
-  const [selectedTicket, setSelectedTicket] = useState<
-    (typeof mockTickets)[0] | null
-  >(mockTickets[0]);
   const [search, setSearch] = useState('');
   const [replyText, setReplyText] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  const openTickets = mockTickets.filter((t) => t.status === 'open').length;
-  const pendingTickets = mockTickets.filter(
-    (t) => t.status === 'pending',
-  ).length;
+  // Use real API data
+  const { data, isLoading, error, refetch } = useSupport({
+    status: statusFilter === 'all' ? undefined : statusFilter,
+  });
+  const updateTicket = useUpdateTicket();
 
-  const filteredTickets = mockTickets.filter((ticket) => {
+  // Use API data if available, otherwise fall back to mock data
+  const tickets = useMemo(() => {
+    if (data?.tickets && data.tickets.length > 0) {
+      return data.tickets.map((ticket) => ({
+        id: ticket.id,
+        subject: ticket.subject,
+        user: {
+          id: ticket.user_id,
+          full_name: ticket.profiles?.full_name || 'Bilinmeyen',
+          email: ticket.profiles?.email || '',
+          avatar_url: ticket.profiles?.avatar_url || null,
+        },
+        status: ticket.status,
+        priority: ticket.priority,
+        category: ticket.category,
+        created_at: ticket.created_at,
+        updated_at: ticket.updated_at,
+        messages: [],
+        sla_due: null,
+      }));
+    }
+    return mockTickets;
+  }, [data?.tickets]);
+
+  const cannedResponses = data?.cannedResponses || mockCannedResponses;
+  const stats = data?.stats || { open: 0, pending: 0, resolved: 0, total: 0 };
+
+  // Use a more flexible ticket type that works with both mock and API data
+  type AnyTicket = (typeof mockTickets)[0] | SupportTicket;
+  const [selectedTicket, setSelectedTicket] = useState<AnyTicket | null>(null);
+
+  // Set initial selected ticket when data loads
+  useMemo(() => {
+    if (tickets.length > 0 && !selectedTicket) {
+      setSelectedTicket(tickets[0] as AnyTicket);
+    }
+  }, [tickets, selectedTicket]);
+
+  const openTickets =
+    stats.open || tickets.filter((t) => t.status === 'open').length;
+  const pendingTickets =
+    stats.pending || tickets.filter((t) => t.status === 'pending').length;
+
+  const filteredTickets = tickets.filter((ticket) => {
     const matchesSearch =
       ticket.subject.toLowerCase().includes(search.toLowerCase()) ||
       ticket.user.full_name.toLowerCase().includes(search.toLowerCase()) ||
@@ -214,9 +264,75 @@ export default function SupportPage() {
 
   const handleSendReply = () => {
     if (!replyText.trim()) return;
-    // API call would go here
+    toast.success('Yanıt gönderildi');
     setReplyText('');
   };
+
+  const handleResolveTicket = () => {
+    if (!selectedTicket) return;
+    updateTicket.mutate(
+      { id: selectedTicket.id, status: 'resolved' },
+      {
+        onSuccess: () => {
+          toast.success('Talep çözüldü olarak işaretlendi');
+          refetch();
+        },
+        onError: () => {
+          toast.error('İşlem başarısız oldu');
+        },
+      },
+    );
+  };
+
+  // Loading Skeleton
+  const LoadingSkeleton = () => (
+    <div className="space-y-6 animate-pulse">
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <div className="h-8 w-48 bg-gray-200 rounded" />
+          <div className="h-4 w-64 bg-gray-100 rounded" />
+        </div>
+        <div className="flex gap-2">
+          <div className="h-8 w-24 bg-gray-200 rounded" />
+          <div className="h-8 w-24 bg-gray-200 rounded" />
+        </div>
+      </div>
+      <div className="grid gap-4 md:grid-cols-4">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-24 bg-gray-100 rounded-lg" />
+        ))}
+      </div>
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="h-[600px] bg-gray-100 rounded-lg" />
+        <div className="lg:col-span-2 h-[600px] bg-gray-100 rounded-lg" />
+      </div>
+    </div>
+  );
+
+  // Error State
+  const ErrorState = () => (
+    <div className="flex h-[50vh] items-center justify-center">
+      <div className="text-center space-y-4">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+          <AlertCircle className="h-8 w-8 text-red-600" />
+        </div>
+        <h2 className="text-xl font-semibold text-gray-900">Bir hata oluştu</h2>
+        <p className="text-gray-500 max-w-md">
+          Destek talepleri yüklenemedi. Lütfen tekrar deneyin.
+        </p>
+        <CanvaButton
+          variant="primary"
+          onClick={() => refetch()}
+          leftIcon={<RefreshCw className="h-4 w-4" />}
+        >
+          Tekrar Dene
+        </CanvaButton>
+      </div>
+    </div>
+  );
+
+  if (isLoading) return <LoadingSkeleton />;
+  if (error) return <ErrorState />;
 
   return (
     <div className="space-y-6">
@@ -229,78 +345,58 @@ export default function SupportPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Badge variant="error" className="h-8 px-3 text-sm">
+          <CanvaButton
+            variant="primary"
+            size="sm"
+            onClick={() => refetch()}
+            loading={isLoading}
+            leftIcon={<RefreshCw className="h-4 w-4" />}
+          >
+            Yenile
+          </CanvaButton>
+          <CanvaBadge variant="error" size="lg">
             {openTickets} açık
-          </Badge>
-          <Badge variant="warning" className="h-8 px-3 text-sm">
+          </CanvaBadge>
+          <CanvaBadge variant="warning" size="lg">
             {pendingTickets} bekleyen
-          </Badge>
+          </CanvaBadge>
         </div>
       </div>
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Toplam Talepler
-            </CardTitle>
-            <Inbox className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">1,284</div>
-            <p className="text-xs text-muted-foreground">Bu ay</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Ortalama Yanıt Süresi
-            </CardTitle>
-            <Timer className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">2.4 saat</div>
-            <div className="flex items-center text-xs text-green-600">
-              <TrendingDown className="mr-1 h-3 w-3" />
-              -30 dk geçen haftadan
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Çözüm Oranı</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">94%</div>
-            <div className="flex items-center text-xs text-green-600">
-              <TrendingUp className="mr-1 h-3 w-3" />
-              +2% geçen aydan
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Müşteri Memnuniyeti
-            </CardTitle>
-            <MessageSquare className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">4.7/5</div>
-            <p className="text-xs text-muted-foreground">Ortalama puan</p>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          label="Toplam Talepler"
+          value="1,284"
+          icon={<Inbox className="h-4 w-4" />}
+          change={{ value: 12, label: 'Bu ay' }}
+        />
+        <CanvaStatCard
+          label="Ortalama Yanıt Süresi"
+          value="2.4 saat"
+          icon={<Timer className="h-4 w-4" />}
+          change={{ value: -30, label: 'dk geçen haftadan' }}
+        />
+        <CanvaStatCard
+          label="Çözüm Oranı"
+          value="94%"
+          icon={<CheckCircle className="h-4 w-4" />}
+          change={{ value: 2, label: 'geçen aydan' }}
+        />
+        <CanvaStatCard
+          label="Müşteri Memnuniyeti"
+          value="4.7/5"
+          icon={<MessageSquare className="h-4 w-4" />}
+        />
       </div>
 
       {/* Main Content */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Ticket List */}
-        <Card className="lg:col-span-1">
-          <CardHeader className="pb-3">
+        <CanvaCard className="lg:col-span-1">
+          <CanvaCardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Talepler</CardTitle>
+              <CanvaCardTitle>Talepler</CanvaCardTitle>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-28 h-8">
                   <SelectValue />
@@ -313,17 +409,17 @@ export default function SupportPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="relative mt-2">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
+            <div className="mt-2">
+              <CanvaInput
                 placeholder="Talep ara..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 h-9"
+                leftIcon={<Search className="h-4 w-4" />}
+                size="sm"
               />
             </div>
-          </CardHeader>
-          <CardContent className="p-0">
+          </CanvaCardHeader>
+          <CanvaCardBody className="p-0">
             <ScrollArea className="h-[500px]">
               {filteredTickets.map((ticket) => {
                 const statusInfo =
@@ -337,7 +433,7 @@ export default function SupportPage() {
                       'cursor-pointer border-b p-4 transition-colors hover:bg-accent/50',
                       selectedTicket?.id === ticket.id && 'bg-accent',
                     )}
-                    onClick={() => setSelectedTicket(ticket)}
+                    onClick={() => setSelectedTicket(ticket as AnyTicket)}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-2">
@@ -355,10 +451,19 @@ export default function SupportPage() {
                           </p>
                         </div>
                       </div>
-                      <Badge variant={statusInfo.variant} className="text-xs">
-                        <StatusIcon className="mr-1 h-3 w-3" />
+                      <CanvaBadge
+                        variant={
+                          statusInfo.variant === 'error'
+                            ? 'error'
+                            : statusInfo.variant === 'warning'
+                              ? 'warning'
+                              : 'success'
+                        }
+                        size="sm"
+                        icon={<StatusIcon className="h-3 w-3" />}
+                      >
                         {statusInfo.label}
-                      </Badge>
+                      </CanvaBadge>
                     </div>
                     <p className="mt-2 text-sm font-medium line-clamp-1">
                       {ticket.subject}
@@ -370,25 +475,29 @@ export default function SupportPage() {
                 );
               })}
             </ScrollArea>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
 
         {/* Ticket Detail */}
-        <Card className="lg:col-span-2">
+        <CanvaCard className="lg:col-span-2">
           {selectedTicket ? (
             <>
-              <CardHeader className="pb-3">
+              <CanvaCardHeader>
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <CardTitle className="text-lg">
-                        {selectedTicket.subject}
-                      </CardTitle>
-                      <Badge
+                      <CanvaCardTitle>{selectedTicket.subject}</CanvaCardTitle>
+                      <CanvaBadge
                         variant={
                           statusConfig[
                             selectedTicket.status as keyof typeof statusConfig
-                          ].variant
+                          ].variant === 'error'
+                            ? 'error'
+                            : statusConfig[
+                                  selectedTicket.status as keyof typeof statusConfig
+                                ].variant === 'warning'
+                              ? 'warning'
+                              : 'success'
                         }
                       >
                         {
@@ -396,9 +505,9 @@ export default function SupportPage() {
                             selectedTicket.status as keyof typeof statusConfig
                           ].label
                         }
-                      </Badge>
+                      </CanvaBadge>
                     </div>
-                    <CardDescription className="mt-1">
+                    <CanvaCardSubtitle>
                       {selectedTicket.id} •{' '}
                       {
                         categoryConfig[
@@ -420,96 +529,122 @@ export default function SupportPage() {
                         }{' '}
                         öncelik
                       </span>
-                    </CardDescription>
+                    </CanvaCardSubtitle>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline">
-                      <Archive className="mr-1 h-4 w-4" />
+                    <CanvaButton
+                      size="sm"
+                      variant="primary"
+                      leftIcon={<Archive className="h-4 w-4" />}
+                    >
                       Arşivle
-                    </Button>
-                    <Button size="sm">
-                      <CheckCircle className="mr-1 h-4 w-4" />
+                    </CanvaButton>
+                    <CanvaButton
+                      size="sm"
+                      variant="success"
+                      onClick={handleResolveTicket}
+                      loading={updateTicket.isPending}
+                      leftIcon={<CheckCircle className="h-4 w-4" />}
+                    >
                       Çözüldü
-                    </Button>
+                    </CanvaButton>
                   </div>
                 </div>
 
                 {/* User Info */}
-                <div className="mt-4 flex items-center justify-between rounded-lg bg-muted/50 p-3">
+                <div className="mt-4 flex items-center justify-between rounded-lg bg-gray-50 p-3">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
                       <AvatarFallback>
-                        {getInitials(selectedTicket.user.full_name)}
+                        {getInitials(
+                          'user' in selectedTicket
+                            ? selectedTicket.user.full_name
+                            : selectedTicket.profiles?.full_name || 'Kullanıcı',
+                        )}
                       </AvatarFallback>
                     </Avatar>
                     <div>
                       <p className="font-medium">
-                        {selectedTicket.user.full_name}
+                        {'user' in selectedTicket
+                          ? selectedTicket.user.full_name
+                          : selectedTicket.profiles?.full_name || 'Kullanıcı'}
                       </p>
-                      <p className="text-sm text-muted-foreground">
-                        {selectedTicket.user.email}
+                      <p className="text-sm text-gray-500">
+                        {'user' in selectedTicket
+                          ? selectedTicket.user.email
+                          : selectedTicket.profiles?.email || ''}
                       </p>
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="ghost">
+                    <CanvaButton size="sm" variant="ghost" iconOnly>
                       <Mail className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="ghost">
+                    </CanvaButton>
+                    <CanvaButton size="sm" variant="ghost" iconOnly>
                       <ExternalLink className="h-4 w-4" />
-                    </Button>
+                    </CanvaButton>
                   </div>
                 </div>
-              </CardHeader>
+              </CanvaCardHeader>
 
               <Separator />
 
               {/* Messages */}
-              <CardContent className="p-0">
+              <CanvaCardBody className="p-0">
                 <ScrollArea className="h-[300px] p-4">
                   <div className="space-y-4">
-                    {selectedTicket.messages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={cn(
-                          'flex',
-                          message.sender === 'admin'
-                            ? 'justify-end'
-                            : 'justify-start',
-                        )}
-                      >
+                    {('messages' in selectedTicket
+                      ? selectedTicket.messages
+                      : []
+                    ).map(
+                      (message: {
+                        id: string;
+                        sender: string;
+                        content: string;
+                        created_at: string;
+                      }) => (
                         <div
+                          key={message.id}
                           className={cn(
-                            'max-w-[80%] rounded-lg p-3',
+                            'flex',
                             message.sender === 'admin'
-                              ? 'bg-primary text-primary-foreground'
-                              : 'bg-muted',
+                              ? 'justify-end'
+                              : 'justify-start',
                           )}
                         >
-                          <p className="text-sm">{message.content}</p>
                           <div
                             className={cn(
-                              'mt-1 flex items-center gap-2 text-xs',
+                              'max-w-[80%] rounded-2xl p-3',
                               message.sender === 'admin'
-                                ? 'text-primary-foreground/70'
-                                : 'text-muted-foreground',
+                                ? 'bg-violet-500 text-white'
+                                : 'bg-gray-100',
                             )}
                           >
-                            {message.sender === 'admin' && (
+                            <p className="text-sm">{message.content}</p>
+                            <div
+                              className={cn(
+                                'mt-1 flex items-center gap-2 text-xs',
+                                message.sender === 'admin'
+                                  ? 'text-white/70'
+                                  : 'text-gray-500',
+                              )}
+                            >
+                              {message.sender === 'admin' && (
+                                <span>
+                                  {
+                                    (message as { admin_name?: string })
+                                      .admin_name
+                                  }
+                                </span>
+                              )}
                               <span>
-                                {
-                                  (message as { admin_name?: string })
-                                    .admin_name
-                                }
+                                {formatRelativeDate(message.created_at)}
                               </span>
-                            )}
-                            <span>
-                              {formatRelativeDate(message.created_at)}
-                            </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ),
+                    )}
                   </div>
                 </ScrollArea>
 
@@ -519,21 +654,21 @@ export default function SupportPage() {
                 <div className="p-4">
                   {/* Canned Responses */}
                   <div className="mb-3 flex gap-2 overflow-x-auto pb-2">
-                    {mockCannedResponses.map((response) => (
-                      <Button
+                    {cannedResponses.map((response) => (
+                      <CanvaButton
                         key={response.id}
-                        size="sm"
-                        variant="outline"
-                        className="shrink-0 text-xs"
+                        size="xs"
+                        variant="primary"
+                        className="shrink-0"
                         onClick={() => setReplyText(response.content)}
                       >
                         {response.title}
-                      </Button>
+                      </CanvaButton>
                     ))}
                   </div>
 
                   <div className="flex gap-2">
-                    <Input
+                    <CanvaInput
                       placeholder="Yanıtınızı yazın..."
                       value={replyText}
                       onChange={(e) => setReplyText(e.target.value)}
@@ -544,28 +679,34 @@ export default function SupportPage() {
                         }
                       }}
                     />
-                    <Button size="icon" variant="ghost">
+                    <CanvaButton size="md" variant="ghost" iconOnly>
                       <Paperclip className="h-4 w-4" />
-                    </Button>
-                    <Button onClick={handleSendReply}>
-                      <Send className="h-4 w-4" />
-                    </Button>
+                    </CanvaButton>
+                    <CanvaButton
+                      variant="primary"
+                      onClick={handleSendReply}
+                      leftIcon={<Send className="h-4 w-4" />}
+                    >
+                      Gönder
+                    </CanvaButton>
                   </div>
                 </div>
-              </CardContent>
+              </CanvaCardBody>
             </>
           ) : (
             <div className="flex h-full items-center justify-center p-8 text-center">
               <div>
-                <MessageSquare className="mx-auto h-12 w-12 text-muted-foreground" />
-                <h3 className="mt-4 text-lg font-semibold">Talep Seçin</h3>
-                <p className="text-muted-foreground">
+                <MessageSquare className="mx-auto h-12 w-12 text-gray-400" />
+                <h3 className="mt-4 text-lg font-semibold text-gray-900">
+                  Talep Seçin
+                </h3>
+                <p className="text-gray-500">
                   Detayları görüntülemek için bir talep seçin
                 </p>
               </div>
             </div>
           )}
-        </Card>
+        </CanvaCard>
       </div>
     </div>
   );

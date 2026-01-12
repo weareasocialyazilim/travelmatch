@@ -15,6 +15,17 @@ import {
   Loader2,
   AlertTriangle,
 } from 'lucide-react';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -58,7 +69,7 @@ const statusConfig = {
   approved: { label: 'Onaylandı', variant: 'success' as const },
   processing: { label: 'İşleniyor', variant: 'info' as const },
   failed: { label: 'Başarısız', variant: 'error' as const },
-  cancelled: { label: 'İptal', variant: 'secondary' as const },
+  cancelled: { label: 'İptal', variant: 'default' as const },
 };
 
 export default function FinancePage() {
@@ -132,10 +143,10 @@ export default function FinancePage() {
               <SelectItem value="90d">90 gün</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline">
+          <CanvaButton variant="primary">
             <Download className="mr-2 h-4 w-4" />
             Rapor İndir
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
@@ -235,9 +246,9 @@ export default function FinancePage() {
           <TabsTrigger value="payouts">
             Bekleyen Ödemeler
             {pendingPayoutsCount > 0 && (
-              <Badge variant="warning" className="ml-2">
+              <CanvaBadge variant="warning" className="ml-2">
                 {pendingPayoutsCount}
-              </Badge>
+              </CanvaBadge>
             )}
           </TabsTrigger>
         </TabsList>
@@ -307,7 +318,7 @@ export default function FinancePage() {
                     };
                     const statusInfo = statusConfig[
                       tx.status as keyof typeof statusConfig
-                    ] || { label: tx.status, variant: 'secondary' as const };
+                    ] || { label: tx.status, variant: 'default' as const };
                     const TypeIcon = typeInfo.icon;
 
                     return (
@@ -333,9 +344,9 @@ export default function FinancePage() {
                           {tx.type === 'refund' ? '-' : '+'}
                           {formatCurrency(tx.amount, tx.currency)}
                         </div>
-                        <Badge variant={statusInfo.variant}>
+                        <CanvaBadge variant={statusInfo.variant}>
                           {statusInfo.label}
-                        </Badge>
+                        </CanvaBadge>
                         <div className="text-sm text-muted-foreground">
                           {formatRelativeDate(tx.created_at)}
                         </div>
@@ -381,7 +392,7 @@ export default function FinancePage() {
                       payout.status as keyof typeof statusConfig
                     ] || {
                       label: payout.status,
-                      variant: 'secondary' as const,
+                      variant: 'default' as const,
                     };
 
                     return (
@@ -398,9 +409,9 @@ export default function FinancePage() {
                           <div>
                             <div className="flex items-center gap-2">
                               <span className="font-medium">{payout.id}</span>
-                              <Badge variant={statusInfo.variant}>
+                              <CanvaBadge variant={statusInfo.variant}>
                                 {statusInfo.label}
-                              </Badge>
+                              </CanvaBadge>
                             </div>
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                               <span>User: {payout.user_id}</span>
@@ -419,17 +430,17 @@ export default function FinancePage() {
                           </div>
                           {payout.status === 'pending' && (
                             <div className="flex gap-2">
-                              <Button
+                              <CanvaButton
                                 size="sm"
-                                variant="outline"
+                                variant="primary"
                                 onClick={() =>
                                   toast.info('İade işlemi henüz bağlı değil')
                                 }
                               >
                                 <XCircle className="mr-1 h-4 w-4" />
                                 Reddet
-                              </Button>
-                              <Button
+                              </CanvaButton>
+                              <CanvaButton
                                 size="sm"
                                 onClick={() =>
                                   toast.info('Onay işlemi henüz bağlı değil')
@@ -437,7 +448,7 @@ export default function FinancePage() {
                               >
                                 <CheckCircle className="mr-1 h-4 w-4" />
                                 Onayla
-                              </Button>
+                              </CanvaButton>
                             </div>
                           )}
                         </div>

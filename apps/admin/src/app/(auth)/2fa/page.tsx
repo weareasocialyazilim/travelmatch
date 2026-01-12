@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
+import { CanvaButton } from '@/components/canva/CanvaButton';
 
 export default function TwoFactorPage() {
   const router = useRouter();
@@ -127,20 +128,20 @@ export default function TwoFactorPage() {
               ))}
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <CanvaButton type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Doğrula
-            </Button>
+            </CanvaButton>
           </form>
 
           <div className="mt-6 text-center">
-            <Button
-              variant="link"
+            <CanvaButton
+              variant="ghost"
               className="text-muted-foreground"
               onClick={() => router.push('/login')}
             >
               Farklı bir hesapla giriş yap
-            </Button>
+            </CanvaButton>
           </div>
         </CardContent>
       </Card>

@@ -5,12 +5,11 @@ export * from './use-permission';
 // Real-time (excluding useRealtimeStats to avoid conflict with use-stats)
 export {
   useRealtimeSubscription,
-  useRealtimeTasks,
+  useRealtimeTaskQueue,
   useRealtimeNotifications,
   useRealtimeDisputes,
   useRealtimePayouts,
-  useRealtimeMetrics,
-  useRealtimeAuditLogs,
+  useRealtimeAuditLog,
 } from './use-realtime';
 
 // Data Hooks

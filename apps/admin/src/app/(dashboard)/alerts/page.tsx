@@ -34,6 +34,17 @@ import {
   TrendingUp,
   TrendingDown,
 } from 'lucide-react';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import {
   Card,
   CardContent,
@@ -41,9 +52,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -219,9 +228,11 @@ export default function AlertsPage() {
       low: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
     };
     return (
-      <Badge className={styles[severity as keyof typeof styles] || styles.low}>
+      <CanvaBadge
+        className={styles[severity as keyof typeof styles] || styles.low}
+      >
         {severity.toUpperCase()}
-      </Badge>
+      </CanvaBadge>
     );
   };
 
@@ -264,8 +275,8 @@ export default function AlertsPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
+          <CanvaButton
+            variant="primary"
             size="sm"
             onClick={() => setSoundEnabled(!soundEnabled)}
           >
@@ -275,13 +286,13 @@ export default function AlertsPage() {
               <VolumeX className="h-4 w-4 mr-2" />
             )}
             Ses {soundEnabled ? 'Açık' : 'Kapalı'}
-          </Button>
+          </CanvaButton>
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
+              <CanvaButton variant="primary" size="sm">
                 <Settings className="h-4 w-4 mr-2" />
                 Kuralları Yönet
-              </Button>
+              </CanvaButton>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
@@ -332,9 +343,9 @@ export default function AlertsPage() {
                 </p>
               </div>
             </div>
-            <Button variant="destructive" size="sm">
+            <CanvaButton variant="danger" size="sm">
               Hepsini Gör
-            </Button>
+            </CanvaButton>
           </div>
         </div>
       )}
@@ -461,10 +472,10 @@ export default function AlertsPage() {
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold">{alert.title}</h3>
                           {getSeverityBadge(alert.severity)}
-                          <Badge variant="outline" className="text-xs">
+                          <CanvaBadge variant="primary" className="text-xs">
                             {getCategoryIcon(alert.category)}
                             <span className="ml-1">{alert.category}</span>
-                          </Badge>
+                          </CanvaBadge>
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">
                           {alert.description}
@@ -486,14 +497,14 @@ export default function AlertsPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm">
+                      <CanvaButton variant="primary" size="sm">
                         <Eye className="h-4 w-4 mr-1" />
                         Onayla
-                      </Button>
-                      <Button variant="default" size="sm">
+                      </CanvaButton>
+                      <CanvaButton variant="primary" size="sm">
                         Çöz
                         <ChevronRight className="h-4 w-4 ml-1" />
-                      </Button>
+                      </CanvaButton>
                     </div>
                   </div>
                 </CardContent>
@@ -524,9 +535,9 @@ export default function AlertsPage() {
                         </p>
                       </div>
                     </div>
-                    <Button variant="default" size="sm">
+                    <CanvaButton variant="primary" size="sm">
                       Çöz
-                    </Button>
+                    </CanvaButton>
                   </div>
                 </CardContent>
               </Card>

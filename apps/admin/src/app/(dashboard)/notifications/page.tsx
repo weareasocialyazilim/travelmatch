@@ -22,9 +22,19 @@ import {
   XCircle,
   TrendingUp,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
 import { Label } from '@/components/ui/label';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
+import { Badge } from '@/components/ui/badge';
 import {
   Card,
   CardContent,
@@ -32,7 +42,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
@@ -220,19 +229,77 @@ export default function NotificationsPage() {
   const getStatusBadge = (status: string) => {
     const variants: Record<
       string,
-      { variant: 'default' | 'secondary' | 'outline'; label: string }
+      { variant: 'primary' | 'default' | 'info'; label: string }
     > = {
-      sent: { variant: 'default', label: 'Gönderildi' },
-      scheduled: { variant: 'secondary', label: 'Zamanlandı' },
-      draft: { variant: 'outline', label: 'Taslak' },
-      failed: { variant: 'outline', label: 'Başarısız' },
+      sent: { variant: 'primary', label: 'Gönderildi' },
+      scheduled: { variant: 'default', label: 'Zamanlandı' },
+      draft: { variant: 'info', label: 'Taslak' },
+      failed: { variant: 'info', label: 'Başarısız' },
     };
     const { variant, label } = variants[status] || {
-      variant: 'outline',
+      variant: 'info',
       label: status,
     };
-    return <Badge variant={variant}>{label}</Badge>;
+    return <CanvaBadge variant={variant}>{label}</CanvaBadge>;
   };
+
+  // Loading Skeleton
+  const LoadingSkeleton = () => (
+    <div className="space-y-6 animate-pulse">
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <div className="h-8 w-64 bg-gray-200 rounded" />
+          <div className="h-4 w-48 bg-gray-100 rounded" />
+        </div>
+        <div className="h-10 w-36 bg-gray-200 rounded" />
+      </div>
+      <div className="grid gap-4 md:grid-cols-4">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-24 bg-gray-100 rounded-lg" />
+        ))}
+      </div>
+      <div className="h-96 bg-gray-100 rounded-lg" />
+    </div>
+  );
+
+  // Error State
+  const ErrorState = () => (
+    <div className="flex h-[50vh] items-center justify-center">
+      <div className="text-center space-y-4">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+          <AlertTriangle className="h-8 w-8 text-red-600" />
+        </div>
+        <h2 className="text-xl font-semibold text-gray-900">Bir hata oluştu</h2>
+        <p className="text-gray-500 max-w-md">
+          Bildirim verileri yüklenemedi. Lütfen tekrar deneyin.
+        </p>
+      </div>
+    </div>
+  );
+
+  // Empty State
+  const EmptyState = () => (
+    <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-gray-200">
+      <div className="text-center space-y-3">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+          <Bell className="h-6 w-6 text-gray-400" />
+        </div>
+        <h3 className="text-lg font-medium text-gray-900">
+          Henüz bildirim yok
+        </h3>
+        <p className="text-sm text-gray-500">
+          İlk push bildiriminizi göndererek başlayın.
+        </p>
+        <CanvaButton variant="primary" onClick={() => setIsCreateOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Bildirim Oluştur
+        </CanvaButton>
+      </div>
+    </div>
+  );
+
+  if (isLoading) return <LoadingSkeleton />;
+  if (error) return <ErrorState />;
 
   return (
     <div className="space-y-6">
@@ -248,10 +315,10 @@ export default function NotificationsPage() {
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <CanvaButton>
               <Plus className="mr-2 h-4 w-4" />
               Yeni Bildirim
-            </Button>
+            </CanvaButton>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
@@ -267,14 +334,14 @@ export default function NotificationsPage() {
                 <Label>Hazır Şablon</Label>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {mockTemplates.map((template) => (
-                    <Button
+                    <CanvaButton
                       key={template.id}
-                      variant="outline"
+                      variant="primary"
                       size="sm"
                       onClick={() => applyTemplate(template)}
                     >
                       {template.name}
-                    </Button>
+                    </CanvaButton>
                   ))}
                 </div>
               </div>
@@ -283,7 +350,7 @@ export default function NotificationsPage() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="title">Başlık</Label>
-                  <Input
+                  <CanvaInput
                     id="title"
                     placeholder="Bildirim başlığı..."
                     value={notificationTitle}
@@ -372,11 +439,11 @@ export default function NotificationsPage() {
                   <div className="flex gap-4">
                     <div className="flex-1 space-y-2">
                       <Label>Tarih</Label>
-                      <Input type="date" />
+                      <CanvaInput type="date" />
                     </div>
                     <div className="flex-1 space-y-2">
                       <Label>Saat</Label>
-                      <Input type="time" />
+                      <CanvaInput type="time" />
                     </div>
                   </div>
                 )}
@@ -397,19 +464,19 @@ export default function NotificationsPage() {
             </div>
 
             <DialogFooter className="gap-2">
-              <Button variant="outline" onClick={handleSaveDraft}>
+              <CanvaButton variant="primary" onClick={handleSaveDraft}>
                 Taslak Kaydet
-              </Button>
+              </CanvaButton>
               {scheduleEnabled ? (
-                <Button onClick={handleSchedule}>
+                <CanvaButton onClick={handleSchedule}>
                   <Clock className="mr-2 h-4 w-4" />
                   Zamanla
-                </Button>
+                </CanvaButton>
               ) : (
-                <Button onClick={handleSend}>
+                <CanvaButton onClick={handleSend}>
                   <Send className="mr-2 h-4 w-4" />
                   Gönder
-                </Button>
+                </CanvaButton>
               )}
             </DialogFooter>
           </DialogContent>
@@ -490,10 +557,10 @@ export default function NotificationsPage() {
             <TabsTrigger value="drafts">Taslaklar</TabsTrigger>
           </TabsList>
           <div className="flex items-center gap-2">
-            <Input placeholder="Ara..." className="w-64" />
-            <Button variant="outline" size="icon">
+            <CanvaInput placeholder="Ara..." className="w-64" />
+            <CanvaButton variant="primary" size="sm" iconOnly>
               <Filter className="h-4 w-4" />
-            </Button>
+            </CanvaButton>
           </div>
         </div>
 
@@ -579,9 +646,9 @@ export default function NotificationsPage() {
                     )}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
+                        <CanvaButton variant="ghost" size="sm" iconOnly>
                           <MoreHorizontal className="h-4 w-4" />
-                        </Button>
+                        </CanvaButton>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem>

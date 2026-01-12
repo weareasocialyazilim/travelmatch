@@ -9,8 +9,8 @@ export async function GET(
   try {
     const supabase = createClient();
 
-    const { data: report, error } = await supabase
-      .from('reports')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: report, error } = await (supabase.from('reports') as any)
       .select(
         `
         *,
@@ -47,8 +47,8 @@ export async function PATCH(
     const supabase = createClient();
     const body = await request.json();
 
-    const { data, error } = await supabase
-      .from('reports')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.from('reports') as any)
       .update({
         status: body.status,
         priority: body.priority,

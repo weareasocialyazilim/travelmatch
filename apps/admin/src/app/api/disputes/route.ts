@@ -23,8 +23,8 @@ export async function GET(request: NextRequest) {
 
     const supabase = createServiceClient();
 
-    let query = supabase
-      .from('disputes')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let query = (supabase.from('disputes') as any)
       .select(
         `
         *,
@@ -106,8 +106,8 @@ export async function POST(request: NextRequest) {
 
     const supabase = createServiceClient();
 
-    const { data: dispute, error } = await supabase
-      .from('disputes')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: dispute, error } = await (supabase.from('disputes') as any)
       .insert({
         requester_id,
         responder_id,

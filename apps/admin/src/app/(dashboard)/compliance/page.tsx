@@ -23,8 +23,18 @@ import {
   Unlock,
   RefreshCw,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
+import { Badge } from '@/components/ui/badge';
 import {
   Card,
   CardContent,
@@ -32,7 +42,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -142,19 +151,19 @@ const getRiskLevelColor = (level: string) => {
 const getStatusBadge = (status: string) => {
   switch (status) {
     case 'pending':
-      return <Badge variant="warning">Bekliyor</Badge>;
+      return <CanvaBadge variant="warning">Bekliyor</CanvaBadge>;
     case 'investigating':
-      return <Badge variant="secondary">İnceleniyor</Badge>;
+      return <CanvaBadge variant="primary">İnceleniyor</CanvaBadge>;
     case 'escalated':
-      return <Badge variant="error">Yükseltildi</Badge>;
+      return <CanvaBadge variant="error">Yükseltildi</CanvaBadge>;
     case 'reported':
-      return <Badge variant="info">Bildirildi</Badge>;
+      return <CanvaBadge variant="info">Bildirildi</CanvaBadge>;
     case 'cleared':
-      return <Badge variant="success">Temiz</Badge>;
+      return <CanvaBadge variant="success">Temiz</CanvaBadge>;
     case 'confirmed':
-      return <Badge variant="error">Onaylandı</Badge>;
+      return <CanvaBadge variant="error">Onaylandı</CanvaBadge>;
     default:
-      return <Badge>{status}</Badge>;
+      return <CanvaBadge>{status}</CanvaBadge>;
   }
 };
 
@@ -459,21 +468,71 @@ export default function CompliancePage() {
     }
   };
 
+  // Loading Skeleton
+  const LoadingSkeleton = () => (
+    <div className="space-y-6 animate-pulse">
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <div className="h-8 w-48 bg-gray-200 rounded" />
+          <div className="h-4 w-64 bg-gray-100 rounded" />
+        </div>
+        <div className="flex gap-2">
+          <div className="h-10 w-24 bg-gray-200 rounded" />
+          <div className="h-8 w-32 bg-gray-200 rounded" />
+        </div>
+      </div>
+      <div className="grid gap-4 md:grid-cols-5">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="h-28 bg-gray-100 rounded-lg" />
+        ))}
+      </div>
+      <div className="h-96 bg-gray-100 rounded-lg" />
+    </div>
+  );
+
+  // Error State
+  const ErrorState = () => (
+    <div className="flex h-[50vh] items-center justify-center">
+      <div className="text-center space-y-4">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+          <AlertTriangle className="h-8 w-8 text-red-600" />
+        </div>
+        <h2 className="text-xl font-semibold text-gray-900">Bir hata oluştu</h2>
+        <p className="text-gray-500 max-w-md">
+          Uyumluluk verileri yüklenemedi. Lütfen tekrar deneyin.
+        </p>
+        <CanvaButton
+          variant="primary"
+          onClick={() => {
+            fetchStats();
+            fetchSarReports();
+            fetchRiskProfiles();
+          }}
+          leftIcon={<RefreshCw className="h-4 w-4" />}
+        >
+          Tekrar Dene
+        </CanvaButton>
+      </div>
+    </div>
+  );
+
+  if (loading) return <LoadingSkeleton />;
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Compliance Center
+            Uyumluluk Merkezi
           </h1>
           <p className="text-muted-foreground">
             AML, Fraud Tespit ve Uyumluluk Yönetimi
           </p>
         </div>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
+          <CanvaButton
+            variant="primary"
             onClick={() => {
               fetchStats();
               fetchSarReports();
@@ -482,12 +541,12 @@ export default function CompliancePage() {
           >
             <RefreshCw className="mr-2 h-4 w-4" />
             Yenile
-          </Button>
+          </CanvaButton>
           {stats?.sar.pending ? (
-            <Badge variant="error" className="h-8 px-3 text-sm">
+            <CanvaBadge variant="error" className="h-8 px-3 text-sm">
               <AlertCircle className="mr-1 h-4 w-4" />
               {stats.sar.pending} bekleyen SAR
-            </Badge>
+            </CanvaBadge>
           ) : null}
         </div>
       </div>
@@ -564,9 +623,9 @@ export default function CompliancePage() {
             <FileText className="mr-2 h-4 w-4" />
             SAR Raporları
             {stats?.sar.pending ? (
-              <Badge variant="error" className="ml-2">
+              <CanvaBadge variant="error" className="ml-2">
                 {stats.sar.pending}
-              </Badge>
+              </CanvaBadge>
             ) : null}
           </TabsTrigger>
           <TabsTrigger value="risk">
@@ -597,7 +656,7 @@ export default function CompliancePage() {
               <div className="mb-6 flex items-center gap-4">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
+                  <CanvaInput
                     placeholder="Rapor numarası veya kullanıcı ara..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -652,27 +711,27 @@ export default function CompliancePage() {
                               {sar.report_number}
                             </span>
                             {getStatusBadge(sar.status)}
-                            <Badge variant="outline">
+                            <CanvaBadge variant="primary">
                               {sar.report_type.toUpperCase()}
-                            </Badge>
+                            </CanvaBadge>
                           </div>
                           <p className="text-sm text-muted-foreground">
                             {sar.user?.email || 'Bilinmeyen kullanıcı'}
                           </p>
                           <div className="mt-1 flex flex-wrap gap-1">
                             {sar.triggered_rules?.slice(0, 3).map((rule, i) => (
-                              <Badge
+                              <CanvaBadge
                                 key={i}
-                                variant="outline"
+                                variant="primary"
                                 className="text-xs"
                               >
                                 {rule}
-                              </Badge>
+                              </CanvaBadge>
                             ))}
                             {sar.triggered_rules?.length > 3 && (
-                              <Badge variant="outline" className="text-xs">
+                              <CanvaBadge variant="primary" className="text-xs">
                                 +{sar.triggered_rules.length - 3}
-                              </Badge>
+                              </CanvaBadge>
                             )}
                           </div>
                           <p className="mt-1 text-xs text-muted-foreground">
@@ -683,9 +742,9 @@ export default function CompliancePage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button
+                        <CanvaButton
                           size="sm"
-                          variant="outline"
+                          variant="primary"
                           onClick={() => {
                             setSelectedSar(sar);
                             setInvestigationNotes(
@@ -695,12 +754,12 @@ export default function CompliancePage() {
                         >
                           <Eye className="mr-1 h-4 w-4" />
                           İncele
-                        </Button>
+                        </CanvaButton>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button size="sm" variant="ghost">
+                            <CanvaButton size="sm" variant="ghost">
                               <MoreHorizontal className="h-4 w-4" />
-                            </Button>
+                            </CanvaButton>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>İşlemler</DropdownMenuLabel>
@@ -801,16 +860,16 @@ export default function CompliancePage() {
                             <span className="font-medium">
                               {profile.user?.email || 'Bilinmeyen'}
                             </span>
-                            <Badge
+                            <CanvaBadge
                               className={getRiskLevelColor(profile.risk_level)}
                             >
                               {profile.risk_level.toUpperCase()}
-                            </Badge>
+                            </CanvaBadge>
                             {profile.is_blocked && (
-                              <Badge variant="error">
+                              <CanvaBadge variant="error">
                                 <Lock className="mr-1 h-3 w-3" />
                                 Engelli
-                              </Badge>
+                              </CanvaBadge>
                             )}
                           </div>
                           <p className="text-sm text-muted-foreground">
@@ -822,42 +881,42 @@ export default function CompliancePage() {
                           {profile.flags?.length > 0 && (
                             <div className="mt-1 flex flex-wrap gap-1">
                               {profile.flags.slice(0, 3).map((flag, i) => (
-                                <Badge
+                                <CanvaBadge
                                   key={i}
-                                  variant="outline"
+                                  variant="primary"
                                   className="text-xs"
                                 >
                                   {flag}
-                                </Badge>
+                                </CanvaBadge>
                               ))}
                             </div>
                           )}
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button
+                        <CanvaButton
                           size="sm"
-                          variant="outline"
+                          variant="primary"
                           onClick={() => setSelectedProfile(profile)}
                         >
                           <Eye className="mr-1 h-4 w-4" />
                           Detay
-                        </Button>
+                        </CanvaButton>
                         {profile.is_blocked ? (
-                          <Button
+                          <CanvaButton
                             size="sm"
-                            variant="outline"
+                            variant="primary"
                             onClick={() =>
                               toggleUserBlock(profile.user_id, false)
                             }
                           >
                             <Unlock className="mr-1 h-4 w-4 text-green-600" />
                             Aç
-                          </Button>
+                          </CanvaButton>
                         ) : (
-                          <Button
+                          <CanvaButton
                             size="sm"
-                            variant="destructive"
+                            variant="danger"
                             onClick={() =>
                               toggleUserBlock(
                                 profile.user_id,
@@ -868,7 +927,7 @@ export default function CompliancePage() {
                           >
                             <Lock className="mr-1 h-4 w-4" />
                             Engelle
-                          </Button>
+                          </CanvaButton>
                         )}
                       </div>
                     </div>
@@ -898,15 +957,15 @@ export default function CompliancePage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>Tek işlem bildirimi</span>
-                      <Badge variant="error">₺75,000</Badge>
+                      <CanvaBadge variant="error">₺75,000</CanvaBadge>
                     </div>
                     <div className="flex justify-between">
                       <span>KYC zorunlu</span>
-                      <Badge variant="warning">₺25,000</Badge>
+                      <CanvaBadge variant="warning">₺25,000</CanvaBadge>
                     </div>
                     <div className="flex justify-between">
                       <span>Günlük hacim</span>
-                      <Badge variant="error">₺100,000</Badge>
+                      <CanvaBadge variant="error">₺100,000</CanvaBadge>
                     </div>
                   </div>
                 </div>
@@ -918,11 +977,11 @@ export default function CompliancePage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>FIU bildirimi</span>
-                      <Badge variant="error">€10,000</Badge>
+                      <CanvaBadge variant="error">€10,000</CanvaBadge>
                     </div>
                     <div className="flex justify-between">
                       <span>KYC zorunlu</span>
-                      <Badge variant="warning">€3,000</Badge>
+                      <CanvaBadge variant="warning">€3,000</CanvaBadge>
                     </div>
                   </div>
                 </div>
@@ -934,11 +993,11 @@ export default function CompliancePage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>SAR bildirimi</span>
-                      <Badge variant="error">$10,000</Badge>
+                      <CanvaBadge variant="error">$10,000</CanvaBadge>
                     </div>
                     <div className="flex justify-between">
                       <span>KYC zorunlu</span>
-                      <Badge variant="warning">$3,000</Badge>
+                      <CanvaBadge variant="warning">$3,000</CanvaBadge>
                     </div>
                   </div>
                 </div>
@@ -950,11 +1009,11 @@ export default function CompliancePage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>NCA bildirimi</span>
-                      <Badge variant="error">£8,000</Badge>
+                      <CanvaBadge variant="error">£8,000</CanvaBadge>
                     </div>
                     <div className="flex justify-between">
                       <span>KYC zorunlu</span>
-                      <Badge variant="warning">£2,500</Badge>
+                      <CanvaBadge variant="warning">£2,500</CanvaBadge>
                     </div>
                   </div>
                 </div>
@@ -1055,14 +1114,14 @@ export default function CompliancePage() {
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="font-medium">{rule.name}</span>
-                          <Badge variant="outline">{rule.type}</Badge>
-                          <Badge
+                          <CanvaBadge variant="primary">{rule.type}</CanvaBadge>
+                          <CanvaBadge
                             variant={
                               rule.action === 'block'
                                 ? 'error'
                                 : rule.action === 'challenge'
                                   ? 'warning'
-                                  : 'secondary'
+                                  : 'default'
                             }
                           >
                             {rule.action === 'block'
@@ -1070,7 +1129,7 @@ export default function CompliancePage() {
                               : rule.action === 'challenge'
                                 ? '2FA İste'
                                 : 'İşaretle'}
-                          </Badge>
+                          </CanvaBadge>
                         </div>
                         <p className="text-sm text-muted-foreground">
                           {rule.desc}
@@ -1130,10 +1189,10 @@ export default function CompliancePage() {
                 <h4 className="mb-2 font-medium">Tetiklenen Kurallar</h4>
                 <div className="flex flex-wrap gap-2">
                   {selectedSar.triggered_rules?.map((rule, i) => (
-                    <Badge key={i} variant="outline">
+                    <CanvaBadge key={i} variant="primary">
                       <AlertTriangle className="mr-1 h-3 w-3 text-orange-500" />
                       {rule}
-                    </Badge>
+                    </CanvaBadge>
                   ))}
                 </div>
               </div>
@@ -1151,11 +1210,11 @@ export default function CompliancePage() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setSelectedSar(null)}>
+            <CanvaButton variant="primary" onClick={() => setSelectedSar(null)}>
               Kapat
-            </Button>
-            <Button
-              variant="outline"
+            </CanvaButton>
+            <CanvaButton
+              variant="primary"
               onClick={() =>
                 selectedSar &&
                 updateSarStatus(
@@ -1167,9 +1226,9 @@ export default function CompliancePage() {
             >
               <Clock className="mr-2 h-4 w-4" />
               Kaydet
-            </Button>
-            <Button
-              variant="default"
+            </CanvaButton>
+            <CanvaButton
+              variant="primary"
               className="bg-green-600 hover:bg-green-700"
               onClick={() =>
                 selectedSar &&
@@ -1178,9 +1237,9 @@ export default function CompliancePage() {
             >
               <CheckCircle className="mr-2 h-4 w-4" />
               Temiz
-            </Button>
-            <Button
-              variant="destructive"
+            </CanvaButton>
+            <CanvaButton
+              variant="danger"
               onClick={() =>
                 selectedSar &&
                 updateSarStatus(selectedSar.id, 'confirmed', investigationNotes)
@@ -1188,7 +1247,7 @@ export default function CompliancePage() {
             >
               <XCircle className="mr-2 h-4 w-4" />
               Onayla
-            </Button>
+            </CanvaButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1254,11 +1313,14 @@ export default function CompliancePage() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setSelectedProfile(null)}>
+            <CanvaButton
+              variant="primary"
+              onClick={() => setSelectedProfile(null)}
+            >
               Kapat
-            </Button>
+            </CanvaButton>
             {selectedProfile?.is_blocked ? (
-              <Button
+              <CanvaButton
                 onClick={() =>
                   selectedProfile &&
                   toggleUserBlock(selectedProfile.user_id, false)
@@ -1266,10 +1328,10 @@ export default function CompliancePage() {
               >
                 <Unlock className="mr-2 h-4 w-4" />
                 Engeli Kaldır
-              </Button>
+              </CanvaButton>
             ) : (
-              <Button
-                variant="destructive"
+              <CanvaButton
+                variant="danger"
                 onClick={() =>
                   selectedProfile &&
                   toggleUserBlock(selectedProfile.user_id, true, 'Manuel engel')
@@ -1277,7 +1339,7 @@ export default function CompliancePage() {
               >
                 <Lock className="mr-2 h-4 w-4" />
                 Engelle
-              </Button>
+              </CanvaButton>
             )}
           </DialogFooter>
         </DialogContent>

@@ -76,6 +76,17 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { cn } from '@/lib/utils';
 
 // Audit log entries
@@ -288,9 +299,9 @@ export default function AuditTrailPage() {
       support: 'Support',
     };
     return (
-      <Badge className={styles[role] || 'bg-gray-500/10 text-gray-500'}>
+      <CanvaBadge className={styles[role] || 'bg-gray-500/10 text-gray-500'}>
         {labels[role] || role}
-      </Badge>
+      </CanvaBadge>
     );
   };
 
@@ -317,14 +328,14 @@ export default function AuditTrailPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
+          <CanvaButton variant="primary">
             <Download className="h-4 w-4 mr-2" />
             Export
-          </Button>
-          <Button variant="outline">
+          </CanvaButton>
+          <CanvaButton variant="primary">
             <Calendar className="h-4 w-4 mr-2" />
             Son 7 Gün
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
@@ -450,21 +461,21 @@ export default function AuditTrailPage() {
                       </TableCell>
                       <TableCell>
                         {log.status === 'success' ? (
-                          <Badge className="bg-green-500/10 text-green-500">
+                          <CanvaBadge className="bg-green-500/10 text-green-500">
                             <CheckCircle2 className="h-3 w-3 mr-1" />
                             Başarılı
-                          </Badge>
+                          </CanvaBadge>
                         ) : (
-                          <Badge className="bg-red-500/10 text-red-500">
+                          <CanvaBadge className="bg-red-500/10 text-red-500">
                             <XCircle className="h-3 w-3 mr-1" />
                             Başarısız
-                          </Badge>
+                          </CanvaBadge>
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">
+                        <CanvaButton variant="ghost" size="sm">
                           <ChevronRight className="h-4 w-4" />
-                        </Button>
+                        </CanvaButton>
                       </TableCell>
                     </TableRow>
                   );
@@ -500,7 +511,7 @@ export default function AuditTrailPage() {
                       </p>
                     </div>
                   </div>
-                  <Badge variant="secondary">{admin.actions}</Badge>
+                  <CanvaBadge variant="default">{admin.actions}</CanvaBadge>
                 </div>
               ))}
             </CardContent>
@@ -512,13 +523,13 @@ export default function AuditTrailPage() {
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base">Log Detayı</CardTitle>
-                  <Button
+                  <CanvaButton
                     variant="ghost"
                     size="sm"
                     onClick={() => setSelectedLog(null)}
                   >
                     <XCircle className="h-4 w-4" />
-                  </Button>
+                  </CanvaButton>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">

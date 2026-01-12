@@ -36,6 +36,17 @@ import {
   Settings,
   Terminal,
 } from 'lucide-react';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import {
   Card,
   CardContent,
@@ -282,56 +293,56 @@ export default function SystemHealthPage() {
     switch (status) {
       case 'healthy':
         return (
-          <Badge className="bg-green-500/10 text-green-500 border-green-500/20">
+          <CanvaBadge className="bg-green-500/10 text-green-500 border-green-500/20">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             Sağlıklı
-          </Badge>
+          </CanvaBadge>
         );
       case 'degraded':
         return (
-          <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">
+          <CanvaBadge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">
             <AlertTriangle className="h-3 w-3 mr-1" />
             Yavaşlama
-          </Badge>
+          </CanvaBadge>
         );
       case 'down':
         return (
-          <Badge className="bg-red-500/10 text-red-500 border-red-500/20">
+          <CanvaBadge className="bg-red-500/10 text-red-500 border-red-500/20">
             <XCircle className="h-3 w-3 mr-1" />
             Kesinti
-          </Badge>
+          </CanvaBadge>
         );
       case 'investigating':
         return (
-          <Badge className="bg-orange-500/10 text-orange-500 border-orange-500/20">
+          <CanvaBadge className="bg-orange-500/10 text-orange-500 border-orange-500/20">
             <Eye className="h-3 w-3 mr-1" />
             İnceleniyor
-          </Badge>
+          </CanvaBadge>
         );
       case 'resolved':
         return (
-          <Badge className="bg-green-500/10 text-green-500 border-green-500/20">
+          <CanvaBadge className="bg-green-500/10 text-green-500 border-green-500/20">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             Çözüldü
-          </Badge>
+          </CanvaBadge>
         );
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <CanvaBadge variant="default">{status}</CanvaBadge>;
     }
   };
 
   const getSeverityBadge = (severity: string) => {
     switch (severity) {
       case 'critical':
-        return <Badge className="bg-red-500">Kritik</Badge>;
+        return <CanvaBadge className="bg-red-500">Kritik</CanvaBadge>;
       case 'high':
-        return <Badge className="bg-orange-500">Yüksek</Badge>;
+        return <CanvaBadge className="bg-orange-500">Yüksek</CanvaBadge>;
       case 'medium':
-        return <Badge className="bg-yellow-500">Orta</Badge>;
+        return <CanvaBadge className="bg-yellow-500">Orta</CanvaBadge>;
       case 'low':
-        return <Badge className="bg-blue-500">Düşük</Badge>;
+        return <CanvaBadge className="bg-blue-500">Düşük</CanvaBadge>;
       default:
-        return <Badge variant="outline">{severity}</Badge>;
+        return <CanvaBadge variant="default">{severity}</CanvaBadge>;
     }
   };
 
@@ -354,10 +365,10 @@ export default function SystemHealthPage() {
             <span className="text-sm">Otomatik Yenile</span>
             <Switch checked={autoRefresh} onCheckedChange={setAutoRefresh} />
           </div>
-          <Button variant="outline" size="sm">
+          <CanvaButton variant="primary" size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             Yenile
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
@@ -547,9 +558,9 @@ export default function SystemHealthPage() {
                 <AdminLineChart
                   data={realtimeMetrics}
                   xAxisKey="time"
-                  series={[
-                    { key: 'cpu', name: 'CPU %', color: '#3b82f6' },
-                    { key: 'memory', name: 'Memory %', color: '#a855f7' },
+                  lines={[
+                    { dataKey: 'cpu', name: 'CPU %', color: '#3b82f6' },
+                    { dataKey: 'memory', name: 'Memory %', color: '#a855f7' },
                   ]}
                   height={250}
                 />
@@ -565,8 +576,8 @@ export default function SystemHealthPage() {
                 <AdminAreaChart
                   data={realtimeMetrics}
                   xAxisKey="time"
-                  series={[
-                    { key: 'requests', name: 'İstek/dk', color: '#10b981' },
+                  areas={[
+                    { dataKey: 'requests', name: 'İstek/dk', color: '#10b981' },
                   ]}
                   height={250}
                 />
@@ -622,10 +633,10 @@ export default function SystemHealthPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Servis Durumları</CardTitle>
-                <Button variant="outline" size="sm">
+                <CanvaButton variant="primary" size="sm">
                   <ExternalLink className="h-4 w-4 mr-2" />
                   Status Page
-                </Button>
+                </CanvaButton>
               </div>
             </CardHeader>
             <CardContent>
@@ -686,7 +697,9 @@ export default function SystemHealthPage() {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{service.region}</Badge>
+                        <CanvaBadge variant="default">
+                          {service.region}
+                        </CanvaBadge>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -820,7 +833,7 @@ export default function SystemHealthPage() {
                         {q.query}
                       </TableCell>
                       <TableCell>
-                        <Badge
+                        <CanvaBadge
                           className={cn(
                             q.duration > 300
                               ? 'bg-red-500/10 text-red-500'
@@ -828,7 +841,7 @@ export default function SystemHealthPage() {
                           )}
                         >
                           {q.duration}ms
-                        </Badge>
+                        </CanvaBadge>
                       </TableCell>
                       <TableCell>{q.calls}</TableCell>
                       <TableCell>{q.table}</TableCell>
@@ -868,7 +881,9 @@ export default function SystemHealthPage() {
                         {endpoint.endpoint}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{endpoint.method}</Badge>
+                        <CanvaBadge variant="default">
+                          {endpoint.method}
+                        </CanvaBadge>
                       </TableCell>
                       <TableCell className="text-green-500">
                         {endpoint.p50}ms
@@ -915,10 +930,10 @@ export default function SystemHealthPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Olay Geçmişi</CardTitle>
-                <Button>
+                <CanvaButton>
                   <Bell className="h-4 w-4 mr-2" />
                   Olay Oluştur
-                </Button>
+                </CanvaButton>
               </div>
             </CardHeader>
             <CardContent>
@@ -948,10 +963,10 @@ export default function SystemHealthPage() {
                       <TableCell>{incident.duration}</TableCell>
                       <TableCell>{incident.affected}</TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">
+                        <CanvaButton variant="ghost" size="sm">
                           Detay
                           <ChevronRight className="h-4 w-4 ml-1" />
-                        </Button>
+                        </CanvaButton>
                       </TableCell>
                     </TableRow>
                   ))}

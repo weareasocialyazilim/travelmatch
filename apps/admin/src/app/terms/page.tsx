@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { CanvaButton } from '@/components/canva/CanvaButton';
 
 export const metadata: Metadata = {
   title: 'Terms of Service | TravelMatch',
@@ -13,10 +13,10 @@ export default function TermsPage() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto max-w-4xl py-12 px-4">
         <Link href="/">
-          <Button variant="ghost" className="mb-8">
+          <CanvaButton variant="ghost" className="mb-8">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
-          </Button>
+          </CanvaButton>
         </Link>
 
         <h1 className="text-4xl font-bold mb-8">Terms of Service</h1>

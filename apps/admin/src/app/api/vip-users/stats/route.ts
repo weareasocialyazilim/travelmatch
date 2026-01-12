@@ -23,17 +23,15 @@ export async function GET() {
     const supabase = createServiceClient();
 
     // Get counts by tier
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [vipResult, influencerResult, partnerResult] = await Promise.all([
-      supabase
-        .from('user_commission_settings')
+      (supabase.from('user_commission_settings') as any)
         .select('id', { count: 'exact', head: true })
         .eq('tier', 'vip'),
-      supabase
-        .from('user_commission_settings')
+      (supabase.from('user_commission_settings') as any)
         .select('id', { count: 'exact', head: true })
         .eq('tier', 'influencer'),
-      supabase
-        .from('user_commission_settings')
+      (supabase.from('user_commission_settings') as any)
         .select('id', { count: 'exact', head: true })
         .eq('tier', 'partner'),
     ]);
@@ -43,8 +41,10 @@ export async function GET() {
     startOfMonth.setDate(1);
     startOfMonth.setHours(0, 0, 0, 0);
 
-    const { data: commissionData } = await supabase
-      .from('commission_ledger')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: commissionData } = await (
+      supabase.from('commission_ledger') as any
+    )
       .select('total_commission, base_amount')
       .gte('created_at', startOfMonth.toISOString())
       .eq('status', 'collected')

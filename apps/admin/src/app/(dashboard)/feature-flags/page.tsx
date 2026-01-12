@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Flag,
   Plus,
@@ -25,19 +25,22 @@ import {
   Zap,
   Shield,
   TrendingUp,
+  RefreshCw,
+  Loader2,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -79,6 +82,13 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import { formatDate } from '@/lib/utils';
+import {
+  useFeatureFlags,
+  useCreateFeatureFlag,
+  useUpdateFeatureFlag,
+  useDeleteFeatureFlag,
+  useToggleFeatureFlag,
+} from '@/hooks/use-feature-flags';
 
 interface FeatureFlag {
   id: string;
@@ -261,12 +271,46 @@ const platformIcons: Record<string, React.ElementType> = {
 };
 
 export default function FeatureFlagsPage() {
-  const [flags, setFlags] = useState<FeatureFlag[]>(mockFlags);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [environmentFilter, setEnvironmentFilter] = useState<string>('all');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingFlag, setEditingFlag] = useState<FeatureFlag | null>(null);
+
+  // Use real API data
+  const { data, isLoading, error, refetch } = useFeatureFlags();
+  const createFlag = useCreateFeatureFlag();
+  const updateFlag = useUpdateFeatureFlag();
+  const deleteFlag = useDeleteFeatureFlag();
+  const toggleFlag = useToggleFeatureFlag();
+
+  // Use API data if available, otherwise fall back to mock data
+  const flags = useMemo(() => {
+    if (data?.flags && data.flags.length > 0) {
+      return data.flags.map((flag) => ({
+        id: flag.id,
+        key: flag.name.toLowerCase().replace(/\s+/g, '_'),
+        name: flag.name,
+        description: flag.description || '',
+        enabled: flag.enabled,
+        rollout_percentage: flag.rollout_percentage,
+        environment: (flag.environments?.[0] || 'production') as
+          | 'production'
+          | 'staging'
+          | 'development',
+        platforms: ['ios', 'android', 'web'] as ('ios' | 'android' | 'web')[],
+        targeting: { type: 'all' as const },
+        created_at: flag.created_at,
+        updated_at: flag.updated_at,
+        created_by: 'Admin',
+        category: flag.category as FeatureFlag['category'],
+        tags: [],
+      }));
+    }
+    return mockFlags;
+  }, [data?.flags]);
+
+  const apiStats = data?.stats;
 
   // New flag form state
   const [newFlag, setNewFlag] = useState({
@@ -296,22 +340,19 @@ export default function FeatureFlagsPage() {
   });
 
   // Stats
-  const stats = {
+  const stats = apiStats || {
     total: flags.length,
     enabled: flags.filter((f) => f.enabled).length,
-    experiments: flags.filter((f) => f.category === 'experiment').length,
-    killSwitches: flags.filter((f) => f.category === 'kill_switch').length,
+    disabled: flags.filter((f) => !f.enabled).length,
+    beta: 0,
   };
+
+  const experiments = flags.filter((f) => f.category === 'experiment').length;
+  const killSwitches = flags.filter((f) => f.category === 'kill_switch').length;
 
   // Toggle flag
   const handleToggle = (flagId: string, enabled: boolean) => {
-    setFlags((prev) =>
-      prev.map((f) =>
-        f.id === flagId
-          ? { ...f, enabled, updated_at: new Date().toISOString() }
-          : f,
-      ),
-    );
+    toggleFlag.mutate(flagId, enabled);
     const flag = flags.find((f) => f.id === flagId);
     toast.success(
       `${flag?.name} ${enabled ? 'etkinleştirildi' : 'devre dışı bırakıldı'}`,
@@ -320,49 +361,58 @@ export default function FeatureFlagsPage() {
 
   // Update rollout percentage
   const handleRolloutChange = (flagId: string, percentage: number) => {
-    setFlags((prev) =>
-      prev.map((f) =>
-        f.id === flagId
-          ? {
-              ...f,
-              rollout_percentage: percentage,
-              updated_at: new Date().toISOString(),
-            }
-          : f,
-      ),
+    updateFlag.mutate(
+      { id: flagId, rollout_percentage: percentage },
+      {
+        onError: () => {
+          toast.error('Rollout güncellenemedi');
+        },
+      },
     );
   };
 
   // Create new flag
   const handleCreateFlag = () => {
-    const flag: FeatureFlag = {
-      id: `ff_${Date.now()}`,
-      ...newFlag,
-      enabled: false,
-      targeting: { type: 'all' },
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      created_by: 'Current Admin',
-      tags: [],
-    };
-    setFlags((prev) => [flag, ...prev]);
-    setIsCreateDialogOpen(false);
-    setNewFlag({
-      key: '',
-      name: '',
-      description: '',
-      category: 'feature',
-      environment: 'staging',
-      platforms: ['ios', 'android', 'web'],
-      rollout_percentage: 0,
-    });
-    toast.success('Feature flag oluşturuldu');
+    createFlag.mutate(
+      {
+        name: newFlag.name,
+        description: newFlag.description,
+        enabled: false,
+        category: newFlag.category,
+        rollout_percentage: newFlag.rollout_percentage,
+        environments: [newFlag.environment],
+      },
+      {
+        onSuccess: () => {
+          setIsCreateDialogOpen(false);
+          setNewFlag({
+            key: '',
+            name: '',
+            description: '',
+            category: 'feature',
+            environment: 'staging',
+            platforms: ['ios', 'android', 'web'],
+            rollout_percentage: 0,
+          });
+          toast.success('Feature flag oluşturuldu');
+        },
+        onError: () => {
+          toast.error('Flag oluşturulamadı');
+        },
+      },
+    );
   };
 
   // Delete flag
   const handleDeleteFlag = (flagId: string) => {
-    setFlags((prev) => prev.filter((f) => f.id !== flagId));
-    toast.success('Feature flag silindi');
+    deleteFlag.mutate(flagId, {
+      onSuccess: () => {
+        toast.success('Feature flag silindi');
+      },
+      onError: () => {
+        toast.error('Flag silinemedi');
+      },
+    });
   };
 
   // Copy flag key
@@ -370,6 +420,82 @@ export default function FeatureFlagsPage() {
     navigator.clipboard.writeText(key);
     toast.success('Key kopyalandı');
   };
+
+  // Loading Skeleton
+  const LoadingSkeleton = () => (
+    <div className="space-y-6 animate-pulse">
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <div className="h-8 w-48 bg-gray-200 rounded" />
+          <div className="h-4 w-64 bg-gray-100 rounded" />
+        </div>
+        <div className="flex gap-2">
+          <div className="h-10 w-24 bg-gray-200 rounded" />
+          <div className="h-10 w-32 bg-gray-200 rounded" />
+        </div>
+      </div>
+      <div className="grid gap-4 md:grid-cols-4">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-24 bg-gray-100 rounded-lg" />
+        ))}
+      </div>
+      <div className="h-16 bg-gray-100 rounded-lg" />
+      <div className="space-y-4">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="h-32 bg-gray-100 rounded-lg" />
+        ))}
+      </div>
+    </div>
+  );
+
+  // Error State
+  const ErrorState = () => (
+    <div className="flex h-[50vh] items-center justify-center">
+      <div className="text-center space-y-4">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+          <AlertTriangle className="h-8 w-8 text-red-600" />
+        </div>
+        <h2 className="text-xl font-semibold text-gray-900">Bir hata oluştu</h2>
+        <p className="text-gray-500 max-w-md">
+          Feature flag verileri yüklenemedi. Lütfen tekrar deneyin.
+        </p>
+        <CanvaButton
+          variant="primary"
+          onClick={() => refetch()}
+          leftIcon={<RefreshCw className="h-4 w-4" />}
+        >
+          Tekrar Dene
+        </CanvaButton>
+      </div>
+    </div>
+  );
+
+  // Empty State
+  const EmptyState = () => (
+    <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-gray-200">
+      <div className="text-center space-y-3">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+          <Flag className="h-6 w-6 text-gray-400" />
+        </div>
+        <h3 className="text-lg font-medium text-gray-900">
+          Henüz feature flag yok
+        </h3>
+        <p className="text-sm text-gray-500">
+          İlk feature flag'inizi oluşturarak başlayın.
+        </p>
+        <CanvaButton
+          variant="primary"
+          onClick={() => setIsCreateDialogOpen(true)}
+          leftIcon={<Plus className="h-4 w-4" />}
+        >
+          Yeni Flag Oluştur
+        </CanvaButton>
+      </div>
+    </div>
+  );
+
+  if (isLoading) return <LoadingSkeleton />;
+  if (error) return <ErrorState />;
 
   return (
     <div className="space-y-6">
@@ -381,25 +507,37 @@ export default function FeatureFlagsPage() {
             Özellikleri kontrollü şekilde yayınlayın ve yönetin
           </p>
         </div>
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Yeni Flag
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-lg">
-            <DialogHeader>
-              <DialogTitle>Yeni Feature Flag</DialogTitle>
-              <DialogDescription>
-                Yeni bir feature flag oluşturun
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="key">Key</Label>
-                <Input
-                  id="key"
+        <div className="flex gap-2">
+          <CanvaButton
+            variant="primary"
+            onClick={() => refetch()}
+            loading={isLoading}
+            leftIcon={<RefreshCw className="h-4 w-4" />}
+          >
+            Yenile
+          </CanvaButton>
+          <Dialog
+            open={isCreateDialogOpen}
+            onOpenChange={setIsCreateDialogOpen}
+          >
+            <DialogTrigger asChild>
+              <CanvaButton
+                variant="primary"
+                leftIcon={<Plus className="h-4 w-4" />}
+              >
+                Yeni Flag
+              </CanvaButton>
+            </DialogTrigger>
+            <DialogContent className="max-w-lg">
+              <DialogHeader>
+                <DialogTitle>Yeni Feature Flag</DialogTitle>
+                <DialogDescription>
+                  Yeni bir feature flag oluşturun
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <CanvaInput
+                  label="Key"
                   placeholder="feature_key"
                   value={newFlag.key}
                   onChange={(e) =>
@@ -408,201 +546,176 @@ export default function FeatureFlagsPage() {
                       key: e.target.value.toLowerCase().replace(/\s+/g, '_'),
                     })
                   }
+                  helperText="Kodda kullanılacak benzersiz tanımlayıcı"
                 />
-                <p className="text-xs text-muted-foreground">
-                  Kodda kullanılacak benzersiz tanımlayıcı
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="name">İsim</Label>
-                <Input
-                  id="name"
+                <CanvaInput
+                  label="İsim"
                   placeholder="Özellik Adı"
                   value={newFlag.name}
                   onChange={(e) =>
                     setNewFlag({ ...newFlag, name: e.target.value })
                   }
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="description">Açıklama</Label>
-                <Textarea
-                  id="description"
-                  placeholder="Bu özellik ne yapar?"
-                  value={newFlag.description}
-                  onChange={(e) =>
-                    setNewFlag({ ...newFlag, description: e.target.value })
-                  }
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Kategori</Label>
-                  <Select
-                    value={newFlag.category}
-                    onValueChange={(v) =>
-                      setNewFlag({
-                        ...newFlag,
-                        category: v as FeatureFlag['category'],
-                      })
+                  <Label htmlFor="description">Açıklama</Label>
+                  <Textarea
+                    id="description"
+                    placeholder="Bu özellik ne yapar?"
+                    value={newFlag.description}
+                    onChange={(e) =>
+                      setNewFlag({ ...newFlag, description: e.target.value })
                     }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="feature">Özellik</SelectItem>
-                      <SelectItem value="experiment">Deney</SelectItem>
-                      <SelectItem value="operational">Operasyonel</SelectItem>
-                      <SelectItem value="kill_switch">Kill Switch</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Kategori</Label>
+                    <Select
+                      value={newFlag.category}
+                      onValueChange={(v) =>
+                        setNewFlag({
+                          ...newFlag,
+                          category: v as FeatureFlag['category'],
+                        })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="feature">Özellik</SelectItem>
+                        <SelectItem value="experiment">Deney</SelectItem>
+                        <SelectItem value="operational">Operasyonel</SelectItem>
+                        <SelectItem value="kill_switch">Kill Switch</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Environment</Label>
+                    <Select
+                      value={newFlag.environment}
+                      onValueChange={(v) =>
+                        setNewFlag({
+                          ...newFlag,
+                          environment: v as FeatureFlag['environment'],
+                        })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="development">Development</SelectItem>
+                        <SelectItem value="staging">Staging</SelectItem>
+                        <SelectItem value="production">Production</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 <div className="space-y-2">
-                  <Label>Environment</Label>
-                  <Select
-                    value={newFlag.environment}
-                    onValueChange={(v) =>
-                      setNewFlag({
-                        ...newFlag,
-                        environment: v as FeatureFlag['environment'],
-                      })
+                  <Label>
+                    Başlangıç Rollout: {newFlag.rollout_percentage}%
+                  </Label>
+                  <Slider
+                    value={[newFlag.rollout_percentage]}
+                    onValueChange={([v]) =>
+                      setNewFlag({ ...newFlag, rollout_percentage: v })
                     }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="development">Development</SelectItem>
-                      <SelectItem value="staging">Staging</SelectItem>
-                      <SelectItem value="production">Production</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    max={100}
+                    step={5}
+                  />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label>Başlangıç Rollout: {newFlag.rollout_percentage}%</Label>
-                <Slider
-                  value={[newFlag.rollout_percentage]}
-                  onValueChange={([v]) =>
-                    setNewFlag({ ...newFlag, rollout_percentage: v })
-                  }
-                  max={100}
-                  step={5}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setIsCreateDialogOpen(false)}
-              >
-                İptal
-              </Button>
-              <Button
-                onClick={handleCreateFlag}
-                disabled={!newFlag.key || !newFlag.name}
-              >
-                Oluştur
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+              <DialogFooter>
+                <CanvaButton
+                  variant="primary"
+                  onClick={() => setIsCreateDialogOpen(false)}
+                >
+                  İptal
+                </CanvaButton>
+                <CanvaButton
+                  variant="primary"
+                  onClick={handleCreateFlag}
+                  disabled={!newFlag.key || !newFlag.name}
+                >
+                  Oluştur
+                </CanvaButton>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Toplam Flag</CardTitle>
-            <Flag className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Aktif</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.enabled}</div>
-            <p className="text-xs text-muted-foreground">
-              {Math.round((stats.enabled / stats.total) * 100)}% etkin
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Deneyler</CardTitle>
-            <TrendingUp className="h-4 w-4 text-purple-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.experiments}</div>
-            <p className="text-xs text-muted-foreground">
-              A/B test devam ediyor
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Kill Switches</CardTitle>
-            <Shield className="h-4 w-4 text-red-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.killSwitches}</div>
-            <p className="text-xs text-muted-foreground">
-              Acil durum kontrolleri
-            </p>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          label="Toplam Flag"
+          value={stats.total}
+          icon={<Flag className="h-4 w-4" />}
+        />
+        <CanvaStatCard
+          label="Aktif"
+          value={stats.enabled}
+          icon={<CheckCircle className="h-4 w-4" />}
+          change={{
+            value:
+              stats.total > 0
+                ? Math.round((stats.enabled / stats.total) * 100)
+                : 0,
+            label: 'etkin',
+          }}
+        />
+        <CanvaStatCard
+          label="Deneyler"
+          value={experiments}
+          icon={<TrendingUp className="h-4 w-4" />}
+        />
+        <CanvaStatCard
+          label="Kill Switches"
+          value={killSwitches}
+          icon={<Shield className="h-4 w-4" />}
+        />
       </div>
 
       {/* Filters */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-wrap gap-4">
-            <div className="flex-1 min-w-[200px]">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Flag ara..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-            </div>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Kategori" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tüm Kategoriler</SelectItem>
-                <SelectItem value="feature">Özellik</SelectItem>
-                <SelectItem value="experiment">Deney</SelectItem>
-                <SelectItem value="operational">Operasyonel</SelectItem>
-                <SelectItem value="kill_switch">Kill Switch</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select
-              value={environmentFilter}
-              onValueChange={setEnvironmentFilter}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Environment" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tüm Env</SelectItem>
-                <SelectItem value="production">Production</SelectItem>
-                <SelectItem value="staging">Staging</SelectItem>
-                <SelectItem value="development">Development</SelectItem>
-              </SelectContent>
-            </Select>
+      <CanvaCard padding="md">
+        <div className="flex flex-wrap gap-4">
+          <div className="flex-1 min-w-[200px]">
+            <CanvaInput
+              placeholder="Flag ara..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              leftIcon={<Search className="h-4 w-4" />}
+            />
           </div>
-        </CardContent>
-      </Card>
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Kategori" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tüm Kategoriler</SelectItem>
+              <SelectItem value="feature">Özellik</SelectItem>
+              <SelectItem value="experiment">Deney</SelectItem>
+              <SelectItem value="operational">Operasyonel</SelectItem>
+              <SelectItem value="kill_switch">Kill Switch</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select
+            value={environmentFilter}
+            onValueChange={setEnvironmentFilter}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Environment" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tüm Env</SelectItem>
+              <SelectItem value="production">Production</SelectItem>
+              <SelectItem value="staging">Staging</SelectItem>
+              <SelectItem value="development">Development</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </CanvaCard>
 
       {/* Flags List */}
       <Tabs defaultValue="all" className="space-y-4">
@@ -681,155 +794,155 @@ function FlagCard({
   const CategoryIcon = categoryInfo.icon;
 
   return (
-    <Card className={flag.category === 'kill_switch' ? 'border-red-200' : ''}>
-      <CardContent className="pt-6">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <h3 className="text-lg font-semibold">{flag.name}</h3>
-              <Badge className={categoryInfo.color} variant="secondary">
-                <CategoryIcon className="mr-1 h-3 w-3" />
-                {categoryInfo.label}
-              </Badge>
-              <Badge
-                variant="outline"
-                className={
-                  flag.environment === 'production'
-                    ? 'border-green-500 text-green-700'
-                    : flag.environment === 'staging'
-                      ? 'border-yellow-500 text-yellow-700'
-                      : 'border-gray-500 text-gray-700'
-                }
-              >
-                {flag.environment}
-              </Badge>
-            </div>
-            <p className="text-sm text-muted-foreground mb-3">
-              {flag.description}
-            </p>
-            <div className="flex items-center gap-4 text-sm">
-              <button
-                onClick={() => onCopyKey(flag.key)}
-                className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <code className="bg-muted px-2 py-0.5 rounded text-xs font-mono">
-                  {flag.key}
-                </code>
-                <Copy className="h-3 w-3" />
-              </button>
-              <div className="flex items-center gap-1 text-muted-foreground">
-                {flag.platforms.map((platform) => {
-                  const Icon = platformIcons[platform];
-                  return <Icon key={platform} className="h-4 w-4" />;
-                })}
-              </div>
-              <span className="text-muted-foreground">
-                <Clock className="inline h-3 w-3 mr-1" />
-                {formatDate(flag.updated_at)}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4">
-            {/* Rollout Percentage */}
-            {flag.enabled && (
-              <div className="w-32">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-muted-foreground">Rollout</span>
-                  <span className="text-xs font-medium">
-                    {flag.rollout_percentage}%
-                  </span>
-                </div>
-                <Slider
-                  value={[flag.rollout_percentage]}
-                  onValueChange={([v]) => onRolloutChange(flag.id, v)}
-                  max={100}
-                  step={5}
-                  className="cursor-pointer"
-                />
-              </div>
-            )}
-
-            {/* Toggle */}
-            <Switch
-              checked={flag.enabled}
-              onCheckedChange={(checked) => onToggle(flag.id, checked)}
-              className={
-                flag.category === 'kill_switch'
-                  ? 'data-[state=checked]:bg-red-600'
-                  : ''
+    <CanvaCard
+      className={flag.category === 'kill_switch' ? 'border-red-200' : ''}
+      padding="md"
+    >
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <div className="flex items-center gap-3 mb-2">
+            <h3 className="text-lg font-semibold text-gray-900">{flag.name}</h3>
+            <CanvaBadge
+              className={categoryInfo.color}
+              icon={<CategoryIcon className="h-3 w-3" />}
+            >
+              {categoryInfo.label}
+            </CanvaBadge>
+            <CanvaBadge
+              variant={
+                flag.environment === 'production'
+                  ? 'success'
+                  : flag.environment === 'staging'
+                    ? 'warning'
+                    : 'primary'
               }
-            />
-
-            {/* Actions */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onCopyKey(flag.key)}>
-                  <Copy className="mr-2 h-4 w-4" />
-                  Key Kopyala
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <History className="mr-2 h-4 w-4" />
-                  Geçmiş
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <DropdownMenuItem
-                      className="text-red-600"
-                      onSelect={(e) => e.preventDefault()}
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Sil
-                    </DropdownMenuItem>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Feature Flag Sil</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        <strong>{flag.name}</strong> flag&apos;ini silmek
-                        istediğinizden emin misiniz? Bu işlem geri alınamaz ve
-                        kodda hatalara yol açabilir.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>İptal</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => onDelete(flag.id)}
-                        className="bg-red-600 hover:bg-red-700"
-                      >
-                        Sil
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            >
+              {flag.environment}
+            </CanvaBadge>
+          </div>
+          <p className="text-sm text-gray-500 mb-3">{flag.description}</p>
+          <div className="flex items-center gap-4 text-sm">
+            <button
+              onClick={() => onCopyKey(flag.key)}
+              className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <code className="bg-muted px-2 py-0.5 rounded text-xs font-mono">
+                {flag.key}
+              </code>
+              <Copy className="h-3 w-3" />
+            </button>
+            <div className="flex items-center gap-1 text-muted-foreground">
+              {flag.platforms.map((platform) => {
+                const Icon = platformIcons[platform];
+                return <Icon key={platform} className="h-4 w-4" />;
+              })}
+            </div>
+            <span className="text-muted-foreground">
+              <Clock className="inline h-3 w-3 mr-1" />
+              {formatDate(flag.updated_at)}
+            </span>
           </div>
         </div>
 
-        {/* Progress bar for rollout */}
-        {flag.enabled && flag.rollout_percentage < 100 && (
-          <div className="mt-4 pt-4 border-t">
-            <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-muted-foreground">Kullanıcı Dağılımı</span>
-              <span>
-                ~
-                {Math.round(
-                  (flag.rollout_percentage / 100) * 125000,
-                ).toLocaleString('tr-TR')}{' '}
-                kullanıcı
-              </span>
+        <div className="flex items-center gap-4">
+          {/* Rollout Percentage */}
+          {flag.enabled && (
+            <div className="w-32">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs text-muted-foreground">Rollout</span>
+                <span className="text-xs font-medium">
+                  {flag.rollout_percentage}%
+                </span>
+              </div>
+              <Slider
+                value={[flag.rollout_percentage]}
+                onValueChange={([v]) => onRolloutChange(flag.id, v)}
+                max={100}
+                step={5}
+                className="cursor-pointer"
+              />
             </div>
-            <Progress value={flag.rollout_percentage} className="h-2" />
+          )}
+
+          {/* Toggle */}
+          <Switch
+            checked={flag.enabled}
+            onCheckedChange={(checked) => onToggle(flag.id, checked)}
+            className={
+              flag.category === 'kill_switch'
+                ? 'data-[state=checked]:bg-red-600'
+                : ''
+            }
+          />
+
+          {/* Actions */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <CanvaButton variant="ghost" size="sm" iconOnly>
+                <MoreHorizontal className="h-4 w-4" />
+              </CanvaButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => onCopyKey(flag.key)}>
+                <Copy className="mr-2 h-4 w-4" />
+                Key Kopyala
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <History className="mr-2 h-4 w-4" />
+                Geçmiş
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <DropdownMenuItem
+                    className="text-red-600"
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Sil
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Feature Flag Sil</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      <strong>{flag.name}</strong> flag&apos;ini silmek
+                      istediğinizden emin misiniz? Bu işlem geri alınamaz ve
+                      kodda hatalara yol açabilir.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>İptal</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => onDelete(flag.id)}
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      Sil
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
+      {/* Progress bar for rollout */}
+      {flag.enabled && flag.rollout_percentage < 100 && (
+        <div className="mt-4 pt-4 border-t border-gray-100">
+          <div className="flex items-center justify-between text-sm mb-2">
+            <span className="text-gray-500">Kullanıcı Dağılımı</span>
+            <span className="text-gray-900">
+              ~
+              {Math.round(
+                (flag.rollout_percentage / 100) * 125000,
+              ).toLocaleString('tr-TR')}{' '}
+              kullanıcı
+            </span>
           </div>
-        )}
-      </CardContent>
-    </Card>
+          <Progress value={flag.rollout_percentage} className="h-2" />
+        </div>
+      )}
+    </CanvaCard>
   );
 }

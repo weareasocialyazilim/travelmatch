@@ -40,10 +40,14 @@ export async function DELETE(
     const supabase = createServiceClient();
 
     // Remove VIP status using admin function
-    const { data, error } = await supabase.rpc('admin_remove_user_vip', {
-      p_user_id: userId,
-      p_removed_by: session.admin.id,
-    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any).rpc(
+      'admin_remove_user_vip',
+      {
+        p_user_id: userId,
+        p_removed_by: session.admin.id,
+      },
+    );
 
     if (error) {
       logger.error('Remove VIP error:', error);
@@ -130,8 +134,10 @@ export async function PATCH(
       );
     }
 
-    const { data, error } = await supabase
-      .from('user_commission_settings')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (
+      supabase.from('user_commission_settings') as any
+    )
       .update(updateData)
       .eq('user_id', userId)
       .select()

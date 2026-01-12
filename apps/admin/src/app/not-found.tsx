@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { FileQuestion, Home, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { CanvaButton } from '@/components/canva/CanvaButton';
 import {
   Card,
   CardContent,
@@ -29,20 +29,20 @@ export default function NotFound() {
             Aradığınız sayfa mevcut değil veya taşınmış olabilir.
           </p>
           <div className="flex gap-2">
-            <Button asChild className="flex-1">
+            <CanvaButton asChild className="flex-1">
               <Link href="/queue">
                 <Home className="mr-2 h-4 w-4" />
                 Ana Sayfa
               </Link>
-            </Button>
-            <Button
-              variant="outline"
+            </CanvaButton>
+            <CanvaButton
+              variant="primary"
               onClick={() => window.history.back()}
               className="flex-1"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Geri Dön
-            </Button>
+            </CanvaButton>
           </div>
         </CardContent>
       </Card>

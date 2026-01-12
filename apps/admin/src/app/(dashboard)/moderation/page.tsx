@@ -7,6 +7,17 @@
  */
 
 import { useState, useEffect } from 'react';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
+import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -194,7 +205,7 @@ export default function ModerationPage() {
     // Calculate severity breakdown
     const severityBreakdown = { critical: 0, high: 0, medium: 0, low: 0 };
     if (logsResult.data) {
-      logsResult.data.forEach((log) => {
+      (logsResult.data as Array<{ severity: string }>).forEach((log) => {
         const severity = log.severity as keyof typeof severityBreakdown;
         if (severity in severityBreakdown) {
           severityBreakdown[severity]++;
@@ -286,8 +297,7 @@ export default function ModerationPage() {
   }
 
   async function handleApproveAppeal(id: string) {
-    const { error } = await supabase
-      .from('blocked_content')
+    const { error } = await (supabase.from('blocked_content') as any)
       .update({
         appeal_status: 'approved',
         reviewed_at: new Date().toISOString(),
@@ -303,8 +313,7 @@ export default function ModerationPage() {
   }
 
   async function handleRejectAppeal(id: string) {
-    const { error } = await supabase
-      .from('blocked_content')
+    const { error } = await (supabase.from('blocked_content') as any)
       .update({
         appeal_status: 'rejected',
         reviewed_at: new Date().toISOString(),
@@ -322,7 +331,9 @@ export default function ModerationPage() {
   async function handleAddWord() {
     if (!newWord.word.trim()) return;
 
-    const { error } = await supabase.from('moderation_dictionary').insert({
+    const { error } = await (
+      supabase.from('moderation_dictionary') as any
+    ).insert({
       word: newWord.word.toLowerCase().trim(),
       severity: newWord.severity,
       category: newWord.category,
@@ -341,8 +352,7 @@ export default function ModerationPage() {
   }
 
   async function handleToggleWord(id: string, isActive: boolean) {
-    const { error } = await supabase
-      .from('moderation_dictionary')
+    const { error } = await (supabase.from('moderation_dictionary') as any)
       .update({ is_active: !isActive })
       .eq('id', id);
 
@@ -435,7 +445,7 @@ export default function ModerationPage() {
             Monitor and manage content moderation across the platform
           </p>
         </div>
-        <Button onClick={loadData}>Refresh</Button>
+        <CanvaButton onClick={loadData}>Refresh</CanvaButton>
       </div>
 
       {/* Stats Cards */}
@@ -589,35 +599,37 @@ export default function ModerationPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">{log.content_type}</Badge>
+                      <CanvaBadge variant="primary">
+                        {log.content_type}
+                      </CanvaBadge>
                     </TableCell>
                     <TableCell>
-                      <Badge className={getSeverityColor(log.severity)}>
+                      <CanvaBadge className={getSeverityColor(log.severity)}>
                         {log.severity}
-                      </Badge>
+                      </CanvaBadge>
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
                         {log.violations?.slice(0, 2).map((v, i) => (
-                          <Badge
+                          <CanvaBadge
                             key={i}
-                            variant="secondary"
+                            variant="primary"
                             className="text-xs"
                           >
                             {v.type}
-                          </Badge>
+                          </CanvaBadge>
                         ))}
                         {log.violations?.length > 2 && (
-                          <Badge variant="secondary" className="text-xs">
+                          <CanvaBadge variant="primary" className="text-xs">
                             +{log.violations.length - 2}
-                          </Badge>
+                          </CanvaBadge>
                         )}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge className={getActionColor(log.action_taken)}>
+                      <CanvaBadge className={getActionColor(log.action_taken)}>
                         {log.action_taken}
-                      </Badge>
+                      </CanvaBadge>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {formatDate(log.created_at)}
@@ -657,23 +669,25 @@ export default function ModerationPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">{item.content_type}</Badge>
+                      <CanvaBadge variant="primary">
+                        {item.content_type}
+                      </CanvaBadge>
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
                         {item.violation_reasons?.map((reason, i) => (
-                          <Badge
+                          <CanvaBadge
                             key={i}
-                            variant="secondary"
+                            variant="primary"
                             className="text-xs"
                           >
                             {reason}
-                          </Badge>
+                          </CanvaBadge>
                         ))}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge
+                      <CanvaBadge
                         className={
                           item.appeal_status === 'pending'
                             ? 'bg-yellow-100 text-yellow-800'
@@ -685,7 +699,7 @@ export default function ModerationPage() {
                         }
                       >
                         {item.appeal_status}
-                      </Badge>
+                      </CanvaBadge>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {formatDate(item.created_at)}
@@ -693,20 +707,20 @@ export default function ModerationPage() {
                     <TableCell>
                       {item.appeal_status === 'pending' && (
                         <div className="flex gap-2">
-                          <Button
+                          <CanvaButton
                             size="sm"
-                            variant="outline"
+                            variant="primary"
                             onClick={() => handleApproveAppeal(item.id)}
                           >
                             <CheckCircle className="h-4 w-4" />
-                          </Button>
-                          <Button
+                          </CanvaButton>
+                          <CanvaButton
                             size="sm"
-                            variant="outline"
+                            variant="primary"
                             onClick={() => handleRejectAppeal(item.id)}
                           >
                             <XCircle className="h-4 w-4" />
-                          </Button>
+                          </CanvaButton>
                         </div>
                       )}
                     </TableCell>
@@ -746,10 +760,12 @@ export default function ModerationPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">{warning.warning_type}</Badge>
+                      <CanvaBadge variant="primary">
+                        {warning.warning_type}
+                      </CanvaBadge>
                     </TableCell>
                     <TableCell>
-                      <Badge
+                      <CanvaBadge
                         className={
                           warning.warning_level === 3
                             ? 'bg-red-500'
@@ -759,7 +775,7 @@ export default function ModerationPage() {
                         }
                       >
                         Level {warning.warning_level}
-                      </Badge>
+                      </CanvaBadge>
                     </TableCell>
                     <TableCell className="max-w-xs truncate">
                       {warning.details || '-'}
@@ -791,10 +807,10 @@ export default function ModerationPage() {
           <div className="flex justify-end">
             <Dialog open={showAddWord} onOpenChange={setShowAddWord}>
               <DialogTrigger asChild>
-                <Button>
+                <CanvaButton>
                   <Plus className="mr-2 h-4 w-4" />
                   Add Word
-                </Button>
+                </CanvaButton>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -856,13 +872,13 @@ export default function ModerationPage() {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button
-                    variant="outline"
+                  <CanvaButton
+                    variant="primary"
                     onClick={() => setShowAddWord(false)}
                   >
                     Cancel
-                  </Button>
-                  <Button onClick={handleAddWord}>Add Word</Button>
+                  </CanvaButton>
+                  <CanvaButton onClick={handleAddWord}>Add Word</CanvaButton>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -886,29 +902,29 @@ export default function ModerationPage() {
                   <TableRow key={item.id}>
                     <TableCell className="font-mono">{item.word}</TableCell>
                     <TableCell>
-                      <Badge className={getSeverityColor(item.severity)}>
+                      <CanvaBadge className={getSeverityColor(item.severity)}>
                         {item.severity}
-                      </Badge>
+                      </CanvaBadge>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">{item.category}</Badge>
+                      <CanvaBadge variant="primary">{item.category}</CanvaBadge>
                     </TableCell>
                     <TableCell>
                       {item.is_regex ? (
-                        <Badge variant="secondary">Regex</Badge>
+                        <CanvaBadge variant="primary">Regex</CanvaBadge>
                       ) : (
-                        <Badge variant="outline">Exact</Badge>
+                        <CanvaBadge variant="primary">Exact</CanvaBadge>
                       )}
                     </TableCell>
                     <TableCell>
                       {item.is_active ? (
-                        <Badge className="bg-green-100 text-green-800">
+                        <CanvaBadge className="bg-green-100 text-green-800">
                           Active
-                        </Badge>
+                        </CanvaBadge>
                       ) : (
-                        <Badge className="bg-gray-100 text-gray-800">
+                        <CanvaBadge className="bg-gray-100 text-gray-800">
                           Disabled
-                        </Badge>
+                        </CanvaBadge>
                       )}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
@@ -916,9 +932,9 @@ export default function ModerationPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button
+                        <CanvaButton
                           size="sm"
-                          variant="outline"
+                          variant="primary"
                           onClick={() =>
                             handleToggleWord(item.id, item.is_active)
                           }
@@ -928,15 +944,15 @@ export default function ModerationPage() {
                           ) : (
                             <CheckCircle className="h-4 w-4" />
                           )}
-                        </Button>
-                        <Button
+                        </CanvaButton>
+                        <CanvaButton
                           size="sm"
-                          variant="outline"
+                          variant="primary"
                           className="text-red-500"
                           onClick={() => handleDeleteWord(item.id)}
                         >
                           <Trash2 className="h-4 w-4" />
-                        </Button>
+                        </CanvaButton>
                       </div>
                     </TableCell>
                   </TableRow>
