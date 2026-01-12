@@ -13,13 +13,22 @@ const serviceClient = createClient(
 );
 
 async function check() {
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  const adminEmail = process.env.ADMIN_EMAIL || 'kemal@weareasocial.com';
+
+  if (!adminPassword) {
+    console.error('❌ ADMIN_PASSWORD not set');
+    console.error('Run: infisical run -- npx tsx scripts/check-admin.ts');
+    process.exit(1);
+  }
+
   console.log('=== Testing with ANON KEY (client-side simulation) ===');
 
   // First sign in
   const { data: authData, error: authError } =
     await anonClient.auth.signInWithPassword({
-      email: 'kemal@weareasocial.com',
-      password: 'Kem19875KemSupabase!',
+      email: adminEmail,
+      password: adminPassword,
     });
 
   console.log('Auth result:', authError ? authError.message : 'SUCCESS');

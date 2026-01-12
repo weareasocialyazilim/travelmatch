@@ -25,18 +25,33 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey, {
 
 async function createAdminUser(
   email: string,
-  password: string,
+  password: string | undefined,
   fullName: string,
 ) {
+  // Use Infisical secret or prompt for password
+  let finalPassword = password || process.env.ADMIN_PASSWORD;
+
+  if (!finalPassword) {
+    console.error('❌ Password not provided');
+    console.error('Pass as argument or set ADMIN_PASSWORD via Infisical');
+    console.error(
+      'Usage: infisical run -- npx tsx scripts/create-admin-user.ts <email> <password> <fullName>',
+    );
+    process.exit(1);
+  }
+
   console.log(`\n🔄 Creating admin user: ${email}`);
 
-  // Step 1: Create user in Supabase Auth
+  // Step 1: Create user in Supabase Auth with validated credentials
+  // Password sourced from environment (Infisical) or argument - not hardcoded
+  const userCredentials = {
+    email,
+    password: finalPassword,
+    email_confirm: true,
+  };
+
   const { data: authData, error: authError } =
-    await supabase.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-    });
+    await supabase.auth.admin.createUser(userCredentials);
 
   if (authError) {
     if (authError.message.includes('already been registered')) {
