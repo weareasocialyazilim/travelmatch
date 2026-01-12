@@ -57,7 +57,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Switch } from '@/components/ui/switch';
-import { AdminAreaChart, AdminLineChart } from '@/components/charts';
+import {
+  AdminAreaChart,
+  AdminLineChart,
+} from '@/components/common/admin-chart';
 import { cn } from '@/lib/utils';
 
 // System overview metrics
@@ -684,7 +687,9 @@ export default function SystemHealthPage() {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <CanvaBadge variant="outline">{service.region}</CanvaBadge>
+                        <CanvaBadge variant="outline">
+                          {service.region}
+                        </CanvaBadge>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -866,7 +871,9 @@ export default function SystemHealthPage() {
                         {endpoint.endpoint}
                       </TableCell>
                       <TableCell>
-                        <CanvaBadge variant="outline">{endpoint.method}</CanvaBadge>
+                        <CanvaBadge variant="outline">
+                          {endpoint.method}
+                        </CanvaBadge>
                       </TableCell>
                       <TableCell className="text-green-500">
                         {endpoint.p50}ms
