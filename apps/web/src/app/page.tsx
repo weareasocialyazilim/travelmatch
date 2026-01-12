@@ -5,7 +5,8 @@
  * - Hero with 3D GiftOrb
  * - TrustRing scrollytelling
  * - CinematicReveal Apple-style text mask
- * - MatchSimulator ML demo
+ * - MatchSimulator ML demo (connected to Neural Nexus API)
+ * - LiveTrustCounter real-time platform stats
  * - IdentityPulse futuristic card
  * - SacredMoments Bento Grid
  * - RitualSection process steps
@@ -16,6 +17,7 @@ import { Hero } from '@/components/landing/Hero';
 import { TrustRing } from '@/components/landing/TrustRing';
 import { CinematicReveal } from '@/components/landing/CinematicReveal';
 import { MatchSimulator } from '@/components/landing/MatchSimulator';
+import { LiveTrustCounter } from '@/components/landing/LiveTrustCounter';
 import { IdentityPulse } from '@/components/landing/IdentityPulse';
 import { SacredMoments } from '@/components/landing/SacredMoments';
 import { RitualSection } from '@/components/landing/RitualSection';
@@ -39,13 +41,16 @@ export default function HomePage() {
       {/* 05: Identity Pulse - Futuristic ID Card */}
       <IdentityPulse />
 
-      {/* 06: Sacred Moments Bento Grid */}
+      {/* 06: Live Trust Counter - Real-time Platform Stats */}
+      <LiveTrustCounter />
+
+      {/* 07: Sacred Moments Bento Grid */}
       <SacredMoments />
 
-      {/* 07: The Ritual of Gifting Process */}
+      {/* 08: The Ritual of Gifting Process */}
       <RitualSection />
 
-      {/* 08: Grand Finale Footer */}
+      {/* 09: Grand Finale Footer */}
       <Footer />
     </div>
   );
