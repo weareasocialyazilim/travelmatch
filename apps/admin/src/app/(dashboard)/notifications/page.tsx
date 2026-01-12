@@ -464,16 +464,16 @@ export default function NotificationsPage() {
             </div>
 
             <DialogFooter className="gap-2">
-              <CanvaButton variant="primary" onClick={handleSaveDraft}>
+              <CanvaButton variant="ghost" onClick={handleSaveDraft}>
                 Taslak Kaydet
               </CanvaButton>
               {scheduleEnabled ? (
-                <CanvaButton onClick={handleSchedule}>
+                <CanvaButton variant="primary" onClick={handleSchedule}>
                   <Clock className="mr-2 h-4 w-4" />
                   Zamanla
                 </CanvaButton>
               ) : (
-                <CanvaButton onClick={handleSend}>
+                <CanvaButton variant="primary" onClick={handleSend}>
                   <Send className="mr-2 h-4 w-4" />
                   Gönder
                 </CanvaButton>
