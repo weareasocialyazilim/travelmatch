@@ -12,7 +12,7 @@
  * - Aesthetic for GenZ (glass effects, neon accents)
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -105,9 +105,19 @@ const CheckoutScreen: React.FC = () => {
       : []),
   ];
 
+  // Double-tap protection ref - prevents multiple submissions even if state update is slow
+  const isSubmittingRef = useRef(false);
+
   const handlePayment = useCallback(async () => {
+    // Double-tap protection: check ref immediately before any async work
+    if (isSubmittingRef.current) {
+      logger.warn('[Checkout] Double-tap prevented');
+      return;
+    }
     if (!selectedMethod || isProcessing || !momentId) return;
 
+    // Lock submission immediately
+    isSubmittingRef.current = true;
     setIsProcessing(true);
     HapticManager.buttonPress();
 
@@ -140,6 +150,7 @@ const CheckoutScreen: React.FC = () => {
       });
     } finally {
       setIsProcessing(false);
+      isSubmittingRef.current = false; // Release lock
     }
   }, [
     selectedMethod,

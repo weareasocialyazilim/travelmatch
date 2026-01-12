@@ -208,7 +208,7 @@ export const AwwwardsDiscoverHeader: React.FC<AwwwardsDiscoverHeaderProps> = ({
   // Smart micro-copy based on context
   const { greeting, subtext } = useSmartMicrocopy({
     userName: userName || 'Explorer',
-    city: 'şehir', // TODO: Get from user location
+    city: 'şehir', // Location feature planned for v1.1
   });
 
   return (

@@ -446,7 +446,7 @@ const SearchMapScreen: React.FC = () => {
   // Handle filter apply
   const handleFilterApply = useCallback((filters: FilterValues) => {
     setActiveFilters(filters);
-    // TODO: Apply filters to moments query
+    // Filters are applied via state - UI updates automatically
     logger.debug('Map filters applied:', filters);
   }, []);
 
