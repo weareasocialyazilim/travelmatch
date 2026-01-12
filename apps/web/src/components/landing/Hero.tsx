@@ -1,162 +1,210 @@
 'use client';
 
+import { Suspense } from 'react';
+import { Canvas } from '@react-three/fiber';
 import { motion } from 'framer-motion';
-import { HERO_CONTENT } from '@/constants/content';
-import { AppStoreBadges } from '@/components/ui/AppStoreBadges';
+import { GiftOrbScene } from '@/components/3d/GiftOrb';
+import { MagneticButton, PremiumButton } from '@/components/ui/MagneticButton';
 
 /**
- * Hero Section - "Anı Hediye Et"
+ * Hero Section - "Unlock Sacred Moments"
  *
- * Features:
- * - Fluid typography with clamp()
- * - Smooth animations
- * - Mobile responsive
+ * Awwwards-ready design with:
+ * - Interactive 3D GiftOrb background
+ * - Fluid typography (Clash Display)
+ * - Magnetic interactions
+ * - Tesla/Nvidia aesthetic
  */
 
+const HERO_CONTENT = {
+  en: {
+    badge: 'The Future of Human Connection',
+    headline: ['Unlock', 'Sacred', 'Moments'],
+    subheadline:
+      "Not just an app, a gifting revolution. No passports, just human stories and locked trust.",
+    cta: {
+      primary: 'Join the Movement',
+      secondary: 'How it Works',
+    },
+    stats: [
+      { value: '50K+', label: 'Connections Made' },
+      { value: '100K+', label: 'Gifts Exchanged' },
+      { value: '50+', label: 'Cities Worldwide' },
+    ],
+  },
+  tr: {
+    badge: 'İnsan Bağlantısının Geleceği',
+    headline: ['Kutsal', 'Anları', 'Keşfet'],
+    subheadline:
+      'Sadece bir uygulama değil, bir hediyeleşme devrimi. Pasaport yok, sadece insan hikayeleri ve kilitli güven.',
+    cta: {
+      primary: 'Harekete Katıl',
+      secondary: 'Nasıl Çalışır?',
+    },
+    stats: [
+      { value: '50K+', label: 'Bağlantı Kuruldu' },
+      { value: '100K+', label: 'Hediye Gönderildi' },
+      { value: '50+', label: 'Şehirde Aktif' },
+    ],
+  },
+};
+
 export function Hero() {
-  const content = HERO_CONTENT.tr;
+  const content = HERO_CONTENT.en;
 
   return (
-    <section
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
-      style={{ padding: 'clamp(2rem, 5vw, 4rem)' }}
-    >
-      <div className="container mx-auto max-w-6xl text-center">
-        {/* Badge */}
+    <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
+      {/* 3D Background Layer */}
+      <div className="absolute inset-0 z-0 opacity-50">
+        <Suspense fallback={null}>
+          <Canvas
+            camera={{ position: [0, 0, 5], fov: 45 }}
+            dpr={[1, 1.5]}
+            gl={{
+              antialias: true,
+              powerPreference: 'high-performance',
+              alpha: true,
+            }}
+          >
+            <GiftOrbScene />
+          </Canvas>
+        </Suspense>
+      </div>
+
+      {/* Radial gradient overlay for depth */}
+      <div
+        className="absolute inset-0 z-[1] pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(ellipse at center, transparent 0%, rgba(2,2,2,0.8) 70%)',
+        }}
+      />
+
+      {/* Content Layer */}
+      <div className="section-container relative z-10 text-center">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-8"
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-5xl mx-auto"
         >
-          <span
-            className="inline-block px-6 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm"
-            style={{ fontSize: 'clamp(0.875rem, 2vw, 1rem)' }}
+          {/* Badge */}
+          <motion.span
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="inline-block mb-8 px-6 py-2 rounded-full glass-card text-xs
+                       font-bold uppercase tracking-[0.2em] text-primary"
           >
             {content.badge}
-          </span>
-        </motion.div>
+          </motion.span>
 
-        {/* Headline */}
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="font-syne font-extrabold leading-tight mb-6"
-          style={{ fontSize: 'clamp(2.5rem, 10vw, 7rem)' }}
-        >
-          <span className="text-stroke hover:text-[#ccff00] transition-all duration-300">
-            {content.headline.split(' ')[0]}
-          </span>
-          <br />
-          <span className="text-[#ccff00]">
-            {content.headline.split(' ').slice(1).join(' ')}
-          </span>
-        </motion.h1>
-
-        {/* Subheadline */}
-        <motion.p
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="text-gray-400 max-w-2xl mx-auto mb-12"
-          style={{ fontSize: 'clamp(1rem, 2.5vw, 1.25rem)' }}
-        >
-          {content.subheadline}
-        </motion.p>
-
-        {/* CTA Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.3 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
-        >
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.98 }}
-            className="sticker bg-[#ccff00] text-black font-bold rounded-none border-2 border-black"
-            style={{
-              padding: 'clamp(0.875rem, 2vw, 1.25rem) clamp(2rem, 4vw, 3rem)',
-              fontSize: 'clamp(1rem, 2vw, 1.125rem)',
-            }}
-            data-cursor-hover
-          >
-            {content.cta.primary}
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.98 }}
-            className="sticker bg-transparent text-white font-bold rounded-none border-2 border-white hover:bg-white hover:text-black transition-colors"
-            style={{
-              padding: 'clamp(0.875rem, 2vw, 1.25rem) clamp(2rem, 4vw, 3rem)',
-              fontSize: 'clamp(1rem, 2vw, 1.125rem)',
-            }}
-            data-cursor-hover
-          >
-            {content.cta.secondary}
-          </motion.button>
-        </motion.div>
-
-        {/* App Store Badges */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.4 }}
-        >
-          <AppStoreBadges />
-        </motion.div>
-
-        {/* Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.5 }}
-          className="grid grid-cols-3 gap-8 mt-20 max-w-2xl mx-auto"
-        >
-          {[
-            { value: '50K+', label: content.stats.connections },
-            { value: '100K+', label: content.stats.gifts },
-            { value: '50+', label: content.stats.cities },
-          ].map((stat, index) => (
-            <motion.div
-              key={index}
-              whileHover={{ scale: 1.05 }}
-              className="text-center"
+          {/* Headline - Clash Display Brutal Style */}
+          <h1 className="font-clash text-fluid-hero font-black uppercase italic tracking-tighter leading-[0.85] mb-8">
+            <motion.span
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="block text-foreground"
             >
-              <div
-                className="font-syne font-bold text-[#ccff00]"
-                style={{ fontSize: 'clamp(1.5rem, 5vw, 3rem)' }}
+              {content.headline[0]}
+            </motion.span>
+            <motion.span
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="block gradient-text"
+            >
+              {content.headline[1]}
+            </motion.span>
+            <motion.span
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+              className="block text-foreground"
+            >
+              {content.headline[2]}
+            </motion.span>
+          </h1>
+
+          {/* Subheadline */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="text-fluid-lg text-muted max-w-2xl mx-auto mb-12 leading-relaxed"
+          >
+            {content.subheadline}
+          </motion.p>
+
+          {/* CTA Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-6"
+          >
+            <PremiumButton className="text-background">
+              {content.cta.primary}
+            </PremiumButton>
+
+            <MagneticButton variant="ghost" size="md">
+              <span className="text-muted group-hover:text-foreground transition-colors">
+                {content.cta.secondary}
+              </span>
+            </MagneticButton>
+          </motion.div>
+
+          {/* Stats */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 1 }}
+            className="grid grid-cols-3 gap-8 mt-20 max-w-2xl mx-auto"
+          >
+            {content.stats.map((stat, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 1 + index * 0.1 }}
+                className="text-center group"
               >
-                {stat.value}
-              </div>
-              <div
-                className="text-gray-500"
-                style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}
-              >
-                {stat.label}
-              </div>
-            </motion.div>
-          ))}
+                <div className="text-fluid-3xl font-clash font-black text-primary
+                                group-hover:text-glow transition-all duration-300">
+                  {stat.value}
+                </div>
+                <div className="text-fluid-xs text-muted uppercase tracking-wider mt-1">
+                  {stat.label}
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
         </motion.div>
       </div>
 
-      {/* Scroll Indicator */}
+      {/* Scroll Indicator - Tesla Style */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1, duration: 0.5 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        transition={{ delay: 1.5, duration: 0.5 }}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10"
       >
         <motion.div
           animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-          className="w-6 h-10 rounded-full border-2 border-white/30 flex items-start justify-center p-2"
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          className="flex flex-col items-center gap-3"
         >
-          <div className="w-1 h-2 bg-white/50 rounded-full" />
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted">
+            Scroll
+          </span>
+          <div className="w-px h-12 bg-gradient-to-b from-primary to-transparent" />
         </motion.div>
       </motion.div>
+
+      {/* Corner Decorations - Premium Detail */}
+      <div className="absolute top-24 left-8 w-16 h-16 border-l border-t border-border opacity-30" />
+      <div className="absolute bottom-24 right-8 w-16 h-16 border-r border-b border-border opacity-30" />
     </section>
   );
 }
