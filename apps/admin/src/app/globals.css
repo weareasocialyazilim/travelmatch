@@ -177,49 +177,59 @@
   @apply bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400;
 }
 
-/* Admin Sidebar - Cinematic Travel + Trust Jewelry Design */
+/* Admin Sidebar - Modern Enterprise Design */
 .admin-sidebar {
   @apply flex h-screen flex-col border-r bg-card transition-all duration-300;
+  @apply shadow-sm;
 }
 
 .admin-sidebar-logo {
-  @apply flex h-16 items-center border-b px-4;
+  @apply flex h-14 items-center border-b px-4;
+  @apply bg-gradient-to-r from-card to-card/95;
 }
 
 .admin-sidebar-logo-icon {
-  @apply flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-md;
+  @apply flex h-8 w-8 items-center justify-center rounded-lg;
+  @apply bg-gradient-to-br from-violet-500 to-violet-600 text-white shadow-md;
 }
 
 .admin-sidebar-nav {
-  @apply px-3 py-4;
+  @apply px-2 py-3;
   scroll-behavior: smooth;
   overflow-anchor: none;
 }
 
 .admin-sidebar-section {
-  @apply mb-6;
+  @apply mb-4;
 }
 
 .admin-sidebar-section-title {
-  @apply mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground;
+  @apply mb-1.5 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider;
+  @apply text-muted-foreground/70 select-none;
 }
 
 .admin-sidebar-item {
-  @apply flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all hover:bg-accent;
-  @apply text-muted-foreground hover:text-foreground;
+  @apply flex items-center gap-2.5 rounded-md px-3 py-2 text-[13px] transition-all;
+  @apply text-muted-foreground hover:text-foreground hover:bg-muted/60;
 }
 
 .admin-sidebar-item-active {
-  @apply bg-primary/10 text-primary font-medium;
-  @apply hover:bg-primary/15 hover:text-primary;
+  @apply bg-violet-500/10 text-violet-600 font-medium;
+  @apply hover:bg-violet-500/15 hover:text-violet-600;
+  @apply dark:text-violet-400 dark:hover:text-violet-400;
 }
 
 .admin-sidebar-item-icon {
-  @apply h-4 w-4 shrink-0;
+  @apply h-4 w-4 shrink-0 opacity-70;
+}
+
+.admin-sidebar-item-active .admin-sidebar-item-icon {
+  @apply opacity-100;
 }
 
 .admin-sidebar-badge {
-  @apply flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-medium text-primary-foreground;
+  @apply flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold;
+  @apply bg-violet-500 text-white;
 }
 
 /* ═══════════════════════════════════════════════════════════════════

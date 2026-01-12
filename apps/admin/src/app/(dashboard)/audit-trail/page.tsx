@@ -36,6 +36,16 @@ import {
   MoreHorizontal,
 } from 'lucide-react';
 import {
+  CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
+  CanvaCardBody,
+  CanvaStatCard,
+} from '@/components/canva/CanvaCard';
+import { CanvaBadge } from '@/components/canva/CanvaBadge';
+import { CanvaButton } from '@/components/canva/CanvaButton';
+import {
   Card,
   CardContent,
   CardDescription,
