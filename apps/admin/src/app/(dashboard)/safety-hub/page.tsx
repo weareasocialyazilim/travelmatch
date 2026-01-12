@@ -555,8 +555,8 @@ export default function SafetyHubPage() {
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* AI Moderation Tab */}
