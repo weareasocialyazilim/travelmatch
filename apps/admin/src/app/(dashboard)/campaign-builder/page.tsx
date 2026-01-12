@@ -300,7 +300,7 @@ export default function CampaignBuilderPage() {
         );
       case 'completed':
         return (
-          <CanvaBadge className="bg-gray-500/10 text-gray-500 border-gray-500/20">
+          <CanvaBadge className="bg-muted text-muted-foreground border-border">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             Tamamlandı
           </CanvaBadge>

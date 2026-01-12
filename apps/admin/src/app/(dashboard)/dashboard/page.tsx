@@ -119,7 +119,7 @@ export default function DashboardPage() {
       case 'down':
         return <XCircle className="h-4 w-4 text-red-500" />;
       default:
-        return <Clock className="h-4 w-4 text-gray-400" />;
+        return <Clock className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -133,7 +133,7 @@ export default function DashboardPage() {
       case 'down':
         return 'bg-red-500';
       default:
-        return 'bg-gray-400';
+        return 'bg-muted-foreground';
     }
   };
 
@@ -146,10 +146,10 @@ export default function DashboardPage() {
             <AlertTriangle className="h-8 w-8 text-red-500" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-foreground">
               Bağlantı Hatası
             </h2>
-            <p className="text-gray-500 mt-1">
+            <p className="text-muted-foreground mt-1">
               Dashboard verileri yüklenemedi. Lütfen tekrar deneyin.
             </p>
           </div>
@@ -181,16 +181,16 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">
             Dashboard
           </h1>
-          <p className="text-gray-500 mt-1">
+          <p className="text-muted-foreground mt-1">
             Platform genel bakış ve canlı metrikler
           </p>
         </div>
         <div className="flex items-center gap-3">
           {data?.meta.generatedAt && (
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-muted-foreground">
               Son güncelleme:{' '}
               {new Date(data.meta.generatedAt).toLocaleTimeString('tr-TR')}
             </span>
@@ -278,7 +278,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CanvaCardTitle>Kullanıcı Aktivitesi</CanvaCardTitle>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Son 14 günlük kayıt ve aktivite trendi
                   </p>
                 </div>
@@ -318,7 +318,7 @@ export default function DashboardPage() {
                   ]}
                 />
               ) : (
-                <div className="flex flex-col items-center justify-center h-[280px] text-gray-400">
+                <div className="flex flex-col items-center justify-center h-[280px] text-muted-foreground">
                   <BarChart3 className="h-12 w-12 mb-3" />
                   <p>Henüz veri yok</p>
                 </div>
@@ -332,7 +332,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CanvaCardTitle>Gelir Trendi</CanvaCardTitle>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Aylık gelir performansı
                   </p>
                 </div>
@@ -368,7 +368,7 @@ export default function DashboardPage() {
                   ]}
                 />
               ) : (
-                <div className="flex flex-col items-center justify-center h-[250px] text-gray-400">
+                <div className="flex flex-col items-center justify-center h-[250px] text-muted-foreground">
                   <TrendingUp className="h-12 w-12 mb-3" />
                   <p>Henüz veri yok</p>
                 </div>
@@ -398,12 +398,12 @@ export default function DashboardPage() {
                   <Loader2 className="h-6 w-6 animate-spin text-violet-500" />
                 </div>
               ) : (data?.pendingTasksList?.length || 0) > 0 ? (
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-border">
                   {data?.pendingTasksList.slice(0, 5).map((task) => (
                     <div
                       key={task.id}
                       className={cn(
-                        'flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors',
+                        'flex items-center justify-between px-6 py-4 hover:bg-muted transition-colors',
                         task.priority === 'urgent' &&
                           'border-l-4 border-l-red-500',
                         task.priority === 'high' &&
@@ -421,16 +421,16 @@ export default function DashboardPage() {
                             task.priority === 'medium' &&
                               'bg-blue-50 text-blue-600',
                             task.priority === 'low' &&
-                              'bg-gray-100 text-gray-600',
+                              'bg-muted text-foreground',
                           )}
                         >
                           <AlertTriangle className="h-4 w-4" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900">
+                          <p className="text-sm font-medium text-foreground">
                             {task.title}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-muted-foreground">
                             {new Date(task.created_at).toLocaleDateString(
                               'tr-TR',
                             )}
@@ -457,9 +457,9 @@ export default function DashboardPage() {
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-8 text-gray-400">
+                <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
                   <CheckCircle2 className="h-12 w-12 mb-3 text-emerald-500" />
-                  <p className="text-gray-600 font-medium">
+                  <p className="text-foreground font-medium">
                     Tüm görevler tamamlandı!
                   </p>
                   <p className="text-sm">Bekleyen görev yok</p>
@@ -527,8 +527,8 @@ export default function DashboardPage() {
                                   getStatusColor(status),
                                 )}
                               />
-                              <Icon className="h-4 w-4 text-gray-400" />
-                              <span className="text-sm font-medium text-gray-700 capitalize">
+                              <Icon className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm font-medium text-foreground capitalize">
                                 {key}
                               </span>
                             </div>
@@ -539,16 +539,16 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Performance Metrics */}
-                  <div className="pt-3 border-t border-gray-100 grid grid-cols-2 gap-4">
+                  <div className="pt-3 border-t border-border grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-xs text-gray-500">Yanıt Süresi</p>
-                      <p className="text-lg font-semibold text-gray-900">
+                      <p className="text-xs text-muted-foreground">Yanıt Süresi</p>
+                      <p className="text-lg font-semibold text-foreground">
                         {data?.systemHealth.responseTime || 45}ms
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">Hata Oranı</p>
-                      <p className="text-lg font-semibold text-gray-900">
+                      <p className="text-xs text-muted-foreground">Hata Oranı</p>
+                      <p className="text-lg font-semibold text-foreground">
                         {data?.systemHealth.errorRate || 0.1}%
                       </p>
                     </div>
@@ -571,21 +571,21 @@ export default function DashboardPage() {
               ) : (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-muted-foreground">
                       Aktif Bağlantılar
                     </span>
-                    <span className="text-sm font-semibold text-gray-900">
+                    <span className="text-sm font-semibold text-foreground">
                       {(
                         data?.systemHealth.activeConnections || 0
                       ).toLocaleString('tr-TR')}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-muted-foreground">
                       Etkileşim Oranı
                     </span>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-gray-900">
+                      <span className="text-sm font-semibold text-foreground">
                         {data?.metrics.engagementRate || 0}%
                       </span>
                       {(data?.metrics.engagementRate || 0) > 50 ? (
@@ -596,7 +596,7 @@ export default function DashboardPage() {
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-muted-foreground">
                       Bekleyen Görevler
                     </span>
                     <CanvaBadge
@@ -632,14 +632,14 @@ export default function DashboardPage() {
                   <link.icon className="h-6 w-6" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-900 group-hover:text-violet-600 transition-colors">
+                  <p className="font-semibold text-foreground group-hover:text-violet-600 transition-colors">
                     {link.title}
                   </p>
-                  <p className="text-sm text-gray-500 truncate">
+                  <p className="text-sm text-muted-foreground truncate">
                     {link.description}
                   </p>
                 </div>
-                <ArrowRight className="h-5 w-5 text-gray-400 transition-transform group-hover:translate-x-1 group-hover:text-violet-500" />
+                <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-violet-500" />
               </div>
             </CanvaCard>
           </Link>
@@ -661,24 +661,24 @@ export default function DashboardPage() {
             </div>
           </CanvaCardHeader>
           <CanvaCardBody className="p-0">
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-border">
               {data?.recentActivities.slice(0, 5).map((activity) => (
                 <div
                   key={activity.id}
-                  className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                  className="px-6 py-4 flex items-center justify-between hover:bg-muted transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-2 rounded-full bg-violet-500" />
                     <div>
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-sm font-medium text-foreground">
                         {activity.action}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-muted-foreground">
                         {activity.entity_type} • {activity.entity_id}
                       </p>
                     </div>
                   </div>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-muted-foreground">
                     {new Date(activity.created_at).toLocaleString('tr-TR')}
                   </span>
                 </div>

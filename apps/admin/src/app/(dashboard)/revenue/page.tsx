@@ -61,10 +61,10 @@ export default function RevenuePage() {
             <AlertTriangle className="h-8 w-8 text-red-500" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-foreground">
               Veri Yüklenemedi
             </h2>
-            <p className="text-gray-500 mt-1">Gelir verileri alınamadı.</p>
+            <p className="text-muted-foreground mt-1">Gelir verileri alınamadı.</p>
           </div>
           <CanvaButton variant="primary" onClick={() => refetch()}>
             <RefreshCw className="h-4 w-4" />
@@ -84,10 +84,10 @@ export default function RevenuePage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Gelir Analitiği
           </h1>
-          <p className="text-gray-500 mt-1">
+          <p className="text-muted-foreground mt-1">
             Gelir metrikleri, tahminler ve fiyatlandırma optimizasyonu
           </p>
         </div>
@@ -167,7 +167,7 @@ export default function RevenuePage() {
         <CanvaCard>
           <div className="p-5">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Büyüme
               </span>
               <div
@@ -213,7 +213,7 @@ export default function RevenuePage() {
           <CanvaCard>
             <CanvaCardHeader>
               <CanvaCardTitle>Gelir Trendi</CanvaCardTitle>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Aylık gelir performansı
               </p>
             </CanvaCardHeader>
@@ -279,7 +279,7 @@ export default function RevenuePage() {
                   </ResponsiveContainer>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center h-[400px] text-gray-400">
+                <div className="flex flex-col items-center justify-center h-[400px] text-muted-foreground">
                   <DollarSign className="h-12 w-12 mb-3" />
                   <p>Henüz gelir verisi yok</p>
                 </div>
@@ -294,7 +294,7 @@ export default function RevenuePage() {
             <CanvaCard>
               <CanvaCardHeader>
                 <CanvaCardTitle>Ürün Dağılımı</CanvaCardTitle>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   Gelir kaynaklarının dağılımı
                 </p>
               </CanvaCardHeader>
@@ -340,7 +340,7 @@ export default function RevenuePage() {
                     </ResponsiveContainer>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-[300px] text-gray-400">
+                  <div className="flex flex-col items-center justify-center h-[300px] text-muted-foreground">
                     <DollarSign className="h-12 w-12 mb-3" />
                     <p>Henüz ürün verisi yok</p>
                   </div>
@@ -376,16 +376,16 @@ export default function RevenuePage() {
                                 className="h-3 w-3 rounded-full"
                                 style={{ backgroundColor: product.color }}
                               />
-                              <span className="font-medium text-gray-900">
+                              <span className="font-medium text-foreground">
                                 {product.name}
                               </span>
                             </div>
-                            <span className="text-sm font-medium text-gray-700">
+                            <span className="text-sm font-medium text-foreground">
                               {formatCurrency(product.value, 'TRY')}
                             </span>
                           </div>
                           <Progress value={percentage} className="h-2" />
-                          <p className="text-xs text-gray-500 text-right">
+                          <p className="text-xs text-muted-foreground text-right">
                             {percentage}% pay
                           </p>
                         </div>
@@ -393,7 +393,7 @@ export default function RevenuePage() {
                     })}
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-[300px] text-gray-400">
+                  <div className="flex flex-col items-center justify-center h-[300px] text-muted-foreground">
                     <DollarSign className="h-12 w-12 mb-3" />
                     <p>Henüz ürün verisi yok</p>
                   </div>
@@ -408,7 +408,7 @@ export default function RevenuePage() {
           <CanvaCard>
             <CanvaCardHeader>
               <CanvaCardTitle>Son Ödemeler</CanvaCardTitle>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 En son tamamlanan ödemeler
               </p>
             </CanvaCardHeader>
@@ -418,25 +418,25 @@ export default function RevenuePage() {
                   <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
                 </div>
               ) : (data?.recentPayments?.length || 0) > 0 ? (
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-border">
                   {data?.recentPayments.slice(0, 10).map((payment) => (
                     <div
                       key={payment.id}
-                      className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                      className="px-6 py-4 flex items-center justify-between hover:bg-muted transition-colors"
                     >
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
                           <DollarSign className="h-5 w-5 text-emerald-600" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900">
+                          <p className="text-sm font-medium text-foreground">
                             {payment.type === 'subscription'
                               ? 'Abonelik'
                               : payment.type === 'gift'
                                 ? 'Hediye'
                                 : 'Ödeme'}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-muted-foreground">
                             {new Date(payment.created_at).toLocaleString(
                               'tr-TR',
                             )}
@@ -444,7 +444,7 @@ export default function RevenuePage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-semibold text-gray-900">
+                        <p className="text-sm font-semibold text-foreground">
                           {formatCurrency(
                             payment.amount,
                             payment.currency || 'TRY',
@@ -458,7 +458,7 @@ export default function RevenuePage() {
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+                <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                   <CreditCard className="h-12 w-12 mb-3" />
                   <p>Henüz ödeme yok</p>
                 </div>

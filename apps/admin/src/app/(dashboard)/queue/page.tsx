@@ -83,10 +83,10 @@ export default function QueuePage() {
             <AlertTriangle className="h-8 w-8 text-red-500" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-foreground">
               Veri Yüklenemedi
             </h2>
-            <p className="text-gray-500 mt-1">Görev listesi alınamadı.</p>
+            <p className="text-muted-foreground mt-1">Görev listesi alınamadı.</p>
           </div>
           <CanvaButton variant="primary" onClick={() => refetch()}>
             <RefreshCw className="h-4 w-4" />
@@ -102,10 +102,10 @@ export default function QueuePage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Bugün ne yapmalıyım?
           </h1>
-          <p className="text-gray-500 mt-1">
+          <p className="text-muted-foreground mt-1">
             İş kuyruğundaki görevleri öncelik sırasına göre tamamlayın
           </p>
         </div>
@@ -151,10 +151,10 @@ export default function QueuePage() {
               <AlertTriangle className="h-5 w-5 text-red-500" />
             </div>
             <div>
-              <p className="font-semibold text-gray-900">
+              <p className="font-semibold text-foreground">
                 {stats?.overdue} görev süresi geçmiş!
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 Bu görevlere hemen dikkat etmeniz gerekiyor.
               </p>
             </div>
@@ -168,12 +168,12 @@ export default function QueuePage() {
           <div className="flex items-center justify-between">
             <div>
               <CanvaCardTitle>İş Kuyruğu</CanvaCardTitle>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Öncelik sırasına göre sıralanmış görevler
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-gray-400" />
+              <Filter className="h-4 w-4 text-muted-foreground" />
               <Select value={priorityFilter} onValueChange={setPriorityFilter}>
                 <SelectTrigger className="w-32">
                   <SelectValue placeholder="Öncelik" />
@@ -222,7 +222,7 @@ export default function QueuePage() {
                   <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
                 </div>
               ) : tasks.length > 0 ? (
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-border">
                   {tasks.map((task) => {
                     const typeInfo =
                       typeConfig[task.type] || typeConfig.general;
@@ -236,7 +236,7 @@ export default function QueuePage() {
                       <div
                         key={task.id}
                         className={cn(
-                          'flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors',
+                          'flex items-center justify-between px-6 py-4 hover:bg-muted transition-colors',
                           task.priority === 'urgent' &&
                             'border-l-4 border-l-red-500',
                           task.priority === 'high' &&
@@ -254,14 +254,14 @@ export default function QueuePage() {
                               task.priority === 'medium' &&
                                 'bg-blue-50 text-blue-600',
                               task.priority === 'low' &&
-                                'bg-gray-100 text-gray-600',
+                                'bg-muted text-foreground',
                             )}
                           >
                             <TypeIcon className="h-5 w-5" />
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <h4 className="font-medium text-gray-900">
+                              <h4 className="font-medium text-foreground">
                                 {task.title}
                               </h4>
                               <CanvaBadge
@@ -275,11 +275,11 @@ export default function QueuePage() {
                               </CanvaBadge>
                             </div>
                             {task.description && (
-                              <p className="text-sm text-gray-500 mt-0.5">
+                              <p className="text-sm text-muted-foreground mt-0.5">
                                 {task.description}
                               </p>
                             )}
-                            <p className="text-xs text-gray-400 mt-1">
+                            <p className="text-xs text-muted-foreground mt-1">
                               {formatRelativeDate(task.created_at)}
                               {task.assignee && (
                                 <span>
@@ -316,10 +316,10 @@ export default function QueuePage() {
               ) : (
                 <div className="py-12 text-center">
                   <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-500" />
-                  <h3 className="mt-4 text-lg font-semibold text-gray-900">
+                  <h3 className="mt-4 text-lg font-semibold text-foreground">
                     Tebrikler!
                   </h3>
-                  <p className="text-gray-500">
+                  <p className="text-muted-foreground">
                     Tüm görevler tamamlandı. Şimdilik yapılacak bir şey yok.
                   </p>
                 </div>
@@ -332,7 +332,7 @@ export default function QueuePage() {
                   <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
                 </div>
               ) : (
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-border">
                   {tasks
                     .filter((t) => t.priority === 'urgent')
                     .map((task) => {
@@ -343,17 +343,17 @@ export default function QueuePage() {
                       return (
                         <div
                           key={task.id}
-                          className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors border-l-4 border-l-red-500"
+                          className="flex items-center justify-between px-6 py-4 hover:bg-muted transition-colors border-l-4 border-l-red-500"
                         >
                           <div className="flex items-center gap-4">
                             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-600">
                               <TypeIcon className="h-5 w-5" />
                             </div>
                             <div>
-                              <h4 className="font-medium text-gray-900">
+                              <h4 className="font-medium text-foreground">
                                 {task.title}
                               </h4>
-                              <p className="text-xs text-gray-400">
+                              <p className="text-xs text-muted-foreground">
                                 {formatRelativeDate(task.created_at)}
                               </p>
                             </div>
@@ -369,7 +369,7 @@ export default function QueuePage() {
                     0 && (
                     <div className="py-12 text-center">
                       <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-500" />
-                      <p className="mt-4 text-gray-500">
+                      <p className="mt-4 text-muted-foreground">
                         Acil görev bulunmuyor.
                       </p>
                     </div>
@@ -384,7 +384,7 @@ export default function QueuePage() {
                   <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
                 </div>
               ) : (
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-border">
                   {tasks
                     .filter((t) => t.status === 'pending')
                     .map((task) => {
@@ -399,15 +399,15 @@ export default function QueuePage() {
                       return (
                         <div
                           key={task.id}
-                          className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors"
+                          className="flex items-center justify-between px-6 py-4 hover:bg-muted transition-colors"
                         >
                           <div className="flex items-center gap-4">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-100">
-                              <TypeIcon className="h-5 w-5 text-gray-600" />
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted">
+                              <TypeIcon className="h-5 w-5 text-foreground" />
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
-                                <h4 className="font-medium text-gray-900">
+                                <h4 className="font-medium text-foreground">
                                   {task.title}
                                 </h4>
                                 <CanvaBadge
@@ -417,7 +417,7 @@ export default function QueuePage() {
                                   {priorityInfo.label}
                                 </CanvaBadge>
                               </div>
-                              <p className="text-xs text-gray-400">
+                              <p className="text-xs text-muted-foreground">
                                 {formatRelativeDate(task.created_at)}
                               </p>
                             </div>
@@ -436,7 +436,7 @@ export default function QueuePage() {
                   {tasks.filter((t) => t.status === 'pending').length === 0 && (
                     <div className="py-12 text-center">
                       <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-500" />
-                      <p className="mt-4 text-gray-500">
+                      <p className="mt-4 text-muted-foreground">
                         Bekleyen görev bulunmuyor.
                       </p>
                     </div>

@@ -290,7 +290,7 @@ export default function GeographicPage() {
                         onClick={() => setSelectedCountry(country.code)}
                       >
                         <div className="flex items-center gap-4">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 font-semibold">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted font-semibold">
                             #{index + 1}
                           </div>
                           <div>

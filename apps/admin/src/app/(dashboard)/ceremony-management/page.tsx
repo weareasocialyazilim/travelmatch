@@ -182,15 +182,15 @@ export default function CeremonyManagementPage() {
                       className={`w-full text-left p-3 rounded-lg border transition-colors ${
                         selectedProof.id === proof.id
                           ? 'border-amber-500 bg-amber-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                          : 'border-border hover:border-border'
                       }`}
                     >
                       <div className="flex items-start justify-between">
                         <div>
-                          <p className="font-medium text-gray-900">
+                          <p className="font-medium text-foreground">
                             {proof.userName}
                           </p>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-muted-foreground">
                             {proof.momentTitle}
                           </p>
                         </div>
@@ -208,7 +208,7 @@ export default function CeremonyManagementPage() {
                         {proof.aiAnalysis.flags.slice(0, 2).map((flag, i) => (
                           <span
                             key={i}
-                            className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded"
+                            className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded"
                           >
                             {flag}
                           </span>
@@ -218,7 +218,7 @@ export default function CeremonyManagementPage() {
                   ))}
 
                   {mockPendingProofs.length === 0 && (
-                    <div className="text-center py-8 text-gray-500">
+                    <div className="text-center py-8 text-muted-foreground">
                       <CheckCircleIcon className="w-12 h-12 mx-auto mb-2 text-emerald-500" />
                       <p>Bekleyen inceleme yok!</p>
                     </div>
@@ -251,7 +251,7 @@ export default function CeremonyManagementPage() {
               <CanvaCardTitle>İnceleme Geçmişi</CanvaCardTitle>
             </CanvaCardHeader>
             <CanvaCardBody>
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-muted-foreground">
                 <p>Geçmiş incelemeler burada listelenecek</p>
               </div>
             </CanvaCardBody>

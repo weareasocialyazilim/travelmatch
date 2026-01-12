@@ -254,7 +254,7 @@ const categoryLabels: Record<
   },
   operational: {
     label: 'Operasyonel',
-    color: 'bg-gray-100 text-gray-800',
+    color: 'bg-muted text-foreground',
     icon: Settings,
   },
   kill_switch: {
@@ -426,23 +426,23 @@ export default function FeatureFlagsPage() {
     <div className="space-y-6 animate-pulse">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
-          <div className="h-8 w-48 bg-gray-200 rounded" />
-          <div className="h-4 w-64 bg-gray-100 rounded" />
+          <div className="h-8 w-48 bg-muted rounded" />
+          <div className="h-4 w-64 bg-muted rounded" />
         </div>
         <div className="flex gap-2">
-          <div className="h-10 w-24 bg-gray-200 rounded" />
-          <div className="h-10 w-32 bg-gray-200 rounded" />
+          <div className="h-10 w-24 bg-muted rounded" />
+          <div className="h-10 w-32 bg-muted rounded" />
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-24 bg-gray-100 rounded-lg" />
+          <div key={i} className="h-24 bg-muted rounded-lg" />
         ))}
       </div>
-      <div className="h-16 bg-gray-100 rounded-lg" />
+      <div className="h-16 bg-muted rounded-lg" />
       <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-32 bg-gray-100 rounded-lg" />
+          <div key={i} className="h-32 bg-muted rounded-lg" />
         ))}
       </div>
     </div>
@@ -455,8 +455,8 @@ export default function FeatureFlagsPage() {
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
           <AlertTriangle className="h-8 w-8 text-red-600" />
         </div>
-        <h2 className="text-xl font-semibold text-gray-900">Bir hata oluştu</h2>
-        <p className="text-gray-500 max-w-md">
+        <h2 className="text-xl font-semibold text-foreground">Bir hata oluştu</h2>
+        <p className="text-muted-foreground max-w-md">
           Feature flag verileri yüklenemedi. Lütfen tekrar deneyin.
         </p>
         <CanvaButton
@@ -472,15 +472,15 @@ export default function FeatureFlagsPage() {
 
   // Empty State
   const EmptyState = () => (
-    <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-gray-200">
+    <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-border">
       <div className="text-center space-y-3">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-          <Flag className="h-6 w-6 text-gray-400" />
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+          <Flag className="h-6 w-6 text-muted-foreground" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900">
+        <h3 className="text-lg font-medium text-foreground">
           Henüz feature flag yok
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           İlk feature flag'inizi oluşturarak başlayın.
         </p>
         <CanvaButton
@@ -801,7 +801,7 @@ function FlagCard({
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
-            <h3 className="text-lg font-semibold text-gray-900">{flag.name}</h3>
+            <h3 className="text-lg font-semibold text-foreground">{flag.name}</h3>
             <CanvaBadge
               className={categoryInfo.color}
               icon={<CategoryIcon className="h-3 w-3" />}
@@ -820,7 +820,7 @@ function FlagCard({
               {flag.environment}
             </CanvaBadge>
           </div>
-          <p className="text-sm text-gray-500 mb-3">{flag.description}</p>
+          <p className="text-sm text-muted-foreground mb-3">{flag.description}</p>
           <div className="flex items-center gap-4 text-sm">
             <button
               onClick={() => onCopyKey(flag.key)}
@@ -929,10 +929,10 @@ function FlagCard({
 
       {/* Progress bar for rollout */}
       {flag.enabled && flag.rollout_percentage < 100 && (
-        <div className="mt-4 pt-4 border-t border-gray-100">
+        <div className="mt-4 pt-4 border-t border-border">
           <div className="flex items-center justify-between text-sm mb-2">
-            <span className="text-gray-500">Kullanıcı Dağılımı</span>
-            <span className="text-gray-900">
+            <span className="text-muted-foreground">Kullanıcı Dağılımı</span>
+            <span className="text-foreground">
               ~
               {Math.round(
                 (flag.rollout_percentage / 100) * 125000,

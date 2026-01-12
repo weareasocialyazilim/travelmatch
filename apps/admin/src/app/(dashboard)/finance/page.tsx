@@ -244,7 +244,7 @@ export default function FinancePage() {
                     ] || {
                       label: tx.type,
                       icon: DollarSign,
-                      color: 'text-gray-600',
+                      color: 'text-muted-foreground',
                     };
                     const statusInfo = statusConfig[
                       tx.status as keyof typeof statusConfig

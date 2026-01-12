@@ -401,7 +401,7 @@ export default function UserDetailPage() {
       match: <Heart className="h-4 w-4 text-pink-500" />,
       payment: <CreditCard className="h-4 w-4 text-green-500" />,
       report_received: <Flag className="h-4 w-4 text-orange-500" />,
-      login: <Activity className="h-4 w-4 text-gray-500" />,
+      login: <Activity className="h-4 w-4 text-muted-foreground" />,
     };
     return icons[type] || <Activity className="h-4 w-4" />;
   };
@@ -585,7 +585,7 @@ export default function UserDetailPage() {
                   Risk Skoru
                 </span>
                 <div className="flex items-center gap-2">
-                  <div className="h-2 w-24 rounded-full bg-gray-200">
+                  <div className="h-2 w-24 rounded-full bg-muted">
                     <div
                       className="h-2 rounded-full bg-green-500"
                       style={{ width: `${user.risk_score}%` }}
