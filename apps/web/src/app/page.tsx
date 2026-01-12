@@ -1,24 +1,42 @@
 /**
- * TravelMatch V2 - Ana Sayfa
- * Clean, modern, Gen Z focused
+ * TravelMatch - Awwwards-Ready Landing Page
+ *
+ * Premium design with:
+ * - Hero with 3D GiftOrb
+ * - TrustRing scrollytelling
+ * - MatchSimulator ML demo
+ * - SacredMoments Bento Grid
+ * - RitualSection process steps
+ * - Grand Footer finale
  */
 
 import { Hero } from '@/components/landing/Hero';
-import { Features } from '@/components/landing/Features';
-import { HowItWorks } from '@/components/landing/HowItWorks';
-import { Testimonials } from '@/components/landing/Testimonials';
-import { CTA } from '@/components/landing/CTA';
-import { Footer } from '@/components/landing/Footer';
+import { TrustRing } from '@/components/landing/TrustRing';
+import { MatchSimulator } from '@/components/landing/MatchSimulator';
+import { SacredMoments } from '@/components/landing/SacredMoments';
+import { RitualSection } from '@/components/landing/RitualSection';
+import { Footer } from '@/components/layout/Footer';
 
 export default function HomePage() {
   return (
-    <main className="relative">
+    <div className="flex flex-col w-full selection:bg-primary selection:text-background">
+      {/* 01: Hero & 3D Atmosphere */}
       <Hero />
-      <Features />
-      <HowItWorks />
-      <Testimonials />
-      <CTA />
+
+      {/* 02: Trust Ring Scrollytelling */}
+      <TrustRing />
+
+      {/* 03: ML Neural Match Simulator */}
+      <MatchSimulator />
+
+      {/* 04: Sacred Moments Bento Grid */}
+      <SacredMoments />
+
+      {/* 05: The Ritual of Gifting Process */}
+      <RitualSection />
+
+      {/* 06: Grand Finale Footer */}
       <Footer />
-    </main>
+    </div>
   );
 }
