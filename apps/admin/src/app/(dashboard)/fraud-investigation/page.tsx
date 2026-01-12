@@ -50,15 +50,6 @@ import {
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { CanvaButton } from '@/components/canva/CanvaButton';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -293,9 +284,9 @@ export default function FraudInvestigationPage() {
       escalated: 'Eskale Edildi',
     };
     return (
-      <Badge className={styles[status as keyof typeof styles]}>
+      <CanvaBadge className={styles[status as keyof typeof styles]}>
         {labels[status as keyof typeof labels]}
-      </Badge>
+      </CanvaBadge>
     );
   };
 
@@ -307,9 +298,9 @@ export default function FraudInvestigationPage() {
       low: 'bg-blue-500 text-white',
     };
     return (
-      <Badge className={styles[severity as keyof typeof styles]}>
+      <CanvaBadge className={styles[severity as keyof typeof styles]}>
         {severity.toUpperCase()}
-      </Badge>
+      </CanvaBadge>
     );
   };
 
@@ -330,22 +321,22 @@ export default function FraudInvestigationPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
+          <CanvaButton variant="outline">
             <Download className="h-4 w-4 mr-2" />
             Rapor
-          </Button>
-          <Button>
+          </CanvaButton>
+          <CanvaButton>
             <Flag className="h-4 w-4 mr-2" />
             Yeni Case
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
       {/* Risk Indicators */}
       <div className="grid grid-cols-5 gap-4">
         {riskIndicators.map((indicator) => (
-          <Card key={indicator.name} className="admin-card">
-            <CardContent className="p-4">
+          <CanvaCard key={indicator.name}>
+            <CanvaCardBody className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-muted-foreground truncate">
                   {indicator.name}
@@ -362,25 +353,25 @@ export default function FraudInvestigationPage() {
                 <p className="text-2xl font-bold">{indicator.count}</p>
                 {getSeverityBadge(indicator.severity)}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         ))}
       </div>
 
       <div className="grid grid-cols-3 gap-6">
         {/* Case List */}
-        <Card className="admin-card col-span-1">
-          <CardHeader className="pb-3">
+        <CanvaCard className="col-span-1">
+          <CanvaCardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base">Aktif Case'ler</CardTitle>
-              <Badge variant="secondary">{fraudCases.length}</Badge>
+              <CanvaCardTitle className="text-base">Aktif Case'ler</CanvaCardTitle>
+              <CanvaBadge variant="secondary">{fraudCases.length}</CanvaBadge>
             </div>
             <div className="relative mt-2">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Case ara..." className="pl-9" />
             </div>
-          </CardHeader>
-          <CardContent className="space-y-2">
+          </CanvaCardHeader>
+          <CanvaCardBody className="space-y-2">
             {fraudCases.map((fraudCase) => (
               <div
                 key={fraudCase.id}
@@ -412,32 +403,32 @@ export default function FraudInvestigationPage() {
                 </div>
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
 
         {/* Case Detail */}
-        <Card className="admin-card col-span-2">
-          <CardHeader>
+        <CanvaCard className="col-span-2">
+          <CanvaCardHeader>
             <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-2">
-                  <CardTitle>{investigationDetail.caseId}</CardTitle>
+                  <CanvaCardTitle>{investigationDetail.caseId}</CanvaCardTitle>
                   {getSeverityBadge('critical')}
                   {getStatusBadge('investigating')}
                 </div>
-                <CardDescription>Multi-Account Fraud Ring</CardDescription>
+                <CanvaCardSubtitle>Multi-Account Fraud Ring</CanvaCardSubtitle>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm">
+                <CanvaButton variant="outline" size="sm">
                   <Share2 className="h-4 w-4 mr-1" />
                   Paylaş
-                </Button>
+                </CanvaButton>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
+                    <CanvaButton variant="outline" size="sm">
                       Aksiyon
                       <ChevronDown className="h-4 w-4 ml-1" />
-                    </Button>
+                    </CanvaButton>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem>
@@ -457,8 +448,8 @@ export default function FraudInvestigationPage() {
                 </DropdownMenu>
               </div>
             </div>
-          </CardHeader>
-          <CardContent>
+          </CanvaCardHeader>
+          <CanvaCardBody>
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="mb-4">
                 <TabsTrigger value="overview">Özet</TabsTrigger>
@@ -496,9 +487,9 @@ export default function FraudInvestigationPage() {
                               {indicator.value}
                             </span>
                           </div>
-                          <Badge variant="outline">
+                          <CanvaBadge variant="outline">
                             {indicator.confidence}%
-                          </Badge>
+                          </CanvaBadge>
                         </div>
                       ),
                     )}
@@ -538,9 +529,9 @@ export default function FraudInvestigationPage() {
                     placeholder="Notlarınızı buraya ekleyin..."
                     className="min-h-[100px]"
                   />
-                  <Button size="sm" className="mt-2">
+                  <CanvaButton size="sm" className="mt-2">
                     Not Ekle
-                  </Button>
+                  </CanvaButton>
                 </div>
               </TabsContent>
 
@@ -573,9 +564,9 @@ export default function FraudInvestigationPage() {
                               </p>
                             </div>
                             {user.isPrimary && (
-                              <Badge variant="outline" className="ml-2">
+                              <CanvaBadge variant="outline" className="ml-2">
                                 Primary
-                              </Badge>
+                              </CanvaBadge>
                             )}
                           </div>
                         </TableCell>
@@ -601,9 +592,9 @@ export default function FraudInvestigationPage() {
                         </TableCell>
                         <TableCell>{user.createdAt}</TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="sm">
+                          <CanvaButton variant="ghost" size="sm">
                             <Eye className="h-4 w-4" />
-                          </Button>
+                          </CanvaButton>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -638,7 +629,7 @@ export default function FraudInvestigationPage() {
                         <TableCell>{txn.date}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <Badge variant="outline">{txn.status}</Badge>
+                            <CanvaBadge variant="outline">{txn.status}</CanvaBadge>
                             {txn.suspicious && (
                               <AlertTriangle className="h-4 w-4 text-red-500" />
                             )}
@@ -676,8 +667,8 @@ export default function FraudInvestigationPage() {
                 </div>
               </TabsContent>
             </Tabs>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
       </div>
     </div>
   );

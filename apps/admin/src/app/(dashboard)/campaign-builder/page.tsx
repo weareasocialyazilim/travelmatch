@@ -46,15 +46,6 @@ import {
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { CanvaButton } from '@/components/canva/CanvaButton';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -288,34 +279,34 @@ export default function CampaignBuilderPage() {
     switch (status) {
       case 'active':
         return (
-          <Badge className="bg-green-500/10 text-green-500 border-green-500/20">
+          <CanvaBadge className="bg-green-500/10 text-green-500 border-green-500/20">
             <Play className="h-3 w-3 mr-1" />
             Aktif
-          </Badge>
+          </CanvaBadge>
         );
       case 'paused':
         return (
-          <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">
+          <CanvaBadge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">
             <Pause className="h-3 w-3 mr-1" />
             Duraklatıldı
-          </Badge>
+          </CanvaBadge>
         );
       case 'scheduled':
         return (
-          <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20">
+          <CanvaBadge className="bg-blue-500/10 text-blue-500 border-blue-500/20">
             <Calendar className="h-3 w-3 mr-1" />
             Zamanlandı
-          </Badge>
+          </CanvaBadge>
         );
       case 'completed':
         return (
-          <Badge className="bg-gray-500/10 text-gray-500 border-gray-500/20">
+          <CanvaBadge className="bg-gray-500/10 text-gray-500 border-gray-500/20">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             Tamamlandı
-          </Badge>
+          </CanvaBadge>
         );
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <CanvaBadge variant="outline">{status}</CanvaBadge>;
     }
   };
 
@@ -346,10 +337,10 @@ export default function CampaignBuilderPage() {
         </div>
         <Dialog open={showNewCampaign} onOpenChange={setShowNewCampaign}>
           <DialogTrigger asChild>
-            <Button>
+            <CanvaButton>
               <Plus className="h-4 w-4 mr-2" />
               Yeni Kampanya
-            </Button>
+            </CanvaButton>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
@@ -441,16 +432,16 @@ export default function CampaignBuilderPage() {
               </div>
             </div>
             <DialogFooter>
-              <Button
+              <CanvaButton
                 variant="outline"
                 onClick={() => setShowNewCampaign(false)}
               >
                 İptal
-              </Button>
-              <Button>
+              </CanvaButton>
+              <CanvaButton>
                 <Send className="h-4 w-4 mr-2" />
                 Kampanya Oluştur
-              </Button>
+              </CanvaButton>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -458,103 +449,47 @@ export default function CampaignBuilderPage() {
 
       {/* Overview Stats */}
       <div className="grid grid-cols-6 gap-4">
-        <Card className="admin-card">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <Layers className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {campaignStats.totalCampaigns}
-                </p>
-                <p className="text-xs text-muted-foreground">Toplam Kampanya</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="admin-card">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-green-500/10">
-                <Play className="h-5 w-5 text-green-500" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {campaignStats.activeCampaigns}
-                </p>
-                <p className="text-xs text-muted-foreground">Aktif</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="admin-card">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <Send className="h-5 w-5 text-blue-500" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {formatNumber(campaignStats.totalSent)}
-                </p>
-                <p className="text-xs text-muted-foreground">Toplam Gönderim</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="admin-card">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-purple-500/10">
-                <Eye className="h-5 w-5 text-purple-500" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {campaignStats.avgOpenRate}%
-                </p>
-                <p className="text-xs text-muted-foreground">Ort. Açılma</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="admin-card">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-orange-500/10">
-                <Target className="h-5 w-5 text-orange-500" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {campaignStats.avgClickRate}%
-                </p>
-                <p className="text-xs text-muted-foreground">Ort. Tıklama</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="admin-card">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-emerald-500/10">
-                <TrendingUp className="h-5 w-5 text-emerald-500" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {campaignStats.avgConversionRate}%
-                </p>
-                <p className="text-xs text-muted-foreground">Ort. Dönüşüm</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <CanvaStatCard
+          title="Toplam Kampanya"
+          value={campaignStats.totalCampaigns}
+          icon={<Layers className="h-5 w-5 text-primary" />}
+        />
+        <CanvaStatCard
+          title="Aktif"
+          value={campaignStats.activeCampaigns}
+          icon={<Play className="h-5 w-5 text-green-500" />}
+          variant="success"
+        />
+        <CanvaStatCard
+          title="Toplam Gönderim"
+          value={formatNumber(campaignStats.totalSent)}
+          icon={<Send className="h-5 w-5 text-blue-500" />}
+          variant="info"
+        />
+        <CanvaStatCard
+          title="Ort. Açılma"
+          value={`${campaignStats.avgOpenRate}%`}
+          icon={<Eye className="h-5 w-5 text-purple-500" />}
+        />
+        <CanvaStatCard
+          title="Ort. Tıklama"
+          value={`${campaignStats.avgClickRate}%`}
+          icon={<Target className="h-5 w-5 text-orange-500" />}
+          variant="warning"
+        />
+        <CanvaStatCard
+          title="Ort. Dönüşüm"
+          value={`${campaignStats.avgConversionRate}%`}
+          icon={<TrendingUp className="h-5 w-5 text-emerald-500" />}
+          variant="success"
+        />
       </div>
 
       {/* Channel Performance */}
       <div className="grid grid-cols-4 gap-4">
         {channelStats.map((channel) => (
-          <Card key={channel.channel} className="admin-card">
-            <CardHeader className="pb-2">
+          <CanvaCard key={channel.channel}>
+            <CanvaCardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className={cn('p-2 rounded-lg', channel.color + '/10')}>
@@ -565,11 +500,11 @@ export default function CampaignBuilderPage() {
                       )}
                     />
                   </div>
-                  <CardTitle className="text-base">{channel.channel}</CardTitle>
+                  <CanvaCardTitle className="text-base">{channel.channel}</CanvaCardTitle>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
+            </CanvaCardHeader>
+            <CanvaCardBody className="space-y-3">
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div>
                   <p className="text-muted-foreground">Gönderildi</p>
@@ -606,8 +541,8 @@ export default function CampaignBuilderPage() {
                   className="h-1.5"
                 />
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         ))}
       </div>
 
@@ -638,19 +573,19 @@ export default function CampaignBuilderPage() {
 
         {/* Campaigns Tab */}
         <TabsContent value="campaigns" className="space-y-4">
-          <Card className="admin-card">
-            <CardHeader>
+          <CanvaCard>
+            <CanvaCardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Aktif ve Zamanlanmış Kampanyalar</CardTitle>
+                <CanvaCardTitle>Aktif ve Zamanlanmış Kampanyalar</CanvaCardTitle>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
+                  <CanvaButton variant="outline" size="sm">
                     <Filter className="h-4 w-4 mr-2" />
                     Filtrele
-                  </Button>
+                  </CanvaButton>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -672,12 +607,12 @@ export default function CampaignBuilderPage() {
                         <div className="flex items-center gap-2">
                           <span className="font-medium">{campaign.name}</span>
                           {campaign.abTest && (
-                            <Badge
+                            <CanvaBadge
                               variant="outline"
                               className="text-xs bg-purple-500/10 text-purple-500 border-purple-500/20"
                             >
                               A/B
-                            </Badge>
+                            </CanvaBadge>
                           )}
                         </div>
                       </TableCell>
@@ -713,37 +648,37 @@ export default function CampaignBuilderPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          <Button variant="ghost" size="icon">
+                          <CanvaButton variant="ghost" size="icon">
                             <BarChart3 className="h-4 w-4" />
-                          </Button>
+                          </CanvaButton>
                           {campaign.status === 'active' ? (
-                            <Button variant="ghost" size="icon">
+                            <CanvaButton variant="ghost" size="icon">
                               <Pause className="h-4 w-4" />
-                            </Button>
+                            </CanvaButton>
                           ) : (
-                            <Button variant="ghost" size="icon">
+                            <CanvaButton variant="ghost" size="icon">
                               <Play className="h-4 w-4" />
-                            </Button>
+                            </CanvaButton>
                           )}
-                          <Button variant="ghost" size="icon">
+                          <CanvaButton variant="ghost" size="icon">
                             <Edit className="h-4 w-4" />
-                          </Button>
+                          </CanvaButton>
                         </div>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Segments Tab */}
         <TabsContent value="segments" className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
             {audienceSegments.map((segment) => (
-              <Card key={segment.id} className="admin-card">
-                <CardContent className="p-4">
+              <CanvaCard key={segment.id}>
+                <CanvaCardBody className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-primary/10">
@@ -756,27 +691,27 @@ export default function CampaignBuilderPage() {
                         </p>
                       </div>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <CanvaButton variant="outline" size="sm">
                       <Send className="h-3 w-3 mr-1" />
                       Kampanya
-                    </Button>
+                    </CanvaButton>
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))}
           </div>
 
-          <Card className="admin-card">
-            <CardHeader>
+          <CanvaCard>
+            <CanvaCardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Özel Segment Oluştur</CardTitle>
-                <Button>
+                <CanvaCardTitle>Özel Segment Oluştur</CanvaCardTitle>
+                <CanvaButton>
                   <Plus className="h-4 w-4 mr-2" />
                   Yeni Segment
-                </Button>
+                </CanvaButton>
               </div>
-            </CardHeader>
-            <CardContent>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="grid grid-cols-3 gap-4">
                 <div className="p-4 border rounded-lg space-y-2">
                   <h4 className="font-medium">Davranış Bazlı</h4>
@@ -797,23 +732,23 @@ export default function CampaignBuilderPage() {
                   </p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Templates Tab */}
         <TabsContent value="templates" className="space-y-4">
-          <Card className="admin-card">
-            <CardHeader>
+          <CanvaCard>
+            <CanvaCardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Mesaj Şablonları</CardTitle>
-                <Button>
+                <CanvaCardTitle>Mesaj Şablonları</CanvaCardTitle>
+                <CanvaButton>
                   <Plus className="h-4 w-4 mr-2" />
                   Yeni Şablon
-                </Button>
+                </CanvaButton>
               </div>
-            </CardHeader>
-            <CardContent>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -838,7 +773,7 @@ export default function CampaignBuilderPage() {
                       </TableCell>
                       <TableCell>{formatNumber(template.usage)}</TableCell>
                       <TableCell>
-                        <Badge
+                        <CanvaBadge
                           variant="outline"
                           className={cn(
                             template.openRate > 70
@@ -849,39 +784,39 @@ export default function CampaignBuilderPage() {
                           )}
                         >
                           {template.openRate}%
-                        </Badge>
+                        </CanvaBadge>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          <Button variant="ghost" size="icon">
+                          <CanvaButton variant="ghost" size="icon">
                             <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon">
+                          </CanvaButton>
+                          <CanvaButton variant="ghost" size="icon">
                             <Copy className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon">
+                          </CanvaButton>
+                          <CanvaButton variant="ghost" size="icon">
                             <Edit className="h-4 w-4" />
-                          </Button>
+                          </CanvaButton>
                         </div>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* A/B Tests Tab */}
         <TabsContent value="ab-tests" className="space-y-4">
-          <Card className="admin-card">
-            <CardHeader>
-              <CardTitle>A/B Test Sonuçları</CardTitle>
-              <CardDescription>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>A/B Test Sonuçları</CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Kampanyalarınızın performansını karşılaştırın
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody className="space-y-6">
               {abTests.map((test) => (
                 <div key={test.id} className="p-4 border rounded-lg space-y-4">
                   <div className="flex items-center justify-between">
@@ -891,10 +826,10 @@ export default function CampaignBuilderPage() {
                         Güven Düzeyi: {test.confidence}%
                       </p>
                     </div>
-                    <Badge className="bg-green-500/10 text-green-500 border-green-500/20">
+                    <CanvaBadge className="bg-green-500/10 text-green-500 border-green-500/20">
                       <CheckCircle2 className="h-3 w-3 mr-1" />
                       Kazanan: Varyant {test.winner}
-                    </Badge>
+                    </CanvaBadge>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div
@@ -966,21 +901,21 @@ export default function CampaignBuilderPage() {
                   </div>
                 </div>
               ))}
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Automation Tab */}
         <TabsContent value="automation" className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <Card className="admin-card">
-              <CardHeader>
-                <CardTitle>Otomatik Akışlar</CardTitle>
-                <CardDescription>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Otomatik Akışlar</CanvaCardTitle>
+                <CanvaCardSubtitle>
                   Tetikleyici bazlı otomatik mesajlar
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
+                </CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody className="space-y-3">
                 {[
                   {
                     name: 'Hoş Geldin Serisi',
@@ -1035,15 +970,15 @@ export default function CampaignBuilderPage() {
                     </div>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
-            <Card className="admin-card">
-              <CardHeader>
-                <CardTitle>Zamanlama Ayarları</CardTitle>
-                <CardDescription>Optimal gönderim zamanları</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Zamanlama Ayarları</CanvaCardTitle>
+                <CanvaCardSubtitle>Optimal gönderim zamanları</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody className="space-y-4">
                 <div className="p-3 bg-muted/30 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium">Akıllı Zamanlama</span>
@@ -1089,8 +1024,8 @@ export default function CampaignBuilderPage() {
                     </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
         </TabsContent>
       </Tabs>
