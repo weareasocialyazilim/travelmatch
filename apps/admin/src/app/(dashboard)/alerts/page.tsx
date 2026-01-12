@@ -33,6 +33,7 @@ import {
   Activity,
   TrendingUp,
   TrendingDown,
+  Loader2,
 } from 'lucide-react';
 import {
   CanvaCard,
@@ -64,156 +65,104 @@ import {
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-
-// Alert types and thresholds
-const alertRules = [
-  {
-    id: 'fraud-spike',
-    name: 'Fraud Spike',
-    category: 'security',
-    condition: 'fraud_count > 10 in 1 hour',
-    threshold: 10,
-    severity: 'critical',
-    enabled: true,
-  },
-  {
-    id: 'payment-failure',
-    name: 'Payment Gateway Error Rate',
-    category: 'payments',
-    condition: 'error_rate > 5%',
-    threshold: 5,
-    severity: 'critical',
-    enabled: true,
-  },
-  {
-    id: 'escrow-expiring',
-    name: 'Escrow Expiring Soon',
-    category: 'operations',
-    condition: 'expires_in < 2 hours',
-    threshold: 2,
-    severity: 'high',
-    enabled: true,
-  },
-  {
-    id: 'proof-queue',
-    name: 'Proof Queue Backlog',
-    category: 'operations',
-    condition: 'pending_proofs > 100',
-    threshold: 100,
-    severity: 'medium',
-    enabled: true,
-  },
-  {
-    id: 'system-latency',
-    name: 'High API Latency',
-    category: 'engineering',
-    condition: 'p95_latency > 500ms',
-    threshold: 500,
-    severity: 'high',
-    enabled: true,
-  },
-  {
-    id: 'user-spike',
-    name: 'Unusual User Activity',
-    category: 'security',
-    condition: 'registrations > 500 in 1 hour',
-    threshold: 500,
-    severity: 'medium',
-    enabled: true,
-  },
-];
-
-// Active alerts
-const activeAlerts = [
-  {
-    id: 'alert-001',
-    ruleId: 'payment-failure',
-    title: 'PayTR Error Rate Yükseldi',
-    description: 'Son 1 saatte error rate %7.2 (threshold: %5)',
-    severity: 'critical',
-    category: 'payments',
-    triggeredAt: new Date(Date.now() - 45 * 60000),
-    acknowledgedBy: null,
-    status: 'active',
-    metric: { current: 7.2, threshold: 5, unit: '%' },
-  },
-  {
-    id: 'alert-002',
-    ruleId: 'escrow-expiring',
-    title: '12 Escrow 2 Saat İçinde Expire Olacak',
-    description: 'Toplam değer: ₺45,200',
-    severity: 'high',
-    category: 'operations',
-    triggeredAt: new Date(Date.now() - 30 * 60000),
-    acknowledgedBy: 'Kemal Y.',
-    status: 'acknowledged',
-    metric: { current: 12, threshold: 0, unit: 'adet' },
-  },
-  {
-    id: 'alert-003',
-    ruleId: 'proof-queue',
-    title: 'Proof Queue Birikmesi',
-    description: '127 proof manual review bekliyor',
-    severity: 'medium',
-    category: 'operations',
-    triggeredAt: new Date(Date.now() - 2 * 3600000),
-    acknowledgedBy: null,
-    status: 'active',
-    metric: { current: 127, threshold: 100, unit: 'adet' },
-  },
-  {
-    id: 'alert-004',
-    ruleId: 'fraud-spike',
-    title: 'Potansiyel Fraud Ring Tespit',
-    description: '5 hesap aynı device fingerprint ile işlem yapıyor',
-    severity: 'critical',
-    category: 'security',
-    triggeredAt: new Date(Date.now() - 15 * 60000),
-    acknowledgedBy: null,
-    status: 'active',
-    metric: { current: 5, threshold: 3, unit: 'hesap' },
-  },
-];
-
-// Alert history
-const alertHistory = [
-  {
-    id: 'hist-001',
-    title: 'Database Connection Pool Exhausted',
-    severity: 'critical',
-    resolvedAt: new Date(Date.now() - 24 * 3600000),
-    duration: '8 dakika',
-    resolvedBy: 'System Auto-recovery',
-  },
-  {
-    id: 'hist-002',
-    title: 'Twilio SMS Delivery Failure',
-    severity: 'high',
-    resolvedAt: new Date(Date.now() - 48 * 3600000),
-    duration: '25 dakika',
-    resolvedBy: 'Ahmet K.',
-  },
-];
+import {
+  useAlertRules,
+  useActiveAlerts,
+  useAlertHistory,
+  useAcknowledgeAlert,
+  useResolveAlert,
+  type ActiveAlert,
+} from '@/hooks/use-alerts';
 
 export default function AlertsPage() {
   const [activeTab, setActiveTab] = useState('active');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [filter, setFilter] = useState('all');
-  const [alerts, setAlerts] = useState(activeAlerts);
+
+  // Fetch data with React Query
+  const {
+    data: alertRules = [],
+    isLoading: isLoadingRules,
+    error: rulesError,
+  } = useAlertRules();
+
+  const {
+    data: fetchedAlerts = [],
+    isLoading: isLoadingAlerts,
+    error: alertsError,
+  } = useActiveAlerts();
+
+  const {
+    data: alertHistory = [],
+    isLoading: isLoadingHistory,
+    error: historyError,
+  } = useAlertHistory();
+
+  // Local state for optimistic updates
+  const [alerts, setAlerts] = useState<ActiveAlert[]>([]);
+
+  // Sync local state with fetched data
+  useEffect(() => {
+    if (fetchedAlerts.length > 0) {
+      setAlerts(fetchedAlerts);
+    }
+  }, [fetchedAlerts]);
+
+  // Show error toasts
+  useEffect(() => {
+    if (rulesError) {
+      toast.error('Alert kuralları yüklenirken hata oluştu. Mock veri kullanılıyor.');
+    }
+  }, [rulesError]);
+
+  useEffect(() => {
+    if (alertsError) {
+      toast.error('Aktif alertler yüklenirken hata oluştu. Mock veri kullanılıyor.');
+    }
+  }, [alertsError]);
+
+  useEffect(() => {
+    if (historyError) {
+      toast.error('Alert geçmişi yüklenirken hata oluştu. Mock veri kullanılıyor.');
+    }
+  }, [historyError]);
+
+  // Mutations
+  const acknowledgeAlert = useAcknowledgeAlert();
+  const resolveAlert = useResolveAlert();
 
   const handleAcknowledge = (alertId: string) => {
+    // Optimistic update
     setAlerts(prev => prev.map(alert =>
       alert.id === alertId
-        ? { ...alert, status: 'acknowledged', acknowledgedBy: 'Admin' }
+        ? { ...alert, status: 'acknowledged' as const, acknowledgedBy: 'Admin' }
         : alert
     ));
     toast.success('Alert onaylandı');
+
+    // Fire mutation (best effort, already optimistically updated)
+    acknowledgeAlert.mutate(alertId, {
+      onError: () => {
+        toast.error('Alert onaylanırken hata oluştu (yerel değişiklik korundu)');
+      },
+    });
   };
 
   const handleResolve = (alertId: string) => {
+    // Optimistic update
     setAlerts(prev => prev.filter(alert => alert.id !== alertId));
     toast.success('Alert çözüldü ve kapatıldı');
+
+    // Fire mutation (best effort, already optimistically updated)
+    resolveAlert.mutate(alertId, {
+      onError: () => {
+        toast.error('Alert çözülürken hata oluştu (yerel değişiklik korundu)');
+      },
+    });
   };
+
+  // Loading state
+  const isLoading = isLoadingRules || isLoadingAlerts || isLoadingHistory;
 
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
@@ -269,6 +218,28 @@ export default function AlertsPage() {
     (a) => a.severity === 'critical',
   ).length;
   const highCount = alerts.filter((a) => a.severity === 'high').length;
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Alert Merkezi</h1>
+            <p className="text-muted-foreground">
+              Gerçek zamanlı sistem ve operasyon alertleri
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center justify-center py-12">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">Alertler yükleniyor...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -384,7 +355,7 @@ export default function AlertsPage() {
           <TabsList>
             <TabsTrigger value="active">
               <Zap className="h-4 w-4 mr-2" />
-              Aktif ({activeAlerts.length})
+              Aktif ({alerts.length})
             </TabsTrigger>
             <TabsTrigger value="acknowledged">
               <Eye className="h-4 w-4 mr-2" />

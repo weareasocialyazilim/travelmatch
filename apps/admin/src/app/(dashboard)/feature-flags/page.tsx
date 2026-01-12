@@ -90,7 +90,8 @@ import {
   useToggleFeatureFlag,
 } from '@/hooks/use-feature-flags';
 
-interface FeatureFlag {
+// Local interface for UI display (extends hook data with UI-specific fields)
+interface FeatureFlagDisplay {
   id: string;
   key: string;
   name: string;
@@ -109,138 +110,6 @@ interface FeatureFlag {
   category: 'feature' | 'experiment' | 'operational' | 'kill_switch';
   tags: string[];
 }
-
-// Mock data
-const mockFlags: FeatureFlag[] = [
-  {
-    id: 'ff_1',
-    key: 'dark_mode',
-    name: 'Dark Mode',
-    description: 'Karanlık tema özelliğini etkinleştirir',
-    enabled: true,
-    rollout_percentage: 100,
-    environment: 'production',
-    platforms: ['ios', 'android', 'web'],
-    targeting: { type: 'all' },
-    created_at: '2024-01-15T10:00:00Z',
-    updated_at: '2024-12-18T08:00:00Z',
-    created_by: 'Zeynep Arslan',
-    category: 'feature',
-    tags: ['ui', 'theme'],
-  },
-  {
-    id: 'ff_2',
-    key: 'new_matching_algorithm',
-    name: 'Yeni Eşleşme Algoritması',
-    description: 'ML tabanlı gelişmiş eşleşme algoritması',
-    enabled: true,
-    rollout_percentage: 25,
-    environment: 'production',
-    platforms: ['ios', 'android'],
-    targeting: { type: 'segment', value: ['premium_users'] },
-    created_at: '2024-11-01T10:00:00Z',
-    updated_at: '2024-12-17T14:00:00Z',
-    created_by: 'Ahmet Yılmaz',
-    category: 'experiment',
-    tags: ['ml', 'matching', 'core'],
-  },
-  {
-    id: 'ff_3',
-    key: 'video_calls',
-    name: 'Video Görüşme',
-    description: 'Uygulama içi video görüşme özelliği',
-    enabled: false,
-    rollout_percentage: 0,
-    environment: 'staging',
-    platforms: ['ios', 'android'],
-    targeting: { type: 'all' },
-    created_at: '2024-12-01T10:00:00Z',
-    updated_at: '2024-12-15T10:00:00Z',
-    created_by: 'Fatma Demir',
-    category: 'feature',
-    tags: ['communication', 'video'],
-  },
-  {
-    id: 'ff_4',
-    key: 'maintenance_mode',
-    name: 'Bakım Modu',
-    description: 'Acil durumlarda tüm sistemi bakım moduna alır',
-    enabled: false,
-    rollout_percentage: 0,
-    environment: 'production',
-    platforms: ['ios', 'android', 'web'],
-    targeting: { type: 'all' },
-    created_at: '2024-01-01T10:00:00Z',
-    updated_at: '2024-06-15T10:00:00Z',
-    created_by: 'Zeynep Arslan',
-    category: 'kill_switch',
-    tags: ['emergency', 'system'],
-  },
-  {
-    id: 'ff_5',
-    key: 'disable_payments',
-    name: 'Ödeme Sistemi Durdur',
-    description: 'Acil durumlarda ödeme sistemini devre dışı bırakır',
-    enabled: false,
-    rollout_percentage: 0,
-    environment: 'production',
-    platforms: ['ios', 'android', 'web'],
-    targeting: { type: 'all' },
-    created_at: '2024-01-01T10:00:00Z',
-    updated_at: '2024-03-20T10:00:00Z',
-    created_by: 'Zeynep Arslan',
-    category: 'kill_switch',
-    tags: ['emergency', 'payments'],
-  },
-  {
-    id: 'ff_6',
-    key: 'super_likes',
-    name: 'Super Like',
-    description: 'Günlük super like özelliği',
-    enabled: true,
-    rollout_percentage: 100,
-    environment: 'production',
-    platforms: ['ios', 'android', 'web'],
-    targeting: { type: 'all' },
-    created_at: '2024-02-15T10:00:00Z',
-    updated_at: '2024-12-01T10:00:00Z',
-    created_by: 'Mehmet Kaya',
-    category: 'feature',
-    tags: ['engagement', 'premium'],
-  },
-  {
-    id: 'ff_7',
-    key: 'ai_bio_suggestions',
-    name: 'AI Biyografi Önerileri',
-    description: 'Yapay zeka destekli profil biyografisi önerileri',
-    enabled: true,
-    rollout_percentage: 50,
-    environment: 'production',
-    platforms: ['ios', 'android'],
-    targeting: { type: 'all' },
-    created_at: '2024-10-01T10:00:00Z',
-    updated_at: '2024-12-10T10:00:00Z',
-    created_by: 'Can Öztürk',
-    category: 'experiment',
-    tags: ['ai', 'profile'],
-  },
-  {
-    id: 'ff_8',
-    key: 'rate_limiting_strict',
-    name: 'Sıkı Rate Limiting',
-    description: 'API isteklerinde sıkı rate limiting uygular',
-    enabled: true,
-    rollout_percentage: 100,
-    environment: 'production',
-    platforms: ['ios', 'android', 'web'],
-    targeting: { type: 'all' },
-    created_at: '2024-06-01T10:00:00Z',
-    updated_at: '2024-12-05T10:00:00Z',
-    created_by: 'Zeynep Arslan',
-    category: 'operational',
-    tags: ['security', 'performance'],
-  },
-];
 
 const categoryLabels: Record<
   string,
@@ -275,7 +144,7 @@ export default function FeatureFlagsPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [environmentFilter, setEnvironmentFilter] = useState<string>('all');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [editingFlag, setEditingFlag] = useState<FeatureFlag | null>(null);
+  const [editingFlag, setEditingFlag] = useState<FeatureFlagDisplay | null>(null);
 
   // Use real API data
   const { data, isLoading, error, refetch } = useFeatureFlags();
@@ -284,30 +153,29 @@ export default function FeatureFlagsPage() {
   const deleteFlag = useDeleteFeatureFlag();
   const toggleFlag = useToggleFeatureFlag();
 
-  // Use API data if available, otherwise fall back to mock data
-  const flags = useMemo(() => {
-    if (data?.flags && data.flags.length > 0) {
-      return data.flags.map((flag) => ({
-        id: flag.id,
-        key: flag.name.toLowerCase().replace(/\s+/g, '_'),
-        name: flag.name,
-        description: flag.description || '',
-        enabled: flag.enabled,
-        rollout_percentage: flag.rollout_percentage,
-        environment: (flag.environments?.[0] || 'production') as
-          | 'production'
-          | 'staging'
-          | 'development',
-        platforms: ['ios', 'android', 'web'] as ('ios' | 'android' | 'web')[],
-        targeting: { type: 'all' as const },
-        created_at: flag.created_at,
-        updated_at: flag.updated_at,
-        created_by: 'Admin',
-        category: flag.category as FeatureFlag['category'],
-        tags: [],
-      }));
-    }
-    return mockFlags;
+  // Transform API data to display format
+  const flags = useMemo((): FeatureFlagDisplay[] => {
+    if (!data?.flags) return [];
+
+    return data.flags.map((flag) => ({
+      id: flag.id,
+      key: flag.name.toLowerCase().replace(/\s+/g, '_'),
+      name: flag.name,
+      description: flag.description || '',
+      enabled: flag.enabled,
+      rollout_percentage: flag.rollout_percentage,
+      environment: (flag.environments?.[0] || 'production') as
+        | 'production'
+        | 'staging'
+        | 'development',
+      platforms: ['ios', 'android', 'web'] as ('ios' | 'android' | 'web')[],
+      targeting: { type: 'all' as const },
+      created_at: flag.created_at,
+      updated_at: flag.updated_at,
+      created_by: 'Admin',
+      category: flag.category as FeatureFlagDisplay['category'],
+      tags: [],
+    }));
   }, [data?.flags]);
 
   const apiStats = data?.stats;
@@ -317,9 +185,9 @@ export default function FeatureFlagsPage() {
     key: '',
     name: '',
     description: '',
-    category: 'feature' as FeatureFlag['category'],
-    environment: 'staging' as FeatureFlag['environment'],
-    platforms: ['ios', 'android', 'web'] as FeatureFlag['platforms'],
+    category: 'feature' as FeatureFlagDisplay['category'],
+    environment: 'staging' as FeatureFlagDisplay['environment'],
+    platforms: ['ios', 'android', 'web'] as FeatureFlagDisplay['platforms'],
     rollout_percentage: 0,
   });
 
@@ -339,11 +207,11 @@ export default function FeatureFlagsPage() {
     return matchesSearch && matchesCategory && matchesEnvironment;
   });
 
-  // Stats
+  // Stats from API (hook handles fallback to mock data stats)
   const stats = apiStats || {
-    total: flags.length,
-    enabled: flags.filter((f) => f.enabled).length,
-    disabled: flags.filter((f) => !f.enabled).length,
+    total: 0,
+    enabled: 0,
+    disabled: 0,
     beta: 0,
   };
 
@@ -394,25 +262,15 @@ export default function FeatureFlagsPage() {
             platforms: ['ios', 'android', 'web'],
             rollout_percentage: 0,
           });
-          toast.success('Feature flag oluşturuldu');
-        },
-        onError: () => {
-          toast.error('Flag oluşturulamadı');
+          // Toast is handled by the hook
         },
       },
     );
   };
 
-  // Delete flag
+  // Delete flag - toasts are handled by the hook
   const handleDeleteFlag = (flagId: string) => {
-    deleteFlag.mutate(flagId, {
-      onSuccess: () => {
-        toast.success('Feature flag silindi');
-      },
-      onError: () => {
-        toast.error('Flag silinemedi');
-      },
-    });
+    deleteFlag.mutate(flagId);
   };
 
   // Copy flag key
@@ -575,7 +433,7 @@ export default function FeatureFlagsPage() {
                       onValueChange={(v) =>
                         setNewFlag({
                           ...newFlag,
-                          category: v as FeatureFlag['category'],
+                          category: v as FeatureFlagDisplay['category'],
                         })
                       }
                     >
@@ -597,7 +455,7 @@ export default function FeatureFlagsPage() {
                       onValueChange={(v) =>
                         setNewFlag({
                           ...newFlag,
-                          environment: v as FeatureFlag['environment'],
+                          environment: v as FeatureFlagDisplay['environment'],
                         })
                       }
                     >
@@ -784,7 +642,7 @@ function FlagCard({
   onDelete,
   onCopyKey,
 }: {
-  flag: FeatureFlag;
+  flag: FeatureFlagDisplay;
   onToggle: (id: string, enabled: boolean) => void;
   onRolloutChange: (id: string, percentage: number) => void;
   onDelete: (id: string) => void;

@@ -15,13 +15,11 @@ import {
   Edit,
   Eye,
   CheckCircle,
-  XCircle,
   Clock,
   DollarSign,
   Percent,
   AlertTriangle,
   RefreshCw,
-  Loader2,
 } from 'lucide-react';
 import { CanvaButton } from '@/components/canva/CanvaButton';
 import { CanvaInput } from '@/components/canva/CanvaInput';
@@ -64,116 +62,13 @@ import {
 import { toast } from 'sonner';
 import { formatDate, formatCurrency } from '@/lib/utils';
 import {
-  usePromos,
+  usePromosPageData,
   useCreatePromo,
   useDeletePromo,
   useTogglePromo,
+  useUpdateReferralSettings,
+  type Referral,
 } from '@/hooks/use-promos';
-
-// Mock data
-const mockPromoCodes = [
-  {
-    id: '1',
-    code: 'YILBASI30',
-    type: 'percentage',
-    value: 30,
-    description: 'Yılbaşı kampanyası - %30 indirim',
-    status: 'active',
-    usage: { current: 456, limit: 1000 },
-    valid_from: '2024-12-15T00:00:00Z',
-    valid_until: '2024-12-31T23:59:59Z',
-    applicable_to: 'premium_subscription',
-    revenue_impact: 68400,
-  },
-  {
-    id: '2',
-    code: 'HOSGELDIN',
-    type: 'fixed',
-    value: 50,
-    description: 'Yeni kullanıcı indirimi',
-    status: 'active',
-    usage: { current: 3240, limit: null },
-    valid_from: '2024-01-01T00:00:00Z',
-    valid_until: null,
-    applicable_to: 'first_purchase',
-    revenue_impact: 162000,
-  },
-  {
-    id: '3',
-    code: 'PREMIUM50',
-    type: 'percentage',
-    value: 50,
-    description: 'Premium abonelik %50 indirim',
-    status: 'scheduled',
-    usage: { current: 0, limit: 500 },
-    valid_from: '2024-12-20T00:00:00Z',
-    valid_until: '2024-12-25T23:59:59Z',
-    applicable_to: 'premium_subscription',
-    revenue_impact: 0,
-  },
-  {
-    id: '4',
-    code: 'BLACKFRIDAY',
-    type: 'percentage',
-    value: 40,
-    description: 'Black Friday kampanyası',
-    status: 'expired',
-    usage: { current: 2800, limit: 5000 },
-    valid_from: '2024-11-24T00:00:00Z',
-    valid_until: '2024-11-27T23:59:59Z',
-    applicable_to: 'all',
-    revenue_impact: 420000,
-  },
-];
-
-const mockReferrals = [
-  {
-    id: '1',
-    referrer: 'Ahmet Y.',
-    referrer_id: 'user_1',
-    total_referrals: 24,
-    successful_referrals: 18,
-    pending_referrals: 6,
-    total_earnings: 540,
-    status: 'active',
-  },
-  {
-    id: '2',
-    referrer: 'Elif K.',
-    referrer_id: 'user_2',
-    total_referrals: 15,
-    successful_referrals: 12,
-    pending_referrals: 3,
-    total_earnings: 360,
-    status: 'active',
-  },
-  {
-    id: '3',
-    referrer: 'Mehmet A.',
-    referrer_id: 'user_3',
-    total_referrals: 8,
-    successful_referrals: 5,
-    pending_referrals: 3,
-    total_earnings: 150,
-    status: 'active',
-  },
-];
-
-const promoStats = {
-  totalCodes: 24,
-  activeCodes: 8,
-  totalUsage: 12450,
-  totalRevenue: 650400,
-  avgConversion: 23.5,
-};
-
-const referralStats = {
-  totalReferrers: 4500,
-  activeReferrers: 1200,
-  totalReferrals: 8900,
-  successRate: 67.2,
-  totalPayout: 267000,
-};
 
 export default function PromosPage() {
   const [isCreatePromoOpen, setIsCreatePromoOpen] = useState(false);
@@ -187,54 +82,40 @@ export default function PromosPage() {
   // Referral program settings
   const [referrerReward, setReferrerReward] = useState('30');
   const [referredReward, setReferredReward] = useState('20');
-  const [isSavingReferralSettings, setIsSavingReferralSettings] = useState(false);
 
-  // Use real API data
-  const { data, isLoading, error, refetch } = usePromos();
+  // Use combined hook for promos and referrals data
+  const { data: pageData, isLoading, error, refetch, promos: promosState, referrals: referralsState } = usePromosPageData();
   const createPromo = useCreatePromo();
   const deletePromo = useDeletePromo();
   const togglePromo = useTogglePromo();
+  const updateReferralSettings = useUpdateReferralSettings();
 
-  // Use API data if available, otherwise fall back to mock data
+  // Transform promo codes for display
   const promoCodes = useMemo(() => {
-    if (data?.promo_codes && data.promo_codes.length > 0) {
-      return data.promo_codes.map((promo) => ({
-        id: promo.id,
-        code: promo.code,
-        type: promo.discount_type,
-        value: promo.discount_value,
-        description: promo.description || '',
-        status: promo.is_active ? 'active' : 'disabled',
-        usage: {
-          current: promo.usage_count || 0,
-          limit: promo.usage_limit || null,
-        },
-        valid_from: promo.valid_from,
-        valid_until: promo.valid_until || null,
-        applicable_to: 'all',
-        revenue_impact: 0,
-      }));
-    }
-    return mockPromoCodes;
-  }, [data?.promo_codes]);
+    return pageData.promoCodes.map((promo) => ({
+      id: promo.id,
+      code: promo.code,
+      type: promo.discount_type,
+      value: promo.discount_value,
+      description: promo.description || '',
+      status: promo.is_active ? 'active' : 'disabled',
+      usage: {
+        current: promo.usage_count || 0,
+        limit: promo.usage_limit || null,
+      },
+      valid_from: promo.valid_from,
+      valid_until: promo.valid_until || null,
+      applicable_to: 'all',
+      revenue_impact: 0,
+    }));
+  }, [pageData.promoCodes]);
 
-  // Stats calculation
-  const stats = useMemo(() => {
-    const total = promoCodes.length;
-    const active = promoCodes.filter((p) => p.status === 'active').length;
-    const totalUsage = promoCodes.reduce((sum, p) => sum + p.usage.current, 0);
-    const totalRevenue = promoCodes.reduce(
-      (sum, p) => sum + p.revenue_impact,
-      0,
-    );
-    return {
-      totalCodes: total || promoStats.totalCodes,
-      activeCodes: active || promoStats.activeCodes,
-      totalUsage: totalUsage || promoStats.totalUsage,
-      totalRevenue: totalRevenue || promoStats.totalRevenue,
-      avgConversion: promoStats.avgConversion,
-    };
-  }, [promoCodes]);
+  // Get stats from page data
+  const stats = pageData.promoStats;
+
+  // Get referrals from page data
+  const referrals: Referral[] = pageData.referrals;
+  const referralStats = pageData.referralStats;
 
   const handleCreatePromo = () => {
     createPromo.mutate(
@@ -314,9 +195,9 @@ export default function PromosPage() {
     return code;
   };
 
-  const handleSaveReferralSettings = async () => {
+  const handleSaveReferralSettings = () => {
     if (!referrerReward || !referredReward) {
-      toast.error('Ödül değerleri boş olamaz');
+      toast.error('Odul degerleri bos olamaz');
       return;
     }
 
@@ -324,20 +205,24 @@ export default function PromosPage() {
     const referredValue = parseFloat(referredReward);
 
     if (isNaN(referrerValue) || isNaN(referredValue) || referrerValue < 0 || referredValue < 0) {
-      toast.error('Geçerli ödül değerleri girin');
+      toast.error('Gecerli odul degerleri girin');
       return;
     }
 
-    setIsSavingReferralSettings(true);
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      toast.success(`Referans ayarları kaydedildi: Referrer ${referrerReward}₺, Referred ${referredReward}₺`);
-    } catch {
-      toast.error('Ayarlar kaydedilemedi');
-    } finally {
-      setIsSavingReferralSettings(false);
-    }
+    updateReferralSettings.mutate(
+      {
+        referrerReward: referrerValue,
+        referredReward: referredValue,
+      },
+      {
+        onSuccess: () => {
+          toast.success(`Referans ayarlari kaydedildi: Referrer ${referrerReward}TL, Referred ${referredReward}TL`);
+        },
+        onError: (error) => {
+          toast.error(error.message || 'Ayarlar kaydedilemedi');
+        },
+      },
+    );
   };
 
   // Loading Skeleton Component
@@ -800,7 +685,7 @@ export default function PromosPage() {
             </CanvaCardHeader>
             <CanvaCardBody>
               <div className="space-y-4">
-                {mockReferrals.map((referral, index) => (
+                {referrals.map((referral, index) => (
                   <div
                     key={referral.id}
                     className="flex items-center justify-between rounded-lg border p-4"
@@ -892,9 +777,9 @@ export default function PromosPage() {
                 <CanvaButton
                   variant="primary"
                   onClick={handleSaveReferralSettings}
-                  loading={isSavingReferralSettings}
+                  loading={updateReferralSettings.isPending}
                 >
-                  Ayarları Kaydet
+                  Ayarlari Kaydet
                 </CanvaButton>
               </div>
             </CanvaCardBody>
