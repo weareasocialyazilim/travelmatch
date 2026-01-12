@@ -89,9 +89,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { formatCurrency, cn } from '@/lib/utils';
 import { AdminAreaChart, CHART_COLORS } from '@/components/common/admin-chart';
 
-// Wallet Stats
+// Wallet Stats - Para PayTR havuzunda tutulmaktadır
 const walletStats = {
-  totalWalletBalance: 2456780,
+  paytrPoolBalance: 2456780, // PayTR'da tutulan toplam bakiye
   pendingPayouts: 456780,
   processedToday: 89450,
   avgPayoutTime: 2.4, // saat
@@ -101,7 +101,7 @@ const walletStats = {
   payoutSuccessRate: 99.2,
 };
 
-// Payout Requests
+// Payout Requests - IBAN'lar maskelenmiş formatta (güvenlik için)
 const payoutRequests = [
   {
     id: 'PAY-2024-001',
@@ -112,9 +112,9 @@ const payoutRequests = [
       phone: '+90 532 XXX XX XX',
     },
     amount: 4560,
-    walletBalance: 5200,
+    paytrBalance: 5200, // PayTR'daki bakiye
     bank: 'Garanti BBVA',
-    iban: 'TR12 0006 2000 0000 0000 1234 56',
+    ibanMasked: 'TR** **** **** **** **** **34 56', // Maskelenmiş IBAN
     kycStatus: 'verified',
     requestedAt: '2024-01-10 09:15',
     status: 'pending',
@@ -129,9 +129,9 @@ const payoutRequests = [
       phone: '+90 533 XXX XX XX',
     },
     amount: 12340,
-    walletBalance: 15600,
+    paytrBalance: 15600,
     bank: 'Isbank',
-    iban: 'TR45 0006 4000 0000 0000 5678 90',
+    ibanMasked: 'TR** **** **** **** **** **78 90',
     kycStatus: 'verified',
     requestedAt: '2024-01-10 08:45',
     status: 'pending',
@@ -146,9 +146,9 @@ const payoutRequests = [
       phone: '+90 535 XXX XX XX',
     },
     amount: 8900,
-    walletBalance: 9200,
+    paytrBalance: 9200,
     bank: 'Akbank',
-    iban: 'TR78 0004 6000 0000 0000 9012 34',
+    ibanMasked: 'TR** **** **** **** **** **12 34',
     kycStatus: 'pending',
     requestedAt: '2024-01-10 08:00',
     status: 'blocked',
@@ -164,9 +164,9 @@ const payoutRequests = [
       phone: '+90 536 XXX XX XX',
     },
     amount: 3200,
-    walletBalance: 4500,
+    paytrBalance: 4500,
     bank: 'Yapi Kredi',
-    iban: 'TR90 0006 7000 0000 0000 3456 78',
+    ibanMasked: 'TR** **** **** **** **** **56 78',
     kycStatus: 'verified',
     requestedAt: '2024-01-10 07:30',
     status: 'processing',
@@ -181,9 +181,9 @@ const payoutRequests = [
       phone: '+90 537 XXX XX XX',
     },
     amount: 25600,
-    walletBalance: 28900,
+    paytrBalance: 28900,
     bank: 'Ziraat Bankasi',
-    iban: 'TR23 0001 0000 0000 0000 7890 12',
+    ibanMasked: 'TR** **** **** **** **** **90 12',
     kycStatus: 'verified',
     requestedAt: '2024-01-09 16:45',
     status: 'pending',
@@ -402,21 +402,33 @@ export default function WalletOperationsPage() {
         </div>
       </div>
 
+      {/* PayTR Info Banner */}
+      <Card className="border-blue-500/30 bg-blue-500/5">
+        <CardContent className="py-3">
+          <div className="flex items-center gap-2 text-sm text-blue-700">
+            <Shield className="h-4 w-4" />
+            <span className="font-medium">
+              Tum odemeler PayTR uzerinden gerceklestirilmektedir. Banka hesap bilgileri sistemimizde saklanmaz.
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Stats Overview */}
       <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-8">
         <Card className="col-span-2">
           <CardHeader className="pb-2">
             <CardDescription className="flex items-center gap-1">
               <PiggyBank className="h-3 w-3" />
-              Toplam Cuzdan Bakiyesi
+              PayTR Havuz Bakiyesi
             </CardDescription>
             <CardTitle className="text-2xl font-bold text-emerald-600">
-              {formatCurrency(walletStats.totalWalletBalance, 'TRY')}
+              {formatCurrency(walletStats.paytrPoolBalance, 'TRY')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-xs text-muted-foreground">
-              Tum kullanici bakiyeleri
+              PayTR'da tutulan toplam bakiye
             </p>
           </CardContent>
         </Card>
@@ -622,7 +634,7 @@ export default function WalletOperationsPage() {
                         {formatCurrency(payout.amount, 'TRY')}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Bakiye: {formatCurrency(payout.walletBalance, 'TRY')}
+                        Bakiye: {formatCurrency(payout.paytrBalance, 'TRY')}
                       </p>
                     </TableCell>
                     <TableCell>
@@ -631,7 +643,7 @@ export default function WalletOperationsPage() {
                         <div>
                           <p className="text-sm font-medium">{payout.bank}</p>
                           <p className="text-xs text-muted-foreground font-mono">
-                            {payout.iban.slice(0, 12)}...
+                            {payout.ibanMasked.slice(0, 12)}...
                           </p>
                         </div>
                       </div>

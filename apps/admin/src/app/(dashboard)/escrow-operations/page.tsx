@@ -474,6 +474,19 @@ export default function EscrowOperationsPage() {
         </div>
       </div>
 
+      {/* PayTR Security Info */}
+      <Card className="border-purple-500/30 bg-purple-500/5">
+        <CardContent className="py-3">
+          <div className="flex items-center gap-2 text-sm text-purple-700">
+            <Shield className="h-4 w-4" />
+            <span className="font-medium">
+              Escrow islemleri PayTR uzerinden gerceklestirilmektedir. Kartlar PCI-DSS uyumlu olarak tokenize edilir,
+              banka hesap bilgileri (IBAN) sistemde hash'lenmis ve maskelenmis olarak saklanir.
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Stats Overview */}
       <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-8">
         {/* Escrow Stats */}
