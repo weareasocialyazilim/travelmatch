@@ -1,56 +1,94 @@
 /**
  * TravelMatch - Awwwards-Ready Landing Page
  *
+ * Section-Based Reveal Architecture:
+ * Each section owns its viewport - no cognitive overload
+ *
  * Premium design with:
  * - Hero with 3D GiftOrb
  * - TrustRing scrollytelling
  * - CinematicReveal Apple-style text mask
  * - MatchSimulator ML demo (connected to Neural Nexus API)
- * - LiveTrustCounter real-time platform stats
  * - IdentityPulse futuristic card
+ * - LiveTrustCounter real-time platform stats
  * - SacredMoments Bento Grid
  * - RitualSection process steps
  * - Grand Footer finale
+ *
+ * Fixed Overlays (don't interfere with flow):
+ * - LiveHeartbeat (bottom-right) - Real-time social proof
+ * - NeuralChat (bottom-left) - AI vibe assistant
  */
 
 import { Hero } from '@/components/landing/Hero';
 import { TrustRing } from '@/components/landing/TrustRing';
 import { CinematicReveal } from '@/components/landing/CinematicReveal';
 import { MatchSimulator } from '@/components/landing/MatchSimulator';
-import { LiveTrustCounter } from '@/components/landing/LiveTrustCounter';
 import { IdentityPulse } from '@/components/landing/IdentityPulse';
+import { LiveTrustCounter } from '@/components/landing/LiveTrustCounter';
 import { SacredMoments } from '@/components/landing/SacredMoments';
 import { RitualSection } from '@/components/landing/RitualSection';
 import { Footer } from '@/components/layout/Footer';
+import { LiveHeartbeat } from '@/components/landing/LiveHeartbeat';
+import { NeuralChat } from '@/components/shared/NeuralChat';
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col w-full selection:bg-primary selection:text-background">
-      {/* 01: Hero & 3D Atmosphere */}
-      <Hero />
+    <div className="flex flex-col w-full bg-background selection:bg-primary selection:text-background">
+      {/* ═══════════════════════════════════════════════════════════
+          FIXED OVERLAYS - These don't interfere with page flow
+          Bottom corners, minimalist, appear/hide on interaction
+      ═══════════════════════════════════════════════════════════ */}
+      <LiveHeartbeat />
+      <NeuralChat />
 
-      {/* 02: Trust Ring Scrollytelling */}
-      <TrustRing />
+      {/* ═══════════════════════════════════════════════════════════
+          MAIN FLOW (CHAPTERS) - Section-Based Reveal
+          Each section is 'relative' and 'overflow-hidden'
+          viewport={{ once: true, amount: 0.5 }} triggers animations
+      ═══════════════════════════════════════════════════════════ */}
 
-      {/* 03: Cinematic Reveal - Apple-style text mask */}
-      <CinematicReveal />
+      {/* Chapter 01: Hero & 3D Atmosphere */}
+      <section className="relative min-h-screen overflow-hidden">
+        <Hero />
+      </section>
 
-      {/* 04: ML Neural Match Simulator */}
-      <MatchSimulator />
+      {/* Chapter 02: Trust Ring Scrollytelling */}
+      <section className="relative overflow-hidden bg-black">
+        <TrustRing />
+      </section>
 
-      {/* 05: Identity Pulse - Futuristic ID Card */}
-      <IdentityPulse />
+      {/* Chapter 03: Cinematic Reveal - Apple-style text mask */}
+      <section className="relative overflow-hidden">
+        <CinematicReveal />
+      </section>
 
-      {/* 06: Live Trust Counter - Real-time Platform Stats */}
-      <LiveTrustCounter />
+      {/* Chapter 04: ML Neural Match Simulator */}
+      <section className="relative overflow-hidden">
+        <MatchSimulator />
+      </section>
 
-      {/* 07: Sacred Moments Bento Grid */}
-      <SacredMoments />
+      {/* Chapter 05: Identity Pulse - Futuristic ID Card */}
+      <section className="relative overflow-hidden bg-[#050505]">
+        <IdentityPulse />
+      </section>
 
-      {/* 08: The Ritual of Gifting Process */}
-      <RitualSection />
+      {/* Chapter 06: Live Trust Counter - Real-time Platform Stats */}
+      <section className="relative overflow-hidden">
+        <LiveTrustCounter />
+      </section>
 
-      {/* 09: Grand Finale Footer */}
+      {/* Chapter 07: Sacred Moments Bento Grid */}
+      <section className="relative overflow-hidden">
+        <SacredMoments />
+      </section>
+
+      {/* Chapter 08: The Ritual of Gifting Process */}
+      <section className="relative overflow-hidden bg-black">
+        <RitualSection />
+      </section>
+
+      {/* Chapter 09: Grand Finale Footer */}
       <Footer />
     </div>
   );
