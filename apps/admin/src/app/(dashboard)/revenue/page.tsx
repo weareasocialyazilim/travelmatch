@@ -236,8 +236,8 @@ export default function RevenuePage() {
                         fontSize={12}
                       />
                       <Tooltip
-                        formatter={(value: number) => [
-                          formatCurrency(value, 'TRY'),
+                        formatter={(value: number | undefined) => [
+                          formatCurrency(value ?? 0, 'TRY'),
                           'Gelir',
                         ]}
                         contentStyle={{
@@ -308,7 +308,12 @@ export default function RevenuePage() {
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
-                          data={revenueByProduct}
+                          data={
+                            revenueByProduct as unknown as Record<
+                              string,
+                              unknown
+                            >[]
+                          }
                           cx="50%"
                           cy="50%"
                           innerRadius={60}
@@ -321,8 +326,8 @@ export default function RevenuePage() {
                           ))}
                         </Pie>
                         <Tooltip
-                          formatter={(value: number) => [
-                            formatCurrency(value, 'TRY'),
+                          formatter={(value: number | undefined) => [
+                            formatCurrency(value ?? 0, 'TRY'),
                             '',
                           ]}
                           contentStyle={{

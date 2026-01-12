@@ -123,10 +123,10 @@ const contentStats = [
   { metric: 'Onay Oranı', value: '94%', change: '+2%', trend: 'up' },
 ];
 
+type DateRange = '7d' | '30d' | '90d' | '365d';
+
 export default function AnalyticsPage() {
-  const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d' | '365d'>(
-    '7d',
-  );
+  const [dateRange, setDateRange] = useState<DateRange>('7d');
 
   // Use real API data
   const { data, isLoading, error } = useAnalytics({ period: dateRange });
@@ -159,16 +159,19 @@ export default function AnalyticsPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Select value={dateRange} onValueChange={setDateRange}>
+          <Select
+            value={dateRange}
+            onValueChange={(v) => setDateRange(v as DateRange)}
+          >
             <SelectTrigger className="w-40">
               <Calendar className="mr-2 h-4 w-4" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="24h">Son 24 saat</SelectItem>
               <SelectItem value="7d">Son 7 gün</SelectItem>
               <SelectItem value="30d">Son 30 gün</SelectItem>
               <SelectItem value="90d">Son 90 gün</SelectItem>
+              <SelectItem value="365d">Son 1 yıl</SelectItem>
             </SelectContent>
           </Select>
           <CanvaButton variant="primary">
@@ -335,7 +338,7 @@ export default function AnalyticsPage() {
                         }}
                         formatter={(
                           value: number | undefined,
-                          name: string,
+                          name?: string,
                         ) => [
                           name === 'revenue'
                             ? formatCurrency(value ?? 0)

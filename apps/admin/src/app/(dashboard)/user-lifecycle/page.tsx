@@ -416,9 +416,9 @@ export default function UserLifecyclePage() {
                 <AdminAreaChart
                   data={dauTrend}
                   xAxisKey="date"
-                  series={[
-                    { key: 'dau', name: 'DAU', color: '#3b82f6' },
-                    { key: 'wau', name: 'WAU', color: '#10b981' },
+                  areas={[
+                    { dataKey: 'dau', name: 'DAU', color: '#3b82f6' },
+                    { dataKey: 'wau', name: 'WAU', color: '#10b981' },
                   ]}
                   height={250}
                 />
@@ -626,8 +626,12 @@ export default function UserLifecyclePage() {
               <AdminBarChart
                 data={retentionData}
                 xAxisKey="week"
-                series={[
-                  { key: 'retention', name: 'Retention %', color: '#3b82f6' },
+                bars={[
+                  {
+                    dataKey: 'retention',
+                    name: 'Retention %',
+                    color: '#3b82f6',
+                  },
                 ]}
                 height={300}
               />

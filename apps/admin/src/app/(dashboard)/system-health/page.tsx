@@ -558,9 +558,9 @@ export default function SystemHealthPage() {
                 <AdminLineChart
                   data={realtimeMetrics}
                   xAxisKey="time"
-                  series={[
-                    { key: 'cpu', name: 'CPU %', color: '#3b82f6' },
-                    { key: 'memory', name: 'Memory %', color: '#a855f7' },
+                  lines={[
+                    { dataKey: 'cpu', name: 'CPU %', color: '#3b82f6' },
+                    { dataKey: 'memory', name: 'Memory %', color: '#a855f7' },
                   ]}
                   height={250}
                 />
@@ -576,8 +576,8 @@ export default function SystemHealthPage() {
                 <AdminAreaChart
                   data={realtimeMetrics}
                   xAxisKey="time"
-                  series={[
-                    { key: 'requests', name: 'İstek/dk', color: '#10b981' },
+                  areas={[
+                    { dataKey: 'requests', name: 'İstek/dk', color: '#10b981' },
                   ]}
                   height={250}
                 />

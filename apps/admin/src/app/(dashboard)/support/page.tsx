@@ -236,14 +236,14 @@ export default function SupportPage() {
   const cannedResponses = data?.cannedResponses || mockCannedResponses;
   const stats = data?.stats || { open: 0, pending: 0, resolved: 0, total: 0 };
 
-  const [selectedTicket, setSelectedTicket] = useState<
-    (typeof mockTickets)[0] | null
-  >(null);
+  // Use a more flexible ticket type that works with both mock and API data
+  type AnyTicket = (typeof mockTickets)[0] | SupportTicket;
+  const [selectedTicket, setSelectedTicket] = useState<AnyTicket | null>(null);
 
   // Set initial selected ticket when data loads
   useMemo(() => {
     if (tickets.length > 0 && !selectedTicket) {
-      setSelectedTicket(tickets[0]);
+      setSelectedTicket(tickets[0] as AnyTicket);
     }
   }, [tickets, selectedTicket]);
 
@@ -433,7 +433,7 @@ export default function SupportPage() {
                       'cursor-pointer border-b p-4 transition-colors hover:bg-accent/50',
                       selectedTicket?.id === ticket.id && 'bg-accent',
                     )}
-                    onClick={() => setSelectedTicket(ticket)}
+                    onClick={() => setSelectedTicket(ticket as AnyTicket)}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-2">
@@ -556,15 +556,23 @@ export default function SupportPage() {
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
                       <AvatarFallback>
-                        {getInitials(selectedTicket.user.full_name)}
+                        {getInitials(
+                          'user' in selectedTicket
+                            ? selectedTicket.user.full_name
+                            : selectedTicket.profiles?.full_name || 'Kullanıcı',
+                        )}
                       </AvatarFallback>
                     </Avatar>
                     <div>
                       <p className="font-medium">
-                        {selectedTicket.user.full_name}
+                        {'user' in selectedTicket
+                          ? selectedTicket.user.full_name
+                          : selectedTicket.profiles?.full_name || 'Kullanıcı'}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {selectedTicket.user.email}
+                        {'user' in selectedTicket
+                          ? selectedTicket.user.email
+                          : selectedTicket.profiles?.email || ''}
                       </p>
                     </div>
                   </div>
@@ -585,48 +593,58 @@ export default function SupportPage() {
               <CanvaCardBody className="p-0">
                 <ScrollArea className="h-[300px] p-4">
                   <div className="space-y-4">
-                    {selectedTicket.messages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={cn(
-                          'flex',
-                          message.sender === 'admin'
-                            ? 'justify-end'
-                            : 'justify-start',
-                        )}
-                      >
+                    {('messages' in selectedTicket
+                      ? selectedTicket.messages
+                      : []
+                    ).map(
+                      (message: {
+                        id: string;
+                        sender: string;
+                        content: string;
+                        created_at: string;
+                      }) => (
                         <div
+                          key={message.id}
                           className={cn(
-                            'max-w-[80%] rounded-2xl p-3',
+                            'flex',
                             message.sender === 'admin'
-                              ? 'bg-violet-500 text-white'
-                              : 'bg-gray-100',
+                              ? 'justify-end'
+                              : 'justify-start',
                           )}
                         >
-                          <p className="text-sm">{message.content}</p>
                           <div
                             className={cn(
-                              'mt-1 flex items-center gap-2 text-xs',
+                              'max-w-[80%] rounded-2xl p-3',
                               message.sender === 'admin'
-                                ? 'text-white/70'
-                                : 'text-gray-500',
+                                ? 'bg-violet-500 text-white'
+                                : 'bg-gray-100',
                             )}
                           >
-                            {message.sender === 'admin' && (
+                            <p className="text-sm">{message.content}</p>
+                            <div
+                              className={cn(
+                                'mt-1 flex items-center gap-2 text-xs',
+                                message.sender === 'admin'
+                                  ? 'text-white/70'
+                                  : 'text-gray-500',
+                              )}
+                            >
+                              {message.sender === 'admin' && (
+                                <span>
+                                  {
+                                    (message as { admin_name?: string })
+                                      .admin_name
+                                  }
+                                </span>
+                              )}
                               <span>
-                                {
-                                  (message as { admin_name?: string })
-                                    .admin_name
-                                }
+                                {formatRelativeDate(message.created_at)}
                               </span>
-                            )}
-                            <span>
-                              {formatRelativeDate(message.created_at)}
-                            </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ),
+                    )}
                   </div>
                 </ScrollArea>
 

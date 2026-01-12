@@ -1010,7 +1010,7 @@ export default function WalletOperationsPage() {
               Iptal
             </CanvaButton>
             <CanvaButton
-              variant={actionDialog.action === 'reject' ? 'error' : 'primary'}
+              variant={actionDialog.action === 'reject' ? 'danger' : 'primary'}
               className={
                 actionDialog.action === 'approve'
                   ? 'bg-emerald-600 hover:bg-emerald-700'

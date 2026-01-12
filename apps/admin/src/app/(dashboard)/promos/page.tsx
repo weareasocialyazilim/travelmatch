@@ -280,17 +280,17 @@ export default function PromosPage() {
     const variants: Record<
       string,
       {
-        variant: 'primary' | 'default' | 'outline' | 'error';
+        variant: 'primary' | 'default' | 'info' | 'error';
         label: string;
       }
     > = {
       active: { variant: 'primary', label: 'Aktif' },
       scheduled: { variant: 'default', label: 'Zamanlandı' },
-      expired: { variant: 'outline', label: 'Süresi Doldu' },
+      expired: { variant: 'info', label: 'Süresi Doldu' },
       disabled: { variant: 'error', label: 'Devre Dışı' },
     };
     const { variant, label } = variants[status] || {
-      variant: 'outline',
+      variant: 'info',
       label: status,
     };
     return <CanvaBadge variant={variant}>{label}</CanvaBadge>;

@@ -429,11 +429,11 @@ export default function CompliancePage() {
         fetchStats();
         setSelectedSar(null);
       } else {
-        toast({ title: 'Güncelleme başarısız', variant: 'error' });
+        toast({ title: 'Güncelleme başarısız', variant: 'destructive' });
       }
     } catch (error) {
       logger.error('Failed to update SAR', error);
-      toast({ title: 'Bir hata oluştu', variant: 'error' });
+      toast({ title: 'Bir hata oluştu', variant: 'destructive' });
     }
   };
 
@@ -460,11 +460,11 @@ export default function CompliancePage() {
         fetchStats();
         setSelectedProfile(null);
       } else {
-        toast({ title: 'İşlem başarısız', variant: 'error' });
+        toast({ title: 'İşlem başarısız', variant: 'destructive' });
       }
     } catch (error) {
       logger.error('Failed to toggle block', error);
-      toast({ title: 'Bir hata oluştu', variant: 'error' });
+      toast({ title: 'Bir hata oluştu', variant: 'destructive' });
     }
   };
 

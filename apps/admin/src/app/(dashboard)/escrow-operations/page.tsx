@@ -1022,7 +1022,7 @@ export default function EscrowOperationsPage() {
                           variant={
                             payout.kycStatus === 'verified'
                               ? 'primary'
-                              : 'outline'
+                              : 'secondary'
                           }
                           disabled={payout.kycStatus !== 'verified'}
                         >

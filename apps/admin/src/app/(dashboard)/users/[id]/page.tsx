@@ -241,29 +241,60 @@ export default function UserDetailPage() {
   const [actionReason, setActionReason] = useState('');
 
   // Use real API data
-  const { data: userData, isLoading, error } = useUser(params.id as string);
+  const { data: apiResponse, isLoading, error } = useUser(params.id as string);
   const suspendUser = useSuspendUser();
   const banUser = useBanUser();
   const verifyUser = useVerifyUser();
 
   // Fallback to mock data while loading or if no data
-  const user = userData || mockUser;
+  // API returns { user: UserDetails } so we extract and merge with mockUser structure
+  const user = apiResponse?.user
+    ? {
+        ...mockUser,
+        id: apiResponse.user.id,
+        email: apiResponse.user.email || mockUser.email,
+        full_name: apiResponse.user.display_name || mockUser.full_name,
+        avatar_url: apiResponse.user.avatar_url || mockUser.avatar_url,
+        bio: apiResponse.user.bio || mockUser.bio,
+        created_at: apiResponse.user.created_at || mockUser.created_at,
+        last_active_at:
+          apiResponse.user.last_active_at || mockUser.last_active_at,
+        status: apiResponse.user.is_banned
+          ? 'banned'
+          : apiResponse.user.is_suspended
+            ? 'suspended'
+            : apiResponse.user.is_active
+              ? 'active'
+              : 'inactive',
+        verification: {
+          ...mockUser.verification,
+          kyc_status: apiResponse.user.is_verified ? 'verified' : 'pending',
+        },
+        stats: {
+          ...mockUser.stats,
+          total_moments:
+            apiResponse.user.stats?.moments ?? mockUser.stats.total_moments,
+          total_matches:
+            apiResponse.user.stats?.matches ?? mockUser.stats.total_matches,
+        },
+      }
+    : mockUser;
 
   const getStatusBadge = (status: string) => {
     const variants: Record<
       string,
       {
-        variant: 'primary' | 'default' | 'error' | 'outline';
+        variant: 'primary' | 'default' | 'error' | 'info';
         label: string;
       }
     > = {
       active: { variant: 'primary', label: 'Aktif' },
       suspended: { variant: 'default', label: 'Askıya Alındı' },
       banned: { variant: 'error', label: 'Yasaklandı' },
-      inactive: { variant: 'outline', label: 'Pasif' },
+      inactive: { variant: 'info', label: 'Pasif' },
     };
     const { variant, label } = variants[status] || {
-      variant: 'outline',
+      variant: 'info',
       label: status,
     };
     return <CanvaBadge variant={variant}>{label}</CanvaBadge>;
@@ -273,7 +304,7 @@ export default function UserDetailPage() {
     const variants: Record<
       string,
       {
-        variant: 'primary' | 'default' | 'error' | 'outline';
+        variant: 'primary' | 'default' | 'error' | 'info';
         label: string;
         icon: React.ReactNode;
       }
@@ -293,10 +324,10 @@ export default function UserDetailPage() {
         label: 'Reddedildi',
         icon: <XCircle className="h-3 w-3" />,
       },
-      not_submitted: { variant: 'outline', label: 'Gönderilmedi', icon: null },
+      not_submitted: { variant: 'info', label: 'Gönderilmedi', icon: null },
     };
     const { variant, label, icon } = variants[status] || {
-      variant: 'outline',
+      variant: 'info',
       label: status,
       icon: null,
     };
@@ -312,10 +343,10 @@ export default function UserDetailPage() {
     const userId = params.id as string;
     try {
       if (action === 'suspend') {
-        await suspendUser.mutateAsync({ id: userId, reason: actionReason });
+        await suspendUser.mutateAsync(userId, actionReason);
         toast.success('Kullanıcı askıya alındı');
       } else if (action === 'ban') {
-        await banUser.mutateAsync({ id: userId, reason: actionReason });
+        await banUser.mutateAsync(userId, actionReason);
         toast.success('Kullanıcı yasaklandı');
       } else if (action === 'verify_kyc') {
         await verifyUser.mutateAsync(userId);
@@ -605,7 +636,7 @@ export default function UserDetailPage() {
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Otomatik Yenileme</span>
                 <CanvaBadge
-                  variant={user.subscription.auto_renew ? 'primary' : 'outline'}
+                  variant={user.subscription.auto_renew ? 'primary' : 'info'}
                 >
                   {user.subscription.auto_renew ? 'Aktif' : 'Kapalı'}
                 </CanvaBadge>
@@ -973,7 +1004,7 @@ export default function UserDetailPage() {
               İptal
             </CanvaButton>
             <CanvaButton
-              variant={actionDialog === 'ban' ? 'error' : 'primary'}
+              variant={actionDialog === 'ban' ? 'danger' : 'primary'}
               onClick={() => handleAction(actionDialog!)}
             >
               Onayla

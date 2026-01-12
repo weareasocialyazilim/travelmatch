@@ -229,15 +229,15 @@ export default function NotificationsPage() {
   const getStatusBadge = (status: string) => {
     const variants: Record<
       string,
-      { variant: 'primary' | 'default' | 'outline'; label: string }
+      { variant: 'primary' | 'default' | 'info'; label: string }
     > = {
       sent: { variant: 'primary', label: 'Gönderildi' },
       scheduled: { variant: 'default', label: 'Zamanlandı' },
-      draft: { variant: 'outline', label: 'Taslak' },
-      failed: { variant: 'outline', label: 'Başarısız' },
+      draft: { variant: 'info', label: 'Taslak' },
+      failed: { variant: 'info', label: 'Başarısız' },
     };
     const { variant, label } = variants[status] || {
-      variant: 'outline',
+      variant: 'info',
       label: status,
     };
     return <CanvaBadge variant={variant}>{label}</CanvaBadge>;

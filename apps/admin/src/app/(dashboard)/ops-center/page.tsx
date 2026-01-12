@@ -161,7 +161,7 @@ export default function OpsCenterPage() {
         </div>
         <div className="flex items-center gap-2">
           <CanvaButton
-            variant={isLive ? 'primary' : 'outline'}
+            variant={isLive ? 'primary' : 'secondary'}
             size="sm"
             onClick={() => setIsLive(!isLive)}
           >
