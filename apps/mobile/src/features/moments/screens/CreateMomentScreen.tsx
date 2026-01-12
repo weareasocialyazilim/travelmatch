@@ -17,7 +17,7 @@
  * - requested_amount zorunlu alan (min: 1)
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -29,6 +29,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Switch,
+  ActivityIndicator,
 } from 'react-native';
 import { showAlert } from '@/stores/modalStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -85,7 +86,7 @@ const getEscrowTier = (
   if (isNaN(amount) || amount <= 0) {
     return {
       tier: 'direct',
-      message: 'Miktar girin',
+      message: 'Fiyat girerek ödeme türünü görün',
       color: COLORS.text.secondary,
     };
   }
@@ -103,19 +104,19 @@ const getEscrowTier = (
   if (usdEquivalent < ESCROW_THRESHOLDS.DIRECT_MAX) {
     return {
       tier: 'direct',
-      message: 'Doğrudan ödeme aktif • Anında cüzdanınıza aktarılır',
+      message: 'Hızlı ödeme - Anında cüzdanınıza aktarılır',
       color: COLORS.feedback.success,
     };
   } else if (usdEquivalent < ESCROW_THRESHOLDS.OPTIONAL_MAX) {
     return {
       tier: 'optional',
-      message: 'Escrow koruması isteğe bağlı • Alıcı onayından sonra ödeme',
+      message: 'Güvenli ödeme - Onayınızdan sonra ödeme alırsınız',
       color: COLORS.feedback.warning,
     };
   } else {
     return {
       tier: 'mandatory',
-      message: 'Zorunlu escrow koruması • 48 saat güvenli tutulur',
+      message: 'Korumalı ödeme - 48 saat güvence ile tutulur',
       color: COLORS.feedback.error,
     };
   }
@@ -193,6 +194,9 @@ const CreateMomentScreen: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAsStory, setShowAsStory] = useState(true); // Default: show as story for 24h
 
+  // Double-tap protection ref
+  const isPublishingRef = useRef(false);
+
   // 1. Media Selection - Story format (9:16)
   // NOTE: All hooks must be defined before any conditional returns (React rules of hooks)
   const pickImage = useCallback(async () => {
@@ -224,6 +228,12 @@ const CreateMomentScreen: React.FC = () => {
 
   // 2. Drop Action (Submit to API) - UPDATED with new fields
   const handleDrop = useCallback(async () => {
+    // Double-tap protection
+    if (isPublishingRef.current) {
+      logger.info('[CreateMoment] Ignoring duplicate publish tap');
+      return;
+    }
+
     // Check if user is authenticated
     if (isGuest || !user) {
       showLoginPrompt({ action: 'create_moment' });
@@ -250,6 +260,8 @@ const CreateMomentScreen: React.FC = () => {
       return;
     }
 
+    // Set double-tap protection
+    isPublishingRef.current = true;
     setIsSubmitting(true);
     HapticManager.buttonPress();
 
@@ -300,9 +312,10 @@ const CreateMomentScreen: React.FC = () => {
         error: createMomentError,
       });
       HapticManager.error();
-      showToast('Something went wrong. Please try again.', 'error');
+      showToast('Bir şeyler yanlış gitti. Lütfen tekrar deneyin.', 'error');
     } finally {
       setIsSubmitting(false);
+      isPublishingRef.current = false;
     }
   }, [
     title,
@@ -748,9 +761,9 @@ const CreateMomentScreen: React.FC = () => {
               )}
 
               <Text style={styles.priceHint}>
-                Bu fiyatı kabul eden kişiler sana destek olabilir.
-                {'\n'}Platform komisyonu: %5 • Minimum:{' '}
-                {CURRENCY_SYMBOLS[currency]}1
+                Bu fiyatı ödeyenler anını desteklemiş olur.
+                {'\n'}Platform komisyonu: %5 • Min: {CURRENCY_SYMBOLS[currency]}
+                1 • Maks: {CURRENCY_SYMBOLS[currency]}99999
               </Text>
 
               <TouchableOpacity
@@ -909,11 +922,7 @@ const CreateMomentScreen: React.FC = () => {
                 >
                   {isSubmitting ? (
                     <>
-                      <MaterialCommunityIcons
-                        name="loading"
-                        size={20}
-                        color="black"
-                      />
+                      <ActivityIndicator size="small" color="black" />
                       <Text style={styles.publishButtonText}>
                         Yayınlanıyor...
                       </Text>
