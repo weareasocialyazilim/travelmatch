@@ -6,15 +6,24 @@ const logger = new Logger();
  *
  * Handles phone verification via Twilio Verify
  *
+ * SECURITY:
+ * - OTP endpoints are public (for login/signup)
+ * - send-sms requires authentication (prevents spam abuse)
+ * - All endpoints are rate limited
+ * - 30 second timeout on all API calls
+ *
  * Endpoints:
  * - POST /send-otp - Send verification code (rate limited: 1/min, 5/hour per phone)
  * - POST /verify-otp - Verify code (rate limited: 5/min per phone)
- * - POST /send-sms - Send direct SMS (rate limited: standard)
+ * - POST /send-sms - Send direct SMS (auth required, rate limited)
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { corsHeaders } from '../_shared/cors.ts';
 import { createUpstashRateLimiter, RateLimitPresets } from '../_shared/upstashRateLimit.ts';
+
+const TWILIO_API_TIMEOUT = 30000; // 30 seconds
 
 const TWILIO_ACCOUNT_SID = Deno.env.get('TWILIO_ACCOUNT_SID');
 
@@ -57,7 +66,7 @@ interface TwilioResponse {
 }
 
 /**
- * Make authenticated request to Twilio API
+ * Make authenticated request to Twilio API with timeout
  */
 async function twilioRequest(
   url: string,
@@ -69,6 +78,8 @@ async function twilioRequest(
   }
 
   const auth = btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), TWILIO_API_TIMEOUT);
 
   try {
     const response = await fetch(url, {
@@ -78,8 +89,10 @@ async function twilioRequest(
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: body?.toString(),
+      signal: controller.signal,
     });
 
+    clearTimeout(timeoutId);
     const data = await response.json();
 
     if (!response.ok) {
@@ -92,6 +105,11 @@ async function twilioRequest(
 
     return { success: true, data };
   } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      logger.error('[Twilio] Request timed out');
+      return { success: false, error: 'Request timed out. Please try again.' };
+    }
     logger.error('[Twilio] Request error:', error);
     return {
       success: false,
@@ -313,6 +331,45 @@ serve(async (req) => {
       }
 
       case 'send-sms': {
+        // SECURITY: send-sms requires authentication
+        const authHeader = req.headers.get('Authorization');
+        if (!authHeader) {
+          return new Response(
+            JSON.stringify({ error: 'Authentication required' }),
+            {
+              status: 401,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            },
+          );
+        }
+
+        // Verify the token
+        const supabaseUrl = Deno.env.get('SUPABASE_URL');
+        const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+        if (!supabaseUrl || !supabaseServiceKey) {
+          return new Response(
+            JSON.stringify({ error: 'Server configuration error' }),
+            {
+              status: 500,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            },
+          );
+        }
+
+        const supabase = createClient(supabaseUrl, supabaseServiceKey);
+        const token = authHeader.replace('Bearer ', '');
+        const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+        if (authError || !user) {
+          return new Response(
+            JSON.stringify({ error: 'Invalid or expired token' }),
+            {
+              status: 401,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            },
+          );
+        }
+
         if (!body.to || !body.message) {
           return new Response(
             JSON.stringify({ error: 'Recipient and message required' }),
@@ -323,12 +380,17 @@ serve(async (req) => {
           );
         }
 
-        // Standard rate limit for SMS
-        const smsLimit = await smsLimiter.check(req);
+        // Rate limit by user ID for authenticated requests
+        const userSmsLimiter = createUpstashRateLimiter({
+          requests: 20,
+          window: 3600, // 20 SMS per hour per user
+          prefix: 'sms_user',
+        });
+        const smsLimit = await userSmsLimiter.checkByKey(user.id);
         if (!smsLimit.ok) {
           return new Response(
             JSON.stringify({
-              error: 'Rate limit exceeded',
+              error: 'SMS limit exceeded. Maximum 20 per hour.',
               retryAfter: smsLimit.retryAfter,
             }),
             {
@@ -342,6 +404,7 @@ serve(async (req) => {
           );
         }
 
+        logger.info(`[Twilio] Authenticated SMS request from user ${user.id}`);
         result = await sendSms(body.to, body.message);
         break;
       }
