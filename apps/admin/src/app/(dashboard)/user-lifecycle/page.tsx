@@ -64,7 +64,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { AdminAreaChart, AdminBarChart } from '@/components/charts';
+import { AdminAreaChart, AdminBarChart } from '@/components/common/admin-chart';
 import { cn } from '@/lib/utils';
 
 // Lifecycle stage stats
@@ -418,7 +418,9 @@ export default function UserLifecyclePage() {
             <CanvaCard className="admin-card">
               <CanvaCardHeader>
                 <CanvaCardTitle>Kullanıcı Sağlık Metrikleri</CanvaCardTitle>
-                <CanvaCardSubtitle>Platform sağlık göstergeleri</CanvaCardSubtitle>
+                <CanvaCardSubtitle>
+                  Platform sağlık göstergeleri
+                </CanvaCardSubtitle>
               </CanvaCardHeader>
               <CanvaCardBody className="space-y-4">
                 {healthMetrics.map((metric) => (
@@ -742,7 +744,9 @@ export default function UserLifecyclePage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <CanvaBadge variant="outline">{user.segment}</CanvaBadge>
+                        <CanvaBadge variant="outline">
+                          {user.segment}
+                        </CanvaBadge>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">

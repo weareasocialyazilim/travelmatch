@@ -254,13 +254,19 @@ export default function SafetyHubPage() {
     switch (priority) {
       case 'critical':
         return (
-          <CanvaBadge variant="error" icon={<AlertTriangle className="h-3 w-3" />}>
+          <CanvaBadge
+            variant="error"
+            icon={<AlertTriangle className="h-3 w-3" />}
+          >
             Kritik
           </CanvaBadge>
         );
       case 'high':
         return (
-          <CanvaBadge variant="warning" icon={<AlertCircle className="h-3 w-3" />}>
+          <CanvaBadge
+            variant="warning"
+            icon={<AlertCircle className="h-3 w-3" />}
+          >
             Yüksek
           </CanvaBadge>
         );
@@ -307,10 +313,16 @@ export default function SafetyHubPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <CanvaButton variant="outline" leftIcon={<Activity className="h-4 w-4" />}>
+          <CanvaButton
+            variant="outline"
+            leftIcon={<Activity className="h-4 w-4" />}
+          >
             Canlı İzleme
           </CanvaButton>
-          <CanvaButton variant="primary" leftIcon={<Shield className="h-4 w-4" />}>
+          <CanvaButton
+            variant="primary"
+            leftIcon={<Shield className="h-4 w-4" />}
+          >
             Güvenlik Raporu
           </CanvaButton>
         </div>
@@ -506,7 +518,12 @@ export default function SafetyHubPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          <CanvaButton variant="ghost" size="sm" iconOnly title="İncele">
+                          <CanvaButton
+                            variant="ghost"
+                            size="sm"
+                            iconOnly
+                            title="İncele"
+                          >
                             <Eye className="h-4 w-4" />
                           </CanvaButton>
                           <CanvaButton
@@ -555,8 +572,8 @@ export default function SafetyHubPage() {
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* AI Moderation Tab */}
