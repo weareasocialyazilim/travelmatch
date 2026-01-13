@@ -33,6 +33,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import type { RootStackParamList } from '@/navigation/routeParams';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { HapticManager } from '@/services/HapticManager';
@@ -487,8 +489,7 @@ const WithdrawScreen: React.FC = () => {
 
   const handleVerifyKYC = () => {
     // Navigate to KYC verification flow
-    // @ts-ignore - navigation typing
-    navigation.navigate('KYCVerification' as never);
+    (navigation as StackNavigationProp<RootStackParamList>).navigate('IdentityVerification');
   };
 
   // If user doesn't meet KYC requirements, show gate screen

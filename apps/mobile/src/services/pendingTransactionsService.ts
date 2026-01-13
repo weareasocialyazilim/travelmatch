@@ -113,8 +113,8 @@ class PendingTransactionsService {
   ): Promise<void> {
     try {
       const stored = await AsyncStorage.getItem(PENDING_PAYMENTS_KEY);
-      const payments = stored ? JSON.parse(stored) : [];
-      const index = payments.findIndex((p: any) => p.id === id);
+      const payments: PendingPayment[] = stored ? JSON.parse(stored) : [];
+      const index = payments.findIndex((p) => p.id === id);
 
       if (index === -1) {
         logger.warn('PendingTransactions', 'Payment not found for update', {
@@ -259,8 +259,8 @@ class PendingTransactionsService {
   ): Promise<void> {
     try {
       const stored = await AsyncStorage.getItem(PENDING_UPLOADS_KEY);
-      const uploads = stored ? JSON.parse(stored) : [];
-      const index = uploads.findIndex((u: any) => u.id === id);
+      const uploads: PendingUpload[] = stored ? JSON.parse(stored) : [];
+      const index = uploads.findIndex((u) => u.id === id);
 
       if (index === -1) {
         logger.warn(

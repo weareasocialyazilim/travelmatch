@@ -22,7 +22,21 @@
 
 import { logger } from '@/utils/logger';
 
-let Audio: any = null;
+// Type definitions for expo-av Audio module (optional dependency)
+// These are minimal interfaces based on what methods we use
+interface SoundObject {
+  replayAsync: () => Promise<void>;
+  unloadAsync: () => Promise<void>;
+}
+
+interface AudioModule {
+  setAudioModeAsync: (options: { playsInSilentModeIOS: boolean; staysActiveInBackground: boolean }) => Promise<void>;
+  Sound: {
+    createAsync: (source: unknown) => Promise<{ sound: SoundObject }>;
+  };
+}
+
+let Audio: AudioModule | null = null;
 
 // Try to load expo-av dynamically - graceful degradation if not available
 try {
@@ -38,7 +52,7 @@ try {
 import { HapticManager } from '@/services/HapticManager';
 
 class AudioSystem {
-  private sounds: Map<string, any> = new Map();
+  private sounds: Map<string, SoundObject> = new Map();
   private enabled: boolean = true;
 
   async initialize() {
