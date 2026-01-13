@@ -1,6 +1,12 @@
 'use client';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useMotionValueEvent,
+} from 'framer-motion';
 import { WhisperUI } from './WhisperUI';
+import { useAuraSync } from '@/hooks/useAuraSync';
 
 const MOMENTS = [
   {
@@ -130,7 +136,7 @@ export function MomentDeck() {
     <section className="relative min-h-[400vh] w-full bg-black">
       {/* Sticky Container */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
-        <h2 className="absolute top-20 left-10 text-4xl md:text-6xl font-black italic opacity-20 uppercase tracking-tighter z-0">
+        <h2 className="absolute top-10 md:top-20 left-4 md:left-10 text-2xl md:text-6xl font-black italic opacity-20 uppercase tracking-tighter z-0">
           The Network
         </h2>
 
@@ -159,6 +165,7 @@ function MomentCard({
   total: number;
 }) {
   const { scrollYProgress } = useScroll();
+  const { setAura } = useAuraSync();
 
   // Her kartın kendi scroll aralığında belirmesi ve kaybolması
   const start = index / total;
@@ -177,6 +184,13 @@ function MomentCard({
     [start, end],
     [index % 2 === 0 ? -3 : 3, 0],
   );
+
+  // Sync aura when card becomes visible
+  useMotionValueEvent(opacity, 'change', (latest) => {
+    if (latest > 0.5) {
+      setAura(moment.aura);
+    }
+  });
 
   return (
     <motion.div
@@ -197,14 +211,14 @@ function MomentCard({
       {/* Whisper UI - Social Proof */}
       <WhisperUI momentId={moment.id} active={true} />
 
-      <div className="absolute bottom-10 left-8 right-8 text-white z-20">
+      <div className="absolute bottom-6 md:bottom-10 left-4 md:left-8 right-4 md:right-8 text-white z-20">
         <span
           style={{ borderColor: `${moment.aura}80`, color: moment.aura }}
-          className={`inline-block px-3 py-1 mb-3 text-xs font-mono uppercase tracking-[0.2em] border rounded-full bg-black/50 backdrop-blur-md`}
+          className={`inline-block px-2 md:px-3 py-1 mb-2 md:mb-3 text-[10px] md:text-xs font-mono uppercase tracking-[0.2em] border rounded-full bg-black/50 backdrop-blur-md`}
         >
           {moment.vibe}
         </span>
-        <h3 className="text-5xl font-black italic uppercase leading-[0.85] tracking-tight">
+        <h3 className="text-[clamp(2rem,8vw,6rem)] md:text-[clamp(3rem,5vw,6rem)] font-black italic uppercase leading-[0.85] tracking-tight">
           {moment.user} <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-white/50">
             {moment.city}

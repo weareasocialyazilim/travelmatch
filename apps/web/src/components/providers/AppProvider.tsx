@@ -3,7 +3,6 @@
 import { useState, useEffect, ReactNode } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { SmoothScrollProvider } from '@/providers/SmoothScroll';
-import { CustomCursor } from '@/components/ui/CustomCursor';
 import { Navbar } from '@/components/layout/Navbar';
 import { Preloader } from '@/components/ui/Preloader';
 
@@ -13,7 +12,6 @@ import { Preloader } from '@/components/ui/Preloader';
  * Features:
  * - Preloader management
  * - Smooth scroll provider
- * - Custom cursor
  * - Navbar
  */
 
@@ -57,7 +55,6 @@ export function AppProvider({ children }: AppProviderProps) {
       {/* Main Content */}
       {!isLoading && (
         <SmoothScrollProvider>
-          <CustomCursor />
           <Navbar />
           <main className="relative z-10">{children}</main>
         </SmoothScrollProvider>

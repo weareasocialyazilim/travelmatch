@@ -12,15 +12,33 @@
   --acid-green: #ccff00;
   --warm-coffee: #f59e0b;
   --foreground: #ffffff;
+  --aura-color: var(--neon-purple); /* Dinamik olarak JS ile değiştirilecek */
 }
 
 @layer base {
   body {
     @apply bg-[var(--bg-deep)] text-white overflow-x-hidden;
-    /* Noise Overlay */
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-repeat: repeat;
-    background-size: 150px;
+    /* Noise Overlay - REMOVED per user request ("broken tv look") */
+    /* background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' ... */
+  }
+}
+
+.sacred-bg-overlay {
+  background: radial-gradient(
+    circle at 50% 50%,
+    var(--aura-color) 0%,
+    transparent 70%
+  );
+  opacity: 0.15;
+  transition: background 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer utilities {
+  .text-ritual-hero {
+    /* Mobilde 3.5rem'den başlar, ekran büyüdükçe 12rem'e kadar pürüzsüzce akar */
+    font-size: clamp(3.5rem, 12vw, 12rem);
+    line-height: 0.85;
+    letter-spacing: -0.05em;
   }
 }
 

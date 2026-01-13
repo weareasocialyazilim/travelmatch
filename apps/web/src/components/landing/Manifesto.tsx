@@ -2,6 +2,7 @@
 
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
+import { useRitual } from '@/context/RitualContext';
 
 /**
  * Manifesto - Kinetic Typography Page
@@ -13,6 +14,8 @@ import { useRef } from 'react';
 
 export function Manifesto() {
   const containerRef = useRef(null);
+  const { t } = useRitual();
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start end', 'end start'],
@@ -36,7 +39,7 @@ export function Manifesto() {
         {/* First flowing text - Right to Left */}
         <motion.div style={{ x: x1 }} className="whitespace-nowrap">
           <h2 className="text-[10vw] md:text-[12vw] font-clash font-black uppercase italic text-white/8 tracking-tighter leading-none">
-            NO PASSPORTS JUST RITUALS NO PASSPORTS JUST RITUALS
+            {t.manifesto.title} {t.manifesto.title}
           </h2>
         </motion.div>
 
@@ -52,10 +55,10 @@ export function Manifesto() {
             transition={{ duration: 1 }}
             className="font-clash text-3xl md:text-6xl text-white italic max-w-5xl mx-auto leading-tight tracking-tight"
           >
-            We erased borders from maps.
+            {t.manifesto.content.split('\n')[0]}
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary">
-              Now we return them to heartbeats.
+              {t.manifesto.content.split('\n')[1]}
             </span>
           </motion.p>
 
@@ -66,36 +69,17 @@ export function Manifesto() {
             transition={{ duration: 1, delay: 0.2 }}
             className="mt-12 text-neutral-400 text-base md:text-lg max-w-3xl mx-auto leading-relaxed font-light"
           >
-            TravelMatch isn't an app. It's a ritual. A moment. A promise that
-            somewhere in the world, someone is thinking of you enough to send a
-            gift—a moment—across impossible distances.
+            {t.manifesto.sub_content}
           </motion.p>
         </motion.div>
 
         {/* Second flowing text - Left to Right */}
         <motion.div style={{ x: x2 }} className="whitespace-nowrap">
           <h2 className="text-[10vw] md:text-[12vw] font-clash font-black uppercase italic text-secondary/8 tracking-tighter leading-none">
-            SACRED MOMENTS EXCHANGE SACRED MOMENTS EXCHANGE
+            {t.manifesto.title_line2} {t.manifesto.title_line2}
           </h2>
-        </motion.div>
-
-        {/* Bottom highlight */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1, delay: 0.3 }}
-          className="container mx-auto px-6 text-center z-10 py-10"
-        >
-          <div className="inline-block px-6 py-4 border border-primary/30 rounded-full">
-            <p className="text-primary text-sm md:text-base font-bold uppercase tracking-widest">
-              ✨ Every gift is a time machine. Every moment, a bridge.
-            </p>
-          </div>
         </motion.div>
       </div>
     </section>
   );
 }
-
-export default Manifesto;
