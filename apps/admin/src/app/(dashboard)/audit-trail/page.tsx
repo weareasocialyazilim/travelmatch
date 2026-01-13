@@ -523,7 +523,7 @@ export default function AuditTrailPage() {
                       </p>
                     </div>
                   </div>
-                  <CanvaBadge variant="secondary">{admin.actions}</CanvaBadge>
+                  <CanvaBadge variant="default">{admin.actions}</CanvaBadge>
                 </div>
               ))}
             </CanvaCardBody>
