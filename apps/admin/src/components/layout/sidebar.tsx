@@ -276,9 +276,9 @@ const techNavItems: NavItem[] = [
 const settingsNavItems: NavItem[] = [
   {
     title: 'Admin Yönetimi',
-    href: '/users',
+    href: '/team',
     icon: UserCog,
-    resource: 'users',
+    resource: 'admin_users',
   },
   {
     title: 'Güvenlik',
@@ -286,7 +286,7 @@ const settingsNavItems: NavItem[] = [
     icon: Lock,
     resource: 'admin_users',
   },
-  { title: 'Ekip', href: '/team', icon: UsersRound, resource: 'admin_users' },
+  // { title: 'Ekip', href: '/team', icon: UsersRound, resource: 'admin_users' },
   {
     title: 'Audit Trail',
     href: '/audit-trail',
@@ -539,14 +539,16 @@ const NavSection = memo(function NavSection({
     (item) => pathname === item.href || pathname.startsWith(item.href + '/'),
   );
 
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded || hasActiveItem);
+  const [isExpanded, setIsExpanded] = useState(
+    defaultExpanded || hasActiveItem,
+  );
 
   // Auto-expand when navigating to an item in this section
   useEffect(() => {
-    if (hasActiveItem && !isExpanded) {
+    if (hasActiveItem) {
       setIsExpanded(true);
     }
-  }, [hasActiveItem, isExpanded]);
+  }, [hasActiveItem]);
 
   if (visibleItems.length === 0) return null;
 
@@ -554,6 +556,7 @@ const NavSection = memo(function NavSection({
     <div className="admin-sidebar-section">
       {!collapsed && (
         <button
+          type="button"
           onClick={() => setIsExpanded(!isExpanded)}
           className="admin-sidebar-section-title w-full flex items-center justify-between pr-3 hover:text-foreground transition-colors cursor-pointer"
         >
@@ -570,7 +573,9 @@ const NavSection = memo(function NavSection({
         className={cn(
           'space-y-1 overflow-hidden transition-all duration-200',
           !collapsed && !isExpanded && 'max-h-0 opacity-0',
-          (!collapsed && isExpanded) || collapsed ? 'max-h-[1000px] opacity-100' : '',
+          (!collapsed && isExpanded) || collapsed
+            ? 'max-h-[1000px] opacity-100'
+            : '',
         )}
       >
         {visibleItems.map((item) => {

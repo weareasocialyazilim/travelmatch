@@ -122,11 +122,11 @@ class AdminLogger {
         ? { name: error.name, message: error.message }
         : error;
     // eslint-disable-next-line no-console
-    console.error(
-      this.formatMessage('error', message),
-      errorInfo,
-      this.sanitizeContext(context) || '',
-    );
+    // console.error(
+    //   this.formatMessage('error', message),
+    //   errorInfo,
+    //   this.sanitizeContext(context) || '',
+    // );
   }
 
   child(name: string): AdminLogger {
