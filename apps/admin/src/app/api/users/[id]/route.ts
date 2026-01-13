@@ -34,8 +34,8 @@ export async function GET(
     const supabase = createServiceClient();
 
     // Get user profile with related data
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: user, error } = await (supabase.from('users') as any)
+    const { data: user, error } = await supabase
+      .from('users')
       .select('*')
       .eq('id', id)
       .single();
@@ -54,25 +54,28 @@ export async function GET(
     );
 
     // Get user stats
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [
       { count: momentCount },
       { count: matchCount },
       { count: reportCount },
       { data: recentTransactions },
     ] = await Promise.all([
-      (supabase.from('moments') as any)
+      supabase
+        .from('moments')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', id),
       matchFilter
-        ? (supabase.from('matches') as any)
+        ? supabase
+            .from('matches')
             .select('*', { count: 'exact', head: true })
             .or(matchFilter)
         : Promise.resolve({ count: 0 }),
-      (supabase.from('reports') as any)
+      supabase
+        .from('reports')
         .select('*', { count: 'exact', head: true })
         .eq('reported_user_id', id),
-      (supabase.from('transactions') as any)
+      supabase
+        .from('transactions')
         .select('*')
         .eq('user_id', id)
         .order('created_at', { ascending: false })
@@ -113,10 +116,8 @@ export async function PATCH(
     const supabase = createServiceClient();
 
     // Get current user data
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: currentUser, error: fetchError } = await (
-      supabase.from('users') as any
-    )
+    const { data: currentUser, error: fetchError } = await supabase
+      .from('users')
       .select('*')
       .eq('id', id)
       .single();
@@ -153,8 +154,8 @@ export async function PATCH(
       updateData.banned_at = new Date().toISOString();
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: user, error } = await (supabase.from('users') as any)
+    const { data: user, error } = await supabase
+      .from('users')
       .update(updateData)
       .eq('id', id)
       .select()

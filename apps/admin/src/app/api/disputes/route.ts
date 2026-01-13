@@ -2,6 +2,9 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
+import type { Database } from '@/types/database';
+
+type DisputeRow = Database['public']['Tables']['disputes']['Row'];
 
 export async function GET(request: NextRequest) {
   try {
@@ -23,8 +26,8 @@ export async function GET(request: NextRequest) {
 
     const supabase = createServiceClient();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (supabase.from('disputes') as any)
+    let query = supabase
+      .from('disputes')
       .select(
         `
         *,
@@ -37,13 +40,13 @@ export async function GET(request: NextRequest) {
       .range(offset, offset + limit - 1);
 
     if (status) {
-      query = query.eq('status', status);
+      query = query.eq('status', status as DisputeRow['status']);
     } else {
       query = query.in('status', ['pending', 'under_review']);
     }
 
     if (priority) {
-      query = query.eq('priority', priority);
+      query = query.eq('priority', priority as DisputeRow['priority']);
     }
 
     if (assignedTo === 'me') {
@@ -106,15 +109,15 @@ export async function POST(request: NextRequest) {
 
     const supabase = createServiceClient();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: dispute, error } = await (supabase.from('disputes') as any)
+    const { data: dispute, error } = await supabase
+      .from('disputes')
       .insert({
         requester_id,
         responder_id,
         request_id,
         reason,
         description,
-        priority,
+        priority: priority as DisputeRow['priority'],
         status: 'pending',
       })
       .select()

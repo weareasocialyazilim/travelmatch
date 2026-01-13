@@ -6,7 +6,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { createClient } from '@/lib/supabase/client';
+import { getClient } from '@/lib/supabase';
 import { toast } from 'sonner';
 
 // Types
@@ -128,7 +128,7 @@ export function useFraudStats() {
   return useQuery({
     queryKey: ['fraud-stats'],
     queryFn: async (): Promise<FraudStats> => {
-      const supabase = createClient();
+      const supabase = getClient();
 
       try {
         // Get total cases
@@ -189,7 +189,7 @@ export function useFraudCases(filters?: {
   return useQuery({
     queryKey: ['fraud-cases', filters],
     queryFn: async (): Promise<FraudCase[]> => {
-      const supabase = createClient();
+      const supabase = getClient();
 
       try {
         let query = supabase
@@ -230,7 +230,7 @@ export function useFraudCase(caseId: string) {
   return useQuery({
     queryKey: ['fraud-case', caseId],
     queryFn: async (): Promise<FraudCase | null> => {
-      const supabase = createClient();
+      const supabase = getClient();
 
       try {
         const { data, error } = await supabase
@@ -254,7 +254,7 @@ export function useFraudEvidence(caseId: string) {
   return useQuery({
     queryKey: ['fraud-evidence', caseId],
     queryFn: async (): Promise<FraudEvidence[]> => {
-      const supabase = createClient();
+      const supabase = getClient();
 
       try {
         const { data, error } = await supabase
@@ -278,7 +278,7 @@ export function useLinkedAccounts(caseId: string) {
   return useQuery({
     queryKey: ['linked-accounts', caseId],
     queryFn: async (): Promise<LinkedAccount[]> => {
-      const supabase = createClient();
+      const supabase = getClient();
 
       try {
         const { data, error } = await supabase
@@ -309,7 +309,7 @@ export function useUpdateFraudCase() {
       caseId: string;
       updates: Partial<FraudCase>;
     }) => {
-      const supabase = createClient();
+      const supabase = getClient();
 
       const { data, error } = await supabase
         .from('fraud_cases')
@@ -347,7 +347,7 @@ export function useResolveFraudCase() {
       resolution: string;
       action: 'ban' | 'warn' | 'dismiss' | 'escalate';
     }) => {
-      const supabase = createClient();
+      const supabase = getClient();
 
       const status = action === 'escalate' ? 'escalated' : 'resolved';
 
@@ -397,7 +397,7 @@ export function useAssignFraudCase() {
       caseId: string;
       adminId: string;
     }) => {
-      const supabase = createClient();
+      const supabase = getClient();
 
       const { data, error } = await supabase
         .from('fraud_cases')
@@ -428,7 +428,7 @@ export function useAddFraudEvidence() {
 
   return useMutation({
     mutationFn: async (evidence: Omit<FraudEvidence, 'id' | 'uploaded_at'>) => {
-      const supabase = createClient();
+      const supabase = getClient();
 
       const { data, error } = await supabase
         .from('fraud_evidence')

@@ -1,6 +1,9 @@
 import { createClient } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
+import type { Database } from '@/types/database';
+
+type TaskRow = Database['public']['Tables']['tasks']['Row'];
 
 /**
  * Task Queue API Endpoint
@@ -17,8 +20,8 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get('limit') || '50');
 
     // Build query
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (supabase.from('tasks') as any)
+    let query = supabase
+      .from('tasks')
       .select(
         `
         id,
@@ -44,13 +47,13 @@ export async function GET(request: Request) {
       .limit(limit);
 
     if (status && status !== 'all') {
-      query = query.eq('status', status);
+      query = query.eq('status', status as TaskRow['status']);
     }
     if (type && type !== 'all') {
       query = query.eq('type', type);
     }
     if (priority && priority !== 'all') {
-      query = query.eq('priority', priority);
+      query = query.eq('priority', priority as TaskRow['priority']);
     }
 
     const { data: tasks, error: tasksError } = await query;
@@ -67,30 +70,36 @@ export async function GET(request: Request) {
       urgentCount,
       overdueCount,
     ] = await Promise.all([
-      (supabase.from('tasks') as any)
+      supabase
+        .from('tasks')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'pending'),
-      (supabase.from('tasks') as any)
+      supabase
+        .from('tasks')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'in_progress'),
-      (supabase.from('tasks') as any)
+      supabase
+        .from('tasks')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'completed'),
-      (supabase.from('tasks') as any)
+      supabase
+        .from('tasks')
         .select('*', { count: 'exact', head: true })
         .eq('priority', 'urgent'),
-      (supabase.from('tasks') as any)
+      supabase
+        .from('tasks')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'pending')
         .lt('due_date', new Date().toISOString()),
     ]);
 
     // Get task types for filter
-    const { data: taskTypes } = await (supabase.from('tasks') as any)
+    const { data: taskTypes } = await supabase
+      .from('tasks')
       .select('type')
       .not('type', 'is', null);
 
-    const uniqueTypes = [...new Set(taskTypes?.map((t: any) => t.type) || [])];
+    const uniqueTypes = [...new Set(taskTypes?.map((t) => t.type) || [])];
 
     return NextResponse.json({
       tasks: tasks || [],
@@ -139,13 +148,14 @@ export async function POST(request: Request) {
     const supabase = createClient();
     const body = await request.json();
 
-    const { data, error } = await (supabase.from('tasks') as any)
+    const { data, error } = await supabase
+      .from('tasks')
       .insert({
         title: body.title,
         description: body.description,
         type: body.type || 'general',
         status: 'pending',
-        priority: body.priority || 'medium',
+        priority: (body.priority || 'medium') as TaskRow['priority'],
         assigned_to: body.assigned_to,
         due_date: body.due_date,
         metadata: body.metadata || {},
@@ -173,7 +183,8 @@ export async function PATCH(request: Request) {
     const body = await request.json();
     const { id, ...updates } = body;
 
-    const { data, error } = await (supabase.from('tasks') as any)
+    const { data, error } = await supabase
+      .from('tasks')
       .update({
         ...updates,
         updated_at: new Date().toISOString(),
@@ -206,9 +217,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'Task ID required' }, { status: 400 });
     }
 
-    const { error } = await (supabase.from('tasks') as any)
-      .delete()
-      .eq('id', id);
+    const { error } = await supabase.from('tasks').delete().eq('id', id);
 
     if (error) {
       throw error;

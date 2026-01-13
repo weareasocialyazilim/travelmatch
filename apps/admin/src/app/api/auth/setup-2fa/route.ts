@@ -73,10 +73,8 @@ export async function GET(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Get admin user
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: adminUser, error: userError } = await (
-      supabase.from('admin_users') as any
-    )
+    const { data: adminUser, error: userError } = await supabase
+      .from('admin_users')
       .select('id, email, totp_enabled')
       .eq('id', session.admin.id)
       .eq('is_active', true)
@@ -103,8 +101,8 @@ export async function GET(request: NextRequest) {
     // Encrypt and store the secret temporarily (not enabled yet)
     const encryptedSecret = encrypt(secret);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from('admin_users') as any)
+    await supabase
+      .from('admin_users')
       .update({
         totp_secret: encryptedSecret,
         totp_enabled: false, // Will be enabled after verification
@@ -117,10 +115,10 @@ export async function GET(request: NextRequest) {
       request.headers.get('x-real-ip');
     const userAgent = request.headers.get('user-agent');
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from('audit_logs') as any).insert({
+    await supabase.from('audit_logs').insert({
       admin_id: session.admin.id,
       action: '2fa_setup_initiated',
+      resource_type: 'auth',
       ip_address: clientIp,
       user_agent: userAgent,
     });
@@ -167,10 +165,8 @@ export async function POST(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Get admin user with pending TOTP secret
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: adminUser, error: userError } = await (
-      supabase.from('admin_users') as any
-    )
+    const { data: adminUser, error: userError } = await supabase
+      .from('admin_users')
       .select('id, totp_secret, totp_enabled')
       .eq('id', session.admin.id)
       .eq('is_active', true)
@@ -239,10 +235,10 @@ export async function POST(request: NextRequest) {
 
     if (!isValid) {
       // Log failed attempt
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase.from('audit_logs') as any).insert({
+      await supabase.from('audit_logs').insert({
         admin_id: session.admin.id,
         action: '2fa_setup_verification_failed',
+        resource_type: 'auth',
         ip_address: clientIp,
         user_agent: userAgent,
       });
@@ -254,16 +250,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Enable 2FA
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from('admin_users') as any)
+    await supabase
+      .from('admin_users')
       .update({ totp_enabled: true })
       .eq('id', session.admin.id);
 
     // Log successful setup
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from('audit_logs') as any).insert({
+    await supabase.from('audit_logs').insert({
       admin_id: session.admin.id,
       action: '2fa_enabled',
+      resource_type: 'auth',
       ip_address: clientIp,
       user_agent: userAgent,
     });
@@ -308,17 +304,12 @@ export async function DELETE(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Get admin user
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: adminUserData, error: userError } = await (
-      supabase.from('admin_users') as any
-    )
+    const { data: adminUser, error: userError } = await supabase
+      .from('admin_users')
       .select('id, totp_secret, totp_enabled')
       .eq('id', session.admin.id)
       .eq('is_active', true)
       .single();
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const adminUser = adminUserData as any;
 
     if (userError || !adminUser) {
       return NextResponse.json(
@@ -369,8 +360,8 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Disable 2FA
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from('admin_users') as any)
+    await supabase
+      .from('admin_users')
       .update({
         totp_enabled: false,
         totp_secret: null,
@@ -383,10 +374,10 @@ export async function DELETE(request: NextRequest) {
       request.headers.get('x-real-ip');
     const userAgent = request.headers.get('user-agent');
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from('audit_logs') as any).insert({
+    await supabase.from('audit_logs').insert({
       admin_id: session.admin.id,
       action: '2fa_disabled',
+      resource_type: 'auth',
       ip_address: clientIp,
       user_agent: userAgent,
     });

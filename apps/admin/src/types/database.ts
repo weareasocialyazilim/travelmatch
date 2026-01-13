@@ -550,7 +550,12 @@ export interface Database {
           user_id: string;
           amount: number;
           currency: string;
-          status: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded';
+          status:
+            | 'pending'
+            | 'processing'
+            | 'completed'
+            | 'failed'
+            | 'refunded';
           type: string;
           payment_method: string | null;
           transaction_id: string | null;
@@ -563,7 +568,12 @@ export interface Database {
           user_id: string;
           amount: number;
           currency?: string;
-          status?: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded';
+          status?:
+            | 'pending'
+            | 'processing'
+            | 'completed'
+            | 'failed'
+            | 'refunded';
           type: string;
           payment_method?: string | null;
           transaction_id?: string | null;
@@ -576,7 +586,12 @@ export interface Database {
           user_id?: string;
           amount?: number;
           currency?: string;
-          status?: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded';
+          status?:
+            | 'pending'
+            | 'processing'
+            | 'completed'
+            | 'failed'
+            | 'refunded';
           type?: string;
           payment_method?: string | null;
           transaction_id?: string | null;
@@ -622,6 +637,783 @@ export interface Database {
           ip_address?: string | null;
           user_agent?: string | null;
           created_at?: string;
+        };
+      };
+      // Escrow transactions table
+      escrow_transactions: {
+        Row: {
+          id: string;
+          sender_id: string;
+          recipient_id: string;
+          moment_id: string | null;
+          amount: number;
+          currency: string;
+          status: 'pending' | 'released' | 'refunded' | 'expired' | 'disputed';
+          expires_at: string | null;
+          released_at: string | null;
+          released_by: string | null;
+          refunded_at: string | null;
+          refunded_by: string | null;
+          refund_reason: string | null;
+          admin_notes: string | null;
+          metadata: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          sender_id: string;
+          recipient_id: string;
+          moment_id?: string | null;
+          amount: number;
+          currency?: string;
+          status?: 'pending' | 'released' | 'refunded' | 'expired' | 'disputed';
+          expires_at?: string | null;
+          released_at?: string | null;
+          released_by?: string | null;
+          refunded_at?: string | null;
+          refunded_by?: string | null;
+          refund_reason?: string | null;
+          admin_notes?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          sender_id?: string;
+          recipient_id?: string;
+          moment_id?: string | null;
+          amount?: number;
+          currency?: string;
+          status?: 'pending' | 'released' | 'refunded' | 'expired' | 'disputed';
+          expires_at?: string | null;
+          released_at?: string | null;
+          released_by?: string | null;
+          refunded_at?: string | null;
+          refunded_by?: string | null;
+          refund_reason?: string | null;
+          admin_notes?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      // Disputes table
+      disputes: {
+        Row: {
+          id: string;
+          requester_id: string;
+          responder_id: string;
+          request_id: string | null;
+          reason: string;
+          description: string | null;
+          priority: 'low' | 'medium' | 'high' | 'urgent';
+          status:
+            | 'pending'
+            | 'under_review'
+            | 'resolved'
+            | 'closed'
+            | 'escalated';
+          assigned_to: string | null;
+          resolution: string | null;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          metadata: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          requester_id: string;
+          responder_id: string;
+          request_id?: string | null;
+          reason: string;
+          description?: string | null;
+          priority?: 'low' | 'medium' | 'high' | 'urgent';
+          status?:
+            | 'pending'
+            | 'under_review'
+            | 'resolved'
+            | 'closed'
+            | 'escalated';
+          assigned_to?: string | null;
+          resolution?: string | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          requester_id?: string;
+          responder_id?: string;
+          request_id?: string | null;
+          reason?: string;
+          description?: string | null;
+          priority?: 'low' | 'medium' | 'high' | 'urgent';
+          status?:
+            | 'pending'
+            | 'under_review'
+            | 'resolved'
+            | 'closed'
+            | 'escalated';
+          assigned_to?: string | null;
+          resolution?: string | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      // KYC submissions table
+      kyc_submissions: {
+        Row: {
+          id: string;
+          user_id: string;
+          status: 'pending' | 'approved' | 'rejected' | 'verified';
+          document_type: string | null;
+          document_url: string | null;
+          selfie_url: string | null;
+          reviewed_by: string | null;
+          reviewed_at: string | null;
+          rejection_reason: string | null;
+          notes: string | null;
+          metadata: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          status?: 'pending' | 'approved' | 'rejected' | 'verified';
+          document_type?: string | null;
+          document_url?: string | null;
+          selfie_url?: string | null;
+          reviewed_by?: string | null;
+          reviewed_at?: string | null;
+          rejection_reason?: string | null;
+          notes?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          status?: 'pending' | 'approved' | 'rejected' | 'verified';
+          document_type?: string | null;
+          document_url?: string | null;
+          selfie_url?: string | null;
+          reviewed_by?: string | null;
+          reviewed_at?: string | null;
+          rejection_reason?: string | null;
+          notes?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      // Suspicious activity reports table
+      suspicious_activity_reports: {
+        Row: {
+          id: string;
+          user_id: string;
+          report_type: string;
+          triggered_rules: string[];
+          risk_score: number;
+          total_amount: number | null;
+          currency: string;
+          status:
+            | 'pending'
+            | 'under_review'
+            | 'cleared'
+            | 'confirmed'
+            | 'reported';
+          assigned_to: string | null;
+          investigation_notes: string | null;
+          reported_to: string | null;
+          reported_at: string | null;
+          resolved_at: string | null;
+          metadata: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          report_type?: string;
+          triggered_rules?: string[];
+          risk_score?: number;
+          total_amount?: number | null;
+          currency?: string;
+          status?:
+            | 'pending'
+            | 'under_review'
+            | 'cleared'
+            | 'confirmed'
+            | 'reported';
+          assigned_to?: string | null;
+          investigation_notes?: string | null;
+          reported_to?: string | null;
+          reported_at?: string | null;
+          resolved_at?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          report_type?: string;
+          triggered_rules?: string[];
+          risk_score?: number;
+          total_amount?: number | null;
+          currency?: string;
+          status?:
+            | 'pending'
+            | 'under_review'
+            | 'cleared'
+            | 'confirmed'
+            | 'reported';
+          assigned_to?: string | null;
+          investigation_notes?: string | null;
+          reported_to?: string | null;
+          reported_at?: string | null;
+          resolved_at?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      // User risk profiles table
+      user_risk_profiles: {
+        Row: {
+          id: string;
+          user_id: string;
+          risk_level: 'low' | 'medium' | 'high' | 'critical';
+          risk_score: number;
+          is_blocked: boolean;
+          block_reason: string | null;
+          blocked_at: string | null;
+          last_reviewed_at: string | null;
+          reviewed_by: string | null;
+          metadata: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          risk_level?: 'low' | 'medium' | 'high' | 'critical';
+          risk_score?: number;
+          is_blocked?: boolean;
+          block_reason?: string | null;
+          blocked_at?: string | null;
+          last_reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          risk_level?: 'low' | 'medium' | 'high' | 'critical';
+          risk_score?: number;
+          is_blocked?: boolean;
+          block_reason?: string | null;
+          blocked_at?: string | null;
+          last_reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      // AML thresholds table
+      aml_thresholds: {
+        Row: {
+          id: string;
+          name: string;
+          currency: string;
+          threshold_amount: number;
+          risk_score: number;
+          is_active: boolean;
+          description: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          currency?: string;
+          threshold_amount: number;
+          risk_score?: number;
+          is_active?: boolean;
+          description?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          currency?: string;
+          threshold_amount?: number;
+          risk_score?: number;
+          is_active?: boolean;
+          description?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      // Fraud rules table
+      fraud_rules: {
+        Row: {
+          id: string;
+          name: string;
+          rule_type: string;
+          condition: Json;
+          risk_score: number;
+          is_active: boolean;
+          action: string;
+          description: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          rule_type: string;
+          condition?: Json;
+          risk_score?: number;
+          is_active?: boolean;
+          action?: string;
+          description?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          rule_type?: string;
+          condition?: Json;
+          risk_score?: number;
+          is_active?: boolean;
+          action?: string;
+          description?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      // Support tickets table
+      support_tickets: {
+        Row: {
+          id: string;
+          user_id: string;
+          subject: string;
+          description: string;
+          status: 'open' | 'pending' | 'in_progress' | 'resolved' | 'closed';
+          priority: 'low' | 'medium' | 'high' | 'urgent';
+          category: string;
+          assigned_to: string | null;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          metadata: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          subject: string;
+          description: string;
+          status?: 'open' | 'pending' | 'in_progress' | 'resolved' | 'closed';
+          priority?: 'low' | 'medium' | 'high' | 'urgent';
+          category?: string;
+          assigned_to?: string | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          subject?: string;
+          description?: string;
+          status?: 'open' | 'pending' | 'in_progress' | 'resolved' | 'closed';
+          priority?: 'low' | 'medium' | 'high' | 'urgent';
+          category?: string;
+          assigned_to?: string | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      // Canned responses table
+      canned_responses: {
+        Row: {
+          id: string;
+          title: string;
+          content: string;
+          category: string;
+          is_active: boolean;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          content: string;
+          category?: string;
+          is_active?: boolean;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          content?: string;
+          category?: string;
+          is_active?: boolean;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      // Wallets table
+      wallets: {
+        Row: {
+          id: string;
+          user_id: string;
+          available_balance: number;
+          pending_balance: number;
+          currency: string;
+          is_frozen: boolean;
+          frozen_reason: string | null;
+          frozen_at: string | null;
+          frozen_by: string | null;
+          metadata: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          available_balance?: number;
+          pending_balance?: number;
+          currency?: string;
+          is_frozen?: boolean;
+          frozen_reason?: string | null;
+          frozen_at?: string | null;
+          frozen_by?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          available_balance?: number;
+          pending_balance?: number;
+          currency?: string;
+          is_frozen?: boolean;
+          frozen_reason?: string | null;
+          frozen_at?: string | null;
+          frozen_by?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      // Transactions table
+      transactions: {
+        Row: {
+          id: string;
+          sender_id: string | null;
+          receiver_id: string | null;
+          user_id: string | null;
+          moment_id: string | null;
+          amount: number;
+          currency: string;
+          type:
+            | 'gift'
+            | 'withdrawal'
+            | 'refund'
+            | 'deposit'
+            | 'subscription'
+            | 'boost'
+            | 'transfer';
+          status:
+            | 'pending'
+            | 'processing'
+            | 'completed'
+            | 'failed'
+            | 'cancelled';
+          description: string | null;
+          reference: string | null;
+          metadata: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          sender_id?: string | null;
+          receiver_id?: string | null;
+          user_id?: string | null;
+          moment_id?: string | null;
+          amount: number;
+          currency?: string;
+          type:
+            | 'gift'
+            | 'withdrawal'
+            | 'refund'
+            | 'deposit'
+            | 'subscription'
+            | 'boost'
+            | 'transfer';
+          status?:
+            | 'pending'
+            | 'processing'
+            | 'completed'
+            | 'failed'
+            | 'cancelled';
+          description?: string | null;
+          reference?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          sender_id?: string | null;
+          receiver_id?: string | null;
+          user_id?: string | null;
+          moment_id?: string | null;
+          amount?: number;
+          currency?: string;
+          type?:
+            | 'gift'
+            | 'withdrawal'
+            | 'refund'
+            | 'deposit'
+            | 'subscription'
+            | 'boost'
+            | 'transfer';
+          status?:
+            | 'pending'
+            | 'processing'
+            | 'completed'
+            | 'failed'
+            | 'cancelled';
+          description?: string | null;
+          reference?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      // Feature flags table
+      feature_flags: {
+        Row: {
+          id: string;
+          name: string;
+          description: string | null;
+          enabled: boolean;
+          category: string;
+          rollout_percentage: number;
+          environments: string[];
+          metadata: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          description?: string | null;
+          enabled?: boolean;
+          category?: string;
+          rollout_percentage?: number;
+          environments?: string[];
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          description?: string | null;
+          enabled?: boolean;
+          category?: string;
+          rollout_percentage?: number;
+          environments?: string[];
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      // Subscriptions table
+      subscriptions: {
+        Row: {
+          id: string;
+          user_id: string;
+          plan: string;
+          amount: number;
+          currency: string;
+          status: 'active' | 'cancelled' | 'expired' | 'paused';
+          started_at: string;
+          expires_at: string | null;
+          cancelled_at: string | null;
+          metadata: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          plan: string;
+          amount: number;
+          currency?: string;
+          status?: 'active' | 'cancelled' | 'expired' | 'paused';
+          started_at?: string;
+          expires_at?: string | null;
+          cancelled_at?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          plan?: string;
+          amount?: number;
+          currency?: string;
+          status?: 'active' | 'cancelled' | 'expired' | 'paused';
+          started_at?: string;
+          expires_at?: string | null;
+          cancelled_at?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      // Matches table
+      matches: {
+        Row: {
+          id: string;
+          user1_id: string;
+          user2_id: string;
+          status: 'pending' | 'matched' | 'rejected' | 'unmatched';
+          matched_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user1_id: string;
+          user2_id: string;
+          status?: 'pending' | 'matched' | 'rejected' | 'unmatched';
+          matched_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user1_id?: string;
+          user2_id?: string;
+          status?: 'pending' | 'matched' | 'rejected' | 'unmatched';
+          matched_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      // Reports table
+      reports: {
+        Row: {
+          id: string;
+          reporter_id: string;
+          reported_user_id: string;
+          reason: string;
+          description: string | null;
+          status: 'pending' | 'reviewed' | 'resolved' | 'dismissed';
+          resolved_by: string | null;
+          resolved_at: string | null;
+          metadata: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          reporter_id: string;
+          reported_user_id: string;
+          reason: string;
+          description?: string | null;
+          status?: 'pending' | 'reviewed' | 'resolved' | 'dismissed';
+          resolved_by?: string | null;
+          resolved_at?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          reporter_id?: string;
+          reported_user_id?: string;
+          reason?: string;
+          description?: string | null;
+          status?: 'pending' | 'reviewed' | 'resolved' | 'dismissed';
+          resolved_by?: string | null;
+          resolved_at?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      // User commission settings table (VIP users)
+      user_commission_settings: {
+        Row: {
+          id: string;
+          user_id: string;
+          tier: 'vip' | 'influencer' | 'partner';
+          commission_override: number;
+          giver_pays_commission: boolean;
+          valid_until: string | null;
+          reason: string | null;
+          granted_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          tier: 'vip' | 'influencer' | 'partner';
+          commission_override?: number;
+          giver_pays_commission?: boolean;
+          valid_until?: string | null;
+          reason?: string | null;
+          granted_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          tier?: 'vip' | 'influencer' | 'partner';
+          commission_override?: number;
+          giver_pays_commission?: boolean;
+          valid_until?: string | null;
+          reason?: string | null;
+          granted_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
         };
       };
       // Users table for admin operations

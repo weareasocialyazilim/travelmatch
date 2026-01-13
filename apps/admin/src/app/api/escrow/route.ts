@@ -2,6 +2,10 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
+import type { Database } from '@/types/database';
+
+type EscrowTransactionRow =
+  Database['public']['Tables']['escrow_transactions']['Row'];
 
 export async function GET(request: NextRequest) {
   try {
@@ -22,8 +26,8 @@ export async function GET(request: NextRequest) {
 
     const supabase = createServiceClient();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (supabase.from('escrow_transactions') as any)
+    let query = supabase
+      .from('escrow_transactions')
       .select(
         `
         *,
@@ -37,7 +41,7 @@ export async function GET(request: NextRequest) {
       .range(offset, offset + limit - 1);
 
     if (status) {
-      query = query.eq('status', status);
+      query = query.eq('status', status as EscrowTransactionRow['status']);
     }
 
     if (userId) {
@@ -55,37 +59,22 @@ export async function GET(request: NextRequest) {
     }
 
     // Calculate summary
-    type EscrowTransaction = { status?: string; amount?: number };
     const summary = {
       total: count || 0,
       pending:
-        escrowTransactions?.filter(
-          (e: EscrowTransaction) => e.status === 'pending',
-        ).length || 0,
+        escrowTransactions?.filter((e) => e.status === 'pending').length || 0,
       released:
-        escrowTransactions?.filter(
-          (e: EscrowTransaction) => e.status === 'released',
-        ).length || 0,
+        escrowTransactions?.filter((e) => e.status === 'released').length || 0,
       refunded:
-        escrowTransactions?.filter(
-          (e: EscrowTransaction) => e.status === 'refunded',
-        ).length || 0,
+        escrowTransactions?.filter((e) => e.status === 'refunded').length || 0,
       expired:
-        escrowTransactions?.filter(
-          (e: EscrowTransaction) => e.status === 'expired',
-        ).length || 0,
+        escrowTransactions?.filter((e) => e.status === 'expired').length || 0,
       totalAmount:
-        escrowTransactions?.reduce(
-          (sum: number, e: EscrowTransaction) => sum + (e.amount || 0),
-          0,
-        ) || 0,
+        escrowTransactions?.reduce((sum, e) => sum + (e.amount || 0), 0) || 0,
       pendingAmount:
         escrowTransactions
-          ?.filter((e: EscrowTransaction) => e.status === 'pending')
-          .reduce(
-            (sum: number, e: EscrowTransaction) => sum + (e.amount || 0),
-            0,
-          ) || 0,
+          ?.filter((e) => e.status === 'pending')
+          .reduce((sum, e) => sum + (e.amount || 0), 0) || 0,
     };
 
     return NextResponse.json({
@@ -132,10 +121,8 @@ export async function POST(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Get current escrow transaction
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: escrow, error: fetchError } = await (
-      supabase.from('escrow_transactions') as any
-    )
+    const { data: escrow, error: fetchError } = await supabase
+      .from('escrow_transactions')
       .select('*')
       .eq('id', escrow_id)
       .single();
@@ -190,10 +177,8 @@ export async function POST(request: NextRequest) {
         break;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: updated, error: updateError } = await (
-      supabase.from('escrow_transactions') as any
-    )
+    const { data: updated, error: updateError } = await supabase
+      .from('escrow_transactions')
       .update(updates)
       .eq('id', escrow_id)
       .select()

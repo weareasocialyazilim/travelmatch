@@ -1,6 +1,9 @@
 import { createClient } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
+import type { Database } from '@/types/database';
+
+type SupportTicketRow = Database['public']['Tables']['support_tickets']['Row'];
 
 /**
  * Support Tickets API Endpoint
@@ -16,8 +19,8 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get('limit') || '50');
 
     // Build query
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (supabase.from('support_tickets') as any)
+    let query = supabase
+      .from('support_tickets')
       .select(
         `
         id,
@@ -42,10 +45,10 @@ export async function GET(request: Request) {
       .limit(limit);
 
     if (status && status !== 'all') {
-      query = query.eq('status', status);
+      query = query.eq('status', status as SupportTicketRow['status']);
     }
     if (priority && priority !== 'all') {
-      query = query.eq('priority', priority);
+      query = query.eq('priority', priority as SupportTicketRow['priority']);
     }
 
     const { data: tickets, error: ticketsError } = await query;
@@ -57,25 +60,26 @@ export async function GET(request: Request) {
     // Get ticket stats
     const [openCount, pendingCount, resolvedCount, totalCount] =
       await Promise.all([
-        (supabase.from('support_tickets') as any)
+        supabase
+          .from('support_tickets')
           .select('*', { count: 'exact', head: true })
           .eq('status', 'open'),
-        (supabase.from('support_tickets') as any)
+        supabase
+          .from('support_tickets')
           .select('*', { count: 'exact', head: true })
           .eq('status', 'pending'),
-        (supabase.from('support_tickets') as any)
+        supabase
+          .from('support_tickets')
           .select('*', { count: 'exact', head: true })
           .eq('status', 'resolved'),
-        (supabase.from('support_tickets') as any).select('*', {
-          count: 'exact',
-          head: true,
-        }),
+        supabase
+          .from('support_tickets')
+          .select('*', { count: 'exact', head: true }),
       ]);
 
     // Get canned responses
-    const { data: cannedResponses } = await (
-      supabase.from('canned_responses') as any
-    )
+    const { data: cannedResponses } = await supabase
+      .from('canned_responses')
       .select('id, title, content, category')
       .order('title');
 
@@ -114,11 +118,12 @@ export async function POST(request: Request) {
     const supabase = createClient();
     const body = await request.json();
 
-    const { data, error } = await (supabase.from('support_tickets') as any)
+    const { data, error } = await supabase
+      .from('support_tickets')
       .insert({
         subject: body.subject,
         description: body.description,
-        priority: body.priority || 'medium',
+        priority: (body.priority || 'medium') as SupportTicketRow['priority'],
         category: body.category || 'general',
         status: 'open',
         user_id: body.user_id,
@@ -146,7 +151,8 @@ export async function PATCH(request: Request) {
     const body = await request.json();
     const { id, ...updates } = body;
 
-    const { data, error } = await (supabase.from('support_tickets') as any)
+    const { data, error } = await supabase
+      .from('support_tickets')
       .update({
         ...updates,
         updated_at: new Date().toISOString(),
