@@ -181,7 +181,7 @@ export default function CeremonyManagementPage() {
                       onClick={() => setSelectedProof(proof)}
                       className={`w-full text-left p-3 rounded-lg border transition-colors ${
                         selectedProof.id === proof.id
-                          ? 'border-amber-500 bg-amber-50'
+                          ? 'border-amber-500 bg-amber-500/10 dark:bg-amber-500/20'
                           : 'border-border hover:border-border'
                       }`}
                     >
