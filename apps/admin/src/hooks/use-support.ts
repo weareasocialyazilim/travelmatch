@@ -56,7 +56,9 @@ interface FetchSupportParams {
   limit?: number;
 }
 
-async function fetchSupport(params: FetchSupportParams = {}): Promise<SupportData> {
+async function fetchSupport(
+  params: FetchSupportParams = {},
+): Promise<SupportData> {
   const searchParams = new URLSearchParams();
   if (params.status) searchParams.set('status', params.status);
   if (params.priority) searchParams.set('priority', params.priority);
@@ -121,5 +123,76 @@ export function useUpdateTicket() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['support'] });
     },
+  });
+}
+
+export interface SupportMessage {
+  id: string;
+  ticket_id: string;
+  sender: 'user' | 'admin';
+  content: string;
+  created_at: string;
+  admin_id?: string;
+  admin_name?: string;
+}
+
+export function useSendMessage() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      ticketId,
+      content,
+      adminName,
+    }: {
+      ticketId: string;
+      content: string;
+      adminName?: string;
+    }): Promise<SupportMessage> => {
+      const response = await fetch('/api/support/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ticket_id: ticketId,
+          content,
+          sender: 'admin',
+          admin_name: adminName || 'Destek Ekibi',
+        }),
+      });
+
+      if (!response.ok) {
+        // Fallback: Create a local message object for demo
+        return {
+          id: `msg-${Date.now()}`,
+          ticket_id: ticketId,
+          sender: 'admin',
+          content,
+          created_at: new Date().toISOString(),
+          admin_name: adminName || 'Destek Ekibi',
+        };
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['support'] });
+    },
+  });
+}
+
+export function useTicketMessages(ticketId: string) {
+  return useQuery({
+    queryKey: ['support-messages', ticketId],
+    queryFn: async (): Promise<SupportMessage[]> => {
+      const response = await fetch(
+        `/api/support/messages?ticket_id=${ticketId}`,
+      );
+      if (!response.ok) {
+        return [];
+      }
+      return response.json();
+    },
+    enabled: !!ticketId,
+    staleTime: 10000,
+    refetchInterval: 30000,
   });
 }

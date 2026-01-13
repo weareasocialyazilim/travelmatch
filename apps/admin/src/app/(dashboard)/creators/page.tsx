@@ -2,299 +2,479 @@
 
 import { useState } from 'react';
 import {
+  Star,
   Users,
   TrendingUp,
+  DollarSign,
+  Eye,
+  Heart,
+  Award,
+  Crown,
   CheckCircle,
+  Clock,
   XCircle,
-  Instagram,
-  ThumbsUp,
-  ThumbsDown,
-  ClipboardList,
-  Send,
-  ExternalLink,
-  MapPin,
-  BarChart3,
+  Search,
+  Filter,
+  MoreHorizontal,
   ChevronRight,
-  Globe2,
+  Camera,
+  Sparkles,
 } from 'lucide-react';
 import { CanvaButton } from '@/components/canva/CanvaButton';
+import { CanvaInput } from '@/components/canva/CanvaInput';
 import {
   CanvaCard,
+  CanvaCardHeader,
+  CanvaCardTitle,
+  CanvaCardSubtitle,
   CanvaCardBody,
   CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
+import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
-// 15 Şehir Hub Verisi
-const cityHubs = [
-  { name: 'İstanbul', applicants: 24, ambassadors: 12, growth: '+15%' },
-  { name: 'Roma', applicants: 12, ambassadors: 8, growth: '+5%' },
-  { name: 'Paris', applicants: 18, ambassadors: 9, growth: '+8%' },
-  { name: 'Tokyo', applicants: 32, ambassadors: 6, growth: '+22%' },
-  { name: 'Dubai', applicants: 15, ambassadors: 11, growth: '+12%' },
-  { name: 'New York', applicants: 45, ambassadors: 20, growth: '+30%' },
-  { name: 'Seul', applicants: 28, ambassadors: 5, growth: '+18%' },
-  { name: 'Rio de Janeiro', applicants: 10, ambassadors: 4, growth: '+2%' },
-  { name: 'Marakeş', applicants: 7, ambassadors: 3, growth: '+4%' },
-  { name: 'Amsterdam', applicants: 14, ambassadors: 7, growth: '+9%' },
-  { name: 'Los Angeles', applicants: 22, ambassadors: 14, growth: '+11%' },
-  { name: 'Atina', applicants: 6, ambassadors: 4, growth: '0%' },
-  { name: 'Singapur', applicants: 19, ambassadors: 8, growth: '+14%' },
-  { name: 'Sidney', applicants: 11, ambassadors: 5, growth: '+6%' },
-  { name: 'Reykjavik', applicants: 5, ambassadors: 2, growth: '+25%' },
+// Mock data
+const creatorStats = {
+  total_creators: 1247,
+  verified_creators: 856,
+  pending_applications: 42,
+  total_earnings: 89450,
+  avg_engagement: 4.8,
+};
+
+const creators = [
+  {
+    id: '1',
+    name: 'Ayşe Yılmaz',
+    username: '@ayse_travels',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ayse',
+    tier: 'gold',
+    followers: 45200,
+    moments: 234,
+    earnings: 12450,
+    engagement: 5.2,
+    verified: true,
+    joined: '2024-01-15',
+    status: 'active',
+  },
+  {
+    id: '2',
+    name: 'Mehmet Kaya',
+    username: '@mehmet_adventures',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=mehmet',
+    tier: 'platinum',
+    followers: 89300,
+    moments: 456,
+    earnings: 28900,
+    engagement: 6.1,
+    verified: true,
+    joined: '2023-08-20',
+    status: 'active',
+  },
+  {
+    id: '3',
+    name: 'Zeynep Demir',
+    username: '@zeynep_world',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=zeynep',
+    tier: 'silver',
+    followers: 12800,
+    moments: 89,
+    earnings: 3200,
+    engagement: 4.5,
+    verified: true,
+    joined: '2024-06-10',
+    status: 'active',
+  },
+  {
+    id: '4',
+    name: 'Can Öztürk',
+    username: '@can_explorer',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=can',
+    tier: 'bronze',
+    followers: 5400,
+    moments: 45,
+    earnings: 890,
+    engagement: 3.8,
+    verified: false,
+    joined: '2024-09-01',
+    status: 'active',
+  },
 ];
 
-// Güncellenmiş Profesyonel Veri Modeli
 const applications = [
   {
     id: 'app_1',
     name: 'Elif Arslan',
     username: '@elif_journey',
-    platform: 'Instagram',
-    social_link: 'https://instagram.com/elif_journey',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=elif',
     followers: 8500,
-    applied_at: '16.12.2024',
+    moments: 67,
+    engagement: 4.2,
+    applied_at: '2024-12-16',
     status: 'pending',
-    votes: { approve: 3, reject: 0 },
+    notes: 'İstanbul ve Kapadokya içerikleri güçlü',
+  },
+  {
+    id: 'app_2',
+    name: 'Burak Şahin',
+    username: '@burak_nomad',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=burak',
+    followers: 12300,
+    moments: 89,
+    engagement: 5.1,
+    applied_at: '2024-12-15',
+    status: 'pending',
+    notes: 'Avrupa seyahatleri odaklı',
+  },
+  {
+    id: 'app_3',
+    name: 'Selin Yıldız',
+    username: '@selin_wanders',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=selin',
+    followers: 3200,
+    moments: 34,
+    engagement: 3.5,
+    applied_at: '2024-12-14',
+    status: 'review',
+    notes: 'Takipçi sayısı düşük ama içerik kalitesi iyi',
   },
 ];
 
+const tierConfig = {
+  bronze: { color: 'bg-amber-700', icon: Award, min: 0, max: 5000 },
+  silver: { color: 'bg-gray-400', icon: Award, min: 5000, max: 25000 },
+  gold: { color: 'bg-yellow-500', icon: Star, min: 25000, max: 100000 },
+  platinum: { color: 'bg-purple-500', icon: Crown, min: 100000, max: Infinity },
+};
+
 export default function CreatorsPage() {
-  const [selectedApp, setSelectedApp] = useState<any>(null);
-  const [evaluationNote, setEvaluationNote] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [tierFilter, setTierFilter] = useState('all');
+
+  const getTierBadge = (tier: string) => {
+    const config = tierConfig[tier as keyof typeof tierConfig];
+    const Icon = config.icon;
+    return (
+      <CanvaBadge className={`${config.color} text-white`}>
+        <Icon className="mr-1 h-3 w-3" />
+        {tier.charAt(0).toUpperCase() + tier.slice(1)}
+      </CanvaBadge>
+    );
+  };
 
   const formatNumber = (num: number) => {
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
     if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
     return num.toString();
   };
 
   return (
     <div className="space-y-6">
-      {/* Sayfa Başlığı ve Genel İstatistikler */}
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 uppercase">
-            İçerik Üreticisi Programı
-          </h1>
-          <p className="text-muted-foreground text-sm font-medium">
-            Marka elçilerini ve bölgesel genişlemeyi yönetin
+          <h1 className="text-3xl font-bold tracking-tight">Creator Program</h1>
+          <p className="text-muted-foreground">
+            İçerik üreticilerini yönet ve takip et
           </p>
         </div>
+        <CanvaButton>
+          <Sparkles className="mr-2 h-4 w-4" />
+          Yeni Creator Ekle
+        </CanvaButton>
       </div>
 
-      <Tabs defaultValue="geographic" className="space-y-4">
-        <TabsList className="bg-slate-100 p-1 rounded-xl">
-          <TabsTrigger value="geographic" className="rounded-lg gap-2">
-            <Globe2 className="h-4 w-4" /> Bölgesel Dağılım
-          </TabsTrigger>
-          <TabsTrigger value="applications" className="rounded-lg">
-            Yeni Başvurular
-            <CanvaBadge className="ml-2 bg-blue-700 text-[10px]">
+      {/* Stats */}
+      <div className="grid gap-4 md:grid-cols-5">
+        <CanvaStatCard
+          label="Toplam Creator"
+          value={creatorStats.total_creators.toLocaleString('tr-TR')}
+          icon={<Users className="h-6 w-6 text-blue-500 dark:text-blue-400" />}
+        />
+        <CanvaStatCard
+          label="Onaylı"
+          value={creatorStats.verified_creators}
+          icon={
+            <CheckCircle className="h-6 w-6 text-green-500 dark:text-green-400" />
+          }
+        />
+        <CanvaStatCard
+          label="Bekleyen"
+          value={creatorStats.pending_applications}
+          icon={
+            <Clock className="h-6 w-6 text-orange-500 dark:text-orange-400" />
+          }
+        />
+        <CanvaStatCard
+          label="Toplam Kazanç"
+          value={`₺${creatorStats.total_earnings.toLocaleString('tr-TR')}`}
+          icon={
+            <DollarSign className="h-6 w-6 text-emerald-500 dark:text-emerald-400" />
+          }
+        />
+        <CanvaStatCard
+          label="Ort. Etkileşim"
+          value={`${creatorStats.avg_engagement}%`}
+          icon={
+            <TrendingUp className="h-6 w-6 text-pink-500 dark:text-pink-400" />
+          }
+        />
+      </div>
+
+      <Tabs defaultValue="creators" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="creators">Creatorlar</TabsTrigger>
+          <TabsTrigger value="applications">
+            Başvurular
+            <CanvaBadge className="ml-2 bg-orange-500">
               {applications.length}
             </CanvaBadge>
           </TabsTrigger>
-          <TabsTrigger value="creators" className="rounded-lg">
-            Aktif Elçiler
-          </TabsTrigger>
+          <TabsTrigger value="tiers">Tier Sistemi</TabsTrigger>
+          <TabsTrigger value="payouts">Ödemeler</TabsTrigger>
         </TabsList>
 
-        {/* Bölgesel Dağılım İçeriği */}
-        <TabsContent value="geographic" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
-              <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">
-                En Aktif Hub
-              </p>
-              <p className="text-xl font-black text-blue-900">NEW YORK</p>
+        <TabsContent value="creators" className="space-y-4">
+          {/* Filters */}
+          <div className="flex items-center gap-4">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Creator ara..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
             </div>
-            <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
-              <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">
-                Global Elçi Sayısı
-              </p>
-              <p className="text-xl font-black text-emerald-900">118</p>
-            </div>
-            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                Toplam Hub
-              </p>
-              <p className="text-xl font-black text-slate-900">15/15</p>
-            </div>
-            <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100">
-              <p className="text-[10px] font-bold text-amber-400 uppercase tracking-widest">
-                Ort. İçerik Kalitesi
-              </p>
-              <p className="text-xl font-black text-amber-900">4.8/5.0</p>
-            </div>
+            <Select value={tierFilter} onValueChange={setTierFilter}>
+              <SelectTrigger className="w-36">
+                <SelectValue placeholder="Tier" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tüm Tierlar</SelectItem>
+                <SelectItem value="platinum">Platinum</SelectItem>
+                <SelectItem value="gold">Gold</SelectItem>
+                <SelectItem value="silver">Silver</SelectItem>
+                <SelectItem value="bronze">Bronze</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          <CanvaCard className="border-slate-200 overflow-hidden shadow-sm">
-            <CanvaCardBody className="p-0">
-              <Table>
-                <TableHeader className="bg-slate-50/50">
-                  <TableRow className="hover:bg-transparent border-slate-100">
-                    <TableHead className="font-bold text-slate-400 uppercase text-[10px] tracking-widest py-5">
-                      Şehir Hub
-                    </TableHead>
-                    <TableHead className="text-center font-bold text-slate-400 uppercase text-[10px] tracking-widest">
-                      Bekleyen Başvuru
-                    </TableHead>
-                    <TableHead className="text-center font-bold text-slate-400 uppercase text-[10px] tracking-widest">
-                      Aktif Elçi
-                    </TableHead>
-                    <TableHead className="text-center font-bold text-slate-400 uppercase text-[10px] tracking-widest">
-                      Büyüme
-                    </TableHead>
-                    <TableHead className="text-right font-bold text-slate-400 uppercase text-[10px] tracking-widest pr-8">
-                      Aksiyon
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {cityHubs.map((hub) => (
-                    <TableRow key={hub.name} className="border-slate-100 group">
-                      <TableCell className="py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-slate-100 rounded-xl group-hover:bg-blue-100 transition-colors">
-                            <MapPin className="h-4 w-4 text-slate-500 group-hover:text-blue-600" />
-                          </div>
-                          <span className="font-bold text-slate-900">
-                            {hub.name}
-                          </span>
+          {/* Creators Grid */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {creators.map((creator) => (
+              <CanvaCard key={creator.id}>
+                <CanvaCardBody>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={creator.avatar} />
+                        <AvatarFallback>{creator.name[0]}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium">{creator.name}</p>
+                          {creator.verified && (
+                            <CheckCircle className="h-4 w-4 text-blue-500 dark:text-blue-400" />
+                          )}
                         </div>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <CanvaBadge className="bg-blue-50 text-blue-700 border-blue-100 font-mono">
-                          {hub.applicants}
-                        </CanvaBadge>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <CanvaBadge className="bg-emerald-50 text-emerald-700 border-emerald-100 font-mono">
-                          {hub.ambassadors}
-                        </CanvaBadge>
-                      </TableCell>
-                      <TableCell className="text-center font-bold text-emerald-600 text-xs">
-                        {hub.growth}
-                      </TableCell>
-                      <TableCell className="text-right pr-8">
+                        <p className="text-sm text-muted-foreground">
+                          {creator.username}
+                        </p>
+                      </div>
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
                         <CanvaButton
                           variant="ghost"
                           size="sm"
-                          className="hover:bg-slate-100 text-slate-400 hover:text-slate-900"
+                          iconOnly
+                          aria-label="Daha fazla seçenek"
                         >
-                          Detayları Gör{' '}
-                          <ChevronRight className="ml-1 h-3 w-3" />
+                          <MoreHorizontal className="h-4 w-4" />
                         </CanvaButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CanvaCardBody>
-          </CanvaCard>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>Profili Görüntüle</DropdownMenuItem>
+                        <DropdownMenuItem>Tier Değiştir</DropdownMenuItem>
+                        <DropdownMenuItem>Mesaj Gönder</DropdownMenuItem>
+                        <DropdownMenuItem className="text-red-600">
+                          Askıya Al
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+
+                  <div className="mt-4">{getTierBadge(creator.tier)}</div>
+
+                  <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      <span>{formatNumber(creator.followers)} takipçi</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Camera className="h-4 w-4 text-muted-foreground" />
+                      <span>{creator.moments} moment</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Heart className="h-4 w-4 text-muted-foreground" />
+                      <span>{creator.engagement}% etkileşim</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4 text-muted-foreground" />
+                      <span>₺{creator.earnings.toLocaleString('tr-TR')}</span>
+                    </div>
+                  </div>
+
+                  <CanvaButton variant="primary" className="mt-4 w-full">
+                    Detayları Gör
+                    <ChevronRight className="ml-2 h-4 w-4" />
+                  </CanvaButton>
+                </CanvaCardBody>
+              </CanvaCard>
+            ))}
+          </div>
         </TabsContent>
 
         <TabsContent value="applications" className="space-y-4">
-          <div className="grid gap-4">
-            {applications.map((app) => (
-              <CanvaCard
-                key={app.id}
-                className="border-slate-200 shadow-sm border-l-4 border-l-blue-600"
-              >
-                <CanvaCardBody className="p-6">
-                  <div className="flex items-center justify-between">
-                    {/* Aday Bilgileri */}
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Creator Başvuruları</CanvaCardTitle>
+              <CanvaCardSubtitle>
+                İnceleme bekleyen başvurular
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
+              <div className="space-y-4">
+                {applications.map((app) => (
+                  <div
+                    key={app.id}
+                    className="flex items-center justify-between rounded-lg border p-4"
+                  >
                     <div className="flex items-center gap-4">
-                      <Avatar className="h-14 w-14 border border-slate-200 shadow-inner">
+                      <Avatar className="h-12 w-12">
                         <AvatarImage src={app.avatar} />
                         <AvatarFallback>{app.name[0]}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <div className="flex items-center gap-2">
-                          <p className="font-bold text-lg text-slate-900 leading-tight">
-                            {app.name}
-                          </p>
-                          <a
-                            href={app.social_link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-slate-400 hover:text-pink-600 transition-colors"
-                          >
-                            <Instagram className="h-4 w-4" />
-                          </a>
-                        </div>
-                        <p className="text-xs font-medium text-slate-500">
-                          {app.username} • {app.platform}
+                        <p className="font-medium">{app.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {app.username}
                         </p>
-                        <p className="text-[10px] text-slate-400 mt-1 uppercase font-bold tracking-tighter italic">
-                          Başvuru Tarihi: {app.applied_at}
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {app.notes}
                         </p>
                       </div>
                     </div>
-
-                    {/* Değerlendirme Metrikleri */}
-                    <div className="flex items-center gap-12">
-                      <div className="text-center border-r pr-8 border-slate-100">
-                        <p className="text-lg font-bold text-slate-900">
-                          {formatNumber(app.followers)}
-                        </p>
-                        <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">
-                          Takipçi
+                    <div className="flex items-center gap-6">
+                      <div className="text-right text-sm">
+                        <p>{formatNumber(app.followers)} takipçi</p>
+                        <p className="text-muted-foreground">
+                          {app.moments} moment
                         </p>
                       </div>
-
-                      <div className="flex flex-col items-center border-r pr-8 border-slate-100">
-                        <p className="text-[10px] text-slate-400 uppercase font-bold mb-2 tracking-widest">
-                          Ekip Oylaması
+                      <div className="text-right text-sm">
+                        <p>{app.engagement}% etkileşim</p>
+                        <p className="text-muted-foreground">
+                          {app.applied_at}
                         </p>
-                        <div className="flex gap-4 font-mono">
-                          <div className="flex items-center gap-1.5 text-emerald-700 font-black bg-emerald-50 px-2.5 py-1 rounded-lg text-xs">
-                            <ThumbsUp className="h-3.5 w-3.5" />{' '}
-                            {app.votes.approve}
-                          </div>
-                          <div className="flex items-center gap-1.5 text-rose-700 font-black bg-rose-50 px-2.5 py-1 rounded-lg text-xs">
-                            <ThumbsDown className="h-3.5 w-3.5" />{' '}
-                            {app.votes.reject}
-                          </div>
-                        </div>
                       </div>
-
-                      {/* Aksiyon Grubu */}
                       <div className="flex gap-2">
-                        <CanvaButton
-                          variant="ghost"
-                          className="text-slate-700 border border-slate-200 hover:bg-slate-50"
-                          onClick={() => setSelectedApp(app)}
-                        >
-                          <ClipboardList className="mr-2 h-4 w-4" />
-                          Profili İncele
+                        <CanvaButton size="sm" variant="primary">
+                          <XCircle className="mr-1 h-4 w-4" />
+                          Reddet
                         </CanvaButton>
-                        <CanvaButton
-                          variant="primary"
-                          className="bg-slate-900 text-white font-bold px-6"
-                        >
-                          Elçi Olarak Ata
+                        <CanvaButton size="sm">
+                          <CheckCircle className="mr-1 h-4 w-4" />
+                          Onayla
                         </CanvaButton>
                       </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CanvaCardBody>
+          </CanvaCard>
+        </TabsContent>
+
+        <TabsContent value="tiers" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {Object.entries(tierConfig).map(([tier, config]) => (
+              <CanvaCard key={tier}>
+                <CanvaCardHeader>
+                  <div className="flex items-center justify-between">
+                    <CanvaCardTitle className="capitalize">
+                      {tier}
+                    </CanvaCardTitle>
+                    <div className={`rounded-full p-2 ${config.color}`}>
+                      <config.icon className="h-5 w-5 text-white" />
+                    </div>
+                  </div>
+                </CanvaCardHeader>
+                <CanvaCardBody>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        Takipçi Aralığı
+                      </p>
+                      <p className="font-medium">
+                        {formatNumber(config.min)} -{' '}
+                        {config.max === Infinity
+                          ? '∞'
+                          : formatNumber(config.max)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        Komisyon Payı
+                      </p>
+                      <p className="font-medium">
+                        {tier === 'bronze'
+                          ? '70%'
+                          : tier === 'silver'
+                            ? '75%'
+                            : tier === 'gold'
+                              ? '80%'
+                              : '85%'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        Özel Avantajlar
+                      </p>
+                      <ul className="mt-1 text-sm space-y-1">
+                        {tier === 'platinum' && (
+                          <>
+                            <li>• Öncelikli destek</li>
+                            <li>• Öne çıkarılma</li>
+                            <li>• Özel etkinlikler</li>
+                          </>
+                        )}
+                        {tier === 'gold' && (
+                          <>
+                            <li>• Öncelikli destek</li>
+                            <li>• Haftalık öne çıkarılma</li>
+                          </>
+                        )}
+                        {tier === 'silver' && <li>• Aylık öne çıkarılma</li>}
+                        {tier === 'bronze' && <li>• Temel özellikler</li>}
+                      </ul>
                     </div>
                   </div>
                 </CanvaCardBody>
@@ -303,92 +483,75 @@ export default function CreatorsPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="creators" className="space-y-4">
-          <div className="flex items-center justify-center p-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-            <div className="text-center">
-              <Users className="mx-auto h-12 w-12 text-slate-300" />
-              <h3 className="mt-2 text-sm font-semibold text-slate-900">
-                Elçi Listesi
-              </h3>
-              <p className="mt-1 text-sm text-slate-500">
-                Aktif elçiler yakında burada listelenecek.
-              </p>
-            </div>
-          </div>
+        <TabsContent value="payouts" className="space-y-4">
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Ödeme Özeti</CanvaCardTitle>
+              <CanvaCardSubtitle>Bu ayki creator ödemeleri</CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
+              <div className="space-y-6">
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div className="rounded-lg border p-4">
+                    <p className="text-sm text-muted-foreground">
+                      Bekleyen Ödemeler
+                    </p>
+                    <p className="text-2xl font-bold">₺24,500</p>
+                    <p className="text-sm text-muted-foreground">12 creator</p>
+                  </div>
+                  <div className="rounded-lg border p-4">
+                    <p className="text-sm text-muted-foreground">
+                      Bu Ay Ödenen
+                    </p>
+                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                      ₺89,450
+                    </p>
+                    <p className="text-sm text-muted-foreground">45 creator</p>
+                  </div>
+                  <div className="rounded-lg border p-4">
+                    <p className="text-sm text-muted-foreground">
+                      Sonraki Ödeme
+                    </p>
+                    <p className="text-2xl font-bold">3 gün</p>
+                    <p className="text-sm text-muted-foreground">
+                      21 Aralık 2024
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="font-medium">Bekleyen Ödemeler</h4>
+                  {creators.slice(0, 3).map((creator) => (
+                    <div
+                      key={creator.id}
+                      className="flex items-center justify-between rounded-lg border p-3"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={creator.avatar} />
+                          <AvatarFallback>{creator.name[0]}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium text-sm">{creator.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {creator.username}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <p className="font-medium">
+                          ₺{(creator.earnings * 0.2).toLocaleString('tr-TR')}
+                        </p>
+                        <CanvaButton size="sm">Öde</CanvaButton>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
       </Tabs>
-
-      {/* Detaylı İnceleme ve Not Modalı */}
-      <Dialog open={!!selectedApp} onOpenChange={() => setSelectedApp(null)}>
-        <DialogContent className="sm:max-w-[550px] border-slate-200 rounded-[2.5rem]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-xl font-black text-slate-900 uppercase">
-              <ClipboardList className="h-5 w-5 text-blue-700" />
-              Başvuru Analizi
-            </DialogTitle>
-            <DialogDescription className="text-slate-500 font-medium italic">
-              {selectedApp?.name} için profil uygunluğu ve içerik kalitesi
-              notlarını ekleyin.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="py-6 space-y-5">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
-                  Takipçi Kitlesi
-                </p>
-                <p className="text-lg font-bold text-slate-900">
-                  {formatNumber(selectedApp?.followers || 0)}
-                </p>
-              </div>
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col justify-center">
-                <a
-                  href={selectedApp?.social_link}
-                  target="_blank"
-                  className="flex items-center justify-between text-blue-700 font-bold text-sm hover:underline"
-                >
-                  Sosyal Medya Profili <ExternalLink className="h-4 w-4" />
-                </a>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-black text-slate-700 uppercase tracking-tighter ml-1">
-                Değerlendirme Notu
-              </label>
-              <Textarea
-                placeholder="Örn: İçerik estetiği projemize %100 uyumlu, etkileşim oranları stabil..."
-                className="min-h-[140px] rounded-2xl border-slate-200 focus:ring-slate-900 resize-none p-4"
-                value={evaluationNote}
-                onChange={(e) => setEvaluationNote(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <DialogFooter className="flex gap-3 mt-4">
-            <CanvaButton
-              variant="ghost"
-              className="flex-1 font-bold text-slate-500"
-              onClick={() => setSelectedApp(null)}
-            >
-              Vazgeç
-            </CanvaButton>
-            <CanvaButton
-              variant="primary"
-              className="flex-1 bg-slate-900 text-white font-bold"
-              onClick={() => {
-                // Not kaydetme servisi buraya bağlanacak
-                setSelectedApp(null);
-                setEvaluationNote('');
-              }}
-            >
-              <Send className="mr-2 h-4 w-4" />
-              Notu Kaydet ve Kapat
-            </CanvaButton>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

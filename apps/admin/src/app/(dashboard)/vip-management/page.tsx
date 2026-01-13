@@ -12,7 +12,7 @@
  * - View commission history
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Search,
   MoreHorizontal,
@@ -51,13 +51,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import { CanvaButton } from '@/components/canva/CanvaButton';
-import { CanvaInput } from '@/components/canva/CanvaInput';
 import {
   CanvaCard,
   CanvaCardHeader,
@@ -68,40 +66,15 @@ import {
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { formatDate, getInitials } from '@/lib/utils';
-import { logger } from '@/lib/logger';
-
-// =============================================================================
-// TYPES
-// =============================================================================
-
-interface VIPUser {
-  id: string;
-  user_id: string;
-  tier: 'vip' | 'influencer' | 'partner';
-  commission_override: number; // Percentage (0-100)
-  giver_pays_commission: boolean;
-  valid_from: string;
-  valid_until: string | null;
-  reason: string | null;
-  granted_by: string;
-  created_at: string;
-  user: {
-    display_name: string;
-    full_name: string;
-    email: string;
-    avatar_url: string | null;
-  };
-  granted_by_user: {
-    display_name: string;
-  };
-}
-
-interface Stats {
-  totalVIP: number;
-  totalInfluencer: number;
-  totalPartner: number;
-  commissionSaved: number;
-}
+import {
+  useVIPUsers,
+  useVIPStats,
+  useSearchUsers,
+  useAddVIP,
+  useRemoveVIP,
+  type VIPUser,
+  type AddVIPData,
+} from '@/hooks/use-vip';
 
 const tierConfig = {
   vip: {
@@ -132,19 +105,15 @@ interface AddVIPDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAdd: (data: AddVIPData) => Promise<void>;
+  isLoading?: boolean;
 }
 
-interface AddVIPData {
-  userId: string;
-  tier: 'vip' | 'influencer' | 'partner';
-  commissionOverride: number;
-  giverPaysCommission: boolean;
-  validUntil: string | null;
-  reason: string;
-}
-
-function AddVIPDialog({ open, onOpenChange, onAdd }: AddVIPDialogProps) {
-  const [loading, setLoading] = useState(false);
+function AddVIPDialog({
+  open,
+  onOpenChange,
+  onAdd,
+  isLoading,
+}: AddVIPDialogProps) {
   const [userSearch, setUserSearch] = useState('');
   const [selectedUser, setSelectedUser] = useState<{
     id: string;
@@ -156,48 +125,58 @@ function AddVIPDialog({ open, onOpenChange, onAdd }: AddVIPDialogProps) {
   const [giverPaysCommission, setGiverPaysCommission] = useState(false);
   const [validUntil, setValidUntil] = useState('');
   const [reason, setReason] = useState('');
+  const [showResults, setShowResults] = useState(false);
+
+  // Use the search hook for user search
+  const { data: searchResults, isLoading: isSearching } =
+    useSearchUsers(userSearch);
 
   const handleSubmit = async () => {
     if (!selectedUser) return;
 
-    setLoading(true);
-    try {
-      await onAdd({
-        userId: selectedUser.id,
-        tier,
-        commissionOverride,
-        giverPaysCommission,
-        validUntil: validUntil || null,
-        reason,
-      });
-      onOpenChange(false);
-      // Reset form
-      setSelectedUser(null);
-      setUserSearch('');
-      setTier('vip');
-      setCommissionOverride(0);
-      setGiverPaysCommission(false);
-      setValidUntil('');
-      setReason('');
-    } finally {
-      setLoading(false);
-    }
+    await onAdd({
+      userId: selectedUser.id,
+      tier,
+      commissionOverride,
+      giverPaysCommission,
+      validUntil: validUntil || null,
+      reason,
+    });
+    onOpenChange(false);
+    // Reset form
+    setSelectedUser(null);
+    setUserSearch('');
+    setTier('vip');
+    setCommissionOverride(0);
+    setGiverPaysCommission(false);
+    setValidUntil('');
+    setReason('');
+  };
+
+  const handleSelectUser = (user: {
+    id: string;
+    name: string;
+    email: string;
+  }) => {
+    setSelectedUser(user);
+    setUserSearch('');
+    setShowResults(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>VIP Kullanıcı Ekle</DialogTitle>
+          <DialogTitle>VIP Kullanici Ekle</DialogTitle>
           <DialogDescription>
-            Kullanıcıya VIP, Influencer veya Partner statüsü verin.
+            Kullaniciya VIP, Influencer veya Partner statusu verin.
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
           {/* User Search */}
           <div className="grid gap-2">
-            <Label>Kullanıcı</Label>
+            <Label>Kullanici</Label>
             {selectedUser ? (
               <div className="flex items-center justify-between rounded-md border p-3">
                 <div>
@@ -211,19 +190,55 @@ function AddVIPDialog({ open, onOpenChange, onAdd }: AddVIPDialogProps) {
                   size="sm"
                   onClick={() => setSelectedUser(null)}
                 >
-                  Değiştir
+                  Degistir
                 </CanvaButton>
               </div>
             ) : (
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder="İsim veya e-posta ile ara..."
+                  placeholder="Isim veya e-posta ile ara..."
                   value={userSearch}
-                  onChange={(e) => setUserSearch(e.target.value)}
+                  onChange={(e) => {
+                    setUserSearch(e.target.value);
+                    setShowResults(true);
+                  }}
+                  onFocus={() => setShowResults(true)}
                   className="pl-10"
                 />
-                {/* TODO: Add search results dropdown */}
+                {/* Search results dropdown */}
+                {showResults && userSearch.length >= 2 && (
+                  <div className="absolute top-full left-0 right-0 z-50 mt-1 max-h-60 overflow-auto rounded-md border bg-popover shadow-md">
+                    {isSearching ? (
+                      <div className="flex items-center justify-center p-4">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span className="ml-2 text-sm text-muted-foreground">
+                          Araniyor...
+                        </span>
+                      </div>
+                    ) : searchResults && searchResults.length > 0 ? (
+                      searchResults.map((user) => (
+                        <button
+                          key={user.id}
+                          type="button"
+                          className="flex w-full items-center gap-3 px-4 py-2 text-left hover:bg-accent"
+                          onClick={() => handleSelectUser(user)}
+                        >
+                          <div>
+                            <p className="font-medium">{user.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {user.email}
+                            </p>
+                          </div>
+                        </button>
+                      ))
+                    ) : (
+                      <div className="p-4 text-center text-sm text-muted-foreground">
+                        Kullanici bulunamadi
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -241,19 +256,19 @@ function AddVIPDialog({ open, onOpenChange, onAdd }: AddVIPDialogProps) {
               <SelectContent>
                 <SelectItem value="vip">
                   <div className="flex items-center gap-2">
-                    <Crown className="h-4 w-4 text-yellow-500" />
+                    <Crown className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />
                     VIP
                   </div>
                 </SelectItem>
                 <SelectItem value="influencer">
                   <div className="flex items-center gap-2">
-                    <Star className="h-4 w-4 text-green-500" />
+                    <Star className="h-4 w-4 text-green-500 dark:text-green-400" />
                     Influencer
                   </div>
                 </SelectItem>
                 <SelectItem value="partner">
                   <div className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-blue-500" />
+                    <CheckCircle className="h-4 w-4 text-blue-500 dark:text-blue-400" />
                     Partner
                   </div>
                 </SelectItem>
@@ -329,13 +344,13 @@ function AddVIPDialog({ open, onOpenChange, onAdd }: AddVIPDialogProps) {
 
         <DialogFooter>
           <CanvaButton variant="primary" onClick={() => onOpenChange(false)}>
-            İptal
+            Iptal
           </CanvaButton>
           <CanvaButton
             onClick={handleSubmit}
-            disabled={!selectedUser || loading}
+            disabled={!selectedUser || isLoading}
           >
-            {loading ? (
+            {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Ekleniyor...
@@ -353,217 +368,72 @@ function AddVIPDialog({ open, onOpenChange, onAdd }: AddVIPDialogProps) {
   );
 }
 
-// Mock data for development
-const mockVIPUsers: VIPUser[] = [
-  {
-    id: '1',
-    user_id: 'user-1',
-    tier: 'vip',
-    commission_override: 0,
-    giver_pays_commission: true,
-    valid_from: '2025-01-01T00:00:00Z',
-    valid_until: null,
-    reason: 'Premium üyelik',
-    granted_by: 'admin-1',
-    created_at: '2025-01-01T00:00:00Z',
-    user: {
-      display_name: 'Ahmet Yılmaz',
-      full_name: 'Ahmet Yılmaz',
-      email: 'ahmet@example.com',
-      avatar_url: null,
-    },
-    granted_by_user: {
-      display_name: 'Admin',
-    },
-  },
-  {
-    id: '2',
-    user_id: 'user-2',
-    tier: 'influencer',
-    commission_override: 5,
-    giver_pays_commission: false,
-    valid_from: '2025-02-15T00:00:00Z',
-    valid_until: '2026-02-15T00:00:00Z',
-    reason: 'Sosyal medya kampanyası ortağı',
-    granted_by: 'admin-1',
-    created_at: '2025-02-15T00:00:00Z',
-    user: {
-      display_name: 'Elif Demir',
-      full_name: 'Elif Demir',
-      email: 'elif@example.com',
-      avatar_url: null,
-    },
-    granted_by_user: {
-      display_name: 'Admin',
-    },
-  },
-  {
-    id: '3',
-    user_id: 'user-3',
-    tier: 'partner',
-    commission_override: 3,
-    giver_pays_commission: true,
-    valid_from: '2025-03-01T00:00:00Z',
-    valid_until: null,
-    reason: 'İş ortağı anlaşması',
-    granted_by: 'admin-1',
-    created_at: '2025-03-01T00:00:00Z',
-    user: {
-      display_name: 'Mehmet Kaya',
-      full_name: 'Mehmet Kaya',
-      email: 'mehmet@example.com',
-      avatar_url: null,
-    },
-    granted_by_user: {
-      display_name: 'Admin',
-    },
-  },
-];
-
-const mockStats: Stats = {
-  totalVIP: 12,
-  totalInfluencer: 8,
-  totalPartner: 5,
-  commissionSaved: 4520.5,
-};
-
 // =============================================================================
 // MAIN PAGE
 // =============================================================================
 
 export default function VIPManagementPage() {
-  const [vipUsers, setVIPUsers] = useState<VIPUser[]>([]);
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [tierFilter, setTierFilter] = useState('all');
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
   const limit = 50;
 
-  const fetchVIPUsers = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  // Use React Query hooks for data fetching
+  const {
+    data: vipData,
+    isLoading: isLoadingUsers,
+    error: usersError,
+    refetch: refetchUsers,
+  } = useVIPUsers({
+    search: debouncedSearch,
+    tier: tierFilter,
+    limit,
+    offset: page * limit,
+  });
 
-      const params = new URLSearchParams();
-      if (search) params.append('search', search);
-      if (tierFilter !== 'all') params.append('tier', tierFilter);
-      params.append('limit', limit.toString());
-      params.append('offset', (page * limit).toString());
+  const { data: stats, isLoading: isLoadingStats } = useVIPStats();
 
-      const res = await fetch(`/api/vip-users?${params}`);
-      if (!res.ok) {
-        // Use mock data on auth error
-        if (res.status === 401 || res.status === 403) {
-          const filtered =
-            tierFilter === 'all'
-              ? mockVIPUsers
-              : mockVIPUsers.filter((u) => u.tier === tierFilter);
-          setVIPUsers(filtered);
-          setTotal(filtered.length);
-          return;
-        }
-        throw new Error('VIP kullanıcıları yüklenemedi');
-      }
+  const addVIPMutation = useAddVIP();
+  const removeVIPMutation = useRemoveVIP();
 
-      const data = await res.json();
-      setVIPUsers(data.users || []);
-      setTotal(data.total || 0);
-    } catch (err) {
-      logger.error('VIP users fetch error', err);
-      // Fallback to mock data
-      setVIPUsers(mockVIPUsers);
-      setTotal(mockVIPUsers.length);
-    } finally {
-      setLoading(false);
-    }
-  }, [search, tierFilter, page]);
-
-  const fetchStats = useCallback(async () => {
-    try {
-      const res = await fetch('/api/vip-users/stats');
-      if (!res.ok) {
-        // Use mock stats on auth error
-        setStats(mockStats);
-        return;
-      }
-
-      const data = await res.json();
-      setStats(data);
-    } catch (err) {
-      logger.error('Stats fetch error', err);
-      // Fallback to mock stats
-      setStats(mockStats);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchVIPUsers();
-  }, [fetchVIPUsers]);
-
-  useEffect(() => {
-    fetchStats();
-  }, [fetchStats]);
+  const vipUsers = vipData?.users || [];
+  const total = vipData?.total || 0;
+  const isLoading = isLoadingUsers || isLoadingStats;
 
   // Debounced search
   useEffect(() => {
     const timeout = setTimeout(() => {
+      setDebouncedSearch(search);
       setPage(0);
-      fetchVIPUsers();
     }, 300);
     return () => clearTimeout(timeout);
   }, [search]);
 
   const handleAddVIP = async (data: AddVIPData) => {
-    const res = await fetch('/api/vip-users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.message || 'VIP eklenemedi');
-    }
-
-    fetchVIPUsers();
-    fetchStats();
+    await addVIPMutation.mutateAsync(data);
   };
 
   const handleRemoveVIP = async (userId: string) => {
     if (
       !confirm(
-        'Bu kullanıcının VIP statüsünü kaldırmak istediğinize emin misiniz?',
+        'Bu kullanicinin VIP statusunu kaldirmak istediginize emin misiniz?',
       )
     ) {
       return;
     }
 
-    try {
-      const res = await fetch(`/api/vip-users/${userId}`, {
-        method: 'DELETE',
-      });
-
-      if (!res.ok) throw new Error('VIP kaldırılamadı');
-
-      fetchVIPUsers();
-      fetchStats();
-    } catch (err) {
-      logger.error('Remove VIP error', err);
-      setError('VIP statüsü kaldırılırken bir hata oluştu');
-    }
+    await removeVIPMutation.mutateAsync(userId);
   };
 
-  if (loading && vipUsers.length === 0) {
+  if (isLoadingUsers && vipUsers.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <p className="text-muted-foreground">
-            VIP kullanıcıları yükleniyor...
+            VIP kullanicilari yukleniyor...
           </p>
         </div>
       </div>
@@ -575,25 +445,25 @@ export default function VIPManagementPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">VIP Yönetimi</h1>
+          <h1 className="text-3xl font-bold tracking-tight">VIP Yonetimi</h1>
           <p className="text-muted-foreground">
-            VIP, Influencer ve Partner kullanıcılarını yönetin
+            VIP, Influencer ve Partner kullanicilarini yonetin
           </p>
         </div>
         <div className="flex gap-2">
           <CanvaButton
             variant="primary"
-            onClick={fetchVIPUsers}
-            disabled={loading}
+            onClick={() => refetchUsers()}
+            disabled={isLoadingUsers}
           >
             <RefreshCw
-              className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`}
+              className={`mr-2 h-4 w-4 ${isLoadingUsers ? 'animate-spin' : ''}`}
             />
             Yenile
           </CanvaButton>
           <CanvaButton variant="primary">
             <Download className="mr-2 h-4 w-4" />
-            Dışa Aktar
+            Disa Aktar
           </CanvaButton>
           <CanvaButton onClick={() => setAddDialogOpen(true)}>
             <UserPlus className="mr-2 h-4 w-4" />
@@ -607,17 +477,21 @@ export default function VIPManagementPage() {
         <CanvaStatCard
           label="VIP Kullanıcılar"
           value={stats?.totalVIP?.toLocaleString('tr-TR') || '-'}
-          icon={<Crown className="h-5 w-5 text-yellow-500" />}
+          icon={
+            <Crown className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />
+          }
         />
         <CanvaStatCard
           label="Influencerlar"
           value={stats?.totalInfluencer?.toLocaleString('tr-TR') || '-'}
-          icon={<Star className="h-5 w-5 text-green-500" />}
+          icon={<Star className="h-5 w-5 text-green-500 dark:text-green-400" />}
         />
         <CanvaStatCard
           label="Partnerlar"
           value={stats?.totalPartner?.toLocaleString('tr-TR') || '-'}
-          icon={<CheckCircle className="h-5 w-5 text-blue-500" />}
+          icon={
+            <CheckCircle className="h-5 w-5 text-blue-500 dark:text-blue-400" />
+          }
         />
         <CanvaStatCard
           label="Tasarruf Edilen Komisyon"
@@ -671,10 +545,13 @@ export default function VIPManagementPage() {
             </Select>
           </div>
 
-          {error && (
+          {usersError && (
             <div className="mb-4 flex items-center gap-2 text-destructive">
               <AlertCircle className="h-4 w-4" />
-              <span>{error}</span>
+              <span>
+                {usersError.message ||
+                  'VIP kullanicilari yuklenirken bir hata olustu'}
+              </span>
             </div>
           )}
 
@@ -778,19 +655,19 @@ export default function VIPManagementPage() {
             })}
           </div>
 
-          {vipUsers.length === 0 && !loading && (
+          {vipUsers.length === 0 && !isLoadingUsers && (
             <div className="py-12 text-center">
               <Crown className="mx-auto h-12 w-12 text-muted-foreground/50" />
-              <h3 className="mt-4 text-lg font-medium">VIP Kullanıcı Yok</h3>
+              <h3 className="mt-4 text-lg font-medium">VIP Kullanici Yok</h3>
               <p className="mt-2 text-muted-foreground">
-                Henüz VIP statüsü verilmiş kullanıcı bulunmuyor.
+                Henuz VIP statusu verilmis kullanici bulunmuyor.
               </p>
               <CanvaButton
                 className="mt-4"
                 onClick={() => setAddDialogOpen(true)}
               >
                 <UserPlus className="mr-2 h-4 w-4" />
-                İlk VIP'i Ekle
+                Ilk VIP'i Ekle
               </CanvaButton>
             </div>
           )}
@@ -830,6 +707,7 @@ export default function VIPManagementPage() {
         open={addDialogOpen}
         onOpenChange={setAddDialogOpen}
         onAdd={handleAddVIP}
+        isLoading={addVIPMutation.isPending}
       />
     </div>
   );

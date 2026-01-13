@@ -14,12 +14,9 @@ import {
   XCircle,
   AlertTriangle,
   MoreHorizontal,
-  Edit,
   Trash2,
   Copy,
-  Eye,
   History,
-  Globe,
   Smartphone,
   Monitor,
   Zap,
@@ -90,7 +87,8 @@ import {
   useToggleFeatureFlag,
 } from '@/hooks/use-feature-flags';
 
-interface FeatureFlag {
+// Local interface for UI display (extends hook data with UI-specific fields)
+interface FeatureFlagDisplay {
   id: string;
   key: string;
   name: string;
@@ -110,138 +108,6 @@ interface FeatureFlag {
   tags: string[];
 }
 
-// Mock data
-const mockFlags: FeatureFlag[] = [
-  {
-    id: 'ff_1',
-    key: 'dark_mode',
-    name: 'Dark Mode',
-    description: 'Karanlık tema özelliğini etkinleştirir',
-    enabled: true,
-    rollout_percentage: 100,
-    environment: 'production',
-    platforms: ['ios', 'android', 'web'],
-    targeting: { type: 'all' },
-    created_at: '2024-01-15T10:00:00Z',
-    updated_at: '2024-12-18T08:00:00Z',
-    created_by: 'Zeynep Arslan',
-    category: 'feature',
-    tags: ['ui', 'theme'],
-  },
-  {
-    id: 'ff_2',
-    key: 'new_matching_algorithm',
-    name: 'Yeni Eşleşme Algoritması',
-    description: 'ML tabanlı gelişmiş eşleşme algoritması',
-    enabled: true,
-    rollout_percentage: 25,
-    environment: 'production',
-    platforms: ['ios', 'android'],
-    targeting: { type: 'segment', value: ['premium_users'] },
-    created_at: '2024-11-01T10:00:00Z',
-    updated_at: '2024-12-17T14:00:00Z',
-    created_by: 'Ahmet Yılmaz',
-    category: 'experiment',
-    tags: ['ml', 'matching', 'core'],
-  },
-  {
-    id: 'ff_3',
-    key: 'video_calls',
-    name: 'Video Görüşme',
-    description: 'Uygulama içi video görüşme özelliği',
-    enabled: false,
-    rollout_percentage: 0,
-    environment: 'staging',
-    platforms: ['ios', 'android'],
-    targeting: { type: 'all' },
-    created_at: '2024-12-01T10:00:00Z',
-    updated_at: '2024-12-15T10:00:00Z',
-    created_by: 'Fatma Demir',
-    category: 'feature',
-    tags: ['communication', 'video'],
-  },
-  {
-    id: 'ff_4',
-    key: 'maintenance_mode',
-    name: 'Bakım Modu',
-    description: 'Acil durumlarda tüm sistemi bakım moduna alır',
-    enabled: false,
-    rollout_percentage: 0,
-    environment: 'production',
-    platforms: ['ios', 'android', 'web'],
-    targeting: { type: 'all' },
-    created_at: '2024-01-01T10:00:00Z',
-    updated_at: '2024-06-15T10:00:00Z',
-    created_by: 'Zeynep Arslan',
-    category: 'kill_switch',
-    tags: ['emergency', 'system'],
-  },
-  {
-    id: 'ff_5',
-    key: 'disable_payments',
-    name: 'Ödeme Sistemi Durdur',
-    description: 'Acil durumlarda ödeme sistemini devre dışı bırakır',
-    enabled: false,
-    rollout_percentage: 0,
-    environment: 'production',
-    platforms: ['ios', 'android', 'web'],
-    targeting: { type: 'all' },
-    created_at: '2024-01-01T10:00:00Z',
-    updated_at: '2024-03-20T10:00:00Z',
-    created_by: 'Zeynep Arslan',
-    category: 'kill_switch',
-    tags: ['emergency', 'payments'],
-  },
-  {
-    id: 'ff_6',
-    key: 'super_likes',
-    name: 'Super Like',
-    description: 'Günlük super like özelliği',
-    enabled: true,
-    rollout_percentage: 100,
-    environment: 'production',
-    platforms: ['ios', 'android', 'web'],
-    targeting: { type: 'all' },
-    created_at: '2024-02-15T10:00:00Z',
-    updated_at: '2024-12-01T10:00:00Z',
-    created_by: 'Mehmet Kaya',
-    category: 'feature',
-    tags: ['engagement', 'premium'],
-  },
-  {
-    id: 'ff_7',
-    key: 'ai_bio_suggestions',
-    name: 'AI Biyografi Önerileri',
-    description: 'Yapay zeka destekli profil biyografisi önerileri',
-    enabled: true,
-    rollout_percentage: 50,
-    environment: 'production',
-    platforms: ['ios', 'android'],
-    targeting: { type: 'all' },
-    created_at: '2024-10-01T10:00:00Z',
-    updated_at: '2024-12-10T10:00:00Z',
-    created_by: 'Can Öztürk',
-    category: 'experiment',
-    tags: ['ai', 'profile'],
-  },
-  {
-    id: 'ff_8',
-    key: 'rate_limiting_strict',
-    name: 'Sıkı Rate Limiting',
-    description: 'API isteklerinde sıkı rate limiting uygular',
-    enabled: true,
-    rollout_percentage: 100,
-    environment: 'production',
-    platforms: ['ios', 'android', 'web'],
-    targeting: { type: 'all' },
-    created_at: '2024-06-01T10:00:00Z',
-    updated_at: '2024-12-05T10:00:00Z',
-    created_by: 'Zeynep Arslan',
-    category: 'operational',
-    tags: ['security', 'performance'],
-  },
-];
-
 const categoryLabels: Record<
   string,
   { label: string; color: string; icon: React.ElementType }
@@ -254,7 +120,7 @@ const categoryLabels: Record<
   },
   operational: {
     label: 'Operasyonel',
-    color: 'bg-gray-100 text-gray-800',
+    color: 'bg-muted text-foreground',
     icon: Settings,
   },
   kill_switch: {
@@ -275,7 +141,6 @@ export default function FeatureFlagsPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [environmentFilter, setEnvironmentFilter] = useState<string>('all');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [editingFlag, setEditingFlag] = useState<FeatureFlag | null>(null);
 
   // Use real API data
   const { data, isLoading, error, refetch } = useFeatureFlags();
@@ -284,30 +149,29 @@ export default function FeatureFlagsPage() {
   const deleteFlag = useDeleteFeatureFlag();
   const toggleFlag = useToggleFeatureFlag();
 
-  // Use API data if available, otherwise fall back to mock data
-  const flags = useMemo(() => {
-    if (data?.flags && data.flags.length > 0) {
-      return data.flags.map((flag) => ({
-        id: flag.id,
-        key: flag.name.toLowerCase().replace(/\s+/g, '_'),
-        name: flag.name,
-        description: flag.description || '',
-        enabled: flag.enabled,
-        rollout_percentage: flag.rollout_percentage,
-        environment: (flag.environments?.[0] || 'production') as
-          | 'production'
-          | 'staging'
-          | 'development',
-        platforms: ['ios', 'android', 'web'] as ('ios' | 'android' | 'web')[],
-        targeting: { type: 'all' as const },
-        created_at: flag.created_at,
-        updated_at: flag.updated_at,
-        created_by: 'Admin',
-        category: flag.category as FeatureFlag['category'],
-        tags: [],
-      }));
-    }
-    return mockFlags;
+  // Transform API data to display format
+  const flags = useMemo((): FeatureFlagDisplay[] => {
+    if (!data?.flags) return [];
+
+    return data.flags.map((flag) => ({
+      id: flag.id,
+      key: flag.name.toLowerCase().replace(/\s+/g, '_'),
+      name: flag.name,
+      description: flag.description || '',
+      enabled: flag.enabled,
+      rollout_percentage: flag.rollout_percentage,
+      environment: (flag.environments?.[0] || 'production') as
+        | 'production'
+        | 'staging'
+        | 'development',
+      platforms: ['ios', 'android', 'web'] as ('ios' | 'android' | 'web')[],
+      targeting: { type: 'all' as const },
+      created_at: flag.created_at,
+      updated_at: flag.updated_at,
+      created_by: 'Admin',
+      category: flag.category as FeatureFlagDisplay['category'],
+      tags: [],
+    }));
   }, [data?.flags]);
 
   const apiStats = data?.stats;
@@ -317,9 +181,9 @@ export default function FeatureFlagsPage() {
     key: '',
     name: '',
     description: '',
-    category: 'feature' as FeatureFlag['category'],
-    environment: 'staging' as FeatureFlag['environment'],
-    platforms: ['ios', 'android', 'web'] as FeatureFlag['platforms'],
+    category: 'feature' as FeatureFlagDisplay['category'],
+    environment: 'staging' as FeatureFlagDisplay['environment'],
+    platforms: ['ios', 'android', 'web'] as FeatureFlagDisplay['platforms'],
     rollout_percentage: 0,
   });
 
@@ -339,11 +203,11 @@ export default function FeatureFlagsPage() {
     return matchesSearch && matchesCategory && matchesEnvironment;
   });
 
-  // Stats
+  // Stats from API (hook handles fallback to mock data stats)
   const stats = apiStats || {
-    total: flags.length,
-    enabled: flags.filter((f) => f.enabled).length,
-    disabled: flags.filter((f) => !f.enabled).length,
+    total: 0,
+    enabled: 0,
+    disabled: 0,
     beta: 0,
   };
 
@@ -394,25 +258,15 @@ export default function FeatureFlagsPage() {
             platforms: ['ios', 'android', 'web'],
             rollout_percentage: 0,
           });
-          toast.success('Feature flag oluşturuldu');
-        },
-        onError: () => {
-          toast.error('Flag oluşturulamadı');
+          // Toast is handled by the hook
         },
       },
     );
   };
 
-  // Delete flag
+  // Delete flag - toasts are handled by the hook
   const handleDeleteFlag = (flagId: string) => {
-    deleteFlag.mutate(flagId, {
-      onSuccess: () => {
-        toast.success('Feature flag silindi');
-      },
-      onError: () => {
-        toast.error('Flag silinemedi');
-      },
-    });
+    deleteFlag.mutate(flagId);
   };
 
   // Copy flag key
@@ -426,23 +280,23 @@ export default function FeatureFlagsPage() {
     <div className="space-y-6 animate-pulse">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
-          <div className="h-8 w-48 bg-gray-200 rounded" />
-          <div className="h-4 w-64 bg-gray-100 rounded" />
+          <div className="h-8 w-48 bg-muted rounded" />
+          <div className="h-4 w-64 bg-muted rounded" />
         </div>
         <div className="flex gap-2">
-          <div className="h-10 w-24 bg-gray-200 rounded" />
-          <div className="h-10 w-32 bg-gray-200 rounded" />
+          <div className="h-10 w-24 bg-muted rounded" />
+          <div className="h-10 w-32 bg-muted rounded" />
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-24 bg-gray-100 rounded-lg" />
+          <div key={i} className="h-24 bg-muted rounded-lg" />
         ))}
       </div>
-      <div className="h-16 bg-gray-100 rounded-lg" />
+      <div className="h-16 bg-muted rounded-lg" />
       <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-32 bg-gray-100 rounded-lg" />
+          <div key={i} className="h-32 bg-muted rounded-lg" />
         ))}
       </div>
     </div>
@@ -452,11 +306,13 @@ export default function FeatureFlagsPage() {
   const ErrorState = () => (
     <div className="flex h-[50vh] items-center justify-center">
       <div className="text-center space-y-4">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
-          <AlertTriangle className="h-8 w-8 text-red-600" />
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-500/10 dark:bg-red-500/20">
+          <AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-400" />
         </div>
-        <h2 className="text-xl font-semibold text-gray-900">Bir hata oluştu</h2>
-        <p className="text-gray-500 max-w-md">
+        <h2 className="text-xl font-semibold text-foreground">
+          Bir hata oluştu
+        </h2>
+        <p className="text-muted-foreground max-w-md">
           Feature flag verileri yüklenemedi. Lütfen tekrar deneyin.
         </p>
         <CanvaButton
@@ -472,15 +328,15 @@ export default function FeatureFlagsPage() {
 
   // Empty State
   const EmptyState = () => (
-    <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-gray-200">
+    <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-border">
       <div className="text-center space-y-3">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-          <Flag className="h-6 w-6 text-gray-400" />
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+          <Flag className="h-6 w-6 text-muted-foreground" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900">
+        <h3 className="text-lg font-medium text-foreground">
           Henüz feature flag yok
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           İlk feature flag'inizi oluşturarak başlayın.
         </p>
         <CanvaButton
@@ -575,7 +431,7 @@ export default function FeatureFlagsPage() {
                       onValueChange={(v) =>
                         setNewFlag({
                           ...newFlag,
-                          category: v as FeatureFlag['category'],
+                          category: v as FeatureFlagDisplay['category'],
                         })
                       }
                     >
@@ -597,7 +453,7 @@ export default function FeatureFlagsPage() {
                       onValueChange={(v) =>
                         setNewFlag({
                           ...newFlag,
-                          environment: v as FeatureFlag['environment'],
+                          environment: v as FeatureFlagDisplay['environment'],
                         })
                       }
                     >
@@ -784,7 +640,7 @@ function FlagCard({
   onDelete,
   onCopyKey,
 }: {
-  flag: FeatureFlag;
+  flag: FeatureFlagDisplay;
   onToggle: (id: string, enabled: boolean) => void;
   onRolloutChange: (id: string, percentage: number) => void;
   onDelete: (id: string) => void;
@@ -801,7 +657,9 @@ function FlagCard({
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
-            <h3 className="text-lg font-semibold text-gray-900">{flag.name}</h3>
+            <h3 className="text-lg font-semibold text-foreground">
+              {flag.name}
+            </h3>
             <CanvaBadge
               className={categoryInfo.color}
               icon={<CategoryIcon className="h-3 w-3" />}
@@ -820,11 +678,14 @@ function FlagCard({
               {flag.environment}
             </CanvaBadge>
           </div>
-          <p className="text-sm text-gray-500 mb-3">{flag.description}</p>
+          <p className="text-sm text-muted-foreground mb-3">
+            {flag.description}
+          </p>
           <div className="flex items-center gap-4 text-sm">
             <button
               onClick={() => onCopyKey(flag.key)}
               className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Anahtarı kopyala"
             >
               <code className="bg-muted px-2 py-0.5 rounded text-xs font-mono">
                 {flag.key}
@@ -929,10 +790,10 @@ function FlagCard({
 
       {/* Progress bar for rollout */}
       {flag.enabled && flag.rollout_percentage < 100 && (
-        <div className="mt-4 pt-4 border-t border-gray-100">
+        <div className="mt-4 pt-4 border-t border-border">
           <div className="flex items-center justify-between text-sm mb-2">
-            <span className="text-gray-500">Kullanıcı Dağılımı</span>
-            <span className="text-gray-900">
+            <span className="text-muted-foreground">Kullanıcı Dağılımı</span>
+            <span className="text-foreground">
               ~
               {Math.round(
                 (flag.rollout_percentage / 100) * 125000,

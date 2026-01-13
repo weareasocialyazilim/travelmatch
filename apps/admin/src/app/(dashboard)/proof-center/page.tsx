@@ -99,35 +99,35 @@ const proofTypes = [
     label: 'Fotograf',
     icon: Camera,
     count: 45,
-    color: 'text-blue-500',
+    color: 'text-blue-500 dark:text-blue-400',
   },
   {
     type: 'receipt',
     label: 'Fis/Makbuz',
     icon: FileText,
     count: 12,
-    color: 'text-emerald-500',
+    color: 'text-emerald-500 dark:text-emerald-400',
   },
   {
     type: 'geo',
     label: 'Konum',
     icon: MapPin,
     count: 18,
-    color: 'text-purple-500',
+    color: 'text-purple-500 dark:text-purple-400',
   },
   {
     type: 'ticket_qr',
     label: 'QR/Bilet',
     icon: FileText,
     count: 8,
-    color: 'text-amber-500',
+    color: 'text-amber-500 dark:text-amber-400',
   },
   {
     type: 'video',
     label: 'Video',
     icon: Video,
     count: 6,
-    color: 'text-pink-500',
+    color: 'text-pink-500 dark:text-pink-400',
   },
 ];
 
@@ -248,21 +248,21 @@ export default function ProofCenterPage() {
   const getVerdictBadge = (verdict: string, score: number) => {
     if (verdict === 'approved' || score >= 85) {
       return (
-        <CanvaBadge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
+        <CanvaBadge className="bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30">
           <CheckCircle2 className="h-3 w-3 mr-1" />
           AI Onayladi
         </CanvaBadge>
       );
     } else if (verdict === 'needs_review' || (score >= 60 && score < 85)) {
       return (
-        <CanvaBadge className="bg-amber-500/10 text-amber-600 border-amber-500/30">
+        <CanvaBadge className="bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30">
           <Eye className="h-3 w-3 mr-1" />
           Inceleme Gerekli
         </CanvaBadge>
       );
     } else {
       return (
-        <CanvaBadge className="bg-red-500/10 text-red-600 border-red-500/30">
+        <CanvaBadge className="bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400 border-red-500/30">
           <XCircle className="h-3 w-3 mr-1" />
           AI Reddetti
         </CanvaBadge>
@@ -271,9 +271,9 @@ export default function ProofCenterPage() {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 85) return 'text-emerald-600';
-    if (score >= 60) return 'text-amber-600';
-    return 'text-red-600';
+    if (score >= 85) return 'text-emerald-600 dark:text-emerald-400';
+    if (score >= 60) return 'text-amber-600 dark:text-amber-400';
+    return 'text-red-600 dark:text-red-400';
   };
 
   const getScoreBg = (score: number) => {
@@ -298,7 +298,7 @@ export default function ProofCenterPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <Camera className="h-6 w-6 text-blue-500" />
+            <Camera className="h-6 w-6 text-blue-500 dark:text-blue-400" />
             Proof Verification Center
           </h1>
           <p className="text-muted-foreground">
@@ -365,7 +365,9 @@ export default function ProofCenterPage() {
       {/* Proof Types Distribution */}
       <CanvaCard>
         <CanvaCardHeader className="pb-3">
-          <CanvaCardTitle className="text-base">Bekleyen Proof Turleri</CanvaCardTitle>
+          <CanvaCardTitle className="text-base">
+            Bekleyen Proof Turleri
+          </CanvaCardTitle>
         </CanvaCardHeader>
         <CanvaCardBody>
           <div className="flex gap-4 flex-wrap">
@@ -448,7 +450,10 @@ export default function ProofCenterPage() {
                 <CanvaCardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <CanvaBadge variant="outline" className="text-xs font-mono">
+                      <CanvaBadge
+                        variant="outline"
+                        className="text-xs font-mono"
+                      >
                         {proof.id}
                       </CanvaBadge>
                       {proof.flags.length > 0 && (
@@ -493,8 +498,8 @@ export default function ProofCenterPage() {
                         className={cn(
                           'font-medium flex items-center gap-1',
                           proof.location.verified
-                            ? 'text-emerald-600'
-                            : 'text-amber-600',
+                            ? 'text-emerald-600 dark:text-emerald-400'
+                            : 'text-amber-600 dark:text-amber-400',
                         )}
                       >
                         {proof.location.verified ? (
@@ -580,7 +585,7 @@ export default function ProofCenterPage() {
                         <CanvaBadge
                           key={flag}
                           variant="outline"
-                          className="text-xs bg-red-500/10 text-red-600 border-red-500/30"
+                          className="text-xs bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400 border-red-500/30"
                         >
                           {flag.replace(/_/g, ' ')}
                         </CanvaBadge>
@@ -624,7 +629,7 @@ export default function ProofCenterPage() {
             <CanvaCard>
               <CanvaCardHeader>
                 <CanvaCardTitle className="flex items-center gap-2">
-                  <Brain className="h-5 w-5 text-cyan-500" />
+                  <Brain className="h-5 w-5 text-cyan-500 dark:text-cyan-400" />
                   AI Bilesenleri Performansi
                 </CanvaCardTitle>
                 <CanvaCardSubtitle>
@@ -652,7 +657,7 @@ export default function ProofCenterPage() {
             <CanvaCard>
               <CanvaCardHeader>
                 <CanvaCardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5 text-purple-500" />
+                  <Target className="h-5 w-5 text-purple-500 dark:text-purple-400" />
                   Hata Oranlari
                 </CanvaCardTitle>
                 <CanvaCardSubtitle>
@@ -661,12 +666,12 @@ export default function ProofCenterPage() {
               </CanvaCardHeader>
               <CanvaCardBody>
                 <div className="grid gap-4">
-                  <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                  <div className="p-4 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/20">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-medium">
                         False Positive (Yanlis Onay)
                       </span>
-                      <span className="text-amber-600 font-bold">
+                      <span className="text-amber-600 dark:text-amber-400 font-bold">
                         %{proofStats.falsePositiveRate}
                       </span>
                     </div>
@@ -679,12 +684,12 @@ export default function ProofCenterPage() {
                     />
                   </div>
 
-                  <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+                  <div className="p-4 rounded-lg bg-red-500/10 dark:bg-red-500/20 border border-red-500/20">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-medium">
                         False Negative (Yanlis Red)
                       </span>
-                      <span className="text-red-600 font-bold">
+                      <span className="text-red-600 dark:text-red-400 font-bold">
                         %{proofStats.falseNegativeRate}
                       </span>
                     </div>
@@ -697,10 +702,10 @@ export default function ProofCenterPage() {
                     />
                   </div>
 
-                  <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                  <div className="p-4 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-medium">Genel Dogruluk</span>
-                      <span className="text-emerald-600 font-bold">
+                      <span className="text-emerald-600 dark:text-emerald-400 font-bold">
                         %{proofStats.aiAccuracy}
                       </span>
                     </div>
@@ -723,7 +728,7 @@ export default function ProofCenterPage() {
           <CanvaCard>
             <CanvaCardHeader>
               <CanvaCardTitle className="flex items-center gap-2">
-                <MapPin className="h-5 w-5 text-emerald-500" />
+                <MapPin className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />
                 Turkiye Landmark Tespiti
               </CanvaCardTitle>
               <CanvaCardSubtitle>
@@ -738,8 +743,8 @@ export default function ProofCenterPage() {
                     className="flex items-center justify-between p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                        <MapPin className="h-5 w-5 text-emerald-500" />
+                      <div className="w-12 h-12 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center">
+                        <MapPin className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />
                       </div>
                       <div>
                         <p className="font-medium">{landmark.name}</p>
@@ -827,7 +832,7 @@ export default function ProofCenterPage() {
                     <CanvaBadge
                       key={flag}
                       variant="outline"
-                      className="text-xs bg-red-500/10 text-red-600"
+                      className="text-xs bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400"
                     >
                       {flag.replace(/_/g, ' ')}
                     </CanvaBadge>
@@ -846,7 +851,10 @@ export default function ProofCenterPage() {
             </div>
           </div>
           <DialogFooter>
-            <CanvaButton variant="outline" onClick={() => setReviewDialog(false)}>
+            <CanvaButton
+              variant="outline"
+              onClick={() => setReviewDialog(false)}
+            >
               Iptal
             </CanvaButton>
             <CanvaButton

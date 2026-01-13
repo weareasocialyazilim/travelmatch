@@ -49,7 +49,9 @@ import { formatRelativeDate, getInitials, cn } from '@/lib/utils';
 import {
   useSupport,
   useUpdateTicket,
+  useSendMessage,
   type SupportTicket,
+  type SupportMessage,
 } from '@/hooks/use-support';
 import { toast } from 'sonner';
 
@@ -185,9 +187,10 @@ const statusConfig = {
 };
 
 const priorityConfig = {
-  high: { label: 'Yüksek', color: 'text-red-600' },
-  medium: { label: 'Orta', color: 'text-yellow-600' },
-  low: { label: 'Düşük', color: 'text-green-600' },
+  high: { label: 'Yüksek', color: 'text-red-600 dark:text-red-400' },
+  medium: { label: 'Orta', color: 'text-yellow-600 dark:text-yellow-400' },
+  low: { label: 'Düşük', color: 'text-green-600 dark:text-green-400' },
+  urgent: { label: 'Acil', color: 'text-red-700 dark:text-red-300' },
 };
 
 const categoryConfig = {
@@ -208,6 +211,12 @@ export default function SupportPage() {
     status: statusFilter === 'all' ? undefined : statusFilter,
   });
   const updateTicket = useUpdateTicket();
+  const sendMessage = useSendMessage();
+
+  // Track locally sent messages for immediate UI feedback
+  const [localMessages, setLocalMessages] = useState<
+    Record<string, SupportMessage[]>
+  >({});
 
   // Use API data if available, otherwise fall back to mock data
   const tickets = useMemo(() => {
@@ -263,9 +272,52 @@ export default function SupportPage() {
   });
 
   const handleSendReply = () => {
-    if (!replyText.trim()) return;
-    toast.success('Yanıt gönderildi');
+    if (!replyText.trim() || !selectedTicket) {
+      if (!replyText.trim()) {
+        toast.error('Lütfen bir yanıt yazın');
+      }
+      return;
+    }
+
+    const ticketId = selectedTicket.id;
+    const messageContent = replyText.trim();
+
+    // Optimistically add the message to local state
+    const newMessage: SupportMessage = {
+      id: `local-${Date.now()}`,
+      ticket_id: ticketId,
+      sender: 'admin',
+      content: messageContent,
+      created_at: new Date().toISOString(),
+      admin_name: 'Destek Ekibi',
+    };
+
+    setLocalMessages((prev) => ({
+      ...prev,
+      [ticketId]: [...(prev[ticketId] || []), newMessage],
+    }));
+
     setReplyText('');
+
+    // Send to API
+    sendMessage.mutate(
+      { ticketId, content: messageContent, adminName: 'Destek Ekibi' },
+      {
+        onSuccess: () => {
+          toast.success('Yanıt gönderildi');
+        },
+        onError: () => {
+          toast.error('Yanıt gönderilemedi, lütfen tekrar deneyin');
+          // Remove the optimistically added message on error
+          setLocalMessages((prev) => ({
+            ...prev,
+            [ticketId]: (prev[ticketId] || []).filter(
+              (m) => m.id !== newMessage.id,
+            ),
+          }));
+        },
+      },
+    );
   };
 
   const handleResolveTicket = () => {
@@ -289,22 +341,22 @@ export default function SupportPage() {
     <div className="space-y-6 animate-pulse">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
-          <div className="h-8 w-48 bg-gray-200 rounded" />
-          <div className="h-4 w-64 bg-gray-100 rounded" />
+          <div className="h-8 w-48 bg-muted rounded" />
+          <div className="h-4 w-64 bg-muted rounded" />
         </div>
         <div className="flex gap-2">
-          <div className="h-8 w-24 bg-gray-200 rounded" />
-          <div className="h-8 w-24 bg-gray-200 rounded" />
+          <div className="h-8 w-24 bg-muted rounded" />
+          <div className="h-8 w-24 bg-muted rounded" />
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-24 bg-gray-100 rounded-lg" />
+          <div key={i} className="h-24 bg-muted rounded-lg" />
         ))}
       </div>
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="h-[600px] bg-gray-100 rounded-lg" />
-        <div className="lg:col-span-2 h-[600px] bg-gray-100 rounded-lg" />
+        <div className="h-[600px] bg-muted rounded-lg" />
+        <div className="lg:col-span-2 h-[600px] bg-muted rounded-lg" />
       </div>
     </div>
   );
@@ -313,11 +365,13 @@ export default function SupportPage() {
   const ErrorState = () => (
     <div className="flex h-[50vh] items-center justify-center">
       <div className="text-center space-y-4">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
-          <AlertCircle className="h-8 w-8 text-red-600" />
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-500/10 dark:bg-red-500/20">
+          <AlertCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
         </div>
-        <h2 className="text-xl font-semibold text-gray-900">Bir hata oluştu</h2>
-        <p className="text-gray-500 max-w-md">
+        <h2 className="text-xl font-semibold text-foreground">
+          Bir hata oluştu
+        </h2>
+        <p className="text-muted-foreground max-w-md">
           Destek talepleri yüklenemedi. Lütfen tekrar deneyin.
         </p>
         <CanvaButton
@@ -552,7 +606,7 @@ export default function SupportPage() {
                 </div>
 
                 {/* User Info */}
-                <div className="mt-4 flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                <div className="mt-4 flex items-center justify-between rounded-lg bg-muted p-3">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
                       <AvatarFallback>
@@ -569,7 +623,7 @@ export default function SupportPage() {
                           ? selectedTicket.user.full_name
                           : selectedTicket.profiles?.full_name || 'Kullanıcı'}
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-muted-foreground">
                         {'user' in selectedTicket
                           ? selectedTicket.user.email
                           : selectedTicket.profiles?.email || ''}
@@ -577,10 +631,20 @@ export default function SupportPage() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <CanvaButton size="sm" variant="ghost" iconOnly>
+                    <CanvaButton
+                      size="sm"
+                      variant="ghost"
+                      iconOnly
+                      aria-label="E-posta gönder"
+                    >
                       <Mail className="h-4 w-4" />
                     </CanvaButton>
-                    <CanvaButton size="sm" variant="ghost" iconOnly>
+                    <CanvaButton
+                      size="sm"
+                      variant="ghost"
+                      iconOnly
+                      aria-label="Kullanıcı profilini aç"
+                    >
                       <ExternalLink className="h-4 w-4" />
                     </CanvaButton>
                   </div>
@@ -593,58 +657,64 @@ export default function SupportPage() {
               <CanvaCardBody className="p-0">
                 <ScrollArea className="h-[300px] p-4">
                   <div className="space-y-4">
-                    {('messages' in selectedTicket
-                      ? selectedTicket.messages
-                      : []
-                    ).map(
-                      (message: {
-                        id: string;
-                        sender: string;
-                        content: string;
-                        created_at: string;
-                      }) => (
-                        <div
-                          key={message.id}
-                          className={cn(
-                            'flex',
-                            message.sender === 'admin'
-                              ? 'justify-end'
-                              : 'justify-start',
-                          )}
-                        >
+                    {/* Combine original messages with locally sent messages */}
+                    {[
+                      ...('messages' in selectedTicket
+                        ? selectedTicket.messages
+                        : []),
+                      ...(localMessages[selectedTicket.id] || []),
+                    ]
+                      .sort(
+                        (a, b) =>
+                          new Date(a.created_at).getTime() -
+                          new Date(b.created_at).getTime(),
+                      )
+                      .map(
+                        (message: {
+                          id: string;
+                          sender: string;
+                          content: string;
+                          created_at: string;
+                          admin_name?: string;
+                        }) => (
                           <div
+                            key={message.id}
                             className={cn(
-                              'max-w-[80%] rounded-2xl p-3',
+                              'flex',
                               message.sender === 'admin'
-                                ? 'bg-violet-500 text-white'
-                                : 'bg-gray-100',
+                                ? 'justify-end'
+                                : 'justify-start',
                             )}
                           >
-                            <p className="text-sm">{message.content}</p>
                             <div
                               className={cn(
-                                'mt-1 flex items-center gap-2 text-xs',
+                                'max-w-[80%] rounded-2xl p-3',
                                 message.sender === 'admin'
-                                  ? 'text-white/70'
-                                  : 'text-gray-500',
+                                  ? 'bg-primary text-primary-foreground'
+                                  : 'bg-muted',
                               )}
                             >
-                              {message.sender === 'admin' && (
+                              <p className="text-sm">{message.content}</p>
+                              <div
+                                className={cn(
+                                  'mt-1 flex items-center gap-2 text-xs',
+                                  message.sender === 'admin'
+                                    ? 'text-primary-foreground/70'
+                                    : 'text-muted-foreground',
+                                )}
+                              >
+                                {message.sender === 'admin' &&
+                                  message.admin_name && (
+                                    <span>{message.admin_name}</span>
+                                  )}
                                 <span>
-                                  {
-                                    (message as { admin_name?: string })
-                                      .admin_name
-                                  }
+                                  {formatRelativeDate(message.created_at)}
                                 </span>
-                              )}
-                              <span>
-                                {formatRelativeDate(message.created_at)}
-                              </span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ),
-                    )}
+                        ),
+                      )}
                   </div>
                 </ScrollArea>
 
@@ -685,6 +755,7 @@ export default function SupportPage() {
                     <CanvaButton
                       variant="primary"
                       onClick={handleSendReply}
+                      loading={sendMessage.isPending}
                       leftIcon={<Send className="h-4 w-4" />}
                     >
                       Gönder
@@ -696,11 +767,11 @@ export default function SupportPage() {
           ) : (
             <div className="flex h-full items-center justify-center p-8 text-center">
               <div>
-                <MessageSquare className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-4 text-lg font-semibold text-gray-900">
+                <MessageSquare className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-4 text-lg font-semibold text-foreground">
                   Talep Seçin
                 </h3>
-                <p className="text-gray-500">
+                <p className="text-muted-foreground">
                   Detayları görüntülemek için bir talep seçin
                 </p>
               </div>

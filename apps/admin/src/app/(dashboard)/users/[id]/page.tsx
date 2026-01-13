@@ -401,7 +401,7 @@ export default function UserDetailPage() {
       match: <Heart className="h-4 w-4 text-pink-500" />,
       payment: <CreditCard className="h-4 w-4 text-green-500" />,
       report_received: <Flag className="h-4 w-4 text-orange-500" />,
-      login: <Activity className="h-4 w-4 text-gray-500" />,
+      login: <Activity className="h-4 w-4 text-muted-foreground" />,
     };
     return icons[type] || <Activity className="h-4 w-4" />;
   };
@@ -487,12 +487,7 @@ export default function UserDetailPage() {
                 <div className="mt-2 flex items-center gap-2">
                   {getStatusBadge(user.status)}
                   {user.subscription.plan === 'premium' && (
-                    <CanvaBadge
-                      variant="primary"
-                      className="bg-amber-100 text-amber-800"
-                    >
-                      Premium
-                    </CanvaBadge>
+                    <CanvaBadge variant="warning">Premium</CanvaBadge>
                   )}
                 </div>
                 <div className="mt-4 flex items-center gap-1 text-sm">
@@ -577,7 +572,9 @@ export default function UserDetailPage() {
           {/* Risk Assessment */}
           <CanvaCard>
             <CanvaCardHeader>
-              <CanvaCardTitle className="text-base">Risk Değerlendirmesi</CanvaCardTitle>
+              <CanvaCardTitle className="text-base">
+                Risk Değerlendirmesi
+              </CanvaCardTitle>
             </CanvaCardHeader>
             <CanvaCardBody>
               <div className="flex items-center justify-between">
@@ -585,7 +582,7 @@ export default function UserDetailPage() {
                   Risk Skoru
                 </span>
                 <div className="flex items-center gap-2">
-                  <div className="h-2 w-24 rounded-full bg-gray-200">
+                  <div className="h-2 w-24 rounded-full bg-muted">
                     <div
                       className="h-2 rounded-full bg-green-500"
                       style={{ width: `${user.risk_score}%` }}
@@ -615,10 +612,7 @@ export default function UserDetailPage() {
             <CanvaCardBody className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Plan</span>
-                <CanvaBadge
-                  variant="primary"
-                  className="bg-amber-100 text-amber-800"
-                >
+                <CanvaBadge variant="warning">
                   {user.subscription.plan === 'premium'
                     ? 'Premium'
                     : 'Ücretsiz'}
@@ -727,8 +721,8 @@ export default function UserDetailPage() {
                           <div
                             className={`flex h-10 w-10 items-center justify-center rounded-full ${
                               txn.amount > 0
-                                ? 'bg-green-100 text-green-600'
-                                : 'bg-red-100 text-red-600'
+                                ? 'bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400'
+                                : 'bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400'
                             }`}
                           >
                             <CreditCard className="h-5 w-5" />
@@ -898,28 +892,32 @@ export default function UserDetailPage() {
           {/* Stats Overview */}
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <CanvaStatCard
-              title="Moment"
+              label="Moment"
               value={user.stats.total_moments}
-              icon={<Camera className="h-6 w-6 text-blue-600" />}
-              iconBgColor="bg-blue-100"
+              icon={
+                <Camera className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              }
             />
             <CanvaStatCard
-              title="Eşleşme"
+              label="Eşleşme"
               value={user.stats.total_matches}
-              icon={<Heart className="h-6 w-6 text-pink-600" />}
-              iconBgColor="bg-pink-100"
+              icon={
+                <Heart className="h-6 w-6 text-pink-600 dark:text-pink-400" />
+              }
             />
             <CanvaStatCard
-              title="Mesaj"
+              label="Mesaj"
               value={user.stats.total_messages}
-              icon={<MessageSquare className="h-6 w-6 text-purple-600" />}
-              iconBgColor="bg-purple-100"
+              icon={
+                <MessageSquare className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              }
             />
             <CanvaStatCard
-              title="Toplam Harcama"
+              label="Toplam Harcama"
               value={formatCurrency(user.stats.total_spent, 'TRY')}
-              icon={<CreditCard className="h-6 w-6 text-green-600" />}
-              iconBgColor="bg-green-100"
+              icon={
+                <CreditCard className="h-6 w-6 text-green-600 dark:text-green-400" />
+              }
             />
           </div>
         </div>

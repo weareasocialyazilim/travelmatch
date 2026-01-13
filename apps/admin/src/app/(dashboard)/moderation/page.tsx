@@ -384,22 +384,22 @@ export default function ModerationPage() {
       case 'low':
         return 'bg-blue-500';
       default:
-        return 'bg-gray-500';
+        return 'bg-muted-foreground';
     }
   }
 
   function getActionColor(action: string) {
     switch (action) {
       case 'blocked':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
       case 'allowed':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
       case 'flagged':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
       case 'sanitized':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
     }
   }
 
@@ -598,7 +598,9 @@ export default function ModerationPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <CanvaBadge className={getActionColor(log.action_taken)}>
+                        <CanvaBadge
+                          className={getActionColor(log.action_taken)}
+                        >
                           {log.action_taken}
                         </CanvaBadge>
                       </TableCell>
@@ -618,89 +620,89 @@ export default function ModerationPage() {
           <CanvaCard>
             <CanvaCardBody className="p-0">
               <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>User</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Reasons</TableHead>
-                  <TableHead>Appeal Status</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {blockedContent.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">
-                          {item.user?.full_name || 'Unknown'}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          @{item.user?.username || 'unknown'}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <CanvaBadge variant="primary">
-                        {item.content_type}
-                      </CanvaBadge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {item.violation_reasons?.map((reason, i) => (
-                          <CanvaBadge
-                            key={i}
-                            variant="primary"
-                            className="text-xs"
-                          >
-                            {reason}
-                          </CanvaBadge>
-                        ))}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <CanvaBadge
-                        className={
-                          item.appeal_status === 'pending'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : item.appeal_status === 'approved'
-                              ? 'bg-green-100 text-green-800'
-                              : item.appeal_status === 'rejected'
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-gray-100 text-gray-800'
-                        }
-                      >
-                        {item.appeal_status}
-                      </CanvaBadge>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {formatDate(item.created_at)}
-                    </TableCell>
-                    <TableCell>
-                      {item.appeal_status === 'pending' && (
-                        <div className="flex gap-2">
-                          <CanvaButton
-                            size="sm"
-                            variant="primary"
-                            onClick={() => handleApproveAppeal(item.id)}
-                          >
-                            <CheckCircle className="h-4 w-4" />
-                          </CanvaButton>
-                          <CanvaButton
-                            size="sm"
-                            variant="danger"
-                            onClick={() => handleRejectAppeal(item.id)}
-                          >
-                            <XCircle className="h-4 w-4" />
-                          </CanvaButton>
-                        </div>
-                      )}
-                    </TableCell>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>User</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Reasons</TableHead>
+                    <TableHead>Appeal Status</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {blockedContent.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">
+                            {item.user?.full_name || 'Unknown'}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            @{item.user?.username || 'unknown'}
+                          </p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <CanvaBadge variant="primary">
+                          {item.content_type}
+                        </CanvaBadge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {item.violation_reasons?.map((reason, i) => (
+                            <CanvaBadge
+                              key={i}
+                              variant="primary"
+                              className="text-xs"
+                            >
+                              {reason}
+                            </CanvaBadge>
+                          ))}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <CanvaBadge
+                          className={
+                            item.appeal_status === 'pending'
+                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                              : item.appeal_status === 'approved'
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                                : item.appeal_status === 'rejected'
+                                  ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                                  : 'bg-muted text-foreground'
+                          }
+                        >
+                          {item.appeal_status}
+                        </CanvaBadge>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {formatDate(item.created_at)}
+                      </TableCell>
+                      <TableCell>
+                        {item.appeal_status === 'pending' && (
+                          <div className="flex gap-2">
+                            <CanvaButton
+                              size="sm"
+                              variant="primary"
+                              onClick={() => handleApproveAppeal(item.id)}
+                            >
+                              <CheckCircle className="h-4 w-4" />
+                            </CanvaButton>
+                            <CanvaButton
+                              size="sm"
+                              variant="danger"
+                              onClick={() => handleRejectAppeal(item.id)}
+                            >
+                              <XCircle className="h-4 w-4" />
+                            </CanvaButton>
+                          </div>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </CanvaCardBody>
           </CanvaCard>
         </TabsContent>
@@ -710,70 +712,70 @@ export default function ModerationPage() {
           <CanvaCard>
             <CanvaCardBody className="p-0">
               <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>User</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Level</TableHead>
-                  <TableHead>Details</TableHead>
-                  <TableHead>Acknowledged</TableHead>
-                  <TableHead>Expires</TableHead>
-                  <TableHead>Date</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {warnings.map((warning) => (
-                  <TableRow key={warning.id}>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">
-                          {warning.user?.full_name || 'Unknown'}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          @{warning.user?.username || 'unknown'}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <CanvaBadge variant="primary">
-                        {warning.warning_type}
-                      </CanvaBadge>
-                    </TableCell>
-                    <TableCell>
-                      <CanvaBadge
-                        className={
-                          warning.warning_level === 3
-                            ? 'bg-red-500'
-                            : warning.warning_level === 2
-                              ? 'bg-orange-500'
-                              : 'bg-yellow-500'
-                        }
-                      >
-                        Level {warning.warning_level}
-                      </CanvaBadge>
-                    </TableCell>
-                    <TableCell className="max-w-xs truncate">
-                      {warning.details || '-'}
-                    </TableCell>
-                    <TableCell>
-                      {warning.acknowledged ? (
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      ) : (
-                        <XCircle className="h-4 w-4 text-gray-400" />
-                      )}
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {warning.expires_at
-                        ? formatDate(warning.expires_at)
-                        : 'Never'}
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {formatDate(warning.created_at)}
-                    </TableCell>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>User</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Level</TableHead>
+                    <TableHead>Details</TableHead>
+                    <TableHead>Acknowledged</TableHead>
+                    <TableHead>Expires</TableHead>
+                    <TableHead>Date</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {warnings.map((warning) => (
+                    <TableRow key={warning.id}>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">
+                            {warning.user?.full_name || 'Unknown'}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            @{warning.user?.username || 'unknown'}
+                          </p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <CanvaBadge variant="primary">
+                          {warning.warning_type}
+                        </CanvaBadge>
+                      </TableCell>
+                      <TableCell>
+                        <CanvaBadge
+                          className={
+                            warning.warning_level === 3
+                              ? 'bg-red-500'
+                              : warning.warning_level === 2
+                                ? 'bg-orange-500'
+                                : 'bg-yellow-500'
+                          }
+                        >
+                          Level {warning.warning_level}
+                        </CanvaBadge>
+                      </TableCell>
+                      <TableCell className="max-w-xs truncate">
+                        {warning.details || '-'}
+                      </TableCell>
+                      <TableCell>
+                        {warning.acknowledged ? (
+                          <CheckCircle className="h-4 w-4 text-green-500 dark:text-green-400" />
+                        ) : (
+                          <XCircle className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {warning.expires_at
+                          ? formatDate(warning.expires_at)
+                          : 'Never'}
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {formatDate(warning.created_at)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </CanvaCardBody>
           </CanvaCard>
         </TabsContent>
@@ -854,7 +856,9 @@ export default function ModerationPage() {
                   >
                     Cancel
                   </CanvaButton>
-                  <CanvaButton variant="primary" onClick={handleAddWord}>Add Word</CanvaButton>
+                  <CanvaButton variant="primary" onClick={handleAddWord}>
+                    Add Word
+                  </CanvaButton>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -884,7 +888,9 @@ export default function ModerationPage() {
                         </CanvaBadge>
                       </TableCell>
                       <TableCell>
-                        <CanvaBadge variant="primary">{item.category}</CanvaBadge>
+                        <CanvaBadge variant="primary">
+                          {item.category}
+                        </CanvaBadge>
                       </TableCell>
                       <TableCell>
                         {item.is_regex ? (
@@ -895,11 +901,11 @@ export default function ModerationPage() {
                       </TableCell>
                       <TableCell>
                         {item.is_active ? (
-                          <CanvaBadge className="bg-green-100 text-green-800">
+                          <CanvaBadge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
                             Active
                           </CanvaBadge>
                         ) : (
-                          <CanvaBadge className="bg-gray-100 text-gray-800">
+                          <CanvaBadge className="bg-muted text-foreground">
                             Disabled
                           </CanvaBadge>
                         )}

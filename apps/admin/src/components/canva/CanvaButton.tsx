@@ -28,6 +28,7 @@ const canvaButtonVariants = cva(
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
     'disabled:opacity-50 disabled:cursor-not-allowed',
     'active:scale-[0.98]',
+    'focus-visible:ring-offset-background',
   ],
   {
     variants: {
@@ -36,31 +37,34 @@ const canvaButtonVariants = cva(
           'bg-violet-500 text-white',
           'hover:bg-violet-600 hover:shadow-[0_4px_14px_rgb(139_92_246/0.4)]',
           'focus-visible:ring-violet-500',
+          'dark:bg-violet-600 dark:hover:bg-violet-500',
         ],
         secondary: [
-          'bg-gray-100 text-gray-700',
-          'hover:bg-gray-200',
-          'focus-visible:ring-gray-400',
+          'bg-muted text-foreground',
+          'hover:bg-muted/80',
+          'focus-visible:ring-muted-foreground',
         ],
         outline: [
-          'border border-gray-300 bg-transparent text-gray-700',
-          'hover:bg-gray-50 hover:border-gray-400',
-          'focus-visible:ring-gray-400',
+          'border border-border bg-transparent text-foreground',
+          'hover:bg-muted hover:border-border/80',
+          'focus-visible:ring-border',
         ],
         ghost: [
-          'bg-transparent text-gray-600',
-          'hover:bg-gray-100 hover:text-gray-900',
-          'focus-visible:ring-gray-400',
+          'bg-transparent text-muted-foreground',
+          'hover:bg-muted hover:text-foreground',
+          'focus-visible:ring-muted-foreground',
         ],
         success: [
           'bg-emerald-500 text-white',
           'hover:bg-emerald-600 hover:shadow-[0_4px_14px_rgb(16_185_129/0.4)]',
           'focus-visible:ring-emerald-500',
+          'dark:bg-emerald-600 dark:hover:bg-emerald-500',
         ],
         danger: [
           'bg-red-500 text-white',
           'hover:bg-red-600 hover:shadow-[0_4px_14px_rgb(239_68_68/0.4)]',
           'focus-visible:ring-red-500',
+          'dark:bg-red-600 dark:hover:bg-red-500',
         ],
       },
       size: {
@@ -88,11 +92,12 @@ const canvaButtonVariants = cva(
       variant: 'primary',
       size: 'md',
     },
-  }
+  },
 );
 
 export interface CanvaButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof canvaButtonVariants> {
   asChild?: boolean;
   loading?: boolean;
@@ -100,7 +105,10 @@ export interface CanvaButtonProps
   rightIcon?: React.ReactNode;
 }
 
-export const CanvaButton = React.forwardRef<HTMLButtonElement, CanvaButtonProps>(
+export const CanvaButton = React.forwardRef<
+  HTMLButtonElement,
+  CanvaButtonProps
+>(
   (
     {
       className,
@@ -116,7 +124,7 @@ export const CanvaButton = React.forwardRef<HTMLButtonElement, CanvaButtonProps>
       disabled,
       ...props
     },
-    ref
+    ref,
   ) => {
     const Comp = asChild ? Slot : 'button';
 
@@ -124,22 +132,18 @@ export const CanvaButton = React.forwardRef<HTMLButtonElement, CanvaButtonProps>
       <Comp
         className={cn(
           canvaButtonVariants({ variant, size, fullWidth, iconOnly }),
-          className
+          className,
         )}
         ref={ref}
         disabled={disabled || loading}
         {...props}
       >
-        {loading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          leftIcon
-        )}
+        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : leftIcon}
         {!iconOnly && children}
         {!loading && rightIcon}
       </Comp>
     );
-  }
+  },
 );
 
 CanvaButton.displayName = 'CanvaButton';

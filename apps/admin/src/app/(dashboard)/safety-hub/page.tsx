@@ -290,13 +290,19 @@ export default function SafetyHubPage() {
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'content':
-        return <Image className="h-4 w-4 text-purple-500" />;
+        return (
+          <Image className="h-4 w-4 text-purple-500 dark:text-purple-400" />
+        );
       case 'user':
-        return <Users className="h-4 w-4 text-blue-500" />;
+        return <Users className="h-4 w-4 text-blue-500 dark:text-blue-400" />;
       case 'message':
-        return <MessageSquare className="h-4 w-4 text-green-500" />;
+        return (
+          <MessageSquare className="h-4 w-4 text-green-500 dark:text-green-400" />
+        );
       case 'fraud':
-        return <CreditCard className="h-4 w-4 text-red-500" />;
+        return (
+          <CreditCard className="h-4 w-4 text-red-500 dark:text-red-400" />
+        );
       default:
         return <Flag className="h-4 w-4" />;
     }
@@ -330,11 +336,11 @@ export default function SafetyHubPage() {
 
       {/* Alert Banner */}
       {safetyStats.fraudAttempts > 10 && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center justify-between">
+        <div className="p-4 bg-red-500/10 dark:bg-red-500/20 border border-red-500/20 dark:border-red-500/30 rounded-lg flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <AlertTriangle className="h-5 w-5 text-red-500" />
+            <AlertTriangle className="h-5 w-5 text-red-500 dark:text-red-400" />
             <div>
-              <p className="font-medium text-red-500">
+              <p className="font-medium text-red-500 dark:text-red-400">
                 Yüksek Dolandırıcılık Aktivitesi
               </p>
               <p className="text-sm text-muted-foreground">
@@ -346,7 +352,7 @@ export default function SafetyHubPage() {
           <CanvaButton
             variant="outline"
             size="sm"
-            className="border-red-500/30 text-red-500"
+            className="border-red-500/30 text-red-500 dark:text-red-400"
           >
             Detayları Gör
           </CanvaButton>
@@ -358,26 +364,34 @@ export default function SafetyHubPage() {
         <CanvaStatCard
           label="Bekleyen Raporlar"
           value={safetyStats.pendingReports}
-          icon={<Clock className="h-5 w-5 text-orange-500" />}
+          icon={
+            <Clock className="h-5 w-5 text-orange-500 dark:text-orange-400" />
+          }
           className="border-l-4 border-l-orange-500"
         />
         <CanvaStatCard
           label="Bugün Çözülen"
           value={safetyStats.resolvedToday}
           change={{ value: 18, label: 'dünden' }}
-          icon={<CheckCircle2 className="h-5 w-5 text-green-500" />}
+          icon={
+            <CheckCircle2 className="h-5 w-5 text-green-500 dark:text-green-400" />
+          }
           className="border-l-4 border-l-green-500"
         />
         <CanvaStatCard
           label="Dolandırıcılık"
           value={safetyStats.fraudAttempts}
-          icon={<AlertTriangle className="h-5 w-5 text-red-500" />}
+          icon={
+            <AlertTriangle className="h-5 w-5 text-red-500 dark:text-red-400" />
+          }
           className="border-l-4 border-l-red-500"
         />
         <CanvaStatCard
           label="AI Tespitleri"
           value={safetyStats.aiDetectedThreats}
-          icon={<Brain className="h-5 w-5 text-purple-500" />}
+          icon={
+            <Brain className="h-5 w-5 text-purple-500 dark:text-purple-400" />
+          }
           className="border-l-4 border-l-purple-500"
         />
       </div>
@@ -502,10 +516,10 @@ export default function SafetyHubPage() {
                             className={cn(
                               'w-16 h-2',
                               report.aiScore > 0.8
-                                ? '[&>div]:bg-red-500'
+                                ? '[&>div]:bg-red-500 dark:[&>div]:bg-red-400'
                                 : report.aiScore > 0.5
-                                  ? '[&>div]:bg-yellow-500'
-                                  : '[&>div]:bg-green-500',
+                                  ? '[&>div]:bg-yellow-500 dark:[&>div]:bg-yellow-400'
+                                  : '[&>div]:bg-green-500 dark:[&>div]:bg-green-400',
                             )}
                           />
                           <span className="text-sm font-medium">
@@ -530,7 +544,7 @@ export default function SafetyHubPage() {
                             variant="ghost"
                             size="sm"
                             iconOnly
-                            className="text-green-500"
+                            className="text-green-500 dark:text-green-400"
                             title="Onayla"
                           >
                             <CheckCircle2 className="h-4 w-4" />
@@ -539,7 +553,7 @@ export default function SafetyHubPage() {
                             variant="ghost"
                             size="sm"
                             iconOnly
-                            className="text-red-500"
+                            className="text-red-500 dark:text-red-400"
                             title="Kaldır"
                           >
                             <XCircle className="h-4 w-4" />
@@ -579,11 +593,11 @@ export default function SafetyHubPage() {
         {/* AI Moderation Tab */}
         <TabsContent value="ai-moderation" className="space-y-4">
           <div className="grid grid-cols-4 gap-4">
-            <Card className="admin-card">
-              <CardContent className="p-4">
+            <CanvaCard>
+              <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-blue-500/10">
-                    <Eye className="h-5 w-5 text-blue-500" />
+                  <div className="p-2 rounded-lg bg-blue-500/10 dark:bg-blue-500/20">
+                    <Eye className="h-5 w-5 text-blue-500 dark:text-blue-400" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold">
@@ -594,13 +608,13 @@ export default function SafetyHubPage() {
                     </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-            <Card className="admin-card">
-              <CardContent className="p-4">
+              </CanvaCardBody>
+            </CanvaCard>
+            <CanvaCard>
+              <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-yellow-500/10">
-                    <Flag className="h-5 w-5 text-yellow-500" />
+                  <div className="p-2 rounded-lg bg-yellow-500/10 dark:bg-yellow-500/20">
+                    <Flag className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold">
@@ -609,13 +623,13 @@ export default function SafetyHubPage() {
                     <p className="text-xs text-muted-foreground">İşaretlenen</p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-            <Card className="admin-card">
-              <CardContent className="p-4">
+              </CanvaCardBody>
+            </CanvaCard>
+            <CanvaCard>
+              <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-red-500/10">
-                    <XCircle className="h-5 w-5 text-red-500" />
+                  <div className="p-2 rounded-lg bg-red-500/10 dark:bg-red-500/20">
+                    <XCircle className="h-5 w-5 text-red-500 dark:text-red-400" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold">
@@ -626,13 +640,13 @@ export default function SafetyHubPage() {
                     </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-            <Card className="admin-card">
-              <CardContent className="p-4">
+              </CanvaCardBody>
+            </CanvaCard>
+            <CanvaCard>
+              <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-green-500/10">
-                    <CheckCircle2 className="h-5 w-5 text-green-500" />
+                  <div className="p-2 rounded-lg bg-green-500/10 dark:bg-green-500/20">
+                    <CheckCircle2 className="h-5 w-5 text-green-500 dark:text-green-400" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold">
@@ -641,19 +655,19 @@ export default function SafetyHubPage() {
                     <p className="text-xs text-muted-foreground">Doğruluk</p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Card className="admin-card">
-              <CardHeader>
-                <CardTitle>Kategori Dağılımı</CardTitle>
-                <CardDescription>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Kategori Dağılımı</CanvaCardTitle>
+                <CanvaCardSubtitle>
                   AI tarafından tespit edilen ihlaller
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+                </CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody className="space-y-4">
                 {aiModerationStats.categories.map((cat) => (
                   <div key={cat.name} className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
@@ -665,17 +679,17 @@ export default function SafetyHubPage() {
                     <Progress value={cat.percentage} className="h-2" />
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
-            <Card className="admin-card">
-              <CardHeader>
-                <CardTitle>AI Model Performansı</CardTitle>
-                <CardDescription>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>AI Model Performansı</CanvaCardTitle>
+                <CanvaCardSubtitle>
                   Gerçek zamanlı model metrikleri
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+                </CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody className="space-y-4">
                 {[
                   {
                     model: 'İçerik Sınıflandırma',
@@ -707,7 +721,7 @@ export default function SafetyHubPage() {
                     className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-green-500" />
+                      <div className="w-2 h-2 rounded-full bg-green-500 dark:bg-green-400" />
                       <div>
                         <p className="font-medium text-sm">{model.model}</p>
                         <p className="text-xs text-muted-foreground">
@@ -715,30 +729,27 @@ export default function SafetyHubPage() {
                         </p>
                       </div>
                     </div>
-                    <Badge
-                      variant="outline"
-                      className="bg-green-500/10 text-green-500 border-green-500/20"
-                    >
+                    <CanvaBadge className="bg-green-500/10 dark:bg-green-500/20 text-green-500 dark:text-green-400 border-green-500/20 dark:border-green-500/30">
                       {model.accuracy}%
-                    </Badge>
+                    </CanvaBadge>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
         </TabsContent>
 
         {/* Fraud Tab */}
         <TabsContent value="fraud" className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <Card className="admin-card">
-              <CardHeader>
-                <CardTitle>Dolandırıcılık Kalıpları</CardTitle>
-                <CardDescription>
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Dolandırıcılık Kalıpları</CanvaCardTitle>
+                <CanvaCardSubtitle>
                   Son 30 günde tespit edilen pattern'ler
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
+                </CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody className="space-y-3">
                 {fraudPatterns.map((pattern) => (
                   <div
                     key={pattern.pattern}
@@ -758,7 +769,7 @@ export default function SafetyHubPage() {
                         <p className="text-xs text-muted-foreground">tespit</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-semibold text-green-500">
+                        <p className="text-sm font-semibold text-green-500 dark:text-green-400">
                           {pattern.blocked}
                         </p>
                         <p className="text-xs text-muted-foreground">
@@ -766,24 +777,24 @@ export default function SafetyHubPage() {
                         </p>
                       </div>
                       {pattern.trend === 'up' ? (
-                        <TrendingUp className="h-4 w-4 text-red-500" />
+                        <TrendingUp className="h-4 w-4 text-red-500 dark:text-red-400" />
                       ) : pattern.trend === 'down' ? (
-                        <TrendingDown className="h-4 w-4 text-green-500" />
+                        <TrendingDown className="h-4 w-4 text-green-500 dark:text-green-400" />
                       ) : (
-                        <Activity className="h-4 w-4 text-yellow-500" />
+                        <Activity className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />
                       )}
                     </div>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
 
-            <Card className="admin-card">
-              <CardHeader>
-                <CardTitle>Güvenlik Önlemleri</CardTitle>
-                <CardDescription>Aktif koruma katmanları</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
+            <CanvaCard>
+              <CanvaCardHeader>
+                <CanvaCardTitle>Güvenlik Önlemleri</CanvaCardTitle>
+                <CanvaCardSubtitle>Aktif koruma katmanları</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody className="space-y-3">
                 {[
                   {
                     name: 'Device Fingerprinting',
@@ -816,21 +827,23 @@ export default function SafetyHubPage() {
                     className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-green-500" />
+                      <div className="w-2 h-2 rounded-full bg-green-500 dark:bg-green-400" />
                       <span className="font-medium">{measure.name}</span>
                     </div>
-                    <Badge variant="outline">{measure.blocked} engelleme</Badge>
+                    <CanvaBadge variant="default">
+                      {measure.blocked} engelleme
+                    </CanvaBadge>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </CanvaCardBody>
+            </CanvaCard>
           </div>
 
-          <Card className="admin-card">
-            <CardHeader>
-              <CardTitle>Son Dolandırıcılık Girişimleri</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Son Dolandırıcılık Girişimleri</CanvaCardTitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -880,49 +893,49 @@ export default function SafetyHubPage() {
                       <TableCell>{attempt.user}</TableCell>
                       <TableCell>{attempt.detail}</TableCell>
                       <TableCell>
-                        <Badge
+                        <CanvaBadge
                           className={cn(
                             attempt.risk > 0.9
-                              ? 'bg-red-500/10 text-red-500'
-                              : 'bg-yellow-500/10 text-yellow-500',
+                              ? 'bg-red-500/10 dark:bg-red-500/20 text-red-500 dark:text-red-400'
+                              : 'bg-yellow-500/10 dark:bg-yellow-500/20 text-yellow-500 dark:text-yellow-400',
                           )}
                         >
                           {(attempt.risk * 100).toFixed(0)}%
-                        </Badge>
+                        </CanvaBadge>
                       </TableCell>
                       <TableCell>
-                        <Badge className="bg-green-500/10 text-green-500 border-green-500/20">
+                        <CanvaBadge className="bg-green-500/10 dark:bg-green-500/20 text-green-500 dark:text-green-400 border-green-500/20 dark:border-green-500/30">
                           <Shield className="h-3 w-3 mr-1" />
                           Engellendi
-                        </Badge>
+                        </CanvaBadge>
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">
+                        <CanvaButton variant="ghost" size="sm">
                           Detay
                           <ChevronRight className="h-4 w-4 ml-1" />
-                        </Button>
+                        </CanvaButton>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Suspended Accounts Tab */}
         <TabsContent value="suspended" className="space-y-4">
-          <Card className="admin-card">
-            <CardHeader>
+          <CanvaCard>
+            <CanvaCardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Askıya Alınan Hesaplar</CardTitle>
-                <Button variant="outline">
+                <CanvaCardTitle>Askıya Alınan Hesaplar</CanvaCardTitle>
+                <CanvaButton variant="outline">
                   <Filter className="h-4 w-4 mr-2" />
                   Filtrele
-                </Button>
+                </CanvaButton>
               </div>
-            </CardHeader>
-            <CardContent>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -945,42 +958,50 @@ export default function SafetyHubPage() {
                         {account.email}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{account.reason}</Badge>
+                        <CanvaBadge variant="default">
+                          {account.reason}
+                        </CanvaBadge>
                       </TableCell>
                       <TableCell>{account.suspendedAt}</TableCell>
                       <TableCell>
-                        <Badge
+                        <CanvaBadge
                           className={cn(
                             account.duration === 'Kalıcı'
-                              ? 'bg-red-500/10 text-red-500'
-                              : 'bg-yellow-500/10 text-yellow-500',
+                              ? 'bg-red-500/10 dark:bg-red-500/20 text-red-500 dark:text-red-400'
+                              : 'bg-yellow-500/10 dark:bg-yellow-500/20 text-yellow-500 dark:text-yellow-400',
                           )}
                         >
                           {account.duration}
-                        </Badge>
+                        </CanvaBadge>
                       </TableCell>
                       <TableCell>{account.reports}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          <Button variant="ghost" size="icon" title="İncele">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
+                          <CanvaButton
                             variant="ghost"
-                            size="icon"
+                            size="sm"
+                            iconOnly
+                            title="İncele"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </CanvaButton>
+                          <CanvaButton
+                            variant="ghost"
+                            size="sm"
+                            iconOnly
                             title="Askıyı Kaldır"
-                            className="text-green-500"
+                            className="text-green-500 dark:text-green-400"
                           >
                             <Unlock className="h-4 w-4" />
-                          </Button>
+                          </CanvaButton>
                         </div>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* Policies Tab */}
@@ -1030,20 +1051,22 @@ export default function SafetyHubPage() {
                 lastUpdated: '2026-01-07',
               },
             ].map((policy) => (
-              <Card key={policy.title} className="admin-card">
-                <CardHeader>
+              <CanvaCard key={policy.title}>
+                <CanvaCardHeader>
                   <div className="flex items-start justify-between">
                     <div className="p-2 rounded-lg bg-primary/10">
                       <policy.icon className="h-5 w-5 text-primary" />
                     </div>
-                    <Button variant="ghost" size="icon">
+                    <CanvaButton variant="ghost" size="sm" iconOnly>
                       <ExternalLink className="h-4 w-4" />
-                    </Button>
+                    </CanvaButton>
                   </div>
-                  <CardTitle className="text-base">{policy.title}</CardTitle>
-                  <CardDescription>{policy.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
+                  <CanvaCardTitle className="text-base">
+                    {policy.title}
+                  </CanvaCardTitle>
+                  <CanvaCardSubtitle>{policy.description}</CanvaCardSubtitle>
+                </CanvaCardHeader>
+                <CanvaCardBody>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">
                       {policy.rules} kural
@@ -1052,8 +1075,8 @@ export default function SafetyHubPage() {
                       Son: {policy.lastUpdated}
                     </span>
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))}
           </div>
         </TabsContent>

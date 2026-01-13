@@ -240,18 +240,24 @@ export default function AuditTrailPage() {
 
   const getActionIcon = (action: string) => {
     if (action.includes('create'))
-      return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+      return (
+        <CheckCircle2 className="h-4 w-4 text-green-500 dark:text-green-400" />
+      );
     if (action.includes('delete'))
-      return <Trash2 className="h-4 w-4 text-red-500" />;
+      return <Trash2 className="h-4 w-4 text-red-500 dark:text-red-400" />;
     if (action.includes('update') || action.includes('edit'))
-      return <Edit className="h-4 w-4 text-blue-500" />;
+      return <Edit className="h-4 w-4 text-blue-500 dark:text-blue-400" />;
     if (action.includes('suspend') || action.includes('ban'))
-      return <Ban className="h-4 w-4 text-orange-500" />;
+      return <Ban className="h-4 w-4 text-orange-500 dark:text-orange-400" />;
     if (action.includes('verify') || action.includes('approve'))
-      return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+      return (
+        <CheckCircle2 className="h-4 w-4 text-green-500 dark:text-green-400" />
+      );
     if (action.includes('release') || action.includes('refund'))
-      return <DollarSign className="h-4 w-4 text-purple-500" />;
-    return <Activity className="h-4 w-4 text-gray-500" />;
+      return (
+        <DollarSign className="h-4 w-4 text-purple-500 dark:text-purple-400" />
+      );
+    return <Activity className="h-4 w-4 text-muted-foreground" />;
   };
 
   const getActionLabel = (action: string) => {
@@ -275,11 +281,16 @@ export default function AuditTrailPage() {
 
   const getRoleBadge = (role: string) => {
     const styles: Record<string, string> = {
-      super_admin: 'bg-purple-500/10 text-purple-500',
-      manager: 'bg-blue-500/10 text-blue-500',
-      moderator: 'bg-green-500/10 text-green-500',
-      finance: 'bg-yellow-500/10 text-yellow-500',
-      support: 'bg-orange-500/10 text-orange-500',
+      super_admin:
+        'bg-purple-500/10 dark:bg-purple-500/20 text-purple-500 dark:text-purple-400',
+      manager:
+        'bg-blue-500/10 dark:bg-blue-500/20 text-blue-500 dark:text-blue-400',
+      moderator:
+        'bg-green-500/10 dark:bg-green-500/20 text-green-500 dark:text-green-400',
+      finance:
+        'bg-yellow-500/10 dark:bg-yellow-500/20 text-yellow-500 dark:text-yellow-400',
+      support:
+        'bg-orange-500/10 dark:bg-orange-500/20 text-orange-500 dark:text-orange-400',
     };
     const labels: Record<string, string> = {
       super_admin: 'Super Admin',
@@ -289,7 +300,7 @@ export default function AuditTrailPage() {
       support: 'Support',
     };
     return (
-      <CanvaBadge className={styles[role] || 'bg-gray-500/10 text-gray-500'}>
+      <CanvaBadge className={styles[role] || 'bg-muted text-muted-foreground'}>
         {labels[role] || role}
       </CanvaBadge>
     );
@@ -406,9 +417,18 @@ export default function AuditTrailPage() {
                       key={log.id}
                       className={cn(
                         'cursor-pointer hover:bg-muted/50',
-                        log.status === 'failed' && 'bg-red-500/5',
+                        log.status === 'failed' &&
+                          'bg-red-500/5 dark:bg-red-500/10',
                       )}
                       onClick={() => setSelectedLog(log)}
+                      tabIndex={0}
+                      role="button"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setSelectedLog(log);
+                        }
+                      }}
                     >
                       <TableCell>
                         <div className="text-sm">
@@ -451,12 +471,12 @@ export default function AuditTrailPage() {
                       </TableCell>
                       <TableCell>
                         {log.status === 'success' ? (
-                          <CanvaBadge className="bg-green-500/10 text-green-500">
+                          <CanvaBadge className="bg-green-500/10 dark:bg-green-500/20 text-green-500 dark:text-green-400">
                             <CheckCircle2 className="h-3 w-3 mr-1" />
                             Başarılı
                           </CanvaBadge>
                         ) : (
-                          <CanvaBadge className="bg-red-500/10 text-red-500">
+                          <CanvaBadge className="bg-red-500/10 dark:bg-red-500/20 text-red-500 dark:text-red-400">
                             <XCircle className="h-3 w-3 mr-1" />
                             Başarısız
                           </CanvaBadge>
@@ -480,7 +500,9 @@ export default function AuditTrailPage() {
           {/* Admin Activity */}
           <CanvaCard className="admin-card">
             <CanvaCardHeader className="pb-2">
-              <CanvaCardTitle className="text-base">Admin Aktivitesi</CanvaCardTitle>
+              <CanvaCardTitle className="text-base">
+                Admin Aktivitesi
+              </CanvaCardTitle>
             </CanvaCardHeader>
             <CanvaCardBody className="space-y-3">
               {adminActivity.map((admin) => (
@@ -512,7 +534,9 @@ export default function AuditTrailPage() {
             <CanvaCard className="admin-card">
               <CanvaCardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CanvaCardTitle className="text-base">Log Detayı</CanvaCardTitle>
+                  <CanvaCardTitle className="text-base">
+                    Log Detayı
+                  </CanvaCardTitle>
                   <CanvaButton
                     variant="ghost"
                     size="sm"
@@ -539,14 +563,18 @@ export default function AuditTrailPage() {
                   <div>
                     <p className="text-muted-foreground mb-1">Değişiklikler</p>
                     <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div className="p-2 rounded bg-red-500/10">
-                        <p className="font-medium text-red-500">Önceki</p>
+                      <div className="p-2 rounded bg-red-500/10 dark:bg-red-500/20">
+                        <p className="font-medium text-red-500 dark:text-red-400">
+                          Önceki
+                        </p>
                         <pre className="mt-1 overflow-auto">
                           {JSON.stringify(selectedLog.changes.before, null, 2)}
                         </pre>
                       </div>
-                      <div className="p-2 rounded bg-green-500/10">
-                        <p className="font-medium text-green-500">Sonraki</p>
+                      <div className="p-2 rounded bg-green-500/10 dark:bg-green-500/20">
+                        <p className="font-medium text-green-500 dark:text-green-400">
+                          Sonraki
+                        </p>
                         <pre className="mt-1 overflow-auto">
                           {JSON.stringify(selectedLog.changes.after, null, 2)}
                         </pre>
@@ -555,7 +583,7 @@ export default function AuditTrailPage() {
                   </div>
                 )}
                 {selectedLog.error && (
-                  <div className="p-2 rounded bg-red-500/10 text-red-500">
+                  <div className="p-2 rounded bg-red-500/10 dark:bg-red-500/20 text-red-500 dark:text-red-400">
                     <p className="font-medium">Hata</p>
                     <p className="text-xs">{selectedLog.error}</p>
                   </div>

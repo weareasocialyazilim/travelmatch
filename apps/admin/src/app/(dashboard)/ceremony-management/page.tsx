@@ -13,17 +13,15 @@ import {
   ClockIcon,
   CheckCircleIcon,
 } from '@heroicons/react/24/outline';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { getClient } from '@/lib/supabase';
+import { toast } from '@/components/ui/use-toast';
 import { PageHeader } from '@/components/common/page-header';
-import { toast } from 'sonner';
-import { CanvaButton } from '@/components/canva/CanvaButton';
-import { CanvaInput } from '@/components/canva/CanvaInput';
 import {
   CanvaCard,
   CanvaCardHeader,
   CanvaCardTitle,
-  CanvaCardSubtitle,
   CanvaCardBody,
-  CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -115,64 +113,143 @@ const mockRecentActivity = [
 export default function CeremonyManagementPage() {
   const [selectedProof, setSelectedProof] = useState(mockPendingProofs[0]);
   const [activeTab, setActiveTab] = useState('overview');
-  const [isProcessing, setIsProcessing] = useState(false);
+  const queryClient = useQueryClient();
 
-  const handleApprove = async () => {
-    if (!selectedProof?.id) return;
-    setIsProcessing(true);
-    try {
-      const response = await fetch('/api/proofs', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          proof_id: selectedProof.id,
-          action: 'verify',
-        }),
+  // Mutation for approving a proof
+  const approveMutation = useMutation({
+    mutationFn: async (proofId: string) => {
+      const supabase = getClient();
+      const { data, error } = await supabase
+        .from('proof_ceremonies')
+        .update({
+          status: 'verified',
+          verified_at: new Date().toISOString(),
+          reviewed_by: 'admin', // In production, use actual admin user ID
+        })
+        .eq('id', proofId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ceremony-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-proofs'] });
+      toast({
+        title: 'Basarili',
+        description: 'Proof basariyla onaylandi',
       });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Onaylama başarısız');
-      }
-      toast.success('Kanıt onaylandı');
-      // Refresh proof list would go here in production
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Bir hata oluştu');
-    } finally {
-      setIsProcessing(false);
-    }
+    },
+    onError: (error: Error) => {
+      console.error('Approve proof error:', error);
+      toast({
+        title: 'Hata',
+        description: error.message || 'Proof onaylanamadi',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Mutation for rejecting a proof
+  const rejectMutation = useMutation({
+    mutationFn: async ({
+      proofId,
+      reason,
+    }: {
+      proofId: string;
+      reason: string;
+    }) => {
+      const supabase = getClient();
+      const { data, error } = await supabase
+        .from('proof_ceremonies')
+        .update({
+          status: 'rejected',
+          rejection_reason: reason,
+          rejected_at: new Date().toISOString(),
+          reviewed_by: 'admin', // In production, use actual admin user ID
+        })
+        .eq('id', proofId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ceremony-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-proofs'] });
+      toast({
+        title: 'Basarili',
+        description: 'Proof reddedildi',
+      });
+    },
+    onError: (error: Error) => {
+      console.error('Reject proof error:', error);
+      toast({
+        title: 'Hata',
+        description: error.message || 'Proof reddedilemedi',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Mutation for requesting more information
+  const requestInfoMutation = useMutation({
+    mutationFn: async ({
+      proofId,
+      message,
+    }: {
+      proofId: string;
+      message: string;
+    }) => {
+      const supabase = getClient();
+      const { data, error } = await supabase
+        .from('proof_ceremonies')
+        .update({
+          status: 'info_requested',
+          info_request_message: message,
+          info_requested_at: new Date().toISOString(),
+          reviewed_by: 'admin', // In production, use actual admin user ID
+        })
+        .eq('id', proofId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ceremony-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-proofs'] });
+      toast({
+        title: 'Basarili',
+        description: 'Bilgi talebi gonderildi',
+      });
+    },
+    onError: (error: Error) => {
+      console.error('Request info error:', error);
+      toast({
+        title: 'Hata',
+        description: error.message || 'Bilgi talebi gonderilemedi',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const handleApprove = () => {
+    if (!selectedProof?.id) return;
+    approveMutation.mutate(selectedProof.id);
   };
 
-  const handleReject = async (reason: string) => {
-    if (!selectedProof?.id || !reason) return;
-    setIsProcessing(true);
-    try {
-      const response = await fetch('/api/proofs', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          proof_id: selectedProof.id,
-          action: 'reject',
-          rejection_reason: reason,
-        }),
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Reddetme başarısız');
-      }
-      toast.success('Kanıt reddedildi');
-      // Refresh proof list would go here in production
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Bir hata oluştu');
-    } finally {
-      setIsProcessing(false);
-    }
+  const handleReject = (reason: string) => {
+    if (!selectedProof?.id) return;
+    rejectMutation.mutate({ proofId: selectedProof.id, reason });
   };
 
   const handleRequestInfo = (message: string) => {
-    // Note: Request info functionality requires a new API endpoint
-    // For now, show info toast - can be extended when backend supports it
-    if (!message) return;
-    toast.info(`Bilgi talebi gönderilecek: ${message.slice(0, 50)}...`);
+    if (!selectedProof?.id) return;
+    requestInfoMutation.mutate({ proofId: selectedProof.id, message });
   };
 
   return (
@@ -216,7 +293,9 @@ export default function CeremonyManagementPage() {
             {/* Pending list */}
             <CanvaCard className="lg:col-span-1">
               <CanvaCardHeader>
-                <CanvaCardTitle className="text-lg">Bekleyen Prooflar</CanvaCardTitle>
+                <CanvaCardTitle className="text-lg">
+                  Bekleyen Prooflar
+                </CanvaCardTitle>
               </CanvaCardHeader>
               <CanvaCardBody>
                 <div className="space-y-2">
@@ -226,16 +305,16 @@ export default function CeremonyManagementPage() {
                       onClick={() => setSelectedProof(proof)}
                       className={`w-full text-left p-3 rounded-lg border transition-colors ${
                         selectedProof.id === proof.id
-                          ? 'border-amber-500 bg-amber-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-amber-500 bg-amber-500/10 dark:bg-amber-500/20'
+                          : 'border-border hover:border-border'
                       }`}
                     >
                       <div className="flex items-start justify-between">
                         <div>
-                          <p className="font-medium text-gray-900">
+                          <p className="font-medium text-foreground">
                             {proof.userName}
                           </p>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-muted-foreground">
                             {proof.momentTitle}
                           </p>
                         </div>
@@ -253,7 +332,7 @@ export default function CeremonyManagementPage() {
                         {proof.aiAnalysis.flags.slice(0, 2).map((flag, i) => (
                           <span
                             key={i}
-                            className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded"
+                            className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded"
                           >
                             {flag}
                           </span>
@@ -263,7 +342,7 @@ export default function CeremonyManagementPage() {
                   ))}
 
                   {mockPendingProofs.length === 0 && (
-                    <div className="text-center py-8 text-gray-500">
+                    <div className="text-center py-8 text-muted-foreground">
                       <CheckCircleIcon className="w-12 h-12 mx-auto mb-2 text-emerald-500" />
                       <p>Bekleyen inceleme yok!</p>
                     </div>
@@ -296,7 +375,7 @@ export default function CeremonyManagementPage() {
               <CanvaCardTitle>İnceleme Geçmişi</CanvaCardTitle>
             </CanvaCardHeader>
             <CanvaCardBody>
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-muted-foreground">
                 <p>Geçmiş incelemeler burada listelenecek</p>
               </div>
             </CanvaCardBody>

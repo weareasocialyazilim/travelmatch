@@ -224,7 +224,7 @@ export default function AICenterPage() {
   const getTrendBadge = (trend: string) => {
     if (trend === 'rising' || trend === 'up') {
       return (
-        <CanvaBadge variant="primary" className="bg-green-100 text-green-800">
+        <CanvaBadge variant="success">
           <TrendingUp className="mr-1 h-3 w-3" />
           Yükseliyor
         </CanvaBadge>
@@ -412,8 +412,8 @@ export default function AICenterPage() {
                       <span
                         className={
                           model.errorRate > 0.05
-                            ? 'text-red-500'
-                            : 'text-green-500'
+                            ? 'text-red-500 dark:text-red-400'
+                            : 'text-green-500 dark:text-green-400'
                         }
                       >
                         %{(model.errorRate * 100).toFixed(2)}
@@ -466,8 +466,8 @@ export default function AICenterPage() {
                     className="flex items-start justify-between rounded-lg border p-4"
                   >
                     <div className="flex items-start gap-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100">
-                        <Users className="h-5 w-5 text-gray-600" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                        <Users className="h-5 w-5 text-muted-foreground" />
                       </div>
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
@@ -572,7 +572,7 @@ export default function AICenterPage() {
             <CanvaCardBody>
               {anomalies.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-                  <CheckCircle className="h-12 w-12 mb-4 text-green-500" />
+                  <CheckCircle className="h-12 w-12 mb-4 text-green-500 dark:text-green-400" />
                   <p>Aktif anomali bulunmuyor</p>
                 </div>
               ) : (
@@ -593,10 +593,10 @@ export default function AICenterPage() {
                           <div
                             className={`flex h-10 w-10 items-center justify-center rounded-full ${
                               anomaly.severity === 'critical'
-                                ? 'bg-red-100'
+                                ? 'bg-red-500/10 dark:bg-red-500/20'
                                 : anomaly.severity === 'warning'
-                                  ? 'bg-yellow-100'
-                                  : 'bg-blue-100'
+                                  ? 'bg-yellow-500/10 dark:bg-yellow-500/20'
+                                  : 'bg-blue-500/10 dark:bg-blue-500/20'
                             }`}
                           >
                             <AlertTriangle
@@ -687,10 +687,7 @@ export default function AICenterPage() {
                         )}
                       </div>
                       {exp.winner && (
-                        <CanvaBadge
-                          variant="primary"
-                          className="bg-green-100 text-green-800"
-                        >
+                        <CanvaBadge variant="success">
                           Kazanan: {exp.winner}
                         </CanvaBadge>
                       )}
@@ -702,7 +699,7 @@ export default function AICenterPage() {
                           key={i}
                           className={`rounded-lg border p-3 ${
                             exp.winner === variant.name
-                              ? 'border-green-500 bg-green-50'
+                              ? 'border-emerald-500 bg-emerald-500/10 dark:bg-emerald-500/20'
                               : ''
                           }`}
                         >
@@ -765,9 +762,9 @@ export default function AICenterPage() {
                         <span
                           className={
                             trend.changePercent > 0
-                              ? 'text-green-500'
+                              ? 'text-green-500 dark:text-green-400'
                               : trend.changePercent < 0
-                                ? 'text-red-500'
+                                ? 'text-red-500 dark:text-red-400'
                                 : ''
                           }
                         >

@@ -13,6 +13,7 @@ export {
 } from './use-realtime';
 
 // Data Hooks
+export * from './use-alerts';
 export * from './use-tasks';
 export * from './use-users';
 export * from './use-admin-users';
@@ -28,3 +29,24 @@ export * from './use-moments';
 
 // Ceremony Hooks
 export * from './useCeremonyStats';
+
+// VIP Management Hooks
+export * from './use-vip';
+
+// Fraud Investigation Hooks
+export * from './use-fraud';
+
+// Wallet Operations Hooks
+export * from './use-wallet-operations';
+
+// Feature Flags
+export * from './use-feature-flags';
+
+// Security Hooks
+export * from './use-security';
+
+// Promos Hooks
+export * from './use-promos';
+
+// Chat Analytics
+export * from './use-chat-analytics';

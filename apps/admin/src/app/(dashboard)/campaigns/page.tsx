@@ -386,13 +386,21 @@ export default function CampaignsPage() {
         />
         <CanvaStatCard
           title="Toplam Erişim"
-          value={isLoading ? '...' : `${(overallStats.totalReach / 1000).toFixed(0)}K`}
+          value={
+            isLoading
+              ? '...'
+              : `${(overallStats.totalReach / 1000).toFixed(0)}K`
+          }
           icon={<Users className="h-5 w-5" />}
           accentColor="blue"
         />
         <CanvaStatCard
           title="Dönüşüm"
-          value={isLoading ? '...' : overallStats.totalConversions.toLocaleString('tr-TR')}
+          value={
+            isLoading
+              ? '...'
+              : overallStats.totalConversions.toLocaleString('tr-TR')
+          }
           icon={<Target className="h-5 w-5" />}
           accentColor="violet"
         />
@@ -404,7 +412,14 @@ export default function CampaignsPage() {
         />
         <CanvaStatCard
           title="Harcama"
-          value={isLoading ? '...' : formatCurrency(campaigns.reduce((sum, c) => sum + (c.spent || 0), 0), 'TRY')}
+          value={
+            isLoading
+              ? '...'
+              : formatCurrency(
+                  campaigns.reduce((sum, c) => sum + (c.spent || 0), 0),
+                  'TRY',
+                )
+          }
           icon={<DollarSign className="h-5 w-5" />}
           accentColor="emerald"
           trend="up"
@@ -526,7 +541,12 @@ export default function CampaignsPage() {
                       {/* Actions */}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <CanvaButton variant="ghost" size="sm" iconOnly>
+                          <CanvaButton
+                            variant="ghost"
+                            size="sm"
+                            iconOnly
+                            aria-label="Daha fazla seçenek"
+                          >
                             <MoreHorizontal className="h-4 w-4" />
                           </CanvaButton>
                         </DropdownMenuTrigger>
