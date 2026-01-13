@@ -482,7 +482,7 @@ export default function CEOBriefingPage() {
                 <span className="font-medium">{link.label}</span>
               </div>
               {link.count !== null && (
-                <CanvaBadge variant="secondary">{link.count}</CanvaBadge>
+                <CanvaBadge variant="default">{link.count}</CanvaBadge>
               )}
             </CanvaCardBody>
           </CanvaCard>

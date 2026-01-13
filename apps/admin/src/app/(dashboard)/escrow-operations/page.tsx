@@ -357,7 +357,7 @@ export default function EscrowOperationsPage() {
       case 'disputed':
         return (
           <CanvaBadge
-            variant="danger"
+            variant="error"
             icon={<AlertTriangle className="h-3 w-3" />}
           >
             Anlasmazlik
@@ -372,14 +372,14 @@ export default function EscrowOperationsPage() {
       case 'refunded':
         return (
           <CanvaBadge
-            variant="secondary"
+            variant="default"
             icon={<ArrowDownRight className="h-3 w-3" />}
           >
             Iade Edildi
           </CanvaBadge>
         );
       default:
-        return <CanvaBadge variant="secondary">{status}</CanvaBadge>;
+        return <CanvaBadge variant="default">{status}</CanvaBadge>;
     }
   };
 
@@ -413,9 +413,9 @@ export default function EscrowOperationsPage() {
       case 'pending_kyc':
         return <CanvaBadge variant="warning">KYC Bekliyor</CanvaBadge>;
       case 'failed':
-        return <CanvaBadge variant="danger">Basarisiz</CanvaBadge>;
+        return <CanvaBadge variant="error">Basarisiz</CanvaBadge>;
       default:
-        return <CanvaBadge variant="secondary">{status}</CanvaBadge>;
+        return <CanvaBadge variant="default">{status}</CanvaBadge>;
     }
   };
 
@@ -535,7 +535,7 @@ export default function EscrowOperationsPage() {
                   <p className="text-xs text-muted-foreground mt-1">
                     {tier.description}
                   </p>
-                  <CanvaBadge variant="secondary" className="mt-2 text-xs">
+                  <CanvaBadge variant="default" className="mt-2 text-xs">
                     {tier.escrow}
                   </CanvaBadge>
                 </div>

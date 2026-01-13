@@ -375,7 +375,7 @@ export default function AIInsightsPage() {
           </CanvaBadge>
         );
       case 'medium':
-        return <CanvaBadge variant="secondary">Orta</CanvaBadge>;
+        return <CanvaBadge variant="default">Orta</CanvaBadge>;
       default:
         return <CanvaBadge variant="outline">Dusuk</CanvaBadge>;
     }

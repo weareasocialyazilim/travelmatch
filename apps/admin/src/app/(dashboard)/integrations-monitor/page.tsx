@@ -376,7 +376,7 @@ export default function IntegrationsMonitorPage() {
           </CanvaBadge>
         );
       default:
-        return <CanvaBadge variant="neutral">{status}</CanvaBadge>;
+        return <CanvaBadge variant="default">{status}</CanvaBadge>;
     }
   };
 
@@ -426,7 +426,7 @@ export default function IntegrationsMonitorPage() {
           </span>
           <CanvaButton
             variant="secondary"
-            size="small"
+            size="sm"
             onClick={handleRefresh}
             disabled={isRefreshing}
           >
@@ -651,8 +651,8 @@ export default function IntegrationsMonitorPage() {
                       <div className="flex items-center justify-between text-xs text-muted-foreground pt-2">
                         <span>Son kontrol: {service.lastCheck}</span>
                         <CanvaButton
-                          variant="tertiary"
-                          size="small"
+                          variant="ghost"
+                          size="xs"
                           className="h-6 px-2"
                         >
                           <ExternalLink className="h-3 w-3" />
