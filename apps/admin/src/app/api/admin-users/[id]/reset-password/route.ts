@@ -100,10 +100,11 @@ export async function POST(
 
     // E-posta gönder (opsiyonel)
     if (send_email) {
-      // TODO: E-posta servisi entegrasyonu
-      logger.info('Password reset email would be sent', {
+      await sendPasswordResetEmail({
         to: (targetAdmin as any).email,
-        from: session.admin.email,
+        name: (targetAdmin as any).name,
+        temporaryPassword: new_password ? undefined : password,
+        resetBy: session.admin.email,
       });
     }
 
@@ -116,6 +117,60 @@ export async function POST(
   } catch (error) {
     logger.error('Password reset error', { error });
     return NextResponse.json({ error: 'Sunucu hatası' }, { status: 500 });
+  }
+}
+
+// Email service integration
+interface PasswordResetEmailParams {
+  to: string;
+  name: string;
+  temporaryPassword?: string;
+  resetBy: string;
+}
+
+async function sendPasswordResetEmail(
+  params: PasswordResetEmailParams,
+): Promise<void> {
+  const { to, name, temporaryPassword, resetBy } = params;
+
+  // Use Resend/SendGrid/etc. when configured
+  const emailServiceUrl = process.env.EMAIL_SERVICE_URL;
+
+  if (emailServiceUrl) {
+    try {
+      await fetch(emailServiceUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.EMAIL_SERVICE_API_KEY}`,
+        },
+        body: JSON.stringify({
+          template: 'admin-password-reset',
+          to,
+          data: {
+            name,
+            temporaryPassword,
+            resetBy,
+            loginUrl: `${process.env.NEXT_PUBLIC_APP_URL}/admin/login`,
+          },
+        }),
+      });
+      logger.info('Password reset email sent', { to });
+    } catch (error) {
+      logger.error('Failed to send password reset email', { error, to });
+      // Non-blocking - don't fail the reset if email fails
+    }
+  } else {
+    // Log for development/testing
+    logger.info(
+      'Password reset email (not sent - no email service configured)',
+      {
+        to,
+        name,
+        hasTemporaryPassword: !!temporaryPassword,
+        resetBy,
+      },
+    );
   }
 }
 
