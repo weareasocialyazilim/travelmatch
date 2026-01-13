@@ -367,7 +367,7 @@ export default function AIInsightsPage() {
   const getImpactBadge = (impact: string) => {
     switch (impact) {
       case 'critical':
-        return <CanvaBadge variant="destructive">Kritik</CanvaBadge>;
+        return <CanvaBadge variant="error">Kritik</CanvaBadge>;
       case 'high':
         return (
           <CanvaBadge className="bg-amber-500/10 text-amber-600">
