@@ -373,7 +373,7 @@ export default function UsersPage() {
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <CanvaButton variant="ghost" size="sm" iconOnly>
+                      <CanvaButton variant="ghost" size="sm" iconOnly aria-label="Kullanıcı işlemleri">
                         <MoreHorizontal className="h-4 w-4" />
                       </CanvaButton>
                     </DropdownMenuTrigger>

@@ -210,7 +210,7 @@ export default function GeographicPage() {
               <SelectItem value="1y">Son 1 yıl</SelectItem>
             </SelectContent>
           </Select>
-          <CanvaButton variant="primary" size="sm" iconOnly>
+          <CanvaButton variant="primary" size="sm" iconOnly aria-label="Yenile">
             <RefreshCw className="h-4 w-4" />
           </CanvaButton>
           <CanvaButton variant="primary">
@@ -280,9 +280,10 @@ export default function GeographicPage() {
                 <CanvaCardBody>
                   <div className="space-y-4">
                     {countryStats.map((country, index) => (
-                      <div
+                      <button
                         key={country.code}
-                        className={`flex items-center justify-between rounded-lg border p-4 cursor-pointer transition-colors ${
+                        type="button"
+                        className={`flex w-full items-center justify-between rounded-lg border p-4 cursor-pointer transition-colors ${
                           selectedCountry === country.code
                             ? 'border-primary bg-primary/5'
                             : 'hover:bg-accent'
@@ -332,7 +333,7 @@ export default function GeographicPage() {
                             </span>
                           </div>
                         </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </CanvaCardBody>

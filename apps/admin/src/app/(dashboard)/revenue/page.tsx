@@ -24,7 +24,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import {
   LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,

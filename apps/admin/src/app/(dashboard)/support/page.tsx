@@ -625,10 +625,10 @@ export default function SupportPage() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <CanvaButton size="sm" variant="ghost" iconOnly>
+                    <CanvaButton size="sm" variant="ghost" iconOnly aria-label="E-posta gönder">
                       <Mail className="h-4 w-4" />
                     </CanvaButton>
-                    <CanvaButton size="sm" variant="ghost" iconOnly>
+                    <CanvaButton size="sm" variant="ghost" iconOnly aria-label="Kullanıcı profilini aç">
                       <ExternalLink className="h-4 w-4" />
                     </CanvaButton>
                   </div>
