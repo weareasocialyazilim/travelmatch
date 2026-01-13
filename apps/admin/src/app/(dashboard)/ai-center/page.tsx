@@ -224,7 +224,7 @@ export default function AICenterPage() {
   const getTrendBadge = (trend: string) => {
     if (trend === 'rising' || trend === 'up') {
       return (
-        <CanvaBadge variant="primary" className="bg-green-100 text-green-800">
+        <CanvaBadge variant="success">
           <TrendingUp className="mr-1 h-3 w-3" />
           Yükseliyor
         </CanvaBadge>
@@ -687,10 +687,7 @@ export default function AICenterPage() {
                         )}
                       </div>
                       {exp.winner && (
-                        <CanvaBadge
-                          variant="primary"
-                          className="bg-green-100 text-green-800"
-                        >
+                        <CanvaBadge variant="success">
                           Kazanan: {exp.winner}
                         </CanvaBadge>
                       )}
@@ -702,7 +699,7 @@ export default function AICenterPage() {
                           key={i}
                           className={`rounded-lg border p-3 ${
                             exp.winner === variant.name
-                              ? 'border-green-500 bg-green-50'
+                              ? 'border-emerald-500 bg-emerald-500/10 dark:bg-emerald-500/20'
                               : ''
                           }`}
                         >
