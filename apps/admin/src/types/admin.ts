@@ -17,6 +17,7 @@ export interface AdminUser {
   role: AdminRole;
   is_active: boolean;
   requires_2fa: boolean;
+  totp_secret: string | null;
   totp_enabled: boolean;
   last_login_at: string | null;
   created_at: string;

@@ -15,6 +15,19 @@ interface User {
   verification_level: number;
   created_at: string;
   last_active_at?: string;
+  // Status and moderation fields
+  status?: 'active' | 'suspended' | 'banned' | 'pending' | 'deleted' | null;
+  banned_at?: string | null;
+  suspended_at?: string | null;
+  ban_reason?: string | null;
+  suspension_reason?: string | null;
+  banned_by?: string | null;
+  suspended_by?: string | null;
+  suspension_ends_at?: string | null;
+  reinstated_at?: string | null;
+  kyc_status?: string | null;
+  rating?: number | null;
+  updated_at?: string | null;
 }
 
 interface UsersResponse {
@@ -130,7 +143,7 @@ export function useSuspendUser() {
         data: {
           is_suspended: true,
           suspension_reason: reason,
-        } as Partial<User>,
+        },
       }),
     mutateAsync: (id: string, reason?: string) =>
       updateUser.mutateAsync({
@@ -138,7 +151,7 @@ export function useSuspendUser() {
         data: {
           is_suspended: true,
           suspension_reason: reason,
-        } as Partial<User>,
+        },
       }),
   };
 }
@@ -151,12 +164,12 @@ export function useBanUser() {
     mutate: (id: string, reason?: string) =>
       updateUser.mutate({
         id,
-        data: { is_banned: true, ban_reason: reason } as Partial<User>,
+        data: { is_banned: true, ban_reason: reason },
       }),
     mutateAsync: (id: string, reason?: string) =>
       updateUser.mutateAsync({
         id,
-        data: { is_banned: true, ban_reason: reason } as Partial<User>,
+        data: { is_banned: true, ban_reason: reason },
       }),
   };
 }
