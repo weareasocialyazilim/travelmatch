@@ -47,6 +47,22 @@ const translations = {
       c4: ['REYKJAVIK', 'RİO'],
       c5: ['ROMA', 'MARAKEŞ'],
     },
+    cookie: {
+      title: 'Çerez Tercihleri',
+      description:
+        'Deneyiminizi iyileştirmek için çerezler kullanıyoruz. Tercihlerinizi yönetebilirsiniz.',
+      acceptAll: 'Tümünü Kabul Et',
+      acceptNecessary: 'Sadece Gerekli',
+      customize: 'Özelleştir',
+      save: 'Kaydet',
+      necessary: 'Gerekli Çerezler',
+      necessaryDesc: 'Site işlevselliği için zorunlu',
+      analytics: 'Analitik Çerezler',
+      analyticsDesc: 'Site kullanımını anlamamıza yardımcı olur',
+      marketing: 'Pazarlama Çerezleri',
+      marketingDesc: 'Kişiselleştirilmiş içerik için kullanılır',
+      privacyPolicy: 'Gizlilik Politikası',
+    },
   },
   en: {
     hero: {
@@ -78,6 +94,22 @@ const translations = {
       c3: ['TOKYO', 'NEW YORK'],
       c4: ['REYKJAVIK', 'RIO'],
       c5: ['ROME', 'MARRAKESH'],
+    },
+    cookie: {
+      title: 'Cookie Preferences',
+      description:
+        'We use cookies to enhance your experience. You can manage your preferences.',
+      acceptAll: 'Accept All',
+      acceptNecessary: 'Necessary Only',
+      customize: 'Customize',
+      save: 'Save',
+      necessary: 'Necessary Cookies',
+      necessaryDesc: 'Required for site functionality',
+      analytics: 'Analytics Cookies',
+      analyticsDesc: 'Help us understand site usage',
+      marketing: 'Marketing Cookies',
+      marketingDesc: 'Used for personalized content',
+      privacyPolicy: 'Privacy Policy',
     },
   },
 } as const;

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { RitualProvider } from '@/context/RitualContext';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { Navbar } from '@/components/shared/Navbar';
+import { CookieConsent } from '@/components/ui/CookieConsent';
 import './globals.css';
 
 export const viewport: Viewport = {
@@ -48,6 +49,7 @@ export default function RootLayout({
           <LanguageProvider>
             <Navbar />
             {children}
+            <CookieConsent />
 
             {/* Global SVG Filters */}
             <svg className="hidden">
