@@ -16,8 +16,8 @@ export async function GET(
     const { id } = await params;
     const supabase = createServiceClient();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: task, error } = await (supabase.from('tasks') as any)
+    const { data: task, error } = await supabase
+      .from('tasks')
       .select(
         '*, assigned_to_user:admin_users!tasks_assigned_to_fkey(id, name, email, avatar_url)',
       )
@@ -50,10 +50,8 @@ export async function PATCH(
     const supabase = createServiceClient();
 
     // Get current task
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: currentTask, error: fetchError } = await (
-      supabase.from('tasks') as any
-    )
+    const { data: currentTask, error: fetchError } = await supabase
+      .from('tasks')
       .select('*')
       .eq('id', id)
       .single();
@@ -80,8 +78,8 @@ export async function PATCH(
       updateData.completed_by = session.admin.id;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: task, error } = await (supabase.from('tasks') as any)
+    const { data: task, error } = await supabase
+      .from('tasks')
       .update(updateData)
       .eq('id', id)
       .select()
@@ -96,8 +94,7 @@ export async function PATCH(
     }
 
     // Create audit log
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from('audit_logs') as any).insert({
+    await supabase.from('audit_logs').insert({
       admin_id: session.admin.id,
       action: 'update_task',
       resource_type: 'task',
@@ -137,16 +134,13 @@ export async function DELETE(
     const supabase = createServiceClient();
 
     // Get current task for audit log
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: currentTask } = await (supabase.from('tasks') as any)
+    const { data: currentTask } = await supabase
+      .from('tasks')
       .select('*')
       .eq('id', id)
       .single();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase.from('tasks') as any)
-      .delete()
-      .eq('id', id);
+    const { error } = await supabase.from('tasks').delete().eq('id', id);
 
     if (error) {
       logger.error('Task delete error:', error);
@@ -155,8 +149,7 @@ export async function DELETE(
 
     // Create audit log
     if (currentTask) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase.from('audit_logs') as any).insert({
+      await supabase.from('audit_logs').insert({
         admin_id: session.admin.id,
         action: 'delete_task',
         resource_type: 'task',

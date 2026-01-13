@@ -2,6 +2,9 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
+import type { Database } from '@/types/database';
+
+type KycSubmissionRow = Database['public']['Tables']['kyc_submissions']['Row'];
 
 export async function GET(request: NextRequest) {
   try {
@@ -22,8 +25,8 @@ export async function GET(request: NextRequest) {
 
     const supabase = createServiceClient();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (supabase.from('kyc_submissions') as any)
+    let query = supabase
+      .from('kyc_submissions')
       .select(
         `
         *,
@@ -44,7 +47,7 @@ export async function GET(request: NextRequest) {
       .range(offset, offset + limit - 1);
 
     if (status) {
-      query = query.eq('status', status);
+      query = query.eq('status', status as KycSubmissionRow['status']);
     } else {
       // Default to showing pending submissions
       query = query.eq('status', 'pending');
@@ -59,8 +62,8 @@ export async function GET(request: NextRequest) {
     if (error) {
       logger.error('KYC query error:', error);
       // If table doesn't exist, query users for KYC status
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const usersQuery = (supabase.from('users') as any)
+      const usersQuery = supabase
+        .from('users')
         .select(
           'id, display_name, avatar_url, email, phone, kyc_status, kyc_submitted_at, kyc_reviewed_at, created_at',
           { count: 'exact' },
@@ -120,19 +123,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Calculate summary
-    type Submission = { status?: string };
     const summary = {
       total: count || 0,
-      pending:
-        submissions?.filter((s: Submission) => s.status === 'pending').length ||
-        0,
+      pending: submissions?.filter((s) => s.status === 'pending').length || 0,
       approved:
         submissions?.filter(
-          (s: Submission) => s.status === 'approved' || s.status === 'verified',
+          (s) => s.status === 'approved' || s.status === 'verified',
         ).length || 0,
-      rejected:
-        submissions?.filter((s: Submission) => s.status === 'rejected')
-          .length || 0,
+      rejected: submissions?.filter((s) => s.status === 'rejected').length || 0,
     };
 
     return NextResponse.json({
@@ -186,10 +184,8 @@ export async function PUT(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Get current user data
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: profile, error: fetchError } = await (
-      supabase.from('users') as any
-    )
+    const { data: profile, error: fetchError } = await supabase
+      .from('users')
       .select('*')
       .eq('id', user_id)
       .single();
@@ -217,10 +213,8 @@ export async function PUT(request: NextRequest) {
       updates.kyc_admin_notes = notes;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: updated, error: updateError } = await (
-      supabase.from('users') as any
-    )
+    const { data: updated, error: updateError } = await supabase
+      .from('users')
       .update(updates)
       .eq('id', user_id)
       .select()
@@ -235,10 +229,12 @@ export async function PUT(request: NextRequest) {
     }
 
     // Try to update kyc_submissions table if it exists
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from('kyc_submissions') as any)
+    await supabase
+      .from('kyc_submissions')
       .update({
-        status: action === 'approve' ? 'approved' : 'rejected',
+        status: (action === 'approve'
+          ? 'approved'
+          : 'rejected') as KycSubmissionRow['status'],
         reviewed_by: session.admin.id,
         reviewed_at: new Date().toISOString(),
         rejection_reason: action === 'reject' ? rejection_reason : null,

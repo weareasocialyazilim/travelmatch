@@ -11,6 +11,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission } from '@/lib/auth';
 import { escapeSupabaseFilter } from '@/lib/security';
+import type { Database } from '@/types/database';
+
+type UserCommissionRow =
+  Database['public']['Tables']['user_commission_settings']['Row'];
 
 interface VIPUserWithDetails {
   user?: {
@@ -43,8 +47,8 @@ export async function GET(request: NextRequest) {
 
     const supabase = createServiceClient();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (supabase.from('user_commission_settings') as any)
+    let query = supabase
+      .from('user_commission_settings')
       .select(
         `
         *,
@@ -65,7 +69,7 @@ export async function GET(request: NextRequest) {
 
     // Filter by tier
     if (tier && ['vip', 'influencer', 'partner'].includes(tier)) {
-      query = query.eq('tier', tier);
+      query = query.eq('tier', tier as UserCommissionRow['tier']);
     }
 
     const { data: users, count, error } = await query;
@@ -157,8 +161,8 @@ export async function POST(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Check if user exists
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: existingUser } = await (supabase.from('users') as any)
+    const { data: existingUser } = await supabase
+      .from('users')
       .select('id')
       .eq('id', userId)
       .single();
@@ -171,10 +175,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if already VIP
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: existingVIP } = await (
-      supabase.from('user_commission_settings') as any
-    )
+    const { data: existingVIP } = await supabase
+      .from('user_commission_settings')
       .select('id')
       .eq('user_id', userId)
       .single();
@@ -187,8 +189,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Add VIP status using the admin function
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any).rpc('admin_set_user_vip', {
+    const { data, error } = await supabase.rpc('admin_set_user_vip', {
       p_user_id: userId,
       p_tier: tier,
       p_commission_override: commission,

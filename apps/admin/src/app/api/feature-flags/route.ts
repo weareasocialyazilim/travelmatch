@@ -1,6 +1,9 @@
 import { createClient } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
+import type { Database } from '@/types/database';
+
+type FeatureFlagRow = Database['public']['Tables']['feature_flags']['Row'];
 
 /**
  * Feature Flags API Endpoint
@@ -11,8 +14,8 @@ export async function GET() {
   try {
     const supabase = createClient();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: flags, error } = await (supabase.from('feature_flags') as any)
+    const { data: flags, error } = await supabase
+      .from('feature_flags')
       .select('*')
       .order('name');
 
@@ -22,7 +25,7 @@ export async function GET() {
 
     // Group flags by category
     const groupedFlags = (flags || []).reduce(
-      (acc: Record<string, any[]>, flag: any) => {
+      (acc: Record<string, FeatureFlagRow[]>, flag) => {
         const category = flag.category || 'general';
         if (!acc[category]) {
           acc[category] = [];
@@ -30,15 +33,15 @@ export async function GET() {
         acc[category].push(flag);
         return acc;
       },
-      {} as Record<string, any[]>,
+      {} as Record<string, FeatureFlagRow[]>,
     );
 
     // Calculate stats
     const totalFlags = flags?.length || 0;
-    const enabledFlags = flags?.filter((f: any) => f.enabled).length || 0;
+    const enabledFlags = flags?.filter((f) => f.enabled).length || 0;
     const betaFlags =
       flags?.filter(
-        (f: any) => f.rollout_percentage < 100 && f.rollout_percentage > 0,
+        (f) => f.rollout_percentage < 100 && f.rollout_percentage > 0,
       ).length || 0;
 
     return NextResponse.json({
@@ -76,7 +79,8 @@ export async function POST(request: Request) {
     const supabase = createClient();
     const body = await request.json();
 
-    const { data, error } = await (supabase.from('feature_flags') as any)
+    const { data, error } = await supabase
+      .from('feature_flags')
       .insert({
         name: body.name,
         description: body.description,
@@ -109,7 +113,8 @@ export async function PATCH(request: Request) {
     const body = await request.json();
     const { id, ...updates } = body;
 
-    const { data, error } = await (supabase.from('feature_flags') as any)
+    const { data, error } = await supabase
+      .from('feature_flags')
       .update({
         ...updates,
         updated_at: new Date().toISOString(),
@@ -142,7 +147,8 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'Flag ID required' }, { status: 400 });
     }
 
-    const { error } = await (supabase.from('feature_flags') as any)
+    const { error } = await supabase
+      .from('feature_flags')
       .delete()
       .eq('id', id);
 

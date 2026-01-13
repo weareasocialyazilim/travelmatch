@@ -6,7 +6,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { createClient } from '@/lib/supabase/client';
+import { getClient } from '@/lib/supabase';
 import { toast } from 'sonner';
 
 // Types
@@ -156,7 +156,7 @@ export function useWalletStats() {
   return useQuery({
     queryKey: ['wallet-stats'],
     queryFn: async (): Promise<WalletStats> => {
-      const supabase = createClient();
+      const supabase = getClient();
 
       try {
         // Get pending payouts
@@ -211,7 +211,7 @@ export function usePayoutRequests(filters?: {
   return useQuery({
     queryKey: ['payout-requests', filters],
     queryFn: async (): Promise<PayoutRequest[]> => {
-      const supabase = createClient();
+      const supabase = getClient();
 
       try {
         let query = supabase
@@ -252,7 +252,7 @@ export function useKYCVerifications(filters?: {
   return useQuery({
     queryKey: ['kyc-verifications', filters],
     queryFn: async (): Promise<KYCVerification[]> => {
-      const supabase = createClient();
+      const supabase = getClient();
 
       try {
         let query = supabase
@@ -289,7 +289,7 @@ export function useTopWallets(limit = 10) {
   return useQuery({
     queryKey: ['top-wallets', limit],
     queryFn: async (): Promise<WalletBalance[]> => {
-      const supabase = createClient();
+      const supabase = getClient();
 
       try {
         const { data, error } = await supabase
@@ -322,7 +322,7 @@ export function useProcessPayout() {
       action: 'approve' | 'reject';
       reason?: string;
     }) => {
-      const supabase = createClient();
+      const supabase = getClient();
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -400,7 +400,7 @@ export function useBulkProcessPayouts() {
       payoutIds: string[];
       action: 'approve' | 'reject';
     }) => {
-      const supabase = createClient();
+      const supabase = getClient();
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -453,7 +453,7 @@ export function useVerifyKYC() {
       reason?: string;
       notes?: string;
     }) => {
-      const supabase = createClient();
+      const supabase = getClient();
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -519,7 +519,7 @@ export function useWalletTransaction() {
       type: 'credit' | 'debit' | 'adjustment';
       description: string;
     }) => {
-      const supabase = createClient();
+      const supabase = getClient();
       const {
         data: { user },
       } = await supabase.auth.getUser();

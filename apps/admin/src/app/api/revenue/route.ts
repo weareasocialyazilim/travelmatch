@@ -12,22 +12,24 @@ export async function GET() {
     const supabase = createClient();
 
     // Parallel data fetching
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [paymentsResult, subscriptionsResult, transactionsResult] =
       await Promise.all([
         // All completed payments
-        (supabase.from('payments') as any)
+        supabase
+          .from('payments')
           .select('id, amount, currency, status, type, created_at, user_id')
           .eq('status', 'completed')
           .order('created_at', { ascending: false }),
 
         // Active subscriptions
-        (supabase.from('subscriptions') as any)
+        supabase
+          .from('subscriptions')
           .select('id, plan, amount, status, started_at, expires_at, user_id')
           .eq('status', 'active'),
 
         // Recent transactions for chart
-        (supabase.from('payments') as any)
+        supabase
+          .from('payments')
           .select('amount, type, created_at')
           .eq('status', 'completed')
           .gte(
