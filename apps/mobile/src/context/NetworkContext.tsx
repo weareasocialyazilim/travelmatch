@@ -15,6 +15,7 @@ import React, {
   useMemo,
 } from 'react';
 import NetInfo from '@react-native-community/netinfo';
+import { logger } from '@/utils/logger';
 import type { NetInfoState } from '@react-native-community/netinfo';
 
 // ============================================================================
@@ -84,7 +85,7 @@ export const NetworkProvider: React.FC<NetworkProviderProps> = ({
         setNetworkState(state);
       } catch (error) {
         // Silently handle network check failures - assume connected
-        console.warn('[NetworkContext] Failed to fetch initial state:', error);
+        logger.warn('[NetworkContext] Failed to fetch initial state', error as Error);
         setNetworkState(null);
       }
     };
@@ -95,7 +96,7 @@ export const NetworkProvider: React.FC<NetworkProviderProps> = ({
       try {
         setNetworkState(state);
       } catch (error) {
-        console.warn('[NetworkContext] State update failed:', error);
+        logger.warn('[NetworkContext] State update failed', error as Error);
       }
     });
 
@@ -107,7 +108,7 @@ export const NetworkProvider: React.FC<NetworkProviderProps> = ({
       const state = await NetInfo.refresh();
       setNetworkState(state);
     } catch (error) {
-      console.warn('[NetworkContext] Refresh failed:', error);
+      logger.warn('[NetworkContext] Refresh failed', error as Error);
       // Don't update state on error - keep last known state
     }
   }, []);

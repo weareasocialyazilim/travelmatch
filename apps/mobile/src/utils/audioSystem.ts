@@ -20,6 +20,8 @@
  *   npx expo install expo-av
  */
 
+import { logger } from '@/utils/logger';
+
 let Audio: any = null;
 
 // Try to load expo-av dynamically - graceful degradation if not available
@@ -28,7 +30,7 @@ try {
 
   Audio = require('expo-av').Audio;
 } catch {
-  console.warn(
+  logger.warn(
     '[AudioSystem] expo-av not installed. Audio features disabled. Install with: npx expo install expo-av',
   );
 }
@@ -47,7 +49,7 @@ class AudioSystem {
         staysActiveInBackground: false,
       });
     } catch (error) {
-      console.warn('Audio initialization failed:', error);
+      logger.warn('Audio initialization failed', error as Error);
     }
   }
 
@@ -57,7 +59,7 @@ class AudioSystem {
       const { sound } = await Audio.Sound.createAsync(source);
       this.sounds.set(key, sound);
     } catch (error) {
-      console.warn(`Failed to load sound: ${key}`, error);
+      logger.warn(`Failed to load sound: ${key}`, error as Error);
     }
   }
 
@@ -70,7 +72,7 @@ class AudioSystem {
         await sound.replayAsync();
       }
     } catch (error) {
-      console.warn(`Failed to play sound: ${key}`, error);
+      logger.warn(`Failed to play sound: ${key}`, error as Error);
     }
   }
 
