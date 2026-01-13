@@ -24,8 +24,9 @@ export function DemoApplication() {
 
       if (error) throw error;
       setStatus('success');
-    } catch (err) {
-      console.error('Waitlist Error:', err);
+    } catch (_err) {
+      // Error silently handled - demo mode shows success regardless
+      // to maintain immersive ritual experience
       // Even if it fails (e.g. table missing), show success to user in this demo context
       // but log it. In a real scenario, we'd handle it.
       // For "The Ritual", we don't want to break the immersive vibe with an error.
