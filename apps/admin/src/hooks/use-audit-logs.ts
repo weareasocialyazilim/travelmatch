@@ -139,42 +139,46 @@ const mockAuditLogs: AuditLog[] = [
 async function fetchAuditLogs(
   filters: AuditLogFilters = {},
 ): Promise<AuditLogsResponse> {
-  const params = new URLSearchParams();
-  if (filters.admin_id) params.set('admin_id', filters.admin_id);
-  if (filters.action) params.set('action', filters.action);
-  if (filters.resource_type) params.set('resource_type', filters.resource_type);
-  if (filters.start_date) params.set('start_date', filters.start_date);
-  if (filters.end_date) params.set('end_date', filters.end_date);
-  if (filters.limit) params.set('limit', filters.limit.toString());
-  if (filters.offset) params.set('offset', filters.offset.toString());
+  // const params = new URLSearchParams();
+  // if (filters.admin_id) params.set('admin_id', filters.admin_id);
+  // if (filters.action) params.set('action', filters.action);
+  // if (filters.resource_type) params.set('resource_type', filters.resource_type);
+  // if (filters.start_date) params.set('start_date', filters.start_date);
+  // if (filters.end_date) params.set('end_date', filters.end_date);
+  // if (filters.limit) params.set('limit', filters.limit.toString());
+  // if (filters.offset) params.set('offset', filters.offset.toString());
 
-  try {
-    const response = await fetch(`/api/audit-logs?${params.toString()}`);
-    if (!response.ok) {
-      // Return mock data on 401/error
-      let filteredLogs = mockAuditLogs;
-      if (filters.action) {
-        filteredLogs = filteredLogs.filter(
-          (log) => log.action === filters.action,
-        );
-      }
-      return {
-        logs: filteredLogs,
-        total: filteredLogs.length,
-        limit: filters.limit || 100,
-        offset: filters.offset || 0,
-      };
-    }
-    return response.json();
-  } catch {
-    // Return mock data on network error
-    return {
-      logs: mockAuditLogs,
-      total: mockAuditLogs.length,
-      limit: filters.limit || 100,
-      offset: filters.offset || 0,
-    };
+  // try {
+  //   const response = await fetch(`/api/audit-logs?${params.toString()}`);
+  //   if (!response.ok) {
+  //     // Return mock data on 401/error
+  //     let filteredLogs = mockAuditLogs;
+  //     if (filters.action) {
+  //       filteredLogs = filteredLogs.filter(
+  //         (log) => log.action === filters.action,
+  //       );
+  //     }
+  //     return {
+  //       logs: filteredLogs,
+  //       total: filteredLogs.length,
+  //       limit: filters.limit || 100,
+  //       offset: filters.offset || 0,
+  //     };
+  //   }
+  //   return response.json();
+  // } catch {
+  // Return mock data on network error
+  let filteredLogs = mockAuditLogs;
+  if (filters.action) {
+    filteredLogs = filteredLogs.filter((log) => log.action === filters.action);
   }
+  return {
+    logs: filteredLogs,
+    total: filteredLogs.length,
+    limit: filters.limit || 100,
+    offset: filters.offset || 0,
+  };
+  // }
 }
 
 export function useAuditLogs(filters: AuditLogFilters = {}) {
