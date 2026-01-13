@@ -136,9 +136,15 @@ export const CanvaButton = React.forwardRef<
         )}
         ref={ref}
         disabled={disabled || loading}
+        aria-busy={loading}
+        aria-disabled={disabled || loading}
         {...props}
       >
-        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : leftIcon}
+        {loading ? (
+          <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+        ) : (
+          leftIcon
+        )}
         {!iconOnly && children}
         {!loading && rightIcon}
       </Comp>

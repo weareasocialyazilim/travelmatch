@@ -5,21 +5,45 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 interface NotificationCampaign {
   id: string;
   title: string;
-  message: string;
+  message?: string;
+  body?: string;
   type: 'push' | 'email' | 'in_app';
-  target_audience: object;
-  scheduled_at: string | null;
-  sent_at: string | null;
-  status: 'draft' | 'scheduled' | 'sent' | 'cancelled';
-  sent_count: number;
-  opened_count: number;
-  created_by: string;
+  target_audience?: { segment?: string };
+  segment?: string;
+  scheduled_at?: string | null;
+  scheduled_for?: string | null;
+  sent_at?: string | null;
+  status: 'draft' | 'scheduled' | 'sent' | 'cancelled' | 'failed';
+  sent_count?: number;
+  opened_count?: number;
+  stats?: {
+    sent: number;
+    delivered: number;
+    opened: number;
+    clicked: number;
+  } | null;
+  created_by?: string;
   created_at: string;
+}
+
+interface NotificationStats {
+  totalSent: number;
+  avgDeliveryRate: number;
+  avgOpenRate: number;
+  avgClickRate: number;
+}
+
+interface NotificationSegment {
+  id: string;
+  name: string;
+  count: number;
 }
 
 interface NotificationsData {
   campaigns: NotificationCampaign[];
   total: number;
+  stats?: NotificationStats;
+  segments?: NotificationSegment[];
 }
 
 interface UseNotificationsOptions {

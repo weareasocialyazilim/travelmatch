@@ -34,6 +34,8 @@ const canvaBadgeVariants = cva(
         error:
           'bg-red-500/10 text-red-700 dark:bg-red-500/20 dark:text-red-400',
         info: 'bg-blue-500/10 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
+        outline:
+          'bg-transparent border border-border text-muted-foreground',
       },
       size: {
         sm: 'px-1.5 py-0.5 text-[10px]',
@@ -62,6 +64,7 @@ export const CanvaBadge = React.forwardRef<HTMLSpanElement, CanvaBadgeProps>(
       <span
         ref={ref}
         className={cn(canvaBadgeVariants({ variant, size }), className)}
+        role="status"
         {...props}
       >
         {dot && (
@@ -75,9 +78,10 @@ export const CanvaBadge = React.forwardRef<HTMLSpanElement, CanvaBadgeProps>(
               variant === 'error' && 'bg-red-500 dark:bg-red-400',
               variant === 'info' && 'bg-blue-500 dark:bg-blue-400',
             )}
+            aria-hidden="true"
           />
         )}
-        {icon}
+        {icon && <span aria-hidden="true">{icon}</span>}
         {children}
       </span>
     );
