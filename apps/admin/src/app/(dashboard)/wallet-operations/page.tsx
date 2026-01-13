@@ -31,7 +31,6 @@ import {
   MoreHorizontal,
   Users,
   Banknote,
-  Timer,
   Loader2,
   CheckCheck,
   Image,
@@ -443,6 +442,7 @@ export default function WalletOperationsPage() {
                                 variant="ghost"
                                 size="sm"
                                 iconOnly
+                                aria-label="Ödemeyi onayla"
                                 className="text-green-500"
                                 onClick={() => handleApprovePayout(payout.id)}
                                 disabled={processPayout.isPending}
@@ -453,6 +453,7 @@ export default function WalletOperationsPage() {
                                 variant="ghost"
                                 size="sm"
                                 iconOnly
+                                aria-label="Ödemeyi reddet"
                                 className="text-red-500"
                                 onClick={() => {
                                   setSelectedPayouts([payout.id]);
@@ -461,13 +462,13 @@ export default function WalletOperationsPage() {
                               >
                                 <XCircle className="h-4 w-4" />
                               </CanvaButton>
-                              <CanvaButton variant="ghost" size="sm" iconOnly>
+                              <CanvaButton variant="ghost" size="sm" iconOnly aria-label="Detayları görüntüle">
                                 <Eye className="h-4 w-4" />
                               </CanvaButton>
                             </div>
                           )}
                           {payout.status !== 'pending' && (
-                            <CanvaButton variant="ghost" size="sm" iconOnly>
+                            <CanvaButton variant="ghost" size="sm" iconOnly aria-label="Detayları görüntüle">
                               <Eye className="h-4 w-4" />
                             </CanvaButton>
                           )}
@@ -587,6 +588,7 @@ export default function WalletOperationsPage() {
                               variant="ghost"
                               size="sm"
                               iconOnly
+                              aria-label="KYC detaylarını görüntüle"
                               onClick={() => {
                                 setSelectedKYC(kyc);
                                 setShowKYCDialog(true);
@@ -600,6 +602,7 @@ export default function WalletOperationsPage() {
                                   variant="ghost"
                                   size="sm"
                                   iconOnly
+                                  aria-label="KYC doğrulamasını onayla"
                                   className="text-green-500"
                                   onClick={() => {
                                     setSelectedKYC(kyc);
@@ -612,6 +615,7 @@ export default function WalletOperationsPage() {
                                   variant="ghost"
                                   size="sm"
                                   iconOnly
+                                  aria-label="KYC doğrulamasını reddet"
                                   className="text-red-500"
                                   onClick={() => {
                                     setSelectedKYC(kyc);

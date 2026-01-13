@@ -226,7 +226,6 @@ async function fetchTeamStats(): Promise<TeamStats> {
     return mockTeamStats;
   } catch {
     // Fall back to mock data in development or on error
-    console.log('Using mock team stats data');
     return mockTeamStats;
   }
 }
@@ -278,7 +277,6 @@ async function fetchTeamMembers(): Promise<TeamMember[]> {
 
     return mockTeamMembers;
   } catch {
-    console.log('Using mock team members data');
     return mockTeamMembers;
   }
 }
@@ -323,7 +321,6 @@ async function fetchShifts(): Promise<Shift[]> {
 
     return mockShifts;
   } catch {
-    console.log('Using mock shifts data');
     return mockShifts;
   }
 }
@@ -355,7 +352,6 @@ async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
 
     return mockLeaderboard;
   } catch {
-    console.log('Using mock leaderboard data');
     return mockLeaderboard;
   }
 }
@@ -457,9 +453,7 @@ export default function TeamPage() {
   }
 
   // Show error state (but still render with fallback data)
-  if (hasError) {
-    console.error('Team page data fetch error:', { statsError, membersError, shiftsError, leaderboardError });
-  }
+  // Errors are silently handled - fallback data is used
 
   return (
     <div className="space-y-6">

@@ -409,6 +409,14 @@ export default function AuditTrailPage() {
                         log.status === 'failed' && 'bg-red-500/5 dark:bg-red-500/10',
                       )}
                       onClick={() => setSelectedLog(log)}
+                      tabIndex={0}
+                      role="button"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setSelectedLog(log);
+                        }
+                      }}
                     >
                       <TableCell>
                         <div className="text-sm">

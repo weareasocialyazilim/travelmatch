@@ -23,7 +23,6 @@ import {
   ArrowDownRight,
   Bell,
   Calendar,
-  BarChart3,
   Activity,
   Star,
   AlertCircle,

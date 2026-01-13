@@ -174,7 +174,6 @@ function useAnalyticsChartData(period: DateRange) {
 
       if (error) {
         // If RPC doesn't exist or fails, fall back to individual queries
-        console.warn('RPC not available, using fallback queries:', error.message);
 
         // Fetch daily active users from user activity
         const now = new Date();
@@ -367,9 +366,8 @@ export default function AnalyticsPage() {
 
   // Use real API data for metrics
   const { data, isLoading: isMetricsLoading, error: metricsError } = useAnalytics({ period: dateRange });
-  const userMetrics = useUserMetrics(dateRange);
-  const revenueMetrics = useRevenueMetrics(dateRange);
-  const engagementMetrics = useEngagementMetrics(dateRange);
+  const { data: userMetricsData } = useUserMetrics(dateRange);
+  const { data: revenueMetricsData } = useRevenueMetrics(dateRange);
 
   // Use chart data hook for all chart-related data
   const {
@@ -478,7 +476,7 @@ export default function AnalyticsPage() {
           <>
             <CanvaStatCard
               title="Günlük Aktif Kullanıcı"
-              value={formatNumber(userMetrics.activeUsers || dailyActiveUsers[dailyActiveUsers.length - 1]?.dau || 4521)}
+              value={formatNumber(userMetricsData?.activeUsers || dailyActiveUsers[dailyActiveUsers.length - 1]?.dau || 4521)}
               icon={Users}
               change="+12.5%"
               changeLabel="geçen haftadan"
@@ -486,7 +484,7 @@ export default function AnalyticsPage() {
             />
             <CanvaStatCard
               title="Günlük Gelir"
-              value={formatCurrency(revenueMetrics.totalRevenue / 30 || revenueData[revenueData.length - 1]?.revenue || 24500)}
+              value={formatCurrency((revenueMetricsData?.totalRevenue || 0) / 30 || revenueData[revenueData.length - 1]?.revenue || 24500)}
               icon={DollarSign}
               change="+23.7%"
               changeLabel="geçen haftadan"

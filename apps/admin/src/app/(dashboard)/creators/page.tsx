@@ -293,7 +293,7 @@ export default function CreatorsPage() {
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <CanvaButton variant="ghost" size="sm" iconOnly>
+                        <CanvaButton variant="ghost" size="sm" iconOnly aria-label="Daha fazla seçenek">
                           <MoreHorizontal className="h-4 w-4" />
                         </CanvaButton>
                       </DropdownMenuTrigger>

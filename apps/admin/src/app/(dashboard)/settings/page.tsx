@@ -239,6 +239,7 @@ export default function SettingsPage() {
                       onClick={() =>
                         setShowCurrentPassword(!showCurrentPassword)
                       }
+                      aria-label={showCurrentPassword ? "Şifreyi gizle" : "Şifreyi göster"}
                     >
                       {showCurrentPassword ? (
                         <EyeOff className="h-4 w-4" />
@@ -265,6 +266,7 @@ export default function SettingsPage() {
                       iconOnly
                       className="absolute right-0 top-0 h-full px-3"
                       onClick={() => setShowNewPassword(!showNewPassword)}
+                      aria-label={showNewPassword ? "Şifreyi gizle" : "Şifreyi göster"}
                     >
                       {showNewPassword ? (
                         <EyeOff className="h-4 w-4" />

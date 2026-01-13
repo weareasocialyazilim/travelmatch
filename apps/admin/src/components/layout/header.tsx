@@ -42,7 +42,7 @@ interface AuthState {
   user: AdminUser | null;
 }
 
-// Breadcrumb mapping
+// Breadcrumb mapping - Complete route labels for all admin pages
 const routeLabels: Record<string, string> = {
   dashboard: 'Dashboard',
   users: 'Kullanıcılar',
@@ -59,6 +59,37 @@ const routeLabels: Record<string, string> = {
   profile: 'Profil',
   kyc: 'KYC',
   reports: 'Raporlar',
+  revenue: 'Gelir',
+  geographic: 'Coğrafi Analiz',
+  'wallet-operations': 'Cüzdan İşlemleri',
+  'escrow-operations': 'Escrow İşlemleri',
+  promos: 'Promosyonlar',
+  creators: 'İçerik Üreticileri',
+  moderation: 'Moderasyon',
+  'safety-hub': 'Güvenlik Merkezi',
+  compliance: 'Uyumluluk',
+  'audit-trail': 'Denetim Kaydı',
+  'feature-flags': 'Feature Flags',
+  'ai-center': 'AI Merkezi',
+  'ai-insights': 'AI Insights',
+  'command-center': 'Komuta Merkezi',
+  'ceo-briefing': 'CEO Brifing',
+  team: 'Ekip',
+  alerts: 'Uyarılar',
+  'system-health': 'Sistem Sağlığı',
+  'ops-center': 'Operasyon Merkezi',
+  'dev-tools': 'Geliştirici Araçları',
+  'chat-analytics': 'Sohbet Analitiği',
+  'discovery-analytics': 'Keşif Analitiği',
+  'proof-center': 'Kanıt Merkezi',
+  'ceremony-management': 'Tören Yönetimi',
+  'user-lifecycle': 'Kullanıcı Yaşam Döngüsü',
+  'campaign-builder': 'Kampanya Oluşturucu',
+  'integrations-monitor': 'Entegrasyon Monitörü',
+  pricing: 'Fiyatlandırma',
+  'vip-management': 'VIP Yönetimi',
+  'fraud-investigation': 'Dolandırıcılık Araştırması',
+  'subscription-management': 'Abonelik Yönetimi',
 };
 
 export function Header() {
@@ -80,18 +111,54 @@ export function Header() {
     isLast: index === pathSegments.length - 1,
   }));
 
-  // Keyboard shortcut for command palette
+  // Global keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      // Don't trigger shortcuts when typing in input fields
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        (e.target as HTMLElement).isContentEditable
+      ) {
+        return;
+      }
+
+      const isModifier = e.metaKey || e.ctrlKey;
+
+      // Command palette: Cmd/Ctrl + K
+      if (isModifier && e.key === 'k') {
         e.preventDefault();
         setCommandPaletteOpen(true);
+        return;
+      }
+
+      // Quick navigation shortcuts (Cmd/Ctrl + key)
+      if (isModifier) {
+        const shortcuts: Record<string, string> = {
+          d: '/dashboard',
+          u: '/users',
+          f: '/finance',
+          a: '/analytics',
+          '1': '/queue',
+          ',': '/settings',
+        };
+
+        const route = shortcuts[e.key.toLowerCase()];
+        if (route) {
+          e.preventDefault();
+          router.push(route);
+        }
+      }
+
+      // Escape to go back
+      if (e.key === 'Escape' && !e.metaKey && !e.ctrlKey) {
+        router.back();
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [setCommandPaletteOpen]);
+  }, [setCommandPaletteOpen, router]);
 
   const handleLogout = useCallback(async () => {
     await logout();
@@ -144,16 +211,16 @@ export function Header() {
         </button>
 
         {/* Help */}
-        <Button variant="ghost" size="icon" className="h-9 w-9">
+        <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Yardım">
           <HelpCircle className="h-5 w-5 text-muted-foreground" />
         </Button>
 
         {/* Notifications */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-9 w-9 relative">
+            <Button variant="ghost" size="icon" className="h-9 w-9 relative" aria-label="Bildirimler (3 yeni)">
               <Bell className="h-5 w-5 text-muted-foreground" />
-              <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-destructive text-[10px] font-bold text-white flex items-center justify-center">
+              <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-destructive text-[10px] font-bold text-white flex items-center justify-center" aria-hidden="true">
                 3
               </span>
             </Button>

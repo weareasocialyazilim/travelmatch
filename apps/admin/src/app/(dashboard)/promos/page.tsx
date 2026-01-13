@@ -549,6 +549,7 @@ export default function PromosPage() {
                             variant="ghost"
                             size="xs"
                             iconOnly
+                            aria-label="Kodu kopyala"
                             onClick={() => copyCode(promo.code)}
                           >
                             <Copy className="h-3 w-3" />

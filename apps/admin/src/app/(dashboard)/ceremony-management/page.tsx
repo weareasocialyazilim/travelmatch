@@ -7,22 +7,21 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   SparklesIcon,
   ClockIcon,
   CheckCircleIcon,
 } from '@heroicons/react/24/outline';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { getClient } from '@/lib/supabase';
+import { toast } from '@/components/ui/use-toast';
 import { PageHeader } from '@/components/common/page-header';
-import { CanvaButton } from '@/components/canva/CanvaButton';
-import { CanvaInput } from '@/components/canva/CanvaInput';
 import {
   CanvaCard,
   CanvaCardHeader,
   CanvaCardTitle,
-  CanvaCardSubtitle,
   CanvaCardBody,
-  CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -114,20 +113,131 @@ const mockRecentActivity = [
 export default function CeremonyManagementPage() {
   const [selectedProof, setSelectedProof] = useState(mockPendingProofs[0]);
   const [activeTab, setActiveTab] = useState('overview');
+  const queryClient = useQueryClient();
+
+  // Mutation for approving a proof
+  const approveMutation = useMutation({
+    mutationFn: async (proofId: string) => {
+      const supabase = getClient();
+      const { data, error } = await supabase
+        .from('proof_ceremonies')
+        .update({
+          status: 'verified',
+          verified_at: new Date().toISOString(),
+          reviewed_by: 'admin', // In production, use actual admin user ID
+        })
+        .eq('id', proofId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ceremony-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-proofs'] });
+      toast({
+        title: 'Basarili',
+        description: 'Proof basariyla onaylandi',
+      });
+    },
+    onError: (error: Error) => {
+      console.error('Approve proof error:', error);
+      toast({
+        title: 'Hata',
+        description: error.message || 'Proof onaylanamadi',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Mutation for rejecting a proof
+  const rejectMutation = useMutation({
+    mutationFn: async ({ proofId, reason }: { proofId: string; reason: string }) => {
+      const supabase = getClient();
+      const { data, error } = await supabase
+        .from('proof_ceremonies')
+        .update({
+          status: 'rejected',
+          rejection_reason: reason,
+          rejected_at: new Date().toISOString(),
+          reviewed_by: 'admin', // In production, use actual admin user ID
+        })
+        .eq('id', proofId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ceremony-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-proofs'] });
+      toast({
+        title: 'Basarili',
+        description: 'Proof reddedildi',
+      });
+    },
+    onError: (error: Error) => {
+      console.error('Reject proof error:', error);
+      toast({
+        title: 'Hata',
+        description: error.message || 'Proof reddedilemedi',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Mutation for requesting more information
+  const requestInfoMutation = useMutation({
+    mutationFn: async ({ proofId, message }: { proofId: string; message: string }) => {
+      const supabase = getClient();
+      const { data, error } = await supabase
+        .from('proof_ceremonies')
+        .update({
+          status: 'info_requested',
+          info_request_message: message,
+          info_requested_at: new Date().toISOString(),
+          reviewed_by: 'admin', // In production, use actual admin user ID
+        })
+        .eq('id', proofId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ceremony-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-proofs'] });
+      toast({
+        title: 'Basarili',
+        description: 'Bilgi talebi gonderildi',
+      });
+    },
+    onError: (error: Error) => {
+      console.error('Request info error:', error);
+      toast({
+        title: 'Hata',
+        description: error.message || 'Bilgi talebi gonderilemedi',
+        variant: 'destructive',
+      });
+    },
+  });
 
   const handleApprove = () => {
-    // TODO: Implement API call to approve proof
-    void selectedProof.id;
+    if (!selectedProof?.id) return;
+    approveMutation.mutate(selectedProof.id);
   };
 
-  const handleReject = (_reason: string) => {
-    // TODO: Implement API call to reject proof with reason
-    void selectedProof.id;
+  const handleReject = (reason: string) => {
+    if (!selectedProof?.id) return;
+    rejectMutation.mutate({ proofId: selectedProof.id, reason });
   };
 
-  const handleRequestInfo = (_message: string) => {
-    // TODO: Implement API call to request more info
-    void selectedProof.id;
+  const handleRequestInfo = (message: string) => {
+    if (!selectedProof?.id) return;
+    requestInfoMutation.mutate({ proofId: selectedProof.id, message });
   };
 
   return (

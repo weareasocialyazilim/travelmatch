@@ -14,12 +14,9 @@ import {
   XCircle,
   AlertTriangle,
   MoreHorizontal,
-  Edit,
   Trash2,
   Copy,
-  Eye,
   History,
-  Globe,
   Smartphone,
   Monitor,
   Zap,
@@ -144,7 +141,6 @@ export default function FeatureFlagsPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [environmentFilter, setEnvironmentFilter] = useState<string>('all');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [editingFlag, setEditingFlag] = useState<FeatureFlagDisplay | null>(null);
 
   // Use real API data
   const { data, isLoading, error, refetch } = useFeatureFlags();
@@ -683,6 +679,7 @@ function FlagCard({
             <button
               onClick={() => onCopyKey(flag.key)}
               className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Anahtarı kopyala"
             >
               <code className="bg-muted px-2 py-0.5 rounded text-xs font-mono">
                 {flag.key}
