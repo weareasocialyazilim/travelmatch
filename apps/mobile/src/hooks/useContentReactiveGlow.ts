@@ -17,6 +17,7 @@
 
 import { useSharedValue, withTiming, Easing } from 'react-native-reanimated';
 import { useState, useCallback } from 'react';
+import { logger } from '@/utils/logger';
 
 interface GlowColors {
   topLeft: string;
@@ -158,7 +159,7 @@ export const useContentReactiveGlow = ({
           });
         }, transitionDuration / 2);
       } catch (error) {
-        console.warn('Failed to extract dominant color:', error);
+        logger.warn('Failed to extract dominant color', error as Error);
         setGlowColors(defaultColors);
       }
     },

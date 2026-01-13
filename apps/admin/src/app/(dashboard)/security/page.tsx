@@ -72,6 +72,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { cn, formatRelativeDate } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 // Mock sessions data
 const mockSessions = [
@@ -203,7 +204,7 @@ export default function SecurityPage() {
           setIs2FASetupOpen(true);
         } else {
           // Invalid QR code format - reject
-          console.error('Invalid QR code format received');
+          logger.error('Invalid QR code format received');
           toast.error('QR kodu doğrulanamadı');
         }
       } else {
