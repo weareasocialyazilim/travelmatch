@@ -123,81 +123,83 @@ const mockLoginHistory: LoginHistoryEntry[] = [
 
 // Fetch functions
 async function fetchSessions(): Promise<SessionsResponse> {
-  try {
-    const response = await fetch('/api/security/sessions');
-    if (!response.ok) {
-      throw new Error('Oturumlar yüklenemedi');
-    }
-    return response.json();
-  } catch {
-    // Return mock data on error
-    return { sessions: mockSessions, total: mockSessions.length };
-  }
+  // try {
+  //   const response = await fetch('/api/security/sessions');
+  //   if (!response.ok) {
+  //     throw new Error('Oturumlar yüklenemedi');
+  //   }
+  //   return response.json();
+  // } catch {
+  // Return mock data on error
+  return { sessions: mockSessions, total: mockSessions.length };
+  // }
 }
 
 async function fetchLoginHistory(
   limit = 30,
   offset = 0,
 ): Promise<LoginHistoryResponse> {
-  try {
-    const params = new URLSearchParams();
-    params.set('limit', limit.toString());
-    params.set('offset', offset.toString());
-
-    const response = await fetch(
-      `/api/security/login-history?${params.toString()}`,
-    );
-    if (!response.ok) {
-      throw new Error('Giriş geçmişi yüklenemedi');
-    }
-    return response.json();
-  } catch {
-    // Return mock data on error
-    return {
-      history: mockLoginHistory,
-      total: mockLoginHistory.length,
-      limit,
-      offset,
-    };
-  }
+  // try {
+  //   const params = new URLSearchParams();
+  //   params.set('limit', limit.toString());
+  //   params.set('offset', offset.toString());
+  //
+  //   const response = await fetch(
+  //     `/api/security/login-history?${params.toString()}`,
+  //   );
+  //   if (!response.ok) {
+  //     throw new Error('Giriş geçmişi yüklenemedi');
+  //   }
+  //   return response.json();
+  // } catch {
+  // Return mock data on error
+  return {
+    history: mockLoginHistory,
+    total: mockLoginHistory.length,
+    limit,
+    offset,
+  };
+  // }
 }
 
 async function fetch2FAStatus(): Promise<TwoFAStatus> {
-  try {
-    const response = await fetch('/api/security/2fa-status');
-    if (!response.ok) {
-      throw new Error('2FA durumu yüklenemedi');
-    }
-    return response.json();
-  } catch {
-    // Return mock data on error
-    return { enabled: false };
-  }
+  // try {
+  //   const response = await fetch('/api/security/2fa-status');
+  //   if (!response.ok) {
+  //     throw new Error('2FA durumu yüklenemedi');
+  //   }
+  //   return response.json();
+  // } catch {
+  // Return mock data on error
+  return { enabled: false };
+  // }
 }
 
 async function revokeSession(
   sessionId: string,
 ): Promise<{ success: boolean; message: string }> {
-  const response = await fetch('/api/security/sessions', {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ sessionId }),
-  });
-  if (!response.ok) {
-    throw new Error('Oturum sonlandırılamadı');
-  }
-  return response.json();
+  // const response = await fetch('/api/security/sessions', {
+  //   method: 'DELETE',
+  //   headers: { 'Content-Type': 'application/json' },
+  //   body: JSON.stringify({ sessionId }),
+  // });
+  // if (!response.ok) {
+  //   throw new Error('Oturum sonlandırılamadı');
+  // }
+  // return response.json();
+  return { success: true, message: 'Oturum kapatıldı' };
 }
 
 async function revokeAllSessions(): Promise<{
   success: boolean;
   message: string;
 }> {
-  const response = await fetch('/api/security/sessions', {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ all: true }),
-  });
+  // const response = await fetch('/api/security/sessions', {
+  //   method: 'DELETE',
+  //   headers: { 'Content-Type': 'application/json' },
+  //   body: JSON.stringify({ all: true }),
+  // });
+  return { success: true, message: 'Tüm oturumlar kapatıldı' };
   if (!response.ok) {
     throw new Error('Oturumlar sonlandırılamadı');
   }

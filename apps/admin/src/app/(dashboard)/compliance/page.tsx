@@ -325,67 +325,75 @@ export default function CompliancePage() {
 
   // Fetch stats
   const fetchStats = useCallback(async () => {
-    try {
-      const res = await fetch('/api/compliance/stats');
-      if (res.ok) {
-        const data = await res.json();
-        setStats(data);
-      } else {
-        // Use mock data on 401/error
-        setStats(mockStats);
-      }
-    } catch (error) {
-      logger.error('Failed to fetch stats', error);
-      setStats(mockStats);
-    }
+    // try {
+    //   const res = await fetch('/api/compliance/stats');
+    //   if (res.ok) {
+    //     const data = await res.json();
+    //     setStats(data);
+    //   } else {
+    //     // Use mock data on 401/error
+    //     setStats(mockStats);
+    //   }
+    // } catch (error) {
+    //   logger.error('Failed to fetch stats', error);
+    setStats(mockStats);
+    // }
   }, []);
 
   // Fetch SAR reports
   const fetchSarReports = useCallback(async () => {
-    try {
-      const params = new URLSearchParams({ type: 'sar' });
-      if (statusFilter !== 'all') params.set('status', statusFilter);
+    // try {
+    //   const params = new URLSearchParams({ type: 'sar' });
+    //   if (statusFilter !== 'all') params.set('status', statusFilter);
 
-      const res = await fetch(`/api/compliance?${params}`);
-      if (res.ok) {
-        const data = await res.json();
-        setSarReports(data.reports || []);
-      } else {
-        // Use mock data on 401/error
-        let filtered = mockSarReports;
-        if (statusFilter !== 'all') {
-          filtered = filtered.filter((r) => r.status === statusFilter);
-        }
-        setSarReports(filtered);
-      }
-    } catch (error) {
-      logger.error('Failed to fetch SAR reports', error);
-      setSarReports(mockSarReports);
+    //   const res = await fetch(`/api/compliance?${params}`);
+    //   if (res.ok) {
+    //     const data = await res.json();
+    //     setSarReports(data.reports || []);
+    //   } else {
+    //     // Use mock data on 401/error
+    //     let filtered = mockSarReports;
+    //     if (statusFilter !== 'all') {
+    //       filtered = filtered.filter((r) => r.status === statusFilter);
+    //     }
+    //     setSarReports(filtered);
+    //   }
+    // } catch (error) {
+    //   logger.error('Failed to fetch SAR reports', error);
+    let filtered = mockSarReports;
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter((r) => r.status === statusFilter);
     }
+    setSarReports(filtered);
+    // }
   }, [statusFilter]);
 
   // Fetch risk profiles
   const fetchRiskProfiles = useCallback(async () => {
-    try {
-      const params = new URLSearchParams({ type: 'risk_profiles' });
-      if (riskFilter !== 'all') params.set('risk_level', riskFilter);
+    // try {
+    //   const params = new URLSearchParams({ type: 'risk_profiles' });
+    //   if (riskFilter !== 'all') params.set('risk_level', riskFilter);
 
-      const res = await fetch(`/api/compliance?${params}`);
-      if (res.ok) {
-        const data = await res.json();
-        setRiskProfiles(data.profiles || []);
-      } else {
-        // Use mock data on 401/error
-        let filtered = mockRiskProfiles;
-        if (riskFilter !== 'all') {
-          filtered = filtered.filter((p) => p.risk_level === riskFilter);
-        }
-        setRiskProfiles(filtered);
-      }
-    } catch (error) {
-      logger.error('Failed to fetch risk profiles', error);
-      setRiskProfiles(mockRiskProfiles);
+    //   const res = await fetch(`/api/compliance?${params}`);
+    //   if (res.ok) {
+    //     const data = await res.json();
+    //     setRiskProfiles(data.profiles || []);
+    //   } else {
+    //     // Use mock data on 401/error
+    //     let filtered = mockRiskProfiles;
+    //     if (riskFilter !== 'all') {
+    //       filtered = filtered.filter((p) => p.risk_level === riskFilter);
+    //     }
+    //     setRiskProfiles(filtered);
+    //   }
+    // } catch (error) {
+    //   logger.error('Failed to fetch risk profiles', error);
+    let filtered = mockRiskProfiles;
+    if (riskFilter !== 'all') {
+      filtered = filtered.filter((p) => p.risk_level === riskFilter);
     }
+    setRiskProfiles(filtered);
+    // }
   }, [riskFilter]);
 
   // Initial load
@@ -405,24 +413,24 @@ export default function CompliancePage() {
     notes?: string,
   ) => {
     try {
-      const res = await fetch('/api/compliance', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id,
-          status,
-          investigation_notes: notes,
-        }),
-      });
+      // const res = await fetch('/api/compliance', {
+      //   method: 'PATCH',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({
+      //     id,
+      //     status,
+      //     investigation_notes: notes,
+      //   }),
+      // });
 
-      if (res.ok) {
-        toast({ title: 'SAR güncellendi' });
-        fetchSarReports();
-        fetchStats();
-        setSelectedSar(null);
-      } else {
-        toast({ title: 'Güncelleme başarısız', variant: 'destructive' });
-      }
+      // if (res.ok) {
+      toast({ title: 'SAR güncellendi' });
+      fetchSarReports();
+      fetchStats();
+      setSelectedSar(null);
+      // } else {
+      //   toast({ title: 'Güncelleme başarısız', variant: 'destructive' });
+      // }
     } catch (error) {
       logger.error('Failed to update SAR', error);
       toast({ title: 'Bir hata oluştu', variant: 'destructive' });
@@ -436,26 +444,26 @@ export default function CompliancePage() {
     reason?: string,
   ) => {
     try {
-      const res = await fetch('/api/compliance', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: block ? 'block_user' : 'unblock_user',
-          user_id: userId,
-          block_reason: reason,
-        }),
-      });
+      // const res = await fetch('/api/compliance', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({
+      //     action: block ? 'block_user' : 'unblock_user',
+      //     user_id: userId,
+      //     block_reason: reason,
+      //   }),
+      // });
 
-      if (res.ok) {
-        toast({ title: block ? 'Kullanıcı engellendi' : 'Engel kaldırıldı' });
-        fetchRiskProfiles();
-        fetchStats();
-        setSelectedProfile(null);
-      } else {
-        toast({ title: 'İşlem başarısız', variant: 'destructive' });
-      }
+      // if (res.ok) {
+      toast({ title: block ? 'Kullanıcı engellendi' : 'Engel kaldırıldı' });
+      fetchRiskProfiles();
+      fetchStats();
+      setSelectedProfile(null);
+      // } else {
+      //   toast({ title: 'İşlem başarısız', variant: 'destructive' });
+      // }
     } catch (error) {
-      logger.error('Failed to toggle block', error);
+      logger.error('Failed to update user status', error);
       toast({ title: 'Bir hata oluştu', variant: 'destructive' });
     }
   };

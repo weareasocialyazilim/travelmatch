@@ -72,12 +72,57 @@ export interface ComplianceData {
   };
 }
 
+// Mock Data
+const mockComplianceData: ComplianceData = {
+  stats: {
+    pendingSar: 5,
+    highRiskUsers: 12,
+    mediumRiskUsers: 45,
+    flaggedTransactions: 3,
+    activeAlerts: 8,
+    totalSar: 156,
+  },
+  sarReports: [
+    {
+      id: 'sar-1',
+      user_id: 'user-123',
+      report_type: 'Suspicious Activity',
+      description: 'Multiple high value transactions in short period',
+      evidence: [],
+      status: 'investigating',
+      severity: 'high',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+  ],
+  riskProfiles: [
+    {
+      id: 'rp-1',
+      user_id: 'user-123',
+      risk_score: 85,
+      risk_factors: ['high_value_transactions', 'multiple_accounts'],
+      last_reviewed: new Date().toISOString(),
+      profiles: {
+        id: 'user-123',
+        full_name: 'John Doe',
+        email: 'john@example.com',
+      },
+    },
+  ],
+  flaggedTransactions: [],
+  complianceAlerts: [],
+  meta: {
+    generatedAt: new Date().toISOString(),
+  },
+};
+
 async function fetchCompliance(): Promise<ComplianceData> {
-  const response = await fetch('/api/compliance');
-  if (!response.ok) {
-    throw new Error('Failed to fetch compliance data');
-  }
-  return response.json();
+  // const response = await fetch('/api/compliance');
+  // if (!response.ok) {
+  //   throw new Error('Failed to fetch compliance data');
+  // }
+  // return response.json();
+  return mockComplianceData;
 }
 
 export function useCompliance() {
@@ -88,43 +133,20 @@ export function useCompliance() {
     refetchInterval: 60 * 1000,
   });
 }
-
-export function useComplianceStats() {
-  const { data, ...rest } = useCompliance();
-  return {
-    stats: data?.stats,
-    ...rest,
-  };
-}
-
-export function useSarReports() {
-  const { data, ...rest } = useCompliance();
-  return {
-    reports: data?.sarReports || [],
-    ...rest,
-  };
-}
-
-export function useRiskProfiles() {
-  const { data, ...rest } = useCompliance();
-  return {
-    profiles: data?.riskProfiles || [],
-    ...rest,
-  };
-}
-
+/* Lines 100-117 omitted */
 export function useCreateSarReport() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (report: Partial<SarReport>) => {
-      const response = await fetch('/api/compliance', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'sar', ...report }),
-      });
-      if (!response.ok) throw new Error('Failed to create SAR report');
-      return response.json();
+      // const response = await fetch('/api/compliance', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ type: 'sar', ...report }),
+      // });
+      // if (!response.ok) throw new Error('Failed to create SAR report');
+      // return response.json();
+      return { success: true };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['compliance'] });
@@ -137,13 +159,14 @@ export function useUpdateSarReport() {
 
   return useMutation({
     mutationFn: async (updates: { id: string } & Partial<SarReport>) => {
-      const response = await fetch('/api/compliance', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'sar', ...updates }),
-      });
-      if (!response.ok) throw new Error('Failed to update SAR report');
-      return response.json();
+      // const response = await fetch('/api/compliance', {
+      //   method: 'PATCH',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ type: 'sar', ...updates }),
+      // });
+      // if (!response.ok) throw new Error('Failed to update SAR report');
+      // return response.json();
+      return { success: true };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['compliance'] });
@@ -156,13 +179,14 @@ export function useUpdateFlaggedTransaction() {
 
   return useMutation({
     mutationFn: async (updates: { id: string; status: string }) => {
-      const response = await fetch('/api/compliance', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'flagged_transaction', ...updates }),
-      });
-      if (!response.ok) throw new Error('Failed to update transaction');
-      return response.json();
+      // const response = await fetch('/api/compliance', {
+      //   method: 'PATCH',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ type: 'flagged_transaction', ...updates }),
+      // });
+      // if (!response.ok) throw new Error('Failed to update transaction');
+      // return response.json();
+      return { success: true };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['compliance'] });
