@@ -8,6 +8,12 @@ import './globals.css';
 export const viewport: Viewport = {
   themeColor: '#050505',
 };
+
+export const metadata: Metadata = {
+  title: 'TravelMatch - Find Your Sacred Journey',
+  description:
+    'Discover destinations that resonate with your soul through our AI-powered travel matching.',
+};
 /* Lines 12-43 omitted */
 export default function RootLayout({
   children,
