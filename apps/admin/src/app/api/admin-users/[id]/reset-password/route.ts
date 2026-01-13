@@ -42,9 +42,8 @@ export async function POST(
 
     // Hedef admini kontrol et
     const supabase = getClient();
-    const { data: targetAdmin, error: fetchError } = await (
-      supabase.from('admin_users') as any
-    )
+    const { data: targetAdmin, error: fetchError } = await supabase
+      .from('admin_users')
       .select('id, email, name')
       .eq('id', id)
       .single();
@@ -57,7 +56,7 @@ export async function POST(
     }
 
     // Kendini sıfırlayamaz (güvenlik için)
-    if ((targetAdmin as any).id === session.admin.id) {
+    if (targetAdmin.id === session.admin.id) {
       return NextResponse.json(
         { error: 'Kendi şifrenizi ayarlar sayfasından değiştirin' },
         { status: 400 },
@@ -69,12 +68,13 @@ export async function POST(
     const hashedPassword = await hashPassword(password);
 
     // Şifreyi güncelle ve force_password_change flag'ini set et
-    const { error: updateError } = await (supabase.from('admin_users') as any)
+    const { error: updateError } = await supabase
+      .from('admin_users')
       .update({
         password_hash: hashedPassword,
         force_password_change: true,
         updated_at: new Date().toISOString(),
-      })
+      } as Record<string, unknown>)
       .eq('id', id);
 
     if (updateError) {
@@ -95,14 +95,14 @@ export async function POST(
       'admin_user',
       id,
       null,
-      { reset_by: session.admin.email, target: (targetAdmin as any).email },
+      { reset_by: session.admin.email, target: targetAdmin.email },
     );
 
     // E-posta gönder (opsiyonel)
     if (send_email) {
       await sendPasswordResetEmail({
-        to: (targetAdmin as any).email,
-        name: (targetAdmin as any).name,
+        to: targetAdmin.email,
+        name: targetAdmin.name,
         temporaryPassword: new_password ? undefined : password,
         resetBy: session.admin.email,
       });

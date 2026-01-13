@@ -115,8 +115,7 @@ export async function PATCH(
       }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: admin, error } = await (supabase as any)
+    const { data: admin, error } = await supabase
       .from('admin_users')
       .update(updateData)
       .eq('id', id)
@@ -184,8 +183,7 @@ export async function DELETE(
       .single();
 
     // Soft delete by setting is_active to false
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('admin_users')
       .update({ is_active: false })
       .eq('id', id);

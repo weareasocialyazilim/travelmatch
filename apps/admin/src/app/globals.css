@@ -1,4 +1,6 @@
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --admin-bg: #050505;
@@ -49,13 +51,17 @@ body {
 
 .admin-sidebar-logo-icon {
   @apply h-10 w-10 rounded-xl flex items-center justify-center text-white;
-  background: linear-gradient(to bottom right, var(--ritual-pink), var(--ritual-purple));
+  background: linear-gradient(
+    to bottom right,
+    var(--ritual-pink),
+    var(--ritual-purple)
+  );
 }
 
 .admin-sidebar-nav {
   @apply flex-1 overflow-y-auto px-2 py-3;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.2) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
 .admin-sidebar-nav::-webkit-scrollbar {
@@ -67,12 +73,12 @@ body {
 }
 
 .admin-sidebar-nav::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 3px;
 }
 
 .admin-sidebar-nav::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.3);
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .admin-sidebar-section {
@@ -130,25 +136,25 @@ body {
 }
 
 .admin-dropdown,
-[role="menu"] {
+[role='menu'] {
   @apply bg-[#1a1a1a] border border-white/20 shadow-2xl;
   backdrop-filter: none !important;
   opacity: 1 !important;
 }
 
 /* Force opaque background for dropdown content */
-[data-state="open"] > [role="menu"],
+[data-state='open'] > [role='menu'],
 [data-radix-menu-content],
 div[data-radix-popper-content-wrapper] > div {
   background-color: #1a1a1a !important;
-  border: 1px solid rgba(255,255,255,0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
 
 /* Menu items should be clearly visible */
-[role="menuitem"] {
+[role='menuitem'] {
   @apply text-white/90;
 }
 
-[role="menuitem"]:hover {
+[role='menuitem']:hover {
   @apply bg-white/10 text-white;
 }
