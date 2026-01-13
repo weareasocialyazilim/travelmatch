@@ -49,7 +49,9 @@ import { formatRelativeDate, getInitials, cn } from '@/lib/utils';
 import {
   useSupport,
   useUpdateTicket,
+  useSendMessage,
   type SupportTicket,
+  type SupportMessage,
 } from '@/hooks/use-support';
 import { toast } from 'sonner';
 
@@ -185,9 +187,10 @@ const statusConfig = {
 };
 
 const priorityConfig = {
-  high: { label: 'Yüksek', color: 'text-red-600' },
-  medium: { label: 'Orta', color: 'text-yellow-600' },
-  low: { label: 'Düşük', color: 'text-green-600' },
+  high: { label: 'Yüksek', color: 'text-red-600 dark:text-red-400' },
+  medium: { label: 'Orta', color: 'text-yellow-600 dark:text-yellow-400' },
+  low: { label: 'Düşük', color: 'text-green-600 dark:text-green-400' },
+  urgent: { label: 'Acil', color: 'text-red-700 dark:text-red-300' },
 };
 
 const categoryConfig = {
@@ -208,6 +211,10 @@ export default function SupportPage() {
     status: statusFilter === 'all' ? undefined : statusFilter,
   });
   const updateTicket = useUpdateTicket();
+  const sendMessage = useSendMessage();
+
+  // Track locally sent messages for immediate UI feedback
+  const [localMessages, setLocalMessages] = useState<Record<string, SupportMessage[]>>({});
 
   // Use API data if available, otherwise fall back to mock data
   const tickets = useMemo(() => {
@@ -263,9 +270,50 @@ export default function SupportPage() {
   });
 
   const handleSendReply = () => {
-    if (!replyText.trim()) return;
-    toast.success('Yanıt gönderildi');
+    if (!replyText.trim() || !selectedTicket) {
+      if (!replyText.trim()) {
+        toast.error('Lütfen bir yanıt yazın');
+      }
+      return;
+    }
+
+    const ticketId = selectedTicket.id;
+    const messageContent = replyText.trim();
+
+    // Optimistically add the message to local state
+    const newMessage: SupportMessage = {
+      id: `local-${Date.now()}`,
+      ticket_id: ticketId,
+      sender: 'admin',
+      content: messageContent,
+      created_at: new Date().toISOString(),
+      admin_name: 'Destek Ekibi',
+    };
+
+    setLocalMessages((prev) => ({
+      ...prev,
+      [ticketId]: [...(prev[ticketId] || []), newMessage],
+    }));
+
     setReplyText('');
+
+    // Send to API
+    sendMessage.mutate(
+      { ticketId, content: messageContent, adminName: 'Destek Ekibi' },
+      {
+        onSuccess: () => {
+          toast.success('Yanıt gönderildi');
+        },
+        onError: () => {
+          toast.error('Yanıt gönderilemedi, lütfen tekrar deneyin');
+          // Remove the optimistically added message on error
+          setLocalMessages((prev) => ({
+            ...prev,
+            [ticketId]: (prev[ticketId] || []).filter((m) => m.id !== newMessage.id),
+          }));
+        },
+      },
+    );
   };
 
   const handleResolveTicket = () => {
@@ -593,58 +641,57 @@ export default function SupportPage() {
               <CanvaCardBody className="p-0">
                 <ScrollArea className="h-[300px] p-4">
                   <div className="space-y-4">
-                    {('messages' in selectedTicket
-                      ? selectedTicket.messages
-                      : []
-                    ).map(
-                      (message: {
-                        id: string;
-                        sender: string;
-                        content: string;
-                        created_at: string;
-                      }) => (
-                        <div
-                          key={message.id}
-                          className={cn(
-                            'flex',
-                            message.sender === 'admin'
-                              ? 'justify-end'
-                              : 'justify-start',
-                          )}
-                        >
+                    {/* Combine original messages with locally sent messages */}
+                    {[
+                      ...('messages' in selectedTicket ? selectedTicket.messages : []),
+                      ...(localMessages[selectedTicket.id] || []),
+                    ]
+                      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+                      .map(
+                        (message: {
+                          id: string;
+                          sender: string;
+                          content: string;
+                          created_at: string;
+                          admin_name?: string;
+                        }) => (
                           <div
+                            key={message.id}
                             className={cn(
-                              'max-w-[80%] rounded-2xl p-3',
+                              'flex',
                               message.sender === 'admin'
-                                ? 'bg-violet-500 text-white'
-                                : 'bg-muted',
+                                ? 'justify-end'
+                                : 'justify-start',
                             )}
                           >
-                            <p className="text-sm">{message.content}</p>
                             <div
                               className={cn(
-                                'mt-1 flex items-center gap-2 text-xs',
+                                'max-w-[80%] rounded-2xl p-3',
                                 message.sender === 'admin'
-                                  ? 'text-white/70'
-                                  : 'text-muted-foreground',
+                                  ? 'bg-primary text-primary-foreground'
+                                  : 'bg-muted',
                               )}
                             >
-                              {message.sender === 'admin' && (
+                              <p className="text-sm">{message.content}</p>
+                              <div
+                                className={cn(
+                                  'mt-1 flex items-center gap-2 text-xs',
+                                  message.sender === 'admin'
+                                    ? 'text-primary-foreground/70'
+                                    : 'text-muted-foreground',
+                                )}
+                              >
+                                {message.sender === 'admin' && message.admin_name && (
+                                  <span>{message.admin_name}</span>
+                                )}
                                 <span>
-                                  {
-                                    (message as { admin_name?: string })
-                                      .admin_name
-                                  }
+                                  {formatRelativeDate(message.created_at)}
                                 </span>
-                              )}
-                              <span>
-                                {formatRelativeDate(message.created_at)}
-                              </span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ),
-                    )}
+                        ),
+                      )}
                   </div>
                 </ScrollArea>
 
@@ -685,6 +732,7 @@ export default function SupportPage() {
                     <CanvaButton
                       variant="primary"
                       onClick={handleSendReply}
+                      loading={sendMessage.isPending}
                       leftIcon={<Send className="h-4 w-4" />}
                     >
                       Gönder

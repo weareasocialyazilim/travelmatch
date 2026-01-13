@@ -457,11 +457,11 @@ export default function SecurityPage() {
                   <div
                     className={cn(
                       'flex h-12 w-12 items-center justify-center rounded-full',
-                      effectiveIs2FAEnabled ? 'bg-green-100' : 'bg-muted',
+                      effectiveIs2FAEnabled ? 'bg-green-500/10 dark:bg-green-500/20' : 'bg-muted',
                     )}
                   >
                     {effectiveIs2FAEnabled ? (
-                      <ShieldCheck className="h-6 w-6 text-green-600" />
+                      <ShieldCheck className="h-6 w-6 text-green-600 dark:text-green-400" />
                     ) : (
                       <ShieldOff className="h-6 w-6 text-muted-foreground" />
                     )}
@@ -635,14 +635,14 @@ export default function SecurityPage() {
                           className={cn(
                             'flex h-10 w-10 items-center justify-center rounded-full',
                             login.status === 'success'
-                              ? 'bg-green-100'
-                              : 'bg-red-100',
+                              ? 'bg-green-500/10 dark:bg-green-500/20'
+                              : 'bg-red-500/10 dark:bg-red-500/20',
                           )}
                         >
                           {login.status === 'success' ? (
-                            <CheckCircle className="h-5 w-5 text-green-600" />
+                            <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
                           ) : (
-                            <XCircle className="h-5 w-5 text-red-600" />
+                            <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
                           )}
                         </div>
                         <div>

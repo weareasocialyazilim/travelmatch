@@ -302,9 +302,9 @@ async function fetchShifts(): Promise<Shift[]> {
       };
 
       const colorMap: Record<string, string> = {
-        morning: 'bg-yellow-100',
-        afternoon: 'bg-orange-100',
-        night: 'bg-indigo-100',
+        morning: 'bg-yellow-500/10 dark:bg-yellow-500/20',
+        afternoon: 'bg-orange-500/10 dark:bg-orange-500/20',
+        night: 'bg-indigo-500/10 dark:bg-indigo-500/20',
       };
 
       return data.map((shift: {
@@ -317,7 +317,7 @@ async function fetchShifts(): Promise<Shift[]> {
         time: shift.time_range || '09:00 - 17:00',
         icon: iconMap[shift.type || 'morning'] || Sun,
         members: shift.member_count || 0,
-        color: colorMap[shift.type || 'morning'] || 'bg-yellow-100',
+        color: colorMap[shift.type || 'morning'] || 'bg-yellow-500/10 dark:bg-yellow-500/20',
       }));
     }
 
@@ -642,11 +642,11 @@ export default function TeamPage() {
                         <div
                           className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
                             item.rank === 1
-                              ? 'bg-yellow-100 text-yellow-600'
+                              ? 'bg-yellow-500/20 dark:bg-yellow-500/30 text-yellow-600 dark:text-yellow-400'
                               : item.rank === 2
                                 ? 'bg-muted text-muted-foreground'
                                 : item.rank === 3
-                                  ? 'bg-orange-100 text-orange-600'
+                                  ? 'bg-orange-500/20 dark:bg-orange-500/30 text-orange-600 dark:text-orange-400'
                                   : 'bg-muted text-muted-foreground'
                           }`}
                         >
