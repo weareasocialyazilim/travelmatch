@@ -2,9 +2,8 @@
 
 /**
  * TravelMatch Wallet & Payout Operations
- * Kullanici cuzdanlari, para cekme talepleri ve KYC yonetimi
- *
- * Tum finansal operasyonlar tek merkezden yonetilir
+ * Kullanıcı cüzdanları, para çekme talepleri ve KYC yönetimi
+ * Real API integration with use-wallet-operations.ts hooks
  */
 
 import { useState } from 'react';
@@ -18,7 +17,6 @@ import {
   XCircle,
   AlertTriangle,
   Search,
-  Filter,
   Download,
   RefreshCw,
   Eye,
@@ -33,13 +31,10 @@ import {
   MoreHorizontal,
   Users,
   Banknote,
-  PiggyBank,
-  Receipt,
-  AlertCircle,
-  CheckCheck,
   Timer,
-  Phone,
-  Mail,
+  Loader2,
+  CheckCheck,
+  Image,
 } from 'lucide-react';
 import {
   CanvaCard,
@@ -51,12 +46,11 @@ import {
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { CanvaButton } from '@/components/canva/CanvaButton';
-// Card components replaced with Canva versions
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -88,869 +82,773 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { formatCurrency, cn } from '@/lib/utils';
-import { AdminAreaChart, CHART_COLORS } from '@/components/common/admin-chart';
-
-// Wallet Stats - Para PayTR havuzunda tutulmaktadır
-const walletStats = {
-  paytrPoolBalance: 2456780, // PayTR'da tutulan toplam bakiye
-  pendingPayouts: 456780,
-  processedToday: 89450,
-  avgPayoutTime: 2.4, // saat
-  kycPending: 156,
-  kycApproved: 4521,
-  kycRejected: 89,
-  payoutSuccessRate: 99.2,
-};
-
-// Payout Requests - IBAN'lar maskelenmiş formatta (güvenlik için)
-const payoutRequests = [
-  {
-    id: 'PAY-2024-001',
-    user: {
-      name: 'Ayse M.',
-      email: 'ayse@email.com',
-      avatar: null,
-      phone: '+90 532 XXX XX XX',
-    },
-    amount: 4560,
-    paytrBalance: 5200, // PayTR'daki bakiye
-    bank: 'Garanti BBVA',
-    ibanMasked: 'TR** **** **** **** **** **34 56', // Maskelenmiş IBAN
-    kycStatus: 'verified',
-    requestedAt: '2024-01-10 09:15',
-    status: 'pending',
-    priority: 'normal',
-  },
-  {
-    id: 'PAY-2024-002',
-    user: {
-      name: 'Mehmet S.',
-      email: 'mehmet@email.com',
-      avatar: null,
-      phone: '+90 533 XXX XX XX',
-    },
-    amount: 12340,
-    paytrBalance: 15600,
-    bank: 'Isbank',
-    ibanMasked: 'TR** **** **** **** **** **78 90',
-    kycStatus: 'verified',
-    requestedAt: '2024-01-10 08:45',
-    status: 'pending',
-    priority: 'high',
-  },
-  {
-    id: 'PAY-2024-003',
-    user: {
-      name: 'Zeynep A.',
-      email: 'zeynep@email.com',
-      avatar: null,
-      phone: '+90 535 XXX XX XX',
-    },
-    amount: 8900,
-    paytrBalance: 9200,
-    bank: 'Akbank',
-    ibanMasked: 'TR** **** **** **** **** **12 34',
-    kycStatus: 'pending',
-    requestedAt: '2024-01-10 08:00',
-    status: 'blocked',
-    priority: 'normal',
-    blockReason: 'KYC dogrulama bekliyor',
-  },
-  {
-    id: 'PAY-2024-004',
-    user: {
-      name: 'Can B.',
-      email: 'can@email.com',
-      avatar: null,
-      phone: '+90 536 XXX XX XX',
-    },
-    amount: 3200,
-    paytrBalance: 4500,
-    bank: 'Yapi Kredi',
-    ibanMasked: 'TR** **** **** **** **** **56 78',
-    kycStatus: 'verified',
-    requestedAt: '2024-01-10 07:30',
-    status: 'processing',
-    priority: 'normal',
-  },
-  {
-    id: 'PAY-2024-005',
-    user: {
-      name: 'Deniz K.',
-      email: 'deniz@email.com',
-      avatar: null,
-      phone: '+90 537 XXX XX XX',
-    },
-    amount: 25600,
-    paytrBalance: 28900,
-    bank: 'Ziraat Bankasi',
-    ibanMasked: 'TR** **** **** **** **** **90 12',
-    kycStatus: 'verified',
-    requestedAt: '2024-01-09 16:45',
-    status: 'pending',
-    priority: 'urgent',
-  },
-];
-
-// KYC Verification Queue
-const kycQueue = [
-  {
-    id: 'KYC-001',
-    user: { name: 'Ali R.', email: 'ali@email.com', avatar: null },
-    documentType: 'tc_kimlik',
-    submittedAt: '2024-01-10 10:30',
-    status: 'pending',
-    pendingAmount: 8900,
-    aiScore: 92,
-  },
-  {
-    id: 'KYC-002',
-    user: { name: 'Selin G.', email: 'selin@email.com', avatar: null },
-    documentType: 'pasaport',
-    submittedAt: '2024-01-10 09:45',
-    status: 'pending',
-    pendingAmount: 5600,
-    aiScore: 78,
-  },
-  {
-    id: 'KYC-003',
-    user: { name: 'Burak Y.', email: 'burak@email.com', avatar: null },
-    documentType: 'ehliyet',
-    submittedAt: '2024-01-10 09:00',
-    status: 'under_review',
-    pendingAmount: 12300,
-    aiScore: 45,
-    flags: ['low_quality', 'possible_manipulation'],
-  },
-];
-
-// Top Wallet Balances
-const topWallets = [
-  {
-    user: 'Ayse M.',
-    balance: 45600,
-    pendingPayout: 4560,
-    totalEarned: 125000,
-    rating: 4.9,
-  },
-  {
-    user: 'Mehmet K.',
-    balance: 38900,
-    pendingPayout: 0,
-    totalEarned: 98000,
-    rating: 4.8,
-  },
-  {
-    user: 'Zeynep A.',
-    balance: 32100,
-    pendingPayout: 8900,
-    totalEarned: 87000,
-    rating: 4.9,
-  },
-  {
-    user: 'Can B.',
-    balance: 28900,
-    pendingPayout: 3200,
-    totalEarned: 76000,
-    rating: 4.7,
-  },
-  {
-    user: 'Deniz K.',
-    balance: 25600,
-    pendingPayout: 25600,
-    totalEarned: 65000,
-    rating: 4.8,
-  },
-];
-
-// Daily Payout Volume
-const dailyPayoutData = [
-  { date: 'Pzt', amount: 125000, count: 45 },
-  { date: 'Sal', amount: 145000, count: 52 },
-  { date: 'Car', amount: 112000, count: 38 },
-  { date: 'Per', amount: 168000, count: 58 },
-  { date: 'Cum', amount: 189000, count: 67 },
-  { date: 'Cmt', amount: 156000, count: 54 },
-  { date: 'Paz', amount: 89450, count: 32 },
-];
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+import {
+  useWalletStats,
+  usePayoutRequests,
+  useKYCVerifications,
+  useTopWallets,
+  useProcessPayout,
+  useBulkProcessPayouts,
+  useVerifyKYC,
+  type PayoutRequest,
+  type KYCVerification,
+} from '@/hooks/use-wallet-operations';
 
 export default function WalletOperationsPage() {
-  const [selectedTab, setSelectedTab] = useState('payouts');
-  const [selectedPayout, setSelectedPayout] = useState<
-    (typeof payoutRequests)[0] | null
-  >(null);
-  const [actionDialog, setActionDialog] = useState<{
-    open: boolean;
-    action: string;
-    item: (typeof payoutRequests)[0] | null;
-  }>({
-    open: false,
-    action: '',
-    item: null,
-  });
+  const [activeTab, setActiveTab] = useState('payouts');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [selectedPayouts, setSelectedPayouts] = useState<string[]>([]);
+  const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [showKYCDialog, setShowKYCDialog] = useState(false);
+  const [selectedKYC, setSelectedKYC] = useState<KYCVerification | null>(null);
   const [rejectReason, setRejectReason] = useState('');
+  const [kycNotes, setKycNotes] = useState('');
+
+  // Data hooks
+  const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useWalletStats();
+  const { data: payouts, isLoading: payoutsLoading, refetch: refetchPayouts } = usePayoutRequests({
+    status: statusFilter,
+    search: searchQuery,
+  });
+  const { data: kycQueue, isLoading: kycLoading, refetch: refetchKYC } = useKYCVerifications({
+    status: statusFilter === 'all' ? undefined : statusFilter,
+    search: searchQuery,
+  });
+  const { data: topWallets, isLoading: walletsLoading } = useTopWallets(10);
+
+  // Mutations
+  const processPayout = useProcessPayout();
+  const bulkProcess = useBulkProcessPayouts();
+  const verifyKYC = useVerifyKYC();
+
+  const formatCurrency = (amount: number) =>
+    new Intl.NumberFormat('tr-TR', {
+      style: 'currency',
+      currency: 'TRY',
+    }).format(amount);
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return (
-          <CanvaBadge variant="warning" icon={<Timer className="h-3 w-3" />}>
-            Bekliyor
-          </CanvaBadge>
-        );
-      case 'processing':
-        return (
-          <CanvaBadge variant="info" icon={<RefreshCw className="h-3 w-3 animate-spin" />}>
-            Isleniyor
-          </CanvaBadge>
-        );
-      case 'completed':
-        return (
-          <CanvaBadge variant="success" icon={<CheckCircle2 className="h-3 w-3" />}>
-            Tamamlandi
-          </CanvaBadge>
-        );
-      case 'blocked':
-        return (
-          <CanvaBadge variant="danger" icon={<Ban className="h-3 w-3" />}>
-            Engellendi
-          </CanvaBadge>
-        );
-      case 'rejected':
-        return (
-          <CanvaBadge variant="danger" icon={<XCircle className="h-3 w-3" />}>
-            Reddedildi
-          </CanvaBadge>
-        );
-      default:
-        return <CanvaBadge variant="secondary">{status}</CanvaBadge>;
-    }
+    const config: Record<string, { className: string; label: string }> = {
+      pending: { className: 'bg-yellow-500/10 text-yellow-500 dark:bg-yellow-500/20 dark:text-yellow-400', label: 'Bekliyor' },
+      processing: { className: 'bg-blue-500/10 text-blue-500 dark:bg-blue-500/20 dark:text-blue-400', label: 'İşleniyor' },
+      completed: { className: 'bg-green-500/10 text-green-500 dark:bg-green-500/20 dark:text-green-400', label: 'Tamamlandı' },
+      failed: { className: 'bg-red-500/10 text-red-500 dark:bg-red-500/20 dark:text-red-400', label: 'Başarısız' },
+      cancelled: { className: 'bg-gray-500/10 text-gray-500 dark:bg-gray-500/20 dark:text-gray-400', label: 'İptal' },
+      approved: { className: 'bg-green-500/10 text-green-500 dark:bg-green-500/20 dark:text-green-400', label: 'Onaylandı' },
+      rejected: { className: 'bg-red-500/10 text-red-500 dark:bg-red-500/20 dark:text-red-400', label: 'Reddedildi' },
+      in_review: { className: 'bg-orange-500/10 text-orange-500 dark:bg-orange-500/20 dark:text-orange-400', label: 'İnceleniyor' },
+    };
+    const { className, label } = config[status] || config.pending;
+    return <CanvaBadge className={className}>{label}</CanvaBadge>;
   };
 
-  const getPriorityBadge = (priority: string) => {
-    switch (priority) {
-      case 'urgent':
-        return <CanvaBadge variant="danger">Acil</CanvaBadge>;
-      case 'high':
-        return <CanvaBadge variant="warning">Yuksek</CanvaBadge>;
-      default:
-        return null;
-    }
+  const handleApprovePayout = async (payoutId: string) => {
+    toast.promise(
+      processPayout.mutateAsync({ payoutId, action: 'approve' }),
+      {
+        loading: 'Ödeme onaylanıyor...',
+        success: 'Ödeme onaylandı ve işleme alındı',
+        error: 'Ödeme onaylanamadı',
+      }
+    );
   };
 
-  const getKycBadge = (status: string) => {
-    switch (status) {
-      case 'verified':
-        return (
-          <CanvaBadge variant="success" icon={<UserCheck className="h-3 w-3" />}>
-            Dogrulandi
-          </CanvaBadge>
-        );
-      case 'pending':
-        return (
-          <CanvaBadge variant="warning" icon={<Clock className="h-3 w-3" />}>
-            Bekliyor
-          </CanvaBadge>
-        );
-      case 'rejected':
-        return (
-          <CanvaBadge variant="danger" icon={<XCircle className="h-3 w-3" />}>
-            Reddedildi
-          </CanvaBadge>
-        );
-      default:
-        return <CanvaBadge variant="secondary">{status}</CanvaBadge>;
+  const handleRejectPayout = async (payoutId: string) => {
+    if (!rejectReason) {
+      toast.error('Lütfen red sebebi girin');
+      return;
     }
+
+    await processPayout.mutateAsync({
+      payoutId,
+      action: 'reject',
+      reason: rejectReason,
+    });
+
+    setShowRejectDialog(false);
+    setRejectReason('');
   };
 
-  const handlePayoutAction = (
-    action: string,
-    payout: (typeof payoutRequests)[0],
-  ) => {
-    setActionDialog({ open: true, action, item: payout });
+  const handleBulkApprove = async () => {
+    if (selectedPayouts.length === 0) {
+      toast.error('Lütfen en az bir ödeme seçin');
+      return;
+    }
+
+    toast.promise(
+      bulkProcess.mutateAsync({ payoutIds: selectedPayouts, action: 'approve' }),
+      {
+        loading: `${selectedPayouts.length} ödeme onaylanıyor...`,
+        success: `${selectedPayouts.length} ödeme onaylandı`,
+        error: 'Toplu onaylama başarısız',
+      }
+    );
+
+    setSelectedPayouts([]);
+  };
+
+  const handleKYCAction = async (action: 'approve' | 'reject') => {
+    if (!selectedKYC) return;
+
+    if (action === 'reject' && !rejectReason) {
+      toast.error('Lütfen red sebebi girin');
+      return;
+    }
+
+    await verifyKYC.mutateAsync({
+      kycId: selectedKYC.id,
+      action,
+      reason: action === 'reject' ? rejectReason : undefined,
+      notes: kycNotes || undefined,
+    });
+
+    setShowKYCDialog(false);
+    setSelectedKYC(null);
+    setRejectReason('');
+    setKycNotes('');
+  };
+
+  const togglePayoutSelection = (id: string) => {
+    setSelectedPayouts((prev) =>
+      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
+    );
+  };
+
+  const handleRefresh = () => {
+    refetchStats();
+    refetchPayouts();
+    refetchKYC();
+    toast.success('Veriler yenilendi');
   };
 
   return (
-    <div className="admin-content space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <Wallet className="h-6 w-6 text-emerald-500" />
-            Wallet & Payout Operations
-          </h1>
+          <h1 className="text-2xl font-bold text-foreground">Cüzdan Operasyonları</h1>
           <p className="text-muted-foreground">
-            Kullanici cuzdanlari, para cekme talepleri ve KYC yonetimi
+            Para çekme talepleri, KYC doğrulama ve cüzdan yönetimi
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <CanvaButton variant="ghost" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Rapor
-          </CanvaButton>
-          <CanvaButton variant="primary" size="sm">
+        <div className="flex gap-2">
+          <CanvaButton variant="outline" onClick={handleRefresh}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Yenile
           </CanvaButton>
+          <CanvaButton variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            Rapor
+          </CanvaButton>
         </div>
       </div>
 
-      {/* PayTR Info Banner */}
-      <CanvaCard className="border-blue-500/30 bg-blue-500/5">
-        <CanvaCardBody className="py-3">
-          <div className="flex items-center gap-2 text-sm text-blue-700">
-            <Shield className="h-4 w-4" />
-            <span className="font-medium">
-              Tum odemeler PayTR uzerinden gerceklestirilmektedir. Banka hesap bilgileri sistemimizde saklanmaz.
-            </span>
-          </div>
-        </CanvaCardBody>
-      </CanvaCard>
-
-      {/* Stats Overview */}
-      <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-8">
-        <CanvaStatCard
-          className="col-span-2"
-          title="PayTR Havuz Bakiyesi"
-          value={formatCurrency(walletStats.paytrPoolBalance, 'TRY')}
-          description="PayTR'da tutulan toplam bakiye"
-          icon={<PiggyBank className="h-5 w-5" />}
-          trend="up"
-          accentColor="emerald"
-        />
-
-        <CanvaStatCard
-          className="col-span-2"
-          title="Bekleyen Odemeler"
-          value={formatCurrency(walletStats.pendingPayouts, 'TRY')}
-          description={`${payoutRequests.filter((p) => p.status === 'pending').length} talep bekliyor`}
-          icon={<Send className="h-5 w-5" />}
-          accentColor="amber"
-        />
-
-        <CanvaStatCard
-          title="Bugun Islenen"
-          value={formatCurrency(walletStats.processedToday, 'TRY')}
-          icon={<CheckCircle2 className="h-5 w-5" />}
-          trend="up"
-        />
-
-        <CanvaStatCard
-          title="Ort. Sure"
-          value={`${walletStats.avgPayoutTime} saat`}
-          icon={<Clock className="h-5 w-5" />}
-        />
-
-        <CanvaStatCard
-          title="KYC Bekleyen"
-          value={walletStats.kycPending.toString()}
-          icon={<Shield className="h-5 w-5" />}
-          accentColor="amber"
-        />
-
-        <CanvaStatCard
-          title="Basari Orani"
-          value={`%${walletStats.payoutSuccessRate}`}
-          icon={<TrendingUp className="h-5 w-5" />}
-          trend="up"
-          accentColor="emerald"
-        />
+      {/* Stats Cards */}
+      <div className="grid grid-cols-4 gap-4">
+        {statsLoading ? (
+          Array(4).fill(0).map((_, i) => <Skeleton key={i} className="h-28" />)
+        ) : (
+          <>
+            <CanvaStatCard
+              label="Bekleyen Ödemeler"
+              value={stats?.total_pending_payouts || 0}
+              icon={<Clock className="h-6 w-6 text-yellow-500" />}
+              change={{ value: 5, label: 'bu hafta' }}
+            />
+            <CanvaStatCard
+              label="Bekleyen Tutar"
+              value={formatCurrency(stats?.pending_payout_amount || 0)}
+              icon={<Wallet className="h-6 w-6 text-blue-500" />}
+            />
+            <CanvaStatCard
+              label="Bugün İşlenen"
+              value={formatCurrency(stats?.processed_amount_today || 0)}
+              icon={<CheckCircle2 className="h-6 w-6 text-green-500" />}
+              change={{ value: stats?.processed_today || 0, label: 'işlem' }}
+            />
+            <CanvaStatCard
+              label="Bekleyen KYC"
+              value={stats?.pending_kyc_count || 0}
+              icon={<Shield className="h-6 w-6 text-purple-500" />}
+            />
+          </>
+        )}
       </div>
 
-      {/* Urgent Payouts Alert */}
-      {payoutRequests.filter((p) => p.priority === 'urgent').length > 0 && (
-        <CanvaCard className="border-red-500/30 bg-red-500/5">
-          <CanvaCardHeader>
-            <CanvaCardTitle className="flex items-center gap-2 text-red-600">
-              <AlertTriangle className="h-5 w-5" />
-              Acil Odeme Talepleri (
-              {payoutRequests.filter((p) => p.priority === 'urgent').length})
-            </CanvaCardTitle>
-          </CanvaCardHeader>
-          <CanvaCardBody>
-            <div className="space-y-2">
-              {payoutRequests
-                .filter((p) => p.priority === 'urgent')
-                .map((payout) => (
-                  <div
-                    key={payout.id}
-                    className="flex items-center justify-between p-3 rounded-lg bg-background"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback>
-                          {payout.user.name
-                            .split(' ')
-                            .map((n) => n[0])
-                            .join('')}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium">{payout.user.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {formatCurrency(payout.amount, 'TRY')}
-                        </p>
-                      </div>
-                    </div>
-                    <CanvaButton
-                      size="sm"
-                      variant="primary"
-                      onClick={() => handlePayoutAction('approve', payout)}
-                    >
-                      Hemen Onayla
-                    </CanvaButton>
-                  </div>
-                ))}
-            </div>
-          </CanvaCardBody>
-        </CanvaCard>
-      )}
+      {/* Main Content */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <div className="flex items-center justify-between mb-4">
+          <TabsList>
+            <TabsTrigger value="payouts">
+              <Banknote className="h-4 w-4 mr-2" />
+              Ödeme Talepleri
+              {payouts && payouts.filter(p => p.status === 'pending').length > 0 && (
+                <CanvaBadge className="ml-2" variant="warning">
+                  {payouts.filter(p => p.status === 'pending').length}
+                </CanvaBadge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="kyc">
+              <UserCheck className="h-4 w-4 mr-2" />
+              KYC Doğrulama
+              {kycQueue && kycQueue.filter(k => k.status === 'pending').length > 0 && (
+                <CanvaBadge className="ml-2" variant="warning">
+                  {kycQueue.filter(k => k.status === 'pending').length}
+                </CanvaBadge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="wallets">
+              <Wallet className="h-4 w-4 mr-2" />
+              En Yüksek Bakiyeler
+            </TabsTrigger>
+          </TabsList>
 
-      {/* Main Tabs */}
-      <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-        <TabsList>
-          <TabsTrigger value="payouts">Odeme Talepleri</TabsTrigger>
-          <TabsTrigger value="kyc">KYC Dogrulama</TabsTrigger>
-          <TabsTrigger value="wallets">Cuzdanlar</TabsTrigger>
-          <TabsTrigger value="analytics">Analitik</TabsTrigger>
-        </TabsList>
-
-        {/* Payout Requests Tab */}
-        <TabsContent value="payouts" className="space-y-4">
-          {/* Filters */}
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1 max-w-sm">
+          <div className="flex items-center gap-2">
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Kullanici veya IBAN ara..."
-                className="pl-9"
+                placeholder="Ara..."
+                className="pl-9 w-[200px]"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <Select defaultValue="all">
-              <SelectTrigger className="w-[180px]">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Durum" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Tum Durumlar</SelectItem>
-                <SelectItem value="pending">Bekleyen</SelectItem>
-                <SelectItem value="processing">Isleniyor</SelectItem>
-                <SelectItem value="blocked">Engellenen</SelectItem>
+                <SelectItem value="all">Tümü</SelectItem>
+                <SelectItem value="pending">Bekliyor</SelectItem>
+                <SelectItem value="processing">İşleniyor</SelectItem>
+                <SelectItem value="completed">Tamamlandı</SelectItem>
+                <SelectItem value="failed">Başarısız</SelectItem>
               </SelectContent>
             </Select>
-            <CanvaButton variant="ghost" size="sm">
-              <Send className="h-4 w-4 mr-2" />
-              Toplu Odeme
-            </CanvaButton>
           </div>
+        </div>
 
-          {/* Payout Table */}
+        {/* Payouts Tab */}
+        <TabsContent value="payouts">
           <CanvaCard>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Kullanici</TableHead>
-                  <TableHead>Tutar</TableHead>
-                  <TableHead>Banka / IBAN</TableHead>
-                  <TableHead>KYC</TableHead>
-                  <TableHead>Talep Tarihi</TableHead>
-                  <TableHead>Durum</TableHead>
-                  <TableHead className="w-[100px]"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {payoutRequests.map((payout) => (
-                  <TableRow
-                    key={payout.id}
-                    className={cn(
-                      payout.priority === 'urgent' && 'bg-red-500/5',
-                      payout.priority === 'high' && 'bg-amber-500/5',
-                    )}
-                  >
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback className="text-xs">
-                            {payout.user.name
-                              .split(' ')
-                              .map((n) => n[0])
-                              .join('')}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <p className="font-medium">{payout.user.name}</p>
-                            {getPriorityBadge(payout.priority)}
-                          </div>
-                          <p className="text-xs text-muted-foreground">
-                            {payout.user.email}
-                          </p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <p className="font-medium text-emerald-600">
-                        {formatCurrency(payout.amount, 'TRY')}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Bakiye: {formatCurrency(payout.paytrBalance, 'TRY')}
-                      </p>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Building className="h-4 w-4 text-muted-foreground" />
-                        <div>
-                          <p className="text-sm font-medium">{payout.bank}</p>
-                          <p className="text-xs text-muted-foreground font-mono">
-                            {payout.ibanMasked.slice(0, 12)}...
-                          </p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>{getKycBadge(payout.kycStatus)}</TableCell>
-                    <TableCell className="text-muted-foreground text-sm">
-                      {payout.requestedAt}
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        {getStatusBadge(payout.status)}
-                        {payout.blockReason && (
-                          <p className="text-xs text-red-600">
-                            {payout.blockReason}
-                          </p>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <CanvaButton variant="ghost" size="sm">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </CanvaButton>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => setSelectedPayout(payout)}
-                          >
-                            <Eye className="h-4 w-4 mr-2" />
-                            Detay
-                          </DropdownMenuItem>
-                          {payout.status === 'pending' &&
-                            payout.kycStatus === 'verified' && (
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  handlePayoutAction('approve', payout)
-                                }
-                              >
-                                <CheckCircle2 className="h-4 w-4 mr-2" />
-                                Onayla
-                              </DropdownMenuItem>
-                            )}
+            <CanvaCardHeader>
+              <div className="flex items-center justify-between">
+                <CanvaCardTitle>Ödeme Talepleri</CanvaCardTitle>
+                {selectedPayouts.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">
+                      {selectedPayouts.length} seçili
+                    </span>
+                    <CanvaButton
+                      variant="success"
+                      size="sm"
+                      onClick={handleBulkApprove}
+                      disabled={bulkProcess.isPending}
+                    >
+                      {bulkProcess.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                      <CheckCheck className="h-4 w-4 mr-2" />
+                      Toplu Onayla
+                    </CanvaButton>
+                  </div>
+                )}
+              </div>
+            </CanvaCardHeader>
+            <CanvaCardBody>
+              {payoutsLoading ? (
+                <div className="space-y-4">
+                  {Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-16" />)}
+                </div>
+              ) : payouts && payouts.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-12">
+                        <input
+                          type="checkbox"
+                          className="rounded"
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedPayouts(payouts.filter(p => p.status === 'pending').map(p => p.id));
+                            } else {
+                              setSelectedPayouts([]);
+                            }
+                          }}
+                        />
+                      </TableHead>
+                      <TableHead>Kullanıcı</TableHead>
+                      <TableHead>Tutar</TableHead>
+                      <TableHead>Banka / IBAN</TableHead>
+                      <TableHead>Tarih</TableHead>
+                      <TableHead>Durum</TableHead>
+                      <TableHead className="text-right">İşlem</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {payouts.map((payout) => (
+                      <TableRow key={payout.id}>
+                        <TableCell>
                           {payout.status === 'pending' && (
-                            <DropdownMenuItem
-                              onClick={() =>
-                                handlePayoutAction('reject', payout)
-                              }
-                              className="text-red-600"
-                            >
-                              <XCircle className="h-4 w-4 mr-2" />
-                              Reddet
-                            </DropdownMenuItem>
+                            <input
+                              type="checkbox"
+                              className="rounded"
+                              checked={selectedPayouts.includes(payout.id)}
+                              onChange={() => togglePayoutSelection(payout.id)}
+                            />
                           )}
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem>
-                            <Phone className="h-4 w-4 mr-2" />
-                            Kullaniciyi Ara
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Mail className="h-4 w-4 mr-2" />
-                            Email Gonder
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={payout.user_avatar || ''} />
+                              <AvatarFallback>
+                                {payout.user_name?.slice(0, 2) || 'NA'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium">{payout.user_name}</p>
+                              <p className="text-xs text-muted-foreground">{payout.user_email}</p>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className="font-bold text-lg">{formatCurrency(payout.amount)}</span>
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{payout.bank_details?.bank_name || '-'}</p>
+                            <p className="text-xs text-muted-foreground font-mono">
+                              {payout.bank_details?.iban || '-'}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <p className="text-sm">
+                            {new Date(payout.created_at).toLocaleDateString('tr-TR')}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(payout.created_at).toLocaleTimeString('tr-TR', {
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </p>
+                        </TableCell>
+                        <TableCell>{getStatusBadge(payout.status)}</TableCell>
+                        <TableCell className="text-right">
+                          {payout.status === 'pending' && (
+                            <div className="flex justify-end gap-1">
+                              <CanvaButton
+                                variant="ghost"
+                                size="sm"
+                                iconOnly
+                                className="text-green-500"
+                                onClick={() => handleApprovePayout(payout.id)}
+                                disabled={processPayout.isPending}
+                              >
+                                <CheckCircle2 className="h-4 w-4" />
+                              </CanvaButton>
+                              <CanvaButton
+                                variant="ghost"
+                                size="sm"
+                                iconOnly
+                                className="text-red-500"
+                                onClick={() => {
+                                  setSelectedPayouts([payout.id]);
+                                  setShowRejectDialog(true);
+                                }}
+                              >
+                                <XCircle className="h-4 w-4" />
+                              </CanvaButton>
+                              <CanvaButton variant="ghost" size="sm" iconOnly>
+                                <Eye className="h-4 w-4" />
+                              </CanvaButton>
+                            </div>
+                          )}
+                          {payout.status !== 'pending' && (
+                            <CanvaButton variant="ghost" size="sm" iconOnly>
+                              <Eye className="h-4 w-4" />
+                            </CanvaButton>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Banknote className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p>Ödeme talebi bulunamadı</p>
+                </div>
+              )}
+            </CanvaCardBody>
           </CanvaCard>
         </TabsContent>
 
         {/* KYC Tab */}
-        <TabsContent value="kyc" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-3">
-            <CanvaStatCard
-              title="Bekleyen"
-              value={walletStats.kycPending.toString()}
-              icon={<Clock className="h-5 w-5" />}
-              accentColor="amber"
-              className="bg-amber-500/5 border-amber-500/30"
-            />
-            <CanvaStatCard
-              title="Onaylanan"
-              value={walletStats.kycApproved.toString()}
-              icon={<CheckCircle2 className="h-5 w-5" />}
-              accentColor="emerald"
-              className="bg-emerald-500/5 border-emerald-500/30"
-            />
-            <CanvaStatCard
-              title="Reddedilen"
-              value={walletStats.kycRejected.toString()}
-              icon={<XCircle className="h-5 w-5" />}
-              accentColor="red"
-              className="bg-red-500/5 border-red-500/30"
-            />
-          </div>
-
+        <TabsContent value="kyc">
           <CanvaCard>
             <CanvaCardHeader>
-              <CanvaCardTitle>KYC Dogrulama Kuyrugu</CanvaCardTitle>
+              <CanvaCardTitle>KYC Doğrulama Kuyruğu</CanvaCardTitle>
               <CanvaCardSubtitle>
-                Para cekme icin kimlik dogrulama bekleyenler
+                Kimlik doğrulama bekleyen kullanıcılar
               </CanvaCardSubtitle>
             </CanvaCardHeader>
             <CanvaCardBody>
-              <div className="space-y-4">
-                {kycQueue.map((kyc) => (
-                  <div
-                    key={kyc.id}
-                    className={cn(
-                      'p-4 rounded-lg border',
-                      kyc.aiScore < 60 && 'border-red-500/30 bg-red-500/5',
-                      kyc.aiScore >= 60 &&
-                        kyc.aiScore < 80 &&
-                        'border-amber-500/30 bg-amber-500/5',
-                    )}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <Avatar className="h-12 w-12">
-                          <AvatarFallback>
-                            {kyc.user.name
-                              .split(' ')
-                              .map((n) => n[0])
-                              .join('')}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">{kyc.user.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {kyc.user.email}
-                          </p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <CanvaBadge variant="secondary" className="text-xs capitalize">
-                              {kyc.documentType.replace('_', ' ')}
-                            </CanvaBadge>
-                            <span className="text-xs text-muted-foreground">
-                              {kyc.submittedAt}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-sm text-muted-foreground">
-                            AI Skoru:
-                          </span>
-                          <span
-                            className={cn(
-                              'font-bold',
-                              kyc.aiScore >= 80
-                                ? 'text-emerald-600'
-                                : kyc.aiScore >= 60
-                                  ? 'text-amber-600'
-                                  : 'text-red-600',
-                            )}
-                          >
-                            %{kyc.aiScore}
-                          </span>
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          Bekleyen odeme:{' '}
-                          <span className="font-medium text-amber-600">
-                            {formatCurrency(kyc.pendingAmount, 'TRY')}
-                          </span>
-                        </p>
-                        {kyc.flags && kyc.flags.length > 0 && (
-                          <div className="flex flex-wrap gap-1 justify-end mb-2">
-                            {kyc.flags.map((flag) => (
-                              <CanvaBadge
-                                key={flag}
-                                variant="danger"
-                                className="text-xs"
-                              >
-                                {flag.replace('_', ' ')}
-                              </CanvaBadge>
-                            ))}
-                          </div>
-                        )}
-                        <div className="flex items-center gap-2">
-                          <CanvaButton size="sm" variant="ghost">
-                            <Eye className="h-3 w-3 mr-1" />
-                            Incele
-                          </CanvaButton>
-                          <CanvaButton size="sm" variant="success">
-                            <CheckCircle2 className="h-3 w-3 mr-1" />
-                            Onayla
-                          </CanvaButton>
-                          <CanvaButton size="sm" variant="danger">
-                            <XCircle className="h-3 w-3 mr-1" />
-                            Reddet
-                          </CanvaButton>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CanvaCardBody>
-          </CanvaCard>
-        </TabsContent>
-
-        {/* Wallets Tab */}
-        <TabsContent value="wallets" className="space-y-4">
-          <CanvaCard>
-            <CanvaCardHeader>
-              <CanvaCardTitle className="flex items-center gap-2">
-                <Wallet className="h-5 w-5 text-emerald-500" />
-                En Yuksek Bakiyeli Cuzdanlar
-              </CanvaCardTitle>
-            </CanvaCardHeader>
-            <CanvaCardBody>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Kullanici</TableHead>
-                    <TableHead>Bakiye</TableHead>
-                    <TableHead>Bekleyen Odeme</TableHead>
-                    <TableHead>Toplam Kazanc</TableHead>
-                    <TableHead>Rating</TableHead>
-                    <TableHead></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {topWallets.map((wallet, index) => (
-                    <TableRow key={wallet.user}>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={cn(
-                              'w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm',
-                              index === 0 && 'bg-amber-500',
-                              index === 1 && 'bg-gray-400',
-                              index === 2 && 'bg-orange-400',
-                              index > 2 && 'bg-blue-500/50',
-                            )}
-                          >
-                            {index + 1}
-                          </div>
-                          <span className="font-medium">{wallet.user}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-bold text-emerald-600">
-                        {formatCurrency(wallet.balance, 'TRY')}
-                      </TableCell>
-                      <TableCell className="text-amber-600">
-                        {formatCurrency(wallet.pendingPayout, 'TRY')}
-                      </TableCell>
-                      <TableCell>
-                        {formatCurrency(wallet.totalEarned, 'TRY')}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          <span className="text-amber-500">★</span>
-                          <span>{wallet.rating}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <CanvaButton variant="ghost" size="sm">
-                          <Eye className="h-4 w-4" />
-                        </CanvaButton>
-                      </TableCell>
+              {kycLoading ? (
+                <div className="space-y-4">
+                  {Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-16" />)}
+                </div>
+              ) : kycQueue && kycQueue.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Kullanıcı</TableHead>
+                      <TableHead>Belge Tipi</TableHead>
+                      <TableHead>AI Güven</TableHead>
+                      <TableHead>Uyarılar</TableHead>
+                      <TableHead>Tarih</TableHead>
+                      <TableHead>Durum</TableHead>
+                      <TableHead className="text-right">İşlem</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {kycQueue.map((kyc) => (
+                      <TableRow key={kyc.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={kyc.user_avatar || ''} />
+                              <AvatarFallback>
+                                {kyc.user_name?.slice(0, 2) || 'NA'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium">{kyc.user_name}</p>
+                              <p className="text-xs text-muted-foreground">{kyc.user_email}</p>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <CanvaBadge variant="outline">
+                            {kyc.document_type === 'national_id' ? 'TC Kimlik' :
+                             kyc.document_type === 'passport' ? 'Pasaport' :
+                             kyc.document_type === 'drivers_license' ? 'Ehliyet' : kyc.document_type}
+                          </CanvaBadge>
+                        </TableCell>
+                        <TableCell>
+                          {kyc.ai_confidence_score !== null && (
+                            <div className="flex items-center gap-2">
+                              <Progress
+                                value={kyc.ai_confidence_score * 100}
+                                className={cn(
+                                  'w-16 h-2',
+                                  kyc.ai_confidence_score > 0.8
+                                    ? '[&>div]:bg-green-500'
+                                    : kyc.ai_confidence_score > 0.5
+                                    ? '[&>div]:bg-yellow-500'
+                                    : '[&>div]:bg-red-500'
+                                )}
+                              />
+                              <span className="text-sm font-medium">
+                                {Math.round(kyc.ai_confidence_score * 100)}%
+                              </span>
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {kyc.ai_flags && kyc.ai_flags.length > 0 ? (
+                            <div className="flex flex-wrap gap-1">
+                              {kyc.ai_flags.slice(0, 2).map((flag, i) => (
+                                <CanvaBadge key={i} variant="error" className="text-xs">
+                                  {flag}
+                                </CanvaBadge>
+                              ))}
+                              {kyc.ai_flags.length > 2 && (
+                                <CanvaBadge variant="default" className="text-xs">
+                                  +{kyc.ai_flags.length - 2}
+                                </CanvaBadge>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <p className="text-sm">
+                            {new Date(kyc.submitted_at).toLocaleDateString('tr-TR')}
+                          </p>
+                        </TableCell>
+                        <TableCell>{getStatusBadge(kyc.status)}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-1">
+                            <CanvaButton
+                              variant="ghost"
+                              size="sm"
+                              iconOnly
+                              onClick={() => {
+                                setSelectedKYC(kyc);
+                                setShowKYCDialog(true);
+                              }}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </CanvaButton>
+                            {kyc.status === 'pending' && (
+                              <>
+                                <CanvaButton
+                                  variant="ghost"
+                                  size="sm"
+                                  iconOnly
+                                  className="text-green-500"
+                                  onClick={() => {
+                                    setSelectedKYC(kyc);
+                                    handleKYCAction('approve');
+                                  }}
+                                >
+                                  <CheckCircle2 className="h-4 w-4" />
+                                </CanvaButton>
+                                <CanvaButton
+                                  variant="ghost"
+                                  size="sm"
+                                  iconOnly
+                                  className="text-red-500"
+                                  onClick={() => {
+                                    setSelectedKYC(kyc);
+                                    setShowKYCDialog(true);
+                                  }}
+                                >
+                                  <XCircle className="h-4 w-4" />
+                                </CanvaButton>
+                              </>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Shield className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p>KYC doğrulama bekleyen kullanıcı yok</p>
+                </div>
+              )}
             </CanvaCardBody>
           </CanvaCard>
         </TabsContent>
 
-        {/* Analytics Tab */}
-        <TabsContent value="analytics" className="space-y-6">
+        {/* Top Wallets Tab */}
+        <TabsContent value="wallets">
           <CanvaCard>
             <CanvaCardHeader>
-              <CanvaCardTitle>Haftalik Odeme Hacmi</CanvaCardTitle>
-              <CanvaCardSubtitle>Gunluk islem tutari ve adedi</CanvaCardSubtitle>
+              <CanvaCardTitle>En Yüksek Bakiyeler</CanvaCardTitle>
+              <CanvaCardSubtitle>
+                En yüksek bakiyeye sahip kullanıcılar
+              </CanvaCardSubtitle>
             </CanvaCardHeader>
             <CanvaCardBody>
-              <AdminAreaChart
-                data={dailyPayoutData}
-                xAxisKey="date"
-                height={300}
-                areas={[
-                  {
-                    dataKey: 'amount',
-                    name: 'Tutar',
-                    color: CHART_COLORS.trust,
-                  },
-                ]}
-                formatter={(value, name) => [
-                  formatCurrency(value as number, 'TRY'),
-                  name,
-                ]}
-              />
+              {walletsLoading ? (
+                <div className="space-y-4">
+                  {Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-16" />)}
+                </div>
+              ) : topWallets && topWallets.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Kullanıcı</TableHead>
+                      <TableHead>Bakiye</TableHead>
+                      <TableHead>Bekleyen</TableHead>
+                      <TableHead>Toplam Kazanç</TableHead>
+                      <TableHead>Toplam Çekim</TableHead>
+                      <TableHead>Son İşlem</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {topWallets.map((wallet, index) => (
+                      <TableRow key={wallet.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <span className="text-lg font-bold text-muted-foreground">
+                              #{index + 1}
+                            </span>
+                            <div>
+                              <p className="font-medium">{wallet.user_name}</p>
+                              <p className="text-xs text-muted-foreground">{wallet.user_email}</p>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className="font-bold text-lg text-green-600 dark:text-green-400">
+                            {formatCurrency(wallet.balance)}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          {wallet.pending_balance > 0 ? (
+                            <span className="text-yellow-600 dark:text-yellow-400">
+                              {formatCurrency(wallet.pending_balance)}
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell>{formatCurrency(wallet.total_earned)}</TableCell>
+                        <TableCell>{formatCurrency(wallet.total_withdrawn)}</TableCell>
+                        <TableCell>
+                          <p className="text-sm">
+                            {new Date(wallet.last_activity).toLocaleDateString('tr-TR')}
+                          </p>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Wallet className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p>Cüzdan verisi bulunamadı</p>
+                </div>
+              )}
             </CanvaCardBody>
           </CanvaCard>
         </TabsContent>
       </Tabs>
 
-      {/* Action Dialog */}
-      <Dialog
-        open={actionDialog.open}
-        onOpenChange={(open) => setActionDialog({ ...actionDialog, open })}
-      >
+      {/* Reject Dialog */}
+      <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {actionDialog.action === 'approve' && 'Odeme Onayla'}
-              {actionDialog.action === 'reject' && 'Odeme Reddet'}
-            </DialogTitle>
+            <DialogTitle>Ödeme Talebini Reddet</DialogTitle>
             <DialogDescription>
-              {actionDialog.item && (
-                <>
-                  {actionDialog.item.user.name} -{' '}
-                  {formatCurrency(actionDialog.item.amount, 'TRY')}
-                </>
-              )}
+              Bu işlem geri alınamaz. Lütfen red sebebini belirtin.
             </DialogDescription>
           </DialogHeader>
-          {actionDialog.action === 'reject' && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Red Sebebi</label>
-              <Textarea
-                placeholder="Red sebebini yazin..."
-                value={rejectReason}
-                onChange={(e) => setRejectReason(e.target.value)}
-              />
-            </div>
-          )}
+          <Textarea
+            placeholder="Red sebebi..."
+            value={rejectReason}
+            onChange={(e) => setRejectReason(e.target.value)}
+            className="min-h-[100px]"
+          />
           <DialogFooter>
-            <CanvaButton
-              variant="ghost"
-              onClick={() =>
-                setActionDialog({ open: false, action: '', item: null })
-              }
-            >
-              Iptal
+            <CanvaButton variant="outline" onClick={() => setShowRejectDialog(false)}>
+              İptal
             </CanvaButton>
             <CanvaButton
-              variant={actionDialog.action === 'reject' ? 'danger' : 'success'}
-              onClick={() =>
-                setActionDialog({ open: false, action: '', item: null })
-              }
+              variant="danger"
+              onClick={() => handleRejectPayout(selectedPayouts[0])}
+              disabled={processPayout.isPending || !rejectReason}
             >
-              {actionDialog.action === 'approve' && 'Onayla ve Gonder'}
-              {actionDialog.action === 'reject' && 'Reddet'}
+              {processPayout.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Reddet
+            </CanvaButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* KYC Review Dialog */}
+      <Dialog open={showKYCDialog} onOpenChange={setShowKYCDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>KYC Doğrulama İnceleme</DialogTitle>
+            <DialogDescription>
+              {selectedKYC?.user_name} - {selectedKYC?.document_type}
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedKYC && (
+            <div className="space-y-4">
+              {/* Document Images */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="border rounded-lg p-2">
+                  <p className="text-xs text-muted-foreground mb-2">Ön Yüz</p>
+                  <div className="aspect-[3/2] bg-muted rounded flex items-center justify-center">
+                    <Image className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                </div>
+                {selectedKYC.document_back_url && (
+                  <div className="border rounded-lg p-2">
+                    <p className="text-xs text-muted-foreground mb-2">Arka Yüz</p>
+                    <div className="aspect-[3/2] bg-muted rounded flex items-center justify-center">
+                      <Image className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                  </div>
+                )}
+                <div className="border rounded-lg p-2">
+                  <p className="text-xs text-muted-foreground mb-2">Selfie</p>
+                  <div className="aspect-[3/2] bg-muted rounded flex items-center justify-center">
+                    <Image className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                </div>
+              </div>
+
+              {/* AI Analysis */}
+              {selectedKYC.ai_confidence_score !== null && (
+                <div className="p-4 rounded-lg bg-muted/30">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium">AI Analizi</span>
+                    <span className={cn(
+                      "font-bold",
+                      selectedKYC.ai_confidence_score > 0.8 ? "text-green-500" :
+                      selectedKYC.ai_confidence_score > 0.5 ? "text-yellow-500" : "text-red-500"
+                    )}>
+                      {Math.round(selectedKYC.ai_confidence_score * 100)}% Güven
+                    </span>
+                  </div>
+                  {selectedKYC.ai_flags && selectedKYC.ai_flags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {selectedKYC.ai_flags.map((flag, i) => (
+                        <CanvaBadge key={i} variant="error">
+                          <AlertTriangle className="h-3 w-3 mr-1" />
+                          {flag}
+                        </CanvaBadge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Notes */}
+              <div>
+                <label className="text-sm font-medium">İnceleme Notları</label>
+                <Textarea
+                  placeholder="Notlarınızı ekleyin..."
+                  value={kycNotes}
+                  onChange={(e) => setKycNotes(e.target.value)}
+                  className="mt-2"
+                />
+              </div>
+
+              {/* Rejection Reason (if rejecting) */}
+              <div>
+                <label className="text-sm font-medium">Red Sebebi (Opsiyonel)</label>
+                <Textarea
+                  placeholder="Red sebebi..."
+                  value={rejectReason}
+                  onChange={(e) => setRejectReason(e.target.value)}
+                  className="mt-2"
+                />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <CanvaButton variant="outline" onClick={() => setShowKYCDialog(false)}>
+              İptal
+            </CanvaButton>
+            <CanvaButton
+              variant="danger"
+              onClick={() => handleKYCAction('reject')}
+              disabled={verifyKYC.isPending}
+            >
+              Reddet
+            </CanvaButton>
+            <CanvaButton
+              variant="success"
+              onClick={() => handleKYCAction('approve')}
+              disabled={verifyKYC.isPending}
+            >
+              {verifyKYC.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Onayla
             </CanvaButton>
           </DialogFooter>
         </DialogContent>
