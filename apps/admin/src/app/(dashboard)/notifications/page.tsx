@@ -68,52 +68,8 @@ import {
 } from '@/hooks/use-notifications';
 import { Loader2, AlertTriangle } from 'lucide-react';
 
-// Fallback mock data (will be replaced by API data when available)
-const mockNotifications = [
-  {
-    id: '1',
-    title: 'Yeni Eşleşme Fırsatı! 🎉',
-    body: 'Yakınında 5 yeni gezgin seni bekliyor. Şimdi keşfet!',
-    segment: 'active_users',
-    status: 'sent',
-    sent_at: '2024-12-18T10:00:00Z',
-    stats: {
-      sent: 12450,
-      delivered: 11890,
-      opened: 4520,
-      clicked: 1230,
-    },
-  },
-  {
-    id: '2',
-    title: "Premium'a Özel İndirim 💎",
-    body: 'Sadece bugün! Premium üyeliğe %30 indirimle geç.',
-    segment: 'free_users',
-    status: 'scheduled',
-    scheduled_for: '2024-12-19T12:00:00Z',
-    stats: null,
-  },
-  {
-    id: '3',
-    title: 'Haftalık Moment Özeti',
-    body: 'Bu hafta 1.2M görüntülenme aldın! İstatistiklerini gör.',
-    segment: 'creators',
-    status: 'draft',
-    stats: null,
-  },
-];
-
-const mockSegments = [
-  { id: 'all', name: 'Tüm Kullanıcılar', count: 125000 },
-  { id: 'active_users', name: 'Aktif Kullanıcılar (Son 7 gün)', count: 45000 },
-  { id: 'inactive_users', name: 'Pasif Kullanıcılar (30+ gün)', count: 32000 },
-  { id: 'free_users', name: 'Ücretsiz Üyeler', count: 98000 },
-  { id: 'premium_users', name: 'Premium Üyeler', count: 27000 },
-  { id: 'creators', name: 'İçerik Üreticileri', count: 8500 },
-  { id: 'new_users', name: 'Yeni Üyeler (Son 7 gün)', count: 3200 },
-];
-
-const mockTemplates = [
+// Notification templates for quick creation
+const notificationTemplates = [
   {
     id: '1',
     name: 'Hoş Geldin',
@@ -140,12 +96,16 @@ const mockTemplates = [
   },
 ];
 
-const mockCampaignStats = {
-  totalSent: 156000,
-  avgDeliveryRate: 95.4,
-  avgOpenRate: 38.2,
-  avgClickRate: 12.8,
-};
+// Segment definitions for targeting
+const segmentDefinitions = [
+  { id: 'all', name: 'Tüm Kullanıcılar' },
+  { id: 'active_users', name: 'Aktif Kullanıcılar (Son 7 gün)' },
+  { id: 'inactive_users', name: 'Pasif Kullanıcılar (30+ gün)' },
+  { id: 'free_users', name: 'Ücretsiz Üyeler' },
+  { id: 'premium_users', name: 'Premium Üyeler' },
+  { id: 'creators', name: 'İçerik Üreticileri' },
+  { id: 'new_users', name: 'Yeni Üyeler (Son 7 gün)' },
+];
 
 export default function NotificationsPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -165,8 +125,15 @@ export default function NotificationsPage() {
   const createNotification = useCreateNotification();
   const sendNotification = useSendNotification();
 
-  // Use API data if available, otherwise fall back to mock data
-  const notifications = data?.campaigns || mockNotifications;
+  // Extract notifications and stats from API data
+  const notifications = data?.campaigns || [];
+  const stats = data?.stats || {
+    totalSent: 0,
+    avgDeliveryRate: 0,
+    avgOpenRate: 0,
+    avgClickRate: 0,
+  };
+  const segments = data?.segments || segmentDefinitions.map((s) => ({ ...s, count: 0 }));
 
   const handleSend = () => {
     if (!notificationTitle || !notificationBody) {
@@ -246,7 +213,7 @@ export default function NotificationsPage() {
     setAbTestEnabled(false);
   };
 
-  const applyTemplate = (template: (typeof mockTemplates)[0]) => {
+  const applyTemplate = (template: (typeof notificationTemplates)[0]) => {
     setNotificationTitle(template.title);
     setNotificationBody(template.body);
   };
@@ -360,7 +327,7 @@ export default function NotificationsPage() {
               <div>
                 <Label>Hazır Şablon</Label>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {mockTemplates.map((template) => (
+                  {notificationTemplates.map((template) => (
                     <CanvaButton
                       key={template.id}
                       variant="primary"
@@ -437,10 +404,11 @@ export default function NotificationsPage() {
                     <SelectValue placeholder="Segment seçin" />
                   </SelectTrigger>
                   <SelectContent>
-                    {mockSegments.map((segment) => (
+                    {segments.map((segment) => (
                       <SelectItem key={segment.id} value={segment.id}>
-                        {segment.name} ({segment.count.toLocaleString('tr-TR')}{' '}
-                        kullanıcı)
+                        {segment.name}
+                        {segment.count > 0 &&
+                          ` (${segment.count.toLocaleString('tr-TR')} kullanıcı)`}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -522,26 +490,26 @@ export default function NotificationsPage() {
       <div className="grid gap-4 md:grid-cols-4">
         <CanvaStatCard
           title="Toplam Gönderim"
-          value={mockCampaignStats.totalSent.toLocaleString('tr-TR')}
+          value={stats.totalSent.toLocaleString('tr-TR')}
           icon={<Send className="h-5 w-5" />}
           accentColor="blue"
         />
         <CanvaStatCard
           title="Teslimat Oranı"
-          value={`%${mockCampaignStats.avgDeliveryRate}`}
+          value={`%${stats.avgDeliveryRate}`}
           icon={<CheckCircle className="h-5 w-5" />}
           accentColor="emerald"
           trend="up"
         />
         <CanvaStatCard
           title="Açılma Oranı"
-          value={`%${mockCampaignStats.avgOpenRate}`}
+          value={`%${stats.avgOpenRate}`}
           icon={<Eye className="h-5 w-5" />}
           accentColor="violet"
         />
         <CanvaStatCard
           title="Tıklama Oranı"
-          value={`%${mockCampaignStats.avgClickRate}`}
+          value={`%${stats.avgClickRate}`}
           icon={<TrendingUp className="h-5 w-5" />}
           accentColor="amber"
         />
@@ -565,7 +533,9 @@ export default function NotificationsPage() {
         </div>
 
         <TabsContent value="all" className="space-y-4">
-          {mockNotifications.map((notification) => (
+          {notifications.length === 0 ? (
+            <EmptyState />
+          ) : notifications.map((notification) => (
             <CanvaCard key={notification.id}>
               <CanvaCardBody className="p-6">
                 <div className="flex items-start justify-between">
@@ -584,11 +554,9 @@ export default function NotificationsPage() {
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Target className="h-4 w-4" />
-                          {
-                            mockSegments.find(
-                              (s) => s.id === notification.segment,
-                            )?.name
-                          }
+                          {segments.find(
+                            (s) => s.id === (notification.segment || notification.target_audience?.segment),
+                          )?.name || 'Tüm Kullanıcılar'}
                         </span>
                         {notification.sent_at && (
                           <span className="flex items-center gap-1">
@@ -716,64 +684,91 @@ export default function NotificationsPage() {
           ))}
         </TabsContent>
 
-        <TabsContent value="sent">
-          {mockNotifications
-            .filter((n) => n.status === 'sent')
-            .map((notification) => (
-              <CanvaCard key={notification.id}>
-                <CanvaCardBody className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-semibold">{notification.title}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {notification.body}
-                      </p>
+        <TabsContent value="sent" className="space-y-4">
+          {notifications.filter((n) => n.status === 'sent').length === 0 ? (
+            <div className="flex h-48 items-center justify-center rounded-lg border-2 border-dashed border-border">
+              <div className="text-center">
+                <Send className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground">Gönderilmiş bildirim yok</p>
+              </div>
+            </div>
+          ) : (
+            notifications
+              .filter((n) => n.status === 'sent')
+              .map((notification) => (
+                <CanvaCard key={notification.id}>
+                  <CanvaCardBody className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-semibold">{notification.title}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {notification.body}
+                        </p>
+                      </div>
+                      {getStatusBadge(notification.status)}
                     </div>
-                    {getStatusBadge(notification.status)}
-                  </div>
-                </CanvaCardBody>
-              </CanvaCard>
-            ))}
+                  </CanvaCardBody>
+                </CanvaCard>
+              ))
+          )}
         </TabsContent>
 
-        <TabsContent value="scheduled">
-          {mockNotifications
-            .filter((n) => n.status === 'scheduled')
-            .map((notification) => (
-              <CanvaCard key={notification.id}>
-                <CanvaCardBody className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-semibold">{notification.title}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {notification.body}
-                      </p>
+        <TabsContent value="scheduled" className="space-y-4">
+          {notifications.filter((n) => n.status === 'scheduled').length === 0 ? (
+            <div className="flex h-48 items-center justify-center rounded-lg border-2 border-dashed border-border">
+              <div className="text-center">
+                <Calendar className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground">Zamanlanmış bildirim yok</p>
+              </div>
+            </div>
+          ) : (
+            notifications
+              .filter((n) => n.status === 'scheduled')
+              .map((notification) => (
+                <CanvaCard key={notification.id}>
+                  <CanvaCardBody className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-semibold">{notification.title}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {notification.body}
+                        </p>
+                      </div>
+                      {getStatusBadge(notification.status)}
                     </div>
-                    {getStatusBadge(notification.status)}
-                  </div>
-                </CanvaCardBody>
-              </CanvaCard>
-            ))}
+                  </CanvaCardBody>
+                </CanvaCard>
+              ))
+          )}
         </TabsContent>
 
-        <TabsContent value="drafts">
-          {mockNotifications
-            .filter((n) => n.status === 'draft')
-            .map((notification) => (
-              <CanvaCard key={notification.id}>
-                <CanvaCardBody className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-semibold">{notification.title}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {notification.body}
-                      </p>
+        <TabsContent value="drafts" className="space-y-4">
+          {notifications.filter((n) => n.status === 'draft').length === 0 ? (
+            <div className="flex h-48 items-center justify-center rounded-lg border-2 border-dashed border-border">
+              <div className="text-center">
+                <Bell className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground">Taslak bildirim yok</p>
+              </div>
+            </div>
+          ) : (
+            notifications
+              .filter((n) => n.status === 'draft')
+              .map((notification) => (
+                <CanvaCard key={notification.id}>
+                  <CanvaCardBody className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-semibold">{notification.title}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {notification.body}
+                        </p>
+                      </div>
+                      {getStatusBadge(notification.status)}
                     </div>
-                    {getStatusBadge(notification.status)}
-                  </div>
-                </CanvaCardBody>
-              </CanvaCard>
-            ))}
+                  </CanvaCardBody>
+                </CanvaCard>
+              ))
+          )}
         </TabsContent>
       </Tabs>
 
@@ -786,8 +781,8 @@ export default function NotificationsPage() {
           </CanvaCardSubtitle>
         </CanvaCardHeader>
         <CanvaCardBody>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {mockSegments.slice(0, 8).map((segment) => (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {segments.slice(0, 8).map((segment) => (
               <div
                 key={segment.id}
                 className="flex items-center justify-between rounded-lg border p-4"
@@ -797,7 +792,9 @@ export default function NotificationsPage() {
                   <div>
                     <p className="font-medium text-sm">{segment.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {segment.count.toLocaleString('tr-TR')} kullanıcı
+                      {segment.count > 0
+                        ? `${segment.count.toLocaleString('tr-TR')} kullanıcı`
+                        : 'Veri yükleniyor...'}
                     </p>
                   </div>
                 </div>

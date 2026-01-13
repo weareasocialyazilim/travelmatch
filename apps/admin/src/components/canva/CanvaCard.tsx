@@ -166,18 +166,36 @@ export const CanvaStatCard = React.forwardRef<
   CanvaStatCardProps
 >(({ className, label, value, change, icon, ...props }, ref) => {
   const isPositive = change && change.value >= 0;
+  const formattedValue =
+    typeof value === 'number' ? value.toLocaleString() : value;
+  const ariaLabel = change
+    ? `${label}: ${formattedValue}, ${isPositive ? 'artış' : 'azalış'} ${Math.abs(change.value)}%${change.label ? ` ${change.label}` : ''}`
+    : `${label}: ${formattedValue}`;
 
   return (
-    <CanvaCard ref={ref} className={className} {...props}>
+    <CanvaCard
+      ref={ref}
+      className={className}
+      role="status"
+      aria-label={ariaLabel}
+      {...props}
+    >
       <div className="p-5">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+          <span
+            className="text-xs font-medium text-muted-foreground uppercase tracking-wider"
+            id={`stat-label-${label.replace(/\s+/g, '-').toLowerCase()}`}
+          >
             {label}
           </span>
-          {icon && <span className="text-muted-foreground">{icon}</span>}
+          {icon && (
+            <span className="text-muted-foreground" aria-hidden="true">
+              {icon}
+            </span>
+          )}
         </div>
         <div className="text-3xl font-bold text-foreground mt-2">
-          {typeof value === 'number' ? value.toLocaleString() : value}
+          {formattedValue}
         </div>
         {change && (
           <div className="mt-2 flex items-center gap-2">
@@ -188,6 +206,7 @@ export const CanvaStatCard = React.forwardRef<
                   ? 'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400'
                   : 'bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400',
               )}
+              aria-hidden="true"
             >
               {isPositive ? '↑' : '↓'}
               {Math.abs(change.value)}%
