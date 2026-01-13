@@ -283,35 +283,35 @@ export default function SystemHealthPage() {
     switch (status) {
       case 'healthy':
         return (
-          <CanvaBadge className="bg-green-500/10 text-green-500 border-green-500/20">
+          <CanvaBadge className="bg-green-500/10 dark:bg-green-500/20 text-green-500 dark:text-green-400 border-green-500/20">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             Sağlıklı
           </CanvaBadge>
         );
       case 'degraded':
         return (
-          <CanvaBadge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">
+          <CanvaBadge className="bg-yellow-500/10 dark:bg-yellow-500/20 text-yellow-500 dark:text-yellow-400 border-yellow-500/20">
             <AlertTriangle className="h-3 w-3 mr-1" />
             Yavaşlama
           </CanvaBadge>
         );
       case 'down':
         return (
-          <CanvaBadge className="bg-red-500/10 text-red-500 border-red-500/20">
+          <CanvaBadge className="bg-red-500/10 dark:bg-red-500/20 text-red-500 dark:text-red-400 border-red-500/20">
             <XCircle className="h-3 w-3 mr-1" />
             Kesinti
           </CanvaBadge>
         );
       case 'investigating':
         return (
-          <CanvaBadge className="bg-orange-500/10 text-orange-500 border-orange-500/20">
+          <CanvaBadge className="bg-orange-500/10 dark:bg-orange-500/20 text-orange-500 dark:text-orange-400 border-orange-500/20">
             <Eye className="h-3 w-3 mr-1" />
             İnceleniyor
           </CanvaBadge>
         );
       case 'resolved':
         return (
-          <CanvaBadge className="bg-green-500/10 text-green-500 border-green-500/20">
+          <CanvaBadge className="bg-green-500/10 dark:bg-green-500/20 text-green-500 dark:text-green-400 border-green-500/20">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             Çözüldü
           </CanvaBadge>
@@ -324,13 +324,27 @@ export default function SystemHealthPage() {
   const getSeverityBadge = (severity: string) => {
     switch (severity) {
       case 'critical':
-        return <CanvaBadge className="bg-red-500">Kritik</CanvaBadge>;
+        return (
+          <CanvaBadge className="bg-red-500 dark:bg-red-600">Kritik</CanvaBadge>
+        );
       case 'high':
-        return <CanvaBadge className="bg-orange-500">Yüksek</CanvaBadge>;
+        return (
+          <CanvaBadge className="bg-orange-500 dark:bg-orange-600">
+            Yüksek
+          </CanvaBadge>
+        );
       case 'medium':
-        return <CanvaBadge className="bg-yellow-500">Orta</CanvaBadge>;
+        return (
+          <CanvaBadge className="bg-yellow-500 dark:bg-yellow-600">
+            Orta
+          </CanvaBadge>
+        );
       case 'low':
-        return <CanvaBadge className="bg-blue-500">Düşük</CanvaBadge>;
+        return (
+          <CanvaBadge className="bg-blue-500 dark:bg-blue-600">
+            Düşük
+          </CanvaBadge>
+        );
       default:
         return <CanvaBadge variant="outline">{severity}</CanvaBadge>;
     }
@@ -363,12 +377,12 @@ export default function SystemHealthPage() {
       </div>
 
       {/* Overall Status Banner */}
-      <CanvaCard className="admin-card border-l-4 border-l-green-500 bg-green-500/5">
+      <CanvaCard className="admin-card border-l-4 border-l-green-500 dark:border-l-green-400 bg-green-500/5 dark:bg-green-500/10">
         <CanvaCardBody className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-green-500/10">
-                <Shield className="h-6 w-6 text-green-500" />
+              <div className="p-3 rounded-lg bg-green-500/10 dark:bg-green-500/20">
+                <Shield className="h-6 w-6 text-green-500 dark:text-green-400" />
               </div>
               <div>
                 <p className="font-semibold text-lg">
@@ -416,7 +430,7 @@ export default function SystemHealthPage() {
           <CanvaCardBody className="p-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <Cpu className="h-5 w-5 text-blue-500" />
+                <Cpu className="h-5 w-5 text-blue-500 dark:text-blue-400" />
                 <span className="font-medium">CPU</span>
               </div>
               <span className="text-sm text-muted-foreground">
@@ -435,7 +449,7 @@ export default function SystemHealthPage() {
           <CanvaCardBody className="p-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <MemoryStick className="h-5 w-5 text-purple-500" />
+                <MemoryStick className="h-5 w-5 text-purple-500 dark:text-purple-400" />
                 <span className="font-medium">Bellek</span>
               </div>
               <span className="text-sm text-muted-foreground">
@@ -449,7 +463,9 @@ export default function SystemHealthPage() {
               value={serverMetrics.memory.current}
               className={cn(
                 'h-2 mt-2',
-                serverMetrics.memory.current > 80 ? '[&>div]:bg-red-500' : '',
+                serverMetrics.memory.current > 80
+                  ? '[&>div]:bg-red-500 dark:[&>div]:bg-red-600'
+                  : '',
               )}
             />
             <p className="text-xs text-muted-foreground mt-1">
@@ -463,7 +479,7 @@ export default function SystemHealthPage() {
           <CanvaCardBody className="p-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <HardDrive className="h-5 w-5 text-green-500" />
+                <HardDrive className="h-5 w-5 text-green-500 dark:text-green-400" />
                 <span className="font-medium">Disk</span>
               </div>
               <span className="text-sm text-muted-foreground">
@@ -486,7 +502,7 @@ export default function SystemHealthPage() {
           <CanvaCardBody className="p-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <Network className="h-5 w-5 text-orange-500" />
+                <Network className="h-5 w-5 text-orange-500 dark:text-orange-400" />
                 <span className="font-medium">Ağ</span>
               </div>
               <span className="text-sm text-muted-foreground">
@@ -495,13 +511,13 @@ export default function SystemHealthPage() {
             </div>
             <div className="flex items-center gap-4 mt-2">
               <div>
-                <p className="text-lg font-bold text-green-500">
+                <p className="text-lg font-bold text-green-500 dark:text-green-400">
                   ↓ {serverMetrics.network.in}
                 </p>
                 <p className="text-xs text-muted-foreground">Mbps gelen</p>
               </div>
               <div>
-                <p className="text-lg font-bold text-blue-500">
+                <p className="text-lg font-bold text-blue-500 dark:text-blue-400">
                   ↑ {serverMetrics.network.out}
                 </p>
                 <p className="text-xs text-muted-foreground">Mbps giden</p>
@@ -588,10 +604,10 @@ export default function SystemHealthPage() {
                     .map((incident) => (
                       <div
                         key={incident.id}
-                        className="flex items-center justify-between p-3 bg-yellow-500/5 border border-yellow-500/20 rounded-lg"
+                        className="flex items-center justify-between p-3 bg-yellow-500/5 dark:bg-yellow-500/10 border border-yellow-500/20 rounded-lg"
                       >
                         <div className="flex items-center gap-3">
-                          <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                          <AlertTriangle className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />
                           <div>
                             <p className="font-medium">{incident.title}</p>
                             <p className="text-sm text-muted-foreground">
@@ -609,7 +625,7 @@ export default function SystemHealthPage() {
                 </div>
               ) : (
                 <div className="flex items-center justify-center p-8 text-muted-foreground">
-                  <CheckCircle2 className="h-5 w-5 mr-2 text-green-500" />
+                  <CheckCircle2 className="h-5 w-5 mr-2 text-green-500 dark:text-green-400" />
                   Aktif olay bulunmuyor
                 </div>
               )}
@@ -653,8 +669,8 @@ export default function SystemHealthPage() {
                         <span
                           className={cn(
                             service.uptime >= 99.9
-                              ? 'text-green-500'
-                              : 'text-yellow-500',
+                              ? 'text-green-500 dark:text-green-400'
+                              : 'text-yellow-500 dark:text-yellow-400',
                           )}
                         >
                           {service.uptime}%
@@ -665,10 +681,10 @@ export default function SystemHealthPage() {
                           className={cn(
                             'font-medium',
                             service.latency < 100
-                              ? 'text-green-500'
+                              ? 'text-green-500 dark:text-green-400'
                               : service.latency < 300
-                                ? 'text-yellow-500'
-                                : 'text-red-500',
+                                ? 'text-yellow-500 dark:text-yellow-400'
+                                : 'text-red-500 dark:text-red-400',
                           )}
                         >
                           {service.latency}ms
@@ -679,7 +695,7 @@ export default function SystemHealthPage() {
                         <span
                           className={cn(
                             service.errors > 10
-                              ? 'text-red-500'
+                              ? 'text-red-500 dark:text-red-400'
                               : 'text-muted-foreground',
                           )}
                         >
@@ -705,7 +721,7 @@ export default function SystemHealthPage() {
             <CanvaCard className="admin-card">
               <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <Database className="h-5 w-5 text-blue-500" />
+                  <Database className="h-5 w-5 text-blue-500 dark:text-blue-400" />
                   <span className="font-medium">Bağlantılar</span>
                 </div>
                 <p className="text-2xl font-bold">
@@ -729,7 +745,7 @@ export default function SystemHealthPage() {
             <CanvaCard className="admin-card">
               <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <Zap className="h-5 w-5 text-yellow-500" />
+                  <Zap className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />
                   <span className="font-medium">Sorgular</span>
                 </div>
                 <p className="text-2xl font-bold">
@@ -738,7 +754,7 @@ export default function SystemHealthPage() {
                 <p className="text-sm text-muted-foreground mt-2">
                   Ort. süre: {databaseStats.queries.avgDuration}ms
                 </p>
-                <p className="text-xs text-red-500">
+                <p className="text-xs text-red-500 dark:text-red-400">
                   {databaseStats.queries.slowQueries} yavaş sorgu
                 </p>
               </CanvaCardBody>
@@ -747,7 +763,7 @@ export default function SystemHealthPage() {
             <CanvaCard className="admin-card">
               <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <HardDrive className="h-5 w-5 text-green-500" />
+                  <HardDrive className="h-5 w-5 text-green-500 dark:text-green-400" />
                   <span className="font-medium">Depolama</span>
                 </div>
                 <p className="text-2xl font-bold">
@@ -770,7 +786,7 @@ export default function SystemHealthPage() {
             <CanvaCard className="admin-card">
               <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <RefreshCw className="h-5 w-5 text-purple-500" />
+                  <RefreshCw className="h-5 w-5 text-purple-500 dark:text-purple-400" />
                   <span className="font-medium">Replikasyon</span>
                 </div>
                 <div className="flex items-center gap-2 mt-2">
@@ -826,8 +842,8 @@ export default function SystemHealthPage() {
                         <CanvaBadge
                           className={cn(
                             q.duration > 300
-                              ? 'bg-red-500/10 text-red-500'
-                              : 'bg-yellow-500/10 text-yellow-500',
+                              ? 'bg-red-500/10 dark:bg-red-500/20 text-red-500 dark:text-red-400'
+                              : 'bg-yellow-500/10 dark:bg-yellow-500/20 text-yellow-500 dark:text-yellow-400',
                           )}
                         >
                           {q.duration}ms
@@ -875,17 +891,17 @@ export default function SystemHealthPage() {
                           {endpoint.method}
                         </CanvaBadge>
                       </TableCell>
-                      <TableCell className="text-green-500">
+                      <TableCell className="text-green-500 dark:text-green-400">
                         {endpoint.p50}ms
                       </TableCell>
-                      <TableCell className="text-yellow-500">
+                      <TableCell className="text-yellow-500 dark:text-yellow-400">
                         {endpoint.p95}ms
                       </TableCell>
                       <TableCell
                         className={cn(
                           endpoint.p99 > 500
-                            ? 'text-red-500'
-                            : 'text-orange-500',
+                            ? 'text-red-500 dark:text-red-400'
+                            : 'text-orange-500 dark:text-orange-400',
                         )}
                       >
                         {endpoint.p99}ms
@@ -896,7 +912,7 @@ export default function SystemHealthPage() {
                         <span
                           className={cn(
                             (endpoint.errors / endpoint.calls) * 100 > 0.5
-                              ? 'text-red-500'
+                              ? 'text-red-500 dark:text-red-400'
                               : 'text-muted-foreground',
                           )}
                         >

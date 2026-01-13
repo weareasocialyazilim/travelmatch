@@ -41,17 +41,41 @@ import { formatCurrency, formatRelativeDate, getInitials } from '@/lib/utils';
 import { useFinance } from '@/hooks/use-finance';
 
 const transactionTypeConfig = {
-  payment: { label: 'Ödeme', icon: ArrowUpRight, color: 'text-green-600' },
+  payment: {
+    label: 'Ödeme',
+    icon: ArrowUpRight,
+    color: 'text-green-600 dark:text-green-400',
+  },
   subscription: {
     label: 'Abonelik',
     icon: ArrowUpRight,
-    color: 'text-green-600',
+    color: 'text-green-600 dark:text-green-400',
   },
-  boost: { label: 'Boost', icon: ArrowUpRight, color: 'text-blue-600' },
-  payout: { label: 'Çekim', icon: ArrowDownRight, color: 'text-blue-600' },
-  refund: { label: 'İade', icon: ArrowDownRight, color: 'text-orange-600' },
-  gift: { label: 'Hediye', icon: DollarSign, color: 'text-purple-600' },
-  fee: { label: 'Komisyon', icon: DollarSign, color: 'text-purple-600' },
+  boost: {
+    label: 'Boost',
+    icon: ArrowUpRight,
+    color: 'text-blue-600 dark:text-blue-400',
+  },
+  payout: {
+    label: 'Çekim',
+    icon: ArrowDownRight,
+    color: 'text-blue-600 dark:text-blue-400',
+  },
+  refund: {
+    label: 'İade',
+    icon: ArrowDownRight,
+    color: 'text-orange-600 dark:text-orange-400',
+  },
+  gift: {
+    label: 'Hediye',
+    icon: DollarSign,
+    color: 'text-purple-600 dark:text-purple-400',
+  },
+  fee: {
+    label: 'Komisyon',
+    icon: DollarSign,
+    color: 'text-purple-600 dark:text-purple-400',
+  },
 };
 
 const statusConfig = {
@@ -153,7 +177,9 @@ export default function FinancePage() {
         />
         <CanvaStatCard
           title="Abonelik Geliri"
-          value={isLoading ? '...' : formatCurrency(summary.subscriptionRevenue)}
+          value={
+            isLoading ? '...' : formatCurrency(summary.subscriptionRevenue)
+          }
           description={`Toplam gelirin %${summary.totalRevenue > 0 ? Math.round((summary.subscriptionRevenue / summary.totalRevenue) * 100) : 0}'i`}
           icon={<CreditCard className="h-5 w-5" />}
           accentColor="violet"
@@ -244,7 +270,7 @@ export default function FinancePage() {
                     ] || {
                       label: tx.type,
                       icon: DollarSign,
-                      color: 'text-gray-600',
+                      color: 'text-muted-foreground',
                     };
                     const statusInfo = statusConfig[
                       tx.status as keyof typeof statusConfig
@@ -391,7 +417,7 @@ export default function FinancePage() {
 
               {!isLoading && pendingPayouts.length === 0 && (
                 <div className="py-12 text-center">
-                  <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
+                  <CheckCircle className="mx-auto h-12 w-12 text-green-500 dark:text-green-400" />
                   <h3 className="mt-4 text-lg font-semibold">
                     Bekleyen ödeme yok
                   </h3>

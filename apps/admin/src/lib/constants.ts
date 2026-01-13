@@ -77,19 +77,24 @@ export const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
 
 // Colors
 export const PRIORITY_COLORS: Record<string, string> = {
-  urgent: 'text-red-500 bg-red-50 border-red-200',
-  high: 'text-orange-500 bg-orange-50 border-orange-200',
-  medium: 'text-yellow-500 bg-yellow-50 border-yellow-200',
-  low: 'text-green-500 bg-green-50 border-green-200',
+  urgent:
+    'text-red-500 bg-red-500/10 border-red-500/30 dark:text-red-400 dark:bg-red-500/20 dark:border-red-500/30',
+  high: 'text-orange-500 bg-orange-500/10 border-orange-500/30 dark:text-orange-400 dark:bg-orange-500/20 dark:border-orange-500/30',
+  medium:
+    'text-yellow-500 bg-yellow-500/10 border-yellow-500/30 dark:text-yellow-400 dark:bg-yellow-500/20 dark:border-yellow-500/30',
+  low: 'text-green-500 bg-green-500/10 border-green-500/30 dark:text-green-400 dark:bg-green-500/20 dark:border-green-500/30',
 };
 
 export const STATUS_COLORS: Record<string, string> = {
-  active: 'text-green-700 bg-green-100',
-  pending: 'text-yellow-700 bg-yellow-100',
-  suspended: 'text-orange-700 bg-orange-100',
-  banned: 'text-red-700 bg-red-100',
-  completed: 'text-blue-700 bg-blue-100',
-  cancelled: 'text-gray-700 bg-gray-100',
+  active:
+    'text-green-700 bg-green-100 dark:text-green-400 dark:bg-green-500/20',
+  pending:
+    'text-yellow-700 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-500/20',
+  suspended:
+    'text-orange-700 bg-orange-100 dark:text-orange-400 dark:bg-orange-500/20',
+  banned: 'text-red-700 bg-red-100 dark:text-red-400 dark:bg-red-500/20',
+  completed: 'text-blue-700 bg-blue-100 dark:text-blue-400 dark:bg-blue-500/20',
+  cancelled: 'text-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-500/20',
 };
 
 // Pagination
@@ -121,10 +126,12 @@ export const CREATOR_TIER_LABELS: Record<string, string> = {
 };
 
 export const CREATOR_TIER_COLORS: Record<string, string> = {
-  bronze: 'text-orange-700 bg-orange-100',
-  silver: 'text-gray-700 bg-gray-200',
-  gold: 'text-yellow-700 bg-yellow-100',
-  platinum: 'text-purple-700 bg-purple-100',
+  bronze:
+    'text-orange-700 bg-orange-100 dark:text-orange-400 dark:bg-orange-500/20',
+  silver: 'text-gray-700 bg-gray-200 dark:text-gray-400 dark:bg-gray-500/20',
+  gold: 'text-yellow-700 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-500/20',
+  platinum:
+    'text-purple-700 bg-purple-100 dark:text-purple-400 dark:bg-purple-500/20',
 };
 
 // Partner tiers
@@ -143,8 +150,9 @@ export const BADGE_RARITY_LABELS: Record<string, string> = {
 };
 
 export const BADGE_RARITY_COLORS: Record<string, string> = {
-  common: 'text-gray-700 bg-gray-100',
-  rare: 'text-blue-700 bg-blue-100',
-  epic: 'text-purple-700 bg-purple-100',
-  legendary: 'text-yellow-700 bg-yellow-100',
+  common: 'text-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-500/20',
+  rare: 'text-blue-700 bg-blue-100 dark:text-blue-400 dark:bg-blue-500/20',
+  epic: 'text-purple-700 bg-purple-100 dark:text-purple-400 dark:bg-purple-500/20',
+  legendary:
+    'text-yellow-700 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-500/20',
 };

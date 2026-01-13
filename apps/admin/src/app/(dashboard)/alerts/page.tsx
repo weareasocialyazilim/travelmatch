@@ -33,6 +33,7 @@ import {
   Activity,
   TrendingUp,
   TrendingDown,
+  Loader2,
 } from 'lucide-react';
 import {
   CanvaCard,
@@ -63,152 +64,136 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-
-// Alert types and thresholds
-const alertRules = [
-  {
-    id: 'fraud-spike',
-    name: 'Fraud Spike',
-    category: 'security',
-    condition: 'fraud_count > 10 in 1 hour',
-    threshold: 10,
-    severity: 'critical',
-    enabled: true,
-  },
-  {
-    id: 'payment-failure',
-    name: 'Payment Gateway Error Rate',
-    category: 'payments',
-    condition: 'error_rate > 5%',
-    threshold: 5,
-    severity: 'critical',
-    enabled: true,
-  },
-  {
-    id: 'escrow-expiring',
-    name: 'Escrow Expiring Soon',
-    category: 'operations',
-    condition: 'expires_in < 2 hours',
-    threshold: 2,
-    severity: 'high',
-    enabled: true,
-  },
-  {
-    id: 'proof-queue',
-    name: 'Proof Queue Backlog',
-    category: 'operations',
-    condition: 'pending_proofs > 100',
-    threshold: 100,
-    severity: 'medium',
-    enabled: true,
-  },
-  {
-    id: 'system-latency',
-    name: 'High API Latency',
-    category: 'engineering',
-    condition: 'p95_latency > 500ms',
-    threshold: 500,
-    severity: 'high',
-    enabled: true,
-  },
-  {
-    id: 'user-spike',
-    name: 'Unusual User Activity',
-    category: 'security',
-    condition: 'registrations > 500 in 1 hour',
-    threshold: 500,
-    severity: 'medium',
-    enabled: true,
-  },
-];
-
-// Active alerts
-const activeAlerts = [
-  {
-    id: 'alert-001',
-    ruleId: 'payment-failure',
-    title: 'PayTR Error Rate Yükseldi',
-    description: 'Son 1 saatte error rate %7.2 (threshold: %5)',
-    severity: 'critical',
-    category: 'payments',
-    triggeredAt: new Date(Date.now() - 45 * 60000),
-    acknowledgedBy: null,
-    status: 'active',
-    metric: { current: 7.2, threshold: 5, unit: '%' },
-  },
-  {
-    id: 'alert-002',
-    ruleId: 'escrow-expiring',
-    title: '12 Escrow 2 Saat İçinde Expire Olacak',
-    description: 'Toplam değer: ₺45,200',
-    severity: 'high',
-    category: 'operations',
-    triggeredAt: new Date(Date.now() - 30 * 60000),
-    acknowledgedBy: 'Kemal Y.',
-    status: 'acknowledged',
-    metric: { current: 12, threshold: 0, unit: 'adet' },
-  },
-  {
-    id: 'alert-003',
-    ruleId: 'proof-queue',
-    title: 'Proof Queue Birikmesi',
-    description: '127 proof manual review bekliyor',
-    severity: 'medium',
-    category: 'operations',
-    triggeredAt: new Date(Date.now() - 2 * 3600000),
-    acknowledgedBy: null,
-    status: 'active',
-    metric: { current: 127, threshold: 100, unit: 'adet' },
-  },
-  {
-    id: 'alert-004',
-    ruleId: 'fraud-spike',
-    title: 'Potansiyel Fraud Ring Tespit',
-    description: '5 hesap aynı device fingerprint ile işlem yapıyor',
-    severity: 'critical',
-    category: 'security',
-    triggeredAt: new Date(Date.now() - 15 * 60000),
-    acknowledgedBy: null,
-    status: 'active',
-    metric: { current: 5, threshold: 3, unit: 'hesap' },
-  },
-];
-
-// Alert history
-const alertHistory = [
-  {
-    id: 'hist-001',
-    title: 'Database Connection Pool Exhausted',
-    severity: 'critical',
-    resolvedAt: new Date(Date.now() - 24 * 3600000),
-    duration: '8 dakika',
-    resolvedBy: 'System Auto-recovery',
-  },
-  {
-    id: 'hist-002',
-    title: 'Twilio SMS Delivery Failure',
-    severity: 'high',
-    resolvedAt: new Date(Date.now() - 48 * 3600000),
-    duration: '25 dakika',
-    resolvedBy: 'Ahmet K.',
-  },
-];
+import { toast } from 'sonner';
+import {
+  useAlertRules,
+  useActiveAlerts,
+  useAlertHistory,
+  useAcknowledgeAlert,
+  useResolveAlert,
+  type ActiveAlert,
+} from '@/hooks/use-alerts';
 
 export default function AlertsPage() {
   const [activeTab, setActiveTab] = useState('active');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [filter, setFilter] = useState('all');
 
+  // Fetch data with React Query
+  const {
+    data: alertRules = [],
+    isLoading: isLoadingRules,
+    error: rulesError,
+  } = useAlertRules();
+
+  const {
+    data: fetchedAlerts = [],
+    isLoading: isLoadingAlerts,
+    error: alertsError,
+  } = useActiveAlerts();
+
+  const {
+    data: alertHistory = [],
+    isLoading: isLoadingHistory,
+    error: historyError,
+  } = useAlertHistory();
+
+  // Local state for optimistic updates
+  const [alerts, setAlerts] = useState<ActiveAlert[]>([]);
+
+  // Sync local state with fetched data
+  useEffect(() => {
+    if (fetchedAlerts.length > 0) {
+      setAlerts(fetchedAlerts);
+    }
+  }, [fetchedAlerts]);
+
+  // Show error toasts
+  useEffect(() => {
+    if (rulesError) {
+      toast.error(
+        'Alert kuralları yüklenirken hata oluştu. Mock veri kullanılıyor.',
+      );
+    }
+  }, [rulesError]);
+
+  useEffect(() => {
+    if (alertsError) {
+      toast.error(
+        'Aktif alertler yüklenirken hata oluştu. Mock veri kullanılıyor.',
+      );
+    }
+  }, [alertsError]);
+
+  useEffect(() => {
+    if (historyError) {
+      toast.error(
+        'Alert geçmişi yüklenirken hata oluştu. Mock veri kullanılıyor.',
+      );
+    }
+  }, [historyError]);
+
+  // Mutations
+  const acknowledgeAlert = useAcknowledgeAlert();
+  const resolveAlert = useResolveAlert();
+
+  const handleAcknowledge = (alertId: string) => {
+    // Optimistic update
+    setAlerts((prev) =>
+      prev.map((alert) =>
+        alert.id === alertId
+          ? {
+              ...alert,
+              status: 'acknowledged' as const,
+              acknowledgedBy: 'Admin',
+            }
+          : alert,
+      ),
+    );
+    toast.success('Alert onaylandı');
+
+    // Fire mutation (best effort, already optimistically updated)
+    acknowledgeAlert.mutate(alertId, {
+      onError: () => {
+        toast.error(
+          'Alert onaylanırken hata oluştu (yerel değişiklik korundu)',
+        );
+      },
+    });
+  };
+
+  const handleResolve = (alertId: string) => {
+    // Optimistic update
+    setAlerts((prev) => prev.filter((alert) => alert.id !== alertId));
+    toast.success('Alert çözüldü ve kapatıldı');
+
+    // Fire mutation (best effort, already optimistically updated)
+    resolveAlert.mutate(alertId, {
+      onError: () => {
+        toast.error('Alert çözülürken hata oluştu (yerel değişiklik korundu)');
+      },
+    });
+  };
+
+  // Loading state
+  const isLoading = isLoadingRules || isLoadingAlerts || isLoadingHistory;
+
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
       case 'critical':
-        return <AlertTriangle className="h-5 w-5 text-red-500" />;
+        return (
+          <AlertTriangle className="h-5 w-5 text-red-500 dark:text-red-400" />
+        );
       case 'high':
-        return <AlertCircle className="h-5 w-5 text-orange-500" />;
+        return (
+          <AlertCircle className="h-5 w-5 text-orange-500 dark:text-orange-400" />
+        );
       case 'medium':
-        return <Info className="h-5 w-5 text-yellow-500" />;
+        return (
+          <Info className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />
+        );
       default:
-        return <Info className="h-5 w-5 text-blue-500" />;
+        return <Info className="h-5 w-5 text-blue-500 dark:text-blue-400" />;
     }
   };
 
@@ -220,7 +205,9 @@ export default function AlertsPage() {
       low: 'info',
     } as const;
     return (
-      <CanvaBadge variant={variantMap[severity as keyof typeof variantMap] || 'info'}>
+      <CanvaBadge
+        variant={variantMap[severity as keyof typeof variantMap] || 'info'}
+      >
         {severity.toUpperCase()}
       </CanvaBadge>
     );
@@ -249,10 +236,32 @@ export default function AlertsPage() {
     return date.toLocaleDateString('tr-TR');
   };
 
-  const criticalCount = activeAlerts.filter(
-    (a) => a.severity === 'critical',
-  ).length;
-  const highCount = activeAlerts.filter((a) => a.severity === 'high').length;
+  const criticalCount = alerts.filter((a) => a.severity === 'critical').length;
+  const highCount = alerts.filter((a) => a.severity === 'high').length;
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Alert Merkezi</h1>
+            <p className="text-muted-foreground">
+              Gerçek zamanlı sistem ve operasyon alertleri
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center justify-center py-12">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">
+              Alertler yükleniyor...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -269,13 +278,23 @@ export default function AlertsPage() {
             variant="outline"
             size="sm"
             onClick={() => setSoundEnabled(!soundEnabled)}
-            leftIcon={soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+            leftIcon={
+              soundEnabled ? (
+                <Volume2 className="h-4 w-4" />
+              ) : (
+                <VolumeX className="h-4 w-4" />
+              )
+            }
           >
             Ses {soundEnabled ? 'Açık' : 'Kapalı'}
           </CanvaButton>
           <Dialog>
             <DialogTrigger asChild>
-              <CanvaButton variant="outline" size="sm" leftIcon={<Settings className="h-4 w-4" />}>
+              <CanvaButton
+                variant="outline"
+                size="sm"
+                leftIcon={<Settings className="h-4 w-4" />}
+              >
                 Kuralları Yönet
               </CanvaButton>
             </DialogTrigger>
@@ -315,12 +334,12 @@ export default function AlertsPage() {
 
       {/* Critical Alert Banner */}
       {criticalCount > 0 && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg animate-pulse">
+        <div className="p-4 bg-red-500/10 dark:bg-red-500/20 border border-red-500/20 rounded-lg animate-pulse">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <AlertTriangle className="h-6 w-6 text-red-500" />
+              <AlertTriangle className="h-6 w-6 text-red-500 dark:text-red-400" />
               <div>
-                <p className="font-semibold text-red-500">
+                <p className="font-semibold text-red-500 dark:text-red-400">
                   {criticalCount} Kritik Alert Aktif
                 </p>
                 <p className="text-sm text-muted-foreground">
@@ -340,24 +359,30 @@ export default function AlertsPage() {
         <CanvaStatCard
           label="Kritik"
           value={criticalCount}
-          icon={<AlertTriangle className="h-5 w-5 text-red-500" />}
+          icon={
+            <AlertTriangle className="h-5 w-5 text-red-500 dark:text-red-400" />
+          }
           className="border-l-4 border-l-red-500"
         />
         <CanvaStatCard
           label="Yüksek"
           value={highCount}
-          icon={<AlertCircle className="h-5 w-5 text-orange-500" />}
+          icon={
+            <AlertCircle className="h-5 w-5 text-orange-500 dark:text-orange-400" />
+          }
           className="border-l-4 border-l-orange-500"
         />
         <CanvaStatCard
           label="Toplam Aktif"
-          value={activeAlerts.length}
+          value={alerts.length}
           icon={<Bell className="h-5 w-5 text-gray-400" />}
         />
         <CanvaStatCard
           label="Onaylandı"
-          value={activeAlerts.filter((a) => a.status === 'acknowledged').length}
-          icon={<CheckCircle2 className="h-5 w-5 text-green-500" />}
+          value={alerts.filter((a) => a.status === 'acknowledged').length}
+          icon={
+            <CheckCircle2 className="h-5 w-5 text-green-500 dark:text-green-400" />
+          }
           className="border-l-4 border-l-green-500"
         />
       </div>
@@ -368,7 +393,7 @@ export default function AlertsPage() {
           <TabsList>
             <TabsTrigger value="active">
               <Zap className="h-4 w-4 mr-2" />
-              Aktif ({activeAlerts.length})
+              Aktif ({alerts.length})
             </TabsTrigger>
             <TabsTrigger value="acknowledged">
               <Eye className="h-4 w-4 mr-2" />
@@ -398,7 +423,7 @@ export default function AlertsPage() {
         </div>
 
         <TabsContent value="active" className="space-y-3 mt-4">
-          {activeAlerts
+          {alerts
             .filter((a) => a.status === 'active')
             .sort((a, b) => {
               const order = { critical: 0, high: 1, medium: 2, low: 3 };
@@ -413,10 +438,10 @@ export default function AlertsPage() {
                 className={cn(
                   'border-l-4',
                   alert.severity === 'critical'
-                    ? 'border-l-red-500 bg-red-500/5'
+                    ? 'border-l-red-500 bg-red-500/5 dark:bg-red-500/10'
                     : alert.severity === 'high'
-                      ? 'border-l-orange-500 bg-orange-500/5'
-                      : 'border-l-yellow-500 bg-yellow-500/5',
+                      ? 'border-l-orange-500 bg-orange-500/5 dark:bg-orange-500/10'
+                      : 'border-l-yellow-500 bg-yellow-500/5 dark:bg-yellow-500/10',
                 )}
               >
                 <CanvaCardBody className="p-4">
@@ -427,7 +452,11 @@ export default function AlertsPage() {
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold">{alert.title}</h3>
                           {getSeverityBadge(alert.severity)}
-                          <CanvaBadge variant="default" size="sm" icon={getCategoryIcon(alert.category)}>
+                          <CanvaBadge
+                            variant="default"
+                            size="sm"
+                            icon={getCategoryIcon(alert.category)}
+                          >
                             {alert.category}
                           </CanvaBadge>
                         </div>
@@ -451,10 +480,20 @@ export default function AlertsPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <CanvaButton variant="outline" size="sm" leftIcon={<Eye className="h-4 w-4" />}>
+                      <CanvaButton
+                        variant="outline"
+                        size="sm"
+                        leftIcon={<Eye className="h-4 w-4" />}
+                        onClick={() => handleAcknowledge(alert.id)}
+                      >
                         Onayla
                       </CanvaButton>
-                      <CanvaButton variant="primary" size="sm" rightIcon={<ChevronRight className="h-4 w-4" />}>
+                      <CanvaButton
+                        variant="primary"
+                        size="sm"
+                        rightIcon={<ChevronRight className="h-4 w-4" />}
+                        onClick={() => handleResolve(alert.id)}
+                      >
                         Çöz
                       </CanvaButton>
                     </div>
@@ -465,7 +504,7 @@ export default function AlertsPage() {
         </TabsContent>
 
         <TabsContent value="acknowledged" className="space-y-3 mt-4">
-          {activeAlerts
+          {alerts
             .filter((a) => a.status === 'acknowledged')
             .map((alert) => (
               <CanvaCard
@@ -475,7 +514,7 @@ export default function AlertsPage() {
                 <CanvaCardBody className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-4">
-                      <Eye className="h-5 w-5 text-blue-500" />
+                      <Eye className="h-5 w-5 text-blue-500 dark:text-blue-400" />
                       <div>
                         <h3 className="font-semibold">{alert.title}</h3>
                         <p className="text-sm text-muted-foreground">
@@ -487,7 +526,11 @@ export default function AlertsPage() {
                         </p>
                       </div>
                     </div>
-                    <CanvaButton variant="primary" size="sm">
+                    <CanvaButton
+                      variant="primary"
+                      size="sm"
+                      onClick={() => handleResolve(alert.id)}
+                    >
                       Çöz
                     </CanvaButton>
                   </div>
@@ -502,7 +545,7 @@ export default function AlertsPage() {
               <CanvaCardBody className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <CheckCircle2 className="h-5 w-5 text-green-500" />
+                    <CheckCircle2 className="h-5 w-5 text-green-500 dark:text-green-400" />
                     <div>
                       <h3 className="font-medium">{alert.title}</h3>
                       <p className="text-xs text-muted-foreground">

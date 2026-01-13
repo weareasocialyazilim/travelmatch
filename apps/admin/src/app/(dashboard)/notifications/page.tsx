@@ -153,6 +153,8 @@ export default function NotificationsPage() {
   const [notificationTitle, setNotificationTitle] = useState('');
   const [notificationBody, setNotificationBody] = useState('');
   const [scheduleEnabled, setScheduleEnabled] = useState(false);
+  const [scheduleDate, setScheduleDate] = useState('');
+  const [scheduleTime, setScheduleTime] = useState('');
   const [abTestEnabled, setAbTestEnabled] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string | undefined>(
     undefined,
@@ -194,9 +196,38 @@ export default function NotificationsPage() {
   };
 
   const handleSchedule = () => {
-    toast.success('Bildirim zamanlandı');
-    setIsCreateOpen(false);
-    resetForm();
+    if (!notificationTitle || !notificationBody) {
+      toast.error('Başlık ve içerik gerekli');
+      return;
+    }
+    if (!scheduleDate || !scheduleTime) {
+      toast.error('Tarih ve saat seçimi gerekli');
+      return;
+    }
+
+    const scheduledDateTime = `${scheduleDate}T${scheduleTime}`;
+    createNotification.mutate(
+      {
+        title: notificationTitle,
+        message: notificationBody,
+        type: 'push',
+        target_audience: { segment: selectedSegment },
+        status: 'scheduled',
+        scheduled_for: scheduledDateTime,
+      },
+      {
+        onSuccess: () => {
+          toast.success(
+            `Bildirim ${scheduleDate} ${scheduleTime} için zamanlandı`,
+          );
+          setIsCreateOpen(false);
+          resetForm();
+        },
+        onError: (error) => {
+          toast.error(error.message || 'Bildirim zamanlanamadı');
+        },
+      },
+    );
   };
 
   const handleSaveDraft = () => {
@@ -210,6 +241,8 @@ export default function NotificationsPage() {
     setNotificationBody('');
     setSelectedSegment('all');
     setScheduleEnabled(false);
+    setScheduleDate('');
+    setScheduleTime('');
     setAbTestEnabled(false);
   };
 
@@ -240,17 +273,17 @@ export default function NotificationsPage() {
     <div className="space-y-6 animate-pulse">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
-          <div className="h-8 w-64 bg-gray-200 rounded" />
-          <div className="h-4 w-48 bg-gray-100 rounded" />
+          <div className="h-8 w-64 bg-muted rounded" />
+          <div className="h-4 w-48 bg-muted rounded" />
         </div>
-        <div className="h-10 w-36 bg-gray-200 rounded" />
+        <div className="h-10 w-36 bg-muted rounded" />
       </div>
       <div className="grid gap-4 md:grid-cols-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-24 bg-gray-100 rounded-lg" />
+          <div key={i} className="h-24 bg-muted rounded-lg" />
         ))}
       </div>
-      <div className="h-96 bg-gray-100 rounded-lg" />
+      <div className="h-96 bg-muted rounded-lg" />
     </div>
   );
 
@@ -258,11 +291,13 @@ export default function NotificationsPage() {
   const ErrorState = () => (
     <div className="flex h-[50vh] items-center justify-center">
       <div className="text-center space-y-4">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
-          <AlertTriangle className="h-8 w-8 text-red-600" />
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-500/10 dark:bg-red-500/20">
+          <AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-400" />
         </div>
-        <h2 className="text-xl font-semibold text-gray-900">Bir hata oluştu</h2>
-        <p className="text-gray-500 max-w-md">
+        <h2 className="text-xl font-semibold text-foreground">
+          Bir hata oluştu
+        </h2>
+        <p className="text-muted-foreground max-w-md">
           Bildirim verileri yüklenemedi. Lütfen tekrar deneyin.
         </p>
       </div>
@@ -271,15 +306,15 @@ export default function NotificationsPage() {
 
   // Empty State
   const EmptyState = () => (
-    <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-gray-200">
+    <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-border">
       <div className="text-center space-y-3">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-          <Bell className="h-6 w-6 text-gray-400" />
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+          <Bell className="h-6 w-6 text-muted-foreground" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900">
+        <h3 className="text-lg font-medium text-foreground">
           Henüz bildirim yok
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           İlk push bildiriminizi göndererek başlayın.
         </p>
         <CanvaButton variant="primary" onClick={() => setIsCreateOpen(true)}>
@@ -373,7 +408,7 @@ export default function NotificationsPage() {
               {/* Preview */}
               <div>
                 <Label>Önizleme</Label>
-                <div className="mt-2 rounded-lg border bg-gray-50 p-4 dark:bg-gray-900">
+                <div className="mt-2 rounded-lg border bg-muted p-4">
                   <div className="flex items-start gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
                       <Smartphone className="h-5 w-5 text-primary-foreground" />
@@ -431,11 +466,19 @@ export default function NotificationsPage() {
                   <div className="flex gap-4">
                     <div className="flex-1 space-y-2">
                       <Label>Tarih</Label>
-                      <CanvaInput type="date" />
+                      <CanvaInput
+                        type="date"
+                        value={scheduleDate}
+                        onChange={(e) => setScheduleDate(e.target.value)}
+                      />
                     </div>
                     <div className="flex-1 space-y-2">
                       <Label>Saat</Label>
-                      <CanvaInput type="time" />
+                      <CanvaInput
+                        type="time"
+                        value={scheduleTime}
+                        onChange={(e) => setScheduleTime(e.target.value)}
+                      />
                     </div>
                   </div>
                 )}
@@ -608,27 +651,59 @@ export default function NotificationsPage() {
                         </CanvaButton>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            toast.info(
+                              `Bildirim detayları: ${notification.title}`,
+                            )
+                          }
+                        >
                           <Eye className="mr-2 h-4 w-4" />
                           Detayları Gör
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            navigator.clipboard.writeText(
+                              notification.title + '\n' + notification.body,
+                            );
+                            toast.success('Bildirim içeriği kopyalandı');
+                          }}
+                        >
                           <Copy className="mr-2 h-4 w-4" />
                           Kopyala
                         </DropdownMenuItem>
                         {notification.status === 'scheduled' && (
                           <>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                toast.success(
+                                  `"${notification.title}" bildirimi şimdi gönderildi`,
+                                )
+                              }
+                            >
                               <Play className="mr-2 h-4 w-4" />
                               Şimdi Gönder
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                toast.info(
+                                  `"${notification.title}" bildirimi duraklatıldı`,
+                                )
+                              }
+                            >
                               <Pause className="mr-2 h-4 w-4" />
                               Duraklat
                             </DropdownMenuItem>
                           </>
                         )}
-                        <DropdownMenuItem className="text-destructive">
+                        <DropdownMenuItem
+                          className="text-destructive"
+                          onClick={() =>
+                            toast.success(
+                              `"${notification.title}" bildirimi silindi`,
+                            )
+                          }
+                        >
                           <Trash2 className="mr-2 h-4 w-4" />
                           Sil
                         </DropdownMenuItem>
@@ -645,8 +720,8 @@ export default function NotificationsPage() {
           {mockNotifications
             .filter((n) => n.status === 'sent')
             .map((notification) => (
-              <Card key={notification.id}>
-                <CardContent className="p-6">
+              <CanvaCard key={notification.id}>
+                <CanvaCardBody className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-semibold">{notification.title}</h3>
@@ -656,8 +731,8 @@ export default function NotificationsPage() {
                     </div>
                     {getStatusBadge(notification.status)}
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))}
         </TabsContent>
 
@@ -665,8 +740,8 @@ export default function NotificationsPage() {
           {mockNotifications
             .filter((n) => n.status === 'scheduled')
             .map((notification) => (
-              <Card key={notification.id}>
-                <CardContent className="p-6">
+              <CanvaCard key={notification.id}>
+                <CanvaCardBody className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-semibold">{notification.title}</h3>
@@ -676,8 +751,8 @@ export default function NotificationsPage() {
                     </div>
                     {getStatusBadge(notification.status)}
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))}
         </TabsContent>
 
@@ -685,8 +760,8 @@ export default function NotificationsPage() {
           {mockNotifications
             .filter((n) => n.status === 'draft')
             .map((notification) => (
-              <Card key={notification.id}>
-                <CardContent className="p-6">
+              <CanvaCard key={notification.id}>
+                <CanvaCardBody className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-semibold">{notification.title}</h3>
@@ -696,8 +771,8 @@ export default function NotificationsPage() {
                     </div>
                     {getStatusBadge(notification.status)}
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))}
         </TabsContent>
       </Tabs>

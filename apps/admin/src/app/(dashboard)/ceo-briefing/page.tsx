@@ -23,7 +23,6 @@ import {
   ArrowDownRight,
   Bell,
   Calendar,
-  BarChart3,
   Activity,
   Star,
   AlertCircle,
@@ -152,9 +151,9 @@ export default function CEOBriefingPage() {
   const healthScore = calculateHealthScore();
 
   const getHealthColor = (score: number) => {
-    if (score >= 85) return 'text-green-500';
-    if (score >= 70) return 'text-yellow-500';
-    return 'text-red-500';
+    if (score >= 85) return 'text-green-500 dark:text-green-400';
+    if (score >= 70) return 'text-yellow-500 dark:text-yellow-400';
+    return 'text-red-500 dark:text-red-400';
   };
 
   const getHealthBg = (score: number) => {
@@ -239,7 +238,7 @@ export default function CEOBriefingPage() {
               </div>
             </div>
             <div className="flex items-center justify-center gap-2 mt-4">
-              <CheckCircle2 className="h-4 w-4 text-green-500" />
+              <CheckCircle2 className="h-4 w-4 text-green-500 dark:text-green-400" />
               <span className="text-sm">Tüm sistemler operasyonel</span>
             </div>
           </CanvaCardBody>
@@ -249,7 +248,7 @@ export default function CEOBriefingPage() {
         <CanvaCard className="admin-card col-span-2">
           <CanvaCardHeader className="pb-2">
             <div className="flex items-center gap-2">
-              <Star className="h-5 w-5 text-yellow-500" />
+              <Star className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />
               <CanvaCardTitle>North Star: {northStar.name}</CanvaCardTitle>
             </div>
             <CanvaCardSubtitle>
@@ -264,7 +263,7 @@ export default function CEOBriefingPage() {
                 </p>
                 <div className="flex items-center gap-2 mt-1">
                   {northStar.trend === 'up' ? (
-                    <CanvaBadge className="bg-green-500/10 text-green-500">
+                    <CanvaBadge className="bg-green-500/10 dark:bg-green-500/20 text-green-500 dark:text-green-400">
                       <ArrowUpRight className="h-3 w-3 mr-1" />+
                       {(
                         ((northStar.current - northStar.lastWeek) /
@@ -274,7 +273,7 @@ export default function CEOBriefingPage() {
                       %
                     </CanvaBadge>
                   ) : (
-                    <CanvaBadge className="bg-red-500/10 text-red-500">
+                    <CanvaBadge className="bg-red-500/10 dark:bg-red-500/20 text-red-500 dark:text-red-400">
                       <ArrowDownRight className="h-3 w-3 mr-1" />
                       Düşüş
                     </CanvaBadge>
@@ -312,10 +311,10 @@ export default function CEOBriefingPage() {
                   variant="outline"
                   className={cn(
                     kpi.trend === 'up' && kpi.name !== 'Fraud Oranı'
-                      ? 'text-green-500 bg-green-500/10'
+                      ? 'text-green-500 dark:text-green-400 bg-green-500/10 dark:bg-green-500/20'
                       : kpi.trend === 'down' && kpi.name === 'Fraud Oranı'
-                        ? 'text-green-500 bg-green-500/10'
-                        : 'text-red-500 bg-red-500/10',
+                        ? 'text-green-500 dark:text-green-400 bg-green-500/10 dark:bg-green-500/20'
+                        : 'text-red-500 dark:text-red-400 bg-red-500/10 dark:bg-red-500/20',
                   )}
                 >
                   {kpi.trend === 'up' ? '+' : ''}
@@ -338,7 +337,9 @@ export default function CEOBriefingPage() {
                 <Bell className="h-5 w-5" />
                 Dikkat Gerektiren Konular
               </CanvaCardTitle>
-              <CanvaBadge variant="outline">{attentionItems.length} aktif</CanvaBadge>
+              <CanvaBadge variant="outline">
+                {attentionItems.length} aktif
+              </CanvaBadge>
             </div>
           </CanvaCardHeader>
           <CanvaCardBody className="space-y-3">
@@ -348,19 +349,19 @@ export default function CEOBriefingPage() {
                 className={cn(
                   'p-3 rounded-lg border-l-4 flex items-start justify-between',
                   item.severity === 'high'
-                    ? 'bg-red-500/5 border-l-red-500'
+                    ? 'bg-red-500/5 dark:bg-red-500/10 border-l-red-500'
                     : item.severity === 'medium'
-                      ? 'bg-yellow-500/5 border-l-yellow-500'
-                      : 'bg-blue-500/5 border-l-blue-500',
+                      ? 'bg-yellow-500/5 dark:bg-yellow-500/10 border-l-yellow-500'
+                      : 'bg-blue-500/5 dark:bg-blue-500/10 border-l-blue-500',
                 )}
               >
                 <div className="flex items-start gap-3">
                   {item.severity === 'high' ? (
-                    <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5" />
+                    <AlertTriangle className="h-5 w-5 text-red-500 dark:text-red-400 mt-0.5" />
                   ) : item.severity === 'medium' ? (
-                    <AlertCircle className="h-5 w-5 text-yellow-500 mt-0.5" />
+                    <AlertCircle className="h-5 w-5 text-yellow-500 dark:text-yellow-400 mt-0.5" />
                   ) : (
-                    <Clock className="h-5 w-5 text-blue-500 mt-0.5" />
+                    <Clock className="h-5 w-5 text-blue-500 dark:text-blue-400 mt-0.5" />
                   )}
                   <div>
                     <p className="font-medium">{item.title}</p>

@@ -60,37 +60,37 @@ const generateActivity = () => {
       type: 'user_signup',
       icon: Users,
       message: 'Yeni kullanıcı kaydı',
-      color: 'text-blue-500',
+      color: 'text-blue-500 dark:text-blue-400',
     },
     {
       type: 'match',
       icon: Heart,
       message: 'Yeni eşleşme',
-      color: 'text-pink-500',
+      color: 'text-pink-500 dark:text-pink-400',
     },
     {
       type: 'moment',
       icon: Camera,
       message: 'Yeni moment paylaşıldı',
-      color: 'text-purple-500',
+      color: 'text-purple-500 dark:text-purple-400',
     },
     {
       type: 'message',
       icon: MessageSquare,
       message: 'Mesaj gönderildi',
-      color: 'text-green-500',
+      color: 'text-green-500 dark:text-green-400',
     },
     {
       type: 'payment',
       icon: CreditCard,
       message: 'Ödeme alındı',
-      color: 'text-emerald-500',
+      color: 'text-emerald-500 dark:text-emerald-400',
     },
     {
       type: 'report',
       icon: AlertTriangle,
       message: 'Şikayet oluşturuldu',
-      color: 'text-orange-500',
+      color: 'text-orange-500 dark:text-orange-400',
     },
   ];
   const randomType = types[Math.floor(Math.random() * types.length)];
@@ -134,7 +134,7 @@ export default function OpsCenterPage() {
       case 'down':
         return 'bg-red-500';
       default:
-        return 'bg-gray-500';
+        return 'bg-muted-foreground';
     }
   };
 
@@ -157,7 +157,7 @@ export default function OpsCenterPage() {
             onClick={() => setIsLive(!isLive)}
           >
             <Circle
-              className={`mr-2 h-2 w-2 ${isLive ? 'fill-red-500 text-red-500 animate-pulse' : 'fill-gray-500 text-gray-500'}`}
+              className={`mr-2 h-2 w-2 ${isLive ? 'fill-red-500 text-red-500 animate-pulse' : 'fill-muted-foreground text-muted-foreground'}`}
             />
             {isLive ? 'Canlı' : 'Duraklatıldı'}
           </CanvaButton>
@@ -316,7 +316,7 @@ export default function OpsCenterPage() {
                     }`}
                   >
                     <div
-                      className={`flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 ${activity.color}`}
+                      className={`flex h-8 w-8 items-center justify-center rounded-full bg-muted ${activity.color}`}
                     >
                       <activity.icon className="h-4 w-4" />
                     </div>

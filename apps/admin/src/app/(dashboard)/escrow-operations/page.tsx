@@ -347,13 +347,19 @@ export default function EscrowOperationsPage() {
         );
       case 'ready_to_release':
         return (
-          <CanvaBadge variant="success" icon={<CheckCircle2 className="h-3 w-3" />}>
+          <CanvaBadge
+            variant="success"
+            icon={<CheckCircle2 className="h-3 w-3" />}
+          >
             Serbest Birakilabilir
           </CanvaBadge>
         );
       case 'disputed':
         return (
-          <CanvaBadge variant="danger" icon={<AlertTriangle className="h-3 w-3" />}>
+          <CanvaBadge
+            variant="danger"
+            icon={<AlertTriangle className="h-3 w-3" />}
+          >
             Anlasmazlik
           </CanvaBadge>
         );
@@ -365,7 +371,10 @@ export default function EscrowOperationsPage() {
         );
       case 'refunded':
         return (
-          <CanvaBadge variant="secondary" icon={<ArrowDownRight className="h-3 w-3" />}>
+          <CanvaBadge
+            variant="secondary"
+            icon={<ArrowDownRight className="h-3 w-3" />}
+          >
             Iade Edildi
           </CanvaBadge>
         );
@@ -377,13 +386,19 @@ export default function EscrowOperationsPage() {
   const getTransactionIcon = (type: string) => {
     switch (type) {
       case 'payment':
-        return <CreditCard className="h-4 w-4 text-emerald-500" />;
+        return (
+          <CreditCard className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
+        );
       case 'payout':
-        return <Send className="h-4 w-4 text-blue-500" />;
+        return <Send className="h-4 w-4 text-blue-500 dark:text-blue-400" />;
       case 'refund':
-        return <ArrowDownRight className="h-4 w-4 text-amber-500" />;
+        return (
+          <ArrowDownRight className="h-4 w-4 text-amber-500 dark:text-amber-400" />
+        );
       case 'subscription':
-        return <Receipt className="h-4 w-4 text-purple-500" />;
+        return (
+          <Receipt className="h-4 w-4 text-purple-500 dark:text-purple-400" />
+        );
       default:
         return <DollarSign className="h-4 w-4" />;
     }
@@ -417,7 +432,7 @@ export default function EscrowOperationsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <Lock className="h-6 w-6 text-purple-500" />
+            <Lock className="h-6 w-6 text-purple-500 dark:text-purple-400" />
             Escrow & Payment Operations
           </h1>
           <p className="text-muted-foreground">
@@ -442,8 +457,9 @@ export default function EscrowOperationsPage() {
           <div className="flex items-center gap-2 text-sm text-purple-700">
             <Shield className="h-4 w-4" />
             <span className="font-medium">
-              Escrow islemleri PayTR uzerinden gerceklestirilmektedir. Kartlar PCI-DSS uyumlu olarak tokenize edilir,
-              banka hesap bilgileri (IBAN) sistemde hash'lenmis ve maskelenmis olarak saklanir.
+              Escrow islemleri PayTR uzerinden gerceklestirilmektedir. Kartlar
+              PCI-DSS uyumlu olarak tokenize edilir, banka hesap bilgileri
+              (IBAN) sistemde hash'lenmis ve maskelenmis olarak saklanir.
             </span>
           </div>
         </CanvaCardBody>
@@ -601,8 +617,8 @@ export default function EscrowOperationsPage() {
                             className={cn(
                               'text-sm font-medium',
                               tx.type === 'refund'
-                                ? 'text-amber-600'
-                                : 'text-emerald-600',
+                                ? 'text-amber-600 dark:text-amber-400'
+                                : 'text-emerald-600 dark:text-emerald-400',
                             )}
                           >
                             {tx.type === 'refund' ? '-' : '+'}
@@ -733,7 +749,7 @@ export default function EscrowOperationsPage() {
                         <span
                           className={cn(
                             escrow.daysRemaining <= 2 &&
-                              'text-red-600 font-medium',
+                              'text-red-600 dark:text-red-400 font-medium',
                           )}
                         >
                           {escrow.daysRemaining} gun
@@ -799,7 +815,9 @@ export default function EscrowOperationsPage() {
           <CanvaCard>
             <CanvaCardHeader>
               <CanvaCardTitle>Tum Islemler</CanvaCardTitle>
-              <CanvaCardSubtitle>Odeme, payout ve iade islemleri</CanvaCardSubtitle>
+              <CanvaCardSubtitle>
+                Odeme, payout ve iade islemleri
+              </CanvaCardSubtitle>
             </CanvaCardHeader>
             <CanvaCardBody>
               <Table>
@@ -831,8 +849,8 @@ export default function EscrowOperationsPage() {
                         className={cn(
                           'font-medium',
                           tx.type === 'refund'
-                            ? 'text-amber-600'
-                            : 'text-emerald-600',
+                            ? 'text-amber-600 dark:text-amber-400'
+                            : 'text-emerald-600 dark:text-emerald-400',
                         )}
                       >
                         {tx.type === 'refund' ? '-' : '+'}
@@ -893,7 +911,7 @@ export default function EscrowOperationsPage() {
                       <TableCell className="font-medium">
                         {payout.user}
                       </TableCell>
-                      <TableCell className="font-medium text-emerald-600">
+                      <TableCell className="font-medium text-emerald-600 dark:text-emerald-400">
                         {formatCurrency(payout.amount, 'TRY')}
                       </TableCell>
                       <TableCell>
@@ -907,11 +925,17 @@ export default function EscrowOperationsPage() {
                       </TableCell>
                       <TableCell>
                         {payout.kycStatus === 'verified' ? (
-                          <CanvaBadge variant="success" icon={<UserCheck className="h-3 w-3" />}>
+                          <CanvaBadge
+                            variant="success"
+                            icon={<UserCheck className="h-3 w-3" />}
+                          >
                             Dogrulandi
                           </CanvaBadge>
                         ) : (
-                          <CanvaBadge variant="warning" icon={<Clock className="h-3 w-3" />}>
+                          <CanvaBadge
+                            variant="warning"
+                            icon={<Clock className="h-3 w-3" />}
+                          >
                             Bekliyor
                           </CanvaBadge>
                         )}
@@ -974,9 +998,7 @@ export default function EscrowOperationsPage() {
               Iptal
             </CanvaButton>
             <CanvaButton
-              variant={
-                actionDialog.action === 'dispute' ? 'danger' : 'primary'
-              }
+              variant={actionDialog.action === 'dispute' ? 'danger' : 'primary'}
               onClick={() => {
                 // Handle action
                 setActionDialog({ open: false, action: '', escrow: null });

@@ -69,92 +69,105 @@ const actionLabels: Record<
 > = {
   'user.ban': {
     label: 'Kullanıcı Yasaklama',
-    color: 'bg-red-100 text-red-800',
+    color: 'bg-red-500/10 dark:bg-red-500/20 text-red-800 dark:text-red-300',
     icon: Shield,
   },
   'user.unban': {
     label: 'Yasak Kaldırma',
-    color: 'bg-green-100 text-green-800',
+    color:
+      'bg-green-500/10 dark:bg-green-500/20 text-green-800 dark:text-green-300',
     icon: Shield,
   },
   'user.update': {
     label: 'Kullanıcı Güncelleme',
-    color: 'bg-blue-100 text-blue-800',
+    color:
+      'bg-blue-500/10 dark:bg-blue-500/20 text-blue-800 dark:text-blue-300',
     icon: User,
   },
   'user.delete': {
     label: 'Kullanıcı Silme',
-    color: 'bg-red-100 text-red-800',
+    color: 'bg-red-500/10 dark:bg-red-500/20 text-red-800 dark:text-red-300',
     icon: User,
   },
   'user.verify': {
     label: 'Kullanıcı Doğrulama',
-    color: 'bg-green-100 text-green-800',
+    color:
+      'bg-green-500/10 dark:bg-green-500/20 text-green-800 dark:text-green-300',
     icon: User,
   },
   'moment.approve': {
     label: 'Moment Onay',
-    color: 'bg-green-100 text-green-800',
+    color:
+      'bg-green-500/10 dark:bg-green-500/20 text-green-800 dark:text-green-300',
     icon: FileText,
   },
   'moment.reject': {
     label: 'Moment Red',
-    color: 'bg-red-100 text-red-800',
+    color: 'bg-red-500/10 dark:bg-red-500/20 text-red-800 dark:text-red-300',
     icon: FileText,
   },
   'moment.delete': {
     label: 'Moment Silme',
-    color: 'bg-red-100 text-red-800',
+    color: 'bg-red-500/10 dark:bg-red-500/20 text-red-800 dark:text-red-300',
     icon: FileText,
   },
   'transaction.approve': {
     label: 'İşlem Onay',
-    color: 'bg-green-100 text-green-800',
+    color:
+      'bg-green-500/10 dark:bg-green-500/20 text-green-800 dark:text-green-300',
     icon: DollarSign,
   },
   'transaction.refund': {
     label: 'İade İşlemi',
-    color: 'bg-orange-100 text-orange-800',
+    color:
+      'bg-orange-500/10 dark:bg-orange-500/20 text-orange-800 dark:text-orange-300',
     icon: DollarSign,
   },
   'settings.update': {
     label: 'Ayar Değişikliği',
-    color: 'bg-purple-100 text-purple-800',
+    color:
+      'bg-purple-500/10 dark:bg-purple-500/20 text-purple-800 dark:text-purple-300',
     icon: Settings,
   },
   'admin.create': {
     label: 'Admin Oluşturma',
-    color: 'bg-blue-100 text-blue-800',
+    color:
+      'bg-blue-500/10 dark:bg-blue-500/20 text-blue-800 dark:text-blue-300',
     icon: User,
   },
   'admin.update': {
     label: 'Admin Güncelleme',
-    color: 'bg-blue-100 text-blue-800',
+    color:
+      'bg-blue-500/10 dark:bg-blue-500/20 text-blue-800 dark:text-blue-300',
     icon: User,
   },
   'admin.delete': {
     label: 'Admin Silme',
-    color: 'bg-red-100 text-red-800',
+    color: 'bg-red-500/10 dark:bg-red-500/20 text-red-800 dark:text-red-300',
     icon: User,
   },
   'report.resolve': {
     label: 'Rapor Çözümleme',
-    color: 'bg-green-100 text-green-800',
+    color:
+      'bg-green-500/10 dark:bg-green-500/20 text-green-800 dark:text-green-300',
     icon: Shield,
   },
   'feature_flag.toggle': {
     label: 'Feature Flag Değişikliği',
-    color: 'bg-purple-100 text-purple-800',
+    color:
+      'bg-purple-500/10 dark:bg-purple-500/20 text-purple-800 dark:text-purple-300',
     icon: Settings,
   },
   'campaign.create': {
     label: 'Kampanya Oluşturma',
-    color: 'bg-blue-100 text-blue-800',
+    color:
+      'bg-blue-500/10 dark:bg-blue-500/20 text-blue-800 dark:text-blue-300',
     icon: FileText,
   },
   'campaign.update': {
     label: 'Kampanya Güncelleme',
-    color: 'bg-blue-100 text-blue-800',
+    color:
+      'bg-blue-500/10 dark:bg-blue-500/20 text-blue-800 dark:text-blue-300',
     icon: FileText,
   },
 };
@@ -323,7 +336,7 @@ export default function AuditLogsPage() {
         />
         <CanvaStatCard
           label="Toplam"
-          value={isLoading ? '...' : (data?.total || logs.length)}
+          value={isLoading ? '...' : data?.total || logs.length}
           icon={<Shield className="h-4 w-4" />}
         />
       </div>
@@ -397,7 +410,9 @@ export default function AuditLogsPage() {
       <CanvaCard>
         <CanvaCardHeader>
           <CanvaCardTitle>İşlem Kayıtları</CanvaCardTitle>
-          <CanvaCardSubtitle>{filteredLogs.length} kayıt bulundu</CanvaCardSubtitle>
+          <CanvaCardSubtitle>
+            {filteredLogs.length} kayıt bulundu
+          </CanvaCardSubtitle>
         </CanvaCardHeader>
         <CanvaCardBody>
           {isLoading ? (
@@ -431,7 +446,7 @@ export default function AuditLogsPage() {
                 {paginatedLogs.map((log) => {
                   const actionInfo = actionLabels[log.action] || {
                     label: log.action,
-                    color: 'bg-gray-100 text-gray-800',
+                    color: 'bg-muted text-foreground',
                     icon: History,
                   };
                   const ActionIcon = actionInfo.icon;

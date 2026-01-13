@@ -210,7 +210,7 @@ export default function GeographicPage() {
               <SelectItem value="1y">Son 1 yıl</SelectItem>
             </SelectContent>
           </Select>
-          <CanvaButton variant="primary" size="sm" iconOnly>
+          <CanvaButton variant="primary" size="sm" iconOnly aria-label="Yenile">
             <RefreshCw className="h-4 w-4" />
           </CanvaButton>
           <CanvaButton variant="primary">
@@ -280,9 +280,10 @@ export default function GeographicPage() {
                 <CanvaCardBody>
                   <div className="space-y-4">
                     {countryStats.map((country, index) => (
-                      <div
+                      <button
                         key={country.code}
-                        className={`flex items-center justify-between rounded-lg border p-4 cursor-pointer transition-colors ${
+                        type="button"
+                        className={`flex w-full items-center justify-between rounded-lg border p-4 cursor-pointer transition-colors ${
                           selectedCountry === country.code
                             ? 'border-primary bg-primary/5'
                             : 'hover:bg-accent'
@@ -290,7 +291,7 @@ export default function GeographicPage() {
                         onClick={() => setSelectedCountry(country.code)}
                       >
                         <div className="flex items-center gap-4">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 font-semibold">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted font-semibold">
                             #{index + 1}
                           </div>
                           <div>
@@ -316,15 +317,15 @@ export default function GeographicPage() {
                           </div>
                           <div className="flex items-center gap-1">
                             {country.growth > 0 ? (
-                              <TrendingUp className="h-4 w-4 text-green-500" />
+                              <TrendingUp className="h-4 w-4 text-green-500 dark:text-green-400" />
                             ) : (
-                              <TrendingDown className="h-4 w-4 text-red-500" />
+                              <TrendingDown className="h-4 w-4 text-red-500 dark:text-red-400" />
                             )}
                             <span
                               className={`text-sm font-medium ${
                                 country.growth > 0
-                                  ? 'text-green-600'
-                                  : 'text-red-600'
+                                  ? 'text-green-600 dark:text-green-400'
+                                  : 'text-red-600 dark:text-red-400'
                               }`}
                             >
                               {country.growth > 0 ? '+' : ''}
@@ -332,7 +333,7 @@ export default function GeographicPage() {
                             </span>
                           </div>
                         </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </CanvaCardBody>
@@ -459,7 +460,9 @@ export default function GeographicPage() {
           <CanvaCard>
             <CanvaCardHeader>
               <CanvaCardTitle>Şehir Performansı</CanvaCardTitle>
-              <CanvaCardSubtitle>En aktif şehirler ve metrikleri</CanvaCardSubtitle>
+              <CanvaCardSubtitle>
+                En aktif şehirler ve metrikleri
+              </CanvaCardSubtitle>
             </CanvaCardHeader>
             <CanvaCardBody>
               <div className="h-[400px]">
@@ -490,13 +493,15 @@ export default function GeographicPage() {
                       <h3 className="font-semibold">{city.name}</h3>
                       <div className="flex items-center gap-1">
                         {city.growth > 0 ? (
-                          <TrendingUp className="h-4 w-4 text-green-500" />
+                          <TrendingUp className="h-4 w-4 text-green-500 dark:text-green-400" />
                         ) : (
-                          <TrendingDown className="h-4 w-4 text-red-500" />
+                          <TrendingDown className="h-4 w-4 text-red-500 dark:text-red-400" />
                         )}
                         <span
                           className={`text-sm ${
-                            city.growth > 0 ? 'text-green-600' : 'text-red-600'
+                            city.growth > 0
+                              ? 'text-green-600 dark:text-green-400'
+                              : 'text-red-600 dark:text-red-400'
                           }`}
                         >
                           {city.growth > 0 ? '+' : ''}

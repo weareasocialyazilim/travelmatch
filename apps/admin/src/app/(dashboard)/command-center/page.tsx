@@ -33,10 +33,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   BarChart3,
-  PieChart,
-  Wallet,
   Lock,
-  Unlock,
   Camera,
   Star,
   Award,
@@ -309,7 +306,7 @@ export default function CommandCenterPage() {
       case 'down':
         return 'text-red-500';
       default:
-        return 'text-gray-500';
+        return 'text-muted-foreground';
     }
   };
 
@@ -479,11 +476,11 @@ export default function CommandCenterPage() {
         {/* Left Column - Charts */}
         <div className="lg:col-span-2 space-y-6">
           {/* Revenue Chart */}
-          <Card>
-            <CardHeader className="pb-2">
+          <CanvaCard>
+            <CanvaCardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Haftalik Gelir Trendi</CardTitle>
+                  <CanvaCardTitle>Haftalik Gelir Trendi</CanvaCardTitle>
                   <CardDescription>
                     Abonelik ve hediye gelir dagilimi
                   </CardDescription>
@@ -495,8 +492,8 @@ export default function CommandCenterPage() {
                   <p className="text-sm text-muted-foreground">Bu ay toplam</p>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <AdminAreaChart
                 data={revenueTrendData}
                 xAxisKey="date"
@@ -518,18 +515,18 @@ export default function CommandCenterPage() {
                   name,
                 ]}
               />
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
 
           {/* User Funnel */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Kullanici Donusum Hunisi</CardTitle>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Kullanici Donusum Hunisi</CanvaCardTitle>
               <CardDescription>
                 Kayittan premium'a donusum oranlari
               </CardDescription>
-            </CardHeader>
-            <CardContent>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-4">
                 {userFunnelData.map((stage, index) => (
                   <div key={stage.stage} className="space-y-2">
@@ -547,21 +544,21 @@ export default function CommandCenterPage() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
 
           {/* Geographic Distribution */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle className="flex items-center gap-2">
                 <Globe className="h-5 w-5" />
                 Bolgesel Performans
-              </CardTitle>
+              </CanvaCardTitle>
               <CardDescription>
                 Sehir bazinda kullanici ve gelir dagilimi
               </CardDescription>
-            </CardHeader>
-            <CardContent>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-4">
                 {geoData.map((city) => (
                   <div
@@ -600,26 +597,26 @@ export default function CommandCenterPage() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </div>
 
         {/* Right Column - Activity & Status */}
         <div className="space-y-6">
           {/* Real-time Activity Feed */}
-          <Card>
-            <CardHeader className="pb-3">
+          <CanvaCard>
+            <CanvaCardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
+                <CanvaCardTitle className="flex items-center gap-2">
                   <Activity className="h-5 w-5 text-primary animate-pulse" />
                   Canli Aktivite
-                </CardTitle>
-                <Badge variant="outline" className="text-xs">
+                </CanvaCardTitle>
+                <CanvaBadge variant="outline" className="text-xs">
                   CANLI
-                </Badge>
+                </CanvaBadge>
               </div>
-            </CardHeader>
-            <CardContent>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <ScrollArea className="h-[400px] pr-4">
                 <div className="space-y-3">
                   {realtimeActivity.map((activity, index) => (
@@ -647,19 +644,19 @@ export default function CommandCenterPage() {
                   ))}
                 </div>
               </ScrollArea>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
 
           {/* AI Insights */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2">
+          <CanvaCard>
+            <CanvaCardHeader className="pb-3">
+              <CanvaCardTitle className="flex items-center gap-2">
                 <Brain className="h-5 w-5 text-cyan-500" />
                 AI Insights
-              </CardTitle>
+              </CanvaCardTitle>
               <CardDescription>Yapay zeka destekli oneriler</CardDescription>
-            </CardHeader>
-            <CardContent>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-3">
                 {aiInsights.map((insight, index) => (
                   <div
@@ -680,9 +677,9 @@ export default function CommandCenterPage() {
                       <span className="text-sm font-medium">
                         {insight.title}
                       </span>
-                      <Badge variant="outline" className="text-xs">
+                      <CanvaBadge variant="outline" className="text-xs">
                         %{insight.confidence} guven
-                      </Badge>
+                      </CanvaBadge>
                     </div>
                     <p className="text-xs text-muted-foreground">
                       {insight.message}
@@ -690,18 +687,18 @@ export default function CommandCenterPage() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
 
           {/* Integration Status */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2">
+          <CanvaCard>
+            <CanvaCardHeader className="pb-3">
+              <CanvaCardTitle className="flex items-center gap-2">
                 <Zap className="h-5 w-5 text-amber-500" />
                 Entegrasyon Durumu
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardTitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-3">
                 {Object.entries(integrationStatus).map(([name, data]) => (
                   <div key={name} className="flex items-center justify-between">
@@ -730,15 +727,15 @@ export default function CommandCenterPage() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
 
           {/* Quick Actions */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle>Hizli Islemler</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
+          <CanvaCard>
+            <CanvaCardHeader className="pb-3">
+              <CanvaCardTitle>Hizli Islemler</CanvaCardTitle>
+            </CanvaCardHeader>
+            <CanvaCardBody className="space-y-2">
               <Button
                 variant="outline"
                 className="w-full justify-start"
@@ -771,15 +768,15 @@ export default function CommandCenterPage() {
                 <Shield className="h-4 w-4 mr-2" />
                 Guvenlik Taramasi
               </Button>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </div>
       </div>
 
       {/* Bottom Stats Row */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="bg-gradient-to-br from-emerald-500/10 to-transparent">
-          <CardContent className="pt-6">
+        <CanvaCard className="bg-gradient-to-br from-emerald-500/10 to-transparent">
+          <CanvaCardBody className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">KYC Onay Orani</p>
@@ -795,11 +792,11 @@ export default function CommandCenterPage() {
               <Shield className="h-8 w-8 text-emerald-500/50" />
             </div>
             <Progress value={60} className="mt-3 h-1" />
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
 
-        <Card className="bg-gradient-to-br from-blue-500/10 to-transparent">
-          <CardContent className="pt-6">
+        <CanvaCard className="bg-gradient-to-br from-blue-500/10 to-transparent">
+          <CanvaCardBody className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Proof Dogrulama</p>
@@ -816,11 +813,11 @@ export default function CommandCenterPage() {
               <Camera className="h-8 w-8 text-blue-500/50" />
             </div>
             <Progress value={84} className="mt-3 h-1" />
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
 
-        <Card className="bg-gradient-to-br from-purple-500/10 to-transparent">
-          <CardContent className="pt-6">
+        <CanvaCard className="bg-gradient-to-br from-purple-500/10 to-transparent">
+          <CanvaCardBody className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">
@@ -833,11 +830,11 @@ export default function CommandCenterPage() {
               <MessageSquare className="h-8 w-8 text-purple-500/50" />
             </div>
             <Progress value={85} className="mt-3 h-1" />
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
 
-        <Card className="bg-gradient-to-br from-amber-500/10 to-transparent">
-          <CardContent className="pt-6">
+        <CanvaCard className="bg-gradient-to-br from-amber-500/10 to-transparent">
+          <CanvaCardBody className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Fraud Tespit</p>
@@ -848,8 +845,8 @@ export default function CommandCenterPage() {
               <AlertTriangle className="h-8 w-8 text-amber-500/50" />
             </div>
             <Progress value={99} className="mt-3 h-1" />
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
       </div>
     </div>
   );

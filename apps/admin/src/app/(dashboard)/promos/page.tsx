@@ -15,13 +15,11 @@ import {
   Edit,
   Eye,
   CheckCircle,
-  XCircle,
   Clock,
   DollarSign,
   Percent,
   AlertTriangle,
   RefreshCw,
-  Loader2,
 } from 'lucide-react';
 import { CanvaButton } from '@/components/canva/CanvaButton';
 import { CanvaInput } from '@/components/canva/CanvaInput';
@@ -64,116 +62,13 @@ import {
 import { toast } from 'sonner';
 import { formatDate, formatCurrency } from '@/lib/utils';
 import {
-  usePromos,
+  usePromosPageData,
   useCreatePromo,
   useDeletePromo,
   useTogglePromo,
+  useUpdateReferralSettings,
+  type Referral,
 } from '@/hooks/use-promos';
-
-// Mock data
-const mockPromoCodes = [
-  {
-    id: '1',
-    code: 'YILBASI30',
-    type: 'percentage',
-    value: 30,
-    description: 'Yılbaşı kampanyası - %30 indirim',
-    status: 'active',
-    usage: { current: 456, limit: 1000 },
-    valid_from: '2024-12-15T00:00:00Z',
-    valid_until: '2024-12-31T23:59:59Z',
-    applicable_to: 'premium_subscription',
-    revenue_impact: 68400,
-  },
-  {
-    id: '2',
-    code: 'HOSGELDIN',
-    type: 'fixed',
-    value: 50,
-    description: 'Yeni kullanıcı indirimi',
-    status: 'active',
-    usage: { current: 3240, limit: null },
-    valid_from: '2024-01-01T00:00:00Z',
-    valid_until: null,
-    applicable_to: 'first_purchase',
-    revenue_impact: 162000,
-  },
-  {
-    id: '3',
-    code: 'PREMIUM50',
-    type: 'percentage',
-    value: 50,
-    description: 'Premium abonelik %50 indirim',
-    status: 'scheduled',
-    usage: { current: 0, limit: 500 },
-    valid_from: '2024-12-20T00:00:00Z',
-    valid_until: '2024-12-25T23:59:59Z',
-    applicable_to: 'premium_subscription',
-    revenue_impact: 0,
-  },
-  {
-    id: '4',
-    code: 'BLACKFRIDAY',
-    type: 'percentage',
-    value: 40,
-    description: 'Black Friday kampanyası',
-    status: 'expired',
-    usage: { current: 2800, limit: 5000 },
-    valid_from: '2024-11-24T00:00:00Z',
-    valid_until: '2024-11-27T23:59:59Z',
-    applicable_to: 'all',
-    revenue_impact: 420000,
-  },
-];
-
-const mockReferrals = [
-  {
-    id: '1',
-    referrer: 'Ahmet Y.',
-    referrer_id: 'user_1',
-    total_referrals: 24,
-    successful_referrals: 18,
-    pending_referrals: 6,
-    total_earnings: 540,
-    status: 'active',
-  },
-  {
-    id: '2',
-    referrer: 'Elif K.',
-    referrer_id: 'user_2',
-    total_referrals: 15,
-    successful_referrals: 12,
-    pending_referrals: 3,
-    total_earnings: 360,
-    status: 'active',
-  },
-  {
-    id: '3',
-    referrer: 'Mehmet A.',
-    referrer_id: 'user_3',
-    total_referrals: 8,
-    successful_referrals: 5,
-    pending_referrals: 3,
-    total_earnings: 150,
-    status: 'active',
-  },
-];
-
-const promoStats = {
-  totalCodes: 24,
-  activeCodes: 8,
-  totalUsage: 12450,
-  totalRevenue: 650400,
-  avgConversion: 23.5,
-};
-
-const referralStats = {
-  totalReferrers: 4500,
-  activeReferrers: 1200,
-  totalReferrals: 8900,
-  successRate: 67.2,
-  totalPayout: 267000,
-};
 
 export default function PromosPage() {
   const [isCreatePromoOpen, setIsCreatePromoOpen] = useState(false);
@@ -184,52 +79,50 @@ export default function PromosPage() {
   const [newPromoApplicableTo, setNewPromoApplicableTo] = useState('all');
   const [newPromoLimit, setNewPromoLimit] = useState('');
 
-  // Use real API data
-  const { data, isLoading, error, refetch } = usePromos();
+  // Referral program settings
+  const [referrerReward, setReferrerReward] = useState('30');
+  const [referredReward, setReferredReward] = useState('20');
+
+  // Use combined hook for promos and referrals data
+  const {
+    data: pageData,
+    isLoading,
+    error,
+    refetch,
+    promos: promosState,
+    referrals: referralsState,
+  } = usePromosPageData();
   const createPromo = useCreatePromo();
   const deletePromo = useDeletePromo();
   const togglePromo = useTogglePromo();
+  const updateReferralSettings = useUpdateReferralSettings();
 
-  // Use API data if available, otherwise fall back to mock data
+  // Transform promo codes for display
   const promoCodes = useMemo(() => {
-    if (data?.promo_codes && data.promo_codes.length > 0) {
-      return data.promo_codes.map((promo) => ({
-        id: promo.id,
-        code: promo.code,
-        type: promo.discount_type,
-        value: promo.discount_value,
-        description: promo.description || '',
-        status: promo.is_active ? 'active' : 'disabled',
-        usage: {
-          current: promo.usage_count || 0,
-          limit: promo.usage_limit || null,
-        },
-        valid_from: promo.valid_from,
-        valid_until: promo.valid_until || null,
-        applicable_to: 'all',
-        revenue_impact: 0,
-      }));
-    }
-    return mockPromoCodes;
-  }, [data?.promo_codes]);
+    return pageData.promoCodes.map((promo) => ({
+      id: promo.id,
+      code: promo.code,
+      type: promo.discount_type,
+      value: promo.discount_value,
+      description: promo.description || '',
+      status: promo.is_active ? 'active' : 'disabled',
+      usage: {
+        current: promo.usage_count || 0,
+        limit: promo.usage_limit || null,
+      },
+      valid_from: promo.valid_from,
+      valid_until: promo.valid_until || null,
+      applicable_to: 'all',
+      revenue_impact: 0,
+    }));
+  }, [pageData.promoCodes]);
 
-  // Stats calculation
-  const stats = useMemo(() => {
-    const total = promoCodes.length;
-    const active = promoCodes.filter((p) => p.status === 'active').length;
-    const totalUsage = promoCodes.reduce((sum, p) => sum + p.usage.current, 0);
-    const totalRevenue = promoCodes.reduce(
-      (sum, p) => sum + p.revenue_impact,
-      0,
-    );
-    return {
-      totalCodes: total || promoStats.totalCodes,
-      activeCodes: active || promoStats.activeCodes,
-      totalUsage: totalUsage || promoStats.totalUsage,
-      totalRevenue: totalRevenue || promoStats.totalRevenue,
-      avgConversion: promoStats.avgConversion,
-    };
-  }, [promoCodes]);
+  // Get stats from page data
+  const stats = pageData.promoStats;
+
+  // Get referrals from page data
+  const referrals: Referral[] = pageData.referrals;
+  const referralStats = pageData.referralStats;
 
   const handleCreatePromo = () => {
     createPromo.mutate(
@@ -309,25 +202,62 @@ export default function PromosPage() {
     return code;
   };
 
+  const handleSaveReferralSettings = () => {
+    if (!referrerReward || !referredReward) {
+      toast.error('Odul degerleri bos olamaz');
+      return;
+    }
+
+    const referrerValue = parseFloat(referrerReward);
+    const referredValue = parseFloat(referredReward);
+
+    if (
+      isNaN(referrerValue) ||
+      isNaN(referredValue) ||
+      referrerValue < 0 ||
+      referredValue < 0
+    ) {
+      toast.error('Gecerli odul degerleri girin');
+      return;
+    }
+
+    updateReferralSettings.mutate(
+      {
+        referrerReward: referrerValue,
+        referredReward: referredValue,
+      },
+      {
+        onSuccess: () => {
+          toast.success(
+            `Referans ayarlari kaydedildi: Referrer ${referrerReward}TL, Referred ${referredReward}TL`,
+          );
+        },
+        onError: (error) => {
+          toast.error(error.message || 'Ayarlar kaydedilemedi');
+        },
+      },
+    );
+  };
+
   // Loading Skeleton Component
   const LoadingSkeleton = () => (
     <div className="space-y-6 animate-pulse">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
-          <div className="h-8 w-64 bg-gray-200 rounded" />
-          <div className="h-4 w-48 bg-gray-100 rounded" />
+          <div className="h-8 w-64 bg-muted rounded" />
+          <div className="h-4 w-48 bg-muted rounded" />
         </div>
         <div className="flex gap-2">
-          <div className="h-10 w-24 bg-gray-200 rounded" />
-          <div className="h-10 w-36 bg-gray-200 rounded" />
+          <div className="h-10 w-24 bg-muted rounded" />
+          <div className="h-10 w-36 bg-muted rounded" />
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-5">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-24 bg-gray-100 rounded-lg" />
+          <div key={i} className="h-24 bg-muted rounded-lg" />
         ))}
       </div>
-      <div className="h-96 bg-gray-100 rounded-lg" />
+      <div className="h-96 bg-muted rounded-lg" />
     </div>
   );
 
@@ -335,11 +265,13 @@ export default function PromosPage() {
   const ErrorState = () => (
     <div className="flex h-[50vh] items-center justify-center">
       <div className="text-center space-y-4">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
-          <AlertTriangle className="h-8 w-8 text-red-600" />
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-500/10 dark:bg-red-500/20">
+          <AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-400" />
         </div>
-        <h2 className="text-xl font-semibold text-gray-900">Bir hata oluştu</h2>
-        <p className="text-gray-500 max-w-md">
+        <h2 className="text-xl font-semibold text-foreground">
+          Bir hata oluştu
+        </h2>
+        <p className="text-muted-foreground max-w-md">
           Promosyon verileri yüklenemedi. Lütfen sayfayı yenileyin veya daha
           sonra tekrar deneyin.
         </p>
@@ -356,15 +288,15 @@ export default function PromosPage() {
 
   // Empty State Component
   const EmptyState = () => (
-    <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-gray-200">
+    <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-border">
       <div className="text-center space-y-3">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-          <Gift className="h-6 w-6 text-gray-400" />
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+          <Gift className="h-6 w-6 text-muted-foreground" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900">
+        <h3 className="text-lg font-medium text-foreground">
           Henüz promosyon yok
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           İlk promosyon kodunuzu oluşturarak başlayın.
         </p>
         <CanvaButton
@@ -477,7 +409,7 @@ export default function PromosPage() {
                       value={newPromoValue}
                       onChange={(e) => setNewPromoValue(e.target.value)}
                     />
-                    <span className="text-gray-500">
+                    <span className="text-muted-foreground">
                       {promoType === 'percentage' ? '%' : '₺'}
                     </span>
                   </div>
@@ -633,6 +565,7 @@ export default function PromosPage() {
                             variant="ghost"
                             size="xs"
                             iconOnly
+                            aria-label="Kodu kopyala"
                             onClick={() => copyCode(promo.code)}
                           >
                             <Copy className="h-3 w-3" />
@@ -698,15 +631,25 @@ export default function PromosPage() {
                           </CanvaButton>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              toast.info('Yakında: Detaylar özelliği')
+                            }
+                          >
                             <Eye className="mr-2 h-4 w-4" />
                             Detaylar
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              toast.info('Yakında: Düzenleme özelliği')
+                            }
+                          >
                             <Edit className="mr-2 h-4 w-4" />
                             Düzenle
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => copyCode(promo.code)}
+                          >
                             <Copy className="mr-2 h-4 w-4" />
                             Kopyala
                           </DropdownMenuItem>
@@ -769,7 +712,7 @@ export default function PromosPage() {
             </CanvaCardHeader>
             <CanvaCardBody>
               <div className="space-y-4">
-                {mockReferrals.map((referral, index) => (
+                {referrals.map((referral, index) => (
                   <div
                     key={referral.id}
                     className="flex items-center justify-between rounded-lg border p-4"
@@ -823,10 +766,11 @@ export default function PromosPage() {
                   <div className="flex items-center gap-2">
                     <CanvaInput
                       type="number"
-                      defaultValue="30"
+                      value={referrerReward}
+                      onChange={(e) => setReferrerReward(e.target.value)}
                       className="w-24"
                     />
-                    <span className="text-gray-500">₺</span>
+                    <span className="text-muted-foreground">₺</span>
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -834,17 +778,18 @@ export default function PromosPage() {
                   <div className="flex items-center gap-2">
                     <CanvaInput
                       type="number"
-                      defaultValue="20"
+                      value={referredReward}
+                      onChange={(e) => setReferredReward(e.target.value)}
                       className="w-24"
                     />
-                    <span className="text-gray-500">₺</span>
+                    <span className="text-muted-foreground">₺</span>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center justify-between rounded-lg border border-gray-200 p-4">
+              <div className="flex items-center justify-between rounded-lg border border-border p-4">
                 <div className="space-y-1">
-                  <p className="font-medium text-gray-900">Abuse Detection</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="font-medium text-foreground">Abuse Detection</p>
+                  <p className="text-sm text-muted-foreground">
                     Kötüye kullanım tespiti ve otomatik engelleme
                   </p>
                 </div>
@@ -854,6 +799,15 @@ export default function PromosPage() {
                 >
                   Aktif
                 </CanvaBadge>
+              </div>
+              <div className="flex justify-end">
+                <CanvaButton
+                  variant="primary"
+                  onClick={handleSaveReferralSettings}
+                  loading={updateReferralSettings.isPending}
+                >
+                  Ayarlari Kaydet
+                </CanvaButton>
               </div>
             </CanvaCardBody>
           </CanvaCard>

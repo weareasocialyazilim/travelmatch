@@ -17,28 +17,29 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const canvaCardVariants = cva(
-  [
-    'rounded-2xl overflow-hidden',
-    'transition-all duration-200 ease-out',
-  ],
+  ['rounded-2xl overflow-hidden', 'transition-all duration-200 ease-out'],
   {
     variants: {
       variant: {
         default: [
-          'bg-white border border-gray-200',
-          'hover:border-gray-300 hover:shadow-md',
+          'bg-card border border-border',
+          'hover:border-border/80 hover:shadow-md',
+          'dark:bg-card dark:border-border dark:hover:border-border/60',
         ],
         elevated: [
-          'bg-white border-0 shadow-lg',
+          'bg-card border-0 shadow-lg',
           'hover:shadow-xl',
+          'dark:bg-card dark:shadow-black/20',
         ],
         flat: [
-          'bg-gray-50 border-0',
-          'hover:bg-gray-100',
+          'bg-muted border-0',
+          'hover:bg-muted/80',
+          'dark:bg-muted dark:hover:bg-muted/60',
         ],
         outline: [
-          'bg-transparent border border-gray-200',
-          'hover:border-gray-300',
+          'bg-transparent border border-border',
+          'hover:border-border/80',
+          'dark:border-border dark:hover:border-border/60',
         ],
       },
       interactive: {
@@ -55,28 +56,33 @@ const canvaCardVariants = cva(
       {
         variant: 'default',
         interactive: true,
-        className: 'hover:border-violet-300 hover:shadow-lg',
+        className:
+          'hover:border-violet-300 hover:shadow-lg dark:hover:border-violet-500/50',
       },
     ],
     defaultVariants: {
       variant: 'default',
       padding: 'none',
     },
-  }
+  },
 );
 
 export interface CanvaCardProps
-  extends React.HTMLAttributes<HTMLDivElement>,
+  extends
+    React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof canvaCardVariants> {}
 
 export const CanvaCard = React.forwardRef<HTMLDivElement, CanvaCardProps>(
   ({ className, variant, interactive, padding, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn(canvaCardVariants({ variant, interactive, padding }), className)}
+      className={cn(
+        canvaCardVariants({ variant, interactive, padding }),
+        className,
+      )}
       {...props}
     />
-  )
+  ),
 );
 CanvaCard.displayName = 'CanvaCard';
 
@@ -87,10 +93,7 @@ export const CanvaCardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn(
-      'px-6 py-5 border-b border-gray-100',
-      className
-    )}
+    className={cn('px-6 py-5 border-b border-border', className)}
     {...props}
   />
 ));
@@ -104,8 +107,8 @@ export const CanvaCardTitle = React.forwardRef<
   <h3
     ref={ref}
     className={cn(
-      'text-lg font-semibold text-gray-900 leading-tight',
-      className
+      'text-lg font-semibold text-foreground leading-tight',
+      className,
     )}
     {...props}
   />
@@ -119,7 +122,7 @@ export const CanvaCardSubtitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn('text-sm text-gray-500 mt-1', className)}
+    className={cn('text-sm text-muted-foreground mt-1', className)}
     {...props}
   />
 ));
@@ -141,10 +144,7 @@ export const CanvaCardFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn(
-      'px-6 py-4 bg-gray-50 border-t border-gray-100',
-      className
-    )}
+    className={cn('px-6 py-4 bg-muted border-t border-border', className)}
     {...props}
   />
 ));
@@ -161,45 +161,46 @@ export interface CanvaStatCardProps extends React.HTMLAttributes<HTMLDivElement>
   icon?: React.ReactNode;
 }
 
-export const CanvaStatCard = React.forwardRef<HTMLDivElement, CanvaStatCardProps>(
-  ({ className, label, value, change, icon, ...props }, ref) => {
-    const isPositive = change && change.value >= 0;
+export const CanvaStatCard = React.forwardRef<
+  HTMLDivElement,
+  CanvaStatCardProps
+>(({ className, label, value, change, icon, ...props }, ref) => {
+  const isPositive = change && change.value >= 0;
 
-    return (
-      <CanvaCard ref={ref} className={className} {...props}>
-        <div className="p-5">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-              {label}
+  return (
+    <CanvaCard ref={ref} className={className} {...props}>
+      <div className="p-5">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            {label}
+          </span>
+          {icon && <span className="text-muted-foreground">{icon}</span>}
+        </div>
+        <div className="text-3xl font-bold text-foreground mt-2">
+          {typeof value === 'number' ? value.toLocaleString() : value}
+        </div>
+        {change && (
+          <div className="mt-2 flex items-center gap-2">
+            <span
+              className={cn(
+                'inline-flex items-center gap-1 text-sm font-medium px-2 py-0.5 rounded-full',
+                isPositive
+                  ? 'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400'
+                  : 'bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400',
+              )}
+            >
+              {isPositive ? '↑' : '↓'}
+              {Math.abs(change.value)}%
             </span>
-            {icon && (
-              <span className="text-gray-400">{icon}</span>
+            {change.label && (
+              <span className="text-xs text-muted-foreground">
+                {change.label}
+              </span>
             )}
           </div>
-          <div className="text-3xl font-bold text-gray-900 mt-2">
-            {typeof value === 'number' ? value.toLocaleString() : value}
-          </div>
-          {change && (
-            <div className="mt-2 flex items-center gap-2">
-              <span
-                className={cn(
-                  'inline-flex items-center gap-1 text-sm font-medium px-2 py-0.5 rounded-full',
-                  isPositive
-                    ? 'bg-emerald-50 text-emerald-700'
-                    : 'bg-red-50 text-red-700'
-                )}
-              >
-                {isPositive ? '↑' : '↓'}
-                {Math.abs(change.value)}%
-              </span>
-              {change.label && (
-                <span className="text-xs text-gray-500">{change.label}</span>
-              )}
-            </div>
-          )}
-        </div>
-      </CanvaCard>
-    );
-  }
-);
+        )}
+      </div>
+    </CanvaCard>
+  );
+});
 CanvaStatCard.displayName = 'CanvaStatCard';
