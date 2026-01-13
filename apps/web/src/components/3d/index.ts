@@ -1,1 +1,1 @@
-export { Atmosphere } from './Atmosphere';
+// Empty - Atmosphere component removed

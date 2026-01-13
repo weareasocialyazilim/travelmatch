@@ -1,8 +1,6 @@
 'use client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { GiftStreamShader } from '@/components/3d/GiftStreamShader';
 import { useLanguage } from '@/context/LanguageContext';
 
 export function GlobalPulse() {

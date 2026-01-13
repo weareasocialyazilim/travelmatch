@@ -17,7 +17,7 @@ const WHISPERS = [
 ];
 
 export function WhisperUI({
-  momentId,
+  momentId: _momentId,
   active,
 }: {
   momentId: number;

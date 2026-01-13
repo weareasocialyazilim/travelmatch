@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { RitualProvider } from '@/context/RitualContext';
 import { LanguageProvider } from '@/context/LanguageContext';
+import { Navbar } from '@/components/shared/Navbar';
 import './globals.css';
 
 export const viewport: Viewport = {
