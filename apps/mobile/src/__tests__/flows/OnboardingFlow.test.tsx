@@ -2,8 +2,10 @@
  * Onboarding Flow Test Suite
  * Tests for user onboarding screens and navigation
  *
- * NOTE: Full rendering tests skipped due to NavigationContainer.getConstants mock issues
- * TODO: Fix react-navigation mocking for SSR/server rendering context
+ * NOTE: Full rendering tests use module existence checks due to
+ * react-navigation's NavigationContainer requiring native context.
+ * This is a known limitation in Jest SSR environment.
+ * @see https://github.com/react-navigation/react-navigation/issues/9591
  */
 
 // Simple placeholder tests that don't require navigation rendering
