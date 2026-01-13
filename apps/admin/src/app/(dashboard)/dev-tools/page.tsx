@@ -133,17 +133,17 @@ export default function DevToolsPage() {
   const getMethodColor = (method: string) => {
     switch (method) {
       case 'GET':
-        return 'bg-green-500';
+        return 'bg-green-500 dark:bg-green-600';
       case 'POST':
-        return 'bg-blue-500';
+        return 'bg-blue-500 dark:bg-blue-600';
       case 'PATCH':
-        return 'bg-yellow-500';
+        return 'bg-yellow-500 dark:bg-yellow-600';
       case 'PUT':
-        return 'bg-orange-500';
+        return 'bg-orange-500 dark:bg-orange-600';
       case 'DELETE':
-        return 'bg-red-500';
+        return 'bg-red-500 dark:bg-red-600';
       default:
-        return 'bg-gray-500';
+        return 'bg-gray-500 dark:bg-gray-600';
     }
   };
 
@@ -258,7 +258,7 @@ export default function DevToolsPage() {
                         </CanvaButton>
                       </div>
                       <div className="relative rounded-lg bg-muted p-4 overflow-auto max-h-96">
-                        <pre className="text-sm font-mono text-green-600">
+                        <pre className="text-sm font-mono text-green-600 dark:text-green-400">
                           {response}
                         </pre>
                       </div>
@@ -322,9 +322,9 @@ export default function DevToolsPage() {
                     >
                       <div className="flex items-center gap-3">
                         {webhook.status === 'success' ? (
-                          <CheckCircle className="h-5 w-5 text-green-500" />
+                          <CheckCircle className="h-5 w-5 text-green-500 dark:text-green-400" />
                         ) : (
-                          <AlertTriangle className="h-5 w-5 text-red-500" />
+                          <AlertTriangle className="h-5 w-5 text-red-500 dark:text-red-400" />
                         )}
                         <div>
                           <p className="font-medium font-mono text-sm">
@@ -336,7 +336,7 @@ export default function DevToolsPage() {
                             )}
                           </p>
                           {webhook.error && (
-                            <p className="text-xs text-red-500">
+                            <p className="text-xs text-red-500 dark:text-red-400">
                               {webhook.error}
                             </p>
                           )}
@@ -465,7 +465,7 @@ export default function DevToolsPage() {
                     >
                       <code className="text-sm">{env.key}</code>
                       {env.status === 'set' ? (
-                        <CanvaBadge className="bg-green-500">
+                        <CanvaBadge className="bg-green-500 dark:bg-green-600">
                           Ayarlandı
                         </CanvaBadge>
                       ) : (

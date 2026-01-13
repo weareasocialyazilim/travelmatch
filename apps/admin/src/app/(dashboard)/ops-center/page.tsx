@@ -60,37 +60,37 @@ const generateActivity = () => {
       type: 'user_signup',
       icon: Users,
       message: 'Yeni kullanıcı kaydı',
-      color: 'text-blue-500',
+      color: 'text-blue-500 dark:text-blue-400',
     },
     {
       type: 'match',
       icon: Heart,
       message: 'Yeni eşleşme',
-      color: 'text-pink-500',
+      color: 'text-pink-500 dark:text-pink-400',
     },
     {
       type: 'moment',
       icon: Camera,
       message: 'Yeni moment paylaşıldı',
-      color: 'text-purple-500',
+      color: 'text-purple-500 dark:text-purple-400',
     },
     {
       type: 'message',
       icon: MessageSquare,
       message: 'Mesaj gönderildi',
-      color: 'text-green-500',
+      color: 'text-green-500 dark:text-green-400',
     },
     {
       type: 'payment',
       icon: CreditCard,
       message: 'Ödeme alındı',
-      color: 'text-emerald-500',
+      color: 'text-emerald-500 dark:text-emerald-400',
     },
     {
       type: 'report',
       icon: AlertTriangle,
       message: 'Şikayet oluşturuldu',
-      color: 'text-orange-500',
+      color: 'text-orange-500 dark:text-orange-400',
     },
   ];
   const randomType = types[Math.floor(Math.random() * types.length)];

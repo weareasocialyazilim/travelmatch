@@ -412,8 +412,8 @@ export default function AICenterPage() {
                       <span
                         className={
                           model.errorRate > 0.05
-                            ? 'text-red-500'
-                            : 'text-green-500'
+                            ? 'text-red-500 dark:text-red-400'
+                            : 'text-green-500 dark:text-green-400'
                         }
                       >
                         %{(model.errorRate * 100).toFixed(2)}
@@ -572,7 +572,7 @@ export default function AICenterPage() {
             <CanvaCardBody>
               {anomalies.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-                  <CheckCircle className="h-12 w-12 mb-4 text-green-500" />
+                  <CheckCircle className="h-12 w-12 mb-4 text-green-500 dark:text-green-400" />
                   <p>Aktif anomali bulunmuyor</p>
                 </div>
               ) : (
@@ -593,10 +593,10 @@ export default function AICenterPage() {
                           <div
                             className={`flex h-10 w-10 items-center justify-center rounded-full ${
                               anomaly.severity === 'critical'
-                                ? 'bg-red-100'
+                                ? 'bg-red-500/10 dark:bg-red-500/20'
                                 : anomaly.severity === 'warning'
-                                  ? 'bg-yellow-100'
-                                  : 'bg-blue-100'
+                                  ? 'bg-yellow-500/10 dark:bg-yellow-500/20'
+                                  : 'bg-blue-500/10 dark:bg-blue-500/20'
                             }`}
                           >
                             <AlertTriangle
@@ -762,9 +762,9 @@ export default function AICenterPage() {
                         <span
                           className={
                             trend.changePercent > 0
-                              ? 'text-green-500'
+                              ? 'text-green-500 dark:text-green-400'
                               : trend.changePercent < 0
-                                ? 'text-red-500'
+                                ? 'text-red-500 dark:text-red-400'
                                 : ''
                           }
                         >

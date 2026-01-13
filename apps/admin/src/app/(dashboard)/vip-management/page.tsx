@@ -246,19 +246,19 @@ function AddVIPDialog({ open, onOpenChange, onAdd, isLoading }: AddVIPDialogProp
               <SelectContent>
                 <SelectItem value="vip">
                   <div className="flex items-center gap-2">
-                    <Crown className="h-4 w-4 text-yellow-500" />
+                    <Crown className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />
                     VIP
                   </div>
                 </SelectItem>
                 <SelectItem value="influencer">
                   <div className="flex items-center gap-2">
-                    <Star className="h-4 w-4 text-green-500" />
+                    <Star className="h-4 w-4 text-green-500 dark:text-green-400" />
                     Influencer
                   </div>
                 </SelectItem>
                 <SelectItem value="partner">
                   <div className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-blue-500" />
+                    <CheckCircle className="h-4 w-4 text-blue-500 dark:text-blue-400" />
                     Partner
                   </div>
                 </SelectItem>
@@ -470,17 +470,17 @@ export default function VIPManagementPage() {
         <CanvaStatCard
           label="VIP Kullanıcılar"
           value={stats?.totalVIP?.toLocaleString('tr-TR') || '-'}
-          icon={<Crown className="h-5 w-5 text-yellow-500" />}
+          icon={<Crown className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />}
         />
         <CanvaStatCard
           label="Influencerlar"
           value={stats?.totalInfluencer?.toLocaleString('tr-TR') || '-'}
-          icon={<Star className="h-5 w-5 text-green-500" />}
+          icon={<Star className="h-5 w-5 text-green-500 dark:text-green-400" />}
         />
         <CanvaStatCard
           label="Partnerlar"
           value={stats?.totalPartner?.toLocaleString('tr-TR') || '-'}
-          icon={<CheckCircle className="h-5 w-5 text-blue-500" />}
+          icon={<CheckCircle className="h-5 w-5 text-blue-500 dark:text-blue-400" />}
         />
         <CanvaStatCard
           label="Tasarruf Edilen Komisyon"

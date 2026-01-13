@@ -757,7 +757,7 @@ export default function ModerationPage() {
                     </TableCell>
                     <TableCell>
                       {warning.acknowledged ? (
-                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <CheckCircle className="h-4 w-4 text-green-500 dark:text-green-400" />
                       ) : (
                         <XCircle className="h-4 w-4 text-muted-foreground" />
                       )}

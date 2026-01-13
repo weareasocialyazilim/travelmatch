@@ -58,7 +58,7 @@ export default function RevenuePage() {
       <div className="flex h-[60vh] items-center justify-center">
         <div className="text-center space-y-4">
           <div className="mx-auto w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-            <AlertTriangle className="h-8 w-8 text-red-500" />
+            <AlertTriangle className="h-8 w-8 text-red-500 dark:text-red-400" />
           </div>
           <div>
             <h2 className="text-xl font-semibold text-foreground">
@@ -179,9 +179,9 @@ export default function RevenuePage() {
                 )}
               >
                 {(overview?.growthRate || 0) >= 0 ? (
-                  <TrendingUp className="h-4 w-4 text-emerald-600" />
+                  <TrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                 ) : (
-                  <TrendingDown className="h-4 w-4 text-red-600" />
+                  <TrendingDown className="h-4 w-4 text-red-600 dark:text-red-400" />
                 )}
               </div>
             </div>
@@ -189,8 +189,8 @@ export default function RevenuePage() {
               className={cn(
                 'text-3xl font-bold mt-2',
                 (overview?.growthRate || 0) >= 0
-                  ? 'text-emerald-600'
-                  : 'text-red-600',
+                  ? 'text-emerald-600 dark:text-emerald-400'
+                  : 'text-red-600 dark:text-red-400',
               )}
             >
               {isLoading
@@ -220,7 +220,7 @@ export default function RevenuePage() {
             <CanvaCardBody>
               {isLoading ? (
                 <div className="flex items-center justify-center h-[400px]">
-                  <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+                  <Loader2 className="h-8 w-8 animate-spin text-violet-500 dark:text-violet-400" />
                 </div>
               ) : monthlyRevenue.length > 0 ? (
                 <div className="h-[400px]">
@@ -301,7 +301,7 @@ export default function RevenuePage() {
               <CanvaCardBody>
                 {isLoading ? (
                   <div className="flex items-center justify-center h-[300px]">
-                    <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+                    <Loader2 className="h-8 w-8 animate-spin text-violet-500 dark:text-violet-400" />
                   </div>
                 ) : revenueByProduct.length > 0 ? (
                   <div className="h-[300px]">
@@ -355,7 +355,7 @@ export default function RevenuePage() {
               <CanvaCardBody>
                 {isLoading ? (
                   <div className="flex items-center justify-center h-[300px]">
-                    <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+                    <Loader2 className="h-8 w-8 animate-spin text-violet-500 dark:text-violet-400" />
                   </div>
                 ) : revenueByProduct.length > 0 ? (
                   <div className="space-y-4">
@@ -415,7 +415,7 @@ export default function RevenuePage() {
             <CanvaCardBody className="p-0">
               {isLoading ? (
                 <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+                  <Loader2 className="h-8 w-8 animate-spin text-violet-500 dark:text-violet-400" />
                 </div>
               ) : (data?.recentPayments?.length || 0) > 0 ? (
                 <div className="divide-y divide-border">
@@ -426,7 +426,7 @@ export default function RevenuePage() {
                     >
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
-                          <DollarSign className="h-5 w-5 text-emerald-600" />
+                          <DollarSign className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                         </div>
                         <div>
                           <p className="text-sm font-medium text-foreground">

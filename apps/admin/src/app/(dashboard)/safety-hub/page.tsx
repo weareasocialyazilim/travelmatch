@@ -284,13 +284,13 @@ export default function SafetyHubPage() {
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'content':
-        return <Image className="h-4 w-4 text-purple-500" />;
+        return <Image className="h-4 w-4 text-purple-500 dark:text-purple-400" />;
       case 'user':
-        return <Users className="h-4 w-4 text-blue-500" />;
+        return <Users className="h-4 w-4 text-blue-500 dark:text-blue-400" />;
       case 'message':
-        return <MessageSquare className="h-4 w-4 text-green-500" />;
+        return <MessageSquare className="h-4 w-4 text-green-500 dark:text-green-400" />;
       case 'fraud':
-        return <CreditCard className="h-4 w-4 text-red-500" />;
+        return <CreditCard className="h-4 w-4 text-red-500 dark:text-red-400" />;
       default:
         return <Flag className="h-4 w-4" />;
     }
@@ -318,11 +318,11 @@ export default function SafetyHubPage() {
 
       {/* Alert Banner */}
       {safetyStats.fraudAttempts > 10 && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center justify-between">
+        <div className="p-4 bg-red-500/10 dark:bg-red-500/20 border border-red-500/20 dark:border-red-500/30 rounded-lg flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <AlertTriangle className="h-5 w-5 text-red-500" />
+            <AlertTriangle className="h-5 w-5 text-red-500 dark:text-red-400" />
             <div>
-              <p className="font-medium text-red-500">
+              <p className="font-medium text-red-500 dark:text-red-400">
                 Yüksek Dolandırıcılık Aktivitesi
               </p>
               <p className="text-sm text-muted-foreground">
@@ -334,7 +334,7 @@ export default function SafetyHubPage() {
           <CanvaButton
             variant="outline"
             size="sm"
-            className="border-red-500/30 text-red-500"
+            className="border-red-500/30 text-red-500 dark:text-red-400"
           >
             Detayları Gör
           </CanvaButton>
@@ -346,26 +346,26 @@ export default function SafetyHubPage() {
         <CanvaStatCard
           label="Bekleyen Raporlar"
           value={safetyStats.pendingReports}
-          icon={<Clock className="h-5 w-5 text-orange-500" />}
+          icon={<Clock className="h-5 w-5 text-orange-500 dark:text-orange-400" />}
           className="border-l-4 border-l-orange-500"
         />
         <CanvaStatCard
           label="Bugün Çözülen"
           value={safetyStats.resolvedToday}
           change={{ value: 18, label: 'dünden' }}
-          icon={<CheckCircle2 className="h-5 w-5 text-green-500" />}
+          icon={<CheckCircle2 className="h-5 w-5 text-green-500 dark:text-green-400" />}
           className="border-l-4 border-l-green-500"
         />
         <CanvaStatCard
           label="Dolandırıcılık"
           value={safetyStats.fraudAttempts}
-          icon={<AlertTriangle className="h-5 w-5 text-red-500" />}
+          icon={<AlertTriangle className="h-5 w-5 text-red-500 dark:text-red-400" />}
           className="border-l-4 border-l-red-500"
         />
         <CanvaStatCard
           label="AI Tespitleri"
           value={safetyStats.aiDetectedThreats}
-          icon={<Brain className="h-5 w-5 text-purple-500" />}
+          icon={<Brain className="h-5 w-5 text-purple-500 dark:text-purple-400" />}
           className="border-l-4 border-l-purple-500"
         />
       </div>
@@ -490,10 +490,10 @@ export default function SafetyHubPage() {
                             className={cn(
                               'w-16 h-2',
                               report.aiScore > 0.8
-                                ? '[&>div]:bg-red-500'
+                                ? '[&>div]:bg-red-500 dark:[&>div]:bg-red-400'
                                 : report.aiScore > 0.5
-                                  ? '[&>div]:bg-yellow-500'
-                                  : '[&>div]:bg-green-500',
+                                  ? '[&>div]:bg-yellow-500 dark:[&>div]:bg-yellow-400'
+                                  : '[&>div]:bg-green-500 dark:[&>div]:bg-green-400',
                             )}
                           />
                           <span className="text-sm font-medium">
@@ -513,7 +513,7 @@ export default function SafetyHubPage() {
                             variant="ghost"
                             size="sm"
                             iconOnly
-                            className="text-green-500"
+                            className="text-green-500 dark:text-green-400"
                             title="Onayla"
                           >
                             <CheckCircle2 className="h-4 w-4" />
@@ -522,7 +522,7 @@ export default function SafetyHubPage() {
                             variant="ghost"
                             size="sm"
                             iconOnly
-                            className="text-red-500"
+                            className="text-red-500 dark:text-red-400"
                             title="Kaldır"
                           >
                             <XCircle className="h-4 w-4" />
@@ -565,8 +565,8 @@ export default function SafetyHubPage() {
             <CanvaCard>
               <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-blue-500/10">
-                    <Eye className="h-5 w-5 text-blue-500" />
+                  <div className="p-2 rounded-lg bg-blue-500/10 dark:bg-blue-500/20">
+                    <Eye className="h-5 w-5 text-blue-500 dark:text-blue-400" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold">
@@ -582,8 +582,8 @@ export default function SafetyHubPage() {
             <CanvaCard>
               <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-yellow-500/10">
-                    <Flag className="h-5 w-5 text-yellow-500" />
+                  <div className="p-2 rounded-lg bg-yellow-500/10 dark:bg-yellow-500/20">
+                    <Flag className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold">
@@ -597,8 +597,8 @@ export default function SafetyHubPage() {
             <CanvaCard>
               <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-red-500/10">
-                    <XCircle className="h-5 w-5 text-red-500" />
+                  <div className="p-2 rounded-lg bg-red-500/10 dark:bg-red-500/20">
+                    <XCircle className="h-5 w-5 text-red-500 dark:text-red-400" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold">
@@ -614,8 +614,8 @@ export default function SafetyHubPage() {
             <CanvaCard>
               <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-green-500/10">
-                    <CheckCircle2 className="h-5 w-5 text-green-500" />
+                  <div className="p-2 rounded-lg bg-green-500/10 dark:bg-green-500/20">
+                    <CheckCircle2 className="h-5 w-5 text-green-500 dark:text-green-400" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold">
@@ -690,7 +690,7 @@ export default function SafetyHubPage() {
                     className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-green-500" />
+                      <div className="w-2 h-2 rounded-full bg-green-500 dark:bg-green-400" />
                       <div>
                         <p className="font-medium text-sm">{model.model}</p>
                         <p className="text-xs text-muted-foreground">
@@ -699,7 +699,7 @@ export default function SafetyHubPage() {
                       </div>
                     </div>
                     <CanvaBadge
-                      className="bg-green-500/10 text-green-500 border-green-500/20"
+                      className="bg-green-500/10 dark:bg-green-500/20 text-green-500 dark:text-green-400 border-green-500/20 dark:border-green-500/30"
                     >
                       {model.accuracy}%
                     </CanvaBadge>
@@ -740,7 +740,7 @@ export default function SafetyHubPage() {
                         <p className="text-xs text-muted-foreground">tespit</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-semibold text-green-500">
+                        <p className="text-sm font-semibold text-green-500 dark:text-green-400">
                           {pattern.blocked}
                         </p>
                         <p className="text-xs text-muted-foreground">
@@ -748,11 +748,11 @@ export default function SafetyHubPage() {
                         </p>
                       </div>
                       {pattern.trend === 'up' ? (
-                        <TrendingUp className="h-4 w-4 text-red-500" />
+                        <TrendingUp className="h-4 w-4 text-red-500 dark:text-red-400" />
                       ) : pattern.trend === 'down' ? (
-                        <TrendingDown className="h-4 w-4 text-green-500" />
+                        <TrendingDown className="h-4 w-4 text-green-500 dark:text-green-400" />
                       ) : (
-                        <Activity className="h-4 w-4 text-yellow-500" />
+                        <Activity className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />
                       )}
                     </div>
                   </div>
@@ -798,7 +798,7 @@ export default function SafetyHubPage() {
                     className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-green-500" />
+                      <div className="w-2 h-2 rounded-full bg-green-500 dark:bg-green-400" />
                       <span className="font-medium">{measure.name}</span>
                     </div>
                     <CanvaBadge variant="default">{measure.blocked} engelleme</CanvaBadge>
@@ -865,15 +865,15 @@ export default function SafetyHubPage() {
                         <CanvaBadge
                           className={cn(
                             attempt.risk > 0.9
-                              ? 'bg-red-500/10 text-red-500'
-                              : 'bg-yellow-500/10 text-yellow-500',
+                              ? 'bg-red-500/10 dark:bg-red-500/20 text-red-500 dark:text-red-400'
+                              : 'bg-yellow-500/10 dark:bg-yellow-500/20 text-yellow-500 dark:text-yellow-400',
                           )}
                         >
                           {(attempt.risk * 100).toFixed(0)}%
                         </CanvaBadge>
                       </TableCell>
                       <TableCell>
-                        <CanvaBadge className="bg-green-500/10 text-green-500 border-green-500/20">
+                        <CanvaBadge className="bg-green-500/10 dark:bg-green-500/20 text-green-500 dark:text-green-400 border-green-500/20 dark:border-green-500/30">
                           <Shield className="h-3 w-3 mr-1" />
                           Engellendi
                         </CanvaBadge>
@@ -934,8 +934,8 @@ export default function SafetyHubPage() {
                         <CanvaBadge
                           className={cn(
                             account.duration === 'Kalıcı'
-                              ? 'bg-red-500/10 text-red-500'
-                              : 'bg-yellow-500/10 text-yellow-500',
+                              ? 'bg-red-500/10 dark:bg-red-500/20 text-red-500 dark:text-red-400'
+                              : 'bg-yellow-500/10 dark:bg-yellow-500/20 text-yellow-500 dark:text-yellow-400',
                           )}
                         >
                           {account.duration}
@@ -952,7 +952,7 @@ export default function SafetyHubPage() {
                             size="sm"
                             iconOnly
                             title="Askıyı Kaldır"
-                            className="text-green-500"
+                            className="text-green-500 dark:text-green-400"
                           >
                             <Unlock className="h-4 w-4" />
                           </CanvaButton>

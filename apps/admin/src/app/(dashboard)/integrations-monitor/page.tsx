@@ -381,17 +381,17 @@ export default function IntegrationsMonitorPage() {
   };
 
   const getUptimeColor = (uptime: number) => {
-    if (uptime >= 99.9) return 'text-emerald-600';
-    if (uptime >= 99) return 'text-blue-600';
-    if (uptime >= 98) return 'text-amber-600';
-    return 'text-red-600';
+    if (uptime >= 99.9) return 'text-emerald-600 dark:text-emerald-400';
+    if (uptime >= 99) return 'text-blue-600 dark:text-blue-400';
+    if (uptime >= 98) return 'text-amber-600 dark:text-amber-400';
+    return 'text-red-600 dark:text-red-400';
   };
 
   const getLatencyColor = (latency: number) => {
-    if (latency < 100) return 'text-emerald-600';
-    if (latency < 200) return 'text-blue-600';
-    if (latency < 500) return 'text-amber-600';
-    return 'text-red-600';
+    if (latency < 100) return 'text-emerald-600 dark:text-emerald-400';
+    if (latency < 200) return 'text-blue-600 dark:text-blue-400';
+    if (latency < 500) return 'text-amber-600 dark:text-amber-400';
+    return 'text-red-600 dark:text-red-400';
   };
 
   // Calculate overall stats
@@ -413,7 +413,7 @@ export default function IntegrationsMonitorPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <Zap className="h-6 w-6 text-amber-500" />
+            <Zap className="h-6 w-6 text-amber-500 dark:text-amber-400" />
             Integration Monitoring
           </h1>
           <p className="text-muted-foreground">
@@ -443,10 +443,10 @@ export default function IntegrationsMonitorPage() {
         <CanvaCard
           className={cn(
             healthyCount === allServices.length
-              ? 'border-emerald-500/30 bg-emerald-500/5'
+              ? 'border-emerald-500/30 dark:border-emerald-500/40 bg-emerald-500/5 dark:bg-emerald-500/10'
               : degradedCount > 0
-                ? 'border-amber-500/30 bg-amber-500/5'
-                : 'border-red-500/30 bg-red-500/5',
+                ? 'border-amber-500/30 dark:border-amber-500/40 bg-amber-500/5 dark:bg-amber-500/10'
+                : 'border-red-500/30 dark:border-red-500/40 bg-red-500/5 dark:bg-red-500/10',
           )}
         >
           <CanvaCardHeader>
@@ -454,17 +454,17 @@ export default function IntegrationsMonitorPage() {
             <CanvaCardTitle className="text-xl flex items-center gap-2">
               {healthyCount === allServices.length ? (
                 <>
-                  <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                  <CheckCircle2 className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />
                   Tum Sistemler Calisiyor
                 </>
               ) : degradedCount > 0 ? (
                 <>
-                  <AlertTriangle className="h-5 w-5 text-amber-500" />
+                  <AlertTriangle className="h-5 w-5 text-amber-500 dark:text-amber-400" />
                   Kismi Yavaslik
                 </>
               ) : (
                 <>
-                  <XCircle className="h-5 w-5 text-red-500" />
+                  <XCircle className="h-5 w-5 text-red-500 dark:text-red-400" />
                   Sorun Var
                 </>
               )}
@@ -499,9 +499,9 @@ export default function IntegrationsMonitorPage() {
 
       {/* Active Incidents */}
       {recentIncidents.filter((i) => i.status !== 'resolved').length > 0 && (
-        <CanvaCard className="border-amber-500/30 bg-amber-500/5">
+        <CanvaCard className="border-amber-500/30 dark:border-amber-500/40 bg-amber-500/5 dark:bg-amber-500/10">
           <CanvaCardHeader>
-            <CanvaCardTitle className="flex items-center gap-2 text-amber-600">
+            <CanvaCardTitle className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
               <AlertTriangle className="h-5 w-5" />
               Aktif Olaylar
             </CanvaCardTitle>
@@ -556,8 +556,8 @@ export default function IntegrationsMonitorPage() {
                     key={service.id}
                     className={cn(
                       'hover:shadow-md transition-all',
-                      service.status === 'degraded' && 'border-amber-500/30',
-                      service.status === 'down' && 'border-red-500/30',
+                      service.status === 'degraded' && 'border-amber-500/30 dark:border-amber-500/40',
+                      service.status === 'down' && 'border-red-500/30 dark:border-red-500/40',
                     )}
                   >
                     <CanvaCardHeader>
@@ -613,7 +613,7 @@ export default function IntegrationsMonitorPage() {
                           <span
                             className={cn(
                               'font-medium',
-                              service.errors_today > 0 && 'text-red-600',
+                              service.errors_today > 0 && 'text-red-600 dark:text-red-400',
                             )}
                           >
                             {service.errors_today}
@@ -717,15 +717,15 @@ export default function IntegrationsMonitorPage() {
                       'p-4 rounded-lg border',
                       incident.status === 'resolved'
                         ? 'bg-muted/50'
-                        : 'bg-amber-500/5 border-amber-500/30',
+                        : 'bg-amber-500/5 dark:bg-amber-500/10 border-amber-500/30 dark:border-amber-500/40',
                     )}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-3">
                         {incident.status === 'resolved' ? (
-                          <CheckCircle2 className="h-5 w-5 text-emerald-500 mt-0.5" />
+                          <CheckCircle2 className="h-5 w-5 text-emerald-500 dark:text-emerald-400 mt-0.5" />
                         ) : (
-                          <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5 animate-pulse" />
+                          <AlertTriangle className="h-5 w-5 text-amber-500 dark:text-amber-400 mt-0.5 animate-pulse" />
                         )}
                         <div>
                           <p className="font-medium">{incident.title}</p>

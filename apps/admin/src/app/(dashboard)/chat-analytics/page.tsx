@@ -78,10 +78,10 @@ export default function ChatAnalyticsPage() {
     switch (tier) {
       case 'tier_3':
         return (
-          <CanvaBadge className="bg-purple-500/10 text-purple-600">Premium</CanvaBadge>
+          <CanvaBadge className="bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400">Premium</CanvaBadge>
         );
       case 'tier_2':
-        return <CanvaBadge className="bg-blue-500/10 text-blue-600">Standard</CanvaBadge>;
+        return <CanvaBadge className="bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400">Standard</CanvaBadge>;
       default:
         return <CanvaBadge variant="outline">Basic</CanvaBadge>;
     }
@@ -91,14 +91,14 @@ export default function ChatAnalyticsPage() {
     switch (status) {
       case 'active':
         return (
-          <CanvaBadge className="bg-emerald-500/10 text-emerald-600">
+          <CanvaBadge className="bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
             <Activity className="h-3 w-3 mr-1" />
             Aktif
           </CanvaBadge>
         );
       case 'idle':
         return (
-          <CanvaBadge className="bg-amber-500/10 text-amber-600">
+          <CanvaBadge className="bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400">
             <Clock className="h-3 w-3 mr-1" />
             Beklemede
           </CanvaBadge>
@@ -114,7 +114,7 @@ export default function ChatAnalyticsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <MessageSquare className="h-6 w-6 text-purple-500" />
+            <MessageSquare className="h-6 w-6 text-purple-500 dark:text-purple-400" />
             Chat & Messaging Analytics
           </h1>
           <p className="text-muted-foreground">
@@ -147,7 +147,7 @@ export default function ChatAnalyticsPage() {
               <Users className="h-3 w-3" />
               Aktif Sohbet
             </CanvaCardSubtitle>
-            <CanvaCardTitle className="text-xl font-bold text-purple-600">
+            <CanvaCardTitle className="text-xl font-bold text-purple-600 dark:text-purple-400">
               {isLoading ? <Skeleton className="h-6 w-16" /> : chatStats.activeToday.toLocaleString()}
             </CanvaCardTitle>
           </CanvaCardHeader>
@@ -171,7 +171,7 @@ export default function ChatAnalyticsPage() {
               <Unlock className="h-3 w-3" />
               Chat Acilma
             </CanvaCardSubtitle>
-            <CanvaCardTitle className="text-xl font-bold text-emerald-600">
+            <CanvaCardTitle className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
               {isLoading ? <Skeleton className="h-6 w-16" /> : `%${chatStats.chatLockRate}`}
             </CanvaCardTitle>
           </CanvaCardHeader>
@@ -207,7 +207,7 @@ export default function ChatAnalyticsPage() {
               <Shield className="h-3 w-3" />
               E2E Sifreleme
             </CanvaCardSubtitle>
-            <CanvaCardTitle className="text-xl font-bold text-emerald-600 flex items-center gap-2">
+            <CanvaCardTitle className="text-xl font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
               {isLoading ? (
                 <Skeleton className="h-6 w-24" />
               ) : (
@@ -224,7 +224,7 @@ export default function ChatAnalyticsPage() {
       <CanvaCard>
         <CanvaCardHeader>
           <CanvaCardTitle className="flex items-center gap-2">
-            <Lock className="h-5 w-5 text-amber-500" />
+            <Lock className="h-5 w-5 text-amber-500 dark:text-amber-400" />
             Chat Lock Sistemi Analizi
           </CanvaCardTitle>
           <CanvaCardSubtitle>Tier bazli chat acilma oranlari</CanvaCardSubtitle>
@@ -236,9 +236,9 @@ export default function ChatAnalyticsPage() {
                 key={tier.tier}
                 className={cn(
                   'p-4 rounded-lg border',
-                  index === 0 && 'bg-gray-500/5',
-                  index === 1 && 'bg-blue-500/5 border-blue-500/30',
-                  index === 2 && 'bg-purple-500/5 border-purple-500/30',
+                  index === 0 && 'bg-gray-500/5 dark:bg-gray-500/10',
+                  index === 1 && 'bg-blue-500/5 dark:bg-blue-500/10 border-blue-500/30',
+                  index === 2 && 'bg-purple-500/5 dark:bg-purple-500/10 border-purple-500/30',
                 )}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -252,8 +252,8 @@ export default function ChatAnalyticsPage() {
                     <CanvaBadge
                       className={
                         index === 2
-                          ? 'bg-purple-500/10 text-purple-600'
-                          : 'bg-blue-500/10 text-blue-600'
+                          ? 'bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400'
+                          : 'bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400'
                       }
                     >
                       <Unlock className="h-3 w-3 mr-1" />
@@ -286,14 +286,14 @@ export default function ChatAnalyticsPage() {
                         <span className="text-muted-foreground">
                           Chat Acildi
                         </span>
-                        <span className="font-medium text-emerald-600">
+                        <span className="font-medium text-emerald-600 dark:text-emerald-400">
                           {tier.chatUnlocked.toLocaleString()}
                         </span>
                       </div>
                       <div className="pt-2 mt-2 border-t">
                         <div className="flex items-center justify-between">
                           <span className="font-medium">Acilma Orani</span>
-                          <span className="text-lg font-bold text-emerald-600">
+                          <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
                             %{tier.unlockRate}
                           </span>
                         </div>
@@ -444,7 +444,7 @@ export default function ChatAnalyticsPage() {
                     <TableCell className="max-w-[150px] truncate">
                       {conv.moment}
                     </TableCell>
-                    <TableCell className="font-medium text-emerald-600">
+                    <TableCell className="font-medium text-emerald-600 dark:text-emerald-400">
                       {formatCurrency(conv.giftAmount, 'TRY')}
                     </TableCell>
                     <TableCell>{conv.messages}</TableCell>
@@ -465,7 +465,7 @@ export default function ChatAnalyticsPage() {
           <CanvaCard>
             <CanvaCardHeader>
               <CanvaCardTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-amber-500" />
+                <AlertTriangle className="h-5 w-5 text-amber-500 dark:text-amber-400" />
                 Isaretlenen Mesajlar
               </CanvaCardTitle>
               <CanvaCardSubtitle>
@@ -480,9 +480,9 @@ export default function ChatAnalyticsPage() {
                     className={cn(
                       'p-4 rounded-lg border',
                       msg.status === 'pending' &&
-                        'border-amber-500/30 bg-amber-500/5',
+                        'border-amber-500/30 bg-amber-500/5 dark:bg-amber-500/10',
                       msg.status === 'reviewing' &&
-                        'border-blue-500/30 bg-blue-500/5',
+                        'border-blue-500/30 bg-blue-500/5 dark:bg-blue-500/10',
                       msg.status === 'actioned' && 'bg-muted/50',
                     )}
                   >
@@ -495,11 +495,11 @@ export default function ChatAnalyticsPage() {
                           <CanvaBadge
                             className={cn(
                               msg.reason === 'potential_spam' &&
-                                'bg-amber-500/10 text-amber-600',
+                                'bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400',
                               msg.reason === 'contact_sharing' &&
-                                'bg-blue-500/10 text-blue-600',
+                                'bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400',
                               msg.reason === 'inappropriate' &&
-                                'bg-red-500/10 text-red-600',
+                                'bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400',
                             )}
                           >
                             {msg.reason.replace(/_/g, ' ')}
