@@ -543,6 +543,87 @@ export interface Database {
           moderated_at?: string | null;
         };
       };
+      // Payments table
+      payments: {
+        Row: {
+          id: string;
+          user_id: string;
+          amount: number;
+          currency: string;
+          status: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded';
+          type: string;
+          payment_method: string | null;
+          transaction_id: string | null;
+          metadata: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          amount: number;
+          currency?: string;
+          status?: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded';
+          type: string;
+          payment_method?: string | null;
+          transaction_id?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          amount?: number;
+          currency?: string;
+          status?: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded';
+          type?: string;
+          payment_method?: string | null;
+          transaction_id?: string | null;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      // Activity logs table
+      activity_logs: {
+        Row: {
+          id: string;
+          action: string;
+          entity_type: string;
+          entity_id: string | null;
+          user_id: string | null;
+          admin_id: string | null;
+          metadata: Json;
+          ip_address: string | null;
+          user_agent: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          action: string;
+          entity_type: string;
+          entity_id?: string | null;
+          user_id?: string | null;
+          admin_id?: string | null;
+          metadata?: Json;
+          ip_address?: string | null;
+          user_agent?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          action?: string;
+          entity_type?: string;
+          entity_id?: string | null;
+          user_id?: string | null;
+          admin_id?: string | null;
+          metadata?: Json;
+          ip_address?: string | null;
+          user_agent?: string | null;
+          created_at?: string;
+        };
+      };
       // Users table for admin operations
       users: {
         Row: {

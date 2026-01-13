@@ -2,8 +2,10 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { cookies } from 'next/headers';
-import { authenticator } from 'otplib';
 import crypto from 'crypto';
+import type { Database } from '@/types/database';
+
+type AdminUserRow = Database['public']['Tables']['admin_users']['Row'];
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,23 +21,19 @@ export async function POST(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Find admin user by email
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: adminUserData, error: userError } = await (supabase as any)
+    const { data: adminUser, error: userError } = await supabase
       .from('admin_users')
       .select('*')
       .eq('email', email)
       .eq('is_active', true)
       .single();
 
-    if (userError || !adminUserData) {
+    if (userError || !adminUser) {
       return NextResponse.json(
         { error: 'Geçersiz kimlik bilgileri' },
         { status: 401 },
       );
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const adminUser = adminUserData as any;
 
     // Authenticate with Supabase Auth
     const { data: authData, error: authError } =
@@ -61,8 +59,7 @@ export async function POST(request: NextRequest) {
         .digest('hex');
 
       // Store temp session
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase as any).from('admin_sessions').insert({
+      await supabase.from('admin_sessions').insert({
         admin_id: adminUser.id,
         token_hash: tokenHash,
         ip_address:
@@ -88,8 +85,7 @@ export async function POST(request: NextRequest) {
       .digest('hex');
 
     // Store session
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any).from('admin_sessions').insert({
+    await supabase.from('admin_sessions').insert({
       admin_id: adminUser.id,
       token_hash: sessionHash,
       ip_address:
@@ -101,8 +97,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Update last login
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any)
+    await supabase
       .from('admin_users')
       .update({ last_login_at: new Date().toISOString() })
       .eq('id', adminUser.id);
@@ -118,8 +113,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Get role permissions
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: permissions } = await (supabase as any)
+    const { data: permissions } = await supabase
       .from('role_permissions')
       .select('resource, action')
       .eq('role', adminUser.role);
