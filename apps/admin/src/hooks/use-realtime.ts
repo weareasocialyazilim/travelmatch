@@ -46,8 +46,7 @@ export function useRealtimeSubscription<T extends Record<string, unknown>>(
 
     const channelName = `realtime:${schema}:${table}:${filter || 'all'}`;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const newChannel = (supabase as any)
+    const newChannel = supabase
       .channel(channelName)
       .on(
         'postgres_changes',

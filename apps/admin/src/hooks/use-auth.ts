@@ -7,6 +7,9 @@ import { getClient } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth-store';
 import { logger } from '@/lib/logger';
 import type { AdminUser } from '@/types/admin';
+import type { Database } from '@/types/database';
+
+type AdminUserRow = Database['public']['Tables']['admin_users']['Row'];
 
 export function useAuth() {
   const router = useRouter();
@@ -32,21 +35,21 @@ export function useAuth() {
 
         if (session?.user) {
           // Fetch admin user profile
-          const { data: adminUser } = await (
-            supabase.from('admin_users') as any
-          )
+          const { data: adminUser } = await supabase
+            .from('admin_users')
             .select('*')
             .eq('email', session.user.email || '')
             .eq('is_active', true)
-            .single();
+            .single<AdminUserRow>();
 
           if (adminUser) {
             setUser(adminUser as AdminUser);
 
             // Update last login
-            await (supabase.from('admin_users') as any)
+            await supabase
+              .from('admin_users')
               .update({ last_login_at: new Date().toISOString() })
-              .eq('id', (adminUser as any).id);
+              .eq('id', adminUser.id);
           } else {
             // User exists in auth but not admin_users
             await supabase.auth.signOut();
