@@ -457,7 +457,7 @@ export default function ProofCenterPage() {
                         {proof.id}
                       </CanvaBadge>
                       {proof.flags.length > 0 && (
-                        <CanvaBadge variant="destructive" className="text-xs">
+                        <CanvaBadge variant="error" className="text-xs">
                           <Flag className="h-3 w-3 mr-1" />
                           {proof.flags.length}
                         </CanvaBadge>
@@ -605,7 +605,7 @@ export default function ProofCenterPage() {
                     </CanvaButton>
                     <CanvaButton
                       size="sm"
-                      variant="destructive"
+                      variant="danger"
                       className="flex-1"
                       onClick={() => handleReject(proof)}
                     >
@@ -858,7 +858,7 @@ export default function ProofCenterPage() {
               Iptal
             </CanvaButton>
             <CanvaButton
-              variant="destructive"
+              variant="danger"
               onClick={() => setReviewDialog(false)}
             >
               <ThumbsDown className="h-4 w-4 mr-1" />
