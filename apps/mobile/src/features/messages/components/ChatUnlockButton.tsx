@@ -134,6 +134,11 @@ export const ChatUnlockButton: React.FC<ChatUnlockButtonProps> = memo(
             onPress={handleUnlockPress}
             disabled={isLoading}
             activeOpacity={0.8}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel={isApproved ? `Chat with ${senderName}` : 'Start chat'}
+            accessibilityState={{ disabled: isLoading }}
+            accessibilityHint={isPremium ? 'Premium offer' : 'Opens chat request'}
           >
             {isLoading ? (
               <ActivityIndicator size="small" color={COLORS.utility.white} />
@@ -209,6 +214,10 @@ export const ChatUnlockButton: React.FC<ChatUnlockButtonProps> = memo(
                   style={styles.cancelButton}
                   onPress={() => setShowConfirmModal(false)}
                   disabled={isUnlocking}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Not now"
+                  accessibilityState={{ disabled: isUnlocking }}
                 >
                   <Text style={styles.cancelButtonText}>Şimdi Değil</Text>
                 </TouchableOpacity>
@@ -220,6 +229,10 @@ export const ChatUnlockButton: React.FC<ChatUnlockButtonProps> = memo(
                   ]}
                   onPress={handleConfirmUnlock}
                   disabled={isUnlocking}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Start chat"
+                  accessibilityState={{ disabled: isUnlocking }}
                 >
                   {isUnlocking ? (
                     <ActivityIndicator
