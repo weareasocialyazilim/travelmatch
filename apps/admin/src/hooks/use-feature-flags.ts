@@ -172,8 +172,8 @@ async function fetchFeatureFlagsFromSupabase(): Promise<FeatureFlagsData> {
   try {
     const supabase = getClient();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: flags, error } = await (supabase.from('feature_flags') as any)
+    const { data: flags, error } = await supabase
+      .from('feature_flags')
       .select('*')
       .order('name');
 
@@ -294,10 +294,10 @@ export function useCreateFeatureFlag() {
       // Try direct Supabase first
       try {
         const supabase = getClient();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data, error } = await (supabase.from('feature_flags') as any)
+        const { data, error } = await supabase
+          .from('feature_flags')
           .insert({
-            name: flag.name,
+            name: flag.name || '',
             description: flag.description,
             enabled: flag.enabled ?? false,
             category: flag.category || 'general',
@@ -341,10 +341,8 @@ export function useUpdateFeatureFlag() {
       // Try direct Supabase first
       try {
         const supabase = getClient();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: result, error } = await (
-          supabase.from('feature_flags') as any
-        )
+        const { data: result, error } = await supabase
+          .from('feature_flags')
           .update({
             ...data,
             updated_at: new Date().toISOString(),
@@ -383,8 +381,8 @@ export function useDeleteFeatureFlag() {
       // Try direct Supabase first
       try {
         const supabase = getClient();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (supabase.from('feature_flags') as any)
+        const { error } = await supabase
+          .from('feature_flags')
           .delete()
           .eq('id', id);
 
