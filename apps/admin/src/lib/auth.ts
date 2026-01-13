@@ -2,6 +2,18 @@ import { cookies } from 'next/headers';
 import { createServiceClient } from '@/lib/supabase';
 import crypto from 'crypto';
 import { logger } from './logger';
+import type { Database } from '@/types/database';
+
+type AdminUserRow = Database['public']['Tables']['admin_users']['Row'];
+type RolePermissionRow = Database['public']['Tables']['role_permissions']['Row'];
+
+interface SessionWithAdmin {
+  id: string;
+  admin_id: string;
+  token_hash: string;
+  expires_at: string;
+  admin: AdminUserRow | null;
+}
 
 export interface AdminSession {
   admin: {
@@ -29,22 +41,20 @@ export async function getAdminSession(): Promise<AdminSession | null> {
       .update(sessionToken)
       .digest('hex');
 
-    // Find session
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: session, error: sessionError } = await (supabase as any)
+    // Find session with admin user data
+    const { data: session, error: sessionError } = await supabase
       .from('admin_sessions')
       .select('*, admin:admin_users(*)')
       .eq('token_hash', sessionHash)
       .gt('expires_at', new Date().toISOString())
-      .single();
+      .single<SessionWithAdmin>();
 
     if (sessionError || !session || !session.admin) {
       return null;
     }
 
-    // Get permissions
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: permissions } = await (supabase as any)
+    // Get permissions for the admin's role
+    const { data: permissions } = await supabase
       .from('role_permissions')
       .select('resource, action')
       .eq('role', session.admin.role);
@@ -57,7 +67,7 @@ export async function getAdminSession(): Promise<AdminSession | null> {
         avatar_url: session.admin.avatar_url,
         role: session.admin.role,
       },
-      permissions: permissions || [],
+      permissions: (permissions as Pick<RolePermissionRow, 'resource' | 'action'>[]) || [],
     };
   } catch (error) {
     logger.error('Session check error', error);
@@ -92,8 +102,7 @@ export async function createAuditLog(
 ): Promise<void> {
   try {
     const supabase = createServiceClient();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any).from('audit_logs').insert({
+    await supabase.from('audit_logs').insert({
       admin_id: adminId,
       action,
       resource_type: resourceType,
