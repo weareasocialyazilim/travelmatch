@@ -89,7 +89,7 @@ const FluidShaderMaterial = shaderMaterial(
 extend({ FluidShaderMaterial });
 
 const FluidPlane = () => {
-  const ref = useRef<any>();
+  const ref = useRef<any>(null);
   useFrame(({ clock }) => {
     if (ref.current) {
       ref.current.uTime = clock.getElapsedTime();
@@ -112,7 +112,8 @@ export function SacredAtmosphere() {
     <div className="absolute inset-0 w-full h-full pointer-events-none">
       <Suspense fallback={null}>
         <Canvas
-          camera={{ position: [0, 0, 1], ortho: true }}
+          orthographic
+          camera={{ position: [0, 0, 1] }}
           dpr={[1, 1.5]}
           gl={{ antialias: false, powerPreference: 'high-performance' }}
         >

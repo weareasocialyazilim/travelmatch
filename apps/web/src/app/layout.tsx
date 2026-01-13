@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from 'next';
+import { RitualProvider } from '@/context/RitualContext';
+import { LanguageProvider } from '@/context/LanguageContext';
 import './globals.css';
 
 export const viewport: Viewport = {
@@ -41,33 +43,30 @@ export default function RootLayout({
           backgroundColor: 'var(--bg-deep)',
         }}
       >
-        <nav className="fixed top-0 w-full z-50 px-6 md:px-10 py-6 md:py-8 flex justify-between items-center mix-blend-difference text-white pointer-events-none">
-          <span className="font-black tracking-tighter text-2xl pointer-events-auto cursor-pointer">
-            TM.
-          </span>
-          <button className="pointer-events-auto border border-white/20 bg-white/5 backdrop-blur-md px-6 py-2 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[var(--neon-pink)] hover:text-white transition-all duration-300">
-            Ritual Menu
-          </button>
-        </nav>
-        {children}
+        <RitualProvider>
+          <LanguageProvider>
+            <Navbar />
+            {children}
 
-        {/* Global SVG Filters */}
-        <svg className="hidden">
-          <filter id="goo">
-            <feGaussianBlur
-              in="SourceGraphic"
-              stdDeviation="10"
-              result="blur"
-            />
-            <feColorMatrix
-              in="blur"
-              mode="matrix"
-              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9"
-              result="goo"
-            />
-            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-          </filter>
-        </svg>
+            {/* Global SVG Filters */}
+            <svg className="hidden">
+              <filter id="goo">
+                <feGaussianBlur
+                  in="SourceGraphic"
+                  stdDeviation="10"
+                  result="blur"
+                />
+                <feColorMatrix
+                  in="blur"
+                  mode="matrix"
+                  values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9"
+                  result="goo"
+                />
+                <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+              </filter>
+            </svg>
+          </LanguageProvider>
+        </RitualProvider>
       </body>
     </html>
   );

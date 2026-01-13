@@ -9,8 +9,9 @@ export { GlobalPulse } from './GlobalPulse';
 export { MomentDeck } from './MomentDeck';
 export { GoldenGlow } from './GoldenGlow';
 export { ProofCeremony } from './ProofCeremony';
-export { DemoApplication } from './DemoApplication';
+export { AuraRitual } from './AuraRitual';
 export { WhisperUI } from './WhisperUI';
 export { LiveHeartbeat } from './LiveHeartbeat';
-export { Manifesto } from './Manifesto';
+export { ManifestoLoop } from './ManifestoLoop';
 export { LiquidCard } from './LiquidCard';
+export { Manifesto } from './Manifesto'; // Keeping just in case, though Loop might be preferred
