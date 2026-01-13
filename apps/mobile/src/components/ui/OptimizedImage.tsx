@@ -18,6 +18,7 @@ import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { Image, ImageContentFit } from 'expo-image';
 import { COLORS } from '../../constants/colors';
 import { analytics } from '../../services/analytics';
+import { logger } from '@/utils/logger';
 
 interface OptimizedImageProps {
   /** Image source URI */
@@ -132,9 +133,7 @@ export const OptimizedImage = memo<OptimizedImageProps>(
       setIsLoading(false);
       setHasError(true);
       onError?.(error);
-      if (__DEV__) {
-        console.error('OptimizedImage load error:', error);
-      }
+      logger.error('OptimizedImage load error', error);
     };
 
     // Show error state for invalid sources or load errors

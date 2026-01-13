@@ -887,5 +887,15 @@
       "createFirstDescription": "İlk momentini oluşturarak yolculuğuna başla",
       "completedDescription": "Tamamlanan momentler burada görünecek"
     }
+  },
+  "accessibility": {
+    "tapToViewDetails": "Detayları görmek için dokun",
+    "sendGiftToUser": "{{name}} adlı kullanıcıya hediye gönder",
+    "closeModal": "Kapat",
+    "goBack": "Geri dön",
+    "openMenu": "Menüyü aç",
+    "loading": "Yükleniyor",
+    "success": "Başarılı",
+    "error": "Hata"
   }
 }

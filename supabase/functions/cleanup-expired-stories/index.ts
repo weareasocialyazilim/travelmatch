@@ -16,6 +16,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { getCorsHeaders } from '../_shared/cors.ts';
+import { createLogger } from '../_shared/logger.ts';
 
 interface CleanupResult {
   expiredCount: number;
@@ -24,6 +25,7 @@ interface CleanupResult {
 }
 
 serve(async (req) => {
+  const logger = createLogger('cleanup-expired-stories', req);
   const origin = req.headers.get('origin');
   const corsHeaders = getCorsHeaders(origin);
 
@@ -101,7 +103,7 @@ serve(async (req) => {
     }
 
     // Log results
-    console.log('Stories cleanup completed:', {
+    logger.info('Stories cleanup completed', {
       timestamp: now,
       expiredCount: result.expiredCount,
       deletedCount: result.deletedCount,
@@ -123,7 +125,7 @@ serve(async (req) => {
       },
     );
   } catch (error) {
-    console.error('Stories cleanup error:', error);
+    logger.error('Stories cleanup error', error);
 
     return new Response(
       JSON.stringify({
