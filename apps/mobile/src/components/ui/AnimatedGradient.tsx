@@ -96,9 +96,11 @@ export const AnimatedGradient: React.FC<AnimatedGradientProps> = ({
 
   return (
     <AnimatedLinearGradient
-      // @ts-ignore - animatedProps type issue with reanimated v3
+      // @ts-ignore - Known reanimated v3 type incompatibility: animatedProps for
+      // createAnimatedComponent() doesn't properly type-check with LinearGradient props.
+      // See: https://github.com/software-mansion/react-native-reanimated/issues/4548
       animatedProps={animatedProps}
-      colors={colors as any}
+      colors={colors as readonly [string, string, ...string[]]}
       start={start}
       end={end}
       style={[StyleSheet.absoluteFill, style]}
