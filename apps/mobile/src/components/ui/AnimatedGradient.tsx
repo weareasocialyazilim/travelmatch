@@ -51,13 +51,22 @@ interface AnimatedGradientProps {
 }
 
 export const AnimatedGradient: React.FC<AnimatedGradientProps> = ({
-  colors,
+  colors: inputColors,
   alternateColors,
   duration = 12000,
   style,
   start = { x: 0, y: 0 },
   end = { x: 0, y: 1 },
 }) => {
+  // Ensure at least 2 colors for LinearGradient (required by expo-linear-gradient)
+  const colors: [string, string, ...string[]] =
+    inputColors.length >= 2
+      ? (inputColors as [string, string, ...string[]])
+      : [
+          inputColors[0] || '#000000',
+          inputColors[1] || inputColors[0] || '#000000',
+        ];
+
   const progress = useSharedValue(0);
 
   useEffect(() => {
@@ -100,7 +109,7 @@ export const AnimatedGradient: React.FC<AnimatedGradientProps> = ({
       // createAnimatedComponent() doesn't properly type-check with LinearGradient props.
       // See: https://github.com/software-mansion/react-native-reanimated/issues/4548
       animatedProps={animatedProps}
-      colors={colors as readonly [string, string, ...string[]]}
+      colors={colors}
       start={start}
       end={end}
       style={[StyleSheet.absoluteFill, style]}
