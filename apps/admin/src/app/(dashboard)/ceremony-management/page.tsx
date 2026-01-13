@@ -15,6 +15,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getClient } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 import { toast } from '@/components/ui/use-toast';
 import { PageHeader } from '@/components/common/page-header';
 import {
@@ -142,7 +143,7 @@ export default function CeremonyManagementPage() {
       });
     },
     onError: (error: Error) => {
-      console.error('Approve proof error:', error);
+      logger.error('Approve proof error', error);
       toast({
         title: 'Hata',
         description: error.message || 'Proof onaylanamadi',
@@ -185,7 +186,7 @@ export default function CeremonyManagementPage() {
       });
     },
     onError: (error: Error) => {
-      console.error('Reject proof error:', error);
+      logger.error('Reject proof error', error);
       toast({
         title: 'Hata',
         description: error.message || 'Proof reddedilemedi',
@@ -228,7 +229,7 @@ export default function CeremonyManagementPage() {
       });
     },
     onError: (error: Error) => {
-      console.error('Request info error:', error);
+      logger.error('Request info error', error);
       toast({
         title: 'Hata',
         description: error.message || 'Bilgi talebi gonderilemedi',

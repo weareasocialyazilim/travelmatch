@@ -470,41 +470,31 @@ export default function EscrowOperationsPage() {
         {/* Escrow Stats */}
         <CanvaStatCard
           className="col-span-2"
-          title="Toplam Escrow"
+          label="Toplam Escrow"
           value={formatCurrency(escrowStats.totalEscrow, 'TRY')}
-          description={`${escrowStats.activeTransactions} aktif islem`}
           icon={<Lock className="h-5 w-5" />}
-          accentColor="violet"
         />
 
         <CanvaStatCard
           className="col-span-2"
-          title="Serbest Birakilacak"
+          label="Serbest Birakilacak"
           value={formatCurrency(escrowStats.pendingRelease, 'TRY')}
-          description={`Ort. ${escrowStats.avgEscrowDuration} gun`}
           icon={<Clock className="h-5 w-5" />}
-          accentColor="amber"
         />
 
         {/* Payment Stats */}
         <CanvaStatCard
           className="col-span-2"
-          title="Bugunun Hacmi"
+          label="Bugunun Hacmi"
           value={formatCurrency(paymentStats.todayVolume, 'TRY')}
-          description={`${paymentStats.todayTransactions} islem`}
           icon={<CreditCard className="h-5 w-5" />}
-          accentColor="emerald"
-          trend="up"
         />
 
         <CanvaStatCard
           className="col-span-2"
-          title="Basari Orani"
+          label="Basari Orani"
           value={`%${paymentStats.successRate}`}
-          description={`${paymentStats.failedTransactions} basarisiz`}
           icon={<CheckCircle2 className="h-5 w-5" />}
-          accentColor="emerald"
-          trend="up"
         />
       </div>
 
@@ -639,34 +629,30 @@ export default function EscrowOperationsPage() {
           {/* Quick Stats */}
           <div className="grid gap-4 md:grid-cols-4">
             <CanvaStatCard
-              title="Bugun Serbest"
+              label="Bugun Serbest"
               value={formatCurrency(escrowStats.releasedToday, 'TRY')}
               icon={<Unlock className="h-5 w-5" />}
-              accentColor="emerald"
               className="bg-gradient-to-br from-emerald-500/10 to-transparent"
             />
 
             <CanvaStatCard
-              title="Bugun Iade"
+              label="Bugun Iade"
               value={formatCurrency(escrowStats.refundedToday, 'TRY')}
               icon={<ArrowDownRight className="h-5 w-5" />}
-              accentColor="amber"
               className="bg-gradient-to-br from-amber-500/10 to-transparent"
             />
 
             <CanvaStatCard
-              title="Abonelik"
+              label="Abonelik"
               value={formatCurrency(paymentStats.subscriptionRevenue, 'TRY')}
               icon={<Receipt className="h-5 w-5" />}
-              accentColor="violet"
               className="bg-gradient-to-br from-purple-500/10 to-transparent"
             />
 
             <CanvaStatCard
-              title="Hediye Geliri"
+              label="Hediye Geliri"
               value={formatCurrency(paymentStats.giftRevenue, 'TRY')}
               icon={<CreditCard className="h-5 w-5" />}
-              accentColor="pink"
               className="bg-gradient-to-br from-pink-500/10 to-transparent"
             />
           </div>

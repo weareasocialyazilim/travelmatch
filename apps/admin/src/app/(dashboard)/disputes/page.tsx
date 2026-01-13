@@ -264,42 +264,21 @@ export default function DisputesPage() {
       <div className="grid gap-4 md:grid-cols-4">
         <CanvaStatCard
           label="Açık Şikayetler"
-          value={
-            isLoading ? (
-              <Loader2 className="h-6 w-6 animate-spin" />
-            ) : (
-              pendingCount
-            )
-          }
-          change={{ value: 0, label: 'Acil ilgi bekliyor' }}
+          value={isLoading ? '...' : pendingCount}
           icon={
             <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
           }
         />
         <CanvaStatCard
           label="İncelenen"
-          value={
-            isLoading ? (
-              <Loader2 className="h-6 w-6 animate-spin" />
-            ) : (
-              underReviewCount
-            )
-          }
-          change={{ value: 0, label: 'Değerlendirme altında' }}
+          value={isLoading ? '...' : underReviewCount}
           icon={
             <Eye className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
           }
         />
         <CanvaStatCard
           label="Toplam"
-          value={
-            isLoading ? (
-              <Loader2 className="h-6 w-6 animate-spin" />
-            ) : (
-              data?.total || 0
-            )
-          }
-          change={{ value: 0, label: 'Tüm anlaşmazlıklar' }}
+          value={isLoading ? '...' : data?.total || 0}
           icon={<FileText className="h-5 w-5 text-muted-foreground" />}
         />
         <CanvaStatCard

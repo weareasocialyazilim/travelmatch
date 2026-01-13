@@ -89,7 +89,7 @@ export default function ChatAnalyticsPage() {
           </CanvaBadge>
         );
       default:
-        return <CanvaBadge variant="outline">Basic</CanvaBadge>;
+        return <CanvaBadge variant="default">Basic</CanvaBadge>;
     }
   };
 
@@ -110,7 +110,7 @@ export default function ChatAnalyticsPage() {
           </CanvaBadge>
         );
       default:
-        return <CanvaBadge variant="outline">{status}</CanvaBadge>;
+        return <CanvaBadge variant="default">{status}</CanvaBadge>;
     }
   };
 
@@ -278,7 +278,7 @@ export default function ChatAnalyticsPage() {
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-medium">{tier.tier}</h4>
                   {index === 0 ? (
-                    <CanvaBadge variant="outline">
+                    <CanvaBadge variant="default">
                       <Lock className="h-3 w-3 mr-1" />
                       Kilitli
                     </CanvaBadge>
@@ -525,7 +525,7 @@ export default function ChatAnalyticsPage() {
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="flex items-center gap-2 mb-2">
-                          <CanvaBadge variant="outline" className="font-mono">
+                          <CanvaBadge variant="default" className="font-mono">
                             {msg.id}
                           </CanvaBadge>
                           <CanvaBadge
@@ -552,7 +552,7 @@ export default function ChatAnalyticsPage() {
                       <div className="text-right">
                         <CanvaBadge
                           variant={
-                            msg.status === 'actioned' ? 'outline' : 'default'
+                            msg.status === 'actioned' ? 'default' : 'primary'
                           }
                         >
                           {msg.status === 'pending' && 'Bekliyor'}

@@ -378,7 +378,7 @@ export default function CommandCenterPage() {
           </span>
           <CanvaButton
             variant="secondary"
-            size="small"
+            size="sm"
             onClick={handleRefresh}
             disabled={isRefreshing}
           >
@@ -406,7 +406,7 @@ export default function CommandCenterPage() {
           </div>
           <CanvaButton
             variant="secondary"
-            size="small"
+            size="sm"
             className="border-amber-500/50 text-amber-600"
           >
             Incele
@@ -418,56 +418,46 @@ export default function CommandCenterPage() {
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
         {/* Gunluk Gelir */}
         <CanvaStatCard
-          title="Gunluk Gelir"
+          label="Gunluk Gelir"
           value={formatCurrency(executiveKPIs.dailyRevenue, 'TRY')}
           icon={<DollarSign className="h-4 w-4" />}
-          trend={{ value: executiveKPIs.dailyRevenueChange, isPositive: true }}
-          variant="success"
+          change={{ value: executiveKPIs.dailyRevenueChange }}
         />
 
         {/* Aktif Kullanici */}
         <CanvaStatCard
-          title="Aktif Simdi"
+          label="Aktif Simdi"
           value={executiveKPIs.activeToday.toLocaleString('tr-TR')}
           icon={<Users className="h-4 w-4" />}
-          subtitle={`+${executiveKPIs.newToday} bugun`}
-          variant="info"
         />
 
         {/* Eslesmeler */}
         <CanvaStatCard
-          title="Bugun Eslesme"
+          label="Bugun Eslesme"
           value={executiveKPIs.matchesToday.toString()}
           icon={<Heart className="h-4 w-4" />}
-          trend={{ value: 12.3, isPositive: true }}
-          variant="default"
+          change={{ value: 12.3 }}
         />
 
         {/* Escrow */}
         <CanvaStatCard
-          title="Escrow Bakiye"
+          label="Escrow Bakiye"
           value={formatCurrency(executiveKPIs.escrowBalance, 'TRY')}
           icon={<Lock className="h-4 w-4" />}
-          subtitle="89 bekleyen"
-          variant="default"
         />
 
         {/* Premium Oran */}
         <CanvaStatCard
-          title="Premium Oran"
+          label="Premium Oran"
           value={`%${executiveKPIs.premiumConversion}`}
           icon={<Star className="h-4 w-4" />}
-          subtitle={`${executiveKPIs.premiumUsers.toLocaleString()} premium`}
-          variant="warning"
         />
 
         {/* AI Dogruluk */}
         <CanvaStatCard
-          title="AI Dogruluk"
+          label="AI Dogruluk"
           value={`%${executiveKPIs.aiVerificationAccuracy}`}
           icon={<Brain className="h-4 w-4" />}
-          subtitle="Excellent"
-          variant="success"
         />
       </div>
 
@@ -481,9 +471,9 @@ export default function CommandCenterPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CanvaCardTitle>Haftalik Gelir Trendi</CanvaCardTitle>
-                  <CardDescription>
+                  <CanvaCardSubtitle>
                     Abonelik ve hediye gelir dagilimi
-                  </CardDescription>
+                  </CanvaCardSubtitle>
                 </div>
                 <div className="text-right">
                   <p className="text-2xl font-bold text-emerald-600">
@@ -522,9 +512,9 @@ export default function CommandCenterPage() {
           <CanvaCard>
             <CanvaCardHeader>
               <CanvaCardTitle>Kullanici Donusum Hunisi</CanvaCardTitle>
-              <CardDescription>
+              <CanvaCardSubtitle>
                 Kayittan premium'a donusum oranlari
-              </CardDescription>
+              </CanvaCardSubtitle>
             </CanvaCardHeader>
             <CanvaCardBody>
               <div className="space-y-4">
@@ -554,9 +544,9 @@ export default function CommandCenterPage() {
                 <Globe className="h-5 w-5" />
                 Bolgesel Performans
               </CanvaCardTitle>
-              <CardDescription>
+              <CanvaCardSubtitle>
                 Sehir bazinda kullanici ve gelir dagilimi
-              </CardDescription>
+              </CanvaCardSubtitle>
             </CanvaCardHeader>
             <CanvaCardBody>
               <div className="space-y-4">
@@ -611,7 +601,7 @@ export default function CommandCenterPage() {
                   <Activity className="h-5 w-5 text-primary animate-pulse" />
                   Canli Aktivite
                 </CanvaCardTitle>
-                <CanvaBadge variant="outline" className="text-xs">
+                <CanvaBadge variant="default" className="text-xs">
                   CANLI
                 </CanvaBadge>
               </div>
@@ -654,7 +644,9 @@ export default function CommandCenterPage() {
                 <Brain className="h-5 w-5 text-cyan-500" />
                 AI Insights
               </CanvaCardTitle>
-              <CardDescription>Yapay zeka destekli oneriler</CardDescription>
+              <CanvaCardSubtitle>
+                Yapay zeka destekli oneriler
+              </CanvaCardSubtitle>
             </CanvaCardHeader>
             <CanvaCardBody>
               <div className="space-y-3">
@@ -677,7 +669,7 @@ export default function CommandCenterPage() {
                       <span className="text-sm font-medium">
                         {insight.title}
                       </span>
-                      <CanvaBadge variant="outline" className="text-xs">
+                      <CanvaBadge variant="default" className="text-xs">
                         %{insight.confidence} guven
                       </CanvaBadge>
                     </div>
@@ -736,38 +728,38 @@ export default function CommandCenterPage() {
               <CanvaCardTitle>Hizli Islemler</CanvaCardTitle>
             </CanvaCardHeader>
             <CanvaCardBody className="space-y-2">
-              <Button
+              <CanvaButton
                 variant="outline"
                 className="w-full justify-start"
                 size="sm"
               >
                 <Send className="h-4 w-4 mr-2" />
                 Kampanya Gonder
-              </Button>
-              <Button
+              </CanvaButton>
+              <CanvaButton
                 variant="outline"
                 className="w-full justify-start"
                 size="sm"
               >
                 <Bell className="h-4 w-4 mr-2" />
                 Toplu Bildirim
-              </Button>
-              <Button
+              </CanvaButton>
+              <CanvaButton
                 variant="outline"
                 className="w-full justify-start"
                 size="sm"
               >
                 <Eye className="h-4 w-4 mr-2" />
                 Rapor Olustur
-              </Button>
-              <Button
+              </CanvaButton>
+              <CanvaButton
                 variant="outline"
                 className="w-full justify-start"
                 size="sm"
               >
                 <Shield className="h-4 w-4 mr-2" />
                 Guvenlik Taramasi
-              </Button>
+              </CanvaButton>
             </CanvaCardBody>
           </CanvaCard>
         </div>

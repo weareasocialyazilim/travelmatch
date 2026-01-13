@@ -299,34 +299,29 @@ export default function AICenterPage() {
       {moderationStats && (
         <div className="grid gap-4 md:grid-cols-5">
           <CanvaStatCard
-            title="Toplam Kanıt"
+            label="Toplam Kanıt"
             value={moderationStats.totalProcessed.toLocaleString('tr-TR')}
-            icon={Brain}
-            color="blue"
+            icon={<Brain className="h-4 w-4" />}
           />
           <CanvaStatCard
-            title="Doğrulanan"
+            label="Doğrulanan"
             value={moderationStats.proofsVerified.toLocaleString('tr-TR')}
-            icon={CheckCircle}
-            color="green"
+            icon={<CheckCircle className="h-4 w-4" />}
           />
           <CanvaStatCard
-            title="Reddedilen"
+            label="Reddedilen"
             value={moderationStats.proofsRejected.toLocaleString('tr-TR')}
-            icon={XCircle}
-            color="red"
+            icon={<XCircle className="h-4 w-4" />}
           />
           <CanvaStatCard
-            title="İnceleme Bekliyor"
+            label="İnceleme Bekliyor"
             value={moderationStats.pendingReview.toLocaleString('tr-TR')}
-            icon={Eye}
-            color="yellow"
+            icon={<Eye className="h-4 w-4" />}
           />
           <CanvaStatCard
-            title="Doğruluk"
+            label="Doğruluk"
             value={`%${moderationStats.accuracy.toFixed(1)}`}
-            icon={Target}
-            color="purple"
+            icon={<Target className="h-4 w-4" />}
           />
         </div>
       )}
