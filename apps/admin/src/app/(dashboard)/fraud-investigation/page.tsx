@@ -328,7 +328,7 @@ export default function FraudInvestigationPage() {
               <CanvaCardTitle className="text-base">
                 Aktif Vakalar
               </CanvaCardTitle>
-              <CanvaBadge variant="default">{cases?.length || 0}</CanvaBadge>
+              <CanvaBadge variant="secondary">{cases?.length || 0}</CanvaBadge>
             </div>
             <div className="space-y-2 mt-2">
               <div className="relative">
@@ -511,7 +511,7 @@ export default function FraudInvestigationPage() {
                     <TabsTrigger value="users">
                       Bağlı Hesaplar
                       {linkedAccounts && linkedAccounts.length > 0 && (
-                        <CanvaBadge className="ml-2" variant="default">
+                        <CanvaBadge className="ml-2" variant="secondary">
                           {linkedAccounts.length}
                         </CanvaBadge>
                       )}
@@ -519,7 +519,7 @@ export default function FraudInvestigationPage() {
                     <TabsTrigger value="evidence">
                       Kanıtlar
                       {evidence && evidence.length > 0 && (
-                        <CanvaBadge className="ml-2" variant="default">
+                        <CanvaBadge className="ml-2" variant="secondary">
                           {evidence.length}
                         </CanvaBadge>
                       )}

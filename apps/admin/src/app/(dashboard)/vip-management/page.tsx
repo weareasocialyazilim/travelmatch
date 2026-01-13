@@ -115,10 +115,6 @@ function AddVIPDialog({
   isLoading,
 }: AddVIPDialogProps) {
   const [userSearch, setUserSearch] = useState('');
-  const [searchResults, setSearchResults] = useState<
-    Array<{ id: string; name: string; email: string }>
-  >([]);
-  const [isSearching, setIsSearching] = useState(false);
   const [selectedUser, setSelectedUser] = useState<{
     id: string;
     name: string;
@@ -134,44 +130,6 @@ function AddVIPDialog({
   // Use the search hook for user search
   const { data: searchResults, isLoading: isSearching } =
     useSearchUsers(userSearch);
-
-  // Search users with debounce
-  useEffect(() => {
-    if (!userSearch || userSearch.length < 2) {
-      setSearchResults([]);
-      return;
-    }
-
-    const timeout = setTimeout(async () => {
-      setIsSearching(true);
-      try {
-        const res = await fetch(
-          `/api/users/search?q=${encodeURIComponent(userSearch)}&limit=5`,
-        );
-        if (res.ok) {
-          const data = await res.json();
-          setSearchResults(
-            data.users?.map(
-              (u: { id: string; display_name: string; email: string }) => ({
-                id: u.id,
-                name: u.display_name,
-                email: u.email,
-              }),
-            ) || [],
-          );
-        }
-      } catch {
-        // Fallback: show mock results for demo
-        setSearchResults([
-          { id: 'demo-1', name: 'Demo User', email: userSearch + '@demo.com' },
-        ]);
-      } finally {
-        setIsSearching(false);
-      }
-    }, 300);
-
-    return () => clearTimeout(timeout);
-  }, [userSearch]);
 
   const handleSubmit = async () => {
     if (!selectedUser) return;

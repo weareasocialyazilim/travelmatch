@@ -308,7 +308,7 @@ export default function CEOBriefingPage() {
               <div className="flex items-center justify-between mb-2">
                 <kpi.icon className="h-5 w-5 text-muted-foreground" />
                 <CanvaBadge
-                  variant="outline"
+                  variant="default"
                   className={cn(
                     kpi.trend === 'up' && kpi.name !== 'Fraud Oranı'
                       ? 'text-green-500 dark:text-green-400 bg-green-500/10 dark:bg-green-500/20'
@@ -337,7 +337,7 @@ export default function CEOBriefingPage() {
                 <Bell className="h-5 w-5" />
                 Dikkat Gerektiren Konular
               </CanvaCardTitle>
-              <CanvaBadge variant="outline">
+              <CanvaBadge variant="default">
                 {attentionItems.length} aktif
               </CanvaBadge>
             </div>

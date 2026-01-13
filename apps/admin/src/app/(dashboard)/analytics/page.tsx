@@ -549,44 +549,36 @@ export default function AnalyticsPage() {
         ) : (
           <>
             <CanvaStatCard
-              title="Günlük Aktif Kullanıcı"
+              label="Günlük Aktif Kullanıcı"
               value={formatNumber(
                 userMetricsData?.activeUsers ||
                   dailyActiveUsers[dailyActiveUsers.length - 1]?.dau ||
                   4521,
               )}
-              icon={Users}
-              change="+12.5%"
-              changeLabel="geçen haftadan"
-              trend="up"
+              icon={<Users className="h-4 w-4" />}
+              change={{ value: 12.5, label: 'geçen haftadan' }}
             />
             <CanvaStatCard
-              title="Günlük Gelir"
+              label="Günlük Gelir"
               value={formatCurrency(
                 (revenueMetricsData?.totalRevenue || 0) / 30 ||
                   revenueData[revenueData.length - 1]?.revenue ||
                   24500,
               )}
-              icon={DollarSign}
-              change="+23.7%"
-              changeLabel="geçen haftadan"
-              trend="up"
+              icon={<DollarSign className="h-4 w-4" />}
+              change={{ value: 23.7, label: 'geçen haftadan' }}
             />
             <CanvaStatCard
-              title="Dönüşüm Oranı"
+              label="Dönüşüm Oranı"
               value="3.2%"
-              icon={Target}
-              change="-0.4%"
-              changeLabel="geçen haftadan"
-              trend="down"
+              icon={<Target className="h-4 w-4" />}
+              change={{ value: -0.4, label: 'geçen haftadan' }}
             />
             <CanvaStatCard
-              title="Retention (D7)"
+              label="Retention (D7)"
               value={`${retentionData.find((r) => r.day === 'Gün 7')?.rate || 58}%`}
-              icon={Repeat}
-              change="+5%"
-              changeLabel="geçen aydan"
-              trend="up"
+              icon={<Repeat className="h-4 w-4" />}
+              change={{ value: 5, label: 'geçen aydan' }}
             />
           </>
         )}
@@ -870,28 +862,24 @@ export default function AnalyticsPage() {
         <TabsContent value="users" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-4">
             <CanvaStatCard
-              title="Yeni Kayıtlar"
+              label="Yeni Kayıtlar"
               value="234"
-              icon={UserPlus}
-              changeLabel="Bugün"
+              icon={<UserPlus className="h-4 w-4" />}
             />
             <CanvaStatCard
-              title="Aktif Oturumlar"
+              label="Aktif Oturumlar"
               value="1,847"
-              icon={Activity}
-              changeLabel="Şu an"
+              icon={<Activity className="h-4 w-4" />}
             />
             <CanvaStatCard
-              title="Ort. Oturum Süresi"
+              label="Ort. Oturum Süresi"
               value="12.4 dk"
-              icon={Clock}
-              changeLabel="Bugün"
+              icon={<Clock className="h-4 w-4" />}
             />
             <CanvaStatCard
-              title="Churn Oranı"
+              label="Churn Oranı"
               value="2.3%"
-              icon={TrendingDown}
-              changeLabel="Bu ay"
+              icon={<TrendingDown className="h-4 w-4" />}
             />
           </div>
         </TabsContent>
@@ -900,30 +888,25 @@ export default function AnalyticsPage() {
         <TabsContent value="revenue" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-4">
             <CanvaStatCard
-              title="Aylık Gelir"
+              label="Aylık Gelir"
               value={formatCurrency(324500)}
-              icon={DollarSign}
-              change="+18%"
-              changeLabel="geçen aydan"
-              trend="up"
+              icon={<DollarSign className="h-4 w-4" />}
+              change={{ value: 18, label: 'geçen aydan' }}
             />
             <CanvaStatCard
-              title="ARPU"
+              label="ARPU"
               value={formatCurrency(24.5)}
-              icon={Users}
-              changeLabel="Kullanıcı başına"
+              icon={<Users className="h-4 w-4" />}
             />
             <CanvaStatCard
-              title="LTV"
+              label="LTV"
               value={formatCurrency(156)}
-              icon={TrendingUp}
-              changeLabel="Yaşam boyu değer"
+              icon={<TrendingUp className="h-4 w-4" />}
             />
             <CanvaStatCard
-              title="İade Oranı"
+              label="İade Oranı"
               value="1.8%"
-              icon={TrendingDown}
-              changeLabel="Bu ay"
+              icon={<TrendingDown className="h-4 w-4" />}
             />
           </div>
         </TabsContent>
@@ -942,11 +925,13 @@ export default function AnalyticsPage() {
               contentStats.map((stat) => (
                 <CanvaStatCard
                   key={stat.metric}
-                  title={stat.metric}
+                  label={stat.metric}
                   value={stat.value}
-                  icon={BarChart3}
-                  change={stat.change}
-                  trend={stat.trend as 'up' | 'down'}
+                  icon={<BarChart3 className="h-4 w-4" />}
+                  change={{
+                    value: parseFloat(stat.change.replace(/[+%]/g, '')),
+                    label: stat.trend === 'up' ? 'artış' : 'düşüş',
+                  }}
                 />
               ))
             )}

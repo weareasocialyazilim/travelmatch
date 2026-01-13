@@ -550,36 +550,27 @@ export default function CompliancePage() {
         <CanvaStatCard
           label="Toplam SAR"
           value={stats?.sar.total || 0}
-          subtitle={`${stats?.sar.pending || 0} bekliyor`}
           icon={<FileText className="h-4 w-4" />}
         />
         <CanvaStatCard
           label="Yüksek Risk"
           value={(stats?.risk.high || 0) + (stats?.risk.critical || 0)}
-          subtitle={`${stats?.risk.critical || 0} kritik`}
           icon={<AlertTriangle className="h-4 w-4 text-orange-500" />}
-          className="[&_[data-stat-value]]:text-orange-600"
         />
         <CanvaStatCard
           label="Engellenen"
           value={stats?.risk.blocked || 0}
-          subtitle="kullanıcı"
           icon={<Ban className="h-4 w-4 text-red-500" />}
-          className="[&_[data-stat-value]]:text-red-600"
         />
         <CanvaStatCard
           label="24h Uyarı"
           value={stats?.recent.alerts24h || 0}
-          subtitle="yeni uyarı"
           icon={<Activity className="h-4 w-4 text-yellow-500" />}
-          className="[&_[data-stat-value]]:text-yellow-600"
         />
         <CanvaStatCard
           label="Çözülen"
           value={stats?.sar.resolved || 0}
-          subtitle="SAR raporu"
           icon={<CheckCircle className="h-4 w-4 text-green-500" />}
-          className="[&_[data-stat-value]]:text-green-600"
         />
       </div>
 

@@ -339,36 +339,32 @@ export default function DiscoveryAnalyticsPage() {
       {/* Key Metrics */}
       <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-8">
         <CanvaStatCard
-          title="Toplam Moment"
+          label="Toplam Moment"
           value={discoveryStats.totalMoments.toLocaleString()}
           icon={<Camera className="h-4 w-4" />}
-          subtitle={`${discoveryStats.activeMoments.toLocaleString()} aktif`}
         />
         <CanvaStatCard
-          title="Bugun Kesif"
+          label="Bugun Kesif"
           value={discoveryStats.discoveriesToday.toLocaleString()}
           icon={<Search className="h-4 w-4" />}
-          variant="info"
         />
         <CanvaStatCard
-          title="Bugun Eslesme"
+          label="Bugun Eslesme"
           value={discoveryStats.matchesToday}
           icon={<Heart className="h-4 w-4" />}
-          variant="error"
         />
         <CanvaStatCard
-          title="Donusum"
+          label="Donusum"
           value={`%${discoveryStats.conversionRate}`}
           icon={<Target className="h-4 w-4" />}
-          variant="success"
         />
         <CanvaStatCard
-          title="Ort. Sure"
+          label="Ort. Sure"
           value={`${discoveryStats.avgDiscoveryToMatch} gun`}
           icon={<Clock className="h-4 w-4" />}
         />
         <CanvaStatCard
-          title="Ort. Radius"
+          label="Ort. Radius"
           value={`${discoveryStats.avgSearchRadius} km`}
           icon={<Navigation className="h-4 w-4" />}
         />
@@ -721,7 +717,7 @@ export default function DiscoveryAnalyticsPage() {
                       </TableCell>
                       <TableCell>{moment.host}</TableCell>
                       <TableCell>
-                        <CanvaBadge variant="outline">
+                        <CanvaBadge variant="default">
                           {moment.category}
                         </CanvaBadge>
                       </TableCell>

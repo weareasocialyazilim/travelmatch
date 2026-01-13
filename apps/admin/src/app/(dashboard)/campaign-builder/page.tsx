@@ -306,7 +306,7 @@ export default function CampaignBuilderPage() {
           </CanvaBadge>
         );
       default:
-        return <CanvaBadge variant="outline">{status}</CanvaBadge>;
+        return <CanvaBadge variant="default">{status}</CanvaBadge>;
     }
   };
 
@@ -450,44 +450,40 @@ export default function CampaignBuilderPage() {
       {/* Overview Stats */}
       <div className="grid grid-cols-6 gap-4">
         <CanvaStatCard
-          title="Toplam Kampanya"
+          label="Toplam Kampanya"
           value={campaignStats.totalCampaigns}
           icon={<Layers className="h-5 w-5 text-primary" />}
         />
         <CanvaStatCard
-          title="Aktif"
+          label="Aktif"
           value={campaignStats.activeCampaigns}
           icon={<Play className="h-5 w-5 text-green-500 dark:text-green-400" />}
-          variant="success"
         />
         <CanvaStatCard
-          title="Toplam Gönderim"
+          label="Toplam Gönderim"
           value={formatNumber(campaignStats.totalSent)}
           icon={<Send className="h-5 w-5 text-blue-500 dark:text-blue-400" />}
-          variant="info"
         />
         <CanvaStatCard
-          title="Ort. Açılma"
+          label="Ort. Açılma"
           value={`${campaignStats.avgOpenRate}%`}
           icon={
             <Eye className="h-5 w-5 text-purple-500 dark:text-purple-400" />
           }
         />
         <CanvaStatCard
-          title="Ort. Tıklama"
+          label="Ort. Tıklama"
           value={`${campaignStats.avgClickRate}%`}
           icon={
             <Target className="h-5 w-5 text-orange-500 dark:text-orange-400" />
           }
-          variant="warning"
         />
         <CanvaStatCard
-          title="Ort. Dönüşüm"
+          label="Ort. Dönüşüm"
           value={`${campaignStats.avgConversionRate}%`}
           icon={
             <TrendingUp className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />
           }
-          variant="success"
         />
       </div>
 
@@ -618,7 +614,7 @@ export default function CampaignBuilderPage() {
                           <span className="font-medium">{campaign.name}</span>
                           {campaign.abTest && (
                             <CanvaBadge
-                              variant="outline"
+                              variant="default"
                               className="text-xs bg-purple-500/10 dark:bg-purple-500/20 text-purple-500 dark:text-purple-400 border-purple-500/20"
                             >
                               A/B
@@ -658,19 +654,19 @@ export default function CampaignBuilderPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          <CanvaButton variant="ghost" size="icon">
+                          <CanvaButton variant="ghost" size="sm" iconOnly>
                             <BarChart3 className="h-4 w-4" />
                           </CanvaButton>
                           {campaign.status === 'active' ? (
-                            <CanvaButton variant="ghost" size="icon">
+                            <CanvaButton variant="ghost" size="sm" iconOnly>
                               <Pause className="h-4 w-4" />
                             </CanvaButton>
                           ) : (
-                            <CanvaButton variant="ghost" size="icon">
+                            <CanvaButton variant="ghost" size="sm" iconOnly>
                               <Play className="h-4 w-4" />
                             </CanvaButton>
                           )}
-                          <CanvaButton variant="ghost" size="icon">
+                          <CanvaButton variant="ghost" size="sm" iconOnly>
                             <Edit className="h-4 w-4" />
                           </CanvaButton>
                         </div>
@@ -784,7 +780,7 @@ export default function CampaignBuilderPage() {
                       <TableCell>{formatNumber(template.usage)}</TableCell>
                       <TableCell>
                         <CanvaBadge
-                          variant="outline"
+                          variant="default"
                           className={cn(
                             template.openRate > 70
                               ? 'bg-green-500/10 dark:bg-green-500/20 text-green-500 dark:text-green-400'
@@ -798,13 +794,13 @@ export default function CampaignBuilderPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          <CanvaButton variant="ghost" size="icon">
+                          <CanvaButton variant="ghost" size="sm" iconOnly>
                             <Eye className="h-4 w-4" />
                           </CanvaButton>
-                          <CanvaButton variant="ghost" size="icon">
+                          <CanvaButton variant="ghost" size="sm" iconOnly>
                             <Copy className="h-4 w-4" />
                           </CanvaButton>
-                          <CanvaButton variant="ghost" size="icon">
+                          <CanvaButton variant="ghost" size="sm" iconOnly>
                             <Edit className="h-4 w-4" />
                           </CanvaButton>
                         </div>

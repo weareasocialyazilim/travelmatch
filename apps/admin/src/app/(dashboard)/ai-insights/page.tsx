@@ -336,7 +336,7 @@ export default function AIInsightsPage() {
           </CanvaBadge>
         );
       default:
-        return <CanvaBadge variant="outline">{status}</CanvaBadge>;
+        return <CanvaBadge variant="default">{status}</CanvaBadge>;
     }
   };
 
@@ -369,15 +369,11 @@ export default function AIInsightsPage() {
       case 'critical':
         return <CanvaBadge variant="error">Kritik</CanvaBadge>;
       case 'high':
-        return (
-          <CanvaBadge className="bg-amber-500/10 text-amber-600">
-            Yuksek
-          </CanvaBadge>
-        );
+        return <CanvaBadge variant="warning">Yuksek</CanvaBadge>;
       case 'medium':
         return <CanvaBadge variant="default">Orta</CanvaBadge>;
       default:
-        return <CanvaBadge variant="outline">Dusuk</CanvaBadge>;
+        return <CanvaBadge variant="info">Dusuk</CanvaBadge>;
     }
   };
 
@@ -553,12 +549,12 @@ export default function AIInsightsPage() {
 
                   <div className="flex flex-wrap gap-1">
                     {model.features.slice(0, 2).map((f) => (
-                      <CanvaBadge key={f} variant="outline" className="text-xs">
+                      <CanvaBadge key={f} variant="default" className="text-xs">
                         {f}
                       </CanvaBadge>
                     ))}
                     {model.features.length > 2 && (
-                      <CanvaBadge variant="outline" className="text-xs">
+                      <CanvaBadge variant="default" className="text-xs">
                         +{model.features.length - 2}
                       </CanvaBadge>
                     )}

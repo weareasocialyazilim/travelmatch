@@ -9,7 +9,8 @@
 }
 
 body {
-  @apply bg-[var(--admin-bg)] text-white;
+  background-color: var(--admin-bg);
+  color: white;
   /* Web'deki o premium kumlanma efekti */
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-attachment: fixed;
@@ -22,14 +23,132 @@ body {
 }
 
 .admin-glass:hover {
-  @apply border-[var(--ritual-pink)]/30 bg-white/10;
+  border-color: rgba(255, 0, 122, 0.3);
+  background-color: rgba(255, 255, 255, 0.1);
   box-shadow: 0 0 40px -15px var(--ritual-pink);
 }
 
-@layer utilities {
-  .text-ritual-title {
-    font-size: clamp(2rem, 5vw, 4rem);
-    line-height: 0.9;
-    letter-spacing: -0.04em;
-  }
+/* Custom utility classes */
+.text-ritual-title {
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+}
+
+/* ===== ADMIN SIDEBAR STYLES ===== */
+.admin-sidebar {
+  @apply h-screen flex flex-col bg-[#0a0a0a] border-r border-white/10 shrink-0 transition-all duration-300;
+  position: sticky;
+  top: 0;
+  left: 0;
+}
+
+.admin-sidebar-logo {
+  @apply px-4 py-4 border-b border-white/10;
+}
+
+.admin-sidebar-logo-icon {
+  @apply h-10 w-10 rounded-xl flex items-center justify-center text-white;
+  background: linear-gradient(to bottom right, var(--ritual-pink), var(--ritual-purple));
+}
+
+.admin-sidebar-nav {
+  @apply flex-1 overflow-y-auto px-2 py-3;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.2) transparent;
+}
+
+.admin-sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.admin-sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-sidebar-nav::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 3px;
+}
+
+.admin-sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.admin-sidebar-section {
+  @apply mb-4;
+}
+
+.admin-sidebar-section-title {
+  @apply px-3 py-2 text-xs font-semibold uppercase tracking-wider text-white/50;
+}
+
+.admin-sidebar-item {
+  @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/70 transition-all duration-200;
+}
+
+.admin-sidebar-item:hover {
+  @apply bg-white/10 text-white;
+}
+
+.admin-sidebar-item-active {
+  @apply text-white;
+  background: linear-gradient(to right, rgba(255, 0, 122, 0.2), transparent);
+  border-left: 2px solid var(--ritual-pink);
+}
+
+.admin-sidebar-item-icon {
+  @apply h-4 w-4 shrink-0;
+}
+
+.admin-sidebar-badge {
+  @apply px-1.5 py-0.5 font-bold rounded-full text-white text-center;
+  font-size: 10px;
+  min-width: 18px;
+  background-color: var(--ritual-pink);
+}
+
+/* ===== ADMIN HEADER STYLES ===== */
+.admin-header {
+  @apply h-14 px-6 flex items-center justify-between border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-xl shrink-0;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.admin-header-actions {
+  @apply flex items-center gap-2;
+}
+
+.admin-header-search {
+  @apply h-9 px-3 rounded-lg bg-white/5 border border-white/10;
+}
+
+/* ===== DROPDOWN MENU FIXES ===== */
+[data-radix-popper-content-wrapper] {
+  z-index: 100 !important;
+}
+
+.admin-dropdown,
+[role="menu"] {
+  @apply bg-[#1a1a1a] border border-white/20 shadow-2xl;
+  backdrop-filter: none !important;
+  opacity: 1 !important;
+}
+
+/* Force opaque background for dropdown content */
+[data-state="open"] > [role="menu"],
+[data-radix-menu-content],
+div[data-radix-popper-content-wrapper] > div {
+  background-color: #1a1a1a !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+}
+
+/* Menu items should be clearly visible */
+[role="menuitem"] {
+  @apply text-white/90;
+}
+
+[role="menuitem"]:hover {
+  @apply bg-white/10 text-white;
 }

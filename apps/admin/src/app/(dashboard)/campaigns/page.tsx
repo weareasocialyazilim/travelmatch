@@ -374,44 +374,40 @@ export default function CampaignsPage() {
       {/* Overall Stats */}
       <div className="grid gap-4 md:grid-cols-6">
         <CanvaStatCard
-          title="Toplam Kampanya"
+          label="Toplam Kampanya"
           value={isLoading ? '...' : overallStats.totalCampaigns.toString()}
           icon={<Megaphone className="h-5 w-5" />}
         />
         <CanvaStatCard
-          title="Aktif"
+          label="Aktif"
           value={isLoading ? '...' : overallStats.activeCampaigns.toString()}
           icon={<Play className="h-5 w-5" />}
-          accentColor="emerald"
         />
         <CanvaStatCard
-          title="Toplam Erişim"
+          label="Toplam Erişim"
           value={
             isLoading
               ? '...'
               : `${(overallStats.totalReach / 1000).toFixed(0)}K`
           }
           icon={<Users className="h-5 w-5" />}
-          accentColor="blue"
         />
         <CanvaStatCard
-          title="Dönüşüm"
+          label="Dönüşüm"
           value={
             isLoading
               ? '...'
               : overallStats.totalConversions.toLocaleString('tr-TR')
           }
           icon={<Target className="h-5 w-5" />}
-          accentColor="violet"
         />
         <CanvaStatCard
-          title="Ort. Dönüşüm"
+          label="Ort. Dönüşüm"
           value={`%${overallStats.avgConversionRate}`}
           icon={<TrendingUp className="h-5 w-5" />}
-          accentColor="amber"
         />
         <CanvaStatCard
-          title="Harcama"
+          label="Harcama"
           value={
             isLoading
               ? '...'
@@ -421,8 +417,6 @@ export default function CampaignsPage() {
                 )
           }
           icon={<DollarSign className="h-5 w-5" />}
-          accentColor="emerald"
-          trend="up"
         />
       </div>
 
