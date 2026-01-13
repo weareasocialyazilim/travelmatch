@@ -136,6 +136,10 @@ export const LiquidMomentCard: React.FC<LiquidMomentCardProps> = memo(
         style={[styles.container, premiumBorderStyle]}
         activeOpacity={0.9}
         onPress={onPress}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel={`${title}, ${location}, ${formattedPrice}${tierConfig.showBadge ? `, ${tierConfig.label}` : ''}`}
+        accessibilityHint="Tap to view moment details"
       >
         <AnimatedImageBackground
           source={{
@@ -206,6 +210,10 @@ export const LiquidMomentCard: React.FC<LiquidMomentCardProps> = memo(
                   style={styles.giftButton}
                   onPress={onGiftPress}
                   activeOpacity={0.8}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Gift ${formattedPrice}`}
+                  accessibilityHint="Opens gift payment flow"
                 >
                   <MaterialCommunityIcons
                     name="gift-outline"

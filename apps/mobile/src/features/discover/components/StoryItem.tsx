@@ -53,6 +53,10 @@ export const StoryItem: React.FC<StoryItemProps> = memo(
         style={styles.container}
         onPress={handlePress}
         activeOpacity={0.8}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel={`${item.name}'s story${item.isNew ? ', new' : ''}`}
+        accessibilityHint="Tap to view story"
       >
         <View style={styles.ringContainer}>
           {/* Neon Glow Ring */}

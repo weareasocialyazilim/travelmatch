@@ -96,6 +96,10 @@ const SidebarButton = memo(
       style={styles.sidebarButton}
       onPress={onPress}
       activeOpacity={0.7}
+      accessible={true}
+      accessibilityRole="button"
+      accessibilityLabel={count || icon}
+      accessibilityState={{ selected: isLiked }}
     >
       <Ionicons
         name={icon}
@@ -155,6 +159,10 @@ export const ImmersiveMomentCard = memo(
             style={styles.userInfo}
             onPress={onUserPress}
             activeOpacity={0.8}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel={`View profile of ${item.hostName || 'host'}`}
+            accessibilityHint="Opens host profile"
           >
             <Image
               source={{
@@ -232,6 +240,10 @@ export const ImmersiveMomentCard = memo(
               style={styles.recommendButton}
               onPress={onCounterOfferPress}
               activeOpacity={0.8}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Make a subscriber offer"
+              accessibilityHint="Opens counter-offer dialog"
             >
               {Platform.OS === 'ios' ? (
                 <BlurView intensity={30} style={styles.glassInner}>
@@ -262,6 +274,10 @@ export const ImmersiveMomentCard = memo(
                 onGiftPress();
               }}
               activeOpacity={0.8}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={`Gift this moment for $${price}`}
+              accessibilityHint="Opens gift payment flow"
             >
               <Text style={styles.giftText}>Gift This</Text>
               <Text style={styles.giftEmoji}>🎁</Text>
