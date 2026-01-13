@@ -180,10 +180,22 @@ export default function SecurityPage() {
     confirm: false,
   });
 
-  // Fetch 2FA status
+  // Fetch 2FA status from admin user profile
   useEffect(() => {
-    // TODO: Fetch from API
-    setIs2FAEnabled(false);
+    const fetch2FAStatus = async () => {
+      try {
+        const res = await fetch('/api/auth/session');
+        if (res.ok) {
+          const data = await res.json();
+          // Note: requires session endpoint to include totp_enabled field
+          setIs2FAEnabled(data.user?.totp_enabled ?? false);
+        }
+      } catch {
+        // Default to false if unable to fetch
+        setIs2FAEnabled(false);
+      }
+    };
+    void fetch2FAStatus();
   }, []);
 
   // Start 2FA setup
@@ -309,8 +321,20 @@ export default function SecurityPage() {
 
     setIsLoading(true);
     try {
-      // TODO: API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Note: Password change for admin users requires a dedicated endpoint
+      // POST /api/auth/change-password with { current_password, new_password }
+      const res = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          current_password: passwords.current,
+          new_password: passwords.new,
+        }),
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Şifre değiştirilemedi');
+      }
       toast.success('Şifre değiştirildi');
       setIsPasswordChangeOpen(false);
       setPasswords({ current: '', new: '', confirm: '' });

@@ -7,13 +7,14 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   SparklesIcon,
   ClockIcon,
   CheckCircleIcon,
 } from '@heroicons/react/24/outline';
 import { PageHeader } from '@/components/common/page-header';
+import { toast } from 'sonner';
 import { CanvaButton } from '@/components/canva/CanvaButton';
 import { CanvaInput } from '@/components/canva/CanvaInput';
 import {
@@ -114,20 +115,64 @@ const mockRecentActivity = [
 export default function CeremonyManagementPage() {
   const [selectedProof, setSelectedProof] = useState(mockPendingProofs[0]);
   const [activeTab, setActiveTab] = useState('overview');
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleApprove = () => {
-    // TODO: Implement API call to approve proof
-    void selectedProof.id;
+  const handleApprove = async () => {
+    if (!selectedProof?.id) return;
+    setIsProcessing(true);
+    try {
+      const response = await fetch('/api/proofs', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          proof_id: selectedProof.id,
+          action: 'verify',
+        }),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Onaylama başarısız');
+      }
+      toast.success('Kanıt onaylandı');
+      // Refresh proof list would go here in production
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Bir hata oluştu');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
-  const handleReject = (_reason: string) => {
-    // TODO: Implement API call to reject proof with reason
-    void selectedProof.id;
+  const handleReject = async (reason: string) => {
+    if (!selectedProof?.id || !reason) return;
+    setIsProcessing(true);
+    try {
+      const response = await fetch('/api/proofs', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          proof_id: selectedProof.id,
+          action: 'reject',
+          rejection_reason: reason,
+        }),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Reddetme başarısız');
+      }
+      toast.success('Kanıt reddedildi');
+      // Refresh proof list would go here in production
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Bir hata oluştu');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
-  const handleRequestInfo = (_message: string) => {
-    // TODO: Implement API call to request more info
-    void selectedProof.id;
+  const handleRequestInfo = (message: string) => {
+    // Note: Request info functionality requires a new API endpoint
+    // For now, show info toast - can be extended when backend supports it
+    if (!message) return;
+    toast.info(`Bilgi talebi gönderilecek: ${message.slice(0, 50)}...`);
   };
 
   return (
