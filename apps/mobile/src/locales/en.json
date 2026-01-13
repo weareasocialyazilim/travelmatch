@@ -887,5 +887,15 @@
       "createFirstDescription": "Start your journey by creating your first moment",
       "completedDescription": "Completed moments will appear here"
     }
+  },
+  "accessibility": {
+    "tapToViewDetails": "Tap to view details",
+    "sendGiftToUser": "Send a gift to {{name}}",
+    "closeModal": "Close",
+    "goBack": "Go back",
+    "openMenu": "Open menu",
+    "loading": "Loading",
+    "success": "Success",
+    "error": "Error"
   }
 }

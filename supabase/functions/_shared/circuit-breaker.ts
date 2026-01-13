@@ -291,7 +291,7 @@ export class CircuitBreaker {
     };
 
     // Log as structured event for monitoring systems
-    console.log(JSON.stringify(event));
+    logger.info('Circuit breaker state change', event);
   }
 
   /**

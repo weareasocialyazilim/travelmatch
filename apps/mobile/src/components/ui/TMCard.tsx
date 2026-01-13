@@ -152,6 +152,10 @@ export const TMCard: React.FC<TMCardProps> = ({
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         style={[styles.card, variant === 'hero' && styles.cardHero]}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel={`${moment.title}, ${moment.location.city}, ${currency}${moment.price}`}
+        accessibilityHint={t('accessibility.tapToViewDetails')}
       >
         {/* Image Section */}
         <View style={[styles.imageContainer, { height: imageHeight }]}>
@@ -159,6 +163,8 @@ export const TMCard: React.FC<TMCardProps> = ({
             source={{ uri: moment.imageUrl }}
             style={styles.image}
             resizeMode="cover"
+            accessible={true}
+            accessibilityLabel={`${moment.title} - ${moment.location.city}`}
           />
 
           {/* Gradient Overlay */}
@@ -335,14 +341,27 @@ export const TMCard: React.FC<TMCardProps> = ({
 
               {/* CTA Buttons - 16px balanced text */}
               <View style={styles.buttons}>
-                <Pressable style={styles.secondaryButton} onPress={onPress}>
+                <Pressable
+                  style={styles.secondaryButton}
+                  onPress={onPress}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('moments.card.view')}
+                >
                   <Text style={styles.secondaryButtonText}>
                     {t('moments.card.view')}
                   </Text>
                 </Pressable>
 
                 {onGiftPress && (
-                  <Pressable style={styles.primaryButton} onPress={onGiftPress}>
+                  <Pressable
+                    style={styles.primaryButton}
+                    onPress={onGiftPress}
+                    accessible={true}
+                    accessibilityRole="button"
+                    accessibilityLabel={t('moments.card.sendGift')}
+                    accessibilityHint={t('accessibility.sendGiftToUser', { name: moment.user.name })}
+                  >
                     <LinearGradient
                       colors={GRADIENTS.gift}
                       start={{ x: 0, y: 0 }}

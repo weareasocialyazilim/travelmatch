@@ -63,6 +63,10 @@ export const HomeWelcomeCard: React.FC<HomeWelcomeCardProps> = ({
           style={styles.actionCard}
           onPress={onSetupProfile}
           activeOpacity={0.7}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Complete your profile"
+          accessibilityHint="Add a photo and bio to connect with hosts"
         >
           <View
             style={[
@@ -94,6 +98,10 @@ export const HomeWelcomeCard: React.FC<HomeWelcomeCardProps> = ({
           style={styles.actionCard}
           onPress={onExplore}
           activeOpacity={0.7}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Explore nearby"
+          accessibilityHint="Discover experiences shared by locals"
         >
           <View
             style={[

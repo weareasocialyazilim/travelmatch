@@ -80,6 +80,11 @@ export const CategoryChips: React.FC<CategoryChipsProps> = ({
             onPress={() => handleSelect(category.id)}
             activeOpacity={0.7}
             style={styles.chipWrapper}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel={`${category.label} category`}
+            accessibilityState={{ selected: isSelected }}
+            accessibilityHint={isSelected ? 'Currently selected' : 'Tap to filter by this category'}
           >
             {isSelected ? (
               <LinearGradient
@@ -153,6 +158,10 @@ export const TabChips: React.FC<TabChipsProps> = ({
             onPress={() => handleSelect(tab.id)}
             activeOpacity={0.7}
             style={[styles.tab, isSelected && styles.tabSelected]}
+            accessible={true}
+            accessibilityRole="tab"
+            accessibilityLabel={`${tab.label}${tab.description ? `, ${tab.description}` : ''}`}
+            accessibilityState={{ selected: isSelected }}
           >
             <Text
               style={[styles.tabLabel, isSelected && styles.tabLabelSelected]}

@@ -165,6 +165,10 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
           style={styles.actionButton}
           onPress={handlePickFromCamera}
           disabled={isUploading}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Take photo with camera"
+          accessibilityState={{ disabled: isUploading }}
         >
           <Text style={styles.actionButtonText}>📷 Camera</Text>
         </TouchableOpacity>
@@ -173,6 +177,10 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
           style={styles.actionButton}
           onPress={handlePickFromGallery}
           disabled={isUploading}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Select photo from gallery"
+          accessibilityState={{ disabled: isUploading }}
         >
           <Text style={styles.actionButtonText}>🖼️ Gallery</Text>
         </TouchableOpacity>
@@ -190,6 +198,10 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
                 style={styles.removeButton}
                 onPress={() => removeImage(index)}
                 disabled={isUploading}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel={`Remove image ${index + 1}`}
+                accessibilityHint="Double tap to remove this image"
               >
                 <Text style={styles.removeButtonText}>✕</Text>
               </TouchableOpacity>

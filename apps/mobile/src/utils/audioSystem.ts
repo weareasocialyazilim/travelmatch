@@ -20,7 +20,23 @@
  *   npx expo install expo-av
  */
 
-let Audio: any = null;
+import { logger } from '@/utils/logger';
+
+// Type definitions for expo-av Audio module (optional dependency)
+// These are minimal interfaces based on what methods we use
+interface SoundObject {
+  replayAsync: () => Promise<void>;
+  unloadAsync: () => Promise<void>;
+}
+
+interface AudioModule {
+  setAudioModeAsync: (options: { playsInSilentModeIOS: boolean; staysActiveInBackground: boolean }) => Promise<void>;
+  Sound: {
+    createAsync: (source: unknown) => Promise<{ sound: SoundObject }>;
+  };
+}
+
+let Audio: AudioModule | null = null;
 
 // Try to load expo-av dynamically - graceful degradation if not available
 try {
@@ -28,7 +44,7 @@ try {
 
   Audio = require('expo-av').Audio;
 } catch {
-  console.warn(
+  logger.warn(
     '[AudioSystem] expo-av not installed. Audio features disabled. Install with: npx expo install expo-av',
   );
 }
@@ -36,7 +52,7 @@ try {
 import { HapticManager } from '@/services/HapticManager';
 
 class AudioSystem {
-  private sounds: Map<string, any> = new Map();
+  private sounds: Map<string, SoundObject> = new Map();
   private enabled: boolean = true;
 
   async initialize() {
@@ -47,7 +63,7 @@ class AudioSystem {
         staysActiveInBackground: false,
       });
     } catch (error) {
-      console.warn('Audio initialization failed:', error);
+      logger.warn('Audio initialization failed', error as Error);
     }
   }
 
@@ -57,7 +73,7 @@ class AudioSystem {
       const { sound } = await Audio.Sound.createAsync(source);
       this.sounds.set(key, sound);
     } catch (error) {
-      console.warn(`Failed to load sound: ${key}`, error);
+      logger.warn(`Failed to load sound: ${key}`, error as Error);
     }
   }
 
@@ -70,7 +86,7 @@ class AudioSystem {
         await sound.replayAsync();
       }
     } catch (error) {
-      console.warn(`Failed to play sound: ${key}`, error);
+      logger.warn(`Failed to play sound: ${key}`, error as Error);
     }
   }
 
