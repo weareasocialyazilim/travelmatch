@@ -24,8 +24,7 @@ export async function GET(request: NextRequest) {
 
     const supabase = createServiceClient();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (supabase as any)
+    let query = supabase
       .from('admin_users')
       .select('*', { count: 'exact' })
       .order('created_at', { ascending: false })
@@ -95,8 +94,7 @@ export async function POST(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Check if email already exists
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: existing } = await (supabase as any)
+    const { data: existing } = await supabase
       .from('admin_users')
       .select('id')
       .eq('email', email)
@@ -109,8 +107,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: admin, error } = await (supabase as any)
+    const { data: admin, error } = await supabase
       .from('admin_users')
       .insert({
         email,
