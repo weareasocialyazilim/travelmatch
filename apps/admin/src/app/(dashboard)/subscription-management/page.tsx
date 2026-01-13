@@ -64,6 +64,13 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from '@/components/ui/card';
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -78,6 +85,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { formatCurrency, cn } from '@/lib/utils';
@@ -317,19 +325,28 @@ export default function SubscriptionManagementPage() {
         );
       case 'upgrade':
         return (
-          <CanvaBadge variant="info" icon={<ArrowUpRight className="h-3 w-3" />}>
+          <CanvaBadge
+            variant="info"
+            icon={<ArrowUpRight className="h-3 w-3" />}
+          >
             Yukseltme
           </CanvaBadge>
         );
       case 'downgrade':
         return (
-          <CanvaBadge variant="warning" icon={<ArrowDownRight className="h-3 w-3" />}>
+          <CanvaBadge
+            variant="warning"
+            icon={<ArrowDownRight className="h-3 w-3" />}
+          >
             Dusurme
           </CanvaBadge>
         );
       case 'renewal':
         return (
-          <CanvaBadge variant="primary" icon={<RefreshCw className="h-3 w-3" />}>
+          <CanvaBadge
+            variant="primary"
+            icon={<RefreshCw className="h-3 w-3" />}
+          >
             Yenileme
           </CanvaBadge>
         );
@@ -379,10 +396,18 @@ export default function SubscriptionManagementPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <CanvaButton variant="outline" size="sm" leftIcon={<Download className="h-4 w-4" />}>
+          <CanvaButton
+            variant="outline"
+            size="sm"
+            leftIcon={<Download className="h-4 w-4" />}
+          >
             Rapor
           </CanvaButton>
-          <CanvaButton size="sm" leftIcon={<Plus className="h-4 w-4" />} onClick={() => setPromoDialog(true)}>
+          <CanvaButton
+            size="sm"
+            leftIcon={<Plus className="h-4 w-4" />}
+            onClick={() => setPromoDialog(true)}
+          >
             Yeni Promo
           </CanvaButton>
         </div>
@@ -490,7 +515,12 @@ export default function SubscriptionManagementPage() {
                   </li>
                 ))}
               </ul>
-              <CanvaButton variant="outline" fullWidth size="sm" leftIcon={<Edit className="h-4 w-4" />}>
+              <CanvaButton
+                variant="outline"
+                fullWidth
+                size="sm"
+                leftIcon={<Edit className="h-4 w-4" />}
+              >
                 Plani Duzenle
               </CanvaButton>
             </CanvaCardBody>
@@ -545,7 +575,9 @@ export default function SubscriptionManagementPage() {
             <CanvaCard>
               <CanvaCardHeader>
                 <CanvaCardTitle>Donusum Hunisi</CanvaCardTitle>
-                <CanvaCardSubtitle>Free'den Premium'a yolculuk</CanvaCardSubtitle>
+                <CanvaCardSubtitle>
+                  Free'den Premium'a yolculuk
+                </CanvaCardSubtitle>
               </CanvaCardHeader>
               <CanvaCardBody>
                 <div className="space-y-4">
@@ -609,7 +641,11 @@ export default function SubscriptionManagementPage() {
                     Aktif ve gecmis promosyonlar
                   </CanvaCardSubtitle>
                 </div>
-                <CanvaButton size="sm" leftIcon={<Plus className="h-4 w-4" />} onClick={() => setPromoDialog(true)}>
+                <CanvaButton
+                  size="sm"
+                  leftIcon={<Plus className="h-4 w-4" />}
+                  onClick={() => setPromoDialog(true)}
+                >
                   Yeni Promo
                 </CanvaButton>
               </div>
@@ -635,11 +671,7 @@ export default function SubscriptionManagementPage() {
                           <code className="px-2 py-1 bg-muted rounded font-mono text-sm">
                             {promo.code}
                           </code>
-                          <CanvaButton
-                            variant="ghost"
-                            size="xs"
-                            iconOnly
-                          >
+                          <CanvaButton variant="ghost" size="xs" iconOnly>
                             <Copy className="h-3 w-3" />
                           </CanvaButton>
                         </div>
@@ -681,20 +713,14 @@ export default function SubscriptionManagementPage() {
                       </TableCell>
                       <TableCell>
                         {promo.isActive ? (
-                          <CanvaBadge variant="success">
-                            Aktif
-                          </CanvaBadge>
+                          <CanvaBadge variant="success">Aktif</CanvaBadge>
                         ) : (
                           <CanvaBadge>Pasif</CanvaBadge>
                         )}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
-                          <CanvaButton
-                            variant="ghost"
-                            size="xs"
-                            iconOnly
-                          >
+                          <CanvaButton variant="ghost" size="xs" iconOnly>
                             <Edit className="h-4 w-4" />
                           </CanvaButton>
                           <CanvaButton
@@ -720,7 +746,9 @@ export default function SubscriptionManagementPage() {
           <CanvaCard>
             <CanvaCardHeader>
               <CanvaCardTitle>Son Abonelik Aktiviteleri</CanvaCardTitle>
-              <CanvaCardSubtitle>Yukseltme, dusurme ve iptaller</CanvaCardSubtitle>
+              <CanvaCardSubtitle>
+                Yukseltme, dusurme ve iptaller
+              </CanvaCardSubtitle>
             </CanvaCardHeader>
             <CanvaCardBody>
               <div className="space-y-4">

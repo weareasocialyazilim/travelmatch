@@ -447,24 +447,24 @@ export default function ModerationPage() {
       {stats && (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <CanvaStatCard
-            title="Total Logs"
+            label="Total Logs"
             value={stats.totalLogs.toString()}
-            icon={FileText}
+            icon={<FileText className="h-4 w-4" />}
           />
           <CanvaStatCard
-            title="Blocked Today"
+            label="Blocked Today"
             value={stats.blockedToday.toString()}
-            icon={Ban}
+            icon={<Ban className="h-4 w-4" />}
           />
           <CanvaStatCard
-            title="Active Warnings"
+            label="Active Warnings"
             value={stats.activeWarnings.toString()}
-            icon={AlertTriangle}
+            icon={<AlertTriangle className="h-4 w-4" />}
           />
           <CanvaStatCard
-            title="Pending Appeals"
+            label="Pending Appeals"
             value={stats.pendingAppeals.toString()}
-            icon={MessageSquare}
+            icon={<MessageSquare className="h-4 w-4" />}
           />
         </div>
       )}

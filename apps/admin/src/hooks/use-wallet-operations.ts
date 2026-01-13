@@ -274,7 +274,7 @@ export function useKYCVerifications(filters?: {
         if (error) throw error;
         return data || [];
       } catch (error) {
-        console.error('KYC verifications fetch error:', error);
+        // console.error('KYC verifications fetch error:', error);
         toast.error(
           'KYC doğrulamaları yüklenemedi, örnek veriler gösteriliyor',
         );
@@ -301,7 +301,7 @@ export function useTopWallets(limit = 10) {
         if (error) throw error;
         return data || [];
       } catch (error) {
-        console.error('Top wallets fetch error:', error);
+        // console.error('Top wallets fetch error:', error);
         return [];
       }
     },

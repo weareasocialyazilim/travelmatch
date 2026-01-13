@@ -14,7 +14,6 @@
  */
 
 import * as React from 'react';
-import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -99,7 +98,6 @@ export interface CanvaButtonProps
   extends
     React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof canvaButtonVariants> {
-  asChild?: boolean;
   loading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
@@ -116,7 +114,6 @@ export const CanvaButton = React.forwardRef<
       size,
       fullWidth,
       iconOnly,
-      asChild = false,
       loading = false,
       leftIcon,
       rightIcon,
@@ -126,10 +123,8 @@ export const CanvaButton = React.forwardRef<
     },
     ref,
   ) => {
-    const Comp = asChild ? Slot : 'button';
-
     return (
-      <Comp
+      <button
         className={cn(
           canvaButtonVariants({ variant, size, fullWidth, iconOnly }),
           className,
@@ -147,7 +142,7 @@ export const CanvaButton = React.forwardRef<
         )}
         {!iconOnly && children}
         {!loading && rightIcon}
-      </Comp>
+      </button>
     );
   },
 );

@@ -29,12 +29,12 @@ export default function NotFound() {
             Aradığınız sayfa mevcut değil veya taşınmış olabilir.
           </p>
           <div className="flex gap-2">
-            <CanvaButton asChild className="flex-1">
-              <Link href="/queue">
+            <Link href="/queue" className="flex-1">
+              <CanvaButton className="w-full">
                 <Home className="mr-2 h-4 w-4" />
                 Ana Sayfa
-              </Link>
-            </CanvaButton>
+              </CanvaButton>
+            </Link>
             <CanvaButton
               variant="primary"
               onClick={() => window.history.back()}

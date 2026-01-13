@@ -186,6 +186,9 @@ function parseAlertHistory(history: unknown[]): AlertHistoryItem[] {
 
 // Fetch functions with fallback
 async function fetchAlertRules(): Promise<AlertRule[]> {
+  // Use mock data directly until API is implemented
+  return MOCK_ALERT_RULES;
+  /*
   try {
     const response = await fetch('/api/alerts/rules');
     if (!response.ok) {
@@ -198,9 +201,13 @@ async function fetchAlertRules(): Promise<AlertRule[]> {
     console.warn('Using mock alert rules data');
     return MOCK_ALERT_RULES;
   }
+  */
 }
 
 async function fetchActiveAlerts(): Promise<ActiveAlert[]> {
+  // Use mock data directly until API is implemented
+  return MOCK_ACTIVE_ALERTS;
+  /*
   try {
     const response = await fetch('/api/alerts/active');
     if (!response.ok) {
@@ -213,9 +220,13 @@ async function fetchActiveAlerts(): Promise<ActiveAlert[]> {
     console.warn('Using mock active alerts data');
     return MOCK_ACTIVE_ALERTS;
   }
+  */
 }
 
 async function fetchAlertHistory(): Promise<AlertHistoryItem[]> {
+  // Use mock data directly until API is implemented
+  return MOCK_ALERT_HISTORY;
+  /*
   try {
     const response = await fetch('/api/alerts/history');
     if (!response.ok) {
@@ -228,6 +239,7 @@ async function fetchAlertHistory(): Promise<AlertHistoryItem[]> {
     console.warn('Using mock alert history data');
     return MOCK_ALERT_HISTORY;
   }
+  */
 }
 
 // Query hooks

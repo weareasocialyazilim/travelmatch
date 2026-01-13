@@ -159,67 +159,101 @@ export interface CanvaStatCardProps extends React.HTMLAttributes<HTMLDivElement>
     label?: string;
   };
   icon?: React.ReactNode;
+  valueClassName?: string;
+  accentColor?: string;
 }
 
 export const CanvaStatCard = React.forwardRef<
   HTMLDivElement,
   CanvaStatCardProps
->(({ className, label, value, change, icon, ...props }, ref) => {
-  const isPositive = change && change.value >= 0;
-  const formattedValue =
-    typeof value === 'number' ? value.toLocaleString() : value;
-  const ariaLabel = change
-    ? `${label}: ${formattedValue}, ${isPositive ? 'artış' : 'azalış'} ${Math.abs(change.value)}%${change.label ? ` ${change.label}` : ''}`
-    : `${label}: ${formattedValue}`;
+>(
+  (
+    {
+      className,
+      label,
+      value,
+      change,
+      icon,
+      valueClassName,
+      accentColor,
+      ...props
+    },
+    ref,
+  ) => {
+    // Defensive check: handle undefined label
+    const safeLabel = label || 'Stat';
+    const isPositive = change && change.value >= 0;
+    const formattedValue =
+      typeof value === 'number' ? value.toLocaleString() : value;
+    const ariaLabel = change
+      ? `${safeLabel}: ${formattedValue}, ${isPositive ? 'artış' : 'azalış'} ${Math.abs(change.value)}%${change.label ? ` ${change.label}` : ''}`
+      : `${safeLabel}: ${formattedValue}`;
 
-  return (
-    <CanvaCard
-      ref={ref}
-      className={className}
-      role="status"
-      aria-label={ariaLabel}
-      {...props}
-    >
-      <div className="p-5">
-        <div className="flex items-center justify-between mb-2">
-          <span
-            className="text-xs font-medium text-muted-foreground uppercase tracking-wider"
-            id={`stat-label-${label.replace(/\s+/g, '-').toLowerCase()}`}
-          >
-            {label}
-          </span>
-          {icon && (
-            <span className="text-muted-foreground" aria-hidden="true">
-              {icon}
-            </span>
-          )}
-        </div>
-        <div className="text-3xl font-bold text-foreground mt-2">
-          {formattedValue}
-        </div>
-        {change && (
-          <div className="mt-2 flex items-center gap-2">
+    const style = accentColor
+      ? ({ '--accent-color': accentColor } as React.CSSProperties)
+      : undefined;
+
+    return (
+      <CanvaCard
+        ref={ref}
+        className={className}
+        role="status"
+        aria-label={ariaLabel}
+        style={{ ...props.style, ...style }}
+        {...props}
+      >
+        <div className="p-5">
+          <div className="flex items-center justify-between mb-2">
             <span
-              className={cn(
-                'inline-flex items-center gap-1 text-sm font-medium px-2 py-0.5 rounded-full',
-                isPositive
-                  ? 'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400'
-                  : 'bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400',
-              )}
-              aria-hidden="true"
+              className="text-xs font-medium text-muted-foreground uppercase tracking-wider"
+              id={`stat-label-${safeLabel.replace(/\s+/g, '-').toLowerCase()}`}
             >
-              {isPositive ? '↑' : '↓'}
-              {Math.abs(change.value)}%
+              {safeLabel}
             </span>
-            {change.label && (
-              <span className="text-xs text-muted-foreground">
-                {change.label}
+            {icon && (
+              <span
+                className={cn(
+                  'text-muted-foreground',
+                  accentColor && 'text-[var(--accent-color)]',
+                )}
+                aria-hidden="true"
+              >
+                {icon}
               </span>
             )}
           </div>
-        )}
-      </div>
-    </CanvaCard>
-  );
-});
+          <div
+            className={cn(
+              'text-3xl font-bold text-foreground mt-2',
+              valueClassName,
+            )}
+          >
+            {formattedValue}
+          </div>
+          {change && (
+            <div className="mt-2 flex items-center gap-2">
+              <span
+                className={cn(
+                  'inline-flex items-center gap-1 text-sm font-medium px-2 py-0.5 rounded-full',
+                  isPositive
+                    ? 'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400'
+                    : 'bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400',
+                )}
+                aria-hidden="true"
+              >
+                {isPositive ? '↑' : '↓'}
+                {Math.abs(change.value)}%
+              </span>
+              {change.label && (
+                <span className="text-xs text-muted-foreground">
+                  {change.label}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      </CanvaCard>
+    );
+  },
+);
 CanvaStatCard.displayName = 'CanvaStatCard';

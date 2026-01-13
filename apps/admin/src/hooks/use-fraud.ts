@@ -217,7 +217,7 @@ export function useFraudCases(filters?: {
         if (error) throw error;
         return data || [];
       } catch (error) {
-        console.error('Fraud cases fetch error:', error);
+        // console.error('Fraud cases fetch error:', error);
         toast.error('Vaka listesi yüklenemedi, örnek veriler gösteriliyor');
         return mockFraudCases;
       }
@@ -242,7 +242,7 @@ export function useFraudCase(caseId: string) {
         if (error) throw error;
         return data;
       } catch (error) {
-        console.error('Fraud case fetch error:', error);
+        // console.error('Fraud case fetch error:', error);
         return mockFraudCases.find((c) => c.id === caseId) || null;
       }
     },
@@ -266,7 +266,7 @@ export function useFraudEvidence(caseId: string) {
         if (error) throw error;
         return data || [];
       } catch (error) {
-        console.error('Fraud evidence fetch error:', error);
+        // console.error('Fraud evidence fetch error:', error);
         return [];
       }
     },
@@ -290,7 +290,7 @@ export function useLinkedAccounts(caseId: string) {
         if (error) throw error;
         return data || [];
       } catch (error) {
-        console.error('Linked accounts fetch error:', error);
+        // console.error('Linked accounts fetch error:', error);
         return [];
       }
     },

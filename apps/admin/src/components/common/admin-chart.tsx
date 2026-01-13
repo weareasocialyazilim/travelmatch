@@ -269,24 +269,27 @@ export function AdminLineChart({
         />
         <Tooltip content={<CustomTooltip formatter={formatter} />} />
         {showLegend && <Legend />}
-        {lines.map((line, index) => (
-          <Line
-            key={line.dataKey}
-            type="monotone"
-            dataKey={line.dataKey}
-            name={line.name}
-            stroke={
-              line.color || CHART_COLOR_ARRAY[index % CHART_COLOR_ARRAY.length]
-            }
-            strokeWidth={line.strokeWidth || 2}
-            dot={
-              line.dot !== false
-                ? { fill: line.color || CHART_COLOR_ARRAY[index] }
-                : false
-            }
-            activeDot={{ r: 4 }}
-          />
-        ))}
+        {lines &&
+          lines.length > 0 &&
+          lines.map((line, index) => (
+            <Line
+              key={line.dataKey}
+              type="monotone"
+              dataKey={line.dataKey}
+              name={line.name}
+              stroke={
+                line.color ||
+                CHART_COLOR_ARRAY[index % CHART_COLOR_ARRAY.length]
+              }
+              strokeWidth={line.strokeWidth || 2}
+              dot={
+                line.dot !== false
+                  ? { fill: line.color || CHART_COLOR_ARRAY[index] }
+                  : false
+              }
+              activeDot={{ r: 4 }}
+            />
+          ))}
       </LineChart>
     </ChartContainer>
   );
@@ -358,26 +361,28 @@ export function AdminAreaChart({
         />
         <Tooltip content={<CustomTooltip formatter={formatter} />} />
         {showLegend && <Legend />}
-        {areas.map((area, index) => {
-          const color =
-            area.color || CHART_COLOR_ARRAY[index % CHART_COLOR_ARRAY.length];
-          const gradientId =
-            area.gradientId ||
-            `gradient${['Primary', 'Secondary', 'Accent', 'Trust', 'Info'][index % 5]}`;
+        {areas &&
+          areas.length > 0 &&
+          areas.map((area, index) => {
+            const color =
+              area.color || CHART_COLOR_ARRAY[index % CHART_COLOR_ARRAY.length];
+            const gradientId =
+              area.gradientId ||
+              `gradient${['Primary', 'Secondary', 'Accent', 'Trust', 'Info'][index % 5]}`;
 
-          return (
-            <Area
-              key={area.dataKey}
-              type="monotone"
-              dataKey={area.dataKey}
-              name={area.name}
-              stroke={color}
-              fill={`url(#${gradientId})`}
-              strokeWidth={2}
-              stackId={stacked ? 'stack' : undefined}
-            />
-          );
-        })}
+            return (
+              <Area
+                key={area.dataKey}
+                type="monotone"
+                dataKey={area.dataKey}
+                name={area.name}
+                stroke={color}
+                fill={`url(#${gradientId})`}
+                strokeWidth={2}
+                stackId={stacked ? 'stack' : undefined}
+              />
+            );
+          })}
       </AreaChart>
     </ChartContainer>
   );
