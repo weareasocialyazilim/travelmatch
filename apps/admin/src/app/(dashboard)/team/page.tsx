@@ -165,21 +165,21 @@ const mockShifts: Shift[] = [
     time: '09:00 - 17:00',
     icon: Sun,
     members: 4,
-    color: 'bg-yellow-100',
+    color: 'bg-yellow-500/10 dark:bg-yellow-500/20',
   },
   {
     name: 'Öğleden Sonra',
     time: '14:00 - 22:00',
     icon: Coffee,
     members: 3,
-    color: 'bg-orange-100',
+    color: 'bg-orange-500/10 dark:bg-orange-500/20',
   },
   {
     name: 'Gece Vardiyası',
     time: '22:00 - 06:00',
     icon: Moon,
     members: 2,
-    color: 'bg-indigo-100',
+    color: 'bg-indigo-500/10 dark:bg-indigo-500/20',
   },
 ];
 

@@ -313,8 +313,8 @@ export default function SupportPage() {
   const ErrorState = () => (
     <div className="flex h-[50vh] items-center justify-center">
       <div className="text-center space-y-4">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
-          <AlertCircle className="h-8 w-8 text-red-600" />
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-500/10 dark:bg-red-500/20">
+          <AlertCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
         </div>
         <h2 className="text-xl font-semibold text-foreground">Bir hata oluştu</h2>
         <p className="text-muted-foreground max-w-md">
