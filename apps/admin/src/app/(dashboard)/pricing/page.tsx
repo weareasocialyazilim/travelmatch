@@ -456,11 +456,11 @@ export default function PricingPage() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span>Premium (%10 artış senaryosu)</span>
-                    <span className="text-red-500">-8% abone</span>
+                    <span className="text-red-500 dark:text-red-400">-8% abone</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span>Premium (%10 düşüş senaryosu)</span>
-                    <span className="text-green-500">+15% abone</span>
+                    <span className="text-green-500 dark:text-green-400">+15% abone</span>
                   </div>
                   <div className="pt-4 border-t">
                     <p className="text-sm text-muted-foreground">
@@ -496,7 +496,7 @@ export default function PricingPage() {
                         <p className="text-muted-foreground">
                           Varyant (₺349.99)
                         </p>
-                        <p className="font-medium text-green-600">
+                        <p className="font-medium text-green-600 dark:text-green-400">
                           4.1% dönüşüm
                         </p>
                       </div>

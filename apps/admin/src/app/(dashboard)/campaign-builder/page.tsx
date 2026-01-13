@@ -279,21 +279,21 @@ export default function CampaignBuilderPage() {
     switch (status) {
       case 'active':
         return (
-          <CanvaBadge className="bg-green-500/10 text-green-500 border-green-500/20">
+          <CanvaBadge className="bg-green-500/10 dark:bg-green-500/20 text-green-500 dark:text-green-400 border-green-500/20">
             <Play className="h-3 w-3 mr-1" />
             Aktif
           </CanvaBadge>
         );
       case 'paused':
         return (
-          <CanvaBadge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">
+          <CanvaBadge className="bg-yellow-500/10 dark:bg-yellow-500/20 text-yellow-500 dark:text-yellow-400 border-yellow-500/20">
             <Pause className="h-3 w-3 mr-1" />
             Duraklatıldı
           </CanvaBadge>
         );
       case 'scheduled':
         return (
-          <CanvaBadge className="bg-blue-500/10 text-blue-500 border-blue-500/20">
+          <CanvaBadge className="bg-blue-500/10 dark:bg-blue-500/20 text-blue-500 dark:text-blue-400 border-blue-500/20">
             <Calendar className="h-3 w-3 mr-1" />
             Zamanlandı
           </CanvaBadge>
@@ -457,30 +457,30 @@ export default function CampaignBuilderPage() {
         <CanvaStatCard
           title="Aktif"
           value={campaignStats.activeCampaigns}
-          icon={<Play className="h-5 w-5 text-green-500" />}
+          icon={<Play className="h-5 w-5 text-green-500 dark:text-green-400" />}
           variant="success"
         />
         <CanvaStatCard
           title="Toplam Gönderim"
           value={formatNumber(campaignStats.totalSent)}
-          icon={<Send className="h-5 w-5 text-blue-500" />}
+          icon={<Send className="h-5 w-5 text-blue-500 dark:text-blue-400" />}
           variant="info"
         />
         <CanvaStatCard
           title="Ort. Açılma"
           value={`${campaignStats.avgOpenRate}%`}
-          icon={<Eye className="h-5 w-5 text-purple-500" />}
+          icon={<Eye className="h-5 w-5 text-purple-500 dark:text-purple-400" />}
         />
         <CanvaStatCard
           title="Ort. Tıklama"
           value={`${campaignStats.avgClickRate}%`}
-          icon={<Target className="h-5 w-5 text-orange-500" />}
+          icon={<Target className="h-5 w-5 text-orange-500 dark:text-orange-400" />}
           variant="warning"
         />
         <CanvaStatCard
           title="Ort. Dönüşüm"
           value={`${campaignStats.avgConversionRate}%`}
-          icon={<TrendingUp className="h-5 w-5 text-emerald-500" />}
+          icon={<TrendingUp className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />}
           variant="success"
         />
       </div>
@@ -609,7 +609,7 @@ export default function CampaignBuilderPage() {
                           {campaign.abTest && (
                             <CanvaBadge
                               variant="outline"
-                              className="text-xs bg-purple-500/10 text-purple-500 border-purple-500/20"
+                              className="text-xs bg-purple-500/10 dark:bg-purple-500/20 text-purple-500 dark:text-purple-400 border-purple-500/20"
                             >
                               A/B
                             </CanvaBadge>
@@ -777,10 +777,10 @@ export default function CampaignBuilderPage() {
                           variant="outline"
                           className={cn(
                             template.openRate > 70
-                              ? 'bg-green-500/10 text-green-500'
+                              ? 'bg-green-500/10 dark:bg-green-500/20 text-green-500 dark:text-green-400'
                               : template.openRate > 40
-                                ? 'bg-yellow-500/10 text-yellow-500'
-                                : 'bg-red-500/10 text-red-500',
+                                ? 'bg-yellow-500/10 dark:bg-yellow-500/20 text-yellow-500 dark:text-yellow-400'
+                                : 'bg-red-500/10 dark:bg-red-500/20 text-red-500 dark:text-red-400',
                           )}
                         >
                           {template.openRate}%
@@ -826,7 +826,7 @@ export default function CampaignBuilderPage() {
                         Güven Düzeyi: {test.confidence}%
                       </p>
                     </div>
-                    <CanvaBadge className="bg-green-500/10 text-green-500 border-green-500/20">
+                    <CanvaBadge className="bg-green-500/10 dark:bg-green-500/20 text-green-500 dark:text-green-400 border-green-500/20">
                       <CheckCircle2 className="h-3 w-3 mr-1" />
                       Kazanan: Varyant {test.winner}
                     </CanvaBadge>

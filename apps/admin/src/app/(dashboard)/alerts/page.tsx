@@ -167,13 +167,13 @@ export default function AlertsPage() {
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
       case 'critical':
-        return <AlertTriangle className="h-5 w-5 text-red-500" />;
+        return <AlertTriangle className="h-5 w-5 text-red-500 dark:text-red-400" />;
       case 'high':
-        return <AlertCircle className="h-5 w-5 text-orange-500" />;
+        return <AlertCircle className="h-5 w-5 text-orange-500 dark:text-orange-400" />;
       case 'medium':
-        return <Info className="h-5 w-5 text-yellow-500" />;
+        return <Info className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />;
       default:
-        return <Info className="h-5 w-5 text-blue-500" />;
+        return <Info className="h-5 w-5 text-blue-500 dark:text-blue-400" />;
     }
   };
 
@@ -302,12 +302,12 @@ export default function AlertsPage() {
 
       {/* Critical Alert Banner */}
       {criticalCount > 0 && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg animate-pulse">
+        <div className="p-4 bg-red-500/10 dark:bg-red-500/20 border border-red-500/20 rounded-lg animate-pulse">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <AlertTriangle className="h-6 w-6 text-red-500" />
+              <AlertTriangle className="h-6 w-6 text-red-500 dark:text-red-400" />
               <div>
-                <p className="font-semibold text-red-500">
+                <p className="font-semibold text-red-500 dark:text-red-400">
                   {criticalCount} Kritik Alert Aktif
                 </p>
                 <p className="text-sm text-muted-foreground">
@@ -327,13 +327,13 @@ export default function AlertsPage() {
         <CanvaStatCard
           label="Kritik"
           value={criticalCount}
-          icon={<AlertTriangle className="h-5 w-5 text-red-500" />}
+          icon={<AlertTriangle className="h-5 w-5 text-red-500 dark:text-red-400" />}
           className="border-l-4 border-l-red-500"
         />
         <CanvaStatCard
           label="Yüksek"
           value={highCount}
-          icon={<AlertCircle className="h-5 w-5 text-orange-500" />}
+          icon={<AlertCircle className="h-5 w-5 text-orange-500 dark:text-orange-400" />}
           className="border-l-4 border-l-orange-500"
         />
         <CanvaStatCard
@@ -344,7 +344,7 @@ export default function AlertsPage() {
         <CanvaStatCard
           label="Onaylandı"
           value={alerts.filter((a) => a.status === 'acknowledged').length}
-          icon={<CheckCircle2 className="h-5 w-5 text-green-500" />}
+          icon={<CheckCircle2 className="h-5 w-5 text-green-500 dark:text-green-400" />}
           className="border-l-4 border-l-green-500"
         />
       </div>
@@ -400,10 +400,10 @@ export default function AlertsPage() {
                 className={cn(
                   'border-l-4',
                   alert.severity === 'critical'
-                    ? 'border-l-red-500 bg-red-500/5'
+                    ? 'border-l-red-500 bg-red-500/5 dark:bg-red-500/10'
                     : alert.severity === 'high'
-                      ? 'border-l-orange-500 bg-orange-500/5'
-                      : 'border-l-yellow-500 bg-yellow-500/5',
+                      ? 'border-l-orange-500 bg-orange-500/5 dark:bg-orange-500/10'
+                      : 'border-l-yellow-500 bg-yellow-500/5 dark:bg-yellow-500/10',
                 )}
               >
                 <CanvaCardBody className="p-4">
@@ -462,7 +462,7 @@ export default function AlertsPage() {
                 <CanvaCardBody className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-4">
-                      <Eye className="h-5 w-5 text-blue-500" />
+                      <Eye className="h-5 w-5 text-blue-500 dark:text-blue-400" />
                       <div>
                         <h3 className="font-semibold">{alert.title}</h3>
                         <p className="text-sm text-muted-foreground">
@@ -489,7 +489,7 @@ export default function AlertsPage() {
               <CanvaCardBody className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <CheckCircle2 className="h-5 w-5 text-green-500" />
+                    <CheckCircle2 className="h-5 w-5 text-green-500 dark:text-green-400" />
                     <div>
                       <h3 className="font-medium">{alert.title}</h3>
                       <p className="text-xs text-muted-foreground">

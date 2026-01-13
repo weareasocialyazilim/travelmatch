@@ -113,11 +113,11 @@ export default function DashboardPage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'operational':
-        return <CheckCircle2 className="h-4 w-4 text-emerald-500" />;
+        return <CheckCircle2 className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />;
       case 'degraded':
-        return <AlertCircle className="h-4 w-4 text-amber-500" />;
+        return <AlertCircle className="h-4 w-4 text-amber-500 dark:text-amber-400" />;
       case 'down':
-        return <XCircle className="h-4 w-4 text-red-500" />;
+        return <XCircle className="h-4 w-4 text-red-500 dark:text-red-400" />;
       default:
         return <Clock className="h-4 w-4 text-muted-foreground" />;
     }
@@ -127,11 +127,11 @@ export default function DashboardPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'operational':
-        return 'bg-emerald-500';
+        return 'bg-emerald-500 dark:bg-emerald-600';
       case 'degraded':
-        return 'bg-amber-500';
+        return 'bg-amber-500 dark:bg-amber-600';
       case 'down':
-        return 'bg-red-500';
+        return 'bg-red-500 dark:bg-red-600';
       default:
         return 'bg-muted-foreground';
     }
@@ -143,7 +143,7 @@ export default function DashboardPage() {
       <div className="flex h-[60vh] items-center justify-center">
         <div className="text-center space-y-4">
           <div className="mx-auto w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-            <AlertTriangle className="h-8 w-8 text-red-500" />
+            <AlertTriangle className="h-8 w-8 text-red-500 dark:text-red-400" />
           </div>
           <div>
             <h2 className="text-xl font-semibold text-foreground">
@@ -293,7 +293,7 @@ export default function DashboardPage() {
             <CanvaCardBody>
               {isLoading ? (
                 <div className="flex items-center justify-center h-[280px]">
-                  <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+                  <Loader2 className="h-8 w-8 animate-spin text-violet-500 dark:text-violet-400" />
                 </div>
               ) : userActivityChartData.length > 0 ? (
                 <AdminAreaChart
@@ -347,7 +347,7 @@ export default function DashboardPage() {
             <CanvaCardBody>
               {isLoading ? (
                 <div className="flex items-center justify-center h-[250px]">
-                  <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+                  <Loader2 className="h-8 w-8 animate-spin text-violet-500 dark:text-violet-400" />
                 </div>
               ) : revenueChartData.length > 0 ? (
                 <AdminLineChart
@@ -395,7 +395,7 @@ export default function DashboardPage() {
             <CanvaCardBody className="p-0">
               {isLoading ? (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin text-violet-500" />
+                  <Loader2 className="h-6 w-6 animate-spin text-violet-500 dark:text-violet-400" />
                 </div>
               ) : (data?.pendingTasksList?.length || 0) > 0 ? (
                 <div className="divide-y divide-border">
@@ -458,7 +458,7 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-                  <CheckCircle2 className="h-12 w-12 mb-3 text-emerald-500" />
+                  <CheckCircle2 className="h-12 w-12 mb-3 text-emerald-500 dark:text-emerald-400" />
                   <p className="text-foreground font-medium">
                     Tüm görevler tamamlandı!
                   </p>
@@ -484,14 +484,14 @@ export default function DashboardPage() {
             <CanvaCardBody>
               {isLoading ? (
                 <div className="flex items-center justify-center py-6">
-                  <Loader2 className="h-6 w-6 animate-spin text-violet-500" />
+                  <Loader2 className="h-6 w-6 animate-spin text-violet-500 dark:text-violet-400" />
                 </div>
               ) : (
                 <div className="space-y-4">
                   {/* Overall Health Bar */}
                   <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-xl">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <div className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-600 animate-pulse" />
                       <span className="text-sm font-medium text-emerald-700">
                         Tüm Sistemler Çalışıyor
                       </span>
@@ -566,7 +566,7 @@ export default function DashboardPage() {
             <CanvaCardBody>
               {isLoading ? (
                 <div className="flex items-center justify-center py-6">
-                  <Loader2 className="h-6 w-6 animate-spin text-violet-500" />
+                  <Loader2 className="h-6 w-6 animate-spin text-violet-500 dark:text-violet-400" />
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -589,9 +589,9 @@ export default function DashboardPage() {
                         {data?.metrics.engagementRate || 0}%
                       </span>
                       {(data?.metrics.engagementRate || 0) > 50 ? (
-                        <ArrowUpRight className="h-4 w-4 text-emerald-500" />
+                        <ArrowUpRight className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
                       ) : (
-                        <ArrowDownRight className="h-4 w-4 text-red-500" />
+                        <ArrowDownRight className="h-4 w-4 text-red-500 dark:text-red-400" />
                       )}
                     </div>
                   </div>
@@ -639,7 +639,7 @@ export default function DashboardPage() {
                     {link.description}
                   </p>
                 </div>
-                <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-violet-500" />
+                <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-violet-500 dark:group-hover:text-violet-400" />
               </div>
             </CanvaCard>
           </Link>
@@ -668,7 +668,7 @@ export default function DashboardPage() {
                   className="px-6 py-4 flex items-center justify-between hover:bg-muted transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-violet-500" />
+                    <div className="w-2 h-2 rounded-full bg-violet-500 dark:bg-violet-600" />
                     <div>
                       <p className="text-sm font-medium text-foreground">
                         {activity.action}

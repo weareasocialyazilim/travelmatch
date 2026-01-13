@@ -205,27 +205,27 @@ export default function CreatorsPage() {
         <CanvaStatCard
           label="Toplam Creator"
           value={creatorStats.total_creators.toLocaleString('tr-TR')}
-          icon={<Users className="h-6 w-6 text-blue-500" />}
+          icon={<Users className="h-6 w-6 text-blue-500 dark:text-blue-400" />}
         />
         <CanvaStatCard
           label="Onaylı"
           value={creatorStats.verified_creators}
-          icon={<CheckCircle className="h-6 w-6 text-green-500" />}
+          icon={<CheckCircle className="h-6 w-6 text-green-500 dark:text-green-400" />}
         />
         <CanvaStatCard
           label="Bekleyen"
           value={creatorStats.pending_applications}
-          icon={<Clock className="h-6 w-6 text-orange-500" />}
+          icon={<Clock className="h-6 w-6 text-orange-500 dark:text-orange-400" />}
         />
         <CanvaStatCard
           label="Toplam Kazanç"
           value={`₺${creatorStats.total_earnings.toLocaleString('tr-TR')}`}
-          icon={<DollarSign className="h-6 w-6 text-emerald-500" />}
+          icon={<DollarSign className="h-6 w-6 text-emerald-500 dark:text-emerald-400" />}
         />
         <CanvaStatCard
           label="Ort. Etkileşim"
           value={`${creatorStats.avg_engagement}%`}
-          icon={<TrendingUp className="h-6 w-6 text-pink-500" />}
+          icon={<TrendingUp className="h-6 w-6 text-pink-500 dark:text-pink-400" />}
         />
       </div>
 
@@ -283,7 +283,7 @@ export default function CreatorsPage() {
                         <div className="flex items-center gap-2">
                           <p className="font-medium">{creator.name}</p>
                           {creator.verified && (
-                            <CheckCircle className="h-4 w-4 text-blue-500" />
+                            <CheckCircle className="h-4 w-4 text-blue-500 dark:text-blue-400" />
                           )}
                         </div>
                         <p className="text-sm text-muted-foreground">
@@ -486,7 +486,7 @@ export default function CreatorsPage() {
                     <p className="text-sm text-muted-foreground">
                       Bu Ay Ödenen
                     </p>
-                    <p className="text-2xl font-bold text-green-600">₺89,450</p>
+                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">₺89,450</p>
                     <p className="text-sm text-muted-foreground">45 creator</p>
                   </div>
                   <div className="rounded-lg border p-4">

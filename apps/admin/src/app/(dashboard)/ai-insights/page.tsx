@@ -316,27 +316,27 @@ export default function AIInsightsPage() {
     switch (status) {
       case 'active':
         return (
-          <Badge className="bg-emerald-500/10 text-emerald-600">
+          <CanvaBadge className="bg-emerald-500/10 text-emerald-600">
             <Activity className="h-3 w-3 mr-1 animate-pulse" />
             Aktif
-          </Badge>
+          </CanvaBadge>
         );
       case 'training':
         return (
-          <Badge className="bg-blue-500/10 text-blue-600">
+          <CanvaBadge className="bg-blue-500/10 text-blue-600">
             <RotateCcw className="h-3 w-3 mr-1 animate-spin" />
             Egitiliyor
-          </Badge>
+          </CanvaBadge>
         );
       case 'paused':
         return (
-          <Badge className="bg-amber-500/10 text-amber-600">
+          <CanvaBadge className="bg-amber-500/10 text-amber-600">
             <Pause className="h-3 w-3 mr-1" />
             Durduruldu
-          </Badge>
+          </CanvaBadge>
         );
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <CanvaBadge variant="outline">{status}</CanvaBadge>;
     }
   };
 
@@ -367,13 +367,13 @@ export default function AIInsightsPage() {
   const getImpactBadge = (impact: string) => {
     switch (impact) {
       case 'critical':
-        return <Badge variant="destructive">Kritik</Badge>;
+        return <CanvaBadge variant="destructive">Kritik</CanvaBadge>;
       case 'high':
-        return <Badge className="bg-amber-500/10 text-amber-600">Yuksek</Badge>;
+        return <CanvaBadge className="bg-amber-500/10 text-amber-600">Yuksek</CanvaBadge>;
       case 'medium':
-        return <Badge variant="secondary">Orta</Badge>;
+        return <CanvaBadge variant="secondary">Orta</CanvaBadge>;
       default:
-        return <Badge variant="outline">Dusuk</Badge>;
+        return <CanvaBadge variant="outline">Dusuk</CanvaBadge>;
     }
   };
 
@@ -391,102 +391,102 @@ export default function AIInsightsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
+          <CanvaButton variant="outline" size="sm">
             <Settings className="h-4 w-4 mr-2" />
             Model Ayarlari
-          </Button>
-          <Button size="sm">
+          </CanvaButton>
+          <CanvaButton size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             Yenile
-          </Button>
+          </CanvaButton>
         </div>
       </div>
 
       {/* Overview Stats */}
       <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Toplam Model</CardDescription>
-            <CardTitle className="text-2xl font-bold">
+        <CanvaCard>
+          <CanvaCardHeader className="pb-2">
+            <p className="text-sm text-muted-foreground">Toplam Model</p>
+            <CanvaCardTitle className="text-2xl font-bold">
               {aiModels.length}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+            </CanvaCardTitle>
+          </CanvaCardHeader>
+          <CanvaCardBody>
             <p className="text-xs text-emerald-600">
               {aiModels.filter((m) => m.status === 'active').length} aktif
             </p>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Bugun Istek</CardDescription>
-            <CardTitle className="text-2xl font-bold">
+        <CanvaCard>
+          <CanvaCardHeader className="pb-2">
+            <p className="text-sm text-muted-foreground">Bugun Istek</p>
+            <CanvaCardTitle className="text-2xl font-bold">
               {aiModels
                 .reduce((acc, m) => acc + m.requests_today, 0)
                 .toLocaleString()}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+            </CanvaCardTitle>
+          </CanvaCardHeader>
+          <CanvaCardBody>
             <p className="text-xs text-muted-foreground">Tum modeller</p>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Ort. Dogruluk</CardDescription>
-            <CardTitle className="text-2xl font-bold text-emerald-600">
+        <CanvaCard>
+          <CanvaCardHeader className="pb-2">
+            <p className="text-sm text-muted-foreground">Ort. Dogruluk</p>
+            <CanvaCardTitle className="text-2xl font-bold text-emerald-600">
               %
               {(
                 aiModels.reduce((acc, m) => acc + m.accuracy, 0) /
                 aiModels.length
               ).toFixed(1)}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+            </CanvaCardTitle>
+          </CanvaCardHeader>
+          <CanvaCardBody>
             <p className="text-xs text-muted-foreground">Tum modeller</p>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Ort. Latency</CardDescription>
-            <CardTitle className="text-2xl font-bold">
+        <CanvaCard>
+          <CanvaCardHeader className="pb-2">
+            <p className="text-sm text-muted-foreground">Ort. Latency</p>
+            <CanvaCardTitle className="text-2xl font-bold">
               {Math.round(
                 aiModels.reduce((acc, m) => acc + m.latency, 0) /
                   aiModels.length,
               )}
               ms
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+            </CanvaCardTitle>
+          </CanvaCardHeader>
+          <CanvaCardBody>
             <p className="text-xs text-muted-foreground">Response time</p>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>AI Insights</CardDescription>
-            <CardTitle className="text-2xl font-bold">
+        <CanvaCard>
+          <CanvaCardHeader className="pb-2">
+            <p className="text-sm text-muted-foreground">AI Insights</p>
+            <CanvaCardTitle className="text-2xl font-bold">
               {recentInsights.length}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+            </CanvaCardTitle>
+          </CanvaCardHeader>
+          <CanvaCardBody>
             <p className="text-xs text-amber-600">2 kritik</p>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>A/B Tests</CardDescription>
-            <CardTitle className="text-2xl font-bold">
+        <CanvaCard>
+          <CanvaCardHeader className="pb-2">
+            <p className="text-sm text-muted-foreground">A/B Tests</p>
+            <CanvaCardTitle className="text-2xl font-bold">
               {abTests.length}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+            </CanvaCardTitle>
+          </CanvaCardHeader>
+          <CanvaCardBody>
             <p className="text-xs text-blue-600">1 aktif</p>
-          </CardContent>
-        </Card>
+          </CanvaCardBody>
+        </CanvaCard>
       </div>
 
       {/* Main Tabs */}
@@ -503,22 +503,22 @@ export default function AIInsightsPage() {
           {/* Model Cards Grid */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {aiModels.map((model) => (
-              <Card
+              <CanvaCard
                 key={model.id}
                 className="cursor-pointer hover:shadow-md transition-all"
                 onClick={() => setSelectedModel(model)}
               >
-                <CardHeader className="pb-3">
+                <CanvaCardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <Brain className="h-5 w-5 text-cyan-500" />
                     {getStatusBadge(model.status)}
                   </div>
-                  <CardTitle className="text-base">{model.name}</CardTitle>
-                  <CardDescription className="text-xs">
+                  <CanvaCardTitle className="text-base">{model.name}</CanvaCardTitle>
+                  <p className="text-xs text-muted-foreground">
                     {model.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
+                  </p>
+                </CanvaCardHeader>
+                <CanvaCardBody className="space-y-3">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Dogruluk</span>
                     <span
@@ -547,28 +547,28 @@ export default function AIInsightsPage() {
 
                   <div className="flex flex-wrap gap-1">
                     {model.features.slice(0, 2).map((f) => (
-                      <Badge key={f} variant="outline" className="text-xs">
+                      <CanvaBadge key={f} variant="outline" className="text-xs">
                         {f}
-                      </Badge>
+                      </CanvaBadge>
                     ))}
                     {model.features.length > 2 && (
-                      <Badge variant="outline" className="text-xs">
+                      <CanvaBadge variant="outline" className="text-xs">
                         +{model.features.length - 2}
-                      </Badge>
+                      </CanvaBadge>
                     )}
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))}
           </div>
 
           {/* Performance Chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Haftalik Model Performansi</CardTitle>
-              <CardDescription>Ana modellerin dogruluk trendi</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle>Haftalik Model Performansi</CanvaCardTitle>
+              <p className="text-sm text-muted-foreground">Ana modellerin dogruluk trendi</p>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <AdminLineChart
                 data={modelPerformanceData}
                 xAxisKey="date"
@@ -597,25 +597,25 @@ export default function AIInsightsPage() {
                 ]}
                 yAxisFormatter={(value) => `%${value}`}
               />
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* AI Insights Tab */}
         <TabsContent value="insights" className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="lg:col-span-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+              <CanvaCard>
+                <CanvaCardHeader>
+                  <CanvaCardTitle className="flex items-center gap-2">
                     <Sparkles className="h-5 w-5 text-amber-500" />
                     AI Uretimi Insights
-                  </CardTitle>
-                  <CardDescription>
+                  </CanvaCardTitle>
+                  <p className="text-sm text-muted-foreground">
                     Yapay zeka tarafindan tespit edilen firsatlar ve uyarilar
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
+                  </p>
+                </CanvaCardHeader>
+                <CanvaCardBody>
                   <ScrollArea className="h-[400px]">
                     <div className="space-y-4">
                       {recentInsights.map((insight, index) => (
@@ -660,27 +660,27 @@ export default function AIInsightsPage() {
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <Button size="sm" variant="outline">
+                              <CanvaButton size="sm" variant="outline">
                                 <Eye className="h-3 w-3 mr-1" />
                                 Detay
-                              </Button>
-                              <Button size="sm">Uygula</Button>
+                              </CanvaButton>
+                              <CanvaButton size="sm">Uygula</CanvaButton>
                             </div>
                           </div>
                         </div>
                       ))}
                     </div>
                   </ScrollArea>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             </div>
 
             <div className="space-y-4">
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Insight Dagilimi</CardTitle>
-                </CardHeader>
-                <CardContent>
+              <CanvaCard>
+                <CanvaCardHeader className="pb-3">
+                  <CanvaCardTitle className="text-base">Insight Dagilimi</CanvaCardTitle>
+                </CanvaCardHeader>
+                <CanvaCardBody>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -711,14 +711,14 @@ export default function AIInsightsPage() {
                       <span className="font-medium">3</span>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
 
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Istek Hacmi</CardTitle>
-                </CardHeader>
-                <CardContent>
+              <CanvaCard>
+                <CanvaCardHeader className="pb-3">
+                  <CanvaCardTitle className="text-base">Istek Hacmi</CanvaCardTitle>
+                </CanvaCardHeader>
+                <CanvaCardBody>
                   <AdminAreaChart
                     data={requestVolumeData}
                     xAxisKey="hour"
@@ -731,8 +731,8 @@ export default function AIInsightsPage() {
                       },
                     ]}
                   />
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             </div>
           </div>
         </TabsContent>
@@ -740,59 +740,59 @@ export default function AIInsightsPage() {
         {/* Chatbot Tab */}
         <TabsContent value="chatbot" className="space-y-6">
           <div className="grid gap-4 md:grid-cols-5">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardDescription>Konusma</CardDescription>
-                <CardTitle className="text-xl">
+            <CanvaCard>
+              <CanvaCardHeader className="pb-2">
+                <p className="text-sm text-muted-foreground">Konusma</p>
+                <CanvaCardTitle className="text-xl">
                   {chatbotStats.totalConversations.toLocaleString()}
-                </CardTitle>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardDescription>Ort. Mesaj</CardDescription>
-                <CardTitle className="text-xl">
+                </CanvaCardTitle>
+              </CanvaCardHeader>
+            </CanvaCard>
+            <CanvaCard>
+              <CanvaCardHeader className="pb-2">
+                <p className="text-sm text-muted-foreground">Ort. Mesaj</p>
+                <CanvaCardTitle className="text-xl">
                   {chatbotStats.avgMessages}
-                </CardTitle>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardDescription>Cozum Orani</CardDescription>
-                <CardTitle className="text-xl text-emerald-600">
+                </CanvaCardTitle>
+              </CanvaCardHeader>
+            </CanvaCard>
+            <CanvaCard>
+              <CanvaCardHeader className="pb-2">
+                <p className="text-sm text-muted-foreground">Cozum Orani</p>
+                <CanvaCardTitle className="text-xl text-emerald-600">
                   %{chatbotStats.resolutionRate}
-                </CardTitle>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardDescription>Escalation</CardDescription>
-                <CardTitle className="text-xl text-amber-600">
+                </CanvaCardTitle>
+              </CanvaCardHeader>
+            </CanvaCard>
+            <CanvaCard>
+              <CanvaCardHeader className="pb-2">
+                <p className="text-sm text-muted-foreground">Escalation</p>
+                <CanvaCardTitle className="text-xl text-amber-600">
                   %{chatbotStats.escalationRate}
-                </CardTitle>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardDescription>Yanit Suresi</CardDescription>
-                <CardTitle className="text-xl">
+                </CanvaCardTitle>
+              </CanvaCardHeader>
+            </CanvaCard>
+            <CanvaCard>
+              <CanvaCardHeader className="pb-2">
+                <p className="text-sm text-muted-foreground">Yanit Suresi</p>
+                <CanvaCardTitle className="text-xl">
                   {chatbotStats.avgResponseTime}s
-                </CardTitle>
-              </CardHeader>
-            </Card>
+                </CanvaCardTitle>
+              </CanvaCardHeader>
+            </CanvaCard>
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle className="flex items-center gap-2">
                 <Bot className="h-5 w-5 text-purple-500" />
                 Intent Performansi
-              </CardTitle>
-              <CardDescription>
+              </CanvaCardTitle>
+              <p className="text-sm text-muted-foreground">
                 Chatbot intent tespit ve cozum oranlari
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </p>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-4">
                 {chatbotStats.topIntents.map((intent) => (
                   <div
@@ -828,45 +828,45 @@ export default function AIInsightsPage() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
 
         {/* A/B Tests Tab */}
         <TabsContent value="experiments" className="space-y-6">
           <div className="grid gap-6">
             {abTests.map((test) => (
-              <Card key={test.id}>
-                <CardHeader>
+              <CanvaCard key={test.id}>
+                <CanvaCardHeader>
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="flex items-center gap-2">
+                      <CanvaCardTitle className="flex items-center gap-2">
                         {test.name}
                         {test.status === 'running' ? (
-                          <Badge className="bg-blue-500/10 text-blue-600">
+                          <CanvaBadge className="bg-blue-500/10 text-blue-600">
                             <Activity className="h-3 w-3 mr-1 animate-pulse" />
                             Devam Ediyor
-                          </Badge>
+                          </CanvaBadge>
                         ) : (
-                          <Badge className="bg-emerald-500/10 text-emerald-600">
+                          <CanvaBadge className="bg-emerald-500/10 text-emerald-600">
                             <CheckCircle2 className="h-3 w-3 mr-1" />
                             Tamamlandi
-                          </Badge>
+                          </CanvaBadge>
                         )}
-                      </CardTitle>
-                      <CardDescription>
+                      </CanvaCardTitle>
+                      <p className="text-sm text-muted-foreground">
                         Baslama: {test.startDate} |{' '}
                         {test.participants.toLocaleString()} katilimci
-                      </CardDescription>
+                      </p>
                     </div>
                     {test.winner && (
-                      <Badge className="bg-emerald-500 text-white">
+                      <CanvaBadge className="bg-emerald-500 text-white">
                         Kazanan: {test.winner}
-                      </Badge>
+                      </CanvaBadge>
                     )}
                   </div>
-                </CardHeader>
-                <CardContent>
+                </CanvaCardHeader>
+                <CanvaCardBody>
                   <div className="grid gap-4 md:grid-cols-3">
                     {Object.entries(test.conversions).map(([variant, rate]) => (
                       <div
@@ -893,13 +893,13 @@ export default function AIInsightsPage() {
                       </span>
                     </div>
                     {test.status === 'running' && (
-                      <Button size="sm" variant="outline">
+                      <CanvaButton size="sm" variant="outline">
                         Deneyi Bitir
-                      </Button>
+                      </CanvaButton>
                     )}
                   </div>
-                </CardContent>
-              </Card>
+                </CanvaCardBody>
+              </CanvaCard>
             ))}
           </div>
         </TabsContent>

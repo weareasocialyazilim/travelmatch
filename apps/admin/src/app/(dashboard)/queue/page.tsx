@@ -79,8 +79,8 @@ export default function QueuePage() {
     return (
       <div className="flex h-[60vh] items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="mx-auto w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-            <AlertTriangle className="h-8 w-8 text-red-500" />
+          <div className="mx-auto w-16 h-16 rounded-full bg-red-50 dark:bg-red-500/20 flex items-center justify-center">
+            <AlertTriangle className="h-8 w-8 text-red-500 dark:text-red-400" />
           </div>
           <div>
             <h2 className="text-xl font-semibold text-foreground">
@@ -124,22 +124,22 @@ export default function QueuePage() {
         <CanvaStatCard
           label="Acil"
           value={isLoading ? '...' : (stats?.urgent || 0).toString()}
-          icon={<Zap className="h-5 w-5 text-red-500" />}
+          icon={<Zap className="h-5 w-5 text-red-500 dark:text-red-400" />}
         />
         <CanvaStatCard
           label="Bekleyen"
           value={isLoading ? '...' : (stats?.pending || 0).toString()}
-          icon={<Clock className="h-5 w-5 text-amber-500" />}
+          icon={<Clock className="h-5 w-5 text-amber-500 dark:text-amber-400" />}
         />
         <CanvaStatCard
           label="Devam Eden"
           value={isLoading ? '...' : (stats?.inProgress || 0).toString()}
-          icon={<ListTodo className="h-5 w-5 text-blue-500" />}
+          icon={<ListTodo className="h-5 w-5 text-blue-500 dark:text-blue-400" />}
         />
         <CanvaStatCard
           label="Tamamlanan"
           value={isLoading ? '...' : (stats?.completed || 0).toString()}
-          icon={<CheckCircle2 className="h-5 w-5 text-emerald-500" />}
+          icon={<CheckCircle2 className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />}
         />
       </div>
 
@@ -147,8 +147,8 @@ export default function QueuePage() {
       {(stats?.overdue || 0) > 0 && (
         <CanvaCard className="border-l-4 border-l-red-500">
           <div className="p-4 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center">
-              <AlertTriangle className="h-5 w-5 text-red-500" />
+            <div className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-500/20 flex items-center justify-center">
+              <AlertTriangle className="h-5 w-5 text-red-500 dark:text-red-400" />
             </div>
             <div>
               <p className="font-semibold text-foreground">
@@ -219,7 +219,7 @@ export default function QueuePage() {
             <TabsContent value="all" className="mt-0">
               {isLoading ? (
                 <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+                  <Loader2 className="h-8 w-8 animate-spin text-violet-500 dark:text-violet-400" />
                 </div>
               ) : tasks.length > 0 ? (
                 <div className="divide-y divide-border">
@@ -248,11 +248,11 @@ export default function QueuePage() {
                             className={cn(
                               'flex h-10 w-10 items-center justify-center rounded-xl',
                               task.priority === 'urgent' &&
-                                'bg-red-50 text-red-600',
+                                'bg-red-50 dark:bg-red-500/20 text-red-600 dark:text-red-400',
                               task.priority === 'high' &&
-                                'bg-amber-50 text-amber-600',
+                                'bg-amber-50 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400',
                               task.priority === 'medium' &&
-                                'bg-blue-50 text-blue-600',
+                                'bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400',
                               task.priority === 'low' &&
                                 'bg-muted text-foreground',
                             )}
@@ -315,7 +315,7 @@ export default function QueuePage() {
                 </div>
               ) : (
                 <div className="py-12 text-center">
-                  <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-500" />
+                  <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-500 dark:text-emerald-400" />
                   <h3 className="mt-4 text-lg font-semibold text-foreground">
                     Tebrikler!
                   </h3>
@@ -329,7 +329,7 @@ export default function QueuePage() {
             <TabsContent value="urgent" className="mt-0">
               {isLoading ? (
                 <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+                  <Loader2 className="h-8 w-8 animate-spin text-violet-500 dark:text-violet-400" />
                 </div>
               ) : (
                 <div className="divide-y divide-border">
@@ -346,7 +346,7 @@ export default function QueuePage() {
                           className="flex items-center justify-between px-6 py-4 hover:bg-muted transition-colors border-l-4 border-l-red-500"
                         >
                           <div className="flex items-center gap-4">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-600">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 dark:bg-red-500/20 text-red-600 dark:text-red-400">
                               <TypeIcon className="h-5 w-5" />
                             </div>
                             <div>
@@ -368,7 +368,7 @@ export default function QueuePage() {
                   {tasks.filter((t) => t.priority === 'urgent').length ===
                     0 && (
                     <div className="py-12 text-center">
-                      <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-500" />
+                      <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-500 dark:text-emerald-400" />
                       <p className="mt-4 text-muted-foreground">
                         Acil görev bulunmuyor.
                       </p>
@@ -381,7 +381,7 @@ export default function QueuePage() {
             <TabsContent value="pending" className="mt-0">
               {isLoading ? (
                 <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+                  <Loader2 className="h-8 w-8 animate-spin text-violet-500 dark:text-violet-400" />
                 </div>
               ) : (
                 <div className="divide-y divide-border">
@@ -435,7 +435,7 @@ export default function QueuePage() {
                     })}
                   {tasks.filter((t) => t.status === 'pending').length === 0 && (
                     <div className="py-12 text-center">
-                      <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-500" />
+                      <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-500 dark:text-emerald-400" />
                       <p className="mt-4 text-muted-foreground">
                         Bekleyen görev bulunmuyor.
                       </p>

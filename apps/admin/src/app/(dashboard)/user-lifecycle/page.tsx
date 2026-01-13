@@ -78,32 +78,32 @@ const lifecycleStats = {
 
 // Onboarding funnel
 const onboardingFunnel = [
-  { stage: 'Kayıt', count: 8500, percentage: 100, color: 'bg-blue-500' },
+  { stage: 'Kayıt', count: 8500, percentage: 100, color: 'bg-blue-500 dark:bg-blue-600' },
   {
     stage: 'Email Doğrulama',
     count: 7650,
     percentage: 90,
-    color: 'bg-blue-400',
+    color: 'bg-blue-400 dark:bg-blue-500',
   },
   {
     stage: 'Profil Tamamlama',
     count: 6120,
     percentage: 72,
-    color: 'bg-purple-500',
+    color: 'bg-purple-500 dark:bg-purple-600',
   },
   {
     stage: 'Fotoğraf Yükleme',
     count: 5200,
     percentage: 61,
-    color: 'bg-purple-400',
+    color: 'bg-purple-400 dark:bg-purple-500',
   },
-  { stage: 'İlk Eşleşme', count: 3900, percentage: 46, color: 'bg-green-500' },
-  { stage: 'İlk Mesaj', count: 2890, percentage: 34, color: 'bg-green-400' },
+  { stage: 'İlk Eşleşme', count: 3900, percentage: 46, color: 'bg-green-500 dark:bg-green-600' },
+  { stage: 'İlk Mesaj', count: 2890, percentage: 34, color: 'bg-green-400 dark:bg-green-500' },
   {
     stage: 'İlk Rezervasyon',
     count: 1275,
     percentage: 15,
-    color: 'bg-orange-500',
+    color: 'bg-orange-500 dark:bg-orange-600',
   },
 ];
 
@@ -179,7 +179,7 @@ const userSegments = [
     count: 12500,
     percentage: 5,
     avgLTV: 680,
-    color: 'bg-green-500',
+    color: 'bg-green-500 dark:bg-green-600',
     description: 'Günlük aktif, yüksek harcama',
   },
   {
@@ -187,7 +187,7 @@ const userSegments = [
     count: 87500,
     percentage: 35,
     avgLTV: 245,
-    color: 'bg-blue-500',
+    color: 'bg-blue-500 dark:bg-blue-600',
     description: 'Haftalık aktif, orta harcama',
   },
   {
@@ -195,7 +195,7 @@ const userSegments = [
     count: 75000,
     percentage: 30,
     avgLTV: 85,
-    color: 'bg-yellow-500',
+    color: 'bg-yellow-500 dark:bg-yellow-600',
     description: 'Aylık aktif, düşük harcama',
   },
   {
@@ -203,7 +203,7 @@ const userSegments = [
     count: 50000,
     percentage: 20,
     avgLTV: 25,
-    color: 'bg-orange-500',
+    color: 'bg-orange-500 dark:bg-orange-600',
     description: '60+ gün inaktif',
   },
   {
@@ -211,7 +211,7 @@ const userSegments = [
     count: 25000,
     percentage: 10,
     avgLTV: 0,
-    color: 'bg-purple-500',
+    color: 'bg-purple-500 dark:bg-purple-600',
     description: 'Son 30 günde kayıt',
   },
 ];
@@ -275,16 +275,16 @@ export default function UserLifecyclePage() {
 
       {/* Lifecycle Stage Cards */}
       <div className="grid grid-cols-5 gap-4">
-        <CanvaCard className="admin-card border-l-4 border-l-blue-500">
+        <CanvaCard className="admin-card border-l-4 border-l-blue-500 dark:border-l-blue-400">
           <CanvaCardBody className="p-4">
             <div className="flex items-center justify-between">
-              <UserPlus className="h-5 w-5 text-blue-500" />
+              <UserPlus className="h-5 w-5 text-blue-500 dark:text-blue-400" />
               <CanvaBadge
                 variant="outline"
                 className={cn(
                   lifecycleStats.newUsers.change > 0
-                    ? 'text-green-500'
-                    : 'text-red-500',
+                    ? 'text-green-500 dark:text-green-400'
+                    : 'text-red-500 dark:text-red-400',
                 )}
               >
                 {lifecycleStats.newUsers.change > 0 ? '+' : ''}
@@ -300,11 +300,11 @@ export default function UserLifecyclePage() {
           </CanvaCardBody>
         </CanvaCard>
 
-        <CanvaCard className="admin-card border-l-4 border-l-green-500">
+        <CanvaCard className="admin-card border-l-4 border-l-green-500 dark:border-l-green-400">
           <CanvaCardBody className="p-4">
             <div className="flex items-center justify-between">
-              <UserCheck className="h-5 w-5 text-green-500" />
-              <CanvaBadge variant="outline" className="text-green-500">
+              <UserCheck className="h-5 w-5 text-green-500 dark:text-green-400" />
+              <CanvaBadge variant="outline" className="text-green-500 dark:text-green-400">
                 +{lifecycleStats.activeUsers.change}%
               </CanvaBadge>
             </div>
@@ -317,11 +317,11 @@ export default function UserLifecyclePage() {
           </CanvaCardBody>
         </CanvaCard>
 
-        <CanvaCard className="admin-card border-l-4 border-l-yellow-500">
+        <CanvaCard className="admin-card border-l-4 border-l-yellow-500 dark:border-l-yellow-400">
           <CanvaCardBody className="p-4">
             <div className="flex items-center justify-between">
-              <AlertTriangle className="h-5 w-5 text-yellow-500" />
-              <CanvaBadge variant="outline" className="text-green-500">
+              <AlertTriangle className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />
+              <CanvaBadge variant="outline" className="text-green-500 dark:text-green-400">
                 {lifecycleStats.atRiskUsers.change}%
               </CanvaBadge>
             </div>
@@ -334,11 +334,11 @@ export default function UserLifecyclePage() {
           </CanvaCardBody>
         </CanvaCard>
 
-        <CanvaCard className="admin-card border-l-4 border-l-red-500">
+        <CanvaCard className="admin-card border-l-4 border-l-red-500 dark:border-l-red-400">
           <CanvaCardBody className="p-4">
             <div className="flex items-center justify-between">
-              <UserX className="h-5 w-5 text-red-500" />
-              <CanvaBadge variant="outline" className="text-red-500">
+              <UserX className="h-5 w-5 text-red-500 dark:text-red-400" />
+              <CanvaBadge variant="outline" className="text-red-500 dark:text-red-400">
                 +{lifecycleStats.churnedUsers.change}%
               </CanvaBadge>
             </div>
@@ -351,11 +351,11 @@ export default function UserLifecyclePage() {
           </CanvaCardBody>
         </CanvaCard>
 
-        <CanvaCard className="admin-card border-l-4 border-l-purple-500">
+        <CanvaCard className="admin-card border-l-4 border-l-purple-500 dark:border-l-purple-400">
           <CanvaCardBody className="p-4">
             <div className="flex items-center justify-between">
-              <RotateCcw className="h-5 w-5 text-purple-500" />
-              <CanvaBadge variant="outline" className="text-green-500">
+              <RotateCcw className="h-5 w-5 text-purple-500 dark:text-purple-400" />
+              <CanvaBadge variant="outline" className="text-green-500 dark:text-green-400">
                 +{lifecycleStats.reactivatedUsers.change}%
               </CanvaBadge>
             </div>
@@ -436,10 +436,10 @@ export default function UserLifecyclePage() {
                       className={cn(
                         'h-2',
                         (metric.value / metric.target) * 100 >= 80
-                          ? '[&>div]:bg-green-500'
+                          ? '[&>div]:bg-green-500 dark:[&>div]:bg-green-600'
                           : (metric.value / metric.target) * 100 >= 60
-                            ? '[&>div]:bg-yellow-500'
-                            : '[&>div]:bg-red-500',
+                            ? '[&>div]:bg-yellow-500 dark:[&>div]:bg-yellow-600'
+                            : '[&>div]:bg-red-500 dark:[&>div]:bg-red-600',
                       )}
                     />
                   </div>
@@ -464,24 +464,28 @@ export default function UserLifecyclePage() {
                     count: 8500,
                     icon: UserPlus,
                     color: 'bg-blue-500',
+                    textColor: 'text-blue-500 dark:text-blue-400',
                   },
                   {
                     stage: 'Aktif',
                     count: 145000,
                     icon: UserCheck,
                     color: 'bg-green-500',
+                    textColor: 'text-green-500 dark:text-green-400',
                   },
                   {
                     stage: 'Risk',
                     count: 12400,
                     icon: AlertTriangle,
                     color: 'bg-yellow-500',
+                    textColor: 'text-yellow-500 dark:text-yellow-400',
                   },
                   {
                     stage: 'Churn',
                     count: 28900,
                     icon: UserX,
                     color: 'bg-red-500',
+                    textColor: 'text-red-500 dark:text-red-400',
                   },
                 ].map((item, i, arr) => (
                   <div
@@ -492,13 +496,13 @@ export default function UserLifecyclePage() {
                       <div
                         className={cn(
                           'w-12 h-12 rounded-full mx-auto flex items-center justify-center',
-                          item.color + '/10',
+                          item.color + '/10 dark:' + item.color + '/20',
                         )}
                       >
                         <item.icon
                           className={cn(
                             'h-6 w-6',
-                            item.color.replace('bg-', 'text-'),
+                            item.textColor,
                           )}
                         />
                       </div>
@@ -591,7 +595,7 @@ export default function UserLifecyclePage() {
                     <div className="p-2 rounded-lg bg-primary/10">
                       <stat.icon className="h-5 w-5 text-primary" />
                     </div>
-                    <CanvaBadge variant="outline" className="text-green-500">
+                    <CanvaBadge variant="outline" className="text-green-500 dark:text-green-400">
                       {stat.trend}
                     </CanvaBadge>
                   </div>
@@ -636,9 +640,9 @@ export default function UserLifecyclePage() {
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium">{item.period} Retention</span>
                     {item.rate > item.benchmark ? (
-                      <TrendingUp className="h-4 w-4 text-green-500" />
+                      <TrendingUp className="h-4 w-4 text-green-500 dark:text-green-400" />
                     ) : (
-                      <TrendingDown className="h-4 w-4 text-red-500" />
+                      <TrendingDown className="h-4 w-4 text-red-500 dark:text-red-400" />
                     )}
                   </div>
                   <p className="text-3xl font-bold">{item.rate}%</p>
@@ -661,8 +665,8 @@ export default function UserLifecyclePage() {
             <CanvaCard className="admin-card">
               <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-yellow-500/10">
-                    <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                  <div className="p-2 rounded-lg bg-yellow-500/10 dark:bg-yellow-500/20">
+                    <AlertTriangle className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold">
@@ -678,8 +682,8 @@ export default function UserLifecyclePage() {
             <CanvaCard className="admin-card">
               <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-purple-500/10">
-                    <Brain className="h-5 w-5 text-purple-500" />
+                  <div className="p-2 rounded-lg bg-purple-500/10 dark:bg-purple-500/20">
+                    <Brain className="h-5 w-5 text-purple-500 dark:text-purple-400" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold">89.2%</p>
@@ -693,8 +697,8 @@ export default function UserLifecyclePage() {
             <CanvaCard className="admin-card">
               <CanvaCardBody className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-green-500/10">
-                    <RotateCcw className="h-5 w-5 text-green-500" />
+                  <div className="p-2 rounded-lg bg-green-500/10 dark:bg-green-500/20">
+                    <RotateCcw className="h-5 w-5 text-green-500 dark:text-green-400" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold">32%</p>
@@ -751,10 +755,10 @@ export default function UserLifecyclePage() {
                             className={cn(
                               'w-16 h-2',
                               user.riskScore > 0.8
-                                ? '[&>div]:bg-red-500'
+                                ? '[&>div]:bg-red-500 dark:[&>div]:bg-red-600'
                                 : user.riskScore > 0.6
-                                  ? '[&>div]:bg-yellow-500'
-                                  : '[&>div]:bg-green-500',
+                                  ? '[&>div]:bg-yellow-500 dark:[&>div]:bg-yellow-600'
+                                  : '[&>div]:bg-green-500 dark:[&>div]:bg-green-600',
                             )}
                           />
                           <span className="font-medium">
@@ -771,7 +775,7 @@ export default function UserLifecyclePage() {
                       <TableCell>
                         <CanvaBadge
                           variant="outline"
-                          className="bg-yellow-500/10 text-yellow-700"
+                          className="bg-yellow-500/10 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-300"
                         >
                           {user.reason}
                         </CanvaBadge>

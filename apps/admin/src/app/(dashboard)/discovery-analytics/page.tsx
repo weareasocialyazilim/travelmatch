@@ -310,7 +310,7 @@ export default function DiscoveryAnalyticsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <Compass className="h-6 w-6 text-pink-500" />
+            <Compass className="h-6 w-6 text-pink-500 dark:text-pink-400" />
             Discovery & Matching Analytics
           </h1>
           <p className="text-muted-foreground">
@@ -379,7 +379,7 @@ export default function DiscoveryAnalyticsPage() {
               En Populer
             </CanvaCardSubtitle>
             <CanvaCardTitle className="text-xl font-bold flex items-center gap-2">
-              <Award className="h-4 w-4 text-amber-500" />
+              <Award className="h-4 w-4 text-amber-500 dark:text-amber-400" />
               {discoveryStats.popularCategory}
             </CanvaCardTitle>
           </CanvaCardHeader>
@@ -390,7 +390,7 @@ export default function DiscoveryAnalyticsPage() {
       <CanvaCard>
         <CanvaCardHeader>
           <CanvaCardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-emerald-500" />
+            <Target className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />
             Kesif Donusum Hunisi
           </CanvaCardTitle>
           <CanvaCardSubtitle>
@@ -462,7 +462,7 @@ export default function DiscoveryAnalyticsPage() {
             <CanvaCard>
               <CanvaCardHeader>
                 <CanvaCardTitle className="flex items-center gap-2">
-                  <Filter className="h-5 w-5 text-blue-500" />
+                  <Filter className="h-5 w-5 text-blue-500 dark:text-blue-400" />
                   Filtre Kullanimi
                 </CanvaCardTitle>
                 <CanvaCardSubtitle>
@@ -520,7 +520,7 @@ export default function DiscoveryAnalyticsPage() {
           <CanvaCard>
             <CanvaCardHeader>
               <CanvaCardTitle className="flex items-center gap-2">
-                <Globe className="h-5 w-5 text-emerald-500" />
+                <Globe className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />
                 Cografi Hotspotlar
               </CanvaCardTitle>
               <CanvaCardSubtitle>PostGIS tabanlı konum analitiği</CanvaCardSubtitle>
@@ -569,7 +569,7 @@ export default function DiscoveryAnalyticsPage() {
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Eslesme</p>
-                        <p className="font-bold text-pink-600">
+                        <p className="font-bold text-pink-600 dark:text-pink-400">
                           {spot.matches}
                         </p>
                       </div>
@@ -579,8 +579,8 @@ export default function DiscoveryAnalyticsPage() {
                           className={cn(
                             'font-bold flex items-center gap-1',
                             spot.growth > 0
-                              ? 'text-emerald-600'
-                              : 'text-red-600',
+                              ? 'text-emerald-600 dark:text-emerald-400'
+                              : 'text-red-600 dark:text-red-400',
                           )}
                         >
                           {spot.growth > 0 ? (
@@ -629,17 +629,17 @@ export default function DiscoveryAnalyticsPage() {
                       </TableCell>
                       <TableCell>{cat.moments.toLocaleString()}</TableCell>
                       <TableCell>{cat.discoveries.toLocaleString()}</TableCell>
-                      <TableCell className="text-pink-600 font-medium">
+                      <TableCell className="text-pink-600 dark:text-pink-400 font-medium">
                         {cat.matches}
                       </TableCell>
                       <TableCell>
                         <CanvaBadge
                           className={cn(
                             cat.conversion >= 15
-                              ? 'bg-emerald-500/10 text-emerald-600'
+                              ? 'bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'
                               : cat.conversion >= 12
-                                ? 'bg-blue-500/10 text-blue-600'
-                                : 'bg-amber-500/10 text-amber-600',
+                                ? 'bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400'
+                                : 'bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400',
                           )}
                         >
                           %{cat.conversion}
@@ -653,8 +653,8 @@ export default function DiscoveryAnalyticsPage() {
                           className={cn(
                             'flex items-center gap-1',
                             cat.growth > 0
-                              ? 'text-emerald-600'
-                              : 'text-red-600',
+                              ? 'text-emerald-600 dark:text-emerald-400'
+                              : 'text-red-600 dark:text-red-400',
                           )}
                         >
                           {cat.growth > 0 ? (
@@ -678,7 +678,7 @@ export default function DiscoveryAnalyticsPage() {
           <CanvaCard>
             <CanvaCardHeader>
               <CanvaCardTitle className="flex items-center gap-2">
-                <Star className="h-5 w-5 text-amber-500" />
+                <Star className="h-5 w-5 text-amber-500 dark:text-amber-400" />
                 En Iyi Performans Gosteren Momentler
               </CanvaCardTitle>
               <CanvaCardSubtitle>
@@ -724,17 +724,17 @@ export default function DiscoveryAnalyticsPage() {
                       <TableCell>
                         {moment.discoveries.toLocaleString()}
                       </TableCell>
-                      <TableCell className="text-pink-600 font-medium">
+                      <TableCell className="text-pink-600 dark:text-pink-400 font-medium">
                         {moment.matches}
                       </TableCell>
                       <TableCell>
-                        <CanvaBadge className="bg-emerald-500/10 text-emerald-600">
+                        <CanvaBadge className="bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
                           %{moment.conversion}
                         </CanvaBadge>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
-                          <Star className="h-4 w-4 fill-amber-500 text-amber-500" />
+                          <Star className="h-4 w-4 fill-amber-500 text-amber-500 dark:text-amber-400" />
                           <span className="font-medium">{moment.rating}</span>
                         </div>
                       </TableCell>

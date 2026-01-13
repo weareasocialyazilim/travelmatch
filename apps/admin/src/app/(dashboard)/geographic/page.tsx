@@ -316,15 +316,15 @@ export default function GeographicPage() {
                           </div>
                           <div className="flex items-center gap-1">
                             {country.growth > 0 ? (
-                              <TrendingUp className="h-4 w-4 text-green-500" />
+                              <TrendingUp className="h-4 w-4 text-green-500 dark:text-green-400" />
                             ) : (
-                              <TrendingDown className="h-4 w-4 text-red-500" />
+                              <TrendingDown className="h-4 w-4 text-red-500 dark:text-red-400" />
                             )}
                             <span
                               className={`text-sm font-medium ${
                                 country.growth > 0
-                                  ? 'text-green-600'
-                                  : 'text-red-600'
+                                  ? 'text-green-600 dark:text-green-400'
+                                  : 'text-red-600 dark:text-red-400'
                               }`}
                             >
                               {country.growth > 0 ? '+' : ''}
@@ -490,13 +490,13 @@ export default function GeographicPage() {
                       <h3 className="font-semibold">{city.name}</h3>
                       <div className="flex items-center gap-1">
                         {city.growth > 0 ? (
-                          <TrendingUp className="h-4 w-4 text-green-500" />
+                          <TrendingUp className="h-4 w-4 text-green-500 dark:text-green-400" />
                         ) : (
-                          <TrendingDown className="h-4 w-4 text-red-500" />
+                          <TrendingDown className="h-4 w-4 text-red-500 dark:text-red-400" />
                         )}
                         <span
                           className={`text-sm ${
-                            city.growth > 0 ? 'text-green-600' : 'text-red-600'
+                            city.growth > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                           }`}
                         >
                           {city.growth > 0 ? '+' : ''}
