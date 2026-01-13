@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { authenticator } from 'otplib';
 import crypto from 'crypto';
+import type { Database } from '@/types/database';
+
+type AdminUserRow = Database['public']['Tables']['admin_users']['Row'];
 
 // Encryption helpers for TOTP secret
 const ALGORITHM = 'aes-256-gcm';
@@ -71,23 +74,19 @@ export async function POST(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Get admin user with TOTP secret
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: adminUserData, error: userError } = await (supabase as any)
+    const { data: adminUser, error: userError } = await supabase
       .from('admin_users')
       .select('id, totp_secret, totp_enabled')
       .eq('id', userId)
       .eq('is_active', true)
       .single();
 
-    if (userError || !adminUserData) {
+    if (userError || !adminUser) {
       return NextResponse.json(
         { success: false, error: 'Kullanıcı bulunamadı' },
         { status: 404 },
       );
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const adminUser = adminUserData as any;
 
     if (!adminUser.totp_enabled || !adminUser.totp_secret) {
       return NextResponse.json(
@@ -125,10 +124,10 @@ export async function POST(request: NextRequest) {
 
     if (!isValid) {
       // Log failed attempt
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase as any).from('audit_logs').insert({
+      await supabase.from('audit_logs').insert({
         admin_id: userId,
         action: '2fa_verification_failed',
+        resource_type: 'auth',
         ip_address: clientIp,
         user_agent: userAgent,
       });
@@ -140,17 +139,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Log successful verification
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any).from('audit_logs').insert({
+    await supabase.from('audit_logs').insert({
       admin_id: userId,
       action: '2fa_verification_success',
+      resource_type: 'auth',
       ip_address: clientIp,
       user_agent: userAgent,
     });
 
     // Update last login timestamp
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any)
+    await supabase
       .from('admin_users')
       .update({ last_login_at: new Date().toISOString() })
       .eq('id', userId);
@@ -160,10 +158,9 @@ export async function POST(request: NextRequest) {
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
     // Store session
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any).from('admin_sessions').insert({
+    await supabase.from('admin_sessions').insert({
       admin_id: userId,
-      session_token: crypto
+      token_hash: crypto
         .createHash('sha256')
         .update(sessionToken)
         .digest('hex'),

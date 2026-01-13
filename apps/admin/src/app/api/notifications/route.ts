@@ -1,16 +1,22 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase';
+import { createServiceClient } from '@/lib/supabase';
+import type { Database } from '@/types/database';
+
+type NotificationCampaignStatus =
+  Database['public']['Tables']['notification_campaigns']['Row']['status'];
+type NotificationCampaignType =
+  Database['public']['Tables']['notification_campaigns']['Row']['type'];
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = createServiceClient();
     const searchParams = request.nextUrl.searchParams;
-    const status = searchParams.get('status');
-    const type = searchParams.get('type');
+    const status = searchParams.get('status') as NotificationCampaignStatus | null;
+    const type = searchParams.get('type') as NotificationCampaignType | null;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (supabase.from('notification_campaigns') as any)
+    let query = supabase
+      .from('notification_campaigns')
       .select('*', { count: 'exact' })
       .order('created_at', { ascending: false });
 
@@ -40,13 +46,11 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = createServiceClient();
     const body = await request.json();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (
-      supabase.from('notification_campaigns') as any
-    )
+    const { data, error } = await supabase
+      .from('notification_campaigns')
       .insert({
         title: body.title,
         message: body.message,

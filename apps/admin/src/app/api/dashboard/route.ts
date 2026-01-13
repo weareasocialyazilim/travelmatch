@@ -1,6 +1,13 @@
-import { createClient } from '@/lib/supabase';
+import { createServiceClient } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
+import type { Database } from '@/types/database';
+
+type ProfileRow = Database['public']['Tables']['profiles']['Row'];
+type MomentRow = Database['public']['Tables']['moments']['Row'];
+type TaskRow = Database['public']['Tables']['tasks']['Row'];
+type PaymentRow = Database['public']['Tables']['payments']['Row'];
+type ActivityLogRow = Database['public']['Tables']['activity_logs']['Row'];
 
 /**
  * Dashboard API Endpoint
@@ -18,10 +25,9 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    const supabase = createClient();
+    const supabase = createServiceClient();
 
     // Parallel data fetching for performance (META approach)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [
       usersResult,
       momentsResult,
@@ -32,29 +38,32 @@ export async function GET() {
       systemHealthResult,
     ] = await Promise.all([
       // Total users count
-      (supabase.from('profiles') as any).select('*', {
+      supabase.from('profiles').select('*', {
         count: 'exact',
         head: true,
       }),
 
       // Total moments count
-      (supabase.from('moments') as any).select('*', {
+      supabase.from('moments').select('*', {
         count: 'exact',
         head: true,
       }),
 
       // Pending tasks count
-      (supabase.from('tasks') as any)
+      supabase
+        .from('tasks')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'pending'),
 
       // Revenue calculation from payments
-      (supabase.from('payments') as any)
+      supabase
+        .from('payments')
         .select('amount, status, created_at')
         .eq('status', 'completed'),
 
       // Recent users for activity chart (last 30 days)
-      (supabase.from('profiles') as any)
+      supabase
+        .from('profiles')
         .select('created_at')
         .gte(
           'created_at',
@@ -63,7 +72,8 @@ export async function GET() {
         .order('created_at', { ascending: true }),
 
       // Recent moments for activity chart
-      (supabase.from('moments') as any)
+      supabase
+        .from('moments')
         .select('created_at, status')
         .gte(
           'created_at',
@@ -72,12 +82,9 @@ export async function GET() {
         .order('created_at', { ascending: true }),
 
       // System health check - count active sessions
-      (supabase.from('profiles') as any)
-        .select('last_sign_in_at', { count: 'exact', head: true })
-        .gte(
-          'last_sign_in_at',
-          new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-        ),
+      supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true }),
     ]);
 
     // Calculate revenue
@@ -97,19 +104,17 @@ export async function GET() {
     const dailyMoments = calculateDailyData(recentMomentsResult.data || []);
 
     // Get pending tasks list
-    const { data: pendingTasks } = await (supabase.from('tasks') as any)
+    const { data: pendingTasks } = await supabase
+      .from('tasks')
       .select('id, title, priority, status, created_at, assigned_to')
       .eq('status', 'pending')
       .order('priority', { ascending: false })
       .limit(10);
 
     // Get recent activities
-    const { data: recentActivities } = await (
-      supabase.from('activity_logs') as any
-    )
-      .select(
-        'id, action, entity_type, entity_id, user_id, created_at, metadata',
-      )
+    const { data: recentActivities } = await supabase
+      .from('activity_logs')
+      .select('id, action, entity_type, entity_id, user_id, created_at, metadata')
       .order('created_at', { ascending: false })
       .limit(20);
 
@@ -120,18 +125,17 @@ export async function GET() {
       totalUsers > 0 ? Math.round((activeUsers24h / totalUsers) * 100) : 0;
 
     // Calculate week-over-week growth
-    const { data: lastWeekUsers } = await (supabase.from('profiles') as any)
+    const { count: lastWeekCount } = await supabase
+      .from('profiles')
       .select('*', { count: 'exact', head: true })
       .lt(
         'created_at',
         new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
       );
 
-    const userGrowth = lastWeekUsers?.length
+    const userGrowth = lastWeekCount
       ? Math.round(
-          ((totalUsers - (lastWeekUsers?.length || 0)) /
-            (lastWeekUsers?.length || 1)) *
-            100,
+          ((totalUsers - (lastWeekCount || 0)) / (lastWeekCount || 1)) * 100,
         )
       : 0;
 
