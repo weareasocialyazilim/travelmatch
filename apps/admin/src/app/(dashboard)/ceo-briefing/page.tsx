@@ -36,6 +36,7 @@ import {
   Lock,
 } from 'lucide-react';
 import { usePermission } from '@/hooks/use-permission';
+import { useFounderDecisions } from '@/hooks/use-founder-decisions';
 import {
   CanvaCard,
   CanvaCardHeader,
@@ -204,6 +205,15 @@ export default function CEOBriefingPage() {
   const healthScore = calculateHealthScore();
   const { isSuperAdmin } = usePermission();
 
+  // Founder Decision Loop
+  const {
+    isEnabled: isDecisionLoopEnabled,
+    markAsReviewed,
+    markAsDeferred,
+    setAsFocus,
+    isPending: isDecisionPending,
+  } = useFounderDecisions();
+
   const getHealthColor = (score: number) => {
     if (score >= 85) return 'text-green-500 dark:text-green-400';
     if (score >= 70) return 'text-yellow-500 dark:text-yellow-400';
@@ -305,6 +315,31 @@ export default function CEOBriefingPage() {
                       {decision.context && (
                         <p className="text-xs text-violet-500 mt-2 italic">{decision.context}</p>
                       )}
+                      {/* Decision Loop Actions - Only visible when enabled */}
+                      {isDecisionLoopEnabled && (
+                        <div className="flex items-center gap-2 mt-3 pt-2 border-t border-white/10">
+                          <CanvaButton
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 text-xs text-emerald-500 hover:text-emerald-400 hover:bg-emerald-500/10"
+                            disabled={isDecisionPending}
+                            onClick={() => markAsReviewed('ceo-briefing', 'fire', `decision_${decision.id}`)}
+                          >
+                            <CheckCircle2 className="h-3 w-3 mr-1" />
+                            Reviewed
+                          </CanvaButton>
+                          <CanvaButton
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 text-xs text-amber-500 hover:text-amber-400 hover:bg-amber-500/10"
+                            disabled={isDecisionPending}
+                            onClick={() => markAsDeferred('ceo-briefing', 'fire', `decision_${decision.id}`)}
+                          >
+                            <Clock className="h-3 w-3 mr-1" />
+                            Defer
+                          </CanvaButton>
+                        </div>
+                      )}
                     </div>
                   ))
                 )}
@@ -347,6 +382,21 @@ export default function CEOBriefingPage() {
                       → {founderFocus.nextAction}
                     </p>
                   </div>
+                  {/* Set as Focus Button - Only visible when decision loop enabled */}
+                  {isDecisionLoopEnabled && (
+                    <div className="pt-2 border-t border-white/10">
+                      <CanvaButton
+                        variant="outline"
+                        size="sm"
+                        className="w-full h-7 text-xs border-blue-500/30 text-blue-500 hover:bg-blue-500/10"
+                        disabled={isDecisionPending}
+                        onClick={() => setAsFocus('ceo-briefing', founderFocus.title.toLowerCase().replace(/\s+/g, '_'))}
+                      >
+                        <Crosshair className="h-3 w-3 mr-1" />
+                        Bu Hafta Odağım Bu
+                      </CanvaButton>
+                    </div>
+                  )}
                 </div>
               </CanvaCardBody>
             </CanvaCard>

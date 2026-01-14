@@ -47,6 +47,7 @@ import {
   TrendingUp as TrendUp,
 } from 'lucide-react';
 import { usePermission } from '@/hooks/use-permission';
+import { useFounderDecisions } from '@/hooks/use-founder-decisions';
 import {
   CanvaCard,
   CanvaCardHeader,
@@ -336,6 +337,12 @@ export default function CommandCenterPage() {
   const { data: stats, isLoading } = useStats();
   const { isSuperAdmin } = usePermission();
 
+  // Founder Decision Loop
+  const {
+    isEnabled: isDecisionLoopEnabled,
+    stats: decisionStats,
+  } = useFounderDecisions();
+
   // Auto-refresh every 30 seconds
   useEffect(() => {
     const interval = setInterval(() => {
@@ -513,6 +520,29 @@ export default function CommandCenterPage() {
             <p className="mt-2 text-xs font-medium text-violet-400">
               → Öncelik: {founderPulseToday.topPriority}
             </p>
+
+            {/* Decision Loop Stats - Only visible when enabled */}
+            {isDecisionLoopEnabled && decisionStats && (
+              <div className="mt-3 pt-3 border-t border-slate-700/50">
+                <div className="flex items-center gap-4 text-xs">
+                  <span className="text-slate-400">Bugün:</span>
+                  <span className="flex items-center gap-1 text-emerald-400">
+                    <CheckCircle2 className="h-3 w-3" />
+                    {decisionStats.reviewedToday} reviewed
+                  </span>
+                  <span className="flex items-center gap-1 text-amber-400">
+                    <Clock className="h-3 w-3" />
+                    {decisionStats.deferredToday} deferred
+                  </span>
+                  {decisionStats.currentFocus && (
+                    <span className="flex items-center gap-1 text-blue-400">
+                      <Crosshair className="h-3 w-3" />
+                      Focus: {decisionStats.currentFocus}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
