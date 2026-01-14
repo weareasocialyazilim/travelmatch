@@ -32,14 +32,75 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
   navigation,
   route,
 }) => {
+  // SAFE GUARD: Prevent crash if params are missing
+  const params = route.params || {};
   const {
-    escrowId,
-    momentTitle,
-    amount,
-    receiverName,
-    receiverAvatar,
-    status,
-  } = route.params;
+    escrowId = '',
+    momentTitle = 'Unknown Moment',
+    amount = 0,
+    receiverName = 'Unknown',
+    receiverAvatar = '',
+    status = 'pending_proof',
+  } = params as {
+    escrowId?: string;
+    momentTitle?: string;
+    amount?: number;
+    receiverName?: string;
+    receiverAvatar?: string;
+    status?: string;
+  };
+
+  // Early return with error UI if critical param is missing
+  if (!escrowId) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={24}
+              color={COLORS.text.primary}
+            />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Escrow Status</Text>
+          <View style={styles.placeholder} />
+        </View>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 20,
+          }}
+        >
+          <MaterialCommunityIcons
+            name="alert-circle-outline"
+            size={48}
+            color={COLORS.text.secondary}
+          />
+          <Text
+            style={{
+              marginTop: 12,
+              fontSize: 16,
+              color: COLORS.text.secondary,
+              textAlign: 'center',
+            }}
+          >
+            Escrow bilgisi bulunamadı
+          </Text>
+          <TouchableOpacity
+            style={styles.primaryButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.primaryButtonText}>Geri Dön</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   // Determine escrow steps based on status
   const getEscrowSteps = (): EscrowStep[] => {

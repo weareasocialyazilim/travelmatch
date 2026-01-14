@@ -107,8 +107,8 @@ CREATE INDEX IF NOT EXISTS idx_promo_codes_created_by ON public.promo_codes(crea
 CREATE INDEX IF NOT EXISTS idx_proof_quality_scores_reviewed_by ON public.proof_quality_scores(reviewed_by);
 CREATE INDEX IF NOT EXISTS idx_proof_quality_scores_user_id ON public.proof_quality_scores(user_id);
 
--- proof_submissions
-CREATE INDEX IF NOT EXISTS idx_proof_submissions_reviewer_id ON public.proof_submissions(reviewer_id);
+-- proof_submissions (commented out)
+-- CREATE INDEX IF NOT EXISTS idx_proof_submissions_reviewer_id ON public.proof_submissions(reviewer_id);
 
 -- proof_verifications
 CREATE INDEX IF NOT EXISTS idx_proof_verifications_moment_id ON public.proof_verifications(moment_id);

@@ -273,6 +273,7 @@ import {
   CommunityGuidelinesScreen,
   ReferralScreen,
   SafetyTipsScreen,
+  DiagnosticsScreen,
 } from '../features/settings';
 
 // NEW: VisibilitySettingsScreen
@@ -872,6 +873,13 @@ const AppNavigator = () => {
             />
             <Stack.Screen name="Referral" component={ReferralScreen} />
             <Stack.Screen name="SafetyTips" component={SafetyTipsScreen} />
+
+            {/* Diagnostics (Hidden - 7 taps on version) */}
+            <Stack.Screen
+              name="Diagnostics"
+              component={DiagnosticsScreen}
+              options={{ animation: 'slide_from_bottom' }}
+            />
 
             {/* Dev Menu (Development Only) */}
             {__DEV__ && (

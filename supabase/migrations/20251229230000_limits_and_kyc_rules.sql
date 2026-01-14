@@ -1,15 +1,6 @@
--- ============================================
--- TravelMatch Limits & KYC Rules
--- Migration: 20251229230000_limits_and_kyc_rules.sql
--- ============================================
---
--- SUBSCRIPTION PLANS:
--- - passport ($0): Free tier - casual explorers
--- - first_class ($10): Enhanced features for serious travelers
--- - concierge ($25): Premium experience - unlimited features
---
--- USER TYPES (based on account age & KYC):
--- - new: Account < 30 days
+-- - free ($0): Free tier - casual explorers
+-- - standard ($10): Enhanced features for serious travelers
+-- - premium ($25): Premium experience - unlimited features
 -- - standard: Account >= 30 days, no KYC
 -- - verified: KYC approved
 -- ============================================
@@ -19,20 +10,20 @@
 -- ============================================
 
 -- First, update existing plans to match frontend
-UPDATE subscription_plans SET id = 'passport' WHERE id = 'free';
-UPDATE subscription_plans SET id = 'first_class' WHERE id = 'starter';
-UPDATE subscription_plans SET id = 'concierge' WHERE id = 'pro';
+UPDATE subscription_plans SET id = 'free' WHERE id = 'free';
+UPDATE subscription_plans SET id = 'standard' WHERE id = 'starter';
+UPDATE subscription_plans SET id = 'premium' WHERE id = 'pro';
 DELETE FROM subscription_plans WHERE id = 'vip';
 
 -- Ensure plans exist with correct data
 INSERT INTO subscription_plans (id, name, price, interval, features, is_popular, color, icon) VALUES
-('passport', 'Passport', 0, 'month',
+('free', 'Free', 0, 'month',
  '["3 moments per month", "20 messages per day", "1 gift per month", "Basic filters"]',
- false, '#6B7280', 'passport'),
-('first_class', 'First Class', 10, 'month',
+ false, '#6B7280', 'free'),
+('standard', 'Standard', 10, 'month',
  '["15 moments per month", "Unlimited messages", "10 gifts per month", "All discovery filters"]',
  true, '#3B82F6', 'airplane-takeoff'),
-('concierge', 'Concierge', 25, 'month',
+('premium', 'Premium', 25, 'month',
  '["Unlimited moments", "Unlimited messages", "Unlimited gifts", "Verified badge", "Incognito mode"]',
  false, '#F59E0B', 'crown')
 ON CONFLICT (id) DO UPDATE SET
@@ -96,123 +87,123 @@ CREATE TABLE user_limits (
 INSERT INTO user_limits (plan_id, user_type, category, limit_period, currency, min_amount, max_amount, max_count, requires_kyc_above) VALUES
 
   -- =====================================
-  -- PASSPORT PLAN ($0 - Free)
+  -- FREE PLAN ($0)
   -- =====================================
 
   -- SEND Limits (TRY)
-  ('passport', 'new', 'send', 'per_transaction', 'TRY', 10, 500, NULL, 500),
-  ('passport', 'new', 'send', 'daily', 'TRY', NULL, 1000, 3, NULL),
-  ('passport', 'new', 'send', 'monthly', 'TRY', NULL, 5000, 15, NULL),
+  ('free', 'new', 'send', 'per_transaction', 'TRY', 10, 500, NULL, 500),
+  ('free', 'new', 'send', 'daily', 'TRY', NULL, 1000, 3, NULL),
+  ('free', 'new', 'send', 'monthly', 'TRY', NULL, 5000, 15, NULL),
 
-  ('passport', 'standard', 'send', 'per_transaction', 'TRY', 10, 1000, NULL, 500),
-  ('passport', 'standard', 'send', 'daily', 'TRY', NULL, 2500, 5, NULL),
-  ('passport', 'standard', 'send', 'monthly', 'TRY', NULL, 10000, 30, NULL),
+  ('free', 'standard', 'send', 'per_transaction', 'TRY', 10, 1000, NULL, 500),
+  ('free', 'standard', 'send', 'daily', 'TRY', NULL, 2500, 5, NULL),
+  ('free', 'standard', 'send', 'monthly', 'TRY', NULL, 10000, 30, NULL),
 
-  ('passport', 'verified', 'send', 'per_transaction', 'TRY', 10, 2500, NULL, NULL),
-  ('passport', 'verified', 'send', 'daily', 'TRY', NULL, 5000, 10, NULL),
-  ('passport', 'verified', 'send', 'monthly', 'TRY', NULL, 25000, 50, NULL),
+  ('free', 'verified', 'send', 'per_transaction', 'TRY', 10, 2500, NULL, NULL),
+  ('free', 'verified', 'send', 'daily', 'TRY', NULL, 5000, 10, NULL),
+  ('free', 'verified', 'send', 'monthly', 'TRY', NULL, 25000, 50, NULL),
 
   -- SEND Limits (EUR)
-  ('passport', 'any', 'send', 'per_transaction', 'EUR', 1, 15, NULL, 15),
-  ('passport', 'any', 'send', 'monthly', 'EUR', NULL, 100, 10, NULL),
+  ('free', 'any', 'send', 'per_transaction', 'EUR', 1, 15, NULL, 15),
+  ('free', 'any', 'send', 'monthly', 'EUR', NULL, 100, 10, NULL),
 
   -- SEND Limits (USD)
-  ('passport', 'any', 'send', 'per_transaction', 'USD', 1, 15, NULL, 15),
-  ('passport', 'any', 'send', 'monthly', 'USD', NULL, 100, 10, NULL),
+  ('free', 'any', 'send', 'per_transaction', 'USD', 1, 15, NULL, 15),
+  ('free', 'any', 'send', 'monthly', 'USD', NULL, 100, 10, NULL),
 
   -- RECEIVE Limits
-  ('passport', 'any', 'receive', 'monthly', 'TRY', NULL, 10000, NULL, 7500),
-  ('passport', 'any', 'receive', 'monthly', 'EUR', NULL, 250, NULL, NULL),
-  ('passport', 'any', 'receive', 'monthly', 'USD', NULL, 250, NULL, NULL),
+  ('free', 'any', 'receive', 'monthly', 'TRY', NULL, 10000, NULL, 7500),
+  ('free', 'any', 'receive', 'monthly', 'EUR', NULL, 250, NULL, NULL),
+  ('free', 'any', 'receive', 'monthly', 'USD', NULL, 250, NULL, NULL),
 
   -- MOMENT CREATE (3/month)
-  ('passport', 'any', 'moment_create', 'daily', 'TRY', NULL, NULL, 1, NULL),
-  ('passport', 'any', 'moment_create', 'monthly', 'TRY', NULL, NULL, 3, NULL),
+  ('free', 'any', 'moment_create', 'daily', 'TRY', NULL, NULL, 1, NULL),
+  ('free', 'any', 'moment_create', 'monthly', 'TRY', NULL, NULL, 3, NULL),
 
   -- GIFT PER MOMENT
-  ('passport', 'any', 'gift_per_moment', 'per_transaction', 'TRY', NULL, 500, 1, NULL),
+  ('free', 'any', 'gift_per_moment', 'per_transaction', 'TRY', NULL, 500, 1, NULL),
 
   -- =====================================
-  -- FIRST CLASS PLAN ($10/month)
+  -- STANDARD PLAN ($10/month)
   -- =====================================
 
   -- SEND Limits (TRY)
-  ('first_class', 'new', 'send', 'per_transaction', 'TRY', 10, 1000, NULL, 1000),
-  ('first_class', 'new', 'send', 'daily', 'TRY', NULL, 2500, 5, NULL),
-  ('first_class', 'new', 'send', 'monthly', 'TRY', NULL, 15000, 30, NULL),
+  ('standard', 'new', 'send', 'per_transaction', 'TRY', 10, 1000, NULL, 1000),
+  ('standard', 'new', 'send', 'daily', 'TRY', NULL, 2500, 5, NULL),
+  ('standard', 'new', 'send', 'monthly', 'TRY', NULL, 15000, 30, NULL),
 
-  ('first_class', 'standard', 'send', 'per_transaction', 'TRY', 10, 2500, NULL, 2500),
-  ('first_class', 'standard', 'send', 'daily', 'TRY', NULL, 5000, 10, NULL),
-  ('first_class', 'standard', 'send', 'monthly', 'TRY', NULL, 25000, 50, NULL),
+  ('standard', 'standard', 'send', 'per_transaction', 'TRY', 10, 2500, NULL, 2500),
+  ('standard', 'standard', 'send', 'daily', 'TRY', NULL, 5000, 10, NULL),
+  ('standard', 'standard', 'send', 'monthly', 'TRY', NULL, 25000, 50, NULL),
 
-  ('first_class', 'verified', 'send', 'per_transaction', 'TRY', 10, 10000, NULL, NULL),
-  ('first_class', 'verified', 'send', 'daily', 'TRY', NULL, 25000, 25, NULL),
-  ('first_class', 'verified', 'send', 'monthly', 'TRY', NULL, 100000, NULL, NULL),
+  ('standard', 'verified', 'send', 'per_transaction', 'TRY', 10, 10000, NULL, NULL),
+  ('standard', 'verified', 'send', 'daily', 'TRY', NULL, 25000, 25, NULL),
+  ('standard', 'verified', 'send', 'monthly', 'TRY', NULL, 100000, NULL, NULL),
 
   -- SEND Limits (EUR)
-  ('first_class', 'any', 'send', 'per_transaction', 'EUR', 1, 75, NULL, 75),
-  ('first_class', 'any', 'send', 'monthly', 'EUR', NULL, 500, 30, NULL),
+  ('standard', 'any', 'send', 'per_transaction', 'EUR', 1, 75, NULL, 75),
+  ('standard', 'any', 'send', 'monthly', 'EUR', NULL, 500, 30, NULL),
 
   -- SEND Limits (USD)
-  ('first_class', 'any', 'send', 'per_transaction', 'USD', 1, 75, NULL, 75),
-  ('first_class', 'any', 'send', 'monthly', 'USD', NULL, 500, 30, NULL),
+  ('standard', 'any', 'send', 'per_transaction', 'USD', 1, 75, NULL, 75),
+  ('standard', 'any', 'send', 'monthly', 'USD', NULL, 500, 30, NULL),
 
   -- RECEIVE Limits
-  ('first_class', 'any', 'receive', 'monthly', 'TRY', NULL, 50000, NULL, 25000),
-  ('first_class', 'any', 'receive', 'monthly', 'EUR', NULL, 1500, NULL, NULL),
-  ('first_class', 'any', 'receive', 'monthly', 'USD', NULL, 1500, NULL, NULL),
+  ('standard', 'any', 'receive', 'monthly', 'TRY', NULL, 50000, NULL, 25000),
+  ('standard', 'any', 'receive', 'monthly', 'EUR', NULL, 1500, NULL, NULL),
+  ('standard', 'any', 'receive', 'monthly', 'USD', NULL, 1500, NULL, NULL),
 
   -- WITHDRAW
-  ('first_class', 'verified', 'withdraw', 'per_transaction', 'TRY', 100, 5000, NULL, NULL),
-  ('first_class', 'verified', 'withdraw', 'daily', 'TRY', NULL, 10000, 2, NULL),
+  ('standard', 'verified', 'withdraw', 'per_transaction', 'TRY', 100, 5000, NULL, NULL),
+  ('standard', 'verified', 'withdraw', 'daily', 'TRY', NULL, 10000, 2, NULL),
 
   -- MOMENT CREATE (15/month)
-  ('first_class', 'any', 'moment_create', 'daily', 'TRY', NULL, NULL, 3, NULL),
-  ('first_class', 'any', 'moment_create', 'monthly', 'TRY', NULL, NULL, 15, NULL),
+  ('standard', 'any', 'moment_create', 'daily', 'TRY', NULL, NULL, 3, NULL),
+  ('standard', 'any', 'moment_create', 'monthly', 'TRY', NULL, NULL, 15, NULL),
 
   -- GIFT PER MOMENT
-  ('first_class', 'any', 'gift_per_moment', 'per_transaction', 'TRY', NULL, 2500, 3, NULL),
+  ('standard', 'any', 'gift_per_moment', 'per_transaction', 'TRY', NULL, 2500, 3, NULL),
 
   -- =====================================
-  -- CONCIERGE PLAN ($25/month - Premium)
+  -- PREMIUM PLAN ($25/month)
   -- =====================================
 
   -- SEND Limits (TRY)
-  ('concierge', 'new', 'send', 'per_transaction', 'TRY', 10, 5000, NULL, 2500),
-  ('concierge', 'new', 'send', 'daily', 'TRY', NULL, 10000, 10, NULL),
-  ('concierge', 'new', 'send', 'monthly', 'TRY', NULL, 50000, 50, NULL),
+  ('premium', 'new', 'send', 'per_transaction', 'TRY', 10, 5000, NULL, 2500),
+  ('premium', 'new', 'send', 'daily', 'TRY', NULL, 10000, 10, NULL),
+  ('premium', 'new', 'send', 'monthly', 'TRY', NULL, 50000, 50, NULL),
 
-  ('concierge', 'standard', 'send', 'per_transaction', 'TRY', 10, 10000, NULL, 5000),
-  ('concierge', 'standard', 'send', 'daily', 'TRY', NULL, 25000, 25, NULL),
-  ('concierge', 'standard', 'send', 'monthly', 'TRY', NULL, 100000, 100, NULL),
+  ('premium', 'standard', 'send', 'per_transaction', 'TRY', 10, 10000, NULL, 5000),
+  ('premium', 'standard', 'send', 'daily', 'TRY', NULL, 25000, 25, NULL),
+  ('premium', 'standard', 'send', 'monthly', 'TRY', NULL, 100000, 100, NULL),
 
-  ('concierge', 'verified', 'send', 'per_transaction', 'TRY', 10, 50000, NULL, NULL),
-  ('concierge', 'verified', 'send', 'daily', 'TRY', NULL, 100000, NULL, NULL),
-  ('concierge', 'verified', 'send', 'monthly', 'TRY', NULL, 500000, NULL, NULL),
+  ('premium', 'verified', 'send', 'per_transaction', 'TRY', 10, 50000, NULL, NULL),
+  ('premium', 'verified', 'send', 'daily', 'TRY', NULL, 100000, NULL, NULL),
+  ('premium', 'verified', 'send', 'monthly', 'TRY', NULL, 500000, NULL, NULL),
 
   -- SEND Limits (EUR)
-  ('concierge', 'any', 'send', 'per_transaction', 'EUR', 1, 250, NULL, 250),
-  ('concierge', 'any', 'send', 'monthly', 'EUR', NULL, 2500, NULL, NULL),
+  ('premium', 'any', 'send', 'per_transaction', 'EUR', 1, 250, NULL, 250),
+  ('premium', 'any', 'send', 'monthly', 'EUR', NULL, 2500, NULL, NULL),
 
   -- SEND Limits (USD)
-  ('concierge', 'any', 'send', 'per_transaction', 'USD', 1, 250, NULL, 250),
-  ('concierge', 'any', 'send', 'monthly', 'USD', NULL, 2500, NULL, NULL),
+  ('premium', 'any', 'send', 'per_transaction', 'USD', 1, 250, NULL, 250),
+  ('premium', 'any', 'send', 'monthly', 'USD', NULL, 2500, NULL, NULL),
 
   -- RECEIVE Limits
-  ('concierge', 'any', 'receive', 'monthly', 'TRY', NULL, 250000, NULL, 100000),
-  ('concierge', 'any', 'receive', 'monthly', 'EUR', NULL, 7500, NULL, NULL),
-  ('concierge', 'any', 'receive', 'monthly', 'USD', NULL, 7500, NULL, NULL),
+  ('premium', 'any', 'receive', 'monthly', 'TRY', NULL, 250000, NULL, 100000),
+  ('premium', 'any', 'receive', 'monthly', 'EUR', NULL, 7500, NULL, NULL),
+  ('premium', 'any', 'receive', 'monthly', 'USD', NULL, 7500, NULL, NULL),
 
   -- WITHDRAW (higher limits)
-  ('concierge', 'verified', 'withdraw', 'per_transaction', 'TRY', 100, 25000, NULL, NULL),
-  ('concierge', 'verified', 'withdraw', 'daily', 'TRY', NULL, 50000, 5, NULL),
+  ('premium', 'verified', 'withdraw', 'per_transaction', 'TRY', 100, 25000, NULL, NULL),
+  ('premium', 'verified', 'withdraw', 'daily', 'TRY', NULL, 50000, 5, NULL),
 
   -- MOMENT CREATE (Unlimited)
-  ('concierge', 'any', 'moment_create', 'daily', 'TRY', NULL, NULL, 10, NULL),
-  ('concierge', 'any', 'moment_create', 'monthly', 'TRY', NULL, NULL, NULL, NULL), -- Unlimited
+  ('premium', 'any', 'moment_create', 'daily', 'TRY', NULL, NULL, 10, NULL),
+  ('premium', 'any', 'moment_create', 'monthly', 'TRY', NULL, NULL, NULL, NULL), -- Unlimited
 
   -- GIFT PER MOMENT
-  ('concierge', 'any', 'gift_per_moment', 'per_transaction', 'TRY', NULL, 10000, 5, NULL)
+  ('premium', 'any', 'gift_per_moment', 'per_transaction', 'TRY', NULL, 10000, 5, NULL)
 
 ON CONFLICT DO NOTHING;
 
@@ -322,7 +313,7 @@ BEGIN
     u.id,
     u.created_at,
     u.kyc_status,
-    COALESCE(us.plan_id, 'passport') as plan_id
+    COALESCE(us.plan_id, 'free') as plan_id
   INTO v_user
   FROM users u
   LEFT JOIN user_subscriptions us ON us.user_id = u.id AND us.status = 'active'
@@ -454,7 +445,7 @@ BEGIN
     'kyc_reason', v_kyc_reason,
     'block_reason', v_block_reason,
     'warnings', v_warnings,
-    'upgrade_available', v_plan_id != 'concierge'
+    'upgrade_available', v_plan_id != 'premium'
   );
 END;
 $$;
@@ -482,7 +473,7 @@ DECLARE
   v_max_times INTEGER;
 BEGIN
   -- Get user's plan
-  SELECT COALESCE(us.plan_id, 'passport')
+  SELECT COALESCE(us.plan_id, 'free')
   INTO v_plan_id
   FROM users u
   LEFT JOIN user_subscriptions us ON us.user_id = u.id AND us.status = 'active'
@@ -558,7 +549,7 @@ DECLARE
   v_monthly_limit INTEGER;
 BEGIN
   -- Get user's plan
-  SELECT COALESCE(us.plan_id, 'passport')
+  SELECT COALESCE(us.plan_id, 'free')
   INTO v_plan_id
   FROM users u
   LEFT JOIN user_subscriptions us ON us.user_id = u.id AND us.status = 'active'
@@ -630,7 +621,7 @@ GRANT EXECUTE ON FUNCTION check_moment_creation_limit TO authenticated;
 -- 9. COMMENTS
 -- ============================================
 
-COMMENT ON TABLE user_limits IS 'Plan ve kullanıcı tipine göre işlem limitleri (Passport/First Class/Concierge)';
+COMMENT ON TABLE user_limits IS 'Plan ve kullanıcı tipine göre işlem limitleri (Free/Standard/Premium)';
 COMMENT ON TABLE kyc_thresholds IS 'KYC gerektiren eşik değerler (TRY/EUR/USD)';
 COMMENT ON FUNCTION check_user_limits IS 'Kullanıcının işlem limitlerini kontrol eder';
 COMMENT ON FUNCTION check_moment_contribution_limit IS 'Tek momente katkı limitini kontrol eder';

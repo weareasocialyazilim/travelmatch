@@ -34,13 +34,9 @@ CREATE POLICY "Allow public read on app_config"
 DROP POLICY IF EXISTS "Only admins can update app_config" ON app_config;
 CREATE POLICY "Only admins can update app_config"
   ON app_config FOR UPDATE
-  USING (
-    EXISTS (
-      SELECT 1 FROM users
-      WHERE users.id = auth.uid()
-      AND users.role = 'admin'
-    )
-  );
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
 
 -- Function to update timestamp
 CREATE OR REPLACE FUNCTION update_app_config_timestamp()
