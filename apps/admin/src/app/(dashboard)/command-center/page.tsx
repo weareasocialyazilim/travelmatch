@@ -51,6 +51,7 @@ import {
 import { usePermission } from '@/hooks/use-permission';
 import { useFounderDecisions } from '@/hooks/use-founder-decisions';
 import { useFounderAlerts } from '@/hooks/use-founder-alerts';
+import { MobileHealthInbox } from '@/components/founder/MobileHealthInbox';
 import { ALERT_LEVEL_COLORS, MAX_ALERTS_DISPLAYED } from '@/config/founder-alerts';
 import {
   CanvaCard,
@@ -646,6 +647,9 @@ export default function CommandCenterPage() {
                 )}
               </div>
             )}
+
+            {/* Mobile Health Inbox - NO-NETWORK */}
+            <MobileHealthInbox />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
