@@ -1,13 +1,24 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase';
+import { createServiceClient } from '@/lib/supabase';
+import { getAdminSession, hasPermission } from '@/lib/auth';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   try {
-    const supabase = createClient();
+    // Auth check - P0 Security Fix
+    const session = await getAdminSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+    }
+
+    if (!hasPermission(session, 'reports', 'view')) {
+      return NextResponse.json({ error: 'Yetersiz yetki' }, { status: 403 });
+    }
+
+    const supabase = createServiceClient();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: report, error } = await (supabase.from('reports') as any)
@@ -44,7 +55,17 @@ export async function PATCH(
   { params }: { params: { id: string } },
 ) {
   try {
-    const supabase = createClient();
+    // Auth check - P0 Security Fix
+    const session = await getAdminSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+    }
+
+    if (!hasPermission(session, 'reports', 'update')) {
+      return NextResponse.json({ error: 'Yetersiz yetki' }, { status: 403 });
+    }
+
+    const supabase = createServiceClient();
     const body = await request.json();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
