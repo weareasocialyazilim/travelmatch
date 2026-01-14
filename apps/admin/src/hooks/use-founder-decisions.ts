@@ -36,27 +36,50 @@ export function useFounderDecisionEnabled(): boolean {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// FETCH DECISION STATS
+// TYPES FOR API RESPONSE
 // ═══════════════════════════════════════════════════════════════════════════
 
-async function fetchDecisionStats(): Promise<FounderDecisionStats> {
+export interface DeferredItem {
+  id: string;
+  item_key: string;
+  item_type: DecisionItemType;
+  note: string | null;
+  created_at: string;
+}
+
+interface DecisionDataResponse {
+  stats: FounderDecisionStats;
+  deferredBacklog: DeferredItem[];
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FETCH DECISION STATS + DEFERRED BACKLOG
+// ═══════════════════════════════════════════════════════════════════════════
+
+async function fetchDecisionData(): Promise<DecisionDataResponse> {
   const response = await fetch('/api/founder-decisions');
 
   if (!response.ok) {
     if (response.status === 403) {
-      // Feature disabled - return empty stats
+      // Feature disabled - return empty data
       return {
-        reviewedToday: 0,
-        deferredToday: 0,
-        currentFocus: null,
-        focusSetAt: null,
+        stats: {
+          reviewedToday: 0,
+          deferredToday: 0,
+          currentFocus: null,
+          focusSetAt: null,
+        },
+        deferredBacklog: [],
       };
     }
-    throw new Error('Failed to fetch decision stats');
+    throw new Error('Failed to fetch decision data');
   }
 
   const data = await response.json();
-  return data.stats;
+  return {
+    stats: data.stats,
+    deferredBacklog: data.deferredBacklog || [],
+  };
 }
 
 export function useFounderDecisionStats() {
@@ -64,7 +87,7 @@ export function useFounderDecisionStats() {
 
   return useQuery({
     queryKey: ['founder-decision-stats'],
-    queryFn: fetchDecisionStats,
+    queryFn: fetchDecisionData,
     enabled: isEnabled, // Only fetch if feature is enabled
     staleTime: 30 * 1000, // 30 seconds
     refetchInterval: 60 * 1000, // Refresh every minute
@@ -199,14 +222,15 @@ export function useSetAsFocus() {
 
 export function useFounderDecisions() {
   const isEnabled = useFounderDecisionEnabled();
-  const stats = useFounderDecisionStats();
+  const queryResult = useFounderDecisionStats();
   const logMutation = useLogFounderDecision();
 
   return {
     isEnabled,
-    stats: stats.data,
-    isLoading: stats.isLoading,
-    isError: stats.isError,
+    stats: queryResult.data?.stats,
+    deferredBacklog: queryResult.data?.deferredBacklog || [],
+    isLoading: queryResult.isLoading,
+    isError: queryResult.isError,
 
     // Actions
     markAsReviewed: (
