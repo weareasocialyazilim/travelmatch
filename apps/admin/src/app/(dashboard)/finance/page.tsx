@@ -166,10 +166,15 @@ export default function FinancePage() {
               try {
                 const exportData = transactions.map((tx) => ({
                   ID: tx.id,
-                  Tip: transactionTypeConfig[tx.type as keyof typeof transactionTypeConfig]?.label || tx.type,
+                  Tip:
+                    transactionTypeConfig[
+                      tx.type as keyof typeof transactionTypeConfig
+                    ]?.label || tx.type,
                   Tutar: tx.amount,
                   ParaBirimi: tx.currency,
-                  Durum: statusConfig[tx.status as keyof typeof statusConfig]?.label || tx.status,
+                  Durum:
+                    statusConfig[tx.status as keyof typeof statusConfig]
+                      ?.label || tx.status,
                   KullaniciID: tx.user_id,
                   Tarih: new Date(tx.created_at).toLocaleDateString('tr-TR'),
                 }));
@@ -424,9 +429,9 @@ export default function FinancePage() {
                               <CanvaButton
                                 size="sm"
                                 variant="danger"
-                                onClick={() =>
-                                  toast.info('İade işlemi henüz bağlı değil')
-                                }
+                                disabled
+                                className="opacity-50 cursor-not-allowed"
+                                title="API entegrasyonu geliştiriliyor"
                               >
                                 <XCircle className="mr-1 h-4 w-4" />
                                 Reddet
@@ -434,9 +439,9 @@ export default function FinancePage() {
                               <CanvaButton
                                 size="sm"
                                 variant="success"
-                                onClick={() =>
-                                  toast.info('Onay işlemi henüz bağlı değil')
-                                }
+                                disabled
+                                className="opacity-50 cursor-not-allowed"
+                                title="API entegrasyonu geliştiriliyor"
                               >
                                 <CheckCircle className="mr-1 h-4 w-4" />
                                 Onayla

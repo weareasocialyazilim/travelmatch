@@ -632,20 +632,18 @@ export default function PromosPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
-                            onClick={() =>
-                              toast.info('Yakında: Detaylar özelliği')
-                            }
+                            disabled
+                            className="opacity-50 cursor-not-allowed"
                           >
                             <Eye className="mr-2 h-4 w-4" />
-                            Detaylar
+                            Detaylar (Geliştiriliyor)
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() =>
-                              toast.info('Yakında: Düzenleme özelliği')
-                            }
+                            disabled
+                            className="opacity-50 cursor-not-allowed"
                           >
                             <Edit className="mr-2 h-4 w-4" />
-                            Düzenle
+                            Düzenle (Geliştiriliyor)
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => copyCode(promo.code)}
