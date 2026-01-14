@@ -41,7 +41,12 @@ import {
   Eye,
   Send,
   Bell,
+  Flame,
+  Crosshair,
+  Bot,
+  TrendingUp as TrendUp,
 } from 'lucide-react';
+import { usePermission } from '@/hooks/use-permission';
 import {
   CanvaCard,
   CanvaCardHeader,
@@ -276,10 +281,60 @@ const aiInsights = [
   },
 ];
 
+// ═══════════════════════════════════════════════════════════════════════════
+// FOUNDER-ONLY DATA (super_admin only - görünmez, bilinmez)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Haftalık Trend Özeti (Founder için kritik metrikler)
+const founderWeeklyTrends = [
+  { metric: 'GMV', current: '₺2.1M', change: 12, direction: 'up', target: '₺2.5M', onTrack: true },
+  { metric: 'DAU', current: '8,234', change: -3, direction: 'down', target: '9,000', onTrack: false },
+  { metric: 'Premium %', current: '9.27%', change: 0.5, direction: 'up', target: '12%', onTrack: false },
+  { metric: 'Churn', current: '2.1%', change: -0.3, direction: 'down', target: '<3%', onTrack: true },
+];
+
+// Stratejik Kararlar Bekleyenler
+const founderStrategicItems = [
+  {
+    category: 'pricing',
+    title: 'Q2 Pricing Review',
+    status: 'decision_needed',
+    impact: 'Potansiyel +₺150K/ay',
+    deadline: 'Bu hafta',
+  },
+  {
+    category: 'partnership',
+    title: 'Airbnb Entegrasyon Teklifi',
+    status: 'evaluation',
+    impact: 'TAM genişleme',
+    deadline: '2 hafta',
+  },
+  {
+    category: 'hiring',
+    title: 'Senior Backend Developer',
+    status: 'final_round',
+    impact: 'Kapasiteyi 2x artırır',
+    deadline: 'Bu hafta',
+  },
+];
+
+// Bugünün Founder Pulse Özeti
+const founderPulseToday = {
+  healthStatus: 'stable', // stable, warning, critical
+  mainMessage: 'Platform stabil, büyüme hedefin altında',
+  quickStats: {
+    decisionsWaiting: 2,
+    systemAutomated: 237,
+    manualNeeded: 5,
+  },
+  topPriority: 'DAU düşüşünü araştır - retention problemi olabilir',
+};
+
 export default function CommandCenterPage() {
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { data: stats, isLoading } = useStats();
+  const { isSuperAdmin } = usePermission();
 
   // Auto-refresh every 30 seconds
   useEffect(() => {
@@ -411,6 +466,124 @@ export default function CommandCenterPage() {
           >
             Incele
           </CanvaButton>
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          FOUNDER-ONLY SECTION (super_admin only - sidebar'da yok, bilinmez)
+          ═══════════════════════════════════════════════════════════════════════ */}
+      {isSuperAdmin() && (
+        <div className="p-4 rounded-xl bg-gradient-to-r from-slate-900/50 via-violet-900/30 to-slate-900/50 border border-violet-500/30">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Lock className="h-4 w-4 text-violet-400" />
+              <span className="text-xs font-medium text-violet-400 uppercase tracking-wider">
+                Founder Pulse
+              </span>
+            </div>
+            <div className={cn(
+              'px-2 py-1 rounded text-xs font-medium',
+              founderPulseToday.healthStatus === 'stable' && 'bg-emerald-500/20 text-emerald-400',
+              founderPulseToday.healthStatus === 'warning' && 'bg-amber-500/20 text-amber-400',
+              founderPulseToday.healthStatus === 'critical' && 'bg-red-500/20 text-red-400',
+            )}>
+              {founderPulseToday.healthStatus === 'stable' && '● Stabil'}
+              {founderPulseToday.healthStatus === 'warning' && '● Dikkat'}
+              {founderPulseToday.healthStatus === 'critical' && '● Kritik'}
+            </div>
+          </div>
+
+          {/* Pulse Summary */}
+          <div className="mb-4 p-3 rounded-lg bg-slate-800/50 border border-slate-700/50">
+            <p className="text-sm text-slate-300">{founderPulseToday.mainMessage}</p>
+            <div className="flex items-center gap-4 mt-2 text-xs text-slate-400">
+              <span className="flex items-center gap-1">
+                <Flame className="h-3 w-3 text-red-400" />
+                {founderPulseToday.quickStats.decisionsWaiting} karar bekliyor
+              </span>
+              <span className="flex items-center gap-1">
+                <Bot className="h-3 w-3 text-emerald-400" />
+                {founderPulseToday.quickStats.systemAutomated} otomasyon
+              </span>
+              <span className="flex items-center gap-1">
+                <Eye className="h-3 w-3 text-amber-400" />
+                {founderPulseToday.quickStats.manualNeeded} manuel gerekli
+              </span>
+            </div>
+            <p className="mt-2 text-xs font-medium text-violet-400">
+              → Öncelik: {founderPulseToday.topPriority}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            {/* Haftalık Trend */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-medium text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                <TrendUp className="h-3 w-3" />
+                Haftalık Trend
+              </h4>
+              <div className="grid grid-cols-2 gap-2">
+                {founderWeeklyTrends.map((trend) => (
+                  <div
+                    key={trend.metric}
+                    className={cn(
+                      'p-2 rounded-lg border',
+                      trend.onTrack
+                        ? 'bg-emerald-500/10 border-emerald-500/30'
+                        : 'bg-amber-500/10 border-amber-500/30'
+                    )}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-slate-400">{trend.metric}</span>
+                      <span className={cn(
+                        'text-xs font-medium flex items-center gap-0.5',
+                        trend.direction === 'up' ? 'text-emerald-400' : 'text-red-400'
+                      )}>
+                        {trend.direction === 'up' ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                        {Math.abs(trend.change)}%
+                      </span>
+                    </div>
+                    <p className="text-sm font-semibold text-white mt-1">{trend.current}</p>
+                    <p className="text-xs text-slate-500">Hedef: {trend.target}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Stratejik Kararlar */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-medium text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                <Crosshair className="h-3 w-3" />
+                Stratejik Kararlar
+              </h4>
+              <div className="space-y-2">
+                {founderStrategicItems.map((item, i) => (
+                  <div
+                    key={i}
+                    className="p-2 rounded-lg bg-slate-800/50 border border-slate-700/50 flex items-center justify-between"
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-white">{item.title}</p>
+                      <p className="text-xs text-slate-400">{item.impact}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className={cn(
+                        'text-xs px-2 py-0.5 rounded',
+                        item.status === 'decision_needed' && 'bg-red-500/20 text-red-400',
+                        item.status === 'evaluation' && 'bg-blue-500/20 text-blue-400',
+                        item.status === 'final_round' && 'bg-amber-500/20 text-amber-400',
+                      )}>
+                        {item.status === 'decision_needed' && 'Karar Gerekli'}
+                        {item.status === 'evaluation' && 'Değerlendirme'}
+                        {item.status === 'final_round' && 'Final'}
+                      </span>
+                      <p className="text-xs text-slate-500 mt-1">{item.deadline}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
