@@ -10,6 +10,8 @@
 | Super admin dışında görünür mü | **❌ HAYIR** | Hard check: `role === 'super_admin'` |
 | NO-NETWORK | **✅ EVET** | Dış servis çağrısı YOK |
 | Otomasyon | **❌ HAYIR** | Sadece görünürlük |
+| Noise Control | **✅ EVET** | Budget (2/2/1) + Cooldown (30-120 dk) |
+| Actionable Links | **✅ EVET** | Her alert → ilgili sayfa |
 | Rollback planı | **✅ VAR** | Server flag kapatınca anında deaktif |
 
 ---
@@ -47,6 +49,30 @@ export function isFounderAlertsEnabled(): boolean {
 ```
 
 **Güvenlik garantisi:** Client flag açık olsa bile server flag kapalıysa → API 403
+
+### ✅ Noise Control (Pager Kalitesi)
+
+**Alert Budget:**
+```typescript
+ALERT_LEVEL_BUDGET = { error: 2, warn: 2, info: 1 }; // Total: 5
+```
+
+**Cooldown (Dedup):**
+- Critical: 30 dk
+- Normal: 60 dk
+- Low priority: 120 dk
+
+**Fresh Indicator:**
+- `isFresh: true` → Parlak görünür
+- `isFresh: false` → Soluk görünür
+
+### ✅ Actionable Links
+
+Her alert satırında → butonu:
+- `/integration-health`
+- `/ops-dashboard`
+- `/triage?...`
+- `/audit-logs?...`
 
 ### ✅ Super Admin Only
 

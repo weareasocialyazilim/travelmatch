@@ -80,6 +80,8 @@ export interface AlertDefinition {
   query: AlertQuery;
   threshold: number;
   lookbackHours: number;
+  cooldownMinutes: number; // Dedup window - alert won't appear "fresh" within this window
+  actionUrl: string | null; // Link to relevant page for immediate action
   enabled: boolean;
 }
 
@@ -96,6 +98,8 @@ export interface AlertItem {
   shortDetail: string; // max 120 chars
   count: number;
   lastSeenAt: string | null;
+  actionUrl: string | null; // Link to relevant page
+  isFresh: boolean; // True if outside cooldown window (attention-worthy)
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -119,8 +123,10 @@ export const ALERT_DEFINITIONS: AlertDefinition[] = [
         status: ['failure', 'timeout'],
       },
     },
-    threshold: 5, // 5+ failure in 24h = alert
+    threshold: 5,
     lookbackHours: 24,
+    cooldownMinutes: 60,
+    actionUrl: '/integration-health',
     enabled: true,
   },
   {
@@ -135,8 +141,10 @@ export const ALERT_DEFINITIONS: AlertDefinition[] = [
         severity: ['critical'],
       },
     },
-    threshold: 1, // Any critical error = alert
+    threshold: 1,
     lookbackHours: 24,
+    cooldownMinutes: 30, // Critical errors need faster refresh
+    actionUrl: '/ops-dashboard',
     enabled: true,
   },
   {
@@ -152,8 +160,10 @@ export const ALERT_DEFINITIONS: AlertDefinition[] = [
         priority: ['critical'],
       },
     },
-    threshold: 1, // Any critical pending = alert
+    threshold: 1,
     lookbackHours: 24,
+    cooldownMinutes: 30,
+    actionUrl: '/triage?priority=critical&status=pending',
     enabled: true,
   },
 
@@ -169,12 +179,14 @@ export const ALERT_DEFINITIONS: AlertDefinition[] = [
     query: {
       table: 'security_logs',
       countCondition: {
-        risk_score_gte: 70, // risk_score >= 70
+        risk_score_gte: 70,
         event_status: ['failure', 'blocked'],
       },
     },
-    threshold: 3, // 3+ high risk events = alert
+    threshold: 3,
     lookbackHours: 24,
+    cooldownMinutes: 60,
+    actionUrl: '/audit-logs?type=security',
     enabled: true,
   },
   {
@@ -190,8 +202,10 @@ export const ALERT_DEFINITIONS: AlertDefinition[] = [
         action_taken: ['blocked', 'flagged'],
       },
     },
-    threshold: 5, // 5+ violations = alert
+    threshold: 5,
     lookbackHours: 24,
+    cooldownMinutes: 60,
+    actionUrl: '/triage?type=content_flag',
     enabled: true,
   },
   {
@@ -206,8 +220,10 @@ export const ALERT_DEFINITIONS: AlertDefinition[] = [
         status: ['pending'],
       },
     },
-    threshold: 20, // 20+ pending items = alert
-    lookbackHours: 168, // All time (weekly window)
+    threshold: 20,
+    lookbackHours: 168, // Weekly window
+    cooldownMinutes: 120, // Backlog doesn't change fast
+    actionUrl: '/triage?status=pending',
     enabled: true,
   },
   {
@@ -222,8 +238,10 @@ export const ALERT_DEFINITIONS: AlertDefinition[] = [
         severity: ['error'],
       },
     },
-    threshold: 20, // 20+ errors in 24h = alert
+    threshold: 20,
     lookbackHours: 24,
+    cooldownMinutes: 60,
+    actionUrl: '/ops-dashboard',
     enabled: true,
   },
 
@@ -242,8 +260,10 @@ export const ALERT_DEFINITIONS: AlertDefinition[] = [
         status: ['degraded'],
       },
     },
-    threshold: 10, // 10+ degraded events = info
+    threshold: 10,
     lookbackHours: 24,
+    cooldownMinutes: 120,
+    actionUrl: '/integration-health',
     enabled: true,
   },
   {
@@ -259,8 +279,10 @@ export const ALERT_DEFINITIONS: AlertDefinition[] = [
         event_status: ['failure'],
       },
     },
-    threshold: 50, // 50+ failed logins = info
+    threshold: 50,
     lookbackHours: 24,
+    cooldownMinutes: 120,
+    actionUrl: '/audit-logs?type=security&event=login',
     enabled: true,
   },
 ];
@@ -287,5 +309,16 @@ export const ALERT_LEVEL_COLORS: Record<AlertLevel, string> = {
   info: 'text-blue-400',
 };
 
-export const MAX_ALERTS_DISPLAYED = 5;
-export const MAX_ALERTS_FETCHED = 10;
+// ═══════════════════════════════════════════════════════════════════════════
+// ALERT BUDGET (Noise Control)
+// Prevents alert fatigue by limiting alerts per level
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const ALERT_LEVEL_BUDGET: Record<AlertLevel, number> = {
+  error: 2, // Max 2 ERROR alerts in default view
+  warn: 2,  // Max 2 WARN alerts in default view
+  info: 1,  // Max 1 INFO alert in default view
+};
+
+export const MAX_ALERTS_DISPLAYED = 5; // Total max (sum of budgets = 5)
+export const MAX_ALERTS_FETCHED = 10;  // Fetch more for "+N more" indicator

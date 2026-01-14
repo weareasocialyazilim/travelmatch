@@ -6,6 +6,7 @@ import {
   isFounderAlertsEnabled,
   ALERT_DEFINITIONS,
   ALERT_LEVEL_PRIORITY,
+  ALERT_LEVEL_BUDGET,
   MAX_ALERTS_FETCHED,
   type AlertItem,
   type AlertLevel,
@@ -193,6 +194,13 @@ export async function GET() {
         if (count >= definition.threshold) {
           const shortDetail = generateShortDetail(definition.key, count, definition.lookbackHours);
 
+          // Calculate if alert is "fresh" (outside cooldown window)
+          const cooldownMs = definition.cooldownMinutes * 60 * 1000;
+          const cooldownThreshold = new Date(now.getTime() - cooldownMs);
+          const isFresh = lastSeenAt
+            ? new Date(lastSeenAt) > cooldownThreshold
+            : true; // New alert = fresh
+
           alerts.push({
             key: definition.key,
             level: definition.level,
@@ -200,6 +208,8 @@ export async function GET() {
             shortDetail,
             count,
             lastSeenAt,
+            actionUrl: definition.actionUrl,
+            isFresh,
           });
         }
       } catch (queryError) {
@@ -209,20 +219,41 @@ export async function GET() {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Sort by priority (ERROR > WARN > INFO) and limit
+    // Sort by priority (ERROR > WARN > INFO)
+    // Fresh alerts first within each level
     // ─────────────────────────────────────────────────────────────────────────
-    const sortedAlerts = alerts
-      .sort((a, b) => {
-        const priorityDiff = ALERT_LEVEL_PRIORITY[b.level] - ALERT_LEVEL_PRIORITY[a.level];
-        if (priorityDiff !== 0) return priorityDiff;
-        // Secondary sort by count (higher first)
-        return b.count - a.count;
-      })
-      .slice(0, MAX_ALERTS_FETCHED);
+    const sortedAlerts = alerts.sort((a, b) => {
+      const priorityDiff = ALERT_LEVEL_PRIORITY[b.level] - ALERT_LEVEL_PRIORITY[a.level];
+      if (priorityDiff !== 0) return priorityDiff;
+      // Fresh alerts first
+      if (a.isFresh !== b.isFresh) return a.isFresh ? -1 : 1;
+      // Secondary sort by count (higher first)
+      return b.count - a.count;
+    });
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Apply budget per level (noise control)
+    // ERROR: 2, WARN: 2, INFO: 1 = Total 5
+    // ─────────────────────────────────────────────────────────────────────────
+    const budgetedAlerts: AlertItem[] = [];
+    const levelCounts: Record<AlertLevel, number> = { error: 0, warn: 0, info: 0 };
+
+    for (const alert of sortedAlerts) {
+      if (levelCounts[alert.level] < ALERT_LEVEL_BUDGET[alert.level]) {
+        budgetedAlerts.push(alert);
+        levelCounts[alert.level]++;
+      }
+      // Stop if we've reached max
+      if (budgetedAlerts.length >= MAX_ALERTS_FETCHED) break;
+    }
+
+    // Calculate overflow (alerts beyond budget)
+    const overflowCount = alerts.length - budgetedAlerts.length;
 
     return NextResponse.json({
-      alerts: sortedAlerts,
+      alerts: budgetedAlerts,
       totalCount: alerts.length,
+      overflowCount,
       fetchedAt: now.toISOString(),
     });
   } catch (error) {

@@ -71,6 +71,59 @@ FOUNDER_ALERTS_ENABLED=true
 
 ---
 
+## Noise Control (Pager Kalitesi)
+
+Alert fatigue'i önlemek için iki mekanizma:
+
+### 1. Alert Budget (Level Başına Limit)
+
+```typescript
+// Her level için maximum alert sayısı
+ALERT_LEVEL_BUDGET = {
+  error: 2,  // Max 2 ERROR
+  warn: 2,   // Max 2 WARN
+  info: 1,   // Max 1 INFO
+};
+// Total: 5 alert
+```
+
+Bu sayede dashboard her zaman okunabilir kalır.
+
+### 2. Cooldown (Dedup Window)
+
+Her alert tipi için cooldown süresi var:
+
+| Alert | Cooldown | Neden |
+|-------|----------|-------|
+| Critical Errors | 30 dk | Hızlı dikkat gerekli |
+| Critical Triage | 30 dk | Hızlı dikkat gerekli |
+| Integration Failures | 60 dk | Normal öncelik |
+| Error Spike | 60 dk | Normal öncelik |
+| Triage Backlog | 120 dk | Yavaş değişir |
+| Degraded Integrations | 120 dk | Düşük öncelik |
+
+**Fresh vs Stale:**
+- `isFresh: true` → Cooldown dışında, dikkat çekmeli (parlak görünür)
+- `isFresh: false` → Cooldown içinde, sadece count arttı (soluk görünür)
+
+### 3. Actionable Links
+
+Her alert satırında "→" butonu:
+- Tıklayınca ilgili sayfaya yönlendirir
+- "Bak → aksiyon" kısaltması sağlar
+
+| Alert | Link |
+|-------|------|
+| Integration Failures | `/integration-health` |
+| Critical Errors | `/ops-dashboard` |
+| Critical Triage | `/triage?priority=critical&status=pending` |
+| High Risk Security | `/audit-logs?type=security` |
+| Content Violations | `/triage?type=content_flag` |
+| Triage Backlog | `/triage?status=pending` |
+| Error Spike | `/ops-dashboard` |
+
+---
+
 ## Veri Kaynakları (Internal Only)
 
 Tüm veriler mevcut internal tablolardan okunur. Yeni tablo eklenmedi.
