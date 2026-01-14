@@ -125,7 +125,7 @@ TravelMatch Admin Dashboard'u META, TESLA, NVIDIA, Airbnb, Anthropic, Google ve 
 | Supabase Auth | ✅ Tam | 2FA desteği |
 | Supabase Realtime | ✅ Tam | Dashboard subscriptions |
 | **PayTR Payments** | ✅ **Tam** | **Doğru terminoloji ile** |
-| Redis Cache | ✅ Bağlı | Upstash Redis |
+| Rate Limiting | ✅ Aktif | In-memory + Cloudflare WAF |
 | Push Notifications | ⚠️ Mock | FCM gerekli |
 | Email Service | ⚠️ Mock | Resend gerekli |
 | SMS Service | ⚠️ Mock | Twilio gerekli |

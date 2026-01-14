@@ -89,9 +89,7 @@ jobs:
             OPENAI_API_KEY="$OPENAI_API_KEY" \
             CLOUDFLARE_STREAM_API_KEY="$CLOUDFLARE_STREAM_API_KEY" \
             CLOUDFLARE_STREAM_ACCOUNT_ID="$CLOUDFLARE_STREAM_ACCOUNT_ID" \
-            MAPBOX_SECRET_TOKEN="$MAPBOX_SECRET_TOKEN" \
-            UPSTASH_REDIS_REST_URL="$UPSTASH_REDIS_REST_URL" \
-            UPSTASH_REDIS_REST_TOKEN="$UPSTASH_REDIS_REST_TOKEN"
+            MAPBOX_SECRET_TOKEN="$MAPBOX_SECRET_TOKEN"
 
           echo "Deploying all Edge Functions..."
           supabase functions deploy
