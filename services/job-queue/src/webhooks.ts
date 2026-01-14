@@ -1,5 +1,6 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import { createClient } from '@supabase/supabase-js';
+import crypto from 'crypto';
 import dotenv from 'dotenv';
 import { logger } from '../shared/utils/logger.js';
 
@@ -10,6 +11,99 @@ const app = express();
 // Security: Disable X-Powered-By header to prevent information disclosure
 app.disable('x-powered-by');
 
+// ============================================================
+// SECURITY: Webhook Signature Verification (P0 FIX)
+// ============================================================
+const WEBHOOK_SECRET = process.env.INTERNAL_WEBHOOK_SECRET;
+
+if (!WEBHOOK_SECRET) {
+  logger.error('CRITICAL: INTERNAL_WEBHOOK_SECRET environment variable is not set!');
+  logger.error('Webhook endpoints will reject all requests until this is configured.');
+}
+
+/**
+ * Constant-time string comparison to prevent timing attacks
+ */
+function secureCompare(a: string, b: string): boolean {
+  if (!a || !b || a.length !== b.length) {
+    return false;
+  }
+  return crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
+}
+
+/**
+ * Generate HMAC signature for webhook payload
+ * Use this when sending webhooks to this endpoint
+ */
+export function generateWebhookSignature(payload: string, secret: string): string {
+  return crypto
+    .createHmac('sha256', secret)
+    .update(payload)
+    .digest('hex');
+}
+
+/**
+ * Verify webhook signature middleware
+ * Requires X-Webhook-Signature header with HMAC-SHA256 signature
+ */
+function verifyWebhookSignature(req: Request, res: Response, next: NextFunction): void {
+  if (!WEBHOOK_SECRET) {
+    res.status(503).json({
+      error: 'Service temporarily unavailable',
+      message: 'Webhook secret not configured on server',
+    });
+    return;
+  }
+
+  const signature = req.headers['x-webhook-signature'] as string | undefined;
+  const timestamp = req.headers['x-webhook-timestamp'] as string | undefined;
+
+  if (!signature) {
+    logger.warn('[SECURITY] Missing webhook signature', { ip: req.ip });
+    res.status(401).json({
+      error: 'Unauthorized',
+      message: 'Missing X-Webhook-Signature header',
+    });
+    return;
+  }
+
+  // Prevent replay attacks: reject requests older than 5 minutes
+  if (timestamp) {
+    const requestTime = parseInt(timestamp, 10);
+    const now = Date.now();
+    const MAX_AGE = 5 * 60 * 1000; // 5 minutes
+
+    if (isNaN(requestTime) || Math.abs(now - requestTime) > MAX_AGE) {
+      logger.warn('[SECURITY] Webhook timestamp expired or invalid', {
+        ip: req.ip,
+        timestamp,
+        now
+      });
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Request timestamp expired or invalid',
+      });
+      return;
+    }
+  }
+
+  // Compute expected signature
+  const payload = JSON.stringify(req.body) + (timestamp || '');
+  const expectedSignature = generateWebhookSignature(payload, WEBHOOK_SECRET);
+
+  if (!secureCompare(signature, expectedSignature)) {
+    logger.warn('[SECURITY] Invalid webhook signature', { ip: req.ip });
+    res.status(401).json({
+      error: 'Unauthorized',
+      message: 'Invalid webhook signature',
+    });
+    return;
+  }
+
+  next();
+}
+
+// Parse JSON body before signature verification
 app.use(express.json());
 
 // Initialize Supabase client with service role key
@@ -27,8 +121,14 @@ const supabase = createClient(
 /**
  * Webhook endpoint for job completion notifications
  * Called by workers when jobs complete (success or failure)
+ *
+ * SECURITY: Protected with HMAC signature verification
+ *
+ * Required Headers:
+ * - X-Webhook-Signature: HMAC-SHA256 signature of payload
+ * - X-Webhook-Timestamp: Unix timestamp in milliseconds (optional, for replay protection)
  */
-app.post('/webhooks/job-complete', async (req, res) => {
+app.post('/webhooks/job-complete', verifyWebhookSignature, async (req, res) => {
   try {
     const { jobId, userId, type, status, result, error } = req.body;
 

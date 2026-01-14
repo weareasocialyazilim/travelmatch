@@ -113,6 +113,21 @@ jobs:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           SENTRY_AUTH_TOKEN: ${{ env.SENTRY_AUTH_TOKEN }}
 
+      # P1 FIX: Upload Sentry source maps for better error debugging
+      - name: Upload Sentry Source Maps (iOS)
+        if: env.SENTRY_AUTH_TOKEN != ''
+        run: |
+          cd apps/mobile
+          npx @sentry/cli releases new "${{ github.ref_name }}"
+          npx @sentry/cli releases set-commits "${{ github.ref_name }}" --auto
+          npx @sentry/cli sourcemaps upload --release "${{ github.ref_name }}" --dist ios ./dist
+          npx @sentry/cli releases finalize "${{ github.ref_name }}"
+        env:
+          SENTRY_AUTH_TOKEN: ${{ env.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ env.SENTRY_ORG || 'travelmatch' }}
+          SENTRY_PROJECT: ${{ env.SENTRY_PROJECT || 'travelmatch-mobile' }}
+        continue-on-error: true
+
   build-android:
     name: Build Android Production
     needs: pre-deploy-checks
@@ -155,6 +170,21 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           SENTRY_AUTH_TOKEN: ${{ env.SENTRY_AUTH_TOKEN }}
+
+      # P1 FIX: Upload Sentry source maps for better error debugging
+      - name: Upload Sentry Source Maps (Android)
+        if: env.SENTRY_AUTH_TOKEN != ''
+        run: |
+          cd apps/mobile
+          npx @sentry/cli releases new "${{ github.ref_name }}"
+          npx @sentry/cli releases set-commits "${{ github.ref_name }}" --auto
+          npx @sentry/cli sourcemaps upload --release "${{ github.ref_name }}" --dist android ./dist
+          npx @sentry/cli releases finalize "${{ github.ref_name }}"
+        env:
+          SENTRY_AUTH_TOKEN: ${{ env.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ env.SENTRY_ORG || 'travelmatch' }}
+          SENTRY_PROJECT: ${{ env.SENTRY_PROJECT || 'travelmatch-mobile' }}
+        continue-on-error: true
 
   submit-ios:
     name: Submit to App Store
