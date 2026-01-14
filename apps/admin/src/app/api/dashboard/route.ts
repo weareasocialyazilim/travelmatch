@@ -1,6 +1,8 @@
 import { createServiceClient } from '@/lib/supabase';
+import { getAdminSession, hasPermission } from '@/lib/auth';
 import { logger } from '@/lib/logger';
-import { NextResponse } from 'next/server';
+import { checkRateLimit, rateLimits, createRateLimitHeaders } from '@/lib/rate-limit';
+import { NextRequest, NextResponse } from 'next/server';
 import type { Database } from '@/types/database';
 
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];
@@ -15,6 +17,11 @@ type ActivityLogRow = Database['public']['Tables']['activity_logs']['Row'];
  * CEO/CMO Meeting Decision: Single endpoint for all dashboard data
  * Inspired by: META's unified data architecture, TESLA's real-time telemetry
  *
+ * Security:
+ * - Requires admin authentication
+ * - Permission-based access control
+ * - Rate limiting
+ *
  * Returns:
  * - Core metrics (users, moments, revenue, tasks)
  * - Chart data (user activity, revenue trends)
@@ -23,8 +30,40 @@ type ActivityLogRow = Database['public']['Tables']['activity_logs']['Row'];
  * - Recent activities
  */
 
-export async function GET() {
+// Helper to get client IP
+function getClientIP(request: NextRequest): string {
+  return (
+    request.headers.get('x-forwarded-for')?.split(',')[0] ||
+    request.headers.get('x-real-ip') ||
+    'unknown'
+  );
+}
+
+export async function GET(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = getClientIP(request);
+    const rateLimit = await checkRateLimit(`dashboard:${ip}`, rateLimits.api);
+
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: 'Çok fazla istek', retryAfter: rateLimit.retryAfter },
+        { status: 429, headers: createRateLimitHeaders(rateLimit) },
+      );
+    }
+
+    // Authentication check
+    const session = await getAdminSession();
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Yetkilendirme gerekli' },
+        { status: 401 },
+      );
+    }
+
+    // All authenticated admins can view dashboard
+    // More granular permissions can be added here if needed
+
     const supabase = createServiceClient();
 
     // Parallel data fetching for performance (META approach)

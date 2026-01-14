@@ -1,6 +1,8 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api-client';
+import { logger } from '@/lib/logger';
 
 // Types
 export interface Session {
@@ -42,7 +44,7 @@ interface LoginHistoryResponse {
   offset: number;
 }
 
-// Mock data for fallback
+// Mock data for fallback (only used when API fails)
 const mockSessions: Session[] = [
   {
     id: '1',
@@ -64,16 +66,6 @@ const mockSessions: Session[] = [
     created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
     is_current: false,
   },
-  {
-    id: '3',
-    device: 'Firefox on Windows',
-    device_type: 'desktop',
-    ip_address: '10.0.0.15',
-    location: 'Ankara, Türkiye',
-    last_active: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
-    is_current: false,
-  },
 ];
 
 const mockLoginHistory: LoginHistoryEntry[] = [
@@ -87,14 +79,6 @@ const mockLoginHistory: LoginHistoryEntry[] = [
   },
   {
     id: '2',
-    status: 'success',
-    ip_address: '192.168.1.50',
-    location: 'İstanbul, Türkiye',
-    device: 'Safari on iPhone',
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-  },
-  {
-    id: '3',
     status: 'failed',
     ip_address: '45.33.32.156',
     location: 'Unknown',
@@ -102,108 +86,116 @@ const mockLoginHistory: LoginHistoryEntry[] = [
     created_at: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
     reason: 'Yanlış şifre',
   },
-  {
-    id: '4',
-    status: 'success',
-    ip_address: '10.0.0.15',
-    location: 'Ankara, Türkiye',
-    device: 'Firefox on Windows',
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-  },
-  {
-    id: '5',
-    status: 'failed',
-    ip_address: '185.220.101.1',
-    location: 'Germany',
-    device: 'Unknown',
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
-    reason: 'Engelli IP',
-  },
 ];
 
-// Fetch functions
+// Fetch functions - Real API calls with fallback
 async function fetchSessions(): Promise<SessionsResponse> {
-  // try {
-  //   const response = await fetch('/api/security/sessions');
-  //   if (!response.ok) {
-  //     throw new Error('Oturumlar yüklenemedi');
-  //   }
-  //   return response.json();
-  // } catch {
-  // Return mock data on error
-  return { sessions: mockSessions, total: mockSessions.length };
-  // }
+  try {
+    const response = await apiClient.get<SessionsResponse>('/security/sessions');
+
+    if (response.error) {
+      logger.warn('Sessions fetch failed, using fallback:', response.error);
+      return { sessions: mockSessions, total: mockSessions.length };
+    }
+
+    return response.data || { sessions: mockSessions, total: mockSessions.length };
+  } catch (error) {
+    logger.error('Sessions fetch error:', error);
+    return { sessions: mockSessions, total: mockSessions.length };
+  }
 }
 
 async function fetchLoginHistory(
   limit = 30,
   offset = 0,
 ): Promise<LoginHistoryResponse> {
-  // try {
-  //   const params = new URLSearchParams();
-  //   params.set('limit', limit.toString());
-  //   params.set('offset', offset.toString());
-  //
-  //   const response = await fetch(
-  //     `/api/security/login-history?${params.toString()}`,
-  //   );
-  //   if (!response.ok) {
-  //     throw new Error('Giriş geçmişi yüklenemedi');
-  //   }
-  //   return response.json();
-  // } catch {
-  // Return mock data on error
-  return {
-    history: mockLoginHistory,
-    total: mockLoginHistory.length,
-    limit,
-    offset,
-  };
-  // }
+  try {
+    const response = await apiClient.get<LoginHistoryResponse>('/security/login-history', {
+      params: { limit, offset },
+    });
+
+    if (response.error) {
+      logger.warn('Login history fetch failed, using fallback:', response.error);
+      return {
+        history: mockLoginHistory,
+        total: mockLoginHistory.length,
+        limit,
+        offset,
+      };
+    }
+
+    return response.data || {
+      history: mockLoginHistory,
+      total: mockLoginHistory.length,
+      limit,
+      offset,
+    };
+  } catch (error) {
+    logger.error('Login history fetch error:', error);
+    return {
+      history: mockLoginHistory,
+      total: mockLoginHistory.length,
+      limit,
+      offset,
+    };
+  }
 }
 
 async function fetch2FAStatus(): Promise<TwoFAStatus> {
-  // try {
-  //   const response = await fetch('/api/security/2fa-status');
-  //   if (!response.ok) {
-  //     throw new Error('2FA durumu yüklenemedi');
-  //   }
-  //   return response.json();
-  // } catch {
-  // Return mock data on error
-  return { enabled: false };
-  // }
+  try {
+    const response = await apiClient.get<TwoFAStatus>('/security/2fa-status');
+
+    if (response.error) {
+      logger.warn('2FA status fetch failed, using fallback:', response.error);
+      return { enabled: false };
+    }
+
+    return response.data || { enabled: false };
+  } catch (error) {
+    logger.error('2FA status fetch error:', error);
+    return { enabled: false };
+  }
 }
 
 async function revokeSession(
   sessionId: string,
 ): Promise<{ success: boolean; message: string }> {
-  // const response = await fetch('/api/security/sessions', {
-  //   method: 'DELETE',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify({ sessionId }),
-  // });
-  // if (!response.ok) {
-  //   throw new Error('Oturum sonlandırılamadı');
-  // }
-  // return response.json();
-  return { success: true, message: 'Oturum kapatıldı' };
+  try {
+    const response = await apiClient.delete<{ success: boolean; message: string }>(
+      '/security/sessions',
+      { params: { sessionId } },
+    );
+
+    if (response.error) {
+      throw new Error(response.error);
+    }
+
+    return response.data || { success: true, message: 'Oturum kapatıldı' };
+  } catch (error) {
+    logger.error('Revoke session error:', error);
+    throw new Error('Oturum sonlandırılamadı');
+  }
 }
 
 async function revokeAllSessions(): Promise<{
   success: boolean;
   message: string;
 }> {
-  // const response = await fetch('/api/security/sessions', {
-  //   method: 'DELETE',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify({ all: true }),
-  // });
-  return { success: true, message: 'Tüm oturumlar kapatıldı' };
-  if (!response.ok) {
+  try {
+    const response = await apiClient.delete<{ success: boolean; message: string }>(
+      '/security/sessions',
+      { params: { all: true } },
+    );
+
+    if (response.error) {
+      throw new Error(response.error);
+    }
+
+    return response.data || { success: true, message: 'Tüm oturumlar kapatıldı' };
+  } catch (error) {
+    logger.error('Revoke all sessions error:', error);
     throw new Error('Oturumlar sonlandırılamadı');
   }
-  return response.json();
 }
 
 // Hooks

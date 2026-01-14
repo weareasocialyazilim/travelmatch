@@ -1,20 +1,56 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
+import { createAuditLog } from '@/lib/auth';
+import { checkRateLimit, rateLimits, createRateLimitHeaders } from '@/lib/rate-limit';
 import { cookies } from 'next/headers';
 import crypto from 'crypto';
 import type { Database } from '@/types/database';
 
 type AdminUserRow = Database['public']['Tables']['admin_users']['Row'];
 
+// Helper to get client IP
+function getClientIP(request: NextRequest): string {
+  return (
+    request.headers.get('x-forwarded-for')?.split(',')[0] ||
+    request.headers.get('x-real-ip') ||
+    'unknown'
+  );
+}
+
 export async function POST(request: NextRequest) {
+  const ip = getClientIP(request);
+
   try {
+    // Rate limiting - strict for auth endpoints
+    const rateLimit = await checkRateLimit(`auth:login:${ip}`, rateLimits.auth);
+
+    if (!rateLimit.success) {
+      logger.warn(`Login rate limit exceeded for IP: ${ip}`);
+      return NextResponse.json(
+        {
+          error: 'Çok fazla başarısız deneme. Lütfen bekleyin.',
+          retryAfter: rateLimit.retryAfter
+        },
+        { status: 429, headers: createRateLimitHeaders(rateLimit) },
+      );
+    }
+
     const { email, password } = await request.json();
 
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email ve şifre gerekli' },
-        { status: 400 },
+        { status: 400, headers: createRateLimitHeaders(rateLimit) },
+      );
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: 'Geçerli bir email adresi girin' },
+        { status: 400, headers: createRateLimitHeaders(rateLimit) },
       );
     }
 
