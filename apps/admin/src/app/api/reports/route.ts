@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase';
+import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
 
 // Input validation schemas
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const supabase = createClient();
+    const supabase = createServiceClient();
     const searchParams = request.nextUrl.searchParams;
 
     // Validate query parameters
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const supabase = createClient();
+    const supabase = createServiceClient();
     const body = await request.json();
 
     // Validate request body

@@ -2,6 +2,7 @@ import { createServiceClient } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import type { Database } from '@/types/database';
+import { getAdminSession, hasPermission } from '@/lib/auth';
 
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];
 type MomentRow = Database['public']['Tables']['moments']['Row'];
@@ -25,6 +26,16 @@ type ActivityLogRow = Database['public']['Tables']['activity_logs']['Row'];
 
 export async function GET() {
   try {
+    // Auth check - P0 Security Fix
+    const session = await getAdminSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+    }
+
+    if (!hasPermission(session, 'dashboard', 'view')) {
+      return NextResponse.json({ error: 'Yetersiz yetki' }, { status: 403 });
+    }
+
     const supabase = createServiceClient();
 
     // Parallel data fetching for performance (META approach)

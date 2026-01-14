@@ -1,7 +1,8 @@
-import { createClient } from '@/lib/supabase';
+import { createServiceClient } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import type { Database } from '@/types/database';
+import { getAdminSession, hasPermission } from '@/lib/auth';
 
 type TaskRow = Database['public']['Tables']['tasks']['Row'];
 
@@ -12,7 +13,17 @@ type TaskRow = Database['public']['Tables']['tasks']['Row'];
 
 export async function GET(request: Request) {
   try {
-    const supabase = createClient();
+    // Auth check - P0 Security Fix
+    const session = await getAdminSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+    }
+
+    if (!hasPermission(session, 'tasks', 'view')) {
+      return NextResponse.json({ error: 'Yetersiz yetki' }, { status: 403 });
+    }
+
+    const supabase = createServiceClient();
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
     const type = searchParams.get('type');
@@ -145,7 +156,17 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const supabase = createClient();
+    // Auth check - P0 Security Fix
+    const session = await getAdminSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+    }
+
+    if (!hasPermission(session, 'tasks', 'create')) {
+      return NextResponse.json({ error: 'Yetersiz yetki' }, { status: 403 });
+    }
+
+    const supabase = createServiceClient();
     const body = await request.json();
 
     const { data, error } = await supabase
@@ -179,7 +200,17 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
-    const supabase = createClient();
+    // Auth check - P0 Security Fix
+    const session = await getAdminSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+    }
+
+    if (!hasPermission(session, 'tasks', 'update')) {
+      return NextResponse.json({ error: 'Yetersiz yetki' }, { status: 403 });
+    }
+
+    const supabase = createServiceClient();
     const body = await request.json();
     const { id, ...updates } = body;
 
@@ -209,7 +240,17 @@ export async function PATCH(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
-    const supabase = createClient();
+    // Auth check - P0 Security Fix
+    const session = await getAdminSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+    }
+
+    if (!hasPermission(session, 'tasks', 'delete')) {
+      return NextResponse.json({ error: 'Yetersiz yetki' }, { status: 403 });
+    }
+
+    const supabase = createServiceClient();
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 

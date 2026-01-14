@@ -1,7 +1,8 @@
-import { createClient } from '@/lib/supabase';
+import { createServiceClient } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import type { Database } from '@/types/database';
+import { getAdminSession, hasPermission } from '@/lib/auth';
 
 type SupportTicketRow = Database['public']['Tables']['support_tickets']['Row'];
 
@@ -12,7 +13,17 @@ type SupportTicketRow = Database['public']['Tables']['support_tickets']['Row'];
 
 export async function GET(request: Request) {
   try {
-    const supabase = createClient();
+    // Auth check - P0 Security Fix
+    const session = await getAdminSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+    }
+
+    if (!hasPermission(session, 'support', 'view')) {
+      return NextResponse.json({ error: 'Yetersiz yetki' }, { status: 403 });
+    }
+
+    const supabase = createServiceClient();
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
     const priority = searchParams.get('priority');
@@ -115,7 +126,17 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const supabase = createClient();
+    // Auth check - P0 Security Fix
+    const session = await getAdminSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+    }
+
+    if (!hasPermission(session, 'support', 'create')) {
+      return NextResponse.json({ error: 'Yetersiz yetki' }, { status: 403 });
+    }
+
+    const supabase = createServiceClient();
     const body = await request.json();
 
     const { data, error } = await supabase
@@ -147,7 +168,17 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
-    const supabase = createClient();
+    // Auth check - P0 Security Fix
+    const session = await getAdminSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+    }
+
+    if (!hasPermission(session, 'support', 'update')) {
+      return NextResponse.json({ error: 'Yetersiz yetki' }, { status: 403 });
+    }
+
+    const supabase = createServiceClient();
     const body = await request.json();
     const { id, ...updates } = body;
 
