@@ -96,7 +96,7 @@ const FEATURE_CONFIG: Record<
     title: 'Verified Badge',
     description:
       'Stand out with a verified badge on your profile. Build trust with the community.',
-    requiredPlan: 'concierge',
+    requiredPlan: 'premium',
   },
 };
 

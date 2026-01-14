@@ -39,7 +39,7 @@ import { formatCurrency, cn } from '@/lib/utils';
 import { useRevenue } from '@/hooks/use-revenue';
 import { CanvaButton } from '@/components/canva/CanvaButton';
 import { exportToCSV, generateExportFilename } from '@/lib/export';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import {
   CanvaCard,
   CanvaCardHeader,

@@ -148,7 +148,7 @@ const subscriptionPlans = [
       'VIP destek',
       'Ozel etkinlikler',
       'Counter offer',
-      'Concierge hizmeti',
+      'VIP asistan hizmeti',
     ],
     color: 'bg-amber-500',
     active: true,
@@ -887,10 +887,15 @@ export default function SubscriptionManagementPage() {
             </div>
           </div>
           <DialogFooter>
-            <CanvaButton variant="outline" onClick={() => setPromoDialog(false)}>
+            <CanvaButton
+              variant="outline"
+              onClick={() => setPromoDialog(false)}
+            >
               Iptal
             </CanvaButton>
-            <CanvaButton onClick={() => setPromoDialog(false)}>Olustur</CanvaButton>
+            <CanvaButton onClick={() => setPromoDialog(false)}>
+              Olustur
+            </CanvaButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>

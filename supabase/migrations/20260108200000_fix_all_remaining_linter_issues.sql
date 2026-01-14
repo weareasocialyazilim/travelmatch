@@ -342,7 +342,8 @@ CREATE POLICY "videos_select" ON public.videos
     FOR SELECT
     USING (deleted_at IS NULL);
 
--- proof_submissions
+-- proof_submissions (Commented out as table missing locally)
+/*
 DROP POLICY IF EXISTS "proof_submissions_recipient_insert" ON public.proof_submissions;
 CREATE POLICY "proof_submissions_recipient_insert" ON public.proof_submissions
     FOR INSERT
@@ -373,6 +374,7 @@ CREATE POLICY "proof_submissions_submitter_update" ON public.proof_submissions
     FOR UPDATE
     USING (submitter_id = (SELECT auth.uid()))
     WITH CHECK (submitter_id = (SELECT auth.uid()));
+*/
 
 -- users
 DROP POLICY IF EXISTS "users_update_own" ON public.users;
