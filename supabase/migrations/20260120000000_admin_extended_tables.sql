@@ -280,6 +280,41 @@ CREATE INDEX IF NOT EXISTS idx_vip_users_active ON vip_users(status, valid_until
 -- REPORTS TABLE
 -- =====================================================
 
+-- Schema alignment for reports table (handle transition from old schema)
+DO $$ 
+BEGIN
+  -- If table exists
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'reports') THEN
+      
+      -- 1. Rename reported_user_id to reported_id if needed
+      IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'reports' AND column_name = 'reported_user_id') 
+         AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'reports' AND column_name = 'reported_id') THEN
+          ALTER TABLE reports RENAME COLUMN reported_user_id TO reported_id;
+      END IF;
+
+      -- 2. Add 'type' column if missing
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'reports' AND column_name = 'type') THEN
+          ALTER TABLE reports ADD COLUMN type TEXT NOT NULL DEFAULT 'general';
+      END IF;
+
+      -- 3. Add 'priority' column if missing
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'reports' AND column_name = 'priority') THEN
+          ALTER TABLE reports ADD COLUMN priority fraud_case_priority NOT NULL DEFAULT 'medium';
+      END IF;
+
+      -- 4. Add 'assigned_to' column if missing
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'reports' AND column_name = 'assigned_to') THEN
+          ALTER TABLE reports ADD COLUMN assigned_to UUID REFERENCES admin_users(id);
+      END IF;
+      
+       -- 5. Add 'resolution' column if missing
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'reports' AND column_name = 'resolution') THEN
+          ALTER TABLE reports ADD COLUMN resolution TEXT;
+      END IF;
+
+  END IF;
+END $$;
+
 CREATE TABLE IF NOT EXISTS reports (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   reporter_id UUID NOT NULL REFERENCES users(id),

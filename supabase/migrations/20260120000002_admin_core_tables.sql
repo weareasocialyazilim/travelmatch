@@ -3,6 +3,17 @@
 -- This creates all tables needed by the admin panel
 
 -- =====================================================
+-- RESET FOR PERMANENT SOLUTION
+-- =====================================================
+-- Drop conflicting tables from previous partial migrations to ensure clean state
+DROP TABLE IF EXISTS fraud_evidence CASCADE;
+DROP TABLE IF EXISTS fraud_cases CASCADE;
+DROP TABLE IF EXISTS linked_accounts CASCADE;
+DROP TABLE IF EXISTS payout_requests CASCADE;
+DROP TABLE IF EXISTS vip_users CASCADE;
+DROP TABLE IF EXISTS kyc_verifications CASCADE;
+
+-- =====================================================
 -- FRAUD CASES TABLE
 -- =====================================================
 

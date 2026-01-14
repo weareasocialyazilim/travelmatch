@@ -356,8 +356,9 @@ export const useMoments = (): UseMomentsReturn => {
             typeof data.location === 'string'
               ? data.location
               : data.location?.city || '',
-          latitude: data.location?.coordinates?.lat ?? null,
-          longitude: data.location?.coordinates?.lng ?? null,
+          coordinates: data.location?.coordinates
+            ? `POINT(${data.location.coordinates.lng} ${data.location.coordinates.lat})`
+            : null,
           date: new Date().toISOString(),
           max_participants: data.maxGuests || 1,
           images: uploadedImageUrls, // Use uploaded URLs instead of local URIs

@@ -10,6 +10,14 @@
 --   4. Public reviews for completed transactions
 -- ============================================
 
+-- Add missing request_id column if needed
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'reviews' AND column_name = 'request_id') THEN
+        ALTER TABLE reviews ADD COLUMN request_id UUID REFERENCES requests(id);
+    END IF;
+END $$;
+
 -- Drop the overly permissive policy
 DROP POLICY IF EXISTS "Anyone can view reviews" ON public.reviews;
 
@@ -62,9 +70,10 @@ CREATE POLICY "reviews_insert_verified"
         request_id IS NOT NULL
         AND EXISTS (
           SELECT 1 FROM requests r
+          JOIN moments m ON m.id = r.moment_id 
           WHERE r.id = request_id
           AND r.status IN ('completed', 'verified')
-          AND (r.host_id = auth.uid() OR r.guest_id = auth.uid())
+          AND (m.user_id = auth.uid() OR r.user_id = auth.uid())
         )
       )
       OR
