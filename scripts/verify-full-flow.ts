@@ -4,6 +4,7 @@
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import path from 'path';
+import crypto from 'crypto';
 
 // Load env vars
 const envPath = path.resolve(process.cwd(), 'apps/admin/.env.local');
@@ -12,6 +13,10 @@ dotenv.config({ path: envPath });
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
+// Generate random test password for ephemeral test users - not stored anywhere
+const TEST_PASSWORD =
+  process.env.TEST_USER_PASSWORD || crypto.randomBytes(16).toString('hex');
+
 if (!SUPABASE_URL || !SERVICE_KEY) {
   console.error('❌ Missing Supabase URL or Service Key');
   process.exit(1);
@@ -19,22 +24,22 @@ if (!SUPABASE_URL || !SERVICE_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
 
-// Data
+// Test user data - password from env or random
 const HOST = {
   email: `host_${Date.now()}@travelmatch.app`,
-  password: 'Password123!',
+  password: TEST_PASSWORD,
   name: 'Host User',
 };
 
 const TRAVELER_LOW = {
   email: `traveler_low_${Date.now()}@travelmatch.app`,
-  password: 'Password123!',
+  password: TEST_PASSWORD,
   name: 'Low Budget Traveler',
 };
 
 const TRAVELER_HIGH = {
   email: `traveler_high_${Date.now()}@travelmatch.app`,
-  password: 'Password123!',
+  password: TEST_PASSWORD,
   name: 'High Budget Traveler',
 };
 

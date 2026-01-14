@@ -113,6 +113,14 @@ export default function SecurityPage() {
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Sanitize QR code to prevent XSS - only allow data: URIs with image/png or image/svg+xml
+  const sanitizeQrCode = (code: string): string => {
+    if (!code) return '';
+    const validDataUriPattern =
+      /^data:image\/(png|svg\+xml|jpeg|gif);base64,[A-Za-z0-9+/=]+$/;
+    return validDataUriPattern.test(code) ? code : '';
+  };
+
   // Use local state if set, otherwise use fetched state
   const effectiveIs2FAEnabled =
     local2FAEnabled !== null ? local2FAEnabled : is2FAEnabled;
@@ -820,8 +828,14 @@ export default function SecurityPage() {
           {setupStep === 1 && (
             <div className="space-y-4">
               <div className="flex justify-center p-4 bg-card rounded-lg border">
-                {qrCode ? (
-                  <img src={qrCode} alt="QR Code" className="w-48 h-48" />
+                {qrCode && sanitizeQrCode(qrCode) ? (
+                  // QR code is validated as a safe data URI from our API
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={sanitizeQrCode(qrCode)}
+                    alt="QR Code"
+                    className="w-48 h-48"
+                  />
                 ) : (
                   <div className="w-48 h-48 bg-muted rounded flex items-center justify-center">
                     <QrCode className="h-12 w-12 text-muted-foreground" />
