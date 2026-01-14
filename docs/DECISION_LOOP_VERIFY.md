@@ -5,7 +5,7 @@
 | Kontrol | Durum | Açıklama |
 |---------|-------|----------|
 | Breaking Change | **0** | Mevcut UI/API değişmedi |
-| Default OFF | **✅ EVET** | `FOUNDER_DECISION_LOOP_ENABLED = false` |
+| Default OFF | **✅ EVET** | ENV yoksa `false` (kod değişikliği gerektirmez) |
 | Super admin dışında görünür mü | **❌ HAYIR** | Hard check: `role === 'super_admin'` |
 | NO-NETWORK | **✅ EVET** | Dış servis çağrısı yok |
 | Rollback planı | **✅ VAR** | Flag kapatınca anında deaktif |
@@ -22,10 +22,23 @@ Mevcut tablolarda değişiklik: YOK
 DROP/ALTER: YOK
 ```
 
-### ✅ Feature Flag (Default OFF)
+### ✅ Feature Flag (Default OFF, ENV-Based)
+
+```bash
+# ENV variable kontrolü (kod değişikliği gerektirmez)
+NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED=true  # veya
+FOUNDER_DECISION_LOOP_ENABLED=true              # server-side
+```
 
 ```typescript
-export const FOUNDER_DECISION_LOOP_ENABLED = false;
+// Client-side
+export const FOUNDER_DECISION_LOOP_ENABLED =
+  process.env.NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED === 'true';
+
+// Server-side (API routes)
+export function isFounderDecisionLoopEnabled(): boolean {
+  return serverEnv === 'true' || publicEnv === 'true';
+}
 ```
 
 ### ✅ Super Admin Only
@@ -74,8 +87,8 @@ const isEnabled = FOUNDER_DECISION_LOOP_ENABLED && isSuperAdmin();
 
 | Dosya | Değişiklik |
 |-------|------------|
-| `apps/admin/src/app/(dashboard)/ceo-briefing/page.tsx` | Action butonları |
-| `apps/admin/src/app/(dashboard)/command-center/page.tsx` | Stats gösterimi |
+| `apps/admin/src/app/(dashboard)/ceo-briefing/page.tsx` | Action butonları (Reviewed/Defer/Focus) |
+| `apps/admin/src/app/(dashboard)/command-center/page.tsx` | Founder Pulse + Ertelenenler listesi |
 
 ---
 
@@ -110,7 +123,8 @@ const isEnabled = FOUNDER_DECISION_LOOP_ENABLED && isSuperAdmin();
 - [ ] CEO Briefing: Reviewed/Defer butonları görünür
 - [ ] CEO Briefing: "Bu Hafta Odağım Bu" butonu görünür
 - [ ] Command Center: Stats satırı görünür
-- [ ] API GET: Stats döner
+- [ ] Command Center: Ertelenenler (son 5) listesi görünür
+- [ ] API GET: Stats + deferredBacklog döner
 - [ ] API POST: Log oluşturur
 - [ ] Idempotency: 5 saniye içinde duplicate önlenir
 
@@ -119,19 +133,19 @@ const isEnabled = FOUNDER_DECISION_LOOP_ENABLED && isSuperAdmin();
 ## Rollback Prosedürü
 
 ```bash
-# 1. Flag'i kapat
-# apps/admin/src/config/founder-config.ts
-export const FOUNDER_DECISION_LOOP_ENABLED = false;
+# 1. ENV variable'ı kaldır veya false yap
+# Vercel: Settings → Environment Variables → Remove
+# Local: .env.local'dan kaldır
 
-# 2. Deploy
-git add . && git commit -m "fix: disable founder decision loop" && git push
+# 2. Restart
+vercel --prod  # veya local: npm run dev (restart)
 
 # 3. Verify
 # - Butonlar görünmemeli
 # - API 403 dönmeli
 ```
 
-**Tahmini süre:** < 5 dakika
+**Tahmini süre:** < 1 dakika (kod değişikliği GEREKMİYOR!)
 
 ---
 

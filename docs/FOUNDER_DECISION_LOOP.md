@@ -28,23 +28,39 @@ Founder Decision Loop, super_admin kullanıcısının karar alma sürecini takip
 
 ## Feature Flag
 
+```bash
+# ENV Variable (no code change needed)
+NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED=true
+# veya server-side için:
+FOUNDER_DECISION_LOOP_ENABLED=true
+```
+
 ```typescript
 // apps/admin/src/config/founder-config.ts
 
-export const FOUNDER_DECISION_LOOP_ENABLED = false; // DEFAULT: OFF
+// Client-side (reads from NEXT_PUBLIC_)
+export const FOUNDER_DECISION_LOOP_ENABLED =
+  process.env.NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED === 'true';
+
+// Server-side (for API routes)
+export function isFounderDecisionLoopEnabled(): boolean {
+  const serverEnv = process.env.FOUNDER_DECISION_LOOP_ENABLED;
+  const publicEnv = process.env.NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED;
+  return serverEnv === 'true' || publicEnv === 'true';
+}
 ```
 
 ### Flag Durumlarına Göre Davranış
 
 | Flag | UI | API | Davranış |
 |------|----|----|----------|
-| `false` (default) | Butonlar görünmez | 403 döner | Mevcut sistem aynen çalışır |
+| Not set (default) | Butonlar görünmez | 403 döner | Mevcut sistem aynen çalışır |
 | `true` | Butonlar görünür | Çalışır | Karar logging aktif |
 
-### Aktivasyon
+### Aktivasyon (Deploy Gerektirmez!)
 
-1. `FOUNDER_DECISION_LOOP_ENABLED = true` yapın
-2. Deploy edin
+1. ENV variable'ı ayarlayın: `NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED=true`
+2. Server'ı restart edin (veya Vercel'de Environment Variables'dan ekleyin)
 3. super_admin olarak giriş yapın
 4. /ceo-briefing veya /command-center'da butonları görün
 
@@ -90,7 +106,7 @@ CREATE TABLE founder_decision_log (
 
 ### GET /api/founder-decisions
 
-Bugünkü istatistikleri ve mevcut odağı döner.
+Bugünkü istatistikleri, mevcut odağı ve ertelenen item'ları döner.
 
 **Response:**
 ```json
@@ -100,7 +116,16 @@ Bugünkü istatistikleri ve mevcut odağı döner.
     "deferredToday": 2,
     "currentFocus": "premium_conversion",
     "focusSetAt": "2026-01-14T08:30:00Z"
-  }
+  },
+  "deferredBacklog": [
+    {
+      "id": "uuid",
+      "item_key": "payment_gateway_review",
+      "item_type": "strategic",
+      "note": "Q2'de değerlendir",
+      "created_at": "2026-01-14T09:00:00Z"
+    }
+  ]
 }
 ```
 
@@ -169,6 +194,7 @@ Yeni bir karar kaydeder.
 **Founder Pulse bölümü:**
 - Bugünkü reviewed/deferred sayıları
 - Mevcut haftalık odak
+- **Ertelenenler (son 5):** En son ertelenen karar item'larının listesi
 
 ---
 
@@ -198,12 +224,12 @@ supabase/migrations/
 
 ## Rollback Planı
 
-1. `FOUNDER_DECISION_LOOP_ENABLED = false` yapın
-2. Deploy edin
+1. ENV variable'ı kaldırın veya `NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED=false` yapın
+2. Server'ı restart edin (veya Vercel'de Environment Variables'dan silin)
 3. Butonlar kaybolur, API 403 döner
 4. Mevcut sistem aynen çalışmaya devam eder
 
-**Rollback süresi:** < 5 dakika
+**Rollback süresi:** < 1 dakika (kod değişikliği gerektirmez!)
 
 ---
 

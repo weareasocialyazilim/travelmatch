@@ -4,9 +4,13 @@
  * SAFE MODE: Default OFF
  * This feature is only visible to super_admin when enabled.
  *
- * To enable:
- * 1. Set FOUNDER_DECISION_LOOP_ENABLED = true below
- * 2. Or add to feature_flags table in database
+ * To enable (no deploy needed):
+ * 1. Set ENV variable: NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED=true
+ * 2. Restart the server
+ *
+ * To disable:
+ * 1. Remove ENV variable or set to false
+ * 2. Restart the server
  */
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -17,8 +21,24 @@
  * Enable/disable the Founder Decision Loop UI
  * When false: No action buttons visible, no behavior change
  * When true: super_admin sees Reviewed/Defer/Focus buttons
+ *
+ * Reads from: NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED
+ * Default: false (SAFE MODE)
  */
-export const FOUNDER_DECISION_LOOP_ENABLED = false;
+export const FOUNDER_DECISION_LOOP_ENABLED =
+  process.env.NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED === 'true';
+
+/**
+ * Server-side only check (for API routes)
+ * Falls back to the public env var for consistency
+ */
+export function isFounderDecisionLoopEnabled(): boolean {
+  // Server can check both, prefer the non-public one if set
+  const serverEnv = process.env.FOUNDER_DECISION_LOOP_ENABLED;
+  const publicEnv = process.env.NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED;
+
+  return serverEnv === 'true' || publicEnv === 'true';
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES

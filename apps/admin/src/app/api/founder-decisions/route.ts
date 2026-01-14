@@ -3,7 +3,7 @@ import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, createAuditLog } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import {
-  FOUNDER_DECISION_LOOP_ENABLED,
+  isFounderDecisionLoopEnabled,
   type FounderDecision,
   type FounderDecisionStats,
 } from '@/config/founder-config';
@@ -25,8 +25,8 @@ import {
 
 export async function GET() {
   try {
-    // Feature flag check
-    if (!FOUNDER_DECISION_LOOP_ENABLED) {
+    // Feature flag check (server-side, reads from ENV)
+    if (!isFounderDecisionLoopEnabled()) {
       return NextResponse.json(
         { error: 'Feature not enabled', code: 'FEATURE_DISABLED' },
         { status: 403 }
@@ -71,6 +71,14 @@ export async function GET() {
       .limit(1)
       .single();
 
+    // Get recent deferred items (top 5, newest first)
+    const { data: deferredItems } = await supabase
+      .from('founder_decision_log')
+      .select('id, item_key, item_type, note, created_at')
+      .eq('action', 'deferred')
+      .order('created_at', { ascending: false })
+      .limit(5);
+
     const stats: FounderDecisionStats = {
       reviewedToday: reviewedToday || 0,
       deferredToday: deferredToday || 0,
@@ -78,7 +86,10 @@ export async function GET() {
       focusSetAt: focusData?.created_at || null,
     };
 
-    return NextResponse.json({ stats });
+    return NextResponse.json({
+      stats,
+      deferredBacklog: deferredItems || [],
+    });
   } catch (error) {
     logger.error('Founder decision GET error:', error);
     return NextResponse.json(
@@ -94,8 +105,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    // Feature flag check
-    if (!FOUNDER_DECISION_LOOP_ENABLED) {
+    // Feature flag check (server-side, reads from ENV)
+    if (!isFounderDecisionLoopEnabled()) {
       return NextResponse.json(
         { error: 'Feature not enabled', code: 'FEATURE_DISABLED' },
         { status: 403 }

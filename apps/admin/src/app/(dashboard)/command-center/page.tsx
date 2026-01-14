@@ -341,6 +341,7 @@ export default function CommandCenterPage() {
   const {
     isEnabled: isDecisionLoopEnabled,
     stats: decisionStats,
+    deferredBacklog,
   } = useFounderDecisions();
 
   // Auto-refresh every 30 seconds
@@ -541,6 +542,31 @@ export default function CommandCenterPage() {
                     </span>
                   )}
                 </div>
+
+                {/* Deferred Backlog (top 5) */}
+                {deferredBacklog.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-slate-700/30">
+                    <p className="text-xs text-slate-400 mb-2">Ertelenenler (son 5):</p>
+                    <div className="space-y-1">
+                      {deferredBacklog.slice(0, 5).map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between text-xs p-1.5 rounded bg-slate-800/30"
+                        >
+                          <span className="text-slate-300 truncate max-w-[200px]">
+                            {item.item_key.replace(/_/g, ' ')}
+                          </span>
+                          <span className="text-slate-500 text-[10px]">
+                            {new Date(item.created_at).toLocaleDateString('tr-TR', {
+                              day: 'numeric',
+                              month: 'short',
+                            })}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
