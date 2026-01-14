@@ -53,7 +53,9 @@ export type Resource =
   | 'analytics'
   | 'settings'
   | 'admin_users'
-  | 'integrations';
+  | 'integrations'
+  | 'compliance'
+  | 'promos';
 
 // Actions
 export type Action =

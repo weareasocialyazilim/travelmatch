@@ -1,6 +1,7 @@
-import { createClient } from '@/lib/supabase';
+import { createServiceClient } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
 import type { Database } from '@/types/database';
 
 type FeatureFlagRow = Database['public']['Tables']['feature_flags']['Row'];
@@ -8,11 +9,21 @@ type FeatureFlagRow = Database['public']['Tables']['feature_flags']['Row'];
 /**
  * Feature Flags API Endpoint
  * Manages feature flags for the application
+ * PROTECTED: Requires admin session and settings permission
  */
 
 export async function GET() {
   try {
-    const supabase = createClient();
+    const session = await getAdminSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+    }
+
+    if (!hasPermission(session, 'settings', 'view')) {
+      return NextResponse.json({ error: 'Yetersiz yetki' }, { status: 403 });
+    }
+
+    const supabase = createServiceClient();
 
     const { data: flags, error } = await supabase
       .from('feature_flags')
@@ -74,9 +85,18 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const session = await getAdminSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+    }
+
+    if (!hasPermission(session, 'settings', 'update')) {
+      return NextResponse.json({ error: 'Yetersiz yetki' }, { status: 403 });
+    }
+
+    const supabase = createServiceClient();
     const body = await request.json();
 
     const { data, error } = await supabase
@@ -97,6 +117,18 @@ export async function POST(request: Request) {
       throw error;
     }
 
+    // Audit log for feature flag creation
+    await createAuditLog(
+      session.admin.id,
+      'feature_flag.create',
+      'feature_flag',
+      data.id,
+      null,
+      data,
+      request.headers.get('x-forwarded-for') || undefined,
+      request.headers.get('user-agent') || undefined,
+    );
+
     return NextResponse.json({ flag: data });
   } catch (error) {
     logger.error('Create flag error:', error);
@@ -107,11 +139,27 @@ export async function POST(request: Request) {
   }
 }
 
-export async function PATCH(request: Request) {
+export async function PATCH(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const session = await getAdminSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+    }
+
+    if (!hasPermission(session, 'settings', 'update')) {
+      return NextResponse.json({ error: 'Yetersiz yetki' }, { status: 403 });
+    }
+
+    const supabase = createServiceClient();
     const body = await request.json();
     const { id, ...updates } = body;
+
+    // Get old value for audit log
+    const { data: oldFlag } = await supabase
+      .from('feature_flags')
+      .select('*')
+      .eq('id', id)
+      .single();
 
     const { data, error } = await supabase
       .from('feature_flags')
@@ -127,6 +175,18 @@ export async function PATCH(request: Request) {
       throw error;
     }
 
+    // Audit log for feature flag update
+    await createAuditLog(
+      session.admin.id,
+      'feature_flag.update',
+      'feature_flag',
+      id,
+      oldFlag,
+      data,
+      request.headers.get('x-forwarded-for') || undefined,
+      request.headers.get('user-agent') || undefined,
+    );
+
     return NextResponse.json({ flag: data });
   } catch (error) {
     logger.error('Update flag error:', error);
@@ -137,15 +197,35 @@ export async function PATCH(request: Request) {
   }
 }
 
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const session = await getAdminSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+    }
+
+    // Only super_admin can delete feature flags
+    if (session.admin.role !== 'super_admin') {
+      return NextResponse.json(
+        { error: 'Bu işlem için super_admin yetkisi gerekli' },
+        { status: 403 },
+      );
+    }
+
+    const supabase = createServiceClient();
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 
     if (!id) {
       return NextResponse.json({ error: 'Flag ID required' }, { status: 400 });
     }
+
+    // Get old value for audit log
+    const { data: oldFlag } = await supabase
+      .from('feature_flags')
+      .select('*')
+      .eq('id', id)
+      .single();
 
     const { error } = await supabase
       .from('feature_flags')
@@ -155,6 +235,18 @@ export async function DELETE(request: Request) {
     if (error) {
       throw error;
     }
+
+    // Audit log for feature flag deletion
+    await createAuditLog(
+      session.admin.id,
+      'feature_flag.delete',
+      'feature_flag',
+      id,
+      oldFlag,
+      null,
+      request.headers.get('x-forwarded-for') || undefined,
+      request.headers.get('user-agent') || undefined,
+    );
 
     return NextResponse.json({ success: true });
   } catch (error) {
