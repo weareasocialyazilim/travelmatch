@@ -185,62 +185,50 @@ function parseAlertHistory(history: unknown[]): AlertHistoryItem[] {
   })) as AlertHistoryItem[];
 }
 
-// Fetch functions with fallback
+// Fetch functions - uses real API with mock fallback
 async function fetchAlertRules(): Promise<AlertRule[]> {
-  // Use mock data directly until API is implemented
-  return MOCK_ALERT_RULES;
-  /*
   try {
     const response = await fetch('/api/alerts/rules');
     if (!response.ok) {
       throw new Error('Failed to fetch alert rules');
     }
     const data = await response.json();
-    return data.rules || data;
-  } catch {
-    // Return mock data on failure
-    logger.warn('Using mock alert rules data');
+    return data.rules || [];
+  } catch (error) {
+    // Return mock data on API failure (e.g., during initial setup)
+    logger.warn('Using mock alert rules data - API not available');
     return MOCK_ALERT_RULES;
   }
-  */
 }
 
 async function fetchActiveAlerts(): Promise<ActiveAlert[]> {
-  // Use mock data directly until API is implemented
-  return MOCK_ACTIVE_ALERTS;
-  /*
   try {
     const response = await fetch('/api/alerts/active');
     if (!response.ok) {
       throw new Error('Failed to fetch active alerts');
     }
     const data = await response.json();
-    return parseActiveAlerts(data.alerts || data);
-  } catch {
-    // Return mock data on failure
-    logger.warn('Using mock active alerts data');
+    return parseActiveAlerts(data.alerts || []);
+  } catch (error) {
+    // Return mock data on API failure
+    logger.warn('Using mock active alerts data - API not available');
     return MOCK_ACTIVE_ALERTS;
   }
-  */
 }
 
 async function fetchAlertHistory(): Promise<AlertHistoryItem[]> {
-  // Use mock data directly until API is implemented
-  return MOCK_ALERT_HISTORY;
-  /*
   try {
     const response = await fetch('/api/alerts/history');
     if (!response.ok) {
       throw new Error('Failed to fetch alert history');
     }
     const data = await response.json();
-    return parseAlertHistory(data.history || data);
-  } catch {
-    // Return mock data on failure
-    logger.warn('Using mock alert history data');
+    return parseAlertHistory(data.history || []);
+  } catch (error) {
+    // Return mock data on API failure
+    logger.warn('Using mock alert history data - API not available');
     return MOCK_ALERT_HISTORY;
   }
-  */
 }
 
 // Query hooks
