@@ -41,14 +41,16 @@
     },
     "admin#build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"],
-      "inputs": ["src/**", "index.html", "vite.config.ts", "package.json"],
+      "outputs": [".next/**", "!.next/cache/**"],
+      "inputs": ["src/**", "app/**", "public/**", "next.config.js", "package.json"],
       "env": [
-        "VITE_SUPABASE_URL",
-        "VITE_SUPABASE_ANON_KEY",
         "NEXT_PUBLIC_SUPABASE_URL",
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-        "SUPABASE_SERVICE_ROLE_KEY"
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "SENTRY_AUTH_TOKEN",
+        "SENTRY_DSN",
+        "SENTRY_ORG",
+        "SENTRY_PROJECT"
       ]
     },
     "admin#lint": {
