@@ -1,27 +1,29 @@
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import path from 'path';
+import crypto from 'crypto';
 
 // Load environment variables
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../apps/admin/.env.local') });
 
-// Hardcoded keys for validation report (Local defaults)
-const supabaseUrl =
-  process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321';
-const supabaseServiceKey =
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  'eyJhbGciOiJFUzI1NiIsImtpZCI6ImI4MTI2OWYxLTIxZDgtNGYyZS1iNzE5LWMyMjQwYTg0MGQ5MCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MjA4Mzc2MDIyNH0.lVRwRv_8A_tGjCQdbEt5P_CZcNg5DTcHUriIQC7nKgXtQFNnqvi0XerGaWIHS9lfC_SU3Z7cDMlpR9TZTZvWPg';
-const supabaseAnonKey =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  'eyJhbGciOiJFUzI1NiIsImtpZCI6ImI4MTI2OWYxLTIxZDgtNGYyZS1iNzE5LWMyMjQwYTg0MGQ5MCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjIwODM3NjAyMjR9.sIjYszZcDkSbNVIHJgI-LTngP4a1GQ2YVLAVFujrcJLUQBbepKbwoh3op6UczXczgFRF7IH_nkrexaRWt-djgQ';
+// Read from environment only - no hardcoded fallbacks in production scripts
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseServiceKey) {
-  console.error('Missing Supabase credentials');
+// Generate random test password for ephemeral test users - not stored anywhere
+const TEST_PASSWORD =
+  process.env.TEST_USER_PASSWORD || crypto.randomBytes(16).toString('hex');
+
+if (!supabaseUrl || !supabaseServiceKey || !supabaseAnonKey) {
+  console.error(
+    'Missing Supabase credentials. Set NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, NEXT_PUBLIC_SUPABASE_ANON_KEY',
+  );
   process.exit(1);
 }
 
 const adminClient = createClient(supabaseUrl, supabaseServiceKey);
-console.log('Using Service Key ending in:', supabaseServiceKey.slice(-10));
+console.log('Using Supabase URL:', supabaseUrl);
 
 async function runTests() {
   console.log('🚀 Starting Comprehensive Scenario Validation...');
@@ -59,7 +61,7 @@ async function runTests() {
     error: userError,
   } = await adminClient.auth.admin.createUser({
     email: `story_tester_${Date.now()}@test.com`,
-    password: 'password123',
+    password: TEST_PASSWORD,
     email_confirm: true,
   });
   if (userError) {
@@ -99,7 +101,7 @@ async function runTests() {
   // Simulate Fetching Stories (as a user)
   const sessionResp = await adminClient.auth.signInWithPassword({
     email: storyUser.email,
-    password: 'password123',
+    password: TEST_PASSWORD,
   });
 
   const storyUserClient = createClient(supabaseUrl, supabaseAnonKey, {
