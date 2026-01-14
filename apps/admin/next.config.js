@@ -93,7 +93,7 @@ const nextConfig = {
 
 module.exports = withSentryConfig(nextConfig, {
   // Sentry configuration
-  org: "travelmatch-2d",
+  org: "lovendo-2d",
   project: "travelmatch-admin",
 
   // Silent mode - no warnings during build

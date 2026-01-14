@@ -1,7 +1,7 @@
 {
   "servers": {
     "Sentry": {
-      "url": "https://mcp.sentry.dev/mcp/travelmatch-2d/travelmatch-mobile",
+      "url": "https://mcp.sentry.dev/mcp/lovendo-2d/travelmatch-mobile",
       "type": "http"
     }
   }
