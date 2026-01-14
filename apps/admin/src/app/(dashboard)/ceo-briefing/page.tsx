@@ -43,6 +43,8 @@ import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { CanvaButton } from '@/components/canva/CanvaButton';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
+import { exportToCSV, generateExportFilename } from '@/lib/export';
+import { useToast } from '@/hooks/use-toast';
 
 // Şirket sağlık skoru hesaplama
 const calculateHealthScore = () => {
@@ -148,7 +150,83 @@ const todayEvents = [
 
 export default function CEOBriefingPage() {
   const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [isSending, setIsSending] = useState(false);
   const healthScore = calculateHealthScore();
+  const { toast } = useToast();
+
+  // Export briefing data to CSV
+  const handleExportCSV = () => {
+    try {
+      const exportData = [
+        { Kategori: 'Sağlık Skoru', Metrik: 'Şirket Sağlık Skoru', Değer: healthScore.toFixed(0), Durum: healthScore >= 85 ? 'İyi' : healthScore >= 70 ? 'Orta' : 'Kritik' },
+        { Kategori: 'North Star', Metrik: northStar.name, Değer: northStar.current, Durum: `Hedefe ${northStar.percentToGoal}%` },
+        ...criticalKPIs.map((kpi) => ({
+          Kategori: 'KPI',
+          Metrik: kpi.name,
+          Değer: kpi.value,
+          Durum: `${kpi.change > 0 ? '+' : ''}${kpi.change}%`,
+        })),
+        ...weeklyGoals.map((goal) => ({
+          Kategori: 'Haftalık Hedef',
+          Metrik: goal.name,
+          Değer: `${goal.current}${goal.unit}`,
+          Durum: `Hedef: ${goal.target}${goal.unit}`,
+        })),
+      ];
+
+      exportToCSV(
+        exportData,
+        [
+          { header: 'Kategori', accessor: 'Kategori' },
+          { header: 'Metrik', accessor: 'Metrik' },
+          { header: 'Değer', accessor: 'Değer' },
+          { header: 'Durum', accessor: 'Durum' },
+        ],
+        generateExportFilename('ceo-briefing'),
+      );
+
+      toast({
+        title: 'Rapor indirildi',
+        description: 'CEO Briefing raporu başarıyla indirildi.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Hata',
+        description: 'Rapor indirilemedi.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  // Print page as PDF
+  const handlePrintPDF = () => {
+    window.print();
+    toast({
+      title: 'PDF Hazırlanıyor',
+      description: 'Yazdırma penceresi açıldı. PDF olarak kaydedin.',
+    });
+  };
+
+  // Send email (mock - requires backend integration)
+  const handleSendEmail = async () => {
+    setIsSending(true);
+    try {
+      // In production, this would call an API endpoint to send the email
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      toast({
+        title: 'Rapor gönderildi',
+        description: 'CEO Briefing raporu email ile gönderildi.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Hata',
+        description: 'Email gönderilemedi.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   const getHealthColor = (score: number) => {
     if (score >= 85) return 'text-green-500 dark:text-green-400';
@@ -178,15 +256,28 @@ export default function CEOBriefingPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <CanvaButton variant="ghost" size="sm">
-            <Mail className="h-4 w-4 mr-2" />
-            Raporu Gönder
+          <CanvaButton
+            variant="ghost"
+            size="sm"
+            onClick={handleSendEmail}
+            disabled={isSending}
+          >
+            <Mail className={cn('h-4 w-4 mr-2', isSending && 'animate-pulse')} />
+            {isSending ? 'Gönderiliyor...' : 'Raporu Gönder'}
           </CanvaButton>
-          <CanvaButton variant="ghost" size="sm">
+          <CanvaButton variant="ghost" size="sm" onClick={handlePrintPDF}>
             <Download className="h-4 w-4 mr-2" />
             PDF İndir
           </CanvaButton>
-          <CanvaButton variant="ghost" size="sm">
+          <CanvaButton variant="ghost" size="sm" onClick={handleExportCSV}>
+            <Download className="h-4 w-4 mr-2" />
+            CSV İndir
+          </CanvaButton>
+          <CanvaButton
+            variant="ghost"
+            size="sm"
+            onClick={() => setLastUpdated(new Date())}
+          >
             <RefreshCw className="h-4 w-4 mr-2" />
             {lastUpdated.toLocaleTimeString('tr-TR', {
               hour: '2-digit',

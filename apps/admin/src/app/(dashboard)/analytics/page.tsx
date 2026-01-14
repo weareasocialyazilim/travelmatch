@@ -59,6 +59,7 @@ import {
   useEngagementMetrics,
 } from '@/hooks/use-analytics';
 import { getClient } from '@/lib/supabase';
+import { exportToCSV, exportToExcel, generateExportFilename } from '@/lib/export';
 import { toast } from '@/components/ui/use-toast';
 import { AlertTriangle } from 'lucide-react';
 
@@ -530,7 +531,56 @@ export default function AnalyticsPage() {
               <SelectItem value="365d">Son 1 yıl</SelectItem>
             </SelectContent>
           </Select>
-          <CanvaButton variant="primary">
+          <CanvaButton
+            variant="primary"
+            onClick={() => {
+              try {
+                const exportData = dailyActiveUsers.map((item) => ({
+                  Tarih: item.date,
+                  'Günlük Aktif Kullanıcı': item.dau,
+                  'Aylık Aktif Kullanıcı': item.mau,
+                }));
+
+                const revenueExportData = revenueData.map((item) => ({
+                  Tarih: item.date,
+                  Gelir: item.revenue,
+                  'İşlem Sayısı': item.transactions,
+                }));
+
+                // Combine data for export
+                const combinedData = dailyActiveUsers.map((item, index) => ({
+                  Tarih: item.date,
+                  DAU: item.dau,
+                  MAU: item.mau,
+                  Gelir: revenueData[index]?.revenue || 0,
+                  'İşlem Sayısı': revenueData[index]?.transactions || 0,
+                }));
+
+                exportToCSV(
+                  combinedData,
+                  [
+                    { header: 'Tarih', accessor: 'Tarih' },
+                    { header: 'DAU', accessor: 'DAU' },
+                    { header: 'MAU', accessor: 'MAU' },
+                    { header: 'Gelir (TRY)', accessor: 'Gelir' },
+                    { header: 'İşlem Sayısı', accessor: 'İşlem Sayısı' },
+                  ],
+                  generateExportFilename('analytics-raporu'),
+                );
+
+                toast({
+                  title: 'Rapor indirildi',
+                  description: 'Analitik raporu başarıyla CSV olarak indirildi.',
+                });
+              } catch (error) {
+                toast({
+                  title: 'Hata',
+                  description: 'Rapor indirilemedi.',
+                  variant: 'destructive',
+                });
+              }
+            }}
+          >
             <Download className="mr-2 h-4 w-4" />
             Rapor İndir
           </CanvaButton>

@@ -39,6 +39,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { formatCurrency, formatRelativeDate, getInitials } from '@/lib/utils';
 import { useFinance } from '@/hooks/use-finance';
+import { exportToCSV, generateExportFilename } from '@/lib/export';
 
 const transactionTypeConfig = {
   payment: {
@@ -158,7 +159,41 @@ export default function FinancePage() {
               <SelectItem value="90d">90 gün</SelectItem>
             </SelectContent>
           </Select>
-          <CanvaButton variant="primary">
+          <CanvaButton
+            variant="primary"
+            disabled={isLoading || transactions.length === 0}
+            onClick={() => {
+              try {
+                const exportData = transactions.map((tx) => ({
+                  ID: tx.id,
+                  Tip: transactionTypeConfig[tx.type as keyof typeof transactionTypeConfig]?.label || tx.type,
+                  Tutar: tx.amount,
+                  ParaBirimi: tx.currency,
+                  Durum: statusConfig[tx.status as keyof typeof statusConfig]?.label || tx.status,
+                  KullaniciID: tx.user_id,
+                  Tarih: new Date(tx.created_at).toLocaleDateString('tr-TR'),
+                }));
+
+                exportToCSV(
+                  exportData,
+                  [
+                    { header: 'İşlem ID', accessor: 'ID' },
+                    { header: 'Tip', accessor: 'Tip' },
+                    { header: 'Tutar', accessor: 'Tutar' },
+                    { header: 'Para Birimi', accessor: 'ParaBirimi' },
+                    { header: 'Durum', accessor: 'Durum' },
+                    { header: 'Kullanıcı ID', accessor: 'KullaniciID' },
+                    { header: 'Tarih', accessor: 'Tarih' },
+                  ],
+                  generateExportFilename('finans-raporu'),
+                );
+
+                toast.success('Finansal rapor başarıyla indirildi');
+              } catch (error) {
+                toast.error('Rapor indirilemedi');
+              }
+            }}
+          >
             <Download className="mr-2 h-4 w-4" />
             Rapor İndir
           </CanvaButton>

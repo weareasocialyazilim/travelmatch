@@ -38,6 +38,8 @@ import {
 import { formatCurrency, cn } from '@/lib/utils';
 import { useRevenue } from '@/hooks/use-revenue';
 import { CanvaButton } from '@/components/canva/CanvaButton';
+import { exportToCSV, generateExportFilename } from '@/lib/export';
+import { useToast } from '@/hooks/use-toast';
 import {
   CanvaCard,
   CanvaCardHeader,
@@ -50,6 +52,7 @@ import { CanvaBadge } from '@/components/canva/CanvaBadge';
 export default function RevenuePage() {
   const [dateRange, setDateRange] = useState('12m');
   const { data, isLoading, error, refetch, isFetching } = useRevenue();
+  const { toast } = useToast();
 
   // Error state
   if (error) {
@@ -114,7 +117,48 @@ export default function RevenuePage() {
             />
             Yenile
           </CanvaButton>
-          <CanvaButton variant="primary">
+          <CanvaButton
+            variant="primary"
+            disabled={isLoading || !data}
+            onClick={() => {
+              try {
+                const exportData = monthlyRevenue.map((item) => ({
+                  Ay: item.month,
+                  Gelir: item.revenue,
+                }));
+
+                // Add product revenue if available
+                if (revenueByProduct.length > 0) {
+                  revenueByProduct.forEach((product) => {
+                    exportData.push({
+                      Ay: `Ürün: ${product.name}`,
+                      Gelir: product.value,
+                    });
+                  });
+                }
+
+                exportToCSV(
+                  exportData,
+                  [
+                    { header: 'Ay / Ürün', accessor: 'Ay' },
+                    { header: 'Gelir (TRY)', accessor: 'Gelir' },
+                  ],
+                  generateExportFilename('gelir-raporu'),
+                );
+
+                toast({
+                  title: 'Rapor indirildi',
+                  description: 'Gelir raporu başarıyla indirildi.',
+                });
+              } catch (error) {
+                toast({
+                  title: 'Hata',
+                  description: 'Rapor indirilemedi.',
+                  variant: 'destructive',
+                });
+              }
+            }}
+          >
             <Download className="h-4 w-4" />
             Rapor İndir
           </CanvaButton>
