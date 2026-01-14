@@ -660,7 +660,7 @@ export default function DashboardPage() {
           <CanvaCardHeader>
             <div className="flex items-center justify-between">
               <CanvaCardTitle>Son Aktiviteler</CanvaCardTitle>
-              <Link href="/activity-logs">
+              <Link href="/audit-logs">
                 <CanvaButton variant="ghost" size="sm">
                   Tümünü Gör
                   <ArrowRight className="h-4 w-4" />

@@ -152,7 +152,14 @@ CanvaCardFooter.displayName = 'CanvaCardFooter';
 
 // Stat Card - Special variant for statistics
 export interface CanvaStatCardProps extends React.HTMLAttributes<HTMLDivElement> {
-  label: string;
+  /** Primary label for the stat */
+  label?: string;
+  /** @deprecated Use label instead */
+  title?: string;
+  /** Subtitle/description text */
+  subtitle?: string;
+  /** @deprecated Use subtitle instead */
+  description?: string;
   value: string | number;
   change?: {
     value: number;
@@ -161,6 +168,7 @@ export interface CanvaStatCardProps extends React.HTMLAttributes<HTMLDivElement>
   icon?: React.ReactNode;
   valueClassName?: string;
   accentColor?: string;
+  trend?: 'up' | 'down';
 }
 
 export const CanvaStatCard = React.forwardRef<
@@ -171,17 +179,23 @@ export const CanvaStatCard = React.forwardRef<
     {
       className,
       label,
+      title,
+      subtitle,
+      description,
       value,
       change,
       icon,
       valueClassName,
       accentColor,
+      trend,
       ...props
     },
     ref,
   ) => {
-    // Defensive check: handle undefined label
-    const safeLabel = label || 'Stat';
+    // Support both label and title (backward compatibility)
+    const safeLabel = label || title || 'Stat';
+    // Support both subtitle and description
+    const safeSubtitle = subtitle || description;
     const isPositive = change && change.value >= 0;
     const formattedValue =
       typeof value === 'number' ? value.toLocaleString() : value;
@@ -230,6 +244,9 @@ export const CanvaStatCard = React.forwardRef<
           >
             {formattedValue}
           </div>
+          {safeSubtitle && (
+            <p className="text-xs text-muted-foreground mt-1">{safeSubtitle}</p>
+          )}
           {change && (
             <div className="mt-2 flex items-center gap-2">
               <span
