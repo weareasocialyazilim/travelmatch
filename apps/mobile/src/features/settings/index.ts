@@ -24,3 +24,4 @@ export { CommunityGuidelinesScreen } from './screens/CommunityGuidelinesScreen';
 export { default as ReferralScreen } from './screens/ReferralScreen';
 export { default as DataSettingsScreen } from './screens/DataSettingsScreen';
 export { default as SafetyTipsScreen } from './screens/SafetyTipsScreen';
+export { default as DiagnosticsScreen } from './screens/DiagnosticsScreen';

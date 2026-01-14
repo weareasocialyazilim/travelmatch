@@ -402,6 +402,9 @@ export type RootStackParamList = {
   // Biometric Setup (auth flow)
   BiometricSetup: undefined;
 
+  // Diagnostics (hidden access - 7 taps on version)
+  Diagnostics: undefined;
+
   // Promo Code
   PromoCode: undefined;
 

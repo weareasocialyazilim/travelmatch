@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,10 @@ import {
   Platform,
   UIManager,
 } from 'react-native';
+import {
+  MOBILE_DIAGNOSTICS_ENABLED,
+  DIAGNOSTICS_TAP_COUNT,
+} from '@/config/diagnostics';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -77,6 +81,27 @@ const AppSettingsScreen: React.FC = () => {
 
   // Language
   const [isLanguageSheetVisible, setIsLanguageSheetVisible] = useState(false);
+
+  // Hidden diagnostics access (7-tap on version)
+  const tapCountRef = useRef(0);
+  const lastTapTimeRef = useRef(0);
+
+  const handleVersionTap = useCallback(() => {
+    if (!MOBILE_DIAGNOSTICS_ENABLED) return;
+
+    const now = Date.now();
+    // Reset tap count if more than 2 seconds since last tap
+    if (now - lastTapTimeRef.current > 2000) {
+      tapCountRef.current = 0;
+    }
+    lastTapTimeRef.current = now;
+    tapCountRef.current++;
+
+    if (tapCountRef.current >= DIAGNOSTICS_TAP_COUNT) {
+      tapCountRef.current = 0;
+      navigation.navigate('Diagnostics' as any);
+    }
+  }, [navigation]);
 
   // Get display name for current language
   const currentLanguageDisplay =
@@ -172,7 +197,7 @@ const AppSettingsScreen: React.FC = () => {
 
         {/* Notifications - Expandable */}
         {/* Notifications Section */}
-        {(
+        {
           <View style={styles.section}>
             <TouchableOpacity
               style={styles.settingsCard}
@@ -268,11 +293,11 @@ const AppSettingsScreen: React.FC = () => {
               )}
             </TouchableOpacity>
           </View>
-        )}
+        }
 
         {/* Privacy */}
         {/* Privacy Section */}
-        {(
+        {
           <View style={styles.section}>
             <View style={styles.settingsCard}>
               <View style={styles.settingItem}>
@@ -306,11 +331,11 @@ const AppSettingsScreen: React.FC = () => {
               </View>
             </View>
           </View>
-        )}
+        }
 
         {/* Language */}
         {/* Language Section */}
-        {(
+        {
           <View style={styles.section}>
             <View style={styles.settingsCard}>
               <TouchableOpacity
@@ -345,11 +370,11 @@ const AppSettingsScreen: React.FC = () => {
               </TouchableOpacity>
             </View>
           </View>
-        )}
+        }
 
         {/* Share */}
         {/* Invite Section */}
-        {(
+        {
           <View style={styles.section}>
             <View style={styles.settingsCard}>
               <TouchableOpacity
@@ -380,11 +405,11 @@ const AppSettingsScreen: React.FC = () => {
               </TouchableOpacity>
             </View>
           </View>
-        )}
+        }
 
         {/* Legal Links */}
         {/* Legal Section */}
-        {(
+        {
           <View style={styles.section}>
             <View style={styles.settingsCard}>
               <TouchableOpacity
@@ -416,7 +441,7 @@ const AppSettingsScreen: React.FC = () => {
               </TouchableOpacity>
             </View>
           </View>
-        )}
+        }
 
         {/* Sign Out & Delete Account - Side by Side */}
         <View style={styles.actionButtonsContainer}>
@@ -442,8 +467,11 @@ const AppSettingsScreen: React.FC = () => {
         </View>
 
         {/* Footer with Version & Member Info */}
+        {/* 7-tap on version opens hidden Diagnostics screen */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>TravelMatch v{APP_VERSION}</Text>
+          <TouchableOpacity onPress={handleVersionTap} activeOpacity={0.8}>
+            <Text style={styles.footerText}>TravelMatch v{APP_VERSION}</Text>
+          </TouchableOpacity>
           <Text style={styles.footerText}>Member since {memberSince}</Text>
         </View>
       </ScrollView>

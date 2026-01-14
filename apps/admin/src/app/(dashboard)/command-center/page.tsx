@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   TrendingUp,
   TrendingDown,
@@ -41,7 +42,20 @@ import {
   Eye,
   Send,
   Bell,
+  Flame,
+  Crosshair,
+  Bot,
+  TrendingUp as TrendUp,
+  ExternalLink,
 } from 'lucide-react';
+import { usePermission } from '@/hooks/use-permission';
+import { useFounderDecisions } from '@/hooks/use-founder-decisions';
+import { useFounderAlerts } from '@/hooks/use-founder-alerts';
+import { MobileHealthInbox } from '@/components/founder/MobileHealthInbox';
+import {
+  ALERT_LEVEL_COLORS,
+  MAX_ALERTS_DISPLAYED,
+} from '@/config/founder-alerts';
 import {
   CanvaCard,
   CanvaCardHeader,
@@ -276,10 +290,102 @@ const aiInsights = [
   },
 ];
 
+// ═══════════════════════════════════════════════════════════════════════════
+// FOUNDER-ONLY DATA (super_admin only - görünmez, bilinmez)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Haftalık Trend Özeti (Founder için kritik metrikler)
+const founderWeeklyTrends = [
+  {
+    metric: 'GMV',
+    current: '₺2.1M',
+    change: 12,
+    direction: 'up',
+    target: '₺2.5M',
+    onTrack: true,
+  },
+  {
+    metric: 'DAU',
+    current: '8,234',
+    change: -3,
+    direction: 'down',
+    target: '9,000',
+    onTrack: false,
+  },
+  {
+    metric: 'Premium %',
+    current: '9.27%',
+    change: 0.5,
+    direction: 'up',
+    target: '12%',
+    onTrack: false,
+  },
+  {
+    metric: 'Churn',
+    current: '2.1%',
+    change: -0.3,
+    direction: 'down',
+    target: '<3%',
+    onTrack: true,
+  },
+];
+
+// Stratejik Kararlar Bekleyenler
+const founderStrategicItems = [
+  {
+    category: 'pricing',
+    title: 'Q2 Pricing Review',
+    status: 'decision_needed',
+    impact: 'Potansiyel +₺150K/ay',
+    deadline: 'Bu hafta',
+  },
+  {
+    category: 'partnership',
+    title: 'Airbnb Entegrasyon Teklifi',
+    status: 'evaluation',
+    impact: 'TAM genişleme',
+    deadline: '2 hafta',
+  },
+  {
+    category: 'hiring',
+    title: 'Senior Backend Developer',
+    status: 'final_round',
+    impact: 'Kapasiteyi 2x artırır',
+    deadline: 'Bu hafta',
+  },
+];
+
+// Bugünün Founder Pulse Özeti
+const founderPulseToday = {
+  healthStatus: 'stable', // stable, warning, critical
+  mainMessage: 'Platform stabil, büyüme hedefin altında',
+  quickStats: {
+    decisionsWaiting: 2,
+    systemAutomated: 237,
+    manualNeeded: 5,
+  },
+  topPriority: 'DAU düşüşünü araştır - retention problemi olabilir',
+};
+
 export default function CommandCenterPage() {
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { data: stats, isLoading } = useStats();
+  const { isSuperAdmin } = usePermission();
+
+  // Founder Decision Loop
+  const {
+    isEnabled: isDecisionLoopEnabled,
+    stats: decisionStats,
+    deferredBacklog,
+  } = useFounderDecisions();
+
+  // Founder Alerts (NO-NETWORK - internal sources only)
+  const {
+    isEnabled: isAlertsEnabled,
+    alerts,
+    overflowCount: alertOverflowCount,
+  } = useFounderAlerts();
 
   // Auto-refresh every 30 seconds
   useEffect(() => {
@@ -411,6 +517,283 @@ export default function CommandCenterPage() {
           >
             Incele
           </CanvaButton>
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          FOUNDER-ONLY SECTION (super_admin only - sidebar'da yok, bilinmez)
+          ═══════════════════════════════════════════════════════════════════════ */}
+      {isSuperAdmin() && (
+        <div className="p-4 rounded-xl bg-gradient-to-r from-slate-900/50 via-violet-900/30 to-slate-900/50 border border-violet-500/30">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Lock className="h-4 w-4 text-violet-400" />
+              <span className="text-xs font-medium text-violet-400 uppercase tracking-wider">
+                Founder Pulse
+              </span>
+            </div>
+            <div
+              className={cn(
+                'px-2 py-1 rounded text-xs font-medium',
+                founderPulseToday.healthStatus === 'stable' &&
+                  'bg-emerald-500/20 text-emerald-400',
+                founderPulseToday.healthStatus === 'warning' &&
+                  'bg-amber-500/20 text-amber-400',
+                founderPulseToday.healthStatus === 'critical' &&
+                  'bg-red-500/20 text-red-400',
+              )}
+            >
+              {founderPulseToday.healthStatus === 'stable' && '● Stabil'}
+              {founderPulseToday.healthStatus === 'warning' && '● Dikkat'}
+              {founderPulseToday.healthStatus === 'critical' && '● Kritik'}
+            </div>
+          </div>
+
+          {/* Pulse Summary */}
+          <div className="mb-4 p-3 rounded-lg bg-slate-800/50 border border-slate-700/50">
+            <p className="text-sm text-slate-300">
+              {founderPulseToday.mainMessage}
+            </p>
+            <div className="flex items-center gap-4 mt-2 text-xs text-slate-400">
+              <span className="flex items-center gap-1">
+                <Flame className="h-3 w-3 text-red-400" />
+                {founderPulseToday.quickStats.decisionsWaiting} karar bekliyor
+              </span>
+              <span className="flex items-center gap-1">
+                <Bot className="h-3 w-3 text-emerald-400" />
+                {founderPulseToday.quickStats.systemAutomated} otomasyon
+              </span>
+              <span className="flex items-center gap-1">
+                <Eye className="h-3 w-3 text-amber-400" />
+                {founderPulseToday.quickStats.manualNeeded} manuel gerekli
+              </span>
+            </div>
+            <p className="mt-2 text-xs font-medium text-violet-400">
+              → Öncelik: {founderPulseToday.topPriority}
+            </p>
+
+            {/* Alert Routing - Only visible when enabled */}
+            {isAlertsEnabled && alerts.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-slate-700/50">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-slate-400 flex items-center gap-1">
+                    <Bell className="h-3 w-3" />
+                    Alerts (son 24 saat)
+                  </span>
+                  {alertOverflowCount > 0 && (
+                    <span className="text-[10px] text-slate-500">
+                      +{alertOverflowCount} more
+                    </span>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  {alerts.slice(0, MAX_ALERTS_DISPLAYED).map((alert) => (
+                    <div
+                      key={alert.key}
+                      className={cn(
+                        'flex items-center justify-between text-xs p-1.5 rounded',
+                        alert.isFresh
+                          ? 'bg-slate-800/50 ring-1 ring-inset ring-slate-600/50'
+                          : 'bg-slate-800/30',
+                      )}
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span
+                          className={cn(
+                            'font-mono text-[10px]',
+                            ALERT_LEVEL_COLORS[alert.level],
+                          )}
+                        >
+                          [{alert.level.toUpperCase()}]
+                        </span>
+                        <span
+                          className={cn(
+                            'truncate',
+                            alert.isFresh ? 'text-slate-200' : 'text-slate-400',
+                          )}
+                        >
+                          {alert.title}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 ml-2">
+                        <span className="text-slate-500 text-[10px] whitespace-nowrap">
+                          {alert.count}x
+                        </span>
+                        {alert.actionUrl && (
+                          <Link
+                            href={alert.actionUrl}
+                            className="text-violet-400 hover:text-violet-300 transition-colors"
+                            title="Detaylara git"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* No alerts message */}
+            {isAlertsEnabled && alerts.length === 0 && (
+              <div className="mt-3 pt-3 border-t border-slate-700/50">
+                <p className="text-xs text-slate-500 flex items-center gap-1">
+                  <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+                  Son 24 saatte kritik alarm yok
+                </p>
+              </div>
+            )}
+
+            {/* Decision Loop Stats - Only visible when enabled */}
+            {isDecisionLoopEnabled && decisionStats && (
+              <div className="mt-3 pt-3 border-t border-slate-700/50">
+                <div className="flex items-center gap-4 text-xs">
+                  <span className="text-slate-400">Bugün:</span>
+                  <span className="flex items-center gap-1 text-emerald-400">
+                    <CheckCircle2 className="h-3 w-3" />
+                    {decisionStats.reviewedToday} reviewed
+                  </span>
+                  <span className="flex items-center gap-1 text-amber-400">
+                    <Clock className="h-3 w-3" />
+                    {decisionStats.deferredToday} deferred
+                  </span>
+                  {decisionStats.currentFocus && (
+                    <span className="flex items-center gap-1 text-blue-400">
+                      <Crosshair className="h-3 w-3" />
+                      Focus: {decisionStats.currentFocus}
+                    </span>
+                  )}
+                </div>
+
+                {/* Deferred Backlog (top 5) */}
+                {deferredBacklog.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-slate-700/30">
+                    <p className="text-xs text-slate-400 mb-2">
+                      Ertelenenler (son 5):
+                    </p>
+                    <div className="space-y-1">
+                      {deferredBacklog.slice(0, 5).map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between text-xs p-1.5 rounded bg-slate-800/30"
+                        >
+                          <span className="text-slate-300 truncate max-w-[200px]">
+                            {item.item_key.replace(/_/g, ' ')}
+                          </span>
+                          <span className="text-slate-500 text-[10px]">
+                            {new Date(item.created_at).toLocaleDateString(
+                              'tr-TR',
+                              {
+                                day: 'numeric',
+                                month: 'short',
+                              },
+                            )}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Mobile Health Inbox - NO-NETWORK */}
+            <MobileHealthInbox />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            {/* Haftalık Trend */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-medium text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                <TrendUp className="h-3 w-3" />
+                Haftalık Trend
+              </h4>
+              <div className="grid grid-cols-2 gap-2">
+                {founderWeeklyTrends.map((trend) => (
+                  <div
+                    key={trend.metric}
+                    className={cn(
+                      'p-2 rounded-lg border',
+                      trend.onTrack
+                        ? 'bg-emerald-500/10 border-emerald-500/30'
+                        : 'bg-amber-500/10 border-amber-500/30',
+                    )}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-slate-400">
+                        {trend.metric}
+                      </span>
+                      <span
+                        className={cn(
+                          'text-xs font-medium flex items-center gap-0.5',
+                          trend.direction === 'up'
+                            ? 'text-emerald-400'
+                            : 'text-red-400',
+                        )}
+                      >
+                        {trend.direction === 'up' ? (
+                          <ArrowUpRight className="h-3 w-3" />
+                        ) : (
+                          <ArrowDownRight className="h-3 w-3" />
+                        )}
+                        {Math.abs(trend.change)}%
+                      </span>
+                    </div>
+                    <p className="text-sm font-semibold text-white mt-1">
+                      {trend.current}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      Hedef: {trend.target}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Stratejik Kararlar */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-medium text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                <Crosshair className="h-3 w-3" />
+                Stratejik Kararlar
+              </h4>
+              <div className="space-y-2">
+                {founderStrategicItems.map((item, i) => (
+                  <div
+                    key={i}
+                    className="p-2 rounded-lg bg-slate-800/50 border border-slate-700/50 flex items-center justify-between"
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-white">
+                        {item.title}
+                      </p>
+                      <p className="text-xs text-slate-400">{item.impact}</p>
+                    </div>
+                    <div className="text-right">
+                      <span
+                        className={cn(
+                          'text-xs px-2 py-0.5 rounded',
+                          item.status === 'decision_needed' &&
+                            'bg-red-500/20 text-red-400',
+                          item.status === 'evaluation' &&
+                            'bg-blue-500/20 text-blue-400',
+                          item.status === 'final_round' &&
+                            'bg-amber-500/20 text-amber-400',
+                        )}
+                      >
+                        {item.status === 'decision_needed' && 'Karar Gerekli'}
+                        {item.status === 'evaluation' && 'Değerlendirme'}
+                        {item.status === 'final_round' && 'Final'}
+                      </span>
+                      <p className="text-xs text-slate-500 mt-1">
+                        {item.deadline}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

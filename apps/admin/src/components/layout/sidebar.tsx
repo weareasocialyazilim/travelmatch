@@ -56,6 +56,7 @@ import {
   Scale,
   Receipt,
   PiggyBank,
+  Shield,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -110,6 +111,12 @@ const managementNavItems: NavItem[] = [
 ];
 
 const operationsNavItems: NavItem[] = [
+  {
+    title: 'Triage Kuyrugu',
+    href: '/triage',
+    icon: ListTodo,
+    resource: 'reports',
+  },
   {
     title: 'Finans',
     href: '/finance',
@@ -173,6 +180,12 @@ const operationsNavItems: NavItem[] = [
 ];
 
 const analyticsNavItems: NavItem[] = [
+  {
+    title: 'Stabilite',
+    href: '/ops-dashboard',
+    icon: Shield,
+    resource: 'analytics',
+  },
   {
     title: 'Analitik',
     href: '/analytics',
@@ -262,6 +275,12 @@ const techNavItems: NavItem[] = [
     title: 'Entegrasyonlar',
     href: '/integrations-monitor',
     icon: Wifi,
+    resource: 'settings',
+  },
+  {
+    title: 'Entegrasyon Sagligi',
+    href: '/integration-health',
+    icon: Activity,
     resource: 'settings',
   },
   {
