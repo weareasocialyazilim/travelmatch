@@ -35,7 +35,7 @@
 | Entegrasyon | Durum | Güvenlik | Dayanıklılık | Gözlemlenebilirlik | Kanıt |
 |-------------|-------|----------|--------------|-------------------|-------|
 | **Supabase** | ✅ TAM | ✅ 1,364+ RLS | ✅ Retry + Timeout | ✅ Audit logs | `/apps/admin/src/lib/supabase.ts` |
-| **Upstash Redis** | ✅ TAM | ✅ TLS + Token | ✅ Fallback var | ✅ Rate limit logs | `/apps/admin/src/lib/rate-limit.ts` |
+| **Rate Limiting** | ✅ TAM | ✅ In-Memory + Cloudflare | ✅ Fallback var | ✅ Rate limit logs | `/apps/admin/src/lib/rate-limit.ts` |
 | **BullMQ** | ⚠️ KISMI | ⚠️ Webhook imza yok | ✅ Retry 3x | ✅ Job logging | `/services/job-queue/src/workers/` |
 
 ### Ödeme Sistemleri

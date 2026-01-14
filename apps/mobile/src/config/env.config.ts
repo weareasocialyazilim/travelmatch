@@ -83,10 +83,6 @@ export const serverEnvSchema = z.object({
   CLOUDFLARE_STREAM_ACCOUNT_ID: z.string().optional(),
   MAPBOX_SECRET_TOKEN: z.string().optional(),
 
-  // Upstash Redis (server-side only)
-  UPSTASH_REDIS_REST_URL: z.string().url().optional(),
-  UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
-
   // OAuth Secrets (NEVER expose to client)
   GOOGLE_CLIENT_SECRET: z.string().optional(),
   APPLE_CLIENT_SECRET: z.string().optional(),
@@ -124,7 +120,6 @@ const FORBIDDEN_PUBLIC_VARS = [
   'MAPBOX_DOWNLOAD_TOKEN', // Build-time download token
   'GOOGLE_CLIENT_SECRET',
   'APPLE_CLIENT_SECRET',
-  'UPSTASH_REDIS_REST_TOKEN',
 ] as const;
 
 /**

@@ -2,7 +2,8 @@
 
 ## Overview
 
-This guide provides actionable recommendations for optimizing database performance, ensuring scalability, and maintaining operational excellence.
+This guide provides actionable recommendations for optimizing database performance, ensuring
+scalability, and maintaining operational excellence.
 
 ---
 
@@ -34,9 +35,7 @@ for (const moment of moments.data) {
 }
 
 // ✅ GOOD: Single query with join
-const moments = await supabase
-  .from('moments')
-  .select(`
+const moments = await supabase.from('moments').select(`
     *,
     user:users(id, full_name, avatar_url, rating)
   `);
@@ -49,9 +48,7 @@ const moments = await supabase
 const users = await supabase.from('users').select('*');
 
 // ✅ GOOD: Select only needed columns
-const users = await supabase
-  .from('users')
-  .select('id, full_name, avatar_url, rating');
+const users = await supabase.from('users').select('id, full_name, avatar_url, rating');
 ```
 
 #### 3. Missing Pagination
@@ -64,7 +61,7 @@ const moments = await supabase.from('moments').select('*');
 const moments = await supabase
   .from('moments')
   .select('*')
-  .range(0, 19)  // First 20 records
+  .range(0, 19) // First 20 records
   .order('created_at', { ascending: false });
 ```
 
@@ -76,7 +73,8 @@ const moments = await supabase
 // Optimized feed query with all necessary joins
 const { data: feed } = await supabase
   .from('moments')
-  .select(`
+  .select(
+    `
     id,
     title,
     description,
@@ -98,7 +96,8 @@ const { data: feed } = await supabase
     ),
     favorite_count:favorites(count),
     is_favorited:favorites!inner(id)
-  `)
+  `,
+  )
   .eq('status', 'active')
   .gt('date', new Date().toISOString())
   .order('created_at', { ascending: false })
@@ -111,7 +110,8 @@ const { data: feed } = await supabase
 // Optimized conversation list with last message
 const { data: conversations } = await supabase
   .from('conversations')
-  .select(`
+  .select(
+    `
     id,
     updated_at,
     moment:moments(id, title),
@@ -124,7 +124,8 @@ const { data: conversations } = await supabase
     participants:conversation_participants(
       user:users(id, full_name, avatar_url)
     )
-  `)
+  `,
+  )
   .contains('participant_ids', [userId])
   .order('updated_at', { ascending: false })
   .limit(50);
@@ -332,7 +333,8 @@ ORDER BY tablename, cmd;
 
 ### Supabase Connection Pool Configuration
 
-The Supabase managed connection pool (Supavisor) handles most connection management automatically. For optimization:
+The Supabase managed connection pool (Supavisor) handles most connection management automatically.
+For optimization:
 
 ```javascript
 // apps/mobile/src/services/supabase.ts
@@ -404,13 +406,13 @@ ORDER BY duration DESC;
 │  └── TTL: 5 minutes                                             │
 │  └── Scope: Per-device                                          │
 │                                                                  │
-│  L2: CDN Cache (Cloudflare Images)                              │
+│  L2: CDN Cache (Cloudflare Images + Edge Cache)                 │
 │  └── TTL: 1 year (immutable images)                             │
 │  └── Scope: Global edge                                         │
 │                                                                  │
-│  L3: Application Cache (Upstash Redis via Edge Functions)       │
+│  L3: Application Cache (In-Memory + Supabase)                   │
 │  └── TTL: Variable (5 min - 1 hour)                             │
-│  └── Scope: Global                                              │
+│  └── Scope: Per-instance / Database                             │
 │                                                                  │
 │  L4: Database (PostgreSQL)                                       │
 │  └── Connection pool: Supavisor                                 │
@@ -431,15 +433,13 @@ export const CACHE_KEYS = {
   userNotifications: (userId: string) => `user:${userId}:notifications:count`,
 
   // Feed caches (shared)
-  feedPage: (page: number, category?: string) =>
-    `feed:${category || 'all'}:page:${page}`,
+  feedPage: (page: number, category?: string) => `feed:${category || 'all'}:page:${page}`,
   momentDetail: (momentId: string) => `moment:${momentId}`,
   momentParticipants: (momentId: string) => `moment:${momentId}:participants`,
 
   // Conversation caches
   conversationList: (userId: string) => `user:${userId}:conversations`,
-  conversationMessages: (convId: string, page: number) =>
-    `conversation:${convId}:messages:${page}`,
+  conversationMessages: (convId: string, page: number) => `conversation:${convId}:messages:${page}`,
 
   // Geo caches
   nearbyMoments: (lat: number, lng: number, radius: number) =>
@@ -447,9 +447,9 @@ export const CACHE_KEYS = {
 };
 
 export const CACHE_TTL = {
-  SHORT: 60,        // 1 minute
-  MEDIUM: 300,      // 5 minutes
-  LONG: 3600,       // 1 hour
+  SHORT: 60, // 1 minute
+  MEDIUM: 300, // 5 minutes
+  LONG: 3600, // 1 hour
   VERY_LONG: 86400, // 24 hours
 };
 ```
@@ -490,24 +490,28 @@ FOR EACH ROW EXECUTE FUNCTION invalidate_cache_on_update();
 ### Phase 1: Current State (0-50K users)
 
 **Architecture:**
+
 - Single Supabase project
 - PostgreSQL 15 with 4 vCPUs
 - Connection pool: 100 connections
 
 **Optimizations:**
+
 - [ ] Implement all covering indexes
 - [ ] Enable read replicas
-- [ ] Add Upstash Redis for caching
+- [ ] Configure Cloudflare caching rules
 - [ ] Implement feed delta sync
 
 ### Phase 2: Growth (50K-200K users)
 
 **Architecture:**
+
 - Supabase Pro plan
 - Read replicas enabled
 - Dedicated compute (8 vCPUs)
 
 **Optimizations:**
+
 - [ ] Table partitioning for `messages` (by month)
 - [ ] Archive old completed moments
 - [ ] Implement materialized views for analytics
@@ -530,11 +534,13 @@ CREATE TABLE messages_y2025m02 PARTITION OF messages_partitioned
 ### Phase 3: Scale (200K-1M users)
 
 **Architecture:**
+
 - Multi-region deployment
 - Read replicas per region
 - Dedicated compute (16+ vCPUs)
 
 **Optimizations:**
+
 - [ ] Horizontal sharding by user geography
 - [ ] Event sourcing for audit trail
 - [ ] Separate OLAP database for analytics
@@ -561,11 +567,13 @@ class ShardRouter:
 ### Phase 4: Enterprise (1M+ users)
 
 **Architecture:**
+
 - Global load balancing
 - Multi-master replication
 - Dedicated infrastructure
 
 **Considerations:**
+
 - [ ] Custom PostgreSQL cluster (Citus)
 - [ ] Event-driven microservices
 - [ ] Dedicated search (Elasticsearch)
@@ -602,14 +610,14 @@ SELECT
 
 ### Alert Thresholds
 
-| Metric | Warning | Critical | Action |
-|--------|---------|----------|--------|
-| Active connections | > 80 | > 95 | Scale connection pool |
-| Cache hit ratio | < 95% | < 90% | Add indexes, increase shared_buffers |
-| Query time P95 | > 100ms | > 500ms | Optimize query, add index |
-| Replication lag | > 1s | > 10s | Check network, replica health |
-| Disk usage | > 70% | > 85% | Archive data, scale storage |
-| Lock wait time | > 1s | > 5s | Review transaction locks |
+| Metric             | Warning | Critical | Action                               |
+| ------------------ | ------- | -------- | ------------------------------------ |
+| Active connections | > 80    | > 95     | Scale connection pool                |
+| Cache hit ratio    | < 95%   | < 90%    | Add indexes, increase shared_buffers |
+| Query time P95     | > 100ms | > 500ms  | Optimize query, add index            |
+| Replication lag    | > 1s    | > 10s    | Check network, replica health        |
+| Disk usage         | > 70%   | > 85%    | Archive data, scale storage          |
+| Lock wait time     | > 1s    | > 5s     | Review transaction locks             |
 
 ### Supabase Dashboard Monitoring
 
@@ -773,5 +781,4 @@ WHERE NOT blocked.granted;
 
 ---
 
-*Document Version: 1.0.0*
-*Last Updated: 2025-12-22*
+_Document Version: 1.0.0_ _Last Updated: 2025-12-22_

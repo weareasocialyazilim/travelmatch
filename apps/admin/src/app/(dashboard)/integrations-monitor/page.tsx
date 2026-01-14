@@ -105,23 +105,6 @@ const integrations = {
           realtimeConnections: 234,
         },
       },
-      {
-        id: 'redis',
-        name: 'Upstash Redis',
-        description: 'Cache ve rate limiting',
-        status: 'healthy',
-        uptime: 99.95,
-        latency: 12,
-        requests_today: 89456,
-        errors_today: 0,
-        lastCheck: '20 sn once',
-        metrics: {
-          hitRate: 94.5,
-          missRate: 5.5,
-          memory: '256 MB',
-          keys: 12456,
-        },
-      },
     ],
   },
   communication: {

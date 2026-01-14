@@ -69,8 +69,6 @@ check_secret() {
 check_secret "OPENAI_API_KEY"
 check_secret "CLOUDFLARE_ACCOUNT_ID"
 check_secret "CLOUDFLARE_IMAGES_TOKEN"
-check_secret "UPSTASH_REDIS_REST_URL"
-check_secret "UPSTASH_REDIS_REST_TOKEN"
 echo ""
 
 # Test 3: Test transcribe-video endpoint (requires auth)

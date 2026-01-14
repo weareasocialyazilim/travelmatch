@@ -36,10 +36,6 @@ echo ""
 # supabase secrets set SENDGRID_FROM_EMAIL="noreply@travelmatch.app"
 # supabase secrets set SENDGRID_FROM_NAME="TravelMatch"
 
-# Upstash Redis (for rate limiting)
-# supabase secrets set UPSTASH_REDIS_REST_URL="https://your-db.upstash.io"
-# supabase secrets set UPSTASH_REDIS_REST_TOKEN="your-token"
-
 echo ""
 echo "✅ Secrets set successfully!"
 echo ""

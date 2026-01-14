@@ -47,7 +47,7 @@ echo "Monitor API usage and costs at:"
 echo ""
 echo "• OpenAI Usage: https://platform.openai.com/usage"
 echo "• Cloudflare Analytics: https://dash.cloudflare.com/"
-echo "• Upstash Redis: https://console.upstash.com/"
+echo "• Supabase Dashboard: https://supabase.com/dashboard"
 echo ""
 
 # Usage stats query
