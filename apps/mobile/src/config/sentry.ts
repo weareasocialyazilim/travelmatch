@@ -6,9 +6,10 @@
  * Sentry is initialized after first render via dynamic import in App.tsx.
  */
 
-import { Platform as _Platform } from 'react-native';
+import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import * as Sentry from '@sentry/react-native';
+import * as Application from 'expo-application';
 import { logger } from '../utils/logger';
 
 // Handle __DEV__ being undefined in test environments
@@ -49,8 +50,18 @@ export function initSentry() {
   }
 
   try {
+    // Build release identifier for source map correlation
+    const appVersion = Application.nativeApplicationVersion || '1.0.0';
+    const buildNumber = Application.nativeBuildVersion || '1';
+    const bundleId = Application.applicationId || 'com.travelmatch.app';
+    const release = `${bundleId}@${appVersion}+${buildNumber}`;
+    const dist = buildNumber;
+
     Sentry.init({
       dsn: SENTRY_DSN,
+      // Release tagging for source map correlation and version tracking
+      release,
+      dist,
       debug: false,
       environment: isDev ? 'development' : 'production',
 
