@@ -195,7 +195,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       '@sentry/react-native/expo',
       {
         url: 'https://sentry.io/',
-        organization: process.env.SENTRY_ORG || 'travelmatch-2d',
+        organization: process.env.SENTRY_ORG || 'lovendo-2d',
         project: process.env.SENTRY_PROJECT || 'travelmatch-mobile',
         // authToken is read automatically from SENTRY_AUTH_TOKEN env var
       },
