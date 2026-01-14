@@ -30,7 +30,12 @@ import {
   Download,
   Mail,
   RefreshCw,
+  Flame,
+  Crosshair,
+  Bot,
+  Lock,
 } from 'lucide-react';
+import { usePermission } from '@/hooks/use-permission';
 import {
   CanvaCard,
   CanvaCardHeader,
@@ -146,9 +151,58 @@ const todayEvents = [
   { time: '16:00', event: 'Board Deck Final Review', type: 'deadline' },
 ];
 
+// ═══════════════════════════════════════════════════════════════════════════
+// FOUNDER-ONLY DATA (super_admin only - görünmez, bilinmez)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// 🔥 Bugün SENİN kararın gerekenler (max 3)
+const founderDecisions = [
+  {
+    id: 1,
+    priority: 'critical',
+    title: '₺180K Escrow: VIP kullanıcı dispute',
+    description: 'Ahmet K. (Premium) 48 saat içinde karar bekliyor. Fraud skoru düşük (%12), muhtemelen iletişim problemi.',
+    deadline: 'Bugün 18:00',
+    action: 'Onay/Red kararı',
+    context: 'Bu kullanıcı 6 aydır aktif, toplam ₺450K GMV üretti.',
+  },
+  {
+    id: 2,
+    priority: 'high',
+    title: 'Stripe rate artışı teklifi',
+    description: 'Stripe %2.4 → %2.9 teklif etti. Alternatif: iyzico %2.2 (entegrasyon 2 hafta)',
+    deadline: 'Yarın COB',
+    action: 'Kabul/Reddet/Pazarlık',
+    context: 'Aylık ₺85K komisyon farkı yaratır.',
+  },
+];
+
+// 🎯 Bu haftanın odak alanı
+const founderFocus = {
+  title: 'Premium Conversion Optimization',
+  why: 'DAU artıyor ama Premium conversion %9.2\'de takılı. Potansiyel aylık ₺120K ek gelir.',
+  metrics: [
+    { label: 'Hedef', value: '%12 conversion' },
+    { label: 'Şu an', value: '%9.27' },
+    { label: 'Gap', value: '2,345 kullanıcı' },
+  ],
+  blockers: ['Pricing page UX zayıf', 'Trial süresi çok kısa (3 gün)'],
+  nextAction: 'A/B test başlat: 7 gün trial vs 3 gün',
+};
+
+// 🧹 Sistem halletti (otomasyon özeti - son 24 saat)
+const systemHandled = [
+  { type: 'proof', count: 47, label: 'Proof otomatik onaylandı', savings: '~4 saat manuel iş' },
+  { type: 'kyc', count: 23, label: 'KYC auto-verified', savings: '~2 saat manuel iş' },
+  { type: 'fraud', count: 3, label: 'Fraud attempt blocked', savings: '₺12K potansiyel kayıp önlendi' },
+  { type: 'support', count: 156, label: 'Chatbot çözümledi', savings: '~8 saat destek' },
+  { type: 'dispute', count: 8, label: 'Auto-resolved (düşük risk)', savings: '~1 saat' },
+];
+
 export default function CEOBriefingPage() {
   const [lastUpdated, setLastUpdated] = useState(new Date());
   const healthScore = calculateHealthScore();
+  const { isSuperAdmin } = usePermission();
 
   const getHealthColor = (score: number) => {
     if (score >= 85) return 'text-green-500 dark:text-green-400';
@@ -195,6 +249,144 @@ export default function CEOBriefingPage() {
           </CanvaButton>
         </div>
       </div>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          FOUNDER-ONLY SECTION (super_admin only - sidebar'da yok, bilinmez)
+          ═══════════════════════════════════════════════════════════════════════ */}
+      {isSuperAdmin() && (
+        <div className="space-y-4 p-4 rounded-xl bg-gradient-to-r from-violet-500/5 via-purple-500/5 to-fuchsia-500/5 border border-violet-500/20">
+          <div className="flex items-center gap-2 mb-4">
+            <Lock className="h-4 w-4 text-violet-500" />
+            <span className="text-xs font-medium text-violet-500 uppercase tracking-wider">
+              Sadece Sen Görüyorsun
+            </span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            {/* 🔥 Bugün SENİN Kararın Gerekenler */}
+            <CanvaCard className="admin-card border-red-500/30 bg-red-500/5">
+              <CanvaCardHeader className="pb-2">
+                <CanvaCardTitle className="flex items-center gap-2 text-base">
+                  <Flame className="h-4 w-4 text-red-500" />
+                  Bugün SENİN Kararın
+                </CanvaCardTitle>
+                <CanvaCardSubtitle className="text-xs">
+                  {founderDecisions.length} karar bekliyor
+                </CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody className="space-y-3">
+                {founderDecisions.length === 0 ? (
+                  <div className="text-center py-4">
+                    <CheckCircle2 className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">Temiz! Karar bekleyen yok.</p>
+                  </div>
+                ) : (
+                  founderDecisions.map((decision) => (
+                    <div
+                      key={decision.id}
+                      className={cn(
+                        'p-3 rounded-lg border-l-4',
+                        decision.priority === 'critical'
+                          ? 'bg-red-500/10 border-l-red-500'
+                          : 'bg-amber-500/10 border-l-amber-500'
+                      )}
+                    >
+                      <p className="font-medium text-sm">{decision.title}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{decision.description}</p>
+                      <div className="flex items-center justify-between mt-2">
+                        <span className="text-xs text-muted-foreground">
+                          <Clock className="h-3 w-3 inline mr-1" />
+                          {decision.deadline}
+                        </span>
+                        <CanvaBadge variant="default" className="text-xs">
+                          {decision.action}
+                        </CanvaBadge>
+                      </div>
+                      {decision.context && (
+                        <p className="text-xs text-violet-500 mt-2 italic">{decision.context}</p>
+                      )}
+                    </div>
+                  ))
+                )}
+              </CanvaCardBody>
+            </CanvaCard>
+
+            {/* 🎯 Bu Haftanın Odağı */}
+            <CanvaCard className="admin-card border-blue-500/30 bg-blue-500/5">
+              <CanvaCardHeader className="pb-2">
+                <CanvaCardTitle className="flex items-center gap-2 text-base">
+                  <Crosshair className="h-4 w-4 text-blue-500" />
+                  Bu Hafta Odak
+                </CanvaCardTitle>
+                <CanvaCardSubtitle className="text-xs">Tek şeye odaklan</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
+                <div className="space-y-3">
+                  <div>
+                    <p className="font-semibold text-blue-600 dark:text-blue-400">{founderFocus.title}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{founderFocus.why}</p>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {founderFocus.metrics.map((m) => (
+                      <div key={m.label} className="text-center p-2 rounded bg-muted/50">
+                        <p className="text-xs text-muted-foreground">{m.label}</p>
+                        <p className="font-semibold text-sm">{m.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-red-500 mb-1">Engelleyiciler:</p>
+                    <ul className="text-xs text-muted-foreground space-y-1">
+                      {founderFocus.blockers.map((b, i) => (
+                        <li key={i}>• {b}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="p-2 rounded bg-green-500/10 border border-green-500/30">
+                    <p className="text-xs font-medium text-green-600 dark:text-green-400">
+                      → {founderFocus.nextAction}
+                    </p>
+                  </div>
+                </div>
+              </CanvaCardBody>
+            </CanvaCard>
+
+            {/* 🧹 Sistem Halletti */}
+            <CanvaCard className="admin-card border-emerald-500/30 bg-emerald-500/5">
+              <CanvaCardHeader className="pb-2">
+                <CanvaCardTitle className="flex items-center gap-2 text-base">
+                  <Bot className="h-4 w-4 text-emerald-500" />
+                  Sistem Halletti
+                </CanvaCardTitle>
+                <CanvaCardSubtitle className="text-xs">Son 24 saat otomasyon</CanvaCardSubtitle>
+              </CanvaCardHeader>
+              <CanvaCardBody>
+                <div className="space-y-2">
+                  {systemHandled.map((item, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center justify-between p-2 rounded bg-muted/30"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+                          {item.count}
+                        </span>
+                        <span className="text-xs">{item.label}</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">{item.savings}</span>
+                    </div>
+                  ))}
+                  <div className="mt-3 p-2 rounded bg-emerald-500/20 text-center">
+                    <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                      Toplam ~15 saat manuel iş tasarrufu
+                    </p>
+                  </div>
+                </div>
+              </CanvaCardBody>
+            </CanvaCard>
+          </div>
+        </div>
+      )}
 
       {/* Şirket Sağlık Skoru + North Star */}
       <div className="grid grid-cols-3 gap-6">
