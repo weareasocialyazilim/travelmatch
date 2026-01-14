@@ -18,6 +18,26 @@
 import { getImageUrl, ImageVariant } from '../services/cloudflareImages';
 
 /**
+ * LRU-style memoization cache for image URL generation
+ * Prevents redundant URL computations in render loops (lists, grids)
+ */
+const IMAGE_URL_CACHE = new Map<string, string>();
+const MAX_CACHE_SIZE = 500;
+
+function getCachedUrl(key: string): string | undefined {
+  return IMAGE_URL_CACHE.get(key);
+}
+
+function setCachedUrl(key: string, url: string): void {
+  // Simple LRU: if cache is full, delete oldest entry
+  if (IMAGE_URL_CACHE.size >= MAX_CACHE_SIZE) {
+    const firstKey = IMAGE_URL_CACHE.keys().next().value;
+    if (firstKey) IMAGE_URL_CACHE.delete(firstKey);
+  }
+  IMAGE_URL_CACHE.set(key, url);
+}
+
+/**
  * Moment with optional Cloudflare/BlurHash fields
  * Use this until API types are updated
  */
@@ -49,6 +69,7 @@ export interface CloudflareUploadedImage {
 
 /**
  * Get optimized image URL from Cloudflare or fallback to legacy URL
+ * Uses memoization cache to prevent redundant URL generation in render loops
  *
  * @param item - Object with imageUrl and optional imageCloudflareId
  * @param variant - Cloudflare image variant (thumbnail, small, medium, large)
@@ -65,31 +86,51 @@ export function getOptimizedImageUrl(
   variant: ImageVariant = 'medium',
   fallbackUrl?: string,
 ): string {
+  // Generate cache key from item identifiers
+  const cacheKey = `${item.imageCloudflareId || ''}_${item.imageUrl || ''}_${item.image || ''}_${variant}_${fallbackUrl || ''}`;
+
+  // Check cache first
+  const cached = getCachedUrl(cacheKey);
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  let result: string;
+
   // Priority 1: Cloudflare CDN (WebP/AVIF optimized)
   if (item.imageCloudflareId) {
     const cloudflareUrl = getImageUrl(item.imageCloudflareId, variant);
     // Only use Cloudflare URL if it's valid (account hash is configured)
     if (cloudflareUrl) {
-      return cloudflareUrl;
+      result = cloudflareUrl;
+      setCachedUrl(cacheKey, result);
+      return result;
     }
   }
 
   // Priority 2: Legacy URL (direct URL)
   if (item.imageUrl) {
-    return item.imageUrl;
+    result = item.imageUrl;
+    setCachedUrl(cacheKey, result);
+    return result;
   }
 
   // Priority 3: Legacy 'image' field (for backwards compatibility)
   if (item.image) {
-    return item.image;
+    result = item.image;
+    setCachedUrl(cacheKey, result);
+    return result;
   }
 
   // Priority 4: Fallback URL (placeholder)
-  return fallbackUrl || '';
+  result = fallbackUrl || '';
+  setCachedUrl(cacheKey, result);
+  return result;
 }
 
 /**
  * Get optimized avatar URL from Cloudflare or fallback
+ * Uses memoization cache for performance in list renders
  *
  * @param user - User object with avatar and optional avatarCloudflareId
  * @param variant - Cloudflare image variant (typically 'thumbnail' or 'small')
@@ -104,15 +145,30 @@ export function getOptimizedAvatarUrl(
   variant: ImageVariant = 'thumbnail',
   fallbackUrl?: string,
 ): string {
+  // Generate cache key
+  const cacheKey = `avatar_${user.avatarCloudflareId || ''}_${user.avatar || ''}_${variant}_${fallbackUrl || ''}`;
+
+  // Check cache first
+  const cached = getCachedUrl(cacheKey);
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  let result: string;
+
   if (user.avatarCloudflareId) {
     const cloudflareUrl = getImageUrl(user.avatarCloudflareId, variant);
     // Only use Cloudflare URL if it's valid (account hash is configured)
     if (cloudflareUrl) {
-      return cloudflareUrl;
+      result = cloudflareUrl;
+      setCachedUrl(cacheKey, result);
+      return result;
     }
   }
 
-  return user.avatar || fallbackUrl || '';
+  result = user.avatar || fallbackUrl || '';
+  setCachedUrl(cacheKey, result);
+  return result;
 }
 
 /**

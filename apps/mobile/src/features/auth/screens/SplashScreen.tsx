@@ -41,8 +41,8 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
         const hasSeenOnboarding = await AsyncStorage.getItem(ONBOARDING_KEY);
         const allowGuestBrowse = await AsyncStorage.getItem(GUEST_MODE_KEY);
 
-        // Wait for animation to complete (2.5s total)
-        await new Promise((resolve) => setTimeout(resolve, 2500));
+        // Wait for animation to complete (1.5s total - optimized for faster startup)
+        await new Promise((resolve) => setTimeout(resolve, 1500));
 
         if (hasSeenOnboarding === 'true') {
           // User has completed onboarding
