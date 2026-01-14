@@ -48,6 +48,8 @@ import {
 } from 'lucide-react';
 import { usePermission } from '@/hooks/use-permission';
 import { useFounderDecisions } from '@/hooks/use-founder-decisions';
+import { useFounderAlerts } from '@/hooks/use-founder-alerts';
+import { ALERT_LEVEL_COLORS, MAX_ALERTS_DISPLAYED } from '@/config/founder-alerts';
 import {
   CanvaCard,
   CanvaCardHeader,
@@ -344,6 +346,13 @@ export default function CommandCenterPage() {
     deferredBacklog,
   } = useFounderDecisions();
 
+  // Founder Alerts (NO-NETWORK - internal sources only)
+  const {
+    isEnabled: isAlertsEnabled,
+    alerts,
+    totalCount: alertTotalCount,
+  } = useFounderAlerts();
+
   // Auto-refresh every 30 seconds
   useEffect(() => {
     const interval = setInterval(() => {
@@ -521,6 +530,53 @@ export default function CommandCenterPage() {
             <p className="mt-2 text-xs font-medium text-violet-400">
               → Öncelik: {founderPulseToday.topPriority}
             </p>
+
+            {/* Alert Routing - Only visible when enabled */}
+            {isAlertsEnabled && alerts.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-slate-700/50">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-slate-400 flex items-center gap-1">
+                    <Bell className="h-3 w-3" />
+                    Alerts (son 24 saat)
+                  </span>
+                  {alertTotalCount > MAX_ALERTS_DISPLAYED && (
+                    <span className="text-[10px] text-slate-500">
+                      +{alertTotalCount - MAX_ALERTS_DISPLAYED} more
+                    </span>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  {alerts.slice(0, MAX_ALERTS_DISPLAYED).map((alert) => (
+                    <div
+                      key={alert.key}
+                      className="flex items-center justify-between text-xs p-1.5 rounded bg-slate-800/30"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className={cn('font-mono text-[10px]', ALERT_LEVEL_COLORS[alert.level])}>
+                          [{alert.level.toUpperCase()}]
+                        </span>
+                        <span className="text-slate-300 truncate">
+                          {alert.title}
+                        </span>
+                      </div>
+                      <span className="text-slate-500 text-[10px] whitespace-nowrap ml-2">
+                        {alert.count}x
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* No alerts message */}
+            {isAlertsEnabled && alerts.length === 0 && (
+              <div className="mt-3 pt-3 border-t border-slate-700/50">
+                <p className="text-xs text-slate-500 flex items-center gap-1">
+                  <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+                  Son 24 saatte kritik alarm yok
+                </p>
+              </div>
+            )}
 
             {/* Decision Loop Stats - Only visible when enabled */}
             {isDecisionLoopEnabled && decisionStats && (
