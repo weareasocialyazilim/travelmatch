@@ -7,6 +7,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   TrendingUp,
   TrendingDown,
@@ -563,20 +564,19 @@ export default function CEOBriefingPage() {
             count: null,
           },
         ].map((link) => (
-          <CanvaCard
-            key={link.label}
-            className="admin-card hover:border-primary/50 cursor-pointer transition-colors"
-          >
-            <CanvaCardBody className="p-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <link.icon className="h-5 w-5 text-primary" />
-                <span className="font-medium">{link.label}</span>
-              </div>
-              {link.count !== null && (
-                <CanvaBadge variant="default">{link.count}</CanvaBadge>
-              )}
-            </CanvaCardBody>
-          </CanvaCard>
+          <Link key={link.label} href={link.href}>
+            <CanvaCard className="admin-card hover:border-primary/50 cursor-pointer transition-colors h-full">
+              <CanvaCardBody className="p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <link.icon className="h-5 w-5 text-primary" />
+                  <span className="font-medium">{link.label}</span>
+                </div>
+                {link.count !== null && (
+                  <CanvaBadge variant="default">{link.count}</CanvaBadge>
+                )}
+              </CanvaCardBody>
+            </CanvaCard>
+          </Link>
         ))}
       </div>
     </div>
