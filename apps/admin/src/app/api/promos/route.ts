@@ -1,7 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
-import { getAdminSession, hasPermission } from '@/lib/auth';
+import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
@@ -139,6 +139,18 @@ export async function POST(request: NextRequest) {
 
     if (error) throw error;
 
+    // Audit log for promo creation
+    await createAuditLog(
+      session.admin.id,
+      'promo.create',
+      'promo_code',
+      data.id,
+      null,
+      data,
+      request.headers.get('x-forwarded-for') || undefined,
+      request.headers.get('user-agent') || undefined,
+    );
+
     return NextResponse.json(data, { status: 201 });
   } catch (error) {
     logger.error('Create promo code error:', error);
@@ -203,6 +215,18 @@ export async function PATCH(request: NextRequest) {
 
     if (error) throw error;
 
+    // Audit log for promo update
+    await createAuditLog(
+      session.admin.id,
+      'promo.update',
+      'promo_code',
+      body.id,
+      null,
+      updateData,
+      request.headers.get('x-forwarded-for') || undefined,
+      request.headers.get('user-agent') || undefined,
+    );
+
     return NextResponse.json(data);
   } catch (error) {
     logger.error('Update promo code error:', error);
@@ -242,6 +266,18 @@ export async function DELETE(request: NextRequest) {
       .eq('id', id);
 
     if (error) throw error;
+
+    // Audit log for promo deletion (soft delete)
+    await createAuditLog(
+      session.admin.id,
+      'promo.delete',
+      'promo_code',
+      id,
+      { is_active: true },
+      { is_active: false },
+      request.headers.get('x-forwarded-for') || undefined,
+      request.headers.get('user-agent') || undefined,
+    );
 
     return NextResponse.json({ success: true });
   } catch (error) {
