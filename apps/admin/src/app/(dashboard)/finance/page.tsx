@@ -389,9 +389,9 @@ export default function FinancePage() {
                               <CanvaButton
                                 size="sm"
                                 variant="danger"
-                                onClick={() =>
-                                  toast.info('İade işlemi henüz bağlı değil')
-                                }
+                                disabled
+                                className="opacity-50 cursor-not-allowed"
+                                title="API entegrasyonu geliştiriliyor"
                               >
                                 <XCircle className="mr-1 h-4 w-4" />
                                 Reddet
@@ -399,9 +399,9 @@ export default function FinancePage() {
                               <CanvaButton
                                 size="sm"
                                 variant="success"
-                                onClick={() =>
-                                  toast.info('Onay işlemi henüz bağlı değil')
-                                }
+                                disabled
+                                className="opacity-50 cursor-not-allowed"
+                                title="API entegrasyonu geliştiriliyor"
                               >
                                 <CheckCircle className="mr-1 h-4 w-4" />
                                 Onayla

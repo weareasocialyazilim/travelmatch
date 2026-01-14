@@ -19,6 +19,7 @@ import {
   ChevronRight,
   Camera,
   Sparkles,
+  AlertTriangle,
 } from 'lucide-react';
 import { CanvaButton } from '@/components/canva/CanvaButton';
 import { CanvaInput } from '@/components/canva/CanvaInput';
@@ -186,6 +187,19 @@ export default function CreatorsPage() {
 
   return (
     <div className="space-y-6">
+      {/* Development Banner */}
+      <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950">
+        <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+        <div>
+          <p className="font-medium text-amber-800 dark:text-amber-200">
+            Geliştirme Aşamasında
+          </p>
+          <p className="text-sm text-amber-600 dark:text-amber-400">
+            Bu sayfa şu anda örnek verilerle çalışmaktadır. API entegrasyonu yakında eklenecektir.
+          </p>
+        </div>
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
