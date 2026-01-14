@@ -66,6 +66,8 @@ import {
 } from '@/components/ui/table';
 import { AdminAreaChart, AdminBarChart } from '@/components/common/admin-chart';
 import { cn } from '@/lib/utils';
+import { exportToCSV, generateExportFilename } from '@/lib/export';
+import { useToast } from '@/hooks/use-toast';
 
 // Lifecycle stage stats
 const lifecycleStats = {
@@ -245,6 +247,7 @@ const dauTrend = [
 export default function UserLifecyclePage() {
   const [activeTab, setActiveTab] = useState('overview');
   const [timeRange, setTimeRange] = useState('7d');
+  const { toast } = useToast();
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
@@ -281,7 +284,58 @@ export default function UserLifecyclePage() {
               <SelectItem value="90d">90 Gün</SelectItem>
             </SelectContent>
           </Select>
-          <CanvaButton variant="ghost">
+          <CanvaButton
+            variant="ghost"
+            onClick={() => {
+              try {
+                // Combine all lifecycle data for export
+                const exportData = [
+                  // Lifecycle stats
+                  { Kategori: 'Yaşam Döngüsü', Metrik: 'Yeni Kullanıcılar', Değer: lifecycleStats.newUsers.count, Değişim: `${lifecycleStats.newUsers.change}%` },
+                  { Kategori: 'Yaşam Döngüsü', Metrik: 'Aktif Kullanıcılar', Değer: lifecycleStats.activeUsers.count, Değişim: `${lifecycleStats.activeUsers.change}%` },
+                  { Kategori: 'Yaşam Döngüsü', Metrik: 'Risk Altında', Değer: lifecycleStats.atRiskUsers.count, Değişim: `${lifecycleStats.atRiskUsers.change}%` },
+                  { Kategori: 'Yaşam Döngüsü', Metrik: 'Churn', Değer: lifecycleStats.churnedUsers.count, Değişim: `${lifecycleStats.churnedUsers.change}%` },
+                  { Kategori: 'Yaşam Döngüsü', Metrik: 'Reaktivasyon', Değer: lifecycleStats.reactivatedUsers.count, Değişim: `${lifecycleStats.reactivatedUsers.change}%` },
+                  // Onboarding funnel
+                  ...onboardingFunnel.map((step) => ({
+                    Kategori: 'Onboarding',
+                    Metrik: step.stage,
+                    Değer: step.count,
+                    Değişim: `${step.percentage}%`,
+                  })),
+                  // Retention data
+                  ...retentionData.map((item) => ({
+                    Kategori: 'Retention',
+                    Metrik: item.week,
+                    Değer: item.users,
+                    Değişim: `${item.retention}%`,
+                  })),
+                ];
+
+                exportToCSV(
+                  exportData,
+                  [
+                    { header: 'Kategori', accessor: 'Kategori' },
+                    { header: 'Metrik', accessor: 'Metrik' },
+                    { header: 'Değer', accessor: 'Değer' },
+                    { header: 'Değişim/Oran', accessor: 'Değişim' },
+                  ],
+                  generateExportFilename('kullanici-yasam-dongusu'),
+                );
+
+                toast({
+                  title: 'Rapor indirildi',
+                  description: 'Kullanıcı yaşam döngüsü raporu başarıyla indirildi.',
+                });
+              } catch (error) {
+                toast({
+                  title: 'Hata',
+                  description: 'Rapor indirilemedi.',
+                  variant: 'destructive',
+                });
+              }
+            }}
+          >
             <Download className="h-4 w-4 mr-2" />
             Rapor
           </CanvaButton>
