@@ -5,10 +5,11 @@
 | Kontrol | Durum | Açıklama |
 |---------|-------|----------|
 | Breaking Change | **0** | Mevcut UI/API değişmedi |
-| Default OFF | **✅ EVET** | ENV yoksa `false` (kod değişikliği gerektirmez) |
+| Default OFF | **✅ EVET** | İki flag da yoksa `false` |
+| Two-Layer Security | **✅ EVET** | Client + Server flag ayrı |
 | Super admin dışında görünür mü | **❌ HAYIR** | Hard check: `role === 'super_admin'` |
 | NO-NETWORK | **✅ EVET** | Dış servis çağrısı yok |
-| Rollback planı | **✅ VAR** | Flag kapatınca anında deaktif |
+| Rollback planı | **✅ VAR** | Server flag kapatınca API anında deaktif |
 
 ---
 
@@ -22,24 +23,29 @@ Mevcut tablolarda değişiklik: YOK
 DROP/ALTER: YOK
 ```
 
-### ✅ Feature Flag (Default OFF, ENV-Based)
+### ✅ Feature Flag (Two-Layer Model, Default OFF)
 
 ```bash
-# ENV variable kontrolü (kod değişikliği gerektirmez)
-NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED=true  # veya
-FOUNDER_DECISION_LOOP_ENABLED=true              # server-side
+# İKİ KATMANLI GÜVENLİK:
+# 1. CLIENT FLAG - UI visibility (public)
+NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED=true
+
+# 2. SERVER FLAG - API data access (private, server-only)
+FOUNDER_DECISION_LOOP_ENABLED=true
 ```
 
 ```typescript
-// Client-side
+// Client-side: sadece UI visibility
 export const FOUNDER_DECISION_LOOP_ENABLED =
   process.env.NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED === 'true';
 
-// Server-side (API routes)
+// Server-side: sadece server flag'i kontrol (NO FALLBACK!)
 export function isFounderDecisionLoopEnabled(): boolean {
-  return serverEnv === 'true' || publicEnv === 'true';
+  return process.env.FOUNDER_DECISION_LOOP_ENABLED === 'true';
 }
 ```
+
+**Güvenlik garantisi:** Client flag açık olsa bile server flag kapalıysa → API 403
 
 ### ✅ Super Admin Only
 
@@ -132,17 +138,21 @@ const isEnabled = FOUNDER_DECISION_LOOP_ENABLED && isSuperAdmin();
 
 ## Rollback Prosedürü
 
+### Hızlı Rollback (Sadece API kapatma)
 ```bash
-# 1. ENV variable'ı kaldır veya false yap
-# Vercel: Settings → Environment Variables → Remove
-# Local: .env.local'dan kaldır
+# Sadece server flag'i kaldır
+FOUNDER_DECISION_LOOP_ENABLED=false  # veya sil
 
-# 2. Restart
-vercel --prod  # veya local: npm run dev (restart)
+# Restart → API 403, UI butonları görünür ama çalışmaz
+```
 
-# 3. Verify
-# - Butonlar görünmemeli
-# - API 403 dönmeli
+### Tam Rollback (UI + API)
+```bash
+# Her iki flag'i kaldır
+NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED=false
+FOUNDER_DECISION_LOOP_ENABLED=false
+
+# Restart → Hiçbir şey görünmez
 ```
 
 **Tahmini süre:** < 1 dakika (kod değişikliği GEREKMİYOR!)

@@ -4,13 +4,28 @@
  * SAFE MODE: Default OFF
  * This feature is only visible to super_admin when enabled.
  *
- * To enable (no deploy needed):
- * 1. Set ENV variable: NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED=true
- * 2. Restart the server
+ * TWO-LAYER FLAG MODEL:
+ * ─────────────────────
+ * 1. Client flag: NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED
+ *    → Controls UI visibility (buttons, stats display)
+ *    → Public: Anyone can see this exists
  *
- * To disable:
- * 1. Remove ENV variable or set to false
- * 2. Restart the server
+ * 2. Server flag: FOUNDER_DECISION_LOOP_ENABLED
+ *    → Controls API data access
+ *    → Private: Server-only, actual data protection
+ *
+ * Scenarios:
+ * ┌─────────┬────────┬─────────────────────────────────────┐
+ * │ Client  │ Server │ Result                              │
+ * ├─────────┼────────┼─────────────────────────────────────┤
+ * │ OFF     │ OFF    │ Feature invisible                   │
+ * │ ON      │ OFF    │ UI visible, API returns 403         │
+ * │ OFF     │ ON     │ UI hidden (useless but safe)        │
+ * │ ON      │ ON     │ Full functionality                  │
+ * └─────────┴────────┴─────────────────────────────────────┘
+ *
+ * Operational safety: Even if client flag leaks or is accidentally
+ * left on, server flag controls actual data access.
  */
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -18,8 +33,8 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Enable/disable the Founder Decision Loop UI
- * When false: No action buttons visible, no behavior change
+ * CLIENT FLAG: UI Visibility
+ * When false: No action buttons visible, no stats display
  * When true: super_admin sees Reviewed/Defer/Focus buttons
  *
  * Reads from: NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED
@@ -29,15 +44,19 @@ export const FOUNDER_DECISION_LOOP_ENABLED =
   process.env.NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED === 'true';
 
 /**
- * Server-side only check (for API routes)
- * Falls back to the public env var for consistency
+ * SERVER FLAG: API Data Access
+ * When false: API returns 403, no data exposure
+ * When true: API returns data (still requires super_admin auth)
+ *
+ * Reads from: FOUNDER_DECISION_LOOP_ENABLED (private, server-only)
+ * Default: false (SAFE MODE)
+ *
+ * SECURITY NOTE: This does NOT fall back to NEXT_PUBLIC_*
+ * Server flag must be explicitly set for API to work.
  */
 export function isFounderDecisionLoopEnabled(): boolean {
-  // Server can check both, prefer the non-public one if set
-  const serverEnv = process.env.FOUNDER_DECISION_LOOP_ENABLED;
-  const publicEnv = process.env.NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED;
-
-  return serverEnv === 'true' || publicEnv === 'true';
+  // ONLY check server-side env var - no fallback to public
+  return process.env.FOUNDER_DECISION_LOOP_ENABLED === 'true';
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

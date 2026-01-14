@@ -26,40 +26,56 @@ Founder Decision Loop, super_admin kullanıcısının karar alma sürecini takip
 
 ---
 
-## Feature Flag
+## Feature Flag (Two-Layer Model)
+
+### İki Katmanlı Güvenlik
 
 ```bash
-# ENV Variable (no code change needed)
+# 1. CLIENT FLAG - UI Görünürlüğü (public, browser'da görünür)
 NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED=true
-# veya server-side için:
+
+# 2. SERVER FLAG - API Data Erişimi (private, sadece server)
 FOUNDER_DECISION_LOOP_ENABLED=true
 ```
 
 ```typescript
 // apps/admin/src/config/founder-config.ts
 
-// Client-side (reads from NEXT_PUBLIC_)
+// Client-side: UI visibility
 export const FOUNDER_DECISION_LOOP_ENABLED =
   process.env.NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED === 'true';
 
-// Server-side (for API routes)
+// Server-side: API data access (NO FALLBACK to public!)
 export function isFounderDecisionLoopEnabled(): boolean {
-  const serverEnv = process.env.FOUNDER_DECISION_LOOP_ENABLED;
-  const publicEnv = process.env.NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED;
-  return serverEnv === 'true' || publicEnv === 'true';
+  return process.env.FOUNDER_DECISION_LOOP_ENABLED === 'true';
 }
 ```
 
-### Flag Durumlarına Göre Davranış
+### Flag Kombinasyonları
 
-| Flag | UI | API | Davranış |
-|------|----|----|----------|
-| Not set (default) | Butonlar görünmez | 403 döner | Mevcut sistem aynen çalışır |
-| `true` | Butonlar görünür | Çalışır | Karar logging aktif |
+| Client Flag | Server Flag | UI | API | Sonuç |
+|-------------|-------------|----|----|-------|
+| ❌ OFF | ❌ OFF | Gizli | 403 | Feature yok |
+| ✅ ON | ❌ OFF | Görünür | 403 | UI var, data yok (güvenli) |
+| ❌ OFF | ✅ ON | Gizli | Çalışır | Kullanılamaz (güvenli) |
+| ✅ ON | ✅ ON | Görünür | Çalışır | **Tam işlevsel** |
+
+### Neden İki Katman?
+
+**Operasyonel emniyet:**
+- Client flag yanlışlıkla açık kalsa bile → server kapalı = data yok
+- `NEXT_PUBLIC_*` herkes görebilir ama **güvenlik flag'den değil, server check'ten gelir**
+- Her iki flag da açık olsa bile → `super_admin` değilsen yine 401
 
 ### Aktivasyon (Deploy Gerektirmez!)
 
-1. ENV variable'ı ayarlayın: `NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED=true`
+```bash
+# Full aktivasyon için İKİ FLAG da gerekli:
+NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED=true
+FOUNDER_DECISION_LOOP_ENABLED=true
+```
+
+1. Her iki ENV variable'ı ayarlayın
 2. Server'ı restart edin (veya Vercel'de Environment Variables'dan ekleyin)
 3. super_admin olarak giriş yapın
 4. /ceo-briefing veya /command-center'da butonları görün
@@ -224,12 +240,45 @@ supabase/migrations/
 
 ## Rollback Planı
 
-1. ENV variable'ı kaldırın veya `NEXT_PUBLIC_FOUNDER_DECISION_LOOP_ENABLED=false` yapın
-2. Server'ı restart edin (veya Vercel'de Environment Variables'dan silin)
-3. Butonlar kaybolur, API 403 döner
-4. Mevcut sistem aynen çalışmaya devam eder
+### Hızlı Rollback (Sadece API kapatma)
+1. `FOUNDER_DECISION_LOOP_ENABLED=false` yapın (veya silin)
+2. Server restart → API 403 döner
+3. UI butonları görünür kalır ama çalışmaz (güvenli)
+
+### Tam Rollback (UI + API)
+1. Her iki flag'i de kaldırın veya `false` yapın
+2. Server restart
+3. Butonlar kaybolur + API 403
 
 **Rollback süresi:** < 1 dakika (kod değişikliği gerektirmez!)
+
+---
+
+## Kullanım Protokolü
+
+### Günlük Ritüel (Alert varsa, ~10 dk)
+
+1. `/command-center` aç
+2. **Founder Pulse** bölümüne bak
+3. "Karar bekliyor" item'ları için:
+   - ✅ **Reviewed** → "Baktım, aksiyon aldım/almayacağım"
+   - 🕐 **Defer** → "Şu an değil, sonra bakarım"
+4. **Ertelenenler (son 5)** listesinden 1 tanesini:
+   - Ya kapat (reviewed)
+   - Ya tekrar defer + not ekle
+
+### Haftalık Ritüel (1 saat, Pazartesi sabahı önerilir)
+
+1. `/ceo-briefing` aç
+2. 🎯 **Bu Hafta Odak** seç (tek bir konu)
+3. Geçen haftanın defer'larından 2 tanesini kapat
+4. Haftalık metriklere bak, anomali var mı?
+
+### Neden Bu Protokol?
+
+- **Dashboard bağımlılığı yaratmaz** → Seni dashboard'a çekmez, seni rahatlatır
+- **Karar yorgunluğunu azaltır** → "Buna baktım mı?" sorusu ortadan kalkar
+- **Focus korur** → Haftada tek odak, günde sınırlı karar
 
 ---
 
