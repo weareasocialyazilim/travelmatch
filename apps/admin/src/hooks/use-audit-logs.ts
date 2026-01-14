@@ -1,6 +1,8 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api-client';
+import { logger } from '@/lib/logger';
 
 interface AuditLog {
   id: string;
@@ -38,7 +40,7 @@ interface AuditLogFilters {
   offset?: number;
 }
 
-// Mock data for development
+// Mock data for development fallback
 const mockAuditLogs: AuditLog[] = [
   {
     id: '1',
@@ -122,9 +124,11 @@ const mockAuditLogs: AuditLog[] = [
   {
     id: '6',
     admin_id: 'admin-1',
-    action: 'report.resolve',
-    resource_type: 'report',
-    resource_id: 'report-123',
+    action: 'feature_flag.update',
+    resource_type: 'feature_flag',
+    resource_id: 'ff-001',
+    old_value: { enabled: false },
+    new_value: { enabled: true },
     ip_address: '192.168.1.1',
     user_agent: 'Mozilla/5.0',
     created_at: new Date(Date.now() - 1000 * 60 * 300).toISOString(),
@@ -136,49 +140,83 @@ const mockAuditLogs: AuditLog[] = [
   },
 ];
 
+// Helper function to filter mock data
+function filterMockLogs(logs: AuditLog[], filters: AuditLogFilters): AuditLog[] {
+  let filtered = logs;
+
+  if (filters.action) {
+    filtered = filtered.filter((log) => log.action === filters.action);
+  }
+
+  if (filters.admin_id) {
+    filtered = filtered.filter((log) => log.admin_id === filters.admin_id);
+  }
+
+  if (filters.resource_type) {
+    filtered = filtered.filter((log) => log.resource_type === filters.resource_type);
+  }
+
+  if (filters.start_date) {
+    const startDate = new Date(filters.start_date);
+    filtered = filtered.filter((log) => new Date(log.created_at) >= startDate);
+  }
+
+  if (filters.end_date) {
+    const endDate = new Date(filters.end_date);
+    filtered = filtered.filter((log) => new Date(log.created_at) <= endDate);
+  }
+
+  // Apply pagination
+  const offset = filters.offset || 0;
+  const limit = filters.limit || 100;
+  filtered = filtered.slice(offset, offset + limit);
+
+  return filtered;
+}
+
 async function fetchAuditLogs(
   filters: AuditLogFilters = {},
 ): Promise<AuditLogsResponse> {
-  // const params = new URLSearchParams();
-  // if (filters.admin_id) params.set('admin_id', filters.admin_id);
-  // if (filters.action) params.set('action', filters.action);
-  // if (filters.resource_type) params.set('resource_type', filters.resource_type);
-  // if (filters.start_date) params.set('start_date', filters.start_date);
-  // if (filters.end_date) params.set('end_date', filters.end_date);
-  // if (filters.limit) params.set('limit', filters.limit.toString());
-  // if (filters.offset) params.set('offset', filters.offset.toString());
+  try {
+    const params: Record<string, string | number | boolean | undefined> = {};
 
-  // try {
-  //   const response = await fetch(`/api/audit-logs?${params.toString()}`);
-  //   if (!response.ok) {
-  //     // Return mock data on 401/error
-  //     let filteredLogs = mockAuditLogs;
-  //     if (filters.action) {
-  //       filteredLogs = filteredLogs.filter(
-  //         (log) => log.action === filters.action,
-  //       );
-  //     }
-  //     return {
-  //       logs: filteredLogs,
-  //       total: filteredLogs.length,
-  //       limit: filters.limit || 100,
-  //       offset: filters.offset || 0,
-  //     };
-  //   }
-  //   return response.json();
-  // } catch {
-  // Return mock data on network error
-  let filteredLogs = mockAuditLogs;
-  if (filters.action) {
-    filteredLogs = filteredLogs.filter((log) => log.action === filters.action);
+    if (filters.admin_id) params.admin_id = filters.admin_id;
+    if (filters.action) params.action = filters.action;
+    if (filters.resource_type) params.resource_type = filters.resource_type;
+    if (filters.start_date) params.start_date = filters.start_date;
+    if (filters.end_date) params.end_date = filters.end_date;
+    if (filters.limit) params.limit = filters.limit;
+    if (filters.offset) params.offset = filters.offset;
+
+    const response = await apiClient.get<AuditLogsResponse>('/audit-logs', { params });
+
+    if (response.error) {
+      logger.warn('Audit logs fetch failed, using fallback:', response.error);
+      const filteredLogs = filterMockLogs(mockAuditLogs, filters);
+      return {
+        logs: filteredLogs,
+        total: mockAuditLogs.length,
+        limit: filters.limit || 100,
+        offset: filters.offset || 0,
+      };
+    }
+
+    return response.data || {
+      logs: filterMockLogs(mockAuditLogs, filters),
+      total: mockAuditLogs.length,
+      limit: filters.limit || 100,
+      offset: filters.offset || 0,
+    };
+  } catch (error) {
+    logger.error('Audit logs fetch error:', error);
+    const filteredLogs = filterMockLogs(mockAuditLogs, filters);
+    return {
+      logs: filteredLogs,
+      total: mockAuditLogs.length,
+      limit: filters.limit || 100,
+      offset: filters.offset || 0,
+    };
   }
-  return {
-    logs: filteredLogs,
-    total: filteredLogs.length,
-    limit: filters.limit || 100,
-    offset: filters.offset || 0,
-  };
-  // }
 }
 
 export function useAuditLogs(filters: AuditLogFilters = {}) {
@@ -188,3 +226,5 @@ export function useAuditLogs(filters: AuditLogFilters = {}) {
     staleTime: 30 * 1000, // 30 seconds
   });
 }
+
+export type { AuditLog, AuditLogsResponse, AuditLogFilters };
