@@ -6,7 +6,6 @@
  * Sentry is initialized after first render via dynamic import in App.tsx.
  */
 
-import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import * as Sentry from '@sentry/react-native';
 import * as Application from 'expo-application';

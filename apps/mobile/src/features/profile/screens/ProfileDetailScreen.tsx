@@ -46,7 +46,83 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
   const params = route.params || {};
   const { userId = '' } = params as { userId?: string };
 
-  // Early return if userId is missing - prevents crash
+  // All hooks must be called before any conditional return
+  const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
+  const [showReportSheet, setShowReportSheet] = useState(false);
+
+  // User profile state
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [userLoading, setUserLoading] = useState(true);
+  const [userError, setUserError] = useState<string | null>(null);
+
+  // User moments state
+  const [userMoments, setUserMoments] = useState<any[]>([]);
+  const [momentsLoading, setMomentsLoading] = useState(true);
+
+  // Trust Notes state
+  const [trustNotes, setTrustNotes] = useState<TrustNote[]>([]);
+  const [trustNotesLoading, setTrustNotesLoading] = useState(true);
+
+  // Fetch user profile
+  useEffect(() => {
+    if (!userId) return;
+    const fetchUser = async () => {
+      setUserLoading(true);
+      setUserError(null);
+      try {
+        const { user: profile } = await userService.getUserById(userId);
+        setUser(profile);
+      } catch (error) {
+        logger.error('Failed to fetch user profile:', error);
+        setUserError('Kullanıcı profili yüklenemedi');
+        showToast('Kullanıcı profili yüklenemedi', 'error');
+      } finally {
+        setUserLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [userId, showToast]);
+
+  // Fetch user moments
+  useEffect(() => {
+    if (!userId) return;
+    const fetchMoments = async () => {
+      setMomentsLoading(true);
+      try {
+        const { data } = await momentsService.list({
+          userId,
+          status: 'active',
+          limit: 20,
+        });
+        setUserMoments(data || []);
+      } catch (error) {
+        logger.error('Failed to fetch user moments:', error);
+      } finally {
+        setMomentsLoading(false);
+      }
+    };
+
+    fetchMoments();
+  }, [userId]);
+
+  // Fetch trust notes for this user
+  useEffect(() => {
+    if (!userId) return;
+    const fetchTrustNotes = async () => {
+      setTrustNotesLoading(true);
+      try {
+        const notes = await getRecentTrustNotes(userId, 5);
+        setTrustNotes(notes);
+      } finally {
+        setTrustNotesLoading(false);
+      }
+    };
+
+    fetchTrustNotes();
+  }, [userId]);
+
+  // Early return if userId is missing - prevents crash (AFTER all hooks)
   if (!userId) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
@@ -81,77 +157,6 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
       </SafeAreaView>
     );
   }
-  const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
-  const [showReportSheet, setShowReportSheet] = useState(false);
-
-  // User profile state
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [userLoading, setUserLoading] = useState(true);
-  const [userError, setUserError] = useState<string | null>(null);
-
-  // User moments state
-  const [userMoments, setUserMoments] = useState<any[]>([]);
-  const [momentsLoading, setMomentsLoading] = useState(true);
-
-  // Trust Notes state
-  const [trustNotes, setTrustNotes] = useState<TrustNote[]>([]);
-  const [trustNotesLoading, setTrustNotesLoading] = useState(true);
-
-  // Fetch user profile
-  useEffect(() => {
-    const fetchUser = async () => {
-      setUserLoading(true);
-      setUserError(null);
-      try {
-        const { user: profile } = await userService.getUserById(userId);
-        setUser(profile);
-      } catch (error) {
-        logger.error('Failed to fetch user profile:', error);
-        setUserError('Kullanıcı profili yüklenemedi');
-        showToast('Kullanıcı profili yüklenemedi', 'error');
-      } finally {
-        setUserLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, [userId, showToast]);
-
-  // Fetch user moments
-  useEffect(() => {
-    const fetchMoments = async () => {
-      setMomentsLoading(true);
-      try {
-        const { data } = await momentsService.list({
-          userId,
-          status: 'active',
-          limit: 20,
-        });
-        setUserMoments(data || []);
-      } catch (error) {
-        logger.error('Failed to fetch user moments:', error);
-      } finally {
-        setMomentsLoading(false);
-      }
-    };
-
-    fetchMoments();
-  }, [userId]);
-
-  // Fetch trust notes for this user
-  useEffect(() => {
-    const fetchTrustNotes = async () => {
-      setTrustNotesLoading(true);
-      try {
-        const notes = await getRecentTrustNotes(userId, 5);
-        setTrustNotes(notes);
-      } finally {
-        setTrustNotesLoading(false);
-      }
-    };
-
-    fetchTrustNotes();
-  }, [userId]);
 
   // Filter moments by status
   const activeMomentsList = userMoments.filter((m) => m.status === 'active');
