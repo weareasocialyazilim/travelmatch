@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   TrendingUp,
   TrendingDown,
@@ -45,6 +46,7 @@ import {
   Crosshair,
   Bot,
   TrendingUp as TrendUp,
+  ExternalLink,
 } from 'lucide-react';
 import { usePermission } from '@/hooks/use-permission';
 import { useFounderDecisions } from '@/hooks/use-founder-decisions';
@@ -350,7 +352,7 @@ export default function CommandCenterPage() {
   const {
     isEnabled: isAlertsEnabled,
     alerts,
-    totalCount: alertTotalCount,
+    overflowCount: alertOverflowCount,
   } = useFounderAlerts();
 
   // Auto-refresh every 30 seconds
@@ -539,9 +541,9 @@ export default function CommandCenterPage() {
                     <Bell className="h-3 w-3" />
                     Alerts (son 24 saat)
                   </span>
-                  {alertTotalCount > MAX_ALERTS_DISPLAYED && (
+                  {alertOverflowCount > 0 && (
                     <span className="text-[10px] text-slate-500">
-                      +{alertTotalCount - MAX_ALERTS_DISPLAYED} more
+                      +{alertOverflowCount} more
                     </span>
                   )}
                 </div>
@@ -549,19 +551,38 @@ export default function CommandCenterPage() {
                   {alerts.slice(0, MAX_ALERTS_DISPLAYED).map((alert) => (
                     <div
                       key={alert.key}
-                      className="flex items-center justify-between text-xs p-1.5 rounded bg-slate-800/30"
+                      className={cn(
+                        'flex items-center justify-between text-xs p-1.5 rounded',
+                        alert.isFresh
+                          ? 'bg-slate-800/50 ring-1 ring-inset ring-slate-600/50'
+                          : 'bg-slate-800/30'
+                      )}
                     >
                       <div className="flex items-center gap-2 min-w-0">
                         <span className={cn('font-mono text-[10px]', ALERT_LEVEL_COLORS[alert.level])}>
                           [{alert.level.toUpperCase()}]
                         </span>
-                        <span className="text-slate-300 truncate">
+                        <span className={cn(
+                          'truncate',
+                          alert.isFresh ? 'text-slate-200' : 'text-slate-400'
+                        )}>
                           {alert.title}
                         </span>
                       </div>
-                      <span className="text-slate-500 text-[10px] whitespace-nowrap ml-2">
-                        {alert.count}x
-                      </span>
+                      <div className="flex items-center gap-2 ml-2">
+                        <span className="text-slate-500 text-[10px] whitespace-nowrap">
+                          {alert.count}x
+                        </span>
+                        {alert.actionUrl && (
+                          <Link
+                            href={alert.actionUrl}
+                            className="text-violet-400 hover:text-violet-300 transition-colors"
+                            title="Detaylara git"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                          </Link>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>

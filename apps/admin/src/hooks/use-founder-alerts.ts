@@ -38,6 +38,7 @@ export function useFounderAlertsEnabled(): boolean {
 interface AlertsResponse {
   alerts: AlertItem[];
   totalCount: number;
+  overflowCount: number; // Alerts beyond budget
   fetchedAt: string;
 }
 
@@ -54,6 +55,7 @@ async function fetchAlerts(): Promise<AlertsResponse> {
       return {
         alerts: [],
         totalCount: 0,
+        overflowCount: 0,
         fetchedAt: new Date().toISOString(),
       };
     }
@@ -79,6 +81,7 @@ export function useFounderAlerts() {
     isEnabled,
     alerts: queryResult.data?.alerts || [],
     totalCount: queryResult.data?.totalCount || 0,
+    overflowCount: queryResult.data?.overflowCount || 0,
     fetchedAt: queryResult.data?.fetchedAt || null,
     isLoading: queryResult.isLoading,
     isError: queryResult.isError,
