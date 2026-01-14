@@ -41,7 +41,46 @@ export const ProfileDetailScreen: React.FC<ProfileDetailScreenProps> = ({
 }) => {
   const { showToast } = useToast();
   const { showConfirmation: _showConfirmation } = useConfirmation();
-  const { userId } = route.params;
+
+  // SAFE GUARD: Prevent crash if params are missing
+  const params = route.params || {};
+  const { userId = '' } = params as { userId?: string };
+
+  // Early return if userId is missing - prevents crash
+  if (!userId) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={24}
+              color={COLORS.text.primary}
+            />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Profil</Text>
+          <View style={styles.moreButton} />
+        </View>
+        <View style={styles.errorContainer}>
+          <MaterialCommunityIcons
+            name="account-alert"
+            size={64}
+            color={COLORS.text.tertiary}
+          />
+          <Text style={styles.errorText}>Kullanıcı bilgisi eksik</Text>
+          <TouchableOpacity
+            style={styles.retryButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.retryButtonText}>Geri Dön</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
   const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
   const [showReportSheet, setShowReportSheet] = useState(false);
 
