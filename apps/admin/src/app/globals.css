@@ -2,28 +2,166 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== CSS VARIABLES - LIGHT MODE (Default) ===== */
 :root {
-  --admin-bg: #050505;
+  /* Base colors */
+  --background: 0 0% 100%;
+  --foreground: 240 10% 3.9%;
+
+  /* Card & surface colors */
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 3.9%;
+
+  /* Popover/dropdown colors */
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 3.9%;
+
+  /* Primary brand color (violet) */
+  --primary: 263 70% 50%;
+  --primary-foreground: 0 0% 98%;
+
+  /* Secondary color */
+  --secondary: 240 4.8% 95.9%;
+  --secondary-foreground: 240 5.9% 10%;
+
+  /* Muted color */
+  --muted: 240 4.8% 95.9%;
+  --muted-foreground: 240 3.8% 46.1%;
+
+  /* Accent color */
+  --accent: 240 4.8% 95.9%;
+  --accent-foreground: 240 5.9% 10%;
+
+  /* Destructive/error color */
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+
+  /* Border & input colors */
+  --border: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+  --ring: 263 70% 50%;
+
+  /* Radius */
+  --radius: 0.75rem;
+
+  /* Success color */
+  --success: 142 76% 36%;
+  --success-foreground: 0 0% 98%;
+
+  /* Warning color */
+  --warning: 38 92% 50%;
+  --warning-foreground: 0 0% 98%;
+
+  /* Trust/Info color */
+  --trust: 217 91% 60%;
+  --trust-foreground: 0 0% 98%;
+
+  /* Sidebar specific */
+  --sidebar-background: 0 0% 98%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-border: 240 5.9% 90%;
+  --sidebar-primary: 263 70% 50%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 240 4.8% 95.9%;
+  --sidebar-accent-foreground: 240 5.9% 10%;
+  --sidebar-ring: 263 70% 50%;
+
+  /* Ritual brand colors */
   --ritual-pink: #ff007a;
   --ritual-purple: #8b5cf6;
   --ritual-cyan: #00f2ff;
   --ritual-acid: #ccff00;
+
+  /* Admin specific */
+  --admin-bg: 0 0% 98%;
 }
 
-body {
-  background-color: var(--admin-bg);
-  color: white;
-  min-height: 100vh;
+/* ===== CSS VARIABLES - DARK MODE ===== */
+.dark {
+  /* Base colors */
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+
+  /* Card & surface colors */
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+
+  /* Popover/dropdown colors */
+  --popover: 240 10% 6%;
+  --popover-foreground: 0 0% 98%;
+
+  /* Primary brand color (violet) */
+  --primary: 263 70% 50%;
+  --primary-foreground: 0 0% 98%;
+
+  /* Secondary color */
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+
+  /* Muted color */
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+
+  /* Accent color */
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
+
+  /* Destructive/error color */
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+
+  /* Border & input colors */
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --ring: 263 70% 50%;
+
+  /* Success color */
+  --success: 142 71% 45%;
+  --success-foreground: 0 0% 98%;
+
+  /* Warning color */
+  --warning: 38 92% 50%;
+  --warning-foreground: 0 0% 98%;
+
+  /* Trust/Info color */
+  --trust: 217 91% 60%;
+  --trust-foreground: 0 0% 98%;
+
+  /* Sidebar specific */
+  --sidebar-background: 240 10% 5%;
+  --sidebar-foreground: 240 4.8% 95.9%;
+  --sidebar-border: 240 3.7% 15.9%;
+  --sidebar-primary: 263 70% 50%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 240 3.7% 15.9%;
+  --sidebar-accent-foreground: 0 0% 98%;
+  --sidebar-ring: 263 70% 50%;
+
+  /* Admin specific */
+  --admin-bg: 240 10% 3.9%;
 }
 
+/* ===== BASE LAYER ===== */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    min-height: 100vh;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* ===== ADMIN GLASS EFFECT ===== */
 .admin-glass {
-  @apply bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2rem];
+  @apply bg-card/80 backdrop-blur-2xl border border-border rounded-[2rem];
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .admin-glass:hover {
-  border-color: rgba(255, 0, 122, 0.3);
-  background-color: rgba(255, 255, 255, 0.1);
+  @apply border-primary/30 bg-card;
   box-shadow: 0 0 40px -15px var(--ritual-pink);
 }
 
@@ -36,14 +174,14 @@ body {
 
 /* ===== ADMIN SIDEBAR STYLES ===== */
 .admin-sidebar {
-  @apply h-screen flex flex-col bg-[#0a0a0a] border-r border-white/10 shrink-0 transition-all duration-300;
+  @apply h-screen flex flex-col bg-sidebar-background border-r border-sidebar-border shrink-0 transition-all duration-300;
   position: sticky;
   top: 0;
   left: 0;
 }
 
 .admin-sidebar-logo {
-  @apply px-4 py-4 border-b border-white/10;
+  @apply px-4 py-4 border-b border-sidebar-border;
 }
 
 .admin-sidebar-logo-icon {
@@ -58,7 +196,7 @@ body {
 .admin-sidebar-nav {
   @apply flex-1 overflow-y-auto px-2 py-3;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
 }
 
 .admin-sidebar-nav::-webkit-scrollbar {
@@ -70,12 +208,12 @@ body {
 }
 
 .admin-sidebar-nav::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  @apply bg-muted-foreground/30;
   border-radius: 3px;
 }
 
 .admin-sidebar-nav::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  @apply bg-muted-foreground/50;
 }
 
 .admin-sidebar-section {
@@ -83,20 +221,19 @@ body {
 }
 
 .admin-sidebar-section-title {
-  @apply px-3 py-2 text-xs font-semibold uppercase tracking-wider text-white/50;
+  @apply px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground;
 }
 
 .admin-sidebar-item {
-  @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/70 transition-all duration-200;
+  @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground transition-all duration-200;
 }
 
 .admin-sidebar-item:hover {
-  @apply bg-white/10 text-white;
+  @apply bg-accent text-accent-foreground;
 }
 
 .admin-sidebar-item-active {
-  @apply text-white;
-  background: linear-gradient(to right, rgba(255, 0, 122, 0.2), transparent);
+  @apply text-foreground bg-accent;
   border-left: 2px solid var(--ritual-pink);
 }
 
@@ -113,7 +250,7 @@ body {
 
 /* ===== ADMIN HEADER STYLES ===== */
 .admin-header {
-  @apply h-14 px-6 flex items-center justify-between border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-xl shrink-0;
+  @apply h-14 px-6 flex items-center justify-between border-b border-border bg-background/80 backdrop-blur-xl shrink-0;
   position: sticky;
   top: 0;
   z-index: 40;
@@ -124,7 +261,16 @@ body {
 }
 
 .admin-header-search {
-  @apply h-9 px-3 rounded-lg bg-white/5 border border-white/10;
+  @apply h-9 px-3 rounded-lg bg-muted border border-border;
+}
+
+/* ===== ADMIN CARD STYLES ===== */
+.admin-card {
+  @apply bg-card border border-border rounded-xl;
+}
+
+.admin-card:hover {
+  @apply border-border/80;
 }
 
 /* ===== DROPDOWN MENU FIXES ===== */
@@ -134,24 +280,106 @@ body {
 
 .admin-dropdown,
 [role='menu'] {
-  @apply bg-[#1a1a1a] border border-white/20 shadow-2xl;
-  backdrop-filter: none !important;
-  opacity: 1 !important;
+  @apply bg-popover border border-border shadow-2xl text-popover-foreground;
 }
 
 /* Force opaque background for dropdown content */
 [data-state='open'] > [role='menu'],
 [data-radix-menu-content],
 div[data-radix-popper-content-wrapper] > div {
-  background-color: #1a1a1a !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  @apply bg-popover border-border;
 }
 
 /* Menu items should be clearly visible */
 [role='menuitem'] {
-  @apply text-white/90;
+  @apply text-popover-foreground;
 }
 
 [role='menuitem']:hover {
-  @apply bg-white/10 text-white;
+  @apply bg-accent text-accent-foreground;
+}
+
+/* Select dropdown fix */
+[data-radix-select-content],
+[data-radix-select-viewport] {
+  @apply bg-popover text-popover-foreground;
+}
+
+/* ===== CHART CONTAINER FIX ===== */
+.recharts-wrapper {
+  @apply text-foreground;
+}
+
+.recharts-cartesian-axis-tick-value {
+  @apply fill-muted-foreground;
+}
+
+.recharts-legend-item-text {
+  @apply text-foreground !important;
+}
+
+/* ===== TABLE STYLES ===== */
+.admin-table {
+  @apply w-full;
+}
+
+.admin-table th {
+  @apply text-muted-foreground font-medium text-left px-4 py-3 border-b border-border;
+}
+
+.admin-table td {
+  @apply text-foreground px-4 py-3 border-b border-border;
+}
+
+.admin-table tr:hover td {
+  @apply bg-muted/50;
+}
+
+/* ===== DIALOG/MODAL FIX ===== */
+[data-radix-dialog-content] {
+  @apply bg-card text-card-foreground;
+}
+
+/* ===== TOAST STYLES ===== */
+[data-sonner-toast] {
+  @apply bg-card text-card-foreground border-border;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 0%,
+    hsl(var(--muted-foreground) / 0.1) 50%,
+    hsl(var(--muted)) 100%
+  );
+  background-size: 200% 100%;
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .admin-sidebar,
+  .admin-header {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .admin-card {
+    border: 1px solid #ddd !important;
+    break-inside: avoid;
+  }
 }

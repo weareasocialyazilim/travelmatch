@@ -64,13 +64,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from '@/components/ui/card';
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -85,7 +78,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { formatCurrency, cn } from '@/lib/utils';
@@ -122,7 +114,7 @@ const subscriptionPlans = [
     period: 'forever',
     users: 44231,
     features: ['Temel kesif', 'Aylik 3 mesaj', 'Standart destek'],
-    color: 'bg-gray-500',
+    color: 'bg-muted-foreground',
     active: true,
   },
   {
@@ -811,17 +803,17 @@ export default function SubscriptionManagementPage() {
 
         {/* Churn Tab */}
         <TabsContent value="churn" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <CanvaCard>
+            <CanvaCardHeader>
+              <CanvaCardTitle className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-amber-500" />
                 Iptal Sebepleri
-              </CardTitle>
-              <CardDescription>
+              </CanvaCardTitle>
+              <CanvaCardSubtitle>
                 Kullanicilarin iptal sebepleri analizi
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </CanvaCardSubtitle>
+            </CanvaCardHeader>
+            <CanvaCardBody>
               <div className="space-y-4">
                 {churnReasons.map((reason) => (
                   <div key={reason.reason} className="space-y-2">
@@ -835,8 +827,8 @@ export default function SubscriptionManagementPage() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </CanvaCardBody>
+          </CanvaCard>
         </TabsContent>
       </Tabs>
 
@@ -895,10 +887,10 @@ export default function SubscriptionManagementPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setPromoDialog(false)}>
+            <CanvaButton variant="outline" onClick={() => setPromoDialog(false)}>
               Iptal
-            </Button>
-            <Button onClick={() => setPromoDialog(false)}>Olustur</Button>
+            </CanvaButton>
+            <CanvaButton onClick={() => setPromoDialog(false)}>Olustur</CanvaButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>

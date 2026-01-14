@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { useDebounce } from '@/hooks/use-debounce';
 import {
   Users,
   Image,
@@ -28,6 +29,11 @@ import {
   Headphones,
   Tag,
   TrendingUp,
+  Search,
+  Loader2,
+  User,
+  CreditCard,
+  Hash,
 } from 'lucide-react';
 import {
   CommandDialog,
@@ -36,9 +42,12 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandSeparator,
 } from '@/components/ui/command';
 import { useUIStore } from '@/stores/ui-store';
 import { useAuth } from '@/hooks/use-auth';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { getInitials } from '@/lib/utils';
 
 interface NavCommandItem {
   id: string;
@@ -47,6 +56,15 @@ interface NavCommandItem {
   href?: string;
   action?: () => void;
   shortcut?: string;
+}
+
+interface SearchResult {
+  type: 'user' | 'transaction' | 'moment';
+  id: string;
+  title: string;
+  subtitle?: string;
+  avatar?: string;
+  href: string;
 }
 
 const navigationItems: NavCommandItem[] = [
@@ -159,10 +177,81 @@ const navigationItems: NavCommandItem[] = [
   },
 ];
 
+// Quick actions for common tasks
+const quickActions: NavCommandItem[] = [
+  {
+    id: 'new-campaign',
+    title: 'Yeni Kampanya Oluştur',
+    icon: Target,
+    href: '/campaign-builder',
+  },
+  {
+    id: 'view-queue',
+    title: 'Bekleyen Görevleri Gör',
+    icon: ListTodo,
+    href: '/queue?status=pending',
+  },
+  {
+    id: 'export-report',
+    title: 'Rapor İndir',
+    icon: FileText,
+    href: '/analytics',
+  },
+];
+
 export function CommandPalette() {
   const router = useRouter();
   const { commandPaletteOpen, setCommandPaletteOpen } = useUIStore();
   const { logout } = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+
+  const debouncedQuery = useDebounce(searchQuery, 300);
+
+  // Reset search when dialog closes
+  useEffect(() => {
+    if (!commandPaletteOpen) {
+      setSearchQuery('');
+      setSearchResults([]);
+    }
+  }, [commandPaletteOpen]);
+
+  // Search API when query changes
+  useEffect(() => {
+    if (!debouncedQuery || debouncedQuery.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    const searchData = async () => {
+      setIsSearching(true);
+      try {
+        const response = await fetch(`/api/search?q=${encodeURIComponent(debouncedQuery)}&limit=10`);
+        if (response.ok) {
+          const data = await response.json();
+          setSearchResults(data.results || []);
+        }
+      } catch (error) {
+        console.error('Search error:', error);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    searchData();
+  }, [debouncedQuery]);
+
+  // Filter navigation items based on query
+  const filteredNavItems = useMemo(() => {
+    if (!searchQuery) return navigationItems;
+    const query = searchQuery.toLowerCase();
+    return navigationItems.filter(
+      (item) =>
+        item.title.toLowerCase().includes(query) ||
+        item.id.toLowerCase().includes(query)
+    );
+  }, [searchQuery]);
 
   const handleSelect = useCallback(
     (item: NavCommandItem) => {
@@ -177,6 +266,14 @@ export function CommandPalette() {
     [router, setCommandPaletteOpen],
   );
 
+  const handleResultSelect = useCallback(
+    (result: SearchResult) => {
+      setCommandPaletteOpen(false);
+      router.push(result.href);
+    },
+    [router, setCommandPaletteOpen],
+  );
+
   const actionItems: NavCommandItem[] = [
     {
       id: 'logout',
@@ -186,32 +283,131 @@ export function CommandPalette() {
     },
   ];
 
+  const getResultIcon = (type: string) => {
+    switch (type) {
+      case 'user':
+        return User;
+      case 'transaction':
+        return CreditCard;
+      case 'moment':
+        return Image;
+      default:
+        return Hash;
+    }
+  };
+
   return (
     <CommandDialog
       open={commandPaletteOpen}
       onOpenChange={setCommandPaletteOpen}
     >
-      <CommandInput placeholder="Ara veya komut yaz..." />
+      <CommandInput
+        placeholder="Kullanıcı, işlem veya sayfa ara..."
+        value={searchQuery}
+        onValueChange={setSearchQuery}
+      />
       <CommandList>
-        <CommandEmpty>Sonuç bulunamadı.</CommandEmpty>
+        {isSearching && (
+          <div className="flex items-center justify-center py-6">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          </div>
+        )}
 
-        <CommandGroup heading="Navigasyon">
-          {navigationItems.map((item) => (
-            <CommandItem
-              key={item.id}
-              value={item.title}
-              onSelect={() => handleSelect(item)}
-            >
-              <item.icon className="mr-2 h-4 w-4" />
-              <span>{item.title}</span>
-              {item.shortcut && (
-                <kbd className="pointer-events-none absolute right-2 top-1/2 hidden h-5 -translate-y-1/2 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground sm:flex">
-                  {item.shortcut}
-                </kbd>
-              )}
-            </CommandItem>
-          ))}
-        </CommandGroup>
+        {!isSearching && searchQuery && searchResults.length === 0 && filteredNavItems.length === 0 && (
+          <CommandEmpty>
+            <div className="flex flex-col items-center gap-2 py-4">
+              <Search className="h-8 w-8 text-muted-foreground" />
+              <p>"{searchQuery}" için sonuç bulunamadı</p>
+              <p className="text-xs text-muted-foreground">
+                Farklı bir arama terimi deneyin
+              </p>
+            </div>
+          </CommandEmpty>
+        )}
+
+        {/* Search Results */}
+        {searchResults.length > 0 && (
+          <>
+            <CommandGroup heading="Arama Sonuçları">
+              {searchResults.map((result) => {
+                const ResultIcon = getResultIcon(result.type);
+                return (
+                  <CommandItem
+                    key={`${result.type}-${result.id}`}
+                    value={`${result.type}-${result.title}`}
+                    onSelect={() => handleResultSelect(result)}
+                    className="flex items-center gap-3 py-3"
+                  >
+                    {result.type === 'user' && result.avatar ? (
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={result.avatar} />
+                        <AvatarFallback>{getInitials(result.title)}</AvatarFallback>
+                      </Avatar>
+                    ) : (
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted">
+                        <ResultIcon className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div className="flex flex-col">
+                      <span className="font-medium">{result.title}</span>
+                      {result.subtitle && (
+                        <span className="text-xs text-muted-foreground">{result.subtitle}</span>
+                      )}
+                    </div>
+                    <span className="ml-auto text-xs text-muted-foreground capitalize">
+                      {result.type === 'user' ? 'Kullanıcı' :
+                       result.type === 'transaction' ? 'İşlem' :
+                       result.type === 'moment' ? 'Moment' : result.type}
+                    </span>
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+            <CommandSeparator />
+          </>
+        )}
+
+        {/* Quick Actions - Only show when not searching */}
+        {!searchQuery && (
+          <>
+            <CommandGroup heading="Hızlı İşlemler">
+              {quickActions.map((item) => (
+                <CommandItem
+                  key={item.id}
+                  value={item.title}
+                  onSelect={() => handleSelect(item)}
+                >
+                  <item.icon className="mr-2 h-4 w-4 text-primary" />
+                  <span>{item.title}</span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+            <CommandSeparator />
+          </>
+        )}
+
+        {/* Navigation */}
+        {filteredNavItems.length > 0 && (
+          <CommandGroup heading="Sayfalar">
+            {filteredNavItems.slice(0, searchQuery ? 10 : 8).map((item) => (
+              <CommandItem
+                key={item.id}
+                value={item.title}
+                onSelect={() => handleSelect(item)}
+              >
+                <item.icon className="mr-2 h-4 w-4" />
+                <span>{item.title}</span>
+                {item.shortcut && (
+                  <kbd className="pointer-events-none absolute right-2 top-1/2 hidden h-5 -translate-y-1/2 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground sm:flex">
+                    {item.shortcut}
+                  </kbd>
+                )}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        )}
+
+        <CommandSeparator />
 
         <CommandGroup heading="İşlemler">
           {actionItems.map((item) => (
