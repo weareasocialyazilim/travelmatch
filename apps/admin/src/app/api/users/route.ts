@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const allowedSortColumns = [
       'created_at',
       'updated_at',
-      'display_name',
+      'full_name',
       'email',
     ];
     const safeSortBy = allowedSortColumns.includes(sortBy)
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       const safeSearch = escapeSupabaseFilter(search);
       if (safeSearch) {
         query = query.or(
-          `display_name.ilike.%${safeSearch}%,email.ilike.%${safeSearch}%`,
+          `full_name.ilike.%${safeSearch}%,email.ilike.%${safeSearch}%`,
         );
       }
     }

@@ -76,6 +76,8 @@ export async function middleware(request: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession();
 
+  const adminSession = request.cookies.get('admin_session');
+
   // All protected dashboard routes - synchronized with sidebar navigation
   const protectedRoutes = [
     // Main Menu
@@ -152,14 +154,14 @@ export async function middleware(request: NextRequest) {
   }
 
   // Redirect unauthenticated users to login
-  if (isProtectedRoute && !session) {
+  if (isProtectedRoute && (!session || !adminSession)) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('redirect', request.nextUrl.pathname);
     return NextResponse.redirect(loginUrl);
   }
 
   // Redirect authenticated users away from auth pages
-  if (isAuthRoute && session) {
+  if (isAuthRoute && session && adminSession) {
     const redirectUrl = new URL('/queue', request.url);
     return NextResponse.redirect(redirectUrl);
   }

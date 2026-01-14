@@ -51,7 +51,7 @@ import { CanvaButton } from '@/components/canva/CanvaButton';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { exportToCSV, generateExportFilename } from '@/lib/export';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 
 // Şirket sağlık skoru hesaplama
 const calculateHealthScore = () => {

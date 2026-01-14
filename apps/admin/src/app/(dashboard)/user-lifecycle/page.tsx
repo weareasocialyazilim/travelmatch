@@ -67,7 +67,7 @@ import {
 import { AdminAreaChart, AdminBarChart } from '@/components/common/admin-chart';
 import { cn } from '@/lib/utils';
 import { exportToCSV, generateExportFilename } from '@/lib/export';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 
 // Lifecycle stage stats
 const lifecycleStats = {
@@ -291,11 +291,36 @@ export default function UserLifecyclePage() {
                 // Combine all lifecycle data for export
                 const exportData = [
                   // Lifecycle stats
-                  { Kategori: 'Yaşam Döngüsü', Metrik: 'Yeni Kullanıcılar', Değer: lifecycleStats.newUsers.count, Değişim: `${lifecycleStats.newUsers.change}%` },
-                  { Kategori: 'Yaşam Döngüsü', Metrik: 'Aktif Kullanıcılar', Değer: lifecycleStats.activeUsers.count, Değişim: `${lifecycleStats.activeUsers.change}%` },
-                  { Kategori: 'Yaşam Döngüsü', Metrik: 'Risk Altında', Değer: lifecycleStats.atRiskUsers.count, Değişim: `${lifecycleStats.atRiskUsers.change}%` },
-                  { Kategori: 'Yaşam Döngüsü', Metrik: 'Churn', Değer: lifecycleStats.churnedUsers.count, Değişim: `${lifecycleStats.churnedUsers.change}%` },
-                  { Kategori: 'Yaşam Döngüsü', Metrik: 'Reaktivasyon', Değer: lifecycleStats.reactivatedUsers.count, Değişim: `${lifecycleStats.reactivatedUsers.change}%` },
+                  {
+                    Kategori: 'Yaşam Döngüsü',
+                    Metrik: 'Yeni Kullanıcılar',
+                    Değer: lifecycleStats.newUsers.count,
+                    Değişim: `${lifecycleStats.newUsers.change}%`,
+                  },
+                  {
+                    Kategori: 'Yaşam Döngüsü',
+                    Metrik: 'Aktif Kullanıcılar',
+                    Değer: lifecycleStats.activeUsers.count,
+                    Değişim: `${lifecycleStats.activeUsers.change}%`,
+                  },
+                  {
+                    Kategori: 'Yaşam Döngüsü',
+                    Metrik: 'Risk Altında',
+                    Değer: lifecycleStats.atRiskUsers.count,
+                    Değişim: `${lifecycleStats.atRiskUsers.change}%`,
+                  },
+                  {
+                    Kategori: 'Yaşam Döngüsü',
+                    Metrik: 'Churn',
+                    Değer: lifecycleStats.churnedUsers.count,
+                    Değişim: `${lifecycleStats.churnedUsers.change}%`,
+                  },
+                  {
+                    Kategori: 'Yaşam Döngüsü',
+                    Metrik: 'Reaktivasyon',
+                    Değer: lifecycleStats.reactivatedUsers.count,
+                    Değişim: `${lifecycleStats.reactivatedUsers.change}%`,
+                  },
                   // Onboarding funnel
                   ...onboardingFunnel.map((step) => ({
                     Kategori: 'Onboarding',
@@ -325,7 +350,8 @@ export default function UserLifecyclePage() {
 
                 toast({
                   title: 'Rapor indirildi',
-                  description: 'Kullanıcı yaşam döngüsü raporu başarıyla indirildi.',
+                  description:
+                    'Kullanıcı yaşam döngüsü raporu başarıyla indirildi.',
                 });
               } catch (error) {
                 toast({

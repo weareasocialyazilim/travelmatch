@@ -77,45 +77,18 @@ interface EscrowFilters {
   offset?: number;
 }
 
-// Mock data for fallback
-const MOCK_ESCROW_STATS: EscrowStatsResponse = {
-  escrow: {
-    totalEscrow: 1245680,
-    pendingRelease: 456780,
-    releasedToday: 89450,
-    refundedToday: 12300,
-    activeTransactions: 234,
-    avgEscrowDuration: 3.2,
-    disputeRate: 2.3,
-    successRate: 97.7,
-  },
-  payment: {
-    todayVolume: 845230,
-    todayTransactions: 567,
-    avgTransactionValue: 1491,
-    successRate: 99.2,
-    failedTransactions: 5,
-    pendingKYC: 23,
-    subscriptionRevenue: 234560,
-    giftRevenue: 156780,
-  },
-};
-
 // Fetch functions
 async function fetchEscrowStats(): Promise<EscrowStatsResponse> {
-  try {
-    const response = await fetch('/api/escrow/stats');
-    if (!response.ok) {
-      throw new Error('Failed to fetch escrow stats');
-    }
-    return response.json();
-  } catch (error) {
-    logger.warn('Using mock escrow stats - API not available');
-    return MOCK_ESCROW_STATS;
+  const response = await fetch('/api/escrow/stats');
+  if (!response.ok) {
+    throw new Error('Failed to fetch escrow stats');
   }
+  return response.json();
 }
 
-async function fetchEscrows(filters: EscrowFilters = {}): Promise<EscrowListResponse> {
+async function fetchEscrows(
+  filters: EscrowFilters = {},
+): Promise<EscrowListResponse> {
   const params = new URLSearchParams();
   if (filters.status) params.set('status', filters.status);
   if (filters.userId) params.set('user_id', filters.userId);
@@ -132,7 +105,7 @@ async function fetchEscrows(filters: EscrowFilters = {}): Promise<EscrowListResp
 async function performEscrowAction(
   escrowId: string,
   action: 'release' | 'refund' | 'extend',
-  reason?: string
+  reason?: string,
 ): Promise<{ escrow: EscrowTransaction; message: string }> {
   const response = await fetch('/api/escrow', {
     method: 'POST',

@@ -36,7 +36,8 @@ export interface WebhookLog {
 const SENTRY_API_TOKEN = process.env.SENTRY_AUTH_TOKEN;
 const SENTRY_ORG = process.env.SENTRY_ORG || 'travelmatch-2p';
 const SENTRY_PROJECT = process.env.SENTRY_PROJECT || 'react-native';
-const POSTHOG_API_KEY = process.env.POSTHOG_API_KEY;
+const POSTHOG_API_KEY =
+  process.env.POSTHOG_API_KEY || process.env.EXPO_PUBLIC_POSTHOG_API_KEY;
 const POSTHOG_PROJECT_ID = process.env.POSTHOG_PROJECT_ID;
 // PayTR is the primary payment provider (Stripe is deprecated)
 const PAYTR_MERCHANT_ID = process.env.PAYTR_MERCHANT_ID;
@@ -129,14 +130,17 @@ async function checkPayTR(): Promise<Integration> {
 
     // PayTR doesn't have a public health check endpoint
     // We verify by checking our Supabase webhook logs for recent successful transactions
-    const supabaseResponse = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_paytr_health_stats`, {
-      method: 'POST',
-      headers: {
-        apikey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
-        'Content-Type': 'application/json',
+    const supabaseResponse = await fetch(
+      `${SUPABASE_URL}/rest/v1/rpc/get_paytr_health_stats`,
+      {
+        method: 'POST',
+        headers: {
+          apikey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
       },
-      body: JSON.stringify({}),
-    });
+    );
 
     const responseTime = Date.now() - startTime;
     integration.response_time_ms = responseTime;
@@ -146,7 +150,8 @@ async function checkPayTR(): Promise<Integration> {
       const successRate = stats?.success_rate ?? 100;
       const last24hTransactions = stats?.last_24h_count ?? 0;
 
-      integration.status = successRate >= 95 ? 'healthy' : successRate >= 80 ? 'warning' : 'error';
+      integration.status =
+        successRate >= 95 ? 'healthy' : successRate >= 80 ? 'warning' : 'error';
       integration.metrics = {
         success_rate: `${successRate.toFixed(1)}%`,
         last_24h_transactions: last24hTransactions,
@@ -353,8 +358,12 @@ async function checkCloudflare(): Promise<Integration> {
       integration.status = data.success ? 'healthy' : 'warning';
       integration.metrics = {
         response_time: `${responseTime}ms`,
-        status: data.success ? 'Aktif' : 'Hata',
+        status: data.success ? 'Tokens Valid' : 'Verify Failed',
+        message: data.messages?.[0]?.message || 'OK',
       };
+
+      // If we could fetch zone analytics, we would do it here.
+      // But basic token verification is enough for health check.
     } else {
       integration.status = 'error';
       integration.alert = `Cloudflare API hatası: ${response.status}`;

@@ -39,54 +39,13 @@ CREATE POLICY "admin_users_select"
 
 -- ============================================
 -- 2. FIX: auth_rls_initplan for stories
+-- (Skipped: table 'stories' does not exist in this version)
 -- ============================================
-
-DROP POLICY IF EXISTS "stories_delete_own" ON public.stories;
-DROP POLICY IF EXISTS "stories_insert_own" ON public.stories;
-DROP POLICY IF EXISTS "stories_update_own" ON public.stories;
-
-CREATE POLICY "stories_delete_own"
-  ON public.stories
-  FOR DELETE
-  USING (user_id = (select auth.uid()));
-
-CREATE POLICY "stories_insert_own"
-  ON public.stories
-  FOR INSERT
-  WITH CHECK (user_id = (select auth.uid()));
-
-CREATE POLICY "stories_update_own"
-  ON public.stories
-  FOR UPDATE
-  USING (user_id = (select auth.uid()))
-  WITH CHECK (user_id = (select auth.uid()));
 
 -- ============================================
 -- 3. FIX: auth_rls_initplan for story_views
+-- (Skipped: table 'story_views' does not exist in this version)
 -- ============================================
-
-DROP POLICY IF EXISTS "story_views_insert_own" ON public.story_views;
-DROP POLICY IF EXISTS "story_views_select_own" ON public.story_views;
-DROP POLICY IF EXISTS "story_views_select_story_owner" ON public.story_views;
-
--- Consolidated select policy
-CREATE POLICY "story_views_select"
-  ON public.story_views
-  FOR SELECT
-  USING (
-    viewer_id = (select auth.uid())
-    OR
-    EXISTS (
-      SELECT 1 FROM stories s
-      WHERE s.id = story_views.story_id
-      AND s.user_id = (select auth.uid())
-    )
-  );
-
-CREATE POLICY "story_views_insert_own"
-  ON public.story_views
-  FOR INSERT
-  WITH CHECK (viewer_id = (select auth.uid()));
 
 -- ============================================
 -- 4. FIX: auth_rls_initplan for ML/AI tables
@@ -433,50 +392,8 @@ CREATE POLICY "moderation_dictionary_admin_all"
 
 -- ============================================
 -- 16. FIX: moment_offers policies
+-- (Skipped: table 'moment_offers' does not exist in this version)
 -- ============================================
-
-DROP POLICY IF EXISTS "hosts_respond_to_offers" ON public.moment_offers;
-DROP POLICY IF EXISTS "hosts_view_offers" ON public.moment_offers;
-DROP POLICY IF EXISTS "subscribers_cancel_own_offers" ON public.moment_offers;
-DROP POLICY IF EXISTS "subscribers_create_offers" ON public.moment_offers;
-DROP POLICY IF EXISTS "subscribers_view_own_offers" ON public.moment_offers;
-
--- Consolidated SELECT policy
-CREATE POLICY "moment_offers_select"
-  ON public.moment_offers
-  FOR SELECT
-  USING (
-    -- Subscriber can see own offers
-    subscriber_id = (select auth.uid())
-    OR
-    -- Host can see offers on their moments
-    EXISTS (
-      SELECT 1 FROM moments m
-      WHERE m.id = moment_offers.moment_id
-      AND m.user_id = (select auth.uid())
-    )
-  );
-
-CREATE POLICY "moment_offers_insert"
-  ON public.moment_offers
-  FOR INSERT
-  WITH CHECK (subscriber_id = (select auth.uid()));
-
--- Consolidated UPDATE policy
-CREATE POLICY "moment_offers_update"
-  ON public.moment_offers
-  FOR UPDATE
-  USING (
-    -- Subscriber can cancel own offers
-    subscriber_id = (select auth.uid())
-    OR
-    -- Host can respond to offers
-    EXISTS (
-      SELECT 1 FROM moments m
-      WHERE m.id = moment_offers.moment_id
-      AND m.user_id = (select auth.uid())
-    )
-  );
 
 -- ============================================
 -- 17. FIX: Function search_path
@@ -622,6 +539,7 @@ BEGIN
 END;
 $$;
 
+DROP FUNCTION IF EXISTS public.transfer_funds(UUID, UUID, DECIMAL, TEXT);
 CREATE OR REPLACE FUNCTION public.transfer_funds(
   p_from_user_id UUID,
   p_to_user_id UUID,
@@ -656,6 +574,7 @@ EXCEPTION
 END;
 $$;
 
+DROP FUNCTION IF EXISTS public.deposit_funds(UUID, DECIMAL);
 CREATE OR REPLACE FUNCTION public.deposit_funds(
   p_user_id UUID,
   p_amount DECIMAL
@@ -671,6 +590,7 @@ BEGIN
 END;
 $$;
 
+DROP FUNCTION IF EXISTS public.withdraw_funds(UUID, DECIMAL);
 CREATE OR REPLACE FUNCTION public.withdraw_funds(
   p_user_id UUID,
   p_amount DECIMAL
@@ -697,29 +617,14 @@ EXCEPTION
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION public.expire_old_moment_offers()
-RETURNS INTEGER
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, pg_temp
-AS $$
-DECLARE
-  v_count INTEGER;
-BEGIN
-  UPDATE moment_offers
-  SET status = 'expired'
-  WHERE status = 'pending'
-  AND expires_at < NOW();
-
-  GET DIAGNOSTICS v_count = ROW_COUNT;
-  RETURN v_count;
-END;
-$$;
+-- Function public.expire_old_moment_offers() REMOVED (table moment_offers missing)
 
 -- ============================================
--- 18. FIX: Enable RLS on spatial_ref_sys
+-- 18. FIX: Enable RLS on spatial_ref_sys (SKIPPED)
 -- ============================================
-
+-- Skipped to avoid "must be owner of table spatial_ref_sys" error.
+-- PostGIS system tables should generally be managed by the extension owner.
+/*
 DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'spatial_ref_sys') THEN
@@ -735,6 +640,7 @@ BEGIN
     RAISE NOTICE '✅ RLS enabled on spatial_ref_sys';
   END IF;
 END $$;
+*/
 
 -- ============================================
 -- 19. FIX: Add missing foreign key indexes
@@ -744,7 +650,7 @@ CREATE INDEX IF NOT EXISTS idx_ab_experiments_created_by ON public.ab_experiment
 CREATE INDEX IF NOT EXISTS idx_ai_anomalies_resolved_by ON public.ai_anomalies(resolved_by);
 CREATE INDEX IF NOT EXISTS idx_blocked_content_reviewed_by ON public.blocked_content(reviewed_by);
 CREATE INDEX IF NOT EXISTS idx_moderation_dictionary_added_by ON public.moderation_dictionary(added_by);
-CREATE INDEX IF NOT EXISTS idx_stories_moment_id ON public.stories(moment_id);
+-- CREATE INDEX IF NOT EXISTS idx_stories_moment_id ON public.stories(moment_id); -- Table removed
 
 -- ============================================
 -- Verification

@@ -495,7 +495,7 @@ DECLARE
 BEGIN
   -- Get user info
   SELECT u.*,
-         COALESCE(us.plan_id, 'passport') as subscription_plan
+         COALESCE(us.plan_id, 'free') as subscription_plan
   INTO v_user
   FROM users u
   LEFT JOIN user_subscriptions us ON us.user_id = u.id AND us.status = 'active'

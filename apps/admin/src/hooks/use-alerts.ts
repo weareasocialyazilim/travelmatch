@@ -42,133 +42,7 @@ export interface AlertHistoryItem {
   resolvedBy: string;
 }
 
-// Mock data for fallback
-const MOCK_ALERT_RULES: AlertRule[] = [
-  {
-    id: 'fraud-spike',
-    name: 'Fraud Spike',
-    category: 'security',
-    condition: 'fraud_count > 10 in 1 hour',
-    threshold: 10,
-    severity: 'critical',
-    enabled: true,
-  },
-  {
-    id: 'payment-failure',
-    name: 'Payment Gateway Error Rate',
-    category: 'payments',
-    condition: 'error_rate > 5%',
-    threshold: 5,
-    severity: 'critical',
-    enabled: true,
-  },
-  {
-    id: 'escrow-expiring',
-    name: 'Escrow Expiring Soon',
-    category: 'operations',
-    condition: 'expires_in < 2 hours',
-    threshold: 2,
-    severity: 'high',
-    enabled: true,
-  },
-  {
-    id: 'proof-queue',
-    name: 'Proof Queue Backlog',
-    category: 'operations',
-    condition: 'pending_proofs > 100',
-    threshold: 100,
-    severity: 'medium',
-    enabled: true,
-  },
-  {
-    id: 'system-latency',
-    name: 'High API Latency',
-    category: 'engineering',
-    condition: 'p95_latency > 500ms',
-    threshold: 500,
-    severity: 'high',
-    enabled: true,
-  },
-  {
-    id: 'user-spike',
-    name: 'Unusual User Activity',
-    category: 'security',
-    condition: 'registrations > 500 in 1 hour',
-    threshold: 500,
-    severity: 'medium',
-    enabled: true,
-  },
-];
-
-const MOCK_ACTIVE_ALERTS: ActiveAlert[] = [
-  {
-    id: 'alert-001',
-    ruleId: 'payment-failure',
-    title: 'PayTR Error Rate Yükseldi',
-    description: 'Son 1 saatte error rate %7.2 (threshold: %5)',
-    severity: 'critical',
-    category: 'payments',
-    triggeredAt: new Date(Date.now() - 45 * 60000),
-    acknowledgedBy: null,
-    status: 'active',
-    metric: { current: 7.2, threshold: 5, unit: '%' },
-  },
-  {
-    id: 'alert-002',
-    ruleId: 'escrow-expiring',
-    title: '12 Escrow 2 Saat Icinde Expire Olacak',
-    description: 'Toplam deger: 45,200 TL',
-    severity: 'high',
-    category: 'operations',
-    triggeredAt: new Date(Date.now() - 30 * 60000),
-    acknowledgedBy: 'Kemal Y.',
-    status: 'acknowledged',
-    metric: { current: 12, threshold: 0, unit: 'adet' },
-  },
-  {
-    id: 'alert-003',
-    ruleId: 'proof-queue',
-    title: 'Proof Queue Birikmesi',
-    description: '127 proof manual review bekliyor',
-    severity: 'medium',
-    category: 'operations',
-    triggeredAt: new Date(Date.now() - 2 * 3600000),
-    acknowledgedBy: null,
-    status: 'active',
-    metric: { current: 127, threshold: 100, unit: 'adet' },
-  },
-  {
-    id: 'alert-004',
-    ruleId: 'fraud-spike',
-    title: 'Potansiyel Fraud Ring Tespit',
-    description: '5 hesap ayni device fingerprint ile islem yapiyor',
-    severity: 'critical',
-    category: 'security',
-    triggeredAt: new Date(Date.now() - 15 * 60000),
-    acknowledgedBy: null,
-    status: 'active',
-    metric: { current: 5, threshold: 3, unit: 'hesap' },
-  },
-];
-
-const MOCK_ALERT_HISTORY: AlertHistoryItem[] = [
-  {
-    id: 'hist-001',
-    title: 'Database Connection Pool Exhausted',
-    severity: 'critical',
-    resolvedAt: new Date(Date.now() - 24 * 3600000),
-    duration: '8 dakika',
-    resolvedBy: 'System Auto-recovery',
-  },
-  {
-    id: 'hist-002',
-    title: 'Twilio SMS Delivery Failure',
-    severity: 'high',
-    resolvedAt: new Date(Date.now() - 48 * 3600000),
-    duration: '25 dakika',
-    resolvedBy: 'Ahmet K.',
-  },
-];
+// Mock data removed
 
 // Helper to parse dates from API response
 function parseActiveAlerts(alerts: unknown[]): ActiveAlert[] {
@@ -187,48 +61,30 @@ function parseAlertHistory(history: unknown[]): AlertHistoryItem[] {
 
 // Fetch functions - uses real API with mock fallback
 async function fetchAlertRules(): Promise<AlertRule[]> {
-  try {
-    const response = await fetch('/api/alerts/rules');
-    if (!response.ok) {
-      throw new Error('Failed to fetch alert rules');
-    }
-    const data = await response.json();
-    return data.rules || [];
-  } catch (error) {
-    // Return mock data on API failure (e.g., during initial setup)
-    logger.warn('Using mock alert rules data - API not available');
-    return MOCK_ALERT_RULES;
+  const response = await fetch('/api/alerts/rules');
+  if (!response.ok) {
+    throw new Error('Failed to fetch alert rules');
   }
+  const data = await response.json();
+  return data.rules || [];
 }
 
 async function fetchActiveAlerts(): Promise<ActiveAlert[]> {
-  try {
-    const response = await fetch('/api/alerts/active');
-    if (!response.ok) {
-      throw new Error('Failed to fetch active alerts');
-    }
-    const data = await response.json();
-    return parseActiveAlerts(data.alerts || []);
-  } catch (error) {
-    // Return mock data on API failure
-    logger.warn('Using mock active alerts data - API not available');
-    return MOCK_ACTIVE_ALERTS;
+  const response = await fetch('/api/alerts/active');
+  if (!response.ok) {
+    throw new Error('Failed to fetch active alerts');
   }
+  const data = await response.json();
+  return parseActiveAlerts(data.alerts || []);
 }
 
 async function fetchAlertHistory(): Promise<AlertHistoryItem[]> {
-  try {
-    const response = await fetch('/api/alerts/history');
-    if (!response.ok) {
-      throw new Error('Failed to fetch alert history');
-    }
-    const data = await response.json();
-    return parseAlertHistory(data.history || []);
-  } catch (error) {
-    // Return mock data on API failure
-    logger.warn('Using mock alert history data - API not available');
-    return MOCK_ALERT_HISTORY;
+  const response = await fetch('/api/alerts/history');
+  if (!response.ok) {
+    throw new Error('Failed to fetch alert history');
   }
+  const data = await response.json();
+  return parseAlertHistory(data.history || []);
 }
 
 // Query hooks
