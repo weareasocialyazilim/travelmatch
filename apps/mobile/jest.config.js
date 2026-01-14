@@ -13,7 +13,7 @@ module.exports = {
     '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { configFile: './babel.config.js' }],
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|react-native-gesture-handler|@react-native|@testing-library|expo|expo-blur|expo-localization|expo/virtual|expo-image-manipulator|expo-av|@expo|@unimodules|react-navigation|@react-navigation|@supabase|@shopify|uuid|i18next|react-i18next)/)',
+    'node_modules/(?!(react-native|react-native-gesture-handler|@react-native|@testing-library|expo.*|@expo|@unimodules|react-navigation|@react-navigation|@supabase|@shopify|uuid|i18next|react-i18next)/)',
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: {

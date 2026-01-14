@@ -318,32 +318,25 @@ class BiometricAuthService {
         const decryptedData = await decryptCredentials(encryptedData);
         return JSON.parse(decryptedData) as BiometricCredentials;
       } catch (decryptError) {
-        // Fallback: try parsing as legacy unencrypted JSON
-        // This handles migration from old unencrypted storage
-        logger.debug(
+        // SECURITY FIX: Legacy unencrypted format detected - force re-authentication
+        // Instead of using potentially compromised unencrypted data, clear it
+        // and require user to re-enable biometric authentication
+        logger.warn(
           'BiometricAuth',
-          'Decryption failed, trying legacy format:',
+          'Decryption failed - clearing credentials for security',
           decryptError,
         );
-        try {
-          const legacyCredentials = JSON.parse(
-            encryptedData,
-          ) as BiometricCredentials;
-          // Re-save with encryption for future use
-          await this.saveCredentials(legacyCredentials);
-          logger.info(
-            'BiometricAuth',
-            'Migrated legacy credentials to encrypted format',
-          );
-          return legacyCredentials;
-        } catch (legacyError) {
-          logger.error(
-            'BiometricAuth',
-            'Failed to parse credentials in any format:',
-            legacyError,
-          );
-          return null;
-        }
+
+        // Clear potentially compromised credentials
+        await this.clearCredentials();
+
+        // Log security event for monitoring
+        logger.error(
+          'BiometricAuth',
+          'SECURITY: Cleared invalid/legacy credentials - user must re-enable biometric auth',
+        );
+
+        return null;
       }
     } catch (error) {
       logger.error('BiometricAuth', 'Failed to get credentials', error);
