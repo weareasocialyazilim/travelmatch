@@ -1,10 +1,21 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase';
+import { createServiceClient } from '@/lib/supabase';
+import { getAdminSession, hasPermission } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
+    // Auth check - P0 Security Fix
+    const session = await getAdminSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+    }
+
+    if (!hasPermission(session, 'campaigns', 'view')) {
+      return NextResponse.json({ error: 'Yetersiz yetki' }, { status: 403 });
+    }
+
+    const supabase = createServiceClient();
     const searchParams = request.nextUrl.searchParams;
     const status = searchParams.get('status');
     const type = searchParams.get('type');
@@ -40,7 +51,17 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    // Auth check - P0 Security Fix
+    const session = await getAdminSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+    }
+
+    if (!hasPermission(session, 'campaigns', 'create')) {
+      return NextResponse.json({ error: 'Yetersiz yetki' }, { status: 403 });
+    }
+
+    const supabase = createServiceClient();
     const body = await request.json();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
