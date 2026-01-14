@@ -43,6 +43,8 @@ import { logger } from '../utils/logger';
 import { userService } from '../services/userService';
 import type { User, KYCStatus, Role } from '../types/index';
 import { setSentryUser, clearSentryUser } from '../config/sentry'; // ADDED: Sentry integration
+import { analytics } from '../services/analytics'; // PostHog analytics
+import { cacheUtils } from '../services/offlineCache'; // Offline cache management
 
 /**
  * Helper to create a valid User object with defaults
@@ -456,6 +458,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         accountType: newUser.role,
       });
 
+      // ADDED: Identify user in PostHog for analytics
+      void analytics.identify(newUser.id, {
+        email: newUser.email,
+        name: newUser.name,
+        role: newUser.role,
+        kyc_status: newUser.kyc,
+      });
+
       // Sync E2E encryption public key to database
       void userService
         .syncKeys()
@@ -599,6 +609,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     } finally {
       // ADDED: Clear Sentry user context on logout
       clearSentryUser();
+
+      // ADDED: Reset PostHog session on logout
+      void analytics.reset();
+
+      // ADDED: Clear offline cache to prevent data leakage between users
+      cacheUtils.clearAll();
 
       // Clear local data regardless of server response
       await clearAuthData();
