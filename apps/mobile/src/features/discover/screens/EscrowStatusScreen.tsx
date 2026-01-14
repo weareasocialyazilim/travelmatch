@@ -68,29 +68,13 @@ export const EscrowStatusScreen: React.FC<EscrowStatusScreenProps> = ({
           <Text style={styles.headerTitle}>Escrow Status</Text>
           <View style={styles.placeholder} />
         </View>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: 20,
-          }}
-        >
+        <View style={styles.emptyStateContainer}>
           <MaterialCommunityIcons
             name="alert-circle-outline"
             size={48}
             color={COLORS.text.secondary}
           />
-          <Text
-            style={{
-              marginTop: 12,
-              fontSize: 16,
-              color: COLORS.text.secondary,
-              textAlign: 'center',
-            }}
-          >
-            Escrow bilgisi bulunamadı
-          </Text>
+          <Text style={styles.emptyStateText}>Escrow bilgisi bulunamadı</Text>
           <TouchableOpacity
             style={styles.primaryButton}
             onPress={() => navigation.goBack()}
@@ -492,6 +476,18 @@ const styles = StyleSheet.create({
   },
   placeholder: {
     width: 40,
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyStateText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: COLORS.text.secondary,
+    textAlign: 'center',
   },
   scrollView: {
     flex: 1,

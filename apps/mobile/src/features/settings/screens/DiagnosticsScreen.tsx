@@ -189,23 +189,8 @@ const DiagnosticsScreen: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // Gate check - should not be accessible if disabled
-  if (!MOBILE_DIAGNOSTICS_ENABLED) {
-    return (
-      <SafeAreaView style={styles.container} edges={['top']}>
-        <View style={styles.disabledContainer}>
-          <MaterialCommunityIcons
-            name="lock"
-            size={48}
-            color={COLORS.softGray}
-          />
-          <Text style={styles.disabledText}>Diagnostics disabled</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   // Load data (memoized, refreshes on refreshKey change)
+  // All hooks must be called before any conditional return
   const buildInfo = useMemo(() => getBuildInfo(), [refreshKey]);
   const configSanity = useMemo(() => getConfigSanity(), [refreshKey]);
   const errorLog = useMemo(() => getErrorLog(), [refreshKey]);
@@ -232,6 +217,22 @@ const DiagnosticsScreen: React.FC = () => {
     setRefreshKey((k) => k + 1);
     showToast('Diagnostics cleared', 'success');
   }, [showToast]);
+
+  // Gate check - should not be accessible if disabled (AFTER all hooks)
+  if (!MOBILE_DIAGNOSTICS_ENABLED) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.disabledContainer}>
+          <MaterialCommunityIcons
+            name="lock"
+            size={48}
+            color={COLORS.softGray}
+          />
+          <Text style={styles.disabledText}>Diagnostics disabled</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   // ─────────────────────────────────────────────────────────────────────────
   // RENDER: Overview Tab
