@@ -4,6 +4,7 @@ import { createServiceClient } from '@/lib/supabase';
 import { authenticator } from 'otplib';
 import crypto from 'crypto';
 import type { Database } from '@/types/database';
+import { checkRateLimit, rateLimits, createRateLimitHeaders } from '@/lib/rate-limit';
 
 type AdminUserRow = Database['public']['Tables']['admin_users']['Row'];
 
@@ -54,7 +55,33 @@ function decrypt(encryptedData: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId, code } = await request.json();
+    // P0 FIX: Add rate limiting to prevent 2FA brute force attacks
+    // 6-digit codes have only 1M combinations - without rate limiting, brute force is trivial
+    const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0] ||
+                     request.headers.get('x-real-ip') ||
+                     'unknown';
+
+    const body = await request.json();
+    const { userId, code } = body;
+
+    // Rate limit by both IP and userId to prevent distributed attacks
+    const rateLimitKey = `2fa:${clientIp}:${userId || 'unknown'}`;
+    const rateLimitResult = await checkRateLimit(rateLimitKey, rateLimits.twoFactor);
+
+    if (!rateLimitResult.success) {
+      logger.warn('2FA rate limit exceeded', { ip: clientIp, userId });
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Çok fazla deneme. Lütfen 15 dakika sonra tekrar deneyin.',
+          retryAfter: rateLimitResult.retryAfter
+        },
+        {
+          status: 429,
+          headers: createRateLimitHeaders(rateLimitResult)
+        },
+      );
+    }
 
     if (!userId || !code) {
       return NextResponse.json(
@@ -117,9 +144,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const clientIp =
-      request.headers.get('x-forwarded-for') ||
-      request.headers.get('x-real-ip');
     const userAgent = request.headers.get('user-agent');
 
     if (!isValid) {

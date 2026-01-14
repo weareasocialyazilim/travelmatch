@@ -319,6 +319,12 @@ export const rateLimits = {
     limit: 5,
     windowMs: 15 * 60 * 1000, // 15 minutes
   },
+  // 2FA verification - very strict to prevent brute force (6 digit = 1M combinations)
+  // P0 FIX: Added 2FA rate limiting to prevent brute force attacks
+  twoFactor: {
+    limit: 5,
+    windowMs: 15 * 60 * 1000, // 15 minutes - 5 attempts max
+  },
   // Standard API endpoints
   api: {
     limit: 100,

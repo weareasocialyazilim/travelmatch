@@ -291,8 +291,10 @@ export default function ModerationPage() {
     setDictionary((data as DictionaryWord[]) || []);
   }
 
+  // P1 FIX: Remove 'as any' type casts - use proper Supabase typing
   async function handleApproveAppeal(id: string) {
-    const { error } = await (supabase.from('blocked_content') as any)
+    const { error } = await supabase
+      .from('blocked_content')
       .update({
         appeal_status: 'approved',
         reviewed_at: new Date().toISOString(),
@@ -308,7 +310,8 @@ export default function ModerationPage() {
   }
 
   async function handleRejectAppeal(id: string) {
-    const { error } = await (supabase.from('blocked_content') as any)
+    const { error } = await supabase
+      .from('blocked_content')
       .update({
         appeal_status: 'rejected',
         reviewed_at: new Date().toISOString(),
@@ -326,15 +329,15 @@ export default function ModerationPage() {
   async function handleAddWord() {
     if (!newWord.word.trim()) return;
 
-    const { error } = await (
-      supabase.from('moderation_dictionary') as any
-    ).insert({
-      word: newWord.word.toLowerCase().trim(),
-      severity: newWord.severity,
-      category: newWord.category,
-      is_regex: false,
-      is_active: true,
-    });
+    const { error } = await supabase
+      .from('moderation_dictionary')
+      .insert({
+        word: newWord.word.toLowerCase().trim(),
+        severity: newWord.severity,
+        category: newWord.category,
+        is_regex: false,
+        is_active: true,
+      });
 
     if (error) {
       logger.error('Failed to add word', error);
@@ -347,7 +350,8 @@ export default function ModerationPage() {
   }
 
   async function handleToggleWord(id: string, isActive: boolean) {
-    const { error } = await (supabase.from('moderation_dictionary') as any)
+    const { error } = await supabase
+      .from('moderation_dictionary')
       .update({ is_active: !isActive })
       .eq('id', id);
 

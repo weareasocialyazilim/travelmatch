@@ -1,10 +1,28 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase';
+import { createServiceClient } from '@/lib/supabase';
+import { getAdminSession, hasPermission, createAuditLog } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
+    // P0 FIX: Add authentication check - Finance API was publicly accessible
+    const session = await getAdminSession();
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Oturum bulunamadı' },
+        { status: 401 }
+      );
+    }
+
+    // Check permission for finance viewing
+    if (!hasPermission(session, 'transactions', 'view')) {
+      return NextResponse.json(
+        { error: 'Bu işlem için yetkiniz yok' },
+        { status: 403 }
+      );
+    }
+
+    const supabase = createServiceClient();
     const searchParams = request.nextUrl.searchParams;
     const period = searchParams.get('period') || '30d';
     const type = searchParams.get('type');
@@ -70,6 +88,20 @@ export async function GET(request: NextRequest) {
         0,
       transactionCount: count || 0,
     };
+
+    // Log the finance data access for audit trail
+    const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip');
+    const userAgent = request.headers.get('user-agent');
+    await createAuditLog(
+      session.admin.id,
+      'finance_data_view',
+      'finance',
+      'summary',
+      null,
+      { period, type, transactionCount: count },
+      clientIp || undefined,
+      userAgent || undefined
+    );
 
     return NextResponse.json({
       transactions,
