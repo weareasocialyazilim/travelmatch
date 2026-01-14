@@ -8,6 +8,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getClient } from '@/lib/supabase';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 // Types
 export interface FraudCase {
@@ -171,7 +172,7 @@ export function useFraudStats() {
           fraud_rate: 0.3,
         };
       } catch (error) {
-        console.error('Fraud stats fetch error:', error);
+        logger.error('Fraud stats fetch error:', error);
         return mockStats;
       }
     },
@@ -328,7 +329,7 @@ export function useUpdateFraudCase() {
       toast.success('Vaka güncellendi');
     },
     onError: (error) => {
-      console.error('Update fraud case error:', error);
+      logger.error('Update fraud case error:', error);
       toast.error('Vaka güncellenemedi');
     },
   });
@@ -380,7 +381,7 @@ export function useResolveFraudCase() {
       toast.success('Vaka çözümlendi');
     },
     onError: (error) => {
-      console.error('Resolve fraud case error:', error);
+      logger.error('Resolve fraud case error:', error);
       toast.error('Vaka çözümlenemedi');
     },
   });
@@ -417,7 +418,7 @@ export function useAssignFraudCase() {
       toast.success('Vaka atandı');
     },
     onError: (error) => {
-      console.error('Assign fraud case error:', error);
+      logger.error('Assign fraud case error:', error);
       toast.error('Vaka atanamadı');
     },
   });
@@ -450,7 +451,7 @@ export function useAddFraudEvidence() {
       toast.success('Kanıt eklendi');
     },
     onError: (error) => {
-      console.error('Add fraud evidence error:', error);
+      logger.error('Add fraud evidence error:', error);
       toast.error('Kanıt eklenemedi');
     },
   });

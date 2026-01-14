@@ -8,6 +8,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getClient } from '@/lib/supabase';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 // Types
 export interface PayoutRequest {
@@ -194,7 +195,7 @@ export function useWalletStats() {
           avg_processing_time: '2.4 saat',
         };
       } catch (error) {
-        console.error('Wallet stats fetch error:', error);
+        logger.error('Wallet stats fetch error:', error);
         return mockStats;
       }
     },
@@ -236,7 +237,7 @@ export function usePayoutRequests(filters?: {
         if (error) throw error;
         return data || [];
       } catch (error) {
-        console.error('Payout requests fetch error:', error);
+        logger.error('Payout requests fetch error:', error);
         toast.error('Ödeme talepleri yüklenemedi, örnek veriler gösteriliyor');
         return mockPayoutRequests;
       }
@@ -383,7 +384,7 @@ export function useProcessPayout() {
       );
     },
     onError: (error) => {
-      console.error('Process payout error:', error);
+      logger.error('Process payout error:', error);
       toast.error('Ödeme işlenemedi');
     },
   });
@@ -432,7 +433,7 @@ export function useBulkProcessPayouts() {
       );
     },
     onError: (error) => {
-      console.error('Bulk process payouts error:', error);
+      logger.error('Bulk process payouts error:', error);
       toast.error('Toplu ödeme işlemi başarısız');
     },
   });
@@ -498,7 +499,7 @@ export function useVerifyKYC() {
       );
     },
     onError: (error) => {
-      console.error('Verify KYC error:', error);
+      logger.error('Verify KYC error:', error);
       toast.error('KYC doğrulaması işlenemedi');
     },
   });
@@ -558,7 +559,7 @@ export function useWalletTransaction() {
       toast.success('Cüzdan işlemi tamamlandı');
     },
     onError: (error) => {
-      console.error('Wallet transaction error:', error);
+      logger.error('Wallet transaction error:', error);
       toast.error('Cüzdan işlemi başarısız');
     },
   });

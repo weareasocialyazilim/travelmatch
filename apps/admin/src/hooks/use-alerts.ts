@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { logger } from '@/lib/logger';
 
 // Types
 export interface AlertRule {
@@ -198,7 +199,7 @@ async function fetchAlertRules(): Promise<AlertRule[]> {
     return data.rules || data;
   } catch {
     // Return mock data on failure
-    console.warn('Using mock alert rules data');
+    logger.warn('Using mock alert rules data');
     return MOCK_ALERT_RULES;
   }
   */
@@ -217,7 +218,7 @@ async function fetchActiveAlerts(): Promise<ActiveAlert[]> {
     return parseActiveAlerts(data.alerts || data);
   } catch {
     // Return mock data on failure
-    console.warn('Using mock active alerts data');
+    logger.warn('Using mock active alerts data');
     return MOCK_ACTIVE_ALERTS;
   }
   */
@@ -236,7 +237,7 @@ async function fetchAlertHistory(): Promise<AlertHistoryItem[]> {
     return parseAlertHistory(data.history || data);
   } catch {
     // Return mock data on failure
-    console.warn('Using mock alert history data');
+    logger.warn('Using mock alert history data');
     return MOCK_ALERT_HISTORY;
   }
   */
