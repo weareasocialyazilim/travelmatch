@@ -21,6 +21,8 @@ const ROLE_PERMISSIONS: Record<AdminRole, Record<Resource, Action[]>> = {
     settings: ['view', 'update'],
     admin_users: ['view', 'create', 'update', 'delete'],
     integrations: ['view', 'update'],
+    compliance: ['view', 'create', 'update', 'delete', 'export'],
+    promos: ['view', 'create', 'update', 'delete', 'export'],
   },
   manager: {
     users: ['view', 'update', 'export', 'impersonate'],
@@ -33,6 +35,8 @@ const ROLE_PERMISSIONS: Record<AdminRole, Record<Resource, Action[]>> = {
     settings: ['view'],
     admin_users: ['view'],
     integrations: ['view'],
+    compliance: ['view', 'update', 'export'],
+    promos: ['view', 'update', 'export'],
   },
   moderator: {
     users: ['view', 'update'],
@@ -45,6 +49,8 @@ const ROLE_PERMISSIONS: Record<AdminRole, Record<Resource, Action[]>> = {
     settings: [],
     admin_users: [],
     integrations: [],
+    compliance: ['view', 'update'],
+    promos: ['view', 'update'],
   },
   finance: {
     users: ['view'],
@@ -57,6 +63,8 @@ const ROLE_PERMISSIONS: Record<AdminRole, Record<Resource, Action[]>> = {
     settings: [],
     admin_users: [],
     integrations: [],
+    compliance: ['view', 'export'],
+    promos: ['view'],
   },
   marketing: {
     users: ['view', 'export'],
@@ -69,6 +77,8 @@ const ROLE_PERMISSIONS: Record<AdminRole, Record<Resource, Action[]>> = {
     settings: [],
     admin_users: [],
     integrations: [],
+    compliance: ['view'],
+    promos: ['view', 'create', 'update', 'export'],
   },
   support: {
     users: ['view', 'update'],
@@ -81,6 +91,8 @@ const ROLE_PERMISSIONS: Record<AdminRole, Record<Resource, Action[]>> = {
     settings: [],
     admin_users: [],
     integrations: [],
+    compliance: ['view'],
+    promos: ['view'],
   },
   viewer: {
     users: ['view'],
@@ -93,6 +105,8 @@ const ROLE_PERMISSIONS: Record<AdminRole, Record<Resource, Action[]>> = {
     settings: [],
     admin_users: [],
     integrations: [],
+    compliance: [],
+    promos: [],
   },
 };
 

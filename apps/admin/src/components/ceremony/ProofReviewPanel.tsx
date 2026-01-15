@@ -255,7 +255,7 @@ export function ProofReviewPanel({
       {/* Actions */}
       <div className="flex gap-3">
         <CanvaButton
-          variant="default"
+          variant="primary"
           className="flex-1 bg-emerald-500 hover:bg-emerald-600"
           onClick={onApprove}
         >

@@ -4,7 +4,7 @@
  */
 
 // Core types - but exclude KYCStatus to avoid conflict with enums
-export {
+export type {
   Role,
   UserLocation,
   User,
@@ -17,7 +17,7 @@ export {
 } from './core';
 
 // Domain types - but exclude duplicates that are in enums
-export {
+export type {
   Message,
   ProofLocation,
   Proof,

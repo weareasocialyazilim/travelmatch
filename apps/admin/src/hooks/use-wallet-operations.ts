@@ -294,7 +294,7 @@ export function useTopWallets(limit = 10) {
 
       try {
         const { data, error } = await supabase
-          .from('wallet_balances')
+          .from('wallets')
           .select('*')
           .order('balance', { ascending: false })
           .limit(limit);

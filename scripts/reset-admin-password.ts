@@ -42,6 +42,7 @@ async function resetPassword(email: string, newPassword: string) {
 }
 
 const email = process.argv[2] || 'kemal@weareasocial.com';
-const password = process.argv[3] || 'Kem19875KemSupabase';
+const password =
+  process.argv[3] || process.env.ADMIN_PASSWORD || 'Kemal!Lovendo!Kemal!19875';
 
 resetPassword(email, password);

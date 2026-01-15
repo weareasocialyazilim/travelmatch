@@ -139,7 +139,7 @@ async function createAdminUser(
 
 // Main
 const email = process.argv[2] || 'kemal@weareasocial.com';
-const password = process.argv[3] || 'Kem19875KemSupabase';
+const password = process.argv[3] || 'Kemal!Lovendo!Kemal!19875';
 const fullName = process.argv[4] || 'Kemal Teksal';
 
 createAdminUser(email, password, fullName)

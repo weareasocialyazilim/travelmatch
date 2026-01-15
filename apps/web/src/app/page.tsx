@@ -1,1715 +1,792 @@
 'use client';
 
+import React, { useState, useEffect, useRef } from 'react';
+import * as THREE from 'three';
 import {
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-  type RefObject,
-} from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Sphere, MeshDistortMaterial } from '@react-three/drei';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Lenis from 'lenis';
-import type { Mesh, Group } from 'three';
+  motion,
+  AnimatePresence,
+  useScroll,
+  useTransform,
+  useSpring,
+  useMotionValue,
+} from 'framer-motion';
+import {
+  X,
+  Zap,
+  MapPin,
+  ArrowRight,
+  Fingerprint,
+  Smartphone,
+  ShieldAlert,
+  Ghost,
+  Activity,
+  Cpu,
+  ShoppingBag,
+  Utensils,
+  Palette,
+  Glasses,
+  Trophy,
+  Lock,
+} from 'lucide-react';
 
-/* ─────────────────────────────────────────────────────────────────
-   TYPES
-───────────────────────────────────────────────────────────────── */
-type Locale = 'en' | 'tr';
-type StashItem = {
-  id: number;
-  label: string;
-  title: string;
-  desc: string;
-  tags: string[];
-  offers: { title: string; meta: string }[];
-};
+// --- 01. KINETIC HEART CURSOR (Snappy & High Precision) ---
+const LovendoCursor = () => {
+  const mouseX = useMotionValue(-100);
+  const mouseY = useMotionValue(-100);
 
-/* ─────────────────────────────────────────────────────────────────
-   COPY (TR/EN)
-───────────────────────────────────────────────────────────────── */
-const COPY = {
-  en: {
-    nav: ['Philosophy', 'How It Works', 'Stash', 'Join'],
-    hero: {
-      kicker: 'THE SOCIAL LAYER FOR MOMENTS',
-      headline: 'LOVENDO',
-      sub: 'No likes. No follows. Just real people, real moments.',
-    },
-    sections: [
-      {
-        title: 'MOMENTS ARE SIGNALS.\nNOT PLANS. NOT PROMISES.',
-        body: 'A rooftop sunset in Lisbon. A jazz bar at 2 AM in Tokyo. Lovendo reads the moment — and connects you to someone feeling the same energy, right now.',
-      },
-      {
-        title: 'THE ALGORITHM\nIS SERENDIPITY.',
-        body: "We don't match profiles. We match presence. Your location, your vibe, your openness — translated into a single pulse that finds its echo.",
-      },
-      {
-        title: 'PROOF OF MOMENT.\nNOT PROOF OF INFLUENCER.',
-        body: "Forget follower counts. Here, your currency is spontaneity. A coffee offered, a story shared, a detour taken together. That's your proof.",
-      },
-    ],
-    cta: 'JOIN THE BETA',
-    stashTitle: 'THE STASH',
-    stashSub: 'Curated moments from the community',
-    email: 'Your email',
-    submit: 'Notify Me',
-    footer: 'Lovendo © 2025 — The social layer for moments.',
-    modalOffer: 'OFFER SUGGESTION',
-    modalHint: "Choose how you'd like to connect",
-  },
-  tr: {
-    nav: ['Felsefe', 'Nasıl Çalışır', 'Stash', 'Katıl'],
-    hero: {
-      kicker: 'ANLAR İÇİN SOSYAL KATMAN',
-      headline: 'LOVENDO',
-      sub: 'Beğeni yok. Takip yok. Sadece gerçek insanlar, gerçek anlar.',
-    },
-    sections: [
-      {
-        title: 'ANLAR SİNYALDİR.\nPLAN DEĞİL. SÖZ DEĞİL.',
-        body: "Lizbon'da bir çatı katı gün batımı. Tokyo'da gece 2'de bir caz barı. Lovendo anı okur — ve şu an aynı enerjiyi hisseden biriyle seni buluşturur.",
-      },
-      {
-        title: 'ALGORİTMA\nTESADÜFTÜR.',
-        body: 'Profil eşleştirmiyoruz. Varlık eşleştiriyoruz. Konumun, enerjin, açıklığın — yankısını bulan tek bir nabza dönüşür.',
-      },
-      {
-        title: 'AN KANITI.\nİNFLUENCER KANITI DEĞİL.',
-        body: 'Takipçi sayısını unut. Burada para birimin kendiliğindenliktir. İkram edilen bir kahve, paylaşılan bir hikaye, birlikte yapılan bir sapma. İşte kanıtın bu.',
-      },
-    ],
-    cta: "BETA'YA KATIL",
-    stashTitle: 'STASH',
-    stashSub: 'Topluluktan küratörlü anlar',
-    email: 'E-posta adresin',
-    submit: 'Beni Bilgilendir',
-    footer: 'Lovendo © 2025 — Anlar için sosyal katman.',
-    modalOffer: 'ÖNERI',
-    modalHint: 'Nasıl bağlanmak istediğini seç',
-  },
-};
-
-const STASH: Record<Locale, StashItem[]> = {
-  en: [
-    {
-      id: 1,
-      label: 'LISBON',
-      title: 'Rooftop Sunset',
-      desc: 'Golden hour vibes at Miradouro da Senhora do Monte. Someone offered sangria.',
-      tags: ['sunset', 'rooftop', 'social'],
-      offers: [
-        { title: 'I can offer a drink', meta: 'Sangria at the bar nearby' },
-        { title: "Let's watch together", meta: 'Best spot in 10 mins' },
-        { title: 'Share a story', meta: 'I have travel tales' },
-      ],
-    },
-    {
-      id: 2,
-      label: 'TOKYO',
-      title: '2 AM Jazz',
-      desc: 'Found a hidden bar in Golden Gai. Piano, whiskey, strangers who became friends.',
-      tags: ['nightlife', 'jazz', 'intimate'],
-      offers: [
-        { title: 'Know a better spot', meta: 'Hidden gem 2 blocks away' },
-        { title: 'Join for a set', meta: 'They play until 4 AM' },
-        { title: 'Grab breakfast after', meta: 'Ramen at sunrise' },
-      ],
-    },
-    {
-      id: 3,
-      label: 'PARIS',
-      title: 'Canal Picnic',
-      desc: 'Baguette, cheese, wine by Canal Saint-Martin. A painter joined us.',
-      tags: ['picnic', 'art', 'spontaneous'],
-      offers: [
-        { title: 'Bring some wine', meta: 'Natural wine shop nearby' },
-        { title: 'Sketch together', meta: 'I have extra pencils' },
-        { title: 'Stay for sunset', meta: 'The light is perfect' },
-      ],
-    },
-    {
-      id: 4,
-      label: 'ISTANBUL',
-      title: 'Bosphorus Tea',
-      desc: 'Çay on the ferry at dusk. The city split between two continents, so were we.',
-      tags: ['tea', 'ferry', 'contemplative'],
-      offers: [
-        { title: 'Catch the next ferry', meta: 'Every 20 mins' },
-        { title: 'Tea on me', meta: 'The vendor knows me' },
-        { title: 'Walk the shore', meta: 'Best views after dark' },
-      ],
-    },
-    {
-      id: 5,
-      label: 'MEXICO CITY',
-      title: 'Mercado Brunch',
-      desc: 'Tacos at La Merced. A local showed us the best stall. Mezcal followed.',
-      tags: ['food', 'local', 'adventure'],
-      offers: [
-        { title: 'Show you around', meta: 'I know all the stalls' },
-        { title: 'Mezcal tasting', meta: 'Small batch, smoky' },
-        { title: 'Cook together', meta: 'My kitchen, your story' },
-      ],
-    },
-  ],
-  tr: [
-    {
-      id: 1,
-      label: 'LİZBON',
-      title: 'Çatı Katı Gün Batımı',
-      desc: "Miradouro da Senhora do Monte'de altın saat. Biri sangria ikram etti.",
-      tags: ['gün batımı', 'çatı', 'sosyal'],
-      offers: [
-        { title: 'İçki ısmarlayabilirim', meta: 'Yakındaki barda sangria' },
-        { title: 'Birlikte izleyelim', meta: "10 dk'da en iyi nokta" },
-        { title: 'Hikaye paylaş', meta: 'Seyahat hikayeleri' },
-      ],
-    },
-    {
-      id: 2,
-      label: 'TOKYO',
-      title: 'Gece 2 Cazı',
-      desc: "Golden Gai'de gizli bir bar bulduk. Piyano, viski, dost olan yabancılar.",
-      tags: ['gece hayatı', 'caz', 'samimi'],
-      offers: [
-        { title: 'Daha iyi yer biliyorum', meta: '2 blok ötede gizli mekan' },
-        { title: 'Sete katıl', meta: "Sabah 4'e kadar çalıyorlar" },
-        { title: 'Sonra kahvaltı', meta: 'Gün doğumunda ramen' },
-      ],
-    },
-    {
-      id: 3,
-      label: 'PARİS',
-      title: 'Kanal Pikniği',
-      desc: "Canal Saint-Martin'de baget, peynir, şarap. Bir ressam bize katıldı.",
-      tags: ['piknik', 'sanat', 'spontan'],
-      offers: [
-        { title: 'Şarap getir', meta: 'Yakında doğal şarap dükkanı' },
-        { title: 'Birlikte çiz', meta: 'Ekstra kalemim var' },
-        { title: 'Gün batımına kal', meta: 'Işık mükemmel' },
-      ],
-    },
-    {
-      id: 4,
-      label: 'İSTANBUL',
-      title: 'Boğaz Çayı',
-      desc: 'Alacakaranlıkta vapurda çay. İki kıta arasında bölünmüş şehir, biz de öyle.',
-      tags: ['çay', 'vapur', 'düşünceli'],
-      offers: [
-        { title: 'Sonraki vapuru yakala', meta: "Her 20 dk'da bir" },
-        { title: 'Çay benden', meta: 'Satıcı beni tanıyor' },
-        { title: 'Sahilde yürü', meta: 'Karanlıkta en iyi manzara' },
-      ],
-    },
-    {
-      id: 5,
-      label: 'MEKSİKA',
-      title: 'Mercado Brunch',
-      desc: "La Merced'de taco. Yerel biri en iyi tezgahı gösterdi. Ardından mezcal.",
-      tags: ['yemek', 'yerel', 'macera'],
-      offers: [
-        { title: 'Gezdireyim', meta: 'Tüm tezgahları biliyorum' },
-        { title: 'Mezcal tadımı', meta: 'Küçük parti, dumanlı' },
-        { title: 'Birlikte pişir', meta: 'Benim mutfak, senin hikaye' },
-      ],
-    },
-  ],
-};
-
-const CITIES = [
-  'PARIS',
-  'TOKYO',
-  'LISBON',
-  'ISTANBUL',
-  'MEXICO CITY',
-  'BERLIN',
-  'NEW YORK',
-  'SEOUL',
-];
-
-/* ─────────────────────────────────────────────────────────────────
-   LOCALE DETECTION
-───────────────────────────────────────────────────────────────── */
-function detectLocale(): Locale {
-  if (typeof navigator === 'undefined') return 'en';
-  const lang = navigator.language || 'en';
-  return lang.toLowerCase().startsWith('tr') ? 'tr' : 'en';
-}
-
-/* ─────────────────────────────────────────────────────────────────
-   3D ORB COMPONENT
-───────────────────────────────────────────────────────────────── */
-function Orb() {
-  const meshRef = useRef<Mesh>(null);
-  const groupRef = useRef<Group>(null);
-
-  useFrame((state) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.x = state.clock.elapsedTime * 0.08;
-      meshRef.current.rotation.y = state.clock.elapsedTime * 0.12;
-    }
-    if (groupRef.current) {
-      groupRef.current.rotation.y = state.clock.elapsedTime * 0.05;
-    }
+  // Maksimum hız ve tepkisellik için ayarlar
+  const cursorX = useSpring(mouseX, {
+    stiffness: 1500,
+    damping: 80,
+    mass: 0.1,
+  });
+  const cursorY = useSpring(mouseY, {
+    stiffness: 1500,
+    damping: 80,
+    mass: 0.1,
   });
 
-  return (
-    <group ref={groupRef}>
-      <Sphere ref={meshRef} args={[1.6, 64, 64]}>
-        <MeshDistortMaterial
-          color="#1a1a1a"
-          attach="material"
-          distort={0.35}
-          speed={1.5}
-          roughness={0.15}
-          metalness={0.9}
-          envMapIntensity={0.8}
-        />
-      </Sphere>
-      {/* Moment pins */}
-      {[
-        { pos: [1.2, 0.8, 0.9] as [number, number, number], color: '#ff2bd6' },
-        { pos: [-1.0, 1.1, 0.5] as [number, number, number], color: '#00ff88' },
-        { pos: [0.5, -1.2, 1.0] as [number, number, number], color: '#ffcc00' },
-        {
-          pos: [-0.8, -0.6, 1.3] as [number, number, number],
-          color: '#00ccff',
-        },
-      ].map((pin, i) => (
-        <mesh key={i} position={pin.pos}>
-          <sphereGeometry args={[0.08, 16, 16]} />
-          <meshBasicMaterial color={pin.color} />
-        </mesh>
-      ))}
-      <ambientLight intensity={0.4} />
-      <directionalLight position={[5, 5, 5]} intensity={0.6} />
-      <pointLight position={[-5, -5, 5]} intensity={0.3} color="#ff2bd6" />
-    </group>
-  );
-}
+  const [isHovering, setIsHovering] = useState(false);
 
-/* ─────────────────────────────────────────────────────────────────
-   HOOKS
-───────────────────────────────────────────────────────────────── */
-
-// Lenis smooth scroll
-function useLenis() {
-  useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.1,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      smoothWheel: true,
-    });
-
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
-
-    return () => lenis.destroy();
-  }, []);
-}
-
-// GSAP ScrollTrigger
-function useGsapReveal() {
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-
-    gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach((el) => {
-      gsap.fromTo(
-        el,
-        { y: 60, opacity: 0, filter: 'blur(8px)' },
-        {
-          y: 0,
-          opacity: 1,
-          filter: 'blur(0px)',
-          duration: 1,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: el,
-            start: 'top 85%',
-            toggleActions: 'play none none none',
-          },
-        },
-      );
-    });
-
-    return () => ScrollTrigger.getAll().forEach((t) => t.kill());
-  }, []);
-}
-
-// Cursor position tracker
-function usePointerGlow() {
   useEffect(() => {
     const handleMove = (e: MouseEvent) => {
-      document.documentElement.style.setProperty('--px', `${e.clientX}px`);
-      document.documentElement.style.setProperty('--py', `${e.clientY}px`);
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
+      const target = e.target as HTMLElement;
+      setIsHovering(
+        !!(
+          target.closest('button') ||
+          target.closest('input') ||
+          target.closest('a') ||
+          target.closest('.moment-card')
+        ),
+      );
     };
     window.addEventListener('mousemove', handleMove);
     return () => window.removeEventListener('mousemove', handleMove);
-  }, []);
-}
-
-// Magnetic hover effect
-function useMagnet() {
-  useEffect(() => {
-    const els = document.querySelectorAll<HTMLElement>('[data-magnet]');
-    const handlers: Array<{
-      el: HTMLElement;
-      move: (e: MouseEvent) => void;
-      leave: () => void;
-    }> = [];
-
-    els.forEach((el) => {
-      const move = (e: MouseEvent) => {
-        const rect = el.getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width / 2;
-        const y = e.clientY - rect.top - rect.height / 2;
-        el.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`;
-      };
-      const leave = () => {
-        el.style.transform = 'translate(0, 0)';
-      };
-      el.addEventListener('mousemove', move);
-      el.addEventListener('mouseleave', leave);
-      handlers.push({ el, move, leave });
-    });
-
-    return () => {
-      handlers.forEach(({ el, move, leave }) => {
-        el.removeEventListener('mousemove', move);
-        el.removeEventListener('mouseleave', leave);
-      });
-    };
-  }, []);
-}
-
-// Custom cursor
-function useCustomCursor() {
-  useEffect(() => {
-    const dot = document.createElement('div');
-    const ring = document.createElement('div');
-    dot.className = 'cursor-dot';
-    ring.className = 'cursor-ring';
-    document.body.appendChild(dot);
-    document.body.appendChild(ring);
-
-    let mouseX = 0;
-    let mouseY = 0;
-    let dotX = 0;
-    let dotY = 0;
-    let ringX = 0;
-    let ringY = 0;
-
-    const move = (e: MouseEvent) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    };
-
-    const down = () => {
-      dot.style.transform = 'translate(-50%, -50%) scale(0.7)';
-      ring.style.transform = 'translate(-50%, -50%) scale(0.85)';
-    };
-
-    const up = () => {
-      dot.style.transform = 'translate(-50%, -50%) scale(1)';
-      ring.style.transform = 'translate(-50%, -50%) scale(1)';
-    };
-
-    window.addEventListener('mousemove', move);
-    window.addEventListener('mousedown', down);
-    window.addEventListener('mouseup', up);
-
-    let rafId: number;
-    const animate = () => {
-      dotX += (mouseX - dotX) * 0.2;
-      dotY += (mouseY - dotY) * 0.2;
-      ringX += (mouseX - ringX) * 0.08;
-      ringY += (mouseY - ringY) * 0.08;
-      dot.style.left = `${dotX}px`;
-      dot.style.top = `${dotY}px`;
-      ring.style.left = `${ringX}px`;
-      ring.style.top = `${ringY}px`;
-      rafId = requestAnimationFrame(animate);
-    };
-    animate();
-
-    return () => {
-      window.removeEventListener('mousemove', move);
-      window.removeEventListener('mousedown', down);
-      window.removeEventListener('mouseup', up);
-      cancelAnimationFrame(rafId);
-      dot.remove();
-      ring.remove();
-    };
-  }, []);
-}
-
-// Rail drag with momentum
-function useRailDrag(railRef: RefObject<HTMLDivElement | null>) {
-  useEffect(() => {
-    const rail = railRef.current;
-    if (!rail) return;
-
-    let isDown = false;
-    let startX = 0;
-    let scrollLeft = 0;
-    let velX = 0;
-    let lastX = 0;
-    let rafId: number;
-
-    const mouseDown = (e: MouseEvent) => {
-      isDown = true;
-      startX = e.pageX - rail.offsetLeft;
-      scrollLeft = rail.scrollLeft;
-      lastX = e.pageX;
-      rail.style.cursor = 'grabbing';
-    };
-
-    const mouseLeave = () => {
-      if (isDown) coast();
-      isDown = false;
-      rail.style.cursor = 'grab';
-    };
-
-    const mouseUp = () => {
-      if (isDown) coast();
-      isDown = false;
-      rail.style.cursor = 'grab';
-    };
-
-    const mouseMove = (e: MouseEvent) => {
-      if (!isDown) return;
-      e.preventDefault();
-      const x = e.pageX - rail.offsetLeft;
-      const walk = (x - startX) * 1.2;
-      rail.scrollLeft = scrollLeft - walk;
-      velX = e.pageX - lastX;
-      lastX = e.pageX;
-    };
-
-    const coast = () => {
-      const friction = 0.92;
-      const step = () => {
-        if (Math.abs(velX) > 0.5) {
-          rail.scrollLeft -= velX;
-          velX *= friction;
-          rafId = requestAnimationFrame(step);
-        }
-      };
-      step();
-    };
-
-    rail.addEventListener('mousedown', mouseDown);
-    rail.addEventListener('mouseleave', mouseLeave);
-    rail.addEventListener('mouseup', mouseUp);
-    rail.addEventListener('mousemove', mouseMove);
-
-    return () => {
-      rail.removeEventListener('mousedown', mouseDown);
-      rail.removeEventListener('mouseleave', mouseLeave);
-      rail.removeEventListener('mouseup', mouseUp);
-      rail.removeEventListener('mousemove', mouseMove);
-      cancelAnimationFrame(rafId);
-    };
-  }, [railRef]);
-}
-
-// 3D tilt effect
-function useTilt() {
-  useEffect(() => {
-    const cards = document.querySelectorAll<HTMLElement>('[data-tilt]');
-    const handlers: Array<{
-      el: HTMLElement;
-      move: (e: MouseEvent) => void;
-      leave: () => void;
-    }> = [];
-
-    cards.forEach((card) => {
-      const move = (e: MouseEvent) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        const rotateX = ((y - centerY) / centerY) * -8;
-        const rotateY = ((x - centerX) / centerX) * 8;
-        card.style.setProperty('--rx', `${rotateX}deg`);
-        card.style.setProperty('--ry', `${rotateY}deg`);
-        card.style.setProperty('--sx', `${(x / rect.width) * 100}%`);
-        card.style.setProperty('--sy', `${(y / rect.height) * 100}%`);
-      };
-      const leave = () => {
-        card.style.setProperty('--rx', '0deg');
-        card.style.setProperty('--ry', '0deg');
-      };
-      card.addEventListener('mousemove', move);
-      card.addEventListener('mouseleave', leave);
-      handlers.push({ el: card, move, leave });
-    });
-
-    return () => {
-      handlers.forEach(({ el, move, leave }) => {
-        el.removeEventListener('mousemove', move);
-        el.removeEventListener('mouseleave', leave);
-      });
-    };
-  }, []);
-}
-
-/* ─────────────────────────────────────────────────────────────────
-   MAIN COMPONENT
-───────────────────────────────────────────────────────────────── */
-export default function HomePage() {
-  const [locale, setLocale] = useState<Locale>('en');
-  const [email, setEmail] = useState('');
-  const [modalItem, setModalItem] = useState<StashItem | null>(null);
-  const railRef = useRef<HTMLDivElement>(null);
-  const t = COPY[locale];
-  const stash = STASH[locale];
-
-  // Initialize locale
-  useEffect(() => {
-    setLocale(detectLocale());
-  }, []);
-
-  // Hooks
-  useLenis();
-  useGsapReveal();
-  usePointerGlow();
-  useMagnet();
-  useCustomCursor();
-  useRailDrag(railRef);
-  useTilt();
-
-  // Close modal on ESC
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setModalItem(null);
-    };
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
-  }, []);
-
-  const toggleLocale = useCallback(() => {
-    setLocale((prev) => (prev === 'en' ? 'tr' : 'en'));
-  }, []);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert(`Demo: ${email} added to beta list!`);
-    setEmail('');
-  };
-
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, [mouseX, mouseY]);
 
   return (
-    <>
-      {/* ─── NAV ─── */}
-      <nav className="nav">
-        <div className="navInner">
-          <span className="logo">Lovendo</span>
-          <div className="navLinks">
-            {t.nav.map((item, i) => (
-              <button
-                key={i}
-                onClick={() =>
-                  scrollTo(
-                    ['philosophy', 'how', 'stash', 'join'][i] ?? 'philosophy',
-                  )
-                }
-                className="navLink"
-                data-magnet
-              >
-                {item}
-              </button>
-            ))}
+    <motion.div
+      className="fixed top-0 left-0 pointer-events-none z-[9999] mix-blend-difference hidden md:flex items-center justify-center"
+      style={{ x: cursorX, y: cursorY, translateX: '-50%', translateY: '-50%' }}
+    >
+      <motion.svg
+        width="44"
+        height="44"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={isHovering ? '#00F5FF' : '#FF3366'}
+        strokeWidth="1.5"
+        animate={{ scale: isHovering ? 1.5 : 1, rotate: isHovering ? 15 : 0 }}
+      >
+        <path
+          d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+          fill={
+            isHovering ? 'rgba(0, 245, 255, 0.3)' : 'rgba(255, 51, 102, 0.3)'
+          }
+        />
+      </motion.svg>
+      <div className="absolute w-1 h-1 bg-white rounded-full shadow-[0_0_8px_#fff]" />
+    </motion.div>
+  );
+};
+
+// --- 02. FLUID ILLUSION SCENE (Uçuk Kaçık İlüzyonlar) ---
+const LovendoFluid = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000,
+    );
+    camera.position.z = 4;
+
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    containerRef.current.appendChild(renderer.domElement);
+
+    // Işıklar
+    const p1 = new THREE.PointLight(0xff3366, 2);
+    p1.position.set(5, 5, 5);
+    scene.add(p1);
+    const p2 = new THREE.PointLight(0x00f5ff, 2);
+    p2.position.set(-5, -5, 5);
+    scene.add(p2);
+
+    // Akışkan Form (Illusion Blob)
+    const geometry = new THREE.IcosahedronGeometry(1.8, 64);
+    const material = new THREE.MeshStandardMaterial({
+      color: 0x111111,
+      metalness: 1,
+      roughness: 0.1,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.2,
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+
+    // Floating Fragments (Anı Parçacıkları)
+    const fragments: { mesh: THREE.Mesh; speed: number }[] = [];
+    const fragGeom = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+    for (let i = 0; i < 60; i++) {
+      const frag = new THREE.Mesh(
+        fragGeom,
+        new THREE.MeshPhongMaterial({
+          color: i % 2 === 0 ? 0xf0eee9 : 0xff3366,
+          transparent: true,
+          opacity: 0.6,
+        }),
+      );
+      frag.position.set(
+        (Math.random() - 0.5) * 15,
+        (Math.random() - 0.5) * 15,
+        (Math.random() - 0.5) * 10,
+      );
+      scene.add(frag);
+      fragments.push({ mesh: frag, speed: Math.random() * 0.02 + 0.01 });
+    }
+
+    const animate = () => {
+      mesh.rotation.y += 0.003;
+      mesh.rotation.z += 0.002;
+      mesh.scale.setScalar(1 + Math.sin(Date.now() * 0.001) * 0.05);
+
+      fragments.forEach((f) => {
+        f.mesh.position.y += f.speed;
+        f.mesh.rotation.x += 0.02;
+        if (f.mesh.position.y > 8) f.mesh.position.y = -8;
+      });
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    };
+    animate();
+    return () => {
+      if (containerRef.current)
+        containerRef.current.removeChild(renderer.domElement);
+    };
+  }, []);
+  return (
+    <div
+      ref={containerRef}
+      className="fixed inset-0 z-0 opacity-40 pointer-events-none bg-[#1A1A1B]"
+    />
+  );
+};
+
+// --- 03. GLOBAL CITIES BAND (With Symbols) ---
+const GlobalCitiesBand = () => {
+  const cities = [
+    { name: 'ISTANBUL', sym: '🕌' },
+    { name: 'PARIS', sym: '†' },
+    { name: 'TOKYO', sym: 'Ξ' },
+    { name: 'NYC', sym: '▰' },
+    { name: 'LONDON', sym: '⌘' },
+    { name: 'ROME', sym: '▼' },
+    { name: 'BERLIN', sym: 'Ø' },
+    { name: 'SEOUL', sym: '◈' },
+    { name: 'DUBAI', sym: '✦' },
+    { name: 'LISBON', sym: '≋' },
+    { name: 'MEXICO', sym: '◬' },
+    { name: 'RIO', sym: '☀' },
+  ];
+  return (
+    <div className="w-full bg-black py-16 border-y border-white/5 relative z-10 overflow-hidden">
+      <motion.div
+        animate={{ x: [0, -3500] }}
+        transition={{ duration: 50, repeat: Infinity, ease: 'linear' }}
+        className="flex gap-40 px-12 whitespace-nowrap"
+      >
+        {[...cities, ...cities].map((city, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-8 group cursor-default opacity-40 hover:opacity-100 transition-opacity"
+          >
+            <span className="text-[20px] font-black uppercase tracking-[0.8em] text-white">
+              {city.name}
+            </span>
+            <span className="text-[#FF3366] text-2xl font-mono grayscale group-hover:grayscale-0 transition-all">
+              {city.sym}
+            </span>
           </div>
-          <button onClick={toggleLocale} className="langToggle" data-magnet>
-            {locale.toUpperCase()}
-          </button>
+        ))}
+      </motion.div>
+    </div>
+  );
+};
+
+// --- 04. DROP ICON SELECTOR ---
+const LovendoIcon = ({ type }: { type: string }) => {
+  const icons: Record<string, React.ReactNode> = {
+    fashion: <ShoppingBag size={14} className="text-[#FF3366]" />,
+    food: <Utensils size={14} className="text-black" />,
+    culture: <Palette size={14} className="text-[#00A3FF]" />,
+    experience: <Zap size={14} className="text-[#FF3366]" />,
+    accessory: <Glasses size={14} className="text-black" />,
+    object: <Trophy size={14} className="text-black" />,
+  };
+  return icons[type] || <Activity size={14} />;
+};
+
+interface MomentData {
+  title: string;
+  location: string;
+  price: string;
+  creator: string;
+  type: string;
+  ritualTag: string;
+  image: string;
+}
+
+// --- 05. LOVENDO DROP CARD (Cloud Dancer Color & Anthracite Accent) ---
+const MomentCard = ({
+  data,
+  onClick,
+}: {
+  data: MomentData;
+  index: number;
+  onClick: (data: MomentData) => void;
+}) => {
+  const [rotation, setRotation] = useState('0');
+
+  useEffect(() => {
+    setRotation((Math.random() * 4 - 2).toFixed(2));
+  }, []);
+
+  return (
+    <motion.div
+      whileHover={{ y: -15, scale: 1.02, zIndex: 50 }}
+      className="moment-card relative group mb-48 px-6 cursor-none"
+      onClick={() => onClick(data)}
+    >
+      <div
+        className="bg-[#F0EEE9] p-6 shadow-[0_60px_130px_rgba(0,0,0,0.6)] relative overflow-hidden transition-all duration-1000 border border-white/5 group-hover:border-[#00F5FF]/40"
+        style={{ transform: `rotate(${rotation}deg)` }}
+      >
+        <div className="absolute -right-12 top-6 z-30 bg-black text-white font-black text-[10px] px-12 py-1 rotate-45 shadow-xl uppercase tracking-widest flex items-center gap-2">
+          ACTIVATE DO
+        </div>
+
+        <div className="flex justify-between items-center mb-6 text-[11px] font-mono font-black tracking-widest text-black/40 uppercase">
+          <div className="flex items-center gap-2">
+            <MapPin size={12} className="text-[#FF3366]" /> {data.location}
+          </div>
+          <div className="flex items-center gap-2 italic">
+            {LovendoIcon({ type: data.type })} {data.type}
+          </div>
+        </div>
+
+        <div className="relative aspect-[1/1.2] bg-white overflow-hidden mb-10 border border-black/5 shadow-inner">
+          <motion.img
+            src={data.image}
+            className="w-full h-full object-cover filter contrast-[1.1] transition-all duration-[1500ms] group-hover:scale-110"
+          />
+          <div className="absolute inset-0 bg-black/10 z-10 mix-blend-multiply opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-6 left-6 right-6">
+            <div className="text-[14px] font-black text-white italic uppercase tracking-tighter border-l-4 border-[#FF3366] pl-4 mb-2 drop-shadow-xl">
+              {data.ritualTag}
+            </div>
+            <div className="text-[10px] font-mono text-white uppercase tracking-widest italic opacity-80">
+              Signal Verified
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-2 mb-10">
+          <h3 className="text-6xl font-black tracking-tighter leading-[0.8] uppercase italic transition-all duration-700 text-black">
+            {data.title.split(' ')[0]}
+          </h3>
+          <h3 className="text-4xl font-black tracking-tighter leading-[0.8] uppercase italic opacity-20 group-hover:opacity-100 transition-opacity text-[#00F5FF]">
+            {data.title.split(' ')[1] || 'DROP'}
+          </h3>
+        </div>
+
+        <div className="flex justify-between items-end border-t border-black/10 pt-8 -mx-6 -mb-6 p-6 bg-black/[0.03]">
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] font-mono text-black/40 uppercase tracking-widest italic font-bold">
+              Source
+            </span>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden shadow-sm grayscale group-hover:grayscale-0 transition-all">
+                <img
+                  src={`https://i.pravatar.cc/100?u=${data.creator.split(' ')[0]}`}
+                  alt="creator"
+                />
+              </div>
+              <span className="text-[16px] font-black text-black/80">
+                {data.creator}
+              </span>
+            </div>
+          </div>
+          <div className="bg-black text-white px-6 py-4 rotate-[-1deg] shadow-2xl">
+            <div className="text-[10px] font-mono font-black uppercase leading-none opacity-50 mb-1">
+              Value Floor
+            </div>
+            <div className="text-3xl font-black italic tracking-tighter shadow-sm">
+              ${data.price}
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// --- 06. SCENE EXECUTION MODAL ---
+const Modal = ({
+  isOpen,
+  onClose,
+  data,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  data: MomentData;
+}) => {
+  const [activeTab, setActiveTab] = useState('match');
+  const [suggestion, setSuggestion] = useState({ place: '', reason: '' });
+
+  if (!isOpen) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl"
+    >
+      <motion.div
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="relative w-full max-w-4xl bg-[#111111] border border-white/10 shadow-[0_0_200px_rgba(0,245,255,0.2)] p-12 md:p-24 overflow-y-auto max-h-[95vh] custom-scrollbar rounded-sm"
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-10 right-10 text-zinc-700 hover:text-[#00F5FF] transition-colors z-50"
+        >
+          <X size={40} />
+        </button>
+
+        <div className="space-y-20">
+          <header className="space-y-8 text-center">
+            <div className="flex items-center justify-center gap-4 text-[#00F5FF] font-mono text-[14px] font-black uppercase tracking-[1.5em] italic">
+              <Fingerprint size={22} /> Signal_v0.0.5
+            </div>
+            <h2 className="text-8xl md:text-[140px] font-black italic uppercase tracking-tighter leading-[0.6] text-[#F0EEE9] drop-shadow-xl">
+              {data?.title}
+            </h2>
+          </header>
+
+          <p className="text-4xl md:text-7xl text-white font-black leading-[0.85] uppercase italic tracking-tighter text-center">
+            Floor is Fixed. <br />{' '}
+            <span className="text-[#FF3366] shadow-glow-white">
+              Upgrade the Move.
+            </span>
+          </p>
+
+          <div className="grid grid-cols-2 gap-6 bg-white/5 p-2 rounded-sm border border-white/5">
+            <button
+              onClick={() => setActiveTab('match')}
+              className={`py-10 text-[18px] font-black uppercase tracking-[0.4em] flex items-center justify-center gap-4 transition-all ${activeTab === 'match' ? 'bg-[#F0EEE9] text-black shadow-3xl' : 'text-zinc-600 hover:text-white'}`}
+            >
+              Match
+            </button>
+            <button
+              onClick={() => setActiveTab('upgrade')}
+              className={`py-10 text-[18px] font-black uppercase tracking-[0.4em] flex items-center justify-center gap-4 transition-all relative overflow-hidden ${activeTab === 'upgrade' ? 'text-black' : 'text-zinc-600 hover:text-white'}`}
+            >
+              {activeTab === 'upgrade' && (
+                <motion.div
+                  layoutId="rit"
+                  className="absolute inset-0 bg-[#00F5FF]"
+                />
+              )}
+              <span className="relative z-10 flex items-center gap-4 text-shadow-glow">
+                Upgrade <Zap size={24} fill="currentColor" />
+              </span>
+            </button>
+          </div>
+
+          <div className="space-y-16">
+            {activeTab === 'match' ? (
+              <div className="p-16 bg-zinc-900 border-l-[12px] border-[#FF3366] shadow-inner space-y-10 rounded-sm">
+                <div className="text-[14px] font-mono text-[#FF3366] font-black uppercase tracking-[1em] italic">
+                  Integrity confirmed
+                </div>
+                <div className="text-8xl font-black italic uppercase tracking-tighter text-white">
+                  ${data?.price} • {data?.location}
+                </div>
+                <p className="text-zinc-500 font-mono text-[12px] font-bold uppercase tracking-widest italic underline underline-offset-4">
+                  Match the creator's floor value.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-12 animate-in slide-in-from-right-10 duration-700">
+                <div className="flex justify-between items-center border-b border-white/5 pb-8">
+                  <div className="text-[14px] font-mono text-zinc-500 font-black uppercase tracking-[1.2em]">
+                    Execution Request
+                  </div>
+                  <div className="text-[#FF3366] font-black text-[16px] uppercase tracking-widest flex items-center gap-4 italic">
+                    <Lock size={20} /> Price Locked: ${data?.price}
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                  <div className="space-y-6">
+                    <label className="text-[12px] font-mono text-zinc-600 font-black uppercase tracking-widest italic">
+                      New Peak Venue
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Drop the name..."
+                      className="w-full bg-transparent border-b-2 border-white/10 py-6 text-4xl font-black italic uppercase focus:border-[#00F5FF] focus:outline-none text-white placeholder:text-zinc-900"
+                      value={suggestion.place}
+                      onChange={(e) =>
+                        setSuggestion({ ...suggestion, place: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-6">
+                    <label className="text-[12px] font-mono text-zinc-600 font-black uppercase tracking-widest italic">
+                      Reasoning
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Why is this better?"
+                      className="w-full bg-transparent border-b-2 border-white/10 py-6 text-4xl font-black italic uppercase focus:border-[#00F5FF] focus:outline-none text-white placeholder:text-zinc-900"
+                      value={suggestion.reason}
+                      onChange={(e) =>
+                        setSuggestion({ ...suggestion, reason: e.target.value })
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+            <button className="w-full bg-[#F0EEE9] text-black py-18 font-black uppercase tracking-[1.5em] hover:bg-[#FF3366] hover:text-white transition-all text-5xl active:scale-95 shadow-[0_40px_120px_rgba(255,51,102,0.3)] flex items-center justify-center gap-12 group rounded-sm">
+              {activeTab === 'upgrade' ? 'ACTIVATE' : 'SEND'}{' '}
+              <ArrowRight
+                size={64}
+                className="group-hover:translate-x-12 transition-transform"
+              />
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
+// --- 07. MANIFESTO TEXTS ---
+const ManifestoSection = () => (
+  <section className="py-80 px-10 relative z-10 space-y-40">
+    <div className="max-w-4xl space-y-12">
+      <h4 className="text-[#00F5FF] font-mono text-sm uppercase tracking-[1em] font-bold italic border-l-4 border-[#00F5FF] pl-8">
+        The_Logic
+      </h4>
+      <p className="text-5xl md:text-8xl font-black italic tracking-tighter text-[#F0EEE9] leading-[0.75] lowercase">
+        Most platforms sell destinations. <br /> Lovendo sells attraction.{' '}
+        <br /> We believe closeness starts with deeds.
+      </p>
+    </div>
+    <div className="max-w-4xl ml-auto text-right space-y-12">
+      <h4 className="text-[#FF3366] font-mono text-sm uppercase tracking-[1em] font-bold italic border-r-4 border-[#FF3366] pr-8">
+        The_Level_Protocol
+      </h4>
+      <p className="text-5xl md:text-8xl font-black italic tracking-tighter text-zinc-600 leading-[0.75] lowercase">
+        A Moment sets the floor. <br /> Offers can only match or upgrade. <br />{' '}
+        No downgrades. No ghosting.
+      </p>
+    </div>
+  </section>
+);
+
+// --- 08. MAIN APP ---
+export default function App() {
+  const [selectedMoment, setSelectedMoment] = useState<MomentData | null>(null);
+  const [email, setEmail] = useState('');
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const { scrollYProgress } = useScroll();
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0.1]);
+
+  const moments: MomentData[] = [
+    {
+      title: '3AM LEATHER',
+      location: 'Paris',
+      price: '2400',
+      creator: 'Lucas Van der Woodsen',
+      type: 'fashion',
+      ritualTag: 'Pure Desire. No Backups.',
+      image:
+        'https://images.unsplash.com/photo-1521223344201-d169129f7b7d?auto=format&fit=crop&q=80&w=800',
+    },
+    {
+      title: 'VINYL NIGHT',
+      location: 'Tokyo',
+      price: '180',
+      creator: 'Kenji Tanaka',
+      type: 'culture',
+      ritualTag: 'Analogue Love in Shibuya.',
+      image:
+        'https://images.unsplash.com/photo-1539375665275-f9ad415ef9ac?auto=format&fit=crop&q=80&w=800',
+    },
+    {
+      title: 'UNMARKED DOOR',
+      location: 'Istanbul',
+      price: '450',
+      creator: 'Elif Demirok',
+      type: 'food',
+      ritualTag: 'Secret Bosphorus Scene.',
+      image:
+        'https://images.unsplash.com/photo-1550966841-39148bc73021?auto=format&fit=crop&q=80&w=800',
+    },
+    {
+      title: 'KINETIC FLOW',
+      location: 'Berlin',
+      price: '95',
+      creator: 'Maximilian Schulz',
+      type: 'experience',
+      ritualTag: 'Industrial Signal.',
+      image:
+        'https://images.unsplash.com/photo-1514525253361-b996b5c57df4?auto=format&fit=crop&q=80&w=800',
+    },
+    {
+      title: 'CUSTOM SKIN',
+      location: 'Stockholm',
+      price: '520',
+      creator: 'Ebba Andersson',
+      type: 'accessory',
+      ritualTag: 'Limited Edge.',
+      image:
+        'https://images.unsplash.com/photo-1591076482161-42ce6da69f67?auto=format&fit=crop&q=80&w=800',
+    },
+    {
+      title: 'MANHATTAN PEAK',
+      location: 'NYC',
+      price: '750',
+      creator: 'Sarah J. Harrington',
+      type: 'experience',
+      ritualTag: 'High-Rise Flow.',
+      image:
+        'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&q=80&w=800',
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#1A1A1B] text-white font-sans selection:bg-[#00F5FF] selection:text-black overflow-x-hidden">
+      <LovendoFluid />
+
+      <div
+        className="fixed inset-0 pointer-events-none z-[9998] opacity-[0.12] mix-blend-overlay"
+        style={{
+          backgroundImage:
+            "url('https://grainy-gradients.vercel.app/noise.svg')",
+        }}
+      />
+
+      <nav className="fixed top-0 left-0 w-full z-50 px-10 py-10 md:px-20 flex justify-between items-center mix-blend-difference">
+        <div className="text-8xl font-black tracking-tighter uppercase italic group cursor-pointer leading-none">
+          LVND
+          <span className="text-[#FF3366] group-hover:text-[#00F5FF] transition-all">
+            .
+          </span>
+        </div>
+        <div className="text-[12px] font-mono font-black tracking-[1em] text-zinc-600 uppercase border-b border-[#00F5FF]/20 pb-1 hidden lg:block">
+          System_v0.0.5_Protocol
         </div>
       </nav>
 
-      {/* ─── HERO ─── */}
-      <section className="hero">
-        <div className="heroContent">
-          <span className="kicker">{t.hero.kicker}</span>
-          <h1 className="headline">
-            {t.hero.headline.split('\n').map((line, i) => (
-              <span key={i} className="headlineLine">
-                {line}
-              </span>
-            ))}
-          </h1>
-          <p className="heroSub">{t.hero.sub}</p>
-          <button
-            className="cta liquid"
-            data-magnet
-            onClick={() => scrollTo('join')}
-          >
-            <span className="ctaLabel">{t.cta}</span>
-            <span className="ctaBlob" />
-          </button>
-        </div>
-        <div className="orbWrap">
-          <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 5], fov: 45 }}>
-            <Orb />
-          </Canvas>
-        </div>
-        <div className="ticker">
-          <div className="tickerTrack">
-            {[...CITIES, ...CITIES].map((city, i) => (
-              <span key={i} className="tickerItem">
-                {city}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── EDITORIAL SECTIONS ─── */}
-      <section id="philosophy" className="editorial">
-        {t.sections.map((sec, i) => (
-          <div key={i} className="editorialBlock" data-reveal>
-            <h2 className="editorialTitle">
-              {sec.title.split('\n').map((line, j) => (
-                <span key={j} className="editorialLine">
-                  {line}
-                </span>
-              ))}
-            </h2>
-            <p className="editorialBody">{sec.body}</p>
-          </div>
-        ))}
-      </section>
-
-      {/* ─── HOW IT WORKS ─── */}
-      <section id="how" className="howSection" data-reveal>
-        <div className="howInner">
-          <h2 className="howTitle">
-            {locale === 'en' ? 'HOW IT WORKS' : 'NASIL ÇALIŞIR'}
-          </h2>
-          <div className="howSteps">
-            {[
-              {
-                icon: '📍',
-                en: 'Share your moment signal',
-                tr: 'An sinyalini paylaş',
-              },
-              {
-                icon: '✨',
-                en: 'Algorithm finds your echo',
-                tr: 'Algoritma yankını bulur',
-              },
-              {
-                icon: '🤝',
-                en: 'Connect in real life',
-                tr: 'Gerçek hayatta bağlan',
-              },
-            ].map((step, i) => (
-              <div key={i} className="howStep" data-magnet>
-                <span className="howIcon">{step.icon}</span>
-                <span className="howText">{step[locale]}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── STASH ─── */}
-      <section id="stash" className="stashSection">
-        <div className="stashHeader" data-reveal>
-          <h2 className="stashTitle">{t.stashTitle}</h2>
-          <p className="stashSub">{t.stashSub}</p>
-        </div>
-        <div className="stashRail" ref={railRef}>
-          {stash.map((item) => (
-            <article
-              key={item.id}
-              className="card"
-              data-tilt
-              data-magnet
-              onClick={() => setModalItem(item)}
+      {/* HERO */}
+      <motion.section
+        style={{ opacity: heroOpacity }}
+        className="relative min-h-screen flex flex-col items-center justify-center px-10 pt-32 z-10"
+      >
+        <div className="max-w-[1600px] w-full text-center space-y-48">
+          <div className="flex flex-col items-center gap-16">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex items-center gap-8 text-[18px] font-mono font-black uppercase tracking-[2.5em] text-zinc-800 italic"
             >
-              <div className="cardMedia">
-                <span className="cardLabel">{item.label}</span>
+              <Activity size={32} className="text-[#FF3366] animate-pulse" />{' '}
+              Stop matching. Start executing.
+            </motion.div>
+            <h1 className="text-[140px] md:text-[520px] font-black tracking-tighter leading-[0.4] uppercase italic select-none text-[#F0EEE9] drop-shadow-2xl">
+              Love <br />{' '}
+              <span
+                className="border-text text-transparent"
+                style={{ WebkitTextStroke: '4px rgba(255,255,255,0.06)' }}
+              >
+                & Do
+              </span>
+            </h1>
+          </div>
+          <div className="text-zinc-600 font-mono text-[16px] uppercase tracking-[2.5em] opacity-40 italic">
+            Signals are Lust. Deeds are Ritual.
+          </div>
+        </div>
+      </motion.section>
+
+      <GlobalCitiesBand />
+
+      <ManifestoSection />
+
+      {/* FEED */}
+      <section className="py-20 px-10 relative z-10">
+        <div className="max-w-[1800px] mx-auto">
+          <div className="mb-80 flex flex-col md:flex-row justify-between items-end gap-20 border-b border-white/5 pb-40">
+            <div className="space-y-16 text-left">
+              <div className="flex items-center gap-10 text-[24px] font-mono font-black text-[#FF3366] uppercase tracking-[3em] italic">
+                The_Archive
               </div>
-              <div className="cardBody">
-                <h3 className="cardTitle">{item.title}</h3>
-                <p className="cardDesc">{item.desc}</p>
-                <div className="cardTags">
-                  {item.tags.map((tag, i) => (
-                    <span key={i} className="cardTag">
-                      {tag}
-                    </span>
-                  ))}
+              <h2 className="text-[20vw] font-black italic uppercase leading-[0.5] tracking-tighter opacity-10 select-none text-[#F0EEE9]">
+                Latest_Drops
+              </h2>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-32">
+            {moments.map((moment, i) => (
+              <MomentCard
+                key={i}
+                index={i}
+                data={moment}
+                onClick={(data) => setSelectedMoment(data)}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ACCESS & APPS SECTION */}
+      <section className="py-80 px-12 bg-black relative z-10 border-t border-[#FF3366]/20">
+        <div className="max-w-[1600px] mx-auto space-y-60">
+          <div className="max-w-6xl mx-auto text-center space-y-32">
+            <div className="space-y-20">
+              <div className="flex items-center justify-center gap-10 text-[#00F5FF] font-mono text-[16px] uppercase tracking-[2.5em] italic font-bold">
+                <ShieldAlert size={32} /> Access_The_Field
+              </div>
+              <h2 className="text-8xl md:text-[16vw] font-black italic uppercase tracking-tighter leading-[0.7] text-[#F0EEE9]">
+                ACCESS <br /> THE FIELD.
+              </h2>
+              <div className="text-zinc-700 font-mono text-xl uppercase tracking-[1.5em] max-w-3xl mx-auto italic">
+                Not for the casuals. Join the elite ritual of closeness.
+              </div>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-0 max-w-6xl mx-auto border-[6px] border-[#F0EEE9]/10 bg-zinc-950 p-3 group hover:border-[#00F5FF]/40 transition-all duration-1000 shadow-3xl">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="ENTER SIGNAL ID..."
+                className="flex-1 bg-transparent px-12 py-14 text-6xl font-black uppercase tracking-tighter focus:outline-none placeholder:text-zinc-900 italic text-[#00F5FF]"
+              />
+              <button
+                onClick={() => {
+                  if (email) setIsSubmitted(true);
+                }}
+                className="bg-[#F0EEE9] text-black px-28 py-14 font-black uppercase tracking-[1em] hover:bg-[#FF3366] hover:text-white transition-all text-5xl active:scale-95"
+              >
+                ENTER
+              </button>
+            </div>
+            {isSubmitted && (
+              <div className="text-[#00F5FF] text-[20px] font-black uppercase tracking-[3em] animate-pulse">
+                Identity_Stored. 👀
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-40">
+            <div className="flex flex-col items-center gap-12 text-center">
+              <div className="text-zinc-800 font-mono text-[16px] uppercase tracking-[2.5em] font-bold">
+                The_App_Protocol
+              </div>
+              <div className="bg-[#FF3366]/10 text-[#FF3366] px-10 py-6 text-[14px] font-black uppercase tracking-[0.5em] rounded-sm border-2 border-[#FF3366]/40 hover:bg-[#FF3366] hover:text-white transition-all cursor-help">
+                <Ghost size={24} className="inline mr-4" /> Uninstall Tinder
+                first. This is for real life.
+              </div>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-24 grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-1000">
+              <div className="flex items-center gap-10 border-4 border-white/5 bg-zinc-900 px-20 py-14 rounded-sm cursor-not-allowed relative overflow-hidden group">
+                <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Smartphone size={64} />
+                <div className="text-left font-black uppercase leading-none text-4xl">
+                  App Store
+                  <br />
+                  <span className="text-[16px] text-[#FF3366] font-mono tracking-widest italic mt-4 inline-block underline underline-offset-4">
+                    SOON_BETA
+                  </span>
                 </div>
               </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {/* ─── JOIN ─── */}
-      <section id="join" className="joinSection" data-reveal>
-        <div className="joinInner">
-          <h2 className="joinTitle">{t.cta}</h2>
-          <form className="joinForm" onSubmit={handleSubmit}>
-            <input
-              type="email"
-              placeholder={t.email}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="joinInput"
-              required
-            />
-            <button type="submit" className="joinBtn" data-magnet>
-              {t.submit}
-            </button>
-          </form>
-        </div>
-      </section>
-
-      {/* ─── FOOTER ─── */}
-      <footer className="footer">
-        <p>{t.footer}</p>
-      </footer>
-
-      {/* ─── MODAL ─── */}
-      {modalItem && (
-        <div className="modal" onClick={() => setModalItem(null)}>
-          <div className="modalCard" onClick={(e) => e.stopPropagation()}>
-            <div className="modalTop">
-              <div className="modalTags">
-                {modalItem.tags.map((tag, i) => (
-                  <span key={i} className="cardTag">
-                    {tag}
+              <div className="flex items-center gap-10 border-4 border-white/5 bg-zinc-900 px-20 py-14 rounded-sm cursor-not-allowed relative overflow-hidden group">
+                <div className="absolute inset-0 bg-[#00F5FF]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Cpu size={64} />
+                <div className="text-left font-black uppercase leading-none text-4xl">
+                  Google Play
+                  <br />
+                  <span className="text-[16px] text-[#00F5FF] font-mono tracking-widest italic mt-4 inline-block underline underline-offset-4">
+                    SOON_DLC
                   </span>
-                ))}
+                </div>
               </div>
-              <button className="modalClose" onClick={() => setModalItem(null)}>
-                ✕
-              </button>
             </div>
-            <h3 className="modalTitle">{modalItem.title}</h3>
-            <p className="modalBody">{modalItem.desc}</p>
+          </div>
 
-            {/* Fake Map */}
-            <div className="fakeMap">
-              <div className="mapGrid">
-                {Array.from({ length: 9 }).map((_, i) => (
-                  <div key={i} className="mapCell" />
-                ))}
-              </div>
-              <div className="mapPins">
-                <span className="mapPin" style={{ top: '30%', left: '40%' }} />
-                <span className="mapPin" style={{ top: '60%', left: '65%' }} />
-                <span className="mapPin" style={{ top: '45%', left: '25%' }} />
-              </div>
-              <span className="mapBadge">MAP · LIVE</span>
+          <div className="flex flex-col md:flex-row justify-between items-end gap-32 pt-60 border-t border-white/5">
+            <div className="text-[25vw] font-black tracking-tighter uppercase italic text-zinc-900 leading-none select-none pointer-events-none text-shadow-glow-cyan opacity-40">
+              LVND.
             </div>
-
-            {/* Offer Suggestions */}
-            <div className="offerBox">
-              <div className="offerHead">
-                <span className="offerKicker">{t.modalOffer}</span>
-                <span className="offerHint">{t.modalHint}</span>
-              </div>
-              <div className="offerList">
-                {modalItem.offers.map((offer, i) => (
-                  <button key={i} className="offerRow" data-magnet>
-                    <span className="offerTitle">{offer.title}</span>
-                    <span className="offerMeta">{offer.meta}</span>
-                  </button>
-                ))}
-              </div>
+            <div className="flex flex-wrap gap-24 text-zinc-800 font-black text-7xl italic uppercase tracking-tighter">
+              <a
+                href="#"
+                className="hover:text-[#FF3366] transition-all hover:tracking-[0.15em] border-b-4 border-transparent hover:border-[#FF3366]"
+              >
+                IG
+              </a>
+              <a
+                href="#"
+                className="hover:text-[#00F5FF] transition-all hover:tracking-[0.15em] border-b-4 border-transparent hover:border-[#00F5FF]"
+              >
+                TK
+              </a>
             </div>
-
-            <div className="modalActions">
-              <button className="cta liquid" data-magnet>
-                <span className="ctaLabel">
-                  {locale === 'en' ? 'CONNECT' : 'BAĞLAN'}
-                </span>
-              </button>
-              <button className="ghost" data-magnet>
-                {locale === 'en' ? 'SAVE FOR LATER' : 'SONRA KAYDET'}
-              </button>
-            </div>
-            <p className="modalNote">
-              {locale === 'en'
-                ? 'NO LIKES. NO FOLLOWS. JUST MOMENTS.'
-                : 'BEĞENİ YOK. TAKİP YOK. SADECE ANLAR.'}
-            </p>
           </div>
         </div>
-      )}
+      </section>
 
-      {/* ─── STYLES ─── */}
-      <style jsx>{`
-        /* Reset & Base */
-        * {
-          box-sizing: border-box;
-          margin: 0;
-          padding: 0;
-        }
+      <AnimatePresence>
+        {selectedMoment && (
+          <Modal
+            isOpen={!!selectedMoment}
+            onClose={() => setSelectedMoment(null)}
+            data={selectedMoment}
+          />
+        )}
+      </AnimatePresence>
+      <LovendoCursor />
 
-        /* Custom Cursor */
-        :global(.cursor-dot) {
-          position: fixed;
-          width: 8px;
-          height: 8px;
-          background: rgba(255, 43, 214, 0.9);
-          border-radius: 50%;
-          pointer-events: none;
-          z-index: 9999;
-          transform: translate(-50%, -50%);
-          transition: transform 0.15s ease;
-        }
-        :global(.cursor-ring) {
-          position: fixed;
-          width: 32px;
-          height: 32px;
-          border: 1px solid rgba(255, 43, 214, 0.4);
-          border-radius: 50%;
-          pointer-events: none;
-          z-index: 9998;
-          transform: translate(-50%, -50%);
-          transition: transform 0.15s ease;
-        }
-
-        /* Cursor Glow */
-        :global(body)::before {
-          content: '';
-          position: fixed;
-          inset: 0;
-          pointer-events: none;
-          z-index: 2;
-          background:
-            radial-gradient(
-              260px 260px at var(--px, 50vw) var(--py, 50vh),
-              rgba(255, 43, 214, 0.14),
-              transparent 60%
-            ),
-            radial-gradient(
-              520px 520px at calc(var(--px, 50vw) - 120px)
-                calc(var(--py, 50vh) + 80px),
-              rgba(255, 43, 214, 0.08),
-              transparent 65%
-            );
-          mix-blend-mode: screen;
-        }
-
-        [data-magnet] {
-          transition: transform 220ms cubic-bezier(0.2, 0.9, 0.2, 1);
-          will-change: transform;
-        }
-
-        /* NAV */
-        .nav {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          z-index: 50;
-          padding: 16px 24px;
-          background: rgba(10, 10, 12, 0.72);
-          backdrop-filter: blur(12px);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-        }
-        .navInner {
-          max-width: 1400px;
-          margin: 0 auto;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        }
-        .logo {
-          font-size: 18px;
-          font-weight: 900;
-          letter-spacing: -0.02em;
-          color: #f2f2f2;
-        }
-        .navLinks {
-          display: none;
-          gap: 8px;
-        }
-        @media (min-width: 768px) {
-          .navLinks {
-            display: flex;
-          }
-        }
-        .navLink {
-          background: transparent;
-          border: none;
-          color: rgba(242, 242, 242, 0.72);
-          font-size: 12px;
-          font-weight: 700;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          padding: 10px 14px;
-          cursor: pointer;
-          border-radius: 8px;
-          transition:
-            background 0.2s ease,
-            color 0.2s ease;
-        }
-        .navLink:hover {
-          background: rgba(255, 255, 255, 0.06);
-          color: #f2f2f2;
-        }
-        .langToggle {
-          background: rgba(255, 255, 255, 0.06);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          color: #f2f2f2;
-          font-size: 12px;
-          font-weight: 900;
-          letter-spacing: 0.1em;
-          padding: 8px 14px;
-          border-radius: 999px;
-          cursor: pointer;
-          transition: background 0.2s ease;
-        }
-        .langToggle:hover {
-          background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* HERO */
-        .hero {
-          min-height: 100vh;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          position: relative;
-          padding: 120px 24px 80px;
-          background: radial-gradient(
-            ellipse 80% 60% at 50% 40%,
-            rgba(255, 43, 214, 0.08),
-            transparent 70%
-          );
-          overflow: hidden;
-        }
-        .heroContent {
-          text-align: center;
-          z-index: 10;
-          max-width: 900px;
-        }
-        .kicker {
-          display: inline-block;
-          font-size: 11px;
-          font-weight: 700;
-          letter-spacing: 0.2em;
-          color: rgba(255, 43, 214, 0.9);
-          margin-bottom: 16px;
-          padding: 8px 16px;
-          background: rgba(255, 43, 214, 0.08);
-          border-radius: 999px;
-          border: 1px solid rgba(255, 43, 214, 0.2);
-        }
-        .headline {
-          font-size: clamp(48px, 12vw, 140px);
-          font-weight: 900;
-          letter-spacing: -0.04em;
-          line-height: 0.9;
-          color: #f2f2f2;
-          margin-bottom: 24px;
-        }
-        .headlineLine {
-          display: block;
-        }
-        .heroSub {
-          font-size: clamp(16px, 2.5vw, 22px);
-          color: rgba(242, 242, 242, 0.65);
-          line-height: 1.5;
-          margin-bottom: 40px;
-        }
-
-        /* CTA */
-        .cta {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          height: 56px;
-          padding: 0 32px;
-          background: linear-gradient(135deg, #ff2bd6 0%, #ff6b9d 100%);
-          border: none;
-          border-radius: 999px;
-          font-size: 13px;
-          font-weight: 900;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          color: #fff;
-          cursor: pointer;
-          position: relative;
-          overflow: hidden;
-          isolation: isolate;
-          box-shadow: 0 4px 30px rgba(255, 43, 214, 0.35);
-          transition:
-            transform 0.2s ease,
-            box-shadow 0.2s ease;
-        }
-        .cta:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 40px rgba(255, 43, 214, 0.5);
-        }
-        .ctaLabel {
-          position: relative;
-          z-index: 2;
-        }
-        .ctaBlob {
-          position: absolute;
-          inset: 0;
-          z-index: 0;
-          background: radial-gradient(
-            240px 140px at var(--px, 50%) var(--py, 50%),
-            rgba(255, 255, 255, 0.2),
-            transparent
-          );
-          opacity: 0.5;
-          mix-blend-mode: overlay;
-          pointer-events: none;
-        }
-        .liquid::before {
-          content: '';
-          position: absolute;
-          inset: -40px;
-          background:
-            radial-gradient(
-              circle at 40% 40%,
-              rgba(255, 255, 255, 0.45),
-              transparent 48%
-            ),
-            radial-gradient(
-              circle at 70% 60%,
-              rgba(0, 0, 0, 0.25),
-              transparent 55%
-            );
-          opacity: 0;
-          transform: translate3d(-10%, 10%, 0) scale(0.9);
-          transition:
-            opacity 220ms ease,
-            transform 420ms cubic-bezier(0.2, 0.9, 0.2, 1);
-          z-index: 1;
-          mix-blend-mode: overlay;
-        }
-        .liquid:hover::before {
-          opacity: 0.85;
-          transform: translate3d(0, 0, 0) scale(1);
-        }
-
-        /* ORB */
-        .orbWrap {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: min(500px, 80vw);
-          height: min(500px, 80vw);
-          z-index: 1;
-          opacity: 0.6;
-        }
-
-        /* TICKER */
-        .ticker {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          overflow: hidden;
-          border-top: 1px solid rgba(255, 255, 255, 0.06);
-          background: rgba(10, 10, 12, 0.5);
-        }
-        .tickerTrack {
-          display: flex;
-          animation: tickerScroll 30s linear infinite;
-          white-space: nowrap;
-        }
-        @keyframes tickerScroll {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
-        .tickerItem {
-          flex-shrink: 0;
-          padding: 14px 40px;
-          font-size: 11px;
-          font-weight: 700;
-          letter-spacing: 0.2em;
-          color: rgba(242, 242, 242, 0.45);
-        }
-
-        /* EDITORIAL */
-        .editorial {
-          padding: 120px 24px;
-          max-width: 900px;
-          margin: 0 auto;
-        }
-        .editorialBlock {
-          margin-bottom: 120px;
-        }
-        .editorialBlock:last-child {
-          margin-bottom: 0;
-        }
-        .editorialTitle {
-          font-size: clamp(28px, 6vw, 56px);
-          font-weight: 900;
-          letter-spacing: -0.03em;
-          line-height: 1.1;
-          color: #f2f2f2;
-          margin-bottom: 24px;
-        }
-        .editorialLine {
-          display: block;
-        }
-        .editorialBody {
-          font-size: clamp(16px, 2vw, 20px);
-          color: rgba(242, 242, 242, 0.65);
-          line-height: 1.7;
-          max-width: 600px;
-        }
-
-        /* HOW */
-        .howSection {
-          padding: 100px 24px;
-          background: rgba(255, 43, 214, 0.03);
-          border-top: 1px solid rgba(255, 255, 255, 0.06);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-        }
-        .howInner {
-          max-width: 1000px;
-          margin: 0 auto;
-          text-align: center;
-        }
-        .howTitle {
-          font-size: clamp(24px, 4vw, 36px);
-          font-weight: 900;
-          letter-spacing: 0.1em;
-          color: #f2f2f2;
-          margin-bottom: 60px;
-        }
-        .howSteps {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: 40px;
-        }
-        .howStep {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 16px;
-          padding: 32px;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 24px;
-        }
-        .howIcon {
-          font-size: 40px;
-        }
-        .howText {
-          font-size: 14px;
-          font-weight: 600;
-          color: rgba(242, 242, 242, 0.8);
-          text-align: center;
-        }
-
-        /* STASH */
-        .stashSection {
-          padding: 100px 0;
-        }
-        .stashHeader {
-          padding: 0 24px;
-          max-width: 900px;
-          margin: 0 auto 60px;
-          text-align: center;
-        }
-        .stashTitle {
-          font-size: clamp(28px, 5vw, 48px);
-          font-weight: 900;
-          letter-spacing: -0.02em;
-          color: #f2f2f2;
-          margin-bottom: 12px;
-        }
-        .stashSub {
-          font-size: 16px;
-          color: rgba(242, 242, 242, 0.55);
-        }
-        .stashRail {
-          display: flex;
-          gap: 24px;
-          padding: 0 24px;
-          overflow-x: auto;
-          scrollbar-width: none;
-          cursor: grab;
-          -webkit-overflow-scrolling: touch;
-        }
-        .stashRail::-webkit-scrollbar {
-          display: none;
-        }
-
-        /* CARD */
-        .card {
-          flex-shrink: 0;
-          width: 320px;
-          border-radius: 24px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          background: rgba(18, 18, 22, 0.8);
-          overflow: hidden;
-          cursor: pointer;
-          position: relative;
-          transform-style: preserve-3d;
-          transform: perspective(900px) rotateX(var(--rx, 0deg))
-            rotateY(var(--ry, 0deg)) translateY(0);
-          will-change: transform;
-          transition:
-            transform 0.3s ease,
-            box-shadow 0.3s ease;
-        }
-        .card:hover {
-          transform: perspective(900px) rotateX(var(--rx, 0deg))
-            rotateY(var(--ry, 0deg)) translateY(-4px);
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-        }
-        .card::before {
-          content: '';
-          position: absolute;
-          inset: -2px;
-          border-radius: 24px;
-          background: radial-gradient(
-            340px 240px at var(--px, 50vw) var(--py, 50vh),
-            rgba(255, 43, 214, 0.22),
-            transparent 60%
-          );
-          opacity: 0;
-          transition: opacity 220ms ease;
-          pointer-events: none;
-          mix-blend-mode: screen;
-        }
-        .card:hover::before {
-          opacity: 1;
-        }
-        .card::after {
-          content: '';
-          position: absolute;
-          inset: -2px;
-          border-radius: 24px;
-          background: radial-gradient(
-            420px 260px at var(--sx, 50%) var(--sy, 50%),
-            rgba(255, 255, 255, 0.22),
-            transparent 62%
-          );
-          opacity: 0;
-          transition: opacity 180ms ease;
-          pointer-events: none;
-          mix-blend-mode: overlay;
-        }
-        .card:hover::after {
-          opacity: 0.95;
-        }
-        .cardMedia {
-          height: 180px;
-          background: linear-gradient(
-            135deg,
-            rgba(255, 43, 214, 0.2),
-            rgba(0, 204, 255, 0.1)
-          );
-          position: relative;
-          transform: translateZ(18px);
-        }
-        .cardLabel {
-          position: absolute;
-          top: 16px;
-          left: 16px;
-          font-size: 10px;
-          font-weight: 700;
-          letter-spacing: 0.15em;
-          color: rgba(242, 242, 242, 0.9);
-          background: rgba(0, 0, 0, 0.4);
-          backdrop-filter: blur(8px);
-          padding: 6px 12px;
-          border-radius: 999px;
-        }
-        .cardBody {
-          padding: 20px;
-          transform: translateZ(18px);
-        }
-        .cardTitle {
-          font-size: 18px;
-          font-weight: 800;
-          color: #f2f2f2;
-          margin-bottom: 8px;
-        }
-        .cardDesc {
-          font-size: 14px;
-          color: rgba(242, 242, 242, 0.6);
-          line-height: 1.5;
-          margin-bottom: 16px;
-        }
-        .cardTags {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-        }
-        .cardTag {
-          font-size: 10px;
-          font-weight: 600;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          color: rgba(255, 43, 214, 0.85);
-          background: rgba(255, 43, 214, 0.1);
-          padding: 6px 10px;
-          border-radius: 999px;
-        }
-
-        /* JOIN */
-        .joinSection {
-          padding: 120px 24px;
-          background: radial-gradient(
-            ellipse 60% 40% at 50% 100%,
-            rgba(255, 43, 214, 0.1),
-            transparent 70%
-          );
-        }
-        .joinInner {
-          max-width: 500px;
-          margin: 0 auto;
-          text-align: center;
-        }
-        .joinTitle {
-          font-size: clamp(28px, 5vw, 42px);
-          font-weight: 900;
-          letter-spacing: -0.02em;
-          color: #f2f2f2;
-          margin-bottom: 32px;
-        }
-        .joinForm {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-        }
-        @media (min-width: 480px) {
-          .joinForm {
-            flex-direction: row;
-          }
-        }
-        .joinInput {
-          flex: 1;
-          height: 56px;
-          padding: 0 20px;
-          background: rgba(255, 255, 255, 0.06);
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          border-radius: 999px;
-          font-size: 15px;
-          color: #f2f2f2;
-          outline: none;
-          transition:
-            border-color 0.2s ease,
-            background 0.2s ease;
-        }
-        .joinInput::placeholder {
-          color: rgba(242, 242, 242, 0.4);
-        }
-        .joinInput:focus {
-          border-color: rgba(255, 43, 214, 0.5);
-          background: rgba(255, 255, 255, 0.08);
-        }
-        .joinBtn {
-          height: 56px;
-          padding: 0 28px;
-          background: #f2f2f2;
-          border: none;
-          border-radius: 999px;
-          font-size: 13px;
-          font-weight: 900;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          color: #0a0a0c;
-          cursor: pointer;
-          transition:
-            background 0.2s ease,
-            transform 0.2s ease;
-        }
-        .joinBtn:hover {
-          background: #fff;
-          transform: translateY(-2px);
-        }
-
-        /* FOOTER */
-        .footer {
-          padding: 40px 24px;
-          text-align: center;
-          border-top: 1px solid rgba(255, 255, 255, 0.06);
-        }
-        .footer p {
-          font-size: 13px;
-          color: rgba(242, 242, 242, 0.4);
-          letter-spacing: 0.05em;
-        }
-
-        /* MODAL */
-        .modal {
-          position: fixed;
-          inset: 0;
-          z-index: 60;
-          display: grid;
-          place-items: center;
-          padding: 18px;
-          background: rgba(0, 0, 0, 0.62);
-          backdrop-filter: blur(10px);
-          animation: modalIn 220ms ease;
-        }
-        @keyframes modalIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-        .modalCard {
-          width: min(720px, 100%);
-          max-height: 90vh;
-          overflow-y: auto;
-          border-radius: 26px;
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          background: rgba(16, 16, 20, 0.92);
-          box-shadow: 0 30px 120px rgba(0, 0, 0, 0.7);
-          padding: 24px;
-          position: relative;
-        }
-        .modalCard::before {
-          content: '';
-          position: absolute;
-          inset: -120px;
-          background:
-            radial-gradient(
-              420px 340px at 35% 30%,
-              rgba(255, 43, 214, 0.18),
-              transparent 62%
-            ),
-            radial-gradient(
-              520px 420px at 80% 70%,
-              rgba(255, 43, 214, 0.1),
-              transparent 65%
-            );
-          pointer-events: none;
-        }
-        .modalTop {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 12px;
-          position: relative;
-        }
-        .modalTags {
-          display: inline-flex;
-          gap: 8px;
-        }
-        .modalClose {
-          height: 40px;
-          width: 40px;
-          border-radius: 999px;
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          background: rgba(0, 0, 0, 0.28);
-          color: rgba(242, 242, 242, 0.85);
-          cursor: pointer;
-          font-size: 14px;
-          transition: background 0.2s ease;
-        }
-        .modalClose:hover {
-          background: rgba(255, 255, 255, 0.08);
-        }
-        .modalTitle {
-          margin-top: 16px;
-          font-size: clamp(24px, 4vw, 34px);
-          font-weight: 900;
-          letter-spacing: -0.02em;
-          color: #f2f2f2;
-          position: relative;
-        }
-        .modalBody {
-          margin-top: 10px;
-          color: rgba(242, 242, 242, 0.65);
-          line-height: 1.65;
-          position: relative;
-        }
-
-        /* Fake Map */
-        .fakeMap {
-          margin-top: 20px;
-          height: 180px;
-          border-radius: 20px;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          background: linear-gradient(
-            135deg,
-            rgba(26, 26, 30, 0.9),
-            rgba(18, 18, 22, 0.9)
-          );
-          position: relative;
-          overflow: hidden;
-        }
-        .mapGrid {
-          position: absolute;
-          inset: 0;
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          grid-template-rows: repeat(3, 1fr);
-          opacity: 0.15;
-        }
-        .mapCell {
-          border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .mapPins {
-          position: absolute;
-          inset: 0;
-        }
-        .mapPin {
-          position: absolute;
-          width: 12px;
-          height: 12px;
-          background: #ff2bd6;
-          border-radius: 50%;
-          box-shadow: 0 0 20px rgba(255, 43, 214, 0.6);
-          animation: pinPulse 2s ease-in-out infinite;
-        }
-        .mapPin:nth-child(2) {
-          animation-delay: 0.5s;
-          background: #00ff88;
-          box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
-        }
-        .mapPin:nth-child(3) {
-          animation-delay: 1s;
-          background: #00ccff;
-          box-shadow: 0 0 20px rgba(0, 204, 255, 0.6);
-        }
-        @keyframes pinPulse {
-          0%,
-          100% {
-            transform: scale(1);
-            opacity: 1;
-          }
-          50% {
-            transform: scale(1.3);
-            opacity: 0.7;
-          }
-        }
-        .mapBadge {
-          position: absolute;
-          bottom: 10px;
-          left: 12px;
-          border-radius: 999px;
-          padding: 7px 10px;
-          font-size: 11px;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          background: rgba(0, 0, 0, 0.28);
-          color: rgba(242, 242, 242, 0.72);
-          backdrop-filter: blur(10px);
-        }
-
-        /* Offer Box */
-        .offerBox {
-          margin-top: 20px;
-          border-radius: 22px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          background: rgba(255, 255, 255, 0.04);
-          padding: 16px;
-          position: relative;
-        }
-        .offerHead {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-        }
-        .offerKicker {
-          font-size: 12px;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          color: rgba(242, 242, 242, 0.78);
-          font-weight: 700;
-        }
-        .offerHint {
-          font-size: 12px;
-          color: rgba(242, 242, 242, 0.55);
-        }
-        .offerList {
-          margin-top: 12px;
-          display: grid;
-          gap: 8px;
-        }
-        .offerRow {
-          width: 100%;
-          text-align: left;
-          border-radius: 18px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          background: rgba(0, 0, 0, 0.26);
-          padding: 12px 14px;
-          cursor: pointer;
-          color: rgba(242, 242, 242, 0.85);
-          transition: background 0.2s ease;
-        }
-        .offerRow:hover {
-          background: rgba(255, 255, 255, 0.06);
-        }
-        .offerTitle {
-          display: block;
-          font-weight: 900;
-          letter-spacing: -0.01em;
-          font-size: 14px;
-        }
-        .offerMeta {
-          display: block;
-          margin-top: 4px;
-          font-size: 12px;
-          color: rgba(242, 242, 242, 0.55);
-        }
-
-        .modalActions {
-          margin-top: 20px;
-          display: flex;
-          gap: 12px;
-          flex-wrap: wrap;
-          position: relative;
-        }
-        .ghost {
-          height: 48px;
-          border-radius: 18px;
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          background: rgba(255, 255, 255, 0.05);
-          color: rgba(242, 242, 242, 0.82);
-          font-weight: 900;
-          font-size: 12px;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          padding: 0 20px;
-          cursor: pointer;
-          transition: background 0.2s ease;
-        }
-        .ghost:hover {
-          background: rgba(255, 255, 255, 0.09);
-        }
-        .modalNote {
-          margin-top: 20px;
-          font-size: 12px;
-          color: rgba(242, 242, 242, 0.45);
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          text-align: center;
-          position: relative;
-        }
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&display=swap');
+        body { font-family: 'Space Grotesk', sans-serif; background-color: #1A1A1B; color: white; cursor: none; overflow-x: hidden; }
+        .border-text { -webkit-text-fill-color: transparent; -webkit-text-stroke: 3px rgba(255,255,255,0.08); }
+        .text-shadow-glow { text-shadow: 0 0 40px rgba(0, 245, 255, 0.3); }
+        .shadow-glow-white { box-shadow: 0 40px 120px rgba(0, 0, 0, 0.2); }
+        .custom-scrollbar::-webkit-scrollbar { width: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #000; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #00F5FF; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #1A1A1B; }
+        ::-webkit-scrollbar-thumb { background: #333; }
+        ::-webkit-scrollbar-thumb:hover { background: #FF3366; }
+        @media (max-width: 768px) { body { cursor: auto; } .border-text { -webkit-text-stroke: 1.5px rgba(255,255,255,0.1); } }
       `}</style>
-    </>
+    </div>
   );
 }
