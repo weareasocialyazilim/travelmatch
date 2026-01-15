@@ -49,7 +49,8 @@ export default function LoginPage() {
         router.push('/2fa');
       } else {
         toast.success('Giriş başarılı');
-        // Force a hard navigation to ensure cookies are sent
+        // Small delay to ensure store is persisted to localStorage before navigation
+        await new Promise((resolve) => setTimeout(resolve, 100));
         window.location.href = '/queue';
       }
     } catch (error) {
