@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
+  const response = NextResponse.next({
     request: {
       headers: request.headers,
     },
@@ -24,57 +23,6 @@ export async function middleware(request: NextRequest) {
     'Content-Security-Policy',
     "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-ancestors 'none';",
   );
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value;
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          });
-        },
-        remove(name: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value: '',
-            ...options,
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
-          response.cookies.set({
-            name,
-            value: '',
-            ...options,
-          });
-        },
-      },
-    },
-  );
-
-  // Refresh session if expired
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
 
   const adminSession = request.cookies.get('admin_session');
 
@@ -146,7 +94,7 @@ export async function middleware(request: NextRequest) {
 
   // Root redirect
   if (request.nextUrl.pathname === '/') {
-    if (session) {
+    if (adminSession) {
       return NextResponse.redirect(new URL('/queue', request.url));
     } else {
       return NextResponse.redirect(new URL('/login', request.url));
@@ -154,14 +102,14 @@ export async function middleware(request: NextRequest) {
   }
 
   // Redirect unauthenticated users to login
-  if (isProtectedRoute && (!session || !adminSession)) {
+  if (isProtectedRoute && !adminSession) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('redirect', request.nextUrl.pathname);
     return NextResponse.redirect(loginUrl);
   }
 
   // Redirect authenticated users away from auth pages
-  if (isAuthRoute && session && adminSession) {
+  if (isAuthRoute && adminSession) {
     const redirectUrl = new URL('/queue', request.url);
     return NextResponse.redirect(redirectUrl);
   }
