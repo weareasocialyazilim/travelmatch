@@ -13,7 +13,7 @@
  *
  * @example
  * ```tsx
- * import { TrustOrb } from '@travelmatch/design-system/native';
+ * import { TrustOrb } from '@lovendo/design-system/native';
  *
  * <TrustOrb
  *   trustScore={85}

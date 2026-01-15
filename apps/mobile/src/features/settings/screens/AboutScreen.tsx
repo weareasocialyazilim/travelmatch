@@ -21,7 +21,7 @@ export const AboutScreen = ({ navigation }: any) => {
         <View style={styles.logoCircle}>
           <MaterialCommunityIcons name="compass-rose" size={60} color="black" />
         </View>
-        <Text style={styles.appName}>TravelMatch</Text>
+        <Text style={styles.appName}>Lovendo</Text>
         <Text style={styles.version}>Version 1.0.0</Text>
 
         <View style={styles.menu}>

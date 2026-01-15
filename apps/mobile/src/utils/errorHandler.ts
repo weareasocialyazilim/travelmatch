@@ -99,7 +99,7 @@ export const ERROR_RECOVERY_SUGGESTIONS: Record<ErrorCode, string[]> = {
     'Restart the app and try again',
   ],
   [ErrorCode.PERMISSION_DENIED]: [
-    'Go to Settings > Apps > TravelMatch > Permissions',
+    'Go to Settings > Apps > Lovendo > Permissions',
     'Enable the required permission',
     'Restart the app after enabling',
   ],

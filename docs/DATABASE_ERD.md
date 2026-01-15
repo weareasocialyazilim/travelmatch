@@ -1,4 +1,4 @@
-# TravelMatch Database Entity-Relationship Diagram
+# Lovendo Database Entity-Relationship Diagram
 
 ## Complete ERD (Mermaid)
 

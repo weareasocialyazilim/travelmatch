@@ -2,7 +2,7 @@ import type { Config } from 'tailwindcss';
 import { liquidTailwindExtension } from './tokens/liquid';
 
 /**
- * TravelMatch Web Design System - Tailwind Preset
+ * Lovendo Web Design System - Tailwind Preset
  * "Cinematic Travel + Trust Jewelry" + "Liquid Design"
  *
  * Use this preset for both Landing Page (apps/web) and Admin Panel (apps/admin)

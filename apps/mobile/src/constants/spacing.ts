@@ -1,5 +1,5 @@
 /**
- * TravelMatch Ultimate Design System 2026 - "8pt Premium Grid"
+ * Lovendo Ultimate Design System 2026 - "8pt Premium Grid"
  * Motto: "Give a moment. See it happen."
  *
  * Based on 8pt grid system for consistent visual rhythm

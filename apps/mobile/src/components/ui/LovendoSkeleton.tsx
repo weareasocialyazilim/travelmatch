@@ -1,5 +1,5 @@
 /**
- * TMSkeleton - TravelMatch Ultimate Design System 2026
+ * LovendoSkeleton - Lovendo Ultimate Design System 2026
  * Consolidated skeleton loading component for all skeleton types
  *
  * Replaces:
@@ -10,19 +10,19 @@
  * @example
  * ```tsx
  * // Basic skeleton shape
- * <TMSkeleton type="base" width={100} height={20} />
+ * <LovendoSkeleton type="base" width={100} height={20} />
  *
  * // Avatar skeleton
- * <TMSkeleton type="avatar" size={48} />
+ * <LovendoSkeleton type="avatar" size={48} />
  *
  * // Text lines skeleton
- * <TMSkeleton type="text" lines={3} />
+ * <LovendoSkeleton type="text" lines={3} />
  *
  * // List of items
- * <TMSkeleton type="list" listType="chat" count={5} />
+ * <LovendoSkeleton type="list" listType="chat" count={5} />
  *
  * // Full screen skeleton
- * <TMSkeleton type="screen" screenType="profile" />
+ * <LovendoSkeleton type="screen" screenType="profile" />
  * ```
  */
 
@@ -47,7 +47,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 // Types
 // ═══════════════════════════════════════════════════════════════════
 
-export type TMSkeletonType =
+export type LovendoSkeletonType =
   | 'base'
   | 'avatar'
   | 'text'
@@ -75,9 +75,9 @@ export type SkeletonScreenType =
 
 export type SkeletonVariant = 'rect' | 'circle';
 
-export interface TMSkeletonProps {
+export interface LovendoSkeletonProps {
   /** Skeleton type determines rendering style */
-  type?: TMSkeletonType;
+  type?: LovendoSkeletonType;
 
   // Base props
   /** Width for base skeleton */
@@ -135,7 +135,7 @@ export interface TMSkeletonProps {
 // Main Component
 // ═══════════════════════════════════════════════════════════════════
 
-export const TMSkeleton: React.FC<TMSkeletonProps> = ({
+export const LovendoSkeleton: React.FC<LovendoSkeletonProps> = ({
   type = 'base',
   width = '100%',
   height = 20,
@@ -1170,44 +1170,44 @@ const styles = StyleSheet.create({
 // Convenience Exports (for direct use)
 // ═══════════════════════════════════════════════════════════════════
 
-/** @deprecated Use TMSkeleton with type="base" */
+/** @deprecated Use LovendoSkeleton with type="base" */
 export const Skeleton = SkeletonBase;
 
-/** @deprecated Use TMSkeleton with type="avatar" */
+/** @deprecated Use LovendoSkeleton with type="avatar" */
 export const SkeletonAvatar: React.FC<{ size?: number; style?: ViewStyle }> = ({
   size = 48,
   style,
-}) => <TMSkeleton type="avatar" size={size} style={style} />;
+}) => <LovendoSkeleton type="avatar" size={size} style={style} />;
 
-/** @deprecated Use TMSkeleton with type="text" */
+/** @deprecated Use LovendoSkeleton with type="text" */
 export const SkeletonText: React.FC<{
   lines?: number;
   lineHeight?: number;
   lastLineWidth?: string;
   style?: ViewStyle;
-}> = (props) => <TMSkeleton type="text" {...props} />;
+}> = (props) => <LovendoSkeleton type="text" {...props} />;
 
-/** @deprecated Use TMSkeleton with type="card" */
+/** @deprecated Use LovendoSkeleton with type="card" */
 export const SkeletonCard: React.FC<{ style?: ViewStyle }> = ({ style }) => (
-  <TMSkeleton type="card" style={style} />
+  <LovendoSkeleton type="card" style={style} />
 );
 
-/** @deprecated Use TMSkeleton with type="message" */
+/** @deprecated Use LovendoSkeleton with type="message" */
 export const SkeletonMessage: React.FC<{
   isOwn?: boolean;
   style?: ViewStyle;
 }> = ({ isOwn, style }) => (
-  <TMSkeleton type="message" isOwn={isOwn} style={style} />
+  <LovendoSkeleton type="message" isOwn={isOwn} style={style} />
 );
 
-/** @deprecated Use TMSkeleton with type="list" */
+/** @deprecated Use LovendoSkeleton with type="list" */
 export const SkeletonList: React.FC<{
   type: SkeletonListType;
   count?: number;
   minDisplayTime?: number;
   show?: boolean;
 }> = (props) => (
-  <TMSkeleton
+  <LovendoSkeleton
     type="list"
     listType={props.type}
     count={props.count}
@@ -1216,13 +1216,13 @@ export const SkeletonList: React.FC<{
   />
 );
 
-/** @deprecated Use TMSkeleton with type="screen" */
+/** @deprecated Use LovendoSkeleton with type="screen" */
 export const ScreenSkeleton: React.FC<{
   showHeader?: boolean;
   showTabBar?: boolean;
   contentType?: string;
 }> = ({ showHeader, showTabBar, contentType = 'list' }) => (
-  <TMSkeleton
+  <LovendoSkeleton
     type="screen"
     screenType={contentType as SkeletonScreenType}
     showHeader={showHeader}
@@ -1230,4 +1230,4 @@ export const ScreenSkeleton: React.FC<{
   />
 );
 
-export default TMSkeleton;
+export default LovendoSkeleton;

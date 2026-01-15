@@ -5,15 +5,12 @@
  */
 
 // Design System Components (migrated) - now active
-export {
-  TrustOrb,
-  TrustConstellation,
-} from '@travelmatch/design-system/native';
+export { TrustOrb, TrustConstellation } from '@lovendo/design-system/native';
 export type {
   TrustOrbProps,
   TrustConstellationProps,
   TrustFactor,
-} from '@travelmatch/design-system/native';
+} from '@lovendo/design-system/native';
 
 // Existing components - AchievementCard moved to another location
 // export { AchievementCard } from './AchievementCard';

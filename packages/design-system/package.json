@@ -1,7 +1,7 @@
 {
-  "name": "@travelmatch/design-system",
+  "name": "@lovendo/design-system",
   "version": "1.0.0",
-  "description": "TravelMatch Design System - Personalization-first component library",
+  "description": "Lovendo Design System - Personalization-first component library",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {

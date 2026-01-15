@@ -196,7 +196,7 @@ importers:
       '@tanstack/react-table':
         specifier: ^8.21.3
         version: 8.21.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@travelmatch/shared':
+      '@lovendo/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       class-variance-authority:
@@ -353,10 +353,10 @@ importers:
       '@tanstack/react-query-persist-client':
         specifier: ^5.90.18
         version: 5.90.18(@tanstack/react-query@5.90.16(react@19.1.0))(react@19.1.0)
-      '@travelmatch/design-system':
+      '@lovendo/design-system':
         specifier: workspace:*
         version: link:../../packages/design-system
-      '@travelmatch/shared':
+      '@lovendo/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       '@types/supercluster':
@@ -627,7 +627,7 @@ importers:
       '@react-three/postprocessing':
         specifier: ^3.0.4
         version: 3.0.4(@react-three/fiber@9.5.0(smtbnvm7ufornppvm5meyksb4q))(@types/three@0.182.0)(react@19.1.0)(three@0.182.0)
-      '@travelmatch/shared':
+      '@lovendo/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       framer-motion:

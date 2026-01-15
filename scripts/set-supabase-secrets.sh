@@ -33,8 +33,8 @@ echo ""
 
 # SendGrid (for Email)
 # supabase secrets set SENDGRID_API_KEY="SG.xxxxxxxxxxxxx"
-# supabase secrets set SENDGRID_FROM_EMAIL="noreply@travelmatch.app"
-# supabase secrets set SENDGRID_FROM_NAME="TravelMatch"
+# supabase secrets set SENDGRID_FROM_EMAIL="noreply@lovendo.app"
+# supabase secrets set SENDGRID_FROM_NAME="Lovendo"
 
 echo ""
 echo "✅ Secrets set successfully!"

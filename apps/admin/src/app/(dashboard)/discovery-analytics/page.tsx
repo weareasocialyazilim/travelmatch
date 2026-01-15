@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * TravelMatch Discovery & Matching Analytics
+ * Lovendo Discovery & Matching Analytics
  * Kesif ve eslestirme sistemi analitiği
  *
  * PostGIS konum analitiği, matching metrikleri, moment performansi

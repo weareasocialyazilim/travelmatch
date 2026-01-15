@@ -1,5 +1,5 @@
 /**
- * TravelMatch Awwwards Design System 2026 - Profile Header
+ * Lovendo Awwwards Design System 2026 - Profile Header
  *
  * Modern profile header with:
  * - Large avatar with animated trust ring
@@ -12,7 +12,7 @@
 
 import React, { useCallback, useEffect, memo } from 'react';
 import { View, Text, StyleSheet, Pressable, Platform } from 'react-native';
-import { TMAvatar } from '@/components/ui/TMAvatar';
+import { LovendoAvatar } from '@/components/ui/LovendoAvatar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -365,7 +365,7 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
           <Reanimated.View style={[parallaxAvatarStyle]}>
             <Pressable onPress={handleTrustPress} style={styles.avatarSection}>
               <AnimatedTrustRing score={resolvedTrust}>
-                <TMAvatar
+                <LovendoAvatar
                   testID="profile-avatar"
                   source={resolvedAvatar}
                   name={resolvedName}

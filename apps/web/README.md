@@ -1,4 +1,4 @@
-# TravelMatch Web App - Award-Winning Landing Experience
+# Lovendo Web App - Award-Winning Landing Experience
 
 > This application was completely redesigned in January 2026 with "Site of the Year" vision. Legacy
 > travel/passport architecture has been removed under "Zero-Legacy" cleanup policy.
@@ -54,7 +54,7 @@ src/
 First, run the development server:
 
 ```bash
-pnpm dev --filter @travelmatch/web
+pnpm dev --filter @lovendo/web
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to see the landing.
@@ -102,7 +102,7 @@ Active components only (Champions League roster):
 Production build:
 
 ```bash
-pnpm --filter @travelmatch/web build
+pnpm --filter @lovendo/web build
 ```
 
 Ready for Vercel, Netlify, or any Node.js hosting.

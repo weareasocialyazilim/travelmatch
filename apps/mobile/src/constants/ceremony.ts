@@ -1,5 +1,5 @@
 /**
- * TravelMatch Proof Ceremony Constants
+ * Lovendo Proof Ceremony Constants
  *
  * Design tokens and configuration for the Proof Ceremony UX system.
  * This transforms proof verification from a bureaucratic process

@@ -15,7 +15,7 @@ Before launching to App Store / Google Play, you **MUST** add these API keys to 
 2. Go to "Access Tokens" → "Create a token"
 3. **Public token:**
    - Scopes: `styles:read`, `fonts:read`, `tiles:read`
-   - URL restrictions (optional): `travelmatch.app`, `localhost`
+   - URL restrictions (optional): `lovendo.app`, `localhost`
    - Copy token → Add to `.env.production`:
      ```bash
      EXPO_PUBLIC_MAPBOX_PUBLIC_TOKEN=pk.eyJ1Ijoi...

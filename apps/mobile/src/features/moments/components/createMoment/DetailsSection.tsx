@@ -149,7 +149,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = memo(
       showAlert({
         title: '💰 Gift Protection Levels',
         message:
-          'TravelMatch protects both givers and receivers:\n\n' +
+          'Lovendo protects both givers and receivers:\n\n' +
           '✅ $0-30: Direct Payment\n' +
           'Money goes directly to the creator. No proof needed.\n\n' +
           '⚡ $30-100: Optional Escrow\n' +

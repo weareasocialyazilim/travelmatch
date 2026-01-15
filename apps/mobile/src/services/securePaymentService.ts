@@ -1,7 +1,7 @@
 /**
  * Secure Payment Service (Client-Side)
  *
- * Master Payment Service for TravelMatch - consolidates all payment operations.
+ * Master Payment Service for Lovendo - consolidates all payment operations.
  * Delegates to specialized services for single-responsibility:
  *
  * - PayTRProvider: PayTR API operations (tokenize, create payment, saved cards)

@@ -19,7 +19,7 @@ export function Navbar() {
         onClick={scrollToTop}
         className="font-black tracking-tighter text-2xl pointer-events-auto cursor-pointer hover:scale-110 transition-transform"
       >
-        TM.
+        Lovendo.
       </span>
 
       <div className="flex items-center gap-4 pointer-events-auto">

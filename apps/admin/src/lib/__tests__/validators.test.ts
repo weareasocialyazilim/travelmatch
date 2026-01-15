@@ -30,7 +30,7 @@ import {
 describe('Admin Validators', () => {
   describe('emailSchema', () => {
     it('should accept valid emails', () => {
-      expect(() => emailSchema.parse('admin@travelmatch.com')).not.toThrow();
+      expect(() => emailSchema.parse('admin@lovendo.xyz')).not.toThrow();
       expect(() => emailSchema.parse('user.name@domain.org')).not.toThrow();
     });
 
@@ -72,7 +72,7 @@ describe('Admin Validators', () => {
     it('should accept valid login credentials', () => {
       expect(() =>
         loginSchema.parse({
-          email: 'admin@travelmatch.com',
+          email: 'admin@lovendo.xyz',
           password: 'password123',
         }),
       ).not.toThrow();
@@ -81,7 +81,7 @@ describe('Admin Validators', () => {
     it('should reject empty password', () => {
       expect(() =>
         loginSchema.parse({
-          email: 'admin@travelmatch.com',
+          email: 'admin@lovendo.xyz',
           password: '',
         }),
       ).toThrow();
@@ -101,7 +101,7 @@ describe('Admin Validators', () => {
     it('should accept valid admin user data', () => {
       expect(() =>
         createAdminUserSchema.parse({
-          email: 'admin@travelmatch.com',
+          email: 'admin@lovendo.xyz',
           name: 'John Doe',
           role: 'moderator',
         }),
@@ -122,7 +122,7 @@ describe('Admin Validators', () => {
       roles.forEach((role) => {
         expect(() =>
           createAdminUserSchema.parse({
-            email: 'admin@travelmatch.com',
+            email: 'admin@lovendo.xyz',
             name: 'Test User',
             role,
           }),
@@ -133,7 +133,7 @@ describe('Admin Validators', () => {
     it('should reject invalid role', () => {
       expect(() =>
         createAdminUserSchema.parse({
-          email: 'admin@travelmatch.com',
+          email: 'admin@lovendo.xyz',
           name: 'Test User',
           role: 'invalid_role',
         }),
@@ -143,7 +143,7 @@ describe('Admin Validators', () => {
     it('should reject short name', () => {
       expect(() =>
         createAdminUserSchema.parse({
-          email: 'admin@travelmatch.com',
+          email: 'admin@lovendo.xyz',
           name: 'A',
           role: 'moderator',
         }),
@@ -152,7 +152,7 @@ describe('Admin Validators', () => {
 
     it('should default requires_2fa to true', () => {
       const result = createAdminUserSchema.parse({
-        email: 'admin@travelmatch.com',
+        email: 'admin@lovendo.xyz',
         name: 'Test User',
         role: 'moderator',
       });

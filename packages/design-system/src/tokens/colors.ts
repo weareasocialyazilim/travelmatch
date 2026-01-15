@@ -1,5 +1,5 @@
 /**
- * TravelMatch - Awwwards Edition Color Palette
+ * Lovendo - Awwwards Edition Color Palette
  *
  * Felsefe: Twilight Zinc (Yumuşak Koyu) zemin üzerinde
  * GenZ enerjisini temsil eden yüksek kontrastlı Neon dokunuşlar.

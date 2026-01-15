@@ -10,9 +10,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'TravelMatch - Find Your Sacred Journey',
+  title: 'Lovendo - Find Your Sacred Journey',
   description:
-    'Discover destinations that resonate with your soul through our AI-powered travel matching.',
+    'Discover destinations that resonate with your soul through our AI-powered matching.',
 };
 /* Lines 12-43 omitted */
 export default function RootLayout({

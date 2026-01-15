@@ -3,12 +3,12 @@ echo "🔍 Running pre-push checks..."
 
 # 1. Lint check (warning only)
 echo "🔧 Lint checking..."
-pnpm turbo run lint --filter=@travelmatch/mobile 2>/dev/null || true
+pnpm turbo run lint --filter=@lovendo/mobile 2>/dev/null || true
 echo "✅ Lint check complete"
 
 # 2. Type checking (warning only - known issues)
 echo "📝 Type checking (warning mode)..."
-pnpm turbo run type-check --filter=@travelmatch/mobile 2>/dev/null || true
+pnpm turbo run type-check --filter=@lovendo/mobile 2>/dev/null || true
 echo "⚠️  Type errors are tracked in technical debt"
 
 echo "✅ Pre-push checks complete!"

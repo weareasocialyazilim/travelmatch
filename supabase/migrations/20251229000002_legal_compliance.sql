@@ -1,5 +1,5 @@
 -- ============================================
--- TravelMatch Yasal Uyumluluk & Güvenlik
+-- Lovendo Yasal Uyumluluk & Güvenlik
 -- Migration: 20251229000002_legal_compliance.sql
 -- ============================================
 --
@@ -136,7 +136,7 @@ CREATE TABLE IF NOT EXISTS gift_contracts (
   receiver_id UUID NOT NULL REFERENCES users(id),
 
   -- Sözleşme Detayları
-  contract_number TEXT NOT NULL UNIQUE, -- TM-2024-000001 formatında
+  contract_number TEXT NOT NULL UNIQUE, -- LV-2024-000001 formatında
   contract_version TEXT NOT NULL DEFAULT '1.0',
 
   -- Ön Bilgilendirme
@@ -197,11 +197,11 @@ BEGIN
   ), 0) + 1
   INTO next_seq
   FROM gift_contracts
-  WHERE contract_number LIKE 'TM-' || year_part || '-%';
+  WHERE contract_number LIKE 'LV-' || year_part || '-%';
 
   seq_part := LPAD(next_seq::TEXT, 6, '0');
 
-  RETURN 'TM-' || year_part || '-' || seq_part;
+  RETURN 'LV-' || year_part || '-' || seq_part;
 END;
 $$;
 

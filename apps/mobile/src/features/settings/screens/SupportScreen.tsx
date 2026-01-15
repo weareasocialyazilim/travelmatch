@@ -72,12 +72,12 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
   );
 
   const handleEmailSupport = () => {
-    Linking.openURL('mailto:support@travelmatch.com?subject=Support Request');
+    Linking.openURL('mailto:support@lovendo.xyz?subject=Support Request');
   };
 
   const handleWhatsApp = () => {
     Linking.openURL(
-      'https://wa.me/905551234567?text=Hello, I need help with TravelMatch',
+      'https://wa.me/905551234567?text=Hello, I need help with Lovendo',
     );
   };
 
@@ -90,7 +90,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({ navigation }) => {
       id: '1',
       icon: 'email-outline',
       title: 'Email Support',
-      description: 'support@travelmatch.com',
+      description: 'support@lovendo.xyz',
       action: handleEmailSupport,
     },
     {

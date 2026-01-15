@@ -1,5 +1,5 @@
 /**
- * DiscoverScreen - TravelMatch: The Rebirth
+ * DiscoverScreen - Lovendo: The Rebirth
  *
  * Awwwards standardında keşfet ekranı.
  * "Soft Minimalist & Premium" tasarım diliyle güncellendi.
@@ -309,11 +309,11 @@ const DiscoverScreen = () => {
     async (story: Story) => {
       HapticManager.buttonPress();
       try {
-        const shareMessage = `🌟 ${story.title || 'Bir hikaye'}\n\n${selectedStoryUser?.name || 'Bir kullanıcı'} TravelMatch'te muhteşem bir an paylaştı!\n\n👉 TravelMatch'te gör: https://travelmatch.app/stories/${story.id}`;
+        const shareMessage = `🌟 ${story.title || 'Bir hikaye'}\n\n${selectedStoryUser?.name || 'Bir kullanıcı'} Lovendo'da muhteşem bir an paylaştı!\n\n👉 Lovendo'da gör: https://www.lovendo.xyz/stories/${story.id}`;
 
         const result = await Share.share({
           message: shareMessage,
-          title: story.title || 'TravelMatch Hikayesi',
+          title: story.title || 'Lovendo Hikayesi',
         });
 
         if (result.action === Share.sharedAction) {
@@ -418,11 +418,11 @@ const DiscoverScreen = () => {
         typeof moment.location === 'string'
           ? moment.location
           : moment.location?.city || 'Bir yer';
-      const shareMessage = `🌟 ${moment.title || 'Bir an'}\n\n${moment.description || "TravelMatch'te bu muhteşem anı keşfet!"}\n\n📍 ${locationDisplay}\n💰 ${moment.price || 0} ${moment.currency || 'TRY'}\n\n👉 TravelMatch'te gör: https://travelmatch.app/moments/${moment.id}`;
+      const shareMessage = `🌟 ${moment.title || 'Bir an'}\n\n${moment.description || "Lovendo'da bu muhteşem anı keşfet!"}\n\n📍 ${locationDisplay}\n💰 ${moment.price || 0} ${moment.currency || 'TRY'}\n\n👉 Lovendo'da gör: https://www.lovendo.xyz/moments/${moment.id}`;
 
       const result = await Share.share({
         message: shareMessage,
-        title: moment.title || 'TravelMatch Anı',
+        title: moment.title || 'Lovendo Anı',
       });
 
       if (result.action === Share.sharedAction) {

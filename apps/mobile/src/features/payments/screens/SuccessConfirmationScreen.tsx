@@ -41,7 +41,7 @@ export const SuccessConfirmationScreen: React.FC = () => {
           <View style={styles.textBlock}>
             <Text style={styles.headline}>You&apos;re in!</Text>
             <Text style={styles.body}>
-              Let&apos;s personalize your TravelMatch journey.
+              Let&apos;s personalize your Lovendo journey.
             </Text>
           </View>
         </View>

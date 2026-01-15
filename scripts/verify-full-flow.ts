@@ -26,19 +26,19 @@ const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
 
 // Test user data - password from env or random
 const HOST = {
-  email: `host_${Date.now()}@travelmatch.app`,
+  email: `host_${Date.now()}@lovendo.app`,
   password: TEST_PASSWORD,
   name: 'Host User',
 };
 
 const TRAVELER_LOW = {
-  email: `traveler_low_${Date.now()}@travelmatch.app`,
+  email: `traveler_low_${Date.now()}@lovendo.app`,
   password: TEST_PASSWORD,
   name: 'Low Budget Traveler',
 };
 
 const TRAVELER_HIGH = {
-  email: `traveler_high_${Date.now()}@travelmatch.app`,
+  email: `traveler_high_${Date.now()}@lovendo.app`,
   password: TEST_PASSWORD,
   name: 'High Budget Traveler',
 };

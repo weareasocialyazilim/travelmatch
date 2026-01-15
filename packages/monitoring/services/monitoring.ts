@@ -36,7 +36,7 @@ class MonitoringService {
    *   applicationId: process.env.DD_APP_ID!,
    *   clientToken: process.env.DD_CLIENT_TOKEN!,
    *   env: 'production',
-   *   serviceName: 'travelmatch-mobile',
+   *   serviceName: 'lovendo-mobile',
    *   version: '1.0.0'
    * });
    * ```

@@ -25,7 +25,7 @@ type InviteFriendsScreenProps = StackScreenProps<
 export default function InviteFriendsScreen({
   navigation,
 }: InviteFriendsScreenProps) {
-  const [inviteCode] = useState('TM-KEMAL23');
+  const [inviteCode] = useState('LV-KEMAL23');
   const [friendsJoined] = useState(5);
   const [momentsGifted] = useState(2);
 
@@ -37,7 +37,7 @@ export default function InviteFriendsScreen({
   const handleShareLink = async () => {
     try {
       await Share.share({
-        message: `Join me on TravelMatch! Use my invite code: ${inviteCode}`,
+        message: `Join me on Lovendo! Use my invite code: ${inviteCode}`,
       });
     } catch (error) {
       logger.error('Share failed:', error);
@@ -83,7 +83,7 @@ export default function InviteFriendsScreen({
         </View>
 
         {/* Title and Description */}
-        <Text style={styles.mainTitle}>Share TravelMatch</Text>
+        <Text style={styles.mainTitle}>Share Lovendo</Text>
         <Text style={styles.description}>
           Invite people who care about real moments.
         </Text>

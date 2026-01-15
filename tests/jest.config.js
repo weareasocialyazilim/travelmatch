@@ -37,7 +37,7 @@ module.exports = {
     '^@react-native-community/netinfo$': '<rootDir>/apps/mobile/__mocks__/@react-native-community/netinfo.js',
     '^@react-native-community/datetimepicker$': '<rootDir>/apps/mobile/__mocks__/@react-native-community/datetimepicker.js',
     '^posthog-react-native$': '<rootDir>/apps/mobile/__mocks__/posthog-react-native.js',
-    '^@travelmatch/design-system/tokens$': '<rootDir>/apps/mobile/__mocks__/design-tokens.js',
+    '^@lovendo/design-system/tokens$': '<rootDir>/apps/mobile/__mocks__/design-tokens.js',
     '^@expo/vector-icons$': '<rootDir>/apps/mobile/__mocks__/@expo/vector-icons.js',
     '^@expo/vector-icons/(.*)$': '<rootDir>/apps/mobile/__mocks__/@expo/vector-icons.js',
     '^@react-navigation/native$': '<rootDir>/apps/mobile/__mocks__/@react-navigation/native.js',

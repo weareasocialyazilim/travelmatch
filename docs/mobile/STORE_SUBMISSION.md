@@ -1,4 +1,4 @@
-# TravelMatch - Store Submission Guide
+# Lovendo - Store Submission Guide
 
 ## Pre-Submission Checklist
 
@@ -14,17 +14,17 @@
 - [ ] App Preview Video (optional): 15-30 seconds
 
 #### App Information
-- **App Name**: TravelMatch
+- **App Name**: Lovendo
 - **Subtitle**: Connect Through Travel Moments
 - **Category**: Primary - Travel, Secondary - Social Networking
 - **Age Rating**: 12+ (Infrequent/Mild User Generated Content)
-- **Privacy Policy URL**: https://travelmatch.app/privacy
-- **Support URL**: https://travelmatch.app/support
-- **Marketing URL**: https://travelmatch.app
+- **Privacy Policy URL**: https://lovendo.app/privacy
+- **Support URL**: https://lovendo.app/support
+- **Marketing URL**: https://lovendo.app
 
 #### Description (4000 chars max)
 ```
-TravelMatch connects travelers through unique experiences. Share your travel moments, discover local guides, and create unforgettable memories.
+Lovendo connects travelers through unique experiences. Share your travel moments, discover local guides, and create unforgettable memories.
 
 KEY FEATURES:
 
@@ -52,8 +52,8 @@ Find moments near you or explore destinations worldwide. Filter by category, pri
 - Withdraw to your bank account
 - Transaction history
 
-WHY TRAVELMATCH?
-We believe the best travel experiences come from real connections. Whether you're a local sharing your favorite spots or a traveler seeking authentic experiences, TravelMatch brings people together.
+WHY LOVENDO?
+We believe the best travel experiences come from real connections. Whether you're a local sharing your favorite spots or a traveler seeking authentic experiences, Lovendo brings people together.
 
 Download now and start your journey!
 ```
@@ -88,7 +88,7 @@ Version 1.0.0
 - [ ] Video (optional): YouTube URL
 
 #### Store Listing
-- **App Name**: TravelMatch - Travel Moments
+- **App Name**: Lovendo - Travel Moments
 - **Short Description** (80 chars):
 ```
 Connect with travelers. Share moments. Gift experiences. Travel differently.
@@ -243,4 +243,4 @@ eas submit --platform android --profile production
 - **Developer Account Owner**: kemalteksal@me.com
 - **Apple Team ID**: ZWCGM5V955
 - **App Store Connect App ID**: 6740496053
-- **Support Email**: support@travelmatch.app
+- **Support Email**: support@lovendo.app

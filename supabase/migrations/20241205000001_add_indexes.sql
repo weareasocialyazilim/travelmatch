@@ -1,4 +1,4 @@
--- TravelMatch Indexes Migration
+-- Lovendo Indexes Migration
 -- Version: 1.0.0
 -- Created: 2024-12-05
 -- Description: Performance indexes for all tables

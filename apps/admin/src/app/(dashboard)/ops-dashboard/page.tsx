@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * TravelMatch Ops Dashboard - READ-ONLY Stability Dashboard
+ * Lovendo Ops Dashboard - READ-ONLY Stability Dashboard
  *
  * Bu sayfa ADD-ONLY prensibiyle eklenmistir.
  * Mevcut sistemlere dokunmaz, sadece gozlem ve stabilite metrikleri gosterir.

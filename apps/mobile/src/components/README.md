@@ -1,6 +1,6 @@
 # Components
 
-Reusable UI components for the TravelMatch application.
+Reusable UI components for the Lovendo application.
 
 ## Table of Contents
 

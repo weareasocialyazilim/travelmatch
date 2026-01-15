@@ -24,7 +24,7 @@ import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { SPACING, RADIUS } from '@/constants/spacing';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { TMButton } from '@/components/ui/TMButton';
+import { LovendoButton } from '@/components/ui/LovendoButton';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { NetworkGuard } from '@/components/NetworkGuard';
 import { INITIAL_VERIFICATION_DATA } from './constants';
@@ -131,8 +131,8 @@ const KYCIntroScreen: React.FC = () => {
             <Text style={styles.overline}>SEÇKİN TOPLULUK</Text>
             <Text style={styles.title}>Güven Seremonisine{'\n'}Hoş Geldin</Text>
             <Text style={styles.subtitle}>
-              TravelMatch'te güvenli bir deneyim için kimliğini doğrulayarak
-              ipeksi bir ağın parçası ol.
+              Lovendo'da güvenli bir deneyim için kimliğini doğrulayarak ipeksi
+              bir ağın parçası ol.
             </Text>
           </View>
 
@@ -196,7 +196,7 @@ const KYCIntroScreen: React.FC = () => {
         <View
           style={[styles.footer, { paddingBottom: insets.bottom + SPACING.lg }]}
         >
-          <TMButton
+          <LovendoButton
             title="Seremoniyi Başlat"
             variant="primary"
             onPress={handleStart}

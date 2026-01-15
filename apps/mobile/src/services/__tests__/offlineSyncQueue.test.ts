@@ -41,6 +41,12 @@ describe('OfflineSyncQueue', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
 
+    // Ensure storage mocks have sane defaults for each test.
+    // `clearAllMocks()` does not reset mock implementations.
+    mockAsyncStorage.setItem.mockResolvedValue(undefined as any);
+    mockAsyncStorage.removeItem.mockResolvedValue(undefined as any);
+    mockAsyncStorage.getItem.mockResolvedValue(null);
+
     // Default: online
     mockNetInfo.fetch.mockResolvedValue({
       isConnected: true,
@@ -48,7 +54,6 @@ describe('OfflineSyncQueue', () => {
     });
 
     // Clear queue
-    mockAsyncStorage.getItem.mockResolvedValue(null);
     await offlineSyncQueue.clearAll();
   });
 
@@ -319,7 +324,7 @@ describe('OfflineSyncQueue', () => {
       await offlineSyncQueue.add('CREATE_MOMENT', { title: 'Test' });
 
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
-        '@travelmatch_offline_queue',
+        '@lovendo/offline_queue',
         expect.stringContaining('CREATE_MOMENT'),
       );
     });

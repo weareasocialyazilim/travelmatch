@@ -53,7 +53,7 @@ jest.mock('expo-crypto', () => mockCrypto);
 jest.mock('react-native-mmkv', () => ({ MMKV: mockMMKV }));
 
 describe('Storage Encryption', () => {
-  const ENCRYPTION_KEY_STORAGE_KEY = 'travelmatch_mmkv_encryption_key';
+  const ENCRYPTION_KEY_STORAGE_KEY = 'lovendo_mmkv_encryption_key';
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -77,7 +77,7 @@ describe('Storage Encryption', () => {
       if (!existingKey) {
         const newKey = await mockCrypto.digestStringAsync(
           mockCrypto.CryptoDigestAlgorithm.SHA256,
-          `travelmatch_${Date.now()}_${Math.random().toString(36)}`,
+          `lovendo_${Date.now()}_${Math.random().toString(36)}`,
         );
 
         await mockSecureStore.setItemAsync(ENCRYPTION_KEY_STORAGE_KEY, newKey, {
@@ -132,13 +132,13 @@ describe('Storage Encryption', () => {
       const keyValue = TestSecrets.encryptionKey();
 
       const storage = new mockMMKV({
-        id: 'travelmatch-storage',
+        id: 'lovendo-storage',
         storageKey: keyValue,
       });
 
       expect(mockMMKV).toHaveBeenCalledWith(
         expect.objectContaining({
-          id: 'travelmatch-storage',
+          id: 'lovendo-storage',
           storageKey: keyValue,
         }),
       );
@@ -201,7 +201,7 @@ describe('Storage Encryption', () => {
 
       // Generate multiple keys
       for (let i = 0; i < 100; i++) {
-        const uniquePart = `travelmatch_${Date.now()}_${Math.random().toString(
+        const uniquePart = `lovendo_${Date.now()}_${Math.random().toString(
           36,
         )}`;
         mockCrypto.digestStringAsync.mockResolvedValueOnce(

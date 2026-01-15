@@ -1,8 +1,8 @@
-# TravelMatch Database Architecture
+# Lovendo Database Architecture
 
 ## Overview
 
-TravelMatch uses **Supabase** (PostgreSQL 15) as its primary database, providing a scalable, secure, and feature-rich backend for the social travel platform. This document outlines the complete database architecture, design decisions, and best practices.
+Lovendo uses **Supabase** (PostgreSQL 15) as its primary database, providing a scalable, secure, and feature-rich backend for the social travel platform. This document outlines the complete database architecture, design decisions, and best practices.
 
 ## Table of Contents
 
@@ -35,7 +35,7 @@ TravelMatch uses **Supabase** (PostgreSQL 15) as its primary database, providing
 ### Database Structure
 
 ```
-travelmatch/
+lovendo/
 ├── supabase/
 │   ├── migrations/          # 50+ versioned migrations
 │   ├── functions/           # Edge functions (Deno)
@@ -62,7 +62,7 @@ travelmatch/
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           TravelMatch Data Model                             │
+│                           Lovendo Data Model                             │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
 │    ┌─────────┐         ┌─────────────┐         ┌──────────────┐             │

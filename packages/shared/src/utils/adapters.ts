@@ -5,7 +5,7 @@
  * used by admin panel, mobile app, and database.
  *
  * These adapters ensure data consistency when passing data between
- * different parts of the TravelMatch platform.
+ * different parts of the Lovendo platform.
  */
 
 import type {

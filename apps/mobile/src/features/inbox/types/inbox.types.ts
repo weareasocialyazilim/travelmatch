@@ -1,5 +1,5 @@
 /**
- * TravelMatch Vibe Room - Inbox Types
+ * Lovendo Vibe Room - Inbox Types
  *
  * Type definitions for the dark-themed, glass morphism inbox experience.
  * "Context is King" - Every chat is connected to a Moment.

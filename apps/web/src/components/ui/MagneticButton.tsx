@@ -4,7 +4,7 @@ import { useRef, useState, ReactNode } from 'react';
 import { motion } from 'framer-motion';
 
 /**
- * TravelMatch Premium Magnetic Button
+ * Lovendo Premium Magnetic Button
  *
  * Features:
  * - Magnetic mouse attraction effect

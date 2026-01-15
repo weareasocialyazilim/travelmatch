@@ -1,9 +1,9 @@
 /**
  * Payment Schema - Local wrapper for shared schemas
- * Re-exports from @travelmatch/shared package
+ * Re-exports from @lovendo/shared package
  *
  * ARCHITECTURE NOTE:
- * - Production: Use '@travelmatch/shared' package import
+ * - Production: Use '@lovendo/shared' package import
  * - Local Dev: This file provides local definitions for schema resolution
  */
 

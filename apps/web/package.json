@@ -1,5 +1,5 @@
 {
-  "name": "@travelmatch/web",
+  "name": "@lovendo/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -18,7 +18,7 @@
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "@react-three/postprocessing": "^3.0.4",
-    "@travelmatch/shared": "workspace:*",
+    "@lovendo/shared": "workspace:*",
     "framer-motion": "^12.23.26",
     "gsap": "^3.14.2",
     "lenis": "^1.3.17",

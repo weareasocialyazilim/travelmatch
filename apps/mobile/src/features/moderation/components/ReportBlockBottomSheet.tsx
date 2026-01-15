@@ -105,9 +105,7 @@ export const ReportBlockBottomSheet: React.FC<ReportBlockBottomSheetProps> = ({
             {/* Header */}
             <View style={styles.header}>
               <Text style={styles.title}>Report or block</Text>
-              <Text style={styles.subtitle}>
-                Help us keep TravelMatch safe.
-              </Text>
+              <Text style={styles.subtitle}>Help us keep Lovendo safe.</Text>
             </View>
 
             {/* Content */}

@@ -1,5 +1,5 @@
 -- ============================================
--- TRAVELMATCH PRODUCTION-READY SEED DATA
+-- LOVENDO PRODUCTION-READY SEED DATA
 -- ============================================
 -- Version: 2.0.0
 -- Purpose: Comprehensive test data with edge cases
@@ -14,33 +14,33 @@ BEGIN;
 INSERT INTO users (id, email, full_name, bio, location, languages, interests, verified, balance, currency, created_at)
 VALUES
   -- Regular user
-  ('11111111-1111-1111-1111-111111111111', 'alice@travelmatch.test', 'Alice Johnson',
+  ('11111111-1111-1111-1111-111111111111', 'alice@lovendo.test', 'Alice Johnson',
    'Coffee lover ☕ | Istanbul explorer', 'Istanbul, Turkey',
    ARRAY['en', 'tr'], ARRAY['food', 'culture'], true, 100.00, 'TRY', NOW() - INTERVAL '30 days'),
 
   -- Unicode edge case (Chinese name)
-  ('22222222-2222-2222-2222-222222222222', 'wei@travelmatch.test', '王伟 (Wang Wei)',
+  ('22222222-2222-2222-2222-222222222222', 'wei@lovendo.test', '王伟 (Wang Wei)',
    '我喜欢旅行 🌏', 'Beijing, China',
    ARRAY['zh', 'en'], ARRAY['adventure', 'nature'], true, 250.50, 'CNY', NOW() - INTERVAL '15 days'),
 
   -- Long name edge case
-  ('33333333-3333-3333-3333-333333333333', 'maria@travelmatch.test',
+  ('33333333-3333-3333-3333-333333333333', 'maria@lovendo.test',
    'María José García Hernández de la Cruz López',
    'Hola! Passionate about sharing local Spanish culture with travelers.',
    'Barcelona, Spain', ARRAY['es', 'en', 'ca'], ARRAY['food', 'art', 'music'], true, 0.00, 'EUR', NOW() - INTERVAL '60 days'),
 
   -- Emoji-heavy bio (mobile rendering test)
-  ('44444444-4444-4444-4444-444444444444', 'yuki@travelmatch.test', 'ゆき Yuki',
+  ('44444444-4444-4444-4444-444444444444', 'yuki@lovendo.test', 'ゆき Yuki',
    '🗾 Tokyo Native | 🍱 Foodie | 🎌 Cultural Guide | 🌸 Sakura Season Expert',
    'Tokyo, Japan', ARRAY['ja', 'en'], ARRAY['food', 'culture', 'nature'], false, 0.00, 'JPY', NOW() - INTERVAL '5 days'),
 
   -- Unverified new user (testing pending states)
-  ('55555555-5555-5555-5555-555555555555', 'newuser@travelmatch.test', 'New User',
+  ('55555555-5555-5555-5555-555555555555', 'newuser@lovendo.test', 'New User',
    NULL, 'New York, USA', ARRAY['en'], ARRAY[], false, 0.00, 'USD', NOW() - INTERVAL '1 hour'),
 
   -- Admin user for testing
-  ('99999999-9999-9999-9999-999999999999', 'admin@travelmatch.test', 'Admin User',
-   'TravelMatch Administrator', 'Remote', ARRAY['en'], ARRAY[], true, 0.00, 'USD', NOW());
+  ('99999999-9999-9999-9999-999999999999', 'admin@lovendo.test', 'Admin User',
+   'Lovendo Administrator', 'Remote', ARRAY['en'], ARRAY[], true, 0.00, 'USD', NOW());
 
 -- ============================================
 -- 2. MOMENTS (Various States & Edge Cases)

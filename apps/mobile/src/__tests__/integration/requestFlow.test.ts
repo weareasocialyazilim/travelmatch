@@ -49,13 +49,13 @@ mockSupabase.auth = mockAuth as unknown as typeof mockSupabase.auth;
 describe('Request Flow Integration', () => {
   const mockRequester = {
     id: 'user-requester-123',
-    email: 'requester@travelmatch.com',
+    email: 'requester@lovendo.com',
     user_metadata: { name: 'Request User' },
   };
 
   const mockHost = {
     id: 'user-host-456',
-    email: 'host@travelmatch.com',
+    email: 'host@lovendo.com',
     user_metadata: { name: 'Host User' },
   };
 

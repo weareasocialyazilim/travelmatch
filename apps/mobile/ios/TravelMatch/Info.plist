@@ -7,7 +7,7 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleDisplayName</key>
-    <string>TravelMatch</string>
+    <string>Lovendo</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
@@ -27,8 +27,8 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>travelmatch</string>
-          <string>com.travelmatch.mobile</string>
+          <string>lovendo</string>
+          <string>com.lovendo.mobile</string>
         </array>
       </dict>
     </array>
@@ -46,25 +46,25 @@
       <false/>
     </dict>
     <key>NSCameraUsageDescription</key>
-    <string>TravelMatch needs camera access to capture travel moments.</string>
+    <string>Lovendo needs camera access to capture travel moments.</string>
     <key>NSContactsUsageDescription</key>
-    <string>TravelMatch can help you find friends who are also using the app.</string>
+    <string>Lovendo can help you find friends who are also using the app.</string>
     <key>NSFaceIDUsageDescription</key>
-    <string>TravelMatch uses Face ID for secure authentication.</string>
+    <string>Lovendo uses Face ID for secure authentication.</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your location</string>
     <key>NSLocationAlwaysUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your location</string>
     <key>NSLocationWhenInUseUsageDescription</key>
-    <string>TravelMatch uses your location to show nearby experiences.</string>
+    <string>Lovendo uses your location to show nearby experiences.</string>
     <key>NSMicrophoneUsageDescription</key>
-    <string>TravelMatch uses the microphone to record voice messages in chats.</string>
+    <string>Lovendo uses the microphone to record voice messages in chats.</string>
     <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>TravelMatch needs permission to save photos to your library.</string>
+    <string>Lovendo needs permission to save photos to your library.</string>
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>TravelMatch needs access to your photos to share travel moments.</string>
+    <string>Lovendo needs access to your photos to share travel moments.</string>
     <key>NSUserTrackingUsageDescription</key>
-    <string>TravelMatch uses this to provide personalized recommendations and improve app experience. Your data is never sold to third parties.</string>
+    <string>Lovendo uses this to provide personalized recommendations and improve app experience. Your data is never sold to third parties.</string>
     <key>RCTNewArchEnabled</key>
     <true/>
     <key>UIBackgroundModes</key>

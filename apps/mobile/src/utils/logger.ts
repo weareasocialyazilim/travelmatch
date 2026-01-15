@@ -93,7 +93,7 @@ const SENSITIVE_KEYS = [
 interface LoggerConfig {
   /** Enable logging in production (default: false) */
   enableInProduction?: boolean;
-  /** Prefix for all log messages (default: [TravelMatch]) */
+  /** Prefix for all log messages (default: [Lovendo]) */
   prefix?: string;
   /** Minimum log level to output (default: debug) */
   minLevel?: LogLevel;
@@ -146,7 +146,7 @@ class Logger {
 
     this.config = {
       enableInProduction: false,
-      prefix: '[TravelMatch]',
+      prefix: '[Lovendo]',
       minLevel: 'debug',
       enableRemoteLogging: false, // default off; tests enable explicitly
       jsonFormat: !isDev,

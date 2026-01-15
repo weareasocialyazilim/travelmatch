@@ -344,7 +344,7 @@ describe('Auth Flow Integration', () => {
       expect(result.error).toBeNull();
       expect(mockAuth.resetPasswordForEmail).toHaveBeenCalledWith(
         'test@example.com',
-        { redirectTo: 'travelmatch://auth/reset-password' },
+        { redirectTo: 'lovendo://auth/reset-password' },
       );
 
       // Verify logging

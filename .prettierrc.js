@@ -1,6 +1,6 @@
 /**
  * Prettier Configuration
- * Consistent code formatting for TravelMatch
+ * Consistent code formatting for Lovendo
  */
 module.exports = {
   // Basic formatting

@@ -141,8 +141,8 @@ const ENV_TEMPLATES = {
       {
         key: 'REDIS_PASSWORD',
         desc: 'Redis Password',
-        example: 'travelmatch-redis-dev-password',
-        default: 'travelmatch-redis-dev-password',
+        example: 'lovendo-redis-dev-password',
+        default: 'lovendo-redis-dev-password',
       },
       {
         key: 'GRAFANA_ADMIN_USER',
@@ -341,7 +341,7 @@ async function setupEnvironment(name, config) {
 
 async function main() {
   log('\n' + '='.repeat(60), 'bright');
-  log('🚀 TravelMatch Environment Setup', 'bright');
+  log('🚀 Lovendo Environment Setup', 'bright');
   log('='.repeat(60) + '\n', 'bright');
 
   log('This wizard will help you set up environment files for:', 'cyan');
@@ -421,7 +421,7 @@ async function main() {
   log('\n💡 Tips:', 'blue');
   log('  • Re-run this script anytime: npm run setup:env', 'dim');
   log('  • Check .env.example files for reference', 'dim');
-  log('  • Use Developer CLI: npm run tm:dev', 'dim');
+  log('  • Use Developer CLI: npm run lovendo:dev', 'dim');
   log('  • Use Docker: docker-compose up -d', 'dim');
 
   log('');

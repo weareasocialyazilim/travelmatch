@@ -14,7 +14,7 @@ const envSchema = z.object({
   NODE_ENV: z
     .enum(['development', 'production', 'test'])
     .default('development'),
-  APP_NAME: z.string().default('TravelMatch'),
+  APP_NAME: z.string().default('Lovendo'),
   APP_VERSION: z.string().default('1.0.0'),
   ENABLE_ANALYTICS: z.boolean().default(false),
   ENABLE_LOGGING: z.boolean().default(true),
@@ -45,7 +45,7 @@ function getEnvVars() {
   const rawEnv = {
     API_URL: process.env.EXPO_PUBLIC_API_URL as string | undefined,
     NODE_ENV: process.env.NODE_ENV as 'development' | 'production' | 'test',
-    APP_NAME: 'TravelMatch' as const,
+    APP_NAME: 'Lovendo' as const,
     APP_VERSION: '1.0.0' as const,
     ENABLE_ANALYTICS: process.env.EXPO_PUBLIC_ENABLE_ANALYTICS === 'true',
     ENABLE_LOGGING: __DEV__,

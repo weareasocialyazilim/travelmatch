@@ -1,7 +1,7 @@
 {
-  "name": "@travelmatch/payment-services",
+  "name": "@lovendo/payment-services",
   "version": "1.0.0",
-  "description": "Payment processing services for TravelMatch",
+  "description": "Payment processing services for Lovendo",
   "private": true,
   "main": "./src/index.ts",
   "types": "./src/index.ts",

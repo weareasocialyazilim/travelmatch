@@ -1,6 +1,6 @@
 /**
  * Validation Schemas
- * Re-exports from @travelmatch/shared and mobile-specific schemas
+ * Re-exports from @lovendo/shared and mobile-specific schemas
  *
  * @see packages/shared/src/schemas for base schemas
  */

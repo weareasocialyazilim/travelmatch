@@ -1,5 +1,5 @@
 -- ============================================================================
--- TravelMatch RLS Policy Templates
+-- Lovendo RLS Policy Templates
 -- Version: 2.0
 -- 
 -- Usage: Copy and customize these templates for each table.

@@ -1,7 +1,7 @@
 /**
  * Base Service
  *
- * Abstract base class for all TravelMatch services.
+ * Abstract base class for all Lovendo services.
  * Provides automatic error recovery, retry logic, and logging.
  *
  * @example

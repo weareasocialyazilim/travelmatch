@@ -1,5 +1,5 @@
 /**
- * ImmersiveMomentCard - TravelMatch: The Rebirth
+ * ImmersiveMomentCard - Lovendo: The Rebirth
  *
  * Full-screen moment card for TikTok-style vertical feed
  * Features:

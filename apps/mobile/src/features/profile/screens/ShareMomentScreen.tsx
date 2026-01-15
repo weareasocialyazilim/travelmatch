@@ -70,7 +70,7 @@ export const ShareMomentScreen: React.FC = () => {
 
   const displayMoment = moment || {
     id: momentId,
-    title: 'TravelMatch Moment',
+    title: 'Lovendo Moment',
     description: 'Check out this amazing moment!',
     images: [
       'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400',
@@ -78,8 +78,8 @@ export const ShareMomentScreen: React.FC = () => {
     pricePerGuest: 0,
   };
 
-  const shareUrl = `https://travelmatch.app/moment/${momentId}`;
-  const shareMessage = `Check out this moment on TravelMatch: ${displayMoment.title}\n${shareUrl}`;
+  const shareUrl = `https://www.lovendo.xyz/moment/${momentId}`;
+  const shareMessage = `Check out this moment on Lovendo: ${displayMoment.title}\n${shareUrl}`;
 
   const handleNativeShare = useCallback(async () => {
     try {
@@ -347,9 +347,7 @@ export const ShareMomentScreen: React.FC = () => {
           size={20}
           color={COLORS.utility.white}
         />
-        <Text style={styles.inviteButtonText}>
-          Invite Friends to TravelMatch
-        </Text>
+        <Text style={styles.inviteButtonText}>Invite Friends to Lovendo</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );

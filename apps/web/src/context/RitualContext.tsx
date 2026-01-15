@@ -41,7 +41,7 @@ const DICTIONARIES: Record<Language, Dictionary> = {
         'Seni tanımak üzereyim... Gece yürüyüşlerini mi seversin, yoksa gün doğumu keşiflerini mi?',
       coffee:
         'Harika. Bir yabancıya kahve ikram etmek sence bir jest midir, yoksa bir başlangıç mı?',
-      aura: "Aura'n TravelMatch ruhuna %94 uyumlu. Demo listesinde ön sıraya geçmek ister misin?",
+      aura: "Aura'n Lovendo ruhuna %94 uyumlu. Demo listesinde ön sıraya geçmek ister misin?",
     },
     global: {
       origin: 'BAŞLANGIÇ',
@@ -53,7 +53,7 @@ const DICTIONARIES: Record<Language, Dictionary> = {
       content:
         'Haritalardan sınırları sildik.\nŞimdi onları kalp atışlarına geri döndürüyoruz.',
       sub_content:
-        'TravelMatch bir uygulama değil. Bir ritüel. Bir an. Dünyanın bir yerinde, birinin seni imkansız mesafelerin ötesinden bir hediye—bir an—gönderecek kadar düşündüğüne dair bir söz.',
+        'Lovendo bir uygulama değil. Bir ritüel. Bir an. Dünyanın bir yerinde, birinin seni imkansız mesafelerin ötesinden bir hediye—bir an—gönderecek kadar düşündüğüne dair bir söz.',
     },
   },
   en: {
@@ -68,7 +68,7 @@ const DICTIONARIES: Record<Language, Dictionary> = {
         'Getting to know you... Do you prefer night walks or sunrise discoveries?',
       coffee:
         'Excellent. is offering coffee to a stranger a gesture, or a beginning?',
-      aura: 'Your Aura matches 94% with TravelMatch spirit. Want priority access?',
+      aura: 'Your Aura matches 94% with Lovendo spirit. Want priority access?',
     },
     global: {
       origin: 'ORIGIN',
@@ -80,7 +80,7 @@ const DICTIONARIES: Record<Language, Dictionary> = {
       content:
         'We erased borders from maps.\nNow we return them to heartbeats.',
       sub_content:
-        "TravelMatch isn't an app. It's a ritual. A moment. A promise that somewhere in the world, someone is thinking of you enough to send a gift—a moment—across impossible distances.",
+        "Lovendo isn't an app. It's a ritual. A moment. A promise that somewhere in the world, someone is thinking of you enough to send a gift—a moment—across impossible distances.",
     },
   },
 };

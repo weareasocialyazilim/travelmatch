@@ -1,4 +1,4 @@
--- TravelMatch Row Level Security Migration
+-- Lovendo Row Level Security Migration
 -- Version: 1.0.0
 -- Created: 2024-12-05
 -- Description: RLS policies for all tables

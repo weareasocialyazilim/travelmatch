@@ -48,7 +48,7 @@ export const CommunityGuidelinesScreen = ({ navigation }: any) => {
 
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.hero}>The Vibe Code</Text>
-        <Text style={styles.sub}>How we keep TravelMatch safe and fun.</Text>
+        <Text style={styles.sub}>How we keep Lovendo safe and fun.</Text>
 
         {RULES.map((rule, index) => (
           <View key={index} style={styles.card}>

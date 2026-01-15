@@ -128,7 +128,7 @@ export const MemoryCard: React.FC<MemoryCardProps> = ({
       try {
         await Share.share({
           url: uri,
-          message: `${gift.momentTitle} deneyimimi TravelMatch'te tamamladım! 🎉`,
+          message: `${gift.momentTitle} deneyimimi Lovendo'da tamamladım! 🎉`,
         });
         onShare?.(uri);
       } catch (error) {
@@ -263,7 +263,7 @@ export const MemoryCard: React.FC<MemoryCardProps> = ({
                 size={14}
                 color="rgba(255,255,255,0.6)"
               />
-              <Text style={styles.brandText}>TravelMatch</Text>
+              <Text style={styles.brandText}>Lovendo</Text>
             </View>
           </View>
 

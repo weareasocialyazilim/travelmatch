@@ -50,7 +50,7 @@ function encrypt(plaintext: string): string {
  * Generate QR code URL for authenticator app
  */
 function generateQRCodeURL(secret: string, email: string): string {
-  const issuer = 'TravelMatch Admin';
+  const issuer = 'Lovendo Admin';
   const otpauthURL = authenticator.keyuri(email, issuer, secret);
   return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(otpauthURL)}`;
 }

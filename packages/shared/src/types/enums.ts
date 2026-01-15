@@ -2,7 +2,7 @@
  * Unified Status Enums
  *
  * SINGLE SOURCE OF TRUTH for status types across admin, mobile, and backend.
- * These enums ensure consistency between all applications in the TravelMatch platform.
+ * These enums ensure consistency between all applications in the Lovendo platform.
  *
  * IMPORTANT: When updating these enums, ensure database migrations are created
  * to add/modify corresponding CHECK constraints.

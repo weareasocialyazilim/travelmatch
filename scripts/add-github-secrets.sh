@@ -121,7 +121,7 @@ case $choice in
         echo "📋 Adding known Supabase secrets automatically"
         echo ""
         
-        # Known Supabase values for TravelMatch project
+        # Known Supabase values for Lovendo project
         SUPABASE_URL="https://bjikxgtbptrvawkguypv.supabase.co"
         SUPABASE_PROJECT_REF="bjikxgtbptrvawkguypv"
         
@@ -267,7 +267,7 @@ if [ "$add_p2" = "y" ]; then
         ""
     
     prompt_secret "CODECOV_TOKEN" \
-        "Codecov token. Get from: https://codecov.io/gh/kemalteksalgit/travelmatch" \
+        "Codecov token. Get from: https://codecov.io/gh/kemalteksalgit/lovendo" \
         ""
     
     prompt_secret "SNYK_TOKEN" \

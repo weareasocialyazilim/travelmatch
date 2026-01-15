@@ -91,7 +91,7 @@ Parser otomatik olarak su bilgileri cikartir:
 Parser, mobile `getDiagnosticsSummaryText()` ciktisini bekler:
 
 ```
-═══ TravelMatch Diagnostics ═══
+═══ Lovendo Diagnostics ═══
 
 📱 Build Info:
   Version: 1.0.0 (123)

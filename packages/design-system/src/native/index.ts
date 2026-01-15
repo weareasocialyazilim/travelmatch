@@ -1,5 +1,5 @@
 /**
- * TravelMatch Design System - React Native Components
+ * Lovendo Design System - React Native Components
  *
  * Platform-specific components with animations, haptics, and native features.
  * These components are designed specifically for React Native and use:
@@ -28,7 +28,7 @@
 // POST-LAUNCH MIGRATION PLAN:
 // 1. Mobile constants/colors.ts → design-system/tokens re-export
 // 2. Bileşen bağımlılıklarını (hooks, constants) design-system'e taşı
-// 3. Phase 1 bileşenlerini (TMButton, TMBadge, TMCard) migrate et
+// 3. Phase 1 bileşenlerini (LovendoButton, LovendoBadge, LovendoCard) migrate et
 // 4. Mobile'dan backward-compat re-export sağla
 //
 // =============================================================================
@@ -36,30 +36,30 @@
 // =============================================================================
 //
 // Phase 1 (Critical - Shared by multiple screens):
-// - TMButton      → @travelmatch/design-system/native
-// - TMBadge       → @travelmatch/design-system/native
-// - TMCard        → @travelmatch/design-system/native
-// - LiquidInput   → @travelmatch/design-system/native
-// - TMAvatar      → @travelmatch/design-system/native
+// - LovendoButton      → @lovendo/design-system/native
+// - LovendoBadge       → @lovendo/design-system/native
+// - LovendoCard        → @lovendo/design-system/native
+// - LiquidInput   → @lovendo/design-system/native
+// - LovendoAvatar      → @lovendo/design-system/native
 //
 // Phase 2 (Liquid Design System):
-// - LiquidBottomSheet      → @travelmatch/design-system/native
-// - LiquidSegmentedControl → @travelmatch/design-system/native
-// - LiquidSelection        → @travelmatch/design-system/native
+// - LiquidBottomSheet      → @lovendo/design-system/native
+// - LiquidSegmentedControl → @lovendo/design-system/native
+// - LiquidSelection        → @lovendo/design-system/native
 //
 // Phase 3 (Trust/Ceremony Components):
-// - TMTrustRing           → @travelmatch/design-system/native
-// - TrustConstellation    → @travelmatch/design-system/native
-// - TrustScoreCircle      → @travelmatch/design-system/native
-// - SuccessCeremony       → @travelmatch/design-system/native
+// - LovendoTrustRing           → @lovendo/design-system/native
+// - TrustConstellation    → @lovendo/design-system/native
+// - TrustScoreCircle      → @lovendo/design-system/native
+// - SuccessCeremony       → @lovendo/design-system/native
 //
 // Phase 4 (Utility Components):
-// - TMLoading, TMSkeleton → @travelmatch/design-system/native
-// - OptimizedImage        → @travelmatch/design-system/native
-// - GlassCard, GlassModal → @travelmatch/design-system/native
+// - LovendoLoading, LovendoSkeleton → @lovendo/design-system/native
+// - OptimizedImage        → @lovendo/design-system/native
+// - GlassCard, GlassModal → @lovendo/design-system/native
 //
 // After migration, apps/mobile/src/components/ui/index.ts will re-export
-// from @travelmatch/design-system/native for backward compatibility.
+// from @lovendo/design-system/native for backward compatibility.
 // =============================================================================
 
 // Re-export from mobile (temporary - until migration complete)
@@ -106,11 +106,11 @@ export const MIGRATION_STATUS = {
   TrustOrb: 'done',
 
   // 🚀 POST-LAUNCH (Phase 1 - Critical)
-  TMButton: 'post-launch',
-  TMBadge: 'post-launch',
-  TMCard: 'post-launch',
+  LovendoButton: 'post-launch',
+  LovendoBadge: 'post-launch',
+  LovendoCard: 'post-launch',
   LiquidInput: 'post-launch',
-  TMAvatar: 'post-launch',
+  LovendoAvatar: 'post-launch',
 
   // 🚀 POST-LAUNCH (Phase 2 - Liquid)
   LiquidBottomSheet: 'post-launch',
@@ -118,13 +118,13 @@ export const MIGRATION_STATUS = {
   LiquidSelection: 'post-launch',
 
   // 🚀 POST-LAUNCH (Phase 3 - Trust)
-  TMTrustRing: 'post-launch',
+  LovendoTrustRing: 'post-launch',
   TrustScoreCircle: 'post-launch',
   SuccessCeremony: 'post-launch',
 
   // 🚀 POST-LAUNCH (Phase 4 - Utility)
-  TMLoading: 'post-launch',
-  TMSkeleton: 'post-launch',
+  LovendoLoading: 'post-launch',
+  LovendoSkeleton: 'post-launch',
   OptimizedImage: 'post-launch',
   GlassCard: 'post-launch',
   GlassModal: 'post-launch',
@@ -134,13 +134,13 @@ export const MIGRATION_STATUS = {
 // USAGE AFTER MIGRATION:
 // =============================================================================
 //
-// import { TMButton, TMBadge, LiquidInput } from '@travelmatch/design-system/native';
+// import { LovendoButton, LovendoBadge, LiquidInput } from '@lovendo/design-system/native';
 //
 // Or with configuration:
 //
-// import { NativeConfigProvider, TMButton } from '@travelmatch/design-system/native';
+// import { NativeConfigProvider, LovendoButton } from '@lovendo/design-system/native';
 //
 // <NativeConfigProvider config={{ enableHaptics: true, enableBlur: false }}>
-//   <TMButton variant="primary">Click me</TMButton>
+//   <LovendoButton variant="primary">Click me</LovendoButton>
 // </NativeConfigProvider>
 // =============================================================================

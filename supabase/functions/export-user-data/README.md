@@ -2,7 +2,7 @@
 
 ## Overview
 
-This Supabase Edge Function provides GDPR-compliant data export functionality, allowing users to download all their personal data stored in the TravelMatch platform.
+This Supabase Edge Function provides GDPR-compliant data export functionality, allowing users to download all their personal data stored in the Lovendo platform.
 
 ## Compliance
 
@@ -275,9 +275,9 @@ import { Resend } from 'https://esm.sh/resend@1.0.0';
 const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
 
 await resend.emails.send({
-  from: 'noreply@travelmatch.com',
+  from: 'noreply@lovendo.com',
   to: user.email,
-  subject: 'Your TravelMatch Data Export',
+  subject: 'Your Lovendo Data Export',
   attachments: [
     {
       filename: 'data-export.json',
@@ -308,8 +308,8 @@ await resend.emails.send({
 
 For questions or issues:
 - Create an issue in the repository
-- Contact: privacy@travelmatch.com
-- GDPR Officer: dpo@travelmatch.com
+- Contact: privacy@lovendo.com
+- GDPR Officer: dpo@lovendo.com
 
 ## License
 

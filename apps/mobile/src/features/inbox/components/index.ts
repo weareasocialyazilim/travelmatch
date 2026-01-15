@@ -1,5 +1,5 @@
 /**
- * TravelMatch Vibe Room - Components Index
+ * Lovendo Vibe Room - Components Index
  */
 
 export { default as InboxChatItem } from './InboxChatItem';

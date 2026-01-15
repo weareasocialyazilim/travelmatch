@@ -1,4 +1,4 @@
-# TravelMatch Architecture Best Practices
+# Lovendo Architecture Best Practices
 
 **Version:** 1.0
 **Created:** December 22, 2025

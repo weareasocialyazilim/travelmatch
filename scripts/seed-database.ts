@@ -1,5 +1,5 @@
 /**
- * Database Seed Script for TravelMatch
+ * Database Seed Script for Lovendo
  * 
  * Generates realistic test data for local development:
  * - 20 test users with profiles
@@ -437,7 +437,7 @@ const command = args[0];
 
 if (command === '--help' || command === '-h') {
   console.log(`
-TravelMatch Database Seed Script
+Lovendo Database Seed Script
 
 Usage:
   pnpm seed:local     # Seed local Supabase database

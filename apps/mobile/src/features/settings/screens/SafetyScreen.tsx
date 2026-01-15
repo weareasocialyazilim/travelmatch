@@ -70,7 +70,7 @@ export const SafetyScreen: React.FC<SafetyScreenProps> = ({ navigation }) => {
       icon: 'credit-card-check',
       title: 'Use Platform Payments',
       description:
-        "Always use TravelMatch's payment system. Never send money outside the platform or share financial details.",
+        "Always use Lovendo's payment system. Never send money outside the platform or share financial details.",
     },
     {
       id: 'report',
@@ -152,8 +152,8 @@ export const SafetyScreen: React.FC<SafetyScreenProps> = ({ navigation }) => {
           </View>
           <Text style={styles.heroTitle}>Your Safety Matters</Text>
           <Text style={styles.heroSubtitle}>
-            TravelMatch is committed to keeping you safe. Follow these
-            guidelines for a secure experience.
+            Lovendo is committed to keeping you safe. Follow these guidelines
+            for a secure experience.
           </Text>
         </View>
 

@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 /**
- * TravelMatch V2 - Robots.txt Configuration
+ * Lovendo V2 - Robots.txt Configuration
  */
 
 export default function robots(): MetadataRoute.Robots {
@@ -29,7 +29,7 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
       },
     ],
-    sitemap: 'https://travelmatch.app/sitemap.xml',
-    host: 'https://travelmatch.app',
+    sitemap: 'https://www.lovendo.xyz/sitemap.xml',
+    host: 'https://www.lovendo.xyz',
   };
 }

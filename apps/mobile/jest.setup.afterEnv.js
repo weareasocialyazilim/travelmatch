@@ -1452,7 +1452,7 @@ try {
 
 // Mock design tokens package used by web/native shared components
 try {
-  jest.mock('@travelmatch/design-system/tokens', () => ({
+  jest.mock('@lovendo/design-system/tokens', () => ({
     colors: {},
     spacing: {},
     typography: {},

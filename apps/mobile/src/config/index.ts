@@ -1,9 +1,9 @@
-const API_URL: string = process.env.API_URL ?? 'https://api.travelmatch.com';
+const API_URL: string = process.env.API_URL ?? 'https://api.lovendo.xyz';
 
 const config = {
   apiUrl: API_URL,
   apiTimeout: 10000,
-  appName: 'TravelMatch',
+  appName: 'Lovendo',
   version: '1.0.0',
 };
 

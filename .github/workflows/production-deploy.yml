@@ -124,8 +124,8 @@ jobs:
           npx @sentry/cli releases finalize "${{ github.ref_name }}"
         env:
           SENTRY_AUTH_TOKEN: ${{ env.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ env.SENTRY_ORG || 'travelmatch' }}
-          SENTRY_PROJECT: ${{ env.SENTRY_PROJECT || 'travelmatch-mobile' }}
+          SENTRY_ORG: ${{ env.SENTRY_ORG || 'lovendo' }}
+          SENTRY_PROJECT: ${{ env.SENTRY_PROJECT || 'lovendo-mobile' }}
         continue-on-error: true
 
   build-android:
@@ -182,8 +182,8 @@ jobs:
           npx @sentry/cli releases finalize "${{ github.ref_name }}"
         env:
           SENTRY_AUTH_TOKEN: ${{ env.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ env.SENTRY_ORG || 'travelmatch' }}
-          SENTRY_PROJECT: ${{ env.SENTRY_PROJECT || 'travelmatch-mobile' }}
+          SENTRY_ORG: ${{ env.SENTRY_ORG || 'lovendo' }}
+          SENTRY_PROJECT: ${{ env.SENTRY_PROJECT || 'lovendo-mobile' }}
         continue-on-error: true
 
   submit-ios:

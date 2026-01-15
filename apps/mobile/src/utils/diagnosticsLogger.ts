@@ -343,7 +343,7 @@ export function getDiagnosticsSummaryText(): string {
   const { buildInfo, configSanity, errorCount, topSlowScreens } = summary;
 
   const lines = [
-    '═══ TravelMatch Diagnostics ═══',
+    '═══ Lovendo Diagnostics ═══',
     '',
     '📱 Build Info:',
     `  Version: ${buildInfo.appVersion} (${buildInfo.buildNumber || 'N/A'})`,

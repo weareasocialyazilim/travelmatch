@@ -1,4 +1,4 @@
--- TravelMatch Supabase Database Schema
+-- Lovendo Supabase Database Schema
 -- Version: 1.0.0
 -- Run this in Supabase SQL Editor
 

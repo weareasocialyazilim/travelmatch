@@ -1,4 +1,4 @@
-# TravelMatch Database Optimization Guide
+# Lovendo Database Optimization Guide
 
 ## Overview
 
@@ -351,7 +351,7 @@ export const supabase = createClient(
     },
     global: {
       headers: {
-        'x-client-info': 'travelmatch-mobile',
+        'x-client-info': 'lovendo-mobile',
       },
     },
     db: {
@@ -550,9 +550,9 @@ CREATE TABLE messages_y2025m02 PARTITION OF messages_partitioned
 # Sharding strategy example
 class ShardRouter:
     SHARDS = {
-        'eu': 'supabase-eu.travelmatch.app',
-        'us': 'supabase-us.travelmatch.app',
-        'asia': 'supabase-asia.travelmatch.app',
+        'eu': 'supabase-eu.lovendo.app',
+        'us': 'supabase-us.lovendo.app',
+        'asia': 'supabase-asia.lovendo.app',
     }
 
     def get_shard(self, user_country: str) -> str:

@@ -1,4 +1,4 @@
-# TravelMatch Compliance Assessment Report
+# Lovendo Compliance Assessment Report
 
 **Assessment Date:** December 22, 2025
 **Assessment Type:** Comprehensive Regulatory Compliance Review
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-This document provides a comprehensive compliance assessment for the TravelMatch platform, covering regulatory requirements including GDPR, CCPA, SOC 2 Type II, PCI-DSS, and relevant industry standards. The assessment identifies existing controls, gaps, and remediation priorities.
+This document provides a comprehensive compliance assessment for the Lovendo platform, covering regulatory requirements including GDPR, CCPA, SOC 2 Type II, PCI-DSS, and relevant industry standards. The assessment identifies existing controls, gaps, and remediation priorities.
 
 ### Overall Compliance Posture
 
@@ -96,7 +96,7 @@ This document provides a comprehensive compliance assessment for the TravelMatch
 **Documented Process:**
 - 72-hour notification requirement acknowledged
 - Incident response workflow defined in `soc2-compliance.ts`
-- DPO contact: `gdpr-dpo@travelmatch.app`
+- DPO contact: `gdpr-dpo@lovendo.app`
 
 **Gap:** No automated breach detection system configured.
 
@@ -200,7 +200,7 @@ security: ['encryption_key_rotated', 'security_alert', 'vulnerability_detected']
 
 **Payment Processing Model:** Stripe Integration (SAQ A-EP equivalent)
 
-TravelMatch uses Stripe for all payment processing, which significantly reduces PCI-DSS scope:
+Lovendo uses Stripe for all payment processing, which significantly reduces PCI-DSS scope:
 
 | Component | In Scope | Notes |
 |-----------|----------|-------|
@@ -496,10 +496,10 @@ Annually:
 
 | Role | Contact |
 |------|---------|
-| Compliance Lead | compliance@travelmatch.app |
-| DPO (pending) | dpo@travelmatch.app |
-| Security Team | security@travelmatch.app |
-| Legal | legal@travelmatch.app |
+| Compliance Lead | compliance@lovendo.app |
+| DPO (pending) | dpo@lovendo.app |
+| Security Team | security@lovendo.app |
+| Legal | legal@lovendo.app |
 
 ---
 

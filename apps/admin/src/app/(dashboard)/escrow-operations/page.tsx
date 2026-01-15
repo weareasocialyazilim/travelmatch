@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * TravelMatch Escrow & Payment Operations
+ * Lovendo Escrow & Payment Operations
  * Tum odeme islemleri, escrow yonetimi ve finansal operasyonlar
  *
  * PayTR entegrasyonu, escrow sistemleri, iade yonetimi ve cuzdan islemleri

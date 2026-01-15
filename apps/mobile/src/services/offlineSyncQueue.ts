@@ -1,9 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import { logger } from '../utils/logger';
+import {
+  getItemWithLegacyFallback,
+  setItemAndCleanupLegacy,
+} from '../utils/storageKeyMigration';
 
 // Queue storage key
-const QUEUE_KEY = '@travelmatch_offline_queue';
+const QUEUE_KEY = '@lovendo/offline_queue';
+const LEGACY_QUEUE_KEYS = ['@lovendo_offline_queue'];
 
 // Action types
 export type OfflineActionType =
@@ -58,7 +63,10 @@ class OfflineSyncQueue {
    */
   private async loadQueue(): Promise<void> {
     try {
-      const stored = await AsyncStorage.getItem(QUEUE_KEY);
+      const stored = await getItemWithLegacyFallback(
+        QUEUE_KEY,
+        LEGACY_QUEUE_KEYS,
+      );
       if (stored) {
         this.queue = JSON.parse(stored) as OfflineAction[];
         // Reset any actions that were processing when app closed
@@ -79,7 +87,11 @@ class OfflineSyncQueue {
    */
   private async saveQueue(): Promise<void> {
     try {
-      await AsyncStorage.setItem(QUEUE_KEY, JSON.stringify(this.queue));
+      await setItemAndCleanupLegacy(
+        QUEUE_KEY,
+        JSON.stringify(this.queue),
+        LEGACY_QUEUE_KEYS,
+      );
       this.notifyListeners();
     } catch (error) {
       logger.error('OfflineSyncQueue.saveQueue error:', error);

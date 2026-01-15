@@ -1,5 +1,5 @@
 /**
- * TravelMatch Liquid Design System
+ * Lovendo Liquid Design System
  * Cross-Platform Design Tokens
  *
  * This file provides unified "Liquid" design tokens that work across:

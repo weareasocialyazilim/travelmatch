@@ -7,7 +7,7 @@ set -e
 PROJECT_REF="bjikxgtbptrvawkguypv"
 MIGRATIONS_DIR="supabase/migrations"
 
-echo "🚀 TravelMatch Production Database Migration"
+echo "🚀 Lovendo Production Database Migration"
 echo "============================================="
 echo ""
 
@@ -34,8 +34,8 @@ echo "📁 Found $FILE_COUNT migration files"
 echo ""
 
 # Create combined migration file
-COMBINED_FILE="/tmp/travelmatch_combined_migration.sql"
-echo "-- TravelMatch Combined Migration" > "$COMBINED_FILE"
+COMBINED_FILE="/tmp/lovendo_combined_migration.sql"
+echo "-- Lovendo Combined Migration" > "$COMBINED_FILE"
 echo "-- Generated: $(date)" >> "$COMBINED_FILE"
 echo "-- Project: $PROJECT_REF" >> "$COMBINED_FILE"
 echo "" >> "$COMBINED_FILE"

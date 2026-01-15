@@ -2,13 +2,13 @@
 
 ## Overview
 
-TravelMatch ML Service provides AI-powered verification and analysis for the gift experience
-platform. When someone gifts a travel experience, the recipient must prove they completed it before
-funds are released from escrow.
+Lovendo ML Service provides AI-powered verification and analysis for the gift experience platform.
+When someone gifts a travel experience, the recipient must prove they completed it before funds are
+released from escrow.
 
-## What is TravelMatch?
+## What is Lovendo?
 
-TravelMatch is a **gift platform for travel experiences**:
+Lovendo is a **gift platform for travel experiences**:
 
 1. **Create a Moment** — Define a travel experience you want to gift
 2. **Gift & Send** — Send it to someone with funds held in escrow

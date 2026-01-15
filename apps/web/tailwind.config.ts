@@ -1,7 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 /**
- * TravelMatch - Premium Awwwards-Ready Tailwind Config
+ * Lovendo - Premium Awwwards-Ready Tailwind Config
  * Inspired by Tesla, Nvidia, Apple - Futuristic & Deep
  */
 

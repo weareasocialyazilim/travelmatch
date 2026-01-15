@@ -1,5 +1,5 @@
 /**
- * TravelMatch Mobile Constants - Awwwards Edition Color Palette
+ * Lovendo Mobile Constants - Awwwards Edition Color Palette
  *
  * Felsefe: Twilight Zinc (Yumuşak Koyu) zemin üzerinde
  * GenZ enerjisini temsil eden yüksek kontrastlı Neon dokunuşlar.
@@ -7,7 +7,7 @@
  * ═══════════════════════════════════════════════════════════════════
  * ARCHITECTURE NOTE:
  * ═══════════════════════════════════════════════════════════════════
- * Bu dosya @travelmatch/design-system/tokens ile senkronize tutulmalıdır.
+ * Bu dosya @lovendo/design-system/tokens ile senkronize tutulmalıdır.
  * Canonical source: packages/design-system/src/tokens/colors.ts
  *
  * Mobile flat exports (COLORS.primary) kullanırken,

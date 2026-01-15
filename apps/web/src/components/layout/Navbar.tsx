@@ -24,7 +24,7 @@ export function Navbar() {
         {/* Logo: Web sitesinden giriş yok, sadece vizyon var */}
         <Link href="/">
           <span className="text-2xl font-black italic tracking-tighter uppercase select-none">
-            travelmatch<span className="text-[var(--neon-pink)]">.</span>
+            lovendo<span className="text-[var(--neon-pink)]">.</span>
           </span>
         </Link>
 

@@ -2,7 +2,7 @@
  * KYCBadge Component
  *
  * Displays verification level badges on user avatars.
- * Part of iOS 26.3 design system for TravelMatch.
+ * Part of iOS 26.3 design system for Lovendo.
  *
  * Badge Levels:
  * - Bronze: Email verified

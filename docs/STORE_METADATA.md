@@ -1,9 +1,9 @@
-# TravelMatch - Store Listing Metadata
+# Lovendo - Store Listing Metadata
 
 ## App Information
 
-**App Name:** TravelMatch **Bundle ID (iOS):** com.travelmatch.app **Package Name (Android):**
-com.travelmatch.app
+**App Name:** Lovendo **Bundle ID (iOS):** com.lovendo.app **Package Name (Android):**
+com.lovendo.app
 
 ---
 
@@ -18,9 +18,9 @@ paylaş, gezginlerle bağlan, hediye gönder ve al! ✈️🎁
 
 ### English
 
-**TravelMatch - Share Your Journey, Connect with Travelers**
+**Lovendo - Share Your Journey, Connect with Travelers**
 
-Discover a new way to experience travel! TravelMatch is the social platform where travelers share
+Discover a new way to experience travel! Lovendo is the social platform where travelers share
 authentic moments, verify their adventures, and connect through gifts.
 
 🌍 **SHARE YOUR MOMENTS** • Capture and share your travel experiences • Verify your location with
@@ -36,7 +36,7 @@ real experiences • Build meaningful connections worldwide • Join a community
 wallet & payment system • GDPR-compliant data handling • Available in English & Turkish
 
 Whether you're a solo adventurer, a travel influencer, or simply love discovering new places through
-others' experiences, TravelMatch is your gateway to authentic travel connections.
+others' experiences, Lovendo is your gateway to authentic travel connections.
 
 Download now and start sharing your journey!
 
@@ -44,9 +44,9 @@ Download now and start sharing your journey!
 
 ### Turkish (Türkçe)
 
-**TravelMatch - Yolculuğunu Paylaş, Gezginlerle Bağlan**
+**Lovendo - Yolculuğunu Paylaş, Gezginlerle Bağlan**
 
-Seyahati yeni bir şekilde deneyimle! TravelMatch, gezginlerin otantik anlarını paylaştığı,
+Seyahati yeni bir şekilde deneyimle! Lovendo, gezginlerin otantik anlarını paylaştığı,
 maceralarını doğruladığı ve hediyelerle bağlandığı sosyal platformdur.
 
 🌍 **ANLARINI PAYLAŞ** • Seyahat deneyimlerini yakala ve paylaş • Proof sistemiyle konumunu doğrula
@@ -62,7 +62,7 @@ hazineleri keşfet • Dünya çapında anlamlı bağlantılar kur • Tutkulu g
 Güvenli cüzdan ve ödeme sistemi • KVKK uyumlu veri işleme • Türkçe ve İngilizce dil desteği
 
 İster solo maceracı, ister seyahat influencer'ı ol, ister başkalarının deneyimleri üzerinden yeni
-yerler keşfetmeyi sev - TravelMatch otantik seyahat bağlantılarına açılan kapın.
+yerler keşfetmeyi sev - Lovendo otantik seyahat bağlantılarına açılan kapın.
 
 Şimdi indir ve yolculuğunu paylaşmaya başla!
 
@@ -99,11 +99,11 @@ seyahat,gezi,sosyal,hediye,macera,keşif,yolculuk,anı,paylaş,bağlan
 
 ## Contact Information
 
-- **Developer:** TravelMatch
-- **Email:** support@travelmatch.app
-- **Website:** https://travelmatch.app
-- **Privacy Policy:** https://travelmatch.app/privacy
-- **Terms of Service:** https://travelmatch.app/terms
+- **Developer:** Lovendo
+- **Email:** support@lovendo.app
+- **Website:** https://lovendo.app
+- **Privacy Policy:** https://lovendo.app/privacy
+- **Terms of Service:** https://lovendo.app/terms
 
 ---
 

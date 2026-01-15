@@ -2,7 +2,7 @@
 """
 Usability Testing Framework - Comprehensive Testing Toolkit
 
-Creates and manages usability testing sessions for TravelMatch.
+Creates and manages usability testing sessions for Lovendo.
 Generates test plans, tasks, metrics tracking, and result analysis.
 
 Usage:
@@ -17,7 +17,7 @@ Test Types:
     guerrilla     - Quick informal testing
     benchmark     - Standardized comparative testing
 
-Author: TravelMatch UX Team
+Author: Lovendo UX Team
 """
 
 import argparse
@@ -165,14 +165,14 @@ class TestAnalysis:
 class UsabilityTestingFramework:
     """Main class for usability testing operations."""
 
-    # Pre-defined test task templates for TravelMatch flows
+    # Pre-defined test task templates for Lovendo flows
     TASK_TEMPLATES = {
         "onboarding": [
             {
                 "id": "onb_01",
                 "name": "Complete Sign Up",
-                "description": "Create a new TravelMatch account",
-                "scenario": "You just heard about TravelMatch from a friend and want to try it out. Download the app and create an account.",
+                "description": "Create a new Lovendo account",
+                "scenario": "You just heard about Lovendo from a friend and want to try it out. Download the app and create an account.",
                 "success_criteria": [
                     "Account successfully created",
                     "Reached profile setup screen",
@@ -202,7 +202,7 @@ class UsabilityTestingFramework:
                 "id": "onb_03",
                 "name": "Complete Travel Preferences",
                 "description": "Set travel style and destination preferences",
-                "scenario": "Tell TravelMatch about your travel style and what kind of trips interest you so we can find you great matches.",
+                "scenario": "Tell Lovendo about your travel style and what kind of trips interest you so we can find you great matches.",
                 "success_criteria": [
                     "All preference questions answered",
                     "At least 3 travel styles selected",
@@ -546,7 +546,7 @@ class UsabilityTestingFramework:
         flow_name = flow.replace("_", " ").title()
 
         return TestPlan(
-            name=f"TravelMatch {flow_name} Usability Test",
+            name=f"Lovendo {flow_name} Usability Test",
             objective=f"Evaluate the usability of the {flow_name} flow and identify areas for improvement",
             test_type=self.test_type.value,
             target_participants=target_participants,
@@ -555,7 +555,7 @@ class UsabilityTestingFramework:
                 "travel_frequency": "At least 1 trip per year",
                 "smartphone_usage": "Daily smartphone user",
                 "app_familiarity": "Mix of new and returning users",
-                "exclusions": ["TravelMatch employees", "UX professionals", "Direct competitors"]
+                "exclusions": ["Lovendo employees", "UX professionals", "Direct competitors"]
             },
             tasks=[asdict(t) for t in task_objects],
             pre_test_questions=self.PRE_TEST_QUESTIONS,
@@ -825,7 +825,7 @@ class UsabilityTestingFramework:
     def generate_blank_template(self) -> dict:
         """Generate a blank results template for data collection."""
         return {
-            "test_name": "TravelMatch Usability Test",
+            "test_name": "Lovendo Usability Test",
             "test_date": datetime.now().strftime("%Y-%m-%d"),
             "facilitator": "",
             "participants": [
@@ -946,7 +946,7 @@ def format_analysis_output(analysis: TestAnalysis) -> str:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Usability Testing Framework for TravelMatch",
+        description="Usability Testing Framework for Lovendo",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

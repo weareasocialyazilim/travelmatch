@@ -34,8 +34,8 @@ export interface WebhookLog {
 
 // Environment variables for API keys/tokens
 const SENTRY_API_TOKEN = process.env.SENTRY_AUTH_TOKEN;
-const SENTRY_ORG = process.env.SENTRY_ORG || 'travelmatch-2p';
-const SENTRY_PROJECT = process.env.SENTRY_PROJECT || 'react-native';
+const SENTRY_ORG = process.env.SENTRY_ORG || 'lovendo-2d';
+const SENTRY_PROJECT = process.env.SENTRY_PROJECT || 'lovendo-admin';
 const POSTHOG_API_KEY =
   process.env.POSTHOG_API_KEY || process.env.EXPO_PUBLIC_POSTHOG_API_KEY;
 const POSTHOG_PROJECT_ID = process.env.POSTHOG_PROJECT_ID;
@@ -105,7 +105,7 @@ async function checkSupabase(): Promise<Integration> {
 
 /**
  * Check PayTR health
- * PayTR is the primary payment provider for TravelMatch (Turkish market)
+ * PayTR is the primary payment provider for Lovendo (Turkish market)
  */
 async function checkPayTR(): Promise<Integration> {
   const startTime = Date.now();
@@ -117,7 +117,7 @@ async function checkPayTR(): Promise<Integration> {
     category: 'payments',
     metrics: {},
     last_check: new Date().toISOString(),
-    webhook_url: 'https://api.travelmatch.app/webhooks/paytr',
+    webhook_url: 'https://api.lovendo.xyz/webhooks/paytr',
   };
 
   try {

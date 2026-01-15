@@ -1,7 +1,7 @@
 /**
  * CreateMomentScreen - Phase 3: The Drop
  *
- * ELEVATED: Moments are the core of TravelMatch.
+ * ELEVATED: Moments are the core of Lovendo.
  * Story Mode UI: Instagram-like immersive moment creation
  * - No boring forms, just layered experience on top of selected photo
  * - Neon & Glass aesthetic with brand colors

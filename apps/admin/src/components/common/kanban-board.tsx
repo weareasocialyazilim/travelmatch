@@ -2,7 +2,7 @@
 
 /**
  * KanbanBoard Component
- * TravelMatch Admin Panel - Task/Queue Management
+ * Lovendo Admin Panel - Task/Queue Management
  *
  * Inspired by recruitment board design (Visual 3):
  * - Column-based layout with status indicators

@@ -131,7 +131,7 @@ const DataPrivacyScreen = () => {
 
               // Generate filename with timestamp
               const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-              const filename = `travelmatch-data-export-${timestamp}.json`;
+              const filename = `lovendo-data-export-${timestamp}.json`;
 
               if (Platform.OS === 'web') {
                 // Web: Create download link

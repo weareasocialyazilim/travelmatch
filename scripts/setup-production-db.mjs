@@ -66,7 +66,7 @@ async function runMigration(filename, sql) {
 }
 
 async function main() {
-  console.log('🚀 TravelMatch Production Database Setup\n');
+  console.log('🚀 Lovendo Production Database Setup\n');
   console.log(`📍 Target: ${SUPABASE_URL}\n`);
   
   // Test connection

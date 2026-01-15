@@ -395,7 +395,7 @@ const AppSettingsScreen: React.FC = () => {
                 </View>
                 <View style={styles.settingContent}>
                   <Text style={styles.settingLabel}>Invite Friends</Text>
-                  <Text style={styles.settingDesc}>Share TravelMatch</Text>
+                  <Text style={styles.settingDesc}>Share Lovendo</Text>
                 </View>
                 <MaterialCommunityIcons
                   name="chevron-right"
@@ -470,7 +470,7 @@ const AppSettingsScreen: React.FC = () => {
         {/* 7-tap on version opens hidden Diagnostics screen */}
         <View style={styles.footer}>
           <TouchableOpacity onPress={handleVersionTap} activeOpacity={0.8}>
-            <Text style={styles.footerText}>TravelMatch v{APP_VERSION}</Text>
+            <Text style={styles.footerText}>Lovendo v{APP_VERSION}</Text>
           </TouchableOpacity>
           <Text style={styles.footerText}>Member since {memberSince}</Text>
         </View>

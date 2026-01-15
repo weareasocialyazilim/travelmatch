@@ -1,21 +1,21 @@
-# @travelmatch/monitoring
+# @lovendo/monitoring
 
-Production monitoring package for TravelMatch using Datadog RUM.
+Production monitoring package for Lovendo using Datadog RUM.
 
 ## Usage
 
 ### In Mobile App
 
 ```typescript
-import { monitoringService } from '@travelmatch/monitoring/service';
-import { useScreenTracking } from '@travelmatch/monitoring/hooks';
+import { monitoringService } from '@lovendo/monitoring/service';
+import { useScreenTracking } from '@lovendo/monitoring/hooks';
 
 // Initialize in App.tsx
 await monitoringService.initialize({
   applicationId: process.env.DD_APP_ID!,
   clientToken: process.env.DD_CLIENT_TOKEN!,
   env: 'production',
-  serviceName: 'travelmatch-mobile',
+  serviceName: 'lovendo-mobile',
 });
 
 // Use in screens

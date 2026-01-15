@@ -2,7 +2,7 @@
 """
 Persona Generator - Data-Driven User Persona Creation Tool
 
-Creates research-backed personas from user data and interviews for TravelMatch.
+Creates research-backed personas from user data and interviews for Lovendo.
 Analyzes behavior patterns, identifies archetypes, extracts psychographics,
 and provides actionable design implications.
 
@@ -15,7 +15,7 @@ Output Formats:
     default: Human-readable formatted output
     json:    Machine-readable JSON output
 
-Author: TravelMatch UX Team
+Author: Lovendo UX Team
 """
 
 import argparse
@@ -475,7 +475,7 @@ class PersonaGenerator:
         """Generate usage scenarios based on archetype and behaviors."""
         scenarios = {
             PersonaArchetype.EXPLORER: [
-                "Discovers an off-the-beaten-path destination through TravelMatch community",
+                "Discovers an off-the-beaten-path destination through Lovendo community",
                 "Uses the app to find local experiences not in typical travel guides",
                 "Connects with fellow adventurers for a spontaneous group trip"
             ],

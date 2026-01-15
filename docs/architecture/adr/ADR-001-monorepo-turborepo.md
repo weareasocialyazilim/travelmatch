@@ -10,7 +10,7 @@ December 2024
 
 ## Context
 
-TravelMatch consists of multiple applications (mobile, web, admin) and shared packages (design-system, shared utilities, monitoring). We needed to decide on a repository structure that would:
+Lovendo consists of multiple applications (mobile, web, admin) and shared packages (design-system, shared utilities, monitoring). We needed to decide on a repository structure that would:
 
 1. Enable code sharing across applications
 2. Maintain consistent versioning and dependencies
@@ -32,7 +32,7 @@ We decided to use **Turborepo** as our monorepo build system with **pnpm** as th
 ### Repository Structure
 
 ```
-travelmatch/
+lovendo/
 ├── apps/
 │   ├── mobile/          # React Native + Expo
 │   ├── web/             # Next.js

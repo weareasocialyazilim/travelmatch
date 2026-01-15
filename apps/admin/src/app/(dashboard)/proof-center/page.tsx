@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * TravelMatch Proof Verification Center
+ * Lovendo Proof Verification Center
  * AI destekli kanit dogrulama merkezi
  *
  * Proof queue, AI skorlari, manuel inceleme ve kalite metrikleri

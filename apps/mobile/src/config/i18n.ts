@@ -9,13 +9,18 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logger } from '@/utils/logger';
+import {
+  getItemWithLegacyFallback,
+  setItemAndCleanupLegacy,
+} from '@/utils/storageKeyMigration';
 
 // Import translations
 import en from '../locales/en.json';
 import tr from '../locales/tr.json';
 
 // Storage key for language persistence
-const LANGUAGE_STORAGE_KEY = '@travelmatch/language';
+const LANGUAGE_STORAGE_KEY = '@lovendo/language';
+const LEGACY_LANGUAGE_STORAGE_KEYS = ['@lovendo_legacy/language'];
 
 // Get device language
 const deviceLanguage = Localization.getLocales()[0]?.languageCode || 'en';
@@ -34,7 +39,10 @@ const languageDetector = {
   async: true,
   detect: async (callback: (lng: string) => void) => {
     try {
-      const savedLanguage = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
+      const savedLanguage = await getItemWithLegacyFallback(
+        LANGUAGE_STORAGE_KEY,
+        LEGACY_LANGUAGE_STORAGE_KEYS,
+      );
       if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'tr')) {
         callback(savedLanguage);
         return;
@@ -48,7 +56,11 @@ const languageDetector = {
   init: () => {},
   cacheUserLanguage: async (lng: string) => {
     try {
-      await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, lng);
+      await setItemAndCleanupLegacy(
+        LANGUAGE_STORAGE_KEY,
+        lng,
+        LEGACY_LANGUAGE_STORAGE_KEYS,
+      );
     } catch (error) {
       logger.warn('[i18n] Failed to save language:', error);
     }
@@ -80,7 +92,11 @@ export const changeLanguageAndPersist = async (
 ): Promise<void> => {
   await i18n.changeLanguage(lng);
   try {
-    await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, lng);
+    await setItemAndCleanupLegacy(
+      LANGUAGE_STORAGE_KEY,
+      lng,
+      LEGACY_LANGUAGE_STORAGE_KEYS,
+    );
   } catch (error) {
     logger.warn('[i18n] Failed to persist language:', error);
   }
@@ -90,7 +106,10 @@ export const changeLanguageAndPersist = async (
 export const getStoredLanguage =
   async (): Promise<SupportedLanguage | null> => {
     try {
-      const lng = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
+      const lng = await getItemWithLegacyFallback(
+        LANGUAGE_STORAGE_KEY,
+        LEGACY_LANGUAGE_STORAGE_KEYS,
+      );
       if (lng === 'en' || lng === 'tr') return lng;
     } catch (error) {
       logger.warn('[i18n] Failed to get stored language:', error);

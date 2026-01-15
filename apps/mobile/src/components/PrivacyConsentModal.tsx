@@ -244,11 +244,11 @@ export const PrivacyConsentModal = memo<PrivacyConsentModalProps>(
     }, [preferences, userId, onConsentGiven]);
 
     const handleOpenPrivacyPolicy = useCallback(() => {
-      Linking.openURL('https://travelmatch.app/privacy');
+      Linking.openURL('https://www.lovendo.xyz/privacy');
     }, []);
 
     const handleOpenCookiePolicy = useCallback(() => {
-      Linking.openURL('https://travelmatch.app/cookies');
+      Linking.openURL('https://www.lovendo.xyz/cookies');
     }, []);
 
     const updatePreference = useCallback(

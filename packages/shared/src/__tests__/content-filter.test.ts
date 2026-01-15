@@ -303,8 +303,8 @@ describe('BilingualContentFilter', () => {
       );
     });
 
-    it('should allow @travelmatch handle', () => {
-      const result = filterContent('Follow us @travelmatch');
+    it('should allow @lovendo handle', () => {
+      const result = filterContent('Follow us @lovendo');
       expect(
         result.violations.filter(
           (v) =>

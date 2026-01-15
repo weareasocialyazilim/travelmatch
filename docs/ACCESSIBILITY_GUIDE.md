@@ -1,5 +1,6 @@
 # Accessibility (a11y) Quick Start Guide
-## TravelMatch Mobile - Internal Developer Reference
+
+## Lovendo Mobile - Internal Developer Reference
 
 > **Amaç:** Hiç a11y bilgisi olmayan bir geliştirici bile bu kılavuzu okuyup hemen uygulayabilsin.
 
@@ -7,9 +8,11 @@
 
 ## 📖 Nedir Bu Accessibility?
 
-**Kısaca:** Uygulamanızı görme engelli kullanıcılar da dahil **herkesin** kullanabilmesi için ekstra bilgi eklemektir.
+**Kısaca:** Uygulamanızı görme engelli kullanıcılar da dahil **herkesin** kullanabilmesi için ekstra
+bilgi eklemektir.
 
-**Örnek:** Bir butona "Sign In" yazan text var ama ekran okuyucu (VoiceOver/TalkBack) ona tıklayınca ne olacağını bilmiyor. Biz söylemeliyiz: "Sign in with your email and password" diye.
+**Örnek:** Bir butona "Sign In" yazan text var ama ekran okuyucu (VoiceOver/TalkBack) ona tıklayınca
+ne olacağını bilmiyor. Biz söylemeliyiz: "Sign in with your email and password" diye.
 
 ---
 
@@ -26,7 +29,7 @@ import { useAccessibility } from '@/hooks/useAccessibility';
 ```tsx
 export const MyScreen = () => {
   const { props: a11y } = useAccessibility();
-  
+
   // ... rest of your component
 };
 ```
@@ -34,10 +37,7 @@ export const MyScreen = () => {
 ### 3️⃣ Elementlere Ekle
 
 ```tsx
-<TouchableOpacity
-  onPress={handlePress}
-  {...a11y.button('Sign In', 'Sign in to your account')}
->
+<TouchableOpacity onPress={handlePress} {...a11y.button('Sign In', 'Sign in to your account')}>
   <Text>Sign In</Text>
 </TouchableOpacity>
 ```
@@ -60,6 +60,7 @@ export const MyScreen = () => {
 ```
 
 **Parametreler:**
+
 - 1: Label (ne yazdığı)
 - 2: Hint (ne işe yaradığı)
 - 3: Disabled mi? (opsiyonel)
@@ -67,10 +68,7 @@ export const MyScreen = () => {
 ### ✅ Header (Başlık)
 
 ```tsx
-<Text 
-  style={styles.title}
-  {...a11y.header('Welcome Back')}
->
+<Text style={styles.title} {...a11y.header('Welcome Back')}>
   Welcome Back
 </Text>
 ```
@@ -92,7 +90,7 @@ export const MyScreen = () => {
   name="arrow-left"
   size={24}
   color="#000"
-  accessible={false}  // ← Buton zaten accessible olduğu için icon'a gerek yok
+  accessible={false} // ← Buton zaten accessible olduğu için icon'a gerek yok
 />
 ```
 
@@ -108,6 +106,7 @@ export const MyScreen = () => {
 ```
 
 **Parametreler:**
+
 - 1: Label
 - 2: Seçili mi? (boolean)
 
@@ -127,10 +126,7 @@ export const MyScreen = () => {
 ### ✅ Alert/Error Message (Hata Mesajı)
 
 ```tsx
-<Text 
-  style={styles.errorText}
-  {...a11y.alert('Password is required')}
->
+<Text style={styles.errorText} {...a11y.alert('Password is required')}>
   Password is required
 </Text>
 ```
@@ -147,17 +143,14 @@ import { useAccessibility } from '@/hooks/useAccessibility';
 
 export const LoginScreen = () => {
   const { props: a11y } = useAccessibility();
-  
+
   return (
     <View>
       {/* Başlık */}
-      <Text 
-        style={styles.title}
-        {...a11y.header('Welcome Back')}
-      >
+      <Text style={styles.title} {...a11y.header('Welcome Back')}>
         Welcome Back
       </Text>
-      
+
       {/* Email Input */}
       <TextInput
         value={email}
@@ -167,40 +160,32 @@ export const LoginScreen = () => {
         accessibilityHint="Enter your email to sign in"
         accessibilityValue={{ text: email }}
       />
-      
+
       {/* Hata Mesajı */}
-      {error && (
-        <Text {...a11y.alert(error)}>
-          {error}
-        </Text>
-      )}
-      
+      {error && <Text {...a11y.alert(error)}>{error}</Text>}
+
       {/* Sign In Butonu */}
       <TouchableOpacity
         onPress={handleLogin}
         disabled={isLoading}
-        {...a11y.button(
-          'Sign In',
-          'Sign in with your email and password',
-          isLoading
-        )}
+        {...a11y.button('Sign In', 'Sign in with your email and password', isLoading)}
       >
         <Text>Sign In</Text>
       </TouchableOpacity>
-      
+
       {/* Biometric Login (opsiyonel) */}
       {biometricEnabled && (
         <TouchableOpacity
           onPress={handleBiometricLogin}
           {...a11y.button(
             `Sign in with ${biometricTypeName}`,
-            `Use ${biometricTypeName} to sign in quickly`
+            `Use ${biometricTypeName} to sign in quickly`,
           )}
         >
-          <MaterialCommunityIcons 
-            name="fingerprint" 
+          <MaterialCommunityIcons
+            name="fingerprint"
             size={32}
-            accessible={false}  // ← Buton zaten bilgi veriyor
+            accessible={false} // ← Buton zaten bilgi veriyor
           />
           <Text>Sign in with {biometricTypeName}</Text>
         </TouchableOpacity>
@@ -218,7 +203,7 @@ import { useAccessibility } from '@/hooks/useAccessibility';
 
 export const MyMomentsScreen = () => {
   const { props: a11y } = useAccessibility();
-  
+
   return (
     <View>
       {/* Header */}
@@ -227,52 +212,36 @@ export const MyMomentsScreen = () => {
           onPress={() => navigation.goBack()}
           {...a11y.button('Go back', 'Return to previous screen')}
         >
-          <MaterialCommunityIcons 
-            name="arrow-left" 
-            size={24}
-            accessible={false}
-          />
+          <MaterialCommunityIcons name="arrow-left" size={24} accessible={false} />
         </TouchableOpacity>
-        
-        <Text {...a11y.header('My Moments')}>
-          My Moments
-        </Text>
-        
+
+        <Text {...a11y.header('My Moments')}>My Moments</Text>
+
         <TouchableOpacity
           onPress={handleCreate}
           {...a11y.button('Create new moment', 'Add a new travel moment')}
         >
-          <MaterialCommunityIcons 
-            name="plus" 
-            size={24}
-            accessible={false}
-          />
+          <MaterialCommunityIcons name="plus" size={24} accessible={false} />
         </TouchableOpacity>
       </View>
-      
+
       {/* Tabs */}
       <View style={styles.tabs}>
         <TouchableOpacity
           onPress={() => setTab('active')}
-          {...a11y.tab(
-            `Active moments, ${activeMoments.length} items`,
-            tab === 'active'
-          )}
+          {...a11y.tab(`Active moments, ${activeMoments.length} items`, tab === 'active')}
         >
           <Text>Active ({activeMoments.length})</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           onPress={() => setTab('completed')}
-          {...a11y.tab(
-            `Completed moments, ${completedMoments.length} items`,
-            tab === 'completed'
-          )}
+          {...a11y.tab(`Completed moments, ${completedMoments.length} items`, tab === 'completed')}
         >
           <Text>Completed ({completedMoments.length})</Text>
         </TouchableOpacity>
       </View>
-      
+
       {/* Liste */}
       {moments.map((moment, index) => (
         <TouchableOpacity
@@ -283,10 +252,7 @@ export const MyMomentsScreen = () => {
           accessibilityHint="Tap to view moment details"
           accessibilityRole="button"
         >
-          <Image 
-            source={{ uri: moment.image }}
-            {...a11y.image(`${moment.title} preview`)}
-          />
+          <Image source={{ uri: moment.image }} {...a11y.image(`${moment.title} preview`)} />
           <Text>{moment.title}</Text>
         </TouchableOpacity>
       ))}
@@ -304,28 +270,20 @@ import { useAccessibility } from '@/hooks/useAccessibility';
 export const WithdrawScreen = () => {
   const { props: a11y, formatCurrency } = useAccessibility();
   const availableBalance = 1250.0;
-  
+
   return (
     <View>
       {/* Header */}
-      <Text {...a11y.header('Withdraw')}>
-        Withdraw
-      </Text>
-      
+      <Text {...a11y.header('Withdraw')}>Withdraw</Text>
+
       {/* Balance Card */}
       <View>
-        <Image
-          source={{ uri: backgroundImage }}
-          {...a11y.image('Balance card background')}
-        />
-        <Text
-          accessible={true}
-          accessibilityLabel={formatCurrency(availableBalance)}
-        >
+        <Image source={{ uri: backgroundImage }} {...a11y.image('Balance card background')} />
+        <Text accessible={true} accessibilityLabel={formatCurrency(availableBalance)}>
           ${availableBalance.toFixed(2)}
         </Text>
       </View>
-      
+
       {/* Amount Input */}
       <TextInput
         value={amount}
@@ -335,22 +293,22 @@ export const WithdrawScreen = () => {
         accessibilityHint="Enter the amount you want to withdraw"
         accessibilityValue={{ text: `${amount} dollars` }}
       />
-      
+
       {/* Submit Button */}
       <TouchableOpacity
         onPress={handleWithdraw}
         disabled={isSubmitting}
         {...a11y.button(
           'Confirm withdraw',
-          biometricEnabled 
+          biometricEnabled
             ? `This will require ${biometricTypeName} verification`
             : 'Process withdrawal to your bank account',
-          isSubmitting
+          isSubmitting,
         )}
       >
         <Text>Confirm withdraw</Text>
       </TouchableOpacity>
-      
+
       {/* Processing Alert */}
       {isSubmitting && (
         <Text {...a11y.alert('Processing withdrawal. This may take a few seconds.')}>
@@ -367,42 +325,52 @@ export const WithdrawScreen = () => {
 ## 🛠️ Tüm Yardımcı Fonksiyonlar
 
 ### `a11y.button(label, hint?, disabled?)`
+
 Butonlar için kullan.
 
 ### `a11y.header(label)`
+
 Başlıklar için kullan.
 
 ### `a11y.image(label)`
+
 Görseller için kullan (ama icon'lar için kullanma).
 
 ### `a11y.tab(label, selected)`
+
 Sekme butonları için kullan.
 
 ### `a11y.link(label)`
+
 Linkler için kullan.
 
 ### `a11y.alert(message)`
+
 Hata/uyarı mesajları için kullan.
 
 ### `a11y.checkbox(label, checked)`
+
 Checkbox'lar için kullan.
 
 ### `a11y.switch(label, enabled)`
+
 Switch'ler için kullan.
 
 ### `formatCurrency(amount, currency?)`
+
 Para miktarlarını ekran okuyucu için formatla.
 
 ```tsx
-formatCurrency(1250) // "1250 dollars"
-formatCurrency(500, 'EUR') // "500 EUR"
+formatCurrency(1250); // "1250 dollars"
+formatCurrency(500, 'EUR'); // "500 EUR"
 ```
 
 ### `formatDate(date)`
+
 Tarihleri ekran okuyucu için formatla.
 
 ```tsx
-formatDate(new Date()) // "Monday, December 8, 2025"
+formatDate(new Date()); // "Monday, December 8, 2025"
 ```
 
 ---
@@ -421,7 +389,7 @@ formatDate(new Date()) // "Monday, December 8, 2025"
 
 // ✅ Doğru - Buton zaten bilgi veriyor
 <TouchableOpacity {...a11y.button('Go back')}>
-  <MaterialCommunityIcons 
+  <MaterialCommunityIcons
     name="arrow-left"
     accessible={false}  // ← Buton bilgi verdiği için icon'a gerek yok
   />
@@ -503,10 +471,12 @@ Yeni bir ekran yaptığında şunları kontrol et:
 ## 🎓 Öğrenme Kaynakları
 
 ### Hızlı Video İzle (5 dakika)
+
 - [VoiceOver Demo](https://www.youtube.com/watch?v=qDm7GiKra28) (Apple)
 - [TalkBack Demo](https://www.youtube.com/watch?v=0Zpzl4EKCco) (Android)
 
 ### Daha Fazla Bilgi
+
 - [React Native a11y Docs](https://reactnative.dev/docs/accessibility)
 - [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/accessibility)
 - [Material Design Accessibility](https://m3.material.io/foundations/accessible-design/overview)
@@ -518,6 +488,7 @@ Yeni bir ekran yaptığında şunları kontrol et:
 ### S: Her element'e mi ekleyeceğim?
 
 **C:** Hayır! Sadece **kullanıcının etkileşime geçtiği** elementlere:
+
 - Butonlar ✅
 - Input'lar ✅
 - Linkler ✅
@@ -531,7 +502,7 @@ Yeni bir ekran yaptığında şunları kontrol et:
 
 ```tsx
 <TouchableOpacity {...a11y.button('Settings')}>
-  <Icon name="settings" accessible={false} />  // ← Buton zaten bilgi veriyor
+  <Icon name="settings" accessible={false} /> // ← Buton zaten bilgi veriyor
   <Text>Settings</Text>
 </TouchableOpacity>
 ```
@@ -542,10 +513,11 @@ Yeni bir ekran yaptığında şunları kontrol et:
 
 ```tsx
 // ❌ Çok uzun
-accessibilityLabel="This is the withdraw screen where you can withdraw your money from your TravelMatch account to your bank account..."
+accessibilityLabel =
+  'This is the withdraw screen where you can withdraw your money from your Lovendo account to your bank account...';
 
 // ✅ Kısa ve net
-accessibilityLabel="Withdraw funds to your bank account"
+accessibilityLabel = 'Withdraw funds to your bank account';
 ```
 
 ### S: Liste item'lere nasıl eklerim?
@@ -553,15 +525,17 @@ accessibilityLabel="Withdraw funds to your bank account"
 **C:** Her item'a index bilgisi ekle:
 
 ```tsx
-{moments.map((moment, index) => (
-  <TouchableOpacity
-    accessible={true}
-    accessibilityLabel={`${moment.title}, item ${index + 1} of ${moments.length}`}
-    accessibilityRole="button"
-  >
-    <Text>{moment.title}</Text>
-  </TouchableOpacity>
-))}
+{
+  moments.map((moment, index) => (
+    <TouchableOpacity
+      accessible={true}
+      accessibilityLabel={`${moment.title}, item ${index + 1} of ${moments.length}`}
+      accessibilityRole="button"
+    >
+      <Text>{moment.title}</Text>
+    </TouchableOpacity>
+  ));
+}
 ```
 
 ---
@@ -581,10 +555,9 @@ accessibilityLabel="Withdraw funds to your bank account"
 
 Referans için bu ekranlar tamamlanmış:
 
-✅ **LoginScreen** - Full accessibility
-✅ **DiscoverScreen** (Home) - View toggles, error states
-✅ **MyMomentsScreen** - Tabs, cards, header buttons
-✅ **WithdrawScreen** - Balance, inputs, buttons, biometric hints
+✅ **LoginScreen** - Full accessibility ✅ **DiscoverScreen** (Home) - View toggles, error states ✅
+**MyMomentsScreen** - Tabs, cards, header buttons ✅ **WithdrawScreen** - Balance, inputs, buttons,
+biometric hints
 
 Bu ekranları örnek alabilirsin!
 
@@ -592,4 +565,4 @@ Bu ekranları örnek alabilirsin!
 
 **Son Güncelleme:** 8 Aralık 2025  
 **Sürüm:** 1.0  
-**Yazar:** TravelMatch Engineering Team
+**Yazar:** Lovendo Engineering Team

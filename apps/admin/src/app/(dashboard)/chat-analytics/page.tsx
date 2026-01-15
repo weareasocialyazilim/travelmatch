@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * TravelMatch Chat & Messaging Analytics
+ * Lovendo Chat & Messaging Analytics
  * Mesajlasma sisteminin analitigi ve izlenmesi
  *
  * Chat lock sistemi, E2E encryption, response metrikleri

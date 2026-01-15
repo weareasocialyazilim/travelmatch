@@ -18,19 +18,16 @@
       "@/theme/*": ["src/theme/*"],
       "@/navigation/*": ["src/navigation/*"],
       "@/context/*": ["src/context/*"],
-      "@travelmatch/shared": ["../../packages/shared/src/index.ts"],
-      "@travelmatch/shared/*": ["../../packages/shared/src/*"]
+      "@lovendo/design-system": ["../../packages/design-system/src/index.ts"],
+      "@lovendo/design-system/*": ["../../packages/design-system/src/*"],
+      "@lovendo/design-system": ["../../packages/design-system/src/index.ts"],
+      "@lovendo/design-system/*": ["../../packages/design-system/src/*"],
+      "@lovendo/shared": ["../../packages/shared/src/index.ts"],
+      "@lovendo/shared/*": ["../../packages/shared/src/*"],
+      "@lovendo/shared": ["../../packages/shared/src/index.ts"],
+      "@lovendo/shared/*": ["../../packages/shared/src/*"]
     }
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/types/*.d.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "android",
-    "ios",
-    ".expo"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/types/*.d.ts"],
+  "exclude": ["node_modules", "android", "ios", ".expo"]
 }

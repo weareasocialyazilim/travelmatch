@@ -16,7 +16,7 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-echo -e "${BLUE}Your TravelMatch Supabase Project${NC}"
+echo -e "${BLUE}Your Lovendo Supabase Project${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 echo "Project Reference: bjikxgtbptrvawkguypv"
@@ -86,7 +86,7 @@ echo "URL: https://supabase.com/dashboard/account/tokens"
 echo ""
 echo "Steps:"
 echo "  1. Click 'Generate new token'"
-echo "  2. Name it: 'GitHub Actions - TravelMatch'"
+echo "  2. Name it: 'GitHub Actions - Lovendo'"
 echo "  3. Click 'Generate token'"
 echo "  4. Copy the token immediately (you won't see it again!)"
 echo ""

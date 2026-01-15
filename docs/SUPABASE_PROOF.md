@@ -1,6 +1,6 @@
 # Supabase Integration Proof
 
-Bu dokuman, TravelMatch mobil uygulamasindaki Supabase entegrasyonunun dogrulamasini icerir.
+Bu dokuman, Lovendo mobil uygulamasindaki Supabase entegrasyonunun dogrulamasini icerir.
 
 ## Konfigürasyon Analizi
 

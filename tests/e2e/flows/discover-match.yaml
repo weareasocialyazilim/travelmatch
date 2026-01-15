@@ -1,7 +1,7 @@
 # Maestro Flow: Discover & Match
 # Tests profile discovery and matching functionality
 
-appId: com.travelmatch.app
+appId: com.lovendo.app
 ---
 
 # Start at discover screen

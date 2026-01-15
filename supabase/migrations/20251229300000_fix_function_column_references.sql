@@ -5,7 +5,7 @@
 -- 1. refund_expired_escrow - remove updated_at, fix audit_logs columns
 -- 2. record_rate_limit_violation - fix audit_logs columns
 --
--- Author: TravelMatch Team
+-- Author: Lovendo Team
 -- Date: 2025-12-29
 -- ============================================
 

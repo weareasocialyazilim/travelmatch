@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// TravelMatch Ultimate Design System 2026
+// Lovendo Ultimate Design System 2026
 // "Cinematic Trust Jewelry" Component Library
 // ═══════════════════════════════════════════════════════════════════
 
@@ -19,71 +19,71 @@ export { ControlledLiquidInput } from './ControlledLiquidInput';
 // @deprecated aliases - use LiquidInput instead
 export { LiquidInput as Input } from './LiquidInput';
 
-// TMBadge - Consolidated badge component (replaces Badge, StatusBadge, TrustBadge)
+// LovendoBadge - Consolidated badge component (replaces Badge, StatusBadge, TrustBadge)
 export {
-  TMBadge,
+  LovendoBadge,
   LiveStatusBadge,
   VerifiedBadge,
   PremiumBadge,
-} from './TMBadge';
+} from './LovendoBadge';
 export type {
-  TMBadgeType,
+  LovendoBadgeType,
   LabelVariant,
   StatusVariant,
   BadgeSize,
-  TMBadgeProps,
-} from './TMBadge';
+  LovendoBadgeProps,
+} from './LovendoBadge';
 // @deprecated aliases for backward compatibility
 export {
-  TMBadge as Badge,
-  TMBadge as StatusBadge,
-  TMBadge as TrustBadge,
-} from './TMBadge';
+  LovendoBadge as Badge,
+  LovendoBadge as StatusBadge,
+  LovendoBadge as TrustBadge,
+} from './LovendoBadge';
 
 // ═══════════════════════════════════════════════════════════════════
-// TravelMatch Design System Components (TM* prefix)
+// Lovendo Design System Components
 // ═══════════════════════════════════════════════════════════════════
 
-// TMButton - Primary button with gradient, animation, haptics
+// LovendoButton - Primary button with gradient, animation, haptics
 // Consolidated master component - replaces Button, HapticButton, AnimatedButton
-export { TMButton } from './TMButton';
+export { LovendoButton } from './LovendoButton';
 export { MagneticButton } from './MagneticButton';
 export type {
-  TMButtonProps,
+  LovendoButtonProps,
   ButtonVariant,
   ButtonSize,
   AnimationMode,
   HapticType,
-} from './TMButton';
+} from './LovendoButton';
 
-// TMTrustRing - Trust score visualization with "Jewelry" aesthetic
-export { TMTrustRing } from './TMTrustRing';
+// LovendoTrustRing - Trust score visualization with "Jewelry" aesthetic
+export { LovendoTrustRing } from './LovendoTrustRing';
 
-// TMCard - Moment card with "Soft Glass" aesthetic
-export { TMCard } from './TMCard';
-export type { MomentData, MomentBadgeType } from './TMCard';
+// LovendoCard - Moment card with "Soft Glass" aesthetic
+export { LovendoCard } from './LovendoCard';
+export type { MomentData, MomentBadgeType } from './LovendoCard';
 
-// TMPill - Chip/pill components
-export { TMPill, TMCategoryChip } from './TMPill';
+// LovendoPill - Chip/pill components
+export { LovendoPill, LovendoCategoryChip } from './LovendoPill';
 
-// TMLoading - Consolidated loading component (replaces Spinner, LoadingSpinner, LiquidLoading)
-export { TMLoading } from './TMLoading';
+// LovendoLoading - Consolidated loading component (replaces Spinner, LoadingSpinner, LiquidLoading)
+export { LovendoLoading } from './LovendoLoading';
 export type {
-  TMLoadingType,
+  LovendoLoadingType,
   LoadingSize,
   LoadingVariant,
-  TMLoadingProps,
-} from './TMLoading';
+  LovendoLoadingProps,
+} from './LovendoLoading';
 // @deprecated aliases for backward compatibility
 export {
-  TMLoading as Spinner,
-  TMLoading as LoadingSpinner,
-  TMLoading as LiquidLoading,
-} from './TMLoading';
+  LovendoLoading as Spinner,
+  LovendoLoading as LoadingSpinner,
+  LovendoLoading as LiquidLoading,
+} from './LovendoLoading';
 
-// TMSkeleton - Consolidated skeleton component (replaces Skeleton, SkeletonList, NavigationSkeleton)
+// LovendoSkeleton - Consolidated skeleton component (replaces Skeleton, SkeletonList, NavigationSkeleton)
 export {
-  TMSkeleton,
+  LovendoSkeleton,
   Skeleton,
   SkeletonAvatar,
   SkeletonText,
@@ -91,30 +91,30 @@ export {
   SkeletonMessage,
   SkeletonList,
   ScreenSkeleton,
-} from './TMSkeleton';
+} from './LovendoSkeleton';
 export type {
-  TMSkeletonType,
+  LovendoSkeletonType,
   SkeletonListType,
   SkeletonScreenType,
   SkeletonVariant,
-  TMSkeletonProps,
-} from './TMSkeleton';
-// @deprecated aliases for backward compatibility - use TMSkeleton with type prop instead
-export { TMSkeleton as FeedSkeleton } from './TMSkeleton';
+  LovendoSkeletonProps,
+} from './LovendoSkeleton';
+// @deprecated aliases for backward compatibility - use LovendoSkeleton with type prop instead
+export { LovendoSkeleton as FeedSkeleton } from './LovendoSkeleton';
 
-// TMSheet - Bottom sheet with gestures and blur
-export { TMSheet } from './TMSheet';
-export type { TMSheetProps, TMSheetSize } from './TMSheet';
+// LovendoSheet - Bottom sheet with gestures and blur
+export { LovendoSheet } from './LovendoSheet';
+export type { LovendoSheetProps, LovendoSheetSize } from './LovendoSheet';
 
-// TMAvatar - Avatar with initials fallback, status, verified badge
-export { TMAvatar } from './TMAvatar';
-export type { TMAvatarProps, AvatarSize, AvatarStatus } from './TMAvatar';
+// LovendoAvatar - Avatar with initials fallback, status, verified badge
+export { LovendoAvatar } from './LovendoAvatar';
+export type { LovendoAvatarProps, AvatarSize, AvatarStatus } from './LovendoAvatar';
 // @deprecated alias for backward compatibility
-export { TMAvatar as Avatar } from './TMAvatar';
+export { LovendoAvatar as Avatar } from './LovendoAvatar';
 
-// TMProofCard - Proof submission card for chat
-export { TMProofCard } from './TMProofCard';
-export type { TMProofCardProps, ProofStatus, MediaType } from './TMProofCard';
+// LovendoProofCard - Proof submission card for chat
+export { LovendoProofCard } from './LovendoProofCard';
+export type { LovendoProofCardProps, ProofStatus, MediaType } from './LovendoProofCard';
 
 // Paywall - Feature paywall with upgrade CTA
 export { Paywall } from './Paywall';

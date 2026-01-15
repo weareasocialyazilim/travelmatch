@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines the comprehensive database optimizations implemented for TravelMatch
+This document outlines the comprehensive database optimizations implemented for Lovendo
 production readiness, including keyset pagination, foreign key indexes, and query performance
 improvements.
 

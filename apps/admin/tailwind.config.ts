@@ -3,7 +3,7 @@ import type { Config } from 'tailwindcss';
 import designSystemPreset from '../../packages/design-system/src/tailwind.preset';
 
 /**
- * TravelMatch Admin Panel - Tailwind Config
+ * Lovendo Admin Panel - Tailwind Config
  * Extends the shared design system preset for brand consistency
  * "Sunset Proof Palette" - Amber primary, Magenta secondary
  */
@@ -60,9 +60,9 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
-        // TravelMatch brand colors - Sunset Proof Palette (Amber)
+        // Lovendo brand colors - Sunset Proof Palette (Amber)
         // Aligned with packages/design-system/src/tokens/colors.ts
-        travelmatch: {
+        lovendo: {
           50: '#FFFBEB',
           100: '#FEF3C7',
           200: '#FDE68A',

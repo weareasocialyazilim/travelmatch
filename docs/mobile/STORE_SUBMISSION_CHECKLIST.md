@@ -1,4 +1,4 @@
-# TravelMatch - App Store & Play Store Submission Checklist
+# Lovendo - App Store & Play Store Submission Checklist
 
 ## Version Information
 
@@ -13,8 +13,8 @@
 ### App Store Connect Setup
 
 - [ ] Create app record in App Store Connect
-- [ ] Set app name: **TravelMatch**
-- [ ] Set bundle ID: `com.travelmatch.app`
+- [ ] Set app name: **Lovendo**
+- [ ] Set bundle ID: `com.lovendo.app`
 - [ ] Set primary category: **Travel** (or Social Networking)
 - [ ] Set secondary category: **Lifestyle**
 - [ ] Set content rating: Complete the questionnaire
@@ -22,14 +22,14 @@
 
 ### Required Metadata
 
-- [ ] App Name (30 characters max): `TravelMatch`
+- [ ] App Name (30 characters max): `Lovendo`
 - [ ] Subtitle (30 characters max): `Share Moments, Gift Experiences`
 - [ ] Description (4000 characters max)
 - [ ] Keywords (100 characters max): `travel, gift, moments, experiences, local, meet, share`
-- [ ] Support URL: `https://travelmatch.app/support`
-- [ ] Marketing URL: `https://travelmatch.app`
-- [ ] Privacy Policy URL: `https://travelmatch.app/privacy`
-- [ ] Terms of Service URL: `https://travelmatch.app/terms`
+- [ ] Support URL: `https://lovendo.app/support`
+- [ ] Marketing URL: `https://lovendo.app`
+- [ ] Privacy Policy URL: `https://lovendo.app/privacy`
+- [ ] Terms of Service URL: `https://lovendo.app/terms`
 
 ### Screenshots Required
 
@@ -83,8 +83,8 @@ eas submit --platform ios --profile production
 ### Google Play Console Setup
 
 - [ ] Create app in Google Play Console
-- [ ] Set app name: **TravelMatch**
-- [ ] Set package name: `com.travelmatch.app`
+- [ ] Set app name: **Lovendo**
+- [ ] Set package name: `com.lovendo.app`
 - [ ] Set default language: English (US)
 - [ ] Set app category: Travel & Local (or Social)
 - [ ] Set content rating: Complete questionnaire
@@ -96,7 +96,7 @@ eas submit --platform ios --profile production
 - [ ] Full description (4000 characters max)
 - [ ] App icon: 512x512 PNG
 - [ ] Feature graphic: 1024x500 PNG
-- [ ] Privacy Policy URL: `https://travelmatch.app/privacy`
+- [ ] Privacy Policy URL: `https://lovendo.app/privacy`
 
 ### Screenshots Required
 
@@ -194,8 +194,8 @@ eas submit --platform android --profile production
 
 ### Legal
 
-- [x] Privacy Policy published at https://travelmatch.app/privacy
-- [x] Terms of Service published at https://travelmatch.app/terms
+- [x] Privacy Policy published at https://lovendo.app/privacy
+- [x] Terms of Service published at https://lovendo.app/terms
 - [x] GDPR compliance (data export, deletion via DataPrivacyScreen)
 - [x] KVKK compliance (Turkey - data breach notification in docs/LEGAL_PROCEDURES.md)
 - [x] Age verification (17+ content rating configured)
@@ -276,7 +276,7 @@ Share travel moments, gift experiences. Connect with travelers worldwide.
 ### Full Description
 
 ```
-TravelMatch - Where Travel Moments Become Shared Experiences
+Lovendo - Where Travel Moments Become Shared Experiences
 
 🌍 DISCOVER AUTHENTIC MOMENTS
 Browse unique experiences shared by travelers and locals worldwide. From hidden coffee shops to breathtaking viewpoints, find moments that matter.
@@ -302,7 +302,7 @@ Create and share your own travel moments. Whether it's a sunset view, a local de
 • Offline support for saved content
 • Dark mode support
 
-Join TravelMatch today and transform the way you travel!
+Join Lovendo today and transform the way you travel!
 ```
 
 ---
@@ -329,12 +329,12 @@ Join TravelMatch today and transform the way you travel!
 
 ## 📞 Support Information
 
-- **Support Email**: support@travelmatch.app
-- **Support URL**: https://travelmatch.app/support
-- **Marketing URL**: https://travelmatch.app
-- **Privacy Policy**: https://travelmatch.app/privacy
-- **Terms of Service**: https://travelmatch.app/terms
+- **Support Email**: support@lovendo.app
+- **Support URL**: https://lovendo.app/support
+- **Marketing URL**: https://lovendo.app
+- **Privacy Policy**: https://lovendo.app/privacy
+- **Terms of Service**: https://lovendo.app/terms
 
 ---
 
-**Last Updated**: December 2024 **Prepared For**: TravelMatch v1.0.0
+**Last Updated**: December 2024 **Prepared For**: Lovendo v1.0.0

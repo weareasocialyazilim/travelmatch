@@ -1,5 +1,5 @@
 /**
- * TravelMatch Proof Ceremony Components
+ * Lovendo Proof Ceremony Components
  *
  * DEPRECATED: This module has been moved to features/verifications.
  * These re-exports are for backward compatibility.

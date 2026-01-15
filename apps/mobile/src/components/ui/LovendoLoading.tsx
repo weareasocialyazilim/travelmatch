@@ -1,5 +1,5 @@
 /**
- * TMLoading - TravelMatch Ultimate Design System 2026
+ * LovendoLoading - Lovendo Ultimate Design System 2026
  * Consolidated loading component for all loading types
  *
  * Replaces:
@@ -10,16 +10,16 @@
  * @example
  * ```tsx
  * // Simple inline spinner
- * <TMLoading type="simple" />
+ * <LovendoLoading type="simple" />
  *
  * // Standard spinner with message
- * <TMLoading type="standard" message="Loading..." />
+ * <LovendoLoading type="standard" message="Loading..." />
  *
  * // Full screen loading
- * <TMLoading type="standard" fullScreen message="Please wait..." />
+ * <LovendoLoading type="standard" fullScreen message="Please wait..." />
  *
  * // Premium liquid loading (cinematic)
- * <TMLoading type="liquid" message="İpeksi detaylar hazırlanıyor..." />
+ * <LovendoLoading type="liquid" message="İpeksi detaylar hazırlanıyor..." />
  * ```
  */
 
@@ -55,15 +55,15 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 // Types
 // ═══════════════════════════════════════════════════════════════════
 
-export type TMLoadingType = 'simple' | 'standard' | 'liquid';
+export type LovendoLoadingType = 'simple' | 'standard' | 'liquid';
 
 export type LoadingSize = 'sm' | 'md' | 'lg';
 
 export type LoadingVariant = 'primary' | 'secondary' | 'trust';
 
-export interface TMLoadingProps {
+export interface LovendoLoadingProps {
   /** Loading type determines rendering style */
-  type?: TMLoadingType;
+  type?: LovendoLoadingType;
 
   // Common props
   /** Loading message */
@@ -98,7 +98,7 @@ export interface TMLoadingProps {
 // Main Component
 // ═══════════════════════════════════════════════════════════════════
 
-export const TMLoading: React.FC<TMLoadingProps> = ({
+export const LovendoLoading: React.FC<LovendoLoadingProps> = ({
   type = 'standard',
   message,
   style,
@@ -752,4 +752,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TMLoading;
+export default LovendoLoading;

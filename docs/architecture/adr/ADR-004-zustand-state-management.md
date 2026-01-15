@@ -10,7 +10,7 @@ December 2024
 
 ## Context
 
-TravelMatch's mobile app requires client-side state management for:
+Lovendo's mobile app requires client-side state management for:
 
 1. Authentication state (user, session, tokens)
 2. Application data (moments, conversations, notifications)

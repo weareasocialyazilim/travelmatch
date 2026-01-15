@@ -1,6 +1,6 @@
-# 🛠️ TravelMatch Scripts
+# 🛠️ Lovendo Scripts
 
-Utility scripts for setting up and managing TravelMatch infrastructure.
+Utility scripts for setting up and managing Lovendo infrastructure.
 
 ---
 
@@ -274,4 +274,4 @@ cat apps/mobile/.env.development | grep SUPABASE
 ---
 
 **Last Updated:** 2025-12-15
-**Maintainer:** TravelMatch DevOps Team
+**Maintainer:** Lovendo DevOps Team

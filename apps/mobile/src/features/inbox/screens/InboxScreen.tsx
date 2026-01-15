@@ -1,5 +1,5 @@
 /**
- * TravelMatch Inbox Screen - Awwwards Edition
+ * Lovendo Inbox Screen - Awwwards Edition
  *
  * Premium inbox experience with:
  * - Twilight Zinc dark theme

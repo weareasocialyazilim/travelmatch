@@ -34,7 +34,7 @@ ALLOWED_IMAGE_DOMAINS = [
     'supabase.co',
     'supabase.in',
     'cloudflare.com',
-    'cdn.travelmatch.app',
+    'cdn.lovendo.xyz',
     'localhost',
     '127.0.0.1',
 ]

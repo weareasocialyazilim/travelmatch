@@ -5,7 +5,7 @@
 
 set -e
 
-REPO="kemalteksalgit/travelmatch"
+REPO="kemalteksalgit/lovendo"
 
 echo "🔐 GitHub Secrets Setup Script"
 echo "================================"

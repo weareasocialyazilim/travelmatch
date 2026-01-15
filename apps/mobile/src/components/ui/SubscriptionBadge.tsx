@@ -257,7 +257,7 @@ export const SubscriptionUpgradeCTA: React.FC<SubscriptionUpgradeCTAProps> = ({
         <View style={styles.ctaContent}>
           <MaterialCommunityIcons name="crown" size={28} color="#1A1A1A" />
           <View style={styles.ctaTextContainer}>
-            <Text style={styles.ctaTitle}>TravelMatch Premium</Text>
+            <Text style={styles.ctaTitle}>Lovendo Premium</Text>
             <Text style={styles.ctaSubtitle}>
               Sınırsız teklif gönder, öncelikli eşleşme
             </Text>

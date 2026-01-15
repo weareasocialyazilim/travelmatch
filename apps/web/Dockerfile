@@ -50,7 +50,7 @@ COPY pnpm-workspace.yaml ./
 
 # Build with Turbo
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN pnpm turbo run build --filter=@travelmatch/web
+RUN pnpm turbo run build --filter=@lovendo/web
 
 # ==========================================
 # Stage 3: Runner (Production)

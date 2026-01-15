@@ -1,5 +1,5 @@
 /**
- * TravelMatch V2 - Content Constants
+ * Lovendo V2 - Content Constants
  * "Anı Hediye Et" - Sıcak, samimi, jargonsuz içerikler
  *
  * YASAK KELİMELER: escrow, verification, algorithm, protocol, queue
@@ -208,14 +208,13 @@ export const CTA_CONTENT = {
   tr: {
     title: 'İlk Adımı Atmaya Hazır mısın?',
     subtitle:
-      'Binlerce kişi TravelMatch ile gerçek bağlantılar kuruyor. Sıra sende!',
+      'Binlerce kişi Lovendo ile gerçek bağlantılar kuruyor. Sıra sende!',
     button: 'Uygulamayı İndir',
     note: 'Ücretsiz başla, hediye gönderirken öde.',
   },
   en: {
     title: 'Ready to Take the First Step?',
-    subtitle:
-      'Thousands are making real connections with TravelMatch. Your turn!',
+    subtitle: 'Thousands are making real connections with Lovendo. Your turn!',
     button: 'Download the App',
     note: 'Start free, pay only when sending gifts.',
   },
@@ -234,10 +233,10 @@ export const FOOTER_CONTENT = {
       contact: 'İletişim',
     },
     social: {
-      instagram: '@travelmatchapp',
-      twitter: '@travelmatch',
+      instagram: '@lovendoapp',
+      twitter: '@lovendo',
     },
-    copyright: '© 2026 TravelMatch. Tüm hakları saklıdır.',
+    copyright: '© 2026 Lovendo. Tüm hakları saklıdır.',
   },
   en: {
     tagline: 'Real connections start with genuine gestures.',
@@ -251,19 +250,19 @@ export const FOOTER_CONTENT = {
       contact: 'Contact',
     },
     social: {
-      instagram: '@travelmatchapp',
-      twitter: '@travelmatch',
+      instagram: '@lovendoapp',
+      twitter: '@lovendo',
     },
-    copyright: '© 2026 TravelMatch. All rights reserved.',
+    copyright: '© 2026 Lovendo. All rights reserved.',
   },
 } as const;
 
 // SEO Meta Content
 export const SEO_CONTENT = {
   tr: {
-    title: 'TravelMatch | Anı Hediye Et - Gerçek Bağlantılar Kur',
+    title: 'Lovendo | Anı Hediye Et - Gerçek Bağlantılar Kur',
     description:
-      "Swipe'lamayı bırak, samimi ol. Bir kahve gönder, gerçek hayatta tanış. TravelMatch ile anlamlı bağlantılar kur.",
+      "Swipe'lamayı bırak, samimi ol. Bir kahve gönder, gerçek hayatta tanış. Lovendo ile anlamlı bağlantılar kur.",
     keywords: [
       'tanışma uygulaması',
       'hediye gönder',
@@ -273,9 +272,9 @@ export const SEO_CONTENT = {
     ],
   },
   en: {
-    title: 'TravelMatch | Gift a Moment - Make Real Connections',
+    title: 'Lovendo | Gift a Moment - Make Real Connections',
     description:
-      'Stop swiping, be genuine. Send a coffee, meet in real life. Make meaningful connections with TravelMatch.',
+      'Stop swiping, be genuine. Send a coffee, meet in real life. Make meaningful connections with Lovendo.',
     keywords: [
       'dating app',
       'send gift',

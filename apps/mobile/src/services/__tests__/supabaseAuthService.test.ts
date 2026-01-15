@@ -265,7 +265,7 @@ describe('supabaseAuthService', () => {
         expect.objectContaining({
           provider: 'google',
           options: expect.objectContaining({
-            redirectTo: 'travelmatch://auth/callback',
+            redirectTo: 'lovendo://auth/callback',
             skipBrowserRedirect: true,
           }),
         }),
@@ -289,7 +289,7 @@ describe('supabaseAuthService', () => {
         expect.objectContaining({
           provider: 'apple',
           options: expect.objectContaining({
-            redirectTo: 'travelmatch://auth/callback',
+            redirectTo: 'lovendo://auth/callback',
             skipBrowserRedirect: true,
           }),
         }),
@@ -471,7 +471,7 @@ describe('supabaseAuthService', () => {
       expect(auth.resetPasswordForEmail).toHaveBeenCalledWith(
         'test@example.com',
         {
-          redirectTo: 'travelmatch://auth/reset-password',
+          redirectTo: 'lovendo://auth/reset-password',
         },
       );
       expect(logger.info).toHaveBeenCalledWith(

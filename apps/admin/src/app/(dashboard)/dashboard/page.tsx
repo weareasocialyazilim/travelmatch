@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * TravelMatch Admin Dashboard
+ * Lovendo Admin Dashboard
  *
  * CEO/CMO Final Meeting - Ultimate Dashboard Implementation
  *

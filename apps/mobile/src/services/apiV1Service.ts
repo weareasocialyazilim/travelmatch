@@ -21,12 +21,12 @@ const API_BASE_URL = `${SUPABASE_URL}/functions/v1/api/v1`;
 
 /**
  * Generate a unique trace ID for distributed tracing
- * Format: tm-{timestamp}-{random} for easy identification
+ * Format: lv-{timestamp}-{random} for easy identification
  */
 const generateTraceId = (): string => {
   const timestamp = Date.now().toString(36);
   const random = Math.random().toString(36).substring(2, 10);
-  return `tm-${timestamp}-${random}`;
+  return `lv-${timestamp}-${random}`;
 };
 
 export interface ApiResponse<T> {

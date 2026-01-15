@@ -1,5 +1,5 @@
 -- ============================================
--- TravelMatch Payment System Enhancements
+-- Lovendo Payment System Enhancements
 -- Migration: 20251229000001_payment_enhancements.sql
 -- ============================================
 --

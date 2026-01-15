@@ -1,4 +1,4 @@
-# 🔐 Secret Management - TravelMatch
+# 🔐 Secret Management - Lovendo
 
 ## ⚠️ Important Security Notes
 
@@ -156,7 +156,7 @@ All workflows automatically import secrets from Infisical:
   with:
     client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
     client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-    project-slug: travelmatch
+    project-slug: lovendo
     env-slug: prod # or staging
     export-type: env
 
@@ -203,8 +203,8 @@ infisical secrets set TWILIO_VERIFY_SERVICE_SID="VAxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```bash
 # SendGrid credentials (from app.sendgrid.com)
 infisical secrets set SENDGRID_API_KEY="SG.xxxxxxxxxxxxxxxxxxxxxxxxxxxx" --env=prod
-infisical secrets set SENDGRID_FROM_EMAIL="noreply@travelmatch.app" --env=prod
-infisical secrets set SENDGRID_FROM_NAME="TravelMatch" --env=prod
+infisical secrets set SENDGRID_FROM_EMAIL="noreply@lovendo.xyz" --env=prod
+infisical secrets set SENDGRID_FROM_NAME="Lovendo" --env=prod
 
 # Optional: Dynamic Template IDs
 infisical secrets set SENDGRID_TEMPLATE_WELCOME="d-xxxxxxxx" --env=prod

@@ -1,4 +1,4 @@
-package com.travelmatch.app
+package com.lovendo.app
 
 import android.app.Application
 import android.content.res.Configuration

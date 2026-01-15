@@ -154,7 +154,7 @@ const auditLogs = [
     changes: {
       before: null,
       after: {
-        email: 'elif@travelmatch.com',
+        email: 'elif@lovendo.com',
         role: 'support',
         is_active: true,
       },

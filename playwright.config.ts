@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * Playwright E2E Test Configuration for TravelMatch
+ * Playwright E2E Test Configuration for Lovendo
  *
  * This configuration enables E2E testing for both web and admin apps.
  *
@@ -136,13 +136,13 @@ export default defineConfig({
   // Web server configuration
   webServer: [
     {
-      command: 'pnpm --filter @travelmatch/web dev',
+      command: 'pnpm --filter @lovendo/web dev',
       port: 3000,
       reuseExistingServer: !process.env.CI,
       timeout: 120000,
     },
     {
-      command: 'pnpm --filter @travelmatch/admin dev',
+      command: 'pnpm --filter @lovendo/admin dev',
       port: 3001,
       reuseExistingServer: !process.env.CI,
       timeout: 120000,

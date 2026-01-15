@@ -2,7 +2,7 @@
 
 ## Overview
 
-TravelMatch uses **Infisical** to manage environment secrets securely. All sensitive credentials are
+Lovendo uses **Infisical** to manage environment secrets securely. All sensitive credentials are
 stored in Infisical and injected at runtime.
 
 ## Quick Start
@@ -64,7 +64,7 @@ ADMIN_EMAIL = "admin@example.com"  (optional, defaults to kemal@weareasocial.com
 
 ```
 DEMO_PASSWORD = "Demo account password"
-DEMO_EMAIL = "demo@example.com"  (optional, defaults to demo@travelmatch.app)
+DEMO_EMAIL = "demo@example.com"  (optional, defaults to demo@lovendo.app)
 ```
 
 ## Adding Secrets to Infisical
@@ -85,7 +85,7 @@ infisical secrets delete --env=dev --key=ADMIN_PASSWORD
 ### Via Infisical Dashboard
 
 1. Go to [app.infisical.com](https://app.infisical.com)
-2. Select Project: **TravelMatch**
+2. Select Project: **Lovendo**
 3. Select Environment: **dev** or **production**
 4. Click **Add Secret**
 5. Enter Key and Value
@@ -205,5 +205,5 @@ Store `INFISICAL_TOKEN` as a secret in your CI/CD provider:
 ## Support
 
 - Infisical Docs: https://infisical.com/docs
-- Workspace: TravelMatch (261defa2-bcaf-4905-9230-35c1acc3b026)
+- Workspace: Lovendo (261defa2-bcaf-4905-9230-35c1acc3b026)
 - Contact: Setup team

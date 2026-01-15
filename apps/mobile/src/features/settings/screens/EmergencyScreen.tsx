@@ -74,7 +74,7 @@ export const EmergencyScreen: React.FC<EmergencyScreenProps> = ({
           <Text style={styles.contactName}>Mom</Text>
         </View>
         <View style={styles.contactChip}>
-          <Text style={styles.contactName}>TravelMatch Support</Text>
+          <Text style={styles.contactName}>Lovendo Support</Text>
         </View>
       </View>
     </View>

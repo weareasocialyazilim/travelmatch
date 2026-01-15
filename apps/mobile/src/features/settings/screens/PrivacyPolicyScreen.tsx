@@ -34,8 +34,8 @@ export const PrivacyPolicyScreen = ({ navigation }: any) => {
         <Text style={styles.section}>2. Location Information</Text>
         <Text style={styles.para}>
           When you use the Services for transportation or delivery, we collect
-          precise location data about the trip from the TravelMatch app used by
-          the Host.
+          precise location data about the trip from the Lovendo app used by the
+          Host.
         </Text>
 
         <Text style={styles.section}>3. Use of Information</Text>

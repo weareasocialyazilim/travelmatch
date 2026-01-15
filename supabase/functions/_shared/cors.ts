@@ -8,12 +8,18 @@
 // Allowed origins for CORS
 const ALLOWED_ORIGINS = [
   // Production
-  'https://travelmatch.app',
-  'https://www.travelmatch.app',
-  'https://admin.travelmatch.app',
-  'https://api.travelmatch.app',
+  'https://www.lovendo.xyz',
+  'https://lovendo.xyz',
+  'https://admin.lovendo.xyz',
+  'https://api.lovendo.xyz',
   // React Native / Mobile (uses custom scheme)
-  'travelmatch://',
+  'lovendo://',
+  // Legacy (existing installs/links)
+  'https://lovendo.app',
+  'https://www.lovendo.app',
+  'https://admin.lovendo.app',
+  'https://api.lovendo.app',
+  'lovendo://',
   // Expo development (when using expo go)
   'exp://',
 ];
@@ -78,7 +84,7 @@ export function getCorsHeaders(origin: string | null): Record<string, string> {
  * @security This export will be removed in the next major version.
  */
 export const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://travelmatch.app', // Locked to production
+  'Access-Control-Allow-Origin': 'https://lovendo.app', // Locked to production
   'Access-Control-Allow-Headers':
     'authorization, x-client-info, apikey, content-type, x-supabase-auth',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',

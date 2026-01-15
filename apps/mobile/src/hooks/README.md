@@ -1,51 +1,51 @@
 # Hooks
 
-Custom React hooks for the TravelMatch application.
+Custom React hooks for the Lovendo application.
 
 ## Available Hooks
 
 ### Data Fetching
 
-| Hook | Description |
-|------|-------------|
-| `useMoments` | Fetch and manage moment data |
+| Hook          | Description                          |
+| ------------- | ------------------------------------ |
+| `useMoments`  | Fetch and manage moment data         |
 | `useMessages` | Chat messages with real-time updates |
-| `useRequests` | Gift requests management |
-| `usePayments` | Wallet and transaction data |
-| `useReviews` | User reviews and ratings |
+| `useRequests` | Gift requests management             |
+| `usePayments` | Wallet and transaction data          |
+| `useReviews`  | User reviews and ratings             |
 
 ### Form & Validation
 
-| Hook | Description |
-|------|-------------|
-| `useZodForm` | React Hook Form with Zod validation |
-| `useFormSubmit` | Form submission with loading/error states |
-| `useFormValidation` | Custom validation logic |
+| Hook                | Description                               |
+| ------------------- | ----------------------------------------- |
+| `useZodForm`        | React Hook Form with Zod validation       |
+| `useFormSubmit`     | Form submission with loading/error states |
+| `useFormValidation` | Custom validation logic                   |
 
 ### UI & Experience
 
-| Hook | Description |
-|------|-------------|
-| `useBottomSheet` | Bottom sheet state management |
-| `useHaptics` | Haptic feedback |
-| `useAccessibility` | Accessibility utilities |
-| `useTheme` | Theme values and dark mode |
-| `useResponsive` | Responsive sizing utilities |
+| Hook               | Description                   |
+| ------------------ | ----------------------------- |
+| `useBottomSheet`   | Bottom sheet state management |
+| `useHaptics`       | Haptic feedback               |
+| `useAccessibility` | Accessibility utilities       |
+| `useTheme`         | Theme values and dark mode    |
+| `useResponsive`    | Responsive sizing utilities   |
 
 ### Network & Offline
 
-| Hook | Description |
-|------|-------------|
-| `useNetwork` | Network connectivity status |
-| `useOfflineData` | Offline data with caching |
-| `useFetch` | Generic data fetching |
+| Hook             | Description                 |
+| ---------------- | --------------------------- |
+| `useNetwork`     | Network connectivity status |
+| `useOfflineData` | Offline data with caching   |
+| `useFetch`       | Generic data fetching       |
 
 ### Analytics & Tracking
 
-| Hook | Description |
-|------|-------------|
-| `useAnalytics` | Event tracking |
-| `useScreenTracking` | Screen view tracking |
+| Hook                   | Description            |
+| ---------------------- | ---------------------- |
+| `useAnalytics`         | Event tracking         |
+| `useScreenTracking`    | Screen view tracking   |
 | `useScreenPerformance` | Performance monitoring |
 
 ## Usage Examples
@@ -63,7 +63,7 @@ const schema = z.object({
 
 function LoginForm() {
   const form = useZodForm({ schema });
-  
+
   const onSubmit = form.handleSubmit((data) => {
     // data is typed: { email: string; password: string }
   });
@@ -93,7 +93,7 @@ import { useBottomSheet } from '@/hooks';
 
 function MyComponent() {
   const { isOpen, open, close, snapTo } = useBottomSheet();
-  
+
   return (
     <>
       <Button onPress={open}>Open Sheet</Button>
@@ -116,7 +116,7 @@ function MomentsList() {
     fetcher: () => api.getMoments(),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
-  
+
   return (
     <>
       {isStale && <Banner>Showing cached data</Banner>}
@@ -136,9 +136,9 @@ import { useBottomSheet } from '../useBottomSheet';
 
 test('should toggle bottom sheet', () => {
   const { result } = renderHook(() => useBottomSheet());
-  
+
   expect(result.current.isOpen).toBe(false);
-  
+
   act(() => result.current.open());
   expect(result.current.isOpen).toBe(true);
 });

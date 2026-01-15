@@ -17,7 +17,7 @@ Output Types:
     report       - Full research report
     quotes       - Key quote extraction
 
-Author: TravelMatch UX Team
+Author: Lovendo UX Team
 """
 
 import argparse
@@ -871,7 +871,7 @@ def format_insights_output(insights: list) -> str:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Research Synthesis Tool for TravelMatch",
+        description="Research Synthesis Tool for Lovendo",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

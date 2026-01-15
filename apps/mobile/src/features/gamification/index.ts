@@ -1,7 +1,7 @@
 /**
  * Gamification Feature Module
  *
- * Achievements, badges, and reward system for TravelMatch
+ * Achievements, badges, and reward system for Lovendo
  *
  * ELEVATED: Moved from profile feature to dedicated gamification module
  * as achievements span the entire platform (gifting, proofs, trust, hosting)

@@ -1,5 +1,5 @@
 /**
- * LiquidSkeleton - TravelMatch Ultimate Design System 2026
+ * LiquidSkeleton - Lovendo Ultimate Design System 2026
  * Premium skeleton loading component with "Liquid" neon aesthetic
  *
  * Features:
@@ -289,7 +289,7 @@ export const SkeletonCard: React.FC<{
   </View>
 );
 
-/** Moment card skeleton matching TMCard layout */
+/** Moment card skeleton matching LovendoCard layout */
 export const SkeletonMomentCard: React.FC<{
   animated?: boolean;
   style?: StyleProp<ViewStyle>;

@@ -6,13 +6,13 @@ This directory contains service modules that handle API communication and extern
 
 ### API Services
 
-| Service | Description |
-|---------|-------------|
-| `api.ts` | Base API client with interceptors, token refresh, retry logic |
-| `paymentService.ts` | Payment processing, wallet, transactions |
-| `cacheService.ts` | Offline caching with AsyncStorage |
-| `notificationService.ts` | Push notification handling |
-| `loggingService.ts` | Unified logging and error tracking |
+| Service                  | Description                                                   |
+| ------------------------ | ------------------------------------------------------------- |
+| `api.ts`                 | Base API client with interceptors, token refresh, retry logic |
+| `paymentService.ts`      | Payment processing, wallet, transactions                      |
+| `cacheService.ts`        | Offline caching with AsyncStorage                             |
+| `notificationService.ts` | Push notification handling                                    |
+| `loggingService.ts`      | Unified logging and error tracking                            |
 
 ### Usage
 
@@ -44,7 +44,7 @@ The base API client (`api.ts`) provides:
 ```typescript
 // API configuration in config/api.ts
 export const API_CONFIG = {
-  BASE_URL: 'https://api.travelmatch.com',
+  BASE_URL: 'https://api.lovendo.xyz',
   TIMEOUT: 30000,
   MAX_RETRIES: 3,
 };

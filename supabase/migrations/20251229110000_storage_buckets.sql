@@ -1,5 +1,5 @@
 -- ============================================
--- Storage Buckets Configuration for TravelMatch
+-- Storage Buckets Configuration for Lovendo
 -- 2025/2026 Image Standards
 -- ============================================
 

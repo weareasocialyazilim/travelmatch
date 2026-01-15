@@ -31,7 +31,7 @@ export const getTestCredentials = () => ({
    * Admin test credentials
    */
   adminUser: {
-    email: 'admin@travelmatch.test',
+    email: 'admin@lovendo.test',
     password: _build('Admin', 'Test', '456', '!'),
   },
 

@@ -1,5 +1,5 @@
 /**
- * TravelMatch Vibe Room - Inbox Chat Item
+ * Lovendo Vibe Room - Inbox Chat Item
  *
  * Smart list item with:
  * - Left: Moment context strip (photo with gradient overlay)
@@ -43,7 +43,7 @@ import {
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
 import StatusBadge from './StatusBadge';
-import { TMAvatar } from '@/components/ui/TMAvatar';
+import { LovendoAvatar } from '@/components/ui/LovendoAvatar';
 import type { InboxChat } from '../types/inbox.types';
 
 interface InboxChatItemProps {
@@ -138,7 +138,7 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
           <View style={styles.content}>
             {/* User Row */}
             <View style={styles.userRow}>
-              <TMAvatar
+              <LovendoAvatar
                 source={chat.user.avatar}
                 name={chat.user.name}
                 size="md"

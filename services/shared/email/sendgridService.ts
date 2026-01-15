@@ -16,8 +16,8 @@ import sgMail from '@sendgrid/mail';
 // Environment variables (stored in Infisical)
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 const SENDGRID_FROM_EMAIL =
-  process.env.SENDGRID_FROM_EMAIL || 'noreply@travelmatch.app';
-const SENDGRID_FROM_NAME = process.env.SENDGRID_FROM_NAME || 'TravelMatch';
+  process.env.SENDGRID_FROM_EMAIL || 'noreply@lovendo.xyz';
+const SENDGRID_FROM_NAME = process.env.SENDGRID_FROM_NAME || 'Lovendo';
 
 // Template IDs (create these in SendGrid dashboard)
 const TEMPLATE_IDS = {
@@ -117,8 +117,8 @@ export async function sendTemplateEmail(
       dynamicTemplateData: {
         ...dynamicData,
         // Common variables available in all templates
-        appName: 'TravelMatch',
-        supportEmail: 'support@travelmatch.app',
+        appName: 'Lovendo',
+        supportEmail: 'support@lovendo.xyz',
         currentYear: new Date().getFullYear(),
       },
     };
@@ -158,24 +158,24 @@ export async function sendWelcomeEmail(
   if (TEMPLATE_IDS.WELCOME) {
     return sendTemplateEmail(to, TEMPLATE_IDS.WELCOME, {
       firstName: data.firstName,
-      loginUrl: 'https://travelmatch.app/login',
+      loginUrl: 'https://www.lovendo.xyz/login',
     });
   }
 
   // Fallback to inline template
-  return sendEmail(to, "TravelMatch'a Hoş Geldiniz! 🎉", {
+  return sendEmail(to, "Lovendo'ya Hoş Geldiniz! 🎉", {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h1 style="color: #A6E5C1;">Hoş Geldiniz, ${data.firstName}! 🎉</h1>
-        <p>TravelMatch ailesine katıldığınız için çok mutluyuz!</p>
+        <p>Lovendo ailesine katıldığınız için çok mutluyuz!</p>
         <p>Şimdi:</p>
         <ul>
           <li>Profilinizi tamamlayın</li>
           <li>Yakınlarınızdaki anları keşfedin</li>
           <li>İlk hediyenizi gönderin veya alın</li>
         </ul>
-        <a href="https://travelmatch.app" style="display: inline-block; background: #A6E5C1; color: #1A1A1A; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin: 16px 0;">Keşfetmeye Başla</a>
-        <p style="color: #666; font-size: 14px;">Herhangi bir sorunuz varsa, support@travelmatch.app adresinden bize ulaşabilirsiniz.</p>
+        <a href="https://www.lovendo.xyz" style="display: inline-block; background: #A6E5C1; color: #1A1A1A; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin: 16px 0;">Keşfetmeye Başla</a>
+        <p style="color: #666; font-size: 14px;">Herhangi bir sorunuz varsa, support@lovendo.xyz adresinden bize ulaşabilirsiniz.</p>
       </div>
     `,
   });
@@ -197,7 +197,7 @@ export async function sendEmailVerification(
     });
   }
 
-  return sendEmail(to, 'TravelMatch - E-posta Doğrulama Kodu', {
+  return sendEmail(to, 'Lovendo - E-posta Doğrulama Kodu', {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; text-align: center;">
         <h1 style="color: #A6E5C1;">E-posta Doğrulama</h1>
@@ -228,7 +228,7 @@ export async function sendPasswordReset(
     });
   }
 
-  return sendEmail(to, 'TravelMatch - Şifre Sıfırlama', {
+  return sendEmail(to, 'Lovendo - Şifre Sıfırlama', {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; text-align: center;">
         <h1 style="color: #A6E5C1;">Şifre Sıfırlama</h1>
@@ -267,7 +267,7 @@ export async function sendGiftReceivedEmail(
           <p style="margin: 0;"><strong>An:</strong> ${data.momentTitle}</p>
           ${data.giftType ? `<p style="margin: 8px 0 0 0;"><strong>Hediye:</strong> ${data.giftType}</p>` : ''}
         </div>
-        <a href="https://travelmatch.app/wallet" style="display: inline-block; background: #A6E5C1; color: #1A1A1A; padding: 12px 24px; text-decoration: none; border-radius: 8px;">Cüzdanımı Görüntüle</a>
+        <a href="https://www.lovendo.xyz/wallet" style="display: inline-block; background: #A6E5C1; color: #1A1A1A; padding: 12px 24px; text-decoration: none; border-radius: 8px;">Cüzdanımı Görüntüle</a>
       </div>
     `,
   });
@@ -292,7 +292,7 @@ export async function sendPaymentReceipt(
 
   return sendEmail(
     to,
-    `TravelMatch - Ödeme Makbuzu #${data.transactionId.slice(0, 8)}`,
+    `Lovendo - Ödeme Makbuzu #${data.transactionId.slice(0, 8)}`,
     {
       html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -336,7 +336,7 @@ export async function sendSecurityAlertEmail(
     });
   }
 
-  return sendEmail(to, `⚠️ TravelMatch Güvenlik Uyarısı`, {
+  return sendEmail(to, `⚠️ Lovendo Güvenlik Uyarısı`, {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h1 style="color: #FF6F61;">⚠️ Güvenlik Uyarısı</h1>
@@ -353,7 +353,7 @@ export async function sendSecurityAlertEmail(
           <li>Aktif oturumlarınızı kontrol edin</li>
           <li>İki faktörlü doğrulamayı etkinleştirin</li>
         </ol>
-        <a href="https://travelmatch.app/settings/security" style="display: inline-block; background: #FF6F61; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px;">Güvenlik Ayarları</a>
+        <a href="https://www.lovendo.xyz/settings/security" style="display: inline-block; background: #FF6F61; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px;">Güvenlik Ayarları</a>
       </div>
     `,
   });
@@ -383,7 +383,7 @@ export async function sendNewMessageEmail(
           <p style="margin: 0;"><strong>${data.senderName}:</strong></p>
           <p style="margin: 8px 0 0 0; color: #666;">"${data.messagePreview}"</p>
         </div>
-        <a href="https://travelmatch.app/messages/${data.conversationId}" style="display: inline-block; background: #A6E5C1; color: #1A1A1A; padding: 12px 24px; text-decoration: none; border-radius: 8px;">Mesajı Görüntüle</a>
+        <a href="https://www.lovendo.xyz/messages/${data.conversationId}" style="display: inline-block; background: #A6E5C1; color: #1A1A1A; padding: 12px 24px; text-decoration: none; border-radius: 8px;">Mesajı Görüntüle</a>
       </div>
     `,
   });

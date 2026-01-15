@@ -1,6 +1,6 @@
 # Architecture Decision Records (ADRs)
 
-This directory contains Architecture Decision Records (ADRs) for the TravelMatch platform.
+This directory contains Architecture Decision Records (ADRs) for the Lovendo platform.
 
 ## What is an ADR?
 

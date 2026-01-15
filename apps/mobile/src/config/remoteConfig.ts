@@ -24,7 +24,7 @@ const getRemoteConfigUrl = (): string => {
   }
 
   // Default endpoint
-  return 'https://api.travelmatch.com/api/v1/feature-flags';
+  return 'https://api.lovendo.xyz/api/v1/feature-flags';
 };
 
 const REMOTE_CONFIG_URL = getRemoteConfigUrl();

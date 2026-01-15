@@ -1,5 +1,5 @@
 /**
- * TravelMatch Typography - Unified Entry Point
+ * Lovendo Typography - Unified Entry Point
  *
  * @deprecated theme/typography.ts is deprecated. Use constants/typography.ts instead.
  *

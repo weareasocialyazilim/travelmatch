@@ -25,8 +25,8 @@ const logger = new Logger();
 
 const SENDGRID_API_KEY = Deno.env.get('SENDGRID_API_KEY');
 const SENDGRID_FROM_EMAIL =
-  Deno.env.get('SENDGRID_FROM_EMAIL') || 'noreply@travelmatch.app';
-const SENDGRID_FROM_NAME = Deno.env.get('SENDGRID_FROM_NAME') || 'TravelMatch';
+  Deno.env.get('SENDGRID_FROM_EMAIL') || 'noreply@lovendo.app';
+const SENDGRID_FROM_NAME = Deno.env.get('SENDGRID_FROM_NAME') || 'Lovendo';
 const SENDGRID_API_BASE = 'https://api.sendgrid.com/v3';
 
 // Rate limiting: Track requests per user
@@ -163,8 +163,8 @@ async function sendTemplateEmail(
         to: to.map((r) => ({ email: r.email, name: r.name })),
         dynamic_template_data: {
           ...dynamicData,
-          appName: 'TravelMatch',
-          supportEmail: 'support@travelmatch.app',
+          appName: 'Lovendo',
+          supportEmail: 'support@lovendo.app',
           currentYear: new Date().getFullYear(),
         },
       },
@@ -200,7 +200,7 @@ async function sendVerificationEmail(
     </div>
   `;
 
-  return sendEmail([to], 'TravelMatch - E-posta Doğrulama Kodu', { html });
+  return sendEmail([to], 'Lovendo - E-posta Doğrulama Kodu', { html });
 }
 
 /**
@@ -221,7 +221,7 @@ async function sendPasswordResetEmail(
     </div>
   `;
 
-  return sendEmail([to], 'TravelMatch - Şifre Sıfırlama', { html });
+  return sendEmail([to], 'Lovendo - Şifre Sıfırlama', { html });
 }
 
 /**
@@ -234,19 +234,19 @@ async function sendWelcomeEmail(
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h1 style="color: #A6E5C1;">Hoş Geldiniz, ${firstName}! 🎉</h1>
-      <p>TravelMatch ailesine katıldığınız için çok mutluyuz!</p>
+      <p>Lovendo ailesine katıldığınız için çok mutluyuz!</p>
       <p>Şimdi:</p>
       <ul>
         <li>Profilinizi tamamlayın</li>
         <li>Yakınlarınızdaki anları keşfedin</li>
         <li>İlk hediyenizi gönderin veya alın</li>
       </ul>
-      <a href="https://travelmatch.app" style="display: inline-block; background: #A6E5C1; color: #1A1A1A; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin: 16px 0;">Keşfetmeye Başla</a>
-      <p style="color: #666; font-size: 14px;">Herhangi bir sorunuz varsa, support@travelmatch.app adresinden bize ulaşabilirsiniz.</p>
+      <a href="https://lovendo.app" style="display: inline-block; background: #A6E5C1; color: #1A1A1A; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin: 16px 0;">Keşfetmeye Başla</a>
+      <p style="color: #666; font-size: 14px;">Herhangi bir sorunuz varsa, support@lovendo.app adresinden bize ulaşabilirsiniz.</p>
     </div>
   `;
 
-  return sendEmail([to], "TravelMatch'a Hoş Geldiniz! 🎉", { html });
+  return sendEmail([to], "Lovendo'a Hoş Geldiniz! 🎉", { html });
 }
 
 /**

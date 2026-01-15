@@ -440,8 +440,13 @@ function checkExternalLinks(text: string, lang: 'tr' | 'en'): string[] {
     errors.push(msgs.whatsapp);
   }
 
-  // Instagram handle (but allow @travelmatch)
-  if (/@[a-zA-Z0-9._]{3,}/.test(text) && !text.includes('@travelmatch')) {
+  // Instagram handle (allow official handle)
+  const allowedHandles = ['@lovendo'];
+  const lower = text.toLowerCase();
+  if (
+    /@[a-zA-Z0-9._]{3,}/.test(text) &&
+    !allowedHandles.some((h) => lower.includes(h))
+  ) {
     errors.push(msgs.socialMedia);
   }
 

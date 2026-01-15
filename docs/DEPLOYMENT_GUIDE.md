@@ -1,4 +1,4 @@
-# 🚀 TravelMatch Deployment Guide
+# 🚀 Lovendo Deployment Guide
 **Version:** 1.0.0  
 **Last Updated:** December 8, 2024  
 **Status:** Production-Ready ✅
@@ -21,7 +21,7 @@
 
 ## 🌐 Overview
 
-TravelMatch uses a **fully automated CI/CD pipeline** for deployments:
+Lovendo uses a **fully automated CI/CD pipeline** for deployments:
 
 ### Architecture
 ```
@@ -164,14 +164,14 @@ REDIS_URL=redis://user:password@your-redis-host:6379
 # App Configuration
 NODE_ENV=production
 APP_ENV=production
-API_URL=https://api.travelmatch.app
+API_URL=https://api.lovendo.app
 ```
 
 #### **Mobile `.env`** (`apps/mobile/.env`)
 ```bash
 EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-EXPO_PUBLIC_API_URL=https://api.travelmatch.app
+EXPO_PUBLIC_API_URL=https://api.lovendo.app
 EXPO_PUBLIC_CLOUDFLARE_ACCOUNT_HASH=your-cloudflare-hash
 EXPO_PUBLIC_SENTRY_DSN=https://xxx@sentry.io/xxx
 ```
@@ -186,7 +186,7 @@ GOOGLE_ANDROID_CLIENT_ID=xxx.apps.googleusercontent.com
 GOOGLE_IOS_CLIENT_ID=xxx.apps.googleusercontent.com
 
 # Apple OAuth
-APPLE_SERVICE_ID=com.travelmatch.app.signin
+APPLE_SERVICE_ID=com.lovendo.app.signin
 
 # Facebook OAuth
 FACEBOOK_APP_ID=1234567890
@@ -677,10 +677,10 @@ gh run view <run-id>
 - [Google Play Console](https://play.google.com/console)
 
 ### Dashboards
-- [GitHub Actions](https://github.com/kemalteksalgit/travelmatch/actions)
-- [Expo Dashboard](https://expo.dev/accounts/travelmatch/projects)
+- [GitHub Actions](https://github.com/kemalteksalgit/lovendo/actions)
+- [Expo Dashboard](https://expo.dev/accounts/lovendo/projects)
 - [Supabase Dashboard](https://app.supabase.com/project/your-project)
-- [Sentry](https://sentry.io/organizations/travelmatch)
+- [Sentry](https://sentry.io/organizations/lovendo)
 
 ---
 
@@ -700,5 +700,5 @@ gh run view <run-id>
 ---
 
 **Last Updated:** December 8, 2024  
-**Maintained by:** TravelMatch DevOps Team  
+**Maintained by:** Lovendo DevOps Team  
 **Version:** 1.0.0

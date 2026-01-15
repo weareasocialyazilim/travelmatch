@@ -1,5 +1,5 @@
 // components/ui/EmptyState.tsx
-// TravelMatch Ultimate Design System 2026
+// Lovendo Ultimate Design System 2026
 // "Liquid Empty State System" - Zarif Boşluklar
 // Awwwards-standard premium empty state with neon particles
 
@@ -23,7 +23,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, GRADIENTS, primitives } from '../../constants/colors';
 import { SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../theme/typography';
-import { TMButton, type ButtonSize } from './TMButton';
+import { LovendoButton, type ButtonSize } from './LovendoButton';
 import { EmptyStateIllustration } from './EmptyStateIllustration';
 import type { IllustrationType } from './EmptyStateIllustration';
 
@@ -291,7 +291,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
     return (
       <>
         {actionLabel && onAction && (
-          <TMButton
+          <LovendoButton
             onPress={onAction}
             variant="primary"
             size={actionSize}
@@ -299,10 +299,10 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             testID="empty-state-action-primary"
           >
             {actionLabel}
-          </TMButton>
+          </LovendoButton>
         )}
         {secondaryActionLabel && onSecondaryAction && (
-          <TMButton
+          <LovendoButton
             onPress={onSecondaryAction}
             variant="ghost"
             size="md"
@@ -310,7 +310,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             testID="empty-state-action-secondary"
           >
             {secondaryActionLabel}
-          </TMButton>
+          </LovendoButton>
         )}
       </>
     );

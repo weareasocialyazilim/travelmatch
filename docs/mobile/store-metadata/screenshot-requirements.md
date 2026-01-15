@@ -1,4 +1,4 @@
-# TravelMatch Screenshot Requirements
+# Lovendo Screenshot Requirements
 
 ## App Store Screenshots
 

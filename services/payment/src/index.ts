@@ -1,7 +1,7 @@
 /**
- * @travelmatch/payment-services
+ * @lovendo/payment-services
  *
- * Payment processing services for TravelMatch platform
+ * Payment processing services for Lovendo platform
  *
  * This package contains payment-related utilities and types.
  * Edge Functions (PayTR) are deployed separately via Supabase.

@@ -177,7 +177,7 @@ export function EnterpriseSidebar() {
             </div>
             <div className="flex flex-col">
               <span className="font-semibold text-sm text-gray-900 dark:text-white">
-                TravelMatch
+                Lovendo
               </span>
               <span className="text-[10px] text-gray-500 dark:text-gray-400 -mt-0.5">
                 Admin Console

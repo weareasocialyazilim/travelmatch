@@ -2,10 +2,10 @@ export function GiftingSchema() {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
-    name: 'TravelMatch',
+    name: 'Lovendo',
     description:
       'Gift moments, not things. Send someone you love an experience to live.',
-    url: 'https://travelmatch.app',
+    url: 'https://www.lovendo.xyz',
     applicationCategory: 'LifestyleApplication',
     operatingSystem: ['iOS', 'Android'],
     offers: {

@@ -1,8 +1,8 @@
 /**
- * TravelMatch Design System - Button Component
+ * Lovendo Design System - Button Component
  *
- * @deprecated This component is deprecated. Use TMButton instead.
- * TMButton is the consolidated master button with all features:
+ * @deprecated This component is deprecated. Use LovendoButton instead.
+ * LovendoButton is the consolidated master button with all features:
  * - All variants: primary, secondary, ghost, outline, danger, neon, glass
  * - All sizes: xs, sm, md, lg, xl
  * - Animation modes: none, pulse, shimmer
@@ -11,14 +11,14 @@
  *
  * Migration:
  * - Replace: import { Button } from '@/components/ui/Button'
- * - With: import { TMButton } from '@/components/ui/TMButton'
+ * - With: import { LovendoButton } from '@/components/ui/LovendoButton'
  *
  * @example
  * // Old usage:
  * <Button title="Click" onPress={fn} variant="primary" />
  *
  * // New usage:
- * <TMButton title="Click" onPress={fn} variant="primary" />
+ * <LovendoButton title="Click" onPress={fn} variant="primary" />
  */
 
 import React, { memo, useMemo, useCallback } from 'react';
@@ -46,13 +46,13 @@ import { TYPE_SCALE } from '../../theme/typography';
 import { SPRINGS } from '../../hooks/useAnimations';
 import { a11yProps } from '../../utils/accessibility';
 
-// Re-export TMButton for easier migration
-export { TMButton } from './TMButton';
+// Re-export LovendoButton for easier migration
+export { LovendoButton } from './LovendoButton';
 export type {
-  TMButtonProps,
-  ButtonVariant as TMButtonVariant,
-  ButtonSize as TMButtonSize,
-} from './TMButton';
+  LovendoButtonProps,
+  ButtonVariant as LovendoButtonVariant,
+  ButtonSize as LovendoButtonSize,
+} from './LovendoButton';
 
 // ============================================
 // TYPES

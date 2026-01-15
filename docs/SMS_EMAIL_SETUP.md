@@ -1,6 +1,6 @@
 # 📱 SMS (Twilio) ve 📧 Email (SendGrid) Kurulum Rehberi
 
-Bu döküman TravelMatch için telefon (SMS OTP) ve email doğrulama sistemlerinin kurulumunu açıklar.
+Bu döküman Lovendo için telefon (SMS OTP) ve email doğrulama sistemlerinin kurulumunu açıklar.
 
 ---
 
@@ -35,7 +35,7 @@ Phone Number: +1xxxxxxxxxx (veya +90xxxxxxxxxx)
 ### 4. Verify Service Oluştur (OTP için)
 
 1. **Verify** > **Services** > **Create Service**
-2. Friendly name: `TravelMatch OTP`
+2. Friendly name: `Lovendo OTP`
 3. Code length: 6
 4. Service SID'i kopyala:
 
@@ -79,7 +79,7 @@ curl -X POST \
 ### 2. API Key Oluştur
 
 1. **Settings** > **API Keys** > **Create API Key**
-2. Name: `TravelMatch Production`
+2. Name: `Lovendo Production`
 3. Permissions: **Full Access** veya **Restricted Access** (Mail Send only)
 4. API Key'i kopyala (sadece bir kez gösterilir!)
 
@@ -93,7 +93,7 @@ API Key: SG.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 1. **Settings** > **Sender Authentication** > **Domain Authentication**
 2. DNS provider seç
-3. Domain gir: `travelmatch.app`
+3. Domain gir: `lovendo.app`
 4. DNS kayıtlarını ekle:
    - CNAME records (3 adet)
    - TXT record (DKIM)
@@ -101,7 +101,7 @@ API Key: SG.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 #### Single Sender (Hızlı Test için)
 
 1. **Settings** > **Sender Authentication** > **Single Sender Verification**
-2. Email: `noreply@travelmatch.app`
+2. Email: `noreply@lovendo.app`
 3. Doğrulama emailini onayla
 
 ### 4. Dynamic Templates Oluştur (Opsiyonel)
@@ -122,8 +122,8 @@ API Key: SG.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```bash
 # Supabase CLI ile
 supabase secrets set SENDGRID_API_KEY=SG.xxxxx
-supabase secrets set SENDGRID_FROM_EMAIL=noreply@travelmatch.app
-supabase secrets set SENDGRID_FROM_NAME=TravelMatch
+supabase secrets set SENDGRID_FROM_EMAIL=noreply@lovendo.app
+supabase secrets set SENDGRID_FROM_NAME=Lovendo
 
 # Template ID'ler (opsiyonel)
 supabase secrets set SENDGRID_TEMPLATE_WELCOME=d-xxxxx
@@ -141,7 +141,7 @@ curl -X POST \
   -d '{
     "to": [{"email": "test@example.com"}],
     "subject": "Test Email",
-    "content": {"text": "Hello from TravelMatch!"}
+    "content": {"text": "Hello from Lovendo!"}
   }'
 ```
 
@@ -173,8 +173,8 @@ Supabase Dashboard'da:
    - Port: `587`
    - Username: `apikey`
    - Password: `SG.xxxxx` (API Key)
-   - Sender email: `noreply@travelmatch.app`
-   - Sender name: `TravelMatch`
+   - Sender email: `noreply@lovendo.app`
+   - Sender name: `Lovendo`
 4. **Save**
 
 ---

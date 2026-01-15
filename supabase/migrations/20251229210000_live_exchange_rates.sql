@@ -1,5 +1,5 @@
 -- ============================================
--- TravelMatch Live Exchange Rate System
+-- Lovendo Live Exchange Rate System
 -- Migration: 20251229210000_live_exchange_rates.sql
 -- ============================================
 --

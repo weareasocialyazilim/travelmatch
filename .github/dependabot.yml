@@ -1,5 +1,5 @@
 # Dependabot Configuration
-# Automated dependency updates for TravelMatch monorepo
+# Automated dependency updates for Lovendo monorepo
 
 version: 2
 updates:
@@ -12,7 +12,7 @@ updates:
       time: "09:00"
     open-pull-requests-limit: 10
     reviewers:
-      - "travelmatch-dev-team"
+      - "lovendo-dev-team"
     labels:
       - "dependencies"
       - "mobile"
@@ -35,7 +35,7 @@ updates:
       time: "09:00"
     open-pull-requests-limit: 10
     reviewers:
-      - "travelmatch-dev-team"
+      - "lovendo-dev-team"
     labels:
       - "dependencies"
       - "web"

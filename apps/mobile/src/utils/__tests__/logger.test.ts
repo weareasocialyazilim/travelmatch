@@ -200,7 +200,7 @@ describe('logger.ts', () => {
       logger.debug('Debug message');
       expect(mockConsoleInfo).toHaveBeenCalled();
       const loggedCall = mockConsoleInfo.mock.calls[0][0];
-      expect(loggedCall).toContain('[TravelMatch] [DEBUG]');
+      expect(loggedCall).toContain('[Lovendo] [DEBUG]');
       expect(loggedCall).toContain('Debug message');
     });
 
@@ -208,7 +208,7 @@ describe('logger.ts', () => {
       logger.info('Info message');
       expect(mockConsoleInfo).toHaveBeenCalled();
       const loggedCall = mockConsoleInfo.mock.calls[0][0];
-      expect(loggedCall).toContain('[TravelMatch] [INFO]');
+      expect(loggedCall).toContain('[Lovendo] [INFO]');
       expect(loggedCall).toContain('Info message');
     });
 
@@ -216,7 +216,7 @@ describe('logger.ts', () => {
       logger.warn('Warning message');
       expect(mockConsoleWarn).toHaveBeenCalled();
       const loggedCall = mockConsoleWarn.mock.calls[0][0];
-      expect(loggedCall).toContain('[TravelMatch] [WARN]');
+      expect(loggedCall).toContain('[Lovendo] [WARN]');
       expect(loggedCall).toContain('Warning message');
     });
 
@@ -224,7 +224,7 @@ describe('logger.ts', () => {
       logger.error('Error message');
       expect(mockConsoleError).toHaveBeenCalled();
       const loggedCall = mockConsoleError.mock.calls[0][0];
-      expect(loggedCall).toContain('[TravelMatch] [ERROR]');
+      expect(loggedCall).toContain('[Lovendo] [ERROR]');
       expect(loggedCall).toContain('Error message');
     });
 
@@ -395,7 +395,7 @@ describe('logger.ts', () => {
       logger.data('Users', data);
 
       expect(mockConsoleInfo).toHaveBeenCalledWith(
-        expect.stringContaining('[TravelMatch] [INFO]'),
+        expect.stringContaining('[Lovendo] [INFO]'),
         expect.stringContaining('Users'),
       );
       expect(mockConsoleTable).toHaveBeenCalledWith(data);
@@ -596,7 +596,7 @@ describe('logger.ts', () => {
 
       expect(mockConsoleInfo).toHaveBeenCalled();
       const loggedCall = mockConsoleInfo.mock.calls[0][0];
-      expect(loggedCall).toContain('[TravelMatch]');
+      expect(loggedCall).toContain('[Lovendo]');
     });
   });
 

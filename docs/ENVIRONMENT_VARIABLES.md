@@ -64,8 +64,8 @@ TWILIO_MESSAGING_SERVICE_SID=MGxxxxx
 SENDGRID_API_KEY=SG.xxxxx
 
 # Sender Configuration
-SENDGRID_FROM_EMAIL=noreply@travelmatch.app
-SENDGRID_FROM_NAME=TravelMatch
+SENDGRID_FROM_EMAIL=noreply@lovendo.app
+SENDGRID_FROM_NAME=Lovendo
 
 # Template IDs (from SendGrid Dynamic Templates)
 SENDGRID_TEMPLATE_WELCOME=d-xxxxx
@@ -180,8 +180,8 @@ TWILIO_VERIFY_SERVICE_SID=VAxxxxx
 
 # SendGrid
 SENDGRID_API_KEY=SG.xxxxx
-SENDGRID_FROM_EMAIL=noreply@travelmatch.app
-SENDGRID_FROM_NAME=TravelMatch
+SENDGRID_FROM_EMAIL=noreply@lovendo.app
+SENDGRID_FROM_NAME=Lovendo
 ```
 
 ---

@@ -1,5 +1,5 @@
 -- ============================================
--- TravelMatch Komisyon Sistemi
+-- Lovendo Komisyon Sistemi
 -- Migration: 20251229000000_commission_system.sql
 -- ============================================
 --

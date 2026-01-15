@@ -1,6 +1,6 @@
 /**
  * Supabase Database Service
- * CRUD operations for TravelMatch entities
+ * CRUD operations for Lovendo entities
  *
  * ⚠️ REFACTORED: This file now re-exports from modular db/ directory.
  * Import directly from '@/services/db' for new code.

@@ -1,5 +1,5 @@
 // hooks/useMotion.ts
-// TravelMatch Ultimate Design System 2026 - "Unified Physics" Motion System
+// Lovendo Ultimate Design System 2026 - "Unified Physics" Motion System
 // Motto: "Give a moment. See it happen."
 
 import { useCallback } from 'react';

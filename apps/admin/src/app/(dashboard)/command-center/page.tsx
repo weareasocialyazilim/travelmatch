@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * TravelMatch Command Center
+ * Lovendo Command Center
  * CEO/CMO Executive Dashboard - Real-time Platform Overview
  *
  * Tum sirketin nabzini tek bir yerden gormek icin tasarlandi.

@@ -32,7 +32,7 @@ const clientEnvSchema = z.object({
   APP_ENV: z
     .enum(['development', 'staging', 'production'])
     .default('development'),
-  APP_NAME: z.string().default('TravelMatch'),
+  APP_NAME: z.string().default('Lovendo'),
   APP_VERSION: z.string().default('1.0.0'),
 
   // Supabase (anon key is safe to expose)
@@ -129,7 +129,7 @@ function parseEnv() {
   // Extract EXPO_PUBLIC_* variables
   const rawClientEnv = {
     APP_ENV: process.env.EXPO_PUBLIC_APP_ENV,
-    APP_NAME: process.env.EXPO_PUBLIC_APP_NAME || 'TravelMatch',
+    APP_NAME: process.env.EXPO_PUBLIC_APP_NAME || 'Lovendo',
     APP_VERSION: process.env.EXPO_PUBLIC_APP_VERSION || '1.0.0',
     SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL,
     SUPABASE_ANON_KEY: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,

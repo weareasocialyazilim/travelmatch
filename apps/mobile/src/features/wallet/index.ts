@@ -2,7 +2,7 @@
  * Wallet Feature - Barrel Exports
  *
  * Manages user wallet, withdrawals, and payment methods.
- * Part of the TravelMatch financial system.
+ * Part of the Lovendo financial system.
  */
 
 // ===================================

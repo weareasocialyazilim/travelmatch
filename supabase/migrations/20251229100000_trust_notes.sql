@@ -1,5 +1,5 @@
 -- ============================================
--- TravelMatch Trust Notes System
+-- Lovendo Trust Notes System
 -- Migration: 20251229100000_trust_notes.sql
 -- ============================================
 --

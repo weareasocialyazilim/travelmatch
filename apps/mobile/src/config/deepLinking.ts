@@ -7,8 +7,8 @@ import { Linking } from 'react-native';
 import { logger } from '../utils/logger';
 
 // App URL scheme
-const APP_SCHEME = 'travelmatch://';
-const WEB_URL = 'https://travelmatch.app';
+const APP_SCHEME = 'lovendo://';
+const WEB_URL = 'https://www.lovendo.xyz';
 
 // Deep link patterns
 export const DEEP_LINK_PATTERNS = {
@@ -41,7 +41,8 @@ type LinkingConfig = {
  * Navigation linking configuration
  */
 export const linkingConfig: LinkingConfig = {
-  prefixes: [APP_SCHEME, WEB_URL],
+  // Keep legacy prefixes for backward compatibility with existing installs/links.
+  prefixes: [APP_SCHEME, WEB_URL, 'lovendo://', 'https://lovendo.app'],
 
   config: {
     screens: {

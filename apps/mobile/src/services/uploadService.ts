@@ -293,7 +293,7 @@ const trackUploadAttempt = async (
       mime_type: fileInfo.type,
       upload_status: status,
       metadata: {
-        user_agent: `TravelMatch/${Platform.OS}/${Platform.Version}`,
+        user_agent: `Lovendo/${Platform.OS}/${Platform.Version}`,
         timestamp: new Date().toISOString(),
       },
     });

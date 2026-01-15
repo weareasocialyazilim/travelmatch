@@ -3,7 +3,7 @@
  *
  * Horizontal scrollable category filter chips for the Discover screen.
  * Features gradient selection state and emoji icons.
- * Part of iOS 26.3 design system for TravelMatch.
+ * Part of iOS 26.3 design system for Lovendo.
  */
 import React, { useCallback } from 'react';
 import {

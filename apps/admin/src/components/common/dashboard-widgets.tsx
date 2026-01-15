@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * TravelMatch Admin Dashboard Widgets
+ * Lovendo Admin Dashboard Widgets
  * Tranzacta dashboard tasarımından ilham alınmıştır.
  */
 

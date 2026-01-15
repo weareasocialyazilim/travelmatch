@@ -14,7 +14,7 @@ export const TransactionDetailScreen = () => {
     try {
       await Share.share({
         message:
-          'TravelMatch Receipt: $150.00 for Dinner at Hotel Costes. Ref: #TM-8921',
+          'Lovendo Receipt: $150.00 for Dinner at Hotel Costes. Ref: #LV-8921',
       });
     } catch (error) {
       logger.error('Failed to share receipt', error as Error);
@@ -70,7 +70,7 @@ export const TransactionDetailScreen = () => {
 
           <View style={styles.row}>
             <Text style={styles.label}>Reference ID</Text>
-            <Text style={[styles.value, styles.monoValue]}>#TM-8921-X92</Text>
+            <Text style={[styles.value, styles.monoValue]}>#LV-8921-X92</Text>
           </View>
         </View>
 

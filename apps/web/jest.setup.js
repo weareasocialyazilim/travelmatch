@@ -1,4 +1,4 @@
-// Jest setup file for @travelmatch/web
+// Jest setup file for @lovendo/web
 import '@testing-library/jest-dom';
 
 // Mock Next.js router

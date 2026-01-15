@@ -45,8 +45,8 @@ const getMockTicket = (momentId: string): TicketData => ({
   hostName: 'Selin Y.',
   guestName: 'Kemal A.',
   status: 'paid',
-  confirmationCode: 'TM-' + momentId.toUpperCase().slice(0, 4) + '-XK',
-  qrValue: `travelmatch-ticket-${momentId}`,
+  confirmationCode: 'LV-' + momentId.toUpperCase().slice(0, 4) + '-XK',
+  qrValue: `lovendo-ticket-${momentId}`,
 });
 
 export const TicketScreen: React.FC = () => {

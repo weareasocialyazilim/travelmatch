@@ -43,12 +43,12 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="travelmatch"/>
+        <data android:scheme="lovendo"/>
       </intent-filter>
       <intent-filter android:autoVerify="true" data-generated="true">
         <action android:name="android.intent.action.VIEW"/>
-        <data android:scheme="https" android:host="travelmatch.app" android:pathPrefix="/"/>
-        <data android:scheme="travelmatch" android:host="*"/>
+        <data android:scheme="https" android:host="lovendo.app" android:pathPrefix="/"/>
+        <data android:scheme="lovendo" android:host="*"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <category android:name="android.intent.category.DEFAULT"/>
       </intent-filter>

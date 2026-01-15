@@ -101,7 +101,7 @@ const CheckoutScreen: React.FC = () => {
     {
       id: 'wallet',
       type: 'wallet',
-      name: 'TravelMatch Wallet',
+      name: 'Lovendo Wallet',
       icon: 'wallet-outline',
     },
     ...cardMethods,

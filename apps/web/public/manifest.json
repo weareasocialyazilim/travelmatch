@@ -1,7 +1,7 @@
 {
-  "name": "TravelMatch",
-  "short_name": "TravelMatch",
-  "description": "Seyahatinin Ruhunu Keşfet - Premium travel matching platform",
+  "name": "Lovendo",
+  "short_name": "Lovendo",
+  "description": "Seyahatinin Ruhunu Keşfet - Premium Lovendo platform",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#050505",

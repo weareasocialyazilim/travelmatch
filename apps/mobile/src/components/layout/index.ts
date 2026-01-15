@@ -1,6 +1,6 @@
 /**
  * Layout Components - Barrel exports
- * TravelMatch: The Rebirth Design System
+ * Lovendo: The Rebirth Design System
  *
  * Note: FloatingDock is now exported from @/components/navigation
  * This ensures proper React Navigation integration

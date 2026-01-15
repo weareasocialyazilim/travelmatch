@@ -20,11 +20,11 @@ const logger = new Logger('security-middleware');
  * Allowed origins for CORS
  */
 const ALLOWED_ORIGINS = [
-  'https://travelmatch.app',
-  'https://www.travelmatch.app',
-  'https://api.travelmatch.app',
-  'https://staging.travelmatch.app',
-  /^https:\/\/travelmatch-.*\.vercel\.app$/,
+  'https://lovendo.app',
+  'https://www.lovendo.app',
+  'https://api.lovendo.app',
+  'https://staging.lovendo.app',
+  /^https:\/\/lovendo-.*\.vercel\.app$/,
   ...(Deno.env.get('DENO_ENV') !== 'production'
     ? [
         'http://localhost:3000',

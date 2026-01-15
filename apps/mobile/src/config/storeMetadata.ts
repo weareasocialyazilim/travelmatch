@@ -8,7 +8,7 @@
 
 export const STORE_METADATA = {
   // App Identity
-  appName: 'TravelMatch',
+  appName: 'Lovendo',
   subtitle: 'Connect Through Travel Moments',
   shortDescription:
     'Connect with travelers. Share moments. Gift experiences. Travel differently.',
@@ -17,28 +17,28 @@ export const STORE_METADATA = {
   storeIds: {
     ios: {
       appStoreId: '6740496053',
-      bundleId: 'com.travelmatch.app',
+      bundleId: 'com.lovendo.app',
       teamId: 'ZWCGM5V955',
     },
     android: {
-      packageName: 'com.travelmatch.app',
+      packageName: 'com.lovendo.app',
     },
   },
 
   // URLs
   urls: {
-    website: 'https://travelmatch.app',
-    privacyPolicy: 'https://travelmatch.app/privacy',
-    termsOfService: 'https://travelmatch.app/terms',
-    support: 'https://travelmatch.app/support',
-    marketing: 'https://travelmatch.app',
+    website: 'https://www.lovendo.xyz',
+    privacyPolicy: 'https://www.lovendo.xyz/privacy',
+    termsOfService: 'https://www.lovendo.xyz/terms',
+    support: 'https://www.lovendo.xyz/support',
+    marketing: 'https://www.lovendo.xyz',
   },
 
   // Contact
   contact: {
-    supportEmail: 'support@travelmatch.app',
-    privacyEmail: 'privacy@travelmatch.app',
-    legalEmail: 'legal@travelmatch.app',
+    supportEmail: 'support@lovendo.xyz',
+    privacyEmail: 'privacy@lovendo.xyz',
+    legalEmail: 'legal@lovendo.xyz',
   },
 
   // Categories
@@ -213,8 +213,8 @@ ${f.description}`,
   )
   .join('\n\n')}
 
-WHY TRAVELMATCH?
-We believe the best travel experiences come from real connections. Whether you're a local sharing your favorite spots or a traveler seeking authentic experiences, TravelMatch brings people together.
+WHY LOVENDO?
+We believe the best travel experiences come from real connections. Whether you're a local sharing your favorite spots or a traveler seeking authentic experiences, Lovendo brings people together.
 
 Download now and start your journey!`;
 };

@@ -1,5 +1,5 @@
-// components/ui/TMButton.tsx
-// TravelMatch Ultimate Design System 2026
+// components/ui/LovendoButton.tsx
+// Lovendo Ultimate Design System 2026
 // Awwwards standardında Buton Sistemi
 // Neon parlaması, haptik geri bildirim ve ipeksi geçişler içerir.
 //
@@ -57,7 +57,7 @@ type HapticType =
   | 'error'
   | 'none';
 
-interface TMButtonProps {
+interface LovendoButtonProps {
   /** Button text - use either children or title */
   children?: string;
   /** Button text - alias for children (backward compat) */
@@ -88,7 +88,7 @@ interface TMButtonProps {
 }
 
 export type {
-  TMButtonProps,
+  LovendoButtonProps,
   ButtonVariant,
   ButtonSize,
   AnimationMode,
@@ -123,7 +123,7 @@ const triggerHaptic = (type: HapticType) => {
   }
 };
 
-export const TMButton: React.FC<TMButtonProps> = ({
+export const LovendoButton: React.FC<LovendoButtonProps> = ({
   children,
   title,
   variant = 'primary',
@@ -641,4 +641,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TMButton;
+export default LovendoButton;

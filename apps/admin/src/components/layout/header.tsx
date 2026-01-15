@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * TravelMatch Admin Header
+ * Lovendo Admin Header
  * "Cinematic Travel + Trust Jewelry" Design
  */
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Accessibility Compliance Checker for TravelMatch Design System
+Accessibility Compliance Checker for Lovendo Design System
 
 Validates design tokens and color combinations against WCAG 2.1 guidelines.
 
@@ -368,7 +368,7 @@ def generate_full_audit() -> Dict[str, Any]:
     """
     Run a complete accessibility audit on default design tokens.
     """
-    # Default TravelMatch color palette
+    # Default Lovendo color palette
     colors = {
         "primary": {
             "500": "#2196F3",

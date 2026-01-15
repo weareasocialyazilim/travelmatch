@@ -40,8 +40,8 @@ export async function generateEncryptionKey(): Promise<string> {
       deviceId = 'default-device';
     }
   }
-  const bundleId = Application.applicationId || 'com.travelmatch.app';
-  const combined = `${bundleId}-${deviceId}-travelmatch-cache-v1`;
+  const bundleId = Application.applicationId || 'com.lovendo.app';
+  const combined = `${bundleId}-${deviceId}-lovendo-cache-v1`;
 
   // Hash to create a consistent 32-byte key
   const hash = await Crypto.digestStringAsync(
@@ -56,11 +56,64 @@ export async function generateEncryptionKey(): Promise<string> {
 // The encryption key is generated on first access
 let cachedEncryptionKey: string | undefined;
 
+const STORAGE_ID = 'lovendo-cache';
+const LEGACY_STORAGE_ID = 'lovendo-legacy-cache';
+
 export const mmkvStorage = new MMKV({
-  id: 'travelmatch-cache',
+  id: STORAGE_ID,
   // Use device-specific key (will be set on first access)
   encryptionKey: cachedEncryptionKey,
 });
+
+// Best-effort migration from legacy store.
+// Only run when the current store appears empty.
+try {
+  const currentKeys = mmkvStorage.getAllKeys();
+  if (currentKeys.length === 0) {
+    const legacyStorage = new MMKV({
+      id: LEGACY_STORAGE_ID,
+      encryptionKey: cachedEncryptionKey,
+    });
+    const legacyKeys = legacyStorage.getAllKeys();
+
+    if (legacyKeys.length > 0) {
+      for (const key of legacyKeys) {
+        const stringVal = legacyStorage.getString(key);
+        if (stringVal !== undefined) {
+          mmkvStorage.set(key, stringVal);
+          legacyStorage.delete(key);
+          continue;
+        }
+
+        const numberVal = legacyStorage.getNumber(key);
+        if (numberVal !== undefined) {
+          mmkvStorage.set(key, numberVal);
+          legacyStorage.delete(key);
+          continue;
+        }
+
+        const boolVal = legacyStorage.getBoolean(key);
+        if (boolVal !== undefined) {
+          mmkvStorage.set(key, boolVal);
+          legacyStorage.delete(key);
+        }
+      }
+
+      logger.info('[OfflineCache] Migrated MMKV store', {
+        from: LEGACY_STORAGE_ID,
+        to: STORAGE_ID,
+        keyCount: legacyKeys.length,
+      });
+    }
+  }
+} catch (migrationError) {
+  logger.debug('[OfflineCache] MMKV migration skipped/failed', {
+    error:
+      migrationError instanceof Error
+        ? migrationError.message
+        : String(migrationError),
+  });
+}
 
 // MMKV wrapper for React Query persister
 const mmkvPersister = {

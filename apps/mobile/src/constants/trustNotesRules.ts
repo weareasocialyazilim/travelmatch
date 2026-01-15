@@ -1,6 +1,6 @@
 /**
  * Trust Notes Rules & Validation
- * TravelMatch - One-way gratitude system (not reviews)
+ * Lovendo - One-way gratitude system (not reviews)
  *
  * Philosophy: Gift receiver → Gift sender only
  * This is a thank-you system, not a review system

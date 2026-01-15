@@ -2,7 +2,7 @@
  * Production Monitoring Examples
  *
  * Real-world examples of how to use the monitoring service and hooks
- * throughout the TravelMatch application.
+ * throughout the Lovendo application.
  */
 
 import React, { useEffect, useState } from 'react';

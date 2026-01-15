@@ -1,5 +1,5 @@
 -- ============================================
--- TravelMatch Zero-Sensitive-Data Schema
+-- Lovendo Zero-Sensitive-Data Schema
 -- Migration: 20251229250000_zero_sensitive_data.sql
 -- ============================================
 --

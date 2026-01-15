@@ -24,6 +24,10 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { analytics } from '../services/analytics';
 import { logger } from '../utils/logger';
+import {
+  getItemWithLegacyFallback,
+  setItemAndCleanupLegacy,
+} from '../utils/storageKeyMigration';
 
 // Performance thresholds (in milliseconds)
 const PERFORMANCE_THRESHOLDS = {
@@ -114,7 +118,8 @@ interface LowPowerModeActions {
   resetPerformanceSamples: () => void;
 }
 
-const STORAGE_KEY = '@travelmatch/lowPowerMode';
+const STORAGE_KEY = '@lovendo/lowPowerMode';
+const LEGACY_STORAGE_KEYS = ['@lovendo/lowPowerMode_legacy'];
 
 export const useLowPowerMode = (): LowPowerModeState & LowPowerModeActions => {
   // State
@@ -132,7 +137,10 @@ export const useLowPowerMode = (): LowPowerModeState & LowPowerModeActions => {
   useEffect(() => {
     const loadPreference = async () => {
       try {
-        const stored = await AsyncStorage.getItem(STORAGE_KEY);
+        const stored = await getItemWithLegacyFallback(
+          STORAGE_KEY,
+          LEGACY_STORAGE_KEYS,
+        );
         if (stored !== null) {
           setUserPreferredLowPower(JSON.parse(stored));
         }
@@ -228,7 +236,11 @@ export const useLowPowerMode = (): LowPowerModeState & LowPowerModeActions => {
   const enableLowPowerMode = useCallback(async () => {
     setUserPreferredLowPower(true);
     try {
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(true));
+      await setItemAndCleanupLegacy(
+        STORAGE_KEY,
+        JSON.stringify(true),
+        LEGACY_STORAGE_KEYS,
+      );
       analytics.trackEvent('low_power_mode_enabled', {
         source: 'manual',
         detected_slow: detectedSlowDevice,
@@ -242,7 +254,11 @@ export const useLowPowerMode = (): LowPowerModeState & LowPowerModeActions => {
   const disableLowPowerMode = useCallback(async () => {
     setUserPreferredLowPower(false);
     try {
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(false));
+      await setItemAndCleanupLegacy(
+        STORAGE_KEY,
+        JSON.stringify(false),
+        LEGACY_STORAGE_KEYS,
+      );
       analytics.trackEvent('low_power_mode_disabled', {
         source: 'manual',
       });

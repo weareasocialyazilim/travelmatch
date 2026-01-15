@@ -45,7 +45,7 @@ jobs:
         run: |
           # Use build:ci for admin (no Infisical CLI), regular build for others
           cd apps/admin && pnpm build:ci && cd ../..
-          pnpm turbo run build --filter=!@travelmatch/admin
+          pnpm turbo run build --filter=!@lovendo/admin
 
       - name: Type check
         run: pnpm turbo run type-check

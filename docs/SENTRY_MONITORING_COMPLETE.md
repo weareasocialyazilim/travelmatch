@@ -3,7 +3,7 @@
 ## Overview
 
 This document outlines the comprehensive Sentry error tracking and performance monitoring
-implementation for TravelMatch mobile app production deployment.
+implementation for Lovendo mobile app production deployment.
 
 ---
 
@@ -346,8 +346,8 @@ canceling requests).
       {
         file: '@sentry/react-native/expo',
         config: {
-          organization: process.env.SENTRY_ORG || 'travelmatch-2d',
-          project: process.env.SENTRY_PROJECT || 'travelmatch-mobile',
+          organization: process.env.SENTRY_ORG || 'lovendo-2d',
+          project: process.env.SENTRY_PROJECT || 'lovendo-mobile',
           // authToken read from SENTRY_AUTH_TOKEN env var
         },
       },

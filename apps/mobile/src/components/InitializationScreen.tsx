@@ -349,7 +349,7 @@ export const InitializationScreen: React.FC<InitializationScreenProps> = ({
 
         {/* App Name */}
         <Animated.View entering={FadeInUp.delay(400).duration(500)}>
-          <Text style={styles.appName}>TravelMatch</Text>
+          <Text style={styles.appName}>Lovendo</Text>
           <Text style={styles.tagline}>Give a moment. See it happen.</Text>
         </Animated.View>
       </View>

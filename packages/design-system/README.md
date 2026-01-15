@@ -1,10 +1,11 @@
 # Design System Documentation
 
-> **TravelMatch Design System** - Personalization-first component library
+> **Lovendo Design System** - Personalization-first component library
 
 ## 🎨 Overview
 
-The TravelMatch Design System is a comprehensive UI/UX framework built for:
+The Lovendo Design System is a comprehensive UI/UX framework built for:
+
 - **Brand consistency** across mobile and admin applications
 - **Personalization** to boost user engagement by 30-50%
 - **Accessibility** compliance (WCAG 2.1 AA)
@@ -16,7 +17,7 @@ The TravelMatch Design System is a comprehensive UI/UX framework built for:
 
 ```bash
 # In your workspace
-pnpm add @travelmatch/design-system
+pnpm add @lovendo/design-system
 ```
 
 ---
@@ -26,21 +27,17 @@ pnpm add @travelmatch/design-system
 ### 1. Wrap your app with PersonalizationProvider
 
 ```tsx
-import { PersonalizationProvider } from '@travelmatch/design-system/personalization';
+import { PersonalizationProvider } from '@lovendo/design-system/personalization';
 
 function App() {
-  return (
-    <PersonalizationProvider>
-      {/* Your app */}
-    </PersonalizationProvider>
-  );
+  return <PersonalizationProvider>{/* Your app */}</PersonalizationProvider>;
 }
 ```
 
 ### 2. Use components
 
 ```tsx
-import { MomentCard } from '@travelmatch/design-system/components';
+import { MomentCard } from '@lovendo/design-system/components';
 
 function MomentList() {
   return (
@@ -58,16 +55,14 @@ function MomentList() {
 ### 3. Access design tokens
 
 ```tsx
-import { useColors, spacing, typography } from '@travelmatch/design-system';
+import { useColors, spacing, typography } from '@lovendo/design-system';
 
 function CustomComponent() {
   const colors = useColors();
-  
+
   return (
     <View style={{ padding: spacing.md, backgroundColor: colors.primary[500] }}>
-      <Text style={{ fontSize: typography.h3.fontSize }}>
-        Hello World
-      </Text>
+      <Text style={{ fontSize: typography.h3.fontSize }}>Hello World</Text>
     </View>
   );
 }
@@ -80,7 +75,7 @@ function CustomComponent() {
 ### Colors
 
 ```tsx
-import { baseColors, useColors } from '@travelmatch/design-system/tokens';
+import { baseColors, useColors } from '@lovendo/design-system/tokens';
 
 // Access base colors
 const primaryColor = baseColors.primary[500]; // #0EA5E9
@@ -91,6 +86,7 @@ const adaptedPrimary = colors.primary[500]; // Adapts to user preferences
 ```
 
 **Color Scales:**
+
 - `primary`: Brand primary color (blue)
 - `secondary`: Brand secondary color (purple)
 - `accent`: Accent color (orange)
@@ -103,39 +99,39 @@ const adaptedPrimary = colors.primary[500]; // Adapts to user preferences
 ### Typography
 
 ```tsx
-import { typography } from '@travelmatch/design-system/tokens';
+import { typography } from '@lovendo/design-system/tokens';
 
 // Headings
-typography.h1 // { fontSize: 32, lineHeight: 40, fontWeight: 700 }
-typography.h2 // { fontSize: 28, lineHeight: 36, fontWeight: 700 }
-typography.h3 // { fontSize: 24, lineHeight: 32, fontWeight: 600 }
-typography.h4 // { fontSize: 20, lineHeight: 28, fontWeight: 600 }
-typography.h5 // { fontSize: 18, lineHeight: 24, fontWeight: 600 }
-typography.h6 // { fontSize: 16, lineHeight: 22, fontWeight: 600 }
+typography.h1; // { fontSize: 32, lineHeight: 40, fontWeight: 700 }
+typography.h2; // { fontSize: 28, lineHeight: 36, fontWeight: 700 }
+typography.h3; // { fontSize: 24, lineHeight: 32, fontWeight: 600 }
+typography.h4; // { fontSize: 20, lineHeight: 28, fontWeight: 600 }
+typography.h5; // { fontSize: 18, lineHeight: 24, fontWeight: 600 }
+typography.h6; // { fontSize: 16, lineHeight: 22, fontWeight: 600 }
 
 // Body
-typography.body1 // { fontSize: 16, lineHeight: 24, fontWeight: 400 }
-typography.body2 // { fontSize: 14, lineHeight: 20, fontWeight: 400 }
+typography.body1; // { fontSize: 16, lineHeight: 24, fontWeight: 400 }
+typography.body2; // { fontSize: 14, lineHeight: 20, fontWeight: 400 }
 
 // Special
-typography.caption // { fontSize: 12, lineHeight: 16, fontWeight: 400 }
-typography.button  // { fontSize: 14, lineHeight: 20, fontWeight: 600 }
+typography.caption; // { fontSize: 12, lineHeight: 16, fontWeight: 400 }
+typography.button; // { fontSize: 14, lineHeight: 20, fontWeight: 600 }
 ```
 
 ### Spacing
 
 ```tsx
-import { spacing } from '@travelmatch/design-system/tokens';
+import { spacing } from '@lovendo/design-system/tokens';
 
-spacing.none  // 0
-spacing.xs    // 4
-spacing.sm    // 8
-spacing.md    // 16
-spacing.lg    // 24
-spacing.xl    // 32
-spacing['2xl'] // 40
-spacing['3xl'] // 48
-spacing['4xl'] // 64
+spacing.none; // 0
+spacing.xs; // 4
+spacing.sm; // 8
+spacing.md; // 16
+spacing.lg; // 24
+spacing.xl; // 32
+spacing['2xl']; // 40
+spacing['3xl']; // 48
+spacing['4xl']; // 64
 ```
 
 ---
@@ -174,30 +170,23 @@ spacing['4xl'] // 64
 ### User Preferences
 
 ```tsx
-import { usePersonalization } from '@travelmatch/design-system/personalization';
+import { usePersonalization } from '@lovendo/design-system/personalization';
 
 function SettingsScreen() {
   const { preferences, updatePreferences } = usePersonalization();
-  
+
   return (
     <View>
-      <Button
-        onPress={() => updatePreferences({ colorMode: 'dark' })}
-      >
-        Toggle Dark Mode
-      </Button>
-      
-      <Button
-        onPress={() => updatePreferences({ fontSize: 'large' })}
-      >
-        Increase Font Size
-      </Button>
+      <Button onPress={() => updatePreferences({ colorMode: 'dark' })}>Toggle Dark Mode</Button>
+
+      <Button onPress={() => updatePreferences({ fontSize: 'large' })}>Increase Font Size</Button>
     </View>
   );
 }
 ```
 
 **Available Preferences:**
+
 - `colorMode`: 'light' | 'dark' | 'auto'
 - `accentColor`: Custom accent color
 - `fontSize`: 'small' | 'medium' | 'large'
@@ -208,18 +197,18 @@ function SettingsScreen() {
 ### Engagement Tracking
 
 ```tsx
-import { usePersonalization } from '@travelmatch/design-system/personalization';
+import { usePersonalization } from '@lovendo/design-system/personalization';
 
 function MomentDetails() {
   const { trackEngagement } = usePersonalization();
-  
+
   const handleLike = () => {
     trackEngagement('moment_like', {
       momentId: moment.id,
       category: moment.category,
     });
   };
-  
+
   return <Button onPress={handleLike}>Like</Button>;
 }
 ```
@@ -227,11 +216,11 @@ function MomentDetails() {
 ### Adaptive Layout
 
 ```tsx
-import { useAdaptiveLayout } from '@travelmatch/design-system/personalization';
+import { useAdaptiveLayout } from '@lovendo/design-system/personalization';
 
 function MomentGrid() {
   const { columns, cardWidth, spacing } = useAdaptiveLayout();
-  
+
   return (
     <FlatList
       data={moments}
@@ -265,6 +254,7 @@ pnpm run generate-tokens
 ```
 
 This will:
+
 1. Export colors, typography, spacing from Figma
 2. Transform them into React Native tokens
 3. Generate TypeScript types
@@ -364,7 +354,7 @@ export const Interactive: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const button = canvas.getByRole('button');
-    
+
     await userEvent.click(button);
     expect(canvas.getByText('Clicked!')).toBeInTheDocument();
   },
@@ -400,12 +390,12 @@ import { colors } from '../constants/colors';
 
 <Card style={{ backgroundColor: colors.primary }}>
   <Text>{moment.title}</Text>
-</Card>
+</Card>;
 
 // After
-import { MomentCard } from '@travelmatch/design-system/components';
+import { MomentCard } from '@lovendo/design-system/components';
 
-<MomentCard moment={moment} />
+<MomentCard moment={moment} />;
 ```
 
 ---
@@ -413,6 +403,7 @@ import { MomentCard } from '@travelmatch/design-system/components';
 ## 📚 Examples
 
 See `/examples` folder for:
+
 - Mobile app integration
 - Admin panel integration
 - Custom theme creation
@@ -444,26 +435,26 @@ See `/examples` folder for:
 
 **After Design System Implementation:**
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| **Development Time** | 2 days/feature | 4 hours/feature | **75% faster** |
-| **UI Consistency** | 60% | 100% | **+40%** |
-| **Accessibility Score** | 72 | 95 | **+32%** |
-| **Bundle Size** | 450KB | 165KB | **63% smaller** |
-| **User Engagement** | Baseline | +35% | **+35%** |
-| **Brand Satisfaction** | 7.2/10 | 9.1/10 | **+26%** |
+| Metric                  | Before         | After           | Improvement     |
+| ----------------------- | -------------- | --------------- | --------------- |
+| **Development Time**    | 2 days/feature | 4 hours/feature | **75% faster**  |
+| **UI Consistency**      | 60%            | 100%            | **+40%**        |
+| **Accessibility Score** | 72             | 95              | **+32%**        |
+| **Bundle Size**         | 450KB          | 165KB           | **63% smaller** |
+| **User Engagement**     | Baseline       | +35%            | **+35%**        |
+| **Brand Satisfaction**  | 7.2/10         | 9.1/10          | **+26%**        |
 
 ---
 
 ## 🆘 Support
 
-- **Documentation**: https://design.travelmatch.com
-- **Storybook**: https://storybook.travelmatch.com
-- **GitHub**: https://github.com/travelmatch/design-system
+- **Documentation**: https://design.lovendo.xyz
+- **Storybook**: https://storybook.lovendo.xyz
+- **GitHub**: https://github.com/lovendo/design-system
 - **Slack**: #design-system
 
 ---
 
 ## 📄 License
 
-Proprietary - TravelMatch Inc.
+Proprietary - Lovendo Inc.

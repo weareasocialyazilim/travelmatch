@@ -421,7 +421,13 @@ const AppNavigator = () => {
 
   // Deep linking configuration
   const linking = {
-    prefixes: ['travelmatch://', 'https://travelmatch.app'],
+    // Canonical Lovendo prefixes first; keep legacy Lovendo for backward compatibility.
+    prefixes: [
+      'lovendo://',
+      'https://www.lovendo.xyz',
+      'lovendo://',
+      'https://lovendo.app',
+    ],
     config: {
       screens: {
         MomentDetail: 'moment/:momentId',

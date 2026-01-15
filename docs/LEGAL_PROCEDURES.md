@@ -1,4 +1,4 @@
-# TravelMatch Yasal Prosedürler
+# Lovendo Yasal Prosedürler
 
 ## İçindekiler
 
@@ -110,11 +110,11 @@ supabase rpc logout_all_users
 ```typescript
 // Email template: data_breach_notification
 const notificationTemplate = {
-  subject: 'TravelMatch Güvenlik Bildirimi',
+  subject: 'Lovendo Güvenlik Bildirimi',
   body: `
 Sayın {user_name},
 
-{date} tarihinde TravelMatch sistemlerinde bir güvenlik olayı tespit edilmiştir.
+{date} tarihinde Lovendo sistemlerinde bir güvenlik olayı tespit edilmiştir.
 
 **Etkilenen Veriler:**
 {affected_data_types}
@@ -125,14 +125,14 @@ Sayın {user_name},
 - Şifre sıfırlama zorunlu hale getirilmiştir
 
 **Önerilen Eylemler:**
-1. TravelMatch şifrenizi değiştirin
+1. Lovendo şifrenizi değiştirin
 2. Aynı şifreyi kullanan diğer hesaplarınızı güncelleyin
 3. Hesap aktivitelerinizi kontrol edin
 
-Sorularınız için: privacy@travelmatch.app
+Sorularınız için: privacy@lovendo.app
 
 Saygılarımızla,
-TravelMatch Güvenlik Ekibi
+Lovendo Güvenlik Ekibi
   `,
 };
 ```
@@ -258,7 +258,7 @@ Her DPA şunları içermelidir:
 | Düzeltme       | 30 gün       | Profil düzenleme               |
 | Silme          | 30 gün       | schedule_account_deletion RPC  |
 | Taşınabilirlik | 30 gün       | JSON export                    |
-| İtiraz         | 30 gün       | privacy@travelmatch.app        |
+| İtiraz         | 30 gün       | privacy@lovendo.app        |
 
 ### 4.2 Talep İşleme Akışı
 
@@ -288,7 +288,7 @@ Her DPA şunları içermelidir:
 
 ## İletişim
 
-- **Veri Koruma Sorumlusu:** dpo@travelmatch.app
-- **Güvenlik Ekibi:** security@travelmatch.app
-- **Hukuk:** legal@travelmatch.app
+- **Veri Koruma Sorumlusu:** dpo@lovendo.app
+- **Güvenlik Ekibi:** security@lovendo.app
+- **Hukuk:** legal@lovendo.app
 - **Acil Durum:** +90 XXX XXX XX XX (7/24)

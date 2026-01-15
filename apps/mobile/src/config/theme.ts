@@ -1,7 +1,7 @@
 import { COLORS, primitives } from '../constants/colors';
 
 export const colors = {
-  // TravelMatch Calm Palette
+  // Lovendo Calm Palette
   primary: COLORS.brand.primary,
   secondary: COLORS.brand.secondary,
   success: COLORS.feedback.success,
@@ -18,7 +18,7 @@ export const colors = {
   border: COLORS.border.default,
   background: COLORS.bg.primary,
 
-  // TravelMatch Brand Colors
+  // Lovendo Brand Colors
   mint: {
     50: COLORS.successLight,
     100: COLORS.mint,

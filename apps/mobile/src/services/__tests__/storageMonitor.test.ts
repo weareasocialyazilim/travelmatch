@@ -323,7 +323,7 @@ describe('StorageMonitorService', () => {
       await storageMonitor.checkStorage();
 
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
-        '@travelmatch/last_storage_check',
+        '@lovendo/last_storage_check',
         expect.any(String),
       );
     });
@@ -456,7 +456,7 @@ describe('StorageMonitorService', () => {
 
       expect(mockFileSystem.getFreeDiskStorageAsync).toHaveBeenCalled();
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
-        '@travelmatch/last_storage_check',
+        '@lovendo/last_storage_check',
         expect.any(String),
       );
 
@@ -557,7 +557,7 @@ describe('StorageMonitorService', () => {
       await storageMonitor.markWarningShown();
 
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
-        '@travelmatch/storage_warning_shown',
+        '@lovendo/storage_warning_shown',
         'true',
       );
     });
@@ -566,7 +566,7 @@ describe('StorageMonitorService', () => {
       await storageMonitor.resetWarningFlag();
 
       expect(mockAsyncStorage.removeItem).toHaveBeenCalledWith(
-        '@travelmatch/storage_warning_shown',
+        '@lovendo/storage_warning_shown',
       );
     });
 

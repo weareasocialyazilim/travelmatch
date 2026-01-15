@@ -157,7 +157,7 @@ serve(async (req) => {
         headers: {
           ...corsHeaders,
           'Content-Type': 'application/json',
-          'Content-Disposition': `attachment; filename="travelmatch-data-export-${userId}-${Date.now()}.json"`,
+          'Content-Disposition': `attachment; filename="lovendo-data-export-${userId}-${Date.now()}.json"`,
           'X-Cache': 'HIT',
         },
       });
@@ -334,7 +334,7 @@ serve(async (req) => {
       headers: {
         ...corsHeaders,
         'Content-Type': 'application/json',
-        'Content-Disposition': `attachment; filename="travelmatch-data-export-${userId}-${Date.now()}.json"`,
+        'Content-Disposition': `attachment; filename="lovendo-data-export-${userId}-${Date.now()}.json"`,
         'X-Cache': 'MISS',
       },
     });

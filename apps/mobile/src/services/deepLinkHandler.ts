@@ -136,8 +136,16 @@ class DeepLinkHandler {
     try {
       // Normalize URL
       const normalizedURL = url
-        .replace(/^travelmatch:\/\//, 'https://travelmatch.app/')
-        .replace(/^https:\/\/travelmatch\.app\//, 'https://travelmatch.app/');
+        .replace(/^lovendo:\/\//, 'https://www.lovendo.xyz/')
+        .replace(/^lovendo:\/\//, 'https://www.lovendo.xyz/')
+        .replace(
+          /^https:\/\/(www\.)?lovendo\.xyz\//,
+          'https://www.lovendo.xyz/',
+        )
+        .replace(
+          /^https:\/\/(www\.)?lovendo\.app\//,
+          'https://www.lovendo.xyz/',
+        );
 
       const urlObj = new URL(normalizedURL);
       const pathSegments = urlObj.pathname.split('/').filter(Boolean);
@@ -508,7 +516,7 @@ class DeepLinkHandler {
       content?: string;
     },
   ): string {
-    const baseUrl = 'https://travelmatch.app';
+    const baseUrl = 'https://www.lovendo.xyz';
 
     // Map type to path
     const pathMap: Record<DeepLinkType, string> = {

@@ -1,4 +1,4 @@
-# TravelMatch API Reference
+# Lovendo API Reference
 
 **Complete API documentation with error handling**  
 **Version**: 1.0.0  
@@ -23,7 +23,7 @@
 
 ## Overview
 
-TravelMatch API provides access to user profiles, travel moments, gift transactions, and payment processing. The API follows RESTful conventions and uses Supabase as the backend infrastructure.
+Lovendo API provides access to user profiles, travel moments, gift transactions, and payment processing. The API follows RESTful conventions and uses Supabase as the backend infrastructure.
 
 **Key Features:**
 - 🔐 JWT-based authentication
@@ -84,7 +84,7 @@ const { data, error } = await supabase.auth.refreshSession();
 
 ### Cursor-Based Pagination
 
-TravelMatch uses **cursor-based pagination** for better performance and consistency, especially for real-time data like feeds and infinite scroll.
+Lovendo uses **cursor-based pagination** for better performance and consistency, especially for real-time data like feeds and infinite scroll.
 
 #### Why Cursor-Based?
 

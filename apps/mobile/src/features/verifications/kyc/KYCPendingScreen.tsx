@@ -27,7 +27,7 @@ import { COLORS } from '@/constants/colors';
 import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { TMButton } from '@/components/ui/TMButton';
+import { LovendoButton } from '@/components/ui/LovendoButton';
 
 /**
  * Animated processing ring component (vault lock visualization)
@@ -205,7 +205,7 @@ const KYCPendingScreen: React.FC = () => {
 
       {/* Footer */}
       <View style={[styles.footer, { paddingBottom: insets.bottom + 20 }]}>
-        <TMButton
+        <LovendoButton
           title="Keşfet'e Dön"
           variant="secondary"
           onPress={handleDone}

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ============================================================================
-# TravelMatch Migration Squash Script
+# Lovendo Migration Squash Script
 # Version: 2.0
 # 
 # Purpose: Squash multiple migrations into clean baseline files
@@ -55,7 +55,7 @@ done
 
 echo -e "${BLUE}"
 echo "╔════════════════════════════════════════════════════════════════╗"
-echo "║         TravelMatch Migration Squash Script v2.0               ║"
+echo "║         Lovendo Migration Squash Script v2.0               ║"
 echo "╚════════════════════════════════════════════════════════════════╝"
 echo -e "${NC}"
 
@@ -96,7 +96,7 @@ if [ "$DRY_RUN" = false ]; then
         echo -e "${YELLOW}Warning: Could not dump schema. Using placeholder.${NC}"
         cat > "$SQUASH_DIR/001_baseline_schema.sql" << 'EOF'
 -- ============================================================================
--- TravelMatch Baseline Schema v2.0
+-- Lovendo Baseline Schema v2.0
 -- Generated: $(date)
 -- 
 -- This file was created by squashing migrations.
@@ -117,7 +117,7 @@ echo -e "${BLUE}Step 2: Creating index baseline...${NC}"
 if [ "$DRY_RUN" = false ]; then
     cat > "$SQUASH_DIR/002_indexes_and_constraints.sql" << 'EOF'
 -- ============================================================================
--- TravelMatch Indexes and Constraints v2.0
+-- Lovendo Indexes and Constraints v2.0
 -- 
 -- All indexes consolidated from:
 --   - 20241205000001_add_indexes.sql
@@ -144,7 +144,7 @@ echo -e "${BLUE}Step 3: Creating RLS policies baseline...${NC}"
 if [ "$DRY_RUN" = false ]; then
     cat > "$SQUASH_DIR/003_rls_policies.sql" << 'EOF'
 -- ============================================================================
--- TravelMatch RLS Policies v2.0
+-- Lovendo RLS Policies v2.0
 -- 
 -- All RLS policies consolidated from multiple security fix migrations.
 -- 
@@ -181,7 +181,7 @@ echo -e "${BLUE}Step 4: Creating functions baseline...${NC}"
 if [ "$DRY_RUN" = false ]; then
     cat > "$SQUASH_DIR/004_functions_and_triggers.sql" << 'EOF'
 -- ============================================================================
--- TravelMatch Functions and Triggers v2.0
+-- Lovendo Functions and Triggers v2.0
 -- 
 -- All functions consolidated. SECURITY DEFINER functions have:
 --   - SET search_path = public, pg_temp
@@ -204,7 +204,7 @@ echo -e "${BLUE}Step 5: Creating seed data file...${NC}"
 if [ "$DRY_RUN" = false ]; then
     cat > "$SQUASH_DIR/005_seed_data.sql" << 'EOF'
 -- ============================================================================
--- TravelMatch Seed Data v2.0
+-- Lovendo Seed Data v2.0
 -- 
 -- Essential data for application startup.
 -- NOT for test data - use supabase/seed.sql for development data.

@@ -9,17 +9,21 @@
  */
 const ALLOWED_ORIGINS = [
   // Production domains
-  'https://travelmatch.app',
-  'https://www.travelmatch.app',
-  'https://api.travelmatch.app',
+  'https://www.lovendo.xyz',
+  'https://lovendo.xyz',
+  'https://api.lovendo.xyz',
   // Staging/Preview domains
-  'https://staging.travelmatch.app',
-  'https://preview.travelmatch.app',
+  'https://staging.lovendo.xyz',
+  'https://preview.lovendo.xyz',
   // Vercel preview deployments
-  /^https:\/\/travelmatch-.*\.vercel\.app$/,
+  /^https:\/\/lovendo-.*\.vercel\.app$/,
   // Local development (only in non-production)
   ...(Deno.env.get('DENO_ENV') !== 'production'
-    ? ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:8081']
+    ? [
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'http://localhost:8081',
+      ]
     : []),
 ];
 
@@ -28,7 +32,7 @@ const ALLOWED_ORIGINS = [
  */
 function isOriginAllowed(origin: string | null): boolean {
   if (!origin) return false;
-  
+
   return ALLOWED_ORIGINS.some((allowed) => {
     if (typeof allowed === 'string') {
       return allowed === origin;
@@ -43,14 +47,14 @@ function isOriginAllowed(origin: string | null): boolean {
  */
 export function getCorsHeaders(origin: string | null): Record<string, string> {
   const allowedOrigin = isOriginAllowed(origin) ? origin : ALLOWED_ORIGINS[0];
-  
+
   return {
     'Access-Control-Allow-Origin': allowedOrigin as string,
     'Access-Control-Allow-Headers':
       'authorization, x-client-info, apikey, content-type, x-idempotency-key',
     'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE',
     'Access-Control-Allow-Credentials': 'true',
-    'Vary': 'Origin',
+    Vary: 'Origin',
   };
 }
 

@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * TravelMatch Wallet & Payout Operations
+ * Lovendo Wallet & Payout Operations
  * Kullanıcı cüzdanları, para çekme talepleri ve KYC yönetimi
  * Real API integration with use-wallet-operations.ts hooks
  */

@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 # Create FastAPI app
 app = FastAPI(
-    title="TravelMatch ML Service",
+    title="Lovendo ML Service",
     description="Machine learning microservice for content moderation and quality scoring",
     version="1.0.0"
 )
@@ -48,7 +48,7 @@ app.include_router(scoring_router, tags=["scoring"])
 async def root():
     """Root endpoint"""
     return {
-        "service": "TravelMatch ML Service",
+        "service": "Lovendo ML Service",
         "version": "1.0.0",
         "status": "running",
         "endpoints": {

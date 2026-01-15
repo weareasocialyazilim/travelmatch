@@ -183,9 +183,9 @@ Deno.test('KYC verification should have rate limiting', () => {
 
 // Return URL configuration
 Deno.test('Return URL is properly configured', () => {
-  const returnUrl = 'travelmatch://kyc/callback';
+  const returnUrl = 'lovendo://kyc/callback';
 
-  assertEquals(returnUrl.startsWith('travelmatch://'), true);
+  assertEquals(returnUrl.startsWith('lovendo://'), true);
   assertEquals(returnUrl.includes('kyc'), true);
 });
 
@@ -193,7 +193,7 @@ Deno.test('Return URL is properly configured', () => {
 Deno.test('Verification session includes user metadata', () => {
   const metadata = {
     supabase_user_id: 'user-123',
-    app: 'travelmatch',
+    app: 'lovendo',
   };
 
   assertExists(metadata.supabase_user_id);

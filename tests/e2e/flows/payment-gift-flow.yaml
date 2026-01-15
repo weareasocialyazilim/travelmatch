@@ -4,7 +4,7 @@
 # File: tests/e2e/paymentFlow.e2e.test.ts
 # Status: ✅ IMPLEMENTED
 
-appId: com.travelmatch.app
+appId: com.lovendo.app
 ---
 
 # Test Suite: Payment Flow - Gift Sending

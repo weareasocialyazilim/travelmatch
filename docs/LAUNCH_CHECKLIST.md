@@ -1,4 +1,4 @@
-# 🚀 TravelMatch Launch Checklist
+# 🚀 Lovendo Launch Checklist
 
 ## Pre-Launch Status
 

@@ -1,7 +1,7 @@
 /**
  * AI Hooks
  *
- * React hooks for AI/ML features in TravelMatch mobile app.
+ * React hooks for AI/ML features in Lovendo mobile app.
  * Provides easy-to-use hooks for all AI capabilities.
  */
 

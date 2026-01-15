@@ -18,7 +18,7 @@ const TOGGLES = [
   {
     id: 'marketing',
     label: 'Offers & Updates',
-    desc: 'News about TravelMatch features',
+    desc: 'News about Lovendo features',
   },
   { id: 'reminders', label: 'Reminders', desc: 'Upcoming moment alerts' },
 ];

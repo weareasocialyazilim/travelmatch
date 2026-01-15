@@ -1,5 +1,5 @@
 /**
- * MediaService - TravelMatch Unified Media Service
+ * MediaService - Lovendo Unified Media Service
  *
  * Consolidates all media-related services into a single entry point:
  * - Image CDN delivery (Cloudflare Images)

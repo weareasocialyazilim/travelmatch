@@ -53,7 +53,7 @@ describe('PendingTransactionsService', () => {
 
       // Verify AsyncStorage was called with correct data
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
-        '@travelmatch/pending_payments',
+        '@lovendo/pending_payments',
         expect.stringContaining('"id":"payment-1"'),
       );
 
@@ -101,7 +101,7 @@ describe('PendingTransactionsService', () => {
       expect(payments[0]?.id).toBe('payment-1');
       expect(payments[1]?.id).toBe('payment-2');
       expect(mockAsyncStorage.getItem).toHaveBeenCalledWith(
-        '@travelmatch/pending_payments',
+        '@lovendo/pending_payments',
       );
     });
 
@@ -341,7 +341,7 @@ describe('PendingTransactionsService', () => {
 
       // Should save cleaned list
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
-        '@travelmatch/pending_payments',
+        '@lovendo/pending_payments',
         expect.stringContaining('"id":"payment-valid"'),
       );
     });
@@ -435,7 +435,7 @@ describe('PendingTransactionsService', () => {
       await pendingTransactionsService.addPendingUpload(upload);
 
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
-        '@travelmatch/pending_uploads',
+        '@lovendo/pending_uploads',
         expect.stringContaining('"id":"upload-1"'),
       );
 
@@ -501,7 +501,7 @@ describe('PendingTransactionsService', () => {
       expect(uploads).toHaveLength(1);
       expect(uploads[0]?.id).toBe('upload-1');
       expect(mockAsyncStorage.getItem).toHaveBeenCalledWith(
-        '@travelmatch/pending_uploads',
+        '@lovendo/pending_uploads',
       );
     });
 
@@ -902,7 +902,7 @@ describe('PendingTransactionsService', () => {
       ];
 
       mockAsyncStorage.getItem.mockImplementation(async (key) => {
-        if (key === '@travelmatch/pending_payments') {
+        if (key === '@lovendo/pending_payments') {
           return JSON.stringify(storedPayments);
         }
         return null;
@@ -944,7 +944,7 @@ describe('PendingTransactionsService', () => {
       ];
 
       mockAsyncStorage.getItem.mockImplementation(async (key) => {
-        if (key === '@travelmatch/pending_uploads') {
+        if (key === '@lovendo/pending_uploads') {
           return JSON.stringify(storedUploads);
         }
         return null;
@@ -989,10 +989,10 @@ describe('PendingTransactionsService', () => {
       ];
 
       mockAsyncStorage.getItem.mockImplementation(async (key) => {
-        if (key === '@travelmatch/pending_payments') {
+        if (key === '@lovendo/pending_payments') {
           return JSON.stringify(storedPayments);
         }
-        if (key === '@travelmatch/pending_uploads') {
+        if (key === '@lovendo/pending_uploads') {
           return JSON.stringify(storedUploads);
         }
         return null;
@@ -1049,8 +1049,10 @@ describe('PendingTransactionsService', () => {
       await pendingTransactionsService.clearAll();
 
       expect(mockAsyncStorage.multiRemove).toHaveBeenCalledWith([
-        '@travelmatch/pending_payments',
-        '@travelmatch/pending_uploads',
+        '@lovendo/pending_payments',
+        '@lovendo/pending_uploads',
+        '@lovendo_legacy/pending_payments',
+        '@lovendo_legacy/pending_uploads',
       ]);
 
       expect(mockLogger.info).toHaveBeenCalledWith(

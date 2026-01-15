@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('TravelMatch Admin - Login', () => {
+test.describe('Lovendo Admin - Login', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/login');
   });
@@ -78,7 +78,7 @@ test.describe('TravelMatch Admin - Login', () => {
   });
 });
 
-test.describe('TravelMatch Admin - Authentication Flow', () => {
+test.describe('Lovendo Admin - Authentication Flow', () => {
   test('should redirect unauthenticated users to login', async ({ page }) => {
     // Try to access a protected route
     await page.goto('/dashboard');
@@ -94,7 +94,7 @@ test.describe('TravelMatch Admin - Authentication Flow', () => {
   });
 });
 
-test.describe('TravelMatch Admin - Security', () => {
+test.describe('Lovendo Admin - Security', () => {
   test('should have secure headers', async ({ page }) => {
     const response = await page.goto('/login');
     const headers = response?.headers() ?? {};
@@ -117,7 +117,7 @@ test.describe('TravelMatch Admin - Security', () => {
   });
 });
 
-test.describe('TravelMatch Admin - Accessibility', () => {
+test.describe('Lovendo Admin - Accessibility', () => {
   test('login form should be keyboard accessible', async ({ page }) => {
     await page.goto('/login');
 

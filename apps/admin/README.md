@@ -1,6 +1,7 @@
-# TravelMatch Admin Dashboard
+# Lovendo Admin Dashboard
 
-Enterprise-grade administrative dashboard for the TravelMatch platform. Built with Next.js 16 (App Router) and modern React patterns.
+Enterprise-grade administrative dashboard for the Lovendo platform. Built with Next.js 16 (App
+Router) and modern React patterns.
 
 ## Tech Stack
 
@@ -16,6 +17,7 @@ Enterprise-grade administrative dashboard for the TravelMatch platform. Built wi
 ## Features
 
 ### Core Operations (Phase 1) ✅
+
 - **Dashboard**: Real-time platform health, task queue, metrics
 - **User Management**: View, verify (KYC), ban/suspend users
 - **Content Moderation**: Review and approve/reject Moments
@@ -23,6 +25,7 @@ Enterprise-grade administrative dashboard for the TravelMatch platform. Built wi
 - **Audit Logging**: Complete action tracking
 
 ### Operations & Safety (Phase 2) ✅
+
 - **Trust & Safety**: Fraud detection, risk scoring
 - **Support Center**: Ticket system, SLA tracking
 - **Integration Hub**: Supabase, Stripe, Sentry health
@@ -30,6 +33,7 @@ Enterprise-grade administrative dashboard for the TravelMatch platform. Built wi
 - **Errors Dashboard**: Sentry integration
 
 ### Growth & Intelligence (Phase 3) ✅
+
 - **Notifications**: Push notification composer
 - **Campaigns**: Campaign builder, A/B testing
 - **AI Center**: Auto-moderation, ML predictions
@@ -38,6 +42,7 @@ Enterprise-grade administrative dashboard for the TravelMatch platform. Built wi
 - **Creators**: Creator tiers, performance dashboard
 
 ### Advanced (Phase 4) ✅
+
 - **Geographic Intelligence**: World map, heat maps
 - **Ops Control Room**: Live activity, real-time metrics
 - **Incident Management**: Status page, post-mortems
@@ -45,6 +50,7 @@ Enterprise-grade administrative dashboard for the TravelMatch platform. Built wi
 - **Team Hub**: Shift planning, performance
 
 ### Differentiators (Phase 5) ⚠️ In Progress
+
 - Safety Center, ESG Dashboard, Partner Portal
 - Knowledge Base, Feedback Hub, Gamification
 - Dynamic Pricing, Customer Success
@@ -52,11 +58,13 @@ Enterprise-grade administrative dashboard for the TravelMatch platform. Built wi
 ## Setup
 
 1. Install dependencies:
+
    ```bash
    pnpm install
    ```
 
 2. Create a `.env.local` file (see `.env.example`):
+
    ```
    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -64,6 +72,7 @@ Enterprise-grade administrative dashboard for the TravelMatch platform. Built wi
    ```
 
 3. Run the development server:
+
    ```bash
    pnpm dev:admin
    # or from this directory:
@@ -105,14 +114,14 @@ apps/admin/
 
 ## Available Pages (33 Modules)
 
-| Category | Pages |
-|----------|-------|
-| Core | Dashboard, Queue, Admin Users, Moments, Finance, Disputes |
-| Operations | Support, Analytics, Errors, Integrations, Settings |
-| Growth | Notifications, Campaigns, Promos, Creators |
-| Intelligence | AI Center, Automation, Feature Flags |
-| Advanced | Geographic, Ops Center, Incidents, Pricing |
-| Extras | Safety Center, Team, Events, Partners, Editorial, etc. |
+| Category     | Pages                                                     |
+| ------------ | --------------------------------------------------------- |
+| Core         | Dashboard, Queue, Admin Users, Moments, Finance, Disputes |
+| Operations   | Support, Analytics, Errors, Integrations, Settings        |
+| Growth       | Notifications, Campaigns, Promos, Creators                |
+| Intelligence | AI Center, Automation, Feature Flags                      |
+| Advanced     | Geographic, Ops Center, Incidents, Pricing                |
+| Extras       | Safety Center, Team, Events, Partners, Editorial, etc.    |
 
 ## Deployment
 

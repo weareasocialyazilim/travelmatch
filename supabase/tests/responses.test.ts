@@ -147,15 +147,15 @@ Deno.test('[Response] internalErrorResponse - 500 status', async () => {
 // =============================================================================
 
 Deno.test('[Response] corsPreflightResponse - 204 with headers', () => {
-  const response = corsPreflightResponse('https://travelmatch.app');
+  const response = corsPreflightResponse('https://lovendo.app');
   assertEquals(response.status, 204);
   assertExists(response.headers.get('Access-Control-Allow-Origin'));
   assertExists(response.headers.get('Access-Control-Allow-Methods'));
 });
 
 Deno.test('[Response] jsonResponse - includes CORS headers', () => {
-  const response = jsonResponse({ ok: true }, { origin: 'https://travelmatch.app' });
-  assertEquals(response.headers.get('Access-Control-Allow-Origin'), 'https://travelmatch.app');
+  const response = jsonResponse({ ok: true }, { origin: 'https://lovendo.app' });
+  assertEquals(response.headers.get('Access-Control-Allow-Origin'), 'https://lovendo.app');
 });
 
 // =============================================================================

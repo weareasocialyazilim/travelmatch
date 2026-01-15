@@ -1,5 +1,5 @@
 /**
- * TMSheet - TravelMatch Ultimate Design System 2026
+ * LovendoSheet - Lovendo Ultimate Design System 2026
  * Bottom sheet component with "Soft Glass" aesthetic
  *
  * Features:
@@ -19,17 +19,17 @@ import {
   BottomSheetHeight,
 } from './GenericBottomSheet';
 
-export type TMSheetSize = 'content' | 'half' | 'full' | 'dynamic';
+export type LovendoSheetSize = 'content' | 'half' | 'full' | 'dynamic';
 
-export interface TMSheetProps extends Omit<GenericBottomSheetProps, 'height'> {
+export interface LovendoSheetProps extends Omit<GenericBottomSheetProps, 'height'> {
   /** Sheet size preset */
-  size?: TMSheetSize;
+  size?: LovendoSheetSize;
   /** Custom height (overrides size) */
   height?: BottomSheetHeight;
 }
 
-// Map TMSheet sizes to GenericBottomSheet heights
-const SIZE_TO_HEIGHT: Record<TMSheetSize, BottomSheetHeight> = {
+// Map LovendoSheet sizes to GenericBottomSheet heights
+const SIZE_TO_HEIGHT: Record<LovendoSheetSize, BottomSheetHeight> = {
   content: 'auto',
   half: 'medium',
   full: 'full',
@@ -37,21 +37,21 @@ const SIZE_TO_HEIGHT: Record<TMSheetSize, BottomSheetHeight> = {
 };
 
 /**
- * TMSheet - Premium bottom sheet component
+ * LovendoSheet - Premium bottom sheet component
  *
  * @example
  * ```tsx
- * <TMSheet
+ * <LovendoSheet
  *   visible={isOpen}
  *   onClose={() => setIsOpen(false)}
  *   title="Select Option"
  *   size="half"
  * >
  *   <YourContent />
- * </TMSheet>
+ * </LovendoSheet>
  * ```
  */
-export const TMSheet = forwardRef<BottomSheetRef, TMSheetProps>(
+export const LovendoSheet = forwardRef<BottomSheetRef, LovendoSheetProps>(
   ({ size = 'half', height, ...props }, ref) => {
     // Use custom height if provided, otherwise map size to height
     const resolvedHeight = height ?? SIZE_TO_HEIGHT[size];
@@ -71,7 +71,7 @@ export const TMSheet = forwardRef<BottomSheetRef, TMSheetProps>(
   },
 );
 
-TMSheet.displayName = 'TMSheet';
+LovendoSheet.displayName = 'LovendoSheet';
 
 // Re-export types and variants for convenience
 export type { BottomSheetRef, BottomSheetHeight };
@@ -83,4 +83,4 @@ export {
   type SelectionOption,
 } from './GenericBottomSheet';
 
-export default TMSheet;
+export default LovendoSheet;

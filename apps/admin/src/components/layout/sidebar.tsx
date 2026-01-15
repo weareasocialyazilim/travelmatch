@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * TravelMatch Admin Sidebar
+ * Lovendo Admin Sidebar
  * "Cinematic Travel + Trust Jewelry" Design
  */
 
@@ -378,7 +378,7 @@ export function Sidebar() {
               <MapPin className="h-5 w-5" />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-sm">TravelMatch</span>
+              <span className="font-bold text-sm">Lovendo</span>
               <span className="text-xs text-muted-foreground">Admin Panel</span>
             </div>
           </Link>

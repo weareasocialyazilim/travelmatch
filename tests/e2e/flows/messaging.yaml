@@ -1,7 +1,7 @@
 # Maestro Flow: Messaging
 # Tests chat functionality with different message types
 
-appId: com.travelmatch.app
+appId: com.lovendo.app
 ---
 
 # Navigate to matches

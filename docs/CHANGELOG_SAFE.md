@@ -1,6 +1,6 @@
 # CHANGELOG_SAFE.md
 
-## TravelMatch Stabilization Release - 2026-01-14
+## Lovendo Stabilization Release - 2026-01-14
 
 Bu changelog, stabilization calismasinda yapilan TUM degisiklikleri ve her birinin neden "breaking"
 OLMADIGINI aciklar.

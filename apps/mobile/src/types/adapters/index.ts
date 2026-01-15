@@ -14,7 +14,7 @@ import type {
   ProofStatus,
   TransactionType,
   TransactionStatus,
-} from '@travelmatch/shared';
+} from '@lovendo/shared';
 
 // Re-export base types from shared for external use
 export type {

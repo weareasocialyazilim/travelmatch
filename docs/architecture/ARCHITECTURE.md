@@ -1,4 +1,4 @@
-# TravelMatch Architecture Documentation
+# Lovendo Architecture Documentation
 
 > **Version**: 1.0.0
 > **Last Updated**: December 2024
@@ -22,7 +22,7 @@
 
 ## Executive Summary
 
-TravelMatch is a social travel platform that connects travelers through shared experiences and gift exchanges. The platform enables users to create and join "moments" - unique travel experiences - and facilitates secure peer-to-peer transactions.
+Lovendo is a social travel platform that connects travelers through shared experiences and gift exchanges. The platform enables users to create and join "moments" - unique travel experiences - and facilitates secure peer-to-peer transactions.
 
 ### Key Business Capabilities
 
@@ -49,7 +49,7 @@ TravelMatch is a social travel platform that connects travelers through shared e
 ## System Overview
 
 ```
-                                    TravelMatch Platform
+                                    Lovendo Platform
     ┌──────────────────────────────────────────────────────────────────────────┐
     │                                                                          │
     │   ┌─────────────┐    ┌─────────────┐    ┌─────────────┐                 │
@@ -139,7 +139,7 @@ This section provides a summary of the C4 model diagrams. For detailed diagrams,
 
 ### Level 1: System Context
 
-TravelMatch interacts with the following external systems:
+Lovendo interacts with the following external systems:
 
 | External System | Description | Integration |
 |-----------------|-------------|-------------|
@@ -232,9 +232,9 @@ S3 Emulation:  Minio / LocalStack
 
 | Package | Purpose |
 |---------|---------|
-| `@travelmatch/shared` | Common utilities, types, validation |
-| `@travelmatch/design-system` | UI components, tokens, theming |
-| `@travelmatch/monitoring` | Logging, metrics, error tracking |
+| `@lovendo/shared` | Common utilities, types, validation |
+| `@lovendo/design-system` | UI components, tokens, theming |
+| `@lovendo/monitoring` | Logging, metrics, error tracking |
 
 ### Development Tools
 

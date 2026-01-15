@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Design Token Generator for TravelMatch Design System
+Design Token Generator for Lovendo Design System
 
 Generates complete design system tokens from brand colors including:
 - Color palettes (primary, secondary, semantic)
@@ -433,7 +433,7 @@ def generate_all_tokens(brand_color: str, style: str) -> Dict[str, Any]:
 
     return {
         "meta": {
-            "name": "TravelMatch Design System",
+            "name": "Lovendo Design System",
             "version": "2.0.0",
             "generatedAt": datetime.now().isoformat(),
             "brandColor": brand_color,
@@ -487,7 +487,7 @@ def export_css(tokens: Dict[str, Any]) -> str:
     """Export tokens as CSS custom properties."""
     lines = [
         "/**",
-        " * TravelMatch Design System Tokens",
+        " * Lovendo Design System Tokens",
         f" * Generated: {tokens['meta']['generatedAt']}",
         f" * Brand Color: {tokens['meta']['brandColor']}",
         f" * Style: {tokens['meta']['style']}",
@@ -549,7 +549,7 @@ def export_scss(tokens: Dict[str, Any]) -> str:
     """Export tokens as SCSS variables and maps."""
     lines = [
         "//",
-        "// TravelMatch Design System Tokens",
+        "// Lovendo Design System Tokens",
         f"// Generated: {tokens['meta']['generatedAt']}",
         f"// Brand Color: {tokens['meta']['brandColor']}",
         f"// Style: {tokens['meta']['style']}",
@@ -645,7 +645,7 @@ def export_typescript(tokens: Dict[str, Any]) -> str:
     """Export tokens as TypeScript."""
     lines = [
         "/**",
-        " * TravelMatch Design System Tokens",
+        " * Lovendo Design System Tokens",
         f" * Generated: {tokens['meta']['generatedAt']}",
         f" * Brand Color: {tokens['meta']['brandColor']}",
         f" * Style: {tokens['meta']['style']}",

@@ -1,30 +1,29 @@
-# TravelMatch Admin - Entegrasyon Durum Raporu
+# Lovendo Admin - Entegrasyon Durum Raporu
 
-**Rapor Tarihi:** 2026-01-14
-**Denetçi:** Principal Engineer / Security Lead
-**Kapsam:** Tüm 3rd-party entegrasyonların güvenlik, dayanıklılık ve operasyonel hazırlık denetimi
+**Rapor Tarihi:** 2026-01-14 **Denetçi:** Principal Engineer / Security Lead **Kapsam:** Tüm
+3rd-party entegrasyonların güvenlik, dayanıklılık ve operasyonel hazırlık denetimi
 
 ---
 
 ## 🎯 YÖNETİCİ ÖZETİ
 
-| Metrik | Değer |
-|--------|-------|
-| **Toplam Entegrasyon** | 28 |
-| **Tam ve Güvenli (✅)** | 19 |
-| **Kısmi / Eksik (⚠️)** | 7 |
-| **Kırık / Kritik (❌)** | 2 |
+| Metrik                   | Değer      |
+| ------------------------ | ---------- |
+| **Toplam Entegrasyon**   | 28         |
+| **Tam ve Güvenli (✅)**  | 19         |
+| **Kısmi / Eksik (⚠️)**   | 7          |
+| **Kırık / Kritik (❌)**  | 2          |
 | **Genel Hazırlık Skoru** | **82/100** |
 
 ### Kritik Bulgular
 
-| Öncelik | Entegrasyon | Sorun | Risk |
-|---------|-------------|-------|------|
-| 🔴 P0 | Job Queue Webhooks | İmza doğrulaması yok | HIGH |
-| 🔴 P0 | Email Worker | email_logs tablosu eksik | MEDIUM |
-| 🟡 P1 | SendGrid | Email doğrulaması yok | MEDIUM |
-| 🟡 P1 | Sentry | Source maps upload kapalı | LOW |
-| 🟡 P1 | Stripe | Legacy kod temizlenmemiş | LOW |
+| Öncelik | Entegrasyon        | Sorun                     | Risk   |
+| ------- | ------------------ | ------------------------- | ------ |
+| 🔴 P0   | Job Queue Webhooks | İmza doğrulaması yok      | HIGH   |
+| 🔴 P0   | Email Worker       | email_logs tablosu eksik  | MEDIUM |
+| 🟡 P1   | SendGrid           | Email doğrulaması yok     | MEDIUM |
+| 🟡 P1   | Sentry             | Source maps upload kapalı | LOW    |
+| 🟡 P1   | Stripe             | Legacy kod temizlenmemiş  | LOW    |
 
 ---
 
@@ -32,62 +31,62 @@
 
 ### Veritabanı & Altyapı
 
-| Entegrasyon | Durum | Güvenlik | Dayanıklılık | Gözlemlenebilirlik | Kanıt |
-|-------------|-------|----------|--------------|-------------------|-------|
-| **Supabase** | ✅ TAM | ✅ 1,364+ RLS | ✅ Retry + Timeout | ✅ Audit logs | `/apps/admin/src/lib/supabase.ts` |
-| **Rate Limiting** | ✅ TAM | ✅ In-Memory + Cloudflare | ✅ Fallback var | ✅ Rate limit logs | `/apps/admin/src/lib/rate-limit.ts` |
-| **BullMQ** | ⚠️ KISMI | ⚠️ Webhook imza yok | ✅ Retry 3x | ✅ Job logging | `/services/job-queue/src/workers/` |
+| Entegrasyon       | Durum    | Güvenlik                  | Dayanıklılık       | Gözlemlenebilirlik | Kanıt                               |
+| ----------------- | -------- | ------------------------- | ------------------ | ------------------ | ----------------------------------- |
+| **Supabase**      | ✅ TAM   | ✅ 1,364+ RLS             | ✅ Retry + Timeout | ✅ Audit logs      | `/apps/admin/src/lib/supabase.ts`   |
+| **Rate Limiting** | ✅ TAM   | ✅ In-Memory + Cloudflare | ✅ Fallback var    | ✅ Rate limit logs | `/apps/admin/src/lib/rate-limit.ts` |
+| **BullMQ**        | ⚠️ KISMI | ⚠️ Webhook imza yok       | ✅ Retry 3x        | ✅ Job logging     | `/services/job-queue/src/workers/`  |
 
 ### Ödeme Sistemleri
 
-| Entegrasyon | Durum | Güvenlik | Dayanıklılık | Gözlemlenebilirlik | Kanıt |
-|-------------|-------|----------|--------------|-------------------|-------|
-| **PayTR** | ✅ MÜKEMMEL | ✅ HMAC + IP whitelist | ✅ Idempotency | ✅ Full audit | `/supabase/functions/paytr-webhook/` |
-| **Stripe** | ⚠️ LEGACY | ✅ Signature var | ❌ Kullanılmıyor | ⚠️ Eski kod | `/supabase/functions/stripe-webhook/` |
+| Entegrasyon | Durum       | Güvenlik               | Dayanıklılık     | Gözlemlenebilirlik | Kanıt                                 |
+| ----------- | ----------- | ---------------------- | ---------------- | ------------------ | ------------------------------------- |
+| **PayTR**   | ✅ MÜKEMMEL | ✅ HMAC + IP whitelist | ✅ Idempotency   | ✅ Full audit      | `/supabase/functions/paytr-webhook/`  |
+| **Stripe**  | ⚠️ LEGACY   | ✅ Signature var       | ❌ Kullanılmıyor | ⚠️ Eski kod        | `/supabase/functions/stripe-webhook/` |
 
 ### İletişim
 
-| Entegrasyon | Durum | Güvenlik | Dayanıklılık | Gözlemlenebilirlik | Kanıt |
-|-------------|-------|----------|--------------|-------------------|-------|
-| **Twilio SMS** | ✅ TAM | ✅ Token auth | ✅ Rate limit 5/15dk | ✅ sms_logs | `/supabase/functions/twilio-sms/` |
-| **SendGrid** | ⚠️ KISMI | ✅ API key | ✅ Queue + retry | ❌ email_logs yok | `/supabase/functions/sendgrid-email/` |
-| **Expo Push** | ✅ TAM | ✅ Token auth | ✅ Batch 100 | ✅ Log var | `/apps/mobile/src/services/notifications.ts` |
-| **FCM** | ✅ TAM | ✅ Service account | ✅ Batch support | ✅ analytics | `/apps/mobile/src/services/fcm.ts` |
+| Entegrasyon    | Durum    | Güvenlik           | Dayanıklılık         | Gözlemlenebilirlik | Kanıt                                        |
+| -------------- | -------- | ------------------ | -------------------- | ------------------ | -------------------------------------------- |
+| **Twilio SMS** | ✅ TAM   | ✅ Token auth      | ✅ Rate limit 5/15dk | ✅ sms_logs        | `/supabase/functions/twilio-sms/`            |
+| **SendGrid**   | ⚠️ KISMI | ✅ API key         | ✅ Queue + retry     | ❌ email_logs yok  | `/supabase/functions/sendgrid-email/`        |
+| **Expo Push**  | ✅ TAM   | ✅ Token auth      | ✅ Batch 100         | ✅ Log var         | `/apps/mobile/src/services/notifications.ts` |
+| **FCM**        | ✅ TAM   | ✅ Service account | ✅ Batch support     | ✅ analytics       | `/apps/mobile/src/services/fcm.ts`           |
 
 ### Analytics & Monitoring
 
-| Entegrasyon | Durum | Güvenlik | Dayanıklılık | Gözlemlenebilirlik | Kanıt |
-|-------------|-------|----------|--------------|-------------------|-------|
-| **PostHog** | ✅ TAM | ✅ PII sanitize | ✅ Offline queue | ✅ Full events | `/apps/mobile/src/services/analytics.ts` |
-| **Sentry** | ⚠️ KISMI | ✅ PII scrub | ✅ Error boundaries | ⚠️ No source maps | `/apps/mobile/src/config/sentry.ts` |
-| **Datadog** | ✅ TAM | ✅ API key | ✅ Agent-based | ✅ APM + logs | `infrastructure/datadog/` |
+| Entegrasyon | Durum    | Güvenlik        | Dayanıklılık        | Gözlemlenebilirlik | Kanıt                                    |
+| ----------- | -------- | --------------- | ------------------- | ------------------ | ---------------------------------------- |
+| **PostHog** | ✅ TAM   | ✅ PII sanitize | ✅ Offline queue    | ✅ Full events     | `/apps/mobile/src/services/analytics.ts` |
+| **Sentry**  | ⚠️ KISMI | ✅ PII scrub    | ✅ Error boundaries | ⚠️ No source maps  | `/apps/mobile/src/config/sentry.ts`      |
+| **Datadog** | ✅ TAM   | ✅ API key      | ✅ Agent-based      | ✅ APM + logs      | `infrastructure/datadog/`                |
 
 ### AI & ML
 
-| Entegrasyon | Durum | Güvenlik | Dayanıklılık | Gözlemlenebilirlik | Kanıt |
-|-------------|-------|----------|--------------|-------------------|-------|
-| **OpenAI** | ✅ TAM | ✅ API key server-side | ✅ Timeout + retry | ✅ Token logging | `/supabase/functions/ai-moderation/` |
-| **Anthropic Claude** | ✅ TAM | ✅ API key server-side | ✅ Fallback to OpenAI | ✅ Usage logs | `/supabase/functions/ai-assistant/` |
+| Entegrasyon          | Durum  | Güvenlik               | Dayanıklılık          | Gözlemlenebilirlik | Kanıt                                |
+| -------------------- | ------ | ---------------------- | --------------------- | ------------------ | ------------------------------------ |
+| **OpenAI**           | ✅ TAM | ✅ API key server-side | ✅ Timeout + retry    | ✅ Token logging   | `/supabase/functions/ai-moderation/` |
+| **Anthropic Claude** | ✅ TAM | ✅ API key server-side | ✅ Fallback to OpenAI | ✅ Usage logs      | `/supabase/functions/ai-assistant/`  |
 
 ### Harita & Konum
 
-| Entegrasyon | Durum | Güvenlik | Dayanıklılık | Gözlemlenebilirlik | Kanıt |
-|-------------|-------|----------|--------------|-------------------|-------|
-| **Mapbox** | ✅ TAM | ✅ Token scoped | ✅ Offline tiles | ✅ Usage dashboard | `/apps/mobile/src/components/MapView.tsx` |
-| **Google Places** | ✅ TAM | ✅ API key restricted | ✅ Cache + fallback | ✅ Quota alerts | `/packages/shared/src/services/places.ts` |
+| Entegrasyon       | Durum  | Güvenlik              | Dayanıklılık        | Gözlemlenebilirlik | Kanıt                                     |
+| ----------------- | ------ | --------------------- | ------------------- | ------------------ | ----------------------------------------- |
+| **Mapbox**        | ✅ TAM | ✅ Token scoped       | ✅ Offline tiles    | ✅ Usage dashboard | `/apps/mobile/src/components/MapView.tsx` |
+| **Google Places** | ✅ TAM | ✅ API key restricted | ✅ Cache + fallback | ✅ Quota alerts    | `/packages/shared/src/services/places.ts` |
 
 ### Depolama
 
-| Entegrasyon | Durum | Güvenlik | Dayanıklılık | Gözlemlenebilirlik | Kanıt |
-|-------------|-------|----------|--------------|-------------------|-------|
-| **Supabase Storage** | ✅ TAM | ✅ RLS + signed URLs | ✅ CDN cached | ✅ Access logs | `/apps/mobile/src/services/storage.ts` |
-| **Cloudflare R2** | ✅ TAM | ✅ Token auth | ✅ Multi-region | ✅ Analytics | `/supabase/functions/_shared/storage.ts` |
+| Entegrasyon          | Durum  | Güvenlik             | Dayanıklılık    | Gözlemlenebilirlik | Kanıt                                    |
+| -------------------- | ------ | -------------------- | --------------- | ------------------ | ---------------------------------------- |
+| **Supabase Storage** | ✅ TAM | ✅ RLS + signed URLs | ✅ CDN cached   | ✅ Access logs     | `/apps/mobile/src/services/storage.ts`   |
+| **Cloudflare R2**    | ✅ TAM | ✅ Token auth        | ✅ Multi-region | ✅ Analytics       | `/supabase/functions/_shared/storage.ts` |
 
 ### KYC & Doğrulama
 
-| Entegrasyon | Durum | Güvenlik | Dayanıklılık | Gözlemlenebilirlik | Kanıt |
-|-------------|-------|----------|--------------|-------------------|-------|
-| **In-house KYC** | ✅ TAM | ✅ Encrypted storage | ✅ Manual review | ✅ Audit trail | `/supabase/functions/kyc-verify/` |
+| Entegrasyon      | Durum  | Güvenlik             | Dayanıklılık     | Gözlemlenebilirlik | Kanıt                             |
+| ---------------- | ------ | -------------------- | ---------------- | ------------------ | --------------------------------- |
+| **In-house KYC** | ✅ TAM | ✅ Encrypted storage | ✅ Manual review | ✅ Audit trail     | `/supabase/functions/kyc-verify/` |
 
 ---
 
@@ -96,6 +95,7 @@
 ### ✅ TAM VE GÜVENLİ ENTEGRASYONLAR (19/28)
 
 #### 1. Supabase - GRADE: A+
+
 ```
 Dosya: /apps/admin/src/lib/supabase.ts
 Güçlü Yönler:
@@ -107,6 +107,7 @@ Güçlü Yönler:
 ```
 
 #### 2. PayTR - GRADE: A+
+
 ```
 Dosya: /supabase/functions/paytr-webhook/index.ts
 Güçlü Yönler:
@@ -118,6 +119,7 @@ Güçlü Yönler:
 ```
 
 #### 3. Twilio SMS - GRADE: A
+
 ```
 Dosya: /supabase/functions/twilio-sms/index.ts
 Güçlü Yönler:
@@ -129,6 +131,7 @@ Güçlü Yönler:
 ```
 
 #### 4. PostHog - GRADE: A
+
 ```
 Dosya: /apps/mobile/src/services/analytics.ts
 Güçlü Yönler:
@@ -142,6 +145,7 @@ Güçlü Yönler:
 ### ⚠️ KISMI / EKSİK ENTEGRASYONLAR (7/28)
 
 #### 1. SendGrid Email - GRADE: B-
+
 ```
 Dosya: /supabase/functions/sendgrid-email/index.ts
 Dosya: /services/job-queue/src/workers/email-worker.ts
@@ -158,6 +162,7 @@ Düzeltme:
 ```
 
 #### 2. Sentry - GRADE: B
+
 ```
 Dosya: /apps/mobile/src/config/sentry.ts
 
@@ -171,6 +176,7 @@ Düzeltme:
 ```
 
 #### 3. BullMQ Job Queue - GRADE: B-
+
 ```
 Dosya: /services/job-queue/src/workers/
 
@@ -184,6 +190,7 @@ Düzeltme:
 ```
 
 #### 4. Stripe (Legacy) - GRADE: C
+
 ```
 Dosya: /supabase/functions/stripe-webhook/index.ts
 
@@ -200,7 +207,8 @@ Düzeltme:
 ### ❌ KRİTİK SORUNLAR (2/28)
 
 #### 1. Job Queue Webhooks - CRITICAL
-```
+
+````
 Risk: HIGH - İç webhooklar imzasız
 Etki: Yetkisiz job tetikleme mümkün
 
@@ -227,10 +235,11 @@ function verifyWebhookSignature(payload: string, signature: string): boolean {
     Buffer.from(expected)
   );
 }
-```
+````
 
 #### 2. Email Worker Logging - CRITICAL
-```
+
+````
 Risk: MEDIUM - Email audit trail yok
 Etki: Compliance/debugging zorluğu
 
@@ -259,7 +268,7 @@ CREATE TABLE email_logs (
 
 CREATE INDEX idx_email_logs_recipient ON email_logs(recipient_email);
 CREATE INDEX idx_email_logs_status ON email_logs(status);
-```
+````
 
 ---
 
@@ -267,30 +276,30 @@ CREATE INDEX idx_email_logs_status ON email_logs(status);
 
 ### Zorunlu (Tümü Mevcut ✅)
 
-| Variable | Kullanım | Durum |
-|----------|----------|-------|
-| `SUPABASE_URL` | Database connection | ✅ |
-| `SUPABASE_ANON_KEY` | Client-side auth | ✅ |
-| `SUPABASE_SERVICE_ROLE_KEY` | Server-side operations | ✅ |
-| `PAYTR_MERCHANT_ID` | Payment processing | ✅ |
-| `PAYTR_MERCHANT_KEY` | Payment signing | ✅ |
-| `PAYTR_MERCHANT_SALT` | Payment signing | ✅ |
-| `TWILIO_ACCOUNT_SID` | SMS service | ✅ |
-| `TWILIO_AUTH_TOKEN` | SMS auth | ✅ |
-| `SENDGRID_API_KEY` | Email service | ✅ |
-| `POSTHOG_API_KEY` | Analytics | ✅ |
-| `SENTRY_DSN` | Error tracking | ✅ |
-| `OPENAI_API_KEY` | AI services | ✅ |
-| `TOTP_ENCRYPTION_KEY` | 2FA secret encryption | ✅ |
-| `TOTP_ENCRYPTION_SALT` | 2FA encryption | ✅ |
+| Variable                    | Kullanım               | Durum |
+| --------------------------- | ---------------------- | ----- |
+| `SUPABASE_URL`              | Database connection    | ✅    |
+| `SUPABASE_ANON_KEY`         | Client-side auth       | ✅    |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-side operations | ✅    |
+| `PAYTR_MERCHANT_ID`         | Payment processing     | ✅    |
+| `PAYTR_MERCHANT_KEY`        | Payment signing        | ✅    |
+| `PAYTR_MERCHANT_SALT`       | Payment signing        | ✅    |
+| `TWILIO_ACCOUNT_SID`        | SMS service            | ✅    |
+| `TWILIO_AUTH_TOKEN`         | SMS auth               | ✅    |
+| `SENDGRID_API_KEY`          | Email service          | ✅    |
+| `POSTHOG_API_KEY`           | Analytics              | ✅    |
+| `SENTRY_DSN`                | Error tracking         | ✅    |
+| `OPENAI_API_KEY`            | AI services            | ✅    |
+| `TOTP_ENCRYPTION_KEY`       | 2FA secret encryption  | ✅    |
+| `TOTP_ENCRYPTION_SALT`      | 2FA encryption         | ✅    |
 
 ### Önerilen (Eksik ⚠️)
 
-| Variable | Kullanım | Durum |
-|----------|----------|-------|
-| `INTERNAL_WEBHOOK_SECRET` | Job queue signing | ❌ EKSİK |
-| `SENDGRID_WEBHOOK_SECRET` | Email events | ❌ EKSİK |
-| `SENTRY_AUTH_TOKEN` | Source maps upload | ❌ EKSİK |
+| Variable                  | Kullanım           | Durum    |
+| ------------------------- | ------------------ | -------- |
+| `INTERNAL_WEBHOOK_SECRET` | Job queue signing  | ❌ EKSİK |
+| `SENDGRID_WEBHOOK_SECRET` | Email events       | ❌ EKSİK |
+| `SENTRY_AUTH_TOKEN`       | Source maps upload | ❌ EKSİK |
 
 ---
 
@@ -298,27 +307,27 @@ CREATE INDEX idx_email_logs_status ON email_logs(status);
 
 ### Bu Hafta (P0 - Critical)
 
-| # | Görev | Dosya | Süre |
-|---|-------|-------|------|
-| 1 | Job queue webhook imzalama ekle | `/services/job-queue/src/workers/*.ts` | 2 saat |
-| 2 | email_logs migration oluştur | `/supabase/migrations/` | 1 saat |
-| 3 | Email worker'a logging ekle | `/services/job-queue/src/workers/email-worker.ts` | 2 saat |
+| #   | Görev                           | Dosya                                             | Süre   |
+| --- | ------------------------------- | ------------------------------------------------- | ------ |
+| 1   | Job queue webhook imzalama ekle | `/services/job-queue/src/workers/*.ts`            | 2 saat |
+| 2   | email_logs migration oluştur    | `/supabase/migrations/`                           | 1 saat |
+| 3   | Email worker'a logging ekle     | `/services/job-queue/src/workers/email-worker.ts` | 2 saat |
 
 ### Gelecek Hafta (P1 - High)
 
-| # | Görev | Dosya | Süre |
-|---|-------|-------|------|
-| 4 | SendGrid bounce webhook ekle | `/supabase/functions/sendgrid-webhook/` | 3 saat |
-| 5 | Email validation library ekle | `/packages/shared/src/utils/` | 1 saat |
-| 6 | Sentry source maps CI/CD'ye ekle | `/.github/workflows/deploy.yml` | 1 saat |
+| #   | Görev                            | Dosya                                   | Süre   |
+| --- | -------------------------------- | --------------------------------------- | ------ |
+| 4   | SendGrid bounce webhook ekle     | `/supabase/functions/sendgrid-webhook/` | 3 saat |
+| 5   | Email validation library ekle    | `/packages/shared/src/utils/`           | 1 saat |
+| 6   | Sentry source maps CI/CD'ye ekle | `/.github/workflows/deploy.yml`         | 1 saat |
 
 ### Bu Ay (P2 - Medium)
 
-| # | Görev | Dosya | Süre |
-|---|-------|-------|------|
-| 7 | Stripe legacy kodu kaldır | `/supabase/functions/stripe-*/` | 2 saat |
-| 8 | Feature flag refresh mechanism | `/apps/mobile/src/hooks/use-feature-flags.ts` | 2 saat |
-| 9 | Sentry performance sampling %20'ye | `/apps/mobile/src/config/sentry.ts` | 30 dk |
+| #   | Görev                              | Dosya                                         | Süre   |
+| --- | ---------------------------------- | --------------------------------------------- | ------ |
+| 7   | Stripe legacy kodu kaldır          | `/supabase/functions/stripe-*/`               | 2 saat |
+| 8   | Feature flag refresh mechanism     | `/apps/mobile/src/hooks/use-feature-flags.ts` | 2 saat |
+| 9   | Sentry performance sampling %20'ye | `/apps/mobile/src/config/sentry.ts`           | 30 dk  |
 
 ---
 
@@ -328,18 +337,18 @@ CREATE INDEX idx_email_logs_status ON email_logs(status);
 
 ## **BÜYÜK ORANDA EVET, AMA 2 KRİTİK EKSİK VAR**
 
-| Kategori | Durum | Yorum |
-|----------|-------|-------|
-| **Ödeme** | ✅ Tam | PayTR mükemmel, Stripe legacy kaldırılmalı |
-| **Auth/Security** | ✅ Tam | Supabase + 2FA + RLS + Rate Limiting |
-| **SMS** | ✅ Tam | Twilio + Rate limit + Audit |
-| **Email** | ⚠️ %80 | SendGrid çalışıyor ama audit eksik |
-| **Analytics** | ✅ Tam | PostHog + Sentry (minor issues) |
-| **Push** | ✅ Tam | Expo + FCM |
-| **AI** | ✅ Tam | OpenAI + Claude |
-| **Maps** | ✅ Tam | Mapbox + Google Places |
-| **Storage** | ✅ Tam | Supabase Storage + R2 |
-| **Internal** | ⚠️ %70 | Job Queue webhook güvenliği eksik |
+| Kategori          | Durum  | Yorum                                      |
+| ----------------- | ------ | ------------------------------------------ |
+| **Ödeme**         | ✅ Tam | PayTR mükemmel, Stripe legacy kaldırılmalı |
+| **Auth/Security** | ✅ Tam | Supabase + 2FA + RLS + Rate Limiting       |
+| **SMS**           | ✅ Tam | Twilio + Rate limit + Audit                |
+| **Email**         | ⚠️ %80 | SendGrid çalışıyor ama audit eksik         |
+| **Analytics**     | ✅ Tam | PostHog + Sentry (minor issues)            |
+| **Push**          | ✅ Tam | Expo + FCM                                 |
+| **AI**            | ✅ Tam | OpenAI + Claude                            |
+| **Maps**          | ✅ Tam | Mapbox + Google Places                     |
+| **Storage**       | ✅ Tam | Supabase Storage + R2                      |
+| **Internal**      | ⚠️ %70 | Job Queue webhook güvenliği eksik          |
 
 ### Risk Matrisi
 
@@ -369,4 +378,4 @@ LIKELI-  ├──────────────────────�
 
 ---
 
-*Rapor Sonu*
+_Rapor Sonu_
