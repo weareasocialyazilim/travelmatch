@@ -28,7 +28,6 @@
 
 import { Platform } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logger } from '../utils/logger';
 import {
   getItemWithLegacyFallback,
