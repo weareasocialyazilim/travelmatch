@@ -124,16 +124,26 @@ export async function POST(request: NextRequest) {
       .digest('hex');
 
     // Store session
-    await supabase.from('admin_sessions').insert({
-      admin_id: adminUser.id,
-      token_hash: sessionHash,
-      ip_address:
-        request.headers.get('x-forwarded-for') ||
-        request.headers.get('x-real-ip') ||
-        'unknown',
-      user_agent: request.headers.get('user-agent'),
-      expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours
-    });
+    const { error: sessionError } = await supabase
+      .from('admin_sessions')
+      .insert({
+        admin_id: adminUser.id,
+        token_hash: sessionHash,
+        ip_address:
+          request.headers.get('x-forwarded-for') ||
+          request.headers.get('x-real-ip') ||
+          'unknown',
+        user_agent: request.headers.get('user-agent'),
+        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours
+      });
+
+    if (sessionError) {
+      logger.error('Session insert error:', sessionError);
+      return NextResponse.json(
+        { error: 'Oturum oluşturulamadı: ' + sessionError.message },
+        { status: 500 },
+      );
+    }
 
     // Update last login
     await supabase
