@@ -14,7 +14,7 @@ export type {
   TrustConstellationProps,
 } from './TrustMilestones';
 export { SunsetClock } from './SunsetClock';
-export { MomentAuthenticator } from './MomentAuthenticator';
+// export { MomentAuthenticator } from './MomentAuthenticator';
 export { SacredMoments } from './SacredMoments';
 export { GiftVault } from './GiftVault';
 export { ThankYouCardCreator } from './ThankYouCardCreator';
@@ -25,4 +25,4 @@ export { CeremonyProgress } from './CeremonyProgress';
 export { ProofCeremonyFlow } from './ProofCeremonyFlow';
 
 // Types
-export type { AuthenticationResult } from './MomentAuthenticator';
+// export type { AuthenticationResult } from './MomentAuthenticator';

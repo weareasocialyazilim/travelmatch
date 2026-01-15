@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 import { createAuditLog } from '@/lib/auth';
 import {
   checkRateLimit,
@@ -59,6 +60,19 @@ export async function POST(request: NextRequest) {
 
     const supabase = createServiceClient();
 
+    // Create a separate client for auth verification to avoid
+    // polluting the service role client with user session
+    const supabaseAuth = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      },
+    );
+
     // Find admin user by email
     const { data: adminUser, error: userError } = await supabase
       .from('admin_users')
@@ -75,11 +89,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Authenticate with Supabase Auth
-    const { data: authData, error: authError } =
-      await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+    const { error: authError } = await supabaseAuth.auth.signInWithPassword({
+      email,
+      password,
+    });
 
     if (authError) {
       return NextResponse.json(

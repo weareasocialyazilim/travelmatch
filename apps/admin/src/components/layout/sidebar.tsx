@@ -327,12 +327,29 @@ const settingsNavItems: NavItem[] = [
   { title: 'Ayarlar', href: '/settings', icon: Settings, resource: 'settings' },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  user?: {
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+  } | null;
+}
+
+export function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname();
   const { sidebarCollapsed, setSidebarCollapsed } = useUIStore();
-  const { can } = usePermission();
+  const { can: storeCan } = usePermission();
   const navRef = useRef<HTMLDivElement>(null);
   const lastScrolledPath = useRef<string | null>(null);
+
+  // Use prop user if available, otherwise fall back to store
+  const can = (resource: Resource, action: Action): boolean => {
+    // If user prop is passed and is super_admin, allow everything
+    if (user?.role === 'super_admin') return true;
+    // Otherwise use store-based permission check
+    return storeCan(resource, action);
+  };
 
   // Scroll to active item only on initial mount or when navigating to a different section
   const scrollToActiveItem = useCallback(() => {

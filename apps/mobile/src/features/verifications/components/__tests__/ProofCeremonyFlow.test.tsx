@@ -99,40 +99,7 @@ jest.mock('../SunsetClock', () => ({
   },
 }));
 
-jest.mock('../MomentAuthenticator', () => ({
-  MomentAuthenticator: ({ onResult, onCancel, testID }: any) => {
-    const React = require('react');
-    const { View, Text, TouchableOpacity } = require('react-native');
-    return React.createElement(
-      View,
-      { testID: testID || 'moment-authenticator' },
-      React.createElement(
-        TouchableOpacity,
-        {
-          testID: 'verify-button',
-          onPress: () => onResult({ status: 'verified', confidence: 0.92 }),
-        },
-        React.createElement(Text, null, 'Verify'),
-      ),
-      React.createElement(
-        TouchableOpacity,
-        {
-          testID: 'pending-review-button',
-          onPress: () => onResult({ status: 'pending_review' }),
-        },
-        React.createElement(Text, null, 'Pending Review'),
-      ),
-      React.createElement(
-        TouchableOpacity,
-        {
-          testID: 'cancel-auth-button',
-          onPress: onCancel,
-        },
-        React.createElement(Text, null, 'Cancel'),
-      ),
-    );
-  },
-}));
+// MomentAuthenticator mock removed - component no longer exists
 
 jest.mock('../ThankYouCardCreator', () => ({
   ThankYouCardCreator: ({ onComplete, onSkip, recipientName, testID }: any) => {

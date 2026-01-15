@@ -22,8 +22,8 @@ import {
   isRetryableError,
   NetworkQueue,
   safeAsync,
-} from '../utils/errorRecovery';
-import { logger } from '../utils/logger';
+} from './errorRecovery';
+import { logger } from './logger';
 
 // ============================================
 // Types
