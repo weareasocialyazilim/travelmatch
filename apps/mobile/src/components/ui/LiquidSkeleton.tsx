@@ -289,7 +289,7 @@ export const SkeletonCard: React.FC<{
   </View>
 );
 
-/** Moment card skeleton matching LovendoCard layout */
+/** Moment card skeleton matching MomentCard layout */
 export const SkeletonMomentCard: React.FC<{
   animated?: boolean;
   style?: StyleProp<ViewStyle>;

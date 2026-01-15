@@ -43,7 +43,7 @@ import {
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
 import StatusBadge from './StatusBadge';
-import { LovendoAvatar } from '@/components/ui/LovendoAvatar';
+import { Avatar } from '@/components/ui/Avatar';
 import type { InboxChat } from '../types/inbox.types';
 
 interface InboxChatItemProps {
@@ -138,7 +138,7 @@ const InboxChatItem: React.FC<InboxChatItemProps> = memo(
           <View style={styles.content}>
             {/* User Row */}
             <View style={styles.userRow}>
-              <LovendoAvatar
+              <Avatar
                 source={chat.user.avatar}
                 name={chat.user.name}
                 size="md"

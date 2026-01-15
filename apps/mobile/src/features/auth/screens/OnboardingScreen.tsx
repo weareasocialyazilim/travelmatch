@@ -39,7 +39,7 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
-import { LovendoButton } from '@/components/ui/LovendoButton';
+import { Button } from '@/components/ui/Button';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { useGyroscopeParallax } from '@/hooks/useGyroscopeParallax';
@@ -581,7 +581,7 @@ export const AwwwardsOnboardingScreen: React.FC<
         </View>
 
         {/* Action Button */}
-        <LovendoButton
+        <Button
           title={
             currentIndex === AWWWARDS_SLIDES.length - 1
               ? 'Hadi Başlayalım'

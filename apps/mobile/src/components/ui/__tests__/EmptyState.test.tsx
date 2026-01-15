@@ -13,6 +13,40 @@ import { Text } from 'react-native';
 import { EmptyState } from '../EmptyState';
 
 // Mock dependencies
+jest.mock('react-native-reanimated', () => {
+  const { View, Text } = require('react-native');
+  const Reanimated = {
+    View: View,
+    Text: Text,
+    createAnimatedComponent: (component: any) => component,
+  };
+
+  return {
+    __esModule: true,
+    default: Reanimated,
+    FadeInUp: {
+      delay: jest.fn().mockReturnThis(),
+      duration: jest.fn().mockReturnThis(),
+      springify: jest.fn().mockReturnThis(),
+      damping: jest.fn().mockReturnThis(),
+    },
+    FadeIn: {
+      duration: jest.fn().mockReturnThis(),
+    },
+    Easing: {
+      inOut: jest.fn(),
+      ease: jest.fn(),
+    },
+    withRepeat: jest.fn(),
+    withSequence: jest.fn(),
+    withTiming: jest.fn(),
+    withDelay: jest.fn(),
+    interpolate: jest.fn(),
+    useSharedValue: jest.fn((val) => ({ value: val })),
+    useAnimatedStyle: jest.fn(() => ({})),
+  };
+});
+
 jest.mock('../EmptyStateIllustration', () => {
   const React = require('react');
   const RN = require('react-native');
@@ -28,11 +62,13 @@ jest.mock('../Button', () => {
   return {
     Button: ({
       title,
+      children,
       onPress,
       variant,
       testID,
     }: {
       title?: string;
+      children?: React.ReactNode;
       onPress?: () => void;
       variant?: string;
       testID?: string;
@@ -40,7 +76,7 @@ jest.mock('../Button', () => {
       React.createElement(
         RN.TouchableOpacity,
         { onPress, testID },
-        React.createElement(RN.Text, null, title),
+        React.createElement(RN.Text, null, title || (children as string)),
         React.createElement(
           RN.Text,
           { testID: `button-variant-${variant}` },

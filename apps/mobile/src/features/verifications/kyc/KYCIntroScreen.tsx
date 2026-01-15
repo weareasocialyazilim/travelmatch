@@ -24,7 +24,7 @@ import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { SPACING, RADIUS } from '@/constants/spacing';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { LovendoButton } from '@/components/ui/LovendoButton';
+import { Button } from '@/components/ui/Button';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { NetworkGuard } from '@/components/NetworkGuard';
 import { INITIAL_VERIFICATION_DATA } from './constants';
@@ -196,7 +196,7 @@ const KYCIntroScreen: React.FC = () => {
         <View
           style={[styles.footer, { paddingBottom: insets.bottom + SPACING.lg }]}
         >
-          <LovendoButton
+          <Button
             title="Seremoniyi Başlat"
             variant="primary"
             onPress={handleStart}

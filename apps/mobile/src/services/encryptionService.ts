@@ -22,6 +22,7 @@ async function getSecureItemWithLegacyFallback(
   if (currentVal) return currentVal;
 
   for (const legacyKey of legacyKeys) {
+    if (legacyKey === key) continue;
     const legacyVal = await SecureStore.getItemAsync(legacyKey);
     if (legacyVal) {
       await SecureStore.setItemAsync(key, legacyVal);
@@ -39,7 +40,11 @@ async function setSecureItemAndCleanupLegacy(
   legacyKeys: string[],
 ): Promise<void> {
   await SecureStore.setItemAsync(key, value);
-  await Promise.all(legacyKeys.map((k) => SecureStore.deleteItemAsync(k)));
+  await Promise.all(
+    legacyKeys
+      .filter((k) => k !== key)
+      .map((k) => SecureStore.deleteItemAsync(k)),
+  );
 }
 
 export interface KeyPair {

@@ -23,7 +23,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, GRADIENTS, primitives } from '../../constants/colors';
 import { SPACING } from '../../constants/spacing';
 import { TYPOGRAPHY } from '../../theme/typography';
-import { LovendoButton, type ButtonSize } from './LovendoButton';
+import { Button, type ButtonSize } from './Button';
 import { EmptyStateIllustration } from './EmptyStateIllustration';
 import type { IllustrationType } from './EmptyStateIllustration';
 
@@ -291,7 +291,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
     return (
       <>
         {actionLabel && onAction && (
-          <LovendoButton
+          <Button
             onPress={onAction}
             variant="primary"
             size={actionSize}
@@ -299,10 +299,10 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             testID="empty-state-action-primary"
           >
             {actionLabel}
-          </LovendoButton>
+          </Button>
         )}
         {secondaryActionLabel && onSecondaryAction && (
-          <LovendoButton
+          <Button
             onPress={onSecondaryAction}
             variant="ghost"
             size="md"
@@ -310,7 +310,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             testID="empty-state-action-secondary"
           >
             {secondaryActionLabel}
-          </LovendoButton>
+          </Button>
         )}
       </>
     );

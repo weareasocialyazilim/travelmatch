@@ -18,7 +18,7 @@ import { useToast } from '@/context/ToastContext';
 import { COLORS } from '@/constants/colors';
 import { FONTS, TYPE_SCALE } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { LovendoButton } from '@/components/ui/LovendoButton';
+import { Button } from '@/components/ui/Button';
 
 /**
  * Awwwards standardında Kayıt Ekranı - "Liquid Register Screen"
@@ -195,7 +195,7 @@ export const RegisterScreen: React.FC = () => {
           </View>
 
           <View style={styles.actionSection}>
-            <LovendoButton
+            <Button
               testID="register-button"
               variant="primary"
               onPress={handleRegister}
@@ -205,7 +205,7 @@ export const RegisterScreen: React.FC = () => {
               style={styles.registerButton}
             >
               {isLoading ? 'Oluşturuluyor...' : 'Hesabımı Oluştur'}
-            </LovendoButton>
+            </Button>
           </View>
 
           {/* Login Link */}

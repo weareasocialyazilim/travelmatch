@@ -21,7 +21,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { LovendoAvatar } from '@/components/ui/LovendoAvatar';
+import { Avatar } from '@/components/ui/Avatar';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
 import type { UserStory, SubscriptionTierType } from './types';
@@ -104,7 +104,7 @@ const StoriesRow: React.FC<StoriesRowProps> = memo(
                     !user.isNew && styles.storyRingViewed,
                   ]}
                 >
-                  <LovendoAvatar
+                  <Avatar
                     source={user.avatar}
                     name={user.name}
                     size="lg"

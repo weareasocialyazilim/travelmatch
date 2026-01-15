@@ -45,8 +45,7 @@ describe('Button Component - Enhanced Tests', () => {
         <Button
           title="Send"
           onPress={jest.fn() as jest.Mock}
-          icon="send"
-          iconPosition="left"
+          leftIcon="send"
         />,
       );
       expect(getByText('Send')).toBeTruthy();
@@ -59,8 +58,7 @@ describe('Button Component - Enhanced Tests', () => {
         <Button
           title="Next"
           onPress={jest.fn() as jest.Mock}
-          icon="arrow-right"
-          iconPosition="right"
+          rightIcon="arrow-right"
         />,
       );
       expect(getByText('Next')).toBeTruthy();
@@ -261,8 +259,7 @@ describe('Button Component - Enhanced Tests', () => {
         <Button
           title="Icon Left"
           onPress={jest.fn() as jest.Mock}
-          icon="check"
-          iconPosition="left"
+          leftIcon="check"
         />,
       );
       expect(getByText('Icon Left')).toBeTruthy();
@@ -273,8 +270,7 @@ describe('Button Component - Enhanced Tests', () => {
         <Button
           title="Icon Right"
           onPress={jest.fn() as jest.Mock}
-          icon="arrow-right"
-          iconPosition="right"
+          rightIcon="arrow-right"
         />,
       );
       expect(getByText('Icon Right')).toBeTruthy();
@@ -285,7 +281,7 @@ describe('Button Component - Enhanced Tests', () => {
         <Button
           title="Small Icon"
           onPress={jest.fn() as jest.Mock}
-          icon="heart"
+          leftIcon="heart"
           size="sm"
         />,
       );
@@ -316,7 +312,7 @@ describe('Button Component - Enhanced Tests', () => {
         <Button
           title="Default Position"
           onPress={jest.fn() as jest.Mock}
-          icon="check"
+          leftIcon="check"
         />,
       );
       expect(getByText('Default Position')).toBeTruthy();

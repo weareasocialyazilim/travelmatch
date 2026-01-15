@@ -1,13 +1,23 @@
+// Button - Consolidated master button component
 export { Button } from './ui/Button';
-// LovendoButton - Consolidated master button component
-export { LovendoButton } from './ui/LovendoButton';
 export type {
-  LovendoButtonProps,
+  ButtonProps,
   ButtonVariant,
   ButtonSize,
   AnimationMode,
   HapticType,
-} from './ui/LovendoButton';
+} from './ui/Button';
+
+// Core UI Components
+export { Badge } from './ui/Badge';
+export { Avatar } from './ui/Avatar';
+export { Pill, CategoryChip } from './ui/Pill';
+export { Sheet } from './ui/Sheet';
+export { Loading } from './ui/Loading';
+export { MomentCard } from './ui/MomentCard';
+export { ProofCard } from './ui/ProofCard';
+export { TrustRing } from './ui/TrustRing';
+
 export { SocialButton } from './SocialButton';
 export type { SocialButtonProps } from './SocialButton';
 export {
@@ -89,9 +99,8 @@ export { LoginPromptModal } from './LoginPromptModal';
 export { EmptyStateIllustration } from './ui/EmptyStateIllustration';
 export { EmptyState } from './ui/EmptyState';
 
-// Loading States & Skeletons - All from LovendoSkeleton.tsx
+// Loading States & Skeletons - All from Skeleton.tsx
 export {
-  LovendoSkeleton,
   Skeleton,
   SkeletonAvatar,
   SkeletonText,
@@ -99,8 +108,8 @@ export {
   SkeletonMessage,
   SkeletonList,
   ScreenSkeleton,
-} from './ui/LovendoSkeleton';
-export type { SkeletonListType } from './ui/LovendoSkeleton';
+} from './ui/Skeleton';
+export type { SkeletonListType } from './ui/Skeleton';
 
 export { ErrorState } from './ErrorState';
 
@@ -129,9 +138,8 @@ export {
 // FloatingDock is exported from navigation for proper React Navigation integration
 export { FloatingDock } from './navigation';
 
-// Trust Badge & Ring - LovendoTrustRing is the consolidated component
-export { LovendoTrustRing } from './ui/LovendoTrustRing';
-// TrustRing silindi - LovendoTrustRing kullanılmalı
+// Trust Badge & Ring - TrustRing is the consolidated component
+// TrustRing moved to top exports
 
 // Loading State
 export { LoadingState } from './LoadingState';

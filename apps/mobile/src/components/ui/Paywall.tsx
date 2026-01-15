@@ -17,7 +17,7 @@ import { COLORS, GRADIENTS, primitives } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { RADIUS, SPACING } from '@/constants/spacing';
 import { HAPTIC } from '@/utils/motion';
-import { LovendoSheet } from './LovendoSheet';
+import { Sheet } from './Sheet';
 
 export type PaywallFeature =
   | 'moments'
@@ -135,7 +135,7 @@ export const Paywall: React.FC<PaywallProps> = ({
   }, [onClose]);
 
   return (
-    <LovendoSheet
+    <Sheet
       visible={visible}
       onClose={onClose}
       size="content"
@@ -215,7 +215,7 @@ export const Paywall: React.FC<PaywallProps> = ({
           <Text style={styles.dismissText}>Maybe later</Text>
         </Pressable>
       </View>
-    </LovendoSheet>
+    </Sheet>
   );
 };
 

@@ -32,7 +32,7 @@ import type { RootStackParamList } from '@/navigation/routeParams';
 import { COLORS } from '@/constants/colors';
 import { FONTS, FONT_SIZES } from '@/constants/typography';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { LovendoAvatar } from '@/components/ui/LovendoAvatar';
+import { Avatar } from '@/components/ui/Avatar';
 import { TrustScoreCircle } from '@/components/ui/TrustScoreCircle';
 import { LoadingState } from '@/components/LoadingState';
 import { supabase } from '@/config/supabase';
@@ -306,7 +306,7 @@ export const ReceiverApprovalScreen: React.FC<
           >
             {/* Candidate Info */}
             <View style={styles.candidateInfo}>
-              <LovendoAvatar
+              <Avatar
                 size="hero"
                 name={currentCandidate.giver.name}
                 source={currentCandidate.giver.avatar}

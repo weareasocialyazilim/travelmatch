@@ -1,246 +1,333 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Button Component Snapshots matches snapshot for disabled state 1`] = `
-<RCTPressable
-  accessibilityLabel="Disabled"
-  accessibilityRole="button"
-  accessibilityState={
-    {
-      "disabled": true,
-    }
-  }
-  accessible={true}
-  aria-disabled={true}
-  aria-label="Disabled"
-  disabled={true}
-  onPressIn={[Function]}
-  onPressOut={[Function]}
+<RCTView
   ref={null}
-  role="button"
   style={
-    [
-      {
-        "transform": [
-          {
-            "scale": 1,
-          },
-        ],
-      },
-      {
-        "alignItems": "center",
-        "flexDirection": "row",
-        "justifyContent": "center",
-      },
-      {
-        "backgroundColor": "#27272A",
-        "borderRadius": 26,
-        "height": 52,
-        "opacity": 0.6,
-        "paddingHorizontal": 24,
-      },
-      false,
-      undefined,
-    ]
+    {
+      "transform": [
+        {
+          "scale": 1,
+        },
+        {
+          "scale": 1,
+        },
+      ],
+    }
   }
 >
-  <RCTView
-    ref={null}
-    style={
+  <RCTPressable
+    accessibilityLabel="Disabled"
+    accessibilityRole="button"
+    accessibilityState={
       {
-        "alignItems": "center",
-        "flexDirection": "row",
-        "justifyContent": "center",
+        "disabled": true,
       }
     }
+    accessible={true}
+    aria-disabled={true}
+    aria-label="Disabled"
+    disabled={true}
+    onPressIn={[Function]}
+    onPressOut={[Function]}
+    ref={null}
+    role="button"
+    style={
+      [
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "center",
+          "overflow": "hidden",
+        },
+        {
+          "height": 44,
+          "paddingHorizontal": 20,
+        },
+        {
+          "borderRadius": 14,
+        },
+        {
+          "opacity": 0.5,
+        },
+      ]
+    }
   >
-    <RCTText
+    <View
+      data-colors="["#52525B","#3F3F46"]"
+      data-end="{"x":1,"y":0}"
+      data-start="{"x":0,"y":0}"
       ref={null}
       style={
         [
           {
-            "fontFamily": "Satoshi-Medium",
-            "fontSize": 16,
-            "fontWeight": "600",
-            "letterSpacing": 0.5,
-            "lineHeight": 18,
+            "alignItems": "center",
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "center",
           },
           {
-            "color": "#475569",
-            "fontSize": 16,
+            "borderRadius": 14,
           },
-          undefined,
+          false,
         ]
       }
-      testID="RCTText"
+      testID="linear-gradient"
     >
-      Disabled
-    </RCTText>
-  </RCTView>
-</RCTPressable>
+      <RCTView
+        ref={null}
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "justifyContent": "center",
+          }
+        }
+      >
+        <RCTText
+          ref={null}
+          style={
+            [
+              {
+                "letterSpacing": 0.5,
+                "textAlign": "center",
+              },
+              {
+                "fontFamily": "Satoshi-Medium",
+                "fontSize": 14,
+                "fontWeight": "600",
+                "letterSpacing": 0.5,
+                "lineHeight": 15,
+              },
+              {
+                "color": "#334155",
+              },
+              false,
+              undefined,
+            ]
+          }
+          testID="RCTText"
+        >
+          Disabled
+        </RCTText>
+      </RCTView>
+    </View>
+  </RCTPressable>
+</RCTView>
 `;
 
 exports[`Button Component Snapshots matches snapshot for loading state 1`] = `
-<RCTPressable
-  accessibilityHint="Loading"
-  accessibilityLabel="Loading"
-  accessibilityRole="button"
-  accessibilityState={
-    {
-      "disabled": true,
-    }
-  }
-  accessible={true}
-  aria-disabled={true}
-  aria-label="Loading"
-  disabled={true}
-  onPressIn={[Function]}
-  onPressOut={[Function]}
+<RCTView
   ref={null}
-  role="button"
   style={
-    [
-      {
-        "transform": [
-          {
-            "scale": 1,
-          },
-        ],
-      },
-      {
-        "borderRadius": 26,
-        "height": 52,
-        "overflow": "hidden",
-        "paddingHorizontal": 24,
-      },
-      false,
-      undefined,
-    ]
+    {
+      "transform": [
+        {
+          "scale": 1,
+        },
+        {
+          "scale": 1,
+        },
+      ],
+    }
   }
 >
-  <View
-    data-colors="["#FFD700","#FFA500"]"
-    data-end="{"x":1,"y":0}"
-    data-start="{"x":0,"y":0}"
-    ref={null}
-    style={
+  <RCTPressable
+    accessibilityLabel="Loading"
+    accessibilityRole="button"
+    accessibilityState={
       {
-        "alignItems": "center",
-        "flex": 1,
-        "height": "100%",
-        "justifyContent": "center",
-        "width": "100%",
+        "disabled": true,
       }
     }
-    testID="linear-gradient"
-  >
-    <RCTView
-      ref={null}
-      style={
+    accessible={true}
+    aria-disabled={true}
+    aria-label="Loading"
+    disabled={true}
+    onPressIn={[Function]}
+    onPressOut={[Function]}
+    ref={null}
+    role="button"
+    style={
+      [
         {
           "alignItems": "center",
           "flexDirection": "row",
           "justifyContent": "center",
-        }
+          "overflow": "hidden",
+        },
+        {
+          "height": 44,
+          "paddingHorizontal": 20,
+        },
+        {
+          "borderRadius": 14,
+        },
+        false,
+      ]
+    }
+  >
+    <View
+      data-colors="["#FFD700","#FFA500"]"
+      data-end="{"x":1,"y":0}"
+      data-start="{"x":0,"y":0}"
+      ref={null}
+      style={
+        [
+          {
+            "alignItems": "center",
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "center",
+          },
+          {
+            "borderRadius": 14,
+          },
+          {
+            "elevation": 3,
+            "shadowColor": "#000000",
+            "shadowOffset": {
+              "height": 2,
+              "width": 0,
+            },
+            "shadowOpacity": 0.1,
+            "shadowRadius": 4,
+          },
+        ]
       }
+      testID="linear-gradient"
     >
       <RCTActivityIndicator
-        color="#FFFFFF"
+        color="#FFF"
         ref={null}
         size="small"
         testID="RCTActivityIndicator"
       />
-    </RCTView>
-  </View>
-</RCTPressable>
+    </View>
+  </RCTPressable>
+</RCTView>
 `;
 
 exports[`Button Component Snapshots matches snapshot for primary variant 1`] = `
-<RCTPressable
-  accessibilityLabel="Primary"
-  accessibilityRole="button"
-  accessibilityState={
-    {
-      "disabled": false,
-    }
-  }
-  accessible={true}
-  aria-disabled={false}
-  aria-label="Primary"
-  disabled={false}
-  onPress={[Function]}
-  onPressIn={[Function]}
-  onPressOut={[Function]}
+<RCTView
   ref={null}
-  role="button"
   style={
-    [
-      {
-        "transform": [
-          {
-            "scale": 1,
-          },
-        ],
-      },
-      {
-        "borderRadius": 26,
-        "height": 52,
-        "overflow": "hidden",
-        "paddingHorizontal": 24,
-      },
-      false,
-      undefined,
-    ]
+    {
+      "transform": [
+        {
+          "scale": 1,
+        },
+        {
+          "scale": 1,
+        },
+      ],
+    }
   }
 >
-  <View
-    data-colors="["#FFD700","#FFA500"]"
-    data-end="{"x":1,"y":0}"
-    data-start="{"x":0,"y":0}"
-    ref={null}
-    style={
+  <RCTPressable
+    accessibilityLabel="Primary"
+    accessibilityRole="button"
+    accessibilityState={
       {
-        "alignItems": "center",
-        "flex": 1,
-        "height": "100%",
-        "justifyContent": "center",
-        "width": "100%",
+        "disabled": false,
       }
     }
-    testID="linear-gradient"
-  >
-    <RCTView
-      ref={null}
-      style={
+    accessible={true}
+    aria-disabled={false}
+    aria-label="Primary"
+    disabled={false}
+    onPress={[MockFunction]}
+    onPressIn={[Function]}
+    onPressOut={[Function]}
+    ref={null}
+    role="button"
+    style={
+      [
         {
           "alignItems": "center",
           "flexDirection": "row",
           "justifyContent": "center",
-        }
+          "overflow": "hidden",
+        },
+        {
+          "height": 44,
+          "paddingHorizontal": 20,
+        },
+        {
+          "borderRadius": 14,
+        },
+        false,
+      ]
+    }
+  >
+    <View
+      data-colors="["#FFD700","#FFA500"]"
+      data-end="{"x":1,"y":0}"
+      data-start="{"x":0,"y":0}"
+      ref={null}
+      style={
+        [
+          {
+            "alignItems": "center",
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "center",
+          },
+          {
+            "borderRadius": 14,
+          },
+          {
+            "elevation": 3,
+            "shadowColor": "#000000",
+            "shadowOffset": {
+              "height": 2,
+              "width": 0,
+            },
+            "shadowOpacity": 0.1,
+            "shadowRadius": 4,
+          },
+        ]
       }
+      testID="linear-gradient"
     >
-      <RCTText
+      <RCTView
         ref={null}
         style={
-          [
-            {
-              "fontFamily": "Satoshi-Medium",
-              "fontSize": 16,
-              "fontWeight": "600",
-              "letterSpacing": 0.5,
-              "lineHeight": 18,
-            },
-            {
-              "color": "#FFFFFF",
-              "fontSize": 16,
-            },
-            undefined,
-          ]
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "justifyContent": "center",
+          }
         }
-        testID="RCTText"
       >
-        Primary
-      </RCTText>
-    </RCTView>
-  </View>
-</RCTPressable>
+        <RCTText
+          ref={null}
+          style={
+            [
+              {
+                "letterSpacing": 0.5,
+                "textAlign": "center",
+              },
+              {
+                "fontFamily": "Satoshi-Medium",
+                "fontSize": 14,
+                "fontWeight": "600",
+                "letterSpacing": 0.5,
+                "lineHeight": 15,
+              },
+              {
+                "color": "#0A0A0A",
+              },
+              false,
+              undefined,
+            ]
+          }
+          testID="RCTText"
+        >
+          Primary
+        </RCTText>
+      </RCTView>
+    </View>
+  </RCTPressable>
+</RCTView>
 `;

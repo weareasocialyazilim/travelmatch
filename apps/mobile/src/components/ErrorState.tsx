@@ -4,7 +4,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, primitives } from '../constants/colors';
 import { FONTS, TYPE_SCALE } from '../constants/typography';
-import { LovendoButton } from './ui/LovendoButton';
+import { Button } from './ui/Button';
 
 type ErrorType =
   | 'network'
@@ -211,7 +211,7 @@ export const ErrorState: React.FC<ErrorStateProps> = memo(
         </Text>
 
         {onRetry && (
-          <LovendoButton
+          <Button
             variant="primary"
             size="lg"
             onPress={onRetry}
@@ -219,7 +219,7 @@ export const ErrorState: React.FC<ErrorStateProps> = memo(
             style={styles.button}
           >
             {displayRetryText}
-          </LovendoButton>
+          </Button>
         )}
       </View>
     );

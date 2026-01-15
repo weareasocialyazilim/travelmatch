@@ -136,16 +136,19 @@ ALTER TABLE public.active_alerts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.alert_history ENABLE ROW LEVEL SECURITY;
 
 -- Service role full access
+DROP POLICY IF EXISTS "Service role full access to alert_rules" ON public.alert_rules;
 CREATE POLICY "Service role full access to alert_rules"
     ON public.alert_rules FOR ALL
     USING (auth.jwt() ->> 'role' = 'service_role')
     WITH CHECK (auth.jwt() ->> 'role' = 'service_role');
 
+DROP POLICY IF EXISTS "Service role full access to active_alerts" ON public.active_alerts;
 CREATE POLICY "Service role full access to active_alerts"
     ON public.active_alerts FOR ALL
     USING (auth.jwt() ->> 'role' = 'service_role')
     WITH CHECK (auth.jwt() ->> 'role' = 'service_role');
 
+DROP POLICY IF EXISTS "Service role full access to alert_history" ON public.alert_history;
 CREATE POLICY "Service role full access to alert_history"
     ON public.alert_history FOR ALL
     USING (auth.jwt() ->> 'role' = 'service_role')

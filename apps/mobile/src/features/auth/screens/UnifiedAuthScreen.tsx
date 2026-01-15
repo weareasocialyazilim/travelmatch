@@ -40,7 +40,7 @@ import { TYPE_SCALE, FONTS } from '@/constants/typography';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
-import { LovendoButton } from '@/components/ui/LovendoButton';
+import { Button } from '@/components/ui/Button';
 import { LoadingState } from '@/components/LoadingState';
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
@@ -451,7 +451,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                   accessibilityLabel="E-posta veya telefon numarası"
                 />
 
-                <LovendoButton
+                <Button
                   variant="primary"
                   onPress={handleIdentifierSubmit}
                   size="lg"
@@ -460,7 +460,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                   style={styles.submitButton}
                 >
                   {isCheckingUser ? 'Kontrol ediliyor...' : 'Devam Et'}
-                </LovendoButton>
+                </Button>
               </Reanimated.View>
             )}
 
@@ -504,7 +504,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                   <Text style={styles.forgotPasswordText}>Şifremi Unuttum</Text>
                 </TouchableOpacity>
 
-                <LovendoButton
+                <Button
                   variant="primary"
                   onPress={handleLogin}
                   size="lg"
@@ -513,7 +513,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                   style={styles.submitButton}
                 >
                   Giriş Yap
-                </LovendoButton>
+                </Button>
 
                 <TouchableOpacity
                   style={styles.switchMode}
@@ -589,7 +589,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                   </Text>
                 </View>
 
-                <LovendoButton
+                <Button
                   variant="primary"
                   onPress={handleRegister}
                   size="lg"
@@ -598,7 +598,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                   style={styles.submitButton}
                 >
                   Hesabımı Oluştur
-                </LovendoButton>
+                </Button>
 
                 <TouchableOpacity
                   style={styles.switchMode}
@@ -638,7 +638,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                   Telefonuna gönderilen 6 haneli kodu gir
                 </Text>
 
-                <LovendoButton
+                <Button
                   variant="secondary"
                   onPress={() => navigation.navigate('VerifyCode' as never)}
                   size="lg"
@@ -646,7 +646,7 @@ export const UnifiedAuthScreen: React.FC = () => {
                   style={styles.submitButton}
                 >
                   Kodu Gir
-                </LovendoButton>
+                </Button>
               </Reanimated.View>
             )}
           </View>
