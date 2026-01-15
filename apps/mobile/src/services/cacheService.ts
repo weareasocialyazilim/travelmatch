@@ -53,14 +53,8 @@ const calculateSize = (data: unknown): number => {
  */
 const getCacheKey = (key: string): string => `${CACHE_PREFIX}${key}`;
 
-/**
- * Cache service for offline data storage with:
- * - LRU eviction (Least Recently Used)
- * - Compression for large items
- * - Memory leak prevention
- * - Automatic cleanup
- */
-class CacheService {
+// Legacy cache prefixes for migration
+const LEGACY_CACHE_PREFIXES = ['@lovendo_cache/', '@lovendo/cache_'];
 
 const getLegacyCacheKeys = (key: string): string[] =>
   LEGACY_CACHE_PREFIXES.map((prefix) => `${prefix}${key}`);
@@ -70,31 +64,27 @@ const isCacheKey = (fullKey: string): boolean =>
   LEGACY_CACHE_PREFIXES.some((prefix) => fullKey.startsWith(prefix));
 
 const stripCachePrefix = (fullKey: string): string => {
-  if (fullKey.startsWith(CACHE_PREFIX)) return fullKey.slice(CACHE_PREFIX.length);
+  if (fullKey.startsWith(CACHE_PREFIX))
+    return fullKey.slice(CACHE_PREFIX.length);
   for (const prefix of LEGACY_CACHE_PREFIXES) {
     if (fullKey.startsWith(prefix)) return fullKey.slice(prefix.length);
   }
   return fullKey;
 };
+
+/**
+ * Cache service for offline data storage with:
+ * - LRU eviction (Least Recently Used)
+ * - Compression for large items
+ * - Memory leak prevention
+ * - Automatic cleanup
+ */
+class CacheService {
   private memoryCache: Map<string, CacheItem<unknown>> = new Map();
   private accessOrder: string[] = []; // LRU tracking
   private currentSize = 0; // Total cache size in bytes
   private cleanupInterval: NodeJS.Timeout | null = null;
-      let stored = await AsyncStorage.getItem(getCacheKey(key));
-
-      if (!stored) {
-        for (const legacyKey of getLegacyCacheKeys(key)) {
-          const legacyStored = await AsyncStorage.getItem(legacyKey);
-          if (legacyStored) {
-            stored = legacyStored;
-            // Migrate legacy cache entry to new key
-            await AsyncStorage.setItem(getCacheKey(key), legacyStored);
-            await AsyncStorage.removeItem(legacyKey);
-            break;
-          }
-        }
-      }
-
+  private isInitialized = false;
 
   /**
    * Initialize cache service (call on app start)
@@ -106,28 +96,13 @@ const stripCachePrefix = (fullKey: string): string => {
     await this.calculateCurrentSize();
 
     // Start automatic cleanup interval
-      let stored = await AsyncStorage.getItem(getCacheKey(key));
-
-      if (!stored) {
-        for (const legacyKey of getLegacyCacheKeys(key)) {
-          const legacyStored = await AsyncStorage.getItem(legacyKey);
-          if (legacyStored) {
-            stored = legacyStored;
-            // Migrate legacy cache entry to new key
-            await AsyncStorage.setItem(getCacheKey(key), legacyStored);
-            await AsyncStorage.removeItem(legacyKey);
-            break;
-          }
-        }
-      }
-
+    this.startCleanupInterval();
 
     this.isInitialized = true;
     logger.info('CacheService initialized', {
       currentSize: this.formatBytes(this.currentSize),
       maxSize: this.formatBytes(MAX_CACHE_SIZE_BYTES),
     });
-      await Promise.all(getLegacyCacheKeys(key).map((k) => AsyncStorage.removeItem(k)));
   }
 
   /**
@@ -142,7 +117,6 @@ const stripCachePrefix = (fullKey: string): string => {
     this.accessOrder = [];
     this.isInitialized = false;
   }
-      const cacheKeys = keys.filter(isCacheKey);
   /**
    * Set data in cache with size limits and compression
    */
@@ -154,13 +128,13 @@ const stripCachePrefix = (fullKey: string): string => {
     let finalData: any = data;
     let compressed = false;
     let size = calculateSize(data);
-      const cacheKeys = keys.filter(isCacheKey);
+
     if (size > COMPRESSION_THRESHOLD_BYTES) {
       try {
         const json = JSON.stringify(data);
-      const cacheKeys = keys.filter(isCacheKey);
+        const compressedData = pako.deflate(json);
         const compressedSize = compressedData.byteLength;
-          const key = stripCachePrefix(fullKey);
+
         // Only use compression if it reduces size by at least 20%
         if (compressedSize < size * 0.8) {
           finalData = Buffer.from(compressedData).toString('base64');
@@ -169,13 +143,12 @@ const stripCachePrefix = (fullKey: string): string => {
           logger.debug('Compressed cache item', {
             key,
             originalSize: calculateSize(data),
-      const cacheKeys = keys.filter(isCacheKey);
+            compressedSize: size,
             ratio: ((size / calculateSize(data)) * 100).toFixed(1) + '%',
           });
         }
-      const cacheKeys = keys.filter(isCacheKey);
+      } catch (error) {
         logger.error('Compression error:', error);
-            key: stripCachePrefix(fullKey),
       }
     }
 
@@ -188,7 +161,7 @@ const stripCachePrefix = (fullKey: string): string => {
       lastAccessed: now,
       compressed,
     };
-        (k) => isCacheKey(k) && k.includes(pattern),
+
     // Check if adding this item would exceed size limit
     if (this.currentSize + size > MAX_CACHE_SIZE_BYTES) {
       await this.evictToMakeSpace(size);

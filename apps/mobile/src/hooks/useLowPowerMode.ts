@@ -21,7 +21,6 @@ import {
   AppState,
   AppStateStatus,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { analytics } from '../services/analytics';
 import { logger } from '../utils/logger';
 import {
