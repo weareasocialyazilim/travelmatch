@@ -1,4 +1,4 @@
-// components/ui/LovendoTrustRing.tsx
+// components/ui/TrustRing.tsx
 // Lovendo Ultimate Design System 2026
 // Trust ring component with "Jewelry" aesthetic - animated progress ring with avatar
 
@@ -48,7 +48,7 @@ try {
 type TrustLevel = 'platinum' | 'gold' | 'silver' | 'bronze';
 type RingSize = 'xs' | 'sm' | 'md' | 'lg' | 'hero';
 
-interface LovendoTrustRingProps {
+interface TrustRingProps {
   score: number;
   avatarUrl: string;
   size?: RingSize;
@@ -100,7 +100,7 @@ const sizeConfig = {
 };
 
 // Fallback component when SVG is not available
-const FallbackLovendoTrustRing: React.FC<LovendoTrustRingProps> = ({
+const FallbackTrustRing: React.FC<TrustRingProps> = ({
   score,
   avatarUrl,
   size = 'md',
@@ -192,7 +192,7 @@ const FallbackLovendoTrustRing: React.FC<LovendoTrustRingProps> = ({
   );
 };
 
-export const LovendoTrustRing: React.FC<LovendoTrustRingProps> = ({
+export const TrustRing: React.FC<TrustRingProps> = ({
   score,
   avatarUrl,
   size = 'md',
@@ -254,7 +254,7 @@ export const LovendoTrustRing: React.FC<LovendoTrustRingProps> = ({
   // Use fallback if SVG is not available
   if (!svgAvailable) {
     return (
-      <FallbackLovendoTrustRing
+      <FallbackTrustRing
         score={safeScore}
         avatarUrl={avatarUrl}
         size={size}
@@ -386,7 +386,7 @@ export const LovendoTrustRing: React.FC<LovendoTrustRingProps> = ({
   } catch (_renderError) {
     setSvgError(true);
     return (
-      <FallbackLovendoTrustRing
+      <FallbackTrustRing
         score={safeScore}
         avatarUrl={avatarUrl}
         size={size}
@@ -476,4 +476,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LovendoTrustRing;
+export default TrustRing;

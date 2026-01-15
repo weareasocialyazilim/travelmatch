@@ -17,7 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
-import { LovendoAvatar } from '@/components/ui/LovendoAvatar';
+import { Avatar } from '@/components/ui/Avatar';
 import { NotificationCard } from '@/features/notifications/components';
 import { withErrorBoundary } from '@/components/withErrorBoundary';
 import { useRequestsScreen } from '@/hooks/useRequestsScreen';
@@ -95,7 +95,7 @@ const RequestsScreen = ({ navigation }: any) => {
       <GlassCard intensity={15} style={styles.requestCard}>
         <View style={styles.cardHeader}>
           <View style={styles.userInfo}>
-            <LovendoAvatar
+            <Avatar
               size="md"
               source={item.person?.avatar}
               name={item.person?.name || 'User'}

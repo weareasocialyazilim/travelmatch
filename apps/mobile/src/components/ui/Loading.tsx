@@ -1,5 +1,5 @@
 /**
- * LovendoLoading - Lovendo Ultimate Design System 2026
+ * Loading - Lovendo Ultimate Design System 2026
  * Consolidated loading component for all loading types
  *
  * Replaces:
@@ -10,16 +10,16 @@
  * @example
  * ```tsx
  * // Simple inline spinner
- * <LovendoLoading type="simple" />
+ * <Loading type="simple" />
  *
  * // Standard spinner with message
- * <LovendoLoading type="standard" message="Loading..." />
+ * <Loading type="standard" message="Loading..." />
  *
  * // Full screen loading
- * <LovendoLoading type="standard" fullScreen message="Please wait..." />
+ * <Loading type="standard" fullScreen message="Please wait..." />
  *
  * // Premium liquid loading (cinematic)
- * <LovendoLoading type="liquid" message="İpeksi detaylar hazırlanıyor..." />
+ * <Loading type="liquid" message="İpeksi detaylar hazırlanıyor..." />
  * ```
  */
 
@@ -55,15 +55,15 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 // Types
 // ═══════════════════════════════════════════════════════════════════
 
-export type LovendoLoadingType = 'simple' | 'standard' | 'liquid';
+export type LoadingType = 'simple' | 'standard' | 'liquid';
 
 export type LoadingSize = 'sm' | 'md' | 'lg';
 
 export type LoadingVariant = 'primary' | 'secondary' | 'trust';
 
-export interface LovendoLoadingProps {
+export interface LoadingProps {
   /** Loading type determines rendering style */
-  type?: LovendoLoadingType;
+  type?: LoadingType;
 
   // Common props
   /** Loading message */
@@ -98,7 +98,7 @@ export interface LovendoLoadingProps {
 // Main Component
 // ═══════════════════════════════════════════════════════════════════
 
-export const LovendoLoading: React.FC<LovendoLoadingProps> = ({
+export const Loading: React.FC<LoadingProps> = ({
   type = 'standard',
   message,
   style,
@@ -752,4 +752,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LovendoLoading;
+export default Loading;

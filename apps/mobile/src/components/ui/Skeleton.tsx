@@ -1,5 +1,5 @@
 /**
- * LovendoSkeleton - Lovendo Ultimate Design System 2026
+ * Skeleton - Lovendo Ultimate Design System 2026
  * Consolidated skeleton loading component for all skeleton types
  *
  * Replaces:
@@ -10,19 +10,19 @@
  * @example
  * ```tsx
  * // Basic skeleton shape
- * <LovendoSkeleton type="base" width={100} height={20} />
+ * <Skeleton type="base" width={100} height={20} />
  *
  * // Avatar skeleton
- * <LovendoSkeleton type="avatar" size={48} />
+ * <Skeleton type="avatar" size={48} />
  *
  * // Text lines skeleton
- * <LovendoSkeleton type="text" lines={3} />
+ * <Skeleton type="text" lines={3} />
  *
  * // List of items
- * <LovendoSkeleton type="list" listType="chat" count={5} />
+ * <Skeleton type="list" listType="chat" count={5} />
  *
  * // Full screen skeleton
- * <LovendoSkeleton type="screen" screenType="profile" />
+ * <Skeleton type="screen" screenType="profile" />
  * ```
  */
 
@@ -47,7 +47,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 // Types
 // ═══════════════════════════════════════════════════════════════════
 
-export type LovendoSkeletonType =
+export type SkeletonType =
   | 'base'
   | 'avatar'
   | 'text'
@@ -75,9 +75,9 @@ export type SkeletonScreenType =
 
 export type SkeletonVariant = 'rect' | 'circle';
 
-export interface LovendoSkeletonProps {
+export interface SkeletonProps {
   /** Skeleton type determines rendering style */
-  type?: LovendoSkeletonType;
+  type?: SkeletonType;
 
   // Base props
   /** Width for base skeleton */
@@ -135,7 +135,7 @@ export interface LovendoSkeletonProps {
 // Main Component
 // ═══════════════════════════════════════════════════════════════════
 
-export const LovendoSkeleton: React.FC<LovendoSkeletonProps> = ({
+export const Skeleton: React.FC<SkeletonProps> = ({
   type = 'base',
   width = '100%',
   height = 20,
@@ -1170,44 +1170,44 @@ const styles = StyleSheet.create({
 // Convenience Exports (for direct use)
 // ═══════════════════════════════════════════════════════════════════
 
-/** @deprecated Use LovendoSkeleton with type="base" */
-export const Skeleton = SkeletonBase;
+/** @deprecated Use Skeleton with type="base" */
+// export const Skeleton = SkeletonBase;
 
-/** @deprecated Use LovendoSkeleton with type="avatar" */
+/** @deprecated Use Skeleton with type="avatar" */
 export const SkeletonAvatar: React.FC<{ size?: number; style?: ViewStyle }> = ({
   size = 48,
   style,
-}) => <LovendoSkeleton type="avatar" size={size} style={style} />;
+}) => <Skeleton type="avatar" size={size} style={style} />;
 
-/** @deprecated Use LovendoSkeleton with type="text" */
+/** @deprecated Use Skeleton with type="text" */
 export const SkeletonText: React.FC<{
   lines?: number;
   lineHeight?: number;
   lastLineWidth?: string;
   style?: ViewStyle;
-}> = (props) => <LovendoSkeleton type="text" {...props} />;
+}> = (props) => <Skeleton type="text" {...props} />;
 
-/** @deprecated Use LovendoSkeleton with type="card" */
+/** @deprecated Use Skeleton with type="card" */
 export const SkeletonCard: React.FC<{ style?: ViewStyle }> = ({ style }) => (
-  <LovendoSkeleton type="card" style={style} />
+  <Skeleton type="card" style={style} />
 );
 
-/** @deprecated Use LovendoSkeleton with type="message" */
+/** @deprecated Use Skeleton with type="message" */
 export const SkeletonMessage: React.FC<{
   isOwn?: boolean;
   style?: ViewStyle;
 }> = ({ isOwn, style }) => (
-  <LovendoSkeleton type="message" isOwn={isOwn} style={style} />
+  <Skeleton type="message" isOwn={isOwn} style={style} />
 );
 
-/** @deprecated Use LovendoSkeleton with type="list" */
+/** @deprecated Use Skeleton with type="list" */
 export const SkeletonList: React.FC<{
   type: SkeletonListType;
   count?: number;
   minDisplayTime?: number;
   show?: boolean;
 }> = (props) => (
-  <LovendoSkeleton
+  <Skeleton
     type="list"
     listType={props.type}
     count={props.count}
@@ -1216,13 +1216,13 @@ export const SkeletonList: React.FC<{
   />
 );
 
-/** @deprecated Use LovendoSkeleton with type="screen" */
+/** @deprecated Use Skeleton with type="screen" */
 export const ScreenSkeleton: React.FC<{
   showHeader?: boolean;
   showTabBar?: boolean;
   contentType?: string;
 }> = ({ showHeader, showTabBar, contentType = 'list' }) => (
-  <LovendoSkeleton
+  <Skeleton
     type="screen"
     screenType={contentType as SkeletonScreenType}
     showHeader={showHeader}
@@ -1230,4 +1230,4 @@ export const ScreenSkeleton: React.FC<{
   />
 );
 
-export default LovendoSkeleton;
+export default Skeleton;

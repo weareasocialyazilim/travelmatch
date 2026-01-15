@@ -1,5 +1,5 @@
 /**
- * LovendoSheet - Lovendo Ultimate Design System 2026
+ * Sheet - Lovendo Ultimate Design System 2026
  * Bottom sheet component with "Soft Glass" aesthetic
  *
  * Features:
@@ -19,17 +19,17 @@ import {
   BottomSheetHeight,
 } from './GenericBottomSheet';
 
-export type LovendoSheetSize = 'content' | 'half' | 'full' | 'dynamic';
+export type SheetSize = 'content' | 'half' | 'full' | 'dynamic';
 
-export interface LovendoSheetProps extends Omit<GenericBottomSheetProps, 'height'> {
+export interface SheetProps extends Omit<GenericBottomSheetProps, 'height'> {
   /** Sheet size preset */
-  size?: LovendoSheetSize;
+  size?: SheetSize;
   /** Custom height (overrides size) */
   height?: BottomSheetHeight;
 }
 
-// Map LovendoSheet sizes to GenericBottomSheet heights
-const SIZE_TO_HEIGHT: Record<LovendoSheetSize, BottomSheetHeight> = {
+// Map Sheet sizes to GenericBottomSheet heights
+const SIZE_TO_HEIGHT: Record<SheetSize, BottomSheetHeight> = {
   content: 'auto',
   half: 'medium',
   full: 'full',
@@ -37,21 +37,21 @@ const SIZE_TO_HEIGHT: Record<LovendoSheetSize, BottomSheetHeight> = {
 };
 
 /**
- * LovendoSheet - Premium bottom sheet component
+ * Sheet - Premium bottom sheet component
  *
  * @example
  * ```tsx
- * <LovendoSheet
+ * <Sheet
  *   visible={isOpen}
  *   onClose={() => setIsOpen(false)}
  *   title="Select Option"
  *   size="half"
  * >
  *   <YourContent />
- * </LovendoSheet>
+ * </Sheet>
  * ```
  */
-export const LovendoSheet = forwardRef<BottomSheetRef, LovendoSheetProps>(
+export const Sheet = forwardRef<BottomSheetRef, SheetProps>(
   ({ size = 'half', height, ...props }, ref) => {
     // Use custom height if provided, otherwise map size to height
     const resolvedHeight = height ?? SIZE_TO_HEIGHT[size];
@@ -71,7 +71,7 @@ export const LovendoSheet = forwardRef<BottomSheetRef, LovendoSheetProps>(
   },
 );
 
-LovendoSheet.displayName = 'LovendoSheet';
+Sheet.displayName = 'Sheet';
 
 // Re-export types and variants for convenience
 export type { BottomSheetRef, BottomSheetHeight };
@@ -83,4 +83,4 @@ export {
   type SelectionOption,
 } from './GenericBottomSheet';
 
-export default LovendoSheet;
+export default Sheet;

@@ -54,7 +54,7 @@ import { useDiscoverMoments } from '@/hooks/useDiscoverMoments';
 import { useSubscription } from '@/features/payments/hooks/usePayments';
 import { useNetwork } from '@/context/NetworkContext';
 import { supabase } from '@/config/supabase';
-import TrustBadge from '@/components/ui/LovendoBadge';
+import TrustBadge from '@/components/ui/Badge';
 import { logger } from '@/utils/logger';
 import {
   applyLocationJitter,

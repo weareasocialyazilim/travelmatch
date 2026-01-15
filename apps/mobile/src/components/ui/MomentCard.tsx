@@ -1,5 +1,5 @@
 /**
- * LovendoCard - Lovendo Ultimate Design System 2026
+ * MomentCard - Lovendo Ultimate Design System 2026
  * Moment card component with "Soft Glass" aesthetic
  *
  * Implements UX best practices from design references:
@@ -34,7 +34,7 @@ import { COLORS, GRADIENTS, SHADOWS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { RADIUS, SPACING, SIZES } from '@/constants/spacing';
 import { SPRING, HAPTIC } from '@/hooks/useMotion';
-import { LovendoTrustRing } from './LovendoTrustRing';
+import { TrustRing } from './TrustRing';
 
 // Badge type for moment cards (inspired by property card designs)
 export type MomentBadgeType = 'featured' | 'popular' | 'new' | 'premium' | null;
@@ -72,7 +72,7 @@ export interface MomentData {
   };
 }
 
-interface LovendoCardProps {
+interface MomentCardProps {
   moment: MomentData;
   onPress: () => void;
   onGiftPress?: () => void;
@@ -82,7 +82,7 @@ interface LovendoCardProps {
   testID?: string;
 }
 
-export const LovendoCard: React.FC<LovendoCardProps> = ({
+export const MomentCard: React.FC<MomentCardProps> = ({
   moment,
   onPress,
   onGiftPress,
@@ -176,7 +176,7 @@ export const LovendoCard: React.FC<LovendoCardProps> = ({
 
           {/* Trust Ring - Top Right */}
           <View style={styles.trustRingPosition}>
-            <LovendoTrustRing
+            <TrustRing
               score={moment.user.trustScore}
               avatarUrl={moment.user.avatar}
               size="sm"
@@ -360,7 +360,9 @@ export const LovendoCard: React.FC<LovendoCardProps> = ({
                     accessible={true}
                     accessibilityRole="button"
                     accessibilityLabel={t('moments.card.sendGift')}
-                    accessibilityHint={t('accessibility.sendGiftToUser', { name: moment.user.name })}
+                    accessibilityHint={t('accessibility.sendGiftToUser', {
+                      name: moment.user.name,
+                    })}
                   >
                     <LinearGradient
                       colors={GRADIENTS.gift}
@@ -565,4 +567,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LovendoCard;
+export default MomentCard;

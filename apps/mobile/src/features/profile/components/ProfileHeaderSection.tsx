@@ -12,7 +12,7 @@
 
 import React, { useCallback, useEffect, memo } from 'react';
 import { View, Text, StyleSheet, Pressable, Platform } from 'react-native';
-import { LovendoAvatar } from '@/components/ui/LovendoAvatar';
+import { Avatar } from '@/components/ui/Avatar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -365,7 +365,7 @@ const ProfileHeaderSection: React.FC<ProfileHeaderSectionProps> = memo(
           <Reanimated.View style={[parallaxAvatarStyle]}>
             <Pressable onPress={handleTrustPress} style={styles.avatarSection}>
               <AnimatedTrustRing score={resolvedTrust}>
-                <LovendoAvatar
+                <Avatar
                   testID="profile-avatar"
                   source={resolvedAvatar}
                   name={resolvedName}

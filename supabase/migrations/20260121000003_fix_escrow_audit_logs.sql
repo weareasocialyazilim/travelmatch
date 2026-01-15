@@ -114,6 +114,7 @@ END;
 $$;
 
 -- 2. Update release_escrow
+DROP FUNCTION IF EXISTS release_escrow(UUID, UUID);
 CREATE OR REPLACE FUNCTION release_escrow(
   p_escrow_id UUID,
   p_verified_by UUID DEFAULT NULL

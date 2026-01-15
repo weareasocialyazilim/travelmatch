@@ -32,7 +32,7 @@ const DISPOSABLE_DOMAINS = new Set([
   'guerrillamailblock.com',
   'pokemail.net',
   'trashmail.com',
-  'mailnesia.com'
+  'mailnesia.com',
 ]);
 
 // Common email domain typos and their corrections
@@ -58,22 +58,22 @@ const DOMAIN_TYPO_MAP: Record<string, string> = {
   'yhaoo.com': 'yahoo.com',
   'iclod.com': 'icloud.com',
   'icould.com': 'icloud.com',
-  'icloud.co': 'icloud.com'
+  'icloud.co': 'icloud.com',
 };
 
 // Common TLD typos
 const TLD_TYPO_MAP: Record<string, string> = {
-  'con': 'com',
-  'cpm': 'com',
-  'ocm': 'com',
-  'vom': 'com',
-  'xom': 'com',
-  'comm': 'com',
-  'ner': 'net',
-  'ent': 'net',
-  'ogr': 'org',
-  'prg': 'org',
-  'tr': 'com.tr'
+  con: 'com',
+  cpm: 'com',
+  ocm: 'com',
+  vom: 'com',
+  xom: 'com',
+  comm: 'com',
+  ner: 'net',
+  ent: 'net',
+  ogr: 'org',
+  prg: 'org',
+  tr: 'com.tr',
 };
 
 export interface EmailValidationResult {
@@ -96,7 +96,8 @@ export interface EmailValidationOptions {
  * RFC 5322 compliant email regex pattern
  * More permissive than simple patterns to handle edge cases
  */
-const EMAIL_REGEX = /^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])$/i;
+const EMAIL_REGEX =
+  /^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])$/i;
 
 /**
  * Simple email format check (more lenient)
@@ -118,7 +119,10 @@ function validateFormat(email: string): { isValid: boolean; error?: string } {
   }
 
   if (trimmed.length > 254) {
-    return { isValid: false, error: 'Email adresi çok uzun (max 254 karakter)' };
+    return {
+      isValid: false,
+      error: 'Email adresi çok uzun (max 254 karakter)',
+    };
   }
 
   if (!trimmed.includes('@')) {
@@ -132,7 +136,10 @@ function validateFormat(email: string): { isValid: boolean; error?: string } {
   }
 
   if (localPart.length > 64) {
-    return { isValid: false, error: 'Email adresi yerel kısmı çok uzun (max 64 karakter)' };
+    return {
+      isValid: false,
+      error: 'Email adresi yerel kısmı çok uzun (max 64 karakter)',
+    };
   }
 
   if (!domain || domain.length === 0) {
@@ -140,7 +147,10 @@ function validateFormat(email: string): { isValid: boolean; error?: string } {
   }
 
   if (!domain.includes('.')) {
-    return { isValid: false, error: 'Email adresi geçerli bir domain içermeli' };
+    return {
+      isValid: false,
+      error: 'Email adresi geçerli bir domain içermeli',
+    };
   }
 
   // Check with simple regex first
@@ -180,7 +190,7 @@ function suggestCorrection(email: string): string | undefined {
   const domainParts = domain.split('.');
   if (domainParts.length >= 2) {
     const tld = domainParts[domainParts.length - 1];
-    if (TLD_TYPO_MAP[tld]) {
+    if (tld && TLD_TYPO_MAP[tld]) {
       domainParts[domainParts.length - 1] = TLD_TYPO_MAP[tld];
       return `${localPart}@${domainParts.join('.')}`;
     }
@@ -198,7 +208,7 @@ function suggestCorrection(email: string): string | undefined {
  */
 export function normalizeEmail(
   email: string,
-  options: { removeGmailDots?: boolean; removePlusAddressing?: boolean } = {}
+  options: { removeGmailDots?: boolean; removePlusAddressing?: boolean } = {},
 ): string {
   let normalized = email.toLowerCase().trim();
 
@@ -208,13 +218,19 @@ export function normalizeEmail(
   let normalizedLocal = localPart;
 
   // Gmail ignores dots in the local part
-  if (options.removeGmailDots && (domain === 'gmail.com' || domain === 'googlemail.com')) {
+  if (
+    options.removeGmailDots &&
+    (domain === 'gmail.com' || domain === 'googlemail.com')
+  ) {
     normalizedLocal = normalizedLocal.replace(/\./g, '');
   }
 
   // Remove plus addressing (user+tag@domain.com -> user@domain.com)
   if (options.removePlusAddressing && normalizedLocal.includes('+')) {
-    normalizedLocal = normalizedLocal.split('+')[0];
+    const beforePlus = normalizedLocal.split('+')[0];
+    if (beforePlus) {
+      normalizedLocal = beforePlus;
+    }
   }
 
   return `${normalizedLocal}@${domain}`;
@@ -225,12 +241,9 @@ export function normalizeEmail(
  */
 export function validateEmail(
   email: string,
-  options: EmailValidationOptions = {}
+  options: EmailValidationOptions = {},
 ): EmailValidationResult {
-  const {
-    allowDisposable = false,
-    suggestCorrections = true
-  } = options;
+  const { allowDisposable = false, suggestCorrections = true } = options;
 
   const result: EmailValidationResult = {
     isValid: true,
@@ -238,7 +251,7 @@ export function validateEmail(
     normalizedEmail: '',
     errors: [],
     warnings: [],
-    isDisposable: false
+    isDisposable: false,
   };
 
   // Format validation
@@ -302,5 +315,5 @@ export const __testing = {
   TLD_TYPO_MAP,
   validateFormat,
   checkDisposable,
-  suggestCorrection
+  suggestCorrection,
 };

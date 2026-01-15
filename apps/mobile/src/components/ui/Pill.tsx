@@ -1,4 +1,4 @@
-// components/ui/LovendoPill.tsx
+// components/ui/Pill.tsx
 // Lovendo Ultimate Design System 2026
 // Pill/Chip component for categories, filters, and tags
 
@@ -25,7 +25,7 @@ import { SPRING, HAPTIC } from '@/hooks/useMotion';
 type PillVariant = 'default' | 'selected' | 'outlined' | 'muted';
 type PillSize = 'sm' | 'md' | 'lg';
 
-interface LovendoPillProps {
+interface PillProps {
   children: string;
   variant?: PillVariant;
   size?: PillSize;
@@ -41,7 +41,7 @@ interface LovendoPillProps {
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-export const LovendoPill: React.FC<LovendoPillProps> = ({
+export const Pill: React.FC<PillProps> = ({
   children,
   variant = 'default',
   size = 'md',
@@ -244,14 +244,9 @@ export const CategoryChip: React.FC<CategoryChipProps> = ({
   onPress,
   testID,
 }) => (
-  <LovendoPill
-    emoji={emoji}
-    selected={selected}
-    onPress={onPress}
-    testID={testID}
-  >
+  <Pill emoji={emoji} selected={selected} onPress={onPress} testID={testID}>
     {category}
-  </LovendoPill>
+  </Pill>
 );
 
 const styles = StyleSheet.create({
@@ -286,4 +281,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LovendoPill;
+export default Pill;

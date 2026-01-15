@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { FONTS } from '@/constants/typography';
-import { LovendoButton } from '@/components/ui/LovendoButton';
+import { Button } from '@/components/ui/Button';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -52,7 +52,7 @@ export const WithdrawSuccessScreen = ({
       </View>
 
       <View style={styles.footer}>
-        <LovendoButton
+        <Button
           title="Cüzdana Dön"
           variant="secondary"
           onPress={() => navigation.navigate('Wallet')}

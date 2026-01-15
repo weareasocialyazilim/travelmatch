@@ -19,71 +19,60 @@ export { ControlledLiquidInput } from './ControlledLiquidInput';
 // @deprecated aliases - use LiquidInput instead
 export { LiquidInput as Input } from './LiquidInput';
 
-// LovendoBadge - Consolidated badge component (replaces Badge, StatusBadge, TrustBadge)
-export {
-  LovendoBadge,
-  LiveStatusBadge,
-  VerifiedBadge,
-  PremiumBadge,
-} from './LovendoBadge';
+// Badge - Consolidated badge component (replaces Badge, StatusBadge, TrustBadge)
+export { Badge, LiveStatusBadge, VerifiedBadge, PremiumBadge } from './Badge';
 export type {
-  LovendoBadgeType,
+  BadgeType,
   LabelVariant,
   StatusVariant,
   BadgeSize,
-  LovendoBadgeProps,
-} from './LovendoBadge';
+  BadgeProps,
+} from './Badge';
 // @deprecated aliases for backward compatibility
-export {
-  LovendoBadge as Badge,
-  LovendoBadge as StatusBadge,
-  LovendoBadge as TrustBadge,
-} from './LovendoBadge';
+export { Badge as StatusBadge, Badge as TrustBadge } from './Badge';
 
 // ═══════════════════════════════════════════════════════════════════
 // Lovendo Design System Components
 // ═══════════════════════════════════════════════════════════════════
 
-// LovendoButton - Primary button with gradient, animation, haptics
+// Button - Primary button with gradient, animation, haptics
 // Consolidated master component - replaces Button, HapticButton, AnimatedButton
-export { LovendoButton } from './LovendoButton';
 export { MagneticButton } from './MagneticButton';
 export type {
-  LovendoButtonProps,
+  ButtonProps,
   ButtonVariant,
   ButtonSize,
   AnimationMode,
   HapticType,
-} from './LovendoButton';
+} from './Button';
 
-// LovendoTrustRing - Trust score visualization with "Jewelry" aesthetic
-export { LovendoTrustRing } from './LovendoTrustRing';
+// TrustRing - Trust score visualization with "Jewelry" aesthetic
+export { TrustRing } from './TrustRing';
 
-// LovendoCard - Moment card with "Soft Glass" aesthetic
-export { LovendoCard } from './LovendoCard';
-export type { MomentData, MomentBadgeType } from './LovendoCard';
+// MomentCard - Moment card with "Soft Glass" aesthetic
+export { MomentCard } from './MomentCard';
+export type { MomentData, MomentBadgeType } from './MomentCard';
 
-// LovendoPill - Chip/pill components
-export { LovendoPill, LovendoCategoryChip } from './LovendoPill';
+// Pill/Chip component for categories, filters, and tags
+export { Pill, CategoryChip } from './Pill';
 
-// LovendoLoading - Consolidated loading component (replaces Spinner, LoadingSpinner, LiquidLoading)
-export { LovendoLoading } from './LovendoLoading';
+// Loading - Consolidated loading component (replaces Spinner, LoadingSpinner, LiquidLoading)
+export { Loading } from './Loading';
 export type {
-  LovendoLoadingType,
+  LoadingType,
   LoadingSize,
   LoadingVariant,
-  LovendoLoadingProps,
-} from './LovendoLoading';
+  LoadingProps,
+} from './Loading';
 // @deprecated aliases for backward compatibility
 export {
-  LovendoLoading as Spinner,
-  LovendoLoading as LoadingSpinner,
-  LovendoLoading as LiquidLoading,
-} from './LovendoLoading';
+  Loading as Spinner,
+  Loading as LoadingSpinner,
+  Loading as LiquidLoading,
+} from './Loading';
 
-// LovendoSkeleton - Consolidated skeleton component (replaces Skeleton, SkeletonList, NavigationSkeleton)
+// Skeleton - Consolidated skeleton component (replaces Skeleton, SkeletonList, NavigationSkeleton)
 export {
-  LovendoSkeleton,
   Skeleton,
   SkeletonAvatar,
   SkeletonText,
@@ -91,30 +80,30 @@ export {
   SkeletonMessage,
   SkeletonList,
   ScreenSkeleton,
-} from './LovendoSkeleton';
+} from './Skeleton';
 export type {
-  LovendoSkeletonType,
+  SkeletonType,
   SkeletonListType,
   SkeletonScreenType,
   SkeletonVariant,
-  LovendoSkeletonProps,
-} from './LovendoSkeleton';
-// @deprecated aliases for backward compatibility - use LovendoSkeleton with type prop instead
-export { LovendoSkeleton as FeedSkeleton } from './LovendoSkeleton';
+  SkeletonProps,
+} from './Skeleton';
+// @deprecated aliases for backward compatibility - use Skeleton with type prop instead
+export { Skeleton as FeedSkeleton } from './Skeleton';
 
-// LovendoSheet - Bottom sheet with gestures and blur
-export { LovendoSheet } from './LovendoSheet';
-export type { LovendoSheetProps, LovendoSheetSize } from './LovendoSheet';
+// Sheet - Bottom sheet with gestures and blur
+export { Sheet } from './Sheet';
+export type { SheetProps, SheetSize } from './Sheet';
 
-// LovendoAvatar - Avatar with initials fallback, status, verified badge
-export { LovendoAvatar } from './LovendoAvatar';
-export type { LovendoAvatarProps, AvatarSize, AvatarStatus } from './LovendoAvatar';
+// Avatar - Avatar with initials fallback, status, verified badge
+export { Avatar } from './Avatar';
+export type { AvatarProps, AvatarSize, AvatarStatus } from './Avatar';
 // @deprecated alias for backward compatibility
-export { LovendoAvatar as Avatar } from './LovendoAvatar';
+// export { Avatar as Avatar } from './Avatar';
 
-// LovendoProofCard - Proof submission card for chat
-export { LovendoProofCard } from './LovendoProofCard';
-export type { LovendoProofCardProps, ProofStatus, MediaType } from './LovendoProofCard';
+// ProofCard - Proof submission card for chat
+export { ProofCard } from './ProofCard';
+export type { ProofCardProps, ProofStatus, MediaType } from './ProofCard';
 
 // Paywall - Feature paywall with upgrade CTA
 export { Paywall } from './Paywall';

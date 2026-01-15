@@ -170,8 +170,9 @@ CREATE INDEX IF NOT EXISTS idx_error_log_service ON internal_error_log(service);
 CREATE INDEX IF NOT EXISTS idx_error_log_created ON internal_error_log(created_at DESC);
 
 -- Index for 24h error count queries
-CREATE INDEX IF NOT EXISTS idx_error_log_recent ON internal_error_log(created_at DESC)
-  WHERE created_at > now() - interval '24 hours';
+-- REMOVED: Incompatible with IMMUTABLE requirement for partial indexes. idx_error_log_created covers this.
+-- CREATE INDEX IF NOT EXISTS idx_error_log_recent ON internal_error_log(created_at DESC)
+--   WHERE created_at > now() - interval '24 hours';
 
 -- =====================================================
 -- ROW LEVEL SECURITY

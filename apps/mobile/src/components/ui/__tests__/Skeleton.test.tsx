@@ -1,12 +1,11 @@
 /**
  * Skeleton Component Test Suite
- * Tests for LovendoSkeleton and exported skeleton components
+ * Tests for Skeleton and exported skeleton components
  */
 
 import React from 'react';
 import { render } from '@testing-library/react-native';
 import {
-  LovendoSkeleton,
   Skeleton,
   SkeletonAvatar,
   SkeletonText,
@@ -14,9 +13,9 @@ import {
   SkeletonMessage,
   SkeletonList,
   ScreenSkeleton,
-} from '../LovendoSkeleton';
+} from '../Skeleton';
 
-describe('LovendoSkeleton Component', () => {
+describe('Skeleton Component', () => {
   describe('Base Skeleton', () => {
     it('renders without props', () => {
       const { toJSON } = render(<Skeleton />);
@@ -39,44 +38,44 @@ describe('LovendoSkeleton Component', () => {
     });
   });
 
-  describe('LovendoSkeleton Types', () => {
+  describe('Skeleton Types', () => {
     it('renders base type', () => {
       const { toJSON } = render(
-        <LovendoSkeleton type="base" width={100} height={20} />,
+        <Skeleton type="base" width={100} height={20} />,
       );
       expect(toJSON()).toBeTruthy();
     });
 
     it('renders avatar type', () => {
-      const { toJSON } = render(<LovendoSkeleton type="avatar" size={48} />);
+      const { toJSON } = render(<Skeleton type="avatar" size={48} />);
       expect(toJSON()).toBeTruthy();
     });
 
     it('renders text type', () => {
-      const { toJSON } = render(<LovendoSkeleton type="text" lines={3} />);
+      const { toJSON } = render(<Skeleton type="text" lines={3} />);
       expect(toJSON()).toBeTruthy();
     });
 
     it('renders card type', () => {
-      const { toJSON } = render(<LovendoSkeleton type="card" />);
+      const { toJSON } = render(<Skeleton type="card" />);
       expect(toJSON()).toBeTruthy();
     });
 
     it('renders message type', () => {
-      const { toJSON } = render(<LovendoSkeleton type="message" />);
+      const { toJSON } = render(<Skeleton type="message" />);
       expect(toJSON()).toBeTruthy();
     });
 
     it('renders list type', () => {
       const { toJSON } = render(
-        <LovendoSkeleton type="list" listType="chat" count={3} />,
+        <Skeleton type="list" listType="chat" count={3} />,
       );
       expect(toJSON()).toBeTruthy();
     });
 
     it('renders screen type', () => {
       const { toJSON } = render(
-        <LovendoSkeleton type="screen" screenType="profile" />,
+        <Skeleton type="screen" screenType="profile" />,
       );
       expect(toJSON()).toBeTruthy();
     });
