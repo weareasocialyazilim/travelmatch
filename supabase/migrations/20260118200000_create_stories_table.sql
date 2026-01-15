@@ -1,6 +1,6 @@
 -- Migration: Create Stories and Story Views Tables
 -- Description: Adds tables for Instagram-like stories feature
--- Author: TravelMatch Team
+-- Author: Lovendo Team
 -- Date: 2026-01-18
 
 -- Create stories table

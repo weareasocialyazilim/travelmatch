@@ -2,7 +2,7 @@
 """
 Customer Journey Mapper - Visual Journey Mapping Tool
 
-Creates comprehensive customer journey maps for TravelMatch user flows.
+Creates comprehensive customer journey maps for Lovendo user flows.
 Analyzes touchpoints, emotions, pain points, and opportunities across
 the user experience lifecycle.
 
@@ -19,7 +19,7 @@ Journey Types:
     gifting         - Gift exchange experience
     full            - Complete end-to-end journey
 
-Author: TravelMatch UX Team
+Author: Lovendo UX Team
 """
 
 import argparse
@@ -138,18 +138,18 @@ class JourneyMap:
 class JourneyMapper:
     """Main class for generating customer journey maps."""
 
-    # Pre-defined journey templates for TravelMatch
+    # Pre-defined journey templates for Lovendo
     JOURNEY_TEMPLATES = {
         "onboarding": {
             "name": "New User Onboarding Journey",
-            "persona": "New TravelMatch User",
+            "persona": "New Lovendo User",
             "goal": "Successfully create an account and set up travel preferences",
             "touchpoints": [
                 {
                     "id": "ob_01",
                     "name": "App Discovery",
                     "phase": "Awareness",
-                    "description": "User discovers TravelMatch through app store or referral",
+                    "description": "User discovers Lovendo through app store or referral",
                     "user_action": "Searches for travel apps or clicks referral link",
                     "system_response": "App store listing or landing page",
                     "channel": "Web/App Store",
@@ -289,7 +289,7 @@ class JourneyMapper:
         },
         "discovery": {
             "name": "Travel Discovery Journey",
-            "persona": "Active TravelMatch User",
+            "persona": "Active Lovendo User",
             "goal": "Find inspiring destinations and travel experiences",
             "touchpoints": [
                 {
@@ -949,7 +949,7 @@ def format_journey_output(journey_map: JourneyMap) -> str:
 def generate_full_journey() -> JourneyMap:
     """Generate complete end-to-end journey combining all templates."""
     combined_touchpoints = []
-    combined_name = "Complete TravelMatch User Journey"
+    combined_name = "Complete Lovendo User Journey"
 
     journey_order = ["onboarding", "discovery", "matching", "trip_planning", "gifting"]
 
@@ -962,8 +962,8 @@ def generate_full_journey() -> JourneyMap:
 
     combined_data = {
         "name": combined_name,
-        "persona": "Complete TravelMatch User",
-        "goal": "Experience the full TravelMatch platform from signup to gifting",
+        "persona": "Complete Lovendo User",
+        "goal": "Experience the full Lovendo platform from signup to gifting",
         "touchpoints": combined_touchpoints
     }
 
@@ -973,7 +973,7 @@ def generate_full_journey() -> JourneyMap:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate customer journey maps for TravelMatch",
+        description="Generate customer journey maps for Lovendo",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

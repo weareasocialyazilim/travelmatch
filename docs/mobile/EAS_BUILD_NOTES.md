@@ -4,7 +4,7 @@
 
 ### 1. Bundle Identifier Güncellemesi
 
-- **Yeni Bundle ID:** `com.kemalteksal.travelmatch`
+- **Yeni Bundle ID:** `com.kemalteksal.lovendo`
 - **Sebep:** Apple Developer hesabı için gerekli
 - **Durum:** ✅ Commit edildi ve push yapıldı
 
@@ -96,7 +96,7 @@ Build başarıyla tamamlandıktan sonra:
 ```bash
 # 1. Build başlat
 export PATH="$HOME/.npm-global/bin:$PATH" && \
-cd /Users/kemalteksal/travelmatch/apps/mobile && \
+cd /Users/kemalteksal/lovendo/apps/mobile && \
 eas build --platform ios --profile production
 
 # 2. Build tamamlandıktan sonra submit et
@@ -130,7 +130,7 @@ eas update --branch production --message "Fix: Description of change"
 
 ## 🔗 Faydalı Linkler
 
-- **EAS Build Dashboard:** https://expo.dev/accounts/travelmatch/projects/travelmatch/builds
+- **EAS Build Dashboard:** https://expo.dev/accounts/lovendo/projects/lovendo/builds
 - **App Store Connect:** https://appstoreconnect.apple.com
 - **Deployment Guide:** /docs/DEPLOYMENT_GUIDE.md
 - **EAS Config:** /apps/mobile/eas.json

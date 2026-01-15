@@ -1,5 +1,5 @@
 /**
- * TravelMatch Vibe Room - Neon Status Badge
+ * Lovendo Vibe Room - Neon Status Badge
  *
  * Glowing status badges with neon aesthetic.
  * Shows chat/transaction status at a glance.

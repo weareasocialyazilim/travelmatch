@@ -1,4 +1,4 @@
-appId: com.travelmatch.app
+appId: com.lovendo.app
 ---
 # Login Flow E2E Test
 # Tests user authentication with email and password

@@ -1,5 +1,5 @@
 /**
- * TravelMatch Verifications Feature
+ * Lovendo Verifications Feature
  *
  * The security heart of the platform.
  * Handles all proof ceremonies, moment authentication, and trust verification.

@@ -1,5 +1,5 @@
 /**
- * TravelMatch Types - Central Export Hub
+ * Lovendo Types - Central Export Hub
  *
  * TYPE HIERARCHY:
  * 1. db.ts - Database types (SINGLE SOURCE OF TRUTH)

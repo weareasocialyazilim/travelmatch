@@ -9,7 +9,7 @@ ACCESS_TOKEN="sbp_9a6ad7e105b0ad9ae37cb9aea7968f3cfb070a38"
 API_URL="https://api.supabase.com/v1/projects/${PROJECT_REF}/database/query"
 MIGRATIONS_DIR="supabase/migrations"
 
-echo "🚀 TravelMatch Production Database Migration"
+echo "🚀 Lovendo Production Database Migration"
 echo "============================================="
 echo ""
 

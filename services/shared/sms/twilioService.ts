@@ -176,10 +176,10 @@ export async function sendTransactionNotification(
   },
 ): Promise<SendSmsResult> {
   const messages: Record<typeof type, string> = {
-    gift_received: `🎁 TravelMatch: ${details.senderName} size ${details.amount} ${details.currency} değerinde bir hediye gönderdi! "${details.momentTitle}"`,
-    gift_sent: `✅ TravelMatch: ${details.receiverName}'e ${details.amount} ${details.currency} değerinde hediye başarıyla gönderildi.`,
-    payment_completed: `💳 TravelMatch: ${details.amount} ${details.currency} ödemeniz başarıyla tamamlandı.`,
-    escrow_released: `💰 TravelMatch: ${details.amount} ${details.currency} cüzdanınıza aktarıldı.`,
+    gift_received: `🎁 Lovendo: ${details.senderName} size ${details.amount} ${details.currency} değerinde bir hediye gönderdi! "${details.momentTitle}"`,
+    gift_sent: `✅ Lovendo: ${details.receiverName}'e ${details.amount} ${details.currency} değerinde hediye başarıyla gönderildi.`,
+    payment_completed: `💳 Lovendo: ${details.amount} ${details.currency} ödemeniz başarıyla tamamlandı.`,
+    escrow_released: `💰 Lovendo: ${details.amount} ${details.currency} cüzdanınıza aktarıldı.`,
   };
 
   return sendSms(phoneNumber, messages[type]);
@@ -194,9 +194,9 @@ export async function sendSecurityAlert(
   details?: { device?: string; location?: string; ip?: string },
 ): Promise<SendSmsResult> {
   const messages: Record<typeof alertType, string> = {
-    new_device: `🔐 TravelMatch: Hesabınıza yeni bir cihazdan giriş yapıldı${details?.device ? ` (${details.device})` : ''}. Siz değilseniz hemen şifrenizi değiştirin.`,
-    password_changed: `🔐 TravelMatch: Şifreniz başarıyla değiştirildi. Bunu siz yapmadıysanız hemen bize ulaşın.`,
-    suspicious_activity: `⚠️ TravelMatch: Hesabınızda şüpheli aktivite tespit edildi. Güvenliğiniz için hesabınızı kontrol edin.`,
+    new_device: `🔐 Lovendo: Hesabınıza yeni bir cihazdan giriş yapıldı${details?.device ? ` (${details.device})` : ''}. Siz değilseniz hemen şifrenizi değiştirin.`,
+    password_changed: `🔐 Lovendo: Şifreniz başarıyla değiştirildi. Bunu siz yapmadıysanız hemen bize ulaşın.`,
+    suspicious_activity: `⚠️ Lovendo: Hesabınızda şüpheli aktivite tespit edildi. Güvenliğiniz için hesabınızı kontrol edin.`,
   };
 
   return sendSms(phoneNumber, messages[alertType]);

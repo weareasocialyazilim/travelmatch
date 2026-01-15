@@ -376,7 +376,7 @@ class BiometricAuthService {
     }
 
     const result = await this.authenticate({
-      promptMessage: 'Unlock TravelMatch',
+      promptMessage: 'Unlock Lovendo',
       cancelLabel: 'Use Password',
       disableDeviceFallback: false,
     });

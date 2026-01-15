@@ -1,5 +1,5 @@
-// components/ui/TMPill.tsx
-// TravelMatch Ultimate Design System 2026
+// components/ui/LovendoPill.tsx
+// Lovendo Ultimate Design System 2026
 // Pill/Chip component for categories, filters, and tags
 
 import React, { useCallback } from 'react';
@@ -25,7 +25,7 @@ import { SPRING, HAPTIC } from '@/hooks/useMotion';
 type PillVariant = 'default' | 'selected' | 'outlined' | 'muted';
 type PillSize = 'sm' | 'md' | 'lg';
 
-interface TMPillProps {
+interface LovendoPillProps {
   children: string;
   variant?: PillVariant;
   size?: PillSize;
@@ -41,7 +41,7 @@ interface TMPillProps {
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-export const TMPill: React.FC<TMPillProps> = ({
+export const LovendoPill: React.FC<LovendoPillProps> = ({
   children,
   variant = 'default',
   size = 'md',
@@ -229,7 +229,7 @@ export const TMPill: React.FC<TMPillProps> = ({
 };
 
 // Convenience wrapper for category chips
-interface TMCategoryChipProps {
+interface CategoryChipProps {
   category: string;
   emoji?: string;
   selected?: boolean;
@@ -237,16 +237,21 @@ interface TMCategoryChipProps {
   testID?: string;
 }
 
-export const TMCategoryChip: React.FC<TMCategoryChipProps> = ({
+export const CategoryChip: React.FC<CategoryChipProps> = ({
   category,
   emoji,
   selected = false,
   onPress,
   testID,
 }) => (
-  <TMPill emoji={emoji} selected={selected} onPress={onPress} testID={testID}>
+  <LovendoPill
+    emoji={emoji}
+    selected={selected}
+    onPress={onPress}
+    testID={testID}
+  >
     {category}
-  </TMPill>
+  </LovendoPill>
 );
 
 const styles = StyleSheet.create({
@@ -281,4 +286,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TMPill;
+export default LovendoPill;

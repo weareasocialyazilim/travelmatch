@@ -1,8 +1,13 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logger } from '../utils/logger';
+import {
+  getItemWithLegacyFallback,
+  setItemAndCleanupLegacy,
+} from '../utils/storageKeyMigration';
 
-const STORAGE_KEY = '@travelmatch/feedback_prompt';
+const STORAGE_KEY = '@lovendo/feedback_prompt';
+const LEGACY_STORAGE_KEYS = ['@lovendo/feedback_prompt'];
 const SESSION_THRESHOLD = 5; // Show feedback after 5 sessions
 const DAYS_BETWEEN_PROMPTS = 30; // Don't show again for 30 days after dismissal
 
@@ -33,7 +38,10 @@ export function useFeedbackPrompt() {
   useEffect(() => {
     async function loadState() {
       try {
-        const stored = await AsyncStorage.getItem(STORAGE_KEY);
+        const stored = await getItemWithLegacyFallback(
+          STORAGE_KEY,
+          LEGACY_STORAGE_KEYS,
+        );
         if (stored) {
           setState(JSON.parse(stored));
         }
@@ -92,7 +100,11 @@ export function useFeedbackPrompt() {
         sessionCount: currentState.sessionCount + 1,
       };
 
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
+      await setItemAndCleanupLegacy(
+        STORAGE_KEY,
+        JSON.stringify(newState),
+        LEGACY_STORAGE_KEYS,
+      );
       setState(newState);
 
       // Check if we should show feedback
@@ -122,7 +134,11 @@ export function useFeedbackPrompt() {
         lastPromptDate: new Date().toISOString(),
       };
 
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
+      await setItemAndCleanupLegacy(
+        STORAGE_KEY,
+        JSON.stringify(newState),
+        LEGACY_STORAGE_KEYS,
+      );
       setState(newState);
       setShowFeedback(false);
 
@@ -143,7 +159,11 @@ export function useFeedbackPrompt() {
         lastPromptDate: new Date().toISOString(),
       };
 
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
+      await setItemAndCleanupLegacy(
+        STORAGE_KEY,
+        JSON.stringify(newState),
+        LEGACY_STORAGE_KEYS,
+      );
       setState(newState);
       setShowFeedback(false);
 
@@ -161,7 +181,10 @@ export function useFeedbackPrompt() {
   // Reset feedback state (for testing)
   const resetFeedbackState = useCallback(async () => {
     try {
-      await AsyncStorage.removeItem(STORAGE_KEY);
+      await Promise.all([
+        AsyncStorage.removeItem(STORAGE_KEY),
+        ...LEGACY_STORAGE_KEYS.map((k) => AsyncStorage.removeItem(k)),
+      ]);
       setState(defaultState);
       setShowFeedback(false);
       logger.info('useFeedbackPrompt', 'Feedback state reset');

@@ -1,5 +1,5 @@
 /**
- * Paywall - TravelMatch Ultimate Design System 2026
+ * Paywall - Lovendo Ultimate Design System 2026
  * Feature-specific paywall component
  *
  * Shows when user tries to access a premium feature:
@@ -17,7 +17,7 @@ import { COLORS, GRADIENTS, primitives } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { RADIUS, SPACING } from '@/constants/spacing';
 import { HAPTIC } from '@/utils/motion';
-import { TMSheet } from './TMSheet';
+import { LovendoSheet } from './LovendoSheet';
 
 export type PaywallFeature =
   | 'moments'
@@ -101,7 +101,7 @@ const FEATURE_CONFIG: Record<
 };
 
 /**
- * Plan display names - TravelMatch 3-Tier System
+ * Plan display names - Lovendo 3-Tier System
  */
 const PLAN_NAMES: Record<string, string> = {
   basic: 'Momentum (Free)',
@@ -135,7 +135,7 @@ export const Paywall: React.FC<PaywallProps> = ({
   }, [onClose]);
 
   return (
-    <TMSheet
+    <LovendoSheet
       visible={visible}
       onClose={onClose}
       size="content"
@@ -215,7 +215,7 @@ export const Paywall: React.FC<PaywallProps> = ({
           <Text style={styles.dismissText}>Maybe later</Text>
         </Pressable>
       </View>
-    </TMSheet>
+    </LovendoSheet>
   );
 };
 

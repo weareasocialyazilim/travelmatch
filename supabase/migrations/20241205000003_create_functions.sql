@@ -1,4 +1,4 @@
--- TravelMatch Functions and Triggers Migration
+-- Lovendo Functions and Triggers Migration
 -- Version: 1.0.0
 -- Created: 2024-12-05
 -- Description: Database functions and triggers

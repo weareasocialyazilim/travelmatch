@@ -18,8 +18,8 @@ interface AppStoreBadgesProps {
 
 export function AppStoreBadges({
   className = '',
-  appStoreUrl = 'https://apps.apple.com/app/travelmatch',
-  playStoreUrl = 'https://play.google.com/store/apps/details?id=app.travelmatch',
+  appStoreUrl = 'https://apps.apple.com/app/lovendo',
+  playStoreUrl = 'https://play.google.com/store/apps/details?id=app.lovendo',
   variant = 'horizontal',
 }: AppStoreBadgesProps) {
   const containerClass =

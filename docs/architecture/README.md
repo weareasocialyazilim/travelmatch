@@ -1,6 +1,6 @@
-# TravelMatch Architecture Documentation
+# Lovendo Architecture Documentation
 
-Welcome to the TravelMatch architecture documentation. This directory contains comprehensive documentation of the system architecture, design decisions, and technical specifications.
+Welcome to the Lovendo architecture documentation. This directory contains comprehensive documentation of the system architecture, design decisions, and technical specifications.
 
 ## Quick Links
 

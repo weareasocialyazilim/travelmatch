@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "TravelMatch",
+    "appName": "Lovendo",
     "loading": "Yükleniyor...",
     "error": "Hata",
     "success": "Başarılı",
@@ -328,7 +328,7 @@
   },
   "onboarding": {
     "page1": {
-      "title": "TravelMatch'e Hoş Geldiniz",
+      "title": "Lovendo'ya Hoş Geldiniz",
       "description": "Doğrulanmış, içten hediyelerle gezginlere benzersiz yolculuklarında bağlantı kurun ve destek olun."
     },
     "page2": {
@@ -370,7 +370,7 @@
     "getStarted": "Başlayın",
     "continue": "Devam",
     "start": "Başla",
-    "welcome": "TravelMatch'e Hoş Geldiniz",
+    "welcome": "Lovendo'ya Hoş Geldiniz",
     "welcomeMessage": "Gezginlerle bağlantı kurun ve unutulmaz deneyimler yaratın",
     "step1Title": "Anları Keşfedin",
     "step1Description": "Yerli halk tarafından oluşturulan benzersiz seyahat deneyimlerini keşfedin",
@@ -380,7 +380,7 @@
     "step3Description": "Kendi anlarınızı oluşturun ve para kazanın"
   },
   "welcome": {
-    "title": "TravelMatch'e Hoş Geldiniz",
+    "title": "Lovendo'ya Hoş Geldiniz",
     "subtitle": "Yerel halkla tanışın. Deneyimlerinizi paylaşın.\nHer seyahati anlamlı kılın.",
     "continueWithApple": "Apple ile devam et",
     "continueWithGoogle": "Google ile devam et",
@@ -471,7 +471,7 @@
     "deleteAccountWarning": "Bu işlem geri alınamaz. Tüm verileriniz kalıcı olarak silinecektir."
   },
   "store": {
-    "appName": "TravelMatch",
+    "appName": "Lovendo",
     "subtitle": "Anları Paylaş, Bağlantı Kur",
     "shortDescription": "Yakınındaki insanlarla tanış. Anları paylaş. Deneyimleri hediye et. Farklı bağlan.",
     "keywords": "buluşma,deneyim,hediye,tanışma,anlar,keşfet,bağlantı,kahve,yemek,çıkma"
@@ -511,7 +511,7 @@
     "version": "Sürüm",
     "build": "Yapı",
     "buildDate": "Yapı Tarihi",
-    "copyright": "© 2024 TravelMatch Inc."
+    "copyright": "© 2024 Lovendo Inc."
   },
   "notifications": {
     "settings": {
@@ -707,7 +707,7 @@
     },
     "forceUpdate": {
       "title": "Güncelleme Gerekli",
-      "description": "TravelMatch'in yeni bir sürümü mevcut. Devam etmek için lütfen güncelleyin.",
+      "description": "Lovendo'nun yeni bir sürümü mevcut. Devam etmek için lütfen güncelleyin.",
       "update": "Şimdi Güncelle"
     },
     "notFound": {
@@ -871,7 +871,7 @@
   },
   "profile": {
     "title": "Profil",
-    "shareMessage": "TravelMatch profilime göz at!",
+    "shareMessage": "Lovendo profilime göz at!",
     "shareProfile": "Profili paylaş",
     "savedMoments": "Kaydedilen Anlar",
     "offlineTitle": "İnternet bağlantısı yok",

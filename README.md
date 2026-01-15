@@ -1,8 +1,8 @@
-# TravelMatch
+# Lovendo
 
 **Gift travel experiences to the people you love.**
 
-TravelMatch is a platform where you can send monetary gifts for travel experiences. Recipients must
+Lovendo is a platform where you can send monetary gifts for travel experiences. Recipients must
 provide proof of completing the experience before funds are released — turning every gift into a
 guaranteed memory.
 
@@ -56,7 +56,7 @@ guaranteed memory.
 ## 📁 Project Structure
 
 ```
-travelmatch/
+lovendo/
 ├── apps/
 │   ├── mobile/          # React Native app (iOS & Android)
 │   ├── web/             # Next.js landing page

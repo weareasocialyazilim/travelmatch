@@ -46,7 +46,7 @@ const mockLogger = logger;
 describe('Moment Creation Flow Integration', () => {
   const mockUser = {
     id: 'user-123',
-    email: 'creator@travelmatch.com',
+    email: 'creator@lovendo.com',
     user_metadata: { name: 'Moment Creator' },
   };
 

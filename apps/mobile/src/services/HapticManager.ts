@@ -1,11 +1,11 @@
 /**
  * HapticManager - Centralized Haptic Feedback System
  *
- * Master-level haptic feedback management for TravelMatch.
+ * Master-level haptic feedback management for Lovendo.
  * Provides semantic haptic patterns for all user interactions.
  *
  * Features:
- * - Semantic haptic patterns for TravelMatch actions
+ * - Semantic haptic patterns for Lovendo actions
  * - User preference integration
  * - Analytics tracking
  * - Debouncing for rapid interactions
@@ -19,7 +19,7 @@
  * HapticManager.buttonPress();
  * HapticManager.success();
  *
- * // TravelMatch-specific patterns
+ * // Lovendo-specific patterns
  * HapticManager.momentCreated();
  * HapticManager.paymentComplete();
  * HapticManager.matchFound();
@@ -30,6 +30,10 @@ import { Platform } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logger } from '../utils/logger';
+import {
+  getItemWithLegacyFallback,
+  setItemAndCleanupLegacy,
+} from '../utils/storageKeyMigration';
 
 // =============================================================================
 // TYPES
@@ -59,7 +63,8 @@ interface _HapticEvent {
 // CONSTANTS
 // =============================================================================
 
-const STORAGE_KEY = '@travelmatch/haptic_preferences';
+const STORAGE_KEY = '@lovendo/haptic_preferences';
+const LEGACY_STORAGE_KEYS = ['@lovendo/haptic_preferences_legacy'];
 const DEBOUNCE_MS = 50; // Minimum time between haptics
 const MAX_EVENTS_PER_SECOND = 10; // Rate limiting
 
@@ -91,7 +96,10 @@ class HapticManagerClass {
    */
   private async loadPreferences(): Promise<void> {
     try {
-      const stored = await AsyncStorage.getItem(STORAGE_KEY);
+      const stored = await getItemWithLegacyFallback(
+        STORAGE_KEY,
+        LEGACY_STORAGE_KEYS,
+      );
       if (stored) {
         this.config = { ...this.config, ...JSON.parse(stored) };
       }
@@ -105,7 +113,11 @@ class HapticManagerClass {
    */
   private async savePreferences(): Promise<void> {
     try {
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(this.config));
+      await setItemAndCleanupLegacy(
+        STORAGE_KEY,
+        JSON.stringify(this.config),
+        LEGACY_STORAGE_KEYS,
+      );
     } catch (error) {
       logger.warn('Failed to save haptic preferences', { error });
     }
@@ -329,7 +341,7 @@ class HapticManagerClass {
   swipe = (): Promise<void> => this.impact('light');
 
   // ===========================================================================
-  // TRAVELMATCH-SPECIFIC PATTERNS
+  // LOVENDO-SPECIFIC PATTERNS
   // ===========================================================================
 
   /**

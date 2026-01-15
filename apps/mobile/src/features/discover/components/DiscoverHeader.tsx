@@ -7,7 +7,7 @@
  * 40+ yaş: Yüksek okunabilirlik, net hiyerarşi
  * GenZ: Estetik derinlik, modern tipografi
  *
- * Part of TravelMatch "Cinematic Trust Jewelry" Design System.
+ * Part of Lovendo "Cinematic Trust Jewelry" Design System.
  */
 import React from 'react';
 import {

@@ -1,9 +1,9 @@
-# TravelMatch Data Architecture
+# Lovendo Data Architecture
 
 > **Version**: 1.0.0
 > **Last Updated**: December 2024
 
-This document describes the data architecture of TravelMatch, including database design, data flows, and storage patterns.
+This document describes the data architecture of Lovendo, including database design, data flows, and storage patterns.
 
 ## Table of Contents
 

@@ -10,7 +10,7 @@ December 2024
 
 ## Context
 
-TravelMatch needs a backend infrastructure that provides:
+Lovendo needs a backend infrastructure that provides:
 
 1. User authentication with social providers
 2. Real-time capabilities for messaging

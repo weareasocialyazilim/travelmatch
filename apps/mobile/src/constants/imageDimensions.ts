@@ -1,5 +1,5 @@
 /**
- * TravelMatch Image Dimensions - 2026 Standards
+ * Lovendo Image Dimensions - 2026 Standards
  * Based on 2025/2026 social media best practices
  *
  * Key ratios:

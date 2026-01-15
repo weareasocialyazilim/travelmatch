@@ -1,4 +1,4 @@
--- TravelMatch Initial Schema Migration
+-- Lovendo Initial Schema Migration
 -- Version: 1.0.0
 -- Created: 2024-12-05
 -- Description: Core tables for users, moments, requests, conversations, messages, reviews, notifications, reports, blocks, favorites, and transactions

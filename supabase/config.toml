@@ -46,13 +46,13 @@ max_client_conn = 100
 [auth]
 enabled = true
 # Production site URL (primary domain)
-site_url = "https://travelmatch.app"
+site_url = "https://lovendo.app"
 # Redirect URLs for OAuth callbacks and deep links
 additional_redirect_urls = [
-  "https://www.travelmatch.app",
-  "https://staging.travelmatch.app",
-  "travelmatch://",  # Mobile app deep link (prefix match)
-  "travelmatch://auth/callback",  # OAuth callback for social login
+  "https://www.lovendo.app",
+  "https://staging.lovendo.app",
+  "lovendo://",  # Mobile app deep link (prefix match)
+  "lovendo://auth/callback",  # OAuth callback for social login
 ]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true
@@ -75,8 +75,8 @@ enable_confirmations = false
 #   Port: 587
 #   Username: apikey
 #   Password: env(SENDGRID_API_KEY)
-#   Sender email: noreply@travelmatch.app
-#   Sender name: TravelMatch
+#   Sender email: noreply@lovendo.app
+#   Sender name: Lovendo
 
 [auth.sms]
 enable_signup = true

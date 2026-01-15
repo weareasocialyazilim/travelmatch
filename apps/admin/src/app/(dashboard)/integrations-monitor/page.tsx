@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * TravelMatch Integration Monitoring
+ * Lovendo Integration Monitoring
  * Tum 3rd party entegrasyonlarin durumu ve metrikleri
  *
  * PayTR, Supabase, Twilio, SendGrid, Cloudflare, Sentry, PostHog

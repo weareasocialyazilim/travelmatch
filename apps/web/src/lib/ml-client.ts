@@ -1,5 +1,5 @@
 /**
- * TravelMatch ML Service Client
+ * Lovendo ML Service Client
  * "Deneyim Asistanı" - ML yeteneklerini web'e bağlar
  *
  * KULLANICI DİLİ: "Deneyim Asistanı" (ML, AI, algorithm yasak)

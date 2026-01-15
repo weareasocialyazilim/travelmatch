@@ -97,9 +97,9 @@ packagingOptions {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.travelmatch.app'
+    namespace 'com.lovendo.app'
     defaultConfig {
-        applicationId 'com.travelmatch.app'
+        applicationId 'com.lovendo.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

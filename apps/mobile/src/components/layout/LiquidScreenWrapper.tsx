@@ -1,5 +1,5 @@
 // components/layout/LiquidScreenWrapper.tsx
-// TravelMatch Ultimate Design System 2026
+// Lovendo Ultimate Design System 2026
 // Premium screen wrapper with Twilight Zinc background and safe area
 
 import React from 'react';

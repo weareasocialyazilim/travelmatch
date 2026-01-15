@@ -1,5 +1,5 @@
 /**
- * TravelMatch API Load Testing
+ * Lovendo API Load Testing
  * 
  * Comprehensive load test for all critical API endpoints
  * Target: 500 req/s sustained, p95 < 100ms, 0% error rate

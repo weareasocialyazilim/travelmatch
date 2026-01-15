@@ -59,7 +59,7 @@ module.exports = {
     '^expo-image-manipulator$': '<rootDir>/__mocks__/expo-image-manipulator.js',
     '^expo-haptics$': '<rootDir>/__mocks__/expo-haptics.js',
     '^posthog-react-native$': '<rootDir>/__mocks__/posthog-react-native.js',
-    '^@travelmatch/design-system/tokens$': '<rootDir>/__mocks__/design-tokens.js',
+    '^@lovendo/design-system/tokens$': '<rootDir>/__mocks__/design-tokens.js',
     '^@react-native-community/datetimepicker$': '<rootDir>/__mocks__/@react-native-community/datetimepicker.js',
     // Shared mocks in tests/__mocks__/ to avoid duplication
     '^react-native-svg$': '<rootDir>/../../tests/__mocks__/react-native-svg.js',

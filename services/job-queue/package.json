@@ -1,5 +1,5 @@
 {
-  "name": "@travelmatch/job-queue",
+  "name": "@lovendo/job-queue",
   "version": "1.0.0",
   "private": true,
   "description": "Background job queue service using BullMQ and Redis",

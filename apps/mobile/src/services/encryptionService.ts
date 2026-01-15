@@ -8,8 +8,39 @@ import {
 } from 'tweetnacl-util';
 import { logger } from '../utils/logger';
 
-const PRIVATE_KEY_STORAGE_KEY = 'travelmatch_private_key';
-const PUBLIC_KEY_STORAGE_KEY = 'travelmatch_public_key';
+const PRIVATE_KEY_STORAGE_KEY = 'lovendo_private_key';
+const PUBLIC_KEY_STORAGE_KEY = 'lovendo_public_key';
+
+const LEGACY_PRIVATE_KEY_STORAGE_KEYS = ['lovendo_private_key'];
+const LEGACY_PUBLIC_KEY_STORAGE_KEYS = ['lovendo_public_key'];
+
+async function getSecureItemWithLegacyFallback(
+  key: string,
+  legacyKeys: string[],
+): Promise<string | null> {
+  const currentVal = await SecureStore.getItemAsync(key);
+  if (currentVal) return currentVal;
+
+  for (const legacyKey of legacyKeys) {
+    const legacyVal = await SecureStore.getItemAsync(legacyKey);
+    if (legacyVal) {
+      await SecureStore.setItemAsync(key, legacyVal);
+      await SecureStore.deleteItemAsync(legacyKey);
+      return legacyVal;
+    }
+  }
+
+  return null;
+}
+
+async function setSecureItemAndCleanupLegacy(
+  key: string,
+  value: string,
+  legacyKeys: string[],
+): Promise<void> {
+  await SecureStore.setItemAsync(key, value);
+  await Promise.all(legacyKeys.map((k) => SecureStore.deleteItemAsync(k)));
+}
 
 export interface KeyPair {
   publicKey: string;
@@ -32,12 +63,14 @@ export const encryptionService = {
    */
   initializeKeys: async (): Promise<KeyPair> => {
     try {
-      // Check if keys already exist
-      const storedPrivateKey = await SecureStore.getItemAsync(
+      // Check if keys already exist (with legacy migration)
+      const storedPrivateKey = await getSecureItemWithLegacyFallback(
         PRIVATE_KEY_STORAGE_KEY,
+        LEGACY_PRIVATE_KEY_STORAGE_KEYS,
       );
-      const storedPublicKey = await SecureStore.getItemAsync(
+      const storedPublicKey = await getSecureItemWithLegacyFallback(
         PUBLIC_KEY_STORAGE_KEY,
+        LEGACY_PUBLIC_KEY_STORAGE_KEYS,
       );
 
       if (storedPrivateKey && storedPublicKey) {
@@ -53,8 +86,16 @@ export const encryptionService = {
       const privateKeyBase64 = encodeBase64(keyPair.secretKey);
 
       // Store keys securely
-      await SecureStore.setItemAsync(PRIVATE_KEY_STORAGE_KEY, privateKeyBase64);
-      await SecureStore.setItemAsync(PUBLIC_KEY_STORAGE_KEY, publicKeyBase64);
+      await setSecureItemAndCleanupLegacy(
+        PRIVATE_KEY_STORAGE_KEY,
+        privateKeyBase64,
+        LEGACY_PRIVATE_KEY_STORAGE_KEYS,
+      );
+      await setSecureItemAndCleanupLegacy(
+        PUBLIC_KEY_STORAGE_KEY,
+        publicKeyBase64,
+        LEGACY_PUBLIC_KEY_STORAGE_KEYS,
+      );
 
       logger.info('[Encryption] New key pair generated');
 
@@ -72,7 +113,10 @@ export const encryptionService = {
    * Get the user's public key
    */
   getPublicKey: async (): Promise<string | null> => {
-    return await SecureStore.getItemAsync(PUBLIC_KEY_STORAGE_KEY);
+    return await getSecureItemWithLegacyFallback(
+      PUBLIC_KEY_STORAGE_KEY,
+      LEGACY_PUBLIC_KEY_STORAGE_KEYS,
+    );
   },
 
   /**
@@ -85,8 +129,9 @@ export const encryptionService = {
     recipientPublicKeyBase64: string,
   ): Promise<EncryptedMessage> => {
     try {
-      const privateKeyBase64 = await SecureStore.getItemAsync(
+      const privateKeyBase64 = await getSecureItemWithLegacyFallback(
         PRIVATE_KEY_STORAGE_KEY,
+        LEGACY_PRIVATE_KEY_STORAGE_KEYS,
       );
       if (!privateKeyBase64) throw new Error('Private key not found');
 
@@ -124,8 +169,9 @@ export const encryptionService = {
     senderPublicKeyBase64: string,
   ): Promise<string> => {
     try {
-      const privateKeyBase64 = await SecureStore.getItemAsync(
+      const privateKeyBase64 = await getSecureItemWithLegacyFallback(
         PRIVATE_KEY_STORAGE_KEY,
+        LEGACY_PRIVATE_KEY_STORAGE_KEYS,
       );
       if (!privateKeyBase64) throw new Error('Private key not found');
 
@@ -158,5 +204,11 @@ export const encryptionService = {
   clearKeys: async () => {
     await SecureStore.deleteItemAsync(PRIVATE_KEY_STORAGE_KEY);
     await SecureStore.deleteItemAsync(PUBLIC_KEY_STORAGE_KEY);
+    await Promise.all(
+      [
+        ...LEGACY_PRIVATE_KEY_STORAGE_KEYS,
+        ...LEGACY_PUBLIC_KEY_STORAGE_KEYS,
+      ].map((k) => SecureStore.deleteItemAsync(k)),
+    );
   },
 };

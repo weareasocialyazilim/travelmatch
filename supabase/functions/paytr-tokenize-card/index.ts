@@ -146,7 +146,7 @@ serve(async (req: Request) => {
     // Hash = base64(sha256(merchant_id + user_ip + merchant_oid + email + card_owner + card_number + expire_month + expire_year + cvv + test_mode + merchant_salt))
     const userIp =
       req.headers.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1';
-    const userEmail = user.email || 'user@travelmatch.app';
+    const userEmail = user.email || 'user@lovendo.app';
     const testMode = config.testMode ? '1' : '0';
 
     const hashStr = `${config.merchantId}${userIp}${merchantOid}${userEmail}${body.cardHolderName}${cleanedNumber}${body.expireMonth}${body.expireYear}${body.cvv}${testMode}${config.merchantSalt}`;

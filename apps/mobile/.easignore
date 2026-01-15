@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════════════
-# TravelMatch Mobile - EAS Build Ignore List
+# Lovendo Mobile - EAS Build Ignore List
 # NOTE: EAS uploads from monorepo ROOT, not from apps/mobile!
 # All paths must be relative to monorepo root
 # Target: 628MB → ~25MB

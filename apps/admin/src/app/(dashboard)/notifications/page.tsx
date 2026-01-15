@@ -73,7 +73,7 @@ const notificationTemplates = [
   {
     id: '1',
     name: 'Hoş Geldin',
-    title: "TravelMatch'e Hoş Geldin! 🌍",
+    title: "Lovendo'e Hoş Geldin! 🌍",
     body: 'Seyahat arkadaşını bulmaya hazır mısın?',
   },
   {

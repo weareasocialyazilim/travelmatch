@@ -1,6 +1,6 @@
 /**
  * Gift Tier Schema - 0-30-100 Barem Kuralları
- * TravelMatch Master UX System
+ * Lovendo Master UX System
  *
  * Bu schema, hediye miktarına göre chat ve onay kurallarını
  * backend'e gitmeden önce Zod ile doğrular.

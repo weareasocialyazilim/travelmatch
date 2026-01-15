@@ -1,7 +1,7 @@
 /**
  * AI Service
  *
- * Comprehensive AI/ML service for TravelMatch mobile app.
+ * Comprehensive AI/ML service for Lovendo mobile app.
  * Integrates with ML service via Supabase Edge Functions.
  *
  * Features:

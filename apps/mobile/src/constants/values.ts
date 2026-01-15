@@ -2,10 +2,10 @@ import { SHADOWS } from './shadows';
 
 export const VALUES = {
   // App deep link scheme
-  APP_SCHEME: 'travelmatch',
+  APP_SCHEME: 'lovendo',
   DEEP_LINKS: {
-    AUTH_CALLBACK: 'travelmatch://auth/callback',
-    RESET_PASSWORD: 'travelmatch://auth/reset-password',
+    AUTH_CALLBACK: 'lovendo://auth/callback',
+    RESET_PASSWORD: 'lovendo://auth/reset-password',
   },
 
   // Default images - undefined triggers component's built-in fallback UI

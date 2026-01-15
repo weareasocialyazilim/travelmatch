@@ -16,6 +16,7 @@ import { supabase } from '@/config/supabase';
 import { useToast } from '@/context/ToastContext';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { COLORS } from '@/constants/colors';
+import { VALUES } from '@/constants/values';
 import { logger } from '@/utils/logger';
 
 type EmailAuthStep = 'email' | 'sent';
@@ -46,7 +47,7 @@ export const EmailAuthScreen: React.FC = () => {
         email,
         options: {
           // Deep link back to the app
-          emailRedirectTo: 'travelmatch://auth/callback',
+          emailRedirectTo: VALUES.DEEP_LINKS.AUTH_CALLBACK,
         },
       });
 

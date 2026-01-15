@@ -324,7 +324,7 @@ function checkPII(text: string, msgs: typeof MESSAGES['tr']): Violation[] {
 
   // Instagram
   const igMatch = text.match(/@[a-zA-Z0-9._]{3,30}/);
-  if (igMatch && !text.includes('@travelmatch')) {
+  if (igMatch && !text.includes('@lovendo')) {
     violations.push({
       type: 'external_contact',
       matched: igMatch[0],

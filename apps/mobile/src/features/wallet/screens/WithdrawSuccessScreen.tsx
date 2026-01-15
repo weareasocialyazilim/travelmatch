@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { FONTS } from '@/constants/typography';
-import { TMButton } from '@/components/ui/TMButton';
+import { LovendoButton } from '@/components/ui/LovendoButton';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -47,12 +47,12 @@ export const WithdrawSuccessScreen = ({
 
         <View style={styles.receiptContainer}>
           <Text style={styles.receiptLabel}>İŞLEM KODU</Text>
-          <Text style={styles.receiptValue}>#TM-98234-AX</Text>
+          <Text style={styles.receiptValue}>#LV-98234-AX</Text>
         </View>
       </View>
 
       <View style={styles.footer}>
-        <TMButton
+        <LovendoButton
           title="Cüzdana Dön"
           variant="secondary"
           onPress={() => navigation.navigate('Wallet')}

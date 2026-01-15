@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 
 /**
- * TravelMatch Developer CLI (tm)
+ * Lovendo Developer CLI (lovendo)
  *
  * A unified command-line interface for all development tasks
  *
  * Usage:
- *   tm dev          - Start development environment
- *   tm db           - Database commands
- *   tm test         - Run tests
- *   tm docker       - Docker commands
- *   tm deploy       - Deploy commands
- *   tm help         - Show help
+ *   lovendo dev          - Start development environment
+ *   lovendo db           - Database commands
+ *   lovendo test         - Run tests
+ *   lovendo docker       - Docker commands
+ *   lovendo deploy       - Deploy commands
+ *   lovendo help         - Show help
  */
 
 import { spawn, execSync } from 'child_process';
@@ -90,7 +90,7 @@ const commands = {
         description: 'Start mobile app only',
         run: async () => {
           log('📱 Starting mobile app...', 'cyan');
-          await runCommand('pnpm', ['--filter', '@travelmatch/mobile', 'dev']);
+          await runCommand('pnpm', ['--filter', '@lovendo/mobile', 'dev']);
         },
       },
       admin: {
@@ -338,7 +338,7 @@ const commands = {
           log('📱 Building mobile app...', 'cyan');
           await runCommand('pnpm', [
             '--filter',
-            '@travelmatch/mobile',
+            '@lovendo/mobile',
             'build',
           ]);
         },
@@ -389,7 +389,7 @@ const commands = {
           log('✅ Docker environment ready', 'green');
           log('\nNext steps:', 'cyan');
           log('  1. Review .env.local and customize if needed', 'dim');
-          log('  2. Run: tm docker up', 'dim');
+          log('  2. Run: lovendo docker up', 'dim');
         },
       },
       all: {
@@ -465,10 +465,10 @@ const commands = {
 
 function showHelp() {
   log('\n' + '='.repeat(60), 'bright');
-  log('🚀 TravelMatch Developer CLI', 'bright');
+  log('🚀 Lovendo Developer CLI', 'bright');
   log('='.repeat(60) + '\n', 'bright');
 
-  log('Usage: tm <command> [subcommand]\n', 'cyan');
+  log('Usage: lovendo <command> [subcommand]\n', 'cyan');
 
   log('Available commands:\n', 'bright');
 
@@ -493,16 +493,16 @@ function showHelp() {
   }
 
   log('\nExamples:', 'bright');
-  log('  tm dev start              Start all development servers', 'dim');
-  log('  tm db reset               Reset local database', 'dim');
-  log('  tm test coverage          Run tests with coverage', 'dim');
-  log('  tm docker up              Start Docker stack', 'dim');
-  log('  tm lint fix               Fix linting errors', 'dim');
+  log('  lovendo dev start              Start all development servers', 'dim');
+  log('  lovendo db reset               Reset local database', 'dim');
+  log('  lovendo test coverage          Run tests with coverage', 'dim');
+  log('  lovendo docker up              Start Docker stack', 'dim');
+  log('  lovendo lint fix               Fix linting errors', 'dim');
 
   log('\n💡 Tips:', 'cyan');
-  log('  • Run "tm help" anytime to see this help', 'dim');
+  log('  • Run "lovendo help" anytime to see this help', 'dim');
   log('  • Check docs/ folder for detailed guides', 'dim');
-  log('  • Use Docker for local development: tm docker up', 'dim');
+  log('  • Use Docker for local development: lovendo docker up', 'dim');
   log('');
 }
 
@@ -523,17 +523,17 @@ async function main() {
 
   if (!command) {
     log(`❌ Unknown command: ${commandName}`, 'red');
-    log('Run "tm help" to see available commands', 'dim');
+    log('Run "lovendo help" to see available commands', 'dim');
     process.exit(1);
   }
 
-  // Direct command (e.g., "tm help")
+  // Direct command (e.g., "lovendo help")
   if (command.run) {
     await command.run();
     return;
   }
 
-  // Command with subcommands (e.g., "tm dev start")
+  // Command with subcommands (e.g., "lovendo dev start")
   if (!subCommandName) {
     log(`❌ Missing subcommand for: ${commandName}`, 'red');
     log(`Available subcommands:`, 'dim');

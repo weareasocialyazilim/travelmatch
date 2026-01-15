@@ -1,6 +1,6 @@
 /**
  * Design Tokens - Typography
- * TravelMatch Web Design System 2026
+ * Lovendo Web Design System 2026
  * "Cinematic Travel + Trust Jewelry"
  */
 

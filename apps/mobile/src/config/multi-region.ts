@@ -8,17 +8,17 @@ export const EDGE_REGIONS = {
   primary: {
     region: 'eu-west-1', // Frankfurt (Turkey'ye en yakın)
     name: 'Europe West',
-    cdnEndpoint: 'https://eu-west.travelmatch.app',
+    cdnEndpoint: 'https://eu-west.lovendo.xyz',
   },
   secondary: {
     region: 'us-east-1', // N. Virginia
     name: 'US East',
-    cdnEndpoint: 'https://us-east.travelmatch.app',
+    cdnEndpoint: 'https://us-east.lovendo.xyz',
   },
   tertiary: {
     region: 'ap-southeast-1', // Singapore
     name: 'Asia Pacific',
-    cdnEndpoint: 'https://ap-southeast.travelmatch.app',
+    cdnEndpoint: 'https://ap-southeast.lovendo.xyz',
   },
 } as const;
 

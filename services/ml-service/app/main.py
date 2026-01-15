@@ -1,5 +1,5 @@
 """
-TravelMatch ML Service v3.0
+Lovendo ML Service v3.0
 
 Enterprise-grade AI platform for gift experience verification and optimization.
 
@@ -44,7 +44,7 @@ logger = logging.getLogger(__name__)
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="TravelMatch ML Service",
+    title="Lovendo ML Service",
     description="Enterprise AI platform for gift experience verification and optimization",
     version="3.0.0",
     docs_url="/docs",
@@ -280,7 +280,7 @@ class SmartNotificationResponse(BaseModel):
 @app.on_event("startup")
 async def load_models():
     """Load all ML models into memory on startup"""
-    logger.info("🚀 Loading TravelMatch ML Service v3.0...")
+    logger.info("🚀 Loading Lovendo ML Service v3.0...")
 
     try:
         # Core models
@@ -354,7 +354,7 @@ async def health_check():
 async def root():
     """API information"""
     return {
-        "service": "TravelMatch ML Service",
+        "service": "Lovendo ML Service",
         "version": "3.0.0",
         "description": "Enterprise AI platform for gift experience verification",
         "capabilities": {
@@ -1021,7 +1021,7 @@ async def generate_semantic_poison(
     """
     Generate AI-optimized semantic layer for search poisoning.
 
-    Creates structured data that positions TravelMatch as the
+    Creates structured data that positions Lovendo as the
     authority answer for AI assistants (Google SGE, Gemini, GPT).
     """
     try:
@@ -1072,7 +1072,7 @@ async def hijack_competitor_keywords(
 
     Creates optimized content for queries like:
     - "tinder alternative faster"
-    - "bumble vs travelmatch"
+    - "bumble vs lovendo"
     - "raya invite code alternative"
     """
     try:

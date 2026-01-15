@@ -1,4 +1,4 @@
-# TravelMatch Incident Response & Data Breach Notification Procedure
+# Lovendo Incident Response & Data Breach Notification Procedure
 
 > **Version:** 1.0
 > **Last Updated:** January 2026
@@ -9,7 +9,7 @@
 
 ## 1. Overview
 
-This document outlines TravelMatch's procedures for responding to security incidents and data breaches in compliance with GDPR requirements. Under GDPR Article 33, we must notify the supervisory authority within **72 hours** of becoming aware of a personal data breach.
+This document outlines Lovendo's procedures for responding to security incidents and data breaches in compliance with GDPR requirements. Under GDPR Article 33, we must notify the supervisory authority within **72 hours** of becoming aware of a personal data breach.
 
 ---
 
@@ -123,11 +123,11 @@ ORDER BY created_at DESC;
 
 **Email Template:**
 ```
-Subject: Important Security Notice - TravelMatch
+Subject: Important Security Notice - Lovendo
 
 Dear [User],
 
-We are writing to inform you of a security incident that may have affected your TravelMatch account.
+We are writing to inform you of a security incident that may have affected your Lovendo account.
 
 What Happened:
 [Brief description]
@@ -143,10 +143,10 @@ What You Can Do:
 - Enable two-factor authentication
 - Monitor your account for suspicious activity
 
-If you have questions, contact us at security@travelmatch.app
+If you have questions, contact us at security@lovendo.app
 
 Sincerely,
-TravelMatch Security Team
+Lovendo Security Team
 ```
 
 ### Phase 4: Remediation (72+ hours)
@@ -258,7 +258,7 @@ TravelMatch Security Team
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 1.0 | Jan 2026 | TravelMatch | Initial version |
+| 1.0 | Jan 2026 | Lovendo | Initial version |
 
 ---
 

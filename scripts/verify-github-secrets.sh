@@ -5,7 +5,7 @@
 
 set -e
 
-echo "🔍 GitHub Secrets Verification for TravelMatch"
+echo "🔍 GitHub Secrets Verification for Lovendo"
 echo "================================================"
 echo ""
 
@@ -258,7 +258,7 @@ if [ $p0_configured -lt $p0_count ]; then
     echo "1. Add P0 secrets (CRITICAL)"
     echo "   See: docs/GITHUB_SECRETS_SETUP.md"
     echo ""
-    echo "   GitHub Settings: https://github.com/kemalteksalgit/travelmatch/settings/secrets/actions"
+    echo "   GitHub Settings: https://github.com/kemalteksalgit/lovendo/settings/secrets/actions"
     echo ""
     echo "   Missing P0 secrets:"
     for secret in "${!P0_SECRETS[@]}"; do

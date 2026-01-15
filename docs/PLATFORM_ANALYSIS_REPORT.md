@@ -1,4 +1,4 @@
-# TravelMatch Platform - Kapsamlı Teknik Analiz Raporu
+# Lovendo Platform - Kapsamlı Teknik Analiz Raporu
 
 > **Rapor Tarihi:** 2 Ocak 2026
 > **Versiyon:** 5.0
@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-**TravelMatch**, seyahat deneyimlerini hediye olarak göndermeyi sağlayan yenilikçi bir sosyal platformdur. Kullanıcılar Tokyo'da bir kahve deneyiminden Santorini'de romantik bir akşam yemeğine kadar gerçek seyahat anlarını hediye edebilir. Platform, AI-destekli kanıt doğrulama sistemi sayesinde deneyimlerin gerçekleştiğini teyit eder ve güvenli escrow ödeme altyapısı ile finansal işlemleri koruma altına alır.
+**Lovendo**, seyahat deneyimlerini hediye olarak göndermeyi sağlayan yenilikçi bir sosyal platformdur. Kullanıcılar Tokyo'da bir kahve deneyiminden Santorini'de romantik bir akşam yemeğine kadar gerçek seyahat anlarını hediye edebilir. Platform, AI-destekli kanıt doğrulama sistemi sayesinde deneyimlerin gerçekleştiğini teyit eder ve güvenli escrow ödeme altyapısı ile finansal işlemleri koruma altına alır.
 
 ### Genel Değerlendirme
 
@@ -59,7 +59,7 @@ packages/
 ### 2.1 Monorepo Organizasyonu
 
 ```
-travelmatch/
+lovendo/
 │
 ├── apps/                          # Uygulamalar
 │   ├── mobile/                    # React Native + Expo 52
@@ -258,7 +258,7 @@ GRADIENTS = {
 | Paydaş | Pay | Açıklama |
 |--------|-----|----------|
 | **Alıcı (Host)** | %70 | Deneyimi sunan kişi |
-| **Platform** | %30 | TravelMatch komisyonu |
+| **Platform** | %30 | Lovendo komisyonu |
 
 **Özel Oranlar:**
 - VIP kullanıcılar: Azaltılmış komisyon
@@ -418,7 +418,7 @@ if (signature !== expectedSignature) {
 
 ```yaml
 Platform:
-  - iOS: Bundle ID com.travelmatch.mobile
+  - iOS: Bundle ID com.lovendo.mobile
   - Android: Full Play Store support
 
 Architecture:
@@ -430,7 +430,7 @@ Architecture:
 Build:
   - EAS Build profiles (development, staging, production)
   - OTA Updates via Expo
-  - Deep linking: travelmatch://
+  - Deep linking: lovendo://
 ```
 
 ### 6.3 Settings Ekranları (30+)
@@ -914,7 +914,7 @@ Code Hygiene:
 
 ### Final Assessment
 
-> **TravelMatch, güçlü bir teknik temele sahip, production-ready bir platformdur.**
+> **Lovendo, güçlü bir teknik temele sahip, production-ready bir platformdur.**
 >
 > P0 blocker'ların çözümü ile **Ocak 2026 lansmanı için hazır** olacaktır.
 >
@@ -966,5 +966,5 @@ pnpm format           # Kod formatlama
 
 ---
 
-*Bu rapor, TravelMatch platformunun kapsamlı teknik analizini içermektedir.*
+*Bu rapor, Lovendo platformunun kapsamlı teknik analizini içermektedir.*
 *Rapor Tarihi: 2 Ocak 2026 | Versiyon: 5.0*

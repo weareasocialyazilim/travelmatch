@@ -1,7 +1,7 @@
 /**
  * Auth Service
  *
- * Consolidated authentication service for TravelMatch.
+ * Consolidated authentication service for Lovendo.
  * Handles email/password, OAuth, phone OTP, and session management.
  */
 

@@ -1,13 +1,13 @@
 export { Button } from './ui/Button';
-// TMButton - Consolidated master button component
-export { TMButton } from './ui/TMButton';
+// LovendoButton - Consolidated master button component
+export { LovendoButton } from './ui/LovendoButton';
 export type {
-  TMButtonProps,
+  LovendoButtonProps,
   ButtonVariant,
   ButtonSize,
   AnimationMode,
   HapticType,
-} from './ui/TMButton';
+} from './ui/LovendoButton';
 export { SocialButton } from './SocialButton';
 export type { SocialButtonProps } from './SocialButton';
 export {
@@ -89,9 +89,9 @@ export { LoginPromptModal } from './LoginPromptModal';
 export { EmptyStateIllustration } from './ui/EmptyStateIllustration';
 export { EmptyState } from './ui/EmptyState';
 
-// Loading States & Skeletons - All from TMSkeleton.tsx
+// Loading States & Skeletons - All from LovendoSkeleton.tsx
 export {
-  TMSkeleton,
+  LovendoSkeleton,
   Skeleton,
   SkeletonAvatar,
   SkeletonText,
@@ -99,8 +99,8 @@ export {
   SkeletonMessage,
   SkeletonList,
   ScreenSkeleton,
-} from './ui/TMSkeleton';
-export type { SkeletonListType } from './ui/TMSkeleton';
+} from './ui/LovendoSkeleton';
+export type { SkeletonListType } from './ui/LovendoSkeleton';
 
 export { ErrorState } from './ErrorState';
 
@@ -125,13 +125,13 @@ export {
   FormInput,
 } from './FormComponents';
 
-// Layout Components (TravelMatch: The Rebirth)
+// Layout Components (Lovendo: The Rebirth)
 // FloatingDock is exported from navigation for proper React Navigation integration
 export { FloatingDock } from './navigation';
 
-// Trust Badge & Ring - TMTrustRing is the consolidated component
-export { TMTrustRing } from './ui/TMTrustRing';
-// TrustRing silindi - TMTrustRing kullanılmalı
+// Trust Badge & Ring - LovendoTrustRing is the consolidated component
+export { LovendoTrustRing } from './ui/LovendoTrustRing';
+// TrustRing silindi - LovendoTrustRing kullanılmalı
 
 // Loading State
 export { LoadingState } from './LoadingState';

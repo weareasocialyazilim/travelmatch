@@ -4,8 +4,8 @@ import { ArrowLeft } from 'lucide-react';
 import { CanvaButton } from '@/components/canva/CanvaButton';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | TravelMatch',
-  description: 'TravelMatch Terms of Service',
+  title: 'Terms of Service | Lovendo',
+  description: 'Lovendo Terms of Service',
 };
 
 export default function TermsPage() {
@@ -123,10 +123,10 @@ export default function TermsPage() {
               For any questions or legal inquiries regarding these Terms of
               Service, please contact us at{' '}
               <a
-                href="mailto:legal@travelmatch.com"
+                href="mailto:legal@lovendo.xyz"
                 className="text-primary hover:underline"
               >
-                legal@travelmatch.com
+                legal@lovendo.xyz
               </a>
             </p>
           </section>

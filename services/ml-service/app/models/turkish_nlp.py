@@ -669,10 +669,10 @@ class TextEnhancer:
             ContentCategory.FAMILY: ["aile", "cocuk", "eglence", "kids"],
         }
 
-        hashtags = base_hashtags.get(category, ["travelmatch", "deneyim"])
+        hashtags = base_hashtags.get(category, ["lovendo", "deneyim"])
 
-        # Add TravelMatch branded hashtags
-        hashtags = ["TravelMatch", "HediyeAnı", "DeneyimHediye"] + hashtags
+        # Add Lovendo branded hashtags
+        hashtags = ["Lovendo", "HediyeAnı", "DeneyimHediye"] + hashtags
 
         return [f"#{tag}" for tag in hashtags[:limit]]
 

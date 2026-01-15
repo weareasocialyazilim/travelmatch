@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ============================================
-# TravelMatch Supabase Verification Script
+# Lovendo Supabase Verification Script
 # ============================================
 # Verifies all Supabase components are working
 
@@ -28,7 +28,7 @@ if [ -z "$EXPO_PUBLIC_SUPABASE_ANON_KEY" ]; then
     exit 1
 fi
 
-echo -e "${BLUE}🔍 TravelMatch Supabase Verification${NC}"
+echo -e "${BLUE}🔍 Lovendo Supabase Verification${NC}"
 echo -e "${BLUE}=====================================${NC}\n"
 
 PASSED=0

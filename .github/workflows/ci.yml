@@ -1,4 +1,4 @@
-# CI/CD Pipeline for TravelMatch
+# CI/CD Pipeline for Lovendo
 name: CI
 
 on:
@@ -57,7 +57,7 @@ jobs:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: unittests
-          name: travelmatch-coverage
+          name: lovendo-coverage
 
   build:
     name: Build Check

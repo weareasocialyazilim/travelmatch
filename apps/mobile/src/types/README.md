@@ -1,6 +1,6 @@
 # Type Safety Implementation Guide
 
-Bu dizin TravelMatch projesi için tip güvenliği sağlayan dosyaları içerir.
+Bu dizin Lovendo projesi için tip güvenliği sağlayan dosyaları içerir.
 
 ## 📁 Dizin Yapısı
 
@@ -73,12 +73,12 @@ import { withCursorPagination, PaginationResult } from '@/types/supabase-helpers
 
 async function fetchMoments(cursor?: string): Promise<PaginationResult<Moment>> {
   const query = supabase.from('moments').select('*');
-  
+
   const paginatedQuery = withCursorPagination(query, {
     pageSize: 20,
     cursor,
   });
-  
+
   const { data, error } = await paginatedQuery;
   // Type-safe response handling
 }
@@ -97,6 +97,7 @@ async function fetchMoments(cursor?: string): Promise<PaginationResult<Moment>> 
 ## 🚀 Sonraki Adımlar
 
 1. **Supabase Types Generation** (Docker gerekli):
+
    ```bash
    supabase start
    supabase gen types typescript --local > src/types/database.types.ts
@@ -126,14 +127,20 @@ type Message = TextMessage | ImageMessage;
 const user = UserSchema.parse(apiResponse);
 
 // 3. Use type guards
-if (isTextMessage(msg)) { /* ... */ }
+if (isTextMessage(msg)) {
+  /* ... */
+}
 
 // 4. Use unknown, then narrow
 const data: unknown = await fetch();
-if (isObject(data)) { /* type-safe access */ }
+if (isObject(data)) {
+  /* type-safe access */
+}
 
 // 5. Use generic constraints
-function process<T extends BaseType>(item: T) { /* ... */ }
+function process<T extends BaseType>(item: T) {
+  /* ... */
+}
 ```
 
 ### ❌ DON'T
@@ -211,17 +218,17 @@ pnpm db:generate-types:local  # Local
 
 ### Known Manual Types (TO BE CONSOLIDATED)
 
-The following files contain manual type definitions that should eventually 
-use `Database['public']['Tables']` instead:
+The following files contain manual type definitions that should eventually use
+`Database['public']['Tables']` instead:
 
-| File | Manual Types | Priority |
-|------|--------------|----------|
-| `types/api.ts` | `User`, `Moment` | HIGH |
-| `types/core.ts` | `User` | HIGH |
-| `types/domain.ts` | `Message`, `Moment` | MEDIUM |
-| `hooks/useMoments.ts` | `Moment` | MEDIUM |
-| `services/messageService.ts` | `Conversation`, `Message` | MEDIUM |
-| `features/discover/types/discover.types.ts` | `Profile`, `Message` | LOW |
+| File                                        | Manual Types              | Priority |
+| ------------------------------------------- | ------------------------- | -------- |
+| `types/api.ts`                              | `User`, `Moment`          | HIGH     |
+| `types/core.ts`                             | `User`                    | HIGH     |
+| `types/domain.ts`                           | `Message`, `Moment`       | MEDIUM   |
+| `hooks/useMoments.ts`                       | `Moment`                  | MEDIUM   |
+| `services/messageService.ts`                | `Conversation`, `Message` | MEDIUM   |
+| `features/discover/types/discover.types.ts` | `Profile`, `Message`      | LOW      |
 
 ### Type Extension Pattern
 
@@ -236,7 +243,7 @@ type DbUser = Database['public']['Tables']['users']['Row'];
 export interface User extends DbUser {
   // Frontend-only computed fields
   displayName: string; // computed from full_name
-  isOnline: boolean;   // from presence
+  isOnline: boolean; // from presence
 }
 ```
 
@@ -245,6 +252,7 @@ export interface User extends DbUser {
 ## 🔧 Konfigürasyon
 
 ### tsconfig.json
+
 ```json
 {
   "compilerOptions": {
@@ -258,6 +266,7 @@ export interface User extends DbUser {
 ```
 
 ### .eslintrc.js
+
 ```javascript
 {
   "rules": {
@@ -269,6 +278,7 @@ export interface User extends DbUser {
 ## 📊 Metrics
 
 **Hedef (2 hafta):**
+
 - Production `any` count: <10
 - Type coverage: >95%
 - Runtime type errors: 0
@@ -276,6 +286,7 @@ export interface User extends DbUser {
 - Manual DB type definitions: 0 (all from database.types.ts)
 
 **Şu An:**
+
 - ✅ 5 new type files created
 - ✅ ESLint rule enforced
 - ✅ TypeScript strict mode enhanced

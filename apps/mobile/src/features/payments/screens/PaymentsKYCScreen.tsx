@@ -90,8 +90,8 @@ export default function PaymentsKYCScreen({
 
         {/* Trust Badge */}
         <Text style={styles.disclaimer}>
-          TravelMatch, finansal güvenliğinizi en üst düzeyde korur. PayTR
-          altyapısı ile PCI-DSS uyumlu, BDDK lisanslı güvenli ödeme sistemi
+          Lovendo, finansal güvenliğinizi en üst düzeyde korur. PayTR altyapısı
+          ile PCI-DSS uyumlu, BDDK lisanslı güvenli ödeme sistemi
           kullanılmaktadır.
         </Text>
 

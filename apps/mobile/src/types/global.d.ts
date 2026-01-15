@@ -79,7 +79,7 @@ declare module 'react-native-image-picker' {
 }
 
 // Design system tokens
-declare module '@travelmatch/design-system/tokens' {
+declare module '@lovendo/design-system/tokens' {
   export const colors: {
     primary: string;
     secondary: string;

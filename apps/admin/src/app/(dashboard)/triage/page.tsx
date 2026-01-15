@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * TravelMatch Triage Queue - PASSIVE MODE
+ * Lovendo Triage Queue - PASSIVE MODE
  *
  * Bu sayfa ADD-ONLY prensibiyle eklenmistir.
  * Default: Sadece goruntumleme

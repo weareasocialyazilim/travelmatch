@@ -8,6 +8,10 @@
 import * as FileSystem from 'expo-file-system/legacy';
 import { logger } from '../utils/logger';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  getItemWithLegacyFallback,
+  setItemAndCleanupLegacy,
+} from '../utils/storageKeyMigration';
 
 // Storage thresholds (in bytes)
 const LOW_STORAGE_THRESHOLD = 100 * 1024 * 1024; // 100MB
@@ -17,8 +21,12 @@ const CRITICAL_STORAGE_THRESHOLD = 50 * 1024 * 1024; // 50MB
 const STORAGE_CHECK_INTERVAL = 5 * 60 * 1000;
 
 // Storage keys
-const LAST_STORAGE_CHECK_KEY = '@travelmatch/last_storage_check';
-const STORAGE_WARNING_SHOWN_KEY = '@travelmatch/storage_warning_shown';
+const LAST_STORAGE_CHECK_KEY = '@lovendo/last_storage_check';
+const STORAGE_WARNING_SHOWN_KEY = '@lovendo/storage_warning_shown';
+const LEGACY_LAST_STORAGE_CHECK_KEYS = ['@lovendo_legacy/last_storage_check'];
+const LEGACY_STORAGE_WARNING_SHOWN_KEYS = [
+  '@lovendo_legacy/storage_warning_shown',
+];
 
 export enum StorageLevel {
   NORMAL = 'normal',
@@ -150,7 +158,11 @@ class StorageMonitorService {
       }
 
       // Log storage info
-      await AsyncStorage.setItem(LAST_STORAGE_CHECK_KEY, Date.now().toString());
+      await setItemAndCleanupLegacy(
+        LAST_STORAGE_CHECK_KEY,
+        Date.now().toString(),
+        LEGACY_LAST_STORAGE_CHECK_KEYS,
+      );
 
       // Log based on level
       if (storageInfo.level === StorageLevel.CRITICAL) {
@@ -258,7 +270,10 @@ class StorageMonitorService {
       }
 
       // Check if already shown this session
-      const shown = await AsyncStorage.getItem(STORAGE_WARNING_SHOWN_KEY);
+      const shown = await getItemWithLegacyFallback(
+        STORAGE_WARNING_SHOWN_KEY,
+        LEGACY_STORAGE_WARNING_SHOWN_KEYS,
+      );
       if (shown === 'true') {
         return false;
       }
@@ -276,7 +291,11 @@ class StorageMonitorService {
   async markWarningShown(): Promise<void> {
     try {
       this.lastWarningTime = Date.now();
-      await AsyncStorage.setItem(STORAGE_WARNING_SHOWN_KEY, 'true');
+      await setItemAndCleanupLegacy(
+        STORAGE_WARNING_SHOWN_KEY,
+        'true',
+        LEGACY_STORAGE_WARNING_SHOWN_KEYS,
+      );
     } catch (error) {
       logger.error('StorageMonitor', 'Failed to mark warning shown', error);
     }
@@ -287,7 +306,12 @@ class StorageMonitorService {
    */
   async resetWarningFlag(): Promise<void> {
     try {
-      await AsyncStorage.removeItem(STORAGE_WARNING_SHOWN_KEY);
+      await Promise.all([
+        AsyncStorage.removeItem(STORAGE_WARNING_SHOWN_KEY),
+        ...LEGACY_STORAGE_WARNING_SHOWN_KEYS.map((k) =>
+          AsyncStorage.removeItem(k),
+        ),
+      ]);
     } catch (error) {
       logger.error('StorageMonitor', 'Failed to reset warning flag', error);
     }

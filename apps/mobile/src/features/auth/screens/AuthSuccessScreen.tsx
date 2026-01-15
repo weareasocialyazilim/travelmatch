@@ -27,7 +27,7 @@ export const AuthSuccessScreen: React.FC = () => {
   return (
     <SuccessCeremony
       title="Kapılar Açıldı!"
-      message="Hesabın başarıyla oluşturuldu. Artık TravelMatch dünyasının seçkin bir üyesisin."
+      message="Hesabın başarıyla oluşturuldu. Artık Lovendo dünyasının seçkin bir üyesisin."
       buttonText="Keşfetmeye Başla"
       onPress={handleStartExploring}
       icon="door-open"

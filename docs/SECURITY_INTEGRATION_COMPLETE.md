@@ -1,4 +1,4 @@
-# TravelMatch Security & Infisical Integration - Complete ✅
+# Lovendo Security & Infisical Integration - Complete ✅
 
 ## What Was Done
 
@@ -15,10 +15,10 @@
 
 ### 3. Infisical Setup
 
-- ✅ Workspace configured: `TravelMatch` (ID: 261defa2-bcaf-4905-9230-35c1acc3b026)
+- ✅ Workspace configured: `Lovendo` (ID: 261defa2-bcaf-4905-9230-35c1acc3b026)
 - ✅ Secrets added to **dev** environment:
   - `ADMIN_PASSWORD` = `Kem19875KemAdmin@2026!`
-  - `DEMO_PASSWORD` = `TravelMatch2024Demo@!`
+  - `DEMO_PASSWORD` = `Lovendo2024Demo@!`
 
 ### 4. Scripts Updated
 

@@ -2,7 +2,7 @@
  * Moments Service - Single Source of Truth
  *
  * ELEVATED: This service handles ALL moment-related API operations.
- * Moments are the core experience of TravelMatch - sharing and gifting
+ * Moments are the core experience of Lovendo - sharing and gifting
  * unforgettable experiences with others.
  *
  * Terminology Note:
@@ -19,7 +19,7 @@ import { supabase } from '@/config/supabase';
 
 /**
  * Subscription Tier Types
- * TravelMatch 3-Tier System:
+ * Lovendo 3-Tier System:
  * - free (Momentum): Basic users
  * - premium: Subscribers with enhanced features
  * - platinum: Top-tier with all privileges

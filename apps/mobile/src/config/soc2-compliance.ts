@@ -420,9 +420,9 @@ export const INCIDENT_RESPONSE = {
   ],
 
   communications: {
-    internal: ['security-team@travelmatch.app', 'engineering@travelmatch.app'],
-    external: ['customers@travelmatch.app'],
-    regulatory: ['gdpr-dpo@travelmatch.app'],
+    internal: ['security-team@lovendo.xyz', 'engineering@lovendo.xyz'],
+    external: ['customers@lovendo.xyz'],
+    regulatory: ['gdpr-dpo@lovendo.xyz'],
   },
 } as const;
 

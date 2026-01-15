@@ -1,5 +1,5 @@
 /**
- * TravelMatch Design System - Typography & Spacing Guide
+ * Lovendo Design System - Typography & Spacing Guide
  * "Cinematic Travel + Trust Jewelry"
  *
  * Based on design reference (Visual 4):

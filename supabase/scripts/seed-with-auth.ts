@@ -1,5 +1,5 @@
 /**
- * TravelMatch Seed Script with Supabase Auth
+ * Lovendo Seed Script with Supabase Auth
  *
  * Bu script:
  * 1. Supabase Auth'ta test kullanıcıları oluşturur
@@ -55,7 +55,7 @@ const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'AdminPass123!';
 // ============================================
 const TEST_USERS = [
   {
-    email: 'alice@travelmatch.test',
+    email: 'alice@lovendo.test',
     password: TEST_PASSWORD,
     metadata: {
       full_name: 'Alice Johnson',
@@ -64,7 +64,7 @@ const TEST_USERS = [
     },
   },
   {
-    email: 'wei@travelmatch.test',
+    email: 'wei@lovendo.test',
     password: TEST_PASSWORD,
     metadata: {
       full_name: '王伟 (Wang Wei)',
@@ -73,7 +73,7 @@ const TEST_USERS = [
     },
   },
   {
-    email: 'maria@travelmatch.test',
+    email: 'maria@lovendo.test',
     password: TEST_PASSWORD,
     metadata: {
       full_name: 'María José García Hernández de la Cruz López',
@@ -82,7 +82,7 @@ const TEST_USERS = [
     },
   },
   {
-    email: 'yuki@travelmatch.test',
+    email: 'yuki@lovendo.test',
     password: TEST_PASSWORD,
     metadata: {
       full_name: 'ゆき Yuki',
@@ -91,7 +91,7 @@ const TEST_USERS = [
     },
   },
   {
-    email: 'newuser@travelmatch.test',
+    email: 'newuser@lovendo.test',
     password: TEST_PASSWORD,
     metadata: {
       full_name: 'New User',
@@ -100,11 +100,11 @@ const TEST_USERS = [
     },
   },
   {
-    email: 'admin@travelmatch.test',
+    email: 'admin@lovendo.test',
     password: ADMIN_PASSWORD,
     metadata: {
       full_name: 'Admin User',
-      bio: 'TravelMatch Administrator',
+      bio: 'Lovendo Administrator',
       location: 'Remote',
     },
   },
@@ -155,48 +155,48 @@ async function syncPublicUsers() {
     if (!userData) continue;
 
     const languagesMap: Record<string, string[]> = {
-      'alice@travelmatch.test': ['en', 'tr'],
-      'wei@travelmatch.test': ['zh', 'en'],
-      'maria@travelmatch.test': ['es', 'en', 'ca'],
-      'yuki@travelmatch.test': ['ja', 'en'],
-      'newuser@travelmatch.test': ['en'],
-      'admin@travelmatch.test': ['en'],
+      'alice@lovendo.test': ['en', 'tr'],
+      'wei@lovendo.test': ['zh', 'en'],
+      'maria@lovendo.test': ['es', 'en', 'ca'],
+      'yuki@lovendo.test': ['ja', 'en'],
+      'newuser@lovendo.test': ['en'],
+      'admin@lovendo.test': ['en'],
     };
 
     const interestsMap: Record<string, string[]> = {
-      'alice@travelmatch.test': ['food', 'culture'],
-      'wei@travelmatch.test': ['adventure', 'nature'],
-      'maria@travelmatch.test': ['food', 'art', 'music'],
-      'yuki@travelmatch.test': ['food', 'culture', 'nature'],
-      'newuser@travelmatch.test': [],
-      'admin@travelmatch.test': [],
+      'alice@lovendo.test': ['food', 'culture'],
+      'wei@lovendo.test': ['adventure', 'nature'],
+      'maria@lovendo.test': ['food', 'art', 'music'],
+      'yuki@lovendo.test': ['food', 'culture', 'nature'],
+      'newuser@lovendo.test': [],
+      'admin@lovendo.test': [],
     };
 
     const balanceMap: Record<string, number> = {
-      'alice@travelmatch.test': 100.0,
-      'wei@travelmatch.test': 250.5,
-      'maria@travelmatch.test': 0.0,
-      'yuki@travelmatch.test': 0.0,
-      'newuser@travelmatch.test': 0.0,
-      'admin@travelmatch.test': 0.0,
+      'alice@lovendo.test': 100.0,
+      'wei@lovendo.test': 250.5,
+      'maria@lovendo.test': 0.0,
+      'yuki@lovendo.test': 0.0,
+      'newuser@lovendo.test': 0.0,
+      'admin@lovendo.test': 0.0,
     };
 
     const currencyMap: Record<string, string> = {
-      'alice@travelmatch.test': 'TRY',
-      'wei@travelmatch.test': 'CNY',
-      'maria@travelmatch.test': 'EUR',
-      'yuki@travelmatch.test': 'JPY',
-      'newuser@travelmatch.test': 'USD',
-      'admin@travelmatch.test': 'USD',
+      'alice@lovendo.test': 'TRY',
+      'wei@lovendo.test': 'CNY',
+      'maria@lovendo.test': 'EUR',
+      'yuki@lovendo.test': 'JPY',
+      'newuser@lovendo.test': 'USD',
+      'admin@lovendo.test': 'USD',
     };
 
     const verifiedMap: Record<string, boolean> = {
-      'alice@travelmatch.test': true,
-      'wei@travelmatch.test': true,
-      'maria@travelmatch.test': true,
-      'yuki@travelmatch.test': false,
-      'newuser@travelmatch.test': false,
-      'admin@travelmatch.test': true,
+      'alice@lovendo.test': true,
+      'wei@lovendo.test': true,
+      'maria@lovendo.test': true,
+      'yuki@lovendo.test': false,
+      'newuser@lovendo.test': false,
+      'admin@lovendo.test': true,
     };
 
     const { error } = await supabase.from('users').upsert(
@@ -229,10 +229,10 @@ async function syncPublicUsers() {
 async function seedMoments() {
   console.log('\n🌟 Seeding moments...\n');
 
-  const alice = userIds['alice@travelmatch.test'];
-  const wei = userIds['wei@travelmatch.test'];
-  const maria = userIds['maria@travelmatch.test'];
-  const yuki = userIds['yuki@travelmatch.test'];
+  const alice = userIds['alice@lovendo.test'];
+  const wei = userIds['wei@lovendo.test'];
+  const maria = userIds['maria@lovendo.test'];
+  const yuki = userIds['yuki@lovendo.test'];
 
   if (!alice || !wei || !maria || !yuki) {
     console.error('  ❌ Missing user IDs for moments');
@@ -361,9 +361,9 @@ async function seedMoments() {
 async function seedRequests(moments: any[]) {
   console.log('\n📬 Seeding requests...\n');
 
-  const alice = userIds['alice@travelmatch.test'];
-  const newUser = userIds['newuser@travelmatch.test'];
-  const yuki = userIds['yuki@travelmatch.test'];
+  const alice = userIds['alice@lovendo.test'];
+  const newUser = userIds['newuser@lovendo.test'];
+  const yuki = userIds['yuki@lovendo.test'];
 
   if (!alice || !newUser || !moments?.length) {
     console.error('  ❌ Missing data for requests');
@@ -423,9 +423,9 @@ async function seedRequests(moments: any[]) {
 async function seedConversationsAndMessages(moments: any[]) {
   console.log('\n💬 Seeding conversations and messages...\n');
 
-  const alice = userIds['alice@travelmatch.test'];
-  const newUser = userIds['newuser@travelmatch.test'];
-  const wei = userIds['wei@travelmatch.test'];
+  const alice = userIds['alice@lovendo.test'];
+  const newUser = userIds['newuser@lovendo.test'];
+  const wei = userIds['wei@lovendo.test'];
 
   if (!alice || !newUser || !wei || !moments?.length) {
     console.error('  ❌ Missing data for conversations');
@@ -517,8 +517,8 @@ async function seedConversationsAndMessages(moments: any[]) {
 async function seedNotifications() {
   console.log('\n🔔 Seeding notifications...\n');
 
-  const alice = userIds['alice@travelmatch.test'];
-  const newUser = userIds['newuser@travelmatch.test'];
+  const alice = userIds['alice@lovendo.test'];
+  const newUser = userIds['newuser@lovendo.test'];
 
   if (!alice || !newUser) {
     console.error('  ❌ Missing user IDs for notifications');
@@ -561,8 +561,8 @@ async function seedNotifications() {
 async function seedFavorites(moments: any[]) {
   console.log('\n⭐ Seeding favorites...\n');
 
-  const alice = userIds['alice@travelmatch.test'];
-  const newUser = userIds['newuser@travelmatch.test'];
+  const alice = userIds['alice@lovendo.test'];
+  const newUser = userIds['newuser@lovendo.test'];
 
   if (!alice || !newUser || !moments?.length) {
     console.error('  ❌ Missing data for favorites');
@@ -597,7 +597,7 @@ async function seedFavorites(moments: any[]) {
 }
 
 async function main() {
-  console.log('🚀 TravelMatch Seed Script with Auth');
+  console.log('🚀 Lovendo Seed Script with Auth');
   console.log('=====================================');
   console.log(`📍 Supabase URL: ${SUPABASE_URL}`);
 

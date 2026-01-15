@@ -264,7 +264,7 @@ export const ThankYouCardCreator: React.FC<ThankYouCardCreatorProps> = ({
                     { color: selectedTemplate.accentColor },
                   ]}
                 >
-                  TravelMatch
+                  Lovendo
                 </Text>
               </View>
             </View>

@@ -1,6 +1,6 @@
-# TravelMatch Developer Onboarding Guide
+# Lovendo Developer Onboarding Guide
 
-Welcome to TravelMatch! This guide will help you get up and running quickly.
+Welcome to Lovendo! This guide will help you get up and running quickly.
 
 ## 🚀 Quick Start (5 minutes)
 
@@ -13,8 +13,8 @@ Welcome to TravelMatch! This guide will help you get up and running quickly.
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/travelmatch-new.git
-cd travelmatch-new
+git clone https://github.com/yourusername/lovendo-new.git
+cd lovendo-new
 
 # 2. Install dependencies
 pnpm install
@@ -103,7 +103,7 @@ tm setup all         # Complete setup
 
 ### Monorepo Structure
 ```
-travelmatch-new/
+lovendo-new/
 ├── apps/
 │   └── mobile/              # React Native + Expo app
 ├── admin/                   # Admin panel (React + Vite)
@@ -155,13 +155,13 @@ travelmatch-new/
 docker ps
 
 # View logs for specific service
-docker logs travelmatch-postgres -f
+docker logs lovendo-postgres -f
 
 # Restart a service
-docker restart travelmatch-redis
+docker restart lovendo-redis
 
 # Enter a container
-docker exec -it travelmatch-postgres bash
+docker exec -it lovendo-postgres bash
 
 # Check resource usage
 docker stats
@@ -562,9 +562,9 @@ pnpm analyze-rn-bundle
 
 ## 🆘 Getting Help
 
-- **Slack**: #travelmatch-dev
-- **Email**: dev@travelmatch.com
-- **GitHub Issues**: [Report bugs](https://github.com/yourusername/travelmatch/issues)
+- **Slack**: #lovendo-dev
+- **Email**: dev@lovendo.com
+- **GitHub Issues**: [Report bugs](https://github.com/yourusername/lovendo/issues)
 - **Documentation**: [Read the docs](./docs/)
 
 ## 🎉 You're Ready!

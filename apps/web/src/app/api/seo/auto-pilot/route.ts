@@ -45,7 +45,7 @@ export async function POST(req: Request) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          domain: 'travelmatch.app',
+          domain: 'lovendo.xyz',
           competitors: ['tinder', 'bumble', 'hinge', 'raya'],
           targetAudience: 'gen-z',
         }),

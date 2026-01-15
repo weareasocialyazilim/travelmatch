@@ -1,5 +1,5 @@
 /**
- * TravelMatch Vibe Room - Inbox Hook
+ * Lovendo Vibe Room - Inbox Hook
  *
  * Manages inbox state, real-time updates, and data fetching.
  * Integrates with existing message and realtime services.

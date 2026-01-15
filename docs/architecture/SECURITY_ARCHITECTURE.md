@@ -1,9 +1,9 @@
-# TravelMatch Security Architecture
+# Lovendo Security Architecture
 
 > **Version**: 1.0.0
 > **Last Updated**: December 2024
 
-This document describes the security architecture of TravelMatch, including authentication, authorization, data protection, and compliance measures.
+This document describes the security architecture of Lovendo, including authentication, authorization, data protection, and compliance measures.
 
 ## Table of Contents
 
@@ -412,8 +412,8 @@ plugins:
   - name: cors
     config:
       origins:
-        - https://travelmatch.app
-        - https://admin.travelmatch.app
+        - https://lovendo.app
+        - https://admin.lovendo.app
       methods:
         - GET
         - POST
@@ -504,7 +504,7 @@ const securityHeaders = [
 ```yaml
 # Infisical configuration
 infisical:
-  projectId: travelmatch
+  projectId: lovendo
   environments:
     - dev
     - staging

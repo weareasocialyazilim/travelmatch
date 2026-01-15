@@ -19,8 +19,8 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 // Demo account credentials - loaded from Infisical secrets
-const demoPassword = process.env.DEMO_PASSWORD || 'TravelMatch2024Demo!';
-const demoEmail = process.env.DEMO_EMAIL || 'demo@travelmatch.app';
+const demoPassword = process.env.DEMO_PASSWORD || 'Lovendo2024Demo!';
+const demoEmail = process.env.DEMO_EMAIL || 'demo@lovendo.app';
 
 if (process.env.NODE_ENV === 'production' && !process.env.DEMO_PASSWORD) {
   console.warn('⚠️  DEMO_PASSWORD not set from Infisical in production');
@@ -33,7 +33,7 @@ const DEMO_ACCOUNT = {
   profile: {
     full_name: 'Demo User',
     username: 'demo_traveler',
-    bio: 'Official TravelMatch demo account. Exploring the world one moment at a time! 🌍✈️',
+    bio: 'Official Lovendo demo account. Exploring the world one moment at a time! 🌍✈️',
     avatar_url:
       'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
     age: 28,

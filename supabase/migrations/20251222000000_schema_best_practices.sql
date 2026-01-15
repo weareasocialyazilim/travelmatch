@@ -70,7 +70,7 @@ Should be kept in sync with the location text field.';
 -- Following PostgreSQL best practice of documenting all tables
 
 COMMENT ON TABLE users IS
-'Core user profiles for TravelMatch platform.
+'Core user profiles for Lovendo platform.
 Contains authentication-linked user data, preferences, and trust metrics.
 Primary key: UUID linked to Supabase auth.users.id';
 

@@ -1,4 +1,4 @@
-appId: com.travelmatch.app
+appId: com.lovendo.app
 ---
 # Wallet Management E2E Test
 # Tests wallet operations: add funds, withdraw, view transactions

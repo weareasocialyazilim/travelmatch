@@ -1,4 +1,4 @@
-# TravelMatch - App Store Review Demo Account
+# Lovendo - App Store Review Demo Account
 
 ## Demo Account Credentials
 
@@ -6,8 +6,8 @@
 
 | Field        | Value                  |
 | ------------ | ---------------------- |
-| **Email**    | `demo@travelmatch.app` |
-| **Password** | `TravelMatch2024Demo!` |
+| **Email**    | `demo@lovendo.app` |
+| **Password** | `Lovendo2024Demo!` |
 
 ## Account Features
 
@@ -65,7 +65,7 @@ This demo account has been pre-configured with:
 
 If you encounter any issues during review:
 
-- **Email**: support@travelmatch.app
+- **Email**: support@lovendo.app
 - **Response Time**: Within 24 hours
 
 ---

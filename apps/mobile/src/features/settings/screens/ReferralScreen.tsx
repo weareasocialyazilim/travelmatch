@@ -21,7 +21,7 @@ export default function ReferralScreen({ navigation }: ReferralScreenProps) {
   const handleShare = async () => {
     try {
       await Share.share({
-        message: `TravelMatch'e katıl! Referans kodum: ${REFERRAL_CODE} - Her ikiniz de $20 kredi kazanın!`,
+        message: `Lovendo'ya katıl! Referans kodum: ${REFERRAL_CODE} - Her ikiniz de $20 kredi kazanın!`,
       });
     } catch (_shareError) {
       // Share cancelled or failed

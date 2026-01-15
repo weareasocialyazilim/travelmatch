@@ -294,7 +294,7 @@ describe('SacredMoments Component', () => {
           <Text>Content</Text>
         </SacredMoments>,
       );
-      expect(getByText('TravelMatch')).toBeTruthy();
+      expect(getByText('Lovendo')).toBeTruthy();
     });
   });
 

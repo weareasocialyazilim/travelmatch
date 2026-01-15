@@ -1,4 +1,4 @@
-# TravelMatch Mimari Temizlik Raporu
+# Lovendo Mimari Temizlik Raporu
 
 **Tarih:** 3 Ocak 2026  
 **Versiyon:** 2.0 Baseline Hazırlık  
@@ -8,7 +8,7 @@
 
 ## 📋 Executive Summary
 
-Bu rapor, TravelMatch projesinin mimari temizliğini ve "Master Plan" uygulamasını kapsamaktadır.
+Bu rapor, Lovendo projesinin mimari temizliğini ve "Master Plan" uygulamasını kapsamaktadır.
 Aşağıda tespit edilen sorunlar, yapılan düzeltmeler ve gelecek adımlar detaylı olarak açıklanmıştır.
 
 **Durum:** ✅ Tüm kritik maddeler tamamlandı. Güvenlik taraması geçti (Snyk: 0 issue).
@@ -202,7 +202,7 @@ packages/design-system/
 
 1. `apps/mobile/src/components/ui/` bileşenlerini `packages/design-system/src/native/` altına taşı
 2. Import path'leri güncelle: `@/components/ui/TMButton` →
-   `@travelmatch/design-system/native/TMButton`
+   `@lovendo/design-system/native/TMButton`
 3. `apps/mobile/src/components/ui/index.ts` → re-export facade olarak tut (backward compat)
 
 ---
@@ -257,7 +257,7 @@ schemas (createMomentSchema, sendMessageSchema) yerinde.
 
 1. `packages/design-system/src/tokens/` → Tailwind preset'leri ortaklaştır
 2. Web için CSS-in-JS veya Tailwind ile Liquid eşdeğerleri oluştur
-3. `apps/web/` → `@travelmatch/design-system` preset'ini kullan
+3. `apps/web/` → `@lovendo/design-system` preset'ini kullan
 
 ---
 

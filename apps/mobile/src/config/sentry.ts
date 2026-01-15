@@ -52,7 +52,7 @@ export function initSentry() {
     // Build release identifier for source map correlation
     const appVersion = Application.nativeApplicationVersion || '1.0.0';
     const buildNumber = Application.nativeBuildVersion || '1';
-    const bundleId = Application.applicationId || 'com.travelmatch.app';
+    const bundleId = Application.applicationId || 'com.lovendo.app';
     const release = `${bundleId}@${appVersion}+${buildNumber}`;
     const dist = buildNumber;
 

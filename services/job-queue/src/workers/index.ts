@@ -47,7 +47,7 @@ setInterval(() => {
 console.log(`
 ╔════════════════════════════════════════════════════════════╗
 ║                                                            ║
-║  TravelMatch Job Queue Workers                             ║
+║  Lovendo Job Queue Workers                             ║
 ║                                                            ║
 ║  Status: Running                                           ║
 ║  Workers: KYC Verification                                 ║

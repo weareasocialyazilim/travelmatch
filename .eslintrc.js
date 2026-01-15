@@ -1,6 +1,6 @@
 /**
  * ESLint Configuration
- * Comprehensive linting rules for TravelMatch React Native app
+ * Comprehensive linting rules for Lovendo React Native app
  */
 module.exports = {
   root: true,

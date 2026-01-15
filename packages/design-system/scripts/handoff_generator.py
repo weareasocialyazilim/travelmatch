@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Developer Handoff Documentation Generator for TravelMatch Design System
+Developer Handoff Documentation Generator for Lovendo Design System
 
 Generates comprehensive developer documentation from design specifications.
 
@@ -37,11 +37,11 @@ from typing import Dict, List, Optional, Any
 
 # Design system metadata
 DESIGN_SYSTEM = {
-    "name": "TravelMatch Design System",
+    "name": "Lovendo Design System",
     "version": "2.0.0",
-    "description": "Personalization-first component library for TravelMatch",
-    "repository": "https://github.com/travelmatch/design-system",
-    "storybook": "https://storybook.travelmatch.com",
+    "description": "Personalization-first component library for Lovendo",
+    "repository": "https://github.com/lovendo/design-system",
+    "storybook": "https://storybook.lovendo.com",
 }
 
 # Component categories
@@ -93,21 +93,21 @@ def generate_component_spec(
         f"# {name} Component Specification",
         "",
         f"> **Type:** {component_type.capitalize()}",
-        f"> **Package:** @travelmatch/design-system",
+        f"> **Package:** @lovendo/design-system",
         f"> **Last Updated:** {now}",
         "",
         "---",
         "",
         "## Overview",
         "",
-        description or f"The {name} component provides a reusable UI element for the TravelMatch application.",
+        description or f"The {name} component provides a reusable UI element for the Lovendo application.",
         "",
         "---",
         "",
         "## Import",
         "",
         "```tsx",
-        f"import {{ {name} }} from '@travelmatch/design-system';",
+        f"import {{ {name} }} from '@lovendo/design-system';",
         "```",
         "",
         "---",
@@ -271,7 +271,7 @@ def generate_token_documentation(format: str = "md") -> str:
 def generate_markdown_token_docs(tokens: Dict[str, Any]) -> str:
     """Generate Markdown token documentation."""
     lines = [
-        "# TravelMatch Design Tokens",
+        "# Lovendo Design Tokens",
         "",
         f"> Version: {DESIGN_SYSTEM['version']}",
         f"> Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}",
@@ -388,7 +388,7 @@ def generate_markdown_token_docs(tokens: Dict[str, Any]) -> str:
         "### React Native",
         "",
         "```tsx",
-        "import { colors, spacing, typography } from '@travelmatch/design-system';",
+        "import { colors, spacing, typography } from '@lovendo/design-system';",
         "",
         "const styles = StyleSheet.create({",
         "  container: {",
@@ -425,7 +425,7 @@ def generate_html_token_docs(tokens: Dict[str, Any]) -> str:
         "<head>",
         "  <meta charset='UTF-8'>",
         "  <meta name='viewport' content='width=device-width, initial-scale=1.0'>",
-        "  <title>TravelMatch Design Tokens</title>",
+        "  <title>Lovendo Design Tokens</title>",
         "  <style>",
         "    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 1200px; margin: 0 auto; padding: 40px; }",
         "    h1, h2, h3 { color: #212121; }",

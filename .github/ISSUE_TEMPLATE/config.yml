@@ -1,11 +1,11 @@
 blank_issues_enabled: false
 contact_links:
   - name: 💬 General Questions & Discussions
-    url: https://github.com/kemalteksalgit/travelmatch/discussions
+    url: https://github.com/kemalteksalgit/lovendo/discussions
     about: Ask questions and discuss ideas with the community
   - name: 🔒 Security Vulnerabilities
-    url: mailto:security@travelmatch.com
+    url: mailto:security@lovendo.com
     about: Report security issues privately (DO NOT create public issues)
   - name: 📖 Documentation
-    url: https://github.com/kemalteksalgit/travelmatch/blob/main/README.md
+    url: https://github.com/kemalteksalgit/lovendo/blob/main/README.md
     about: Read the project documentation

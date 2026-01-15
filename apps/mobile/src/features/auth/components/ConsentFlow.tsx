@@ -265,9 +265,8 @@ export const ConsentFlow: React.FC<ConsentFlowProps> = ({
               color="#1976D2"
             />
             <Text style={styles.infoBannerText}>
-              TravelMatch olarak kişisel verilerinizin güvenliğine önem
-              veriyoruz. Aşağıdaki onayları vererek hizmetlerimizden
-              faydalanabilirsiniz.
+              Lovendo olarak kişisel verilerinizin güvenliğine önem veriyoruz.
+              Aşağıdaki onayları vererek hizmetlerimizden faydalanabilirsiniz.
             </Text>
           </View>
 

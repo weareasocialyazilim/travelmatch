@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Responsive Design Calculator for TravelMatch Design System
+Responsive Design Calculator for Lovendo Design System
 
 Calculate responsive values, fluid typography, and layout dimensions
 for different screen sizes and breakpoints.

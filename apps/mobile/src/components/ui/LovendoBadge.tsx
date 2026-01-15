@@ -1,5 +1,5 @@
 /**
- * TMBadge - TravelMatch Ultimate Design System 2026
+ * LovendoBadge - Lovendo Ultimate Design System 2026
  * Consolidated badge component for all badge types
  *
  * Replaces:
@@ -10,16 +10,16 @@
  * @example
  * ```tsx
  * // Label badge
- * <TMBadge type="label" variant="success" label="Active" />
+ * <LovendoBadge type="label" variant="success" label="Active" />
  *
  * // Status badge with pulse
- * <TMBadge type="status" variant="error" label="LIVE" pulse showDot />
+ * <LovendoBadge type="status" variant="error" label="LIVE" pulse showDot />
  *
  * // Trust badge
- * <TMBadge type="trust" trustScore={85} />
+ * <LovendoBadge type="trust" trustScore={85} />
  *
  * // Notification count
- * <TMBadge type="notification" count={5} />
+ * <LovendoBadge type="notification" count={5} />
  * ```
  */
 
@@ -42,7 +42,7 @@ import { RADII } from '@/constants/radii';
 // Types
 // ═══════════════════════════════════════════════════════════════════
 
-export type TMBadgeType = 'label' | 'status' | 'trust' | 'notification';
+export type LovendoBadgeType = 'label' | 'status' | 'trust' | 'notification';
 
 export type LabelVariant =
   | 'default'
@@ -70,9 +70,9 @@ export type StatusVariant =
 
 export type BadgeSize = 'sm' | 'md' | 'lg';
 
-export interface TMBadgeProps {
+export interface LovendoBadgeProps {
   /** Badge type determines rendering style */
-  type?: TMBadgeType;
+  type?: LovendoBadgeType;
 
   // Label/Status props
   /** Badge label text */
@@ -214,7 +214,7 @@ const TRUST_LEVELS = [
 // Component
 // ═══════════════════════════════════════════════════════════════════
 
-export const TMBadge: React.FC<TMBadgeProps> = ({
+export const LovendoBadge: React.FC<LovendoBadgeProps> = ({
   type = 'label',
   label,
   variant = 'default',
@@ -597,12 +597,12 @@ const styles = StyleSheet.create({
 // Convenience Exports (backward compatible)
 // ═══════════════════════════════════════════════════════════════════
 
-/** @deprecated Use TMBadge with type="status" variant="error" pulse showDot */
+/** @deprecated Use LovendoBadge with type="status" variant="error" pulse showDot */
 export const LiveStatusBadge: React.FC<{
   label?: string;
   style?: ViewStyle;
 }> = ({ label = 'CANLI', style }) => (
-  <TMBadge
+  <LovendoBadge
     type="status"
     variant="error"
     label={label}
@@ -613,12 +613,12 @@ export const LiveStatusBadge: React.FC<{
   />
 );
 
-/** @deprecated Use TMBadge with type="status" variant="success" icon="check-decagram" */
+/** @deprecated Use LovendoBadge with type="status" variant="success" icon="check-decagram" */
 export const VerifiedBadge: React.FC<{
   size?: BadgeSize;
   style?: ViewStyle;
 }> = ({ size = 'sm', style }) => (
-  <TMBadge
+  <LovendoBadge
     type="status"
     variant="success"
     label="Onaylı"
@@ -628,12 +628,12 @@ export const VerifiedBadge: React.FC<{
   />
 );
 
-/** @deprecated Use TMBadge with type="status" variant="premium" icon="crown" */
+/** @deprecated Use LovendoBadge with type="status" variant="premium" icon="crown" */
 export const PremiumBadge: React.FC<{
   size?: BadgeSize;
   style?: ViewStyle;
 }> = ({ size = 'sm', style }) => (
-  <TMBadge
+  <LovendoBadge
     type="status"
     variant="premium"
     label="Premium"
@@ -643,4 +643,4 @@ export const PremiumBadge: React.FC<{
   />
 );
 
-export default TMBadge;
+export default LovendoBadge;

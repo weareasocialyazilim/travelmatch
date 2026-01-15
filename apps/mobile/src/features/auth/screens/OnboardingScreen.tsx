@@ -1,5 +1,5 @@
 /**
- * TravelMatch Onboarding Screen
+ * Lovendo Onboarding Screen
  *
  * Immersive image-based onboarding with:
  * - Full-screen background images
@@ -39,7 +39,7 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
-import { TMButton } from '@/components/ui/TMButton';
+import { LovendoButton } from '@/components/ui/LovendoButton';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { useGyroscopeParallax } from '@/hooks/useGyroscopeParallax';
@@ -581,7 +581,7 @@ export const AwwwardsOnboardingScreen: React.FC<
         </View>
 
         {/* Action Button */}
-        <TMButton
+        <LovendoButton
           title={
             currentIndex === AWWWARDS_SLIDES.length - 1
               ? 'Hadi Başlayalım'

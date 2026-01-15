@@ -180,7 +180,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
     showConfirmation({
       title: 'Phone Verification Required',
       message:
-        'Phone verification is required to use TravelMatch. You can skip other profile details, but phone number is mandatory for your security.',
+        'Phone verification is required to use Lovendo. You can skip other profile details, but phone number is mandatory for your security.',
       type: 'warning',
       onConfirm: () => {
         // Only skip if phone is already filled

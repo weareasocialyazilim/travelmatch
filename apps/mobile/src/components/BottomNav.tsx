@@ -1,5 +1,5 @@
 /**
- * TravelMatch Awwwards Design System 2026 - Bottom Navigation
+ * Lovendo Awwwards Design System 2026 - Bottom Navigation
  *
  * Premium navigation with:
  * - Glassmorphism background

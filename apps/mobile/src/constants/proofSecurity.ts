@@ -1,6 +1,6 @@
 /**
  * Proof Security & Verification Constants
- * TravelMatch - Escrow proof system security rules
+ * Lovendo - Escrow proof system security rules
  */
 
 // ============================================
@@ -210,7 +210,7 @@ export const NOTIFICATION_TRIGGERS = {
       immediate: true,
       titleKey: 'notification.proof_uploaded.title',
       bodyKey: 'notification.proof_uploaded.body',
-      deepLink: 'travelmatch://proof-review/{escrowId}',
+      deepLink: 'lovendo://proof-review/{escrowId}',
     },
     approvalReminder: {
       delayHours: 48,

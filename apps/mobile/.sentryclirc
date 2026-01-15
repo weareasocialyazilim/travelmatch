@@ -1,6 +1,6 @@
 [defaults]
 url = https://de.sentry.io/
-org = travelmatch-2p
+org = lovendo-2p
 project = react-native
 
 [auth]

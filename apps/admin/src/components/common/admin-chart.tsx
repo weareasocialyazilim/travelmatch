@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
-// TravelMatch Chart Color Palette
+// Lovendo Chart Color Palette
 export const CHART_COLORS = {
   primary: '#F59E0B', // Amber - Primary metric
   secondary: '#EC4899', // Magenta - Comparison

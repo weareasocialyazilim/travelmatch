@@ -1,9 +1,9 @@
-# TravelMatch C4 Model Architecture
+# Lovendo C4 Model Architecture
 
 > **Version**: 1.0.0
 > **Last Updated**: December 2024
 
-This document provides detailed C4 model diagrams for the TravelMatch platform using Mermaid syntax for easy visualization in GitHub and other Markdown viewers.
+This document provides detailed C4 model diagrams for the Lovendo platform using Mermaid syntax for easy visualization in GitHub and other Markdown viewers.
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@ This document provides detailed C4 model diagrams for the TravelMatch platform u
 
 ## Level 1: System Context
 
-The System Context diagram shows TravelMatch and its relationships with users and external systems.
+The System Context diagram shows Lovendo and its relationships with users and external systems.
 
 ```mermaid
 graph TB
@@ -26,8 +26,8 @@ graph TB
         admin["Administrator<br/><i>Person</i><br/>Manages platform operations"]
     end
 
-    subgraph travelmatch ["TravelMatch Platform"]
-        system["TravelMatch<br/><i>Software System</i><br/>Social travel platform for<br/>connecting travelers"]
+    subgraph lovendo ["Lovendo Platform"]
+        system["Lovendo<br/><i>Software System</i><br/>Social travel platform for<br/>connecting travelers"]
     end
 
     subgraph external ["External Systems"]

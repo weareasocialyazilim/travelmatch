@@ -19,7 +19,7 @@ Validation Types:
     patterns        - Common UI pattern validation
     mobile          - Mobile-specific design guidelines
 
-Author: TravelMatch UX Team
+Author: Lovendo UX Team
 """
 
 import argparse
@@ -149,7 +149,7 @@ class DesignValidator:
                 "Toast notifications for completed actions",
                 "Real-time sync status indicators"
             ],
-            "travelmatch_context": [
+            "lovendo_context": [
                 "Show loading state when fetching matches",
                 "Display progress during trip planning steps",
                 "Confirm when message is sent",
@@ -169,7 +169,7 @@ class DesignValidator:
                 "Trash can icon for delete",
                 "Calendar for date selection"
             ],
-            "travelmatch_context": [
+            "lovendo_context": [
                 "Use 'Travel Companions' not 'Match Partners'",
                 "Say 'Plan a Trip' not 'Create Itinerary Object'",
                 "Use travel-related icons and imagery"
@@ -189,7 +189,7 @@ class DesignValidator:
                 "Back navigation always available",
                 "Clear all/reset options"
             ],
-            "travelmatch_context": [
+            "lovendo_context": [
                 "Undo accidental swipe on match",
                 "Cancel mid-checkout for gifts",
                 "Edit or delete trip plans",
@@ -209,7 +209,7 @@ class DesignValidator:
                 "Consistent button placement",
                 "Following iOS/Android conventions"
             ],
-            "travelmatch_context": [
+            "lovendo_context": [
                 "Heart icon always means 'like/save'",
                 "Swipe gestures consistent across screens",
                 "Same terminology for 'matches' throughout"
@@ -228,7 +228,7 @@ class DesignValidator:
                 "Date picker prevents invalid dates",
                 "Disable submit until form valid"
             ],
-            "travelmatch_context": [
+            "lovendo_context": [
                 "Confirm before unmatching someone",
                 "Validate travel dates are in future",
                 "Prevent duplicate trip creation",
@@ -248,7 +248,7 @@ class DesignValidator:
                 "Visible navigation labels",
                 "Autocomplete suggestions"
             ],
-            "travelmatch_context": [
+            "lovendo_context": [
                 "Show recently viewed destinations",
                 "Display recent conversations prominently",
                 "Suggest previous trip companions",
@@ -268,7 +268,7 @@ class DesignValidator:
                 "Quick filters and saved searches",
                 "Customizable homepage"
             ],
-            "travelmatch_context": [
+            "lovendo_context": [
                 "Quick match from discovery view",
                 "Save filter preferences",
                 "Favorite destinations one-tap access",
@@ -288,7 +288,7 @@ class DesignValidator:
                 "Clear visual hierarchy",
                 "Hidden advanced options"
             ],
-            "travelmatch_context": [
+            "lovendo_context": [
                 "Match cards show only essential info",
                 "Trip details expandable for more",
                 "Clean messaging interface",
@@ -308,7 +308,7 @@ class DesignValidator:
                 "Inline form validation with fix suggestions",
                 "Retry options for network errors"
             ],
-            "travelmatch_context": [
+            "lovendo_context": [
                 "Explain why match failed to send message",
                 "Guide on fixing profile issues",
                 "Clear payment error recovery steps",
@@ -329,7 +329,7 @@ class DesignValidator:
                 "FAQ section",
                 "In-app chat support"
             ],
-            "travelmatch_context": [
+            "lovendo_context": [
                 "Matching algorithm explanation tooltip",
                 "First-time feature tutorials",
                 "Gift FAQ section",
@@ -528,7 +528,7 @@ class DesignValidator:
         }
     ]
 
-    # TravelMatch Persona-Based Validation
+    # Lovendo Persona-Based Validation
     PERSONA_CHECKS = {
         "The Explorer": {
             "needs": [
@@ -614,7 +614,7 @@ class DesignValidator:
                 pass_criteria=h["pass_criteria"],
                 fail_implications=h["fail_implications"],
                 severity_if_failed=h["severity_if_failed"],
-                resources=h.get("travelmatch_context", [])
+                resources=h.get("lovendo_context", [])
             )
             checklist.append(item)
         return checklist
@@ -874,7 +874,7 @@ def format_report_output(report: ValidationReport) -> str:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Design Validation Tool for TravelMatch",
+        description="Design Validation Tool for Lovendo",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

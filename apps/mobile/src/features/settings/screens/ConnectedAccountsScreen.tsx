@@ -91,7 +91,7 @@ const ConnectedAccountsScreen: React.FC = () => {
       // Simulate connecting
       showAlert({
         title: 'Connect Account',
-        message: `This will redirect you to ${account.name} to authorize TravelMatch.`,
+        message: `This will redirect you to ${account.name} to authorize Lovendo.`,
         buttons: [
           { text: 'Cancel', style: 'cancel' },
           {

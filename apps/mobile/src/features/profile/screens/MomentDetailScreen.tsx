@@ -30,7 +30,7 @@ import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { TMButton } from '@/components/ui/TMButton';
+import { LovendoButton } from '@/components/ui/LovendoButton';
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 const { width: _width, height } = Dimensions.get('window');
@@ -476,7 +476,7 @@ export const AwwwardsMomentDetailScreen: React.FC<
           <Text style={awwwardsStyles.actionBarPrice}>{price}</Text>
           <Text style={awwwardsStyles.actionBarUnit}>tek seferlik</Text>
         </View>
-        <TMButton
+        <LovendoButton
           title="Şimdi Hediye Et"
           variant="primary"
           onPress={() =>

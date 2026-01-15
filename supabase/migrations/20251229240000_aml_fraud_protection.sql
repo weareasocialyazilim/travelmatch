@@ -1,5 +1,5 @@
 -- ============================================
--- TravelMatch AML & Fraud Protection System
+-- Lovendo AML & Fraud Protection System
 -- Migration: 20251229240000_aml_fraud_protection.sql
 -- ============================================
 --

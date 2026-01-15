@@ -53,9 +53,9 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
             <Text style={styles.sectionTitle}>Our Commitment</Text>
           </View>
           <Text style={styles.paragraph}>
-            TravelMatch stands behind every gesture made on our platform. We
-            offer a comprehensive 14-day money-back guarantee to ensure trust
-            and satisfaction for all users.
+            Lovendo stands behind every gesture made on our platform. We offer a
+            comprehensive 14-day money-back guarantee to ensure trust and
+            satisfaction for all users.
           </Text>
         </View>
 
@@ -165,7 +165,7 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
                 color={COLORS.text.secondary}
               />
               <Text style={styles.bulletText}>
-                User violations of TravelMatch terms of service
+                User violations of Lovendo terms of service
               </Text>
             </View>
           </View>
@@ -236,8 +236,8 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
             • Refunds are issued to the original payment method{'\n'}•
             Processing times may vary by payment provider{'\n'}• Partial refunds
             may be offered for partial delivery{'\n'}• All refund decisions are
-            final and at TravelMatch&apos;s discretion{'\n'}• Contact
-            support@travelmatch.com for assistance
+            final and at Lovendo&apos;s discretion{'\n'}• Contact
+            support@lovendo.xyz for assistance
           </Text>
         </View>
 

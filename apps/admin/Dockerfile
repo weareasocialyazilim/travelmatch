@@ -46,7 +46,7 @@ COPY pnpm-workspace.yaml ./
 
 # Build with Turbo
 ENV VITE_TELEMETRY_DISABLED=1
-RUN pnpm turbo run build --filter=@travelmatch/admin
+RUN pnpm turbo run build --filter=@lovendo/admin
 
 # ==========================================
 # Stage 3: Runner (Nginx)

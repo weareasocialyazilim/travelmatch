@@ -1,21 +1,21 @@
 # Maestro Flow: Complete Onboarding Journey
 # Tests the entire user onboarding experience
 
-appId: com.travelmatch.app
+appId: com.lovendo.app
 ---
 
 # Launch app
 - launchApp
 
 # Welcome screens
-- assertVisible: "Welcome to TravelMatch"
+- assertVisible: "Welcome to Lovendo"
 - tapOn: "Get Started"
 
 # Sign up screen
 - assertVisible: "Create Account"
 - tapOn: 
     id: "email-input"
-- inputText: "test-${random}@travelmatch.com"
+- inputText: "test-${random}@lovendo.xyz"
 - tapOn:
     id: "password-input"
 - inputText: "SecurePass123!"
@@ -87,4 +87,4 @@ appId: com.travelmatch.app
 - assertVisible: "Profile"
 
 # Success!
-- assertNotVisible: "Welcome to TravelMatch"
+- assertNotVisible: "Welcome to Lovendo"

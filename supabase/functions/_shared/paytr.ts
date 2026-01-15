@@ -10,7 +10,10 @@
  * Documentation: https://dev.paytr.com/
  */
 
-import { createHmac, timingSafeEqual } from 'https://deno.land/std@0.177.0/node/crypto.ts';
+import {
+  createHmac,
+  timingSafeEqual,
+} from 'https://deno.land/std@0.177.0/node/crypto.ts';
 
 // =============================================================================
 // CONSTANTS
@@ -36,13 +39,14 @@ interface RetryOptions {
  */
 async function withRetry<T>(
   fn: () => Promise<T>,
-  options: RetryOptions = {}
+  options: RetryOptions = {},
 ): Promise<T> {
   const {
     maxRetries = MAX_RETRIES,
     initialBackoff = INITIAL_BACKOFF_MS,
     maxBackoff = 16000,
-    retryOn = (e) => e.message.includes('network') || e.message.includes('timeout'),
+    retryOn = (e) =>
+      e.message.includes('network') || e.message.includes('timeout'),
   } = options;
 
   let lastError: Error | null = null;
@@ -77,7 +81,7 @@ async function withRetry<T>(
  */
 async function fetchWithTimeout(
   url: string,
-  options: RequestInit & { timeout?: number } = {}
+  options: RequestInit & { timeout?: number } = {},
 ): Promise<Response> {
   const { timeout = PAYTR_API_TIMEOUT, ...fetchOptions } = options;
 
@@ -230,7 +234,7 @@ export function generateTokenHash(
     maxInstallment: number;
     currency: string;
     testMode: number;
-  }
+  },
 ): string {
   const hashStr =
     config.merchantId +
@@ -255,7 +259,7 @@ export function generateTokenHash(
  */
 export function verifyWebhookHash(
   config: PayTRConfig,
-  payload: PayTRWebhookPayload
+  payload: PayTRWebhookPayload,
 ): boolean {
   const hashStr =
     payload.merchant_oid +
@@ -289,7 +293,7 @@ export function generateTransferHash(
     platformTransferId: string;
     subMerchantOid: string;
     amount: number;
-  }
+  },
 ): string {
   const hashStr =
     config.merchantId +
@@ -315,7 +319,7 @@ export function generateChargeHash(
     merchantOid: string;
     paymentAmount: number;
     currency: string;
-  }
+  },
 ): string {
   const hashStr =
     config.merchantId +
@@ -343,11 +347,11 @@ const PAYTR_API_BASE = 'https://www.paytr.com';
  */
 export async function getPaymentToken(
   config: PayTRConfig,
-  request: PayTRTokenRequest
+  request: PayTRTokenRequest,
 ): Promise<PayTRTokenResponse> {
   // Convert basket to PayTR format
   const basketJson = JSON.stringify(
-    request.basket.map((item) => [item.name, item.price, item.quantity])
+    request.basket.map((item) => [item.name, item.price, item.quantity]),
   );
   const basketBase64 = btoa(unescape(encodeURIComponent(basketJson)));
 
@@ -402,10 +406,13 @@ export async function getPaymentToken(
   // Make request with retry and timeout
   return withRetry(
     async () => {
-      const response = await fetchWithTimeout(`${PAYTR_API_BASE}/odeme/api/get-token`, {
-        method: 'POST',
-        body: formData,
-      });
+      const response = await fetchWithTimeout(
+        `${PAYTR_API_BASE}/odeme/api/get-token`,
+        {
+          method: 'POST',
+          body: formData,
+        },
+      );
 
       const result = await response.json();
 
@@ -422,8 +429,10 @@ export async function getPaymentToken(
       }
     },
     {
-      retryOn: (e) => !(e as any).noRetry && (e.message.includes('timeout') || e.message.includes('network')),
-    }
+      retryOn: (e) =>
+        !(e as any).noRetry &&
+        (e.message.includes('timeout') || e.message.includes('network')),
+    },
   ).catch((error) => ({
     status: 'failed' as const,
     reason: error.message,
@@ -435,7 +444,7 @@ export async function getPaymentToken(
  */
 export async function initiateTransfer(
   config: PayTRConfig,
-  request: PayTRTransferRequest
+  request: PayTRTransferRequest,
 ): Promise<{ success: boolean; error?: string }> {
   const hash = generateTransferHash(config, {
     platformTransferId: request.platformTransferId,
@@ -455,10 +464,13 @@ export async function initiateTransfer(
   // Make request with retry and timeout
   return withRetry(
     async () => {
-      const response = await fetchWithTimeout(`${PAYTR_API_BASE}/odeme/platform/transfer`, {
-        method: 'POST',
-        body: formData,
-      });
+      const response = await fetchWithTimeout(
+        `${PAYTR_API_BASE}/odeme/platform/transfer`,
+        {
+          method: 'POST',
+          body: formData,
+        },
+      );
 
       const result = await response.json();
 
@@ -472,8 +484,10 @@ export async function initiateTransfer(
       }
     },
     {
-      retryOn: (e) => !(e as any).noRetry && (e.message.includes('timeout') || e.message.includes('network')),
-    }
+      retryOn: (e) =>
+        !(e as any).noRetry &&
+        (e.message.includes('timeout') || e.message.includes('network')),
+    },
   ).catch((error) => ({
     success: false,
     error: error.message,
@@ -485,7 +499,7 @@ export async function initiateTransfer(
  */
 export async function chargeSavedCard(
   config: PayTRConfig,
-  request: PayTRChargeRequest
+  request: PayTRChargeRequest,
 ): Promise<{ success: boolean; error?: string }> {
   const hash = generateChargeHash(config, {
     userToken: request.userToken,
@@ -513,10 +527,13 @@ export async function chargeSavedCard(
   // Make request with retry and timeout
   return withRetry(
     async () => {
-      const response = await fetchWithTimeout(`${PAYTR_API_BASE}/odeme/api/charge`, {
-        method: 'POST',
-        body: formData,
-      });
+      const response = await fetchWithTimeout(
+        `${PAYTR_API_BASE}/odeme/api/charge`,
+        {
+          method: 'POST',
+          body: formData,
+        },
+      );
 
       const result = await response.json();
 
@@ -530,8 +547,10 @@ export async function chargeSavedCard(
       }
     },
     {
-      retryOn: (e) => !(e as any).noRetry && (e.message.includes('timeout') || e.message.includes('network')),
-    }
+      retryOn: (e) =>
+        !(e as any).noRetry &&
+        (e.message.includes('timeout') || e.message.includes('network')),
+    },
   ).catch((error) => ({
     success: false,
     error: error.message,
@@ -544,7 +563,7 @@ export async function chargeSavedCard(
 export async function refundPayment(
   config: PayTRConfig,
   merchantOid: string,
-  amount: number // Amount in kuruş
+  amount: number, // Amount in kuruş
 ): Promise<{ success: boolean; error?: string }> {
   const hashStr = config.merchantId + merchantOid + amount.toString();
   const hashWithSalt = hashStr + config.merchantSalt;
@@ -579,8 +598,10 @@ export async function refundPayment(
       }
     },
     {
-      retryOn: (e) => !(e as any).noRetry && (e.message.includes('timeout') || e.message.includes('network')),
-    }
+      retryOn: (e) =>
+        !(e as any).noRetry &&
+        (e.message.includes('timeout') || e.message.includes('network')),
+    },
   ).catch((error) => ({
     success: false,
     error: error.message,
@@ -610,7 +631,7 @@ export function fromKurus(kurus: number): number {
 /**
  * Generate unique merchant order ID
  */
-export function generateMerchantOid(prefix = 'TM'): string {
+export function generateMerchantOid(prefix = 'LV'): string {
   const timestamp = Date.now().toString(36);
   const random = Math.random().toString(36).substring(2, 8);
   return `${prefix}-${timestamp}-${random}`.toUpperCase();
@@ -629,7 +650,7 @@ export function formatPrice(amount: number): string {
 export function createBasketItem(
   name: string,
   price: number,
-  quantity = 1
+  quantity = 1,
 ): PayTRBasketItem {
   return {
     name: name.substring(0, 100), // Max 100 chars

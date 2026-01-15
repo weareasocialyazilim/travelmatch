@@ -10,7 +10,7 @@ December 2024
 
 ## Context
 
-TravelMatch handles sensitive user data including:
+Lovendo handles sensitive user data including:
 - Personal information (profiles, preferences)
 - Financial transactions
 - Private messages

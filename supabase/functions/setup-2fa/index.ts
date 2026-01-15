@@ -43,7 +43,7 @@ function generateTOTPSecret(): string {
  * Generate TOTP QR code URL
  */
 function generateQRCodeURL(secret: string, email: string): string {
-  const issuer = 'TravelMatch';
+  const issuer = 'Lovendo';
   const label = `${issuer}:${email}`;
   const params = new URLSearchParams({
     secret,

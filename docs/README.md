@@ -1,6 +1,6 @@
-# 📚 TravelMatch Documentation
+# 📚 Lovendo Documentation
 
-**Complete technical documentation for TravelMatch platform**  
+**Complete technical documentation for Lovendo platform**  
 **Last Updated:** December 22, 2025  
 **Status:** Production Ready ✅
 

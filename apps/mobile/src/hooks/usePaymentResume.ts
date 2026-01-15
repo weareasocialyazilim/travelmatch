@@ -35,8 +35,13 @@ import type { RootStackParamList } from '@/navigation/routeParams';
 import { supabase } from '@/config/supabase';
 import { logger } from '@/utils/logger';
 import { showAlert } from '@/stores/modalStore';
+import {
+  getItemWithLegacyFallback,
+  setItemAndCleanupLegacy,
+} from '@/utils/storageKeyMigration';
 
-const PENDING_PAYMENT_KEY = '@travelmatch/pending_payment';
+const PENDING_PAYMENT_KEY = '@lovendo/pending_payment';
+const LEGACY_PENDING_PAYMENT_KEYS = ['@lovendo/pending_payment'];
 const PAYMENT_CHECK_DELAY = 1500; // Wait for backend to process webhook
 
 export interface PendingPayment {
@@ -60,7 +65,9 @@ export type PaymentResumeStatus =
 interface PaymentResumeResult {
   status: PaymentResumeStatus;
   pendingPayment: PendingPayment | null;
-  savePendingPayment: (payment: Omit<PendingPayment, 'createdAt'>) => Promise<void>;
+  savePendingPayment: (
+    payment: Omit<PendingPayment, 'createdAt'>,
+  ) => Promise<void>;
   clearPendingPayment: () => Promise<void>;
   checkPaymentStatus: (merchantOid: string) => Promise<PaymentResumeStatus>;
 }
@@ -90,9 +97,10 @@ export function usePaymentResume(options?: {
           ...payment,
           createdAt: new Date().toISOString(),
         };
-        await AsyncStorage.setItem(
+        await setItemAndCleanupLegacy(
           PENDING_PAYMENT_KEY,
-          JSON.stringify(pendingPayment)
+          JSON.stringify(pendingPayment),
+          LEGACY_PENDING_PAYMENT_KEYS,
         );
         pendingPaymentRef.current = pendingPayment;
         logger.info('PaymentResume', 'Saved pending payment', {
@@ -102,7 +110,7 @@ export function usePaymentResume(options?: {
         logger.error('PaymentResume', 'Failed to save pending payment', error);
       }
     },
-    []
+    [],
   );
 
   /**
@@ -110,7 +118,10 @@ export function usePaymentResume(options?: {
    */
   const clearPendingPayment = useCallback(async () => {
     try {
-      await AsyncStorage.removeItem(PENDING_PAYMENT_KEY);
+      await Promise.all([
+        AsyncStorage.removeItem(PENDING_PAYMENT_KEY),
+        ...LEGACY_PENDING_PAYMENT_KEYS.map((k) => AsyncStorage.removeItem(k)),
+      ]);
       pendingPaymentRef.current = null;
       logger.info('PaymentResume', 'Cleared pending payment');
     } catch (error) {
@@ -124,7 +135,9 @@ export function usePaymentResume(options?: {
   const checkPaymentStatus = useCallback(
     async (merchantOid: string): Promise<PaymentResumeStatus> => {
       try {
-        logger.info('PaymentResume', 'Checking payment status', { merchantOid });
+        logger.info('PaymentResume', 'Checking payment status', {
+          merchantOid,
+        });
 
         // Query transactions table for this merchant order ID
         const { data: transaction, error } = await supabase
@@ -138,7 +151,9 @@ export function usePaymentResume(options?: {
         if (error) {
           // Transaction not found yet - might still be processing
           if (error.code === 'PGRST116') {
-            logger.info('PaymentResume', 'Transaction not found', { merchantOid });
+            logger.info('PaymentResume', 'Transaction not found', {
+              merchantOid,
+            });
             return 'pending';
           }
           throw error;
@@ -148,7 +163,11 @@ export function usePaymentResume(options?: {
 
         if (status === 'completed' || status === 'success') {
           return 'success';
-        } else if (status === 'failed' || status === 'cancelled' || status === 'refunded') {
+        } else if (
+          status === 'failed' ||
+          status === 'cancelled' ||
+          status === 'refunded'
+        ) {
           return 'failed';
         } else if (status === 'pending' || status === 'processing') {
           return 'pending';
@@ -160,7 +179,7 @@ export function usePaymentResume(options?: {
         return 'pending';
       }
     },
-    []
+    [],
   );
 
   /**
@@ -172,7 +191,10 @@ export function usePaymentResume(options?: {
 
     try {
       // Get pending payment from storage
-      const storedPayment = await AsyncStorage.getItem(PENDING_PAYMENT_KEY);
+      const storedPayment = await getItemWithLegacyFallback(
+        PENDING_PAYMENT_KEY,
+        LEGACY_PENDING_PAYMENT_KEYS,
+      );
       if (!storedPayment) {
         isCheckingRef.current = false;
         return;
@@ -269,12 +291,7 @@ export function usePaymentResume(options?: {
     } finally {
       isCheckingRef.current = false;
     }
-  }, [
-    checkPaymentStatus,
-    clearPendingPayment,
-    navigation,
-    onStatusResolved,
-  ]);
+  }, [checkPaymentStatus, clearPendingPayment, navigation, onStatusResolved]);
 
   /**
    * Monitor AppState changes
@@ -294,7 +311,10 @@ export function usePaymentResume(options?: {
       appStateRef.current = nextAppState;
     };
 
-    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    const subscription = AppState.addEventListener(
+      'change',
+      handleAppStateChange,
+    );
 
     // Also check on mount in case app was killed and restarted
     handleAppResume();
@@ -319,7 +339,10 @@ export function usePaymentResume(options?: {
  */
 export async function hasPendingPayment(): Promise<boolean> {
   try {
-    const stored = await AsyncStorage.getItem(PENDING_PAYMENT_KEY);
+    const stored = await getItemWithLegacyFallback(
+      PENDING_PAYMENT_KEY,
+      LEGACY_PENDING_PAYMENT_KEYS,
+    );
     return stored !== null;
   } catch {
     return false;
@@ -332,7 +355,10 @@ export async function hasPendingPayment(): Promise<boolean> {
  */
 export async function getPendingPayment(): Promise<PendingPayment | null> {
   try {
-    const stored = await AsyncStorage.getItem(PENDING_PAYMENT_KEY);
+    const stored = await getItemWithLegacyFallback(
+      PENDING_PAYMENT_KEY,
+      LEGACY_PENDING_PAYMENT_KEYS,
+    );
     return stored ? JSON.parse(stored) : null;
   } catch {
     return null;

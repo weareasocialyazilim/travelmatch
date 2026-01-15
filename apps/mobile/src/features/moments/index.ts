@@ -1,7 +1,7 @@
 /**
  * Moments Feature - Barrel Exports
  *
- * ELEVATED: Moments are the core of TravelMatch, not just a profile feature.
+ * ELEVATED: Moments are the core of Lovendo, not just a profile feature.
  * This is the single source of truth for ALL moment-related functionality:
  * - Discovery (browse moments)
  * - Creation (the drop)

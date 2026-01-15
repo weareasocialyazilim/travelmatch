@@ -4,7 +4,7 @@
  * All form validation schemas using Zod
  * Consistent patterns across the entire app
  *
- * NOTE: Auth schemas are re-exported from @travelmatch/shared
+ * NOTE: Auth schemas are re-exported from @lovendo/shared
  * to ensure single source of truth across all platforms.
  */
 
@@ -26,7 +26,7 @@ export {
   type ChangePasswordInput,
   type VerifyEmailInput,
   type VerifyOtpInput,
-} from '@travelmatch/shared/schemas';
+} from '@lovendo/shared/schemas';
 
 // Re-export common schemas from shared
 export {
@@ -34,7 +34,7 @@ export {
   passwordSchema,
   phoneSchema,
   usernameSchema,
-} from '@travelmatch/shared/schemas';
+} from '@lovendo/shared/schemas';
 
 // ============================================================================
 // MOBILE-SPECIFIC COMMON VALIDATION RULES
@@ -129,7 +129,7 @@ export type Gender = z.infer<typeof genderValidation>;
 // ============================================================================
 // MOBILE-SPECIFIC AUTH SCHEMAS (Extended for mobile UI)
 // Note: Core auth schemas (loginSchema, registerSchema, etc.) are imported
-// from @travelmatch/shared above. These are mobile-specific extensions.
+// from @lovendo/shared above. These are mobile-specific extensions.
 // ============================================================================
 
 export const phoneAuthSchema = z.object({
@@ -432,7 +432,7 @@ export const proofUploadSchema = z.object({
 // ============================================================================
 // TYPE EXPORTS (Mobile-specific schemas only)
 // Note: Auth types (LoginInput, RegisterInput, etc.) are already exported
-// from @travelmatch/shared/schemas above
+// from @lovendo/shared/schemas above
 // ============================================================================
 
 export type ProofInput = z.infer<typeof proofSchema>;

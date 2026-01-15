@@ -4,14 +4,14 @@ const IS_PRODUCTION = process.env.APP_ENV === 'production';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  name: 'TravelMatch',
-  slug: 'travelmatch',
-  owner: 'travelmatch',
+  name: 'Lovendo',
+  slug: 'lovendo',
+  owner: 'lovendo',
   version: '1.0.0',
   orientation: 'portrait',
   icon: './assets/icon.png',
   userInterfaceStyle: 'automatic',
-  scheme: 'travelmatch',
+  scheme: 'lovendo',
   newArchEnabled: true,
 
   // Entry point - use local index.ts instead of expo default
@@ -29,9 +29,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   // ============================================
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'com.travelmatch.mobile',
+    bundleIdentifier: 'com.lovendo.mobile',
     buildNumber: '24',
-    associatedDomains: ['applinks:travelmatch.app'],
+    associatedDomains: ['applinks:www.lovendo.xyz', 'applinks:lovendo.xyz'],
     config: {
       usesNonExemptEncryption: false,
     },
@@ -41,31 +41,39 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 
       // Location permissions
       NSLocationWhenInUseUsageDescription:
-        'TravelMatch uses your location to show nearby experiences and verify travel moments.',
+        'Lovendo uses your location to show nearby experiences and verify travel moments.',
 
       // Camera and Photos
       NSCameraUsageDescription:
-        'TravelMatch needs camera access to capture photos of your travel moments.',
+        'Lovendo needs camera access to capture photos of your travel moments.',
       NSPhotoLibraryUsageDescription:
-        'TravelMatch needs photo library access to upload travel moment photos.',
+        'Lovendo needs photo library access to upload travel moment photos.',
       NSPhotoLibraryAddUsageDescription:
-        'TravelMatch needs permission to save photos to your library.',
+        'Lovendo needs permission to save photos to your library.',
 
       // Face ID for biometric auth
       NSFaceIDUsageDescription:
-        'TravelMatch uses Face ID for secure and quick account authentication.',
+        'Lovendo uses Face ID for secure and quick account authentication.',
 
       // Microphone for voice messages
       NSMicrophoneUsageDescription:
-        'TravelMatch uses the microphone to record voice messages in chats.',
+        'Lovendo uses the microphone to record voice messages in chats.',
 
       // Contacts for finding friends
       NSContactsUsageDescription:
-        'TravelMatch can help you find friends who are also using the app.',
+        'Lovendo can help you find friends who are also using the app.',
 
       // App Tracking Transparency (iOS 14.5+)
       NSUserTrackingUsageDescription:
-        'TravelMatch uses this to provide personalized recommendations and improve app experience. Your data is never sold to third parties.',
+        'Lovendo uses this to provide personalized recommendations and improve app experience. Your data is never sold to third parties.',
+
+      // Deep link URL schemes (keep legacy lovendo for compatibility)
+      CFBundleURLTypes: [
+        {
+          CFBundleURLName: 'com.lovendo.mobile',
+          CFBundleURLSchemes: ['lovendo'],
+        },
+      ],
 
       // Push notifications background modes
       UIBackgroundModes: ['fetch', 'remote-notification'],
@@ -84,7 +92,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   // Android Configuration - Play Store Ready
   // ============================================
   android: {
-    package: 'com.travelmatch.app',
+    package: 'com.lovendo.app',
     versionCode: 1,
     adaptiveIcon: {
       foregroundImage: './assets/adaptive-icon.png',
@@ -97,11 +105,16 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         data: [
           {
             scheme: 'https',
-            host: 'travelmatch.app',
+            host: 'www.lovendo.xyz',
             pathPrefix: '/',
           },
           {
-            scheme: 'travelmatch',
+            scheme: 'https',
+            host: 'lovendo.xyz',
+            pathPrefix: '/',
+          },
+          {
+            scheme: 'lovendo',
             host: '*',
           },
         ],
@@ -196,7 +209,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       {
         url: 'https://sentry.io/',
         organization: process.env.SENTRY_ORG || 'lovendo-2d',
-        project: process.env.SENTRY_PROJECT || 'travelmatch-mobile',
+        project: process.env.SENTRY_PROJECT || 'lovendo-mobile',
         // authToken is read automatically from SENTRY_AUTH_TOKEN env var
       },
     ],
@@ -221,23 +234,23 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'expo-local-authentication',
       {
-        faceIDPermission: 'TravelMatch uses Face ID for secure authentication.',
+        faceIDPermission: 'Lovendo uses Face ID for secure authentication.',
       },
     ],
     [
       'expo-location',
       {
         locationWhenInUsePermission:
-          'TravelMatch uses your location to show nearby experiences.',
+          'Lovendo uses your location to show nearby experiences.',
       },
     ],
     [
       'expo-image-picker',
       {
         photosPermission:
-          'TravelMatch needs access to your photos to share travel moments.',
+          'Lovendo needs access to your photos to share travel moments.',
         cameraPermission:
-          'TravelMatch needs camera access to capture travel moments.',
+          'Lovendo needs camera access to capture travel moments.',
       },
     ],
     // Video compression for optimized uploads
@@ -254,8 +267,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     sentryDsn: process.env.SENTRY_DSN || '',
     appEnv: process.env.APP_ENV || 'development',
     apiUrl: IS_PRODUCTION
-      ? 'https://api.travelmatch.app'
-      : 'https://staging-api.travelmatch.app',
+      ? 'https://api.lovendo.xyz'
+      : 'https://staging-api.lovendo.xyz',
     supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL || '',
     supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '',
     enableAnalytics: IS_PRODUCTION,

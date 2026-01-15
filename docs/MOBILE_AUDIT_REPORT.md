@@ -1,4 +1,4 @@
-# TravelMatch Mobile App - Kapsamlı Denetim Raporu
+# Lovendo Mobile App - Kapsamlı Denetim Raporu
 
 **Tarih:** 14 Ocak 2026 **Versiyon:** 1.0.0 **Platform:** React Native + Expo SDK 54 **Ekran
 Sayısı:** 105 **Entegrasyon Sayısı:** 12
@@ -83,7 +83,7 @@ Kritik güvenlik açığı bulunmadı.
 | Color Tokens       | ✅ Mükemmel | 10/10 | 764 satır, Awwwards-grade               |
 | Typography         | ✅ İyi      | 8/10  | TYPOGRAPHY constants var                |
 | Spacing (8pt Grid) | ✅ Mükemmel | 10/10 | Semantic + numeric scale                |
-| Component Library  | ✅ İyi      | 8/10  | @travelmatch/design-system sync gerekli |
+| Component Library  | ✅ İyi      | 8/10  | @lovendo/design-system sync gerekli |
 | Dark Mode          | ⚠️ Eksik    | 5/10  | useColorScheme() yok                    |
 
 ### Empty/Loading/Error States
@@ -252,8 +252,8 @@ Total: 105 Screens
 ### Deep Link Configuration
 
 ```
-Scheme: travelmatch://
-HTTPS: https://travelmatch.app
+Scheme: lovendo://
+HTTPS: https://lovendo.app
 
 Supported Paths:
 - /profile/{userId} → ProfileDetail

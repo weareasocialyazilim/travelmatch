@@ -1,6 +1,6 @@
 /**
  * Video Processing Service
- * TravelMatch Master UX System
+ * Lovendo Master UX System
  *
  * On-device video compression before upload to reduce:
  * - Upload time by 70%
@@ -67,7 +67,7 @@ try {
 
 /**
  * Master video compression parameters
- * Optimized for TravelMatch "Silky" experience
+ * Optimized for Lovendo "Silky" experience
  */
 export const VIDEO_COMPRESSION_CONFIG = {
   /** Target resolution - 720p for mobile */

@@ -1,5 +1,5 @@
 /**
- * TravelMatch Vibe Room - Inbox Feature
+ * Lovendo Vibe Room - Inbox Feature
  *
  * Phase 4: THE VIBE ROOM (INBOX & CHAT)
  *

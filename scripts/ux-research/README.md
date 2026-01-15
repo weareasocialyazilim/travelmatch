@@ -1,6 +1,6 @@
 # UX Research & Design Toolkit
 
-Comprehensive toolkit for user-centered research and experience design at TravelMatch.
+Comprehensive toolkit for user-centered research and experience design at Lovendo.
 
 ## Overview
 
@@ -83,7 +83,7 @@ Confidence Score: 78.5% (based on 12 users)
 
 ### 2. Journey Mapper (`journey_mapper.py`)
 
-Creates comprehensive customer journey maps for TravelMatch flows.
+Creates comprehensive customer journey maps for Lovendo flows.
 
 **Usage:**
 ```bash
@@ -388,4 +388,4 @@ To add new features or validation criteria:
 ---
 
 **Last Updated:** 2025-12-22
-**Maintainer:** TravelMatch UX Team
+**Maintainer:** Lovendo UX Team

@@ -1,7 +1,7 @@
 /**
- * @travelmatch/shared
+ * @lovendo/shared
  *
- * Core shared package for TravelMatch monorepo.
+ * Core shared package for Lovendo monorepo.
  * Contains types, constants, utilities, and validation schemas
  * used across mobile, admin, and edge function applications.
  */

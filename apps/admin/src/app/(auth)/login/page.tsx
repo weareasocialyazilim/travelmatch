@@ -64,12 +64,12 @@ export default function LoginPage() {
         <CanvaCardHeader className="space-y-1 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
             <span className="text-xl font-bold text-primary-foreground">
-              TM
+              Lovendo
             </span>
           </div>
           <CanvaCardTitle className="text-2xl">Admin Girişi</CanvaCardTitle>
           <CanvaCardSubtitle>
-            TravelMatch yönetim paneline giriş yapın
+            Lovendo yönetim paneline giriş yapın
           </CanvaCardSubtitle>
         </CanvaCardHeader>
         <CanvaCardBody>
@@ -79,7 +79,7 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@travelmatch.app"
+                placeholder="admin@lovendo.xyz"
                 {...register('email')}
                 error={!!errors.email}
                 disabled={isLoading}
@@ -134,7 +134,7 @@ export default function LoginPage() {
             <p>
               Erişim sorunu mu yaşıyorsunuz?{' '}
               <a
-                href="mailto:support@travelmatch.app"
+                href="mailto:support@lovendo.xyz"
                 className="text-primary hover:underline"
               >
                 İletişime geçin

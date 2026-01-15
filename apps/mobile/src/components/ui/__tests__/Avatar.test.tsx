@@ -1,14 +1,14 @@
 /**
- * TMAvatar Component Test Suite
+ * LovendoAvatar Component Test Suite
  * Tests avatar component with images, initials, badges, and verification
- * Updated to use TMAvatar (renamed from Avatar)
+ * Updated to use LovendoAvatar (renamed from Avatar)
  */
 
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import { TMAvatar as Avatar } from '../TMAvatar';
+import { LovendoAvatar as Avatar } from '../LovendoAvatar';
 
-describe('TMAvatar Component', () => {
+describe('LovendoAvatar Component', () => {
   // ============================================
   // Basic Rendering Tests
   // ============================================
@@ -80,7 +80,7 @@ describe('TMAvatar Component', () => {
 
     it('displays two chars for single name', () => {
       const { getByText } = render(<Avatar name="John" />);
-      expect(getByText('JO')).toBeTruthy(); // TMAvatar uses first 2 chars
+      expect(getByText('JO')).toBeTruthy(); // LovendoAvatar uses first 2 chars
     });
 
     it('displays two initials for full name', () => {

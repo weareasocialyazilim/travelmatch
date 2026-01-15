@@ -4,8 +4,8 @@ import { ArrowLeft } from 'lucide-react';
 import { CanvaButton } from '@/components/canva/CanvaButton';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | TravelMatch',
-  description: 'TravelMatch Privacy Policy',
+  title: 'Privacy Policy | Lovendo',
+  description: 'Lovendo Privacy Policy',
 };
 
 export default function PrivacyPage() {
@@ -125,10 +125,10 @@ export default function PrivacyPage() {
               If you have any questions or concerns about this Privacy Policy,
               please contact us at{' '}
               <a
-                href="mailto:privacy@travelmatch.app"
+                href="mailto:privacy@lovendo.xyz"
                 className="text-primary hover:underline"
               >
-                privacy@travelmatch.app
+                privacy@lovendo.xyz
               </a>
             </p>
           </section>

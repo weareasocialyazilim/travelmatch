@@ -14,7 +14,7 @@ import { motion, AnimatePresence } from 'framer-motion';
  */
 
 const LOADING_STEPS = [
-  'INITIALIZING TRAVELMATCH PROTOCOL...',
+  'INITIALIZING LOVENDO PROTOCOL...',
   'SYNCING NEURAL NEXUS...',
   'ESTABLISHING ESCROW SHIELD...',
   'LOADING SACRED MOMENTS...',
@@ -87,7 +87,7 @@ export function Preloader({ onComplete, minDuration = 3000 }: PreloaderProps) {
             className="mb-16"
           >
             <span className="font-clash text-2xl font-bold text-primary uppercase italic tracking-tight">
-              TravelMatch
+              Lovendo
             </span>
           </motion.div>
 

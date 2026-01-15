@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * TravelMatch AI/ML Insights Dashboard
+ * Lovendo AI/ML Insights Dashboard
  * Tum AI/ML modelleri performansi ve analizleri
  *
  * Proof verification, price prediction, recommendations, NLP ve daha fazlasi

@@ -10,6 +10,9 @@ import { MMKV } from 'react-native-mmkv';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logger } from './logger';
 
+const STORAGE_ID = 'lovendo-storage';
+const LEGACY_STORAGE_ID = 'lovendo-storage';
+
 // Lazy initialization to prevent "runtime not ready" errors with Hermes
 let _storage: MMKV | null = null;
 let _initError: Error | null = null;
@@ -25,9 +28,56 @@ const getStorage = (): MMKV | null => {
   }
   if (!_storage) {
     try {
-      _storage = new MMKV({
-        id: 'travelmatch-storage',
-      });
+      const currentStorage = new MMKV({ id: STORAGE_ID });
+
+      // Best-effort migration from legacy store.
+      // Only run when the current store appears empty.
+      try {
+        const currentKeys = currentStorage.getAllKeys();
+        if (currentKeys.length === 0) {
+          const legacyStorage = new MMKV({ id: LEGACY_STORAGE_ID });
+          const legacyKeys = legacyStorage.getAllKeys();
+
+          if (legacyKeys.length > 0) {
+            for (const key of legacyKeys) {
+              const stringVal = legacyStorage.getString(key);
+              if (stringVal !== undefined) {
+                currentStorage.set(key, stringVal);
+                legacyStorage.delete(key);
+                continue;
+              }
+
+              const numberVal = legacyStorage.getNumber(key);
+              if (numberVal !== undefined) {
+                currentStorage.set(key, numberVal);
+                legacyStorage.delete(key);
+                continue;
+              }
+
+              const boolVal = legacyStorage.getBoolean(key);
+              if (boolVal !== undefined) {
+                currentStorage.set(key, boolVal);
+                legacyStorage.delete(key);
+              }
+            }
+
+            logger.info('[Storage] Migrated MMKV store', {
+              from: LEGACY_STORAGE_ID,
+              to: STORAGE_ID,
+              keyCount: legacyKeys.length,
+            });
+          }
+        }
+      } catch (migrationError) {
+        logger.debug('[Storage] MMKV migration skipped/failed', {
+          error:
+            migrationError instanceof Error
+              ? migrationError.message
+              : String(migrationError),
+        });
+      }
+
+      _storage = currentStorage;
     } catch (error) {
       // Debug level - AsyncStorage fallback is expected on some devices
       logger.debug('[Storage] MMKV init failed, using AsyncStorage fallback');

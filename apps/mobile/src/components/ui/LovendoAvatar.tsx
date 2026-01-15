@@ -1,5 +1,5 @@
 /**
- * TMAvatar - TravelMatch Ultimate Design System 2026
+ * LovendoAvatar - Lovendo Ultimate Design System 2026
  * Avatar component with fallback initials, status indicator, and verified badge
  *
  * Features:
@@ -77,7 +77,7 @@ const VERIFIED_SIZE: Record<AvatarSize, number> = {
   profile: 28,
 };
 
-export interface TMAvatarProps {
+export interface LovendoAvatarProps {
   /** Image source URL */
   source?: string;
   /** User's name for generating initials fallback */
@@ -142,7 +142,7 @@ const getStatusColor = (status: AvatarStatus): string => {
   }
 };
 
-export const TMAvatar: React.FC<TMAvatarProps> = ({
+export const LovendoAvatar: React.FC<LovendoAvatarProps> = ({
   source,
   name = '',
   size = 'md',
@@ -297,4 +297,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TMAvatar;
+export default LovendoAvatar;

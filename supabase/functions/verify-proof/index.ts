@@ -132,7 +132,7 @@ async function analyzeWithClaude(
       content: [
         {
           type: 'text',
-          text: `You are a travel proof verification AI for TravelMatch platform.
+          text: `You are a travel proof verification AI for Lovendo platform.
 
 Analyze this travel proof and verify the claim.
 

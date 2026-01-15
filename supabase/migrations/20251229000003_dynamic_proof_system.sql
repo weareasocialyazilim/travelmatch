@@ -1,5 +1,5 @@
 -- ============================================
--- TravelMatch Dynamic Proof Requirements
+-- Lovendo Dynamic Proof Requirements
 -- Migration: 20251229000003_dynamic_proof_system.sql
 -- ============================================
 --

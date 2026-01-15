@@ -126,7 +126,7 @@ BEGIN
   IF NEW.is_banned = FALSE AND OLD.is_banned = TRUE THEN
     notification_type := 'account_reinstated';
     notification_title := 'Hesabınız yeniden aktif';
-    notification_body := 'Hesabınız yeniden aktif edildi. TravelMatch''e tekrar hoş geldiniz!';
+    notification_body := 'Hesabınız yeniden aktif edildi. Lovendo''e tekrar hoş geldiniz!';
 
     PERFORM create_notification(
       NEW.id,
@@ -168,7 +168,7 @@ BEGIN
   IF NEW.is_suspended = FALSE AND OLD.is_suspended = TRUE THEN
     notification_type := 'account_reinstated';
     notification_title := 'Hesabınız yeniden aktif';
-    notification_body := 'Hesabınızın askı süresi sona erdi. TravelMatch''e tekrar hoş geldiniz!';
+    notification_body := 'Hesabınızın askı süresi sona erdi. Lovendo''e tekrar hoş geldiniz!';
 
     PERFORM create_notification(
       NEW.id,

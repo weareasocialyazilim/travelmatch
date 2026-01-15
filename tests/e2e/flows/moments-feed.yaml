@@ -1,7 +1,7 @@
 # Maestro Flow: Moments Feed
 # Tests social feed functionality
 
-appId: com.travelmatch.app
+appId: com.lovendo.app
 ---
 
 # Navigate to moments

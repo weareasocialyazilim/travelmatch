@@ -9,7 +9,7 @@
  *
  * @example
  * ```typescript
- * import { logger } from '@travelmatch/shared';
+ * import { logger } from '@lovendo/shared';
  *
  * logger.debug('Debug message', { data });
  * logger.info('User action', { userId });
@@ -70,7 +70,7 @@ class ProductionLogger {
   private enableInProduction: boolean;
 
   constructor(options: LoggerOptions = {}) {
-    this.prefix = options.prefix || '[TravelMatch]';
+    this.prefix = options.prefix || '[Lovendo]';
     this.minLevel = options.minLevel || 'debug';
     this.enableInProduction = options.enableInProduction || false;
   }

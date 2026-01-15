@@ -1,11 +1,11 @@
 import type { MetadataRoute } from 'next';
 
 /**
- * TravelMatch V2 - Sitemap Configuration
+ * Lovendo V2 - Sitemap Configuration
  */
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://travelmatch.app';
+  const baseUrl = 'https://www.lovendo.xyz';
 
   return [
     {

@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "TravelMatch",
+    "appName": "Lovendo",
     "loading": "Loading...",
     "error": "Error",
     "success": "Success",
@@ -328,7 +328,7 @@
   },
   "onboarding": {
     "page1": {
-      "title": "Welcome to TravelMatch",
+      "title": "Welcome to Lovendo",
       "description": "Connect with people nearby through verified, heartfelt gifts."
     },
     "page2": {
@@ -370,7 +370,7 @@
     "getStarted": "Get Started",
     "continue": "Continue",
     "start": "Start",
-    "welcome": "Welcome to TravelMatch",
+    "welcome": "Welcome to Lovendo",
     "welcomeMessage": "Connect with travelers and create unforgettable experiences",
     "step1Title": "Discover Moments",
     "step1Description": "Browse unique travel experiences created by locals",
@@ -380,7 +380,7 @@
     "step3Description": "Create your own moments and earn money"
   },
   "welcome": {
-    "title": "Welcome to TravelMatch",
+    "title": "Welcome to Lovendo",
     "subtitle": "Share moments. Gift experiences.\nMake every connection meaningful.",
     "continueWithApple": "Continue with Apple",
     "continueWithGoogle": "Continue with Google",
@@ -471,7 +471,7 @@
     "deleteAccountWarning": "This action cannot be undone. All your data will be permanently deleted."
   },
   "store": {
-    "appName": "TravelMatch",
+    "appName": "Lovendo",
     "subtitle": "Share Moments, Make Connections",
     "shortDescription": "Meet people nearby. Share moments. Gift experiences. Connect differently.",
     "keywords": "dating,experiences,gifts,moments,discover,connection,coffee,food,meetup,social"
@@ -511,7 +511,7 @@
     "version": "Version",
     "build": "Build",
     "buildDate": "Build Date",
-    "copyright": "© 2024 TravelMatch Inc."
+    "copyright": "© 2024 Lovendo Inc."
   },
   "notifications": {
     "settings": {
@@ -707,7 +707,7 @@
     },
     "forceUpdate": {
       "title": "Update Required",
-      "description": "A new version of TravelMatch is available. Please update to continue.",
+      "description": "A new version of Lovendo is available. Please update to continue.",
       "update": "Update Now"
     },
     "notFound": {
@@ -871,7 +871,7 @@
   },
   "profile": {
     "title": "Profile",
-    "shareMessage": "Check out my TravelMatch profile!",
+    "shareMessage": "Check out my Lovendo profile!",
     "shareProfile": "Share profile",
     "savedMoments": "Saved Moments",
     "offlineTitle": "No internet connection",

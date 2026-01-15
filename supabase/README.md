@@ -1,4 +1,4 @@
-# 🚀 Supabase - TravelMatch Backend
+# 🚀 Supabase - Lovendo Backend
 
 > Enterprise-grade backend infrastructure powered by Supabase
 
@@ -276,4 +276,4 @@ SELECT * FROM pg_policies WHERE tablename = 'your_table';
 
 ## 📄 License
 
-Proprietary - TravelMatch © 2024-2025
+Proprietary - Lovendo © 2024-2025

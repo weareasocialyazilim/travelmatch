@@ -1,7 +1,7 @@
 /**
  * MagneticButton - Button with Magnetic Interaction
  *
- * Extends TMButton with Apple Vision Pro-style magnetic pull effect.
+ * Extends LovendoButton with Apple Vision Pro-style magnetic pull effect.
  * The button subtly moves toward the user's finger as it approaches,
  * creating a premium, tactile interaction.
  *
@@ -9,7 +9,7 @@
  * - Magnetic pull (2-3px) within attraction radius
  * - Glow effect on proximity
  * - Haptic feedback
- * - All TMButton props supported
+ * - All LovendoButton props supported
  *
  * Usage:
  * <MagneticButton
@@ -26,10 +26,10 @@ import { View, StyleSheet, LayoutChangeEvent } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { GestureDetector } from 'react-native-gesture-handler';
 import { LinearGradient } from 'expo-linear-gradient';
-import { TMButton, type TMButtonProps } from './TMButton';
+import { LovendoButton, type LovendoButtonProps } from './LovendoButton';
 import { useMagneticEffect } from '@/hooks/useMagneticEffect';
 
-interface MagneticButtonProps extends TMButtonProps {
+interface MagneticButtonProps extends LovendoButtonProps {
   /** Radius in pixels where magnetic effect activates (default: 60) */
   attractionRadius?: number;
   /** Maximum pull distance in pixels (default: 3) */
@@ -82,9 +82,9 @@ export const MagneticButton: React.FC<MagneticButtonProps> = ({
 
   if (disableMagnetic) {
     return (
-      <TMButton {...buttonProps} style={style}>
+      <LovendoButton {...buttonProps} style={style}>
         {children}
-      </TMButton>
+      </LovendoButton>
     );
   }
 
@@ -112,9 +112,9 @@ export const MagneticButton: React.FC<MagneticButtonProps> = ({
 
         {/* Button with magnetic pull */}
         <Animated.View style={[magneticStyle]}>
-          <TMButton {...buttonProps} style={style}>
+          <LovendoButton {...buttonProps} style={style}>
             {children}
-          </TMButton>
+          </LovendoButton>
         </Animated.View>
       </View>
     </GestureDetector>

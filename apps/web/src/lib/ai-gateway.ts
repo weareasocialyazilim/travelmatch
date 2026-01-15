@@ -1,5 +1,5 @@
 /**
- * TravelMatch AI Gateway
+ * Lovendo AI Gateway
  * Clean interface for ML service integration
  *
  * Connects web frontend to Supabase Edge Functions (ml-gateway)
@@ -48,7 +48,7 @@ interface ProofVerificationResult {
 // Base URL for ML Gateway (Supabase Edge Function)
 const ML_GATEWAY_URL =
   process.env.NEXT_PUBLIC_ML_GATEWAY_URL ||
-  'https://api.travelmatch.app/functions/v1/ml-gateway';
+  'https://api.lovendo.xyz/functions/v1/ml-gateway';
 
 /**
  * Make a request to the AI Gateway

@@ -84,8 +84,8 @@ cd services/ml-service
 python3 app.py
 
 # Or with Docker
-docker build -t travelmatch-ml .
-docker run -p 8000:8000 travelmatch-ml
+docker build -t lovendo-ml .
+docker run -p 8000:8000 lovendo-ml
 ```
 
 ### 2. Job Queue Service
@@ -109,8 +109,8 @@ npm run queue:ui
 ```bash
 # Option 1: Use Python 3.11
 pyenv install 3.11.10
-pyenv virtualenv 3.11.10 travelmatch-ml
-pyenv activate travelmatch-ml
+pyenv virtualenv 3.11.10 lovendo-ml
+pyenv activate lovendo-ml
 pip install torch torchvision torchaudio
 
 # Option 2: Wait for PyTorch 2.6 stable (Q1 2026)

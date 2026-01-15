@@ -10,7 +10,7 @@ December 2024
 
 ## Context
 
-TravelMatch's primary interface is a mobile application for iOS and Android. We needed to decide on a mobile development approach that would:
+Lovendo's primary interface is a mobile application for iOS and Android. We needed to decide on a mobile development approach that would:
 
 1. Support both iOS and Android from a single codebase
 2. Enable rapid development and iteration
@@ -48,16 +48,16 @@ E2E:           Maestro
 // app.config.ts
 export default {
   expo: {
-    name: 'TravelMatch',
-    slug: 'travelmatch',
+    name: 'Lovendo',
+    slug: 'lovendo',
     version: '1.0.0',
     sdkVersion: '54.0.0',
     platforms: ['ios', 'android'],
     ios: {
-      bundleIdentifier: 'com.travelmatch.app',
+      bundleIdentifier: 'com.lovendo.app',
     },
     android: {
-      package: 'com.travelmatch.app',
+      package: 'com.lovendo.app',
     },
   },
 };
@@ -161,7 +161,7 @@ describe('MomentCard', () => {
 
 ```yaml
 # Maestro E2E flow
-appId: com.travelmatch.app
+appId: com.lovendo.app
 ---
 - launchApp
 - tapOn: "Email"

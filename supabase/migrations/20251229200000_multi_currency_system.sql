@@ -1,5 +1,5 @@
 -- ============================================
--- TravelMatch Multi-Currency System
+-- Lovendo Multi-Currency System
 -- Migration: 20251229200000_multi_currency_system.sql
 -- ============================================
 

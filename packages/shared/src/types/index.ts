@@ -1,6 +1,6 @@
 /**
  * TypeScript Types
- * All shared type definitions for TravelMatch
+ * All shared type definitions for Lovendo
  */
 
 // Core types - but exclude KYCStatus to avoid conflict with enums

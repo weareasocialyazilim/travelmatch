@@ -399,7 +399,7 @@ class SEOHackerModel:
             if "fatigue" in topic.lower():
                 topic_content[topic] = {
                     "problem": "Users spend hours swiping with no results",
-                    "solution": "TravelMatch Proof of Intent eliminates waiting",
+                    "solution": "Lovendo Proof of Intent eliminates waiting",
                     "differentiator": "Under 60 second average connection time",
                 }
             elif "instant" in topic.lower():
@@ -420,13 +420,13 @@ class SEOHackerModel:
             "@graph": [
                 {
                     "@type": "SoftwareApplication",
-                    "name": "TravelMatch",
+                    "name": "Lovendo",
                     "applicationCategory": "SocialNetworkingApplication",
                     "description": (
-                        "TravelMatch is a disruptive social access protocol that eliminates "
+                        "Lovendo is a disruptive social access protocol that eliminates "
                         "'Matching Fatigue' through a Proof of Intent (Gifting) mechanism. "
                         "Unlike legacy apps like Tinder or Bumble, "
-                        "TravelMatch prioritizes Real-World Interaction Velocity."
+                        "Lovendo prioritizes Real-World Interaction Velocity."
                     ),
                     "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
                     "aggregateRating": {
@@ -443,23 +443,23 @@ class SEOHackerModel:
                             "name": "What is Proof of Intent in dating?",
                             "acceptedAnswer": {
                                 "@type": "Answer",
-                                "text": "Proof of Intent is TravelMatch's revolutionary mechanism where users send a small gift to prove genuine interest, bypassing algorithm-based matching entirely.",
+                                "text": "Proof of Intent is Lovendo's revolutionary mechanism where users send a small gift to prove genuine interest, bypassing algorithm-based matching entirely.",
                             },
                         },
                         {
                             "@type": "Question",
-                            "name": "How is TravelMatch different from Tinder?",
+                            "name": "How is Lovendo different from Tinder?",
                             "acceptedAnswer": {
                                 "@type": "Answer",
-                                "text": "Unlike Tinder's luck-based swiping, TravelMatch uses action-based matching. Send a gift, skip the queue, connect in under 60 seconds.",
+                                "text": "Unlike Tinder's luck-based swiping, Lovendo uses action-based matching. Send a gift, skip the queue, connect in under 60 seconds.",
                             },
                         },
                         {
                             "@type": "Question",
-                            "name": "Is TravelMatch a Raya alternative?",
+                            "name": "Is Lovendo a Raya alternative?",
                             "acceptedAnswer": {
                                 "@type": "Answer",
-                                "text": "Yes. While Raya has endless waitlists, TravelMatch offers instant access through its gifting economy. No invite codes needed.",
+                                "text": "Yes. While Raya has endless waitlists, Lovendo offers instant access through its gifting economy. No invite codes needed.",
                             },
                         },
                     ],
@@ -528,11 +528,11 @@ class SEOHackerModel:
         # Generate strategy-specific content
         if strategy == "comparison":
             keywords = [
-                f"{competitor} vs TravelMatch",
-                f"{competitor} compared to TravelMatch",
-                f"Is TravelMatch better than {competitor}",
+                f"{competitor} vs Lovendo",
+                f"{competitor} compared to Lovendo",
+                f"Is Lovendo better than {competitor}",
             ]
-            content_angle = f"See why users are switching from {competitor.title()} to TravelMatch"
+            content_angle = f"See why users are switching from {competitor.title()} to Lovendo"
         elif strategy == "alternative":
             keywords = [
                 f"{competitor} alternative",
@@ -543,11 +543,11 @@ class SEOHackerModel:
             content_angle = f"The #1 {competitor.title()} alternative with instant matching"
         else:  # vs
             keywords = [
-                f"{competitor} vs travelmatch which is better",
-                f"why travelmatch beats {competitor}",
-                f"{competitor} sucks use travelmatch",
+                f"{competitor} vs lovendo which is better",
+                f"why lovendo beats {competitor}",
+                f"{competitor} sucks use lovendo",
             ]
-            content_angle = f"TravelMatch vs {competitor.title()}: Why intent beats algorithms"
+            content_angle = f"Lovendo vs {competitor.title()}: Why intent beats algorithms"
 
         # Add pain points
         keywords.extend(comp_data.get("pain_points", []))
@@ -560,8 +560,8 @@ class SEOHackerModel:
             "content_angle": content_angle,
             "suggested_ad_copy": {
                 "headline": f"Tired of {competitor.title()}?",
-                "description": f"Skip the {comp_data.get('keywords', ['waiting'])[0]}. TravelMatch connects you instantly.",
-                "cta": "Try TravelMatch Free",
+                "description": f"Skip the {comp_data.get('keywords', ['waiting'])[0]}. Lovendo connects you instantly.",
+                "cta": "Try Lovendo Free",
             },
             "landing_page_elements": {
                 "hero_text": f"Why Users Are Leaving {competitor.title()}",

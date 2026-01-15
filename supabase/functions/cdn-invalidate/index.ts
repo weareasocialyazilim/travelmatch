@@ -10,7 +10,7 @@ import { getCorsHeaders } from '../_shared/cors.ts';
 const CLOUDFLARE_ZONE_ID = Deno.env.get('CLOUDFLARE_ZONE_ID');
 const CLOUDFLARE_API_TOKEN = Deno.env.get('CLOUDFLARE_API_TOKEN');
 const CDN_BASE_URL =
-  Deno.env.get('CDN_BASE_URL') || 'https://cdn.travelmatch.com';
+  Deno.env.get('CDN_BASE_URL') || 'https://cdn.lovendo.com';
 
 const InvalidateRequestSchema = z.object({
   type: z.enum(['profile', 'moment', 'image', 'custom']),

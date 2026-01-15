@@ -1,5 +1,5 @@
 /**
- * Shared Type Definitions for TravelMatch Edge Functions
+ * Shared Type Definitions for Lovendo Edge Functions
  * 
  * This file contains TypeScript interfaces and types used across
  * multiple Edge Functions to ensure type safety and consistency.

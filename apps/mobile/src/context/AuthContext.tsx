@@ -573,7 +573,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       }
 
       // Open OAuth URL in browser
-      // The callback will be handled by deep linking (travelmatch://auth/callback)
+      // The callback will be handled by deep linking (lovendo://auth/callback)
       const supported = await Linking.canOpenURL(url);
       if (!supported) {
         logger.error('[Auth] Cannot open OAuth URL:', url);

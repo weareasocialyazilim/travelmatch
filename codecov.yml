@@ -1,4 +1,4 @@
-# Codecov Configuration for TravelMatch
+# Codecov Configuration for Lovendo
 # https://docs.codecov.com/docs/codecov-yaml
 
 coverage:
@@ -70,7 +70,7 @@ ignore:
 bundle_analysis:
   # Bundle name for the web app
   bundles:
-    - name: 'travelmatch-web'
+    - name: 'lovendo-web'
       # Warn if bundle size increases by more than 5%
       warning_threshold: '5%'
       # Fail if bundle size increases by more than 10%

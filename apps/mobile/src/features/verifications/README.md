@@ -1,7 +1,7 @@
 # Verifications Feature
 
-The **security heart** of TravelMatch. This feature handles all proof ceremonies, moment
-authentication, and trust verification.
+The **security heart** of Lovendo. This feature handles all proof ceremonies, moment authentication,
+and trust verification.
 
 ## Why a Separate Feature?
 

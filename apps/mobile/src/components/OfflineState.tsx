@@ -1,6 +1,6 @@
 /**
  * OfflineState Component
- * Dating-themed offline UI for TravelMatch
+ * Dating-themed offline UI for Lovendo
  *
  * Shows a heartfelt "connection lost" metaphor when offline
  */

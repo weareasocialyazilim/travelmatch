@@ -1,6 +1,6 @@
 # FEATURE_FLAGS.md
 
-## TravelMatch - Feature Flags Registry
+## Lovendo - Feature Flags Registry
 
 **Tarih:** 2026-01-14 **Versiyon:** Stabilization Release
 

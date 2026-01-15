@@ -36,11 +36,11 @@ export function Footer() {
           whileInView={{ y: 0, opacity: 0.05 }}
           className="text-[20vw] font-black italic text-center leading-none select-none"
         >
-          TRAVELMATCH
+          LOVENDO
         </motion.h1>
 
         <div className="mt-12 text-center text-[8px] font-bold opacity-20 uppercase tracking-[0.5em]">
-          © 2025 TravelMatch Protocol • All Rights Reserved
+          © 2025 Lovendo Protocol • All Rights Reserved
         </div>
       </div>
     </footer>

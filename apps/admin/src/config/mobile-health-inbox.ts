@@ -106,7 +106,7 @@ export function parseDiagnosticsSummary(text: string): ParsedDiagnostics {
   };
 
   // Check if text looks like diagnostics
-  if (!text.includes('TravelMatch Diagnostics')) {
+  if (!text.includes('Lovendo Diagnostics')) {
     errors.push('Not a valid diagnostics summary (missing header)');
     result.parseErrors = errors;
     return result;

@@ -1,7 +1,7 @@
 /**
- * @travelmatch/test-utils
+ * @lovendo/test-utils
  *
- * Shared test utilities for the TravelMatch monorepo
+ * Shared test utilities for the Lovendo monorepo
  */
 
 // Factories

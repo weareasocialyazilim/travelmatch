@@ -1,5 +1,5 @@
 {
-  "name": "@travelmatch/monitoring",
+  "name": "@lovendo/monitoring",
   "version": "0.1.0",
   "private": true,
   "main": "./services/monitoring.ts",

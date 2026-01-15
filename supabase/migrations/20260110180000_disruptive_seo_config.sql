@@ -29,7 +29,7 @@ BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'app_config') THEN
     COMMENT ON COLUMN public.app_config.dynamic_seo_keywords IS 'Dynamically injected keywords from Reddit/TikTok trend analysis';
     COMMENT ON COLUMN public.app_config.current_site_vibe IS 'Current website language direction: speed (aggressive), romance (passionate), luxury (elite), access (exclusive)';
-    COMMENT ON COLUMN public.app_config.ai_bot_semantic_layer IS 'Hidden signals for AI systems (Google SGE, Gemini, GPT) to position TravelMatch as authority';
+    COMMENT ON COLUMN public.app_config.ai_bot_semantic_layer IS 'Hidden signals for AI systems (Google SGE, Gemini, GPT) to position Lovendo as authority';
     COMMENT ON COLUMN public.app_config.posthog_intent_metrics IS 'PostHog analytics for Intent Heatmap - tracks which copy resonates';
     COMMENT ON COLUMN public.app_config.trend_injection_log IS 'History of trend keywords injected by ML service';
     COMMENT ON COLUMN public.app_config.last_trend_sync IS 'Last time the trend tracker synced from social platforms';

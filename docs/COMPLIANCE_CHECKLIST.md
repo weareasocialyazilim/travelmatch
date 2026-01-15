@@ -1,7 +1,6 @@
-# TravelMatch Compliance Checklist
+# Lovendo Compliance Checklist
 
-**Last Updated:** December 22, 2025
-**Status:** Pre-Launch Review
+**Last Updated:** December 22, 2025 **Status:** Pre-Launch Review
 
 Use this checklist to track compliance remediation progress.
 
@@ -255,45 +254,45 @@ Use this checklist to track compliance remediation progress.
 
 ## Compliance Metrics Dashboard
 
-| Metric | Target | Current | Status |
-|--------|--------|---------|--------|
-| Critical vulnerabilities | 0 | 5 | 🔴 |
-| GDPR requests processed (30d) | 100% | N/A | ⚪ |
-| Average breach response time | <72h | N/A | ⚪ |
-| Audit log coverage | 100% | 95% | 🟡 |
-| Vendor DPAs in place | 100% | 40% | 🔴 |
-| Staff security trained | 100% | 0% | 🔴 |
-| Backup success rate | 100% | 100% | 🟢 |
-| RLS policy coverage | 100% | 100% | 🟢 |
+| Metric                        | Target | Current | Status |
+| ----------------------------- | ------ | ------- | ------ |
+| Critical vulnerabilities      | 0      | 5       | 🔴     |
+| GDPR requests processed (30d) | 100%   | N/A     | ⚪     |
+| Average breach response time  | <72h   | N/A     | ⚪     |
+| Audit log coverage            | 100%   | 95%     | 🟡     |
+| Vendor DPAs in place          | 100%   | 40%     | 🔴     |
+| Staff security trained        | 100%   | 0%      | 🔴     |
+| Backup success rate           | 100%   | 100%    | 🟢     |
+| RLS policy coverage           | 100%   | 100%    | 🟢     |
 
 ---
 
 ## Quick Reference: Key Contacts
 
-| Role | Name | Email |
-|------|------|-------|
-| Compliance Lead | TBD | compliance@travelmatch.app |
-| Data Protection Officer | TBD | dpo@travelmatch.app |
-| Security Lead | TBD | security@travelmatch.app |
-| Legal Counsel | TBD | legal@travelmatch.app |
-| Incident Response | Team | security@travelmatch.app |
+| Role                    | Name | Email                  |
+| ----------------------- | ---- | ---------------------- |
+| Compliance Lead         | TBD  | compliance@lovendo.xyz |
+| Data Protection Officer | TBD  | dpo@lovendo.xyz        |
+| Security Lead           | TBD  | security@lovendo.xyz   |
+| Legal Counsel           | TBD  | legal@lovendo.xyz      |
+| Incident Response       | Team | security@lovendo.xyz   |
 
 ---
 
 ## Compliance Calendar
 
-| Date | Activity | Owner |
-|------|----------|-------|
-| Weekly | Vulnerability scan review | Security |
-| Monthly | Access review | Security |
-| Quarterly | Policy review | Compliance |
-| Jan 15 | Annual compliance assessment | Compliance |
-| Mar 15 | Penetration test | Security |
-| Jun 15 | SOC 2 audit prep | Compliance |
-| Sep 15 | DR drill | DevOps |
-| Dec 15 | Annual report | Compliance |
+| Date      | Activity                     | Owner      |
+| --------- | ---------------------------- | ---------- |
+| Weekly    | Vulnerability scan review    | Security   |
+| Monthly   | Access review                | Security   |
+| Quarterly | Policy review                | Compliance |
+| Jan 15    | Annual compliance assessment | Compliance |
+| Mar 15    | Penetration test             | Security   |
+| Jun 15    | SOC 2 audit prep             | Compliance |
+| Sep 15    | DR drill                     | DevOps     |
+| Dec 15    | Annual report                | Compliance |
 
 ---
 
-**Checklist maintained by:** Compliance Team
-**Review frequency:** Weekly during pre-launch, monthly after launch
+**Checklist maintained by:** Compliance Team **Review frequency:** Weekly during pre-launch, monthly
+after launch

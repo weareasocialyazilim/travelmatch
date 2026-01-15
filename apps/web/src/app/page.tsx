@@ -35,13 +35,13 @@ const COPY = {
     nav: ['Philosophy', 'How It Works', 'Stash', 'Join'],
     hero: {
       kicker: 'THE SOCIAL LAYER FOR MOMENTS',
-      headline: 'TRAVEL\nMATCH',
+      headline: 'LOVENDO',
       sub: 'No likes. No follows. Just real people, real moments.',
     },
     sections: [
       {
         title: 'MOMENTS ARE SIGNALS.\nNOT PLANS. NOT PROMISES.',
-        body: 'A rooftop sunset in Lisbon. A jazz bar at 2 AM in Tokyo. TravelMatch reads the moment — and connects you to someone feeling the same energy, right now.',
+        body: 'A rooftop sunset in Lisbon. A jazz bar at 2 AM in Tokyo. Lovendo reads the moment — and connects you to someone feeling the same energy, right now.',
       },
       {
         title: 'THE ALGORITHM\nIS SERENDIPITY.',
@@ -57,7 +57,7 @@ const COPY = {
     stashSub: 'Curated moments from the community',
     email: 'Your email',
     submit: 'Notify Me',
-    footer: 'TravelMatch © 2025 — The social layer for moments.',
+    footer: 'Lovendo © 2025 — The social layer for moments.',
     modalOffer: 'OFFER SUGGESTION',
     modalHint: "Choose how you'd like to connect",
   },
@@ -65,13 +65,13 @@ const COPY = {
     nav: ['Felsefe', 'Nasıl Çalışır', 'Stash', 'Katıl'],
     hero: {
       kicker: 'ANLAR İÇİN SOSYAL KATMAN',
-      headline: 'TRAVEL\nMATCH',
+      headline: 'LOVENDO',
       sub: 'Beğeni yok. Takip yok. Sadece gerçek insanlar, gerçek anlar.',
     },
     sections: [
       {
         title: 'ANLAR SİNYALDİR.\nPLAN DEĞİL. SÖZ DEĞİL.',
-        body: "Lizbon'da bir çatı katı gün batımı. Tokyo'da gece 2'de bir caz barı. TravelMatch anı okur — ve şu an aynı enerjiyi hisseden biriyle seni buluşturur.",
+        body: "Lizbon'da bir çatı katı gün batımı. Tokyo'da gece 2'de bir caz barı. Lovendo anı okur — ve şu an aynı enerjiyi hisseden biriyle seni buluşturur.",
       },
       {
         title: 'ALGORİTMA\nTESADÜFTÜR.',
@@ -87,7 +87,7 @@ const COPY = {
     stashSub: 'Topluluktan küratörlü anlar',
     email: 'E-posta adresin',
     submit: 'Beni Bilgilendir',
-    footer: 'TravelMatch © 2025 — Anlar için sosyal katman.',
+    footer: 'Lovendo © 2025 — Anlar için sosyal katman.',
     modalOffer: 'ÖNERI',
     modalHint: 'Nasıl bağlanmak istediğini seç',
   },
@@ -616,7 +616,7 @@ export default function HomePage() {
       {/* ─── NAV ─── */}
       <nav className="nav">
         <div className="navInner">
-          <span className="logo">TravelMatch</span>
+          <span className="logo">Lovendo</span>
           <div className="navLinks">
             {t.nav.map((item, i) => (
               <button

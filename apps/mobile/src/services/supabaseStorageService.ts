@@ -1,6 +1,6 @@
 /**
  * Supabase Storage Service
- * File upload/download operations for TravelMatch
+ * File upload/download operations for Lovendo
  */
 
 import * as FileSystem from 'expo-file-system';

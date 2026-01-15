@@ -1,5 +1,5 @@
 /**
- * TravelMatch Currency Constants
+ * Lovendo Currency Constants
  * ISO 4217 currency codes and display info
  */
 

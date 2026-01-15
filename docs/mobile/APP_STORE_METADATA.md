@@ -1,11 +1,11 @@
-# TravelMatch - App Store Metadata
+# Lovendo - App Store Metadata
 
 ## App Information
 
 ### App Name (30 karakter max)
 
 ```
-TravelMatch
+Lovendo
 ```
 
 ### Subtitle (30 karakter max)
@@ -21,11 +21,11 @@ Seyahat Deneyimlerini Paylaş
 ### Türkçe (Primary)
 
 ```
-TravelMatch ile seyahat deneyimlerini paylaş, keşfet ve hediye et!
+Lovendo ile seyahat deneyimlerini paylaş, keşfet ve hediye et!
 
 🌍 NASIL ÇALIŞIR?
 
-TravelMatch, seyahat severleri bir araya getiren yeni nesil bir platform. Gittiğin yerlerdeki benzersiz deneyimlerini "moment" olarak paylaş, başkalarının deneyimlerini keşfet ve sevdiklerine unutulmaz seyahat hediyeleri gönder.
+Lovendo, seyahat severleri bir araya getiren yeni nesil bir platform. Gittiğin yerlerdeki benzersiz deneyimlerini "moment" olarak paylaş, başkalarının deneyimlerini keşfet ve sevdiklerine unutulmaz seyahat hediyeleri gönder.
 
 ✨ ÖNE ÇIKAN ÖZELLİKLER
 
@@ -57,10 +57,10 @@ Doğum günleri, özel günler veya sürprizler için mükemmel! Sevdiklerine sa
 2. Profilini tamamla
 3. İlk moment'ini paylaş veya keşfetmeye başla!
 
-Sorularınız için: support@travelmatch.app
+Sorularınız için: support@lovendo.app
 
 ---
-TravelMatch - Seyahat et, Paylaş, Hediye Et
+Lovendo - Seyahat et, Paylaş, Hediye Et
 ```
 
 ---
@@ -84,7 +84,7 @@ travel,gift,experience,seyahat,hediye,tatil,gezi,paylaş,keşfet,anı,moment,tri
 ### Version 1.0.0
 
 ```
-TravelMatch'e Hoş Geldiniz! 🎉
+Lovendo'e Hoş Geldiniz! 🎉
 
 İlk sürümümüzde:
 
@@ -96,7 +96,7 @@ TravelMatch'e Hoş Geldiniz! 🎉
 • Türkçe arayüz
 
 Geri bildirimlerinizi bekliyoruz!
-support@travelmatch.app
+support@lovendo.app
 ```
 
 ---
@@ -104,7 +104,7 @@ support@travelmatch.app
 ## Promotional Text (170 karakter max)
 
 ```
-Seyahat deneyimlerini paylaş ve hediye et! Yeni nesil seyahat platformu TravelMatch ile unutulmaz anlar yaşa. 🌍✈️
+Seyahat deneyimlerini paylaş ve hediye et! Yeni nesil seyahat platformu Lovendo ile unutulmaz anlar yaşa. 🌍✈️
 ```
 
 ---
@@ -112,19 +112,19 @@ Seyahat deneyimlerini paylaş ve hediye et! Yeni nesil seyahat platformu TravelM
 ## Support URL
 
 ```
-https://travelmatch.app/support
+https://lovendo.app/support
 ```
 
 ## Privacy Policy URL
 
 ```
-https://travelmatch.app/privacy
+https://lovendo.app/privacy
 ```
 
 ## Marketing URL (Optional)
 
 ```
-https://travelmatch.app
+https://lovendo.app
 ```
 
 ---
@@ -162,8 +162,8 @@ https://travelmatch.app
 
 ```
 Demo Account:
-Email: demo@travelmatch.app
-Password: TravelMatch2024Demo!
+Email: demo@lovendo.app
+Password: Lovendo2024Demo!
 
 Test Instructions:
 1. Login with demo account
@@ -183,7 +183,7 @@ Notes:
 - KYC verification is pre-completed for demo account
 
 Contact for review issues:
-support@travelmatch.app (24hr response)
+support@lovendo.app (24hr response)
 ```
 
 ---

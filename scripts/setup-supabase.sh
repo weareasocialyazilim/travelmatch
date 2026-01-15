@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ============================================
-# TravelMatch Supabase Setup Script
+# Lovendo Supabase Setup Script
 # ============================================
 # This script sets up the complete Supabase infrastructure
 # Run this after updating credentials in .env files
@@ -18,7 +18,7 @@ NC='\033[0m' # No Color
 PROJECT_REF="bjikxgtbptrvawkguypv"
 SUPABASE_URL="https://${PROJECT_REF}.supabase.co"
 
-echo -e "${BLUE}🚀 TravelMatch Supabase Setup${NC}"
+echo -e "${BLUE}🚀 Lovendo Supabase Setup${NC}"
 echo -e "${BLUE}================================${NC}\n"
 
 # ============================================

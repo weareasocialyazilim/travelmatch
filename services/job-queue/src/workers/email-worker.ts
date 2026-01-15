@@ -12,15 +12,18 @@ const supabase = createClient(
       autoRefreshToken: false,
       persistSession: false,
     },
-  }
+  },
 );
 
 // Email templates
-const EMAIL_TEMPLATES: Record<string, { subject: string; html: (data: Record<string, unknown>) => string }> = {
+const EMAIL_TEMPLATES: Record<
+  string,
+  { subject: string; html: (data: Record<string, unknown>) => string }
+> = {
   welcome: {
-    subject: 'Welcome to TravelMatch!',
+    subject: 'Welcome to Lovendo!',
     html: (data) => `
-      <h1>Welcome to TravelMatch, ${data.name}!</h1>
+      <h1>Welcome to Lovendo, ${data.name}!</h1>
       <p>We're excited to have you join our community of travelers.</p>
       <p>Start exploring moments and connect with fellow travelers today!</p>
     `,
@@ -62,7 +65,7 @@ const EMAIL_TEMPLATES: Record<string, { subject: string; html: (data: Record<str
       <p>Hi ${data.name},</p>
       <p>Your payment of $${data.amount} has been processed successfully.</p>
       <p>Transaction ID: ${data.transactionId}</p>
-      <p>Thank you for using TravelMatch!</p>
+      <p>Thank you for using Lovendo!</p>
     `,
   },
   gift_received: {
@@ -80,7 +83,7 @@ const EMAIL_TEMPLATES: Record<string, { subject: string; html: (data: Record<str
     html: (data) => `
       <h1>Identity Verified</h1>
       <p>Hi ${data.name},</p>
-      <p>Your identity has been verified successfully. You now have full access to all TravelMatch features!</p>
+      <p>Your identity has been verified successfully. You now have full access to all Lovendo features!</p>
     `,
   },
   kyc_rejected: {
@@ -97,7 +100,9 @@ const EMAIL_TEMPLATES: Record<string, { subject: string; html: (data: Record<str
 /**
  * Send email via SendGrid
  */
-async function sendWithSendGrid(data: EmailJobData): Promise<{ success: boolean; messageId?: string }> {
+async function sendWithSendGrid(
+  data: EmailJobData,
+): Promise<{ success: boolean; messageId?: string }> {
   const apiKey = process.env.SENDGRID_API_KEY;
   if (!apiKey) {
     throw new Error('SENDGRID_API_KEY not configured');
@@ -116,7 +121,10 @@ async function sendWithSendGrid(data: EmailJobData): Promise<{ success: boolean;
     },
     body: JSON.stringify({
       personalizations: [{ to: [{ email: data.to }] }],
-      from: { email: data.from || process.env.SENDGRID_FROM_EMAIL || 'noreply@travelmatch.app' },
+      from: {
+        email:
+          data.from || process.env.SENDGRID_FROM_EMAIL || 'noreply@lovendo.xyz',
+      },
       reply_to: data.replyTo ? { email: data.replyTo } : undefined,
       subject: template.subject,
       content: [{ type: 'text/html', value: template.html(data.data) }],
@@ -141,7 +149,9 @@ async function sendWithSendGrid(data: EmailJobData): Promise<{ success: boolean;
 /**
  * Send email via Mailgun
  */
-async function sendWithMailgun(data: EmailJobData): Promise<{ success: boolean; messageId?: string }> {
+async function sendWithMailgun(
+  data: EmailJobData,
+): Promise<{ success: boolean; messageId?: string }> {
   const apiKey = process.env.MAILGUN_API_KEY;
   const domain = process.env.MAILGUN_DOMAIN;
 
@@ -164,13 +174,16 @@ async function sendWithMailgun(data: EmailJobData): Promise<{ success: boolean; 
     formData.append('h:Reply-To', data.replyTo);
   }
 
-  const response = await fetch(`https://api.mailgun.net/v3/${domain}/messages`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${Buffer.from(`api:${apiKey}`).toString('base64')}`,
+  const response = await fetch(
+    `https://api.mailgun.net/v3/${domain}/messages`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${Buffer.from(`api:${apiKey}`).toString('base64')}`,
+      },
+      body: formData,
     },
-    body: formData,
-  });
+  );
 
   if (!response.ok) {
     const error = await response.text();
@@ -186,7 +199,7 @@ async function sendWithMailgun(data: EmailJobData): Promise<{ success: boolean; 
  */
 async function logEmail(
   data: EmailJobData,
-  result: { success: boolean; messageId?: string; error?: string }
+  result: { success: boolean; messageId?: string; error?: string },
 ): Promise<void> {
   try {
     await supabase.from('email_logs').insert({
@@ -208,7 +221,10 @@ async function logEmail(
  * Processes email jobs from the queue
  */
 export function createEmailWorker(connection: Redis) {
-  const worker = new Worker<EmailJobData, { success: boolean; messageId?: string }>(
+  const worker = new Worker<
+    EmailJobData,
+    { success: boolean; messageId?: string }
+  >(
     QueueNames.EMAIL,
     async (job: Job<EmailJobData>) => {
       console.log(`[Email Worker] Processing job ${job.id} to ${job.data.to}`);
@@ -221,9 +237,14 @@ export function createEmailWorker(connection: Redis) {
         // 2. Send email based on provider
         let result: { success: boolean; messageId?: string };
 
-        if (process.env.NODE_ENV === 'development' && !process.env.SENDGRID_API_KEY) {
+        if (
+          process.env.NODE_ENV === 'development' &&
+          !process.env.SENDGRID_API_KEY
+        ) {
           // Mock in development without API key
-          console.log('[Email Worker] Using mock email (no API key configured)');
+          console.log(
+            '[Email Worker] Using mock email (no API key configured)',
+          );
           result = { success: true, messageId: `mock_${Date.now()}` };
         } else if (validatedData.provider === 'mailgun') {
           result = await sendWithMailgun(validatedData);
@@ -237,7 +258,9 @@ export function createEmailWorker(connection: Redis) {
         await logEmail(validatedData, result);
         await job.updateProgress(100);
 
-        console.log(`[Email Worker] Job ${job.id} completed - messageId: ${result.messageId}`);
+        console.log(
+          `[Email Worker] Job ${job.id} completed - messageId: ${result.messageId}`,
+        );
         return result;
       } catch (error) {
         console.error(`[Email Worker] Job ${job.id} failed:`, error);
@@ -258,7 +281,7 @@ export function createEmailWorker(connection: Redis) {
         max: 100, // Max 100 emails per interval
         duration: 60000, // 1 minute
       },
-    }
+    },
   );
 
   // Event handlers

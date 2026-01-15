@@ -619,7 +619,7 @@ BEGIN
   UPDATE public.users
   SET 
     full_name = 'Deleted User',
-    email = 'deleted_' || p_user_id || '@travelmatch.app',
+    email = 'deleted_' || p_user_id || '@lovendo.app',
     phone = NULL,
     avatar_url = NULL,
     bio = NULL,

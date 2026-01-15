@@ -1,5 +1,5 @@
 /**
- * Re-export shared types from @travelmatch/shared
+ * Re-export shared types from @lovendo/shared
  *
  * This file provides a single import point for all shared types
  * used across the admin dashboard.
@@ -62,7 +62,7 @@ export {
   isProofStatus,
   isEscrowStatus,
   isDisputeStatus,
-} from '@travelmatch/shared/types';
+} from '@lovendo/shared/types';
 
 // Core Domain Types
 export {
@@ -73,7 +73,7 @@ export {
   type Place,
   type MomentLocation,
   type MomentUser,
-} from '@travelmatch/shared/types';
+} from '@lovendo/shared/types';
 
 // Domain Types
 export {
@@ -81,4 +81,4 @@ export {
   type Proof,
   type Transaction,
   type ProofStory,
-} from '@travelmatch/shared/types';
+} from '@lovendo/shared/types';

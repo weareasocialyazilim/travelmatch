@@ -29,9 +29,9 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: '1',
     category: 'Getting Started',
-    question: 'What is TravelMatch?',
+    question: 'What is Lovendo?',
     answer:
-      "TravelMatch is a platform that connects travelers who want to share their travel moments with generous people who want to help make those moments happen. It's about creating meaningful connections through shared experiences.",
+      "Lovendo is a platform that connects travelers who want to share their travel moments with generous people who want to help make those moments happen. It's about creating meaningful connections through shared experiences.",
   },
   {
     id: '2',

@@ -677,7 +677,7 @@ class BilingualContentFilter {
     while ((match = igPattern.exec(text)) !== null) {
       // Skip if it's the app's own handle
       if (
-        !match[0].toLowerCase().includes('travelmatch') &&
+        !match[0].toLowerCase().includes('lovendo') &&
         match[0].length > 2
       ) {
         violations.push({

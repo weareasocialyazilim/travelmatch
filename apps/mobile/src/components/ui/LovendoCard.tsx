@@ -1,5 +1,5 @@
 /**
- * TMCard - TravelMatch Ultimate Design System 2026
+ * LovendoCard - Lovendo Ultimate Design System 2026
  * Moment card component with "Soft Glass" aesthetic
  *
  * Implements UX best practices from design references:
@@ -34,7 +34,7 @@ import { COLORS, GRADIENTS, SHADOWS } from '@/constants/colors';
 import { TYPOGRAPHY } from '@/theme/typography';
 import { RADIUS, SPACING, SIZES } from '@/constants/spacing';
 import { SPRING, HAPTIC } from '@/hooks/useMotion';
-import { TMTrustRing } from './TMTrustRing';
+import { LovendoTrustRing } from './LovendoTrustRing';
 
 // Badge type for moment cards (inspired by property card designs)
 export type MomentBadgeType = 'featured' | 'popular' | 'new' | 'premium' | null;
@@ -72,7 +72,7 @@ export interface MomentData {
   };
 }
 
-interface TMCardProps {
+interface LovendoCardProps {
   moment: MomentData;
   onPress: () => void;
   onGiftPress?: () => void;
@@ -82,7 +82,7 @@ interface TMCardProps {
   testID?: string;
 }
 
-export const TMCard: React.FC<TMCardProps> = ({
+export const LovendoCard: React.FC<LovendoCardProps> = ({
   moment,
   onPress,
   onGiftPress,
@@ -176,7 +176,7 @@ export const TMCard: React.FC<TMCardProps> = ({
 
           {/* Trust Ring - Top Right */}
           <View style={styles.trustRingPosition}>
-            <TMTrustRing
+            <LovendoTrustRing
               score={moment.user.trustScore}
               avatarUrl={moment.user.avatar}
               size="sm"
@@ -565,4 +565,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TMCard;
+export default LovendoCard;

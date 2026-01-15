@@ -93,7 +93,7 @@ export const RefundRequestScreen = () => {
             size={32}
             color={COLORS.brand.primary}
           />
-          <Text style={styles.txLabel}>Hediye #TM-8921</Text>
+          <Text style={styles.txLabel}>Hediye #LV-8921</Text>
           <Text style={styles.txAmount}>₺150.00</Text>
           <View style={styles.escrowBadge}>
             <MaterialCommunityIcons
@@ -183,7 +183,7 @@ export const RefundRequestScreen = () => {
         <TouchableOpacity style={styles.supportLink}>
           <Text style={styles.supportText}>
             Acil destek için{' '}
-            <Text style={styles.supportHighlight}>destek@travelmatch.com</Text>{' '}
+            <Text style={styles.supportHighlight}>support@lovendo.xyz</Text>{' '}
             adresine yazabilirsin
           </Text>
         </TouchableOpacity>

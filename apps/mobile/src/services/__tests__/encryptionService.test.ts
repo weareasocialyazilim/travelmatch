@@ -97,8 +97,8 @@ describe('encryptionService', () => {
 
       // Switch back to sender
       await encryptionService.clearKeys();
-      mockSecureStore['travelmatch_private_key'] = senderKeys.privateKey;
-      mockSecureStore['travelmatch_public_key'] = senderKeys.publicKey;
+      mockSecureStore['lovendo_private_key'] = senderKeys.privateKey;
+      mockSecureStore['lovendo_public_key'] = senderKeys.publicKey;
 
       const message = 'Hello, this is a secret message!';
       const encrypted = await encryptionService.encrypt(
@@ -130,8 +130,8 @@ describe('encryptionService', () => {
       const recipientKeys = await encryptionService.initializeKeys();
 
       // Switch back to sender
-      mockSecureStore['travelmatch_private_key'] = senderKeys.privateKey;
-      mockSecureStore['travelmatch_public_key'] = senderKeys.publicKey;
+      mockSecureStore['lovendo_private_key'] = senderKeys.privateKey;
+      mockSecureStore['lovendo_public_key'] = senderKeys.publicKey;
 
       const message = 'Same message';
       const encrypted1 = await encryptionService.encrypt(
@@ -160,8 +160,8 @@ describe('encryptionService', () => {
       const recipientPublicKey = recipientKeys.publicKey;
 
       // Sender encrypts message
-      mockSecureStore['travelmatch_private_key'] = senderKeys.privateKey;
-      mockSecureStore['travelmatch_public_key'] = senderKeys.publicKey;
+      mockSecureStore['lovendo_private_key'] = senderKeys.privateKey;
+      mockSecureStore['lovendo_public_key'] = senderKeys.publicKey;
 
       const originalMessage = 'Hello, this is a secret!';
       const encrypted = await encryptionService.encrypt(
@@ -170,8 +170,8 @@ describe('encryptionService', () => {
       );
 
       // Recipient decrypts message
-      mockSecureStore['travelmatch_private_key'] = recipientKeys.privateKey;
-      mockSecureStore['travelmatch_public_key'] = recipientKeys.publicKey;
+      mockSecureStore['lovendo_private_key'] = recipientKeys.privateKey;
+      mockSecureStore['lovendo_public_key'] = recipientKeys.publicKey;
 
       const decrypted = await encryptionService.decrypt(
         encrypted.message,
@@ -219,8 +219,8 @@ describe('encryptionService', () => {
       const recipientKeys = await encryptionService.initializeKeys();
 
       // Sender encrypts
-      mockSecureStore['travelmatch_private_key'] = senderKeys.privateKey;
-      mockSecureStore['travelmatch_public_key'] = senderKeys.publicKey;
+      mockSecureStore['lovendo_private_key'] = senderKeys.privateKey;
+      mockSecureStore['lovendo_public_key'] = senderKeys.publicKey;
 
       const unicodeMessage = 'Merhaba! Nasılsın? Geyik + Rock = Seyahat';
       const encrypted = await encryptionService.encrypt(
@@ -229,8 +229,8 @@ describe('encryptionService', () => {
       );
 
       // Recipient decrypts
-      mockSecureStore['travelmatch_private_key'] = recipientKeys.privateKey;
-      mockSecureStore['travelmatch_public_key'] = recipientKeys.publicKey;
+      mockSecureStore['lovendo_private_key'] = recipientKeys.privateKey;
+      mockSecureStore['lovendo_public_key'] = recipientKeys.publicKey;
 
       const decrypted = await encryptionService.decrypt(
         encrypted.message,
@@ -247,8 +247,8 @@ describe('encryptionService', () => {
       await encryptionService.clearKeys();
       const recipientKeys = await encryptionService.initializeKeys();
 
-      mockSecureStore['travelmatch_private_key'] = senderKeys.privateKey;
-      mockSecureStore['travelmatch_public_key'] = senderKeys.publicKey;
+      mockSecureStore['lovendo_private_key'] = senderKeys.privateKey;
+      mockSecureStore['lovendo_public_key'] = senderKeys.publicKey;
 
       const emojiMessage = 'Hello! How are you?';
       const encrypted = await encryptionService.encrypt(
@@ -256,8 +256,8 @@ describe('encryptionService', () => {
         recipientKeys.publicKey,
       );
 
-      mockSecureStore['travelmatch_private_key'] = recipientKeys.privateKey;
-      mockSecureStore['travelmatch_public_key'] = recipientKeys.publicKey;
+      mockSecureStore['lovendo_private_key'] = recipientKeys.privateKey;
+      mockSecureStore['lovendo_public_key'] = recipientKeys.publicKey;
 
       const decrypted = await encryptionService.decrypt(
         encrypted.message,
@@ -274,8 +274,8 @@ describe('encryptionService', () => {
       await encryptionService.clearKeys();
       const recipientKeys = await encryptionService.initializeKeys();
 
-      mockSecureStore['travelmatch_private_key'] = senderKeys.privateKey;
-      mockSecureStore['travelmatch_public_key'] = senderKeys.publicKey;
+      mockSecureStore['lovendo_private_key'] = senderKeys.privateKey;
+      mockSecureStore['lovendo_public_key'] = senderKeys.publicKey;
 
       const longMessage = 'A'.repeat(10000);
       const encrypted = await encryptionService.encrypt(
@@ -283,8 +283,8 @@ describe('encryptionService', () => {
         recipientKeys.publicKey,
       );
 
-      mockSecureStore['travelmatch_private_key'] = recipientKeys.privateKey;
-      mockSecureStore['travelmatch_public_key'] = recipientKeys.publicKey;
+      mockSecureStore['lovendo_private_key'] = recipientKeys.privateKey;
+      mockSecureStore['lovendo_public_key'] = recipientKeys.publicKey;
 
       const decrypted = await encryptionService.decrypt(
         encrypted.message,
@@ -324,8 +324,8 @@ describe('encryptionService', () => {
       const recipientKeys = await encryptionService.initializeKeys();
 
       // Sender encrypts
-      mockSecureStore['travelmatch_private_key'] = senderKeys.privateKey;
-      mockSecureStore['travelmatch_public_key'] = senderKeys.publicKey;
+      mockSecureStore['lovendo_private_key'] = senderKeys.privateKey;
+      mockSecureStore['lovendo_public_key'] = senderKeys.publicKey;
 
       const encrypted = await encryptionService.encrypt(
         'Secret message',
@@ -333,8 +333,8 @@ describe('encryptionService', () => {
       );
 
       // Recipient tries to decrypt with attacker's public key
-      mockSecureStore['travelmatch_private_key'] = recipientKeys.privateKey;
-      mockSecureStore['travelmatch_public_key'] = recipientKeys.publicKey;
+      mockSecureStore['lovendo_private_key'] = recipientKeys.privateKey;
+      mockSecureStore['lovendo_public_key'] = recipientKeys.publicKey;
 
       await expect(
         encryptionService.decrypt(
@@ -351,8 +351,8 @@ describe('encryptionService', () => {
       await encryptionService.clearKeys();
       const recipientKeys = await encryptionService.initializeKeys();
 
-      mockSecureStore['travelmatch_private_key'] = senderKeys.privateKey;
-      mockSecureStore['travelmatch_public_key'] = senderKeys.publicKey;
+      mockSecureStore['lovendo_private_key'] = senderKeys.privateKey;
+      mockSecureStore['lovendo_public_key'] = senderKeys.publicKey;
 
       const encrypted = await encryptionService.encrypt(
         'Original message',
@@ -362,8 +362,8 @@ describe('encryptionService', () => {
       // Tamper with the encrypted message
       const tamperedMessage = encrypted.message.slice(0, -4) + 'XXXX';
 
-      mockSecureStore['travelmatch_private_key'] = recipientKeys.privateKey;
-      mockSecureStore['travelmatch_public_key'] = recipientKeys.publicKey;
+      mockSecureStore['lovendo_private_key'] = recipientKeys.privateKey;
+      mockSecureStore['lovendo_public_key'] = recipientKeys.publicKey;
 
       await expect(
         encryptionService.decrypt(
@@ -380,8 +380,8 @@ describe('encryptionService', () => {
       await encryptionService.clearKeys();
       const recipientKeys = await encryptionService.initializeKeys();
 
-      mockSecureStore['travelmatch_private_key'] = senderKeys.privateKey;
-      mockSecureStore['travelmatch_public_key'] = senderKeys.publicKey;
+      mockSecureStore['lovendo_private_key'] = senderKeys.privateKey;
+      mockSecureStore['lovendo_public_key'] = senderKeys.publicKey;
 
       const encrypted = await encryptionService.encrypt(
         'Message',
@@ -394,8 +394,8 @@ describe('encryptionService', () => {
         recipientKeys.publicKey,
       );
 
-      mockSecureStore['travelmatch_private_key'] = recipientKeys.privateKey;
-      mockSecureStore['travelmatch_public_key'] = recipientKeys.publicKey;
+      mockSecureStore['lovendo_private_key'] = recipientKeys.privateKey;
+      mockSecureStore['lovendo_public_key'] = recipientKeys.publicKey;
 
       await expect(
         encryptionService.decrypt(
@@ -414,16 +414,16 @@ describe('encryptionService', () => {
       await encryptionService.clearKeys();
       const recipientKeys = await encryptionService.initializeKeys();
 
-      mockSecureStore['travelmatch_private_key'] = senderKeys.privateKey;
-      mockSecureStore['travelmatch_public_key'] = senderKeys.publicKey;
+      mockSecureStore['lovendo_private_key'] = senderKeys.privateKey;
+      mockSecureStore['lovendo_public_key'] = senderKeys.publicKey;
 
       const encrypted = await encryptionService.encrypt(
         '',
         recipientKeys.publicKey,
       );
 
-      mockSecureStore['travelmatch_private_key'] = recipientKeys.privateKey;
-      mockSecureStore['travelmatch_public_key'] = recipientKeys.publicKey;
+      mockSecureStore['lovendo_private_key'] = recipientKeys.privateKey;
+      mockSecureStore['lovendo_public_key'] = recipientKeys.publicKey;
 
       const decrypted = await encryptionService.decrypt(
         encrypted.message,
@@ -440,8 +440,8 @@ describe('encryptionService', () => {
       await encryptionService.clearKeys();
       const recipientKeys = await encryptionService.initializeKeys();
 
-      mockSecureStore['travelmatch_private_key'] = senderKeys.privateKey;
-      mockSecureStore['travelmatch_public_key'] = senderKeys.publicKey;
+      mockSecureStore['lovendo_private_key'] = senderKeys.privateKey;
+      mockSecureStore['lovendo_public_key'] = senderKeys.publicKey;
 
       const specialMessage = '!@#$%^&*()_+-=[]{}|;\':",./<>?`~\n\t\r';
       const encrypted = await encryptionService.encrypt(
@@ -449,8 +449,8 @@ describe('encryptionService', () => {
         recipientKeys.publicKey,
       );
 
-      mockSecureStore['travelmatch_private_key'] = recipientKeys.privateKey;
-      mockSecureStore['travelmatch_public_key'] = recipientKeys.publicKey;
+      mockSecureStore['lovendo_private_key'] = recipientKeys.privateKey;
+      mockSecureStore['lovendo_public_key'] = recipientKeys.publicKey;
 
       const decrypted = await encryptionService.decrypt(
         encrypted.message,

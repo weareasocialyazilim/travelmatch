@@ -2,14 +2,14 @@ services:
   # ============================================================================
   # Supabase Stack (Local Development)
   # ============================================================================
-  
+
   # Supabase PostgreSQL Database
   postgres:
     image: supabase/postgres:15.1.0.147
-    container_name: travelmatch-postgres
+    container_name: lovendo-postgres
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - '5432:5432'
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -17,14 +17,14 @@ services:
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       # Extensions
-      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=en_US.UTF-8"
+      POSTGRES_INITDB_ARGS: '-E UTF8 --locale=en_US.UTF-8'
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./supabase/migrations:/docker-entrypoint-initdb.d/migrations:ro
     networks:
-      - travelmatch-network
+      - lovendo-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -32,10 +32,10 @@ services:
   # Supabase Studio (Database Management UI)
   studio:
     image: supabase/studio:20231123-64a766c
-    container_name: travelmatch-studio
+    container_name: lovendo-studio
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       SUPABASE_URL: http://kong:8000
       STUDIO_PG_META_URL: http://meta:8080
@@ -45,27 +45,27 @@ services:
     depends_on:
       - postgres
     networks:
-      - travelmatch-network
+      - lovendo-network
 
   # Supabase Kong (API Gateway)
   kong:
     image: kong:2.8.1
-    container_name: travelmatch-kong
+    container_name: lovendo-kong
     restart: unless-stopped
     ports:
-      - "8000:8000"
-      - "8443:8443"
+      - '8000:8000'
+      - '8443:8443'
     environment:
-      KONG_DATABASE: "off"
+      KONG_DATABASE: 'off'
       KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
       KONG_DNS_ORDER: LAST,A,CNAME
       KONG_PLUGINS: request-transformer,cors,key-auth,acl
     volumes:
       - ./docker/kong.yml:/var/lib/kong/kong.yml:ro
     networks:
-      - travelmatch-network
+      - lovendo-network
     healthcheck:
-      test: ["CMD", "kong", "health"]
+      test: ['CMD', 'kong', 'health']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -73,34 +73,34 @@ services:
   # Supabase Auth (GoTrue)
   auth:
     image: supabase/gotrue:v2.99.0
-    container_name: travelmatch-auth
+    container_name: lovendo-auth
     restart: unless-stopped
     environment:
       GOTRUE_API_HOST: 0.0.0.0
       GOTRUE_API_PORT: 9999
       API_EXTERNAL_URL: ${API_EXTERNAL_URL:-http://localhost:8000}
-      
+
       GOTRUE_DB_DRIVER: postgres
       GOTRUE_DB_DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres?search_path=auth
-      
+
       GOTRUE_SITE_URL: ${SITE_URL:-http://localhost:3000}
       GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS}
       GOTRUE_DISABLE_SIGNUP: ${DISABLE_SIGNUP:-false}
-      
+
       GOTRUE_JWT_ADMIN_ROLES: service_role
       GOTRUE_JWT_AUD: authenticated
       GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
       GOTRUE_JWT_EXP: ${JWT_EXPIRY:-3600}
       GOTRUE_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
-      
+
       GOTRUE_EXTERNAL_EMAIL_ENABLED: ${ENABLE_EMAIL_SIGNUP:-true}
       GOTRUE_MAILER_AUTOCONFIRM: ${ENABLE_EMAIL_AUTOCONFIRM:-true}
-      
+
       # OAuth Providers
       GOTRUE_EXTERNAL_GOOGLE_ENABLED: ${ENABLE_GOOGLE_OAUTH:-false}
       GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
       GOTRUE_EXTERNAL_GOOGLE_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
-      
+
       GOTRUE_EXTERNAL_APPLE_ENABLED: ${ENABLE_APPLE_OAUTH:-false}
       GOTRUE_EXTERNAL_APPLE_CLIENT_ID: ${APPLE_OAUTH_CLIENT_ID}
       GOTRUE_EXTERNAL_APPLE_SECRET: ${APPLE_OAUTH_CLIENT_SECRET}
@@ -108,9 +108,17 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - travelmatch-network
+      - lovendo-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9999/health"]
+      test:
+        [
+          'CMD',
+          'wget',
+          '--no-verbose',
+          '--tries=1',
+          '--spider',
+          'http://localhost:9999/health',
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -118,23 +126,31 @@ services:
   # Supabase Rest (PostgREST)
   rest:
     image: postgrest/postgrest:v11.2.2
-    container_name: travelmatch-rest
+    container_name: lovendo-rest
     restart: unless-stopped
     environment:
       PGRST_DB_URI: postgres://postgres:postgres@postgres:5432/postgres
       PGRST_DB_SCHEMAS: public,storage,graphql_public
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
-      PGRST_DB_USE_LEGACY_GUCS: "false"
+      PGRST_DB_USE_LEGACY_GUCS: 'false'
       PGRST_APP_SETTINGS_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
       PGRST_APP_SETTINGS_JWT_EXP: ${JWT_EXPIRY:-3600}
     depends_on:
       postgres:
         condition: service_healthy
     networks:
-      - travelmatch-network
+      - lovendo-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      test:
+        [
+          'CMD',
+          'wget',
+          '--no-verbose',
+          '--tries=1',
+          '--spider',
+          'http://localhost:3000/',
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -142,7 +158,7 @@ services:
   # Supabase Realtime
   realtime:
     image: supabase/realtime:v2.25.35
-    container_name: travelmatch-realtime
+    container_name: lovendo-realtime
     restart: unless-stopped
     environment:
       PORT: 4000
@@ -158,15 +174,23 @@ services:
       FLY_APP_NAME: realtime
       SECRET_KEY_BASE: UpNVntn3cDxHJpq99YMc1T1AQgQpc8kfYTuRgBiYa15BLrx8etQoXz3gZv1/u2oq
       ERL_AFLAGS: -proto_dist inet_tcp
-      ENABLE_TAILSCALE: "false"
+      ENABLE_TAILSCALE: 'false'
       DNS_NODES: "''"
     depends_on:
       postgres:
         condition: service_healthy
     networks:
-      - travelmatch-network
+      - lovendo-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4000/api/health"]
+      test:
+        [
+          'CMD',
+          'wget',
+          '--no-verbose',
+          '--tries=1',
+          '--spider',
+          'http://localhost:4000/api/health',
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -174,7 +198,7 @@ services:
   # Supabase Storage
   storage:
     image: supabase/storage-api:v0.43.11
-    container_name: travelmatch-storage
+    container_name: lovendo-storage
     restart: unless-stopped
     environment:
       # SECURITY: Keys must be set via .env file - no defaults allowed in production
@@ -197,9 +221,17 @@ services:
       rest:
         condition: service_healthy
     networks:
-      - travelmatch-network
+      - lovendo-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/status"]
+      test:
+        [
+          'CMD',
+          'wget',
+          '--no-verbose',
+          '--tries=1',
+          '--spider',
+          'http://localhost:5000/status',
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -207,7 +239,7 @@ services:
   # Supabase Meta (Database Metadata API)
   meta:
     image: supabase/postgres-meta:v0.68.0
-    container_name: travelmatch-meta
+    container_name: lovendo-meta
     restart: unless-stopped
     environment:
       PG_META_PORT: 8080
@@ -220,9 +252,17 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - travelmatch-network
+      - lovendo-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      test:
+        [
+          'CMD',
+          'wget',
+          '--no-verbose',
+          '--tries=1',
+          '--spider',
+          'http://localhost:8080/health',
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -230,22 +270,22 @@ services:
   # ============================================================================
   # Redis Stack (Caching, Sessions, Rate Limiting, Pub/Sub)
   # ============================================================================
-  
+
   redis:
     image: redis/redis-stack:7.2.0-v6
-    container_name: travelmatch-redis
+    container_name: lovendo-redis
     restart: unless-stopped
     ports:
-      - "6379:6379"     # Redis
-      - "8001:8001"     # RedisInsight (Web UI)
+      - '6379:6379' # Redis
+      - '8001:8001' # RedisInsight (Web UI)
     environment:
-      REDIS_ARGS: "--requirepass ${REDIS_PASSWORD:-travelmatch-redis-dev-password}"
+      REDIS_ARGS: '--requirepass ${REDIS_PASSWORD:-lovendo-redis-dev-password}'
     volumes:
       - redis-data:/data
     networks:
-      - travelmatch-network
+      - lovendo-network
     healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -254,37 +294,37 @@ services:
       --appendonly yes
       --maxmemory 512mb
       --maxmemory-policy allkeys-lru
-      --requirepass ${REDIS_PASSWORD:-travelmatch-redis-dev-password}
+      --requirepass ${REDIS_PASSWORD:-lovendo-redis-dev-password}
 
   # ============================================================================
   # LocalStack (AWS Services Emulation: S3, SQS, SNS, Lambda)
   # ============================================================================
-  
+
   localstack:
     image: localstack/localstack:3.0
-    container_name: travelmatch-localstack
+    container_name: lovendo-localstack
     restart: unless-stopped
     ports:
-      - "4566:4566"     # LocalStack Gateway
-      - "4510-4559:4510-4559"  # External services port range
+      - '4566:4566' # LocalStack Gateway
+      - '4510-4559:4510-4559' # External services port range
     environment:
       # Core Configuration
       SERVICES: s3,sqs,sns,lambda,cloudwatch,dynamodb
       DEBUG: ${LOCALSTACK_DEBUG:-0}
       DATA_DIR: /var/lib/localstack/data
       PERSISTENCE: ${LOCALSTACK_PERSISTENCE:-1}
-      
+
       # AWS Configuration
       AWS_DEFAULT_REGION: us-east-1
       AWS_ACCESS_KEY_ID: test
       AWS_SECRET_ACCESS_KEY: test
-      
+
       # Docker Configuration
       DOCKER_HOST: unix:///var/run/docker.sock
-      
+
       # Edge Configuration
       EDGE_PORT: 4566
-      
+
       # Features
       DISABLE_CORS_CHECKS: 1
       SKIP_SSL_CERT_DOWNLOAD: 1
@@ -293,9 +333,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./docker/localstack/init-scripts:/etc/localstack/init/ready.d:ro
     networks:
-      - travelmatch-network
+      - lovendo-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:4566/_localstack/health']
       interval: 10s
       timeout: 5s
       retries: 10
@@ -303,14 +343,14 @@ services:
   # ============================================================================
   # Minio (S3-Compatible Object Storage - Alternative to LocalStack S3)
   # ============================================================================
-  
+
   minio:
     image: minio/minio:RELEASE.2023-12-09T18-17-51Z
-    container_name: travelmatch-minio
+    container_name: lovendo-minio
     restart: unless-stopped
     ports:
-      - "9000:9000"     # API
-      - "9001:9001"     # Console
+      - '9000:9000' # API
+      - '9001:9001' # Console
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
@@ -318,10 +358,10 @@ services:
     volumes:
       - minio-data:/data
     networks:
-      - travelmatch-network
+      - lovendo-network
     command: server /data --console-address ":9001"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -329,18 +369,26 @@ services:
   # ============================================================================
   # Mailhog (Email Testing - SMTP Server + Web UI)
   # ============================================================================
-  
+
   mailhog:
     image: mailhog/mailhog:v1.0.1
-    container_name: travelmatch-mailhog
+    container_name: lovendo-mailhog
     restart: unless-stopped
     ports:
-      - "1025:1025"     # SMTP
-      - "8025:8025"     # Web UI
+      - '1025:1025' # SMTP
+      - '8025:8025' # Web UI
     networks:
-      - travelmatch-network
+      - lovendo-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8025/"]
+      test:
+        [
+          'CMD',
+          'wget',
+          '--no-verbose',
+          '--tries=1',
+          '--spider',
+          'http://localhost:8025/',
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -348,13 +396,13 @@ services:
   # ============================================================================
   # Grafana (Monitoring & Observability Dashboard)
   # ============================================================================
-  
+
   grafana:
     image: grafana/grafana:10.2.2
-    container_name: travelmatch-grafana
+    container_name: lovendo-grafana
     restart: unless-stopped
     ports:
-      - "3001:3000"
+      - '3001:3000'
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
@@ -364,12 +412,20 @@ services:
       - grafana-data:/var/lib/grafana
       - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
     networks:
-      - travelmatch-network
+      - lovendo-network
     depends_on:
       - postgres
       - redis
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      test:
+        [
+          'CMD',
+          'wget',
+          '--no-verbose',
+          '--tries=1',
+          '--spider',
+          'http://localhost:3000/api/health',
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -377,16 +433,16 @@ services:
   # ============================================================================
   # Job Queue Service (BullMQ Background Workers)
   # ============================================================================
-  
+
   # Job Queue API Server (Add jobs, monitor status)
   job-queue:
     build:
       context: ./services/job-queue
       dockerfile: Dockerfile
-    container_name: travelmatch-job-queue
+    container_name: lovendo-job-queue
     restart: unless-stopped
     ports:
-      - "3002:3002" # API + Bull Board UI
+      - '3002:3002' # API + Bull Board UI
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       REDIS_URL: redis://redis:6379
@@ -402,12 +458,20 @@ services:
       - ./services/job-queue:/app
       - /app/node_modules
     networks:
-      - travelmatch-network
+      - lovendo-network
     depends_on:
       - redis
       - postgres
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3002/health"]
+      test:
+        [
+          'CMD',
+          'wget',
+          '--no-verbose',
+          '--tries=1',
+          '--spider',
+          'http://localhost:3002/health',
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -417,7 +481,7 @@ services:
     build:
       context: ./services/job-queue
       dockerfile: Dockerfile
-    container_name: travelmatch-job-worker
+    container_name: lovendo-job-worker
     restart: unless-stopped
     command: pnpm worker # Run workers instead of API server
     environment:
@@ -434,7 +498,7 @@ services:
       - ./services/job-queue:/app
       - /app/node_modules
     networks:
-      - travelmatch-network
+      - lovendo-network
     depends_on:
       - redis
       - postgres
@@ -445,12 +509,12 @@ services:
   # ML Service (Machine Learning Inference) - DISABLED FOR NOW
   # ============================================================================
   # Uncomment when ready to use ML features
-  
+
   # ml-service:
   #   build:
   #     context: ./services/ml-service
   #     dockerfile: Dockerfile
-  #   container_name: travelmatch-ml-service
+  #   container_name: lovendo-ml-service
   #   restart: unless-stopped
   #   ports:
   #     - "8000:8000"
@@ -471,7 +535,7 @@ services:
   #     - ./services/ml-service:/app
   #     - ml-models:/models
   #   networks:
-  #     - travelmatch-network
+  #     - lovendo-network
   #   depends_on:
   #     - redis
   #     - postgres
@@ -483,7 +547,7 @@ services:
   #     start_period: 60s
 
   # ============================================================================
-  # TravelMatch Apps (Production)
+  # Lovendo Apps (Production)
   # ============================================================================
 
   # Web (Next.js Landing Page)
@@ -491,19 +555,27 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
-    container_name: travelmatch-web
+    container_name: lovendo-web
     restart: unless-stopped
     ports:
-      - "3001:3000"
+      - '3001:3000'
     environment:
       NEXT_PUBLIC_SUPABASE_URL: http://kong:8000
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
     depends_on:
       - kong
     networks:
-      - travelmatch-network
+      - lovendo-network
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      test:
+        [
+          'CMD',
+          'wget',
+          '--quiet',
+          '--tries=1',
+          '--spider',
+          'http://localhost:3000/api/health',
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -513,16 +585,24 @@ services:
     build:
       context: .
       dockerfile: apps/admin/Dockerfile
-    container_name: travelmatch-admin
+    container_name: lovendo-admin
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - '8080:80'
     depends_on:
       - kong
     networks:
-      - travelmatch-network
+      - lovendo-network
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/health"]
+      test:
+        [
+          'CMD',
+          'wget',
+          '--quiet',
+          '--tries=1',
+          '--spider',
+          'http://localhost:80/health',
+        ]
       interval: 30s
       timeout: 3s
       retries: 3
@@ -533,26 +613,25 @@ services:
 
 volumes:
   postgres-data:
-    name: travelmatch-postgres-data
+    name: lovendo-postgres-data
   redis-data:
-    name: travelmatch-redis-data
+    name: lovendo-redis-data
   storage-data:
-    name: travelmatch-storage-data
+    name: lovendo-storage-data
   localstack-data:
-    name: travelmatch-localstack-data
+    name: lovendo-localstack-data
   minio-data:
-    name: travelmatch-minio-data
+    name: lovendo-minio-data
   grafana-data:
-    name: travelmatch-grafana-data
+    name: lovendo-grafana-data
   ml-models:
-    name: travelmatch-ml-models
+    name: lovendo-ml-models
 
 # ==============================================================================
 # Networks
 # ==============================================================================
 
 networks:
-  travelmatch-network:
-    name: travelmatch-network
+  lovendo-network:
+    name: lovendo-network
     driver: bridge
-

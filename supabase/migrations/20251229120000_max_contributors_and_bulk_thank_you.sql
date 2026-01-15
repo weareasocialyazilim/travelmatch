@@ -1,6 +1,6 @@
 -- ============================================
 -- Max Contributors & Bulk Thank You System
--- TravelMatch - January 2026 Launch
+-- Lovendo - January 2026 Launch
 -- ============================================
 
 -- ============================================

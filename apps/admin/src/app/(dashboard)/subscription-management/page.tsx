@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * TravelMatch Subscription & Revenue Management
+ * Lovendo Subscription & Revenue Management
  * Abonelik planlari, promo kodlari ve gelir yonetimi
  *
  * Free, Premium, Platinum tier yonetimi

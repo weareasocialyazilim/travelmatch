@@ -6,8 +6,8 @@ import { Providers } from '@/components/providers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'TravelMatch Admin',
-  description: 'TravelMatch Platform Admin Panel',
+  title: 'Lovendo Admin',
+  description: 'Lovendo Platform Admin Panel',
   icons: {
     icon: '/favicon.ico',
   },

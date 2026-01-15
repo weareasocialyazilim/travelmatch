@@ -1,10 +1,10 @@
-# TravelMatch Database Schema Reference
+# Lovendo Database Schema Reference
 
-This document provides a comprehensive reference for the TravelMatch PostgreSQL database schema, following PostgreSQL best practices.
+This document provides a comprehensive reference for the Lovendo PostgreSQL database schema, following PostgreSQL best practices.
 
 ## Overview
 
-TravelMatch uses **PostgreSQL** via **Supabase** with the following extensions:
+Lovendo uses **PostgreSQL** via **Supabase** with the following extensions:
 - `uuid-ossp` - UUID generation
 - `postgis` - Geospatial queries and data types
 - `pg_cron` - Scheduled job execution (escrow auto-refund)

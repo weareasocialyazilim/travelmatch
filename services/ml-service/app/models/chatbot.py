@@ -1,7 +1,7 @@
 """
 AI Chatbot Assistant
 
-Intelligent conversational assistant for TravelMatch platform.
+Intelligent conversational assistant for Lovendo platform.
 
 Provides:
 - Gift selection assistance
@@ -109,7 +109,7 @@ class IntentClassifier:
     FAQ_DATABASE = {
         "nasıl_çalışır": {
             "keywords": ["nasıl çalış", "ne işe yarar", "sistem nasıl"],
-            "answer": """TravelMatch 3 adımda çalışır:
+            "answer": """Lovendo 3 adımda çalışır:
 
 1️⃣ **Moment Oluştur**: Hediye etmek istediğin seyahat deneyimini seç
 2️⃣ **Gönder**: Alıcıya gönder, para emanet hesapta tutulur
@@ -139,7 +139,7 @@ Emanet sistemi sayesinde hem gönderen hem alan korunur.""",
         },
         "ücret": {
             "keywords": ["komisyon", "ücret ne", "kaç para"],
-            "answer": """TravelMatch ücretlendirmesi:
+            "answer": """Lovendo ücretlendirmesi:
 
 🆓 **Ücretsiz**: Hesap oluşturma, gezinme
 💎 **Gönderen**: İşlem ücreti %5-8 (üyelik tipine göre)
@@ -281,8 +281,8 @@ class ResponseGenerator:
 
     TEMPLATES = {
         IntentType.GREETING: [
-            "Merhaba! 👋 TravelMatch'e hoş geldiniz. Size nasıl yardımcı olabilirim?",
-            "Selam! Ben TravelMatch asistanı. Bugün size nasıl yardımcı olabilirim?",
+            "Merhaba! 👋 Lovendo'ya hoş geldiniz. Size nasıl yardımcı olabilirim?",
+            "Selam! Ben Lovendo asistanı. Bugün size nasıl yardımcı olabilirim?",
             "Merhaba! Hediye seçimi, kanıt yükleme veya başka konularda yardımcı olabilirim. 🎁",
         ],
         IntentType.GIFT_RECOMMENDATION: [

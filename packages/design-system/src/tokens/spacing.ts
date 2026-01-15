@@ -1,5 +1,5 @@
 /**
- * TravelMatch Ultimate Design System - Spacing & Sizes
+ * Lovendo Ultimate Design System - Spacing & Sizes
  *
  * 8pt Grid System with Premium spacing rules
  *

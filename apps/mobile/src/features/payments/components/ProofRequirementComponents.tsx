@@ -1,5 +1,5 @@
 /**
- * TravelMatch - Proof Requirement UI Components
+ * Lovendo - Proof Requirement UI Components
  *
  * Dynamic proof selection based on gift amount:
  * - 0-30 TL: Direct Pay (no proof)

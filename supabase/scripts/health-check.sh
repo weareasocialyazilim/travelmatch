@@ -215,7 +215,7 @@ check_active_connections() {
 
 echo ""
 echo -e "${BLUE}╔═══════════════════════════════════════════════════╗${NC}"
-echo -e "${BLUE}║       TravelMatch Database Health Check           ║${NC}"
+echo -e "${BLUE}║       Lovendo Database Health Check           ║${NC}"
 echo -e "${BLUE}╚═══════════════════════════════════════════════════╝${NC}"
 echo ""
 

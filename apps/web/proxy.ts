@@ -1,5 +1,5 @@
 /**
- * TravelMatch Bot Tracking Proxy
+ * Lovendo Bot Tracking Proxy
  *
  * Intercepts all requests to:
  * 1. Track bot visits (Google, Bing, Apple)

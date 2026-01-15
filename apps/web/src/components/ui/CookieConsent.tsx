@@ -10,8 +10,8 @@ interface CookiePreferences {
   marketing: boolean;
 }
 
-const COOKIE_CONSENT_KEY = 'tm_cookie_consent';
-const COOKIE_PREFERENCES_KEY = 'tm_cookie_preferences';
+const COOKIE_CONSENT_KEY = 'lv_cookie_consent';
+const COOKIE_PREFERENCES_KEY = 'lv_cookie_preferences';
 
 export function CookieConsent() {
   const { t } = useLanguage();
@@ -68,7 +68,9 @@ export function CookieConsent() {
     saveConsent(preferences);
   }, [saveConsent, preferences]);
 
-  const togglePreference = (key: keyof Omit<CookiePreferences, 'necessary'>) => {
+  const togglePreference = (
+    key: keyof Omit<CookiePreferences, 'necessary'>,
+  ) => {
     setPreferences((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 

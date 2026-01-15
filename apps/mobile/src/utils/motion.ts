@@ -1,5 +1,5 @@
 /**
- * TravelMatch Ultimate Design System - Motion
+ * Lovendo Ultimate Design System - Motion
  *
  * "Unified Physics" - Single spring config across entire app
  *

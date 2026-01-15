@@ -13,10 +13,16 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logger } from '../utils/logger';
+import {
+  getItemWithLegacyFallback,
+  setItemAndCleanupLegacy,
+} from '../utils/storageKeyMigration';
 
 // Storage keys
-const PENDING_PAYMENTS_KEY = '@travelmatch/pending_payments';
-const PENDING_UPLOADS_KEY = '@travelmatch/pending_uploads';
+const PENDING_PAYMENTS_KEY = '@lovendo/pending_payments';
+const PENDING_UPLOADS_KEY = '@lovendo/pending_uploads';
+const LEGACY_PENDING_PAYMENTS_KEYS = ['@lovendo_legacy/pending_payments'];
+const LEGACY_PENDING_UPLOADS_KEYS = ['@lovendo_legacy/pending_uploads'];
 
 // Transaction expiry (24 hours)
 const TRANSACTION_EXPIRY_MS = 24 * 60 * 60 * 1000;
@@ -84,9 +90,10 @@ class PendingTransactionsService {
       };
 
       payments.push(newPayment);
-      await AsyncStorage.setItem(
+      await setItemAndCleanupLegacy(
         PENDING_PAYMENTS_KEY,
         JSON.stringify(payments),
+        LEGACY_PENDING_PAYMENTS_KEYS,
       );
 
       logger.info('PendingTransactions', 'Payment added', {
@@ -112,7 +119,10 @@ class PendingTransactionsService {
     status: TransactionStatus,
   ): Promise<void> {
     try {
-      const stored = await AsyncStorage.getItem(PENDING_PAYMENTS_KEY);
+      const stored = await getItemWithLegacyFallback(
+        PENDING_PAYMENTS_KEY,
+        LEGACY_PENDING_PAYMENTS_KEYS,
+      );
       const payments: PendingPayment[] = stored ? JSON.parse(stored) : [];
       const index = payments.findIndex((p) => p.id === id);
 
@@ -137,9 +147,10 @@ class PendingTransactionsService {
         payments.splice(index, 1);
       }
 
-      await AsyncStorage.setItem(
+      await setItemAndCleanupLegacy(
         PENDING_PAYMENTS_KEY,
         JSON.stringify(payments),
+        LEGACY_PENDING_PAYMENTS_KEYS,
       );
 
       logger.info('PendingTransactions', 'Payment status updated', {
@@ -160,7 +171,10 @@ class PendingTransactionsService {
    */
   async getPendingPayments(): Promise<PendingPayment[]> {
     try {
-      const stored = await AsyncStorage.getItem(PENDING_PAYMENTS_KEY);
+      const stored = await getItemWithLegacyFallback(
+        PENDING_PAYMENTS_KEY,
+        LEGACY_PENDING_PAYMENTS_KEYS,
+      );
       if (!stored) return [];
 
       const payments: PendingPayment[] = JSON.parse(stored);
@@ -174,9 +188,10 @@ class PendingTransactionsService {
 
       // Save cleaned list if we removed any
       if (validPayments.length !== payments.length) {
-        await AsyncStorage.setItem(
+        await setItemAndCleanupLegacy(
           PENDING_PAYMENTS_KEY,
           JSON.stringify(validPayments),
+          LEGACY_PENDING_PAYMENTS_KEYS,
         );
       }
 
@@ -198,9 +213,10 @@ class PendingTransactionsService {
     try {
       const payments = await this.getPendingPayments();
       const filtered = payments.filter((p) => p.id !== id);
-      await AsyncStorage.setItem(
+      await setItemAndCleanupLegacy(
         PENDING_PAYMENTS_KEY,
         JSON.stringify(filtered),
+        LEGACY_PENDING_PAYMENTS_KEYS,
       );
 
       logger.info('PendingTransactions', 'Payment cleared', { id });
@@ -232,7 +248,11 @@ class PendingTransactionsService {
       };
 
       uploads.push(newUpload);
-      await AsyncStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(uploads));
+      await setItemAndCleanupLegacy(
+        PENDING_UPLOADS_KEY,
+        JSON.stringify(uploads),
+        LEGACY_PENDING_UPLOADS_KEYS,
+      );
 
       logger.info('PendingTransactions', 'Upload added', {
         id: upload.id,
@@ -258,7 +278,10 @@ class PendingTransactionsService {
     status?: TransactionStatus,
   ): Promise<void> {
     try {
-      const stored = await AsyncStorage.getItem(PENDING_UPLOADS_KEY);
+      const stored = await getItemWithLegacyFallback(
+        PENDING_UPLOADS_KEY,
+        LEGACY_PENDING_UPLOADS_KEYS,
+      );
       const uploads: PendingUpload[] = stored ? JSON.parse(stored) : [];
       const index = uploads.findIndex((u) => u.id === id);
 
@@ -289,7 +312,11 @@ class PendingTransactionsService {
         uploads.splice(index, 1);
       }
 
-      await AsyncStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(uploads));
+      await setItemAndCleanupLegacy(
+        PENDING_UPLOADS_KEY,
+        JSON.stringify(uploads),
+        LEGACY_PENDING_UPLOADS_KEYS,
+      );
 
       logger.info('PendingTransactions', 'Upload progress updated', {
         id,
@@ -324,7 +351,11 @@ class PendingTransactionsService {
       upload.updatedAt = Date.now();
       upload.status = TransactionStatus.FAILED;
 
-      await AsyncStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(uploads));
+      await setItemAndCleanupLegacy(
+        PENDING_UPLOADS_KEY,
+        JSON.stringify(uploads),
+        LEGACY_PENDING_UPLOADS_KEYS,
+      );
 
       return upload.retryCount;
     } catch (error) {
@@ -342,7 +373,10 @@ class PendingTransactionsService {
    */
   async getPendingUploads(): Promise<PendingUpload[]> {
     try {
-      const stored = await AsyncStorage.getItem(PENDING_UPLOADS_KEY);
+      const stored = await getItemWithLegacyFallback(
+        PENDING_UPLOADS_KEY,
+        LEGACY_PENDING_UPLOADS_KEYS,
+      );
       if (!stored) return [];
 
       const uploads: PendingUpload[] = JSON.parse(stored);
@@ -356,9 +390,10 @@ class PendingTransactionsService {
 
       // Save cleaned list if we removed any
       if (validUploads.length !== uploads.length) {
-        await AsyncStorage.setItem(
+        await setItemAndCleanupLegacy(
           PENDING_UPLOADS_KEY,
           JSON.stringify(validUploads),
+          LEGACY_PENDING_UPLOADS_KEYS,
         );
       }
 
@@ -380,7 +415,11 @@ class PendingTransactionsService {
     try {
       const uploads = await this.getPendingUploads();
       const filtered = uploads.filter((u) => u.id !== id);
-      await AsyncStorage.setItem(PENDING_UPLOADS_KEY, JSON.stringify(filtered));
+      await setItemAndCleanupLegacy(
+        PENDING_UPLOADS_KEY,
+        JSON.stringify(filtered),
+        LEGACY_PENDING_UPLOADS_KEYS,
+      );
 
       logger.info('PendingTransactions', 'Upload cleared', { id });
     } catch (error) {
@@ -406,8 +445,14 @@ class PendingTransactionsService {
   }> {
     try {
       // Probe storage first so storage-level errors are surfaced as a single aggregated error
-      await AsyncStorage.getItem(PENDING_PAYMENTS_KEY);
-      await AsyncStorage.getItem(PENDING_UPLOADS_KEY);
+      await getItemWithLegacyFallback(
+        PENDING_PAYMENTS_KEY,
+        LEGACY_PENDING_PAYMENTS_KEYS,
+      );
+      await getItemWithLegacyFallback(
+        PENDING_UPLOADS_KEY,
+        LEGACY_PENDING_UPLOADS_KEYS,
+      );
 
       const payments = await this.getPendingPayments();
       const uploads = await this.getPendingUploads();
@@ -454,6 +499,8 @@ class PendingTransactionsService {
       await AsyncStorage.multiRemove([
         PENDING_PAYMENTS_KEY,
         PENDING_UPLOADS_KEY,
+        ...LEGACY_PENDING_PAYMENTS_KEYS,
+        ...LEGACY_PENDING_UPLOADS_KEYS,
       ]);
       logger.info('PendingTransactions', 'All pending transactions cleared');
     } catch (error) {

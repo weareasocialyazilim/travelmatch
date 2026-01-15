@@ -204,7 +204,7 @@ const ProfileScreen: React.FC = () => {
     try {
       await Share.share({
         message: t('profile.shareMessage'),
-        url: `https://travelmatch.app/profile/${authUser?.id}`,
+        url: `https://www.lovendo.xyz/profile/${authUser?.id}`,
       });
     } catch (_error) {
       // User cancelled or share failed
@@ -424,10 +424,14 @@ const ProfileScreen: React.FC = () => {
                   />
                 </View>
                 <View style={styles.dashboardItemText}>
-                  <Text style={styles.dashboardItemTitle}>{t('profile.trustStatus')}</Text>
+                  <Text style={styles.dashboardItemTitle}>
+                    {t('profile.trustStatus')}
+                  </Text>
                   <Text style={styles.dashboardItemSubtitle}>
                     {(userData.trustScore || 0) > 0
-                      ? t('profile.trustScore.points', { score: userData.trustScore })
+                      ? t('profile.trustScore.points', {
+                          score: userData.trustScore,
+                        })
                       : t('profile.trustScore.earnTrust')}
                   </Text>
                 </View>
@@ -455,7 +459,9 @@ const ProfileScreen: React.FC = () => {
                   />
                 </View>
                 <View style={styles.dashboardItemText}>
-                  <Text style={styles.dashboardItemTitle}>{t('wallet.title')}</Text>
+                  <Text style={styles.dashboardItemTitle}>
+                    {t('wallet.title')}
+                  </Text>
                   <Text style={styles.dashboardItemSubtitle}>
                     {userData.walletBalance.toLocaleString('tr-TR')} TL
                   </Text>

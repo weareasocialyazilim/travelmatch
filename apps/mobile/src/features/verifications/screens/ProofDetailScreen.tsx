@@ -84,7 +84,7 @@ export const ProofDetailScreen: React.FC<ProofDetailScreenProps> = ({
         message: `Check out this proof: ${proof.title ?? 'Proof'}\n${
           proof.description ?? ''
         }`,
-        url: `travelmatch://proof/${proof.id}`,
+        url: `lovendo://proof/${proof.id}`,
       });
     } catch (error) {
       logger.error('Share error', error as Error);

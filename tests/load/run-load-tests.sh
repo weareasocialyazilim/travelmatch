@@ -26,7 +26,7 @@ if ! command -v k6 &> /dev/null; then
   exit 1
 fi
 
-echo "🚀 TravelMatch Load Testing Suite"
+echo "🚀 Lovendo Load Testing Suite"
 echo "=================================="
 echo ""
 

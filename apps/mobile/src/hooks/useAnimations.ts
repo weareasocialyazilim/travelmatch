@@ -1,5 +1,5 @@
 /**
- * TravelMatch Awwwards Design System - Animation Hooks
+ * Lovendo Awwwards Design System - Animation Hooks
  *
  * Pre-built animation patterns for consistent micro-interactions
  * Uses react-native-reanimated 3

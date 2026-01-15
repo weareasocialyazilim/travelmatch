@@ -368,7 +368,7 @@ serve(async (req: Request) => {
     // Prepare basket
     const basket = [
       createBasketItem(
-        `TravelMatch Hediye: ${moment.title.substring(0, 50)}`,
+        `Lovendo Hediye: ${moment.title.substring(0, 50)}`,
         commissionData.giver_pays,
         1,
       ),

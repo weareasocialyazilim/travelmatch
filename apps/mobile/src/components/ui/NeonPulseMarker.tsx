@@ -1,5 +1,5 @@
 // components/ui/NeonPulseMarker.tsx
-// TravelMatch Ultimate Design System 2026
+// Lovendo Ultimate Design System 2026
 // Neon Pulse Marker - GenZ "Breathing Neon" animation for map moments
 // Awwwards standard animated marker component
 

@@ -11,7 +11,7 @@ import { COLORS } from '@/constants/colors';
 
 export const MaintenanceScreen = () => {
   const handleCheckStatus = () => {
-    Linking.openURL('https://status.travelmatch.app');
+    Linking.openURL('https://status.lovendo.xyz');
   };
 
   return (
@@ -23,8 +23,8 @@ export const MaintenanceScreen = () => {
 
         <Text style={styles.title}>Bakımdayız</Text>
         <Text style={styles.desc}>
-          TravelMatch deneyimini daha iyi hale getirmek için kısa bir mola
-          verdik. Çok yakında geri döneceğiz!
+          Lovendo deneyimini daha iyi hale getirmek için kısa bir mola verdik.
+          Çok yakında geri döneceğiz!
         </Text>
 
         <View style={styles.statusBox}>

@@ -9,7 +9,7 @@
  * - Canlı deneyimler için özel styling
  * - Premium spacing (20px horizontal padding)
  *
- * Part of TravelMatch "Cinematic Trust Jewelry" Design System.
+ * Part of Lovendo "Cinematic Trust Jewelry" Design System.
  */
 
 import React, { memo } from 'react';
@@ -21,7 +21,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { TMAvatar } from '@/components/ui/TMAvatar';
+import { LovendoAvatar } from '@/components/ui/LovendoAvatar';
 import { COLORS } from '@/constants/colors';
 import { TYPOGRAPHY_SYSTEM } from '@/constants/typography';
 import type { UserStory, SubscriptionTierType } from './types';
@@ -104,7 +104,7 @@ const StoriesRow: React.FC<StoriesRowProps> = memo(
                     !user.isNew && styles.storyRingViewed,
                   ]}
                 >
-                  <TMAvatar
+                  <LovendoAvatar
                     source={user.avatar}
                     name={user.name}
                     size="lg"

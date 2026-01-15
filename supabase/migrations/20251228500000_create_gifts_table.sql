@@ -1,5 +1,5 @@
 -- ============================================
--- TravelMatch Gifts Table
+-- Lovendo Gifts Table
 -- Migration: 20251228500000_create_gifts_table.sql
 -- ============================================
 --

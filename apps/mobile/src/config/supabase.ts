@@ -101,7 +101,7 @@ export const supabase = createClient<Database>(
     },
     global: {
       headers: {
-        'x-app-name': 'TravelMatch',
+        'x-app-name': 'Lovendo',
         'x-app-version': '1.0.0',
       },
     },

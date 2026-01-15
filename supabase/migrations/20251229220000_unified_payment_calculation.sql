@@ -1,5 +1,5 @@
 -- ============================================
--- TravelMatch Unified Payment System
+-- Lovendo Unified Payment System
 -- Migration: 20251229220000_unified_payment_calculation.sql
 -- ============================================
 --

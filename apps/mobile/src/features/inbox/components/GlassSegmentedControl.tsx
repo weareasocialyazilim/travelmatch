@@ -1,5 +1,5 @@
 /**
- * TravelMatch Vibe Room - Glass Segmented Control
+ * Lovendo Vibe Room - Glass Segmented Control
  *
  * Premium glassmorphism tab switcher with animated indicator.
  * Switches between "Active Matches" and "Requests"

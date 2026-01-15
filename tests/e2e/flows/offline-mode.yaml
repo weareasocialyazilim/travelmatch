@@ -1,7 +1,7 @@
 # Maestro Flow: Offline Mode Testing
 # Tests app behavior when network is unavailable
 
-appId: com.travelmatch.app
+appId: com.lovendo.app
 ---
 
 # Start with network enabled

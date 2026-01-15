@@ -228,7 +228,7 @@ config:
 
   # Environment
   environment:
-    API_URL: 'https://staging-api.travelmatch.com'
+    API_URL: 'https://staging-api.lovendo.xyz'
     TIMEOUT: 30000
     RETRY_COUNT: 3
 
@@ -247,16 +247,16 @@ config:
   # Test data
   testData:
     users:
-      - email: 'test1@travelmatch.com'
+      - email: 'test1@lovendo.xyz'
         password: 'TestPassword123!'
-      - email: 'test2@travelmatch.com'
+      - email: 'test2@lovendo.xyz'
         password: 'TestPassword123!'
-    
+
   # Timeouts
   timeouts:
-    short: 5000    # Element appears
-    medium: 15000  # Network request
-    long: 30000    # Complex operation
+    short: 5000 # Element appears
+    medium: 15000 # Network request
+    long: 30000 # Complex operation
 
 # CI/CD Integration
 ci:
@@ -265,12 +265,12 @@ ci:
     - onboarding-complete
     - discover-match
     - messaging
-  
+
   # Run on main branch
   main:
     - all flows
     - performance tests
-  
+
   # Nightly runs
   nightly:
     - all flows
@@ -280,10 +280,10 @@ ci:
 
 # Metrics & Thresholds
 thresholds:
-  passRate: 95%        # Min 95% tests pass
-  flakeRate: 5%        # Max 5% flaky tests
-  duration: 30min      # Max 30 min total
+  passRate: 95% # Min 95% tests pass
+  flakeRate: 5% # Max 5% flaky tests
+  duration: 30min # Max 30 min total
   coverage:
-    critical: 100%     # All critical flows
-    high: 90%          # 90% high priority
-    medium: 70%        # 70% medium priority
+    critical: 100% # All critical flows
+    high: 90% # 90% high priority
+    medium: 70% # 70% medium priority

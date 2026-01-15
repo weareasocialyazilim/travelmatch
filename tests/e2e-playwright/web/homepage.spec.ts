@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('TravelMatch Web - Homepage', () => {
+test.describe('Lovendo Web - Homepage', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
   });
@@ -45,7 +45,7 @@ test.describe('TravelMatch Web - Homepage', () => {
   });
 
   test('should display footer with company info', async ({ page }) => {
-    // Footer should have TravelMatch branding - use locator for footer area
+    // Footer should have Lovendo branding - use locator for footer area
     const footer = page.locator('footer, [class*="footer"]').first();
     await expect(footer).toBeVisible();
   });
@@ -57,7 +57,7 @@ test.describe('TravelMatch Web - Homepage', () => {
   });
 });
 
-test.describe('TravelMatch Web - Responsiveness', () => {
+test.describe('Lovendo Web - Responsiveness', () => {
   test('should be responsive on mobile', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/');
@@ -76,7 +76,7 @@ test.describe('TravelMatch Web - Responsiveness', () => {
   });
 });
 
-test.describe('TravelMatch Web - Accessibility', () => {
+test.describe('Lovendo Web - Accessibility', () => {
   test('should have proper heading hierarchy', async ({ page }) => {
     await page.goto('/');
 

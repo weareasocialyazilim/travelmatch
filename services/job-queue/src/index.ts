@@ -34,7 +34,9 @@ const JOB_QUEUE_API_KEY = process.env.JOB_QUEUE_API_KEY;
 
 if (!JOB_QUEUE_API_KEY) {
   logger.error('CRITICAL: JOB_QUEUE_API_KEY environment variable is not set!');
-  logger.error('The job queue service will reject all requests until this is configured.');
+  logger.error(
+    'The job queue service will reject all requests until this is configured.',
+  );
 }
 
 /**
@@ -51,7 +53,11 @@ function secureCompare(a: string, b: string): boolean {
  * Authentication middleware for protected endpoints
  * Requires X-API-Key header with valid API key
  */
-function authenticateApiKey(req: Request, res: Response, next: NextFunction): void {
+function authenticateApiKey(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
   const apiKey = req.headers['x-api-key'] as string | undefined;
 
   if (!JOB_QUEUE_API_KEY) {
@@ -88,7 +94,11 @@ const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
 const RATE_LIMIT_MAX_REQUESTS = 100; // 100 requests per minute per IP
 
-function rateLimitMiddleware(req: Request, res: Response, next: NextFunction): void {
+function rateLimitMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
   const ip = req.ip || 'unknown';
   const now = Date.now();
 
@@ -131,9 +141,13 @@ const redis = new Redis(process.env.REDIS_URL!, {
 
 // Create queues
 const kycQueue = new Queue(QueueNames.KYC_VERIFICATION, { connection: redis });
-const imageQueue = new Queue(QueueNames.IMAGE_PROCESSING, { connection: redis });
+const imageQueue = new Queue(QueueNames.IMAGE_PROCESSING, {
+  connection: redis,
+});
 const emailQueue = new Queue(QueueNames.EMAIL, { connection: redis });
-const notificationQueue = new Queue(QueueNames.NOTIFICATION, { connection: redis });
+const notificationQueue = new Queue(QueueNames.NOTIFICATION, {
+  connection: redis,
+});
 const analyticsQueue = new Queue(QueueNames.ANALYTICS, { connection: redis });
 
 // Setup Bull Board (job monitoring UI)
@@ -142,11 +156,21 @@ serverAdapter.setBasePath('/admin/queues');
 
 createBullBoard({
   queues: [
-    new BullMQAdapter(kycQueue) as unknown as Parameters<typeof createBullBoard>[0]['queues'][number],
-    new BullMQAdapter(imageQueue) as unknown as Parameters<typeof createBullBoard>[0]['queues'][number],
-    new BullMQAdapter(emailQueue) as unknown as Parameters<typeof createBullBoard>[0]['queues'][number],
-    new BullMQAdapter(notificationQueue) as unknown as Parameters<typeof createBullBoard>[0]['queues'][number],
-    new BullMQAdapter(analyticsQueue) as unknown as Parameters<typeof createBullBoard>[0]['queues'][number],
+    new BullMQAdapter(kycQueue) as unknown as Parameters<
+      typeof createBullBoard
+    >[0]['queues'][number],
+    new BullMQAdapter(imageQueue) as unknown as Parameters<
+      typeof createBullBoard
+    >[0]['queues'][number],
+    new BullMQAdapter(emailQueue) as unknown as Parameters<
+      typeof createBullBoard
+    >[0]['queues'][number],
+    new BullMQAdapter(notificationQueue) as unknown as Parameters<
+      typeof createBullBoard
+    >[0]['queues'][number],
+    new BullMQAdapter(analyticsQueue) as unknown as Parameters<
+      typeof createBullBoard
+    >[0]['queues'][number],
   ],
   serverAdapter,
 });
@@ -292,7 +316,13 @@ app.get('/jobs/:jobId', async (req: Request, res: Response) => {
     const { jobId } = req.params;
 
     // Try to find job in all queues
-    const queues = [kycQueue, imageQueue, emailQueue, notificationQueue, analyticsQueue];
+    const queues = [
+      kycQueue,
+      imageQueue,
+      emailQueue,
+      notificationQueue,
+      analyticsQueue,
+    ];
     let job = null;
 
     for (const queue of queues) {
@@ -383,7 +413,7 @@ app.post('/admin/clean', async (req: Request, res: Response) => {
 const PORT = process.env.PORT || 3002;
 
 app.listen(PORT, () => {
-  logger.info('TravelMatch Job Queue Server started', {
+  logger.info('Lovendo Job Queue Server started', {
     port: PORT,
     apiServer: `http://localhost:${PORT}`,
     bullBoard: `http://localhost:${PORT}/admin/queues`,

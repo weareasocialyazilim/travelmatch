@@ -1,4 +1,4 @@
-# Getting Started with TravelMatch
+# Getting Started with Lovendo
 
 **Complete setup guide for developers**  
 **Last Updated**: December 8, 2025
@@ -24,8 +24,8 @@ Get up and running in 5 minutes:
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/kemalteksalgit/travelmatch.git
-cd travelmatch
+git clone https://github.com/kemalteksalgit/lovendo.git
+cd lovendo
 
 # 2. Install pnpm (if not installed)
 npm install -g pnpm@9.15.0
@@ -88,8 +88,8 @@ pnpm --version  # Should output 9.15.0
 ### Step 2: Clone Repository
 
 ```bash
-git clone https://github.com/kemalteksalgit/travelmatch.git
-cd travelmatch
+git clone https://github.com/kemalteksalgit/lovendo.git
+cd lovendo
 ```
 
 ### Step 3: Install Dependencies
@@ -138,10 +138,10 @@ See [ENVIRONMENT_VARIABLES.md](./ENVIRONMENT_VARIABLES.md) for complete list.
 
 ## Monorepo Structure
 
-TravelMatch uses a **pnpm workspace + Turborepo** monorepo:
+Lovendo uses a **pnpm workspace + Turborepo** monorepo:
 
 ```
-travelmatch/
+lovendo/
 ├── apps/
 │   ├── mobile/          # React Native + Expo app
 │   └── admin/           # React admin panel (Vite)
@@ -192,8 +192,8 @@ import { COLORS } from '../../constants/colors';
 
 **After (monorepo):**
 ```typescript
-import type { User } from '@travelmatch/shared/types';
-import { COLORS } from '@travelmatch/design-system/tokens';
+import type { User } from '@lovendo/shared/types';
+import { COLORS } from '@lovendo/design-system/tokens';
 ```
 
 ---
@@ -419,7 +419,7 @@ rm -rf node_modules pnpm-lock.yaml
 pnpm install
 ```
 
-### Issue: Module not found `@travelmatch/shared`
+### Issue: Module not found `@lovendo/shared`
 
 **Solution:**
 ```bash
@@ -560,7 +560,7 @@ pnpm eslint src/hooks/useMoments.ts --fix
 ## Getting Help
 
 - **Documentation**: Check `docs/` folder
-- **GitHub Issues**: [Report bugs](https://github.com/kemalteksalgit/travelmatch/issues)
+- **GitHub Issues**: [Report bugs](https://github.com/kemalteksalgit/lovendo/issues)
 - **Team Chat**: Internal Slack/Discord
 - **Code Review**: Submit PRs for feedback
 

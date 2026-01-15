@@ -1,6 +1,6 @@
 /**
  * NotificationCard Component
- * TravelMatch Design System 2026
+ * Lovendo Design System 2026
  *
  * Displays notification items with:
  * - Clear visual hierarchy (Title: 15px semibold, Message: 14px, Timestamp: 12px)

@@ -43,7 +43,7 @@ const getDeviceEncryptionKey = async (): Promise<string> => {
     // Fallback to a deterministic key based on timestamp (less secure, but better than nothing)
     return await Crypto.digestStringAsync(
       Crypto.CryptoDigestAlgorithm.SHA256,
-      `travelmatch-${Date.now()}-fallback`,
+      `lovendo-${Date.now()}-fallback`,
     );
   }
 };

@@ -1,5 +1,5 @@
 /**
- * TMProofCard - TravelMatch Ultimate Design System 2026
+ * LovendoProofCard - Lovendo Ultimate Design System 2026
  * Proof card component for chat messages
  *
  * Displays a proof submission with:
@@ -33,7 +33,7 @@ import { SPRING, HAPTIC } from '@/utils/motion';
 export type ProofStatus = 'pending' | 'verified' | 'rejected';
 export type MediaType = 'photo' | 'video';
 
-export interface TMProofCardProps {
+export interface LovendoProofCardProps {
   /** Title of the completed moment */
   momentTitle: string;
   /** When the moment was completed */
@@ -105,7 +105,7 @@ const formatDate = (date: Date): string => {
   });
 };
 
-export const TMProofCard: React.FC<TMProofCardProps> = ({
+export const LovendoProofCard: React.FC<LovendoProofCardProps> = ({
   momentTitle,
   completedAt,
   mediaUrl,
@@ -391,4 +391,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TMProofCard;
+export default LovendoProofCard;

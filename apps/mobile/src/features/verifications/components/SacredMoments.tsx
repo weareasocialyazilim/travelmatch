@@ -188,7 +188,7 @@ export const SacredMoments = memo<SacredMomentsProps>(
         {/* Subtle watermark for shared content */}
         {showShareOption && (
           <View style={styles.watermark} pointerEvents="none">
-            <Text style={styles.watermarkText}>TravelMatch</Text>
+            <Text style={styles.watermarkText}>Lovendo</Text>
           </View>
         )}
 

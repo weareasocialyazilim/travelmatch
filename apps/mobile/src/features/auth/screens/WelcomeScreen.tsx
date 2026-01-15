@@ -1,5 +1,5 @@
 /**
- * TravelMatch Awwwards Design System 2026 - Welcome Screen
+ * Lovendo Awwwards Design System 2026 - Welcome Screen
  *
  * Elegant simplicity with:
  * - Breathing logo animation
