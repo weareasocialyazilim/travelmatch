@@ -322,13 +322,16 @@ export default function QueuePage() {
                   })}
                 </div>
               ) : (
-                <div className="py-12 text-center">
-                  <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-500 dark:text-emerald-400" />
-                  <h3 className="mt-4 text-lg font-semibold text-foreground">
-                    Tebrikler!
+                <div className="py-16 text-center">
+                  <div className="mx-auto w-20 h-20 rounded-full bg-emerald-50 dark:bg-emerald-500/20 flex items-center justify-center mb-4">
+                    <CheckCircle2 className="h-10 w-10 text-emerald-500 dark:text-emerald-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground">
+                    Henüz görev yok
                   </h3>
-                  <p className="text-muted-foreground">
-                    Tüm görevler tamamlandı. Şimdilik yapılacak bir şey yok.
+                  <p className="text-muted-foreground mt-2 max-w-md mx-auto">
+                    İş kuyruğu boş. Kullanıcı aktiviteleri (KYC talepleri, ödeme
+                    istekleri, şikayetler) oluştuğunda burada görünecek.
                   </p>
                 </div>
               )}
