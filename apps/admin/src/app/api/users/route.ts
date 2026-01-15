@@ -53,20 +53,23 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Filter by status
+    // Filter by status - use actual database columns
     if (status === 'active') {
-      query = query.eq('is_active', true);
+      query = query
+        .eq('status', 'active')
+        .eq('is_banned', false)
+        .eq('is_suspended', false);
     } else if (status === 'suspended') {
       query = query.eq('is_suspended', true);
     } else if (status === 'banned') {
       query = query.eq('is_banned', true);
     }
 
-    // Filter by verification
+    // Filter by verification - use 'verified' column not 'is_verified'
     if (verified === 'true') {
-      query = query.eq('is_verified', true);
+      query = query.eq('verified', true);
     } else if (verified === 'false') {
-      query = query.eq('is_verified', false);
+      query = query.eq('verified', false);
     }
 
     const { data: users, count, error } = await query;

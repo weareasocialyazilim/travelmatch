@@ -9,22 +9,16 @@ import { useAuthStore } from '@/stores/auth-store';
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { isAuthenticated, is2FAVerified, user, setUser, _hasHydrated } =
-    useAuthStore();
+  const { user, setUser, _hasHydrated, is2FAVerified } = useAuthStore();
   const [isReady, setIsReady] = useState(false);
+  const [sessionUser, setSessionUser] = useState<typeof user>(null);
 
-  // Wait for store hydration then optionally check session
+  // Wait for store hydration then check session from server
   useEffect(() => {
     if (!_hasHydrated) return;
 
     const init = async () => {
-      // If already authenticated from store, no need to check session
-      if (isAuthenticated && user) {
-        setIsReady(true);
-        return;
-      }
-
-      // Try to restore session from cookie
+      // Always check server session - cookie is the source of truth
       try {
         const response = await fetch('/api/auth/session', {
           credentials: 'include',
@@ -34,27 +28,36 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           const data = await response.json();
           if (data.user) {
             setUser(data.user);
+            setSessionUser(data.user);
+            setIsReady(true);
+            return;
           }
         }
       } catch (error) {
         console.error('Session check failed:', error);
       }
 
+      // No valid session from server
+      setSessionUser(null);
       setIsReady(true);
     };
 
     init();
-  }, [_hasHydrated, isAuthenticated, user, setUser]);
+  }, [_hasHydrated, setUser]);
 
   useEffect(() => {
     if (!isReady) return;
 
-    if (!isAuthenticated) {
+    if (!sessionUser) {
       router.push('/login');
-    } else if (user?.requires_2fa && user?.totp_enabled && !is2FAVerified) {
+    } else if (
+      sessionUser?.requires_2fa &&
+      sessionUser?.totp_enabled &&
+      !is2FAVerified
+    ) {
       router.push('/2fa');
     }
-  }, [isReady, isAuthenticated, is2FAVerified, user, router]);
+  }, [isReady, sessionUser, is2FAVerified, router]);
 
   // Show loading state
   if (!isReady) {
@@ -69,13 +72,13 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   }
 
   // Don't render if not authenticated
-  if (!isAuthenticated) {
+  if (!sessionUser) {
     return null;
   }
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Sidebar />
+      <Sidebar user={sessionUser} />
       <div className="flex flex-1 flex-col overflow-hidden">
         <Header />
         <main className="flex-1 overflow-y-auto bg-muted/30 p-6">

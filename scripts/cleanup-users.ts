@@ -27,7 +27,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   },
 });
 
-const KEEP_EMAILS = ['kemal@weareasocial.com', 'kteksal@gmail.com'];
+const KEEP_EMAILS = ['kemal@weareasocial.com'];
 
 async function reliableCleanup() {
   console.log('Starting reliable cleanup...');

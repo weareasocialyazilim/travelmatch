@@ -74,9 +74,6 @@ export type NotificationType =
 // Priority levels for ML-driven importance
 export type NotificationPriority = 'low' | 'normal' | 'high' | 'urgent';
 
-// ML Title Generation Mode
-export type MLTitleMode = 'personalized' | 'time_sensitive' | 'value_based';
-
 export interface Notification {
   id: string;
   type: NotificationType;
@@ -87,9 +84,6 @@ export interface Notification {
   createdAt: string;
   // Priority for high-value offers
   priority?: NotificationPriority;
-  // ML-generated fields
-  mlGeneratedTitle?: string;
-  mlConfidenceScore?: number;
 
   // Related entities
   userId?: string;
@@ -618,81 +612,6 @@ export const calculateOfferPriority = (
 };
 
 /**
- * ML Integration Hook: Generate personalized notification title
- * This will be replaced by actual ML service call in production
- *
- * @param type - Notification type
- * @param context - Context for title generation
- * @param mode - ML generation mode
- * @returns Generated title with confidence score
- */
-export const generateMLTitle = async (
-  type: NotificationType,
-  context: {
-    senderName: string;
-    amount?: number;
-    currency?: string;
-    momentCategory?: string;
-    senderTier?: string;
-    timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'night';
-  },
-  mode: MLTitleMode = 'personalized',
-): Promise<{ title: string; confidence: number }> => {
-  // Default titles by type (fallback if ML unavailable)
-  const defaultTitles: Partial<Record<NotificationType, string>> = {
-    subscriber_offer_received: `🎁 ${context.senderName} bir teklif gönderdi`,
-    paytr_authorized: `✅ ${context.amount} ${context.currency} ödeme onaylandı`,
-    proof_submitted: '📸 Kanıt yüklendi, ödemeniz yolda',
-    payment_captured: `💰 ${context.amount} ${context.currency} hesabınıza aktarıldı`,
-    high_value_offer: `⭐ ${context.senderName} yüksek değerli bir teklif sunuyor!`,
-  };
-
-  // Time-sensitive mode variations
-  if (mode === 'time_sensitive' && context.timeOfDay) {
-    const timeGreetings = {
-      morning: 'Günaydın',
-      afternoon: 'İyi günler',
-      evening: 'İyi akşamlar',
-      night: 'Gece teklifleri',
-    };
-    const greeting = timeGreetings[context.timeOfDay];
-
-    if (type === 'subscriber_offer_received') {
-      return {
-        title: `${greeting}! ${context.senderName} bir teklif gönderdi`,
-        confidence: 0.85,
-      };
-    }
-  }
-
-  // Value-based mode for high amounts
-  if (mode === 'value_based' && context.amount) {
-    if (context.amount >= 1000) {
-      return {
-        title: `🔥 Dikkat! ${context.amount} ${context.currency} değerinde teklif`,
-        confidence: 0.9,
-      };
-    }
-  }
-
-  // Tier-specific personalization
-  if (context.senderTier === 'platinum') {
-    if (type === 'subscriber_offer_received') {
-      return {
-        title: `👑 Platinum Üye ${context.senderName} özel bir teklif sunuyor`,
-        confidence: 0.88,
-      };
-    }
-  }
-
-  // Return default with medium confidence
-  return {
-    title: defaultTitles[type] || `${context.senderName} bir bildirim gönderdi`,
-    confidence: 0.7,
-  };
-};
-
-/**
  * Create a subscriber offer notification with PayTR context
  */
 export const createSubscriberOfferNotification = async (
@@ -713,19 +632,8 @@ export const createSubscriberOfferNotification = async (
       senderTier,
     );
 
-    // Generate ML title
-    const { title, confidence } = await generateMLTitle(
-      'subscriber_offer_received',
-      {
-        senderName,
-        amount,
-        currency,
-        senderTier,
-      },
-      priority === 'urgent' || priority === 'high'
-        ? 'value_based'
-        : 'personalized',
-    );
+    // Generate Title
+    const title = `🎁 ${senderName} bir teklif gönderdi`;
 
     // Insert notification
     await supabase.from('notifications').insert({
@@ -741,7 +649,6 @@ export const createSubscriberOfferNotification = async (
         currency,
         paytrTransactionId,
         senderTier,
-        mlConfidence: confidence,
       },
       priority,
       read: false,
@@ -751,7 +658,6 @@ export const createSubscriberOfferNotification = async (
       receiverId,
       giftId,
       priority,
-      mlConfidence: confidence,
     });
   } catch (error) {
     logger.error(

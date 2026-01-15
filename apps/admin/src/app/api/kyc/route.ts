@@ -25,21 +25,21 @@ export async function GET(request: NextRequest) {
 
     const supabase = createServiceClient();
 
+    // First try kyc_submissions table
     let query = supabase
       .from('kyc_submissions')
       .select(
         `
         *,
-        user:users!kyc_submissions_user_id_fkey(
+        user:user_id(
           id,
-          display_name,
+          full_name,
           avatar_url,
           email,
           phone,
           created_at,
           kyc_status
-        ),
-        reviewed_by_admin:admin_users!kyc_submissions_reviewed_by_fkey(id, name)
+        )
       `,
         { count: 'exact' },
       )
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
       const usersQuery = supabase
         .from('users')
         .select(
-          'id, display_name, avatar_url, email, phone, kyc_status, kyc_submitted_at, kyc_reviewed_at, created_at',
+          'id, full_name, avatar_url, email, phone, kyc_status, created_at',
           { count: 'exact' },
         )
         .order('created_at', { ascending: false })
@@ -93,10 +93,8 @@ export async function GET(request: NextRequest) {
       type UserKyc = {
         id: string;
         kyc_status?: string;
-        kyc_submitted_at?: string;
-        kyc_reviewed_at?: string;
         created_at: string;
-        display_name?: string;
+        full_name?: string;
         avatar_url?: string;
         email?: string;
         phone?: string;
@@ -105,12 +103,12 @@ export async function GET(request: NextRequest) {
         submissions: users?.map((p: UserKyc) => ({
           id: p.id,
           user_id: p.id,
-          status: p.kyc_status,
-          created_at: p.kyc_submitted_at || p.created_at,
-          reviewed_at: p.kyc_reviewed_at,
+          status: p.kyc_status || 'pending',
+          created_at: p.created_at,
+          reviewed_at: null,
           user: {
             id: p.id,
-            display_name: p.display_name,
+            display_name: p.full_name,
             avatar_url: p.avatar_url,
             email: p.email,
             phone: p.phone,

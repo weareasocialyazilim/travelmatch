@@ -88,8 +88,8 @@ export type {
 export { securePaymentService as paymentService } from './securePaymentService';
 
 // Base Service with error recovery
-export { BaseService } from './BaseService';
-export type { RetryConfig, ServiceConfig } from './BaseService';
+export { BaseService } from '@/utils/BaseService';
+export type { RetryConfig, ServiceConfig } from '@/utils/BaseService';
 
 // Re-export currency helpers from utils for backward compatibility
 export { formatCurrency } from '../utils/helpers';

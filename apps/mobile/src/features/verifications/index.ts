@@ -14,7 +14,7 @@ export {
   TrustConstellation,
 } from './components/TrustMilestones';
 export { SunsetClock } from './components/SunsetClock';
-export { MomentAuthenticator } from './components/MomentAuthenticator';
+// export { MomentAuthenticator } from './components/MomentAuthenticator';
 export { SacredMoments } from './components/SacredMoments';
 export { GiftVault } from './components/GiftVault';
 export { ThankYouCardCreator } from './components/ThankYouCardCreator';
@@ -42,4 +42,4 @@ export { default as KYCPendingScreen } from './kyc/KYCPendingScreen';
 export * from './kyc/types';
 
 // Types
-export type { AuthenticationResult } from './components/MomentAuthenticator';
+// export type { AuthenticationResult } from './components/MomentAuthenticator';
