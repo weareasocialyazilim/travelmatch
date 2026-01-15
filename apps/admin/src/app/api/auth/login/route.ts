@@ -2,8 +2,11 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { createAuditLog } from '@/lib/auth';
-import { checkRateLimit, rateLimits, createRateLimitHeaders } from '@/lib/rate-limit';
-import { cookies } from 'next/headers';
+import {
+  checkRateLimit,
+  rateLimits,
+  createRateLimitHeaders,
+} from '@/lib/rate-limit';
 import crypto from 'crypto';
 import type { Database } from '@/types/database';
 
@@ -30,7 +33,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'Çok fazla başarısız deneme. Lütfen bekleyin.',
-          retryAfter: rateLimit.retryAfter
+          retryAfter: rateLimit.retryAfter,
         },
         { status: 429, headers: createRateLimitHeaders(rateLimit) },
       );
@@ -138,23 +141,14 @@ export async function POST(request: NextRequest) {
       .update({ last_login_at: new Date().toISOString() })
       .eq('id', adminUser.id);
 
-    // Set session cookie with strict security settings
-    const cookieStore = await cookies();
-    cookieStore.set('admin_session', sessionToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict', // Strict for admin panel to prevent CSRF
-      maxAge: 24 * 60 * 60, // 24 hours
-      path: '/',
-    });
-
     // Get role permissions
     const { data: permissions } = await supabase
       .from('role_permissions')
       .select('resource, action')
       .eq('role', adminUser.role);
 
-    return NextResponse.json({
+    // Create response with cookie
+    const response = NextResponse.json({
       user: {
         id: adminUser.id,
         email: adminUser.email,
@@ -164,6 +158,17 @@ export async function POST(request: NextRequest) {
       },
       permissions: permissions || [],
     });
+
+    // Set session cookie on the response object
+    response.cookies.set('admin_session', sessionToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax', // Changed from strict to lax for redirect compatibility
+      maxAge: 24 * 60 * 60, // 24 hours
+      path: '/',
+    });
+
+    return response;
   } catch (error) {
     logger.error('Login error:', error);
     return NextResponse.json(
