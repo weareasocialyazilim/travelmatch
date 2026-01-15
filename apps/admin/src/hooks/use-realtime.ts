@@ -52,10 +52,10 @@ export function useRealtimeSubscription<T extends Record<string, unknown>>(
         'postgres_changes',
         {
           event,
-          schema,
+          schema: schema || 'public',
           table,
           filter,
-        },
+        } as any,
         (payload: RealtimePostgresChangesPayload<T>) => {
           switch (payload.eventType) {
             case 'INSERT':

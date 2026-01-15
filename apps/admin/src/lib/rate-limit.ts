@@ -53,6 +53,10 @@ export interface RateLimitResult {
 /**
  * Check if a request is rate limited
  */
+export function resetToInMemoryStore() {
+  memoryStore.clear();
+}
+
 export async function checkRateLimit(
   identifier: string,
   config: RateLimitConfig,

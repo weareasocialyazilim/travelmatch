@@ -511,11 +511,15 @@ export interface Database {
       moments: {
         Row: {
           id: string;
-          user_id: string;
+          creator_id: string;
           title: string;
           description: string | null;
-          location: string | null;
-          images: string[] | null;
+          location: Json | null;
+          thumbnail_url: string | null;
+          start_date: string | null;
+          end_date: string | null;
+          view_count: number;
+          like_count: number;
           status: string | null;
           moderation_status:
             | 'pending_review'
@@ -541,6 +545,119 @@ export interface Database {
           moderation_notes?: string | null;
           moderated_by?: string | null;
           moderated_at?: string | null;
+        };
+      };
+
+      wallet_transactions: {
+        Row: {
+          id: string;
+          user_id: string;
+          type: 'credit' | 'debit' | 'adjustment';
+          amount: number;
+          description: string;
+          status:
+            | 'pending'
+            | 'processing'
+            | 'completed'
+            | 'failed'
+            | 'cancelled';
+          processed_by: string | null;
+          processed_at: string | null;
+          failure_reason: string | null;
+          kyc_verified: boolean;
+          kyc_verified_at: string | null;
+          transaction_id: string | null;
+          created_at: string;
+          created_by: string | null;
+        };
+        Insert: {
+          user_id: string;
+          type: 'credit' | 'debit' | 'adjustment';
+          amount: number;
+          description: string;
+          status?:
+            | 'pending'
+            | 'processing'
+            | 'completed'
+            | 'failed'
+            | 'cancelled';
+          created_by?: string;
+        };
+        Update: {
+          status?:
+            | 'pending'
+            | 'processing'
+            | 'completed'
+            | 'failed'
+            | 'cancelled';
+          processed_by?: string;
+          processed_at?: string | null;
+          failure_reason?: string | null;
+          kyc_verified?: boolean;
+          kyc_verified_at?: string;
+          transaction_id?: string;
+        };
+      };
+
+      fraud_cases: {
+        Row: {
+          id: string;
+          suspect_id: string;
+          total_amount_involved: number;
+          status: string;
+          resolution: string | null;
+          resolved_at: string | null;
+          banned_reason: string | null;
+          assigned_to: string | null;
+          created_at: string;
+        };
+        Insert: {
+          suspect_id: string;
+          total_amount_involved: number;
+        };
+        Update: {
+          status?: string;
+          resolution?: string;
+          resolved_at?: string;
+          banned_reason?: string;
+          assigned_to?: string;
+        };
+      };
+
+      fraud_evidence: {
+        Row: {
+          id: string;
+          case_id: string;
+          title: string;
+          description: string;
+          type:
+            | 'screenshot'
+            | 'transaction'
+            | 'chat_log'
+            | 'document'
+            | 'ip_log';
+          file_url: string | null;
+          metadata: Json;
+          uploaded_by: string;
+          uploaded_at: string;
+        };
+        Insert: {
+          case_id: string;
+          title: string;
+          description: string;
+          type:
+            | 'screenshot'
+            | 'transaction'
+            | 'chat_log'
+            | 'document'
+            | 'ip_log';
+          file_url?: string | null;
+          metadata?: Json;
+          uploaded_by: string;
+          uploaded_at?: string;
+        };
+        Update: {
+          title?: string;
         };
       };
       // Payments table
@@ -1090,12 +1207,91 @@ export interface Database {
         };
       };
       // Wallets table
+      payout_requests: {
+        Row: {
+          id: string;
+          user_id: string;
+          amount: number;
+          currency: string;
+          status:
+            | 'pending'
+            | 'approved'
+            | 'rejected'
+            | 'processed'
+            | 'cancelled';
+          bank_account: Json | null;
+          processed_by: string | null;
+          processed_at: string | null;
+          transaction_id: string | null;
+          failure_reason: string | null;
+          rejection_reason: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          amount: number;
+          currency?: string;
+          status?:
+            | 'pending'
+            | 'approved'
+            | 'rejected'
+            | 'processed'
+            | 'cancelled';
+          bank_account?: Json | null;
+        };
+        Update: {
+          status?:
+            | 'pending'
+            | 'approved'
+            | 'rejected'
+            | 'processed'
+            | 'cancelled';
+          processed_by?: string | null;
+          processed_at?: string | null;
+          transaction_id?: string | null;
+          failure_reason?: string | null;
+          rejection_reason?: string | null;
+        };
+      };
+      kyc_verifications: {
+        Row: {
+          id: string;
+          user_id: string;
+          status: 'pending' | 'approved' | 'rejected';
+          document_type: string | null;
+          document_images: string[] | null;
+          document_data: Json | null;
+          reviewed_by: string | null;
+          reviewed_at: string | null;
+          rejection_reason: string | null;
+          verification_notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          status?: 'pending' | 'approved' | 'rejected';
+          document_type?: string | null;
+        };
+        Update: {
+          status?: 'pending' | 'approved' | 'rejected';
+          reviewed_by?: string | null;
+          reviewed_at?: string | null;
+          rejection_reason?: string | null;
+          verification_notes?: string | null;
+        };
+      };
+
       wallets: {
         Row: {
           id: string;
           user_id: string;
           available_balance: number;
+          balance: number;
           pending_balance: number;
+          total_spent: number;
+          total_earned: number;
           currency: string;
           is_frozen: boolean;
           frozen_reason: string | null;
@@ -1109,7 +1305,10 @@ export interface Database {
           id?: string;
           user_id: string;
           available_balance?: number;
+          balance?: number;
           pending_balance?: number;
+          total_spent?: number;
+          total_earned?: number;
           currency?: string;
           is_frozen?: boolean;
           frozen_reason?: string | null;
@@ -1123,7 +1322,10 @@ export interface Database {
           id?: string;
           user_id?: string;
           available_balance?: number;
+          balance?: number;
           pending_balance?: number;
+          total_spent?: number;
+          total_earned?: number;
           currency?: string;
           is_frozen?: boolean;
           frozen_reason?: string | null;
@@ -1488,6 +1690,25 @@ export interface Database {
           final_discount: number | null;
           error_message: string | null;
         }[];
+      };
+      admin_set_user_vip: {
+        Args: {
+          p_user_id: string;
+          p_tier: string;
+          p_commission_override: number;
+          p_giver_pays_commission: boolean;
+          p_valid_until: string | null;
+          p_reason: string;
+          p_granted_by: string;
+        };
+        Returns: void;
+      };
+      admin_process_wallet_transaction: {
+        Args: {
+          p_user_id: string;
+          p_amount: number;
+        };
+        Returns: void;
       };
     };
     Enums: {

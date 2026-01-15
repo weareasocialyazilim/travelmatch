@@ -9,13 +9,22 @@ import { useAuthStore } from '@/stores/auth-store';
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { isAuthenticated, is2FAVerified, user, isLoading, setUser } =
+  const { isAuthenticated, is2FAVerified, user, setUser, _hasHydrated } =
     useAuthStore();
-  const [isCheckingSession, setIsCheckingSession] = useState(true);
+  const [isReady, setIsReady] = useState(false);
 
-  // Check session on mount
+  // Wait for store hydration then optionally check session
   useEffect(() => {
-    const checkSession = async () => {
+    if (!_hasHydrated) return;
+
+    const init = async () => {
+      // If already authenticated from store, no need to check session
+      if (isAuthenticated && user) {
+        setIsReady(true);
+        return;
+      }
+
+      // Try to restore session from cookie
       try {
         const response = await fetch('/api/auth/session', {
           credentials: 'include',
@@ -29,33 +38,26 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         }
       } catch (error) {
         console.error('Session check failed:', error);
-      } finally {
-        setIsCheckingSession(false);
       }
+
+      setIsReady(true);
     };
 
-    checkSession();
-  }, [setUser]);
+    init();
+  }, [_hasHydrated, isAuthenticated, user, setUser]);
 
   useEffect(() => {
-    if (!isLoading && !isCheckingSession) {
-      if (!isAuthenticated) {
-        router.push('/login');
-      } else if (user?.requires_2fa && user?.totp_enabled && !is2FAVerified) {
-        router.push('/2fa');
-      }
+    if (!isReady) return;
+
+    if (!isAuthenticated) {
+      router.push('/login');
+    } else if (user?.requires_2fa && user?.totp_enabled && !is2FAVerified) {
+      router.push('/2fa');
     }
-  }, [
-    isAuthenticated,
-    is2FAVerified,
-    user,
-    isLoading,
-    isCheckingSession,
-    router,
-  ]);
+  }, [isReady, isAuthenticated, is2FAVerified, user, router]);
 
   // Show loading state
-  if (isLoading || isCheckingSession) {
+  if (!isReady) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="flex flex-col items-center gap-4">

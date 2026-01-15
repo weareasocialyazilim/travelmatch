@@ -14,6 +14,7 @@
 import { useState, useCallback, memo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
   Users,
@@ -34,7 +35,7 @@ import {
   Command,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
@@ -270,17 +271,16 @@ export function EnterpriseSidebar() {
 
         {/* Help Link */}
         {!sidebarCollapsed && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full justify-start text-gray-500 hover:text-gray-900 dark:hover:text-white mt-1"
-            asChild
+          <Link
+            href="/help"
+            className={cn(
+              buttonVariants({ variant: 'ghost', size: 'sm' }),
+              'w-full justify-start text-gray-500 hover:text-gray-900 dark:hover:text-white mt-1',
+            )}
           >
-            <Link href="/help">
-              <HelpCircle className="w-4 h-4 mr-2" />
-              <span>Yardim</span>
-            </Link>
-          </Button>
+            <HelpCircle className="w-4 h-4 mr-2" />
+            <span>Yardim</span>
+          </Link>
         )}
       </div>
     </aside>
