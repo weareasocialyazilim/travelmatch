@@ -107,9 +107,7 @@ const RequestsScreen = ({ navigation }: any) => {
               <Text style={styles.momentTitle}>{item.momentTitle}</Text>
             </View>
           </View>
-          <Badge variant="warning" size="small">
-            Bekliyor
-          </Badge>
+          <Badge variant="warning" size="sm" label="Bekliyor" />
         </View>
 
         <View style={styles.cardFooter}>
