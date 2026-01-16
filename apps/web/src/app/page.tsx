@@ -294,7 +294,7 @@ export default function App() {
                   punchline={
                     lang === 'EN'
                       ? 'Waiting on Tim’s ego.'
-                      : 'Tim’in egosunu bekliyoruz.'
+                      : 'TİM’İN EGOSUNU BEKLİYORUZ.'
                   }
                   type="apple"
                   color="pink"
@@ -305,7 +305,7 @@ export default function App() {
                   punchline={
                     lang === 'EN'
                       ? 'Stop asking, it’s coming.'
-                      : 'Sormayı bırak, geliyor.'
+                      : 'SORMAYI BIRAK, GELİYOR.'
                   }
                   type="google"
                   color="cyan"
