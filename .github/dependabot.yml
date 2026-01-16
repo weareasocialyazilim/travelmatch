@@ -1,129 +1,54 @@
 # Dependabot Configuration
-# Automated dependency updates for Lovendo monorepo
+# Simplified for pnpm monorepo - reduces PR noise significantly
 
 version: 2
 updates:
-  # Mobile App (React Native + Expo)
+  # Root workspace - handles all npm dependencies via pnpm
   - package-ecosystem: 'npm'
-    directory: '/apps/mobile'
+    directory: '/'
     schedule:
-      interval: 'weekly'
+      interval: 'monthly'
       day: 'monday'
       time: '09:00'
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
+    groups:
+      # Group all patch updates together into single PR
+      all-minor-patch:
+        patterns:
+          - '*'
+        update-types:
+          - 'minor'
+          - 'patch'
     labels:
       - 'dependencies'
-      - 'mobile'
+      - 'automated'
     commit-message:
-      prefix: 'deps(mobile)'
-    versioning-strategy: increase
+      prefix: 'chore(deps)'
     ignore:
-      # Ignore major version updates for React Native (manual upgrade)
+      # Major updates require manual review
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+      # React Native ecosystem - manual updates only
       - dependency-name: 'react-native'
-        update-types: ['version-update:semver-major']
+      - dependency-name: 'react-native-*'
       - dependency-name: 'expo'
-        update-types: ['version-update:semver-major']
+      - dependency-name: 'expo-*'
+      - dependency-name: '@expo/*'
 
-  # Admin Dashboard
-  - package-ecosystem: 'npm'
-    directory: '/apps/admin'
-    schedule:
-      interval: 'weekly'
-      day: 'monday'
-      time: '09:00'
-    open-pull-requests-limit: 5
-    labels:
-      - 'dependencies'
-      - 'admin'
-
-  # Design System
-  - package-ecosystem: 'npm'
-    directory: '/packages/design-system'
-    schedule:
-      interval: 'weekly'
-      day: 'monday'
-      time: '09:00'
-    open-pull-requests-limit: 5
-    labels:
-      - 'dependencies'
-      - 'design-system'
-
-  # Shared Package
-  - package-ecosystem: 'npm'
-    directory: '/packages/shared'
-    schedule:
-      interval: 'weekly'
-      day: 'monday'
-      time: '09:00'
-    open-pull-requests-limit: 5
-    labels:
-      - 'dependencies'
-      - 'shared'
-
-  # ML Service (Python)
-  - package-ecosystem: 'pip'
-    directory: '/services/ml'
-    schedule:
-      interval: 'weekly'
-      day: 'tuesday'
-      time: '09:00'
-    open-pull-requests-limit: 5
-    labels:
-      - 'dependencies'
-      - 'ml'
-      - 'python'
-    commit-message:
-      prefix: 'deps(ml)'
-
-  # Payment Service
-  - package-ecosystem: 'npm'
-    directory: '/services/payment'
-    schedule:
-      interval: 'daily' # Critical service - daily updates
-      time: '09:00'
-    open-pull-requests-limit: 5
-    labels:
-      - 'dependencies'
-      - 'payment'
-      - 'critical'
-    commit-message:
-      prefix: 'deps(payment)'
-
-  # Job Queue Service
-  - package-ecosystem: 'npm'
-    directory: '/services/job-queue'
-    schedule:
-      interval: 'weekly'
-      day: 'tuesday'
-      time: '09:00'
-    open-pull-requests-limit: 5
-    labels:
-      - 'dependencies'
-      - 'job-queue'
-
-  # GitHub Actions
+  # GitHub Actions - keep these updated for security
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
-      interval: 'weekly'
-      day: 'wednesday'
+      interval: 'monthly'
+      day: 'monday'
       time: '09:00'
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 3
+    groups:
+      actions:
+        patterns:
+          - '*'
     labels:
       - 'dependencies'
       - 'github-actions'
-      - 'ci-cd'
     commit-message:
-      prefix: 'ci'
-
-  # Docker (if used)
-  - package-ecosystem: 'docker'
-    directory: '/'
-    schedule:
-      interval: 'weekly'
-      day: 'thursday'
-      time: '09:00'
-    open-pull-requests-limit: 3
-    labels:
-      - 'dependencies'
-      - 'docker'
+      prefix: 'ci(deps)'
