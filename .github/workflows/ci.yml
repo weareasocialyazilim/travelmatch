@@ -49,7 +49,7 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm test -- --ci --coverage --maxWorkers=2
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5
         # Coverage should be tracked and significant drops flagged
         continue-on-error: false
         with:
