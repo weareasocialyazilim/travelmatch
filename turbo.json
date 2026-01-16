@@ -73,7 +73,7 @@
     "web#build": {
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**"],
-      "inputs": ["app/**", "public/**", "next.config.ts", "package.json"],
+      "inputs": ["app/**", "public/**", "next.config.js", "package.json"],
       "env": ["NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_ANON_KEY"]
     },
     "web#lint": {

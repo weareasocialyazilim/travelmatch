@@ -14,7 +14,7 @@ import {
   JobPriorities,
   QueueNames,
 } from './jobs/index.js';
-import { logger } from '../shared/utils/logger.js';
+import { logger } from '@lovendo/shared';
 
 // Load environment variables
 import dotenv from 'dotenv';
@@ -140,15 +140,19 @@ const redis = new Redis(process.env.REDIS_URL!, {
 });
 
 // Create queues
-const kycQueue = new Queue(QueueNames.KYC_VERIFICATION, { connection: redis });
+const kycQueue = new Queue(QueueNames.KYC_VERIFICATION, {
+  connection: redis as any,
+});
 const imageQueue = new Queue(QueueNames.IMAGE_PROCESSING, {
-  connection: redis,
+  connection: redis as any,
 });
-const emailQueue = new Queue(QueueNames.EMAIL, { connection: redis });
+const emailQueue = new Queue(QueueNames.EMAIL, { connection: redis as any });
 const notificationQueue = new Queue(QueueNames.NOTIFICATION, {
-  connection: redis,
+  connection: redis as any,
 });
-const analyticsQueue = new Queue(QueueNames.ANALYTICS, { connection: redis });
+const analyticsQueue = new Queue(QueueNames.ANALYTICS, {
+  connection: redis as any,
+});
 
 // Setup Bull Board (job monitoring UI)
 const serverAdapter = new ExpressAdapter();

@@ -1,792 +1,827 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import * as THREE from 'three';
-import {
-  motion,
-  AnimatePresence,
-  useScroll,
-  useTransform,
-  useSpring,
-  useMotionValue,
-} from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
+import dynamic from 'next/dynamic';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
+  Gift,
+  Instagram,
+  MessageSquare,
+  Twitter,
+  Heart,
+  Send,
   Zap,
-  MapPin,
-  ArrowRight,
-  Fingerprint,
-  Smartphone,
-  ShieldAlert,
-  Ghost,
-  Activity,
-  Cpu,
-  ShoppingBag,
-  Utensils,
-  Palette,
-  Glasses,
-  Trophy,
-  Lock,
+  Sparkles,
 } from 'lucide-react';
+import { TRANSLATIONS, MOMENTS, Language } from '../data/content';
+import StoreBadge from '../components/StoreBadge';
 
-// --- 01. KINETIC HEART CURSOR (Snappy & High Precision) ---
-const LovendoCursor = () => {
-  const mouseX = useMotionValue(-100);
-  const mouseY = useMotionValue(-100);
+const PulseEngine = dynamic(() => import('../components/PulseEngine'), {
+  ssr: false,
+});
 
-  // Maksimum hız ve tepkisellik için ayarlar
-  const cursorX = useSpring(mouseX, {
-    stiffness: 1500,
-    damping: 80,
-    mass: 0.1,
-  });
-  const cursorY = useSpring(mouseY, {
-    stiffness: 1500,
-    damping: 80,
-    mass: 0.1,
-  });
+/**
 
-  const [isHovering, setIsHovering] = useState(false);
+--- 2. COMPONENTS ---
+*/
 
-  useEffect(() => {
-    const handleMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
-      const target = e.target as HTMLElement;
-      setIsHovering(
-        !!(
-          target.closest('button') ||
-          target.closest('input') ||
-          target.closest('a') ||
-          target.closest('.moment-card')
-        ),
-      );
-    };
-    window.addEventListener('mousemove', handleMove);
-    return () => window.removeEventListener('mousemove', handleMove);
-  }, [mouseX, mouseY]);
-
-  return (
-    <motion.div
-      className="fixed top-0 left-0 pointer-events-none z-[9999] mix-blend-difference hidden md:flex items-center justify-center"
-      style={{ x: cursorX, y: cursorY, translateX: '-50%', translateY: '-50%' }}
-    >
-      <motion.svg
-        width="44"
-        height="44"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke={isHovering ? '#00F5FF' : '#FF3366'}
-        strokeWidth="1.5"
-        animate={{ scale: isHovering ? 1.5 : 1, rotate: isHovering ? 15 : 0 }}
-      >
-        <path
-          d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-          fill={
-            isHovering ? 'rgba(0, 245, 255, 0.3)' : 'rgba(255, 51, 102, 0.3)'
-          }
-        />
-      </motion.svg>
-      <div className="absolute w-1 h-1 bg-white rounded-full shadow-[0_0_8px_#fff]" />
-    </motion.div>
-  );
-};
-
-// --- 02. FLUID ILLUSION SCENE (Uçuk Kaçık İlüzyonlar) ---
-const LovendoFluid = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000,
-    );
-    camera.position.z = 4;
-
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    containerRef.current.appendChild(renderer.domElement);
-
-    // Işıklar
-    const p1 = new THREE.PointLight(0xff3366, 2);
-    p1.position.set(5, 5, 5);
-    scene.add(p1);
-    const p2 = new THREE.PointLight(0x00f5ff, 2);
-    p2.position.set(-5, -5, 5);
-    scene.add(p2);
-
-    // Akışkan Form (Illusion Blob)
-    const geometry = new THREE.IcosahedronGeometry(1.8, 64);
-    const material = new THREE.MeshStandardMaterial({
-      color: 0x111111,
-      metalness: 1,
-      roughness: 0.1,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.2,
-    });
-    const mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
-
-    // Floating Fragments (Anı Parçacıkları)
-    const fragments: { mesh: THREE.Mesh; speed: number }[] = [];
-    const fragGeom = new THREE.BoxGeometry(0.1, 0.1, 0.1);
-    for (let i = 0; i < 60; i++) {
-      const frag = new THREE.Mesh(
-        fragGeom,
-        new THREE.MeshPhongMaterial({
-          color: i % 2 === 0 ? 0xf0eee9 : 0xff3366,
-          transparent: true,
-          opacity: 0.6,
-        }),
-      );
-      frag.position.set(
-        (Math.random() - 0.5) * 15,
-        (Math.random() - 0.5) * 15,
-        (Math.random() - 0.5) * 10,
-      );
-      scene.add(frag);
-      fragments.push({ mesh: frag, speed: Math.random() * 0.02 + 0.01 });
-    }
-
-    const animate = () => {
-      mesh.rotation.y += 0.003;
-      mesh.rotation.z += 0.002;
-      mesh.scale.setScalar(1 + Math.sin(Date.now() * 0.001) * 0.05);
-
-      fragments.forEach((f) => {
-        f.mesh.position.y += f.speed;
-        f.mesh.rotation.x += 0.02;
-        if (f.mesh.position.y > 8) f.mesh.position.y = -8;
-      });
-
-      renderer.render(scene, camera);
-      requestAnimationFrame(animate);
-    };
-    animate();
-    return () => {
-      if (containerRef.current)
-        containerRef.current.removeChild(renderer.domElement);
-    };
-  }, []);
-  return (
-    <div
-      ref={containerRef}
-      className="fixed inset-0 z-0 opacity-40 pointer-events-none bg-[#1A1A1B]"
-    />
-  );
-};
-
-// --- 03. GLOBAL CITIES BAND (With Symbols) ---
-const GlobalCitiesBand = () => {
-  const cities = [
-    { name: 'ISTANBUL', sym: '🕌' },
-    { name: 'PARIS', sym: '†' },
-    { name: 'TOKYO', sym: 'Ξ' },
-    { name: 'NYC', sym: '▰' },
-    { name: 'LONDON', sym: '⌘' },
-    { name: 'ROME', sym: '▼' },
-    { name: 'BERLIN', sym: 'Ø' },
-    { name: 'SEOUL', sym: '◈' },
-    { name: 'DUBAI', sym: '✦' },
-    { name: 'LISBON', sym: '≋' },
-    { name: 'MEXICO', sym: '◬' },
-    { name: 'RIO', sym: '☀' },
-  ];
-  return (
-    <div className="w-full bg-black py-16 border-y border-white/5 relative z-10 overflow-hidden">
-      <motion.div
-        animate={{ x: [0, -3500] }}
-        transition={{ duration: 50, repeat: Infinity, ease: 'linear' }}
-        className="flex gap-40 px-12 whitespace-nowrap"
-      >
-        {[...cities, ...cities].map((city, i) => (
-          <div
-            key={i}
-            className="flex items-center gap-8 group cursor-default opacity-40 hover:opacity-100 transition-opacity"
-          >
-            <span className="text-[20px] font-black uppercase tracking-[0.8em] text-white">
-              {city.name}
-            </span>
-            <span className="text-[#FF3366] text-2xl font-mono grayscale group-hover:grayscale-0 transition-all">
-              {city.sym}
-            </span>
-          </div>
-        ))}
-      </motion.div>
-    </div>
-  );
-};
-
-// --- 04. DROP ICON SELECTOR ---
-const LovendoIcon = ({ type }: { type: string }) => {
-  const icons: Record<string, React.ReactNode> = {
-    fashion: <ShoppingBag size={14} className="text-[#FF3366]" />,
-    food: <Utensils size={14} className="text-black" />,
-    culture: <Palette size={14} className="text-[#00A3FF]" />,
-    experience: <Zap size={14} className="text-[#FF3366]" />,
-    accessory: <Glasses size={14} className="text-black" />,
-    object: <Trophy size={14} className="text-black" />,
-  };
-  return icons[type] || <Activity size={14} />;
-};
-
-interface MomentData {
-  title: string;
-  location: string;
-  price: string;
-  creator: string;
-  type: string;
-  ritualTag: string;
-  image: string;
-}
-
-// --- 05. LOVENDO DROP CARD (Cloud Dancer Color & Anthracite Accent) ---
-const MomentCard = ({
-  data,
-  onClick,
-}: {
-  data: MomentData;
-  index: number;
-  onClick: (data: MomentData) => void;
-}) => {
-  const [rotation, setRotation] = useState('0');
-
-  useEffect(() => {
-    setRotation((Math.random() * 4 - 2).toFixed(2));
-  }, []);
-
-  return (
-    <motion.div
-      whileHover={{ y: -15, scale: 1.02, zIndex: 50 }}
-      className="moment-card relative group mb-48 px-6 cursor-none"
-      onClick={() => onClick(data)}
-    >
-      <div
-        className="bg-[#F0EEE9] p-6 shadow-[0_60px_130px_rgba(0,0,0,0.6)] relative overflow-hidden transition-all duration-1000 border border-white/5 group-hover:border-[#00F5FF]/40"
-        style={{ transform: `rotate(${rotation}deg)` }}
-      >
-        <div className="absolute -right-12 top-6 z-30 bg-black text-white font-black text-[10px] px-12 py-1 rotate-45 shadow-xl uppercase tracking-widest flex items-center gap-2">
-          ACTIVATE DO
-        </div>
-
-        <div className="flex justify-between items-center mb-6 text-[11px] font-mono font-black tracking-widest text-black/40 uppercase">
-          <div className="flex items-center gap-2">
-            <MapPin size={12} className="text-[#FF3366]" /> {data.location}
-          </div>
-          <div className="flex items-center gap-2 italic">
-            {LovendoIcon({ type: data.type })} {data.type}
-          </div>
-        </div>
-
-        <div className="relative aspect-[1/1.2] bg-white overflow-hidden mb-10 border border-black/5 shadow-inner">
-          <motion.img
-            src={data.image}
-            className="w-full h-full object-cover filter contrast-[1.1] transition-all duration-[1500ms] group-hover:scale-110"
-          />
-          <div className="absolute inset-0 bg-black/10 z-10 mix-blend-multiply opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-6 left-6 right-6">
-            <div className="text-[14px] font-black text-white italic uppercase tracking-tighter border-l-4 border-[#FF3366] pl-4 mb-2 drop-shadow-xl">
-              {data.ritualTag}
-            </div>
-            <div className="text-[10px] font-mono text-white uppercase tracking-widest italic opacity-80">
-              Signal Verified
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-2 mb-10">
-          <h3 className="text-6xl font-black tracking-tighter leading-[0.8] uppercase italic transition-all duration-700 text-black">
-            {data.title.split(' ')[0]}
-          </h3>
-          <h3 className="text-4xl font-black tracking-tighter leading-[0.8] uppercase italic opacity-20 group-hover:opacity-100 transition-opacity text-[#00F5FF]">
-            {data.title.split(' ')[1] || 'DROP'}
-          </h3>
-        </div>
-
-        <div className="flex justify-between items-end border-t border-black/10 pt-8 -mx-6 -mb-6 p-6 bg-black/[0.03]">
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] font-mono text-black/40 uppercase tracking-widest italic font-bold">
-              Source
-            </span>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden shadow-sm grayscale group-hover:grayscale-0 transition-all">
-                <img
-                  src={`https://i.pravatar.cc/100?u=${data.creator.split(' ')[0]}`}
-                  alt="creator"
-                />
-              </div>
-              <span className="text-[16px] font-black text-black/80">
-                {data.creator}
-              </span>
-            </div>
-          </div>
-          <div className="bg-black text-white px-6 py-4 rotate-[-1deg] shadow-2xl">
-            <div className="text-[10px] font-mono font-black uppercase leading-none opacity-50 mb-1">
-              Value Floor
-            </div>
-            <div className="text-3xl font-black italic tracking-tighter shadow-sm">
-              ${data.price}
-            </div>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-// --- 06. SCENE EXECUTION MODAL ---
-const Modal = ({
-  isOpen,
-  onClose,
-  data,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  data: MomentData;
-}) => {
-  const [activeTab, setActiveTab] = useState('match');
-  const [suggestion, setSuggestion] = useState({ place: '', reason: '' });
-
-  if (!isOpen) return null;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl"
-    >
-      <motion.div
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="relative w-full max-w-4xl bg-[#111111] border border-white/10 shadow-[0_0_200px_rgba(0,245,255,0.2)] p-12 md:p-24 overflow-y-auto max-h-[95vh] custom-scrollbar rounded-sm"
-      >
-        <button
-          onClick={onClose}
-          className="absolute top-10 right-10 text-zinc-700 hover:text-[#00F5FF] transition-colors z-50"
-        >
-          <X size={40} />
-        </button>
-
-        <div className="space-y-20">
-          <header className="space-y-8 text-center">
-            <div className="flex items-center justify-center gap-4 text-[#00F5FF] font-mono text-[14px] font-black uppercase tracking-[1.5em] italic">
-              <Fingerprint size={22} /> Signal_v0.0.5
-            </div>
-            <h2 className="text-8xl md:text-[140px] font-black italic uppercase tracking-tighter leading-[0.6] text-[#F0EEE9] drop-shadow-xl">
-              {data?.title}
-            </h2>
-          </header>
-
-          <p className="text-4xl md:text-7xl text-white font-black leading-[0.85] uppercase italic tracking-tighter text-center">
-            Floor is Fixed. <br />{' '}
-            <span className="text-[#FF3366] shadow-glow-white">
-              Upgrade the Move.
-            </span>
-          </p>
-
-          <div className="grid grid-cols-2 gap-6 bg-white/5 p-2 rounded-sm border border-white/5">
-            <button
-              onClick={() => setActiveTab('match')}
-              className={`py-10 text-[18px] font-black uppercase tracking-[0.4em] flex items-center justify-center gap-4 transition-all ${activeTab === 'match' ? 'bg-[#F0EEE9] text-black shadow-3xl' : 'text-zinc-600 hover:text-white'}`}
-            >
-              Match
-            </button>
-            <button
-              onClick={() => setActiveTab('upgrade')}
-              className={`py-10 text-[18px] font-black uppercase tracking-[0.4em] flex items-center justify-center gap-4 transition-all relative overflow-hidden ${activeTab === 'upgrade' ? 'text-black' : 'text-zinc-600 hover:text-white'}`}
-            >
-              {activeTab === 'upgrade' && (
-                <motion.div
-                  layoutId="rit"
-                  className="absolute inset-0 bg-[#00F5FF]"
-                />
-              )}
-              <span className="relative z-10 flex items-center gap-4 text-shadow-glow">
-                Upgrade <Zap size={24} fill="currentColor" />
-              </span>
-            </button>
-          </div>
-
-          <div className="space-y-16">
-            {activeTab === 'match' ? (
-              <div className="p-16 bg-zinc-900 border-l-[12px] border-[#FF3366] shadow-inner space-y-10 rounded-sm">
-                <div className="text-[14px] font-mono text-[#FF3366] font-black uppercase tracking-[1em] italic">
-                  Integrity confirmed
-                </div>
-                <div className="text-8xl font-black italic uppercase tracking-tighter text-white">
-                  ${data?.price} • {data?.location}
-                </div>
-                <p className="text-zinc-500 font-mono text-[12px] font-bold uppercase tracking-widest italic underline underline-offset-4">
-                  Match the creator's floor value.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-12 animate-in slide-in-from-right-10 duration-700">
-                <div className="flex justify-between items-center border-b border-white/5 pb-8">
-                  <div className="text-[14px] font-mono text-zinc-500 font-black uppercase tracking-[1.2em]">
-                    Execution Request
-                  </div>
-                  <div className="text-[#FF3366] font-black text-[16px] uppercase tracking-widest flex items-center gap-4 italic">
-                    <Lock size={20} /> Price Locked: ${data?.price}
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                  <div className="space-y-6">
-                    <label className="text-[12px] font-mono text-zinc-600 font-black uppercase tracking-widest italic">
-                      New Peak Venue
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Drop the name..."
-                      className="w-full bg-transparent border-b-2 border-white/10 py-6 text-4xl font-black italic uppercase focus:border-[#00F5FF] focus:outline-none text-white placeholder:text-zinc-900"
-                      value={suggestion.place}
-                      onChange={(e) =>
-                        setSuggestion({ ...suggestion, place: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div className="space-y-6">
-                    <label className="text-[12px] font-mono text-zinc-600 font-black uppercase tracking-widest italic">
-                      Reasoning
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Why is this better?"
-                      className="w-full bg-transparent border-b-2 border-white/10 py-6 text-4xl font-black italic uppercase focus:border-[#00F5FF] focus:outline-none text-white placeholder:text-zinc-900"
-                      value={suggestion.reason}
-                      onChange={(e) =>
-                        setSuggestion({ ...suggestion, reason: e.target.value })
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-            <button className="w-full bg-[#F0EEE9] text-black py-18 font-black uppercase tracking-[1.5em] hover:bg-[#FF3366] hover:text-white transition-all text-5xl active:scale-95 shadow-[0_40px_120px_rgba(255,51,102,0.3)] flex items-center justify-center gap-12 group rounded-sm">
-              {activeTab === 'upgrade' ? 'ACTIVATE' : 'SEND'}{' '}
-              <ArrowRight
-                size={64}
-                className="group-hover:translate-x-12 transition-transform"
-              />
-            </button>
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-};
-
-// --- 07. MANIFESTO TEXTS ---
-const ManifestoSection = () => (
-  <section className="py-80 px-10 relative z-10 space-y-40">
-    <div className="max-w-4xl space-y-12">
-      <h4 className="text-[#00F5FF] font-mono text-sm uppercase tracking-[1em] font-bold italic border-l-4 border-[#00F5FF] pl-8">
-        The_Logic
-      </h4>
-      <p className="text-5xl md:text-8xl font-black italic tracking-tighter text-[#F0EEE9] leading-[0.75] lowercase">
-        Most platforms sell destinations. <br /> Lovendo sells attraction.{' '}
-        <br /> We believe closeness starts with deeds.
-      </p>
-    </div>
-    <div className="max-w-4xl ml-auto text-right space-y-12">
-      <h4 className="text-[#FF3366] font-mono text-sm uppercase tracking-[1em] font-bold italic border-r-4 border-[#FF3366] pr-8">
-        The_Level_Protocol
-      </h4>
-      <p className="text-5xl md:text-8xl font-black italic tracking-tighter text-zinc-600 leading-[0.75] lowercase">
-        A Moment sets the floor. <br /> Offers can only match or upgrade. <br />{' '}
-        No downgrades. No ghosting.
-      </p>
-    </div>
-  </section>
+const NoiseOverlay = () => (
+  <div
+    className="fixed inset-0 z-[5] pointer-events-none opacity-20 mix-blend-overlay"
+    style={{
+      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E")`,
+      transform: 'translateZ(0)',
+    }}
+  />
 );
 
-// --- 08. MAIN APP ---
-export default function App() {
-  const [selectedMoment, setSelectedMoment] = useState<MomentData | null>(null);
-  const [email, setEmail] = useState('');
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const { scrollYProgress } = useScroll();
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0.1]);
+/**
+ * --- SARCASTIC MELTED CURSOR ---
+ * Eriyen neon kalp şeklinde özel cursor
+ */
+const MeltedCursor = () => {
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
 
-  const moments: MomentData[] = [
-    {
-      title: '3AM LEATHER',
-      location: 'Paris',
-      price: '2400',
-      creator: 'Lucas Van der Woodsen',
-      type: 'fashion',
-      ritualTag: 'Pure Desire. No Backups.',
-      image:
-        'https://images.unsplash.com/photo-1521223344201-d169129f7b7d?auto=format&fit=crop&q=80&w=800',
-    },
-    {
-      title: 'VINYL NIGHT',
-      location: 'Tokyo',
-      price: '180',
-      creator: 'Kenji Tanaka',
-      type: 'culture',
-      ritualTag: 'Analogue Love in Shibuya.',
-      image:
-        'https://images.unsplash.com/photo-1539375665275-f9ad415ef9ac?auto=format&fit=crop&q=80&w=800',
-    },
-    {
-      title: 'UNMARKED DOOR',
-      location: 'Istanbul',
-      price: '450',
-      creator: 'Elif Demirok',
-      type: 'food',
-      ritualTag: 'Secret Bosphorus Scene.',
-      image:
-        'https://images.unsplash.com/photo-1550966841-39148bc73021?auto=format&fit=crop&q=80&w=800',
-    },
-    {
-      title: 'KINETIC FLOW',
-      location: 'Berlin',
-      price: '95',
-      creator: 'Maximilian Schulz',
-      type: 'experience',
-      ritualTag: 'Industrial Signal.',
-      image:
-        'https://images.unsplash.com/photo-1514525253361-b996b5c57df4?auto=format&fit=crop&q=80&w=800',
-    },
-    {
-      title: 'CUSTOM SKIN',
-      location: 'Stockholm',
-      price: '520',
-      creator: 'Ebba Andersson',
-      type: 'accessory',
-      ritualTag: 'Limited Edge.',
-      image:
-        'https://images.unsplash.com/photo-1591076482161-42ce6da69f67?auto=format&fit=crop&q=80&w=800',
-    },
-    {
-      title: 'MANHATTAN PEAK',
-      location: 'NYC',
-      price: '750',
-      creator: 'Sarah J. Harrington',
-      type: 'experience',
-      ritualTag: 'High-Rise Flow.',
-      image:
-        'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&q=80&w=800',
-    },
-  ];
+  useEffect(() => {
+    const handleMove = (e: MouseEvent) =>
+      setMousePos({ x: e.clientX, y: e.clientY });
+    const handleHover = () => setIsHovered(true);
+    const handleUnhover = () => setIsHovered(false);
+
+    window.addEventListener('mousemove', handleMove);
+
+    const interactiveElements = document.querySelectorAll(
+      'button, a, input, textarea, .cursor-pointer, .hover-trigger',
+    );
+    interactiveElements.forEach((el) => {
+      el.addEventListener('mouseenter', handleHover);
+      el.addEventListener('mouseleave', handleUnhover);
+    });
+
+    return () => {
+      window.removeEventListener('mousemove', handleMove);
+      interactiveElements.forEach((el) => {
+        el.removeEventListener('mouseenter', handleHover);
+        el.removeEventListener('mouseleave', handleUnhover);
+      });
+    };
+  }, []);
 
   return (
-    <div className="min-h-screen bg-[#1A1A1B] text-white font-sans selection:bg-[#00F5FF] selection:text-black overflow-x-hidden">
-      <LovendoFluid />
+    <motion.div
+      className="fixed top-0 left-0 pointer-events-none z-[99999] hidden md:block"
+      animate={{
+        x: mousePos.x - 20,
+        y: mousePos.y - 20,
+        scale: isHovered ? 1.3 : 1,
+        rotate: isHovered ? 10 : 0,
+      }}
+      transition={{ type: 'spring', damping: 30, stiffness: 400, mass: 0.4 }}
+    >
+      <svg width="44" height="55" viewBox="0 0 40 50">
+        {/* Gift Box Body - Clean Rectangle */}
+        <rect x="5" y="22" width="30" height="24" fill="#39FF14" rx="2" />
 
-      <div
-        className="fixed inset-0 pointer-events-none z-[9998] opacity-[0.12] mix-blend-overlay"
-        style={{
-          backgroundImage:
-            "url('https://grainy-gradients.vercel.app/noise.svg')",
-        }}
-      />
+        {/* Gift Box Lid - Slightly wider */}
+        <rect x="3" y="16" width="34" height="8" fill="#39FF14" rx="2" />
 
-      <nav className="fixed top-0 left-0 w-full z-50 px-10 py-10 md:px-20 flex justify-between items-center mix-blend-difference">
-        <div className="text-8xl font-black tracking-tighter uppercase italic group cursor-pointer leading-none">
+        {/* Lid shadow line */}
+        <rect x="5" y="23" width="30" height="2" fill="#2BD910" />
+
+        {/* Ribbon - Vertical on box */}
+        <rect x="17" y="16" width="6" height="30" fill="#FF00FF" />
+
+        {/* Ribbon - Horizontal on lid */}
+        <rect x="3" y="18" width="34" height="5" fill="#FF00FF" />
+
+        {/* Bow - Left Loop */}
+        <ellipse cx="13" cy="12" rx="7" ry="6" fill="#FF00FF" />
+        <ellipse cx="13" cy="12" rx="4" ry="3" fill="#CC00CC" />
+
+        {/* Bow - Right Loop */}
+        <ellipse cx="27" cy="12" rx="7" ry="6" fill="#FF00FF" />
+        <ellipse cx="27" cy="12" rx="4" ry="3" fill="#CC00CC" />
+
+        {/* Bow - Center Knot */}
+        <ellipse cx="20" cy="14" rx="4" ry="5" fill="#FF00FF" />
+        <ellipse cx="20" cy="14" rx="2" ry="3" fill="#CC00CC" />
+
+        {/* Bow - Ribbon Tails */}
+        <path d="M16,18 Q14,22 12,26 Q14,24 16,22 Z" fill="#FF00FF" />
+        <path d="M24,18 Q26,22 28,26 Q26,24 24,22 Z" fill="#FF00FF" />
+
+        {/* Melted Drips - Bottom (slow & subtle) */}
+        <motion.ellipse
+          cx="10"
+          cy="46"
+          rx="2.5"
+          ry="3"
+          fill="#39FF14"
+          animate={{ cy: [46, 58], opacity: [1, 0], ry: [3, 6] }}
+          transition={{ repeat: Infinity, duration: 2.0, ease: 'easeIn' }}
+        />
+
+        <motion.ellipse
+          cx="20"
+          cy="46"
+          rx="3"
+          ry="4"
+          fill="#39FF14"
+          animate={{ cy: [46, 62], opacity: [1, 0], ry: [4, 8] }}
+          transition={{
+            repeat: Infinity,
+            duration: 2.2,
+            delay: 0.5,
+            ease: 'easeIn',
+          }}
+        />
+
+        <motion.ellipse
+          cx="30"
+          cy="46"
+          rx="2.5"
+          ry="3"
+          fill="#39FF14"
+          animate={{ cy: [46, 58], opacity: [1, 0], ry: [3, 6] }}
+          transition={{
+            repeat: Infinity,
+            duration: 2.0,
+            delay: 1.0,
+            ease: 'easeIn',
+          }}
+        />
+      </svg>
+    </motion.div>
+  );
+};
+
+/**
+ * --- ANIMATED TITLE ---
+ * Harflerin hover'da renk değiştirmesi (sarı-yeşil-mavi)
+ */
+const AnimatedTitle = ({ text }: { text: string }) => {
+  const colors = ['#FFFF00', '#39FF14', '#00FFFF', '#FF00FF', '#FF6B35'];
+
+  return (
+    <span className="inline">
+      {text.split('').map((char, index) => (
+        <motion.span
+          key={index}
+          className="inline-block cursor-default"
+          whileHover={{
+            color: colors[index % colors.length],
+            scale: 1.1,
+            textShadow: `0 0 20px ${colors[index % colors.length]}`,
+          }}
+          transition={{ duration: 0.1 }}
+          style={{
+            display: char === ' ' || char === '\n' ? 'inline' : 'inline-block',
+          }}
+        >
+          {char === '\n' ? <br /> : char === ' ' ? '\u00A0' : char}
+        </motion.span>
+      ))}
+    </span>
+  );
+};
+
+/**
+
+--- 3. MAIN APPLICATION ---
+*/
+export default function App() {
+  const [lang, setLang] = useState<Language>('EN');
+  const [selected, setSelected] = useState<any>(null);
+  const [view, setView] = useState('home');
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showGiftSuccess, setShowGiftSuccess] = useState(false);
+  const [showAltSuccess, setShowAltSuccess] = useState(false);
+  const [igHandle, setIgHandle] = useState('');
+
+  // Alternative Suggestion State
+  const [showAltForm, setShowAltForm] = useState(false);
+  const [altInput, setAltInput] = useState('');
+
+  const t = TRANSLATIONS[lang];
+
+  const handleApply = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!igHandle) return;
+    setShowSuccess(true);
+  };
+
+  const handleAltSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setShowAltForm(false);
+    setShowAltSuccess(true);
+  };
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0a] text-white font-['Archivo_Black',sans-serif] selection:bg-[#FF00FF] selection:text-white overflow-x-hidden relative cursor-none md:cursor-none">
+      <MeltedCursor />
+      <NoiseOverlay />
+      <PulseEngine />
+
+      {/* NAVBAR */}
+      <nav className="fixed top-0 w-full z-[1000] p-4 md:p-8 flex justify-between items-center bg-[#0a0a0a]/80 backdrop-blur-md border-b border-zinc-900">
+        <motion.div
+          className="text-3xl md:text-4xl font-black italic tracking-tighter cursor-pointer group"
+          onClick={() => setView('home')}
+          whileHover={{ scale: 1.1 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+        >
           LVND
-          <span className="text-[#FF3366] group-hover:text-[#00F5FF] transition-all">
+          <span className="text-[#FF00FF] group-hover:animate-ping inline-block">
             .
           </span>
-        </div>
-        <div className="text-[12px] font-mono font-black tracking-[1em] text-zinc-600 uppercase border-b border-[#00F5FF]/20 pb-1 hidden lg:block">
-          System_v0.0.5_Protocol
+        </motion.div>
+        <div className="flex items-center gap-4 md:gap-6">
+          {/* LIQUID LANG TOGGLE */}
+          <div
+            onClick={() => setLang(lang === 'EN' ? 'TR' : 'EN')}
+            className="relative cursor-pointer w-20 h-8 border-2 border-zinc-800 bg-black flex items-center px-0 overflow-hidden hover:border-[#00FFFF] transition-colors group"
+          >
+            <motion.div
+              className="absolute top-0 bottom-0 w-1/2 bg-[#00FFFF] shadow-[0_0_10px_#00FFFF] mix-blend-difference"
+              animate={{ x: lang === 'EN' ? 0 : '100%' }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            />
+            <div className="relative z-10 w-full flex justify-between px-2 pointer-events-none">
+              <span
+                className={`text-[10px] font-black transition-all duration-300 ${lang === 'EN' ? 'text-black scale-110' : 'text-zinc-600'}`}
+              >
+                EN
+              </span>
+              <span
+                className={`text-[10px] font-black transition-all duration-300 ${lang === 'TR' ? 'text-black scale-110' : 'text-zinc-600'}`}
+              >
+                TR
+              </span>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setView('creator')}
+            className="bg-[#39FF14] text-black px-4 md:px-6 py-2 text-[10px] md:text-xs font-black uppercase hover:scale-105 active:scale-95 transition-all shadow-[4px_4px_0px_0px_#FF00FF]"
+          >
+            {t.nav_creator}
+          </button>
         </div>
       </nav>
 
-      {/* HERO */}
-      <motion.section
-        style={{ opacity: heroOpacity }}
-        className="relative min-h-screen flex flex-col items-center justify-center px-10 pt-32 z-10"
-      >
-        <div className="max-w-[1600px] w-full text-center space-y-48">
-          <div className="flex flex-col items-center gap-16">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex items-center gap-8 text-[18px] font-mono font-black uppercase tracking-[2.5em] text-zinc-800 italic"
+      <AnimatePresence mode="wait">
+        {view === 'home' && (
+          <motion.div
+            key="home"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <header className="relative z-10 pt-40 md:pt-48 pb-20 px-6 max-w-7xl mx-auto text-center">
+              <h1 className="text-[14vw] sm:text-[12vw] font-black uppercase leading-[0.8] tracking-tighter italic mb-12 whitespace-pre-wrap">
+                <AnimatedTitle text={t.hero_title} />
+              </h1>
+              <p className="text-[#00FFFF] font-black text-lg md:text-xl uppercase mb-12 tracking-wide">
+                {t.hero_sub}
+              </p>
+
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-4 md:gap-8 max-w-lg mx-auto sm:max-w-none">
+                <StoreBadge
+                  platform="App Store"
+                  punchline={
+                    lang === 'EN'
+                      ? 'Waiting on Tim’s ego.'
+                      : 'Tim’in egosunu bekliyoruz.'
+                  }
+                  type="apple"
+                  color="pink"
+                  ribbonPos="left"
+                />
+                <StoreBadge
+                  platform="Google Play"
+                  punchline={
+                    lang === 'EN'
+                      ? 'Stop asking, it’s coming.'
+                      : 'Sormayı bırak, geliyor.'
+                  }
+                  type="google"
+                  color="cyan"
+                  ribbonPos="right"
+                />
+              </div>
+            </header>
+
+            {/* City Ticker - Full Width */}
+            <div className="w-full bg-[#F0EEE9] py-6 border-y-[6px] border-black overflow-hidden flex whitespace-nowrap z-10 relative my-20 md:my-32">
+              <div className="animate-marquee-slow inline-block text-black font-black uppercase italic text-2xl md:text-4xl tracking-tighter">
+                {lang === 'EN'
+                  ? 'ISTANBUL 🕌 • PARIS 🗼 • TOKYO 🍣 • NEW YORK 🗽 • LONDON 🎡 • BERLIN 🥨 • ROME 🍕 • RIO 🏖️ • SYDNEY 🐨 • CAIRO 🗿 • AMSTERDAM 🚲 • SEOUL 🥢 • MEXICO CITY 🌮 • BARCELONA ⚽ • DUBAI 🏗️ • SINGAPORE 🦁 • BANGKOK 🛺 • ATHENS 🏛️ • CAPE TOWN 🏔️ • TORONTO 🍁 •'
+                  : 'İSTANBUL 🕌 • PARİS 🗼 • TOKYO 🍣 • NEW YORK 🗽 • LONDRA 🎡 • BERLİN 🥨 • ROMA 🍕 • RİO 🏖️ • SİDNEY 🐨 • KAHİRE 🗿 • AMSTERDAM 🚲 • SEUL 🥢 • MEKSİKO 🌮 • BARSELONA ⚽ • DUBAİ 🏗️ • SİNGAPUR 🦁 • BANGKOK 🛺 • ATİNA 🏛️ • CAPE TOWN 🏔️ • TORONTO 🍁 •'}
+                &nbsp;
+              </div>
+              <div className="animate-marquee-slow inline-block text-black font-black uppercase italic text-2xl md:text-4xl tracking-tighter">
+                {lang === 'EN'
+                  ? 'ISTANBUL 🕌 • PARIS 🗼 • TOKYO 🍣 • NEW YORK 🗽 • LONDON 🎡 • BERLIN 🥨 • ROME 🍕 • RIO 🏖️ • SYDNEY 🐨 • CAIRO 🗿 • AMSTERDAM 🚲 • SEOUL 🥢 • MEXICO CITY 🌮 • BARCELONA ⚽ • DUBAI 🏗️ • SINGAPORE 🦁 • BANGKOK 🛺 • ATHENS 🏛️ • CAPE TOWN 🏔️ • TORONTO 🍁 •'
+                  : 'İSTANBUL 🕌 • PARİS 🗼 • TOKYO 🍣 • NEW YORK 🗽 • LONDRA 🎡 • BERLİN 🥨 • ROMA 🍕 • RİO 🏖️ • SİDNEY 🐨 • KAHİRE 🗿 • AMSTERDAM 🚲 • SEUL 🥢 • MEKSİKO 🌮 • BARSELONA ⚽ • DUBAİ 🏗️ • SİNGAPUR 🦁 • BANGKOK 🛺 • ATİNA 🏛️ • CAPE TOWN 🏔️ • TORONTO 🍁 •'}
+                &nbsp;
+              </div>
+            </div>
+
+            <section
+              id="manifesto"
+              className="relative z-10 py-32 bg-zinc-950/90 border-y-4 border-black"
             >
-              <Activity size={32} className="text-[#FF3366] animate-pulse" />{' '}
-              Stop matching. Start executing.
-            </motion.div>
-            <h1 className="text-[140px] md:text-[520px] font-black tracking-tighter leading-[0.4] uppercase italic select-none text-[#F0EEE9] drop-shadow-2xl">
-              Love <br />{' '}
-              <span
-                className="border-text text-transparent"
-                style={{ WebkitTextStroke: '4px rgba(255,255,255,0.06)' }}
-              >
-                & Do
-              </span>
-            </h1>
-          </div>
-          <div className="text-zinc-600 font-mono text-[16px] uppercase tracking-[2.5em] opacity-40 italic">
-            Signals are Lust. Deeds are Ritual.
-          </div>
-        </div>
-      </motion.section>
-
-      <GlobalCitiesBand />
-
-      <ManifestoSection />
-
-      {/* FEED */}
-      <section className="py-20 px-10 relative z-10">
-        <div className="max-w-[1800px] mx-auto">
-          <div className="mb-80 flex flex-col md:flex-row justify-between items-end gap-20 border-b border-white/5 pb-40">
-            <div className="space-y-16 text-left">
-              <div className="flex items-center gap-10 text-[24px] font-mono font-black text-[#FF3366] uppercase tracking-[3em] italic">
-                The_Archive
+              <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <h2 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter text-[#FF00FF] leading-none">
+                  {t.manifesto_title}
+                </h2>
+                <motion.p
+                  className="text-xl md:text-3xl font-black uppercase leading-tight italic text-zinc-400 border-l-8 border-[#00FFFF] pl-8 cursor-default"
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                >
+                  {t.manifesto_txt}
+                </motion.p>
               </div>
-              <h2 className="text-[20vw] font-black italic uppercase leading-[0.5] tracking-tighter opacity-10 select-none text-[#F0EEE9]">
-                Latest_Drops
-              </h2>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-32">
-            {moments.map((moment, i) => (
-              <MomentCard
-                key={i}
-                index={i}
-                data={moment}
-                onClick={(data) => setSelectedMoment(data)}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
+            </section>
 
-      {/* ACCESS & APPS SECTION */}
-      <section className="py-80 px-12 bg-black relative z-10 border-t border-[#FF3366]/20">
-        <div className="max-w-[1600px] mx-auto space-y-60">
-          <div className="max-w-6xl mx-auto text-center space-y-32">
-            <div className="space-y-20">
-              <div className="flex items-center justify-center gap-10 text-[#00F5FF] font-mono text-[16px] uppercase tracking-[2.5em] italic font-bold">
-                <ShieldAlert size={32} /> Access_The_Field
+            <main
+              id="moments"
+              className="relative z-10 max-w-7xl mx-auto px-6 py-20 md:py-40"
+            >
+              {/* Sarcastic Header for Moments */}
+              <div className="text-center mb-24 space-y-6">
+                <h2 className="text-5xl md:text-9xl font-black uppercase italic tracking-tighter text-white hover:text-[#39FF14] transition-colors cursor-default leading-[0.8]">
+                  {t.moments_title}.
+                </h2>
+                <p className="text-[#00FFFF] text-lg md:text-2xl font-black uppercase tracking-[0.5em] bg-black inline-block px-6 py-2 border-2 border-[#00FFFF] transform -rotate-1 hover:rotate-1 transition-transform">
+                  {t.moments_sub}
+                </p>
               </div>
-              <h2 className="text-8xl md:text-[16vw] font-black italic uppercase tracking-tighter leading-[0.7] text-[#F0EEE9]">
-                ACCESS <br /> THE FIELD.
-              </h2>
-              <div className="text-zinc-700 font-mono text-xl uppercase tracking-[1.5em] max-w-3xl mx-auto italic">
-                Not for the casuals. Join the elite ritual of closeness.
-              </div>
-            </div>
 
-            <div className="flex flex-col md:flex-row gap-0 max-w-6xl mx-auto border-[6px] border-[#F0EEE9]/10 bg-zinc-950 p-3 group hover:border-[#00F5FF]/40 transition-all duration-1000 shadow-3xl">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="ENTER SIGNAL ID..."
-                className="flex-1 bg-transparent px-12 py-14 text-6xl font-black uppercase tracking-tighter focus:outline-none placeholder:text-zinc-900 italic text-[#00F5FF]"
-              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
+                {MOMENTS.map((m) => (
+                  <motion.div
+                    key={m.id}
+                    whileHover={{ y: -15, rotate: 1 }}
+                    onClick={() => setSelected(m)}
+                    className="relative aspect-[9/16] bg-zinc-900 border-[6px] border-black shadow-[10px_10px_0px_0px_#FF00FF] md:shadow-[15px_15px_0px_0px_#FF00FF] cursor-pointer overflow-hidden group"
+                  >
+                    <Image
+                      src={m.image}
+                      alt={m.title[lang]}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                    />
+
+                    {/* Kart Üzerindeki Fiyat Rozeti */}
+                    <div className="absolute top-6 right-6 bg-[#39FF14] text-black px-3 py-1 text-lg font-black italic border-2 border-black z-20">
+                      ${m.price}
+                    </div>
+
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80 group-hover:opacity-40 transition-opacity" />
+                    <div className="absolute top-6 left-6 bg-white text-black px-3 py-1 text-[10px] font-black uppercase tracking-widest">
+                      {m.location}
+                    </div>
+                    <div className="absolute bottom-8 left-8 right-8 flex flex-col gap-4">
+                      <div className="text-[10px] font-black text-[#FF00FF] uppercase mb-[-12px]">
+                        {m.creator}
+                      </div>
+                      <h3 className="text-3xl md:text-4xl font-black uppercase italic leading-[0.85] text-white">
+                        {m.title[lang]}
+                      </h3>
+                      <div className="bg-[#00FFFF] text-black text-center py-4 text-[10px] font-black uppercase group-hover:bg-white transition-colors">
+                        {t.unlock}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </main>
+
+            <section className="relative z-10 py-32 px-6">
+              <div className="max-w-5xl mx-auto bg-[#FF00FF] p-1 border-[6px] md:border-[12px] border-black shadow-[15px_15px_0px_0px_#00FFFF] md:shadow-[30px_30px_0px_0px_#00FFFF]">
+                <div className="bg-[#0a0a0a] p-8 md:p-20 text-center space-y-12 border-4 border-black">
+                  <h2 className="text-5xl md:text-8xl font-black uppercase italic leading-none tracking-tighter text-white">
+                    {t.creator_cta_title}
+                  </h2>
+                  <p className="text-[#00FFFF] text-sm md:text-xl font-black uppercase tracking-[0.2em]">
+                    {t.creator_cta_sub}
+                  </p>
+                  <button
+                    onClick={() => setView('creator')}
+                    className="w-full md:w-auto bg-[#39FF14] text-black px-10 md:px-16 py-6 md:py-8 text-2xl md:text-4xl font-black uppercase italic hover:scale-105 active:scale-95 transition-transform"
+                  >
+                    {t.creator_cta_btn}
+                  </button>
+                </div>
+              </div>
+            </section>
+            {/* --- FOOTER --- */}
+            <footer className="relative z-10 bg-zinc-950 border-t-[8px] border-black pt-20 overflow-hidden">
+              {/* Manifesto Ticker */}
+              <div className="w-full bg-[#FF00FF] py-4 border-y-4 border-black overflow-hidden flex whitespace-nowrap">
+                <div className="animate-marquee inline-block text-black font-black uppercase italic text-sm md:text-xl tracking-tighter">
+                  NO DIGITAL ROT • THE TALKING STAGE IS A SCAM • GO TOUCH GRASS
+                  • SYNC YOUR BIOLOGY • YAP LESS DO MORE • NOT YOUR AVERAGE
+                  DELULU • PHYSICAL REALITY ONLY • SHOW UP OR LOG OFF • NO
+                  GHOSTS ALLOWED •&nbsp;
+                </div>
+                <div className="animate-marquee inline-block text-black font-black uppercase italic text-sm md:text-xl tracking-tighter">
+                  NO DIGITAL ROT • THE TALKING STAGE IS A SCAM • GO TOUCH GRASS
+                  • SYNC YOUR BIOLOGY • YAP LESS DO MORE • NOT YOUR AVERAGE
+                  DELULU • PHYSICAL REALITY ONLY • SHOW UP OR LOG OFF • NO
+                  GHOSTS ALLOWED •&nbsp;
+                </div>
+              </div>
+
+              <div className="max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 md:grid-cols-4 gap-16 relative">
+                <div className="col-span-1 md:col-span-2 space-y-8">
+                  <div className="text-7xl font-black italic tracking-tighter text-white opacity-20">
+                    LVND.
+                  </div>
+                  <p className="text-2xl font-black uppercase italic leading-none text-[#00FFFF]">
+                    {t.footer_tag}
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                  <motion.h4
+                    className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.3em] cursor-default inline-block"
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                  >
+                    SYSTEM
+                  </motion.h4>
+                  <div className="flex flex-col gap-6 font-black uppercase text-sm italic">
+                    <button
+                      onClick={() =>
+                        document
+                          .getElementById('manifesto')
+                          ?.scrollIntoView({ behavior: 'smooth' })
+                      }
+                      className="text-left hover:text-[#FF00FF] transition-colors"
+                    >
+                      Manifesto
+                    </button>
+                    <button
+                      onClick={() => setView('creator')}
+                      className="text-left hover:text-[#39FF14] transition-colors"
+                    >
+                      Creators
+                    </button>
+                    <button
+                      onClick={() =>
+                        document
+                          .getElementById('moments')
+                          ?.scrollIntoView({ behavior: 'smooth' })
+                      }
+                      className="text-left hover:text-[#00FFFF] transition-colors"
+                    >
+                      Moments
+                    </button>
+                    <a
+                      href="#"
+                      className="text-left hover:text-white transition-colors"
+                    >
+                      Terms
+                    </a>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <motion.h4
+                    className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.3em] cursor-default inline-block"
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                  >
+                    SOCIALS
+                  </motion.h4>
+                  <div className="flex flex-col gap-3 font-black uppercase text-sm italic">
+                    <a
+                      href="#"
+                      className="flex items-center gap-2 hover:text-[#FF00FF] transition-colors"
+                    >
+                      <Instagram size={16} /> Instagram
+                    </a>
+                    <a
+                      href="#"
+                      className="flex items-center gap-2 hover:text-[#00FFFF] transition-colors"
+                    >
+                      <Twitter size={16} /> X / The platform formerly known as
+                      Twitter
+                    </a>
+                    <a
+                      href="#"
+                      className="flex items-center gap-2 hover:text-white transition-colors"
+                    >
+                      {t.nav_void}
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div className="max-w-7xl mx-auto px-6 pb-8 flex flex-col md:flex-row justify-between items-center border-t border-zinc-900 pt-8 gap-4 text-[10px] font-black text-zinc-600">
+                <div>© 2026 {t.footer_rights}</div>
+                <div className="flex gap-8 uppercase tracking-widest">
+                  <span>{t.version}</span>
+                </div>
+              </div>
+            </footer>
+          </motion.div>
+        )}
+
+        {view === 'creator' && (
+          <motion.div
+            key="creator"
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="min-h-screen pt-40 pb-20 px-6 max-w-3xl mx-auto relative z-20"
+          >
+            <h2 className="text-5xl md:text-8xl font-black uppercase italic tracking-tighter text-[#39FF14] leading-none mb-12 underline decoration-white">
+              {t.form_header}
+            </h2>
+            <form onSubmit={handleApply} className="space-y-12">
+              <div className="border-b-4 border-zinc-800 pb-4 flex items-center gap-6 group focus-within:border-[#FF00FF] transition-colors">
+                <Instagram className="text-[#FF00FF] group-focus-within:animate-pulse" />
+                <input
+                  type="text"
+                  required
+                  value={igHandle}
+                  onChange={(e) => setIgHandle(e.target.value)}
+                  placeholder={t.form_ig}
+                  className="bg-transparent w-full text-2xl md:text-3xl font-black uppercase outline-none placeholder:text-zinc-500 placeholder:opacity-100"
+                />
+              </div>
+              <div className="border-b-4 border-zinc-800 pb-4 flex items-start gap-6 group focus-within:border-[#00FFFF] transition-colors">
+                <MessageSquare className="text-[#00FFFF] mt-2" />
+                <textarea
+                  placeholder={t.form_story}
+                  className="bg-transparent w-full text-lg md:text-xl font-bold uppercase outline-none h-40 resize-none placeholder:text-zinc-500 placeholder:opacity-100"
+                />
+              </div>
               <button
-                onClick={() => {
-                  if (email) setIsSubmitted(true);
-                }}
-                className="bg-[#F0EEE9] text-black px-28 py-14 font-black uppercase tracking-[1em] hover:bg-[#FF3366] hover:text-white transition-all text-5xl active:scale-95"
+                type="submit"
+                className="w-full bg-[#FF00FF] text-white py-8 text-2xl md:text-4xl font-black uppercase italic hover:bg-[#39FF14] hover:text-black transition-all shadow-[10px_10px_0px_0px_#00FFFF] md:shadow-[15px_15px_0px_0px_#FF00FF]"
               >
-                ENTER
+                {t.submit}
               </button>
-            </div>
-            {isSubmitted && (
-              <div className="text-[#00F5FF] text-[20px] font-black uppercase tracking-[3em] animate-pulse">
-                Identity_Stored. 👀
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-40">
-            <div className="flex flex-col items-center gap-12 text-center">
-              <div className="text-zinc-800 font-mono text-[16px] uppercase tracking-[2.5em] font-bold">
-                The_App_Protocol
-              </div>
-              <div className="bg-[#FF3366]/10 text-[#FF3366] px-10 py-6 text-[14px] font-black uppercase tracking-[0.5em] rounded-sm border-2 border-[#FF3366]/40 hover:bg-[#FF3366] hover:text-white transition-all cursor-help">
-                <Ghost size={24} className="inline mr-4" /> Uninstall Tinder
-                first. This is for real life.
-              </div>
-            </div>
-
-            <div className="flex flex-wrap justify-center gap-24 grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-1000">
-              <div className="flex items-center gap-10 border-4 border-white/5 bg-zinc-900 px-20 py-14 rounded-sm cursor-not-allowed relative overflow-hidden group">
-                <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <Smartphone size={64} />
-                <div className="text-left font-black uppercase leading-none text-4xl">
-                  App Store
-                  <br />
-                  <span className="text-[16px] text-[#FF3366] font-mono tracking-widest italic mt-4 inline-block underline underline-offset-4">
-                    SOON_BETA
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center gap-10 border-4 border-white/5 bg-zinc-900 px-20 py-14 rounded-sm cursor-not-allowed relative overflow-hidden group">
-                <div className="absolute inset-0 bg-[#00F5FF]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <Cpu size={64} />
-                <div className="text-left font-black uppercase leading-none text-4xl">
-                  Google Play
-                  <br />
-                  <span className="text-[16px] text-[#00F5FF] font-mono tracking-widest italic mt-4 inline-block underline underline-offset-4">
-                    SOON_DLC
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col md:flex-row justify-between items-end gap-32 pt-60 border-t border-white/5">
-            <div className="text-[25vw] font-black tracking-tighter uppercase italic text-zinc-900 leading-none select-none pointer-events-none text-shadow-glow-cyan opacity-40">
-              LVND.
-            </div>
-            <div className="flex flex-wrap gap-24 text-zinc-800 font-black text-7xl italic uppercase tracking-tighter">
-              <a
-                href="#"
-                className="hover:text-[#FF3366] transition-all hover:tracking-[0.15em] border-b-4 border-transparent hover:border-[#FF3366]"
+              <button
+                type="button"
+                onClick={() => setView('home')}
+                className="w-full text-zinc-600 font-black uppercase italic pt-6 hover:text-white transition-colors"
               >
-                IG
-              </a>
-              <a
-                href="#"
-                className="hover:text-[#00F5FF] transition-all hover:tracking-[0.15em] border-b-4 border-transparent hover:border-[#00F5FF]"
-              >
-                TK
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <AnimatePresence>
-        {selectedMoment && (
-          <Modal
-            isOpen={!!selectedMoment}
-            onClose={() => setSelectedMoment(null)}
-            data={selectedMoment}
-          />
+                {t.gift_success_btn}
+              </button>
+            </form>
+          </motion.div>
         )}
       </AnimatePresence>
-      <LovendoCursor />
 
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&display=swap');
-        body { font-family: 'Space Grotesk', sans-serif; background-color: #1A1A1B; color: white; cursor: none; overflow-x: hidden; }
-        .border-text { -webkit-text-fill-color: transparent; -webkit-text-stroke: 3px rgba(255,255,255,0.08); }
-        .text-shadow-glow { text-shadow: 0 0 40px rgba(0, 245, 255, 0.3); }
-        .shadow-glow-white { box-shadow: 0 40px 120px rgba(0, 0, 0, 0.2); }
-        .custom-scrollbar::-webkit-scrollbar { width: 3px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #000; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #00F5FF; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #1A1A1B; }
-        ::-webkit-scrollbar-thumb { background: #333; }
-        ::-webkit-scrollbar-thumb:hover { background: #FF3366; }
-        @media (max-width: 768px) { body { cursor: auto; } .border-text { -webkit-text-stroke: 1.5px rgba(255,255,255,0.1); } }
-      `}</style>
+      <AnimatePresence>
+        {showSuccess && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[3000] flex items-center justify-center bg-black/90 p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.5, rotate: 10 }}
+              animate={{ scale: 1, rotate: 0 }}
+              className="bg-[#39FF14] text-black p-8 md:p-12 max-w-2xl border-[6px] md:border-[10px] border-white shadow-[15px_15px_0px_0px_#FF00FF]"
+            >
+              <h2 className="text-5xl md:text-7xl font-black italic uppercase leading-none mb-6">
+                {t.success_title}
+              </h2>
+              <p className="text-lg md:text-2xl font-black uppercase mb-12 tracking-tight">
+                {t.success_msg}
+              </p>
+              <button
+                onClick={() => {
+                  setShowSuccess(false);
+                  setView('home');
+                }}
+                className="bg-black text-white px-10 py-4 font-black uppercase italic hover:bg-white hover:text-black transition-colors w-full sm:w-auto"
+              >
+                {lang === 'EN' ? 'UNDERSTOOD.' : 'ANLAŞILDI.'}
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showGiftSuccess && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[4000] flex items-center justify-center bg-black/95 p-4 backdrop-blur-xl"
+          >
+            <motion.div
+              initial={{ y: 100, scale: 0.9 }}
+              animate={{ y: 0, scale: 1 }}
+              className="bg-[#FF00FF] text-white p-8 md:p-16 max-w-3xl border-[10px] border-black shadow-[30px_30px_0px_0px_#39FF14] relative"
+            >
+              <button
+                onClick={() => setShowGiftSuccess(false)}
+                className="absolute top-4 right-4 bg-black text-white p-2 border-2 border-white"
+              >
+                <X size={24} />
+              </button>
+              <div className="space-y-8 text-center sm:text-left">
+                <div className="flex items-center gap-6 justify-center sm:justify-start">
+                  <Heart className="text-black fill-black" size={64} />
+                  <h2 className="text-5xl md:text-7xl font-black uppercase italic leading-[0.8]">
+                    {t.gift_success_title}
+                  </h2>
+                </div>
+                <div className="space-y-4 font-black uppercase italic text-lg md:text-2xl text-black">
+                  <p>{t.gift_success_msg_1}</p>
+                  <p>{t.gift_success_msg_2}</p>
+                  <p>{t.gift_success_msg_3}</p>
+                  <p className="bg-black text-[#39FF14] p-4 inline-block">
+                    {t.gift_success_highlight}
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowGiftSuccess(false);
+                    setSelected(null);
+                  }}
+                  className="w-full bg-white text-black py-6 text-2xl font-black uppercase hover:bg-black hover:text-white transition-all"
+                >
+                  {t.gift_success_btn}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showAltSuccess && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[4000] flex items-center justify-center bg-black/95 p-4 backdrop-blur-xl"
+          >
+            <motion.div
+              initial={{ scale: 0.8, rotate: -5 }}
+              animate={{ scale: 1, rotate: 0 }}
+              className="bg-[#00FFFF] text-black p-8 md:p-16 max-w-3xl border-[10px] border-white shadow-[30px_30px_0px_0px_#FF00FF] relative overflow-hidden"
+            >
+              <div className="absolute -right-10 -top-10 text-white opacity-20 rotate-12">
+                <Zap size={200} />
+              </div>
+              <div className="relative z-10 space-y-8">
+                <div className="flex items-center gap-6">
+                  <div className="bg-black p-4 rotate-12 shadow-[5px_5px_0px_0px_#FFF]">
+                    <Sparkles className="text-[#00FFFF]" size={48} />
+                  </div>
+                  <h2 className="text-5xl md:text-6xl font-black uppercase italic leading-none">
+                    {t.alt_success_title}
+                  </h2>
+                </div>
+                <div className="space-y-6 font-black uppercase italic text-lg md:text-2xl">
+                  <p className="bg-white px-2 inline-block">
+                    {t.alt_success_sub}
+                  </p>
+                  <p>{t.alt_success_msg}</p>
+                  <div className="flex items-center gap-3 text-sm tracking-widest bg-black text-white p-4">
+                    <Zap size={20} className="animate-pulse" />
+                    {t.alt_success_footer}
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowAltSuccess(false);
+                    setSelected(null);
+                  }}
+                  className="w-full bg-black text-white py-6 text-2xl font-black uppercase hover:bg-white hover:text-black transition-all shadow-[8px_8px_0px_0px_#FF00FF]"
+                >
+                  {t.alt_success_btn}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {selected && (
+          <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/98 p-4 backdrop-blur-3xl overflow-y-auto">
+            <motion.div
+              initial={{ scale: 0.9, y: 50 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 50 }}
+              className="bg-[#111] border-[4px] md:border-[8px] border-black max-w-[480px] w-full my-auto relative overflow-hidden flex flex-col shadow-[20px_20px_0px_0px_#FF00FF]"
+            >
+              <div className="w-full relative aspect-[4/5] border-b-[8px] border-black">
+                <div className="absolute top-6 left-6 z-30 bg-[#39FF14] border-2 border-black px-4 py-1">
+                  <span className="text-2xl font-black italic text-black tracking-tighter">
+                    ${selected.price}
+                  </span>
+                </div>
+                <button
+                  onClick={() => setSelected(null)}
+                  className="absolute top-6 right-6 z-50 bg-black p-2 border-2 border-zinc-800 hover:border-[#FF00FF] transition-all text-white"
+                >
+                  <X size={24} />
+                </button>
+                <Image
+                  src={selected.image}
+                  alt={selected.title[lang]}
+                  fill
+                  sizes="(max-width: 640px) 100vw, 480px"
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
+                <div className="absolute bottom-6 left-6 right-6">
+                  <div className="text-sm md:text-base font-black text-[#FF00FF] uppercase mb-0 tracking-widest drop-shadow-md">
+                    {selected.creator}
+                  </div>
+                  <h2 className="text-4xl md:text-5xl font-black uppercase italic leading-[0.85] text-white tracking-tighter drop-shadow-lg">
+                    {selected.title[lang]}
+                  </h2>
+                </div>
+              </div>
+
+              <div className="w-full p-8 md:p-10 bg-[#0a0a0a] flex flex-col gap-8">
+                <div className="flex justify-between items-center text-xs font-black uppercase text-zinc-600 border-b-2 border-zinc-900 pb-4">
+                  <span className="bg-zinc-900 px-3 py-1 rounded-sm">
+                    ID: {selected.id}
+                  </span>
+                  <span className="text-zinc-500">{selected.location}</span>
+                </div>
+
+                <div className="flex flex-col gap-4">
+                  {!showAltForm ? (
+                    <>
+                      <button
+                        onClick={() => setShowGiftSuccess(true)}
+                        className="w-full bg-[#FF00FF] text-white py-5 text-sm font-black uppercase hover:bg-white hover:text-black transition-all flex items-center justify-center gap-3 shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)]"
+                      >
+                        <Gift size={20} /> {t.gift}
+                      </button>
+                      <button
+                        onClick={() => setShowAltForm(true)}
+                        className="w-full bg-white text-black py-4 text-xs font-black uppercase hover:bg-[#00FFFF] transition-all border-2 border-transparent hover:border-black"
+                      >
+                        {t.alternative}
+                      </button>
+                      <div className="text-[10px] text-zinc-600 font-black uppercase italic text-center pt-2">
+                        {lang === 'EN' ? 'THE UPGRADE:' : 'LEVEL UP:'}{' '}
+                        {selected.altSuggestion}
+                      </div>
+                    </>
+                  ) : (
+                    <motion.form
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      onSubmit={handleAltSubmit}
+                      className="space-y-4 border-2 border-[#00FFFF] p-4 bg-black"
+                    >
+                      <div className="text-[10px] font-black text-[#00FFFF] uppercase mb-2 leading-tight">
+                        SAME VIBE, DIFFERENT PLACE? (MIN ${selected.price})
+                      </div>
+                      <textarea
+                        required
+                        value={altInput}
+                        onChange={(e) => setAltInput(e.target.value)}
+                        placeholder={`Suggest ${selected.title} alternative...`}
+                        className="bg-zinc-900 border border-zinc-800 w-full p-3 text-xs font-bold text-white outline-none focus:border-[#00FFFF] h-24 resize-none placeholder:text-zinc-600"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          type="submit"
+                          className="flex-1 bg-[#39FF14] text-black py-3 text-[10px] font-black uppercase hover:bg-white transition-all flex items-center justify-center gap-2"
+                        >
+                          <Send size={14} /> SEND
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowAltForm(false)}
+                          className="bg-zinc-800 text-white px-4 py-3 text-[10px] font-black uppercase hover:bg-red-600 transition-all"
+                        >
+                          CANCEL
+                        </button>
+                      </div>
+                    </motion.form>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

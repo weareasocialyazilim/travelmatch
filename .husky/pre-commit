@@ -19,3 +19,8 @@ if [ -n "$FILES_TO_CHECK" ]; then
   fi
 fi
 echo "✅ No console.log found in production code"
+
+# 🔐 Secret scanning - prevent accidental credential commits
+echo "🔐 Scanning for secrets..."
+./scripts/check-secrets.sh $(git diff --cached --name-only)
+echo "✅ No secrets detected"

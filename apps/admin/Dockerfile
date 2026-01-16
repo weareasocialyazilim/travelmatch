@@ -43,6 +43,8 @@ COPY packages/shared/tsconfig.json ./packages/shared/tsconfig.json
 COPY turbo.json ./
 COPY package.json ./
 COPY pnpm-workspace.yaml ./
+COPY pnpm-lock.yaml ./
+COPY tsconfig.json ./
 
 # Build with Turbo
 ENV VITE_TELEMETRY_DISABLED=1

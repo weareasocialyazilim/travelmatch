@@ -366,7 +366,7 @@ export function createNotificationWorker(connection: Redis) {
       }
     },
     {
-      connection,
+      connection: connection as any,
       concurrency: 20, // Process up to 20 notifications in parallel
       limiter: {
         max: 500, // Max 500 notifications per interval

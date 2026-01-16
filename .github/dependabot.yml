@@ -11,8 +11,6 @@ updates:
       day: 'monday'
       time: '09:00'
     open-pull-requests-limit: 10
-    reviewers:
-      - 'lovendo-dev-team'
     labels:
       - 'dependencies'
       - 'mobile'
@@ -25,22 +23,6 @@ updates:
         update-types: ['version-update:semver-major']
       - dependency-name: 'expo'
         update-types: ['version-update:semver-major']
-
-  # Web App (Next.js)
-  - package-ecosystem: 'npm'
-    directory: '/apps/web'
-    schedule:
-      interval: 'weekly'
-      day: 'monday'
-      time: '09:00'
-    open-pull-requests-limit: 10
-    reviewers:
-      - 'lovendo-dev-team'
-    labels:
-      - 'dependencies'
-      - 'web'
-    commit-message:
-      prefix: 'deps(web)'
 
   # Admin Dashboard
   - package-ecosystem: 'npm'
@@ -98,7 +80,7 @@ updates:
     directory: '/services/payment'
     schedule:
       interval: 'daily' # Critical service - daily updates
-    time: '09:00'
+      time: '09:00'
     open-pull-requests-limit: 5
     labels:
       - 'dependencies'

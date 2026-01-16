@@ -12,7 +12,7 @@ const supabase = createClient(
       autoRefreshToken: false,
       persistSession: false,
     },
-  }
+  },
 );
 
 /**
@@ -20,7 +20,7 @@ const supabase = createClient(
  */
 async function updateKycStatus(
   userId: string,
-  status: 'pending' | 'processing' | 'verified' | 'rejected' | 'failed'
+  status: 'pending' | 'processing' | 'verified' | 'rejected' | 'failed',
 ): Promise<void> {
   const { error } = await supabase
     .from('users')
@@ -45,23 +45,28 @@ async function verifyWithOnfido(data: KycJobData): Promise<KycJobResult> {
   }
 
   // 1. Create applicant
-  const applicantResponse = await fetch('https://api.onfido.com/v3/applicants', {
-    method: 'POST',
-    headers: {
-      Authorization: `Token token=${apiKey}`,
-      'Content-Type': 'application/json',
+  const applicantResponse = await fetch(
+    'https://api.onfido.com/v3/applicants',
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Token token=${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        first_name: 'User',
+        last_name: data.userId.slice(0, 8), // Use part of UUID as last name (temporary)
+      }),
     },
-    body: JSON.stringify({
-      first_name: 'User',
-      last_name: data.userId.slice(0, 8), // Use part of UUID as last name (temporary)
-    }),
-  });
+  );
 
   if (!applicantResponse.ok) {
-    throw new Error(`Onfido applicant creation failed: ${applicantResponse.statusText}`);
+    throw new Error(
+      `Onfido applicant creation failed: ${applicantResponse.statusText}`,
+    );
   }
 
-  const applicant = await applicantResponse.json() as { id: string };
+  const applicant = (await applicantResponse.json()) as { id: string };
 
   // 2. Upload document (front image)
   const documentFormData = new FormData();
@@ -80,10 +85,12 @@ async function verifyWithOnfido(data: KycJobData): Promise<KycJobResult> {
   });
 
   if (!documentResponse.ok) {
-    throw new Error(`Onfido document upload failed: ${documentResponse.statusText}`);
+    throw new Error(
+      `Onfido document upload failed: ${documentResponse.statusText}`,
+    );
   }
 
-  const document = await documentResponse.json() as { id: string };
+  const document = (await documentResponse.json()) as { id: string };
 
   // 3. Create check (document + identity verification)
   const checkResponse = await fetch('https://api.onfido.com/v3/checks', {
@@ -99,10 +106,12 @@ async function verifyWithOnfido(data: KycJobData): Promise<KycJobResult> {
   });
 
   if (!checkResponse.ok) {
-    throw new Error(`Onfido check creation failed: ${checkResponse.statusText}`);
+    throw new Error(
+      `Onfido check creation failed: ${checkResponse.statusText}`,
+    );
   }
 
-  const check = await checkResponse.json() as { id: string };
+  const check = (await checkResponse.json()) as { id: string };
 
   // 4. Poll for results (in production, use webhooks)
   let attempts = 0;
@@ -112,14 +121,19 @@ async function verifyWithOnfido(data: KycJobData): Promise<KycJobResult> {
   while (attempts < maxAttempts) {
     await new Promise((resolve) => setTimeout(resolve, 3000)); // Wait 3s
 
-    const resultResponse = await fetch(`https://api.onfido.com/v3/checks/${check.id}`, {
-      headers: {
-        Authorization: `Token token=${apiKey}`,
+    const resultResponse = await fetch(
+      `https://api.onfido.com/v3/checks/${check.id}`,
+      {
+        headers: {
+          Authorization: `Token token=${apiKey}`,
+        },
       },
-    });
+    );
 
     if (!resultResponse.ok) {
-      throw new Error(`Onfido check retrieval failed: ${resultResponse.statusText}`);
+      throw new Error(
+        `Onfido check retrieval failed: ${resultResponse.statusText}`,
+      );
     }
 
     checkResult = await resultResponse.json();
@@ -167,23 +181,31 @@ async function verifyWithStripe(data: KycJobData): Promise<KycJobResult> {
   }
 
   // 1. Create verification session
-  const sessionResponse = await fetch('https://api.stripe.com/v1/identity/verification_sessions', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
+  const sessionResponse = await fetch(
+    'https://api.stripe.com/v1/identity/verification_sessions',
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        type: 'document',
+        'options[document][allowed_types][]': data.documentType,
+      }),
     },
-    body: new URLSearchParams({
-      type: 'document',
-      'options[document][allowed_types][]': data.documentType,
-    }),
-  });
+  );
 
   if (!sessionResponse.ok) {
-    throw new Error(`Stripe session creation failed: ${sessionResponse.statusText}`);
+    throw new Error(
+      `Stripe session creation failed: ${sessionResponse.statusText}`,
+    );
   }
 
-  const session = await sessionResponse.json() as { id: string; livemode: boolean };
+  const session = (await sessionResponse.json()) as {
+    id: string;
+    livemode: boolean;
+  };
 
   // 2. Submit document (in production, use Stripe's client SDK)
   // This is simplified - actual implementation would use Stripe Identity SDK
@@ -194,11 +216,13 @@ async function verifyWithStripe(data: KycJobData): Promise<KycJobResult> {
       headers: {
         Authorization: `Bearer ${apiKey}`,
       },
-    }
+    },
   );
 
   if (!submitResponse.ok) {
-    throw new Error(`Stripe document submission failed: ${submitResponse.statusText}`);
+    throw new Error(
+      `Stripe document submission failed: ${submitResponse.statusText}`,
+    );
   }
 
   // 3. Poll for verification result
@@ -215,16 +239,21 @@ async function verifyWithStripe(data: KycJobData): Promise<KycJobResult> {
         headers: {
           Authorization: `Bearer ${apiKey}`,
         },
-      }
+      },
     );
 
     if (!resultResponse.ok) {
-      throw new Error(`Stripe result retrieval failed: ${resultResponse.statusText}`);
+      throw new Error(
+        `Stripe result retrieval failed: ${resultResponse.statusText}`,
+      );
     }
 
     verificationResult = await resultResponse.json();
 
-    if (verificationResult.status === 'verified' || verificationResult.status === 'requires_input') {
+    if (
+      verificationResult.status === 'verified' ||
+      verificationResult.status === 'requires_input'
+    ) {
       break;
     }
 
@@ -236,8 +265,9 @@ async function verifyWithStripe(data: KycJobData): Promise<KycJobResult> {
   }
 
   const isVerified = verificationResult.status === 'verified';
-  const rejectionReasons =
-    verificationResult.last_error?.reason ? [verificationResult.last_error.reason] : undefined;
+  const rejectionReasons = verificationResult.last_error?.reason
+    ? [verificationResult.last_error.reason]
+    : undefined;
 
   return {
     success: true,
@@ -278,12 +308,18 @@ async function verifyMock(data: KycJobData): Promise<KycJobResult> {
 /**
  * Send notification to user about KYC status
  */
-async function sendNotification(userId: string, result: KycJobResult): Promise<void> {
+async function sendNotification(
+  userId: string,
+  result: KycJobResult,
+): Promise<void> {
   // Insert notification into database
   const { error } = await supabase.from('notifications').insert({
     user_id: userId,
     type: 'kyc_update',
-    title: result.status === 'verified' ? 'KYC Verified ✓' : 'KYC Verification Failed',
+    title:
+      result.status === 'verified'
+        ? 'KYC Verified ✓'
+        : 'KYC Verification Failed',
     body:
       result.status === 'verified'
         ? 'Your identity has been verified successfully!'
@@ -320,7 +356,9 @@ export function createKycWorker(connection: Redis) {
   const worker = new Worker<KycJobData, KycJobResult>(
     'kyc-verification',
     async (job: Job<KycJobData, KycJobResult>) => {
-      console.log(`[KYC Worker] Processing job ${job.id} for user ${job.data.userId}`);
+      console.log(
+        `[KYC Worker] Processing job ${job.id} for user ${job.data.userId}`,
+      );
 
       try {
         // 1. Validate job data
@@ -333,7 +371,10 @@ export function createKycWorker(connection: Redis) {
         // 3. Call appropriate KYC provider
         let result: KycJobResult;
 
-        if (process.env.NODE_ENV === 'development' || process.env.USE_MOCK_KYC === 'true') {
+        if (
+          process.env.NODE_ENV === 'development' ||
+          process.env.USE_MOCK_KYC === 'true'
+        ) {
           console.log('[KYC Worker] Using mock verification');
           result = await verifyMock(validatedData);
         } else if (validatedData.provider === 'onfido') {
@@ -343,7 +384,9 @@ export function createKycWorker(connection: Redis) {
           console.log('[KYC Worker] Verifying with Stripe Identity');
           result = await verifyWithStripe(validatedData);
         } else {
-          throw new Error(`Unsupported KYC provider: ${validatedData.provider}`);
+          throw new Error(
+            `Unsupported KYC provider: ${validatedData.provider}`,
+          );
         }
 
         await job.updateProgress(60);
@@ -351,23 +394,32 @@ export function createKycWorker(connection: Redis) {
         // 4. Update database with result
         await updateKycStatus(
           validatedData.userId,
-          result.status === 'verified' ? 'verified' : result.status === 'rejected' ? 'rejected' : 'failed'
+          result.status === 'verified'
+            ? 'verified'
+            : result.status === 'rejected'
+              ? 'rejected'
+              : 'failed',
         );
 
         // Store verification details
-        const { error: detailsError } = await supabase.from('kyc_verifications').insert({
-          user_id: validatedData.userId,
-          provider: result.provider,
-          provider_id: result.providerId,
-          status: result.status,
-          confidence: result.confidence,
-          rejection_reasons: result.rejectionReasons,
-          metadata: result.metadata,
-          created_at: result.completedAt,
-        });
+        const { error: detailsError } = await supabase
+          .from('kyc_verifications')
+          .insert({
+            user_id: validatedData.userId,
+            provider: result.provider,
+            provider_id: result.providerId,
+            status: result.status,
+            confidence: result.confidence,
+            rejection_reasons: result.rejectionReasons,
+            metadata: result.metadata,
+            created_at: result.completedAt,
+          });
 
         if (detailsError) {
-          console.error('[KYC Worker] Failed to store verification details:', detailsError);
+          console.error(
+            '[KYC Worker] Failed to store verification details:',
+            detailsError,
+          );
           // Don't throw - main verification succeeded
         }
 
@@ -387,20 +439,23 @@ export function createKycWorker(connection: Redis) {
         try {
           await updateKycStatus(job.data.userId, 'failed');
         } catch (updateError) {
-          console.error('[KYC Worker] Failed to update status to failed:', updateError);
+          console.error(
+            '[KYC Worker] Failed to update status to failed:',
+            updateError,
+          );
         }
 
         throw error; // Re-throw to trigger BullMQ retry mechanism
       }
     },
     {
-      connection,
+      connection: connection as any,
       concurrency: 5, // Process up to 5 KYC verifications in parallel
       limiter: {
         max: 10, // Max 10 jobs per interval
         duration: 60000, // 1 minute
       },
-    }
+    },
   );
 
   // Event handlers
@@ -413,7 +468,9 @@ export function createKycWorker(connection: Redis) {
   });
 
   worker.on('stalled', (jobId) => {
-    console.warn(`[KYC Worker] ⚠ Job ${jobId} stalled (worker crashed or took too long)`);
+    console.warn(
+      `[KYC Worker] ⚠ Job ${jobId} stalled (worker crashed or took too long)`,
+    );
   });
 
   worker.on('error', (error) => {

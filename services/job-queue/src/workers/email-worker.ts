@@ -275,7 +275,7 @@ export function createEmailWorker(connection: Redis) {
       }
     },
     {
-      connection,
+      connection: connection as any,
       concurrency: 10, // Process up to 10 emails in parallel
       limiter: {
         max: 100, // Max 100 emails per interval
