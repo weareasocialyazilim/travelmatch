@@ -60,7 +60,7 @@ jobs:
           done
 
       - name: Upload validation report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: migration-validation
           path: migration-report.md
@@ -90,7 +90,7 @@ jobs:
           echo '```' >> rls-report.md
 
       - name: Upload RLS report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: rls-analysis
           path: rls-report.md
