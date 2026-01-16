@@ -437,8 +437,8 @@ services:
   # Job Queue API Server (Add jobs, monitor status)
   job-queue:
     build:
-      context: ./services/job-queue
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: services/job-queue/Dockerfile
     container_name: lovendo-job-queue
     restart: unless-stopped
     ports:
@@ -479,8 +479,8 @@ services:
   # Job Queue Workers (Background processing)
   job-worker:
     build:
-      context: ./services/job-queue
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: services/job-queue/Dockerfile
     container_name: lovendo-job-worker
     restart: unless-stopped
     command: pnpm worker # Run workers instead of API server
@@ -525,7 +525,7 @@ services:
   #     REDIS_URL: redis://redis:6379
   #     REDIS_PASSWORD: ${REDIS_PASSWORD:-}
   #     SUPABASE_URL: ${SUPABASE_URL:-http://kong:8000}
-  #     SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU}
+  #     SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY:?SUPABASE_SERVICE_KEY is required}
   #     MODEL_STORAGE: local
   #     MODEL_PATH: /models
   #     ENABLE_GPU: false

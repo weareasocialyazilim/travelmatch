@@ -1,1 +1,35 @@
-@import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 0, 0, 0;
+  --background-end-rgb: 0, 0, 0;
+}
+
+body {
+  font-family: 'Archivo Black', sans-serif;
+  background: #0a0a0a;
+  margin: 0;
+  color: rgb(var(--foreground-rgb));
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #222;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ff00ff;
+}

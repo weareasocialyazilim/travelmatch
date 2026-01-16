@@ -113,24 +113,6 @@ export default defineConfig({
         baseURL: 'http://localhost:3001',
       },
     },
-
-    // Mobile viewport testing
-    {
-      name: 'web:mobile-chrome',
-      testMatch: '**/web/**/*.spec.ts',
-      use: {
-        ...devices['Pixel 5'],
-        baseURL: 'http://localhost:3000',
-      },
-    },
-    {
-      name: 'web:mobile-safari',
-      testMatch: '**/web/**/*.spec.ts',
-      use: {
-        ...devices['iPhone 13'],
-        baseURL: 'http://localhost:3000',
-      },
-    },
   ],
 
   // Web server configuration

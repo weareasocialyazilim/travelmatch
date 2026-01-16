@@ -1,17 +1,17 @@
 /**
  * Database Seed Script for Lovendo
- * 
+ *
  * Generates realistic test data for local development:
  * - 20 test users with profiles
  * - 50 travel moments with media
  * - 100 reviews and ratings
  * - 30 conversations with messages
  * - Sample transactions and requests
- * 
+ *
  * Usage:
  *   pnpm seed:local     # Seed local database
  *   pnpm seed:staging   # Seed staging environment
- * 
+ *
  * WARNING: Never run on production!
  */
 
@@ -47,10 +47,10 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
 // Test data configuration
 const CONFIG = {
   USERS: 20,
-  MOMENTS_PER_USER: 2-3,
-  REVIEWS_PER_USER: 3-5,
+  MOMENTS_PER_USER: 2 - 3,
+  REVIEWS_PER_USER: 3 - 5,
   CONVERSATIONS: 30,
-  MESSAGES_PER_CONVERSATION: 5-15,
+  MESSAGES_PER_CONVERSATION: 5 - 15,
   TRANSACTIONS: 50,
   REQUESTS: 40,
 };
@@ -70,9 +70,21 @@ const CITIES = [
 ];
 
 const INTERESTS = [
-  'photography', 'hiking', 'food', 'culture', 'adventure', 
-  'beaches', 'nightlife', 'architecture', 'history', 'art',
-  'music', 'sports', 'wellness', 'luxury', 'budget-travel',
+  'photography',
+  'hiking',
+  'food',
+  'culture',
+  'adventure',
+  'beaches',
+  'nightlife',
+  'architecture',
+  'history',
+  'art',
+  'music',
+  'sports',
+  'wellness',
+  'luxury',
+  'budget-travel',
 ];
 
 const LANGUAGES = ['en', 'es', 'fr', 'de', 'tr', 'ja', 'zh', 'ar'];
@@ -92,19 +104,97 @@ function randomElements<T>(array: T[], count: number): T[] {
 }
 
 function randomDate(start: Date, end: Date): Date {
-  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+  return new Date(
+    start.getTime() + Math.random() * (end.getTime() - start.getTime()),
+  );
 }
 
 // Seeding functions
 async function seedUsers() {
   console.log('\n📝 Seeding users...');
+
+  // --- Create Super Admin User (kemal@weareasocial.com) ---
+  const superAdminEmail = 'kemal@weareasocial.com';
+  // Password MUST come from environment variable for security
+  const superAdminPassword = process.env.SUPER_ADMIN_PASSWORD;
+  if (!superAdminPassword) {
+    console.error('❌ SUPER_ADMIN_PASSWORD environment variable is required');
+    console.log(
+      '   Set it in .env or pass via CLI: SUPER_ADMIN_PASSWORD=YourSecurePassword!',
+    );
+    process.exit(1);
+  }
+
+  console.log(`\n👑 Seeding Super Admin: ${superAdminEmail}`);
+
+  // Check if exists first
+  const { data: existingUsers } = await supabase.auth.admin.listUsers();
+  const existingAdmin = existingUsers?.users?.find(
+    (u) => u.email === superAdminEmail,
+  );
+
+  let adminUserId;
+
+  if (existingAdmin) {
+    console.log('   User exists in Auth, updating password...');
+    const { error: updateError } = await supabase.auth.admin.updateUserById(
+      existingAdmin.id,
+      { password: superAdminPassword },
+    );
+    if (updateError)
+      console.error('   ❌ Password update failed:', updateError.message);
+    adminUserId = existingAdmin.id;
+  } else {
+    // snyk-ignore: password value comes from environment variable, not hardcoded
+    const { data: adminAuth, error: adminAuthError } =
+      await supabase.auth.admin.createUser({
+        email: superAdminEmail,
+        password: superAdminPassword, // Value from process.env.SUPER_ADMIN_PASSWORD
+        email_confirm: true,
+        user_metadata: { full_name: 'Kemal Teksal' },
+      });
+
+    if (adminAuthError) {
+      console.error('   ❌ Error creating admin auth:', adminAuthError.message);
+    } else {
+      adminUserId = adminAuth?.user?.id;
+    }
+  }
+
+  if (adminUserId) {
+    // Add to admin_users table
+    const { error: adminTableError } = await supabase
+      .from('admin_users')
+      .upsert({
+        id: adminUserId, // Use the same ID as Auth
+        email: superAdminEmail,
+        full_name: 'Kemal Teksal',
+        role: 'super_admin',
+        is_active: true,
+        permissions: ['*'],
+      });
+
+    if (adminTableError) {
+      // If table doesn't exist or other error
+      console.error(
+        '   ❌ Error adding to admin_users:',
+        adminTableError.message,
+      );
+    } else {
+      console.log('   ✅ Super Admin configured successfully');
+    }
+  }
+  // -----------------------------------------------------
+
   const users = [];
 
   // Get test password from environment or generate a secure random one
   const testPassword = process.env.SEED_TEST_PASSWORD;
   if (!testPassword) {
     console.error('❌ SEED_TEST_PASSWORD environment variable is required');
-    console.error('   Set it in .env or pass via CLI: SEED_TEST_PASSWORD=YourSecurePassword123!');
+    console.error(
+      '   Set it in .env or pass via CLI: SEED_TEST_PASSWORD=YourSecurePassword123!',
+    );
     process.exit(1);
   }
 
@@ -112,16 +202,17 @@ async function seedUsers() {
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
     const email = faker.internet.email({ firstName, lastName }).toLowerCase();
-    
+
     // Create auth user
-    const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
-      email,
-      password: testPassword, // From environment variable
-      email_confirm: true,
-      user_metadata: {
-        full_name: `${firstName} ${lastName}`,
-      },
-    });
+    const { data: authUser, error: authError } =
+      await supabase.auth.admin.createUser({
+        email,
+        password: testPassword, // From environment variable
+        email_confirm: true,
+        user_metadata: {
+          full_name: `${firstName} ${lastName}`,
+        },
+      });
 
     if (authError) {
       console.error(`  ❌ Failed to create user ${email}:`, authError.message);
@@ -132,7 +223,7 @@ async function seedUsers() {
     const profile = {
       id: authUser.user.id,
       full_name: `${firstName} ${lastName}`,
-      username: faker.internet.userName({ firstName, lastName }).toLowerCase(),
+      username: faker.internet.username({ firstName, lastName }).toLowerCase(),
       bio: faker.lorem.sentence(),
       avatar_url: faker.image.avatar(),
       age: randomInt(18, 65),
@@ -153,7 +244,10 @@ async function seedUsers() {
       .insert(profile);
 
     if (profileError) {
-      console.error(`  ❌ Failed to create profile for ${email}:`, profileError.message);
+      console.error(
+        `  ❌ Failed to create profile for ${email}:`,
+        profileError.message,
+      );
       continue;
     }
 
@@ -171,11 +265,13 @@ async function seedMoments(users: any[]) {
 
   for (const user of users) {
     const momentCount = randomInt(2, 5);
-    
+
     for (let i = 0; i < momentCount; i++) {
       const city = randomElement(CITIES);
       const startDate = randomDate(new Date('2023-01-01'), new Date());
-      const endDate = new Date(startDate.getTime() + randomInt(1, 14) * 24 * 60 * 60 * 1000);
+      const endDate = new Date(
+        startDate.getTime() + randomInt(1, 14) * 24 * 60 * 60 * 1000,
+      );
 
       const moment = {
         user_id: user.id,
@@ -195,12 +291,20 @@ async function seedMoments(users: any[]) {
           {
             type: 'image',
             url: faker.image.urlLoremFlickr({ category: 'travel' }),
-            thumbnail_url: faker.image.urlLoremFlickr({ category: 'travel', width: 200, height: 200 }),
+            thumbnail_url: faker.image.urlLoremFlickr({
+              category: 'travel',
+              width: 200,
+              height: 200,
+            }),
           },
           {
             type: 'image',
             url: faker.image.urlLoremFlickr({ category: 'city' }),
-            thumbnail_url: faker.image.urlLoremFlickr({ category: 'city', width: 200, height: 200 }),
+            thumbnail_url: faker.image.urlLoremFlickr({
+              category: 'city',
+              width: 200,
+              height: 200,
+            }),
           },
         ],
         tags: randomElements(INTERESTS, randomInt(2, 5)),
@@ -236,10 +340,10 @@ async function seedReviews(users: any[], moments: any[]) {
 
   for (const user of users) {
     const reviewCount = randomInt(3, 7);
-    
+
     for (let i = 0; i < reviewCount; i++) {
-      const targetUser = randomElement(users.filter(u => u.id !== user.id));
-      
+      const targetUser = randomElement(users.filter((u) => u.id !== user.id));
+
       const review = {
         reviewer_id: user.id,
         reviewee_id: targetUser.id,
@@ -248,7 +352,10 @@ async function seedReviews(users: any[], moments: any[]) {
         travel_compatibility: randomInt(3, 5),
         communication: randomInt(3, 5),
         reliability: randomInt(3, 5),
-        created_at: randomDate(new Date('2024-01-01'), new Date()).toISOString(),
+        created_at: randomDate(
+          new Date('2024-01-01'),
+          new Date(),
+        ).toISOString(),
       };
 
       const { data, error } = await supabase
@@ -276,11 +383,14 @@ async function seedConversations(users: any[]) {
 
   for (let i = 0; i < CONFIG.CONVERSATIONS; i++) {
     const [user1, user2] = randomElements(users, 2);
-    
+
     const conversation = {
       participant_1_id: user1.id,
       participant_2_id: user2.id,
-      last_message_at: randomDate(new Date('2024-01-01'), new Date()).toISOString(),
+      last_message_at: randomDate(
+        new Date('2024-01-01'),
+        new Date(),
+      ).toISOString(),
       created_at: randomDate(new Date('2023-06-01'), new Date()).toISOString(),
     };
 
@@ -298,14 +408,17 @@ async function seedConversations(users: any[]) {
     // Add messages
     const messageCount = randomInt(5, 20);
     const participants = [user1.id, user2.id];
-    
+
     for (let j = 0; j < messageCount; j++) {
       const senderId = randomElement(participants);
       const message = {
         conversation_id: data.id,
         sender_id: senderId,
         content: faker.lorem.sentence(),
-        created_at: randomDate(new Date(conversation.created_at), new Date()).toISOString(),
+        created_at: randomDate(
+          new Date(conversation.created_at),
+          new Date(),
+        ).toISOString(),
       };
 
       await supabase.from('messages').insert(message);
@@ -325,7 +438,7 @@ async function seedTransactions(users: any[]) {
   for (let i = 0; i < CONFIG.TRANSACTIONS; i++) {
     const user = randomElement(users);
     const amount = randomInt(10, 500);
-    
+
     const transaction = {
       user_id: user.id,
       type: randomElement(['payment', 'refund', 'payout', 'fee']),
@@ -361,8 +474,10 @@ async function seedTravelRequests(users: any[], moments: any[]) {
 
   for (let i = 0; i < CONFIG.REQUESTS; i++) {
     const requester = randomElement(users);
-    const moment = randomElement(moments.filter(m => m.user_id !== requester.id));
-    
+    const moment = randomElement(
+      moments.filter((m) => m.user_id !== requester.id),
+    );
+
     const request = {
       requester_id: requester.id,
       moment_id: moment.id,
@@ -398,7 +513,10 @@ async function seed() {
 
   try {
     // Test connection
-    const { data, error } = await supabase.from('profiles').select('count').limit(1);
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('count')
+      .limit(1);
     if (error) {
       console.error('❌ Failed to connect to database:', error.message);
       process.exit(1);

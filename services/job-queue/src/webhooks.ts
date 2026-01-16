@@ -2,7 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
-import { logger } from '../shared/utils/logger.js';
+import { logger } from '@lovendo/shared';
 
 dotenv.config();
 
@@ -17,8 +17,12 @@ app.disable('x-powered-by');
 const WEBHOOK_SECRET = process.env.INTERNAL_WEBHOOK_SECRET;
 
 if (!WEBHOOK_SECRET) {
-  logger.error('CRITICAL: INTERNAL_WEBHOOK_SECRET environment variable is not set!');
-  logger.error('Webhook endpoints will reject all requests until this is configured.');
+  logger.error(
+    'CRITICAL: INTERNAL_WEBHOOK_SECRET environment variable is not set!',
+  );
+  logger.error(
+    'Webhook endpoints will reject all requests until this is configured.',
+  );
 }
 
 /**
@@ -35,18 +39,22 @@ function secureCompare(a: string, b: string): boolean {
  * Generate HMAC signature for webhook payload
  * Use this when sending webhooks to this endpoint
  */
-export function generateWebhookSignature(payload: string, secret: string): string {
-  return crypto
-    .createHmac('sha256', secret)
-    .update(payload)
-    .digest('hex');
+export function generateWebhookSignature(
+  payload: string,
+  secret: string,
+): string {
+  return crypto.createHmac('sha256', secret).update(payload).digest('hex');
 }
 
 /**
  * Verify webhook signature middleware
  * Requires X-Webhook-Signature header with HMAC-SHA256 signature
  */
-function verifyWebhookSignature(req: Request, res: Response, next: NextFunction): void {
+function verifyWebhookSignature(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
   if (!WEBHOOK_SECRET) {
     res.status(503).json({
       error: 'Service temporarily unavailable',
@@ -77,7 +85,7 @@ function verifyWebhookSignature(req: Request, res: Response, next: NextFunction)
       logger.warn('[SECURITY] Webhook timestamp expired or invalid', {
         ip: req.ip,
         timestamp,
-        now
+        now,
       });
       res.status(401).json({
         error: 'Unauthorized',
@@ -174,7 +182,9 @@ app.post('/webhooks/job-complete', verifyWebhookSignature, async (req, res) => {
     res.json({ success: true });
   } catch (err: unknown) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-    logger.error('Webhook error', err instanceof Error ? err : undefined, { message: errorMessage });
+    logger.error('Webhook error', err instanceof Error ? err : undefined, {
+      message: errorMessage,
+    });
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -300,7 +310,10 @@ async function handleEmailComplete(
       typeof error === 'string'
         ? error.replace(/[\n\r\t%]/g, ' ').slice(0, 500)
         : JSON.stringify(error).slice(0, 500);
-    logger.error('Email sending failed', undefined, { userId, error: sanitizedError });
+    logger.error('Email sending failed', undefined, {
+      userId,
+      error: sanitizedError,
+    });
     // Retry logic or alert admin
   }
 }

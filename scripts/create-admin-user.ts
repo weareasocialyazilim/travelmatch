@@ -73,6 +73,20 @@ async function createAdminUser(
           console.log('✅ User already exists in admin_users');
           console.log(`   Role: ${adminUser.role}`);
           console.log(`   Active: ${adminUser.is_active}`);
+
+          // Force update password to ensure it matches
+          console.log('🔄 Updating password to ensure match...');
+          const { error: updateError } =
+            await supabase.auth.admin.updateUserById(existingUser.id, {
+              password: finalPassword,
+            });
+
+          if (updateError) {
+            console.error('❌ Failed to update password:', updateError.message);
+          } else {
+            console.log('✅ Password updated successfully');
+          }
+
           return;
         }
 
