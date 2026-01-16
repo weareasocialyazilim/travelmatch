@@ -56,14 +56,15 @@ const getCacheKey = (key: string): string => `${CACHE_PREFIX}${key}`;
 // Legacy cache prefixes for migration
 const LEGACY_CACHE_PREFIXES = ['@lovendo_cache/', '@lovendo/cache_'];
 
-const getLegacyCacheKeys = (key: string): string[] =>
+// Reserved for future cache migration - keeping for backward compatibility
+const _getLegacyCacheKeys = (key: string): string[] =>
   LEGACY_CACHE_PREFIXES.map((prefix) => `${prefix}${key}`);
 
-const isCacheKey = (fullKey: string): boolean =>
+const _isCacheKey = (fullKey: string): boolean =>
   fullKey.startsWith(CACHE_PREFIX) ||
   LEGACY_CACHE_PREFIXES.some((prefix) => fullKey.startsWith(prefix));
 
-const stripCachePrefix = (fullKey: string): string => {
+const _stripCachePrefix = (fullKey: string): string => {
   if (fullKey.startsWith(CACHE_PREFIX))
     return fullKey.slice(CACHE_PREFIX.length);
   for (const prefix of LEGACY_CACHE_PREFIXES) {
