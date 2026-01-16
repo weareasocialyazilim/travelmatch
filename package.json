@@ -67,27 +67,27 @@
   },
   "devDependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
-    "@babel/preset-env": "^7.28.5",
+    "@babel/preset-env": "^7.28.6",
     "@eslint/js": "^9.39.2",
     "@faker-js/faker": "^10.1.0",
     "@playwright/test": "^1.49.1",
-    "@supabase/supabase-js": "^2.88.0",
-    "@typescript-eslint/eslint-plugin": "^8.50.0",
-    "@typescript-eslint/parser": "^8.50.0",
+    "@supabase/supabase-js": "^2.90.1",
+    "@typescript-eslint/eslint-plugin": "^8.53.0",
+    "@typescript-eslint/parser": "^8.53.0",
     "babel-plugin-transform-remove-console": "^6.9.4",
-    "dotenv": "^17.2.3",
+    "dotenv": "^16.6.1",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
-    "openai": "^6.14.0",
-    "prettier": "^3.7.4",
-    "react-test-renderer": "19.1.0",
-    "stripe": "^20.1.0",
+    "openai": "^6.16.0",
+    "prettier": "^3.8.0",
+    "react-test-renderer": "19.2.3",
+    "stripe": "^20.1.2",
     "tsx": "^4.21.0",
-    "turbo": "^2.6.3",
+    "turbo": "^2.7.4",
     "typescript": "~5.9.3",
-    "typescript-eslint": "^8.50.0"
+    "typescript-eslint": "^8.53.0"
   },
   "engines": {
     "node": ">=20.0.0",
@@ -96,9 +96,9 @@
   "packageManager": "pnpm@9.15.9",
   "pnpm": {
     "overrides": {
-      "react": "19.1.0",
+      "react": "19.2.3",
       "react-dom": "19.1.0",
-      "react-test-renderer": "19.1.0",
+      "react-test-renderer": "19.2.3",
       "react-native": "0.81.5",
       "react-native-safe-area-context": "5.6.2",
       "fast-xml-parser": "^4.5.0",
@@ -129,7 +129,7 @@
     "react-native-qrcode-svg": "^6.3.21",
     "react-native-svg": "^15.15.1",
     "expo": "~54.0.31",
-    "react": "19.1.0",
+    "react": "19.2.3",
     "react-native": "0.81.5"
   }
 }

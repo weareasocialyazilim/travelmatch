@@ -15,6 +15,6 @@
     "react-native": "^0.74.0"
   },
   "dependencies": {
-    "@datadog/mobile-react-native": "^2.14.0"
+    "@datadog/mobile-react-native": "^2.14.1"
   }
 }
