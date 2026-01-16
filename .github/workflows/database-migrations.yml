@@ -26,7 +26,7 @@ jobs:
     name: Validate Migrations
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
@@ -70,7 +70,7 @@ jobs:
     name: Check RLS Policies
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Analyze RLS coverage
         run: |
@@ -103,7 +103,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: staging
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: 🔐 Import secrets from Infisical
         uses: infisical/secrets-action@v1
@@ -146,7 +146,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: 🔐 Import secrets from Infisical
         uses: infisical/secrets-action@v1

@@ -32,7 +32,7 @@ jobs:
     name: Pre-Deploy Validation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: 🔐 Import secrets from Infisical
         uses: Infisical/secrets-action@v1.0.7
@@ -77,7 +77,7 @@ jobs:
     if: github.event.inputs.platform == 'all' || github.event.inputs.platform == 'ios'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: 🔐 Import secrets from Infisical
         uses: Infisical/secrets-action@v1.0.7
@@ -136,7 +136,7 @@ jobs:
     if: github.event.inputs.platform == 'all' || github.event.inputs.platform == 'android'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: 🔐 Import secrets from Infisical
         uses: Infisical/secrets-action@v1.0.7
@@ -195,7 +195,7 @@ jobs:
     if: github.event.inputs.track == 'production' || github.event.inputs.track == 'beta'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: 🔐 Import secrets from Infisical
         uses: Infisical/secrets-action@v1.0.7
@@ -226,7 +226,7 @@ jobs:
     if: github.event.inputs.track == 'production' || github.event.inputs.track == 'beta'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: 🔐 Import secrets from Infisical
         uses: Infisical/secrets-action@v1.0.7
