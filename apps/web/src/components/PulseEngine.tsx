@@ -40,7 +40,7 @@ const SARCASTIC_ITEMS = [
   '🪩',
   '🌹',
   '⚡',
-  // Sarcastic texts
+  // Sarcastic texts - EN
   'NO GHOSTS',
   'DELULU',
   'MID',
@@ -61,6 +61,27 @@ const SARCASTIC_ITEMS = [
   'NO CAP',
   'SIKE',
   'BYE',
+  // Sarcastic texts - TR
+  'KAYBOLMAZ',
+  'HAYAL ALEMİ',
+  'VASAT',
+  'HAVA',
+  'ZEHİRLİ',
+  'ANA KARAKTER',
+  'ADI KONMAMIŞ İŞ',
+  'KIRMIZI İŞARET',
+  'YEŞİL IŞIK',
+  'İTİCİ',
+  'BOŞ YAPMA',
+  'FİGÜRAN',
+  'GERÇEK',
+  'OLUR',
+  'DAĞINIK',
+  'DÖNEM',
+  'YERİNDE',
+  'SALLAMA',
+  'SEN MİSİN',
+  'GÜLE GÜLE',
 ];
 
 interface FloatingItem {

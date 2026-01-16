@@ -426,16 +426,16 @@ export default function App() {
               {/* Manifesto Ticker */}
               <div className="w-full bg-[#FF00FF] py-4 border-y-4 border-black overflow-hidden flex whitespace-nowrap">
                 <div className="animate-marquee inline-block text-black font-black uppercase italic text-sm md:text-xl tracking-tighter">
-                  NO DIGITAL ROT • THE TALKING STAGE IS A SCAM • GO TOUCH GRASS
-                  • SYNC YOUR BIOLOGY • YAP LESS DO MORE • NOT YOUR AVERAGE
-                  DELULU • PHYSICAL REALITY ONLY • SHOW UP OR LOG OFF • NO
-                  GHOSTS ALLOWED •&nbsp;
+                  {lang === 'EN'
+                    ? 'NO DIGITAL ROT • THE TALKING STAGE IS A SCAM • GO TOUCH GRASS • SYNC YOUR BIOLOGY • YAP LESS DO MORE • NOT YOUR AVERAGE DELULU • PHYSICAL REALITY ONLY • SHOW UP OR LOG OFF • NO GHOSTS ALLOWED •'
+                    : 'DİJİTAL ÇÜRÜME YOK • SAHNE KONUŞMA YERİ DEĞİL • DAHA FAZLASI • SADECE FİZİKSEL GERÇEKLİK • GEL YA DA ÇIK • KAYBOLANLARA YER YOK • SIRADAN HAYAL ALEMİ DEĞİL •'}
+                  &nbsp;
                 </div>
                 <div className="animate-marquee inline-block text-black font-black uppercase italic text-sm md:text-xl tracking-tighter">
-                  NO DIGITAL ROT • THE TALKING STAGE IS A SCAM • GO TOUCH GRASS
-                  • SYNC YOUR BIOLOGY • YAP LESS DO MORE • NOT YOUR AVERAGE
-                  DELULU • PHYSICAL REALITY ONLY • SHOW UP OR LOG OFF • NO
-                  GHOSTS ALLOWED •&nbsp;
+                  {lang === 'EN'
+                    ? 'NO DIGITAL ROT • THE TALKING STAGE IS A SCAM • GO TOUCH GRASS • SYNC YOUR BIOLOGY • YAP LESS DO MORE • NOT YOUR AVERAGE DELULU • PHYSICAL REALITY ONLY • SHOW UP OR LOG OFF • NO GHOSTS ALLOWED •'
+                    : 'DİJİTAL ÇÜRÜME YOK • SAHNE KONUŞMA YERİ DEĞİL • DAHA FAZLASI • SADECE FİZİKSEL GERÇEKLİK • GEL YA DA ÇIK • KAYBOLANLARA YER YOK • SIRADAN HAYAL ALEMİ DEĞİL •'}
+                  &nbsp;
                 </div>
               </div>
 
@@ -455,7 +455,7 @@ export default function App() {
                     whileHover={{ scale: 1.1 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                   >
-                    SYSTEM
+                    {lang === 'EN' ? 'SYSTEM' : 'SİSTEM'}
                   </motion.h4>
                   <div className="flex flex-col gap-6 font-black uppercase text-sm italic">
                     <button
@@ -466,13 +466,13 @@ export default function App() {
                       }
                       className="text-left hover:text-[#FF00FF] transition-colors"
                     >
-                      Manifesto
+                      {lang === 'EN' ? 'Manifesto' : 'MANİFESTO'}
                     </button>
                     <button
                       onClick={() => setView('creator')}
                       className="text-left hover:text-[#39FF14] transition-colors"
                     >
-                      Creators
+                      {lang === 'EN' ? 'Creators' : 'ÜRETİCİLER'}
                     </button>
                     <button
                       onClick={() =>
@@ -482,13 +482,13 @@ export default function App() {
                       }
                       className="text-left hover:text-[#00FFFF] transition-colors"
                     >
-                      Moments
+                      {lang === 'EN' ? 'Moments' : 'ANLAR'}
                     </button>
                     <a
                       href="#"
                       className="text-left hover:text-white transition-colors"
                     >
-                      Terms
+                      {lang === 'EN' ? 'Terms' : 'KOŞULLAR'}
                     </a>
                   </div>
                 </div>
@@ -790,13 +790,19 @@ export default function App() {
                       className="space-y-4 border-2 border-[#00FFFF] p-4 bg-black"
                     >
                       <div className="text-[10px] font-black text-[#00FFFF] uppercase mb-2 leading-tight">
-                        SAME VIBE, DIFFERENT PLACE? (MIN ${selected.price})
+                        {lang === 'EN'
+                          ? `SAME VIBE, DIFFERENT PLACE? (MIN $${selected.price})`
+                          : `AYNI ENERJİ, BAŞKA BİR YER? (MİN $${selected.price})`}
                       </div>
                       <textarea
                         required
                         value={altInput}
                         onChange={(e) => setAltInput(e.target.value)}
-                        placeholder={`Suggest ${selected.title} alternative...`}
+                        placeholder={
+                          lang === 'EN'
+                            ? `Suggest ${selected.title[lang]} alternative...`
+                            : 'DAHA İYİ BİR ALTERNATİF ÖNER...'
+                        }
                         className="bg-zinc-900 border border-zinc-800 w-full p-3 text-xs font-bold text-white outline-none focus:border-[#00FFFF] h-24 resize-none placeholder:text-zinc-600"
                       />
                       <div className="flex gap-2">
@@ -804,14 +810,14 @@ export default function App() {
                           type="submit"
                           className="flex-1 bg-[#39FF14] text-black py-3 text-[10px] font-black uppercase hover:bg-white transition-all flex items-center justify-center gap-2"
                         >
-                          <Send size={14} /> SEND
+                          <Send size={14} /> {lang === 'EN' ? 'SEND' : 'GÖNDER'}
                         </button>
                         <button
                           type="button"
                           onClick={() => setShowAltForm(false)}
                           className="bg-zinc-800 text-white px-4 py-3 text-[10px] font-black uppercase hover:bg-red-600 transition-all"
                         >
-                          CANCEL
+                          {lang === 'EN' ? 'CANCEL' : 'VAZGEÇ'}
                         </button>
                       </div>
                     </motion.form>
