@@ -25,4 +25,4 @@ export { CeremonyProgress } from './CeremonyProgress';
 export { ProofCeremonyFlow } from './ProofCeremonyFlow';
 
 // Types
-// export type { AuthenticationResult } from './MomentAuthenticator';
+export type { AuthenticationResult } from './ProofCeremonyFlow';

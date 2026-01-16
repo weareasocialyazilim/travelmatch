@@ -12,7 +12,6 @@
 export {
   TrustConstellation,
   SunsetClock,
-  MomentAuthenticator,
   SacredMoments,
   GiftVault,
   ThankYouCardCreator,
@@ -21,4 +20,4 @@ export {
   ProofCeremonyFlow,
 } from '@/features/verifications/components';
 
-export type { AuthenticationResult } from '@/features/verifications/components';
+export type { AuthenticationResult } from '@/features/verifications/components/ProofCeremonyFlow';
