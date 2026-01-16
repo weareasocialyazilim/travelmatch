@@ -29,9 +29,9 @@ onnxruntime==1.20.1
 
 # NLP & Transformers - Updated to fix security vulnerabilities
 # CVE fixes: ReDoS, Deserialization vulnerabilities
-transformers==4.57.6
+transformers==4.48.3
 tokenizers==0.21.0
-sentence-transformers==5.2.0
+sentence-transformers==3.4.1
 
 # Computer Vision
 opencv-python-headless==4.10.0.84  # Headless = smaller, no GUI deps
