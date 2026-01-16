@@ -93,7 +93,7 @@
     "node": ">=20.0.0",
     "pnpm": ">=9.0.0"
   },
-  "packageManager": "pnpm@9.15.9",
+  "packageManager": "pnpm@10.28.0",
   "pnpm": {
     "overrides": {
       "react": "19.1.0",
@@ -123,13 +123,24 @@
         "react",
         "react-native"
       ]
-    }
+    },
+    "onlyBuiltDependencies": [
+      "@datadog/mobile-react-native",
+      "@sentry/cli",
+      "@swc/core",
+      "core-js",
+      "esbuild",
+      "msgpackr-extract",
+      "protobufjs",
+      "sharp",
+      "unrs-resolver"
+    ]
   },
   "dependencies": {
-    "react-native-qrcode-svg": "^6.3.21",
-    "react-native-svg": "^15.15.1",
     "expo": "~54.0.31",
     "react": "19.1.0",
-    "react-native": "0.81.5"
+    "react-native": "0.81.5",
+    "react-native-qrcode-svg": "^6.3.21",
+    "react-native-svg": "^15.15.1"
   }
 }
