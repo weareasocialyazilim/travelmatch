@@ -168,6 +168,13 @@ interface CeremonyResult {
   thankYouCardSent: boolean;
 }
 
+/** Authentication result from proof verification */
+export interface AuthenticationResult {
+  status: 'verified' | 'needs_review' | 'failed';
+  confidence: number;
+  message?: string;
+}
+
 interface ProofCeremonyFlowProps {
   /** Gift/Escrow information */
   gift: Gift;
@@ -250,19 +257,6 @@ export const ProofCeremonyFlow = memo<ProofCeremonyFlowProps>(
       transform: [{ translateX: stepTranslateX.value }],
     }));
 
-    // Auto-verification effect for authenticate step
-    useEffect(() => {
-      if (step === 'authenticate' && proofData) {
-        const timer = setTimeout(() => {
-          handleAuthResult({
-            status: 'verified',
-            confidence: 0.99,
-          });
-        }, 1500);
-        return () => clearTimeout(timer);
-      }
-    }, [step, proofData, handleAuthResult]);
-
     const handleNext = useCallback(
       (nextStep: CeremonyStep) => {
         transitionToStep(nextStep);
@@ -287,6 +281,20 @@ export const ProofCeremonyFlow = memo<ProofCeremonyFlowProps>(
       },
       [handleNext],
     );
+
+    // Auto-verification effect for authenticate step
+    useEffect(() => {
+      if (step === 'authenticate' && proofData) {
+        const timer = setTimeout(() => {
+          handleAuthResult({
+            status: 'verified',
+            confidence: 0.99,
+          });
+        }, 1500);
+        return () => clearTimeout(timer);
+      }
+      return undefined;
+    }, [step, proofData, handleAuthResult]);
 
     const handleThankYouComplete = useCallback(
       (cardUrl: string) => {
