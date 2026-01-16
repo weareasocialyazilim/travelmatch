@@ -1,3 +1,7 @@
+# Skip hooks in CI environment or when HUSKY=0
+[ -n "$CI" ] && exit 0
+[ "$HUSKY" = "0" ] && exit 0
+
 # Run lint-staged for code quality checks
 pnpm exec lint-staged
 
