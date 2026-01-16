@@ -89,7 +89,8 @@ const PulseEngine = () => {
       const newItems: FloatingItem[] = [];
       for (let i = 0; i < 40; i++) {
         const content =
-          SARCASTIC_ITEMS[Math.floor(Math.random() * SARCASTIC_ITEMS.length)];
+          SARCASTIC_ITEMS[Math.floor(Math.random() * SARCASTIC_ITEMS.length)] ??
+          '✨';
         const isEmoji = content.length <= 2;
         newItems.push({
           id: i,

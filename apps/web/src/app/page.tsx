@@ -281,7 +281,7 @@ export default function App() {
             exit={{ opacity: 0 }}
           >
             <header className="relative z-10 pt-40 md:pt-48 pb-20 px-6 max-w-7xl mx-auto text-center">
-              <h1 className="text-[14vw] sm:text-[12vw] font-black uppercase leading-[0.8] tracking-tighter italic mb-12 whitespace-pre-wrap">
+              <h1 className="text-[12vw] sm:text-[10vw] md:text-[9vw] font-black uppercase leading-[0.85] tracking-tighter italic mb-12 whitespace-pre-line">
                 <AnimatedTitle text={t.hero_title} />
               </h1>
               <p className="text-[#00FFFF] font-black text-lg md:text-xl uppercase mb-12 tracking-wide">

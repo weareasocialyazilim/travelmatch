@@ -113,3 +113,4 @@ apps/**/pnpm-lock.yaml
 .github/instructions/snyk_rules.instructions.md
 package-lock.json
 package-lock.json
+.vercel

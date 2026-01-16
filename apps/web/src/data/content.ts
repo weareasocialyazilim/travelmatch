@@ -56,10 +56,10 @@ export const TRANSLATIONS: Record<Language, any> = {
       'Dijital ön sevişmelerden ve 3 haftalık "selam, naber" seanslarından bıktık. LOVENDO, gerçekten orada olanlar içindir. 20 soru yok. Ekran arkasından "vibe" kasmak yok. Sadece yemek, şarap ve biyolojinin kanunları.',
     creator_cta_title: 'ANA KARAKTER ENERJİSİ ARANIYOR.',
     creator_cta_sub:
-      'SENKRONU YÖNETECEK BİRİNE İHTİYACIMIZ VAR. O ENERJİ SENDE VAR MI?',
+      'SENKRONİZASYONU YÖNETECEK BİRİNE İHTİYACIMIZ VAR. O ENERJİ SENDE VAR MI?',
     creator_cta_btn: 'SAHNEYİ_AL',
     form_header: 'VARLIĞINI_KANITLA.',
-    form_ig: '@sosyal_referansin',
+    form_ig: '@sosyal_referansın',
     form_story:
       'Bize "tırt" olmayan bir hikaye anlat ya da varlığını haklı çıkaracak 2 hayalindeki anı söyle.',
     submit: 'GÖNDER_GİTSİN_İŞTE',
@@ -75,9 +75,9 @@ export const TRANSLATIONS: Record<Language, any> = {
     footer_rights: 'LOVENDO PROJECT. KAYDIRMAYI BIRAK.',
     version: 'Varlıklar için tasarlandı | v0.0.5-savage',
     nav_void: 'Boşluk',
-    gift_success_title: 'ANA KARAKTER ANI .',
+    gift_success_title: 'ANA KARAKTER ANI.',
     gift_success_msg_1:
-      '- Tebrikler. Cüzdanın, karakterinin beceremediğini az önce başardı.',
+      'Tebrikler. Cüzdanın, karakterinin beceremediğini az önce başardı.',
     gift_success_msg_2:
       'Umarız o eşleşme gerçekten olur, yoksa bu çok pahalı bir "görüldü" olacak.',
     gift_success_msg_3:
