@@ -938,10 +938,14 @@ try {
         // Process items with keyExtractor
         const items = Array.isArray(data)
           ? data.map((item, index) => {
-              if (keyExtractor) {
-                keyExtractor(item, index);
+              const key = keyExtractor
+                ? keyExtractor(item, index)
+                : String(index);
+              const element = renderItem({ item, index });
+              if (React.isValidElement(element)) {
+                return React.cloneElement(element, { key });
               }
-              return renderItem({ item, index });
+              return React.createElement(View, { key }, element);
             })
           : null;
 

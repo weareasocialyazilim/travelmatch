@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
 import { Text, View } from 'react-native';
 import { SacredMoments } from '../SacredMoments';
 import { GiftVault } from '../GiftVault';
@@ -197,7 +197,9 @@ describe('SacredMoments Component', () => {
 
       // Simulate screenshot
       const callback = mockAddScreenshotListener.mock.calls[0][0];
-      callback();
+      act(() => {
+        callback();
+      });
 
       expect(onScreenshotAttempt).toHaveBeenCalledTimes(1);
     });
@@ -212,7 +214,9 @@ describe('SacredMoments Component', () => {
 
       // Simulate screenshot
       const callback = mockAddScreenshotListener.mock.calls[0][0];
-      callback();
+      act(() => {
+        callback();
+      });
 
       expect(HapticManager.warning).toHaveBeenCalled();
     });

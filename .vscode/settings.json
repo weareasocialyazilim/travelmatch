@@ -74,6 +74,6 @@
 
   // Jest Configuration - run from apps/mobile for proper config
   "jest.rootPath": "apps/mobile",
-  "jest.jestCommandLine": "npx jest",
+  "jest.jestCommandLine": "pnpm jest",
   "jest.autoRevealOutput": "on-exec-error"
 }

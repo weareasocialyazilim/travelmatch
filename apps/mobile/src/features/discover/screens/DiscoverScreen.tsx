@@ -30,6 +30,7 @@ import {
   Share,
   Alert,
 } from 'react-native';
+import { logger } from '@/utils/logger';
 import { FlashList } from '@shopify/flash-list';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -136,9 +137,9 @@ const DiscoverScreen = () => {
   }, []);
 
   const handleReportSubmit = useCallback(
-    (action: string, reason?: string, details?: string) => {
+    (action: string, _reason?: string, _details?: string) => {
       // Logic would go here to call backend
-      console.log(`[Discover] ${action} on moment ${reportMoment?.id}`);
+      logger.info(`[Discover] ${action} on moment ${reportMoment?.id}`);
       setReportMoment(null);
       setTimeout(() => {
         Alert.alert(
