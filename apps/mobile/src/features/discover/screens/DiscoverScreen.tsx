@@ -66,7 +66,6 @@ import {
 import { useSubscription } from '@/features/payments';
 import { showLoginPrompt } from '@/stores/modalStore';
 import { useSearchStore } from '@/stores/searchStore';
-import { logger } from '@/utils/logger';
 import type { NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/routeParams';
 import { useContentReactiveGlow } from '@/hooks/useContentReactiveGlow';
