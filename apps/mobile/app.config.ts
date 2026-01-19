@@ -29,7 +29,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   // ============================================
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'com.lovendo.mobile',
+    bundleIdentifier: 'com.anonymous.lovendo-new',
     buildNumber: '24',
     associatedDomains: ['applinks:www.lovendo.xyz', 'applinks:lovendo.xyz'],
     config: {
@@ -41,13 +41,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 
       // Location permissions
       NSLocationWhenInUseUsageDescription:
-        'Lovendo uses your location to show nearby experiences and verify travel moments.',
+        'Çevrenizdeki ilham verici anları ve popüler içerik üreticilerini keşfedebilmeniz için konumunuz kullanılır.',
 
       // Camera and Photos
       NSCameraUsageDescription:
-        'Lovendo needs camera access to capture photos of your travel moments.',
+        'Özel anlarınızı (Moments) kaydedip takipçilerinizle paylaşabilmeniz için kamera erişimi gereklidir.',
       NSPhotoLibraryUsageDescription:
-        'Lovendo needs photo library access to upload travel moment photos.',
+        "Vibe'ınızı yansıtan fotoğraf ve videoları profilinizde paylaşabilmeniz için galeri erişimi gereklidir.",
       NSPhotoLibraryAddUsageDescription:
         'Lovendo needs permission to save photos to your library.',
 

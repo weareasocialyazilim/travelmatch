@@ -31,7 +31,7 @@ const FAQ_DATA: FAQItem[] = [
     category: 'Getting Started',
     question: 'What is Lovendo?',
     answer:
-      "Lovendo is a platform that connects travelers who want to share their travel moments with generous people who want to help make those moments happen. It's about creating meaningful connections through shared experiences.",
+      "Lovendo is a platform that connects creators who want to share their unique moments with supporters who want to help make those moments happen. It's about creating meaningful connections through shared vibes.",
   },
   {
     id: '2',
@@ -45,14 +45,14 @@ const FAQ_DATA: FAQItem[] = [
     category: 'Moments',
     question: 'What is a Moment?',
     answer:
-      'A Moment is a travel experience or activity you want to do during your trip. It could be trying local food, visiting a landmark, or any memorable experience you want to share.',
+      'A Moment is a visual story or activity you want to share. It could be trying local food, visiting a landmark, or any memorable vibe you want to capture.',
   },
   {
     id: '4',
     category: 'Moments',
     question: 'How do I create a Moment?',
     answer:
-      'Tap the "+" icon at the bottom of the screen, select your travel destination, add photos, describe your moment, and set the amount you need.',
+      'Tap the "+" icon at the bottom of the screen, select your location, add photos, describe your moment, and set the support amount you need.',
   },
   {
     id: '5',

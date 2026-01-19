@@ -37,6 +37,7 @@ export interface ImmersiveMomentCardProps {
   onCounterOfferPress: () => void;
   onSharePress?: () => void;
   onUserPress?: () => void;
+  onReportPress?: () => void;
 }
 
 // Format large numbers (e.g., 2400 -> 2.4k)
@@ -119,6 +120,7 @@ export const ImmersiveMomentCard = memo(
     onCounterOfferPress,
     onSharePress,
     onUserPress,
+    onReportPress,
   }: ImmersiveMomentCardProps) => {
     // Get the first image or use a placeholder
     const imageUrl =
@@ -224,13 +226,20 @@ export const ImmersiveMomentCard = memo(
             </View>
           </View>
 
-          {/* 4. Action Sidebar (Right Side - Share only) */}
+          {/* 4. Action Sidebar (Right Side - Actions) */}
           <View style={styles.sidebar}>
             <SidebarButton
               icon="share-social"
               count="Share"
               onPress={onSharePress}
             />
+            {onReportPress && (
+              <SidebarButton
+                icon="ellipsis-horizontal"
+                count="More"
+                onPress={onReportPress}
+              />
+            )}
           </View>
 
           {/* 5. Main Actions (Gift vs Counter-Offer) */}

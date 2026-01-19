@@ -65,6 +65,7 @@ export const uploadFile = async (
   options?: {
     fileName?: string;
     contentType?: string;
+    metadata?: Record<string, string>;
   },
 ): Promise<UploadResult> => {
   if (!isSupabaseConfigured()) {
@@ -89,6 +90,7 @@ export const uploadFile = async (
       .upload(fileName, arrayBuffer, {
         contentType,
         upsert: false,
+        metadata: options?.metadata,
       });
 
     if (error) throw error;

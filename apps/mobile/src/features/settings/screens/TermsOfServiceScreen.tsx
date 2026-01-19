@@ -38,8 +38,9 @@ export default function TermsOfServiceScreen({
 
         <Text style={styles.section}>1. Introduction</Text>
         <Text style={styles.para}>
-          Welcome to Lovendo. By using our app, you agree to these terms. We
-          connect travelers with local experiences through a gifting mechanism.
+          Welcome to Lovendo. By using our app, you agree to these terms. We are
+          a digital content and social interaction platform that connects
+          creators with supporters through moment sharing and gifting.
         </Text>
 
         <Text style={styles.section}>2. User Conduct</Text>

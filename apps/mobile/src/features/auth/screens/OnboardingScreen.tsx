@@ -66,8 +66,8 @@ const SLIDES = [
     id: '2',
     image:
       'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1200',
-    title: 'Connect & Experience',
-    desc: "Don't just travel. Meet people who share your taste and gift them a moment.",
+    title: 'Connect & Support',
+    desc: 'Connect with creators who share your vibe and support them with a gift.',
   },
   {
     id: '3',

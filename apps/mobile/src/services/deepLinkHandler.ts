@@ -578,6 +578,22 @@ class DeepLinkHandler {
 
     return () => subscription.remove();
   }
+
+  /**
+   * Check for deferred deep links (install attribution)
+   * Should be called on first app launch
+   */
+  public async checkDeferredLink(): Promise<void> {
+    try {
+      // Placeholder for deferred linking logic
+      // In production, generate a fingerprint (IP+UA) and call 'claim_deferred_link' RPC
+      // const { data } = await supabase.rpc('claim_deferred_link', { p_fingerprint: '...' });
+      // if (data) this.handleDeepLink(data);
+      logger.debug('[DeepLink] Checked deferred links');
+    } catch (e) {
+      logger.warn('[DeepLink] Failed check deferred', e);
+    }
+  }
 }
 
 /**

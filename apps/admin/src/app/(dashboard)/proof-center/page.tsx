@@ -7,7 +7,9 @@
  * Proof queue, AI skorlari, manuel inceleme ve kalite metrikleri
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase';
+import { useQuery } from '@tanstack/react-query';
 import {
   Camera,
   CheckCircle2,
@@ -78,7 +80,44 @@ import {
   CHART_COLORS,
 } from '@/components/common/admin-chart';
 
-// Proof Stats
+// Database types extension for Joined Data
+interface ProofWithDetails {
+  id: string;
+  name: string; // File name
+  owner: string; // User ID
+  bucket_id: string;
+  created_at: string;
+  updated_at: string;
+  moderation_status:
+    | 'pending'
+    | 'approved'
+    | 'rejected'
+    | 'unreviewed'
+    | 'pending_review'
+    | 'needs_review';
+  moderation_score: number;
+  moderation_labels: any[];
+  moderation_details: any;
+  metadata: any;
+  publicUrl?: string; // Generated on client
+  aiMode?: string;
+  momentId?: string;
+
+  // Mapped fields for UI compatibility
+  transactionId?: string;
+  type?: string;
+  submitter?: string;
+  moment?: string;
+  submittedAt?: string;
+  aiScore?: number;
+  aiVerdict?: string;
+  aiBreakdown?: any;
+  images?: string[];
+  location?: any;
+  flags?: string[];
+}
+
+// Proof Stats (Mock for now, could be real later)
 const proofStats = {
   pendingReview: 89,
   reviewedToday: 234,
@@ -141,80 +180,6 @@ const aiBreakdown = {
   deepfakeDetection: 98,
 };
 
-// Pending Proofs Queue
-const pendingProofs = [
-  {
-    id: 'PRF-2024-001',
-    transactionId: 'TXN-456',
-    type: 'photo',
-    submitter: 'Ahmet K.',
-    moment: 'Kapadokya Balloon Tour',
-    submittedAt: '2024-01-10 09:15',
-    aiScore: 94,
-    aiVerdict: 'approved',
-    aiBreakdown: { face: 96, landmark: 92, quality: 94, authenticity: 95 },
-    images: ['/proof1.jpg', '/proof2.jpg'],
-    location: { name: 'Goreme, Kapadokya', verified: true },
-    flags: [],
-  },
-  {
-    id: 'PRF-2024-002',
-    transactionId: 'TXN-457',
-    type: 'photo',
-    submitter: 'Ayse M.',
-    moment: 'Bosphorus Dinner Cruise',
-    submittedAt: '2024-01-10 08:45',
-    aiScore: 72,
-    aiVerdict: 'needs_review',
-    aiBreakdown: { face: 85, landmark: 65, quality: 78, authenticity: 60 },
-    images: ['/proof3.jpg'],
-    location: { name: 'Bosphorus, Istanbul', verified: false },
-    flags: ['low_landmark_confidence', 'metadata_mismatch'],
-  },
-  {
-    id: 'PRF-2024-003',
-    transactionId: 'TXN-458',
-    type: 'geo',
-    submitter: 'Can B.',
-    moment: 'Private Istanbul Tour',
-    submittedAt: '2024-01-10 08:30',
-    aiScore: 88,
-    aiVerdict: 'approved',
-    aiBreakdown: { face: 90, landmark: 85, quality: 92, authenticity: 86 },
-    images: ['/proof4.jpg', '/proof5.jpg', '/proof6.jpg'],
-    location: { name: 'Sultanahmet, Istanbul', verified: true },
-    flags: [],
-  },
-  {
-    id: 'PRF-2024-004',
-    transactionId: 'TXN-459',
-    type: 'receipt',
-    submitter: 'Deniz K.',
-    moment: 'Luxury Restaurant Experience',
-    submittedAt: '2024-01-10 08:00',
-    aiScore: 45,
-    aiVerdict: 'rejected',
-    aiBreakdown: { face: 0, landmark: 0, quality: 65, authenticity: 25 },
-    images: ['/proof7.jpg'],
-    location: { name: 'Nisantasi, Istanbul', verified: true },
-    flags: ['possible_fake', 'low_quality', 'no_face_detected'],
-  },
-  {
-    id: 'PRF-2024-005',
-    transactionId: 'TXN-460',
-    type: 'video',
-    submitter: 'Elif T.',
-    moment: 'Paragliding Adventure',
-    submittedAt: '2024-01-10 07:45',
-    aiScore: 96,
-    aiVerdict: 'approved',
-    aiBreakdown: { face: 98, landmark: 94, quality: 96, authenticity: 97 },
-    images: ['/proof8.jpg'],
-    location: { name: 'Fethiye, Mugla', verified: true },
-    flags: [],
-  },
-];
-
 // Daily Performance Data
 const dailyPerformanceData = [
   { date: 'Pzt', submitted: 156, approved: 132, rejected: 24, aiScore: 86 },
@@ -238,14 +203,86 @@ const turkishLandmarks = [
 
 export default function ProofCenterPage() {
   const [selectedTab, setSelectedTab] = useState('queue');
-  const [selectedProof, setSelectedProof] = useState<
-    (typeof pendingProofs)[0] | null
-  >(null);
+  const [selectedProof, setSelectedProof] = useState<ProofWithDetails | null>(
+    null,
+  );
   const [reviewDialog, setReviewDialog] = useState(false);
   const [reviewNote, setReviewNote] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
 
-  const getVerdictBadge = (verdict: string, score: number) => {
+  const supabase = createClient();
+
+  // Fetch Real Data from Supabase
+  const {
+    data: proofs = [],
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ['proofs'],
+    queryFn: async () => {
+      // Fetch uploads from 'proofs' bucket recorded in 'uploaded_images' table
+      const { data, error } = await supabase
+        .from('uploaded_images')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+
+      // Transform and add Public URL & UI Compatible fields
+      return data.map((item: any) => {
+        const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${item.bucket_id}/${item.name}`;
+        const score = item.moderation_score
+          ? Math.round(item.moderation_score * 100)
+          : 0;
+
+        // Normalize status
+        let verdict = item.moderation_status;
+        if (verdict === 'pending') verdict = 'needs_review';
+        if (verdict === 'unreviewed') verdict = 'needs_review';
+
+        return {
+          ...item,
+          publicUrl,
+          // Mapped Fields for UI
+          id: item.id.substring(0, 8), // Short ID
+          transactionId: item.id,
+          type: item.metadata?.type || 'photo',
+          submitter: item.owner || 'Unknown User',
+          moment: item.metadata?.momentId || 'Upload',
+          submittedAt: new Date(item.created_at).toLocaleString('tr-TR'),
+          aiScore: score,
+          aiVerdict: verdict,
+          aiBreakdown: {
+            face: item.moderation_details?.face || 0,
+            landmark: item.moderation_details?.landmark || 0,
+            quality: item.moderation_details?.quality || 0,
+            authenticity: item.moderation_details?.authenticity || 0,
+          },
+          images: [publicUrl],
+          location: { name: 'Unknown Location', verified: false },
+          flags: item.moderation_labels || [],
+        };
+      }) as ProofWithDetails[];
+    },
+  });
+
+  const pendingProofs = proofs; // Use fetched data
+
+  // Stats calculation from real data
+  const realStats = {
+    total: proofs.length,
+    pending: proofs.filter(
+      (p) =>
+        p.moderation_status === 'pending' ||
+        p.moderation_status === 'pending_review' ||
+        p.moderation_status === 'unreviewed',
+    ).length,
+    approved: proofs.filter((p) => p.moderation_status === 'approved').length,
+    rejected: proofs.filter((p) => p.moderation_status === 'rejected').length,
+  };
+
+  const getVerdictBadge = (verdict: string, score: number = 0) => {
     if (verdict === 'approved' || score >= 85) {
       return (
         <CanvaBadge className="bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30">
@@ -253,7 +290,12 @@ export default function ProofCenterPage() {
           AI Onayladi
         </CanvaBadge>
       );
-    } else if (verdict === 'needs_review' || (score >= 60 && score < 85)) {
+    } else if (
+      verdict === 'needs_review' ||
+      verdict === 'pending' ||
+      verdict === 'unreviewed' ||
+      (score >= 60 && score < 85)
+    ) {
       return (
         <CanvaBadge className="bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30">
           <Eye className="h-3 w-3 mr-1" />
@@ -282,13 +324,37 @@ export default function ProofCenterPage() {
     return 'bg-red-500';
   };
 
-  const handleApprove = (proof: (typeof pendingProofs)[0]) => {
+  const handleApprove = async (proof: ProofWithDetails) => {
     setSelectedProof(proof);
+    if (!proof.transactionId) return;
+
+    // Update moderation status in DB
+    // Note: uploaded_images table not in generated types, using type assertion
+    const { error } = await (supabase as any)
+      .from('uploaded_images')
+      .update({ moderation_status: 'approved' })
+      .eq('id', proof.transactionId);
+
+    if (!error) {
+      refetch(); // Refresh list
+    }
     setReviewDialog(true);
   };
 
-  const handleReject = (proof: (typeof pendingProofs)[0]) => {
+  const handleReject = async (proof: ProofWithDetails) => {
     setSelectedProof(proof);
+    if (!proof.transactionId) return;
+
+    // Update moderation status in DB
+    // Note: uploaded_images table not in generated types, using type assertion
+    const { error } = await (supabase as any)
+      .from('uploaded_images')
+      .update({ moderation_status: 'rejected' })
+      .eq('id', proof.transactionId);
+
+    if (!error) {
+      refetch(); // Refresh list
+    }
     setReviewDialog(true);
   };
 
@@ -302,7 +368,8 @@ export default function ProofCenterPage() {
             Proof Verification Center
           </h1>
           <p className="text-muted-foreground">
-            AI destekli kanit dogrulama ve kalite kontrol merkezi
+            AI destekli kanit dogrulama ve kalite kontrol merkezi (
+            {proofs.length} kayit)
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -310,8 +377,10 @@ export default function ProofCenterPage() {
             <Download className="h-4 w-4 mr-2" />
             Rapor
           </CanvaButton>
-          <CanvaButton size="sm">
-            <RefreshCw className="h-4 w-4 mr-2" />
+          <CanvaButton size="sm" onClick={() => refetch()}>
+            <RefreshCw
+              className={cn('h-4 w-4 mr-2', isLoading && 'animate-spin')}
+            />
             Yenile
           </CanvaButton>
         </div>
@@ -321,31 +390,31 @@ export default function ProofCenterPage() {
       <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-6">
         <CanvaStatCard
           title="Bekleyen"
-          value={proofStats.pendingReview}
+          value={realStats.pending}
           icon={<Clock className="h-4 w-4" />}
           subtitle="Inceleme bekliyor"
-          variant="warning"
+          accentColor="#f59e0b"
         />
         <CanvaStatCard
           title="Onaylanan"
-          value={proofStats.approvedToday}
+          value={realStats.approved}
           icon={<CheckCircle2 className="h-4 w-4" />}
-          subtitle="Bugun onaylandi"
-          variant="success"
+          subtitle="Toplam onay"
+          accentColor="#10b981"
         />
         <CanvaStatCard
           title="Reddedilen"
-          value={proofStats.rejectedToday}
+          value={realStats.rejected}
           icon={<XCircle className="h-4 w-4" />}
-          subtitle="Bugun reddedildi"
-          variant="error"
+          subtitle="Toplam red"
+          accentColor="#ef4444"
         />
         <CanvaStatCard
           title="AI Skoru"
           value={`%${proofStats.avgAIScore}`}
           icon={<Brain className="h-4 w-4" />}
           subtitle="Ortalama skor"
-          variant="info"
+          accentColor="#3b82f6"
         />
         <CanvaStatCard
           title="AI Dogruluk"
@@ -358,7 +427,7 @@ export default function ProofCenterPage() {
           value={`${proofStats.avgReviewTime} dk`}
           icon={<Zap className="h-4 w-4" />}
           subtitle="Inceleme suresi"
-          variant="info"
+          accentColor="#3b82f6"
         />
       </div>
 
@@ -438,13 +507,29 @@ export default function ProofCenterPage() {
 
           {/* Proof Cards */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {isLoading && (
+              <div className="col-span-3 text-center py-10">
+                <p className="text-muted-foreground animate-pulse">
+                  Yukleniyor...
+                </p>
+              </div>
+            )}
+
+            {!isLoading && pendingProofs.length === 0 && (
+              <div className="col-span-3 text-center py-10 text-muted-foreground">
+                Hicbir kayit bulunamadi.
+              </div>
+            )}
+
             {pendingProofs.map((proof) => (
               <CanvaCard
                 key={proof.id}
                 className={cn(
                   'cursor-pointer hover:shadow-md transition-all',
                   proof.aiVerdict === 'rejected' && 'border-red-500/30',
-                  proof.aiVerdict === 'needs_review' && 'border-amber-500/30',
+                  (proof.aiVerdict === 'needs_review' ||
+                    proof.aiVerdict === 'pending') &&
+                    'border-amber-500/30',
                 )}
               >
                 <CanvaCardHeader className="pb-3">
@@ -456,27 +541,56 @@ export default function ProofCenterPage() {
                       >
                         {proof.id}
                       </CanvaBadge>
-                      {proof.flags.length > 0 && (
-                        <CanvaBadge variant="destructive" className="text-xs">
+                      {proof.flags && proof.flags.length > 0 && (
+                        <CanvaBadge variant="error" className="text-xs">
                           <Flag className="h-3 w-3 mr-1" />
                           {proof.flags.length}
                         </CanvaBadge>
                       )}
                     </div>
-                    {getVerdictBadge(proof.aiVerdict, proof.aiScore)}
+                    {getVerdictBadge(
+                      proof.aiVerdict || 'needs_review',
+                      proof.aiScore,
+                    )}
                   </div>
                 </CanvaCardHeader>
                 <CanvaCardBody className="space-y-4">
                   {/* Proof Preview */}
-                  <div className="relative aspect-video bg-muted rounded-lg flex items-center justify-center">
-                    <Camera className="h-8 w-8 text-muted-foreground" />
+                  <div className="relative aspect-video bg-muted rounded-lg flex items-center justify-center overflow-hidden">
+                    {proof.images && proof.images[0] ? (
+                      <img
+                        src={proof.images[0]}
+                        alt="Proof"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          // Fallback for failed images
+                          (e.target as HTMLImageElement).style.display = 'none';
+                          (
+                            e.target as HTMLImageElement
+                          ).parentElement?.classList.add(
+                            'flex',
+                            'items-center',
+                            'justify-center',
+                          );
+                        }}
+                      />
+                    ) : (
+                      <Camera className="h-8 w-8 text-muted-foreground" />
+                    )}
+
+                    {(!proof.images || !proof.images[0]) && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Camera className="h-8 w-8 text-muted-foreground" />
+                      </div>
+                    )}
+
                     <CanvaButton
                       size="sm"
                       variant="secondary"
                       className="absolute bottom-2 right-2"
                     >
                       <ZoomIn className="h-3 w-3 mr-1" />
-                      {proof.images.length} gorsel
+                      {proof.images?.length || 0} gorsel
                     </CanvaButton>
                   </div>
 
@@ -490,24 +604,26 @@ export default function ProofCenterPage() {
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Gonderen:</span>
-                      <span className="font-medium">{proof.submitter}</span>
+                      <span className="font-medium truncate max-w-[150px]">
+                        {proof.submitter}
+                      </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Konum:</span>
                       <span
                         className={cn(
                           'font-medium flex items-center gap-1',
-                          proof.location.verified
+                          proof.location?.verified
                             ? 'text-emerald-600 dark:text-emerald-400'
                             : 'text-amber-600 dark:text-amber-400',
                         )}
                       >
-                        {proof.location.verified ? (
+                        {proof.location?.verified ? (
                           <CheckCircle2 className="h-3 w-3" />
                         ) : (
                           <AlertTriangle className="h-3 w-3" />
                         )}
-                        {proof.location.name.split(',')[0]}
+                        {proof.location?.name?.split(',')[0]}
                       </span>
                     </div>
                   </div>
@@ -519,7 +635,7 @@ export default function ProofCenterPage() {
                       <span
                         className={cn(
                           'text-lg font-bold',
-                          getScoreColor(proof.aiScore),
+                          getScoreColor(proof.aiScore || 0),
                         )}
                       >
                         %{proof.aiScore}
@@ -528,58 +644,62 @@ export default function ProofCenterPage() {
                     <Progress value={proof.aiScore} className="h-2" />
 
                     {/* Score Breakdown */}
-                    <div className="grid grid-cols-4 gap-2 pt-2">
-                      <div className="text-center">
-                        <p className="text-xs text-muted-foreground">Yuz</p>
-                        <p
-                          className={cn(
-                            'text-sm font-medium',
-                            getScoreColor(proof.aiBreakdown.face),
-                          )}
-                        >
-                          {proof.aiBreakdown.face}
-                        </p>
+                    {proof.aiBreakdown && (
+                      <div className="grid grid-cols-4 gap-2 pt-2">
+                        <div className="text-center">
+                          <p className="text-xs text-muted-foreground">Yuz</p>
+                          <p
+                            className={cn(
+                              'text-sm font-medium',
+                              getScoreColor(proof.aiBreakdown.face),
+                            )}
+                          >
+                            {proof.aiBreakdown.face}
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xs text-muted-foreground">Mekan</p>
+                          <p
+                            className={cn(
+                              'text-sm font-medium',
+                              getScoreColor(proof.aiBreakdown.landmark),
+                            )}
+                          >
+                            {proof.aiBreakdown.landmark}
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xs text-muted-foreground">
+                            Kalite
+                          </p>
+                          <p
+                            className={cn(
+                              'text-sm font-medium',
+                              getScoreColor(proof.aiBreakdown.quality),
+                            )}
+                          >
+                            {proof.aiBreakdown.quality}
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xs text-muted-foreground">
+                            Orijinal
+                          </p>
+                          <p
+                            className={cn(
+                              'text-sm font-medium',
+                              getScoreColor(proof.aiBreakdown.authenticity),
+                            )}
+                          >
+                            {proof.aiBreakdown.authenticity}
+                          </p>
+                        </div>
                       </div>
-                      <div className="text-center">
-                        <p className="text-xs text-muted-foreground">Mekan</p>
-                        <p
-                          className={cn(
-                            'text-sm font-medium',
-                            getScoreColor(proof.aiBreakdown.landmark),
-                          )}
-                        >
-                          {proof.aiBreakdown.landmark}
-                        </p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-xs text-muted-foreground">Kalite</p>
-                        <p
-                          className={cn(
-                            'text-sm font-medium',
-                            getScoreColor(proof.aiBreakdown.quality),
-                          )}
-                        >
-                          {proof.aiBreakdown.quality}
-                        </p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-xs text-muted-foreground">
-                          Orijinal
-                        </p>
-                        <p
-                          className={cn(
-                            'text-sm font-medium',
-                            getScoreColor(proof.aiBreakdown.authenticity),
-                          )}
-                        >
-                          {proof.aiBreakdown.authenticity}
-                        </p>
-                      </div>
-                    </div>
+                    )}
                   </div>
 
                   {/* Flags */}
-                  {proof.flags.length > 0 && (
+                  {proof.flags && proof.flags.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                       {proof.flags.map((flag) => (
                         <CanvaBadge
@@ -598,23 +718,38 @@ export default function ProofCenterPage() {
                     <CanvaButton
                       size="sm"
                       className="flex-1 bg-emerald-600 hover:bg-emerald-700"
-                      onClick={() => handleApprove(proof)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleApprove(proof);
+                      }}
                     >
                       <ThumbsUp className="h-4 w-4 mr-1" />
                       Onayla
                     </CanvaButton>
                     <CanvaButton
                       size="sm"
-                      variant="destructive"
+                      variant="danger"
                       className="flex-1"
-                      onClick={() => handleReject(proof)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleReject(proof);
+                      }}
                     >
                       <ThumbsDown className="h-4 w-4 mr-1" />
                       Reddet
                     </CanvaButton>
-                    <CanvaButton size="sm" variant="outline">
-                      <Eye className="h-4 w-4" />
-                    </CanvaButton>
+                    {proof.publicUrl && (
+                      <a
+                        href={proof.publicUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <CanvaButton size="sm" variant="outline">
+                          <Eye className="h-4 w-4" />
+                        </CanvaButton>
+                      </a>
+                    )}
                   </div>
                 </CanvaCardBody>
               </CanvaCard>
@@ -810,10 +945,20 @@ export default function ProofCenterPage() {
           <DialogHeader>
             <DialogTitle>Proof Inceleme</DialogTitle>
             <DialogDescription>
-              {selectedProof?.id} - {selectedProof?.moment}
+              {selectedProof?.transactionId} - {selectedProof?.moment}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
+            {selectedProof?.publicUrl && (
+              <div className="aspect-video relative bg-muted rounded-md overflow-hidden">
+                <img
+                  src={selectedProof.publicUrl}
+                  className="object-contain w-full h-full"
+                  alt="Review"
+                />
+              </div>
+            )}
+
             <div className="p-3 rounded-lg bg-muted">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium">AI Skoru</span>
@@ -826,7 +971,7 @@ export default function ProofCenterPage() {
                   %{selectedProof?.aiScore}
                 </span>
               </div>
-              {selectedProof?.flags.length ? (
+              {selectedProof?.flags && selectedProof.flags.length > 0 ? (
                 <div className="flex flex-wrap gap-1">
                   {selectedProof.flags.map((flag) => (
                     <CanvaBadge
@@ -858,15 +1003,19 @@ export default function ProofCenterPage() {
               Iptal
             </CanvaButton>
             <CanvaButton
-              variant="destructive"
-              onClick={() => setReviewDialog(false)}
+              variant="danger"
+              onClick={() => {
+                if (selectedProof) handleReject(selectedProof);
+              }}
             >
               <ThumbsDown className="h-4 w-4 mr-1" />
               Reddet
             </CanvaButton>
             <CanvaButton
               className="bg-emerald-600 hover:bg-emerald-700"
-              onClick={() => setReviewDialog(false)}
+              onClick={() => {
+                if (selectedProof) handleApprove(selectedProof);
+              }}
             >
               <ThumbsUp className="h-4 w-4 mr-1" />
               Onayla

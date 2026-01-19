@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "TravelMatch.app"
-               BlueprintName = "TravelMatch"
-               ReferencedContainer = "container:TravelMatch.xcodeproj">
+               BuildableName = "Lovendo.app"
+               BlueprintName = "Lovendo"
+               ReferencedContainer = "container:Lovendo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "TravelMatchTests.xctest"
-               BlueprintName = "TravelMatchTests"
-               ReferencedContainer = "container:TravelMatch.xcodeproj">
+               BuildableName = "LovendoTests.xctest"
+               BlueprintName = "LovendoTests"
+               ReferencedContainer = "container:Lovendo.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "TravelMatch.app"
-            BlueprintName = "TravelMatch"
-            ReferencedContainer = "container:TravelMatch.xcodeproj">
+            BuildableName = "Lovendo.app"
+            BlueprintName = "Lovendo"
+            ReferencedContainer = "container:Lovendo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "TravelMatch.app"
-            BlueprintName = "TravelMatch"
-            ReferencedContainer = "container:TravelMatch.xcodeproj">
+            BuildableName = "Lovendo.app"
+            BlueprintName = "Lovendo"
+            ReferencedContainer = "container:Lovendo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

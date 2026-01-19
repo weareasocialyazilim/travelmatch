@@ -14,8 +14,8 @@
 
 - [ ] Create app record in App Store Connect
 - [ ] Set app name: **Lovendo**
-- [ ] Set bundle ID: `com.lovendo.app`
-- [ ] Set primary category: **Travel** (or Social Networking)
+- [ ] Set bundle ID: `com.anonymous.lovendo-new`
+- [ ] Set primary category: **Social Networking** (Sosyal Ağ)
 - [ ] Set secondary category: **Lifestyle**
 - [ ] Set content rating: Complete the questionnaire
 - [ ] Set age rating: 17+ (due to user-generated content)
@@ -23,9 +23,9 @@
 ### Required Metadata
 
 - [ ] App Name (30 characters max): `Lovendo`
-- [ ] Subtitle (30 characters max): `Share Moments, Gift Experiences`
+- [ ] Subtitle (30 characters max): `Support Creators, Share Moments`
 - [ ] Description (4000 characters max)
-- [ ] Keywords (100 characters max): `travel, gift, moments, experiences, local, meet, share`
+- [ ] Keywords (100 characters max): `moment, gift, support, creator, social, appreciation`
 - [ ] Support URL: `https://lovendo.app/support`
 - [ ] Marketing URL: `https://lovendo.app`
 - [ ] Privacy Policy URL: `https://lovendo.app/privacy`
@@ -65,6 +65,10 @@
   - [x] NSContactsUsageDescription
 - [x] App Transport Security configured
 - [x] Push notification entitlements
+- [x] Moderation Content (Guideline 1.2):
+  - [x] User Report/Block mechanism implementation
+  - [x] 24h Moderation turnaround commitment in App Review notes
+  - [x] EULA agreement in onboarding flow
 
 ### Build & Submit
 

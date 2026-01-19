@@ -40,8 +40,8 @@
         "required": "Amount is required",
         "invalid": "Please enter a valid amount",
         "positive": "Amount must be positive",
-        "max": "Amount cannot exceed 100,000",
-        "maxMoment": "Amount cannot exceed 10,000"
+        "max": "Amount cannot exceed limits",
+        "maxMoment": "Amount cannot exceed limits for this moment"
       },
       "note": {
         "max": "Note must be at most 500 characters"
@@ -93,8 +93,8 @@
         "required": "End date is required",
         "afterStart": "End date must be after start date"
       },
-      "tripId": {
-        "invalid": "Invalid trip ID"
+      "momentId": {
+        "invalid": "Invalid moment ID"
       },
       "caption": {
         "max": "Caption must be at most 500 characters"
@@ -209,6 +209,25 @@
       "submitted": "Submitted",
       "uploaded": "Uploaded",
       "deleted": "Deleted"
+    },
+    "moderation": {
+      "throttle": {
+        "title": "You're moving a bit fast",
+        "message": "We've temporarily slowed things down for safety. Try again in a minute."
+      },
+      "shadowban": {
+        "success": "Sent."
+      },
+      "locked": {
+        "title": "Account under review",
+        "message": "We've detected unusual activity. To keep the community safe, your account is temporarily under review.",
+        "cta": "Contact Support"
+      },
+      "banned": {
+        "title": "Account Closed",
+        "message": "Your account has been closed due to violations of our community rules.",
+        "cta": "Appeal"
+      }
     }
   }
 }

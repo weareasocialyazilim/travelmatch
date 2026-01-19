@@ -8,6 +8,7 @@ import { COLORS } from '../constants/colors';
 import { logger } from '../utils/logger';
 import { encryptionService } from './encryptionService';
 import { usersService as dbUsersService } from './supabaseDbService';
+import { analytics } from './analytics';
 import type { Database } from '../types/database.types';
 import { uploadFile } from './supabaseStorageService';
 import { isNotNull } from '../types/guards';
@@ -895,15 +896,11 @@ export const userService = {
         user.id,
       );
 
-      // Call the edge function for account deletion
-      // This will handle cascading deletes for all related data:
-      // - moments, chats, transactions, notifications, etc.
-      const { data, error } = await supabase.functions.invoke(
-        'delete-user-account',
-        {
-          body: { userId: user.id },
-        },
-      );
+      // Call the RPC function for soft delete
+      // This will handle cascading deletes/anonymization via DB logic
+      const { data, error } = await supabase.rpc('soft_delete_user', {
+        p_user_id: user.id,
+      });
 
       if (error) {
         logger.error('[UserService] Account deletion failed:', error);
@@ -911,6 +908,12 @@ export const userService = {
       }
 
       logger.info('[UserService] Account deletion successful:', data);
+
+      // Track deletion before resetting analytics
+      await analytics.trackEvent('user_deleted_account');
+
+      // Reset analytics session
+      await analytics.reset();
 
       // Sign out the user after successful deletion
       await supabase.auth.signOut();
