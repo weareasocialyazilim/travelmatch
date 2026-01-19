@@ -93,6 +93,18 @@ export const SacredMoments = memo<SacredMomentsProps>(
       return () => subscription.remove();
     }, [enabled]);
 
+    // Track unblur timer
+    const unblurTimerRef = React.useRef<NodeJS.Timeout>();
+
+    // Cleanup timer on unmount
+    useEffect(() => {
+      return () => {
+        if (unblurTimerRef.current) {
+          clearTimeout(unblurTimerRef.current);
+        }
+      };
+    }, []);
+
     const handleScreenshotAttempt = useCallback(() => {
       setIsBlurred(true);
       setScreenshotCount((prev) => prev + 1);
@@ -106,17 +118,21 @@ export const SacredMoments = memo<SacredMomentsProps>(
         duration: CEREMONY_TIMING.blurTransition,
       });
 
+      // Clear existing timer if any
+      if (unblurTimerRef.current) {
+        clearTimeout(unblurTimerRef.current);
+      }
+
       // Auto-unblur after delay
-      const timer = setTimeout(() => {
+      unblurTimerRef.current = setTimeout(() => {
+        if (!enabled) return; // Don't state update if disabled/unmounted check simplified
+
         blurIntensity.value = withTiming(0, {
           duration: CEREMONY_TIMING.blurTransition,
         });
         setIsBlurred(false);
       }, CEREMONY_TIMING.unblurDelay);
-
-      // Return cleanup function for use by caller if needed
-      return () => clearTimeout(timer);
-    }, [onScreenshotAttempt, blurIntensity]);
+    }, [onScreenshotAttempt, blurIntensity, enabled]);
 
     const blurAnimatedStyle = useAnimatedStyle(() => ({
       opacity: interpolate(blurIntensity.value, [0, 95], [0, 1]),

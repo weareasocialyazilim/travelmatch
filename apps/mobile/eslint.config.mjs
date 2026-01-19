@@ -170,6 +170,7 @@ export default tseslint.config(
       'react-hooks/rules-of-hooks': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       'react-native/no-inline-styles': 'off',
+      'no-console': 'off',
     },
   },
 

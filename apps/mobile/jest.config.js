@@ -1,4 +1,12 @@
-const jestExpoPreset = require('jest-expo/jest-preset');
+const path = require('path');
+let jestExpoPreset;
+try {
+  jestExpoPreset = require('jest-expo/jest-preset');
+} catch (e) {
+  // Fallback for monorepo hoisting if standard resolution fails
+  // This handles cases where Jest is run from a context where it doesn't walk up to the root node_modules
+  jestExpoPreset = require(path.resolve(__dirname, '../../node_modules/jest-expo/jest-preset'));
+}
 
 module.exports = {
   ...jestExpoPreset,
