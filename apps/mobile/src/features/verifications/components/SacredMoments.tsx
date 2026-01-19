@@ -94,7 +94,7 @@ export const SacredMoments = memo<SacredMomentsProps>(
     }, [enabled]);
 
     // Track unblur timer
-    const unblurTimerRef = React.useRef<NodeJS.Timeout>();
+    const unblurTimerRef = React.useRef<NodeJS.Timeout | undefined>(undefined);
 
     // Cleanup timer on unmount
     useEffect(() => {
