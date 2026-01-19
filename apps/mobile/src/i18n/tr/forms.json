@@ -45,8 +45,8 @@
         "required": "Tutar gereklidir",
         "invalid": "Geçerli bir tutar girin",
         "positive": "Tutar pozitif olmalıdır",
-        "max": "Tutar 100.000'den fazla olamaz",
-        "maxMoment": "Tutar 10.000'den fazla olamaz"
+        "max": "Tutar bu işlem için limiti aşıyor",
+        "maxMoment": "Bu an için belirlenen limit aşılamaz"
       },
       "note": {
         "max": "Not en fazla 500 karakter olmalıdır"
@@ -98,8 +98,8 @@
         "required": "Bitiş tarihi gereklidir",
         "afterStart": "Bitiş tarihi başlangıçtan sonra olmalıdır"
       },
-      "tripId": {
-        "invalid": "Geçersiz seyahat ID"
+      "momentId": {
+        "invalid": "Geçersiz an ID"
       },
       "caption": {
         "max": "Açıklama en fazla 500 karakter olmalıdır"
@@ -214,6 +214,25 @@
       "submitted": "Gönderildi",
       "uploaded": "Yüklendi",
       "deleted": "Silindi"
+    },
+    "moderation": {
+      "throttle": {
+        "title": "Çok hızlı gidiyorsun",
+        "message": "Şu an çok hızlı işlem yapıyorsun. Güvenlik için kısa bir süre yavaşlattık. Bir dakika içinde tekrar dene."
+      },
+      "shadowban": {
+        "success": "İşlemin alındı."
+      },
+      "locked": {
+        "title": "Hesabın incelemede",
+        "message": "Güvenlik sistemlerimiz olağandışı bir aktivite tespit etti. Hesabını korumak için geçici olarak incelemeye aldık.",
+        "cta": "Destekle iletişime geç"
+      },
+      "banned": {
+        "title": "Hesap Kapatıldı",
+        "message": "Topluluk kurallarını ihlal eden aktiviteler nedeniyle hesabın kapatıldı.",
+        "cta": "İtiraz Et"
+      }
     }
   }
 }

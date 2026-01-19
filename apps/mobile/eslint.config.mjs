@@ -95,6 +95,9 @@ export default tseslint.config(
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'off',
 
+      // Console
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+
       // TypeScript
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': [

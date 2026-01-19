@@ -28,6 +28,7 @@ import {
   Text,
   TouchableOpacity,
   Share,
+  Alert,
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useNavigation } from '@react-navigation/native';
@@ -35,6 +36,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { HapticManager } from '@/services/HapticManager';
 import { LinearGradient } from 'expo-linear-gradient';
 import { measureScreenLoad } from '@/config/sentry'; // ADDED: Performance monitoring
+import { ReportBlockBottomSheet } from '@/features/moderation/components/ReportBlockBottomSheet';
 import {
   ImmersiveMomentCard,
   AwwwardsDiscoverHeader,
@@ -125,6 +127,30 @@ const DiscoverScreen = () => {
 
   // Pending moment for post-login action
   const [_pendingMoment, setPendingMoment] = useState<Moment | null>(null);
+
+  // Moderate/Report State
+  const [reportMoment, setReportMoment] = useState<Moment | null>(null);
+
+  const handleReportPress = useCallback((moment: Moment) => {
+    setReportMoment(moment);
+  }, []);
+
+  const handleReportSubmit = useCallback(
+    (action: string, reason?: string, details?: string) => {
+      // Logic would go here to call backend
+      console.log(`[Discover] ${action} on moment ${reportMoment?.id}`);
+      setReportMoment(null);
+      setTimeout(() => {
+        Alert.alert(
+          action === 'block' ? 'User Blocked' : 'Report Sent',
+          action === 'block'
+            ? 'You will no longer see content from this user.'
+            : 'Thank you for keeping Lovendo safe. We will review this shortly.',
+        );
+      }, 300);
+    },
+    [reportMoment],
+  );
 
   // Use real stories data from hook instead of mock data
   const {
@@ -472,6 +498,7 @@ const DiscoverScreen = () => {
             onCounterOfferPress={() => handleCounterOffer(item)}
             onUserPress={() => handleUserPress(item)}
             onSharePress={() => handleSharePress(item)}
+            onReportPress={() => handleReportPress(item)}
           />
           {shouldShowSubscription && (
             <View style={styles.inlineSubscription}>
@@ -490,6 +517,7 @@ const DiscoverScreen = () => {
       handleCounterOffer,
       handleUserPress,
       handleSharePress,
+      handleReportPress,
       isPremium,
       navigation,
     ],
@@ -702,6 +730,14 @@ const DiscoverScreen = () => {
 
       {/* Guest Login Prompt Modal - Now rendered by ModalProvider */}
       {/* FloatingDock is rendered by MainTabNavigator */}
+
+      {/* Report/Block Modal */}
+      <ReportBlockBottomSheet
+        visible={!!reportMoment}
+        onClose={() => setReportMoment(null)}
+        onSubmit={handleReportSubmit}
+        targetType="moment"
+      />
     </LiquidScreenWrapper>
   );
 };

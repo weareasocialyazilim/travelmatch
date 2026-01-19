@@ -1,5 +1,20 @@
 # CHANGELOG_SAFE.md
 
+## [Unreleased] - 2026-01-18
+
+### 🚀 New Features
+- 
+
+### 🐛 Bug Fixes
+- 
+
+### 🔧 Improvements
+- 
+
+### 🔒 Security
+- 
+
+
 ## Lovendo Stabilization Release - 2026-01-14
 
 Bu changelog, stabilization calismasinda yapilan TUM degisiklikleri ve her birinin neden "breaking"

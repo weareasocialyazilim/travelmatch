@@ -53,7 +53,7 @@ serve(async (req) => {
     // Get user
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     );
 
     const token = authHeader.replace('Bearer ', '');
@@ -66,6 +66,110 @@ serve(async (req) => {
       return unauthorizedResponse('Invalid token', corsHeaders);
     }
 
+    // ==========================================================================
+    // 0. Risk & Moderation Check (User Status)
+    // ==========================================================================
+    // Use user_safety table for moderation status
+    const { data: userInfo, error: userError } = await supabase
+      .from('user_safety')
+      .select('risk_score, status, ban_reason')
+      .eq('user_id', user.id)
+      .single();
+
+    if (userError) {
+      // If no safety record exists, create one (self-healing)
+      if (userError.code === 'PGRST116') {
+        logger.warn(
+          `Missing safety record for user ${user.id}, creating default.`,
+        );
+        // We can continue with default values if insert is async or we just use defaults here.
+        // For now, assume active.
+      } else {
+        logger.error('Failed to fetch user safety info', userError);
+        return jsonResponse(
+          { success: false, error: 'Service temporary unavailable' },
+          { status: 503, headers: corsHeaders },
+        );
+      }
+    }
+
+    const userStatus = userInfo?.status || 'active';
+    const riskScore = userInfo?.risk_score || 0;
+
+    // ⛔ Permanent Ban Check
+    if (userStatus === 'permanent_ban') {
+      return jsonResponse(
+        {
+          success: false,
+          error: 'Your account has been closed due to violations.',
+          code: 'ACCOUNT_BANNED',
+        },
+        { status: 403, headers: corsHeaders },
+      );
+    }
+
+    // 🔒 Temp Lock Check
+    if (userStatus === 'temp_locked') {
+      return jsonResponse(
+        {
+          success: false,
+          error: 'Account under review. Please contact support.',
+          code: 'ACCOUNT_LOCKED',
+        },
+        { status: 403, headers: corsHeaders },
+      );
+    }
+
+    // ⏳ Soft Throttle Check (Simulated Delay or Rejection)
+    if (userStatus === 'throttled') {
+      // We can reject 1 out of 3 requests or just add a random delay
+      // For simplicity, let's reject bursty behavior aggressively here
+      const random = Math.random();
+      if (random > 0.7) {
+        // 30% chance to fail
+        return jsonResponse(
+          {
+            success: false,
+            error: 'You are sending messages too fast. Slow down.',
+            code: 'THROTTLED',
+          },
+          { status: 429, headers: corsHeaders },
+        );
+      }
+    }
+
+    // ==========================================================================
+    // Rate Limiting (Hardening)
+    // ==========================================================================
+    try {
+      const { data: allowed, error: rateLimitError } = await supabase.rpc(
+        'check_rate_limit',
+        {
+          identifier: user.id,
+          endpoint: 'send-message',
+        },
+      );
+
+      // Fail closed (if error, allow request but log it - or fail open? Let's stay safe and assume allow unless explicitly blocked for UX)
+      // Actually strictly, we should probably block if rate limit system is down, but for user experience let's log error.
+      // However, if allowed is false, we BLOCK.
+
+      if (rateLimitError) {
+        logger.error('Rate limit check failed', rateLimitError);
+      } else if (allowed === false) {
+        return jsonResponse(
+          {
+            success: false,
+            error: 'Too many messages. Please slow down.',
+            code: 'RATE_LIMITED',
+          },
+          { status: 429, headers: corsHeaders },
+        );
+      }
+    } catch (err) {
+      logger.error('Rate limit exception', err);
+    }
+
     // Parse request
     const body: SendMessageRequest = await req.json();
     const { conversationId, content, messageType = 'text' } = body;
@@ -73,7 +177,7 @@ serve(async (req) => {
     if (!conversationId || !content) {
       return badRequestResponse(
         'conversationId and content are required',
-        corsHeaders
+        corsHeaders,
       );
     }
 
@@ -118,15 +222,18 @@ serve(async (req) => {
       });
 
       // Log to analytics table
-      await supabase.from('moderation_logs').insert({
-        user_id: user.id,
-        content_type: 'message',
-        content_hash: await hashContent(content),
-        severity: moderationResult.severity,
-        violations: moderationResult.violations,
-        action_taken: moderationResult.allowed ? 'allowed' : 'blocked',
-        created_at: new Date().toISOString(),
-      }).catch(() => {}); // Don't fail if logging fails
+      await supabase
+        .from('moderation_logs')
+        .insert({
+          user_id: user.id,
+          content_type: 'message',
+          content_hash: await hashContent(content),
+          severity: moderationResult.severity,
+          violations: moderationResult.violations,
+          action_taken: moderationResult.allowed ? 'allowed' : 'blocked',
+          created_at: new Date().toISOString(),
+        })
+        .catch(() => {}); // Don't fail if logging fails
     }
 
     // Block if not allowed
@@ -141,8 +248,72 @@ serve(async (req) => {
           code: 'CONTENT_MODERATION_BLOCKED',
           severity: moderationResult.severity,
         },
-        { status: 400, headers: corsHeaders }
+        { status: 400, headers: corsHeaders },
       );
+    }
+
+    // ==========================================================================
+    // 1. Behavioral Risk Analysis (Triggers)
+    // ==========================================================================
+
+    let riskIncrement = 0;
+    const triggers: string[] = [];
+
+    // Check 1: Link Detection (Social media, URL)
+    const linkRegex =
+      /(http|https|www\.|t\.me|wa\.me|instagram\.com|instagram|whatsapp|telegram)/i;
+    if (linkRegex.test(content)) {
+      riskIncrement += 25; // High risk for taking users off-platform
+      triggers.push('link_in_message');
+    }
+
+    // Check 2: Message Burst (Last 10 minutes)
+    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+    const { count: burstCount } = await supabase
+      .from('messages')
+      .select('id', { count: 'exact', head: true })
+      .eq('sender_id', user.id)
+      .gt('created_at', tenMinutesAgo);
+
+    if ((burstCount || 0) > 15) {
+      riskIncrement += 20;
+      triggers.push('message_burst');
+    }
+
+    // Check 3: Unique Recipients (Last 1 hour) -- Detecting "Shotgun" spam
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    // This query might be expensive, optimize in prod (maybe a materialized view or redis)
+    // For now, raw query is fine for v1
+    const { data: uniqueRecipients } = await supabase
+      .from('messages')
+      .select('receiver_id')
+      .eq('sender_id', user.id)
+      .gt('created_at', oneHourAgo);
+
+    if (uniqueRecipients) {
+      const uniqueSet = new Set(uniqueRecipients.map((m) => m.receiver_id));
+      if (uniqueSet.size > 12) {
+        riskIncrement += 25;
+        triggers.push('dm_many_uniques');
+      }
+    }
+
+    // Check 4: Repeat Message (Spam)
+    // Basic check: Has sent EXACT same message to 3 different people in 24h?
+    // Omitting for now to save DB calls, can act on "burst" mostly. Use Edge function state if possible later.
+
+    // --- Apply Risk Updates ---
+    if (riskIncrement > 0) {
+      // Increment risk score securely via RPC
+      await supabase.rpc('increment_risk_score', {
+        target_user_id: user.id,
+        increment_amount: riskIncrement,
+        reason_text: `Triggers: ${triggers.join(', ')}`,
+      });
+
+      logger.warn(`User ${user.id} risk increased by +${riskIncrement}`, {
+        triggers,
+      });
     }
 
     // ==========================================================================
@@ -155,6 +326,20 @@ serve(async (req) => {
         ? conversation.user2_id
         : conversation.user1_id;
 
+    // Check if user is now Shadowbanned (after risk update or before)
+    // We re-check status locally if we incremented risk significantly, or just rely on 'userInfo' we fetched at start.
+    // If riskIncrement was huge, maybe we should act immediately. Let's assume standard flow.
+
+    // Ghost Mode Logic
+    let visibility = 'public';
+    // Use local variables userStatus and riskScore derived from user_safety
+    if (userStatus === 'shadowbanned' || riskScore + riskIncrement >= 50) {
+      visibility = 'ghost';
+      logger.info(
+        `Shadowban active for user ${user.id}. Message will be ghosted.`,
+      );
+    }
+
     // Insert message
     const { data: message, error: insertError } = await supabase
       .from('messages')
@@ -163,7 +348,8 @@ serve(async (req) => {
         sender_id: user.id,
         receiver_id: receiverId,
         content: content.trim(),
-        message_type: messageType,
+        visibility: visibility,
+        type: messageType,
         created_at: new Date().toISOString(),
       })
       .select()
@@ -173,7 +359,7 @@ serve(async (req) => {
       logger.error('Failed to insert message', insertError);
       return jsonResponse(
         { success: false, error: 'Failed to send message' },
-        { status: 500, headers: corsHeaders }
+        { status: 500, headers: corsHeaders },
       );
     }
 
@@ -184,9 +370,12 @@ serve(async (req) => {
       .eq('id', conversationId);
 
     // Send push notification (async, don't wait)
-    sendPushNotification(supabase, receiverId, user.id, content).catch((err) =>
-      logger.error('Push notification failed', err)
-    );
+    // ONLY if message is public
+    if (visibility === 'public') {
+      sendPushNotification(supabase, receiverId, user.id, content).catch(
+        (err) => logger.error('Push notification failed', err),
+      );
+    }
 
     logger.info('Message sent successfully', {
       messageId: message.id,
@@ -205,14 +394,14 @@ serve(async (req) => {
           createdAt: message.created_at,
         },
       },
-      { headers: corsHeaders }
+      { headers: corsHeaders },
     );
   } catch (error) {
     logger.error('Send message error', error);
 
     return jsonResponse(
       { success: false, error: 'Internal server error' },
-      { status: 500, headers: getCorsHeaders(req.headers.get('origin')) }
+      { status: 500, headers: getCorsHeaders(req.headers.get('origin')) },
     );
   }
 });
@@ -233,8 +422,48 @@ async function sendPushNotification(
   supabase: ReturnType<typeof createClient>,
   receiverId: string,
   senderId: string,
-  _content: string
+  _content: string,
 ): Promise<void> {
+  // Check Quiet Hours
+  try {
+    const { data: receiverSettings } = await supabase
+      .from('users')
+      .select('quiet_hours_start, quiet_hours_end')
+      .eq('id', receiverId)
+      .single();
+
+    if (
+      receiverSettings?.quiet_hours_start &&
+      receiverSettings?.quiet_hours_end
+    ) {
+      const now = new Date();
+      const currentHour = now.getUTCHours();
+      const currentMinute = now.getUTCMinutes();
+      const currentTime = currentHour * 60 + currentMinute;
+
+      const [startH, startM] = receiverSettings.quiet_hours_start
+        .split(':')
+        .map(Number);
+      const [endH, endM] = receiverSettings.quiet_hours_end
+        .split(':')
+        .map(Number);
+
+      const startTime = startH * 60 + startM;
+      const endTime = endH * 60 + endM;
+
+      let isQuietTime = false;
+      if (startTime < endTime) {
+        isQuietTime = currentTime >= startTime && currentTime < endTime;
+      } else {
+        isQuietTime = currentTime >= startTime || currentTime < endTime;
+      }
+
+      if (isQuietTime) return;
+    }
+  } catch (_e) {
+    /* ignore */
+  }
+
   // Get sender name
   const { data: sender } = await supabase
     .from('profiles')

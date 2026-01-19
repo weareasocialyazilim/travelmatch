@@ -7,6 +7,7 @@ import { auth, supabase, isSupabaseConfigured } from '../config/supabase';
 import { logger } from '../utils/logger';
 import { VALUES } from '../constants/values';
 import { secureStorage, StorageKeys } from '../utils/secureStorage';
+import { analytics } from './analytics';
 import type { User, Session, AuthError } from '@supabase/supabase-js';
 
 /**
@@ -190,6 +191,9 @@ export const signOut = async (): Promise<{ error: AuthError | null }> => {
       logger.error('[Auth] Sign out error:', error);
       return { error };
     }
+
+    // Reset analytics session on sign out
+    await analytics.reset();
 
     logger.info('[Auth] Sign out successful');
     return { error: null };

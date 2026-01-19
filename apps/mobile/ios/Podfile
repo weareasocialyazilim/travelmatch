@@ -23,7 +23,7 @@ prepare_react_native_project!
 # @generated begin @rnmapbox/maps-rnmapboxmapsimpl - expo prebuild (DO NOT MODIFY) sync-d78f69de984cf87943b4f0cdd925331ba770b215
 $RNMapboxMapsVersion = '11.16.2'
 # @generated end @rnmapbox/maps-rnmapboxmapsimpl
-target 'TravelMatch' do
+target 'Lovendo' do
   use_expo_modules!
 
   if ENV['EXPO_USE_COMMUNITY_AUTOLINKING'] == '1'

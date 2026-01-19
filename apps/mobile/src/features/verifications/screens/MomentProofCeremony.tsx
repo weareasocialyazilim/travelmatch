@@ -310,7 +310,13 @@ export const MomentProofCeremony: React.FC = () => {
       // 1. Upload photos to storage
       const uploadedUrls: string[] = [];
       for (const photoUri of photos) {
-        const result = await uploadFile('proofs', photoUri, user.id);
+        const result = await uploadFile('proofs', photoUri, user.id, {
+          metadata: {
+            aiMode: cameraMode.aiMode,
+            momentId: momentId,
+            category: momentCategory || 'default',
+          },
+        });
         if (result.error) {
           throw new Error(`Fotoğraf yüklenemedi: ${result.error.message}`);
         }

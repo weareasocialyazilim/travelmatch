@@ -66,7 +66,7 @@
     "settings": "Settings",
     "notifications": "Notifications",
     "favorites": "Favorites",
-    "bookings": "Bookings",
+    "bookings": "My Support",
     "wallet": "Wallet",
     "createMoment": "Create new moment",
     "discoverTab": "Moments tab",
@@ -371,13 +371,13 @@
     "continue": "Continue",
     "start": "Start",
     "welcome": "Welcome to Lovendo",
-    "welcomeMessage": "Connect with travelers and create unforgettable experiences",
+    "welcomeMessage": "Connect with creators and share authentic moments through gifting",
     "step1Title": "Discover Moments",
-    "step1Description": "Browse unique travel experiences created by locals",
-    "step2Title": "Book & Connect",
-    "step2Description": "Book moments and chat with hosts",
-    "step3Title": "Share Your Story",
-    "step3Description": "Create your own moments and earn money"
+    "step1Description": "Discover exclusive vibes and support your favorite creators through meaningful gifts",
+    "step2Title": "Gift & Connect",
+    "step2Description": "Send gifts and chat with creators",
+    "step3Title": "Share Your Vibe",
+    "step3Description": "Create your own moments and earn support"
   },
   "welcome": {
     "title": "Welcome to Lovendo",
@@ -640,7 +640,7 @@
     "title": "Inbox",
     "tabs": {
       "active": "Active Matches",
-      "requests": "Requests"
+      "requests": "Inbox"
     },
     "empty": {
       "activeTitle": "No messages yet",

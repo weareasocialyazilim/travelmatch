@@ -9,15 +9,15 @@
 export const STORE_METADATA = {
   // App Identity
   appName: 'Lovendo',
-  subtitle: 'Connect Through Travel Moments',
+  subtitle: 'Support Creators via Moments',
   shortDescription:
-    'Connect with travelers. Share moments. Gift experiences. Travel differently.',
+    'Use Gifting to support creators. Share moments. Connect via appreciation.',
 
   // Store IDs
   storeIds: {
     ios: {
       appStoreId: '6740496053',
-      bundleId: 'com.lovendo.app',
+      bundleId: 'com.anonymous.lovendo-new',
       teamId: 'ZWCGM5V955',
     },
     android: {
@@ -44,12 +44,12 @@ export const STORE_METADATA = {
   // Categories
   categories: {
     ios: {
-      primary: 'Travel',
-      secondary: 'Social Networking',
+      primary: 'Social Networking',
+      secondary: 'Lifestyle',
     },
     android: {
-      category: 'Travel & Local',
-      tags: ['Travel', 'Social', 'Experiences', 'Local Guide'],
+      category: 'Social',
+      tags: ['Social', 'Lifestyle', 'Creator Economy', 'Gifting'],
     },
   },
 
@@ -67,36 +67,34 @@ export const STORE_METADATA = {
 
   // Keywords (iOS - 100 chars max)
   keywords:
-    'travel,experiences,local guide,tourism,gifts,moments,discover,adventure,trip,vacation,explore',
+    'moments,appreciation,creator,gifts,vibe,social,support,influencer,lifestyle,connect',
 
   // Feature List for Marketing
   features: [
     {
-      emoji: '🌍',
-      title: 'Discover Moments',
-      description:
-        'Browse unique travel experiences shared by locals and travelers.',
+      emoji: '✨',
+      title: 'Discover Vibes',
+      description: 'Browse exclusive moments shared by your favorite creators.',
     },
     {
       emoji: '💝',
-      title: 'Gift Experiences',
-      description:
-        'Send gifts to moment creators with secure escrow protection.',
+      title: 'Send Gifts',
+      description: 'Support creators directly with meaningful digital gifts.',
     },
     {
       emoji: '💬',
-      title: 'Real-time Chat',
-      description: 'Connect with hosts through encrypted messaging.',
+      title: 'Creator Chat',
+      description: 'Connect with creators through secure messaging.',
     },
     {
       emoji: '🔒',
       title: 'Trust & Safety',
-      description: 'KYC verification, secure payments, 24/7 support.',
+      description: 'Verified creators, secure transactions, 24/7 support.',
     },
     {
       emoji: '📍',
-      title: 'Location-Based Discovery',
-      description: 'Find moments near you or explore destinations worldwide.',
+      title: 'Explore Nearby',
+      description: 'Find inspiring moments happening around you.',
     },
     {
       emoji: '🎁',

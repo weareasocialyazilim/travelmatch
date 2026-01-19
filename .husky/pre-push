@@ -1,18 +1,17 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
 # Pre-push checks
 echo "🔍 Running pre-push checks..."
 
-# 1. Lint check (warning only)
+# 1. Lint check (fail on errors)
 echo "🔧 Lint checking..."
-pnpm turbo run lint --filter=@lovendo/mobile 2>/dev/null || true
+pnpm turbo run lint --filter=@lovendo/mobile || exit 1
 echo "✅ Lint check complete"
 
-# 2. Type checking (warning only - known issues)
-echo "📝 Type checking (warning mode)..."
-pnpm turbo run type-check --filter=@lovendo/mobile 2>/dev/null || true
-echo "⚠️  Type errors are tracked in technical debt"
+# 2. Type checking (fail on errors)
+echo "📝 Type checking..."
+pnpm turbo run type-check --filter=@lovendo/mobile || exit 1
+echo "✅ Type check complete"
 
-echo "✅ Pre-push checks complete!"
-echo "📋 Note: TypeScript errors need fixing - tracked in technical debt"
-
-# Always allow push - these are known issues being tracked
-exit 0
+echo "✅ Pre-push checks passed!"
