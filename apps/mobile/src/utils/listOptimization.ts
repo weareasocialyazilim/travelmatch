@@ -25,6 +25,7 @@ interface ListPerformanceConfig {
   showsHorizontalScrollIndicator?: boolean;
   horizontal?: boolean;
   inverted?: boolean;
+  estimatedItemSize?: number;
 }
 
 /**
@@ -75,6 +76,7 @@ export const CHAT_LIST_CONFIG: ListPerformanceConfig = {
   updateCellsBatchingPeriod: 100,
   showsVerticalScrollIndicator: false,
   inverted: true,
+  estimatedItemSize: ITEM_HEIGHTS.CHAT_MESSAGE,
 };
 
 /**

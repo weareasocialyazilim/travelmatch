@@ -77,7 +77,10 @@
     "babel-plugin-transform-remove-console": "^6.9.4",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.2",
+    "eslint-config-next": "^16.1.4",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "openai": "^6.14.0",
@@ -89,7 +92,7 @@
     "typescript-eslint": "^8.50.0"
   },
   "engines": {
-    "node": ">=20.0.0",
+    "node": "22.22.0",
     "pnpm": ">=9.0.0"
   },
   "packageManager": "pnpm@10.28.0",
@@ -134,11 +137,6 @@
       "sharp",
       "unrs-resolver"
     ]
-  },
-  "pnpm": {
-    "overrides": {
-      "tar": ">=7.5.4"
-    }
   },
   "dependencies": {
     "expo": "~54.0.31",

@@ -1,4 +1,4 @@
-import { Worker, Job, Queue } from 'bullmq';
+import { Worker, Job } from 'bullmq';
 import { createClient } from '@supabase/supabase-js';
 import {
   NotificationJobData,
@@ -35,7 +35,7 @@ interface PushResult {
  * Map priority to BullMQ job priority (lower = higher priority)
  * Critical (Platinum offers) = 1, processed immediately
  */
-function getPriorityWeight(priority: NotificationPriority): number {
+function _getPriorityWeight(priority: NotificationPriority): number {
   switch (priority) {
     case 'critical':
       return 1; // Queue front - Platinum subscriber offers
@@ -287,7 +287,7 @@ export function createNotificationWorker(connection: Redis) {
     QueueNames.NOTIFICATION,
     async (job: Job<NotificationJobData>) => {
       const priority = (job.data as any).priority || 'normal';
-      console.log(
+      console.info(
         `[Notification Worker] Processing job ${job.id} (priority: ${priority}) for user ${job.data.userId}`,
       );
 
@@ -349,7 +349,7 @@ export function createNotificationWorker(connection: Redis) {
         await logNotification(validatedData.userId, validatedData, result);
         await job.updateProgress(100);
 
-        console.log(
+        console.info(
           `[Notification Worker] Job ${job.id} completed - type: ${validatedData.type}`,
         );
         return result;
@@ -377,7 +377,7 @@ export function createNotificationWorker(connection: Redis) {
 
   // Event handlers
   worker.on('completed', (job) => {
-    console.log(`[Notification Worker] ✓ Job ${job.id} completed`);
+    console.info(`[Notification Worker] ✓ Job ${job.id} completed`);
   });
 
   worker.on('failed', (job, error) => {
@@ -397,7 +397,7 @@ export function createNotificationWorker(connection: Redis) {
 
   // Graceful shutdown
   process.on('SIGTERM', async () => {
-    console.log(
+    console.info(
       '[Notification Worker] Received SIGTERM, shutting down gracefully...',
     );
     await worker.close();

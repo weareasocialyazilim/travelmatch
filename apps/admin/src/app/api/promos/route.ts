@@ -21,7 +21,6 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
     const offset = Math.max(parseInt(searchParams.get('offset') || '0'), 0);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let query = (supabase.from('promo_codes') as any)
       .select('*, campaign:marketing_campaigns(id, name)', { count: 'exact' })
       .order('created_at', { ascending: false })
@@ -103,7 +102,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if code already exists
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const { data: existingCode } = await (supabase.from('promo_codes') as any)
       .select('id')
       .eq('code', body.code.toUpperCase())
@@ -116,7 +115,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (supabase.from('promo_codes') as any)
       .insert({
         code: body.code.toUpperCase(),
@@ -206,7 +204,6 @@ export async function PATCH(request: NextRequest) {
     if (body.applicable_to !== undefined)
       updateData.applicable_to = body.applicable_to;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (supabase.from('promo_codes') as any)
       .update(updateData)
       .eq('id', body.id)
@@ -260,7 +257,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Soft delete - just deactivate the code
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const { error } = await (supabase.from('promo_codes') as any)
       .update({ is_active: false })
       .eq('id', id);

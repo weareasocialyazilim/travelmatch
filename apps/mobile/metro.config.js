@@ -21,7 +21,7 @@ config.resolver.nodeModulesPaths = [
   path.resolve(monorepoRoot, "node_modules"),
 ];
 
-config.resolver.disableHierarchicalLookup = false;
+config.resolver.disableHierarchicalLookup = true;
 
 // Note: @/ path aliases are handled by Babel module-resolver (babel.config.js)
 // Note: Entry point is defined in package.json "main" field

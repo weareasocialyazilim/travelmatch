@@ -111,13 +111,16 @@ export const useSearchStore = create<SearchState>()(
         // Search history
         searchHistory: [] as string[],
         addToHistory: (query: string) => {
-          if (!query.trim()) return;
+          const trimmedQuery = query.trim();
+          if (!trimmedQuery) return;
 
           set(
             (state) => {
-              const filtered = state.searchHistory.filter((q) => q !== query);
+              const filtered = state.searchHistory.filter(
+                (q) => q !== trimmedQuery,
+              );
               return {
-                searchHistory: [query, ...filtered].slice(0, 10), // Keep last 10
+                searchHistory: [trimmedQuery, ...filtered].slice(0, 10), // Keep last 10
               };
             },
             false,

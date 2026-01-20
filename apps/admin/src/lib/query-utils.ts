@@ -11,7 +11,7 @@
  * Characters that have special meaning in PostgREST filter syntax
  * and must be escaped or removed from user input
  */
-const POSTGREST_SPECIAL_CHARS = /[%_,().'"\[\]{}\\;:*?<>|&=!]/g;
+const POSTGREST_SPECIAL_CHARS = /[%_,().'"[\]{}\\;:*?<>|&=!]/g;
 
 /**
  * Sanitize a string for use in PostgREST ilike/like filters

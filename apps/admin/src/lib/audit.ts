@@ -23,7 +23,6 @@ export async function logAuditAction(
   const supabase = getClient();
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabase as any).from('audit_logs').insert({
       admin_id: adminId,
       action: entry.action,

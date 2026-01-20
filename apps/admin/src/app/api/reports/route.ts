@@ -72,7 +72,6 @@ export async function GET(request: NextRequest) {
 
     const { status, type, priority } = filterResult.data;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let query = (supabase.from('reports') as any)
       .select(
         `
@@ -139,7 +138,6 @@ export async function POST(request: NextRequest) {
 
     const validatedData = parseResult.data;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (supabase.from('reports') as any)
       .insert({
         reporter_id: validatedData.reporter_id,

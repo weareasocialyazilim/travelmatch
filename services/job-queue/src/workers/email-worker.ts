@@ -227,7 +227,7 @@ export function createEmailWorker(connection: Redis) {
   >(
     QueueNames.EMAIL,
     async (job: Job<EmailJobData>) => {
-      console.log(`[Email Worker] Processing job ${job.id} to ${job.data.to}`);
+      console.info(`[Email Worker] Processing job ${job.id} to ${job.data.to}`);
 
       try {
         // 1. Validate job data
@@ -242,7 +242,7 @@ export function createEmailWorker(connection: Redis) {
           !process.env.SENDGRID_API_KEY
         ) {
           // Mock in development without API key
-          console.log(
+          console.info(
             '[Email Worker] Using mock email (no API key configured)',
           );
           result = { success: true, messageId: `mock_${Date.now()}` };
@@ -258,7 +258,7 @@ export function createEmailWorker(connection: Redis) {
         await logEmail(validatedData, result);
         await job.updateProgress(100);
 
-        console.log(
+        console.info(
           `[Email Worker] Job ${job.id} completed - messageId: ${result.messageId}`,
         );
         return result;
@@ -286,7 +286,7 @@ export function createEmailWorker(connection: Redis) {
 
   // Event handlers
   worker.on('completed', (job) => {
-    console.log(`[Email Worker] ✓ Job ${job.id} completed`);
+    console.info(`[Email Worker] ✓ Job ${job.id} completed`);
   });
 
   worker.on('failed', (job, error) => {
@@ -303,7 +303,9 @@ export function createEmailWorker(connection: Redis) {
 
   // Graceful shutdown
   process.on('SIGTERM', async () => {
-    console.log('[Email Worker] Received SIGTERM, shutting down gracefully...');
+    console.info(
+      '[Email Worker] Received SIGTERM, shutting down gracefully...',
+    );
     await worker.close();
   });
 

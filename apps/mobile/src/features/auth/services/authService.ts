@@ -112,19 +112,67 @@ export const signUpWithEmail = async (
   }
 
   try {
-    const { data, error } = await auth.signUp({
-      email,
-      password,
-      options: { data: metadata },
-    });
+    // Use Auth Gateway (Edge Function)
+    logger.info('[Auth] Attempting sign up via auth-proxy');
 
-    if (error) {
-      logger.error('[Auth] Sign up error:', error);
-      return { user: null, session: null, error };
+    const { data: proxyData, error: proxyError } =
+      await supabase.functions.invoke('auth-proxy', {
+        body: {
+          email,
+          password,
+          type: 'signup',
+          options: { data: metadata },
+        },
+      });
+
+    if (proxyError) {
+      logger.error('[Auth] Gateway sign up error:', proxyError);
+      return { user: null, session: null, error: proxyError as AuthError };
     }
 
-    logger.info('[Auth] Sign up successful', { userId: data.user?.id });
-    return { user: data.user, session: data.session, error: null };
+    if (!proxyData?.user && !proxyData?.session) {
+      // It might be email confirmation mode where session is null but user is not null
+      // But if both are missing, it's an error
+      if (proxyData?.error) {
+        return {
+          user: null,
+          session: null,
+          error: { message: proxyData.error, status: 400 } as AuthError,
+        };
+      }
+    }
+
+    // Set session if returned (auto-confirm enabled)
+    if (proxyData.session) {
+      const { data: sessionData, error: sessionError } = await auth.setSession({
+        access_token: proxyData.session.access_token,
+        refresh_token: proxyData.session.refresh_token,
+      });
+
+      if (sessionError) {
+        logger.error(
+          '[Auth] Session handling error during signup:',
+          sessionError,
+        );
+        return { user: null, session: null, error: sessionError };
+      }
+
+      logger.info('[Auth] Sign up successful via gateway (auto-login)', {
+        userId: sessionData.user?.id,
+      });
+      return {
+        user: sessionData.user,
+        session: sessionData.session,
+        error: null,
+      };
+    }
+
+    // Email confirmation required case
+    logger.info(
+      '[Auth] Sign up successful via gateway (confirmation required)',
+      { userId: proxyData.user?.id },
+    );
+    return { user: proxyData.user, session: null, error: null };
   } catch (error) {
     logger.error('[Auth] Sign up exception:', error);
     return { user: null, session: null, error: error as AuthError };
@@ -147,15 +195,51 @@ export const signInWithEmail = async (
   }
 
   try {
-    const { data, error } = await auth.signInWithPassword({ email, password });
+    // Use Auth Gateway (Edge Function) for rate limiting and security
+    logger.info('[Auth] Attempting sign in via auth-proxy');
 
-    if (error) {
-      logger.error('[Auth] Sign in error:', error);
-      return { user: null, session: null, error };
+    const { data: proxyData, error: proxyError } =
+      await supabase.functions.invoke('auth-proxy', {
+        body: { email, password, type: 'signin' },
+      });
+
+    if (proxyError) {
+      logger.error('[Auth] Gateway error:', proxyError);
+      return { user: null, session: null, error: proxyError as AuthError };
     }
 
-    logger.info('[Auth] Sign in successful', { userId: data.user?.id });
-    return { user: data.user, session: data.session, error: null };
+    if (!proxyData?.session) {
+      logger.error('[Auth] Gateway returned no session:', proxyData);
+      return {
+        user: null,
+        session: null,
+        error: {
+          message: proxyData?.error || 'Authentication failed via gateway',
+          name: 'AuthGatewayError',
+          status: 400,
+        } as AuthError,
+      };
+    }
+
+    // Set the session locally so the client is authenticated
+    const { data: sessionData, error: sessionError } = await auth.setSession({
+      access_token: proxyData.session.access_token,
+      refresh_token: proxyData.session.refresh_token,
+    });
+
+    if (sessionError) {
+      logger.error('[Auth] Session handling error:', sessionError);
+      return { user: null, session: null, error: sessionError };
+    }
+
+    logger.info('[Auth] Sign in successful via gateway', {
+      userId: sessionData.user?.id,
+    });
+    return {
+      user: sessionData.user,
+      session: sessionData.session,
+      error: null,
+    };
   } catch (error) {
     logger.error('[Auth] Sign in exception:', error);
     return { user: null, session: null, error: error as AuthError };

@@ -10,8 +10,29 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import NetInfo from '@react-native-community/netinfo';
+import NetInfo, {
+  NetInfoState,
+  NetInfoStateType,
+} from '@react-native-community/netinfo';
 import { offlineSyncQueue } from '../offlineSyncQueue';
+
+const createNetInfoState = (isConnected: boolean): NetInfoState =>
+  ({
+    isConnected,
+    isInternetReachable: isConnected,
+    type: isConnected ? NetInfoStateType.wifi : NetInfoStateType.none,
+    details: isConnected
+      ? {
+          ipAddress: '1.2.3.4',
+          subnet: '255.255.255.0',
+          frequency: 5,
+          strength: 100,
+          isConnectionExpensive: false,
+          ssid: 'TestWifi',
+          bssid: 'TestBSSID',
+        }
+      : null,
+  }) as NetInfoState;
 
 // Mock dependencies
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -21,8 +42,23 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
 }));
 
 jest.mock('@react-native-community/netinfo', () => ({
+  default: {
+    addEventListener: jest.fn(),
+    fetch: jest.fn(),
+  },
   addEventListener: jest.fn(),
   fetch: jest.fn(),
+  NetInfoStateType: {
+    none: 'none',
+    unknown: 'unknown',
+    cellular: 'cellular',
+    wifi: 'wifi',
+    bluetooth: 'bluetooth',
+    ethernet: 'ethernet',
+    wimax: 'wimax',
+    vpn: 'vpn',
+    other: 'other',
+  },
 }));
 
 jest.mock('../../utils/logger', () => ({
@@ -48,10 +84,7 @@ describe('OfflineSyncQueue', () => {
     mockAsyncStorage.getItem.mockResolvedValue(null);
 
     // Default: online
-    mockNetInfo.fetch.mockResolvedValue({
-      isConnected: true,
-      isInternetReachable: true,
-    });
+    mockNetInfo.fetch.mockResolvedValue(createNetInfoState(true));
 
     // Clear queue
     await offlineSyncQueue.clearAll();
@@ -60,10 +93,7 @@ describe('OfflineSyncQueue', () => {
   describe('Queue Mutations When Offline', () => {
     it('should queue CREATE_MOMENT action when offline', async () => {
       // Simulate offline
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: false,
-        isInternetReachable: false,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(false));
 
       const actionId = await offlineSyncQueue.add('CREATE_MOMENT', {
         title: 'Beach Sunset',
@@ -80,10 +110,7 @@ describe('OfflineSyncQueue', () => {
     });
 
     it('should queue SEND_MESSAGE action when offline', async () => {
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: false,
-        isInternetReachable: false,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(false));
 
       const actionId = await offlineSyncQueue.add('SEND_MESSAGE', {
         matchId: 'match-123',
@@ -102,10 +129,7 @@ describe('OfflineSyncQueue', () => {
     });
 
     it('should queue multiple actions when offline', async () => {
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: false,
-        isInternetReachable: false,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(false));
 
       await offlineSyncQueue.add('CREATE_MOMENT', { title: 'Moment 1' });
       await offlineSyncQueue.add('LIKE_MOMENT', { momentId: 'moment-1' });
@@ -117,10 +141,7 @@ describe('OfflineSyncQueue', () => {
     });
 
     it('should preserve action order in queue', async () => {
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: false,
-        isInternetReachable: false,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(false));
 
       await offlineSyncQueue.add('CREATE_MOMENT', { order: 1 });
       await offlineSyncQueue.add('LIKE_MOMENT', { order: 2 });
@@ -137,10 +158,7 @@ describe('OfflineSyncQueue', () => {
   describe('Sync on Reconnect', () => {
     it('should sync queued actions when back online', async () => {
       // Start offline
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: false,
-        isInternetReachable: false,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(false));
 
       // Queue actions
       await offlineSyncQueue.add('CREATE_MOMENT', { title: 'Test' });
@@ -156,10 +174,7 @@ describe('OfflineSyncQueue', () => {
       offlineSyncQueue.registerHandler('LIKE_MOMENT', likeHandler);
 
       // Go online
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: true,
-        isInternetReachable: true,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(true));
 
       const result = await offlineSyncQueue.processQueue();
 
@@ -174,10 +189,7 @@ describe('OfflineSyncQueue', () => {
     });
 
     it('should not sync when offline', async () => {
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: false,
-        isInternetReachable: false,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(false));
 
       await offlineSyncQueue.add('CREATE_MOMENT', { title: 'Test' });
 
@@ -205,10 +217,7 @@ describe('OfflineSyncQueue', () => {
       const { offlineSyncQueue: newQueue } = require('../offlineSyncQueue');
 
       // Queue action while offline on the newly required instance
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: false,
-        isInternetReachable: false,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(false));
 
       await newQueue.add('CREATE_MOMENT', { title: 'Test' });
 
@@ -223,10 +232,7 @@ describe('OfflineSyncQueue', () => {
 
   describe('Action Retry Logic', () => {
     it('should retry failed action up to maxRetries', async () => {
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: true,
-        isInternetReachable: true,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(true));
 
       await offlineSyncQueue.add('CREATE_MOMENT', { title: 'Test' }, 3);
 
@@ -259,10 +265,7 @@ describe('OfflineSyncQueue', () => {
     });
 
     it('should succeed on retry after initial failure', async () => {
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: true,
-        isInternetReachable: true,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(true));
 
       await offlineSyncQueue.add('SEND_MESSAGE', { content: 'Test' });
 
@@ -285,10 +288,7 @@ describe('OfflineSyncQueue', () => {
     });
 
     it('should retry failed actions manually', async () => {
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: true,
-        isInternetReachable: true,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(true));
 
       await offlineSyncQueue.add('CREATE_MOMENT', { title: 'Test' }, 1);
 
@@ -316,10 +316,7 @@ describe('OfflineSyncQueue', () => {
 
   describe('Queue Persistence', () => {
     it('should save queue to AsyncStorage', async () => {
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: false,
-        isInternetReachable: false,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(false));
 
       await offlineSyncQueue.add('CREATE_MOMENT', { title: 'Test' });
 
@@ -376,10 +373,7 @@ describe('OfflineSyncQueue', () => {
     });
 
     it('should persist queue after each action', async () => {
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: false,
-        isInternetReachable: false,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(false));
 
       jest.clearAllMocks();
 
@@ -396,10 +390,7 @@ describe('OfflineSyncQueue', () => {
 
   describe('Action Status Tracking', () => {
     it('should track pending status', async () => {
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: false,
-        isInternetReachable: false,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(false));
 
       await offlineSyncQueue.add('CREATE_MOMENT', { title: 'Test' });
 
@@ -410,10 +401,7 @@ describe('OfflineSyncQueue', () => {
     });
 
     it('should track processing status', async () => {
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: true,
-        isInternetReachable: true,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(true));
 
       await offlineSyncQueue.add('CREATE_MOMENT', { title: 'Test' });
 
@@ -433,10 +421,7 @@ describe('OfflineSyncQueue', () => {
     });
 
     it('should track failed status', async () => {
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: true,
-        isInternetReachable: true,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(true));
 
       await offlineSyncQueue.add('CREATE_MOMENT', { title: 'Test' }, 0);
 
@@ -450,10 +435,7 @@ describe('OfflineSyncQueue', () => {
     });
 
     it('should provide queue status summary', async () => {
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: false,
-        isInternetReachable: false,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(false));
 
       await offlineSyncQueue.add('CREATE_MOMENT', { title: 'Test 1' });
       await offlineSyncQueue.add('LIKE_MOMENT', { momentId: '123' });
@@ -472,10 +454,7 @@ describe('OfflineSyncQueue', () => {
 
   describe('Queue Management', () => {
     it('should remove action from queue', async () => {
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: false,
-        isInternetReachable: false,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(false));
 
       const actionId = await offlineSyncQueue.add('CREATE_MOMENT', {
         title: 'Test',
@@ -489,10 +468,7 @@ describe('OfflineSyncQueue', () => {
     });
 
     it('should clear failed actions', async () => {
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: true,
-        isInternetReachable: true,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(true));
 
       await offlineSyncQueue.add('CREATE_MOMENT', { title: 'Fail' }, 0);
       await offlineSyncQueue.add('LIKE_MOMENT', { momentId: '123' }, 0);
@@ -511,10 +487,7 @@ describe('OfflineSyncQueue', () => {
     });
 
     it('should clear all actions', async () => {
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: false,
-        isInternetReachable: false,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(false));
 
       await offlineSyncQueue.add('CREATE_MOMENT', { title: 'Test 1' });
       await offlineSyncQueue.add('LIKE_MOMENT', { momentId: '123' });
@@ -534,10 +507,7 @@ describe('OfflineSyncQueue', () => {
 
       const unsubscribe = offlineSyncQueue.subscribe(listener);
 
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: false,
-        isInternetReachable: false,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(false));
 
       await offlineSyncQueue.add('CREATE_MOMENT', { title: 'Test' });
 
@@ -561,10 +531,7 @@ describe('OfflineSyncQueue', () => {
 
       jest.clearAllMocks();
 
-      mockNetInfo.fetch.mockResolvedValue({
-        isConnected: false,
-        isInternetReachable: false,
-      });
+      mockNetInfo.fetch.mockResolvedValue(createNetInfoState(false));
 
       await offlineSyncQueue.add('CREATE_MOMENT', { title: 'Test' });
 

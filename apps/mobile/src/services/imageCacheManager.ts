@@ -637,7 +637,7 @@ try {
   memory?: boolean;
   disk?: boolean;
 }) {
-  return await imageCacheManager.clearCache(options);
+  return imageCacheManager.clearCache(options);
 };
 
 // pruneExpiredEntries -> cleanExpired
@@ -653,11 +653,12 @@ try {
 (imageCacheManager as any).cleanupDiskCache = async function () {
   // Prefer evictLRU to reclaim space; fall back to cleaning expired entries
   try {
-    return await (imageCacheManager as any).evictLRU?.(
+    const result = await (imageCacheManager as any).evictLRU?.(
       Math.max(1, (imageCacheManager as any).config?.maxDiskCacheSizeMB * 0.8),
     );
+    return result;
   } catch (_evictError) {
-    return await (imageCacheManager as any).cleanExpired?.();
+    return (imageCacheManager as any).cleanExpired?.();
   }
 };
 
@@ -672,10 +673,7 @@ try {
   cloudflareId?: string,
 ) {
   if (!cloudflareId) return;
-  return await (imageCacheManager as any).prefetchVariants?.(
-    cloudflareId,
-    undefined,
-  );
+  return (imageCacheManager as any).prefetchVariants?.(cloudflareId, undefined);
 };
 
 // ============================================================================
@@ -723,7 +721,7 @@ export function useImageCache() {
   };
 
   const getStats = async () => {
-    return await imageCacheManager.getStats();
+    return imageCacheManager.getStats();
   };
 
   return {

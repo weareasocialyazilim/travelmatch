@@ -366,7 +366,7 @@ class Logger {
     }, 30000);
     // Allow Node to exit even if interval is active (if unref exists)
     try {
-      // @ts-ignore runtime optional
+      // @ts-expect-error runtime optional
       this.flushInterval?.unref?.();
     } catch (_unrefError) {
       // ignore - unref not available in all environments
@@ -585,7 +585,6 @@ class Logger {
       // If this instance is the library default singleton, return 0 for missing timers
       // Otherwise return undefined so test-created instances can assert undefined.
       // The singleton exported below sets `__isDefault = true` on the instance.
-      // @ts-ignore
       return (this as any).__isDefault ? 0 : undefined;
     }
     return undefined;
@@ -698,7 +697,6 @@ class Logger {
 export const logger = new Logger();
 // Mark default singleton so instance methods can detect default behavior in tests
 // (some tests expect different return values from the singleton)
-// @ts-ignore
 (logger as any).__isDefault = true;
 
 // Export class for custom instances

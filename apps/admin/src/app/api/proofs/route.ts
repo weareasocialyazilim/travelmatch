@@ -24,7 +24,6 @@ export async function GET(request: NextRequest) {
 
     const supabase = createServiceClient();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let query = (supabase.from('proofs') as any)
       .select(
         `
@@ -141,7 +140,7 @@ export async function PUT(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Get current proof
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const { data: proof, error: fetchError } = await (
       supabase.from('proofs') as any
     )
@@ -170,7 +169,6 @@ export async function PUT(request: NextRequest) {
       updates.rejection_reason = rejection_reason;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: updated, error: updateError } = await (
       supabase.from('proofs') as any
     )

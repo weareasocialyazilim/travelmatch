@@ -195,15 +195,20 @@ app.post('/webhooks/job-complete', verifyWebhookSignature, async (req, res) => {
 async function handleKycComplete(
   userId: string,
   status: string,
-  result: any,
-  error: any,
+  result: unknown,
+  error: unknown,
 ): Promise<void> {
+  const kycResult = result as {
+    status: string;
+    rejectionReasons?: unknown[];
+    provider?: string;
+  };
   if (status === 'completed') {
     // Update user KYC status
     await supabase
       .from('users')
       .update({
-        kyc_status: result.status, // 'verified' or 'rejected'
+        kyc_status: kycResult.status, // 'verified' or 'rejected'
         kyc_updated_at: new Date().toISOString(),
       })
       .eq('id', userId);
@@ -213,23 +218,23 @@ async function handleKycComplete(
       user_id: userId,
       type: 'kyc_update',
       title:
-        result.status === 'verified'
+        kycResult.status === 'verified'
           ? 'KYC Verified ✓'
           : 'KYC Verification Failed',
       body:
-        result.status === 'verified'
+        kycResult.status === 'verified'
           ? 'Your identity has been verified successfully!'
-          : `Verification ${result.status}. ${Array.isArray(result?.rejectionReasons) ? result.rejectionReasons.filter((r: unknown): r is string => typeof r === 'string').join(', ') : ''}`,
+          : `Verification ${kycResult.status}. ${Array.isArray(kycResult?.rejectionReasons) ? kycResult.rejectionReasons.filter((r: unknown): r is string => typeof r === 'string').join(', ') : ''}`,
       data: {
-        status: result.status,
-        provider: result.provider,
+        status: kycResult.status,
+        provider: kycResult.provider,
       },
       read: false,
       created_at: new Date().toISOString(),
     });
 
     logger.info('KYC verification completed', {
-      status: result.status,
+      status: kycResult.status,
       userId,
     });
   } else if (status === 'failed') {

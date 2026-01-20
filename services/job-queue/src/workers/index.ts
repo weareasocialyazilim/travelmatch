@@ -10,7 +10,9 @@ const requiredEnvVars = ['REDIS_URL', 'SUPABASE_URL', 'SUPABASE_SERVICE_KEY'];
 const missingEnvVars = requiredEnvVars.filter((envVar) => !process.env[envVar]);
 
 if (missingEnvVars.length > 0) {
-  console.error(`Missing required environment variables: ${missingEnvVars.join(', ')}`);
+  console.error(
+    `Missing required environment variables: ${missingEnvVars.join(', ')}`,
+  );
   process.exit(1);
 }
 
@@ -22,7 +24,7 @@ const redis = new Redis(process.env.REDIS_URL!, {
 });
 
 redis.on('connect', () => {
-  console.log('✓ Connected to Redis');
+  console.info('✓ Connected to Redis');
 });
 
 redis.on('error', (error) => {
@@ -30,21 +32,21 @@ redis.on('error', (error) => {
 });
 
 // Start workers
-console.log('Starting job queue workers...');
+console.info('Starting job queue workers...');
 
 const kycWorker = createKycWorker(redis);
 
-console.log('✓ KYC verification worker started');
+console.info('✓ KYC verification worker started');
 
 // Log worker stats every 30 seconds (simplified without getMetrics)
 setInterval(() => {
-  console.log('[Stats] Worker is running', {
+  console.info('[Stats] Worker is running', {
     name: kycWorker.name,
     running: kycWorker.isRunning(),
   });
 }, 30000);
 
-console.log(`
+console.info(`
 ╔════════════════════════════════════════════════════════════╗
 ║                                                            ║
 ║  Lovendo Job Queue Workers                             ║

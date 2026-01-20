@@ -88,7 +88,8 @@ export const CanvaInput = React.forwardRef<HTMLInputElement, CanvaInputProps>(
     },
     ref,
   ) => {
-    const inputId = id || React.useId();
+    const generatedId = React.useId();
+    const inputId = id || generatedId;
     const effectiveState = errorText ? 'error' : state;
 
     return (
@@ -166,7 +167,8 @@ export const CanvaTextarea = React.forwardRef<
     { className, label, helperText, errorText, required, id, ...props },
     ref,
   ) => {
-    const inputId = id || React.useId();
+    const generatedId = React.useId();
+    const inputId = id || generatedId;
     const hasError = !!errorText;
 
     return (

@@ -40,6 +40,7 @@ export default function TwoFactorSetupPage() {
     }
 
     fetchSetupData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, router]);
 
   const fetchSetupData = async () => {

@@ -194,7 +194,7 @@ const AnimatedTitle = ({ text }: { text: string }) => {
 */
 export default function App() {
   const [lang, setLang] = useState<Language>('EN');
-  const [selected, setSelected] = useState<any>(null);
+  const [selected, setSelected] = useState<unknown>(null);
   const [view, setView] = useState('home');
   const [showSuccess, setShowSuccess] = useState(false);
   const [showGiftSuccess, setShowGiftSuccess] = useState(false);

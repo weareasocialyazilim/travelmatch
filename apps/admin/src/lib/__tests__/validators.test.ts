@@ -22,7 +22,6 @@ import {
   createTaskSchema,
   createReportSchema,
   notificationCampaignSchema,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   marketingCampaignSchema as _marketingCampaignSchema,
   resolveDisputeSchema,
 } from '../validators';

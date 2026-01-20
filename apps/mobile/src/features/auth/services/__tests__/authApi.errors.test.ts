@@ -15,6 +15,10 @@ jest.mock('@/config/supabase', () => ({
       resend: jest.fn(),
       getSession: jest.fn(),
       refreshSession: jest.fn(),
+      setSession: jest.fn(),
+    },
+    functions: {
+      invoke: jest.fn(),
     },
   },
   auth: {
@@ -26,6 +30,7 @@ jest.mock('@/config/supabase', () => ({
     resend: jest.fn(),
     getSession: jest.fn(),
     refreshSession: jest.fn(),
+    setSession: jest.fn(),
   },
   isSupabaseConfigured: jest.fn(() => true),
 }));
@@ -58,6 +63,9 @@ import { supabase, auth } from '@/config/supabase';
 
 // Type the mocks
 const mockSupabaseAuth = supabase.auth as jest.Mocked<typeof supabase.auth>;
+const mockSupabaseFunctions = supabase.functions as jest.Mocked<
+  typeof supabase.functions
+>;
 const mockAuth = auth as jest.Mocked<typeof auth>;
 
 describe('authApi - Error Scenarios', () => {
@@ -70,21 +78,10 @@ describe('authApi - Error Scenarios', () => {
   // ========================================
   describe('login errors', () => {
     it('should throw on invalid credentials', async () => {
-      const authError = {
-        message: 'Invalid login credentials',
-        status: 400,
-        code: 'invalid_credentials',
-      };
-
-      // Mock both supabase.auth and auth (the implementation may use either)
-      mockSupabaseAuth.signInWithPassword.mockResolvedValue({
-        data: { user: null, session: null },
-        error: authError,
-      } as never);
-
-      mockAuth.signInWithPassword.mockResolvedValue({
-        data: { user: null, session: null },
-        error: authError,
+      // Mock Gateway Response (Function returns data.error for logical errors)
+      mockSupabaseFunctions.invoke.mockResolvedValue({
+        data: { error: 'Invalid login credentials' },
+        error: null,
       } as never);
 
       await expect(
@@ -95,19 +92,9 @@ describe('authApi - Error Scenarios', () => {
     });
 
     it('should throw on email not confirmed', async () => {
-      const authError = {
-        message: 'Email not confirmed',
-        status: 400,
-        code: 'email_not_confirmed',
-      };
-
-      mockSupabaseAuth.signInWithPassword.mockResolvedValue({
-        data: { user: null, session: null },
-        error: authError,
-      } as never);
-      mockAuth.signInWithPassword.mockResolvedValue({
-        data: { user: null, session: null },
-        error: authError,
+      mockSupabaseFunctions.invoke.mockResolvedValue({
+        data: { error: 'Email not confirmed' },
+        error: null,
       } as never);
 
       await expect(
@@ -124,12 +111,8 @@ describe('authApi - Error Scenarios', () => {
         code: 'over_request_rate_limit',
       };
 
-      mockSupabaseAuth.signInWithPassword.mockResolvedValue({
-        data: { user: null, session: null },
-        error: authError,
-      } as never);
-      mockAuth.signInWithPassword.mockResolvedValue({
-        data: { user: null, session: null },
+      mockSupabaseFunctions.invoke.mockResolvedValue({
+        data: null,
         error: authError,
       } as never);
 
@@ -146,19 +129,9 @@ describe('authApi - Error Scenarios', () => {
   // ========================================
   describe('registration errors', () => {
     it('should throw on email already registered', async () => {
-      const authError = {
-        message: 'User already registered',
-        status: 400,
-        code: 'user_already_exists',
-      };
-
-      mockSupabaseAuth.signUp.mockResolvedValue({
-        data: { user: null, session: null },
-        error: authError,
-      } as never);
-      mockAuth.signUp.mockResolvedValue({
-        data: { user: null, session: null },
-        error: authError,
+      mockSupabaseFunctions.invoke.mockResolvedValue({
+        data: { error: 'User already registered' },
+        error: null,
       } as never);
 
       await expect(
@@ -169,19 +142,9 @@ describe('authApi - Error Scenarios', () => {
     });
 
     it('should throw on weak password', async () => {
-      const authError = {
-        message: 'Password should be at least 6 characters',
-        status: 400,
-        code: 'weak_password',
-      };
-
-      mockSupabaseAuth.signUp.mockResolvedValue({
-        data: { user: null, session: null },
-        error: authError,
-      } as never);
-      mockAuth.signUp.mockResolvedValue({
-        data: { user: null, session: null },
-        error: authError,
+      mockSupabaseFunctions.invoke.mockResolvedValue({
+        data: { error: 'Password should be at least 6 characters' },
+        error: null,
       } as never);
 
       await expect(

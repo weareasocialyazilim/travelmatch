@@ -135,7 +135,7 @@ class BiometricAuthService {
    */
   async getCapabilities(): Promise<BiometricCapabilities> {
     if (!this.isInitialized || !this.capabilities) {
-      return await this.initialize();
+      return this.initialize();
     }
     return this.capabilities;
   }

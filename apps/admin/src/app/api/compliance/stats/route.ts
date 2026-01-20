@@ -9,7 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { getAdminSession, hasPermission } from '@/lib/auth';
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const session = await getAdminSession();
     if (!session) {
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Get SAR counts by status
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const { data: sarCounts } = await (
       supabase.from('suspicious_activity_reports') as any
     )
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
       });
 
     // Get risk profile counts by level
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const { data: riskCounts } = await (
       supabase.from('user_risk_profiles') as any
     )
@@ -77,7 +77,6 @@ export async function GET(request: NextRequest) {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: recentAlerts, count: alertCount } = await (
       supabase.from('suspicious_activity_reports') as any
     )
@@ -87,7 +86,7 @@ export async function GET(request: NextRequest) {
       .limit(10);
 
     // Get blocked users
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const { count: blockedCount } = await (
       supabase.from('user_risk_profiles') as any
     )
@@ -95,7 +94,7 @@ export async function GET(request: NextRequest) {
       .eq('is_blocked', true);
 
     // Get AML thresholds summary
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const { data: amlThresholds } = await (
       supabase.from('aml_thresholds') as any
     )
@@ -104,7 +103,7 @@ export async function GET(request: NextRequest) {
       .in('action', ['report_masak', 'report_fiu', 'block']);
 
     // Get fraud rules summary
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const { data: fraudRules, count: activeRulesCount } = await (
       supabase.from('fraud_rules') as any
     )
@@ -113,7 +112,7 @@ export async function GET(request: NextRequest) {
 
     // Calculate fraud rule type counts
     const ruleTypeCounts: Record<string, number> = {};
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     fraudRules?.forEach((rule: any) => {
       ruleTypeCounts[rule.rule_type] =
         (ruleTypeCounts[rule.rule_type] || 0) + 1;
@@ -147,14 +146,12 @@ export async function GET(request: NextRequest) {
       },
       thresholds: {
         masak:
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           amlThresholds?.filter((t: any) => t.action === 'report_masak')
             .length || 0,
         fiu:
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           amlThresholds?.filter((t: any) => t.action === 'report_fiu').length ||
           0,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
         block:
           amlThresholds?.filter((t: any) => t.action === 'block').length || 0,
       },

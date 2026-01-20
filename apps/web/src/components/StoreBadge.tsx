@@ -70,8 +70,8 @@ const StoreBadge = ({
                 y2="23.328"
                 gradientUnits="userSpaceOnUse"
               >
-                <stop offset="0" stop-color="#3accbb" />
-                <stop offset="1" stop-color="#3eb4d8" />
+                <stop offset="0" stopColor="#3accbb" />
+                <stop offset="1" stopColor="#3eb4d8" />
               </linearGradient>
             </defs>
           </svg>

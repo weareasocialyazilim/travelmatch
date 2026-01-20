@@ -101,6 +101,7 @@ export function useRealtimeSubscription<T extends Record<string, unknown>>(
       supabase.removeChannel(newChannel);
       setIsConnected(false);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.table, config.filter]);
 
   const unsubscribe = useCallback(() => {
