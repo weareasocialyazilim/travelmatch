@@ -4,6 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { Response } from 'express';
 import crypto from 'crypto';
 
 // Test credential helpers - runtime string construction to avoid static analysis
@@ -30,12 +31,12 @@ const createMockRequest = (headers: Record<string, string> = {}) => ({
 });
 
 const createMockResponse = () => {
-  const res: any = {
+  const res = {
     status: vi.fn().mockReturnThis(),
     json: vi.fn().mockReturnThis(),
     set: vi.fn().mockReturnThis(),
-  };
-  return res;
+  } as unknown;
+  return res as Response;
 };
 
 const createMockNext = () => vi.fn();
@@ -68,7 +69,7 @@ describe('Service Authentication Middleware', () => {
     it('should reject requests with invalid token format', () => {
       const req = createMockRequest({ authorization: 'InvalidFormat' });
       const res = createMockResponse();
-      const next = createMockNext();
+      const _next = createMockNext();
 
       const authHeader = req.headers.authorization;
       if (!authHeader?.startsWith('Bearer ')) {
@@ -82,9 +83,9 @@ describe('Service Authentication Middleware', () => {
     });
 
     it('should reject requests with wrong service key', () => {
-      const req = createMockRequest({ authorization: 'Bearer wrong-key' });
+      const _req = createMockRequest({ authorization: 'Bearer wrong-key' });
       const res = createMockResponse();
-      const next = createMockNext();
+      const _next = createMockNext();
 
       const token = 'wrong-key';
       const serviceKey = mockEnv.JOB_QUEUE_SERVICE_KEY;
@@ -99,7 +100,7 @@ describe('Service Authentication Middleware', () => {
     });
 
     it('should accept requests with valid service key', () => {
-      const req = createMockRequest({
+      const _req = createMockRequest({
         authorization: `Bearer ${mockEnv.JOB_QUEUE_SERVICE_KEY}`,
       });
       const res = createMockResponse();
@@ -131,13 +132,17 @@ describe('Service Authentication Middleware', () => {
       const start1 = process.hrtime.bigint();
       try {
         crypto.timingSafeEqual(Buffer.from(validKey), Buffer.from(validKey));
-      } catch {}
+      } catch {
+        /* ignore */
+      }
       const end1 = process.hrtime.bigint();
 
       const start2 = process.hrtime.bigint();
       try {
         crypto.timingSafeEqual(Buffer.from(validKey), Buffer.from(invalidKey));
-      } catch {}
+      } catch {
+        /* ignore */
+      }
       const end2 = process.hrtime.bigint();
 
       // Time difference should be minimal (within 1ms tolerance)
@@ -150,7 +155,7 @@ describe('Service Authentication Middleware', () => {
     it('should reject requests without authorization header', () => {
       const req = createMockRequest({});
       const res = createMockResponse();
-      const next = createMockNext();
+      const _next = createMockNext();
 
       const authHeader = req.headers.authorization;
       if (!authHeader) {
@@ -204,8 +209,8 @@ describe('Service Authentication Middleware', () => {
       const validCreds = Buffer.from(
         `${mockEnv.BULL_BOARD_ADMIN_USER}:${mockEnv.BULL_BOARD_ADMIN_PASSWORD}`,
       ).toString('base64');
-      const req = createMockRequest({ authorization: `Basic ${validCreds}` });
-      const res = createMockResponse();
+      const _req = createMockRequest({ authorization: `Basic ${validCreds}` });
+      const _res = createMockResponse();
       const next = createMockNext();
 
       const authHeader = req.headers.authorization;
@@ -234,7 +239,7 @@ describe('Service Authentication Middleware', () => {
         { count: number; resetAt: number }
       >();
       const ip = '192.168.1.1';
-      const maxRequests = 100;
+      const _maxRequests = 100;
       const windowMs = 60000;
 
       // Simulate multiple requests
@@ -325,6 +330,7 @@ describe('Security Edge Cases', () => {
 
   it('should reject tokens with null bytes', () => {
     const tokenWithNullByte = 'valid-token\x00malicious';
+    // eslint-disable-next-line no-control-regex
     const sanitized = tokenWithNullByte.replace(/\x00/g, '');
 
     expect(sanitized).not.toContain('\x00');

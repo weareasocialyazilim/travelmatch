@@ -90,7 +90,7 @@ class AdminLogger {
 
   debug(message: string, context?: LogContext): void {
     if (!this.shouldLog('debug')) return;
-    // eslint-disable-next-line no-console
+
     console.debug(
       this.formatMessage('debug', message),
       this.sanitizeContext(context) || '',
@@ -99,7 +99,7 @@ class AdminLogger {
 
   info(message: string, context?: LogContext): void {
     if (!this.shouldLog('info')) return;
-    // eslint-disable-next-line no-console
+
     console.info(
       this.formatMessage('info', message),
       this.sanitizeContext(context) || '',
@@ -108,7 +108,7 @@ class AdminLogger {
 
   warn(message: string, context?: LogContext): void {
     if (!this.shouldLog('warn')) return;
-    // eslint-disable-next-line no-console
+
     console.warn(
       this.formatMessage('warn', message),
       this.sanitizeContext(context) || '',
@@ -121,7 +121,7 @@ class AdminLogger {
       error instanceof Error
         ? { name: error.name, message: error.message }
         : error;
-    // eslint-disable-next-line no-console
+
     // console.error(
     //   this.formatMessage('error', message),
     //   errorInfo,

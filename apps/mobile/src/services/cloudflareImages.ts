@@ -287,7 +287,7 @@ export async function optimizeBeforeUpload(
   );
 
   const response = await fetch(manipulated.uri);
-  return await response.blob();
+  return response.blob();
 }
 
 /**

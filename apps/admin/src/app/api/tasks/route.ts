@@ -40,7 +40,6 @@ export async function GET(request: NextRequest) {
 
     const supabase = createServiceClient();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let query = (supabase.from('tasks') as any)
       .select(
         '*, assigned_to_user:admin_users!tasks_assigned_to_fkey(id, name, email, avatar_url)',
@@ -145,7 +144,6 @@ export async function POST(request: NextRequest) {
 
     const supabase = createServiceClient();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: task, error } = await (supabase.from('tasks') as any)
       .insert({
         type,
@@ -171,7 +169,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create audit log
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     await (supabase.from('audit_logs') as any).insert({
       admin_id: session.admin.id,
       action: 'create_task',

@@ -9,7 +9,6 @@ import { useState, useEffect } from 'react';
 import {
   Server,
   Database,
-  Wifi,
   Activity,
   Cpu,
   HardDrive,
@@ -24,17 +23,9 @@ import {
   Zap,
   Shield,
   Eye,
-  TrendingUp,
-  TrendingDown,
   Bell,
   ExternalLink,
-  Circle,
   ChevronRight,
-  BarChart3,
-  Play,
-  Pause,
-  Settings,
-  Terminal,
 } from 'lucide-react';
 import {
   CanvaCard,
@@ -42,7 +33,6 @@ import {
   CanvaCardTitle,
   CanvaCardSubtitle,
   CanvaCardBody,
-  CanvaStatCard,
 } from '@/components/canva/CanvaCard';
 import { CanvaBadge } from '@/components/canva/CanvaBadge';
 import { CanvaButton } from '@/components/canva/CanvaButton';

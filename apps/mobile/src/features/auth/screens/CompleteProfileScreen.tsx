@@ -211,7 +211,7 @@ export const CompleteProfileScreen: React.FC<CompleteProfileScreenProps> = ({
         </TouchableOpacity>
         <View style={styles.progressContainer}>
           <View style={styles.progressBar}>
-            {/* eslint-disable-next-line react-native/no-inline-styles */}
+            {}
             <View style={[styles.progressFill, { width: '100%' }]} />
           </View>
           <Text style={styles.progressText}>Step 2 of 2</Text>

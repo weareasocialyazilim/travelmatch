@@ -1,6 +1,6 @@
 export type Language = 'EN' | 'TR';
 
-export const TRANSLATIONS: Record<Language, any> = {
+export const TRANSLATIONS = {
   EN: {
     hero_title: 'STOP THE YAP.\nLOVE N DO.',
     hero_sub:

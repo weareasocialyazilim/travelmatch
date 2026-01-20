@@ -19,6 +19,7 @@ describe('Utils', () => {
     });
 
     it('handles conditional classes', () => {
+      // eslint-disable-next-line no-constant-binary-expression
       expect(cn('base', true && 'included', false && 'excluded')).toBe(
         'base included',
       );

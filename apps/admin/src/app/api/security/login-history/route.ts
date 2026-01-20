@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Get login history from audit_logs where action is login-related
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const {
       data: logs,
       count,

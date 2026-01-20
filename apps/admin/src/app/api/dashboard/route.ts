@@ -1,15 +1,13 @@
 import { createServiceClient } from '@/lib/supabase';
-import { getAdminSession, hasPermission } from '@/lib/auth';
+import { getAdminSession } from '@/lib/auth';
 import { logger } from '@/lib/logger';
-import { checkRateLimit, rateLimits, createRateLimitHeaders } from '@/lib/rate-limit';
+import {
+  checkRateLimit,
+  rateLimits,
+  createRateLimitHeaders,
+} from '@/lib/rate-limit';
 import { NextRequest, NextResponse } from 'next/server';
 import type { Database } from '@/types/database';
-
-type ProfileRow = Database['public']['Tables']['profiles']['Row'];
-type MomentRow = Database['public']['Tables']['moments']['Row'];
-type TaskRow = Database['public']['Tables']['tasks']['Row'];
-type PaymentRow = Database['public']['Tables']['payments']['Row'];
-type ActivityLogRow = Database['public']['Tables']['activity_logs']['Row'];
 
 /**
  * Dashboard API Endpoint
@@ -121,9 +119,7 @@ export async function GET(request: NextRequest) {
         .order('created_at', { ascending: true }),
 
       // System health check - count active sessions
-      supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true }),
+      supabase.from('profiles').select('*', { count: 'exact', head: true }),
     ]);
 
     // Calculate revenue
@@ -153,7 +149,9 @@ export async function GET(request: NextRequest) {
     // Get recent activities
     const { data: recentActivities } = await supabase
       .from('activity_logs')
-      .select('id, action, entity_type, entity_id, user_id, created_at, metadata')
+      .select(
+        'id, action, entity_type, entity_id, user_id, created_at, metadata',
+      )
       .order('created_at', { ascending: false })
       .limit(20);
 

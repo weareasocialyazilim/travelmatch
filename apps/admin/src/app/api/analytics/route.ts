@@ -69,14 +69,13 @@ export async function GET(request: NextRequest) {
       .gte('created_at', startDate.toISOString());
 
     // Fetch revenue metrics
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const { data: revenueData } = await (supabase as any)
       .from('transactions')
       .select('amount, type')
       .gte('created_at', startDate.toISOString())
       .in('type', ['subscription', 'boost']);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const totalRevenue =
       revenueData?.reduce((sum: number, t: any) => sum + (t.amount || 0), 0) ||
       0;

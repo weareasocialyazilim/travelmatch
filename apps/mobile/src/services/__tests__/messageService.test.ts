@@ -97,6 +97,7 @@ describe('MessageService', () => {
           updated_at: '2025-01-01T00:00:00Z',
           created_at: '2025-01-01T00:00:00Z',
           moment_id: null,
+          migrated_to_junction: null,
         },
       ];
 
@@ -172,6 +173,8 @@ describe('MessageService', () => {
         moment_id: null,
         created_at: '2025-01-01T00:00:00Z',
         updated_at: '2025-01-01T00:00:00Z',
+        last_message_id: null,
+        migrated_to_junction: null,
       };
 
       mockConversationsService.getOrCreate.mockResolvedValue({
@@ -220,6 +223,8 @@ describe('MessageService', () => {
         metadata: null,
         read_at: null,
         created_at: '2025-01-01T00:00:00Z',
+        nonce: null,
+        sender_public_key: null,
       };
 
       mockMessagesService.send.mockResolvedValue({
@@ -380,7 +385,6 @@ describe('MessageService', () => {
       );
 
       mockMessagesService.markAsRead.mockResolvedValue({
-        data: null,
         error: null,
       });
 
@@ -414,6 +418,7 @@ describe('MessageService', () => {
     it('should call messagesService.subscribeToConversation', () => {
       const mockCallback = jest.fn();
       const mockUnsubscribe = jest.fn();
+
       mockMessagesService.subscribeToConversation.mockReturnValue(
         mockUnsubscribe,
       );

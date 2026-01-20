@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
         auditAction = 'refund_escrow';
         break;
 
-      case 'extend':
+      case 'extend': {
         const newExpiry = new Date();
         newExpiry.setDate(newExpiry.getDate() + 7); // Extend by 7 days
         updates = {
@@ -175,6 +175,7 @@ export async function POST(request: NextRequest) {
         };
         auditAction = 'extend_escrow';
         break;
+      }
     }
 
     const { data: updated, error: updateError } = await supabase

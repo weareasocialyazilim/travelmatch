@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { act } from '@testing-library/react';
 
 // Reset modules before importing to get fresh store state
@@ -16,6 +15,7 @@ describe('AuthStore', () => {
     // Reset modules to get fresh store state
     jest.resetModules();
     // Re-import to get fresh store
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     useAuthStore = require('../auth-store').useAuthStore;
   });
 

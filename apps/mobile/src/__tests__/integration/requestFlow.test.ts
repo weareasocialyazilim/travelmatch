@@ -22,29 +22,50 @@ jest.mock('@/utils/logger');
 import { requestService } from '@/services/requestService';
 import { securePaymentService as paymentService } from '@/services/securePaymentService';
 
-// Create mock auth object that's shared
-const mockAuth = {
+// Create mock auth object factory function
+const createMockAuth = () => ({
   getUser: jest.fn(),
   signInWithPassword: jest.fn(),
   signOut: jest.fn(),
   getSession: jest.fn(),
-};
+});
 
 // Mock the supabase module exports
-jest.mock('@/config/supabase', () => ({
-  supabase: {
-    auth: mockAuth,
-    from: jest.fn(),
-  },
-  auth: mockAuth,
-  isSupabaseConfigured: jest.fn(() => true),
-}));
+jest.mock('@/config/supabase', () => {
+  const mockAuth = {
+    getUser: jest.fn(),
+    signInWithPassword: jest.fn(),
+    signOut: jest.fn(),
+    getSession: jest.fn(),
+  };
 
-const mockSupabase = supabase;
-const mockLogger = logger;
+  return {
+    supabase: {
+      auth: mockAuth,
+      from: jest.fn(),
+    },
+    auth: mockAuth,
+    isSupabaseConfigured: jest.fn(() => true),
+  };
+});
+
+type MockAuth = {
+  getUser: jest.Mock;
+  signInWithPassword: jest.Mock;
+  signOut: jest.Mock;
+  getSession: jest.Mock;
+};
+
+type MockSupabaseClient = {
+  auth: MockAuth;
+  from: jest.Mock;
+};
+
+const mockSupabase = supabase as unknown as MockSupabaseClient;
+const mockLogger = logger as unknown as jest.Mocked<typeof logger>;
 
 // Ensure auth is properly assigned after mocking
-mockSupabase.auth = mockAuth as unknown as typeof mockSupabase.auth;
+// mockSupabase.auth is already mocked above
 
 describe('Request Flow Integration', () => {
   const mockRequester = {
@@ -72,7 +93,7 @@ describe('Request Flow Integration', () => {
     jest.clearAllMocks();
 
     // Default auth state (requester)
-    mockAuth.getUser.mockResolvedValue({
+    mockSupabase.auth.getUser.mockResolvedValue({
       data: { user: mockRequester },
       error: null,
     });
@@ -125,6 +146,8 @@ describe('Request Flow Integration', () => {
         total_price: mockMoment.price * requestData.guestCount,
         currency: mockMoment.currency,
         created_at: '2024-01-15T10:00:00Z',
+        responded_at: null,
+        updated_at: null,
       };
 
       // Mock request creation via dbRequestsService
@@ -142,7 +165,7 @@ describe('Request Flow Integration', () => {
       expect(dbRequestsService.create).toHaveBeenCalled();
 
       // Step 2: Host accepts request
-      mockAuth.getUser.mockResolvedValue({
+      mockSupabase.auth.getUser.mockResolvedValue({
         data: { user: mockHost },
         error: null,
       });
@@ -156,6 +179,8 @@ describe('Request Flow Integration', () => {
         ...mockCreatedRequest,
         status: 'accepted',
         selected_date: acceptData.selectedDate,
+        responded_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       };
 
       jest.spyOn(dbRequestsService, 'updateStatus').mockResolvedValue({
@@ -198,7 +223,7 @@ describe('Request Flow Integration', () => {
       expect(acceptedRequest.selectedDate).toBe('2024-01-20');
 
       // Step 3: Requester makes payment
-      mockAuth.getUser.mockResolvedValue({
+      mockSupabase.auth.getUser.mockResolvedValue({
         data: { user: mockRequester },
         error: null,
       });
@@ -212,6 +237,8 @@ describe('Request Flow Integration', () => {
         status: 'completed',
         description: 'Payment for Coffee & Pastries Experience',
         created_at: '2024-01-15T10:10:00Z',
+        metadata: {},
+        moment_id: null,
       };
 
       (mockSupabase.from('transactions').insert as jest.Mock).mockReturnValue({
@@ -238,6 +265,8 @@ describe('Request Flow Integration', () => {
         ...mockAcceptedRequest,
         status: 'completed',
         completed_at: '2024-01-20T15:00:00Z',
+        responded_at: mockAcceptedRequest.responded_at,
+        updated_at: '2024-01-20T15:00:00Z',
       };
 
       jest.spyOn(dbRequestsService, 'updateStatus').mockResolvedValue({
@@ -295,7 +324,7 @@ describe('Request Flow Integration', () => {
         message: 'See you then!',
       };
 
-      mockAuth.getUser.mockResolvedValue({
+      mockSupabase.auth.getUser.mockResolvedValue({
         data: { user: mockHost },
         error: null,
       });
@@ -304,6 +333,12 @@ describe('Request Flow Integration', () => {
         id: requestId,
         status: 'accepted',
         selected_date: acceptData.selectedDate,
+        user_id: mockRequester.id,
+        moment_id: mockMoment.id,
+        created_at: '2024-01-15T10:00:00Z',
+        responded_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        message: 'Original message',
       };
 
       jest.spyOn(dbRequestsService, 'updateStatus').mockResolvedValue({
@@ -361,14 +396,23 @@ describe('Request Flow Integration', () => {
       // Arrange: Multiple hosts trying to accept same request (edge case)
       const requestId = 'request-concurrent-123';
 
-      mockAuth.getUser.mockResolvedValue({
+      mockSupabase.auth.getUser.mockResolvedValue({
         data: { user: mockHost },
         error: null,
       });
 
       // First acceptance succeeds
       jest.spyOn(dbRequestsService, 'updateStatus').mockResolvedValueOnce({
-        data: { id: requestId, status: 'accepted' },
+        data: {
+          id: requestId,
+          status: 'accepted',
+          created_at: '2024-01-15T10:00:00Z',
+          responded_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          message: 'Original message',
+          moment_id: mockMoment.id,
+          user_id: mockRequester.id,
+        },
         error: null,
       });
 
@@ -409,7 +453,7 @@ describe('Request Flow Integration', () => {
       const requestId = 'request-to-decline-123';
       const declineReason = 'Fully booked for that date';
 
-      mockAuth.getUser.mockResolvedValue({
+      mockSupabase.auth.getUser.mockResolvedValue({
         data: { user: mockHost },
         error: null,
       });
@@ -417,6 +461,12 @@ describe('Request Flow Integration', () => {
       const mockDeclinedRequest = {
         id: requestId,
         status: 'rejected',
+        created_at: '2024-01-15T10:00:00Z',
+        responded_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        message: 'Original message',
+        moment_id: mockMoment.id,
+        user_id: mockRequester.id,
       };
 
       jest.spyOn(dbRequestsService, 'updateStatus').mockResolvedValue({
@@ -466,7 +516,7 @@ describe('Request Flow Integration', () => {
       // Arrange: Requester cancels their own request
       const requestId = 'request-to-cancel-123';
 
-      mockAuth.getUser.mockResolvedValue({
+      mockSupabase.auth.getUser.mockResolvedValue({
         data: { user: mockRequester },
         error: null,
       });
@@ -474,6 +524,12 @@ describe('Request Flow Integration', () => {
       const mockCancelledRequest = {
         id: requestId,
         status: 'cancelled',
+        created_at: '2024-01-15T10:00:00Z',
+        responded_at: null,
+        updated_at: new Date().toISOString(),
+        message: 'Original message',
+        moment_id: mockMoment.id,
+        user_id: mockRequester.id,
       };
 
       jest.spyOn(dbRequestsService, 'updateStatus').mockResolvedValue({
@@ -505,7 +561,7 @@ describe('Request Flow Integration', () => {
       const requestId = 'request-accepted-789';
       const totalAmount = 150; // Example: 3 guests * $50
 
-      mockAuth.getUser.mockResolvedValue({
+      mockSupabase.auth.getUser.mockResolvedValue({
         data: { user: mockRequester },
         error: null,
       });
@@ -520,6 +576,8 @@ describe('Request Flow Integration', () => {
         status: 'completed',
         description: `Payment for request ${requestId}`,
         created_at: '2024-01-15T11:00:00Z',
+        metadata: {},
+        moment_id: null,
       };
 
       (mockSupabase.from('transactions').insert as jest.Mock).mockReturnValue({
@@ -555,7 +613,7 @@ describe('Request Flow Integration', () => {
       const requestId = 'request-payment-fail-123';
       const totalAmount = 100;
 
-      mockAuth.getUser.mockResolvedValue({
+      mockSupabase.auth.getUser.mockResolvedValue({
         data: { user: mockRequester },
         error: null,
       });
@@ -568,7 +626,7 @@ describe('Request Flow Integration', () => {
         select: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
             data: null,
-            error: { message: 'Insufficient funds' },
+            error: { message: 'Insufficient funds', name: 'Error' },
           }),
         }),
       });
@@ -612,6 +670,9 @@ describe('Request Flow Integration', () => {
         expires_at: new Date(
           twoDaysAgo.getTime() + 24 * 60 * 60 * 1000,
         ).toISOString(),
+        responded_at: null,
+        updated_at: new Date().toISOString(),
+        message: 'Original message',
       };
 
       // Mock checking request status
@@ -625,14 +686,14 @@ describe('Request Flow Integration', () => {
       });
 
       // Act: Try to accept expired request
-      mockAuth.getUser.mockResolvedValue({
+      mockSupabase.auth.getUser.mockResolvedValue({
         data: { user: mockHost },
         error: null,
       });
 
       jest.spyOn(dbRequestsService, 'updateStatus').mockResolvedValue({
         data: null,
-        error: { message: 'Cannot accept expired request' },
+        error: { message: 'Cannot accept expired request', name: 'Error' },
       });
 
       // Assert: Should fail
@@ -648,14 +709,23 @@ describe('Request Flow Integration', () => {
       const paidRequestId = 'request-paid-to-cancel-123';
       const refundAmount = 75;
 
-      mockAuth.getUser.mockResolvedValue({
+      mockSupabase.auth.getUser.mockResolvedValue({
         data: { user: mockRequester },
         error: null,
       });
 
       // Cancel request
       jest.spyOn(dbRequestsService, 'updateStatus').mockResolvedValue({
-        data: { id: paidRequestId, status: 'cancelled' },
+        data: {
+          id: paidRequestId,
+          status: 'cancelled',
+          created_at: '2024-01-15T10:00:00Z',
+          responded_at: null,
+          updated_at: new Date().toISOString(),
+          message: 'Original message',
+          moment_id: mockMoment.id,
+          user_id: mockRequester.id,
+        },
         error: null,
       });
 
@@ -669,6 +739,8 @@ describe('Request Flow Integration', () => {
         status: 'completed',
         description: `Refund for cancelled request ${paidRequestId}`,
         created_at: '2024-01-15T12:00:00Z',
+        metadata: {},
+        moment_id: null,
       };
 
       (mockSupabase.from('transactions').insert as jest.Mock).mockReturnValue({

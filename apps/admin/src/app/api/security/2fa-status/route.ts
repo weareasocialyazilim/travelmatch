@@ -23,7 +23,7 @@ export async function GET() {
     const supabase = createServiceClient();
 
     // Get 2FA status from admin_users table
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const { data: adminUser, error } = await (
       supabase.from('admin_users') as any
     )

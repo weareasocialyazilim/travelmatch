@@ -830,7 +830,6 @@ export default function SecurityPage() {
               <div className="flex justify-center p-4 bg-card rounded-lg border">
                 {qrCode && sanitizeQrCode(qrCode) ? (
                   // QR code is validated as a safe data URI from our API
-                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={sanitizeQrCode(qrCode)}
                     alt="QR Code"

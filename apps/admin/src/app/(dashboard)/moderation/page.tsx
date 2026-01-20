@@ -157,6 +157,7 @@ export default function ModerationPage() {
 
   useEffect(() => {
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function loadData() {
@@ -329,15 +330,13 @@ export default function ModerationPage() {
   async function handleAddWord() {
     if (!newWord.word.trim()) return;
 
-    const { error } = await supabase
-      .from('moderation_dictionary')
-      .insert({
-        word: newWord.word.toLowerCase().trim(),
-        severity: newWord.severity,
-        category: newWord.category,
-        is_regex: false,
-        is_active: true,
-      });
+    const { error } = await supabase.from('moderation_dictionary').insert({
+      word: newWord.word.toLowerCase().trim(),
+      severity: newWord.severity,
+      category: newWord.category,
+      is_regex: false,
+      is_active: true,
+    });
 
     if (error) {
       logger.error('Failed to add word', error);

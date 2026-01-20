@@ -20,7 +20,6 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const type = searchParams.get('type');
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let query = (supabase.from('marketing_campaigns') as any)
       .select('*', { count: 'exact' })
       .order('created_at', { ascending: false });
@@ -64,7 +63,6 @@ export async function POST(request: NextRequest) {
     const supabase = createServiceClient();
     const body = await request.json();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (supabase.from('marketing_campaigns') as any)
       .insert({
         name: body.name,

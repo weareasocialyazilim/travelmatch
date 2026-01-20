@@ -118,7 +118,7 @@ export const encryptionService = {
    * Get the user's public key
    */
   getPublicKey: async (): Promise<string | null> => {
-    return await getSecureItemWithLegacyFallback(
+    return getSecureItemWithLegacyFallback(
       PUBLIC_KEY_STORAGE_KEY,
       LEGACY_PUBLIC_KEY_STORAGE_KEYS,
     );

@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const supabase = createServiceClient();
 
     // Get sessions from admin_sessions table
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const { data: sessions, error } = await (
       supabase.from('admin_sessions') as any
     )
@@ -97,14 +97,13 @@ export async function DELETE(request: NextRequest) {
       // Revoke all sessions except current
       const currentToken = request.cookies.get('admin_session')?.value;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (supabase.from('admin_sessions') as any)
         .update({ is_active: false })
         .eq('admin_id', session.admin.id)
         .neq('token', currentToken);
 
       // Log audit event
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       await (supabase.from('audit_logs') as any).insert({
         admin_id: session.admin.id,
         action: 'logout_all_sessions',
@@ -120,14 +119,14 @@ export async function DELETE(request: NextRequest) {
       });
     } else if (sessionId) {
       // Revoke specific session
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       await (supabase.from('admin_sessions') as any)
         .update({ is_active: false })
         .eq('id', sessionId)
         .eq('admin_id', session.admin.id);
 
       // Log audit event
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       await (supabase.from('audit_logs') as any).insert({
         admin_id: session.admin.id,
         action: 'logout_session',

@@ -7,16 +7,13 @@ import Redis from 'ioredis';
 const logger = {
   info: (message: string, ...args: unknown[]) => {
     if (process.env.NODE_ENV !== 'test') {
-      // eslint-disable-next-line no-console
       console.info(`[INFO] ${message}`, ...args);
     }
   },
   warn: (message: string, ...args: unknown[]) => {
-    // eslint-disable-next-line no-console
     console.warn(`[WARN] ${message}`, ...args);
   },
   error: (message: string, ...args: unknown[]) => {
-    // eslint-disable-next-line no-console
     console.error(`[ERROR] ${message}`, ...args);
   },
   debug: (message: string, ...args: unknown[]) => {
@@ -140,6 +137,7 @@ async function verifyWithOnfido(data: KycJobData): Promise<KycJobResult> {
   // 4. Poll for results (in production, use webhooks)
   let attempts = 0;
   const maxAttempts = 20; // 20 * 3s = 60s max wait
+
   let checkResult: any;
 
   while (attempts < maxAttempts) {
@@ -176,7 +174,9 @@ async function verifyWithOnfido(data: KycJobData): Promise<KycJobResult> {
   // 5. Parse result
   const isVerified = checkResult.result === 'clear';
   const rejectionReasons = checkResult.reports
+
     ?.filter((r: any) => r.result !== 'clear')
+
     .map((r: any) => r.breakdown?.map((b: any) => b.result).join(', '))
     .filter(Boolean);
 
@@ -235,6 +235,7 @@ async function verifyWithIdenfy(data: KycJobData): Promise<KycJobResult> {
   // 2. Poll for verification result
   let attempts = 0;
   const maxAttempts = 40; // idenfy can take longer
+
   let verificationResult: any;
 
   while (attempts < maxAttempts) {
@@ -343,7 +344,6 @@ async function sendNotification(
   });
 
   if (error) {
-    // eslint-disable-next-line no-console
     console.error('Failed to send notification:', error);
     // Don't throw - notification failure shouldn't fail the job
   }
@@ -426,7 +426,6 @@ export function createKycWorker(connection: Redis) {
           });
 
         if (detailsError) {
-          // eslint-disable-next-line no-console
           console.error(
             '[KYC Worker] Failed to store verification details:',
             detailsError,

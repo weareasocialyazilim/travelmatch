@@ -4,7 +4,7 @@ import { createServiceClient } from '@/lib/supabase';
 import { cookies } from 'next/headers';
 import crypto from 'crypto';
 
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     const cookieStore = await cookies();
     const sessionToken = cookieStore.get('admin_session')?.value;

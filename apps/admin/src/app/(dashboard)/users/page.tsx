@@ -171,6 +171,7 @@ export default function UsersPage() {
       fetchUsers();
     }, 300);
     return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
   const getUserStatus = (user: User): keyof typeof statusConfig => {

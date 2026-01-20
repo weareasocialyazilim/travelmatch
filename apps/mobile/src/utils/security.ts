@@ -41,7 +41,7 @@ const getDeviceEncryptionKey = async (): Promise<string> => {
     return key;
   } catch (_keyGenError) {
     // Fallback to a deterministic key based on timestamp (less secure, but better than nothing)
-    return await Crypto.digestStringAsync(
+    return Crypto.digestStringAsync(
       Crypto.CryptoDigestAlgorithm.SHA256,
       `lovendo-${Date.now()}-fallback`,
     );

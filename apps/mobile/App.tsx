@@ -4,13 +4,14 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+// Initialize app immediately
+import './src/utils/bootOnce';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { FeedbackModal } from './src/components/FeedbackModal';
 import { InitializationScreen } from './src/components/InitializationScreen';
 import { ProviderComposer } from './src/components/ProviderComposer';
 import {
   PrivacyConsentModal,
-  checkConsentStatus,
   type ConsentPreferences,
 } from './src/components/PrivacyConsentModal';
 import { AuthProvider } from './src/context/AuthContext';
@@ -40,44 +41,7 @@ import type {
 } from './src/services/pendingTransactionsService';
 import * as Sentry from '@sentry/react-native';
 
-// Sentry DSN from environment variable - avoid hardcoding
-const SENTRY_DSN = process.env.EXPO_PUBLIC_SENTRY_DSN || '';
-
-// Track if Sentry is initialized
-let isSentryInitialized = false;
-
-// Initialize Sentry before app mounts
-if (SENTRY_DSN) {
-  Sentry.init({
-    dsn: SENTRY_DSN,
-
-    // Only enable in production for performance
-    enabled: !__DEV__,
-
-    // Adds more context data to events (IP address, cookies, user, etc.)
-    // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
-    sendDefaultPii: !__DEV__,
-
-    // Enable Logs only in production
-    enableLogs: !__DEV__,
-
-    // Configure Session Replay (production only)
-    replaysSessionSampleRate: __DEV__ ? 0 : 0.1,
-    replaysOnErrorSampleRate: __DEV__ ? 0 : 1,
-    integrations: __DEV__
-      ? []
-      : [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
-
-    // uncomment the line below to enable Spotlight (https://spotlightjs.com)
-    // spotlight: __DEV__,
-  });
-  isSentryInitialized = true;
-}
-// Sentry.wrap should only be used after Sentry.init - we always call init now (even if disabled)
-// See: src/config/sentry.ts for additional configuration
-
-// Prevent splash screen from auto-hiding
-SplashScreen.preventAutoHideAsync();
+// Sentry configuration is now handled in ./src/utils/bootOnce
 
 // Security monitoring is now handled by appBootstrap service
 
@@ -108,7 +72,7 @@ function App() {
 
   // Privacy consent modal (GDPR/KVKK compliance)
   const [showPrivacyConsent, setShowPrivacyConsent] = useState(false);
-  const [consentPreferences, setConsentPreferences] =
+  const [_consentPreferences, setConsentPreferences] =
     useState<ConsentPreferences | null>(null);
 
   // Feedback prompt
@@ -197,7 +161,6 @@ function App() {
       subscription.remove();
       appBootstrap.cleanup();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handle retry of failed services

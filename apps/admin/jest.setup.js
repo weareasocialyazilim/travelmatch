@@ -1,3 +1,5 @@
+/* eslint-env jest */
+/* eslint-disable @typescript-eslint/no-require-imports */
 // Jest setup file for admin app
 require('@testing-library/jest-dom');
 

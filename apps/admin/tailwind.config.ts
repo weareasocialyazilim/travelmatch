@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import type { Config } from 'tailwindcss';
-// @ts-ignore - design-system exports preset but types aren't built
+// @ts-expect-error - design-system exports preset but types aren't built
 import designSystemPreset from '../../packages/design-system/src/tailwind.preset';
 
 /**

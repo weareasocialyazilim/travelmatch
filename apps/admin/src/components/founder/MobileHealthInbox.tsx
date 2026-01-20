@@ -45,11 +45,6 @@ export function MobileHealthInbox() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showRawInput, setShowRawInput] = useState(true);
 
-  // Gate check
-  if (!MOBILE_HEALTH_INBOX_ENABLED) {
-    return null;
-  }
-
   const handleParse = useCallback(() => {
     if (!inputText.trim()) return;
     const result = parseDiagnosticsSummary(inputText);
@@ -79,6 +74,11 @@ export function MobileHealthInbox() {
       return <XCircle className="h-3 w-3 text-red-400" />;
     return <AlertTriangle className="h-3 w-3 text-slate-400" />;
   };
+
+  // Gate check
+  if (!MOBILE_HEALTH_INBOX_ENABLED) {
+    return null;
+  }
 
   return (
     <div className="mt-3 pt-3 border-t border-slate-700/50">

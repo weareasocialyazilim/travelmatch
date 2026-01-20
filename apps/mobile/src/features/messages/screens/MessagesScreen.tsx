@@ -370,6 +370,7 @@ const MessagesScreen: React.FC = () => {
           renderItem={renderChatItem}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          estimatedItemSize={80}
           refreshControl={
             <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />
           }
