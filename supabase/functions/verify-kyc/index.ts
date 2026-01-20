@@ -90,7 +90,7 @@ serve(async (req) => {
     const json = await req.json();
     const data = KycSchema.parse(json);
 
-    // Audit log KYC attempt (instead of console.log)
+    // Audit log KYC attempt
     await supabaseAdmin.from('audit_logs').insert({
       user_id: user.id,
       action: 'kyc_verification_attempt',
@@ -100,72 +100,66 @@ serve(async (req) => {
       },
     });
 
-    // KYC Verification using Stripe Identity
-    // Documentation: https://stripe.com/docs/identity
-    const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY');
+    // KYC Verification using idenfy
+    // Documentation: https://documentation.idenfy.com/
+    const IDENFY_API_KEY = Deno.env.get('IDENFY_API_KEY');
+    const IDENFY_API_SECRET = Deno.env.get('IDENFY_API_SECRET');
 
-    if (!STRIPE_SECRET_KEY) {
+    if (!IDENFY_API_KEY || !IDENFY_API_SECRET) {
       throw new Error('KYC service not configured');
     }
 
-    // Create a Stripe Identity verification session
-    const verificationResponse = await fetch(
-      'https://api.stripe.com/v1/identity/verification_sessions',
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          type: 'document',
-          'metadata[user_id]': user.id,
-          'metadata[document_type]': data.documentType,
-          'options[document][require_matching_selfie]': 'true',
-        }).toString(),
-      },
-    );
+    // Create idenfy verification token
+    const idenfyAuth = btoa(`${IDENFY_API_KEY}:${IDENFY_API_SECRET}`);
 
-    if (!verificationResponse.ok) {
-      const errorData = await verificationResponse.json();
+    const tokenResponse = await fetch('https://ivs.idenfy.com/api/v2/token', {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${idenfyAuth}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        clientId: user.id,
+      }),
+    });
+
+    if (!tokenResponse.ok) {
+      const errorData = await tokenResponse.json();
+      logger.error('idenfy token creation failed', errorData);
       throw new Error(
-        errorData.error?.message || 'Failed to create verification session',
+        errorData.message || 'Failed to create verification session',
       );
     }
 
-    const verificationSession = await verificationResponse.json();
+    const tokenData = await tokenResponse.json();
 
     // Store the verification session for tracking
-    // User must complete verification in Stripe Identity flow
-    // Status will be updated via webhook when verification completes
     await supabaseAdmin.from('kyc_verifications').upsert({
       user_id: user.id,
-      stripe_session_id: verificationSession.id,
+      provider: 'idenfy',
+      provider_session_id: tokenData.scanRef,
       document_type: data.documentType,
-      status: verificationSession.status,
+      status: 'pending',
       created_at: new Date().toISOString(),
     });
 
-    // Set user status to pending - actual verification happens via webhook
-    // IMPORTANT: Never mark as verified here - wait for Stripe webhook
-    if (verificationSession.status === 'requires_input') {
-      await supabaseAdmin
-        .from('users')
-        .update({
-          kyc_status: 'pending',
-        })
-        .eq('id', user.id);
-    }
+    // Set user status to pending
+    await supabaseAdmin
+      .from('users')
+      .update({
+        kyc_status: 'pending',
+      })
+      .eq('id', user.id);
 
-    // Return the session URL for the client to complete verification
+    // Return the token for the client to start verification
     return new Response(
       JSON.stringify({
         status: 'pending',
         message:
           'Verification session created. Please complete document verification.',
-        sessionId: verificationSession.id,
-        clientSecret: verificationSession.client_secret,
-        url: verificationSession.url,
+        scanRef: tokenData.scanRef,
+        authToken: tokenData.authToken,
+        verificationUrl: `https://ivs.idenfy.com/api/v2/redirect?authToken=${tokenData.authToken}`,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -173,6 +167,7 @@ serve(async (req) => {
       },
     );
   } catch (error) {
+    logger.error('KYC verification error', error);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,

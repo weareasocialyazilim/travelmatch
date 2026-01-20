@@ -28,7 +28,7 @@ Router) and modern React patterns.
 
 - **Trust & Safety**: Fraud detection, risk scoring
 - **Support Center**: Ticket system, SLA tracking
-- **Integration Hub**: Supabase, Stripe, Sentry health
+- **Integration Hub**: Supabase, PayTR, Sentry health
 - **Analytics**: User metrics, revenue, funnels
 - **Errors Dashboard**: Sentry integration
 

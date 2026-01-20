@@ -59,7 +59,8 @@ import {
 
 const integrationIcons: Record<IntegrationName, React.ElementType> = {
   supabase: Database,
-  stripe: CreditCard,
+  paytr: CreditCard,
+  idenfy: CreditCard,
   twilio: MessageSquare,
   sendgrid: Mail,
   posthog: BarChart3,

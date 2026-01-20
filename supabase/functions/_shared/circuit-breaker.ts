@@ -105,7 +105,7 @@ export class CircuitBreaker {
 
   constructor(
     private readonly name: string,
-    private readonly config: CircuitBreakerConfig
+    private readonly config: CircuitBreakerConfig,
   ) {
     logger.info(`Circuit breaker initialized: ${name}`, {
       failureThreshold: config.failureThreshold,
@@ -118,7 +118,7 @@ export class CircuitBreaker {
    */
   async execute<T>(
     fn: () => Promise<T>,
-    options: ExecuteOptions<T> = {}
+    options: ExecuteOptions<T> = {},
   ): Promise<T> {
     this.totalRequests++;
 
@@ -142,7 +142,7 @@ export class CircuitBreaker {
         throw new CircuitOpenError(
           this.name,
           this.state,
-          this.config.resetTimeoutMs - timeSinceFailure
+          this.config.resetTimeoutMs - timeSinceFailure,
         );
       }
     }
@@ -180,12 +180,14 @@ export class CircuitBreaker {
    */
   private async executeWithTimeout<T>(
     fn: () => Promise<T>,
-    timeoutMs: number
+    timeoutMs: number,
   ): Promise<T> {
     return new Promise<T>((resolve, reject) => {
       const timer = setTimeout(() => {
         this.totalTimeouts++;
-        reject(new Error(`Call to ${this.name} timed out after ${timeoutMs}ms`));
+        reject(
+          new Error(`Call to ${this.name} timed out after ${timeoutMs}ms`),
+        );
       }, timeoutMs);
 
       fn()
@@ -267,10 +269,13 @@ export class CircuitBreaker {
       this.successes = 0;
     }
 
-    logger.info(`Circuit ${this.name} transitioned: ${oldState} -> ${newState}`, {
-      failures: this.failures,
-      openCount: this.openCount,
-    });
+    logger.info(
+      `Circuit ${this.name} transitioned: ${oldState} -> ${newState}`,
+      {
+        failures: this.failures,
+        openCount: this.openCount,
+      },
+    );
 
     // Emit state change for monitoring
     this.emitStateChange(oldState, newState);
@@ -386,7 +391,7 @@ class CircuitBreakerRegistry {
       resetTimeoutMs: 60000, // KYC can be slow to recover
       successThreshold: 2,
       callTimeoutMs: 30000, // KYC verification can be slow
-      dependencies: ['stripe-identity'],
+      dependencies: ['idenfy'],
     },
     email: {
       failureThreshold: 5,
@@ -474,11 +479,17 @@ class CircuitBreakerRegistry {
   getPrometheusMetrics(): string {
     const lines: string[] = [];
 
-    lines.push('# HELP circuit_breaker_state Current state of circuit breaker (0=closed, 1=half_open, 2=open)');
+    lines.push(
+      '# HELP circuit_breaker_state Current state of circuit breaker (0=closed, 1=half_open, 2=open)',
+    );
     lines.push('# TYPE circuit_breaker_state gauge');
-    lines.push('# HELP circuit_breaker_failures_total Total number of failures');
+    lines.push(
+      '# HELP circuit_breaker_failures_total Total number of failures',
+    );
     lines.push('# TYPE circuit_breaker_failures_total counter');
-    lines.push('# HELP circuit_breaker_requests_total Total number of requests');
+    lines.push(
+      '# HELP circuit_breaker_requests_total Total number of requests',
+    );
     lines.push('# TYPE circuit_breaker_requests_total counter');
     lines.push('# HELP circuit_breaker_open_total Total times circuit opened');
     lines.push('# TYPE circuit_breaker_open_total counter');
@@ -489,13 +500,19 @@ class CircuitBreakerRegistry {
         stats.state === CircuitState.CLOSED
           ? 0
           : stats.state === CircuitState.HALF_OPEN
-          ? 1
-          : 2;
+            ? 1
+            : 2;
 
       lines.push(`circuit_breaker_state{service="${name}"} ${stateValue}`);
-      lines.push(`circuit_breaker_failures_total{service="${name}"} ${stats.totalFailures}`);
-      lines.push(`circuit_breaker_requests_total{service="${name}"} ${stats.totalRequests}`);
-      lines.push(`circuit_breaker_open_total{service="${name}"} ${stats.openCount}`);
+      lines.push(
+        `circuit_breaker_failures_total{service="${name}"} ${stats.totalFailures}`,
+      );
+      lines.push(
+        `circuit_breaker_requests_total{service="${name}"} ${stats.totalRequests}`,
+      );
+      lines.push(
+        `circuit_breaker_open_total{service="${name}"} ${stats.openCount}`,
+      );
     }
 
     return lines.join('\n');
@@ -556,14 +573,17 @@ export function assessDegradationLevel(): DegradationLevel {
 
   // Critical services that affect core functionality
   const criticalServices = ['payment', 'auth', 'database'];
-  const criticalAffected = openCircuits.filter((s) => criticalServices.includes(s));
+  const criticalAffected = openCircuits.filter((s) =>
+    criticalServices.includes(s),
+  );
 
   if (criticalAffected.length > 0) {
     if (criticalAffected.includes('database')) {
       return {
         level: 'critical',
         affectedServices: openCircuits,
-        message: 'Database connectivity issues. Limited functionality available.',
+        message:
+          'Database connectivity issues. Limited functionality available.',
         allowedOperations: ['read-cache', 'static-content'],
       };
     }
@@ -572,7 +592,8 @@ export function assessDegradationLevel(): DegradationLevel {
       return {
         level: 'degraded',
         affectedServices: openCircuits,
-        message: 'Payment processing temporarily unavailable. Other features work normally.',
+        message:
+          'Payment processing temporarily unavailable. Other features work normally.',
         allowedOperations: ['browse', 'chat', 'view-moments', 'create-moments'],
       };
     }
@@ -581,7 +602,8 @@ export function assessDegradationLevel(): DegradationLevel {
       return {
         level: 'degraded',
         affectedServices: openCircuits,
-        message: 'Authentication service experiencing issues. Existing sessions continue to work.',
+        message:
+          'Authentication service experiencing issues. Existing sessions continue to work.',
         allowedOperations: ['existing-sessions', 'browse', 'read-only'],
       };
     }
@@ -601,7 +623,7 @@ export function assessDegradationLevel(): DegradationLevel {
  */
 export function createDegradedResponse(
   serviceName: string,
-  context?: Record<string, unknown>
+  context?: Record<string, unknown>,
 ): Response {
   const degradation = assessDegradationLevel();
 

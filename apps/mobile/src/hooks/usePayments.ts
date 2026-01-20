@@ -79,7 +79,7 @@ interface UsePaymentsReturn {
   paymentMethodsLoading: boolean;
   /** Refresh all payment methods */
   refreshPaymentMethods: () => Promise<void>;
-  /** Add a new card using Stripe token */
+  /** Add a new card using PayTR token */
   addCard: (tokenId: string) => Promise<PaymentCard | null>;
   /** Remove a saved card */
   removeCard: (cardId: string) => Promise<boolean>;

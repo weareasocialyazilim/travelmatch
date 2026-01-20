@@ -1,0 +1,6 @@
+defaults.url=https://sentry.io/
+defaults.org=lovendo-2d
+defaults.project=lovendo-mobile
+# Auth token should be set via SENTRY_AUTH_TOKEN environment variable
+# Or uncomment and add your token below (DO NOT COMMIT with real token):
+# auth.token=YOUR_SENTRY_AUTH_TOKEN_HERE

@@ -71,8 +71,8 @@ export interface Transaction {
   to_user?: TransactionParticipant;
   moment_id?: string;
   description?: string;
-  stripe_payment_intent_id?: string;
-  stripe_transfer_id?: string;
+  paytr_transaction_id?: string;
+  paytr_merchant_oid?: string;
   metadata?: Record<string, unknown>;
   created_at: string;
   completed_at?: string;

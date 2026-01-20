@@ -39,7 +39,7 @@ const SENTRY_PROJECT = process.env.SENTRY_PROJECT || 'lovendo-admin';
 const POSTHOG_API_KEY =
   process.env.POSTHOG_API_KEY || process.env.EXPO_PUBLIC_POSTHOG_API_KEY;
 const POSTHOG_PROJECT_ID = process.env.POSTHOG_PROJECT_ID;
-// PayTR is the primary payment provider (Stripe is deprecated)
+// PayTR is the primary payment provider
 const PAYTR_MERCHANT_ID = process.env.PAYTR_MERCHANT_ID;
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const CLOUDFLARE_API_TOKEN = process.env.CLOUDFLARE_API_TOKEN;

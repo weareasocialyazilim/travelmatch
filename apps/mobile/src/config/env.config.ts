@@ -73,10 +73,6 @@ export const serverEnvSchema = z.object({
   // Supabase Admin (NEVER expose to client)
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(20).optional(),
 
-  // Stripe Secrets (NEVER expose to client)
-  STRIPE_SECRET_KEY: z.string().startsWith('sk_').optional(),
-  STRIPE_WEBHOOK_SECRET: z.string().startsWith('whsec_').optional(),
-
   // Third-party API Keys (NEVER expose to client)
   OPENAI_API_KEY: z.string().startsWith('sk-').optional(),
   CLOUDFLARE_STREAM_API_KEY: z.string().optional(),
@@ -111,8 +107,6 @@ const REQUIRED_IN_PRODUCTION = ['SUPABASE_URL', 'SUPABASE_ANON_KEY'] as const;
  */
 const FORBIDDEN_PUBLIC_VARS = [
   'SUPABASE_SERVICE_ROLE_KEY',
-  'STRIPE_SECRET_KEY',
-  'STRIPE_WEBHOOK_SECRET',
   'OPENAI_API_KEY',
   'CLOUDFLARE_STREAM_API_KEY',
   'CLOUDFLARE_IMAGES_TOKEN', // API token for image uploads

@@ -46,7 +46,7 @@ export function getCorsHeaders(origin: string | null): Record<string, string> {
   return {
     'Access-Control-Allow-Origin': allowedOrigin as string,
     'Access-Control-Allow-Headers':
-      'authorization, x-client-info, apikey, content-type, stripe-signature',
+      'authorization, x-client-info, apikey, content-type',
     'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE',
     'Access-Control-Allow-Credentials': 'true',
     Vary: 'Origin',
@@ -57,7 +57,7 @@ export function getCorsHeaders(origin: string | null): Record<string, string> {
 export const corsHeaders = {
   'Access-Control-Allow-Origin': ALLOWED_ORIGINS[0] as string,
   'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type, stripe-signature',
+    'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE',
 };
 

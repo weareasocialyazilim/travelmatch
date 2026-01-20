@@ -45,9 +45,6 @@ export const PaymentMetadataSchema = z
     request_id: z.string().uuid().optional(),
     gift_recipient_id: z.string().uuid().optional(),
     platform_fee: z.number().positive().optional(),
-    // Legacy Stripe fields (keep for migration)
-    stripe_payment_intent_id: z.string().optional(),
-    stripe_charge_id: z.string().optional(),
     // PayTR integration fields (required for new transactions)
     paytr_transaction_id: z.string().optional(),
     paytr_token: z.string().optional(),

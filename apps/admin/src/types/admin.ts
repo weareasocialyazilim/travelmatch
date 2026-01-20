@@ -170,7 +170,7 @@ export interface Transaction {
   amount: number;
   currency: string;
   status: 'pending' | 'completed' | 'failed' | 'cancelled';
-  stripe_id: string | null;
+  provider_id: string | null;
   metadata: Record<string, unknown>;
   created_at: string;
 }

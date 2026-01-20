@@ -709,7 +709,7 @@ describe('PaymentService', () => {
   });
 
   describe('createPaymentIntent', () => {
-    it('should create Stripe payment intent', async () => {
+    it('should create PayTR payment intent', async () => {
       // createPaymentIntent takes (momentId, amount) as separate args
       const result = await paymentService.createPaymentIntent(
         'moment-123',

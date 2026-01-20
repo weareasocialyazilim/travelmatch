@@ -13,12 +13,18 @@ test.describe('Lovendo Admin - Login', () => {
     await expect(page.getByLabel(/password/i)).toBeVisible();
 
     // Check for submit button
-    await expect(page.getByRole('button', { name: /login|sign in|giriş/i })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /login|sign in|giriş/i }),
+    ).toBeVisible();
   });
 
-  test('should show validation error for empty form submission', async ({ page }) => {
+  test('should show validation error for empty form submission', async ({
+    page,
+  }) => {
     // Click submit without filling form
-    const submitButton = page.getByRole('button', { name: /login|sign in|giriş/i });
+    const submitButton = page.getByRole('button', {
+      name: /login|sign in|giriş/i,
+    });
     await submitButton.click();
 
     // Should show validation error or required field indication
@@ -34,7 +40,9 @@ test.describe('Lovendo Admin - Login', () => {
     const passwordInput = page.getByLabel(/password/i);
     await passwordInput.fill('password123');
 
-    const submitButton = page.getByRole('button', { name: /login|sign in|giriş/i });
+    const submitButton = page.getByRole('button', {
+      name: /login|sign in|giriş/i,
+    });
     await submitButton.click();
 
     // Wait for validation or error message
@@ -48,7 +56,9 @@ test.describe('Lovendo Admin - Login', () => {
     const passwordInput = page.getByLabel(/password/i);
     await passwordInput.fill('wrongpassword');
 
-    const submitButton = page.getByRole('button', { name: /login|sign in|giriş/i });
+    const submitButton = page.getByRole('button', {
+      name: /login|sign in|giriş/i,
+    });
     await submitButton.click();
 
     // Wait for error response
@@ -63,7 +73,9 @@ test.describe('Lovendo Admin - Login', () => {
     await passwordInput.fill('testpassword');
 
     // Check if there's a visibility toggle button
-    const toggleButton = page.locator('[data-testid="password-toggle"], [aria-label*="show"], [aria-label*="görünür"]');
+    const toggleButton = page.locator(
+      '[data-testid="password-toggle"], [aria-label*="show"], [aria-label*="görünür"]',
+    );
 
     if (await toggleButton.isVisible()) {
       // Password should be hidden by default
@@ -87,7 +99,9 @@ test.describe('Lovendo Admin - Authentication Flow', () => {
     await expect(page).toHaveURL(/login/);
   });
 
-  test('should display 2FA page after valid login (if 2FA enabled)', async ({ page }) => {
+  test('should display 2FA page after valid login (if 2FA enabled)', async ({
+    page,
+  }) => {
     // This test would require a test user with 2FA enabled
     // Skipping actual implementation as it requires backend setup
     test.skip();
@@ -111,7 +125,8 @@ test.describe('Lovendo Admin - Security', () => {
     const pageContent = await page.content();
 
     // Should not contain API keys or secrets
-    expect(pageContent).not.toMatch(/sk_live_/);
+    // Check for common secret patterns (without using actual secret format)
+    expect(pageContent).not.toMatch(/live_[a-zA-Z0-9]{20,}/);
     expect(pageContent).not.toMatch(/supabase_service_role_key/i);
     expect(pageContent).not.toMatch(/SUPABASE_SERVICE_ROLE_KEY/);
   });
@@ -137,7 +152,9 @@ test.describe('Lovendo Admin - Accessibility', () => {
     await page.keyboard.press('Tab');
 
     // Get focused element
-    const focusedElement = await page.evaluate(() => document.activeElement?.tagName);
+    const focusedElement = await page.evaluate(
+      () => document.activeElement?.tagName,
+    );
     expect(focusedElement).toBe('BUTTON');
   });
 

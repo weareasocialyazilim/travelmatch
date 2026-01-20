@@ -451,7 +451,7 @@ services:
       # SECURITY: SERVICE_KEY must be set via .env file - no defaults allowed
       SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY:?SUPABASE_SERVICE_KEY is required - check .env file}
       ONFIDO_API_KEY: ${ONFIDO_API_KEY:-}
-      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      PAYTR_MERCHANT_KEY: ${PAYTR_MERCHANT_KEY:-}
       USE_MOCK_KYC: ${USE_MOCK_KYC:-true}
       PORT: 3002
     volumes:
@@ -492,7 +492,7 @@ services:
       # SECURITY: SERVICE_KEY must be set via .env file - no defaults allowed
       SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY:?SUPABASE_SERVICE_KEY is required - check .env file}
       ONFIDO_API_KEY: ${ONFIDO_API_KEY:-}
-      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      PAYTR_MERCHANT_KEY: ${PAYTR_MERCHANT_KEY:-}
       USE_MOCK_KYC: ${USE_MOCK_KYC:-true}
     volumes:
       - ./services/job-queue:/app

@@ -199,7 +199,7 @@ const generateMockData = (): OpsDashboardData => {
       {
         id: 'err_2',
         type: 'PAYMENT_ERROR',
-        message: 'Stripe webhook verification failed',
+        message: 'PayTR callback verification failed',
         count: 3,
         lastOccurred: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
         service: 'payment',

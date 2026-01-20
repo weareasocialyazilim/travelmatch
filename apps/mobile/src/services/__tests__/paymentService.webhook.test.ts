@@ -1,7 +1,7 @@
 /**
  * Payment Service - Webhook Failure Edge Cases
  *
- * Tests for Stripe webhook failure scenarios:
+ * Tests for PayTR webhook failure scenarios:
  * - Webhook timeout
  * - Webhook retry logic
  * - Fallback to polling

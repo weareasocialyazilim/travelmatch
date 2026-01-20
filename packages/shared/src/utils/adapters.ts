@@ -259,7 +259,7 @@ export interface AdminTransaction {
   amount: number;
   currency: string;
   status: TransactionStatus;
-  stripe_id: string | null;
+  provider_id: string | null;
   created_at: string;
 }
 

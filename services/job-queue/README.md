@@ -1,9 +1,11 @@
 # Background Job Queue Service
 
 ## Overview
+
 High-performance background job processing using BullMQ and Redis for long-running tasks.
 
 ## Features
+
 - ✅ **KYC Verification Queue** - Offload KYC processing from synchronous requests
 - ✅ **Image Processing Queue** - Resize, optimize, and transform images
 - ✅ **Email Queue** - Send emails asynchronously
@@ -42,7 +44,7 @@ High-performance background job processing using BullMQ and Redis for long-runni
 ┌─────────────────────────────────────────────────────────────┐
 │              External Services / Database                    │
 │  • Supabase (update status)                                  │
-│  • KYC Providers (Onfido, Stripe Identity)                   │
+│  • KYC Providers (Onfido, idenfy)                             │
 │  • Email Services (SendGrid, Mailgun)                        │
 │  • Image Processing (Sharp, Cloudflare Images)               │
 └─────────────────────────────────────────────────────────────┘
@@ -51,9 +53,11 @@ High-performance background job processing using BullMQ and Redis for long-runni
 ## Queues
 
 ### 1. KYC Verification Queue
+
 **Purpose**: Offload KYC document verification from sync requests
 
 **Before** (Synchronous - timeout risk):
+
 ```typescript
 // Edge Function (timeout after 30s)
 POST /verify-kyc
@@ -64,6 +68,7 @@ POST /verify-kyc
 ```
 
 **After** (Asynchronous):
+
 ```typescript
 // Edge Function (instant response)
 POST /verify-kyc
@@ -77,6 +82,7 @@ POST /verify-kyc
 ```
 
 **Job Data**:
+
 ```typescript
 {
   userId: string;
@@ -84,20 +90,23 @@ POST /verify-kyc
   documentNumber: string;
   frontImageUrl: string;
   backImageUrl?: string;
-  provider: 'onfido' | 'stripe_identity';
+  provider: 'onfido' | 'idenfy';
 }
 ```
 
 **Configuration**:
+
 - Priority: High
 - Attempts: 3
 - Backoff: Exponential (1min, 5min, 15min)
 - Timeout: 60s per attempt
 
 ### 2. Image Processing Queue
+
 **Purpose**: Resize and optimize images asynchronously
 
 **Job Data**:
+
 ```typescript
 {
   imageUrl: string;
@@ -108,14 +117,17 @@ POST /verify-kyc
 ```
 
 **Configuration**:
+
 - Priority: Medium
 - Attempts: 3
 - Timeout: 30s
 
 ### 3. Email Queue
+
 **Purpose**: Send emails without blocking requests
 
 **Job Data**:
+
 ```typescript
 {
   to: string;
@@ -126,14 +138,17 @@ POST /verify-kyc
 ```
 
 **Configuration**:
+
 - Priority: Medium
 - Attempts: 5
 - Rate Limit: 100 emails/min
 
 ### 4. Notification Queue
+
 **Purpose**: Send push notifications and SMS
 
 **Job Data**:
+
 ```typescript
 {
   userId: string;
@@ -145,12 +160,14 @@ POST /verify-kyc
 ```
 
 **Configuration**:
+
 - Priority: High
 - Attempts: 3
 
 ## Setup
 
 ### 1. Start Redis
+
 ```bash
 # Using Docker
 docker-compose up redis -d
@@ -160,12 +177,14 @@ redis-server
 ```
 
 ### 2. Install Dependencies
+
 ```bash
 cd services/job-queue
 pnpm install
 ```
 
 ### 3. Configure Environment
+
 ```bash
 # .env
 REDIS_URL=redis://localhost:6379
@@ -176,13 +195,14 @@ SUPABASE_SERVICE_KEY=your-service-key
 
 # KYC Providers
 ONFIDO_API_KEY=your-key
-STRIPE_SECRET_KEY=your-key
+IDENFY_API_KEY=your-key
 
 # Email
 SENDGRID_API_KEY=your-key
 ```
 
 ### 4. Start Workers
+
 ```bash
 # Development
 pnpm dev
@@ -193,6 +213,7 @@ pnpm start
 ```
 
 ### 5. Monitor Jobs (Bull Board UI)
+
 ```bash
 # Start dashboard
 pnpm queue:ui
@@ -218,31 +239,38 @@ serve(async (req) => {
   const data = await req.json();
 
   // Add job to queue instead of processing immediately
-  const job = await kycQueue.add('verify', {
-    userId: user.id,
-    documentType: data.documentType,
-    documentNumber: data.documentNumber,
-    frontImageUrl: data.frontImage,
-    backImageUrl: data.backImage,
-    provider: 'onfido',
-  }, {
-    priority: 1, // High priority
-    attempts: 3,
-    backoff: {
-      type: 'exponential',
-      delay: 60000, // 1 minute
+  const job = await kycQueue.add(
+    'verify',
+    {
+      userId: user.id,
+      documentType: data.documentType,
+      documentNumber: data.documentNumber,
+      frontImageUrl: data.frontImage,
+      backImageUrl: data.backImage,
+      provider: 'onfido',
     },
-  });
+    {
+      priority: 1, // High priority
+      attempts: 3,
+      backoff: {
+        type: 'exponential',
+        delay: 60000, // 1 minute
+      },
+    },
+  );
 
   // Return job ID immediately (instant response)
-  return new Response(JSON.stringify({
-    jobId: job.id,
-    status: 'queued',
-    message: 'KYC verification queued. You will be notified when complete.',
-  }), {
-    status: 202, // Accepted
-    headers: { 'Content-Type': 'application/json' },
-  });
+  return new Response(
+    JSON.stringify({
+      jobId: job.id,
+      status: 'queued',
+      message: 'KYC verification queued. You will be notified when complete.',
+    }),
+    {
+      status: 202, // Accepted
+      headers: { 'Content-Type': 'application/json' },
+    },
+  );
 });
 ```
 
@@ -274,58 +302,62 @@ return {
 import { Worker, Job } from 'bullmq';
 import { createClient } from '@supabase/supabase-js';
 
-const worker = new Worker('kyc-verification', async (job: Job) => {
-  const { userId, documentType, frontImageUrl, provider } = job.data;
+const worker = new Worker(
+  'kyc-verification',
+  async (job: Job) => {
+    const { userId, documentType, frontImageUrl, provider } = job.data;
 
-  try {
-    // Update status to processing
-    await updateKycStatus(userId, 'processing');
+    try {
+      // Update status to processing
+      await updateKycStatus(userId, 'processing');
 
-    // Call KYC provider (can take 5-30s, no timeout issue)
-    let verificationResult;
-    
-    if (provider === 'onfido') {
-      verificationResult = await verifyWithOnfido(job.data);
-    } else if (provider === 'stripe_identity') {
-      verificationResult = await verifyWithStripe(job.data);
+      // Call KYC provider (can take 5-30s, no timeout issue)
+      let verificationResult;
+
+      if (provider === 'onfido') {
+        verificationResult = await verifyWithOnfido(job.data);
+      } else if (provider === 'idenfy') {
+        verificationResult = await verifyWithIdenfy(job.data);
+      }
+
+      // Update job progress
+      job.updateProgress(50);
+
+      // Update database
+      await updateKycStatus(userId, verificationResult.status);
+
+      // Update progress
+      job.updateProgress(75);
+
+      // Send notification to user
+      await sendNotification(userId, {
+        type: 'kyc_completed',
+        status: verificationResult.status,
+      });
+
+      // Complete
+      job.updateProgress(100);
+
+      return {
+        success: true,
+        status: verificationResult.status,
+        completedAt: new Date().toISOString(),
+      };
+    } catch (error) {
+      // Log error
+      console.error('KYC verification failed:', error);
+
+      // Update status to failed
+      await updateKycStatus(userId, 'failed');
+
+      throw error; // Will trigger retry
     }
-
-    // Update job progress
-    job.updateProgress(50);
-
-    // Update database
-    await updateKycStatus(userId, verificationResult.status);
-
-    // Update progress
-    job.updateProgress(75);
-
-    // Send notification to user
-    await sendNotification(userId, {
-      type: 'kyc_completed',
-      status: verificationResult.status,
-    });
-
-    // Complete
-    job.updateProgress(100);
-
-    return {
-      success: true,
-      status: verificationResult.status,
-      completedAt: new Date().toISOString(),
-    };
-  } catch (error) {
-    // Log error
-    console.error('KYC verification failed:', error);
-
-    // Update status to failed
-    await updateKycStatus(userId, 'failed');
-
-    throw error; // Will trigger retry
-  }
-}, {
-  connection: redis,
-  concurrency: 5, // Process 5 jobs in parallel
-});
+  },
+  {
+    connection: redis,
+    concurrency: 5, // Process 5 jobs in parallel
+  },
+);
 
 // Event handlers
 worker.on('completed', (job) => {
@@ -344,12 +376,14 @@ worker.on('stalled', (jobId) => {
 ## Performance
 
 ### Before (Synchronous)
+
 - Request timeout: 30s
 - Blocking: User waits entire time
 - Failure rate: 10% (timeouts)
 - Concurrent requests: Limited by function concurrency
 
 ### After (Queue-based)
+
 - API response: < 100ms
 - Blocking: None (job ID returned)
 - Failure rate: < 1% (retries + no timeout)
@@ -358,6 +392,7 @@ worker.on('stalled', (jobId) => {
 ## Monitoring
 
 ### Bull Board Dashboard
+
 ```
 http://localhost:3002
 
@@ -370,6 +405,7 @@ Features:
 ```
 
 ### Metrics to Track
+
 - Queue depth (waiting jobs)
 - Processing time (p50, p95, p99)
 - Success/failure rate
@@ -377,6 +413,7 @@ Features:
 - Worker utilization
 
 ### Alerts
+
 - Queue depth > 1000 → Scale workers
 - Failure rate > 5% → Investigate errors
 - Processing time > 60s → Check provider API
@@ -385,12 +422,14 @@ Features:
 ## Scaling
 
 ### Horizontal Scaling
+
 ```bash
 # Run multiple workers
 docker-compose up --scale job-worker=5
 ```
 
 ### Auto-scaling (Kubernetes)
+
 ```yaml
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -404,13 +443,13 @@ spec:
   minReplicas: 2
   maxReplicas: 20
   metrics:
-  - type: External
-    external:
-      metric:
-        name: bullmq_queue_waiting
-      target:
-        type: AverageValue
-        averageValue: "100" # Scale when > 100 jobs waiting
+    - type: External
+      external:
+        metric:
+          name: bullmq_queue_waiting
+        target:
+          type: AverageValue
+          averageValue: '100' # Scale when > 100 jobs waiting
 ```
 
 ## Best Practices
@@ -427,6 +466,7 @@ spec:
 ## Migration Guide
 
 ### Step 1: Update Edge Function
+
 ```typescript
 // Before: Synchronous
 const result = await verifyKyc(data); // Can timeout
@@ -438,12 +478,14 @@ return Response.json({ jobId: job.id, status: 'queued' }, { status: 202 });
 ```
 
 ### Step 2: Implement Worker
+
 ```typescript
 // Create worker in job-queue service
 const worker = new Worker('kyc-verification', processKyc);
 ```
 
 ### Step 3: Add Job Status Endpoint
+
 ```typescript
 // GET /job-status/:jobId
 const job = await kycQueue.getJob(jobId);
@@ -451,6 +493,7 @@ return Response.json({ status: await job.getState() });
 ```
 
 ### Step 4: Notify on Completion
+
 ```typescript
 // Worker sends notification when done
 await sendNotification(userId, { type: 'kyc_completed', status });
