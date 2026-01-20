@@ -279,8 +279,8 @@ describe('Payment Flow Anti-Fragility', () => {
     ).rejects.toThrow('Invalid card number');
   });
 
-  // Error 5: Processing error (Stripe)
-  it('should handle Stripe processing error', async () => {
+  // Error 5: Processing error (Payment Provider)
+  it('should handle payment processing error', async () => {
     mockPaymentService.confirmPayment.mockRejectedValue(
       new Error('An error occurred while processing your card'),
     );

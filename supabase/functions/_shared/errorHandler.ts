@@ -39,7 +39,7 @@ export enum ErrorCode {
 
   // External Services
   EXTERNAL_SERVICE_ERROR = 'EXTERNAL_SERVICE_ERROR',
-  STRIPE_ERROR = 'STRIPE_ERROR',
+  PAYMENT_PROVIDER_ERROR = 'PAYMENT_PROVIDER_ERROR',
   GEOCODING_ERROR = 'GEOCODING_ERROR',
 
   // Generic
@@ -94,7 +94,7 @@ const ERROR_STATUS_MAP: Record<ErrorCode, number> = {
   // 500 Internal Server Error
   [ErrorCode.INTERNAL_SERVER_ERROR]: 500,
   [ErrorCode.EXTERNAL_SERVICE_ERROR]: 500,
-  [ErrorCode.STRIPE_ERROR]: 500,
+  [ErrorCode.PAYMENT_PROVIDER_ERROR]: 500,
   [ErrorCode.GEOCODING_ERROR]: 500,
 
   // 503 Service Unavailable
@@ -212,10 +212,10 @@ export function createValidationError(
  */
 export function parseExternalError(
   error: any,
-  service: 'stripe' | 'geocoding' | 'other',
+  service: 'payment' | 'geocoding' | 'other',
 ): ErrorResponse {
   const serviceCodeMap = {
-    stripe: ErrorCode.STRIPE_ERROR,
+    payment: ErrorCode.PAYMENT_PROVIDER_ERROR,
     geocoding: ErrorCode.GEOCODING_ERROR,
     other: ErrorCode.EXTERNAL_SERVICE_ERROR,
   };

@@ -20,7 +20,6 @@ const envSchema = z.object({
   ENABLE_LOGGING: z.boolean().default(true),
   MAX_UPLOAD_SIZE: z.number().default(10485760), // 10MB
   SOCKET_URL: z.string().url().optional(),
-  STRIPE_PUBLISHABLE_KEY: z.string().optional(),
   MAPBOX_PUBLIC_TOKEN: z.string().optional(),
   // Supabase configuration
   SUPABASE_URL: z.string().url().optional(),
@@ -51,9 +50,6 @@ function getEnvVars() {
     ENABLE_LOGGING: __DEV__,
     MAX_UPLOAD_SIZE: 10485760 as const,
     SOCKET_URL: process.env.EXPO_PUBLIC_SOCKET_URL as string | undefined,
-    STRIPE_PUBLISHABLE_KEY: process.env.EXPO_PUBLIC_STRIPE_KEY as
-      | string
-      | undefined,
     MAPBOX_PUBLIC_TOKEN: process.env.EXPO_PUBLIC_MAPBOX_PUBLIC_TOKEN as
       | string
       | undefined,
@@ -136,7 +132,7 @@ export const FEATURES = {
   ANALYTICS: config.ENABLE_ANALYTICS,
   LOGGING: config.ENABLE_LOGGING,
   SOCKET_ENABLED: !!config.SOCKET_URL,
-  PAYMENTS_ENABLED: !!config.STRIPE_PUBLISHABLE_KEY,
+  PAYMENTS_ENABLED: true, // PayTR payment provider
   MAPS_ENABLED: !!config.MAPBOX_PUBLIC_TOKEN,
   SUPABASE_ENABLED: !!config.SUPABASE_URL && !!config.SUPABASE_ANON_KEY,
 } as const;

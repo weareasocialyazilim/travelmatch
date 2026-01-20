@@ -482,7 +482,7 @@ export const VENDOR_MANAGEMENT = {
       reviewDate: '2025-12-31',
     },
     {
-      name: 'Stripe',
+      name: 'PayTR',
       category: 'Payment Processing',
       soc2: true,
       pciDss: true,

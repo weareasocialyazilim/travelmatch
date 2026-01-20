@@ -1,6 +1,6 @@
 /**
  * Shared Type Definitions for Lovendo Edge Functions
- * 
+ *
  * This file contains TypeScript interfaces and types used across
  * multiple Edge Functions to ensure type safety and consistency.
  */
@@ -22,7 +22,6 @@ export interface User {
   balance: number;
   rating: number;
   review_count: number;
-  stripe_customer_id: string | null;
   push_token: string | null;
   created_at: string;
   updated_at: string;
@@ -50,7 +49,7 @@ export interface Moment {
   updated_at: string;
 }
 
-export type MomentCategory = 
+export type MomentCategory =
   | 'adventure'
   | 'food'
   | 'culture'
@@ -61,11 +60,7 @@ export type MomentCategory =
   | 'shopping'
   | 'other';
 
-export type MomentStatus = 
-  | 'draft'
-  | 'active'
-  | 'completed'
-  | 'cancelled';
+export type MomentStatus = 'draft' | 'active' | 'completed' | 'cancelled';
 
 export interface Request {
   id: string;
@@ -77,11 +72,7 @@ export interface Request {
   updated_at: string;
 }
 
-export type RequestStatus = 
-  | 'pending'
-  | 'accepted'
-  | 'rejected'
-  | 'cancelled';
+export type RequestStatus = 'pending' | 'accepted' | 'rejected' | 'cancelled';
 
 export interface Transaction {
   id: string;
@@ -95,7 +86,7 @@ export interface Transaction {
   created_at: string;
 }
 
-export type TransactionType = 
+export type TransactionType =
   | 'deposit'
   | 'withdrawal'
   | 'payment'
@@ -106,7 +97,7 @@ export type TransactionType =
   | 'transfer_in'
   | 'transfer_out';
 
-export type TransactionStatus = 
+export type TransactionStatus =
   | 'pending'
   | 'completed'
   | 'failed'
@@ -129,11 +120,7 @@ export interface EscrowTransaction {
   updated_at: string;
 }
 
-export type EscrowStatus = 
-  | 'pending'
-  | 'released'
-  | 'refunded'
-  | 'expired';
+export type EscrowStatus = 'pending' | 'released' | 'refunded' | 'expired';
 
 export interface Conversation {
   id: string;
@@ -155,10 +142,7 @@ export interface Message {
   created_at: string;
 }
 
-export type MessageType = 
-  | 'text'
-  | 'image'
-  | 'system';
+export type MessageType = 'text' | 'image' | 'system';
 
 export interface Notification {
   id: string;
@@ -171,7 +155,7 @@ export interface Notification {
   created_at: string;
 }
 
-export type NotificationType = 
+export type NotificationType =
   | 'message'
   | 'request'
   | 'payment'
@@ -272,13 +256,15 @@ export interface TransferFundsRequest {
 // WEBHOOK TYPES
 // =============================================================================
 
-export interface StripeWebhookEvent {
-  id: string;
-  type: string;
-  data: {
-    object: Record<string, unknown>;
-  };
-  created: number;
+export interface PayTRWebhookEvent {
+  merchant_oid: string;
+  status: 'success' | 'failed';
+  total_amount: number;
+  hash: string;
+  failed_reason_code?: string;
+  failed_reason_msg?: string;
+  payment_type?: string;
+  currency?: string;
 }
 
 // =============================================================================
@@ -303,33 +289,33 @@ export const ERROR_CODES = {
   FORBIDDEN: 'FORBIDDEN',
   TOKEN_EXPIRED: 'TOKEN_EXPIRED',
   INVALID_TOKEN: 'INVALID_TOKEN',
-  
+
   // Validation errors
   VALIDATION_ERROR: 'VALIDATION_ERROR',
   INVALID_INPUT: 'INVALID_INPUT',
   MISSING_FIELD: 'MISSING_FIELD',
-  
+
   // Resource errors
   NOT_FOUND: 'NOT_FOUND',
   ALREADY_EXISTS: 'ALREADY_EXISTS',
   CONFLICT: 'CONFLICT',
-  
+
   // Payment errors
   INSUFFICIENT_FUNDS: 'INSUFFICIENT_FUNDS',
   PAYMENT_FAILED: 'PAYMENT_FAILED',
   ESCROW_ERROR: 'ESCROW_ERROR',
-  
+
   // Rate limiting
   RATE_LIMITED: 'RATE_LIMITED',
   TOO_MANY_REQUESTS: 'TOO_MANY_REQUESTS',
-  
+
   // Server errors
   INTERNAL_ERROR: 'INTERNAL_ERROR',
   SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
   DATABASE_ERROR: 'DATABASE_ERROR',
 } as const;
 
-export type ErrorCode = typeof ERROR_CODES[keyof typeof ERROR_CODES];
+export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];
 
 export const HTTP_STATUS = {
   OK: 200,
@@ -346,4 +332,4 @@ export const HTTP_STATUS = {
   SERVICE_UNAVAILABLE: 503,
 } as const;
 
-export type HttpStatus = typeof HTTP_STATUS[keyof typeof HTTP_STATUS];
+export type HttpStatus = (typeof HTTP_STATUS)[keyof typeof HTTP_STATUS];

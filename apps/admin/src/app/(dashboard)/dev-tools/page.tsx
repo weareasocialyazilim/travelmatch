@@ -457,7 +457,7 @@ export default function DevToolsPage() {
                     { key: 'NEXT_PUBLIC_SUPABASE_URL', status: 'set' },
                     { key: 'NEXT_PUBLIC_SUPABASE_ANON_KEY', status: 'set' },
                     { key: 'SUPABASE_SERVICE_ROLE_KEY', status: 'set' },
-                    { key: 'STRIPE_SECRET_KEY', status: 'set' },
+                    { key: 'PAYTR_MERCHANT_KEY', status: 'set' },
                     { key: 'SENTRY_DSN', status: 'set' },
                     { key: 'POSTHOG_KEY', status: 'not_set' },
                   ].map((env) => (

@@ -536,7 +536,7 @@ class SecurePaymentService {
   }
 
   /**
-   * Add a new card via Stripe token
+   * Add a new card via PayTR token
    */
   async addCard(tokenId: string): Promise<{ card: PaymentCard }> {
     try {

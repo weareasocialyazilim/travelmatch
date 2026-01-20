@@ -9,7 +9,6 @@
   },
   "imports": {
     "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2",
-    "stripe": "https://esm.sh/stripe@14",
     "zod": "https://esm.sh/zod@3.22.4",
     "std/": "https://deno.land/std@0.208.0/",
     "std/testing/": "https://deno.land/std@0.208.0/testing/",
@@ -26,16 +25,9 @@
   "lint": {
     "rules": {
       "tags": ["recommended"],
-      "include": [
-        "ban-untagged-todo",
-        "no-unused-vars",
-        "eqeqeq"
-      ]
+      "include": ["ban-untagged-todo", "no-unused-vars", "eqeqeq"]
     },
-    "exclude": [
-      "node_modules",
-      "coverage"
-    ]
+    "exclude": ["node_modules", "coverage"]
   },
   "fmt": {
     "useTabs": false,

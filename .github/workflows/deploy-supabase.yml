@@ -85,8 +85,9 @@ jobs:
           echo "Setting Edge Function secrets from Infisical..."
           # Secrets are already imported from Infisical in previous step
           supabase secrets set \
-            STRIPE_SECRET_KEY="$STRIPE_SECRET_KEY" \
-            STRIPE_WEBHOOK_SECRET="$STRIPE_WEBHOOK_SECRET" \
+            PAYTR_MERCHANT_ID="$PAYTR_MERCHANT_ID" \
+            PAYTR_MERCHANT_KEY="$PAYTR_MERCHANT_KEY" \
+            PAYTR_MERCHANT_SALT="$PAYTR_MERCHANT_SALT" \
             OPENAI_API_KEY="$OPENAI_API_KEY" \
             CLOUDFLARE_STREAM_API_KEY="$CLOUDFLARE_STREAM_API_KEY" \
             CLOUDFLARE_STREAM_ACCOUNT_ID="$CLOUDFLARE_STREAM_ACCOUNT_ID" \

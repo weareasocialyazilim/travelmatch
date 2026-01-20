@@ -15,7 +15,8 @@ import { logger } from './logger';
 
 export type IntegrationName =
   | 'supabase'
-  | 'stripe'
+  | 'paytr'
+  | 'idenfy'
   | 'twilio'
   | 'sendgrid'
   | 'posthog'
@@ -68,7 +69,8 @@ export interface IntegrationHealthSummary {
 
 export const INTEGRATION_DISPLAY_NAMES: Record<IntegrationName, string> = {
   supabase: 'Supabase',
-  stripe: 'Stripe',
+  paytr: 'PayTR',
+  idenfy: 'idenfy',
   twilio: 'Twilio',
   sendgrid: 'SendGrid',
   posthog: 'PostHog',
@@ -126,7 +128,7 @@ export async function logIntegrationEvent(
 
 /**
  * Wrapper to measure and log integration calls
- * Kullanim: const result = await withIntegrationHealth('stripe', () => stripe.charges.create(...));
+ * Kullanim: const result = await withIntegrationHealth('paytr', () => paytr.createPayment(...));
  */
 export async function withIntegrationHealth<T>(
   integrationName: IntegrationName,
@@ -187,8 +189,8 @@ export function generateMockHealthSummaries(): IntegrationHealthSummary[] {
       failures24h: 3,
     },
     {
-      integrationName: 'stripe',
-      displayName: 'Stripe',
+      integrationName: 'paytr',
+      displayName: 'PayTR',
       status: 'healthy',
       lastCheck: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
       successRate: 99.9,

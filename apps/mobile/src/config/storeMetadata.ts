@@ -17,7 +17,7 @@ export const STORE_METADATA = {
   storeIds: {
     ios: {
       appStoreId: '6740496053',
-      bundleId: 'com.anonymous.lovendo-new',
+      bundleId: 'com.lovendo.app',
       teamId: 'ZWCGM5V955',
     },
     android: {
@@ -156,7 +156,7 @@ export const STORE_METADATA = {
         type: 'Payment Info',
         purpose: 'Purchases',
         shared: true,
-        processor: 'Stripe',
+        processor: 'PayTR',
       },
       { type: 'Messages', purpose: 'App Functionality', shared: false },
     ],
@@ -167,7 +167,7 @@ export const STORE_METADATA = {
       'Independent security review',
     ],
     thirdPartyServices: [
-      { name: 'Stripe', purpose: 'Payment processing' },
+      { name: 'PayTR', purpose: 'Payment processing' },
       { name: 'Supabase', purpose: 'Database and authentication' },
       { name: 'Mapbox', purpose: 'Maps and location' },
       { name: 'Sentry', purpose: 'Error tracking' },

@@ -3,6 +3,30 @@ import { createClient } from '@supabase/supabase-js';
 import { KycJobData, KycJobResult, KycJobSchema } from '../jobs/index.js';
 import Redis from 'ioredis';
 
+// Simple logger for job-queue service
+const logger = {
+  info: (message: string, ...args: unknown[]) => {
+    if (process.env.NODE_ENV !== 'test') {
+      // eslint-disable-next-line no-console
+      console.info(`[INFO] ${message}`, ...args);
+    }
+  },
+  warn: (message: string, ...args: unknown[]) => {
+    // eslint-disable-next-line no-console
+    console.warn(`[WARN] ${message}`, ...args);
+  },
+  error: (message: string, ...args: unknown[]) => {
+    // eslint-disable-next-line no-console
+    console.error(`[ERROR] ${message}`, ...args);
+  },
+  debug: (message: string, ...args: unknown[]) => {
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.debug(`[DEBUG] ${message}`, ...args);
+    }
+  },
+};
+
 // Initialize Supabase client with service role key
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -172,87 +196,71 @@ async function verifyWithOnfido(data: KycJobData): Promise<KycJobResult> {
 }
 
 /**
- * Verify KYC documents using Stripe Identity
+ * Verify KYC documents using idenfy
+ * Documentation: https://documentation.idenfy.com/
  */
-async function verifyWithStripe(data: KycJobData): Promise<KycJobResult> {
-  const apiKey = process.env.STRIPE_SECRET_KEY;
-  if (!apiKey) {
-    throw new Error('STRIPE_SECRET_KEY not configured');
+async function verifyWithIdenfy(data: KycJobData): Promise<KycJobResult> {
+  const apiKey = process.env.IDENFY_API_KEY;
+  const apiSecret = process.env.IDENFY_API_SECRET;
+
+  if (!apiKey || !apiSecret) {
+    throw new Error('IDENFY_API_KEY or IDENFY_API_SECRET not configured');
   }
 
-  // 1. Create verification session
-  const sessionResponse = await fetch(
-    'https://api.stripe.com/v1/identity/verification_sessions',
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        type: 'document',
-        'options[document][allowed_types][]': data.documentType,
-      }),
-    },
-  );
+  const auth = Buffer.from(`${apiKey}:${apiSecret}`).toString('base64');
 
-  if (!sessionResponse.ok) {
+  // 1. Create verification token
+  const tokenResponse = await fetch('https://ivs.idenfy.com/api/v2/token', {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${auth}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      clientId: data.userId,
+    }),
+  });
+
+  if (!tokenResponse.ok) {
     throw new Error(
-      `Stripe session creation failed: ${sessionResponse.statusText}`,
+      `idenfy token creation failed: ${tokenResponse.statusText}`,
     );
   }
 
-  const session = (await sessionResponse.json()) as {
-    id: string;
-    livemode: boolean;
+  const tokenData = (await tokenResponse.json()) as {
+    scanRef: string;
+    authToken: string;
   };
 
-  // 2. Submit document (in production, use Stripe's client SDK)
-  // This is simplified - actual implementation would use Stripe Identity SDK
-  const submitResponse = await fetch(
-    `https://api.stripe.com/v1/identity/verification_sessions/${session.id}/submit`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-      },
-    },
-  );
-
-  if (!submitResponse.ok) {
-    throw new Error(
-      `Stripe document submission failed: ${submitResponse.statusText}`,
-    );
-  }
-
-  // 3. Poll for verification result
+  // 2. Poll for verification result
   let attempts = 0;
-  const maxAttempts = 20;
+  const maxAttempts = 40; // idenfy can take longer
   let verificationResult: any;
 
   while (attempts < maxAttempts) {
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 5000));
 
     const resultResponse = await fetch(
-      `https://api.stripe.com/v1/identity/verification_sessions/${session.id}`,
+      `https://ivs.idenfy.com/api/v2/status?scanRef=${tokenData.scanRef}`,
       {
         headers: {
-          Authorization: `Bearer ${apiKey}`,
+          Authorization: `Basic ${auth}`,
         },
       },
     );
 
     if (!resultResponse.ok) {
       throw new Error(
-        `Stripe result retrieval failed: ${resultResponse.statusText}`,
+        `idenfy status check failed: ${resultResponse.statusText}`,
       );
     }
 
     verificationResult = await resultResponse.json();
 
     if (
-      verificationResult.status === 'verified' ||
-      verificationResult.status === 'requires_input'
+      verificationResult.status === 'APPROVED' ||
+      verificationResult.status === 'DENIED' ||
+      verificationResult.status === 'SUSPECTED'
     ) {
       break;
     }
@@ -261,24 +269,25 @@ async function verifyWithStripe(data: KycJobData): Promise<KycJobResult> {
   }
 
   if (!verificationResult) {
-    throw new Error('Stripe verification timed out');
+    throw new Error('idenfy verification timed out');
   }
 
-  const isVerified = verificationResult.status === 'verified';
-  const rejectionReasons = verificationResult.last_error?.reason
-    ? [verificationResult.last_error.reason]
+  const isVerified = verificationResult.status === 'APPROVED';
+  const rejectionReasons = verificationResult.deniedReason
+    ? [verificationResult.deniedReason]
     : undefined;
 
   return {
     success: true,
     status: isVerified ? 'verified' : 'rejected',
-    provider: 'stripe_identity',
-    providerId: session.id,
+    provider: 'idenfy',
+    providerId: tokenData.scanRef,
     rejectionReasons,
     completedAt: new Date().toISOString(),
     metadata: {
-      sessionId: session.id,
-      livemode: session.livemode,
+      scanRef: tokenData.scanRef,
+      autoStatus: verificationResult.autoStatus,
+      manualStatus: verificationResult.manualStatus,
     },
   };
 }
@@ -334,6 +343,7 @@ async function sendNotification(
   });
 
   if (error) {
+    // eslint-disable-next-line no-console
     console.error('Failed to send notification:', error);
     // Don't throw - notification failure shouldn't fail the job
   }
@@ -356,7 +366,7 @@ export function createKycWorker(connection: Redis) {
   const worker = new Worker<KycJobData, KycJobResult>(
     'kyc-verification',
     async (job: Job<KycJobData, KycJobResult>) => {
-      console.log(
+      logger.info(
         `[KYC Worker] Processing job ${job.id} for user ${job.data.userId}`,
       );
 
@@ -375,14 +385,14 @@ export function createKycWorker(connection: Redis) {
           process.env.NODE_ENV === 'development' ||
           process.env.USE_MOCK_KYC === 'true'
         ) {
-          console.log('[KYC Worker] Using mock verification');
+          logger.debug('[KYC Worker] Using mock verification');
           result = await verifyMock(validatedData);
         } else if (validatedData.provider === 'onfido') {
-          console.log('[KYC Worker] Verifying with Onfido');
+          logger.info('[KYC Worker] Verifying with Onfido');
           result = await verifyWithOnfido(validatedData);
-        } else if (validatedData.provider === 'stripe_identity') {
-          console.log('[KYC Worker] Verifying with Stripe Identity');
-          result = await verifyWithStripe(validatedData);
+        } else if (validatedData.provider === 'idenfy') {
+          logger.info('[KYC Worker] Verifying with idenfy');
+          result = await verifyWithIdenfy(validatedData);
         } else {
           throw new Error(
             `Unsupported KYC provider: ${validatedData.provider}`,
@@ -416,6 +426,7 @@ export function createKycWorker(connection: Redis) {
           });
 
         if (detailsError) {
+          // eslint-disable-next-line no-console
           console.error(
             '[KYC Worker] Failed to store verification details:',
             detailsError,
@@ -430,16 +441,16 @@ export function createKycWorker(connection: Redis) {
 
         await job.updateProgress(100);
 
-        console.log(`[KYC Worker] Job ${job.id} completed successfully`);
+        logger.info(`[KYC Worker] Job ${job.id} completed successfully`);
         return result;
       } catch (error) {
-        console.error(`[KYC Worker] Job ${job.id} failed:`, error);
+        logger.error(`[KYC Worker] Job ${job.id} failed:`, error);
 
         // Update status to failed
         try {
           await updateKycStatus(job.data.userId, 'failed');
         } catch (updateError) {
-          console.error(
+          logger.error(
             '[KYC Worker] Failed to update status to failed:',
             updateError,
           );
@@ -460,26 +471,26 @@ export function createKycWorker(connection: Redis) {
 
   // Event handlers
   worker.on('completed', (job) => {
-    console.log(`[KYC Worker] ✓ Job ${job.id} completed`);
+    logger.info(`[KYC Worker] ✓ Job ${job.id} completed`);
   });
 
   worker.on('failed', (job, error) => {
-    console.error(`[KYC Worker] ✗ Job ${job?.id} failed:`, error.message);
+    logger.error(`[KYC Worker] ✗ Job ${job?.id} failed:`, error.message);
   });
 
   worker.on('stalled', (jobId) => {
-    console.warn(
+    logger.warn(
       `[KYC Worker] ⚠ Job ${jobId} stalled (worker crashed or took too long)`,
     );
   });
 
   worker.on('error', (error) => {
-    console.error('[KYC Worker] Worker error:', error);
+    logger.error('[KYC Worker] Worker error:', error);
   });
 
   // Graceful shutdown
   process.on('SIGTERM', async () => {
-    console.log('[KYC Worker] Received SIGTERM, shutting down gracefully...');
+    logger.info('[KYC Worker] Received SIGTERM, shutting down gracefully...');
     await worker.close();
     process.exit(0);
   });

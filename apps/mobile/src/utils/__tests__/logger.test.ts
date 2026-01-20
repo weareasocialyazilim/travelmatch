@@ -4,13 +4,21 @@
  * Target Coverage: 80%+
  */
 
-import { Logger, logger } from '@/utils/logger';
-import * as Sentry from '@sentry/react-native';
+// Mock the sentry config module that logger.ts imports
+jest.mock('@/config/sentry', () => ({
+  Sentry: {
+    addBreadcrumb: jest.fn(),
+  },
+}));
 
-// Mock Sentry
+// Also mock @sentry/react-native for any direct imports
 jest.mock('@sentry/react-native', () => ({
   addBreadcrumb: jest.fn(),
 }));
+
+// Now import after mocks are set up
+import { Logger, logger } from '@/utils/logger';
+import { Sentry } from '@/config/sentry';
 
 // Mock console methods
 const mockConsoleInfo = jest.spyOn(console, 'info').mockImplementation();
@@ -174,7 +182,8 @@ describe('logger.ts', () => {
     });
 
     it('should redact API keys', () => {
-      const message = 'API Key: sk_live_abcdefghijklmnopqrstuvwxyz123456';
+      // Using fake pattern that matches API key format (32+ alphanumeric chars)
+      const message = 'API Key: fake_key_ABCDEFGHIJKLMNOPQRSTUVWXYZ1234';
       logger.info(message);
       const loggedCall = mockConsoleInfo.mock.calls[0][0]; // Full formatted message
       expect(loggedCall).toContain('[KEY_REDACTED]');
@@ -539,8 +548,8 @@ describe('logger.ts', () => {
       remoteLogger.error('Error', { password: 'secret123' });
       remoteLogger.flushRemoteLogs();
 
-      const breadcrumbs = Sentry.addBreadcrumb.mock.calls;
-      const hasSecret = breadcrumbs.some((call) =>
+      const breadcrumbs = (Sentry.addBreadcrumb as jest.Mock).mock.calls;
+      const hasSecret = breadcrumbs.some((call: unknown[]) =>
         JSON.stringify(call).includes('secret123'),
       );
       expect(hasSecret).toBe(false);

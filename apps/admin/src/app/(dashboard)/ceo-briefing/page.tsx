@@ -171,16 +171,6 @@ const founderDecisions = [
     action: 'Onay/Red kararı',
     context: 'Bu kullanıcı 6 aydır aktif, toplam ₺450K GMV üretti.',
   },
-  {
-    id: 2,
-    priority: 'high',
-    title: 'Stripe rate artışı teklifi',
-    description:
-      'Stripe %2.4 → %2.9 teklif etti. Alternatif: iyzico %2.2 (entegrasyon 2 hafta)',
-    deadline: 'Yarın COB',
-    action: 'Kabul/Reddet/Pazarlık',
-    context: 'Aylık ₺85K komisyon farkı yaratır.',
-  },
 ];
 
 // 🎯 Bu haftanın odak alanı
