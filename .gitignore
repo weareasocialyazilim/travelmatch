@@ -114,3 +114,9 @@ apps/**/pnpm-lock.yaml
 package-lock.json
 package-lock.json
 .vercel
+
+# Sentry properties with auth tokens
+apps/mobile/sentry.properties
+apps/mobile/ios/sentry.properties
+apps/mobile/android/sentry.properties
+

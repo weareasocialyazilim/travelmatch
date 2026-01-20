@@ -47,7 +47,8 @@
       </intent-filter>
       <intent-filter android:autoVerify="true" data-generated="true">
         <action android:name="android.intent.action.VIEW"/>
-        <data android:scheme="https" android:host="lovendo.app" android:pathPrefix="/"/>
+        <data android:scheme="https" android:host="www.lovendo.xyz" android:pathPrefix="/"/>
+        <data android:scheme="https" android:host="lovendo.xyz" android:pathPrefix="/"/>
         <data android:scheme="lovendo" android:host="*"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <category android:name="android.intent.category.DEFAULT"/>

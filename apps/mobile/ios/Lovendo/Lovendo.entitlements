@@ -6,7 +6,8 @@
     <string>development</string>
     <key>com.apple.developer.associated-domains</key>
     <array>
-      <string>applinks:lovendo.app</string>
+      <string>applinks:www.lovendo.xyz</string>
+      <string>applinks:lovendo.xyz</string>
     </array>
   </dict>
 </plist>

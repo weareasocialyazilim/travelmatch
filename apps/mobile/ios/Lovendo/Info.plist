@@ -25,10 +25,11 @@
     <key>CFBundleURLTypes</key>
     <array>
       <dict>
+        <key>CFBundleURLName</key>
+        <string>com.lovendo.mobile</string>
         <key>CFBundleURLSchemes</key>
         <array>
           <string>lovendo</string>
-          <string>com.lovendo.mobile</string>
         </array>
       </dict>
     </array>
@@ -46,7 +47,7 @@
       <false/>
     </dict>
     <key>NSCameraUsageDescription</key>
-    <string>Özel anlarınızı (Moments) kaydedip takipçilerinizle paylaşabilmeniz için kamera erişimi gereklidir.</string>
+    <string>Lovendo needs camera access to capture travel moments.</string>
     <key>NSContactsUsageDescription</key>
     <string>Lovendo can help you find friends who are also using the app.</string>
     <key>NSFaceIDUsageDescription</key>
@@ -56,13 +57,13 @@
     <key>NSLocationAlwaysUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your location</string>
     <key>NSLocationWhenInUseUsageDescription</key>
-    <string>Çevrenizdeki ilham verici anları ve popüler içerik üreticilerini keşfedebilmeniz için konumunuz kullanılır.</string>
+    <string>Lovendo uses your location to show nearby experiences.</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>Lovendo uses the microphone to record voice messages in chats.</string>
     <key>NSPhotoLibraryAddUsageDescription</key>
     <string>Lovendo needs permission to save photos to your library.</string>
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>Vibe'ınızı yansıtan fotoğraf ve videoları profilinizde paylaşabilmeniz için galeri erişimi gereklidir.</string>
+    <string>Lovendo needs access to your photos to share travel moments.</string>
     <key>NSUserTrackingUsageDescription</key>
     <string>Lovendo uses this to provide personalized recommendations and improve app experience. Your data is never sold to third parties.</string>
     <key>RCTNewArchEnabled</key>

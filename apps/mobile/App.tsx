@@ -135,13 +135,8 @@ function App() {
           return;
         }
 
-        // Initialize Sentry dynamically
-        try {
-          const { initSentry } = await import('./src/config/sentry');
-          void initSentry();
-        } catch (sentryError) {
-          logger.warn('App', 'Sentry initialization failed', sentryError);
-        }
+        // Note: Sentry is already initialized at the top of this file (before React mounts)
+        // No need to initialize again here - this prevents double initialization issues
 
         // Increment session count for feedback prompt
         incrementSessionCount();

@@ -1,211 +1,27 @@
 /**
- * Sentry Configuration - Lazy Loaded
- * Error tracking and performance monitoring
+ * Sentry Configuration - TEMPORARILY DISABLED (STUB)
  *
- * OPTIMIZATION: This module is lazy loaded to reduce initial bundle size by ~68MB.
- * Sentry is initialized after first render via dynamic import in App.tsx.
+ * REASON: Sentry v7 is incompatible with React 19.
+ * Sentry's monkey-patching of React.Component.prototype fails because
+ * React 19 changed internal structures.
+ *
+ * This file provides no-op stub functions to maintain API compatibility
+ * while Sentry is disabled. Re-enable when Sentry v8 supports React 19.
+ *
+ * TODO: Monitor https://github.com/getsentry/sentry-javascript/issues for React 19 support
  */
-
-import Constants from 'expo-constants';
-import * as Sentry from '@sentry/react-native';
-import * as Application from 'expo-application';
-import { logger } from '../utils/logger';
-
-// Handle __DEV__ being undefined in test environments
-const isDev = typeof __DEV__ !== 'undefined' ? __DEV__ : true;
-
-// Sentry DSN from environment variables (configured in EAS)
-// SECURITY: DSN must be set via environment variable, no hardcoded fallback
-const SENTRY_DSN =
-  (Constants.expoConfig?.extra?.sentryDsn as string | undefined) ||
-  process.env.EXPO_PUBLIC_SENTRY_DSN ||
-  '';
-
-// Track if Sentry has been initialized
-let isInitialized = false;
-
-/**
- * Initialize Sentry - Call this after JSI runtime is ready (inside useEffect)
- */
-export function initSentry() {
-  if (isInitialized) {
-    logger.debug('Sentry already initialized');
-    return;
-  }
-
-  // Skip initialization in development to avoid JSI issues
-  if (isDev) {
-    logger.debug('Sentry disabled in development');
-    return;
-  }
-
-  // Skip if DSN is not configured
-  if (!SENTRY_DSN) {
-    logger.warn(
-      'Sentry',
-      'Sentry DSN not configured. Set EXPO_PUBLIC_SENTRY_DSN environment variable.',
-    );
-    return;
-  }
-
-  try {
-    // Build release identifier for source map correlation
-    const appVersion = Application.nativeApplicationVersion || '1.0.0';
-    const buildNumber = Application.nativeBuildVersion || '1';
-    const bundleId = Application.applicationId || 'com.lovendo.app';
-    const release = `${bundleId}@${appVersion}+${buildNumber}`;
-    const dist = buildNumber;
-
-    Sentry.init({
-      dsn: SENTRY_DSN,
-      // Release tagging for source map correlation and version tracking
-      release,
-      dist,
-      debug: false,
-      environment: isDev ? 'development' : 'production',
-
-      // Adds more context data to events
-      sendDefaultPii: false, // CHANGED: Never send PII automatically - we manually set safe user context
-
-      // Enable Logs
-      enableLogs: true,
-
-      // Performance Monitoring
-      // IMPORTANT: Set to 1.0 for critical screens (Wallet, Discover, Chat)
-      // Lower to 0.1-0.2 for less critical flows
-      tracesSampleRate: 1.0, // CHANGED: 100% sampling for production launch, reduce after baseline established
-
-      // Configure Session Replay - only in production
-      replaysSessionSampleRate: 0.1,
-      replaysOnErrorSampleRate: 1.0, // Always capture replay when error occurs
-
-      // Enable offline caching
-      enableNativeCrashHandling: true,
-      enableAutoSessionTracking: true,
-      enableAutoPerformanceTracing: true, // ADDED: Auto-track navigation and screen load times
-
-      // Integrations - add safely in production only
-      integrations: [
-        Sentry.mobileReplayIntegration(),
-        Sentry.feedbackIntegration(),
-        // ADDED: Track app start performance
-        Sentry.reactNativeTracingIntegration(),
-      ],
-
-      // Filter sensitive data - PRIVACY PROTECTION
-      beforeSend(event) {
-        // Remove PII from user context
-        if (event.user) {
-          delete event.user.email;
-          delete event.user.ip_address;
-          // Keep only non-sensitive identifiers
-          event.user.username = String(
-            event.user.username || event.user.id || 'anonymous',
-          );
-        }
-
-        // Remove sensitive request data
-        if (event.request) {
-          delete event.request.cookies;
-          delete event.request.headers;
-        }
-
-        // Remove sensitive data from extra context
-        if (event.extra) {
-          delete event.extra.phone;
-          delete event.extra.password;
-          delete event.extra.token;
-          delete event.extra.creditCard;
-          delete event.extra.apiKey;
-        }
-
-        // Filter breadcrumbs for sensitive data
-        if (event.breadcrumbs) {
-          event.breadcrumbs = event.breadcrumbs.map((breadcrumb) => {
-            if (breadcrumb.data) {
-              delete breadcrumb.data.password;
-              delete breadcrumb.data.token;
-              delete breadcrumb.data.email;
-              delete breadcrumb.data.phone;
-              delete breadcrumb.data.creditCard;
-            }
-            return breadcrumb;
-          });
-        }
-
-        return event;
-      },
-
-      // Ignore specific errors
-      ignoreErrors: ['Network request failed', 'NetworkError', 'AbortError'],
-    });
-
-    isInitialized = true;
-    logger.info('Sentry', 'Sentry initialized successfully');
-  } catch (error) {
-    logger.error('Sentry', 'Failed to initialize Sentry', error);
-  }
-}
-
-/**
- * Set user context (NO PII - only non-sensitive identifiers)
- * IMPORTANT: Call this on login/session restore
- */
-export function setSentryUser(user: {
-  id: string;
-  username?: string;
-  kycStatus?: string;
-  accountType?: string;
-}) {
-  Sentry.setUser({
-    id: user.id,
-    username: user.username || `user_${user.id.substring(0, 8)}`,
-    // IMPORTANT: DO NOT include email, phone, or other PII
-  });
-
-  // Add context for analytics
-  Sentry.setTag('user_kyc_status', user.kycStatus || 'unknown');
-  Sentry.setTag('account_type', user.accountType || 'standard');
-}
-
-/**
- * Clear user context (on logout)
- */
-export function clearSentryUser() {
-  Sentry.setUser(null);
-}
-
-/**
- * Add breadcrumb for debugging (filters sensitive data)
- */
-export function addBreadcrumb(
-  message: string,
-  category: string,
-  level: Sentry.SeverityLevel = 'info',
-  data?: Record<string, unknown>,
-) {
-  // Filter sensitive data from breadcrumb
-  const filteredData = data ? { ...data } : undefined;
-  if (filteredData) {
-    delete filteredData.password;
-    delete filteredData.token;
-    delete filteredData.email;
-    delete filteredData.phone;
-    delete filteredData.creditCard;
-  }
-
-  Sentry.addBreadcrumb({
-    message,
-    category,
-    level,
-    data: filteredData,
-    timestamp: Date.now() / 1000,
-  });
-}
 
 // ============================================
-// Payment Error Tracking (PayTR Integration)
+// STUB TYPES - Match original API signatures
 // ============================================
+
+export type SeverityLevel =
+  | 'fatal'
+  | 'error'
+  | 'warning'
+  | 'log'
+  | 'info'
+  | 'debug';
 
 export type PaymentErrorType =
   | 'PAYTR_TIMEOUT'
@@ -216,13 +32,60 @@ export type PaymentErrorType =
   | 'GIFT_OFFER_FAILURE'
   | 'REFUND_FAILURE';
 
+// Stub span type for performance functions
+interface StubSpan {
+  finish: () => void;
+}
+
+// ============================================
+// NO-OP STUB FUNCTIONS
+// ============================================
+
 /**
- * Log payment error with detailed breadcrumb for PayTR tracking
- * Master tracking for all payment-related errors
+ * Initialize Sentry - NO-OP STUB
+ */
+export function initSentry(): void {
+  // Sentry disabled - React 19 incompatibility
+  console.log('[Sentry] Disabled - React 19 incompatibility');
+}
+
+/**
+ * Set user context - NO-OP STUB
+ */
+export function setSentryUser(_user: {
+  id: string;
+  username?: string;
+  kycStatus?: string;
+  accountType?: string;
+}): void {
+  // No-op
+}
+
+/**
+ * Clear user context - NO-OP STUB
+ */
+export function clearSentryUser(): void {
+  // No-op
+}
+
+/**
+ * Add breadcrumb - NO-OP STUB
+ */
+export function addBreadcrumb(
+  _message: string,
+  _category: string,
+  _level: SeverityLevel = 'info',
+  _data?: Record<string, unknown>,
+): void {
+  // No-op
+}
+
+/**
+ * Log payment error - NO-OP STUB
  */
 export function logPaymentError(
-  errorType: PaymentErrorType,
-  details: {
+  _errorType: PaymentErrorType,
+  _details: {
     transactionId?: string;
     amount?: number;
     currency?: string;
@@ -231,186 +94,115 @@ export function logPaymentError(
     momentId?: string;
     giftId?: string;
   },
-) {
-  // Add payment-specific breadcrumb
-  addBreadcrumb(`Payment Error: ${errorType}`, 'payment', 'error', {
-    error_type: errorType,
-    transaction_id: details.transactionId,
-    amount: details.amount,
-    currency: details.currency,
-    error_message: details.errorMessage,
-    error_code: details.errorCode,
-    moment_id: details.momentId,
-    gift_id: details.giftId,
-    timestamp: new Date().toISOString(),
-  });
-
-  // Set payment context for this session
-  Sentry.withScope((scope) => {
-    scope.setTag('transaction_type', 'payment');
-    scope.setTag('payment_error_type', errorType);
-    scope.setTag('payment_provider', 'paytr');
-
-    if (details.transactionId) {
-      scope.setTag('transaction_id', details.transactionId);
-    }
-    if (details.momentId) {
-      scope.setTag('moment_id', details.momentId);
-    }
-    if (details.giftId) {
-      scope.setTag('gift_id', details.giftId);
-    }
-
-    scope.setLevel('error');
-
-    Sentry.captureMessage(`PayTR Error: ${errorType}`, 'error');
-  });
+): void {
+  // No-op
 }
 
 /**
- * Log successful payment for analytics
+ * Log successful payment - NO-OP STUB
  */
-export function logPaymentSuccess(details: {
+export function logPaymentSuccess(_details: {
   transactionId: string;
   amount: number;
   currency: string;
   momentId?: string;
   giftId?: string;
-}) {
-  addBreadcrumb('Payment Success', 'payment', 'info', {
-    transaction_id: details.transactionId,
-    amount: details.amount,
-    currency: details.currency,
-    moment_id: details.momentId,
-    gift_id: details.giftId,
-    timestamp: new Date().toISOString(),
-  });
+}): void {
+  // No-op
 }
 
 /**
- * Capture exception (filters sensitive context)
+ * Capture exception - NO-OP STUB
  */
 export function captureException(
-  error: Error,
-  context?: Record<string, unknown>,
-) {
-  if (context) {
-    // Filter sensitive data from context
-    const filteredContext = { ...context };
-    delete filteredContext.password;
-    delete filteredContext.token;
-    delete filteredContext.email;
-    delete filteredContext.phone;
-    delete filteredContext.creditCard;
-
-    Sentry.setContext('additional_info', filteredContext);
+  _error: Error,
+  _context?: Record<string, unknown>,
+): void {
+  // No-op - but log to console in dev
+  if (typeof __DEV__ !== 'undefined' && __DEV__) {
+    console.error('[Sentry Stub] Exception:', _error);
   }
-  Sentry.captureException(error);
 }
 
 /**
- * Capture message (filters sensitive context)
+ * Capture message - NO-OP STUB
  */
 export function captureMessage(
-  message: string,
-  level: Sentry.SeverityLevel = 'info',
-  context?: Record<string, unknown>,
-) {
-  if (context) {
-    // Filter sensitive data from context
-    const filteredContext = { ...context };
-    delete filteredContext.password;
-    delete filteredContext.token;
-    delete filteredContext.email;
-    delete filteredContext.phone;
-    delete filteredContext.creditCard;
-
-    Sentry.setContext('additional_info', filteredContext);
-  }
-  Sentry.captureMessage(message, level);
+  _message: string,
+  _level: SeverityLevel = 'info',
+  _context?: Record<string, unknown>,
+): void {
+  // No-op
 }
 
 /**
- * Set tag for filtering
+ * Set tag - NO-OP STUB
  */
-export function setTag(key: string, value: string) {
-  Sentry.setTag(key, value);
+export function setTag(_key: string, _value: string): void {
+  // No-op
 }
 
 /**
- * Set tags
+ * Set tags - NO-OP STUB
  */
-export function setTags(tags: Record<string, string>) {
-  Sentry.setTags(tags);
+export function setTags(_tags: Record<string, string>): void {
+  // No-op
 }
 
 /**
- * Start performance transaction for critical screens
- * Usage:
- *   const transaction = startPerformanceTransaction('WalletScreen', 'screen.load');
- *   // ... screen load work ...
- *   transaction?.finish();
+ * Start performance transaction - NO-OP STUB
  */
 export function startPerformanceTransaction(
-  name: string,
-  operation: string,
-): ReturnType<typeof Sentry.startInactiveSpan> | undefined {
-  if (!isInitialized) return undefined;
-
-  return Sentry.startInactiveSpan({
-    name,
-    op: operation,
-  });
+  _name: string,
+  _operation: string,
+): StubSpan | undefined {
+  return { finish: () => {} };
 }
 
 /**
- * Measure screen load time
- * Usage:
- *   useEffect(() => {
- *     const end = measureScreenLoad('DiscoverScreen');
- *     return () => end();
- *   }, []);
+ * Measure screen load time - NO-OP STUB
  */
-export function measureScreenLoad(screenName: string) {
-  const startTime = Date.now();
-
-  return () => {
-    const loadTime = Date.now() - startTime;
-    addBreadcrumb(`Screen loaded: ${screenName}`, 'navigation', 'info', {
-      load_time_ms: loadTime,
-    });
-
-    // Send performance metric
-    Sentry.metrics.distribution('screen.load.time', loadTime, {
-      unit: 'millisecond',
-    });
-  };
+export function measureScreenLoad(_screenName: string): () => void {
+  return () => {};
 }
 
 /**
- * Track critical user action (e.g., payment, booking, withdrawal)
- * Usage: trackCriticalAction('withdrawal_initiated', { amount: 100, currency: 'TRY' });
+ * Track critical user action - NO-OP STUB
  */
 export function trackCriticalAction(
-  action: string,
-  metadata?: Record<string, string | number | boolean>,
-) {
-  addBreadcrumb(`Critical action: ${action}`, 'user', 'info', metadata);
-
-  // Set tag for filtering in Sentry UI
-  Sentry.setTag('critical_action', action);
+  _action: string,
+  _metadata?: Record<string, string | number | boolean>,
+): void {
+  // No-op
 }
 
 /**
- * Start span for performance monitoring
- * Note: Transaction API is deprecated in Sentry v8, using spans instead
+ * Start span for performance monitoring - NO-OP STUB
  */
 export function startTransaction(
-  name: string,
-  operation: string,
-): ReturnType<typeof Sentry.startInactiveSpan> | undefined {
-  return startPerformanceTransaction(name, operation);
+  _name: string,
+  _operation: string,
+): StubSpan | undefined {
+  return { finish: () => {} };
 }
 
-// Export Sentry for advanced usage
-export { Sentry };
+// ============================================
+// STUB SENTRY OBJECT - For `import * as Sentry`
+// ============================================
+
+export const Sentry = {
+  init: (_options?: unknown) => {},
+  setUser: (_user: unknown) => {},
+  setTag: (_key?: string, _value?: string) => {},
+  setTags: (_tags?: Record<string, string>) => {},
+  setContext: (_name?: string, _context?: unknown) => {},
+  addBreadcrumb: (_breadcrumb?: unknown) => {},
+  captureException: (_error?: unknown, _context?: unknown) => {},
+  captureMessage: (_message?: string, _context?: unknown) => {},
+  withScope: (_callback: (scope: unknown) => void) => {},
+  startInactiveSpan: (_options?: unknown) => ({ finish: () => {} }),
+  metrics: {
+    distribution: (_name?: string, _value?: number, _options?: unknown) => {},
+  },
+  wrap: <T>(component: T): T => component,
+};

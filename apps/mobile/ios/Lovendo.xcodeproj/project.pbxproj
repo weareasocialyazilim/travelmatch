@@ -8,28 +8,28 @@
 
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		14B78329650CCAC89A4B145A /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09A16CBD82E6AA69876D3F19 /* ExpoModulesProvider.swift */; };
-		3B5E050538A2F30AE610841B /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 8EA8BC6270C4DD1A6DBB0A9C /* PrivacyInfo.xcprivacy */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
+		95295CC831403CB2F5A2A206 /* libPods-Lovendo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3845D8A7593DEBD44284C572 /* libPods-Lovendo.a */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		E7A3581B8AF940A1D8740F59 /* libPods-Lovendo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E73077CD3C65EDA160E16DC0 /* libPods-Lovendo.a */; };
+		BE13628ADB8E9DFE07D47C49 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4026A612A01A71340A7B524A /* ExpoModulesProvider.swift */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
+		F36A289ADFB5A4128786201E /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 03E7F17012557616F86A27C1 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		09A16CBD82E6AA69876D3F19 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-Lovendo/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		03E7F17012557616F86A27C1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = Lovendo/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* Lovendo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lovendo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Lovendo/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Lovendo/Info.plist; sourceTree = "<group>"; };
-		4C57848503634808B3933AAE /* Pods-Lovendo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Lovendo.release.xcconfig"; path = "Target Support Files/Pods-Lovendo/Pods-Lovendo.release.xcconfig"; sourceTree = "<group>"; };
-		8EA8BC6270C4DD1A6DBB0A9C /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = Lovendo/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		17EEDA8DFC9230BCA530C12B /* Pods-Lovendo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Lovendo.debug.xcconfig"; path = "Target Support Files/Pods-Lovendo/Pods-Lovendo.debug.xcconfig"; sourceTree = "<group>"; };
+		3845D8A7593DEBD44284C572 /* libPods-Lovendo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Lovendo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4026A612A01A71340A7B524A /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-Lovendo/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		9004124B569CC8E6C0BE84F2 /* Pods-Lovendo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Lovendo.release.xcconfig"; path = "Target Support Files/Pods-Lovendo/Pods-Lovendo.release.xcconfig"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = Lovendo/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		E73077CD3C65EDA160E16DC0 /* libPods-Lovendo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Lovendo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Lovendo/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* Lovendo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Lovendo-Bridging-Header.h"; path = "Lovendo/Lovendo-Bridging-Header.h"; sourceTree = "<group>"; };
-		F2A3CF0597173AE68F7C984E /* Pods-Lovendo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Lovendo.debug.xcconfig"; path = "Target Support Files/Pods-Lovendo/Pods-Lovendo.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,7 +37,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E7A3581B8AF940A1D8740F59 /* libPods-Lovendo.a in Frameworks */,
+				95295CC831403CB2F5A2A206 /* libPods-Lovendo.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -53,18 +53,36 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				8EA8BC6270C4DD1A6DBB0A9C /* PrivacyInfo.xcprivacy */,
+				03E7F17012557616F86A27C1 /* PrivacyInfo.xcprivacy */,
 			);
 			name = Lovendo;
+			sourceTree = "<group>";
+		};
+		17A55614E34FE71AD12C6B77 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				17EEDA8DFC9230BCA530C12B /* Pods-Lovendo.debug.xcconfig */,
+				9004124B569CC8E6C0BE84F2 /* Pods-Lovendo.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				E73077CD3C65EDA160E16DC0 /* libPods-Lovendo.a */,
+				3845D8A7593DEBD44284C572 /* libPods-Lovendo.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		6AD54AB3E3B802E4413E2C9A /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				99598BFEBCA307557C51ABF9 /* Lovendo */,
+			);
+			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -81,8 +99,8 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				993E3AD1C63FBE642A910C4D /* Pods */,
-				CB01D793534EAA45CC5040B2 /* ExpoModulesProviders */,
+				17A55614E34FE71AD12C6B77 /* Pods */,
+				6AD54AB3E3B802E4413E2C9A /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -97,14 +115,12 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		993E3AD1C63FBE642A910C4D /* Pods */ = {
+		99598BFEBCA307557C51ABF9 /* Lovendo */ = {
 			isa = PBXGroup;
 			children = (
-				F2A3CF0597173AE68F7C984E /* Pods-Lovendo.debug.xcconfig */,
-				4C57848503634808B3933AAE /* Pods-Lovendo.release.xcconfig */,
+				4026A612A01A71340A7B524A /* ExpoModulesProvider.swift */,
 			);
-			name = Pods;
-			path = Pods;
+			name = Lovendo;
 			sourceTree = "<group>";
 		};
 		BB2F792B24A3F905000567C9 /* Supporting */ = {
@@ -116,22 +132,6 @@
 			path = Lovendo/Supporting;
 			sourceTree = "<group>";
 		};
-		CB01D793534EAA45CC5040B2 /* ExpoModulesProviders */ = {
-			isa = PBXGroup;
-			children = (
-				F0D559E333993925CEFD4013 /* Lovendo */,
-			);
-			name = ExpoModulesProviders;
-			sourceTree = "<group>";
-		};
-		F0D559E333993925CEFD4013 /* Lovendo */ = {
-			isa = PBXGroup;
-			children = (
-				09A16CBD82E6AA69876D3F19 /* ExpoModulesProvider.swift */,
-			);
-			name = Lovendo;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -140,14 +140,14 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Lovendo" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				21450DAAA04209977753F3D6 /* [Expo] Configure project */,
+				0B977A473B6A8BCB198780B1 /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				181CE5EB2F31487E84046636 /* Upload Debug Symbols to Sentry */,
-				351266AA5025E33620B4B2E5 /* [CP] Embed Pods Frameworks */,
+				098520D47EAC4CBB8585E92B /* Upload Debug Symbols to Sentry */,
+				74CFC6031F8F4917EE4D5653 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -199,7 +199,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				3B5E050538A2F30AE610841B /* PrivacyInfo.xcprivacy in Resources */,
+				F36A289ADFB5A4128786201E /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -245,7 +245,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		181CE5EB2F31487E84046636 /* Upload Debug Symbols to Sentry */ = {
+		098520D47EAC4CBB8585E92B /* Upload Debug Symbols to Sentry */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -259,7 +259,7 @@
 			shellPath = /bin/sh;
 			shellScript = "/bin/sh `${NODE_BINARY:-node} --print \"require('path').dirname(require.resolve('@sentry/react-native/package.json')) + '/scripts/sentry-xcode-debug-files.sh'\"`";
 		};
-		21450DAAA04209977753F3D6 /* [Expo] Configure project */ = {
+		0B977A473B6A8BCB198780B1 /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -283,7 +283,7 @@
 			shellPath = /bin/sh;
 			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-Lovendo/expo-configure-project.sh\"\n";
 		};
-		351266AA5025E33620B4B2E5 /* [CP] Embed Pods Frameworks */ = {
+		74CFC6031F8F4917EE4D5653 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -369,7 +369,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				14B78329650CCAC89A4B145A /* ExpoModulesProvider.swift in Sources */,
+				BE13628ADB8E9DFE07D47C49 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -378,7 +378,7 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F2A3CF0597173AE68F7C984E /* Pods-Lovendo.debug.xcconfig */;
+			baseConfigurationReference = 17EEDA8DFC9230BCA530C12B /* Pods-Lovendo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -405,7 +405,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = com.anonymous.lovendo-new;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lovendo.app;
 				PRODUCT_NAME = Lovendo;
 				SWIFT_OBJC_BRIDGING_HEADER = "Lovendo/Lovendo-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -417,7 +417,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4C57848503634808B3933AAE /* Pods-Lovendo.release.xcconfig */;
+			baseConfigurationReference = 9004124B569CC8E6C0BE84F2 /* Pods-Lovendo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -439,7 +439,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = com.anonymous.lovendo-new;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lovendo.app;
 				PRODUCT_NAME = Lovendo;
 				SWIFT_OBJC_BRIDGING_HEADER = "Lovendo/Lovendo-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
