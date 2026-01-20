@@ -12,7 +12,8 @@
 
 import { supabase } from './supabase';
 import { logger } from '@/utils/logger';
-import * as Sentry from '@sentry/react-native';
+// DISABLED: Sentry v7 incompatible with React 19 - using stub
+import { Sentry } from './sentry';
 
 // Types
 export interface ApiResponse<T = unknown> {

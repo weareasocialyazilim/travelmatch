@@ -39,6 +39,8 @@
  * ```
  */
 
+import { Sentry } from '../config/sentry';
+
 /** Log level types */
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
@@ -374,33 +376,14 @@ class Logger {
   /**
    * Flush queued logs to remote service
    */
-  async flushRemoteLogs(): Promise<void> {
+  flushRemoteLogs(): void {
     if (this.remoteLogQueue.length === 0) return;
 
     const logs = [...this.remoteLogQueue];
     this.remoteLogQueue = [];
 
-    // Send to Sentry as breadcrumbs (try synchronous require first so tests
-    // that call flushRemoteLogs() without awaiting still observe breadcrumbs)
+    // Send to Sentry as breadcrumbs (uses stub when Sentry is disabled)
     try {
-      // Try synchronous require (works in Jest where modules are mocked)
-
-      // @ts-ignore
-      const Sentry = require('@sentry/react-native');
-      logs.forEach((log) => {
-        Sentry.addBreadcrumb?.({
-          message: log.message,
-          level: log.level as any,
-          data: { args: log.args, timestamp: log.timestamp },
-        } as any);
-      });
-      return;
-    } catch (_requireError) {
-      // fallback to dynamic import if require fails
-    }
-
-    try {
-      const Sentry = await import('@sentry/react-native');
       logs.forEach((log) => {
         Sentry.addBreadcrumb?.({
           message: log.message,

@@ -75,5 +75,7 @@
   // Jest Configuration - run from apps/mobile for proper config
   "jest.rootPath": "apps/mobile",
   "jest.jestCommandLine": "pnpm jest",
-  "jest.autoRevealOutput": "on-exec-error"
+  "jest.autoRevealOutput": "on-exec-error",
+  "snyk.advanced.organization": "65f49e60-e063-4544-980e-9a5bc8d0ab0b",
+  "snyk.advanced.autoSelectOrganization": true
 }

@@ -1,19 +1,15 @@
 import { logger } from '../utils/logger';
 import PostHog from 'posthog-react-native';
 
-// Sentry is loaded dynamically to avoid JSI runtime errors with New Architecture
-// Do NOT import @sentry/react-native at module level
-type SentryType = typeof import('@sentry/react-native');
-let _sentry: SentryType | null = null;
+// DISABLED: Sentry v7 incompatible with React 19
+// Import from our stub config instead of @sentry/react-native
+import { Sentry as StubSentry } from '../config/sentry';
+
+type SentryType = typeof StubSentry;
 
 async function getSentry(): Promise<SentryType | null> {
-  if (_sentry) return _sentry;
-  try {
-    _sentry = await import('@sentry/react-native');
-    return _sentry;
-  } catch (_sentryImportError) {
-    return null;
-  }
+  // Return stub Sentry - real Sentry disabled due to React 19 incompatibility
+  return StubSentry as any;
 }
 
 /**

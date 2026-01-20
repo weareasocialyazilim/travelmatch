@@ -14,8 +14,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   scheme: 'lovendo',
   newArchEnabled: true,
 
-  // Entry point - use local index.ts instead of expo default
-  entryPoint: './index.ts',
+  // Entry point is defined in package.json "main" field
 
   // Splash screen - matches brand warm white
   splash: {
@@ -29,7 +28,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   // ============================================
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'com.anonymous.lovendo-new',
+    bundleIdentifier: 'com.lovendo.app',
     buildNumber: '24',
     associatedDomains: ['applinks:www.lovendo.xyz', 'applinks:lovendo.xyz'],
     config: {
@@ -276,20 +275,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
 
   // ============================================
-  // Post-publish hooks
+  // Post-publish hooks - Note: hooks are defined in app.json for Expo
+  // Sentry hooks configuration moved to eas.json
   // ============================================
-  hooks: {
-    postPublish: [
-      {
-        file: '@sentry/react-native/expo',
-        config: {
-          organization: process.env.SENTRY_ORG || '',
-          project: process.env.SENTRY_PROJECT || '',
-          // authToken is read automatically from SENTRY_AUTH_TOKEN env var
-        },
-      },
-    ],
-  },
 
   // ============================================
   // OTA Updates

@@ -1,5 +1,8 @@
 {
   "ios": {
-    "bundleIdentifier": "com.anonymous.lovendo-new"
+    "bundleIdentifier": "com.lovendo.app"
+  },
+  "android": {
+    "package": "com.lovendo.app"
   }
 }

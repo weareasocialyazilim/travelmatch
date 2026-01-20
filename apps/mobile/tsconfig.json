@@ -40,13 +40,14 @@
       "@/config/*": ["src/config/*"],
       "@/theme/*": ["src/theme/*"],
       "@/navigation/*": ["src/navigation/*"],
+      "@/context/*": ["src/context/*"],
       "@lovendo/design-system": ["../../packages/design-system/src/index.ts"],
       "@lovendo/design-system/*": ["../../packages/design-system/src/*"],
       "@lovendo/shared": ["../../packages/shared/src/index.ts"],
       "@lovendo/shared/*": ["../../packages/shared/src/*"]
     }
   },
-  "include": ["src/**/*", "src/types/*.d.ts", "index.ts", "App.tsx"],
+  "include": ["src/**/*", "src/types/*.d.ts", "index.js", "App.tsx", "app.config.ts"],
   "exclude": [
     "node_modules",
     "android",

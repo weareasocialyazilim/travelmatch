@@ -59,61 +59,85 @@ let cachedEncryptionKey: string | undefined;
 const STORAGE_ID = 'lovendo-cache';
 const LEGACY_STORAGE_ID = 'lovendo-legacy-cache';
 
-export const mmkvStorage = new MMKV({
-  id: STORAGE_ID,
-  // Use device-specific key (will be set on first access)
-  encryptionKey: cachedEncryptionKey,
-});
+// Lazy initialization to avoid "prototype undefined" error
+// MMKV native module may not be ready at module load time
+let _mmkvStorage: MMKV | null = null;
+let _migrationDone = false;
 
-// Best-effort migration from legacy store.
-// Only run when the current store appears empty.
-try {
-  const currentKeys = mmkvStorage.getAllKeys();
-  if (currentKeys.length === 0) {
-    const legacyStorage = new MMKV({
-      id: LEGACY_STORAGE_ID,
+function getMmkvStorage(): MMKV {
+  if (_mmkvStorage === null) {
+    _mmkvStorage = new MMKV({
+      id: STORAGE_ID,
       encryptionKey: cachedEncryptionKey,
     });
-    const legacyKeys = legacyStorage.getAllKeys();
 
-    if (legacyKeys.length > 0) {
-      for (const key of legacyKeys) {
-        const stringVal = legacyStorage.getString(key);
-        if (stringVal !== undefined) {
-          mmkvStorage.set(key, stringVal);
-          legacyStorage.delete(key);
-          continue;
-        }
+    // Run migration on first access
+    if (!_migrationDone) {
+      _migrationDone = true;
+      try {
+        const currentKeys = _mmkvStorage.getAllKeys();
+        if (currentKeys.length === 0) {
+          const legacyStorage = new MMKV({
+            id: LEGACY_STORAGE_ID,
+            encryptionKey: cachedEncryptionKey,
+          });
+          const legacyKeys = legacyStorage.getAllKeys();
 
-        const numberVal = legacyStorage.getNumber(key);
-        if (numberVal !== undefined) {
-          mmkvStorage.set(key, numberVal);
-          legacyStorage.delete(key);
-          continue;
-        }
+          if (legacyKeys.length > 0) {
+            for (const key of legacyKeys) {
+              const stringVal = legacyStorage.getString(key);
+              if (stringVal !== undefined) {
+                _mmkvStorage.set(key, stringVal);
+                legacyStorage.delete(key);
+                continue;
+              }
 
-        const boolVal = legacyStorage.getBoolean(key);
-        if (boolVal !== undefined) {
-          mmkvStorage.set(key, boolVal);
-          legacyStorage.delete(key);
+              const numberVal = legacyStorage.getNumber(key);
+              if (numberVal !== undefined) {
+                _mmkvStorage.set(key, numberVal);
+                legacyStorage.delete(key);
+                continue;
+              }
+
+              const boolVal = legacyStorage.getBoolean(key);
+              if (boolVal !== undefined) {
+                _mmkvStorage.set(key, boolVal);
+                legacyStorage.delete(key);
+              }
+            }
+
+            logger.info('[OfflineCache] Migrated MMKV store', {
+              from: LEGACY_STORAGE_ID,
+              to: STORAGE_ID,
+              keyCount: legacyKeys.length,
+            });
+          }
         }
+      } catch (migrationError) {
+        logger.debug('[OfflineCache] MMKV migration skipped/failed', {
+          error:
+            migrationError instanceof Error
+              ? migrationError.message
+              : String(migrationError),
+        });
       }
-
-      logger.info('[OfflineCache] Migrated MMKV store', {
-        from: LEGACY_STORAGE_ID,
-        to: STORAGE_ID,
-        keyCount: legacyKeys.length,
-      });
     }
   }
-} catch (migrationError) {
-  logger.debug('[OfflineCache] MMKV migration skipped/failed', {
-    error:
-      migrationError instanceof Error
-        ? migrationError.message
-        : String(migrationError),
-  });
+  return _mmkvStorage;
 }
+
+// Export getter instead of direct instance
+export const mmkvStorage = {
+  getString: (key: string) => getMmkvStorage().getString(key),
+  set: (key: string, value: string | number | boolean) =>
+    getMmkvStorage().set(key, value),
+  delete: (key: string) => getMmkvStorage().delete(key),
+  getAllKeys: () => getMmkvStorage().getAllKeys(),
+  contains: (key: string) => getMmkvStorage().contains(key),
+  getNumber: (key: string) => getMmkvStorage().getNumber(key),
+  getBoolean: (key: string) => getMmkvStorage().getBoolean(key),
+  clearAll: () => getMmkvStorage().clearAll(),
+};
 
 // MMKV wrapper for React Query persister
 const mmkvPersister = {
