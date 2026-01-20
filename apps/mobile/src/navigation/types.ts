@@ -11,17 +11,9 @@ import type { StackScreenProps } from '@react-navigation/stack';
 // Re-export for convenience
 export type { RootStackParamList };
 
-/**
- * Search Filters Type
- */
-export interface SearchFilters {
-  category?: string;
-  location?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  startDate?: Date;
-  endDate?: Date;
-}
+// SearchFilters is now centralized in @/stores/searchStore
+// Re-export for backward compatibility
+export type { SearchFilters } from '@/stores/searchStore';
 
 /**
  * Bottom Tab Navigator Params

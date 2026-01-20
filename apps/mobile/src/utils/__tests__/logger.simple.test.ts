@@ -15,7 +15,7 @@ const mockConsoleTime = jest.spyOn(console, 'time').mockImplementation();
 const mockConsoleTimeEnd = jest.spyOn(console, 'timeEnd').mockImplementation();
 
 // Save original __DEV__
-const originalDEV = global.__DEV__;
+const originalDEV = (globalThis as any).__DEV__;
 
 describe('logger.ts - simplified', () => {
   // Helper: some environments map info -> log; accept either
@@ -38,7 +38,7 @@ describe('logger.ts - simplified', () => {
       return LoggerClass.__testLogs
         .slice()
         .reverse()
-        .map((entry) => {
+        .map((entry: any) => {
           // entry can be [message, argsArray]
           if (Array.isArray(entry)) {
             const [message, argsArr] = entry;
@@ -57,7 +57,7 @@ describe('logger.ts - simplified', () => {
     jest.clearAllMocks();
     jest.clearAllTimers();
     // Ensure __DEV__ is true for tests
-    global.__DEV__ = true;
+    (globalThis as any).__DEV__ = true;
   });
 
   afterEach(() => {
@@ -66,7 +66,7 @@ describe('logger.ts - simplified', () => {
   });
 
   afterAll(() => {
-    global.__DEV__ = originalDEV;
+    (globalThis as any).__DEV__ = originalDEV;
     mockConsoleLog.mockRestore();
     mockConsoleInfo.mockRestore();
     mockConsoleWarn.mockRestore();

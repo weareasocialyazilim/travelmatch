@@ -20,9 +20,9 @@ jest.mock('expo-file-system/legacy');
 jest.mock('@react-native-async-storage/async-storage');
 jest.mock('../../utils/logger');
 
-const mockFileSystem = FileSystem;
-const mockAsyncStorage = AsyncStorage;
-const mockLogger = logger;
+const mockFileSystem = FileSystem as jest.Mocked<typeof FileSystem>;
+const mockAsyncStorage = AsyncStorage as jest.Mocked<typeof AsyncStorage>;
+const mockLogger = logger as jest.Mocked<typeof logger>;
 
 describe('StorageMonitorService', () => {
   beforeEach(() => {

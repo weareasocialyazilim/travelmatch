@@ -52,6 +52,10 @@ jest.mock('@/utils/logger', () => ({
   },
 }));
 
+const mockAuth = auth as jest.Mocked<typeof auth>;
+const mockSupabase = supabase as jest.Mocked<typeof supabase>;
+const mockLogger = logger as jest.Mocked<typeof logger>;
+
 describe('supabaseAuthService', () => {
   // Mock data
   const mockUser: User = {
@@ -708,12 +712,12 @@ describe('supabaseAuthService', () => {
 
     it('should handle exceptions during account deletion', async () => {
       const exception = new Error('Account deletion failed');
-      auth.getUser.mockRejectedValue(exception);
+      mockAuth.getUser.mockRejectedValue(exception);
 
       const result = await deleteAccount();
 
       expect(result.error).toEqual(exception);
-      expect(logger.error).toHaveBeenCalledWith(
+      expect(mockLogger.error).toHaveBeenCalledWith(
         '[Auth] Delete account exception:',
         exception,
       );
@@ -728,17 +732,19 @@ describe('supabaseAuthService', () => {
       const mockCallback = jest.fn() as jest.Mock;
       const mockUnsubscribe = jest.fn() as jest.Mock;
 
-      auth.onAuthStateChange.mockImplementation((callback) => {
-        // Simulate auth state change
-        callback('SIGNED_IN', mockSession);
-        return { data: { subscription: { unsubscribe: mockUnsubscribe } } };
-      });
+      (mockAuth.onAuthStateChange as jest.Mock).mockImplementation(
+        (callback: any) => {
+          // Simulate auth state change
+          callback('SIGNED_IN', mockSession);
+          return { data: { subscription: { unsubscribe: mockUnsubscribe } } };
+        },
+      );
 
       onAuthStateChange(mockCallback);
 
-      expect(auth.onAuthStateChange).toHaveBeenCalled();
+      expect(mockAuth.onAuthStateChange).toHaveBeenCalled();
       expect(mockCallback).toHaveBeenCalledWith('SIGNED_IN', mockSession);
-      expect(logger.debug).toHaveBeenCalledWith(
+      expect(mockLogger.debug).toHaveBeenCalledWith(
         '[Auth] State change:',
         'SIGNED_IN',
       );
@@ -747,10 +753,12 @@ describe('supabaseAuthService', () => {
     it('should handle SIGNED_OUT event', () => {
       const mockCallback = jest.fn() as jest.Mock;
 
-      auth.onAuthStateChange.mockImplementation((callback) => {
-        callback('SIGNED_OUT', null);
-        return { data: { subscription: { unsubscribe: jest.fn() } } };
-      });
+      (mockAuth.onAuthStateChange as jest.Mock).mockImplementation(
+        (callback: any) => {
+          callback('SIGNED_OUT', null);
+          return { data: { subscription: { unsubscribe: jest.fn() } } };
+        },
+      );
 
       onAuthStateChange(mockCallback);
 
@@ -760,10 +768,12 @@ describe('supabaseAuthService', () => {
     it('should handle TOKEN_REFRESHED event', () => {
       const mockCallback = jest.fn() as jest.Mock;
 
-      auth.onAuthStateChange.mockImplementation((callback) => {
-        callback('TOKEN_REFRESHED', mockSession);
-        return { data: { subscription: { unsubscribe: jest.fn() } } };
-      });
+      (mockAuth.onAuthStateChange as jest.Mock).mockImplementation(
+        (callback: any) => {
+          callback('TOKEN_REFRESHED', mockSession);
+          return { data: { subscription: { unsubscribe: jest.fn() } } };
+        },
+      );
 
       onAuthStateChange(mockCallback);
 

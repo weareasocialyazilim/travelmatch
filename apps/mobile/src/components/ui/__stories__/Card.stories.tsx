@@ -3,6 +3,45 @@ import type { Meta, StoryObj } from 'storybook/react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Card } from './Card';
 
+const styles = StyleSheet.create({
+  title: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  description: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginTop: 4,
+    lineHeight: 20,
+  },
+  variantLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#374151',
+  },
+  imagePlaceholder: {
+    height: 150,
+    backgroundColor: '#e5e7eb',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  imagePlaceholderText: {
+    fontSize: 16,
+    color: '#9ca3af',
+    fontWeight: '500',
+  },
+  tripMeta: {
+    flexDirection: 'row',
+    gap: 16,
+    marginTop: 12,
+  },
+  metaText: {
+    fontSize: 12,
+    color: '#6b7280',
+  },
+});
+
 const meta = {
   title: 'Components/Card',
   component: Card,
@@ -210,42 +249,3 @@ export const TripCard: Story = {
     </Card>
   ),
 };
-
-const styles = StyleSheet.create({
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  description: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginTop: 4,
-    lineHeight: 20,
-  },
-  variantLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#374151',
-  },
-  imagePlaceholder: {
-    height: 150,
-    backgroundColor: '#e5e7eb',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  imagePlaceholderText: {
-    fontSize: 16,
-    color: '#9ca3af',
-    fontWeight: '500',
-  },
-  tripMeta: {
-    flexDirection: 'row',
-    gap: 16,
-    marginTop: 12,
-  },
-  metaText: {
-    fontSize: 12,
-    color: '#6b7280',
-  },
-});

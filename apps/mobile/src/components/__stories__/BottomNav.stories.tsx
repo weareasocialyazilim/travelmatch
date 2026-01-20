@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import React from 'react';
 import { View } from 'react-native';
-import BottomNav from './BottomNav';
+import BottomNav from '../BottomNav';
 
 const meta: Meta<typeof BottomNav> = {
   title: 'Components/BottomNav',

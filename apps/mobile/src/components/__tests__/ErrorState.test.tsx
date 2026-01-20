@@ -82,7 +82,7 @@ describe('ErrorState', () => {
 
   describe('Icon Variations', () => {
     it('should render with custom icon', () => {
-      render(<ErrorState icon="cloud-off-outline" />);
+      render(<ErrorState icon="cloud-offline-outline" />); // Valid icon
     });
 
     it('should render with default icon when not specified', () => {

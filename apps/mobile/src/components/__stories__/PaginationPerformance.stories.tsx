@@ -14,7 +14,7 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
-import { usePagination } from '../hooks/usePagination';
+import { usePagination } from '../../hooks/usePagination';
 
 // Mock data generator
 const generateMockData = (count: number) => {

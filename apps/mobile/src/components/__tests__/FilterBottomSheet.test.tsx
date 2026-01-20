@@ -82,7 +82,7 @@ describe('FilterBottomSheet', () => {
       const { toJSON } = render(
         <FilterBottomSheet {...defaultProps} visible={false} />,
       );
-      const modal = toJSON();
+      const modal = toJSON() as unknown as { props: { visible: boolean } };
       expect(modal?.props.visible).toBe(false);
     });
   });
@@ -285,19 +285,21 @@ describe('FilterBottomSheet', () => {
   describe('Modal Properties', () => {
     it('sets modal as transparent', () => {
       const { toJSON } = render(<FilterBottomSheet {...defaultProps} />);
-      const modal = toJSON();
+      const modal = toJSON() as unknown as { props: { transparent: boolean } };
       expect(modal?.props.transparent).toBe(true);
     });
 
     it('uses slide animation', () => {
       const { toJSON } = render(<FilterBottomSheet {...defaultProps} />);
-      const modal = toJSON();
+      const modal = toJSON() as unknown as { props: { animationType: string } };
       expect(modal?.props.animationType).toBe('slide');
     });
 
     it('calls onClose on onRequestClose', () => {
       const { toJSON } = render(<FilterBottomSheet {...defaultProps} />);
-      const modal = toJSON();
+      const modal = toJSON() as unknown as {
+        props: { onRequestClose: () => void };
+      };
       modal?.props.onRequestClose();
       expect(mockOnClose).toHaveBeenCalledTimes(1);
     });

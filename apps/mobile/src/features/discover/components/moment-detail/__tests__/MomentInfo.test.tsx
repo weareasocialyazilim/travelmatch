@@ -43,7 +43,6 @@ describe('MomentInfo', () => {
         emoji: '🏔️',
       };
       const location: MomentLocation = {
-        id: '1',
         name: 'Central Park',
         city: 'New York',
         country: 'USA',
@@ -142,7 +141,6 @@ describe('MomentInfo', () => {
   describe('Location Display', () => {
     it('should display location city in meta row', () => {
       const location: MomentLocation = {
-        id: '1',
         name: 'Café Luna',
         city: 'Istanbul',
         country: 'Turkey',
@@ -157,7 +155,6 @@ describe('MomentInfo', () => {
 
     it('should display location name when no city', () => {
       const location: MomentLocation = {
-        id: '1',
         name: 'Sunny Beach',
         city: '',
         country: 'Greece',
@@ -182,7 +179,6 @@ describe('MomentInfo', () => {
 
     it('should display full location in location card', () => {
       const location: MomentLocation = {
-        id: '1',
         name: 'Golden Gate Park',
         city: 'San Francisco',
         country: 'USA',
@@ -198,7 +194,6 @@ describe('MomentInfo', () => {
 
     it('should handle missing location name in card', () => {
       const location: MomentLocation = {
-        id: '1',
         name: '',
         city: 'Paris',
         country: 'France',
@@ -214,7 +209,6 @@ describe('MomentInfo', () => {
 
     it('should handle missing city and country in card', () => {
       const location: MomentLocation = {
-        id: '1',
         name: 'Secret Spot',
         city: '',
         country: '',
@@ -337,7 +331,6 @@ describe('MomentInfo', () => {
     it('should render all meta info elements', () => {
       const category: MomentCategory = { id: '1', label: 'Music', emoji: '🎵' };
       const location: MomentLocation = {
-        id: '1',
         name: 'Concert Hall',
         city: 'Berlin',
         country: 'Germany',
@@ -363,7 +356,6 @@ describe('MomentInfo', () => {
 
     it('should render without category', () => {
       const location: MomentLocation = {
-        id: '1',
         name: 'Park',
         city: 'Tokyo',
         country: 'Japan',
@@ -506,7 +498,6 @@ describe('MomentInfo', () => {
 
     it('should handle location with only id', () => {
       const location: MomentLocation = {
-        id: '1',
         name: '',
         city: '',
         country: '',
@@ -528,7 +519,7 @@ describe('MomentInfo', () => {
 
     it('should handle null category', () => {
       const { getByText } = render(
-        <MomentInfo title="Event" category={null} />,
+        <MomentInfo title="Event" category={undefined} />,
       );
 
       // Should not crash, just not render category pill
@@ -537,7 +528,7 @@ describe('MomentInfo', () => {
 
     it('should handle null location', () => {
       const { getAllByText, getByText } = render(
-        <MomentInfo title="Event" location={null} />,
+        <MomentInfo title="Event" location={undefined} />,
       );
 
       // Should fallback to defaults - "Location" appears multiple times
@@ -559,7 +550,6 @@ describe('MomentInfo', () => {
         emoji: '☕',
       };
       const location: MomentLocation = {
-        id: '1',
         name: 'Starbucks Reserve',
         city: 'Seattle',
         country: 'USA',
@@ -609,7 +599,6 @@ describe('MomentInfo', () => {
         emoji: '🥾',
       };
       const location: MomentLocation = {
-        id: '2',
         name: 'Mount Rainier',
         city: 'Washington',
         country: 'USA',
@@ -642,7 +631,6 @@ describe('MomentInfo', () => {
         emoji: '🍽️',
       };
       const location: MomentLocation = {
-        id: '3',
         name: 'Le Bernardin',
         city: 'New York',
         country: 'USA',
@@ -667,7 +655,6 @@ describe('MomentInfo', () => {
 
     it('should render international location', () => {
       const location: MomentLocation = {
-        id: '4',
         name: 'Eiffel Tower',
         city: 'Paris',
         country: 'France',

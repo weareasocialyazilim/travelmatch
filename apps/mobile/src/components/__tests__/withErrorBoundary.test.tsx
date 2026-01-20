@@ -199,6 +199,7 @@ describe('withErrorBoundary HOC', () => {
 
       const { getByTestId } = render(
         <WrappedComponent
+          // @ts-ignore
           navigation={
             mockNavigation as unknown as {
               navigate?: (...args: unknown[]) => void;
@@ -225,6 +226,7 @@ describe('withErrorBoundary HOC', () => {
 
       const { getByText } = render(
         <WrappedComponent
+          // @ts-ignore
           navigation={
             mockNavigation as unknown as {
               navigate?: (...args: unknown[]) => void;
@@ -292,7 +294,7 @@ describe('withErrorBoundary HOC', () => {
 
     it('works with class components', () => {
       class ClassComponent extends React.Component {
-        render() {
+        override render() {
           return <Text>Class Component</Text>;
         }
       }

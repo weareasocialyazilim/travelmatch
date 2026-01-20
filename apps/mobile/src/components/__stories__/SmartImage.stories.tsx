@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import React from 'react';
 import { View } from 'react-native';
-import SmartImage from './SmartImage';
+import SmartImage from '../SmartImage';
 
 const meta: Meta<typeof SmartImage> = {
   title: 'Components/SmartImage',

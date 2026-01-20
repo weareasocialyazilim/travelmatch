@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text as RNText, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 // Since we don't have a dedicated Button component file, let's create stories for common button patterns
@@ -65,9 +65,9 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <View style={getButtonStyle()}>
       {loading ? (
-        <Text style={[styles.buttonText, { color: getTextColor() }]}>
+        <RNText style={[styles.buttonText, { color: getTextColor() }]}>
           Loading...
-        </Text>
+        </RNText>
       ) : (
         <>
           {icon && iconPosition === 'left' && (
@@ -77,9 +77,9 @@ const Button: React.FC<ButtonProps> = ({
               color={getTextColor()}
             />
           )}
-          <Text style={[styles.buttonText, { color: getTextColor() }]}>
+          <RNText style={[styles.buttonText, { color: getTextColor() }]}>
             {label}
-          </Text>
+          </RNText>
           {icon && iconPosition === 'right' && (
             <MaterialCommunityIcons
               name={icon}

@@ -32,17 +32,17 @@ const mockConsoleTable = jest.spyOn(console, 'table').mockImplementation();
 const mockConsoleLog = jest.spyOn(console, 'log').mockImplementation();
 
 // Mock __DEV__
-const originalDEV = global.__DEV__;
+const originalDEV = (globalThis as any).__DEV__;
 
 describe('logger.ts', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    global.__DEV__ = true;
+    (globalThis as any).__DEV__ = true;
     // Create a fresh logger instance for each test to avoid state issues
   });
 
   afterAll(() => {
-    global.__DEV__ = originalDEV;
+    (globalThis as any).__DEV__ = originalDEV;
     mockConsoleInfo.mockRestore();
     mockConsoleWarn.mockRestore();
     mockConsoleError.mockRestore();
@@ -289,7 +289,7 @@ describe('logger.ts', () => {
   // ========================================
   describe('environment handling', () => {
     it('should not log in production mode by default', () => {
-      global.__DEV__ = false;
+      (globalThis as any).__DEV__ = false;
       const prodLogger = new Logger();
       prodLogger.debug('Production message');
 
@@ -300,7 +300,7 @@ describe('logger.ts', () => {
     });
 
     it('should log in production if enableInProduction is true', () => {
-      global.__DEV__ = false;
+      (globalThis as any).__DEV__ = false;
       const prodLogger = new Logger({
         enableInProduction: true,
         jsonFormat: false,
@@ -312,7 +312,7 @@ describe('logger.ts', () => {
     });
 
     it('should use JSON format in production when enabled', () => {
-      global.__DEV__ = false;
+      (globalThis as any).__DEV__ = false;
       const prodLogger = new Logger({
         enableInProduction: true,
         jsonFormat: true,

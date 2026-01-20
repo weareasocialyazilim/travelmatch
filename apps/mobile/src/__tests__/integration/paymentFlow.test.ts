@@ -28,9 +28,24 @@ jest.mock('@/services/supabaseDbService', () => ({
   },
 }));
 
-const mockSupabase = supabase;
-const mockLogger = logger;
-const mockTransactionsService = transactionsService;
+type MockAuth = {
+  getUser: jest.Mock;
+  signInWithPassword: jest.Mock;
+  signOut: jest.Mock;
+  getSession: jest.Mock;
+};
+
+type MockSupabaseClient = {
+  auth: MockAuth;
+  from: jest.Mock;
+  rpc: jest.Mock;
+};
+
+const mockSupabase = supabase as unknown as MockSupabaseClient;
+const mockLogger = logger as unknown as jest.Mocked<typeof logger>;
+const mockTransactionsService = transactionsService as unknown as jest.Mocked<
+  typeof transactionsService
+>;
 
 describe('Payment Flow Integration', () => {
   const mockUser = {
@@ -94,6 +109,7 @@ describe('Payment Flow Integration', () => {
         description: 'Gift payment',
         created_at: '2024-01-15T10:00:00Z',
         metadata: { momentId: 'moment-456' },
+        moment_id: 'moment-456',
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -218,6 +234,8 @@ describe('Payment Flow Integration', () => {
         status: 'completed',
         description: 'Payment with new card',
         created_at: '2024-01-15T11:00:00Z',
+        metadata: {},
+        moment_id: null,
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -311,6 +329,8 @@ describe('Payment Flow Integration', () => {
         status: 'pending',
         description: 'Withdrawal to bank account',
         created_at: '2024-01-15T12:00:00Z',
+        metadata: {},
+        moment_id: null,
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -410,6 +430,8 @@ describe('Payment Flow Integration', () => {
             status: 'completed',
             description: 'Retry payment',
             created_at: '2024-01-15T13:00:00Z',
+            metadata: {},
+            moment_id: null,
           },
           error: null,
         });
@@ -449,6 +471,8 @@ describe('Payment Flow Integration', () => {
           status: 'completed',
           description: 'Gift payment 1',
           created_at: '2024-01-15T10:00:00Z',
+          metadata: {},
+          moment_id: null,
         },
         {
           id: 'txn-2',
@@ -459,6 +483,8 @@ describe('Payment Flow Integration', () => {
           status: 'completed',
           description: 'Withdrawal',
           created_at: '2024-01-14T10:00:00Z',
+          metadata: {},
+          moment_id: null,
         },
         {
           id: 'txn-3',
@@ -469,6 +495,8 @@ describe('Payment Flow Integration', () => {
           status: 'completed',
           description: 'Deposit',
           created_at: '2024-01-13T10:00:00Z',
+          metadata: {},
+          moment_id: null,
         },
       ];
 
@@ -587,6 +615,9 @@ describe('Payment Flow Integration', () => {
           type: 'payment',
           status: 'completed',
           created_at: '2024-01-15T10:00:00Z',
+          description: 'Payment 1',
+          metadata: {},
+          moment_id: null,
         },
         error: null,
       });
@@ -616,6 +647,9 @@ describe('Payment Flow Integration', () => {
           type: 'withdrawal',
           status: 'pending',
           created_at: '2024-01-15T12:00:00Z',
+          description: 'Withdrawal',
+          metadata: {},
+          moment_id: null,
         },
         error: null,
       });
@@ -639,19 +673,24 @@ describe('Payment Flow Integration', () => {
         { amount: 100, id: 'txn-3' },
       ];
 
-      mockTransactionsService.create.mockImplementation(
-        (data: Record<string, unknown>) => {
-          return Promise.resolve({
-            data: {
-              id: `txn-${Date.now()}`,
-              user_id: mockUser.id,
-              ...data,
-              created_at: new Date().toISOString(),
-            },
-            error: null,
-          });
-        },
-      );
+      mockTransactionsService.create.mockImplementation((data: any) => {
+        return Promise.resolve({
+          data: {
+            id: `txn-${Date.now()}`,
+            user_id: mockUser.id,
+            description: 'Concurrent txn',
+            metadata: {},
+            moment_id: null,
+            status: 'completed',
+            type: 'payment',
+            currency: 'USD',
+            amount: 0,
+            ...data,
+            created_at: new Date().toISOString(),
+          },
+          error: null,
+        });
+      });
 
       // Process all transactions concurrently
       const results = await Promise.all(

@@ -164,32 +164,28 @@ describe('Avatar Component', () => {
   // Badge Tests
   // ============================================
 
-  describe('Badge Indicator', () => {
-    it('renders with badge', () => {
-      render(<Avatar showBadge={true} />);
+  describe('Status Indicator', () => {
+    it('renders with status', () => {
+      render(<Avatar showStatus={true} status="online" />);
     });
 
-    it('does not render badge by default', () => {
+    it('does not render status by default', () => {
       render(<Avatar />);
     });
 
-    it('renders badge with default color', () => {
-      render(<Avatar showBadge={true} />);
-    });
+    it('renders different statuses', () => {
+      const statuses: Array<'online' | 'offline' | 'away'> = [
+        'online',
+        'offline',
+        'away',
+      ];
 
-    it('renders badge with custom color', () => {
-      render(<Avatar showBadge={true} badgeColor="#FF0000" />);
-    });
-
-    it('renders badge with different colors', () => {
-      const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00'];
-
-      colors.forEach((color) => {
-        render(<Avatar showBadge={true} badgeColor={color} />);
+      statuses.forEach((status) => {
+        render(<Avatar showStatus={true} status={status} />);
       });
     });
 
-    it('renders badge with all sizes', () => {
+    it('renders status with all sizes', () => {
       const sizes: Array<'xs' | 'sm' | 'md' | 'lg' | 'xl'> = [
         'xs',
         'sm',
@@ -199,7 +195,7 @@ describe('Avatar Component', () => {
       ];
 
       sizes.forEach((size) => {
-        render(<Avatar size={size} showBadge={true} />);
+        render(<Avatar size={size} showStatus={true} status="online" />);
       });
     });
   });
@@ -256,8 +252,8 @@ describe('Avatar Component', () => {
           source="https://example.com/avatar.jpg"
           name="John Doe"
           size="lg"
-          showBadge={true}
-          badgeColor="#00FF00"
+          showStatus={true}
+          
           showVerified={true}
           style={{ margin: 10 }}
         />,
@@ -265,14 +261,14 @@ describe('Avatar Component', () => {
     });
 
     it('renders badge and verified together', () => {
-      render(<Avatar showBadge={true} showVerified={true} />);
+      render(<Avatar showStatus={true} showVerified={true} />);
     });
 
     it('renders image with badge and verified', () => {
       render(
         <Avatar
           source="https://example.com/avatar.jpg"
-          showBadge={true}
+          showStatus={true}
           showVerified={true}
         />,
       );
@@ -280,13 +276,13 @@ describe('Avatar Component', () => {
 
     it('renders initials with badge and verified', () => {
       const { getByText } = render(
-        <Avatar name="Jane Smith" showBadge={true} showVerified={true} />,
+        <Avatar name="Jane Smith" showStatus={true} showVerified={true} />,
       );
       expect(getByText('JS')).toBeTruthy();
     });
 
     it('combines size, badge, and verified', () => {
-      render(<Avatar size="xl" showBadge={true} showVerified={true} />);
+      render(<Avatar size="xl" showStatus={true} showVerified={true} />);
     });
 
     it('renders multiple avatars independently', () => {
@@ -294,7 +290,7 @@ describe('Avatar Component', () => {
         <>
           <Avatar name="Alice" />
           <Avatar name="Bob" size="sm" />
-          <Avatar name="Charlie" showBadge={true} />
+          <Avatar name="Charlie" showStatus={true} />
         </>,
       );
 
@@ -347,8 +343,8 @@ describe('Avatar Component', () => {
       expect(getByText('US')).toBeTruthy();
     });
 
-    it('renders with very small badge color', () => {
-      render(<Avatar size="xs" showBadge={true} badgeColor="#000000" />);
+    it('renders with very small size and status', () => {
+      render(<Avatar size="xs" showStatus={true} status="online" />);
     });
 
     it('renders with very large size and all features', () => {
@@ -356,7 +352,7 @@ describe('Avatar Component', () => {
         <Avatar
           size="xl"
           name="John Doe"
-          showBadge={true}
+          showStatus={true}
           showVerified={true}
         />,
       );
@@ -389,9 +385,9 @@ describe('Avatar Component', () => {
     });
 
     it('toggles badge visibility', () => {
-      const { rerender } = render(<Avatar showBadge={false} />);
+      const { rerender } = render(<Avatar showStatus={false} />);
 
-      rerender(<Avatar showBadge={true} />);
+      rerender(<Avatar showStatus={true} />);
     });
 
     it('toggles verified status', () => {
@@ -433,7 +429,7 @@ describe('Avatar Component', () => {
 
     it('maintains accessibility with all features', () => {
       const { getByLabelText } = render(
-        <Avatar name="Jane Smith" showBadge={true} showVerified={true} />,
+        <Avatar name="Jane Smith" showStatus={true} showVerified={true} />,
       );
       expect(getByLabelText("Jane Smith's avatar")).toBeTruthy();
     });
@@ -469,7 +465,7 @@ describe('Avatar Component', () => {
         rerender(
           <Avatar
             size={i % 2 === 0 ? 'sm' : 'lg'}
-            showBadge={i % 2 === 0}
+            showStatus={i % 2 === 0}
             showVerified={i % 3 === 0}
           />,
         );

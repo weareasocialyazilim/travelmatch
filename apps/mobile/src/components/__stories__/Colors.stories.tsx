@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { COLORS } from '../constants/colors';
+import { COLORS } from '../../constants/colors';
 
 const meta: Meta = {
   title: 'Design System/Colors',
@@ -31,10 +31,7 @@ export const AllColors: StoryObj = {
       <View style={styles.row}>
         <ColorSwatch name="Text Primary" color={COLORS.text.primary} />
         <ColorSwatch name="Text Secondary" color={COLORS.text.secondary} />
-        <ColorSwatch
-          name="Text Disabled"
-          color={COLORS.text.primaryDisabled || '#999'}
-        />
+        <ColorSwatch name="Text Disabled" color={COLORS.text.muted || '#999'} />
       </View>
 
       <Text style={styles.sectionTitle}>Neutral Colors</Text>

@@ -46,8 +46,22 @@ jest.mock('@/config/supabase', () => {
 
 jest.mock('@/utils/logger');
 
-const mockSupabase = supabase;
-const mockAuth = auth;
+// Define the mock types explicitly for TypeScript
+type MockAuth = {
+  signInWithPassword: jest.Mock;
+  signUp: jest.Mock;
+  signOut: jest.Mock;
+  getUser: jest.Mock;
+  getSession: jest.Mock;
+  resetPasswordForEmail: jest.Mock;
+};
+
+// Cast the imported objects to their mocked versions
+const mockSupabase = supabase as unknown as {
+  auth: MockAuth;
+  from: jest.Mock;
+};
+const mockAuth = auth as unknown as MockAuth;
 const mockLogger = logger;
 
 describe('Auth Flow Integration', () => {
@@ -418,7 +432,7 @@ describe('Auth Flow Integration', () => {
 
       // Assert: Expired session returned (client should handle refresh)
       expect(result.session).toEqual(expiredSession);
-      expect(result.session.expires_at).toBeLessThan(Date.now());
+      expect(result.session?.expires_at).toBeLessThan(Date.now());
     });
 
     it('should handle no session found', async () => {

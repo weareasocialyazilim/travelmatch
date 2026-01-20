@@ -79,6 +79,9 @@ describe('SessionManager', () => {
     avatar: 'https://example.com/avatar.jpg',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    role: 'user',
+    kyc: 'pending',
+    location: { lat: 0, lng: 0 },
   } as User;
 
   const mockTokens: SessionTokens = {

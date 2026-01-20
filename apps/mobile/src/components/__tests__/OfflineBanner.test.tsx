@@ -12,6 +12,20 @@ jest.mock('../../hooks/useNetwork');
 
 const mockUseNetwork = useNetwork as jest.MockedFunction<typeof useNetwork>;
 
+// Helper to create valid network hook return value
+const createMockNetworkReturn = (isOffline: boolean) => ({
+  isOffline,
+  isOnline: !isOffline,
+  checkConnection: jest.fn(),
+  networkStatus: {
+    isConnected: !isOffline,
+    isInternetReachable: !isOffline,
+    type: !isOffline ? 'wifi' : 'none',
+    isWifi: !isOffline,
+    isCellular: false,
+  },
+});
+
 describe('OfflineBanner', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -19,11 +33,7 @@ describe('OfflineBanner', () => {
 
   describe('Rendering', () => {
     it('should render when offline', () => {
-      mockUseNetwork.mockReturnValue({
-        isOffline: true,
-        isOnline: false,
-        checkConnection: jest.fn(),
-      });
+      mockUseNetwork.mockReturnValue(createMockNetworkReturn(true));
 
       const { getByText } = render(<OfflineBanner />);
 
@@ -31,11 +41,7 @@ describe('OfflineBanner', () => {
     });
 
     it('should not render when online', () => {
-      mockUseNetwork.mockReturnValue({
-        isOffline: false,
-        isOnline: true,
-        checkConnection: jest.fn(),
-      });
+      mockUseNetwork.mockReturnValue(createMockNetworkReturn(false));
 
       const { queryByText } = render(<OfflineBanner />);
 
@@ -43,11 +49,7 @@ describe('OfflineBanner', () => {
     });
 
     it('should render custom message', () => {
-      mockUseNetwork.mockReturnValue({
-        isOffline: true,
-        isOnline: false,
-        checkConnection: jest.fn(),
-      });
+      mockUseNetwork.mockReturnValue(createMockNetworkReturn(true));
 
       const customMessage = 'No internet connection';
       const { getByText } = render(<OfflineBanner message={customMessage} />);
@@ -58,11 +60,7 @@ describe('OfflineBanner', () => {
 
   describe('Retry Functionality', () => {
     it('should show retry button when showRetry is true', () => {
-      mockUseNetwork.mockReturnValue({
-        isOffline: true,
-        isOnline: false,
-        checkConnection: jest.fn(),
-      });
+      mockUseNetwork.mockReturnValue(createMockNetworkReturn(true));
 
       const { getByText } = render(<OfflineBanner showRetry={true} />);
 
@@ -70,11 +68,7 @@ describe('OfflineBanner', () => {
     });
 
     it('should not show retry button when showRetry is false', () => {
-      mockUseNetwork.mockReturnValue({
-        isOffline: true,
-        isOnline: false,
-        checkConnection: jest.fn(),
-      });
+      mockUseNetwork.mockReturnValue(createMockNetworkReturn(true));
 
       const { queryByText } = render(<OfflineBanner showRetry={false} />);
 
@@ -86,8 +80,7 @@ describe('OfflineBanner', () => {
       const mockOnRetry = jest.fn() as jest.Mock;
 
       mockUseNetwork.mockReturnValue({
-        isOffline: true,
-        isOnline: false,
+        ...createMockNetworkReturn(true),
         checkConnection: mockCheckConnection,
       });
 
@@ -110,8 +103,7 @@ describe('OfflineBanner', () => {
       const mockOnRetry = jest.fn() as jest.Mock;
 
       mockUseNetwork.mockReturnValue({
-        isOffline: true,
-        isOnline: false,
+        ...createMockNetworkReturn(true),
         checkConnection: mockCheckConnection,
       });
 
@@ -132,11 +124,7 @@ describe('OfflineBanner', () => {
 
   describe('Icon Rendering', () => {
     it('should render wifi-off icon when offline', () => {
-      mockUseNetwork.mockReturnValue({
-        isOffline: true,
-        isOnline: false,
-        checkConnection: jest.fn(),
-      });
+      mockUseNetwork.mockReturnValue(createMockNetworkReturn(true));
 
       render(<OfflineBanner />);
 

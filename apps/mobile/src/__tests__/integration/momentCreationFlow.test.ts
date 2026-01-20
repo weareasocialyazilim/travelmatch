@@ -40,8 +40,26 @@ jest.mock('@/config/supabase', () => ({
   isSupabaseConfigured: jest.fn(() => true),
 }));
 
-const mockSupabase = supabase;
-const mockLogger = logger;
+// Define Mock Types
+type MockAuth = {
+  getUser: jest.Mock;
+  signInWithPassword: jest.Mock;
+  signOut: jest.Mock;
+  getSession: jest.Mock;
+};
+
+type MockStorage = {
+  from: jest.Mock;
+};
+
+type MockSupabaseClient = {
+  auth: MockAuth;
+  from: jest.Mock;
+  storage: MockStorage;
+};
+
+const mockSupabase = supabase as unknown as MockSupabaseClient;
+const mockLogger = logger as unknown as jest.Mocked<typeof logger>;
 
 describe('Moment Creation Flow Integration', () => {
   const mockUser = {
