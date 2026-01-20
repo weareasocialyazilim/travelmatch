@@ -107,7 +107,7 @@ describe('ImageCacheManager', () => {
       const set = (key: string, data: string, size: number) => {
         // Evict if needed
         while (currentSize + size > maxSize && cache.size > 0) {
-          const oldest = cache.keys().next().value;
+          const oldest = cache.keys().next().value!;
           const oldEntry = cache.get(oldest);
           if (oldEntry) {
             currentSize -= oldEntry.size;

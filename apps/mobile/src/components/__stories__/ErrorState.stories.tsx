@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import React from 'react';
 import { View } from 'react-native';
-import { ErrorState } from './ErrorState';
+import { ErrorState } from '../ErrorState';
 
 const meta: Meta<typeof ErrorState> = {
   title: 'Components/ErrorState',

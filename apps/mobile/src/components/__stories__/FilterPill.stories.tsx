@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
 import React from 'react';
 import { View } from 'react-native';
-import { FilterPill } from './FilterPill';
+import { FilterPill } from '../FilterPill';
 
 const meta: Meta<typeof FilterPill> = {
   title: 'Components/FilterPill',

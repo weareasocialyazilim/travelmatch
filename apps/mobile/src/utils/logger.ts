@@ -366,7 +366,6 @@ class Logger {
     }, 30000);
     // Allow Node to exit even if interval is active (if unref exists)
     try {
-      // @ts-expect-error runtime optional
       this.flushInterval?.unref?.();
     } catch (_unrefError) {
       // ignore - unref not available in all environments

@@ -8,7 +8,7 @@ import {
   Switch,
   Slider,
 } from 'react-native';
-import { AnimatedButton } from './AnimatedComponents';
+import { AnimatedButton } from '../AnimatedComponents';
 
 const meta: Meta = {
   title: 'Testing/Interactions',

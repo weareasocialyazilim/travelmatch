@@ -18,6 +18,19 @@ const mockUseNetworkStatus = useNetworkStatus as jest.MockedFunction<
   typeof useNetworkStatus
 >;
 
+// Helper to create valid network context mock
+const createMockNetworkContext = (isConnected: boolean) => ({
+  isConnected,
+  refresh: jest.fn(),
+  status: {
+    isConnected,
+    isInternetReachable: isConnected,
+    type: isConnected ? 'wifi' : 'none',
+    isWifi: isConnected,
+    isCellular: false,
+  },
+});
+
 describe('NetworkGuard', () => {
   const TestChild = () => <Text>Protected Content</Text>;
 
@@ -27,10 +40,7 @@ describe('NetworkGuard', () => {
 
   describe('Online State', () => {
     it('should render children when connected', () => {
-      mockUseNetworkStatus.mockReturnValue({
-        isConnected: true,
-        refresh: jest.fn(),
-      });
+      mockUseNetworkStatus.mockReturnValue(createMockNetworkContext(true));
 
       const { getByText } = render(
         <NetworkGuard>
@@ -42,10 +52,7 @@ describe('NetworkGuard', () => {
     });
 
     it('should render multiple children when connected', () => {
-      mockUseNetworkStatus.mockReturnValue({
-        isConnected: true,
-        refresh: jest.fn(),
-      });
+      mockUseNetworkStatus.mockReturnValue(createMockNetworkContext(true));
 
       const { getByText } = render(
         <NetworkGuard>
@@ -61,10 +68,7 @@ describe('NetworkGuard', () => {
 
   describe('Offline State', () => {
     it('should render OfflineState when disconnected', () => {
-      mockUseNetworkStatus.mockReturnValue({
-        isConnected: false,
-        refresh: jest.fn(),
-      });
+      mockUseNetworkStatus.mockReturnValue(createMockNetworkContext(false));
 
       const { queryByText } = render(
         <NetworkGuard>
@@ -79,10 +83,7 @@ describe('NetworkGuard', () => {
     });
 
     it('should render custom offline message', () => {
-      mockUseNetworkStatus.mockReturnValue({
-        isConnected: false,
-        refresh: jest.fn(),
-      });
+      mockUseNetworkStatus.mockReturnValue(createMockNetworkContext(false));
 
       const customMessage = 'No internet connection available';
       const { getByText } = render(
@@ -97,7 +98,7 @@ describe('NetworkGuard', () => {
     it('should use network refresh as default retry', () => {
       const mockRefresh = jest.fn() as jest.Mock;
       mockUseNetworkStatus.mockReturnValue({
-        isConnected: false,
+        ...createMockNetworkContext(false),
         refresh: mockRefresh,
       });
 
@@ -115,7 +116,7 @@ describe('NetworkGuard', () => {
       const mockCustomRetry = jest.fn() as jest.Mock;
 
       mockUseNetworkStatus.mockReturnValue({
-        isConnected: false,
+        ...createMockNetworkContext(false),
         refresh: mockRefresh,
       });
 
@@ -131,10 +132,7 @@ describe('NetworkGuard', () => {
 
   describe('Compact Mode', () => {
     it('should render compact OfflineState when compact is true', () => {
-      mockUseNetworkStatus.mockReturnValue({
-        isConnected: false,
-        refresh: jest.fn(),
-      });
+      mockUseNetworkStatus.mockReturnValue(createMockNetworkContext(false));
 
       render(
         <NetworkGuard compact>
@@ -144,10 +142,7 @@ describe('NetworkGuard', () => {
     });
 
     it('should render full OfflineState when compact is false', () => {
-      mockUseNetworkStatus.mockReturnValue({
-        isConnected: false,
-        refresh: jest.fn(),
-      });
+      mockUseNetworkStatus.mockReturnValue(createMockNetworkContext(false));
 
       render(
         <NetworkGuard compact={false}>
@@ -159,10 +154,7 @@ describe('NetworkGuard', () => {
 
   describe('Custom OfflineState Props', () => {
     it('should pass custom offlineProps to OfflineState', () => {
-      mockUseNetworkStatus.mockReturnValue({
-        isConnected: false,
-        refresh: jest.fn(),
-      });
+      mockUseNetworkStatus.mockReturnValue(createMockNetworkContext(false));
 
       const customOfflineProps = {
         retryText: 'Reload',
@@ -189,10 +181,7 @@ describe('NetworkGuard', () => {
       );
 
       // Start offline
-      mockUseNetworkStatus.mockReturnValue({
-        isConnected: false,
-        refresh: jest.fn(),
-      });
+      mockUseNetworkStatus.mockReturnValue(createMockNetworkContext(false));
       rerender(
         <NetworkGuard>
           <TestChild />
@@ -201,10 +190,7 @@ describe('NetworkGuard', () => {
       expect(queryByText('Protected Content')).toBeNull();
 
       // Go online
-      mockUseNetworkStatus.mockReturnValue({
-        isConnected: true,
-        refresh: jest.fn(),
-      });
+      mockUseNetworkStatus.mockReturnValue(createMockNetworkContext(true));
       rerender(
         <NetworkGuard>
           <TestChild />

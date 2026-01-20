@@ -330,6 +330,28 @@ export const transactionsService = {
     }
   },
 
+  async update(updates: {
+    id: string;
+    status?: string;
+    metadata?: any;
+  }): Promise<DbResult<Tables['transactions']['Row']>> {
+    try {
+      const { id, ...updateData } = updates;
+      const { data, error } = await supabase
+        .from('transactions')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      logger.error('[DB] Update transaction error:', error);
+      return { data: null, error: error as Error };
+    }
+  },
+
   async get(id: string): Promise<DbResult<Tables['transactions']['Row']>> {
     try {
       let user: { id: string } | null = null;

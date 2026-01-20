@@ -163,7 +163,7 @@ describe('Badge Component', () => {
 
   describe('Dot Indicator', () => {
     it('renders with dot', () => {
-      const { toJSON } = render(<Badge label="Dot Badge" dot={true} />);
+      const { toJSON } = render(<Badge label="Dot Badge"  />);
       // Dot mode renders a simple View, not text
       expect(toJSON()).toBeTruthy();
     });
@@ -182,7 +182,7 @@ describe('Badge Component', () => {
 
       variants.forEach((variant) => {
         const { toJSON } = render(
-          <Badge label="Dot" variant={variant} dot={true} />,
+          <Badge label="Dot" variant={variant}  />,
         );
         // Dot mode renders a View without text
         expect(toJSON()).toBeTruthy();
@@ -190,7 +190,7 @@ describe('Badge Component', () => {
     });
 
     it('renders both dot and icon', () => {
-      const { toJSON } = render(<Badge label="Both" dot={true} icon="check" />);
+      const { toJSON } = render(<Badge label="Both"  icon="check" />);
       // Dot mode renders a View without text
       expect(toJSON()).toBeTruthy();
     });
@@ -208,7 +208,7 @@ describe('Badge Component', () => {
           variant="success"
           size="lg"
           icon="check"
-          dot={true}
+          
           style={{ marginTop: 10 }}
         />,
       );
@@ -232,7 +232,7 @@ describe('Badge Component', () => {
 
     it('combines dot and variant', () => {
       const { toJSON } = render(
-        <Badge label="Dot Variant" dot={true} variant="error" />,
+        <Badge label="Dot Variant"  variant="error" />,
       );
       // Dot mode renders a View without text
       expect(toJSON()).toBeTruthy();

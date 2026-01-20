@@ -7,7 +7,7 @@ import {
   SlideInView,
   ScaleOnPress,
   PulseView,
-} from './AnimatedComponents';
+} from '../AnimatedComponents';
 
 // Reusable button content
 const ButtonContent = ({ label }: { label: string }) => (

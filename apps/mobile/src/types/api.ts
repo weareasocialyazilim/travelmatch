@@ -164,17 +164,10 @@ export type ReviewResponse = ApiResponse<Review>;
 
 /**
  * Search-related response types
+ * SearchFilters is centralized in @/stores/searchStore
  */
-export interface SearchFilters {
-  category?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  location?: string;
-  dateRange?: {
-    start: string;
-    end: string;
-  };
-}
+import type { SearchFilters } from '@/stores/searchStore';
+export type { SearchFilters };
 
 export interface SearchResult {
   moments: Moment[];

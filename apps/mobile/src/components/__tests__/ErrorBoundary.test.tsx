@@ -11,9 +11,7 @@
  */
 
 // Ensure __DEV__ is defined for React Native
-declare global {
-  var __DEV__: boolean;
-}
+// @ts-ignore
 global.__DEV__ = true;
 
 import React from 'react';
