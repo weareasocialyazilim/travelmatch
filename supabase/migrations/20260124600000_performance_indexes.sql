@@ -26,7 +26,7 @@ CREATE INDEX IF NOT EXISTS idx_conversations_participants ON public.conversation
 
 -- Notifications
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON public.notifications(user_id);
-CREATE INDEX IF NOT EXISTS idx_notifications_is_read ON public.notifications(is_read);
+-- Note: is_read column doesn't exist in notifications table, skipping index
 
 -- Transactions
 CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON public.transactions(user_id);
@@ -35,4 +35,5 @@ CREATE INDEX IF NOT EXISTS idx_transactions_status ON public.transactions(status
 -- Reviews
 CREATE INDEX IF NOT EXISTS idx_reviews_moment_id ON public.reviews(moment_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_reviewer_id ON public.reviews(reviewer_id);
-CREATE INDEX IF NOT EXISTS idx_reviews_reviewee_id ON public.reviews(reviewee_id);
+-- Note: reviewee_id column was renamed to reviewed_id
+CREATE INDEX IF NOT EXISTS idx_reviews_reviewed_id ON public.reviews(reviewed_id);
