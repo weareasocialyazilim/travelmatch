@@ -66,11 +66,7 @@
     "settings": "Settings",
     "notifications": "Notifications",
     "favorites": "Favorites",
-<<<<<<< Updated upstream
     "bookings": "My Support",
-=======
-    "bookings": "My Requests",
->>>>>>> Stashed changes
     "wallet": "Wallet",
     "createMoment": "Create new moment",
     "discoverTab": "Moments tab",
