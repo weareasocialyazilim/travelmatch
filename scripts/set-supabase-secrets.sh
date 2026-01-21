@@ -19,20 +19,20 @@ echo ""
 # Uncomment and add your real keys:
 
 # OpenAI API Key (for video transcription)
-# supabase secrets set OPENAI_API_KEY="sk-proj-xxxxxxxxxxxxxxxx"
+# supabase secrets set OPENAI_API_KEY="YOUR_KEY_FROM_INFISICAL"
 
 # Cloudflare Images (for image uploads)
 # supabase secrets set CLOUDFLARE_ACCOUNT_ID="your-account-id"
 # supabase secrets set CLOUDFLARE_IMAGES_TOKEN="your-images-token"
 
 # Twilio (for SMS/Phone Verification)
-# supabase secrets set TWILIO_ACCOUNT_SID="ACxxxxxxxxxxxxxx"
+# supabase secrets set TWILIO_ACCOUNT_SID="YOUR_SID_FROM_INFISICAL"
 # supabase secrets set TWILIO_AUTH_TOKEN="your-auth-token"
 # supabase secrets set TWILIO_PHONE_NUMBER="+1234567890"
 # supabase secrets set TWILIO_VERIFY_SERVICE_SID="VAxxxxxxxxxxxxxx"
 
 # SendGrid (for Email)
-# supabase secrets set SENDGRID_API_KEY="SG.xxxxxxxxxxxxx"
+# supabase secrets set SENDGRID_API_KEY="YOUR_KEY_FROM_INFISICAL"
 # supabase secrets set SENDGRID_FROM_EMAIL="noreply@lovendo.app"
 # supabase secrets set SENDGRID_FROM_NAME="Lovendo"
 
