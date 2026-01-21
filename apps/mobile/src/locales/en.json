@@ -59,18 +59,22 @@
     "home": "Home",
     "explore": "Explore",
     "discover": "Moments",
-    "requests": "Gifts",
+    "requests": "Gestures",
     "moments": "Moments",
     "messages": "Messages",
     "profile": "Profile",
     "settings": "Settings",
     "notifications": "Notifications",
     "favorites": "Favorites",
+<<<<<<< Updated upstream
     "bookings": "My Support",
+=======
+    "bookings": "My Requests",
+>>>>>>> Stashed changes
     "wallet": "Wallet",
     "createMoment": "Create new moment",
     "discoverTab": "Moments tab",
-    "requestsTab": "Gifts tab",
+    "requestsTab": "Gestures tab",
     "messagesTab": "Messages tab",
     "profileTab": "Profile tab"
   },
@@ -103,9 +107,9 @@
     "noMomentsFound": "No moments found",
     "loadMore": "Load More",
     "card": {
-      "giftFor": "Gift for",
+      "giftFor": "Support for",
       "view": "View",
-      "sendGift": "Send Gift",
+      "sendGift": "Send Gesture",
       "featured": "Featured",
       "popular": "Popular",
       "new": "New",
@@ -113,21 +117,21 @@
     }
   },
   "booking": {
-    "bookNow": "Book Now",
-    "bookingRequest": "Booking Request",
-    "bookingConfirmed": "Booking Confirmed",
-    "bookingCancelled": "Booking Cancelled",
-    "bookingPending": "Booking Pending",
+    "bookNow": "Join Now",
+    "bookingRequest": "Experience Request",
+    "bookingConfirmed": "Request Accepted",
+    "bookingCancelled": "Request Cancelled",
+    "bookingPending": "Request Pending",
     "guests": "Guests",
     "totalPrice": "Total Price",
-    "bookingDate": "Booking Date",
-    "confirmBooking": "Confirm Booking",
-    "cancelBooking": "Cancel Booking",
-    "bookingSuccess": "Booking successful!",
-    "bookingError": "Booking failed. Please try again.",
-    "noBookingsFound": "No bookings found",
-    "upcomingBookings": "Upcoming Bookings",
-    "pastBookings": "Past Bookings"
+    "bookingDate": "Request Date",
+    "confirmBooking": "Accept Request",
+    "cancelBooking": "Cancel Request",
+    "bookingSuccess": "Request sent!",
+    "bookingError": "Request failed. Please try again.",
+    "noBookingsFound": "No requests found",
+    "upcomingBookings": "Upcoming Experiences",
+    "pastBookings": "Past Experiences"
   },
   "chat": {
     "messages": "Messages",
@@ -141,9 +145,12 @@
     "startConversation": "Start a conversation"
   },
   "profile": {
+    "title": "Profile",
     "myProfile": "My Profile",
     "editProfile": "Edit Profile",
     "profileUpdated": "Profile updated successfully!",
+    "shareMessage": "Check out my Lovendo profile!",
+    "shareProfile": "Share profile",
     "bio": "Bio",
     "location": "Location",
     "website": "Website",
@@ -154,43 +161,31 @@
     "verificationStatus": "Verification Status",
     "verified": "Verified",
     "notVerified": "Not Verified",
+    "trustStatus": "Trust Status",
+    "trustScore": {
+      "points": "{{score}} points • Verifications",
+      "earnTrust": "Earn trust through verifications"
+    },
     "memberSince": "Member since {{date}}",
     "reviews": "Reviews",
     "rating": "Rating",
     "moments": {
       "noActive": "No active moments yet",
-      "noPast": "No past moments"
+      "noPast": "No past moments",
+      "createFirstDescription": "Start sharing by creating your first moment",
+      "completedDescription": "Completed experiences will appear here"
     },
     "saved": {
       "empty": {
         "title": "No Saved Vibes Yet",
         "subtitle": "Tap the heart icon on moments you'd like to save for later."
       }
-    }
+    },
+    "savedMoments": "Saved Moments",
+    "offlineTitle": "No internet connection",
+    "offlineMessage": "Internet connection required to view profile."
   },
-  "settings": {
-    "settings": "Settings",
-    "account": "Account",
-    "privacy": "Privacy",
-    "notifications": "Notifications",
-    "language": "Language",
-    "selectLanguage": "Select Language",
-    "languageNote": "The app will update immediately after changing the language.",
-    "theme": "Theme",
-    "lightMode": "Light Mode",
-    "darkMode": "Dark Mode",
-    "systemDefault": "System Default",
-    "help": "Help & Support",
-    "termsOfService": "Terms of Service",
-    "privacyPolicy": "Privacy Policy",
-    "about": "About",
-    "version": "Version",
-    "deleteAccount": "Delete Account",
-    "confirmDeleteAccount": "Are you sure you want to delete your account? This action cannot be undone.",
-    "blockedUsers": "Blocked Users",
-    "clearCache": "Clear Cache",
-    "cacheCleared": "Cache cleared successfully!"
-  },
+
   "payment": {
     "payment": "Payment",
     "addCard": "Add Card",
@@ -216,15 +211,15 @@
       "pending": "Pending",
       "failed": "Failed"
     },
-    "giftFrom": "Gift from {{name}}",
-    "giftFor": "Gift for {{name}}'s trip",
+    "giftFrom": "Gesture from {{name}}",
+    "giftFor": "Gesture for {{name}}",
     "withdrawalTo": "Withdrawal to Bank Account"
   },
   "withdrawal": {
     "title": "Withdraw",
     "availableBalance": "Available Balance",
     "amount": "Amount",
-    "minMax": "Min: ${{min}} • Max: ${{max}}",
+    "minMax": "Min: {{min}} LVND • Max: {{max}} LVND",
     "selectDestination": "Select Destination",
     "bankAccount": "Bank Account",
     "cryptoWallet": "Crypto Wallet",
@@ -234,13 +229,13 @@
     "invalidAmount": "Invalid Amount",
     "invalidAmountMessage": "Please enter a valid number.",
     "amountTooLow": "Amount Too Low",
-    "amountTooLowMessage": "Minimum withdrawal amount is ${{min}}.",
+    "amountTooLowMessage": "Minimum withdrawal amount is {{min}} LVND.",
     "limitExceeded": "Limit Exceeded",
-    "limitExceededMessage": "Daily maximum withdrawal limit is ${{max}}.",
+    "limitExceededMessage": "Daily maximum withdrawal limit is {{max}} LVND.",
     "insufficientBalance": "Insufficient Balance",
     "insufficientBalanceMessage": "You don't have enough balance for this withdrawal.",
     "confirmWithdrawal": "Confirm Withdrawal",
-    "confirmMessage": "Do you want to withdraw ${{amount}} to the selected method?",
+    "confirmMessage": "Do you want to withdraw {{amount}} LVND to the selected method?",
     "confirm": "Confirm",
     "withdrawalStarted": "Withdrawal Started",
     "withdrawalMessage": "Your funds are on the way. Usually takes 1-3 business days.",
@@ -248,16 +243,7 @@
     "errorOccurred": "An error occurred. Please try again.",
     "offlineMessage": "Internet connection required for withdrawals."
   },
-  "notifications": {
-    "notifications": "Notifications",
-    "markAllAsRead": "Mark All as Read",
-    "noNotifications": "No notifications",
-    "newBooking": "New booking request",
-    "bookingConfirmed": "Booking confirmed",
-    "newMessage": "New message from {{name}}",
-    "momentLiked": "{{name}} liked your moment",
-    "newReview": "New review from {{name}}"
-  },
+
   "errors": {
     "titles": {
       "error": "Error",
@@ -381,7 +367,7 @@
   },
   "welcome": {
     "title": "Welcome to Lovendo",
-    "subtitle": "Share moments. Gift experiences.\nMake every connection meaningful.",
+    "subtitle": "Share moments. Send gestures.\nMake every connection meaningful.",
     "continueWithApple": "Continue with Apple",
     "continueWithGoogle": "Continue with Google",
     "continueWithFacebook": "Continue with Facebook",
@@ -468,13 +454,24 @@
     "legal": "Legal",
     "logout": "Log Out",
     "deleteAccount": "Delete Account",
-    "deleteAccountWarning": "This action cannot be undone. All your data will be permanently deleted."
+    "deleteAccountWarning": "This action cannot be undone. All your data will be permanently deleted.",
+    "confirmDeleteAccount": "Are you sure you want to delete your account? This action cannot be undone.",
+    "selectLanguage": "Select Language",
+    "languageNote": "The app will update immediately after changing the language.",
+    "lightMode": "Light Mode",
+    "darkMode": "Dark Mode",
+    "systemDefault": "System Default",
+    "help": "Help & Support",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "clearCache": "Clear Cache",
+    "cacheCleared": "Cache cleared successfully!"
   },
   "store": {
     "appName": "Lovendo",
     "subtitle": "Share Moments, Make Connections",
     "shortDescription": "Meet people nearby. Share moments. Gift experiences. Connect differently.",
-    "keywords": "dating,experiences,gifts,moments,discover,connection,coffee,food,meetup,social"
+    "keywords": "social,experiences,gestures,moments,discover,connection,coffee,food,meetup,community"
   },
   "discover": {
     "title": "Discover",
@@ -488,7 +485,7 @@
       "nightlife": "Nightlife",
       "shopping": "Shopping",
       "music": "Music",
-      "gifts": "Gifts"
+      "gifts": "Gestures"
     },
     "sort": {
       "nearest": "Nearest",
@@ -516,8 +513,8 @@
   "notifications": {
     "settings": {
       "title": "Notification Settings",
-      "giftsAndProofs": "Gifts & Proofs",
-      "whenSomeoneGifts": "When someone gifts my moment",
+      "giftsAndProofs": "Gestures & Proofs",
+      "whenSomeoneGifts": "When someone supports my moment",
       "proofUpdates": "Proof verification updates",
       "messages": "Messages",
       "newChatMessages": "New chat messages",
@@ -527,7 +524,15 @@
       "recommendations": "Personalized recommendations",
       "appUpdates": "App Updates",
       "newFeatures": "New features and updates"
-    }
+    },
+    "notifications": "Notifications",
+    "markAllAsRead": "Mark All as Read",
+    "noNotifications": "No notifications",
+    "newBooking": "New experience request",
+    "bookingConfirmed": "Request accepted",
+    "newMessage": "New message from {{name}}",
+    "momentLiked": "{{name}} liked your moment",
+    "newReview": "New review from {{name}}"
   },
   "report": {
     "title": "Report User",
@@ -535,7 +540,7 @@
     "reasons": {
       "scam": "Scam or payment issue",
       "harassment": "Hate, threats or harassment",
-      "fakeIdentity": "Fake identity or fake trip",
+      "fakeIdentity": "Fake identity or fake content",
       "inappropriateMessages": "Inappropriate messages",
       "other": "Other"
     },
@@ -563,7 +568,7 @@
     },
     "stats": {
       "moments": "Moments",
-      "gifts": "Gifts",
+      "gifts": "Gestures",
       "response": "Response"
     },
     "garden": {
@@ -645,7 +650,7 @@
     "empty": {
       "activeTitle": "No messages yet",
       "activeDescription": "Share a moment to meet new people!",
-      "requestsTitle": "No gift requests",
+      "requestsTitle": "No gesture requests",
       "requestsDescription": "You'll see requests here when someone wants to join your moment."
     },
     "explore": "Explore",
@@ -681,7 +686,7 @@
       "fakeProfile": "Fake Profile",
       "inappropriateContent": "Inappropriate Content",
       "fraudSuspicion": "Fraud Suspicion",
-      "giftIssue": "Gift Issue",
+      "giftIssue": "Gesture Issue",
       "generalFeedback": "General Feedback",
       "bugReport": "Bug Report",
       "featureRequest": "Feature Request"
@@ -869,25 +874,7 @@
       "transactionDetailHint": "View transaction details"
     }
   },
-  "profile": {
-    "title": "Profile",
-    "shareMessage": "Check out my Lovendo profile!",
-    "shareProfile": "Share profile",
-    "savedMoments": "Saved Moments",
-    "offlineTitle": "No internet connection",
-    "offlineMessage": "Internet connection required to view profile.",
-    "trustStatus": "Trust Status",
-    "trustScore": {
-      "points": "{{score}} points • Verifications",
-      "earnTrust": "Earn trust through verifications"
-    },
-    "moments": {
-      "noActive": "No active moments yet",
-      "noPast": "No past moments",
-      "createFirstDescription": "Start your journey by creating your first moment",
-      "completedDescription": "Completed moments will appear here"
-    }
-  },
+
   "accessibility": {
     "tapToViewDetails": "Tap to view details",
     "sendGiftToUser": "Send a gift to {{name}}",

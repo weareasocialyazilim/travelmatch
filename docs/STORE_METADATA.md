@@ -9,8 +9,8 @@ com.lovendo.app
 
 ## Short Description (80 characters max)
 
-EN: Share travel moments, connect with travelers, send & receive gifts! ✈️🎁 TR: Seyahat anlarını
-paylaş, gezginlerle bağlan, hediye gönder ve al! ✈️🎁
+EN: Share moments, connect with verified users, send & receive LVND gestures! 💎 TR: Özgün anlarını
+paylaş, LVND Coin ile şükranını göster. Titan Protocol güvenliği.
 
 ---
 
@@ -46,8 +46,8 @@ Download now and start sharing your journey!
 
 **Lovendo - Yolculuğunu Paylaş, Gezginlerle Bağlan**
 
-Seyahati yeni bir şekilde deneyimle! Lovendo, gezginlerin otantik anlarını paylaştığı,
-maceralarını doğruladığı ve hediyelerle bağlandığı sosyal platformdur.
+Seyahati yeni bir şekilde deneyimle! Lovendo, gezginlerin otantik anlarını paylaştığı, maceralarını
+doğruladığı ve hediyelerle bağlandığı sosyal platformdur.
 
 🌍 **ANLARINI PAYLAŞ** • Seyahat deneyimlerini yakala ve paylaş • Proof sistemiyle konumunu doğrula
 • Maceralarının görsel günlüğünü oluştur • Diğer gezginler tarafından keşfedil
@@ -72,8 +72,8 @@ yerler keşfetmeyi sev - Lovendo otantik seyahat bağlantılarına açılan kap�
 
 ### iOS Keywords
 
-EN: travel,social,moments,gifts,adventure,explore,trip,journey,connect,share TR:
-seyahat,gezi,sosyal,hediye,macera,keşif,yolculuk,anı,paylaş,bağlan
+EN: social,moments,gifts,experience,explore,connect,share,kyc,verified,lvnd TR:
+sosyal,deneyim,şükran,hediye,güvenli,bağlantı,doğrulanmış,lvnd,titan,moment
 
 ### Google Play Tags
 
@@ -85,7 +85,7 @@ seyahat,gezi,sosyal,hediye,macera,keşif,yolculuk,anı,paylaş,bağlan
 
 ## Category
 
-**Primary Category:** Travel & Local **Secondary Category:** Social
+**Primary Category:** Social **Secondary Category:** Lifestyle
 
 ---
 

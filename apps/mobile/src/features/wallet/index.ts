@@ -11,6 +11,7 @@
 export { default as WalletScreen } from './screens/WalletScreen';
 export { default as WithdrawScreen } from './screens/WithdrawScreen';
 export { WithdrawSuccessScreen } from './screens/WithdrawSuccessScreen';
+export { default as CoinStoreScreen } from './screens/CoinStoreScreen';
 
 // ===================================
 // COMPONENTS

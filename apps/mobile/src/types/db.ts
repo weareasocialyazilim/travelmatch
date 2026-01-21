@@ -37,7 +37,7 @@ export type DbKycVerification = Tables['kyc_verifications']['Row'];
 export type DbSubscriptionPlan = Tables['subscription_plans']['Row'];
 export type DbUserSubscription = Tables['user_subscriptions']['Row'];
 
-// Escrow transactions table (Titan Plan v2.0)
+// Escrow transactions table (Titan Protocol)
 export type DbEscrowTransaction = Tables['escrow_transactions']['Row'];
 export type DbEscrowTransactionInsert = Tables['escrow_transactions']['Insert'];
 export type DbEscrowTransactionUpdate = Tables['escrow_transactions']['Update'];

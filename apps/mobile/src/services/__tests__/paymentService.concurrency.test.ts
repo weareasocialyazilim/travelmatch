@@ -18,6 +18,7 @@ jest.mock('../../config/supabase', () => ({
   supabase: {
     auth: {
       getUser: jest.fn(),
+      getSession: jest.fn(),
     },
     from: jest.fn(),
   },
@@ -36,6 +37,13 @@ jest.mock('../../utils/logger', () => ({
     warn: jest.fn(),
     info: jest.fn(),
   },
+}));
+
+jest.mock('../cacheInvalidationService', () => ({
+  getCachedWallet: jest.fn().mockResolvedValue(null),
+  setCachedWallet: jest.fn().mockResolvedValue(undefined),
+  invalidateWallet: jest.fn().mockResolvedValue(undefined),
+  invalidateAllPaymentCache: jest.fn().mockResolvedValue(undefined),
 }));
 
 const mockSupabase = supabase as jest.Mocked<typeof supabase>;
@@ -81,14 +89,29 @@ async function processPaymentWithIdempotency(data: {
 }
 
 describe('PaymentService - Concurrency Edge Cases', () => {
-  const mockUser = { id: 'user-123', email: 'test@example.com' };
+  const mockUser = {
+    id: 'user-123',
+    email: 'test@example.com',
+    coins_balance: 100,
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
     pendingPayments.clear();
-    mockSupabase.auth.getUser.mockResolvedValue({
+    (mockSupabase.auth.getUser as jest.Mock).mockResolvedValue({
       data: { user: mockUser },
       error: null,
+    });
+    (mockSupabase.auth.getSession as jest.Mock).mockResolvedValue({
+      data: { session: { access_token: 'fake-token' } },
+      error: null,
+    });
+
+    // Mock global fetch to fail for getPayTRBalance fallback to database
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: jest.fn().mockResolvedValue({ error: 'PayTR API Error' }),
     });
   });
 
@@ -103,6 +126,8 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        moment_id: null,
+        metadata: {},
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -146,6 +171,8 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift 1',
+        moment_id: null,
+        metadata: {},
       };
 
       const mockTransaction2 = {
@@ -157,6 +184,8 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift 2',
+        moment_id: null,
+        metadata: {},
       };
 
       mockTransactionsService.create
@@ -198,6 +227,8 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift 1',
+        moment_id: null,
+        metadata: {},
       };
 
       const mockTransaction2 = {
@@ -209,6 +240,8 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift 2',
+        moment_id: null,
+        metadata: {},
       };
 
       mockTransactionsService.create
@@ -251,6 +284,8 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift for Moment 1',
+        moment_id: 'moment-1',
+        metadata: { momentId: 'moment-1' },
       };
 
       const mockTransaction2 = {
@@ -262,6 +297,8 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift for Moment 2',
+        moment_id: 'moment-2',
+        metadata: { momentId: 'moment-2' },
       };
 
       const mockTransaction3 = {
@@ -273,6 +310,8 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift for Moment 3',
+        moment_id: 'moment-3',
+        metadata: { momentId: 'moment-3' },
       };
 
       mockTransactionsService.create
@@ -326,13 +365,21 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift 1',
+        moment_id: null,
+        metadata: {},
       };
 
       mockTransactionsService.create
         .mockResolvedValueOnce({ data: mockTransaction1, error: null })
         .mockRejectedValueOnce(new Error('Insufficient funds'))
         .mockResolvedValueOnce({
-          data: { ...mockTransaction1, id: 'tx-3', description: 'Gift 3' },
+          data: {
+            ...mockTransaction1,
+            id: 'tx-3',
+            description: 'Gift 3',
+            moment_id: null,
+            metadata: {},
+          },
           error: null,
         });
 
@@ -384,8 +431,8 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         single: jest.fn().mockResolvedValue({ data: mockBalance, error: null }),
       };
 
-      mockSupabase.from.mockImplementation((table: string) => {
-        if (table === 'wallets') {
+      mockSupabase.from.mockImplementation(((table: string) => {
+        if (table === 'users') {
           return mockChain;
         }
         // escrow_transactions query
@@ -395,8 +442,8 @@ describe('PaymentService - Concurrency Edge Cases', () => {
               eq: jest.fn().mockResolvedValue({ data: [], error: null }),
             }),
           }),
-        };
-      });
+        } as any;
+      }) as any);
 
       // Multiple simultaneous balance checks
       const balance1 = paymentService.getBalance();
@@ -420,8 +467,8 @@ describe('PaymentService - Concurrency Edge Cases', () => {
       // The actual race condition prevention happens at the database level
       const mockBalance = { balance: 100, currency: 'USD', status: 'active' };
 
-      mockSupabase.from.mockImplementation((table: string) => {
-        if (table === 'wallets') {
+      mockSupabase.from.mockImplementation(((table: string) => {
+        if (table === 'users') {
           return {
             select: jest.fn().mockReturnThis(),
             eq: jest.fn().mockReturnThis(),
@@ -436,8 +483,8 @@ describe('PaymentService - Concurrency Edge Cases', () => {
               eq: jest.fn().mockResolvedValue({ data: [], error: null }),
             }),
           }),
-        };
-      });
+        } as any;
+      }) as any);
 
       // Just verify the balance check works, actual withdrawal logic is tested elsewhere
       const balance = await paymentService.getBalance();
@@ -449,22 +496,26 @@ describe('PaymentService - Concurrency Edge Cases', () => {
     it('should process payments in correct order despite concurrent requests', async () => {
       const transactions: string[] = [];
 
-      mockTransactionsService.create.mockImplementation((data) => {
-        transactions.push(data.description);
-        return Promise.resolve({
-          data: {
-            id: `tx-${transactions.length}`,
-            user_id: 'user-123',
-            amount: data.amount,
-            currency: data.currency,
-            type: data.type,
-            status: 'completed',
-            created_at: new Date().toISOString(),
-            description: data.description,
-          },
-          error: null,
-        });
-      });
+      (mockTransactionsService.create as jest.Mock).mockImplementation(
+        (data) => {
+          transactions.push(data.description as string);
+          return Promise.resolve({
+            data: {
+              id: `tx-${transactions.length}`,
+              user_id: 'user-123',
+              amount: data.amount,
+              currency: data.currency,
+              type: data.type,
+              status: 'completed',
+              created_at: new Date().toISOString(),
+              description: data.description,
+              moment_id: data.moment_id || null,
+              metadata: data.metadata || {},
+            },
+            error: null,
+          });
+        },
+      );
 
       const payment1 = paymentService.processPayment({
         amount: 50,
@@ -515,9 +566,11 @@ describe('PaymentService - Concurrency Edge Cases', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift',
+        moment_id: null,
+        metadata: {},
       };
 
-      mockTransactionsService.create.mockResolvedValue({
+      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });

@@ -30,6 +30,10 @@
         <key>CFBundleURLSchemes</key>
         <array>
           <string>lovendo</string>
+<<<<<<< Updated upstream
+=======
+          <string>com.lovendo.app</string>
+>>>>>>> Stashed changes
         </array>
       </dict>
     </array>
@@ -47,7 +51,7 @@
       <false/>
     </dict>
     <key>NSCameraUsageDescription</key>
-    <string>Lovendo needs camera access to capture travel moments.</string>
+    <string>Lovendo needs camera access to capture moments.</string>
     <key>NSContactsUsageDescription</key>
     <string>Lovendo can help you find friends who are also using the app.</string>
     <key>NSFaceIDUsageDescription</key>
@@ -63,7 +67,7 @@
     <key>NSPhotoLibraryAddUsageDescription</key>
     <string>Lovendo needs permission to save photos to your library.</string>
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>Lovendo needs access to your photos to share travel moments.</string>
+    <string>Lovendo needs access to your photos to share moments.</string>
     <key>NSUserTrackingUsageDescription</key>
     <string>Lovendo uses this to provide personalized recommendations and improve app experience. Your data is never sold to third parties.</string>
     <key>RCTNewArchEnabled</key>

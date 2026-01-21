@@ -44,6 +44,8 @@ export interface UserProfile {
   momentCount: number;
   giftsSent: number;
   giftsReceived: number;
+  coinsBalance: number;
+  pendingBalance: number;
 
   // Dates
   createdAt: string;
@@ -219,6 +221,8 @@ export const userService = {
         languages,
         interests,
         notification_preferences,
+        coins_balance,
+        pending_balance,
         created_at,
         updated_at
       `,
@@ -252,6 +256,8 @@ export const userService = {
       momentCount: 0,
       giftsSent: 0,
       giftsReceived: 0,
+      coinsBalance: profile.coins_balance || 0,
+      pendingBalance: profile.pending_balance || 0,
       createdAt: profile.created_at || '',
       lastActiveAt: profile.updated_at || '',
     };

@@ -39,10 +39,10 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
         {/* Hero Section */}
         <View style={styles.hero}>
           <Icon name="cash-refund" size={64} color={COLORS.mint} />
-          <Text style={styles.heroTitle}>14-Day Money-Back Guarantee</Text>
+          <Text style={styles.heroTitle}>14 Gün LVND Coin İade Garantisi</Text>
           <Text style={styles.heroSubtitle}>
-            We&apos;re committed to your satisfaction. If you&apos;re not happy
-            with your experience, we&apos;ll make it right.
+            Memnuniyetiniz bizim için önemli. Deneyim gerçekleşmezse, LVND
+            Coin'leriniz 24 saat içinde cüzdanınıza iade edilir.
           </Text>
         </View>
 
@@ -53,9 +53,8 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
             <Text style={styles.sectionTitle}>Our Commitment</Text>
           </View>
           <Text style={styles.paragraph}>
-            Lovendo stands behind every gesture made on our platform. We offer a
-            comprehensive 14-day money-back guarantee to ensure trust and
-            satisfaction for all users.
+            Lovendo, Titan Protocol ile korunan tüm işlemleri güvence altına
+            alır. Deneyim gerçekleşmezse LVND Coin'leriniz anında iade edilir.
           </Text>
         </View>
 
@@ -66,7 +65,7 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
               size={24}
               color={COLORS.brand.secondary}
             />
-            <Text style={styles.sectionTitle}>Eligible for Refund</Text>
+            <Text style={styles.sectionTitle}>İade Koşulları</Text>
           </View>
           <View style={styles.bulletList}>
             <View style={styles.bulletItem}>
@@ -220,7 +219,8 @@ export const RefundPolicyScreen: React.FC<RefundPolicyScreenProps> = ({
               <View style={styles.stepContent}>
                 <Text style={styles.stepTitle}>Refund Processed</Text>
                 <Text style={styles.stepDescription}>
-                  Approved refunds processed within 5-7 business days
+                  Onaylanan iadeler 24 saat içinde LVND olarak cüzdanınıza
+                  yansır
                 </Text>
               </View>
             </View>

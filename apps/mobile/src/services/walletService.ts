@@ -25,6 +25,7 @@ import {
 
 export interface WalletBalance {
   available: number; // PayTR withdrawable balance
+  coins: number; // Lovendo Coins (Virtual Currency)
   pending: number; // Awaiting proof or PayTR processing
   currency: string;
 }
@@ -91,11 +92,13 @@ class WalletService {
         logger.info('Wallet balance from cache');
         const cachedData = cached as unknown as {
           balance?: number;
+          coins?: number;
           pendingBalance?: number;
           currency?: string;
         };
         return {
           available: cachedData.balance || 0,
+          coins: cachedData.coins || 0,
           pending: cachedData.pendingBalance || 0,
           currency: cachedData.currency || 'TRY',
         };
@@ -128,11 +131,13 @@ class WalletService {
         if (cached) {
           const cachedData = cached as unknown as {
             balance?: number;
+            coins?: number;
             pendingBalance?: number;
             currency?: string;
           };
           return {
             available: cachedData.balance || 0,
+            coins: cachedData.coins || 0,
             pending: cachedData.pendingBalance || 0,
             currency: cachedData.currency || 'TRY',
           };
@@ -162,8 +167,16 @@ class WalletService {
         return await this.getDatabaseBalance(user.id);
       }
 
+      // Fetch updated coins_balance from database since Auth user doesn't have it
+      const { data: dbUser } = await supabase
+        .from('users')
+        .select('coins_balance')
+        .eq('id', user.id)
+        .single();
+
       const balance: WalletBalance = {
         available: result.available_balance,
+        coins: (dbUser as any)?.coins_balance || 0,
         pending: result.pending_balance,
         currency: result.currency || 'TRY',
       };
@@ -172,6 +185,7 @@ class WalletService {
       this.lastBalanceFetch = now;
       await setCachedWallet(user.id, {
         balance: balance.available,
+        coins: balance.coins,
         pendingBalance: balance.pending,
         currency: balance.currency,
       });
@@ -204,7 +218,7 @@ class WalletService {
   private async getDatabaseBalance(userId: string): Promise<WalletBalance> {
     const { data, error } = await supabase
       .from('users')
-      .select('balance, pending_balance, currency')
+      .select('balance, coins_balance, pending_balance, currency')
       .eq('id', userId)
       .single();
 
@@ -212,12 +226,14 @@ class WalletService {
 
     const dbData = data as unknown as {
       balance?: number;
+      coins_balance?: number;
       pending_balance?: number;
       currency?: string;
     };
 
     return {
       available: dbData.balance || 0,
+      coins: dbData.coins_balance || 0,
       pending: dbData.pending_balance || 0,
       currency: dbData.currency || 'TRY',
     };
@@ -318,6 +334,53 @@ class WalletService {
       };
     } catch (error) {
       logger.error('Request PayTR settlement error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Request Coin Withdrawal (Coin -> Fiat)
+   */
+  async requestCoinWithdrawal(params: {
+    coinAmount: number;
+    bankAccountId: string;
+  }): Promise<{ settlementId: string; status: string; fiatAmount: number }> {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const headers = await this.getAuthHeaders();
+      const response = await fetch(
+        `${this.EDGE_FUNCTION_BASE}/paytr-withdraw`,
+        {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            amount: params.coinAmount,
+            bankAccountId: params.bankAccountId,
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Çekim talebi başarısız oldu');
+      }
+
+      const result = await response.json();
+
+      // Invalidate caches
+      await invalidateAllPaymentCache(user.id);
+
+      return {
+        settlementId: result.settlementId,
+        status: 'pending',
+        fiatAmount: result.fiat_amount,
+      };
+    } catch (error) {
+      logger.error('Coin withdrawal error:', error);
       throw error;
     }
   }

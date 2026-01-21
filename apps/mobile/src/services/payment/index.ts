@@ -7,7 +7,7 @@
  * Modular structure:
  * - PayTRProvider: PayTR API operations (tokenize, create payment, saved cards)
  * - walletService: Balance queries, withdrawals
- * - escrowService: Titan Plan v2.0 escrow logic
+ * - escrowService: Titan Protocol escrow logic
  * - transactionService: Transaction history
  */
 

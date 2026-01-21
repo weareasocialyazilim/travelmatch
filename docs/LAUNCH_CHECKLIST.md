@@ -48,7 +48,7 @@
 - [x] Splash screen configured
 - [x] Privacy Policy screen (in-app)
 - [x] Terms of Service screen (in-app)
-- [ ] App Store screenshots
+- [x] App Store screenshots
 - [ ] Store metadata & descriptions
 
 ### 📋 Store Submission Requirements
@@ -60,7 +60,7 @@
 - [x] Provisioning profiles (managed by EAS)
 - [x] Privacy Policy URL (in-app screen ready)
 - [x] Terms of Service URL (in-app screen ready)
-- [ ] App screenshots (6.7", 6.5", 5.5")
+- [x] App screenshots (6.7", 6.5", 5.5")
 - [ ] App description (4000 chars max)
 - [ ] Keywords
 - [ ] Support URL

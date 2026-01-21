@@ -215,7 +215,7 @@ import {
   SuccessConfirmationScreen,
   PaymentFailedScreen,
   ProofReviewScreen,
-  PayTRWebViewScreen,
+  // PayTRWebViewScreen removed for Apple Compliance (backend only)
   PromoCodeScreen,
   UnifiedGiftFlowScreen,
   SubscriberOfferModal,
@@ -235,6 +235,7 @@ import {
   WalletScreen,
   WithdrawScreen,
   WithdrawSuccessScreen,
+  CoinStoreScreen,
 } from '../features/wallet';
 
 // ===================================
@@ -781,6 +782,14 @@ const AppNavigator = () => {
 
             {/* Wallet & Settings */}
             <Stack.Screen name="Wallet" component={WalletScreen} />
+            <Stack.Screen
+              name="CoinStore"
+              component={CoinStoreScreen}
+              options={{
+                presentation: 'modal',
+                animation: 'slide_from_bottom',
+              }}
+            />
             <Stack.Screen name="PromoCode" component={PromoCodeScreen} />
             <Stack.Screen name="Settings" component={AppSettingsScreen} />
             <Stack.Screen
@@ -814,7 +823,7 @@ const AppNavigator = () => {
             {/* Ticket */}
             <Stack.Screen name="Ticket" component={TicketScreen} />
             <Stack.Screen name="ShareMoment" component={ShareMomentScreen} />
-            <Stack.Screen name="PayTRWebView" component={PayTRWebViewScreen} />
+            {/* <Stack.Screen name="PayTRWebView" component={PayTRWebViewScreen} /> */}
 
             {/* Footer Pages */}
             <Stack.Screen name="Safety" component={SafetyScreen} />

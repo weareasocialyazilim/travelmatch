@@ -328,14 +328,15 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
             </Text>
           </AnimatedButton>
 
-          <AnimatedButton
+{/* Google login hidden until implementation is complete */}
+          {/* <AnimatedButton
             variant="google"
             onPress={handleGoogleLogin}
             delay={700}
-            accessibilityLabel="Google ile devam et - Çok yakında"
-            accessibilityHint="Google ile giriş çok yakında aktif olacak"
+            accessibilityLabel="Google ile devam et"
+            accessibilityHint="Google ile giriş yapın"
             disabled={true}
-            showComingSoon={true}
+            showComingSoon={false}
           >
             <MaterialCommunityIcons
               name="google"
@@ -345,7 +346,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
             <Text style={styles.socialButtonText}>
               {t('welcome.continueWithGoogle')}
             </Text>
-          </AnimatedButton>
+          </AnimatedButton> */}
 
           {/* Divider */}
           <View style={styles.divider}>

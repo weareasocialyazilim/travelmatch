@@ -40,6 +40,7 @@ import {
   ProfileMomentCard,
   MomentsTabs,
 } from '../components';
+import { CreatorDashboard } from '../components/CreatorDashboard';
 import { useAuth } from '@/context/AuthContext';
 import { useMoments, type Moment } from '@/hooks/useMoments';
 import { useSubscription } from '@/features/payments';
@@ -58,6 +59,8 @@ import {
   PROFILE_TYPOGRAPHY,
   PROFILE_SPRINGS,
 } from '../constants/theme';
+import { TrustGardenView } from '@/components/TrustGardenView';
+import { trustScoreService, type UserTier } from '@/services/TrustScoreService';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -108,6 +111,38 @@ const ProfileScreen: React.FC = () => {
   const { subscription } = useSubscription();
   const subscriptionTier =
     (subscription?.tier as 'free' | 'premium' | 'platinum') || 'free';
+
+  const [realTrustScore, setRealTrustScore] = useState(0);
+  const [userTier, setUserTier] = useState<UserTier>('Free');
+  const [balances, setBalances] = useState({ coins: 0, pending: 0 });
+
+  const fetchBalances = useCallback(async () => {
+    if (authUser?.id) {
+      const { user: data } = await userService.getCurrentUser();
+      if (data) {
+        setBalances({
+          coins: data.coinsBalance || 0,
+          pending: data.pendingBalance || 0,
+        });
+      }
+    }
+  }, [authUser?.id]);
+
+  useEffect(() => {
+    fetchBalances();
+  }, [fetchBalances]);
+
+  useEffect(() => {
+    const fetchTrustInfo = async () => {
+      if (authUser?.id) {
+        const score = await trustScoreService.calculateTrustScore(authUser.id);
+        const tier = await trustScoreService.getSubscriptionTier(authUser.id);
+        setRealTrustScore(score);
+        setUserTier(tier);
+      }
+    };
+    fetchTrustInfo();
+  }, [authUser?.id]);
 
   useEffect(() => {
     loadMyMoments();
@@ -407,40 +442,27 @@ const ProfileScreen: React.FC = () => {
                 onMomentsPress={handleMyMoments}
               />
 
+              {/* Creator Dashboard (Visible if user has earnings or is verified) */}
+              {(balances.coins > 0 || balances.pending > 0 || userData.isVerified) && (
+                <>
+                  <View style={styles.dashboardDivider} />
+                  <CreatorDashboard 
+                    balance={balances.coins}
+                    pendingBalance={balances.pending}
+                    onWithdraw={handleWallet}
+                  />
+                </>
+              )}
+
               {/* Divider */}
               <View style={styles.dashboardDivider} />
 
-              {/* Trust Score */}
-              <TouchableOpacity
-                onPress={handleTrustGarden}
-                activeOpacity={0.8}
-                style={styles.dashboardItem}
-              >
-                <View style={styles.dashboardIconContainer}>
-                  <Ionicons
-                    name="shield-checkmark-outline"
-                    size={20}
-                    color={PROFILE_COLORS.neon.lime}
-                  />
-                </View>
-                <View style={styles.dashboardItemText}>
-                  <Text style={styles.dashboardItemTitle}>
-                    {t('profile.trustStatus')}
-                  </Text>
-                  <Text style={styles.dashboardItemSubtitle}>
-                    {(userData.trustScore || 0) > 0
-                      ? t('profile.trustScore.points', {
-                          score: userData.trustScore,
-                        })
-                      : t('profile.trustScore.earnTrust')}
-                  </Text>
-                </View>
-                <Ionicons
-                  name="chevron-forward"
-                  size={18}
-                  color={PROFILE_COLORS.text.tertiary}
-                />
-              </TouchableOpacity>
+              {/* Trust Garden */}
+              <TrustGardenView 
+                score={realTrustScore} 
+                isVerified={userData.isVerified} 
+                tier={userTier} 
+              />
 
               {/* Divider */}
               <View style={styles.dashboardDivider} />

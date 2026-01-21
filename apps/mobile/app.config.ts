@@ -44,9 +44,15 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 
       // Camera and Photos
       NSCameraUsageDescription:
+<<<<<<< Updated upstream
         'Özel anlarınızı (Moments) kaydedip takipçilerinizle paylaşabilmeniz için kamera erişimi gereklidir.',
       NSPhotoLibraryUsageDescription:
         "Vibe'ınızı yansıtan fotoğraf ve videoları profilinizde paylaşabilmeniz için galeri erişimi gereklidir.",
+=======
+        'Lovendo needs camera access to capture photos of your moments.',
+      NSPhotoLibraryUsageDescription:
+        'Lovendo needs photo library access to upload moment photos.',
+>>>>>>> Stashed changes
       NSPhotoLibraryAddUsageDescription:
         'Lovendo needs permission to save photos to your library.',
 
@@ -69,7 +75,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       // Deep link URL schemes (keep legacy lovendo for compatibility)
       CFBundleURLTypes: [
         {
-          CFBundleURLName: 'com.lovendo.mobile',
+          CFBundleURLName: 'com.lovendo.app',
           CFBundleURLSchemes: ['lovendo'],
         },
       ],
@@ -126,12 +132,17 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'android.permission.ACCESS_COARSE_LOCATION',
       'android.permission.ACCESS_FINE_LOCATION',
       'android.permission.CAMERA',
+      'android.permission.RECORD_AUDIO', // Gratitude Video recording
       'android.permission.VIBRATE',
       'android.permission.USE_BIOMETRIC',
       'android.permission.USE_FINGERPRINT',
       'android.permission.INTERNET',
       'android.permission.ACCESS_NETWORK_STATE',
       'android.permission.RECEIVE_BOOT_COMPLETED',
+      // Android 13+ (API 33) media permissions
+      'android.permission.READ_MEDIA_IMAGES',
+      'android.permission.READ_MEDIA_VIDEO',
+      'android.permission.POST_NOTIFICATIONS', // Android 13+ push notifications
     ],
     blockedPermissions: [
       'android.permission.READ_PHONE_STATE',
@@ -208,7 +219,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       {
         url: 'https://sentry.io/',
         organization: process.env.SENTRY_ORG || 'lovendo-2d',
-        project: process.env.SENTRY_PROJECT || 'lovendo-mobile',
+        project: process.env.SENTRY_PROJECT || 'lovendo-app',
         // authToken is read automatically from SENTRY_AUTH_TOKEN env var
       },
     ],
@@ -247,9 +258,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'expo-image-picker',
       {
         photosPermission:
-          'Lovendo needs access to your photos to share travel moments.',
-        cameraPermission:
-          'Lovendo needs camera access to capture travel moments.',
+          'Lovendo needs access to your photos to share moments.',
+        cameraPermission: 'Lovendo needs camera access to capture moments.',
       },
     ],
     // Video compression for optimized uploads

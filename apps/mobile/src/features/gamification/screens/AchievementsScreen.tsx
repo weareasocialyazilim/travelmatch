@@ -66,8 +66,8 @@ const ACHIEVEMENTS: Achievement[] = [
   },
   {
     id: '3',
-    title: 'Dünya Gezgini',
-    description: '3 farklı kıtada Moment oluşturdun.',
+    title: 'Kültür Kaşifi',
+    description: '3 farklı kültürden Moment paylaştın.',
     icon: 'earth',
     progress: 33,
     isEarned: false,
@@ -114,7 +114,7 @@ const ACHIEVEMENTS: Achievement[] = [
 const CATEGORIES = [
   { id: 'all', label: 'Tümü', icon: 'view-grid' },
   { id: 'host', label: 'Host', icon: 'home-heart' },
-  { id: 'explorer', label: 'Gezgin', icon: 'compass' },
+  { id: 'explorer', label: 'Kaşif', icon: 'compass' },
   { id: 'social', label: 'Sosyal', icon: 'account-heart' },
   { id: 'trust', label: 'Güven', icon: 'shield-star' },
 ];

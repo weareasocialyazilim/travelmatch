@@ -15,18 +15,25 @@ export const VALUES = {
     DEFAULT_MOMENT: undefined as string | undefined,
   },
 
-  // Escrow thresholds - Titan Plan v2.0
-  // $0-$30: Direct payment (no escrow)
-  // $30-$100: Optional escrow (user chooses)
-  // $100+: Mandatory escrow (forced protection)
+  // Escrow thresholds - Titan Protocol
+  // 0-30 LVND: Direct payment (no escrow)
+  // 30-100 LVND: Optional escrow (user chooses)
+  // 100+ LVND: Mandatory escrow (forced protection)
   ESCROW_THRESHOLDS: {
     /** Max amount for direct payment without escrow */
-    DIRECT_MAX: 30,
+    DIRECT_MAX: 30, // 30 LVND
     /** Max amount for optional escrow (above this is mandatory) */
-    OPTIONAL_MAX: 100,
+    OPTIONAL_MAX: 100, // 100 LVND
     /** Currency for threshold values */
-    CURRENCY: 'USD',
+    CURRENCY: 'LVND',
   } as const,
+
+  // Xcode 26 App Store Connect IAP Product IDs
+  IAP_PRODUCTS: {
+    LVND_50: 'xyz.lovendo.lvnd50',
+    LVND_250: 'xyz.lovendo.lvnd250',
+    LVND_1000: 'xyz.lovendo.lvnd1000',
+  },
 
   // Legacy aliases for backward compatibility
   /** @deprecated Use ESCROW_THRESHOLDS.DIRECT_MAX */

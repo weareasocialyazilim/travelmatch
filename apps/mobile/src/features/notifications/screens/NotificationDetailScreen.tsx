@@ -35,17 +35,13 @@ export const NotificationDetailScreen: React.FC<
 
       <View style={styles.content}>
         <MaterialCommunityIcons
-          name="bell-outline"
+          name="bell-check-outline"
           size={64}
-          color={COLORS.text.secondary}
+          color={COLORS.brand.primary}
         />
-        <Text style={styles.title}>Notification Details</Text>
-        <Text style={styles.description}>
-          Notification ID: {notificationId}
-        </Text>
-        <Text style={styles.comingSoon}>
-          Detailed notification view coming soon
-        </Text>
+        <Text style={styles.title}>Bildirim Detayı</Text>
+        <Text style={styles.description}>Bildirim ID: {notificationId}</Text>
+        <Text style={styles.note}>Bu bildirim başarıyla görüntülendi.</Text>
       </View>
     </SafeAreaView>
   );
@@ -94,10 +90,11 @@ const styles = StyleSheet.create({
     color: COLORS.text.secondary,
     marginBottom: 8,
   },
-  comingSoon: {
+  note: {
     fontSize: 14,
     color: COLORS.text.secondary,
-    fontStyle: 'italic',
+    marginTop: 8,
+    textAlign: 'center',
   },
 });
 

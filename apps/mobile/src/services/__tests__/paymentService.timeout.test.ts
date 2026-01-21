@@ -20,6 +20,7 @@ jest.mock('../../config/supabase', () => ({
   supabase: {
     auth: {
       getUser: jest.fn(),
+      getSession: jest.fn(),
     },
     from: jest.fn(),
   },
@@ -28,7 +29,6 @@ jest.mock('../../config/supabase', () => ({
 jest.mock('../supabaseDbService', () => ({
   transactionsService: {
     create: jest.fn(),
-    update: jest.fn(),
   },
 }));
 
@@ -40,20 +40,42 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
+jest.mock('../cacheInvalidationService', () => ({
+  getCachedWallet: jest.fn().mockResolvedValue(null),
+  setCachedWallet: jest.fn().mockResolvedValue(undefined),
+  invalidateWallet: jest.fn().mockResolvedValue(undefined),
+  invalidateAllPaymentCache: jest.fn().mockResolvedValue(undefined),
+}));
+
 const mockSupabase = supabase as jest.Mocked<typeof supabase>;
 const mockTransactionsService = transactionsService as jest.Mocked<
   typeof transactionsService
 >;
 
 describe('PaymentService - Timeout Edge Cases', () => {
-  const mockUser = { id: 'user-123', email: 'test@example.com' };
+  const mockUser = {
+    id: 'user-123',
+    email: 'test@example.com',
+    coins_balance: 500,
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
-    mockSupabase.auth.getUser.mockResolvedValue({
+    (mockSupabase.auth.getUser as jest.Mock).mockResolvedValue({
       data: { user: mockUser },
       error: null,
+    });
+    (mockSupabase.auth.getSession as jest.Mock).mockResolvedValue({
+      data: { session: { access_token: 'fake-token' } },
+      error: null,
+    });
+
+    // Mock global fetch to fail for getPayTRBalance fallback to database
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: jest.fn().mockResolvedValue({ error: 'PayTR API Error' }),
     });
   });
 
@@ -64,7 +86,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
   describe('Payment Intent Timeout', () => {
     it('should timeout payment intent creation after 30 seconds', async () => {
       // Mock slow payment intent creation
-      const slowPromise = new Promise((resolve) => {
+      const slowPromise = new Promise<{ data: any; error: any }>((resolve) => {
         setTimeout(() => {
           resolve({
             data: {
@@ -76,6 +98,8 @@ describe('PaymentService - Timeout Edge Cases', () => {
               status: 'completed',
               created_at: new Date().toISOString(),
               description: 'Gift sent',
+              moment_id: null,
+              metadata: {},
             },
             error: null,
           });
@@ -116,10 +140,12 @@ describe('PaymentService - Timeout Edge Cases', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        moment_id: null,
+        metadata: {},
       };
 
       // Mock fast response (2 seconds)
-      mockTransactionsService.create.mockResolvedValue({
+      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
@@ -142,7 +168,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
       // Fast-forward only 2 seconds
       jest.advanceTimersByTime(2000);
 
-      const result = await paymentPromise;
+      const result = (await paymentPromise) as any;
 
       expect(result).toHaveProperty('transaction');
       expect(result.transaction.amount).toBe(50);
@@ -159,19 +185,23 @@ describe('PaymentService - Timeout Edge Cases', () => {
         status: 'pending',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        moment_id: null,
+        metadata: {},
       };
 
       // Create transaction first
-      mockTransactionsService.create.mockResolvedValue({
+      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
 
-      // Mock update to mark as failed
-      mockTransactionsService.update.mockResolvedValue({
+      // Note: update not implemented yet in transactionsService
+      /*
+      (mockTransactionsService.update as any).mockResolvedValue({
         data: { ...mockTransaction, status: 'failed' },
         error: null,
       });
+      */
 
       // Simulate timeout
       const paymentPromise = Promise.race([
@@ -204,7 +234,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
 
   describe('Withdrawal Timeout', () => {
     it('should timeout withdrawal after 30 seconds', async () => {
-      const slowPromise = new Promise((resolve) => {
+      const slowPromise = new Promise<{ data: any; error: any }>((resolve) => {
         setTimeout(() => {
           resolve({
             data: {
@@ -216,6 +246,8 @@ describe('PaymentService - Timeout Edge Cases', () => {
               status: 'pending',
               created_at: new Date().toISOString(),
               description: 'Withdrawal to bank account',
+              moment_id: null,
+              metadata: {},
             },
             error: null,
           });
@@ -226,8 +258,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
 
       const withdrawalPromise = Promise.race([
         paymentService.withdrawFunds({
-          amount: 100,
-          currency: 'USD',
+          coinAmount: 100,
           bankAccountId: 'bank_123',
         }),
         new Promise((_, reject) =>
@@ -255,19 +286,29 @@ describe('PaymentService - Timeout Edge Cases', () => {
         status: 'pending',
         created_at: new Date().toISOString(),
         description: 'Withdrawal to bank account',
+        moment_id: null,
+        metadata: {},
       };
 
       // Mock wallet balance
-      mockSupabase.from.mockImplementation((tableName: string) => {
-        if (tableName === 'wallets') {
+      mockSupabase.from.mockImplementation(((tableName: string) => {
+        if (tableName === 'users') {
           return {
             select: jest.fn().mockReturnValue({
               eq: jest.fn().mockReturnValue({
                 single: jest.fn().mockResolvedValue({
-                  data: { balance: 500, currency: 'USD', status: 'active' },
+                  data: {
+                    balance: 500,
+                    currency: 'USD',
+                    status: 'active',
+                    coins_balance: 500,
+                  },
                   error: null,
                 }),
               }),
+            }),
+            update: jest.fn().mockReturnValue({
+              eq: jest.fn().mockResolvedValue({ data: null, error: null }),
             }),
           };
         }
@@ -313,18 +354,50 @@ describe('PaymentService - Timeout Edge Cases', () => {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
           single: jest.fn().mockResolvedValue({ data: null, error: null }),
-        };
-      });
+          update: jest.fn().mockReturnThis(),
+        } as any;
+      }) as any);
 
-      mockTransactionsService.create.mockResolvedValue({
+      (mockTransactionsService.create as jest.Mock).mockResolvedValue({
         data: mockTransaction,
         error: null,
       });
 
+      // Mock fetch to handle both balance check and withdrawal
+      global.fetch = jest.fn().mockImplementation((url: string) => {
+        if (url.includes('paytr-get-balance')) {
+          return Promise.resolve({
+            ok: true,
+            json: () =>
+              Promise.resolve({
+                success: true,
+                available_balance: 500,
+                pending_balance: 0,
+                currency: 'USD',
+              }),
+          });
+        }
+        if (url.includes('paytr-withdraw')) {
+          return Promise.resolve({
+            ok: true,
+            json: () =>
+              Promise.resolve({
+                success: true,
+                settlementId: 'set-123',
+                fiat_amount: 100,
+              }),
+          });
+        }
+        return Promise.resolve({
+          ok: false,
+          status: 404,
+          json: () => Promise.resolve({ error: 'Endpoint not mocked' }),
+        });
+      });
+
       const withdrawalPromise = Promise.race([
         paymentService.withdrawFunds({
-          amount: 100,
-          currency: 'USD',
+          coinAmount: 100,
           bankAccountId: 'bank_123',
         }),
         new Promise((_, reject) =>
@@ -337,17 +410,18 @@ describe('PaymentService - Timeout Edge Cases', () => {
 
       jest.advanceTimersByTime(2000);
 
-      const result = await withdrawalPromise;
+      const result = (await withdrawalPromise) as any;
 
-      expect(result).toHaveProperty('transaction');
-      expect(result.transaction.amount).toBe(-100);
-      expect(result.transaction.status).toBe('pending');
+      expect(result).toHaveProperty('settlementId');
+      expect(result.settlementId).toBe('set-123');
+      expect(result).toHaveProperty('fiatAmount');
+      expect(result.fiatAmount).toBe(100);
     });
   });
 
   describe('Balance Query Timeout', () => {
     it('should timeout balance query after 10 seconds', async () => {
-      const slowPromise = new Promise((resolve) => {
+      const slowPromise = new Promise<{ data: any; error: any }>((resolve) => {
         setTimeout(() => {
           resolve({
             data: { balance: 100, currency: 'USD' },
@@ -356,7 +430,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
         }, 15000);
       });
 
-      mockSupabase.from.mockReturnValue({
+      (mockSupabase.from as jest.Mock).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             single: jest.fn().mockReturnValue(slowPromise),
@@ -382,7 +456,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
     });
 
     it('should return default balance on timeout', async () => {
-      const slowPromise = new Promise((resolve) => {
+      const slowPromise = new Promise<{ data: any; error: any }>((resolve) => {
         setTimeout(() => {
           resolve({
             data: { balance: 100, currency: 'USD' },
@@ -391,7 +465,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
         }, 15000);
       });
 
-      mockSupabase.from.mockReturnValue({
+      (mockSupabase.from as jest.Mock).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             single: jest.fn().mockReturnValue(slowPromise),
@@ -457,6 +531,8 @@ describe('PaymentService - Timeout Edge Cases', () => {
             status: 'completed',
             created_at: new Date().toISOString(),
             description: 'Gift sent (retry)',
+            moment_id: null,
+            metadata: {},
           },
           error: null,
         });
@@ -485,12 +561,12 @@ describe('PaymentService - Timeout Edge Cases', () => {
       jest.clearAllTimers();
 
       // Second attempt (retry)
-      const secondAttempt = await paymentService.processPayment({
+      const secondAttempt = (await paymentService.processPayment({
         amount: 50,
         currency: 'USD',
         paymentMethodId: 'pm_123',
         description: 'Gift sent (retry)',
-      });
+      })) as any;
 
       expect(secondAttempt).toHaveProperty('transaction');
       expect(secondAttempt.transaction.id).toBe('tx-124');
@@ -512,6 +588,8 @@ describe('PaymentService - Timeout Edge Cases', () => {
               status: 'completed',
               created_at: new Date().toISOString(),
               description: 'Payment 1',
+              moment_id: null,
+              metadata: {},
             },
             error: null,
           });
@@ -530,13 +608,15 @@ describe('PaymentService - Timeout Edge Cases', () => {
               status: 'completed',
               created_at: new Date().toISOString(),
               description: 'Payment 2',
+              moment_id: null,
+              metadata: {},
             },
             error: null,
           });
         }, 35000);
       });
 
-      mockTransactionsService.create
+      (mockTransactionsService.create as jest.Mock)
         .mockReturnValueOnce(slowPromise1)
         .mockReturnValueOnce(slowPromise2);
 

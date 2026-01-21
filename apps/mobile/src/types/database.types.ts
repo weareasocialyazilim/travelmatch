@@ -1231,6 +1231,7 @@ export type Database = {
           metadata: Json | null;
           moment_id: string | null;
           status: string | null;
+          escrow_status: 'locked' | 'released' | 'refunded' | null;
           type: string;
           user_id: string;
         };
@@ -1243,6 +1244,7 @@ export type Database = {
           metadata?: Json | null;
           moment_id?: string | null;
           status?: string | null;
+          escrow_status?: 'locked' | 'released' | 'refunded' | null;
           type: string;
           user_id: string;
         };
@@ -1255,6 +1257,7 @@ export type Database = {
           metadata?: Json | null;
           moment_id?: string | null;
           status?: string | null;
+          escrow_status?: 'locked' | 'released' | 'refunded' | null;
           type?: string;
           user_id?: string;
         };
@@ -1418,6 +1421,11 @@ export type Database = {
           suspension_reason: string | null;
           updated_at: string | null;
           verified: boolean | null;
+          coins_balance: number | null;
+          pending_balance: number | null;
+          balance_last_synced: string | null;
+          trust_score: number | null;
+          currency_code: string | null;
         };
         Insert: {
           avatar_url?: string | null;
@@ -1462,6 +1470,11 @@ export type Database = {
           suspension_reason?: string | null;
           updated_at?: string | null;
           verified?: boolean | null;
+          coins_balance?: number | null;
+          pending_balance?: number | null;
+          balance_last_synced?: string | null;
+          trust_score?: number | null;
+          currency_code?: string | null;
         };
         Update: {
           avatar_url?: string | null;
@@ -1506,6 +1519,11 @@ export type Database = {
           suspension_reason?: string | null;
           updated_at?: string | null;
           verified?: boolean | null;
+          coins_balance?: number | null;
+          pending_balance?: number | null;
+          balance_last_synced?: string | null;
+          trust_score?: number | null;
+          currency_code?: string | null;
         };
         Relationships: [];
       };

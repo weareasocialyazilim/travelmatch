@@ -24,7 +24,7 @@ export const MaintenanceScreen = () => {
         <Text style={styles.title}>Bakımdayız</Text>
         <Text style={styles.desc}>
           Lovendo deneyimini daha iyi hale getirmek için kısa bir mola verdik.
-          Çok yakında geri döneceğiz!
+          Geri döneceğiz!
         </Text>
 
         <View style={styles.statusBox}>

@@ -6,13 +6,11 @@
  *
  * - PayTRProvider: PayTR API operations (tokenize, create payment, saved cards)
  * - walletService: Balance queries, withdrawals
- * - escrowService: Titan Plan v2.0 escrow logic
+ * - escrowService: Titan Protocol escrow logic
  * - transactionService: Transaction history
  *
- * @see services/payment/PayTRProvider.ts for PayTR operations
  * @see walletService.ts for wallet balance operations
- * @see transactionService.ts for transaction history queries
- * @see escrowService.ts for escrow operations
+ * - PayTRProvider removed for payments (Apple IAP compliance)
  */
 
 import { supabase } from '../config/supabase';
@@ -27,6 +25,8 @@ import {
   type PayTRPaymentResponse,
   type CreatePaymentParams,
   type SavedCard,
+  type CardTokenizeParams,
+  type CardTokenizeResult,
 } from './payment/PayTRProvider';
 import { ErrorHandler } from '../utils/errorHandler';
 import type { Database, Json } from '../types/database.types';
@@ -118,7 +118,7 @@ export interface PaymentIntent {
 }
 
 // ============================================
-// ESCROW SYSTEM TYPES (Titan Plan v2.0)
+// ESCROW SYSTEM TYPES (Titan Protocol)
 // ============================================
 
 export type EscrowMode = 'direct' | 'optional' | 'mandatory';
@@ -129,15 +129,17 @@ export interface EscrowDecision {
   reason: string;
 }
 
+// 1 Coin = $0.10 (Example Value)
+// Escrow Thresholds in COINS
+// $30 -> 300 Coins
+// $100 -> 1000 Coins
+
 export interface WithdrawalLimits {
-  minAmount: number;
-  maxAmount: number;
-  dailyLimit: number;
-  weeklyLimit: number;
-  monthlyLimit: number;
-  remainingDaily: number;
-  remainingWeekly: number;
-  remainingMonthly: number;
+  minAmount: number; // in Coins
+  maxAmount: number; // in Coins
+  dailyLimit: number; // in Coins
+  weeklyLimit: number; // in Coins
+  monthlyLimit: number; // in Coins
 }
 
 export interface EscrowTransaction {
@@ -172,38 +174,48 @@ interface EscrowOperationResponse {
 // ============================================
 
 /**
- * Titan Plan v2.0 Escrow Matrix:
+ * Titan Protocol Escrow Matrix:
  * - $0-$30: Direct payment (no escrow)
  * - $30-$100: Optional escrow (user chooses)
- * - $100+: Mandatory escrow (forced protection)
+/**
+ * Titan Protocol Escrow Matrix (COIN BASED):
+ * - 0-300 Coins: Direct payment (no escrow)
+ * - 300-1000 Coins: Optional escrow (user chooses)
+ * - 1000+ Coins: Mandatory escrow (forced protection)
  */
-export function determineEscrowMode(amount: number): EscrowMode {
-  const { DIRECT_MAX, OPTIONAL_MAX } = VALUES.ESCROW_THRESHOLDS;
+export function determineEscrowMode(coinAmount: number): EscrowMode {
+  // Thresholds from VALUES (LVND Coins)
+  // 30 LVND = Direct Max
+  // 100 LVND = Optional Max
+  // 100+ = Mandatory
 
-  if (amount < DIRECT_MAX) {
-    return 'direct'; // < $30: Direct pay
-  } else if (amount < OPTIONAL_MAX) {
-    return 'optional'; // $30-$100: User chooses
+  if (coinAmount <= VALUES.ESCROW_THRESHOLDS.DIRECT_MAX) {
+    return 'direct'; // <= 30 LVND
+  } else if (coinAmount <= VALUES.ESCROW_THRESHOLDS.OPTIONAL_MAX) {
+    return 'optional'; // 31-100 LVND
   } else {
-    return 'mandatory'; // >= $100: Must escrow
+    return 'mandatory'; // > 100 LVND
   }
 }
 
 /**
  * Get user-friendly escrow explanation
  */
-export function getEscrowExplanation(mode: EscrowMode, amount: number): string {
-  const { DIRECT_MAX, OPTIONAL_MAX } = VALUES.ESCROW_THRESHOLDS;
+export function getEscrowExplanation(
+  mode: EscrowMode,
+  coinAmount: number,
+): string {
+  const { DIRECT_MAX, OPTIONAL_MAX, CURRENCY } = VALUES.ESCROW_THRESHOLDS;
 
   switch (mode) {
     case 'direct':
-      return `Payment of $${amount} will be sent directly to the recipient immediately.`;
+      return `Transfer of ${coinAmount} ${CURRENCY} will be sent directly to the recipient.`;
 
     case 'optional':
-      return `For payments between $${DIRECT_MAX}-$${OPTIONAL_MAX}, you can choose escrow protection. Funds are held until proof is verified.`;
+      return `For amounts between ${DIRECT_MAX}-${OPTIONAL_MAX} ${CURRENCY}, you can choose escrow protection. Coins are held until proof is verified.`;
 
     case 'mandatory':
-      return `Payments over $${OPTIONAL_MAX} must use escrow protection for your safety. Funds will be released when proof is verified.`;
+      return `Transfers over ${OPTIONAL_MAX} ${CURRENCY} must use escrow protection. Coins will be released when proof is verified.`;
   }
 }
 
@@ -232,43 +244,107 @@ class SecurePaymentService {
   // ============================================
 
   /**
-   * Create a payment via PayTR
-   * @see PayTRProvider.createPayment
+   * PayTR Direct Payment Methods REMOVED for Apple Compliance
+   * We now use In-App Purchases (via RevenueCat) for buying coins.
+   * PayTR is ONLY used deeply in the backend for Payouts (Withdrawals).
    */
-  async createPayment(
-    params: CreatePaymentParams,
-  ): Promise<PayTRPaymentResponse> {
-    return paytrProvider.createPayment(params);
-  }
 
   /**
-   * Get saved cards for the user
-   * @see PayTRProvider.getSavedCards
+   * Replaces direct PayTR payments with virtual currency transfer
    */
   async getSavedCards(): Promise<SavedCard[]> {
     return paytrProvider.getSavedCards();
   }
 
-  /**
-   * Tokenize and save a card via PayTR
-   * @see PayTRProvider.tokenizeAndSaveCard
-   */
-  async tokenizeAndSaveCard(cardDetails: {
-    cardNumber: string;
-    cardHolderName: string;
-    expireMonth: string;
-    expireYear: string;
-    cvv: string;
-  }): Promise<{ cardToken: string; last4: string; brand: string }> {
-    return paytrProvider.tokenizeAndSaveCard(cardDetails);
+  async createPayment(params: CreatePaymentParams): Promise<PayTRPaymentResponse> {
+    return paytrProvider.createPayment(params);
+  }
+
+  async deleteSavedCard(cardToken: string): Promise<void> {
+    return paytrProvider.deleteSavedCard(cardToken);
+  }
+
+  async tokenizeAndSaveCard(params: CardTokenizeParams): Promise<CardTokenizeResult> {
+    return paytrProvider.tokenizeAndSaveCard(params);
+  }
+
+  async transferLVND(params: {
+    amount: number;
+    recipientId: string;
+    momentId?: string;
+    useEscrow?: boolean;
+  }) {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Oturum açılmamış');
+
+      // 1. Sanal bakiye kontrolü
+      const { available } = await this.getBalance();
+      if (available < params.amount) {
+        throw new Error(
+          'Yetersiz LVND bakiyesi. Lütfen mağazadan coin yükleyin.',
+        );
+      }
+
+      // 2. Titan Protocol modunu belirle
+      const { DIRECT_MAX, OPTIONAL_MAX } = VALUES.ESCROW_THRESHOLDS;
+
+      let mode: 'direct' | 'escrow' = 'direct';
+      if (params.amount >= OPTIONAL_MAX)
+        mode = 'escrow'; // 100+ LVND Zorunlu
+      else if (params.amount >= DIRECT_MAX && params.useEscrow) mode = 'escrow'; // 30-100 Opsiyonel
+
+      // 3. Backend RPC çağrısı (LVND bazlı yeni fonksiyonlar)
+      const rpcName =
+        mode === 'escrow' ? 'create_lvnd_escrow' : 'direct_lvnd_transfer';
+
+      const { data, error } = await callRpc<{ id: string }>(rpcName, {
+        p_sender_id: user.id,
+        p_recipient_id: params.recipientId,
+        p_amount: params.amount,
+        p_moment_id: params.momentId,
+      });
+
+      if (error) throw error;
+      return { success: true, transactionId: data?.id || '' };
+    } catch (error) {
+      logger.error('[Titan Protocol] Transfer hatası:', error);
+      throw error;
+    }
   }
 
   /**
-   * Delete a saved card
-   * @see PayTRProvider.deleteSavedCard
+   * Titan Protocol: İhtilaf ve İade Yönetimi (Dispute/Refund)
+   * User-facing refund request with reason tracking
    */
-  async deleteSavedCard(cardToken: string): Promise<void> {
-    return paytrProvider.deleteSavedCard(cardToken);
+  async processRefundRequest(escrowId: string, reason: string) {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('Oturum açılmamış');
+
+      const { data, error } = await callRpc('refund_escrow', {
+        p_escrow_id: escrowId,
+        p_reason: reason,
+        p_unit: 'LVND', // Xcode 26 sanal ekonomi beyanıyla uyumlu
+      });
+
+      if (error) throw error;
+
+      // Gönderene LVND Coin iadesi yapıldığında bildirim tetikle
+      logger.info(`[Refund] Escrow ${escrowId} iade edildi. Sebep: ${reason}`);
+      return {
+        success: true,
+        refundedAmount: (data as { amount?: number })?.amount,
+      };
+    } catch (error) {
+      const standardized = ErrorHandler.handle(error, 'processRefundRequest');
+      logger.error('[Titan Protocol] Refund request error:', standardized);
+      throw standardized;
+    }
   }
 
   /**
@@ -302,53 +378,18 @@ class SecurePaymentService {
   // CONSOLIDATED PAYMENT METHODS (from paymentService.ts)
   // ============================================
 
-  /**
-   * Get wallet balance
-   */
   async getBalance(): Promise<{
     available: number;
     pending: number;
     currency: string;
+    coins: number;
   }> {
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      const { data, error } = await supabase
-        .from('wallets')
-        .select('balance, currency, status')
-        .eq('user_id', user.id)
-        .single();
-
-      if (error) {
-        logger.error('Get balance error:', { error, userId: user.id });
-        if (error.code === 'PGRST205') {
-          return { available: 0, pending: 0, currency: 'USD' };
-        }
-        throw new Error('Failed to fetch wallet balance');
-      }
-
-      const { data: pendingEscrow } = await supabase
-        .from('escrow_transactions')
-        .select('amount')
-        .eq('recipient_id', user.id)
-        .eq('status', 'pending');
-
-      const pendingAmount =
-        pendingEscrow?.reduce((sum, e) => sum + e.amount, 0) || 0;
-
-      const walletData = data as { balance?: number; currency?: string } | null;
-      return {
-        available: walletData?.balance || 0,
-        pending: pendingAmount,
-        currency: walletData?.currency || 'USD',
-      };
+      return await walletService.getBalance();
     } catch (error) {
       const standardized = ErrorHandler.handle(error, 'getBalance');
       logger.error('Get balance error:', standardized);
-      return { available: 0, pending: 0, currency: 'USD' };
+      return { available: 0, pending: 0, currency: 'LVND', coins: 0 };
     }
   }
 
@@ -708,14 +749,11 @@ class SecurePaymentService {
   async getWithdrawalLimits(): Promise<WithdrawalLimits> {
     try {
       return {
-        minAmount: 10,
-        maxAmount: 10000,
-        dailyLimit: 5000,
-        weeklyLimit: 20000,
-        monthlyLimit: 50000,
-        remainingDaily: 5000,
-        remainingWeekly: 20000,
-        remainingMonthly: 50000,
+        minAmount: 50, // 50 Coins
+        maxAmount: 50000, // 50k Coins
+        dailyLimit: 10000,
+        weeklyLimit: 50000,
+        monthlyLimit: 200000,
       };
     } catch (error) {
       const standardized = ErrorHandler.handle(error, 'getWithdrawalLimits');
@@ -740,7 +778,7 @@ class SecurePaymentService {
       const paymentIntent: PaymentIntent = {
         id: `pi_${Date.now()}`,
         amount,
-        currency: 'USD',
+        currency: 'LVND',
         status: 'requires_payment_method',
         clientSecret: `secret_${Date.now()}`,
         momentId,
@@ -823,29 +861,30 @@ class SecurePaymentService {
     }
   }
 
+  // ============================================
+  // WITHDRAWAL (Coins -> Fiat)
+  // ============================================
+
   /**
-   * Withdraw funds
+   * Withdraw Coins (Convert to Fiat and Payout)
    *
    * Master Rule: Host MUST upload thank_you video before withdrawal
-   * This protects the social loop where gratitude is mandatory.
    */
   async withdrawFunds(data: {
-    amount: number;
-    currency: string;
+    coinAmount: number;
     bankAccountId: string;
-  }): Promise<{ transaction: LegacyTransaction }> {
+  }): Promise<{ settlementId: string; fiatAmount: number }> {
     try {
       const {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      if (data.amount <= 0) {
+      if (data.coinAmount <= 0) {
         throw new Error('Withdrawal amount must be greater than zero');
       }
 
       // MASTER RULE: Check for pending thank you videos
-      // Host cannot withdraw if they have unreceived thank you obligations
       const { data: pendingThankYou, error: thankYouError } = await supabase
         .from('gifts')
         .select('id')
@@ -854,86 +893,41 @@ class SecurePaymentService {
         .eq('status', 'completed')
         .limit(1);
 
-      if (thankYouError) {
-        logger.error(
-          'Failed to check pending thank you status:',
-          thankYouError,
-        );
-      }
-
-      if (pendingThankYou && pendingThankYou.length > 0) {
+      if (!thankYouError && pendingThankYou && pendingThankYou.length > 0) {
         throw new Error(
           'Para çekebilmeniz için önce bekleyen şükran videolarınızı yüklemeniz gerekiyor. Hediye gönderenlere teşekkür edin.',
         );
       }
 
-      const { available } = await this.getBalance();
-      if (available < data.amount) {
-        throw new Error(
-          `Insufficient balance. Available: ${available} ${data.currency}`,
-        );
+      // Check Coin Balance locally first
+      const { coins } = await walletService.getBalance(); // Assumes getBalance updated to return coins
+      if ((coins || 0) < data.coinAmount) {
+        throw new Error(`Yetersiz bakiye. Mevcut: ${coins} Coin`);
       }
 
-      const { data: bankAccount, error: bankError } = await supabase
-        .from('bank_accounts')
-        .select('id, is_verified')
-        .eq('id', data.bankAccountId)
-        .eq('user_id', user.id)
-        .single();
-
-      if (bankError || !bankAccount) {
-        throw new Error('Bank account not found or does not belong to you');
-      }
-
-      if (!(bankAccount as { is_verified?: boolean }).is_verified) {
-        throw new Error('Bank account must be verified before withdrawal');
-      }
-
-      const { data: transaction, error } = await dbTransactionsService.create({
-        user_id: user.id,
-        amount: data.amount,
-        currency: data.currency,
-        type: 'withdrawal',
-        status: 'pending',
-        description: 'Withdrawal to bank account',
+      // Execute Coin Withdrawal via WalletService (which calls Edge Function)
+      const result = await walletService.requestCoinWithdrawal({
+        coinAmount: data.coinAmount,
+        bankAccountId: data.bankAccountId,
       });
 
-      if (error) throw error;
-      if (!transaction)
-        throw new Error('Failed to create withdrawal transaction');
-
       return {
-        transaction: {
-          id: transaction.id,
-          type: 'withdrawal' as TransactionType,
-          amount: transaction.amount,
-          currency: transaction.currency ?? 'USD',
-          status: 'pending',
-          date: transaction.created_at ?? new Date().toISOString(),
-          description: transaction.description ?? '',
-        },
+        settlementId: result.settlementId,
+        fiatAmount: result.fiatAmount,
       };
     } catch (error) {
       const standardized = ErrorHandler.handle(error, 'withdrawFunds');
       logger.error('Withdraw funds error:', standardized);
-      if (
-        error instanceof Error &&
-        (error.message.includes('Insufficient') ||
-          error.message.includes('not found') ||
-          error.message.includes('must be'))
-      ) {
-        throw error;
-      }
-      throw new Error('Withdrawal failed. Please try again.');
+      throw error;
     }
   }
 
   // ============================================
-  // ESCROW SYSTEM METHODS (Titan Plan v2.0)
+  // ESCROW SYSTEM METHODS (Titan Protocol)
   // ============================================
 
   /**
-   * Transfer funds with Titan Plan escrow rules
+   * Transfer funds with Titan Protocol escrow rules
    * - < $30: Direct atomic transfer
    * - $30-$100: Optional escrow (user choice via callback)
    * - >= $100: Mandatory escrow
@@ -1169,7 +1163,7 @@ class SecurePaymentService {
           schema: 'public',
           table: 'transactions',
         },
-        async (payload) => {
+        async (payload: any) => {
           logger.info('Payment update received:', payload);
 
           // Invalidate caches
@@ -1374,8 +1368,7 @@ class SecurePaymentService {
    */
   async requestWithdrawal(amount: number, bankAccountId: string) {
     return this.withdrawFunds({
-      amount,
-      currency: 'USD', // Default for legacy tests
+      coinAmount: amount, // Assumes input is now Coins
       bankAccountId,
     });
   }

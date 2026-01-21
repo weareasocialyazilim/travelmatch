@@ -82,7 +82,7 @@ export const GridMomentCard: React.FC<GridCardProps> = memo(
                   {item.distance || '?'} km
                 </Text>
               </View>
-              <Text style={styles.gridPrice}>${item.price}</Text>
+              <Text style={styles.gridPrice}>{item.price} LVND</Text>
             </View>
           </View>
         </TouchableOpacity>

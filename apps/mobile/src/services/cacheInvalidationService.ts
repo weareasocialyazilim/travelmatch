@@ -324,6 +324,7 @@ export async function getCachedWallet(userId: string) {
 // Cache data types
 interface WalletData {
   balance: number;
+  coins: number;
   currency: string;
   pendingBalance?: number;
 }
