@@ -115,7 +115,7 @@ const FAQ_DATA: FAQItem[] = [
     category: 'Subscription',
     question: 'What are the membership tiers?',
     answer:
-      'We have Free, Starter ($4.99/mo), Pro ($9.99/mo), and VIP ($19.99/mo) tiers. Each tier offers different benefits like lower fees, priority support, and exclusive features.',
+      'We have Free, PRO (249.99 TL / $9.99/mo), and ELITE (749.99 TL / $29.99/mo) tiers. Each tier offers different benefits like lower fees, priority support, and exclusive features.',
   },
   {
     id: '14',
@@ -129,7 +129,7 @@ const FAQ_DATA: FAQItem[] = [
     category: 'Payments & Refunds',
     question: 'What payment methods do you accept?',
     answer:
-      'We accept credit/debit cards, Apple Pay, Google Pay, and PayPal. More payment options are coming soon.',
+      'We accept credit/debit cards, Apple Pay, Google Pay, and PayPal.',
   },
   {
     id: '16',

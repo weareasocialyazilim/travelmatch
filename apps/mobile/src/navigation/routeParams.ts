@@ -276,6 +276,7 @@ export type RootStackParamList = {
 
   // Wallet & Settings
   Wallet: undefined;
+  CoinStore: undefined;
   TransactionHistory: undefined;
   Settings: undefined;
   NotificationDetail: { notificationId: string };

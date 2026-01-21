@@ -59,18 +59,18 @@
     "home": "Ana Sayfa",
     "explore": "Keşfet",
     "discover": "Anlar",
-    "requests": "Hediyeler",
+    "requests": "Jestler",
     "moments": "Anlar",
     "messages": "Mesajlar",
     "profile": "Profil",
     "settings": "Ayarlar",
     "notifications": "Bildirimler",
     "favorites": "Favoriler",
-    "bookings": "Hediyelerim",
+    "bookings": "Taleplerim",
     "wallet": "Cüzdan",
     "createMoment": "Yeni an oluştur",
     "discoverTab": "Anlar sekmesi",
-    "requestsTab": "Hediyeler sekmesi",
+    "requestsTab": "Jestler sekmesi",
     "messagesTab": "Mesajlar sekmesi",
     "profileTab": "Profil sekmesi"
   },
@@ -103,9 +103,9 @@
     "noMomentsFound": "An bulunamadı",
     "loadMore": "Daha Fazla Yükle",
     "card": {
-      "giftFor": "Hediye için",
+      "giftFor": "Destek için",
       "view": "Görüntüle",
-      "sendGift": "Hediye Gönder",
+      "sendGift": "Jest Gönder",
       "featured": "Öne Çıkan",
       "popular": "Popüler",
       "new": "Yeni",
@@ -113,21 +113,21 @@
     }
   },
   "booking": {
-    "bookNow": "Hemen Rezervasyon Yap",
-    "bookingRequest": "Rezervasyon Talebi",
-    "bookingConfirmed": "Rezervasyon Onaylandı",
-    "bookingCancelled": "Rezervasyon İptal Edildi",
-    "bookingPending": "Rezervasyon Beklemede",
+    "bookNow": "Hemen Katıl",
+    "bookingRequest": "Deneyim Talebi",
+    "bookingConfirmed": "Talep Onaylandı",
+    "bookingCancelled": "Talep İptal Edildi",
+    "bookingPending": "Talep Beklemede",
     "guests": "Misafirler",
     "totalPrice": "Toplam Fiyat",
-    "bookingDate": "Rezervasyon Tarihi",
-    "confirmBooking": "Rezervasyonu Onayla",
-    "cancelBooking": "Rezervasyonu İptal Et",
-    "bookingSuccess": "Rezervasyon başarılı!",
-    "bookingError": "Rezervasyon başarısız. Lütfen tekrar deneyin.",
-    "noBookingsFound": "Rezervasyon bulunamadı",
-    "upcomingBookings": "Yaklaşan Rezervasyonlar",
-    "pastBookings": "Geçmiş Rezervasyonlar"
+    "bookingDate": "Talep Tarihi",
+    "confirmBooking": "Talebi Onayla",
+    "cancelBooking": "Talebi İptal Et",
+    "bookingSuccess": "Talep gönderildi!",
+    "bookingError": "Talep başarısız. Lütfen tekrar deneyin.",
+    "noBookingsFound": "Talep bulunamadı",
+    "upcomingBookings": "Yaklaşan Deneyimler",
+    "pastBookings": "Geçmiş Deneyimler"
   },
   "chat": {
     "messages": "Mesajlar",
@@ -141,9 +141,12 @@
     "startConversation": "Sohbeti başlat"
   },
   "profile": {
+    "title": "Profil",
     "myProfile": "Profilim",
     "editProfile": "Profili Düzenle",
     "profileUpdated": "Profil başarıyla güncellendi!",
+    "shareMessage": "Lovendo profilime göz at!",
+    "shareProfile": "Profili paylaş",
     "bio": "Hakkımda",
     "location": "Konum",
     "website": "Web Sitesi",
@@ -154,43 +157,31 @@
     "verificationStatus": "Doğrulama Durumu",
     "verified": "Doğrulandı",
     "notVerified": "Doğrulanmadı",
+    "trustStatus": "Güven Durumu",
+    "trustScore": {
+      "points": "{{score}} puan • Doğrulamalar",
+      "earnTrust": "Doğrulama yaparak güven kazan"
+    },
     "memberSince": "{{date}} tarihinden beri üye",
     "reviews": "Yorumlar",
     "rating": "Değerlendirme",
     "moments": {
       "noActive": "Henüz aktif moment yok",
-      "noPast": "Geçmiş moment yok"
+      "noPast": "Geçmiş moment yok",
+      "createFirstDescription": "İlk momentini oluşturarak deneyim paylaşmaya başla",
+      "completedDescription": "Tamamlanan deneyimler burada görünecek"
     },
     "saved": {
       "empty": {
         "title": "Henüz Kayıtlı Vibe Yok",
         "subtitle": "Daha sonra için kaydetmek istediğiniz momentlerdeki kalp simgesine dokunun."
       }
-    }
+    },
+    "savedMoments": "Kaydedilen Anlar",
+    "offlineTitle": "İnternet bağlantısı yok",
+    "offlineMessage": "Profili görüntülemek için internet bağlantısı gerekli."
   },
-  "settings": {
-    "settings": "Ayarlar",
-    "account": "Hesap",
-    "privacy": "Gizlilik",
-    "notifications": "Bildirimler",
-    "language": "Dil",
-    "selectLanguage": "Dil Seçin",
-    "languageNote": "Dil değiştirildikten sonra uygulama hemen güncellenecektir.",
-    "theme": "Tema",
-    "lightMode": "Açık Mod",
-    "darkMode": "Koyu Mod",
-    "systemDefault": "Sistem Varsayılanı",
-    "help": "Yardım ve Destek",
-    "termsOfService": "Kullanım Şartları",
-    "privacyPolicy": "Gizlilik Politikası",
-    "about": "Hakkında",
-    "version": "Sürüm",
-    "deleteAccount": "Hesabı Sil",
-    "confirmDeleteAccount": "Hesabınızı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
-    "blockedUsers": "Engellenen Kullanıcılar",
-    "clearCache": "Önbelleği Temizle",
-    "cacheCleared": "Önbellek başarıyla temizlendi!"
-  },
+
   "payment": {
     "payment": "Ödeme",
     "addCard": "Kart Ekle",
@@ -216,15 +207,15 @@
       "pending": "Beklemede",
       "failed": "Başarısız"
     },
-    "giftFrom": "{{name}}'den Hediye",
-    "giftFor": "{{name}}'e Hediye",
+    "giftFrom": "{{name}}'den Jest",
+    "giftFor": "{{name}}'e Moment Desteği",
     "withdrawalTo": "Banka Hesabına Transfer"
   },
   "withdrawal": {
     "title": "Para Çek",
     "availableBalance": "Çekilebilir Bakiye",
     "amount": "Tutar",
-    "minMax": "Min: ${{min}} • Maks: ${{max}}",
+    "minMax": "Min: {{min}} LVND • Maks: {{max}} LVND",
     "selectDestination": "Hedef Seçin",
     "bankAccount": "Banka Hesabı",
     "cryptoWallet": "Kripto Cüzdan",
@@ -234,13 +225,13 @@
     "invalidAmount": "Geçersiz Tutar",
     "invalidAmountMessage": "Lütfen geçerli bir sayı girin.",
     "amountTooLow": "Tutar Çok Düşük",
-    "amountTooLowMessage": "Minimum çekim tutarı ${{min}}.",
+    "amountTooLowMessage": "Minimum çekim tutarı {{min}} LVND.",
     "limitExceeded": "Limit Aşıldı",
-    "limitExceededMessage": "Günlük maksimum çekim limiti ${{max}}.",
+    "limitExceededMessage": "Günlük maksimum çekim limiti {{max}} LVND.",
     "insufficientBalance": "Yetersiz Bakiye",
     "insufficientBalanceMessage": "Bu çekim işlemi için yeterli bakiyeniz bulunmuyor.",
     "confirmWithdrawal": "Çekimi Onayla",
-    "confirmMessage": "Seçilen yönteme ${{amount}} çekmek istiyor musunuz?",
+    "confirmMessage": "Seçilen yönteme {{amount}} LVND çekmek istiyor musunuz?",
     "confirm": "Onayla",
     "withdrawalStarted": "Çekim Başlatıldı",
     "withdrawalMessage": "Paranız yola çıktı. Genellikle 1-3 iş günü sürer.",
@@ -248,16 +239,7 @@
     "errorOccurred": "Bir hata oluştu. Lütfen tekrar deneyin.",
     "offlineMessage": "Para çekme işlemi için internet bağlantısı gerekli."
   },
-  "notifications": {
-    "notifications": "Bildirimler",
-    "markAllAsRead": "Tümünü Okundu İşaretle",
-    "noNotifications": "Bildirim yok",
-    "newBooking": "Yeni rezervasyon talebi",
-    "bookingConfirmed": "Rezervasyon onaylandı",
-    "newMessage": "{{name}} adlı kişiden yeni mesaj",
-    "momentLiked": "{{name}} anınızı beğendi",
-    "newReview": "{{name}} adlı kişiden yeni yorum"
-  },
+
   "errors": {
     "titles": {
       "error": "Hata",
@@ -300,7 +282,7 @@
     "RATE_LIMIT_EXCEEDED": "Çok fazla istek. Lütfen bir dakika bekleyip tekrar deneyin.",
     "SERVER_ERROR": "Bizim tarafımızda bir şeyler ters gitti. Lütfen daha sonra tekrar deneyin.",
     "SERVICE_UNAVAILABLE": "Servis geçici olarak kullanılamıyor. Lütfen birkaç dakika sonra tekrar deneyin.",
-    "MAINTENANCE_MODE": "Şu anda bakım yapıyoruz. Yakında geri döneceğiz!",
+    "MAINTENANCE_MODE": "Şu anda bakım yapıyoruz. Lütfen daha sonra tekrar deneyin.",
     "UNKNOWN_ERROR": "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.",
     "networkError": "Ağ hatası. Lütfen bağlantınızı kontrol edin.",
     "serverError": "Sunucu hatası. Lütfen daha sonra tekrar deneyin.",
@@ -373,6 +355,7 @@
     "welcome": "Lovendo'ya Hoş Geldiniz",
     "welcomeMessage": "İçerik üreticilerini keşfedin ve hediyeleşerek bağ kurun",
     "step1Title": "Anları Keşfedin",
+<<<<<<< Updated upstream
     "step1Description": "İçerik üreticileri tarafından paylaşılan özel anları keşfedin",
     "step2Title": "Destekleyin ve Bağlantı Kurun",
     "step2Description": "Anlara destek olun ve üreticilerle sohbet edin",
@@ -382,6 +365,17 @@
   "welcome": {
     "title": "Lovendo'ya Hoş Geldiniz",
     "subtitle": "Anları paylaşın, destek kazanın.\nHer etkileşimi anlamlı ve değerli kılın.",
+=======
+    "step1Description": "Yerli halk tarafından oluşturulan benzersiz seyahat deneyimlerini keşfedin",
+    "step2Title": "Talep Gönderin ve Bağlantı Kurun",
+    "step2Description": "Anları rezerve edin ve ev sahipleriyle sohbet edin",
+    "step3Title": "Hikayenizi Paylaşın",
+    "step3Description": "Kendi anlarınızı oluşturun ve para kazanın"
+  },
+  "welcome": {
+    "title": "Lovendo'ya Hoş Geldiniz",
+    "subtitle": "Yerel halkla tanışın. Deneyimlerinizi paylaşın.\nHer bağlantıyı anlamlı kılın.",
+>>>>>>> Stashed changes
     "continueWithApple": "Apple ile devam et",
     "continueWithGoogle": "Google ile devam et",
     "continueWithFacebook": "Facebook ile devam et",
@@ -468,13 +462,24 @@
     "legal": "Yasal",
     "logout": "Çıkış Yap",
     "deleteAccount": "Hesabı Sil",
-    "deleteAccountWarning": "Bu işlem geri alınamaz. Tüm verileriniz kalıcı olarak silinecektir."
+    "deleteAccountWarning": "Bu işlem geri alınamaz. Tüm verileriniz kalıcı olarak silinecektir.",
+    "confirmDeleteAccount": "Hesabınızı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
+    "selectLanguage": "Dil Seçin",
+    "languageNote": "Dil değiştirildikten sonra uygulama hemen güncellenecektir.",
+    "lightMode": "Açık Mod",
+    "darkMode": "Koyu Mod",
+    "systemDefault": "Sistem Varsayılanı",
+    "help": "Yardım ve Destek",
+    "termsOfService": "Kullanım Şartları",
+    "privacyPolicy": "Gizlilik Politikası",
+    "clearCache": "Önbelleği Temizle",
+    "cacheCleared": "Önbellek başarıyla temizlendi!"
   },
   "store": {
     "appName": "Lovendo",
     "subtitle": "Anları Paylaş, Bağlantı Kur",
     "shortDescription": "Yakınındaki insanlarla tanış. Anları paylaş. Deneyimleri hediye et. Farklı bağlan.",
-    "keywords": "buluşma,deneyim,hediye,tanışma,anlar,keşfet,bağlantı,kahve,yemek,çıkma"
+    "keywords": "sosyal,deneyim,jest,tanışma,anlar,keşfet,bağlantı,kahve,yemek,topluluk"
   },
   "discover": {
     "title": "Keşfet",
@@ -488,7 +493,7 @@
       "nightlife": "Gece Hayatı",
       "shopping": "Alışveriş",
       "music": "Müzik",
-      "gifts": "Hediyeler"
+      "gifts": "Jestler"
     },
     "sort": {
       "nearest": "En Yakın",
@@ -516,8 +521,8 @@
   "notifications": {
     "settings": {
       "title": "Bildirim Ayarları",
-      "giftsAndProofs": "Hediyeler ve Kanıtlar",
-      "whenSomeoneGifts": "Biri anımı hediye ettiğinde",
+      "giftsAndProofs": "Jestler ve Kanıtlar",
+      "whenSomeoneGifts": "Biri anıma destek olduğunda",
       "proofUpdates": "Kanıt doğrulama güncellemeleri",
       "messages": "Mesajlar",
       "newChatMessages": "Yeni sohbet mesajları",
@@ -527,7 +532,15 @@
       "recommendations": "Kişiselleştirilmiş öneriler",
       "appUpdates": "Uygulama Güncellemeleri",
       "newFeatures": "Yeni özellikler ve güncellemeler"
-    }
+    },
+    "notifications": "Bildirimler",
+    "markAllAsRead": "Tümünü Okundu İşaretle",
+    "noNotifications": "Bildirim yok",
+    "newBooking": "Yeni eşleşme talebi",
+    "bookingConfirmed": "Talep onaylandı",
+    "newMessage": "{{name}} adlı kişiden yeni mesaj",
+    "momentLiked": "{{name}} anınızı beğendi",
+    "newReview": "{{name}} adlı kişiden yeni yorum"
   },
   "report": {
     "title": "Kullanıcıyı Şikayet Et",
@@ -563,7 +576,7 @@
     },
     "stats": {
       "moments": "Anlar",
-      "gifts": "Hediyeler",
+      "gifts": "Jestler",
       "response": "Yanıt"
     },
     "garden": {
@@ -645,7 +658,7 @@
     "empty": {
       "activeTitle": "Henüz mesaj yok",
       "activeDescription": "Yeni insanlarla tanışmak için bir moment paylaş!",
-      "requestsTitle": "Hediye talebi yok",
+      "requestsTitle": "Jest talebi yok",
       "requestsDescription": "Birisi momentine katılmak istediğinde burada göreceksin."
     },
     "explore": "Keşfet",
@@ -681,7 +694,7 @@
       "fakeProfile": "Sahte Profil",
       "inappropriateContent": "Uygunsuz İçerik",
       "fraudSuspicion": "Dolandırıcılık Şüphesi",
-      "giftIssue": "Hediye Sorunu",
+      "giftIssue": "Jest Sorunu",
       "generalFeedback": "Genel Geri Bildirim",
       "bugReport": "Hata Bildirimi",
       "featureRequest": "Özellik İsteği"
@@ -855,7 +868,7 @@
     },
     "pendingBalance": {
       "title": "Bekleyen Bakiye",
-      "processing": "Bekleyen bakiyeniz PayTR tarafından işleniyor. 1-3 iş günü içinde çekilebilir hale gelecektir.",
+      "processing": "Bekleyen bakiyeniz LVND sistemimiz tarafından doğrulanıyor. 1-3 iş günü içinde çekilebilir hale gelecektir.",
       "pendingPaymentsTitle": "📦 Bekleyen Ödemeler",
       "pendingPaymentsDescription": "{{amount}} tutarında bekleyen ödemeniz var.\n\nKanıt yükledikten sonra çekilebilir hale gelecektir:",
       "andMore": "...ve {{count}} daha",
@@ -869,25 +882,7 @@
       "transactionDetailHint": "İşlem detaylarını görüntüler"
     }
   },
-  "profile": {
-    "title": "Profil",
-    "shareMessage": "Lovendo profilime göz at!",
-    "shareProfile": "Profili paylaş",
-    "savedMoments": "Kaydedilen Anlar",
-    "offlineTitle": "İnternet bağlantısı yok",
-    "offlineMessage": "Profili görüntülemek için internet bağlantısı gerekli.",
-    "trustStatus": "Güven Durumu",
-    "trustScore": {
-      "points": "{{score}} puan • Doğrulamalar",
-      "earnTrust": "Doğrulama yaparak güven kazan"
-    },
-    "moments": {
-      "noActive": "Henüz aktif moment yok",
-      "noPast": "Geçmiş moment yok",
-      "createFirstDescription": "İlk momentini oluşturarak yolculuğuna başla",
-      "completedDescription": "Tamamlanan momentler burada görünecek"
-    }
-  },
+
   "accessibility": {
     "tapToViewDetails": "Detayları görmek için dokun",
     "sendGiftToUser": "{{name}} adlı kullanıcıya hediye gönder",

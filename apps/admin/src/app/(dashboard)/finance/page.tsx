@@ -15,6 +15,7 @@ import {
   Loader2,
   AlertTriangle,
 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 import { CanvaButton } from '@/components/canva/CanvaButton';
 import { CanvaInput } from '@/components/canva/CanvaInput';
 import {
@@ -88,16 +89,83 @@ const statusConfig = {
   cancelled: { label: 'İptal', variant: 'default' as const },
 };
 
+interface PendingPayout {
+  id: string;
+  amount: number;
+}
+
+interface TitanHealth {
+  total_transactions: number;
+  total_escrow_volume: number;
+  active_escrow_balance: number;
+  direct_volume: number;
+  optional_volume: number;
+  mandatory_volume: number;
+  pending_withdrawals_count: number;
+  pending_withdrawals_amount: number;
+  pending_proofs_count: number;
+  total_coins_sold: number;
+  apple_pending_funds: number;
+}
+
 export default function FinancePage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [dateRange, setDateRange] = useState({
+    from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+    to: new Date(),
+  });
+  const [titanHealth, setTitanHealth] = useState<TitanHealth | null>(null);
   const [period, setPeriod] = useState<'7d' | '30d' | '90d'>('30d');
 
   // Use real API data
-  const { data, isLoading, error } = useFinance({ period });
+  const { stats, transactions, isLoading, loadData, exportData, error } =
+    useFinance(dateRange);
 
-  const transactions = data?.transactions || [];
-  const summary = data?.summary || {
+  useEffect(() => {
+    // Load Titan Health independently
+    const loadTitanHealth = async () => {
+      try {
+        const { createClient } = await import('@/lib/supabase/client'); // Dynamic import to avoid SSR issues if any
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from('view_financial_health')
+          .select('*')
+          .single();
+        if (!error && data) {
+          setTitanHealth(data as any);
+        }
+      } catch (e) {
+        logger.error('Failed to load titan health', e);
+      }
+    };
+    loadTitanHealth();
+  }, []);
+
+  const handleApprove = async (id: string) => {
+    try {
+      const response = await fetch(`/api/finance/payout/${id}/approve`, { method: 'POST' });
+      if (!response.ok) throw new Error('Onay başarısız');
+      toast.success('Ödeme başarıyla onaylandı');
+      loadData();
+    } catch (e) {
+      toast.error('Onaylama sırasında hata oluştu');
+    }
+  };
+
+  const handleReject = async (id: string) => {
+    try {
+      const response = await fetch(`/api/finance/payout/${id}/reject`, { method: 'POST' });
+      if (!response.ok) throw new Error('Red başarısız');
+      toast.success('Ödeme reddedildi');
+      loadData();
+    } catch (e) {
+      toast.error('Reddetme sırasında hata oluştu');
+    }
+  };
+
+  const allTransactions = transactions || [];
+  const summary = stats || {
     totalRevenue: 0,
     totalRefunds: 0,
     subscriptionRevenue: 0,
@@ -106,7 +174,7 @@ export default function FinancePage() {
   };
 
   // Filter transactions
-  const filteredTransactions = transactions.filter((tx) => {
+  const filteredTransactions = allTransactions.filter((tx) => {
     const matchesSearch =
       search === '' || tx.id.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || tx.status === statusFilter;
@@ -114,7 +182,9 @@ export default function FinancePage() {
   });
 
   // Pending payouts (filter by type)
-  const pendingPayouts = transactions.filter((tx) => tx.status === 'pending');
+  const pendingPayouts = allTransactions.filter(
+    (tx) => tx.status === 'pending',
+  );
   const pendingPayoutsCount = pendingPayouts.length;
   const pendingPayoutsTotal = pendingPayouts.reduce(
     (sum, p) => sum + p.amount,
@@ -161,10 +231,10 @@ export default function FinancePage() {
           </Select>
           <CanvaButton
             variant="primary"
-            disabled={isLoading || transactions.length === 0}
+            disabled={isLoading || allTransactions.length === 0}
             onClick={() => {
               try {
-                const exportData = transactions.map((tx) => ({
+                const exportData = allTransactions.map((tx) => ({
                   ID: tx.id,
                   Tip:
                     transactionTypeConfig[
@@ -206,7 +276,92 @@ export default function FinancePage() {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {/* TITAN PROTOCOL HEALTH WIDGET */}
+        <div className="rounded-xl border bg-card p-6 shadow-sm border-l-4 border-l-indigo-500">
+          <div className="flex flex-col space-y-2">
+            <span className="text-sm font-medium text-muted-foreground">
+              Titan Protocol (Locked)
+            </span>
+            <div className="flex items-baseline space-x-2">
+              <span className="text-2xl font-bold">
+                {titanHealth
+                  ? formatCurrency(titanHealth.active_escrow_balance)
+                  : '...'}
+              </span>
+              <span className="text-xs text-indigo-500 font-medium">Safe</span>
+            </div>
+            <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-indigo-500"
+                style={{ width: '100%' }}
+              ></div>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              {titanHealth?.total_transactions || 0} secure txns •{' '}
+              {titanHealth?.pending_proofs_count || 0} pending proofs
+            </p>
+          </div>
+        </div>
+
+        {/* PENDING WITHDRAWALS WIDGET */}
+        <div className="rounded-xl border bg-card p-6 shadow-sm border-l-4 border-l-orange-500">
+          <div className="flex flex-col space-y-2">
+            <span className="text-sm font-medium text-muted-foreground">
+              Pending Withdrawals
+            </span>
+            <div className="flex items-baseline space-x-2">
+              <span className="text-2xl font-bold">
+                {titanHealth ? titanHealth.pending_withdrawals_count : '...'}
+              </span>
+              <span className="text-xs text-orange-500">Requests</span>
+            </div>
+            <p className="text-sm font-medium">
+              {titanHealth
+                ? formatCurrency(titanHealth.pending_withdrawals_amount)
+                : '...'}
+            </p>
+            <p className="text-xs text-muted-foreground">Manual Check Required if > 1k</p>
+          </div>
+        </div>
+
+        {/* LVND SALES WIDGET */}
+        <div className="rounded-xl border bg-card p-6 shadow-sm border-l-4 border-l-blue-500">
+          <div className="flex flex-col space-y-2">
+            <span className="text-sm font-medium text-muted-foreground">
+              Total LVND Sold
+            </span>
+            <div className="flex items-baseline space-x-2">
+              <span className="text-2xl font-bold">
+                {titanHealth ? titanHealth.total_coins_sold?.toLocaleString() : '...'}
+              </span>
+              <span className="text-xs text-blue-500">Units</span>
+            </div>
+            <p className="text-sm font-medium">
+              Gross: {titanHealth ? formatCurrency(titanHealth.total_coins_sold * 1.5) : '...'}
+            </p>
+            <p className="text-xs text-muted-foreground">Consumable Revenue</p>
+          </div>
+        </div>
+
+        {/* NET REVENUE WIDGET (Apple Tax Applied) */}
+        <div className="rounded-xl border bg-card p-6 shadow-sm border-l-4 border-l-emerald-500">
+          <div className="flex flex-col space-y-2">
+            <span className="text-sm font-medium text-muted-foreground">
+              Apple Pending Funds
+            </span>
+            <div className="flex items-baseline space-x-2">
+              <span className="text-2xl font-bold">
+                {titanHealth ? formatCurrency(titanHealth.apple_pending_funds) : '...'}
+              </span>
+              <span className="text-xs text-emerald-500 font-medium">Verified</span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Estimated Payout from App Store
+            </p>
+          </div>
+        </div>
+
         <CanvaStatCard
           title="Toplam Gelir"
           value={isLoading ? '...' : formatCurrency(summary.totalRevenue)}
@@ -429,9 +584,7 @@ export default function FinancePage() {
                               <CanvaButton
                                 size="sm"
                                 variant="danger"
-                                disabled
-                                className="opacity-50 cursor-not-allowed"
-                                title="API entegrasyonu geliştiriliyor"
+                                onClick={() => handleReject(payout.id)}
                               >
                                 <XCircle className="mr-1 h-4 w-4" />
                                 Reddet
@@ -439,9 +592,7 @@ export default function FinancePage() {
                               <CanvaButton
                                 size="sm"
                                 variant="success"
-                                disabled
-                                className="opacity-50 cursor-not-allowed"
-                                title="API entegrasyonu geliştiriliyor"
+                                onClick={() => handleApprove(payout.id)}
                               >
                                 <CheckCircle className="mr-1 h-4 w-4" />
                                 Onayla

@@ -184,6 +184,7 @@ export const usePayments = (): UsePaymentsReturn => {
       );
       setBalance({
         available: response.available,
+        coins: response.coins,
         pending: response.pending,
         currency: response.currency,
       });

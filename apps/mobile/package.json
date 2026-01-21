@@ -101,9 +101,15 @@
     "react-native-calendars": "^1.1313.0",
     "react-native-compressor": "^1.14.0",
     "react-native-confetti-cannon": "^1.5.2",
+<<<<<<< Updated upstream
     "react-native-gesture-handler": "2.28.0",
     "react-native-get-random-values": "^2.0.0",
+=======
+    "react-native-gesture-handler": "~2.28.0",
+    "react-native-iap": "^14.7.2",
+>>>>>>> Stashed changes
     "react-native-mmkv": "^4.1.0",
+    "react-native-purchases": "^9.7.1",
     "react-native-qrcode-svg": "^6.3.21",
     "react-native-reanimated": "~4.2.1",
     "react-native-safe-area-context": "5.6.2",

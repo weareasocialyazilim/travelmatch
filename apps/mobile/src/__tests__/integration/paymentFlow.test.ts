@@ -18,7 +18,23 @@ import { logger } from '@/utils/logger';
 import { transactionsService } from '@/services/supabaseDbService';
 
 // Mock dependencies
-jest.mock('@/config/supabase');
+jest.mock('@/config/supabase', () => {
+  const actual = jest.requireActual('@/config/supabase');
+  return {
+    ...actual,
+    supabase: {
+      auth: {
+        getUser: jest.fn(),
+        getSession: jest.fn(),
+      },
+      from: jest.fn(),
+      functions: {
+        invoke: jest.fn(),
+      },
+    },
+    SUPABASE_EDGE_URL: 'https://mock.supabase.co',
+  };
+});
 jest.mock('@/utils/logger');
 jest.mock('@/services/supabaseDbService', () => ({
   transactionsService: {
@@ -62,6 +78,10 @@ describe('Payment Flow Integration', () => {
         data: { user: mockUser },
         error: null,
       }),
+      getSession: jest.fn().mockResolvedValue({
+        data: { session: { access_token: 'fake-token' } },
+        error: null,
+      }),
     } as unknown as typeof mockSupabase.auth;
 
     // Setup default from() chain mock
@@ -76,6 +96,13 @@ describe('Payment Flow Integration', () => {
     mockSupabase.from = jest.fn(
       () => mockFromChain,
     ) as unknown as typeof mockSupabase.from;
+
+    // Mock global fetch for Edge Functions
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: jest.fn().mockResolvedValue({ error: 'PayTR API Error' }),
+    });
   });
 
   describe('Scenario 1: Complete Payment Processing Flow', () => {
@@ -89,7 +116,12 @@ describe('Payment Flow Integration', () => {
         select: jest.fn().mockReturnThis(),
         eq: jest.fn().mockReturnThis(),
         single: jest.fn().mockResolvedValue({
-          data: { balance: initialBalance, currency: 'USD' },
+          data: {
+            balance: initialBalance,
+            coins_balance: initialBalance,
+            pending_balance: 0,
+            currency: 'LVND',
+          },
           error: null,
         }),
       };
@@ -103,7 +135,7 @@ describe('Payment Flow Integration', () => {
         id: 'txn-123',
         user_id: mockUser.id,
         amount: paymentAmount,
-        currency: 'USD',
+        currency: 'LVND',
         type: 'payment',
         status: 'completed',
         description: 'Gift payment',
@@ -119,7 +151,7 @@ describe('Payment Flow Integration', () => {
 
       const paymentResult = await paymentService.processPayment({
         amount: paymentAmount,
-        currency: 'USD',
+        currency: 'LVND',
         paymentMethodId: 'pm-card-123',
         description: 'Gift payment',
         metadata: { momentId: 'moment-456' },
@@ -132,7 +164,7 @@ describe('Payment Flow Integration', () => {
       expect(mockTransactionsService.create).toHaveBeenCalledWith({
         user_id: mockUser.id,
         amount: paymentAmount,
-        currency: 'USD',
+        currency: 'LVND',
         type: 'payment',
         status: 'completed',
         description: 'Gift payment',
@@ -141,7 +173,7 @@ describe('Payment Flow Integration', () => {
 
       // Step 3: Verify updated balance (simulate balance update)
       mockFromChain.single.mockResolvedValue({
-        data: { balance: finalBalance, currency: 'USD' },
+        data: { balance: finalBalance, currency: 'LVND' },
         error: null,
       });
 
@@ -153,24 +185,24 @@ describe('Payment Flow Integration', () => {
       // Arrange: Mock payment processing failure
       mockTransactionsService.create.mockResolvedValue({
         data: null,
-        error: new Error('Insufficient funds'),
+        error: new Error('Yetersiz bakiye'),
       });
 
       // Act & Assert: Payment should fail
       await expect(
         paymentService.processPayment({
           amount: 1000000,
-          currency: 'USD',
+          currency: 'LVND',
           paymentMethodId: 'pm-card-123',
         }),
-      ).rejects.toThrow('Insufficient funds');
+      ).rejects.toThrow('Yetersiz bakiye');
 
       // Verify error logging (securePaymentService logs with standardized error object)
       expect(mockLogger.error).toHaveBeenCalledWith(
         'Process payment error:',
         expect.objectContaining({
           code: expect.any(String),
-          message: expect.stringContaining('Insufficient funds'),
+          message: expect.stringContaining('Yetersiz bakiye'),
         }),
       );
     });
@@ -229,7 +261,7 @@ describe('Payment Flow Integration', () => {
         id: 'txn-456',
         user_id: mockUser.id,
         amount: 75,
-        currency: 'USD',
+        currency: 'LVND',
         type: 'payment',
         status: 'completed',
         description: 'Payment with new card',
@@ -245,7 +277,7 @@ describe('Payment Flow Integration', () => {
 
       const paymentResult = await paymentService.processPayment({
         amount: 75,
-        currency: 'USD',
+        currency: 'LVND',
         paymentMethodId: cardId,
         description: 'Payment with new card',
       });
@@ -264,7 +296,7 @@ describe('Payment Flow Integration', () => {
       await expect(
         paymentService.processPayment({
           amount: 50,
-          currency: 'USD',
+          currency: 'LVND',
           paymentMethodId: 'invalid-pm-123',
         }),
       ).rejects.toThrow('Payment method not found');
@@ -288,6 +320,18 @@ describe('Payment Flow Integration', () => {
     };
 
     it('should request withdrawal → process → update balance → create transaction', async () => {
+      // Mock successful fetch for withdrawal
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: jest
+          .fn()
+          .mockResolvedValue({
+            settlementId: 'txn-withdraw-789',
+            fiat_amount: 200,
+            status: 'success',
+          }),
+      });
+
       const initialBalance = 500;
       const withdrawalAmount = 200;
       const finalBalance = initialBalance - withdrawalAmount;
@@ -298,9 +342,14 @@ describe('Payment Flow Integration', () => {
         switch (table) {
           case 'gifts':
             return createChainMock({ data: [], error: null });
-          case 'wallets':
+          case 'users':
             return createChainMock({
-              data: { balance: currentBalance, currency: 'USD' },
+              data: {
+                balance: currentBalance,
+                coins_balance: currentBalance,
+                pending_balance: 0,
+                currency: 'LVND',
+              },
               error: null,
             });
           case 'escrow_transactions':
@@ -324,7 +373,7 @@ describe('Payment Flow Integration', () => {
         id: 'txn-withdraw-789',
         user_id: mockUser.id,
         amount: withdrawalAmount,
-        currency: 'USD',
+        currency: 'LVND',
         type: 'withdrawal',
         status: 'pending',
         description: 'Withdrawal to bank account',
@@ -339,15 +388,13 @@ describe('Payment Flow Integration', () => {
       });
 
       const withdrawalResult = await paymentService.withdrawFunds({
-        amount: withdrawalAmount,
-        currency: 'USD',
+        coinAmount: withdrawalAmount,
         bankAccountId: 'ba-123',
       });
 
       // Assert withdrawal created with pending status
-      expect(withdrawalResult.transaction.id).toBe('txn-withdraw-789');
-      expect(withdrawalResult.transaction.type).toBe('withdrawal');
-      expect(withdrawalResult.transaction.status).toBe('pending');
+      expect(withdrawalResult).toHaveProperty('settlementId');
+      expect(withdrawalResult).toHaveProperty('fiatAmount');
 
       // Step 3: Verify balance after withdrawal
       currentBalance = finalBalance;
@@ -377,9 +424,9 @@ describe('Payment Flow Integration', () => {
         switch (table) {
           case 'gifts':
             return createChainMock({ data: [], error: null });
-          case 'wallets':
+          case 'users':
             return createChainMock({
-              data: { balance: 50, currency: 'USD' },
+              data: { balance: 50, currency: 'LVND' },
               error: null,
             });
           case 'escrow_transactions':
@@ -397,11 +444,10 @@ describe('Payment Flow Integration', () => {
       // Act & Assert: Withdrawal should fail due to insufficient balance
       await expect(
         paymentService.withdrawFunds({
-          amount: 1000,
-          currency: 'USD',
+          coinAmount: 1000,
           bankAccountId: 'ba-123',
         }),
-      ).rejects.toThrow('Insufficient');
+      ).rejects.toThrow('Yetersiz bakiye');
 
       expect(mockLogger.error).toHaveBeenCalledWith(
         'Withdraw funds error:',
@@ -425,7 +471,7 @@ describe('Payment Flow Integration', () => {
             id: 'txn-retry-456',
             user_id: mockUser.id,
             amount: 100,
-            currency: 'USD',
+            currency: 'LVND',
             type: 'payment',
             status: 'completed',
             description: 'Retry payment',
@@ -440,7 +486,7 @@ describe('Payment Flow Integration', () => {
       await expect(
         paymentService.processPayment({
           amount: 100,
-          currency: 'USD',
+          currency: 'LVND',
           paymentMethodId: 'card-declined-123',
         }),
       ).rejects.toThrow('Card declined');
@@ -448,7 +494,7 @@ describe('Payment Flow Integration', () => {
       // Attempt 2: Succeed with different card
       const retryResult = await paymentService.processPayment({
         amount: 100,
-        currency: 'USD',
+        currency: 'LVND',
         paymentMethodId: 'card-valid-456',
         description: 'Retry payment',
       });
@@ -466,7 +512,7 @@ describe('Payment Flow Integration', () => {
           id: 'txn-1',
           user_id: mockUser.id,
           amount: 50,
-          currency: 'USD',
+          currency: 'LVND',
           type: 'payment',
           status: 'completed',
           description: 'Gift payment 1',
@@ -478,7 +524,7 @@ describe('Payment Flow Integration', () => {
           id: 'txn-2',
           user_id: mockUser.id,
           amount: -100,
-          currency: 'USD',
+          currency: 'LVND',
           type: 'withdrawal',
           status: 'completed',
           description: 'Withdrawal',
@@ -490,7 +536,7 @@ describe('Payment Flow Integration', () => {
           id: 'txn-3',
           user_id: mockUser.id,
           amount: 75,
-          currency: 'USD',
+          currency: 'LVND',
           type: 'deposit',
           status: 'completed',
           description: 'Deposit',
@@ -577,6 +623,18 @@ describe('Payment Flow Integration', () => {
     };
 
     it('should handle multiple transactions → track balance changes → verify final state', async () => {
+      // Mock successful fetch for withdrawal
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: jest
+          .fn()
+          .mockResolvedValue({
+            settlementId: 'sett-multi',
+            fiat_amount: 50,
+            status: 'success',
+          }),
+      });
+
       let currentBalance = 1000;
 
       // Create mock that routes by table
@@ -584,9 +642,14 @@ describe('Payment Flow Integration', () => {
         switch (table) {
           case 'gifts':
             return createChainMock({ data: [], error: null });
-          case 'wallets':
+          case 'users':
             return createChainMock({
-              data: { balance: currentBalance, currency: 'USD' },
+              data: {
+                balance: currentBalance,
+                coins_balance: currentBalance,
+                pending_balance: 0,
+                currency: 'LVND',
+              },
               error: null,
             });
           case 'escrow_transactions':
@@ -611,7 +674,7 @@ describe('Payment Flow Integration', () => {
           id: 'txn-1',
           user_id: mockUser.id,
           amount: 50,
-          currency: 'USD',
+          currency: 'LVND',
           type: 'payment',
           status: 'completed',
           created_at: '2024-01-15T10:00:00Z',
@@ -624,7 +687,7 @@ describe('Payment Flow Integration', () => {
 
       await paymentService.processPayment({
         amount: 50,
-        currency: 'USD',
+        currency: 'LVND',
         paymentMethodId: 'pm-123',
       });
 
@@ -643,7 +706,7 @@ describe('Payment Flow Integration', () => {
           id: 'txn-3',
           user_id: mockUser.id,
           amount: 300,
-          currency: 'USD',
+          currency: 'LVND',
           type: 'withdrawal',
           status: 'pending',
           created_at: '2024-01-15T12:00:00Z',
@@ -655,8 +718,7 @@ describe('Payment Flow Integration', () => {
       });
 
       await paymentService.withdrawFunds({
-        amount: 300,
-        currency: 'USD',
+        coinAmount: 300,
         bankAccountId: 'ba-123',
       });
 
@@ -697,7 +759,7 @@ describe('Payment Flow Integration', () => {
         transactions.map((txn) =>
           paymentService.processPayment({
             amount: txn.amount,
-            currency: 'USD',
+            currency: 'LVND',
             paymentMethodId: 'pm-123',
           }),
         ),

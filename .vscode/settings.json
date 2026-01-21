@@ -74,8 +74,14 @@
 
   // Jest Configuration - run from apps/mobile for proper config
   "jest.rootPath": "apps/mobile",
+<<<<<<< Updated upstream
   "jest.jestCommandLine": "pnpm jest",
   "jest.autoRevealOutput": "on-exec-error",
   "snyk.advanced.organization": "65f49e60-e063-4544-980e-9a5bc8d0ab0b",
   "snyk.advanced.autoSelectOrganization": true
+=======
+  "jest.jestCommandLine": "npx jest",
+  "jest.autoRevealOutput": "on-exec-error",
+  "java.configuration.updateBuildConfiguration": "automatic"
+>>>>>>> Stashed changes
 }

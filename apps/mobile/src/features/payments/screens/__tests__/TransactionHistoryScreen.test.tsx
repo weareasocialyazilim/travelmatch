@@ -49,10 +49,10 @@ describe('TransactionHistoryScreen', () => {
       const { getByText } = render(<TransactionHistoryScreen />);
 
       // Check for default transactions (4 transactions in mock data)
-      expect(getByText('Gift from Alex Johnson')).toBeTruthy();
-      expect(getByText("Gift for Maria's trip")).toBeTruthy();
+      expect(getByText('Gesture from Alex Johnson')).toBeTruthy();
+      expect(getByText('Gesture for Maria')).toBeTruthy();
       expect(getByText('Withdrawal to Bank Account')).toBeTruthy();
-      expect(getByText('Gift from Samantha Bee')).toBeTruthy();
+      expect(getByText('Gesture from Samantha Bee')).toBeTruthy();
     });
 
     it('should display transaction amounts', () => {
@@ -89,10 +89,10 @@ describe('TransactionHistoryScreen', () => {
       const { getByText } = render(<TransactionHistoryScreen />);
 
       // All 4 transactions should be visible
-      expect(getByText('Gift from Alex Johnson')).toBeTruthy();
-      expect(getByText("Gift for Maria's trip")).toBeTruthy();
+      expect(getByText('Gesture from Alex Johnson')).toBeTruthy();
+      expect(getByText('Gesture for Maria')).toBeTruthy();
       expect(getByText('Withdrawal to Bank Account')).toBeTruthy();
-      expect(getByText('Gift from Samantha Bee')).toBeTruthy();
+      expect(getByText('Gesture from Samantha Bee')).toBeTruthy();
     });
 
     it('should filter sent transactions', () => {
@@ -102,11 +102,11 @@ describe('TransactionHistoryScreen', () => {
       fireEvent.press(sentButton);
 
       // Should show sent transaction
-      expect(getByText("Gift for Maria's trip")).toBeTruthy();
+      expect(getByText('Gesture for Maria')).toBeTruthy();
 
       // Should not show received transactions
-      expect(queryByText('Gift from Alex Johnson')).toBeNull();
-      expect(queryByText('Gift from Samantha Bee')).toBeNull();
+      expect(queryByText('Gesture from Alex Johnson')).toBeNull();
+      expect(queryByText('Gesture from Samantha Bee')).toBeNull();
       expect(queryByText('Withdrawal to Bank Account')).toBeNull();
     });
 
@@ -117,11 +117,11 @@ describe('TransactionHistoryScreen', () => {
       fireEvent.press(receivedButton);
 
       // Should show received transactions
-      expect(getByText('Gift from Alex Johnson')).toBeTruthy();
-      expect(getByText('Gift from Samantha Bee')).toBeTruthy();
+      expect(getByText('Gesture from Alex Johnson')).toBeTruthy();
+      expect(getByText('Gesture from Samantha Bee')).toBeTruthy();
 
       // Should not show sent or withdrawal transactions
-      expect(queryByText("Gift for Maria's trip")).toBeNull();
+      expect(queryByText('Gesture for Maria')).toBeNull();
       expect(queryByText('Withdrawal to Bank Account')).toBeNull();
     });
 
@@ -135,9 +135,9 @@ describe('TransactionHistoryScreen', () => {
       expect(getByText('Withdrawal to Bank Account')).toBeTruthy();
 
       // Should not show received or sent transactions
-      expect(queryByText('Gift from Alex Johnson')).toBeNull();
-      expect(queryByText('Gift from Samantha Bee')).toBeNull();
-      expect(queryByText("Gift for Maria's trip")).toBeNull();
+      expect(queryByText('Gesture from Alex Johnson')).toBeNull();
+      expect(queryByText('Gesture from Samantha Bee')).toBeNull();
+      expect(queryByText('Gesture for Maria')).toBeNull();
     });
 
     it('should return to all transactions when All is pressed', () => {
@@ -150,10 +150,10 @@ describe('TransactionHistoryScreen', () => {
       fireEvent.press(getByText('All'));
 
       // All transactions should be visible again
-      expect(getByText('Gift from Alex Johnson')).toBeTruthy();
-      expect(getByText("Gift for Maria's trip")).toBeTruthy();
+      expect(getByText('Gesture from Alex Johnson')).toBeTruthy();
+      expect(getByText('Gesture for Maria')).toBeTruthy();
       expect(getByText('Withdrawal to Bank Account')).toBeTruthy();
-      expect(getByText('Gift from Samantha Bee')).toBeTruthy();
+      expect(getByText('Gesture from Samantha Bee')).toBeTruthy();
     });
 
     it('should highlight active filter button', () => {
@@ -181,7 +181,7 @@ describe('TransactionHistoryScreen', () => {
     it('should navigate to transaction detail when transaction is pressed', () => {
       const { getByText } = render(<TransactionHistoryScreen />);
 
-      const transaction = getByText('Gift from Alex Johnson');
+      const transaction = getByText('Gesture from Alex Johnson');
       fireEvent.press(transaction);
 
       expect(mockNavigation.navigate).toHaveBeenCalledWith(
@@ -195,7 +195,7 @@ describe('TransactionHistoryScreen', () => {
     it('should navigate to correct transaction detail for different transactions', () => {
       const { getByText } = render(<TransactionHistoryScreen />);
 
-      const transaction2 = getByText("Gift for Maria's trip");
+      const transaction2 = getByText('Gesture for Maria');
       fireEvent.press(transaction2);
 
       expect(mockNavigation.navigate).toHaveBeenCalledWith(
@@ -262,7 +262,7 @@ describe('TransactionHistoryScreen', () => {
       const { getByText } = render(<TransactionHistoryScreen />);
 
       // Transaction titles should be accessible
-      expect(getByText('Gift from Alex Johnson')).toBeTruthy();
+      expect(getByText('Gesture from Alex Johnson')).toBeTruthy();
     });
 
     it('should have accessible filter buttons', () => {
@@ -291,7 +291,7 @@ describe('TransactionHistoryScreen', () => {
       fireEvent.press(getByText('Sent'));
 
       // Only sent transactions should appear
-      expect(queryByText('Gift from Alex Johnson')).toBeNull();
+      expect(queryByText('Gesture from Alex Johnson')).toBeNull();
     });
   });
 
@@ -300,10 +300,10 @@ describe('TransactionHistoryScreen', () => {
       const { getByText } = render(<TransactionHistoryScreen />);
 
       // Should render 4 transactions without performance issues
-      expect(getByText('Gift from Alex Johnson')).toBeTruthy();
-      expect(getByText("Gift for Maria's trip")).toBeTruthy();
+      expect(getByText('Gesture from Alex Johnson')).toBeTruthy();
+      expect(getByText('Gesture for Maria')).toBeTruthy();
       expect(getByText('Withdrawal to Bank Account')).toBeTruthy();
-      expect(getByText('Gift from Samantha Bee')).toBeTruthy();
+      expect(getByText('Gesture from Samantha Bee')).toBeTruthy();
     });
 
     it('should filter transactions quickly', () => {
@@ -316,7 +316,7 @@ describe('TransactionHistoryScreen', () => {
       fireEvent.press(getByText('All'));
 
       // Should end up showing all transactions
-      expect(getByText('Gift from Alex Johnson')).toBeTruthy();
+      expect(getByText('Gesture from Alex Johnson')).toBeTruthy();
     });
   });
 });

@@ -1,9 +1,14 @@
-/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
+// supabase/functions/handle-storage-upload/index.ts (AWS Rekognition LIVE Build)
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
+import { RekognitionClient, DetectModerationLabelsCommand } from "https://esm.sh/@aws-sdk/client-rekognition";
 
-// Edge Function: handle-storage-upload
-// Webhook handler for storage.objects INSERT events
-// Creates uploaded_images records automatically
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
 
+<<<<<<< Updated upstream
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
 import { getCorsHeaders } from '../_shared/cors.ts';
 import {
@@ -60,33 +65,26 @@ Deno.serve(async (req) => {
       );
     }
 
+=======
+serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  try {
+    const payload = await req.json();
+>>>>>>> Stashed changes
     const { record } = payload;
+    // record format: { name: 'folder/filename.jpg', bucket_id: 'moments', owner: 'user-uuid', id: 'object-uuid', ... }
 
-    // Skip if no owner (system uploads)
-    if (!record.owner) {
-      return new Response(
-        JSON.stringify({ message: 'Skipping upload without owner' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+    if (!record || !record.name) {
+      return new Response("No record found", { status: 200, headers: corsHeaders });
     }
 
-    // Generate public URL
-    const publicUrl = `${supabaseUrl}/storage/v1/object/public/${record.bucket_id}/${record.name}`;
-
-    // Determine image type from path
-    let imageType = 'other';
-    const pathLower = record.name.toLowerCase();
-    if (pathLower.includes('avatar') || pathLower.includes('profile')) {
-      imageType = 'avatar';
-    } else if (pathLower.includes('moment')) {
-      imageType = 'moment';
-    } else if (
-      pathLower.includes('verification') ||
-      pathLower.includes('proof')
-    ) {
-      imageType = 'verification';
+    // Critical: Only scan 'moments' or 'verification' buckets
+    if (!['moments', 'kyc-documents'].includes(record.bucket_id)) {
+      return new Response("Skipped Bucket", { status: 200, headers: corsHeaders });
     }
 
+<<<<<<< Updated upstream
     // --- AWS Rekognition Analysis ---
     let moderationStatus = 'pending';
     let moderationLabels: any[] = [];
@@ -274,23 +272,85 @@ Deno.serve(async (req) => {
       })
       .select()
       .single();
+=======
+    // Initialize Supabase Admin Client
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
 
-    if (error) {
-      // Error logged by Supabase
-      return new Response(JSON.stringify({ error: error.message }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    // 1. AWS Rekognition Analizi
+    const rekognition = new RekognitionClient({
+      region: Deno.env.get("AWS_REGION"),
+      credentials: {
+        accessKeyId: Deno.env.get("AWS_ACCESS_KEY_ID")!,
+        secretAccessKey: Deno.env.get("AWS_SECRET_ACCESS_KEY")!,
+      },
+    });
+
+    const command = new DetectModerationLabelsCommand({
+      Image: { S3Object: { Bucket: record.bucket_id, Name: record.name } },
+      MinConfidence: 75,
+    });
+
+    let response;
+    try {
+        // Note: For S3Object to work, the bucket and name must match what AWS expects (usually an S3 bucket).
+        // If Supabase Storage is S3-compatible or backed by S3, this might work if 'bucket_id' maps to the S3 bucket name.
+        // However, usually we send bytes or use a public URL if the bucket is not directly accessible by this Rekognition role in this way.
+        // The user provided code uses `S3Object`, implying Supabase is backed by S3 and we are using the underlying S3 bucket.
+        // If this fails, we might need to fetch the image bytes and send `Bytes`.
+        // Given the prompt explicitly provided `{ S3Object: ... }`, I will stick to it, but add a comment.
+        response = await rekognition.send(command);
+    } catch (awsError) {
+        console.error("AWS Rekognition Error:", awsError);
+        // Fallback or re-throw? 
+        // If we can't scan, we might fail-open or fail-closed. Failsafe: log and return.
+        return new Response(JSON.stringify({ error: "AWS Scan Failed", details: awsError.message }), { status: 500, headers: corsHeaders });
+    }
+
+    // 2. İhlal Tespit Edilirse (Xcode 26/Guideline 1.2 Uyumlu)
+    if (response.ModerationLabels && response.ModerationLabels.length > 0) {
+      console.warn(`[AI SCAN] FLAGGED: ${record.name} - Labels: ${response.ModerationLabels.map(l => l.Name).join(", ")}`);
+
+      // İçeriği otomatik blokla
+      // Both tables for safety
+      if (record.bucket_id === 'moments') {
+        await supabase.from('moments').update({ is_approved: false, is_hidden: true, moderation_status: 'rejected' }).eq('media_url', record.name);
+      }
+      
+      // Admin Dashboard'u besleyen log kaydı
+      await supabase.from('moderation_logs').insert({
+        user_id: record.owner,
+        content_type: 'moment_description',
+        severity: 'high',
+        violations: response.ModerationLabels.map(l => l.Name),
+        action_taken: 'blocked',
+        metadata: { provider: 'AWS_Rekognition', labels: response.ModerationLabels }
+      });
+>>>>>>> Stashed changes
+
+      return new Response(JSON.stringify({ status: "unsafe", action: "blocked", labels: response.ModerationLabels }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
       });
     }
 
-    return new Response(JSON.stringify({ success: true, data }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    // Auto-approve if safe
+    if (record.bucket_id === 'moments') {
+         await supabase.from('moments').update({ is_approved: true, moderation_status: 'approved' }).eq('media_url', record.name);
+    }
+
+    return new Response(JSON.stringify({ status: "safe" }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 200,
     });
+
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    console.error("Handler Error:", error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 400,
     });
   }
 });

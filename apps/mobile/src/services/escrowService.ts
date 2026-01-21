@@ -1,7 +1,7 @@
 /**
  * Escrow Service
  *
- * Titan Plan v2.0 Escrow Matrix implementation:
+ * Titan Protocol Escrow Matrix implementation:
  * - $0-$30: Direct payment (no escrow)
  * - $30-$100: Optional escrow (user chooses)
  * - $100+: Mandatory escrow (forced protection)
@@ -93,7 +93,7 @@ export function getEscrowExplanation(mode: EscrowMode, amount: number): string {
 
 class EscrowService {
   /**
-   * Transfer funds with Titan Plan escrow rules
+   * Transfer funds with Titan Protocol escrow rules
    */
   async transferFunds(params: {
     amount: number;

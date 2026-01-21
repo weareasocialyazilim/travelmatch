@@ -130,19 +130,39 @@ interface ModerationStats {
   };
 }
 
+export interface TriageQueueItem {
+  moment_id: string;
+  title: string;
+  user_id: string;
+  username: string;
+  media_url: string; // bucket path
+  created_at: string;
+  is_approved: boolean;
+  is_hidden: boolean;
+  ai_moderation_score?: number;
+  ai_moderation_labels?: string[];
+}
+
 // =============================================================================
 // Component
 // =============================================================================
 
 export default function ModerationPage() {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState<
+    'logs' | 'blocked' | 'warnings' | 'dictionary' | 'triage'
+  >('triage');
   const [stats, setStats] = useState<ModerationStats | null>(null);
   const [logs, setLogs] = useState<ModerationLog[]>([]);
   const [blockedContent, setBlockedContent] = useState<BlockedContent[]>([]);
   const [warnings, setWarnings] = useState<UserWarning[]>([]);
   const [dictionary, setDictionary] = useState<DictionaryWord[]>([]);
+  const [triageQueue, setTriageQueue] = useState<TriageQueueItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [dateRange, setDateRange] = useState({
+    from: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    to: new Date(),
+  });
   const [severityFilter, setSeverityFilter] = useState<string>('all');
 
   // New word dialog
@@ -157,19 +177,26 @@ export default function ModerationPage() {
 
   useEffect(() => {
     loadData();
+<<<<<<< Updated upstream
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+=======
+  }, [activeTab, dateRange]);
+>>>>>>> Stashed changes
 
   async function loadData() {
     setLoading(true);
     try {
-      await Promise.all([
-        loadStats(),
-        loadLogs(),
-        loadBlockedContent(),
-        loadWarnings(),
-        loadDictionary(),
-      ]);
+      await Promise.all(
+        [
+          loadStats(),
+          activeTab === 'logs' && loadLogs(),
+          activeTab === 'blocked' && loadBlockedContent(),
+          activeTab === 'warnings' && loadWarnings(),
+          activeTab === 'dictionary' && loadDictionary(),
+          activeTab === 'triage' && loadTriageQueue(),
+        ].filter(Boolean),
+      ); // Filter out false values from conditional loads
     } catch (error) {
       logger.error('Failed to load moderation data', error);
     } finally {
@@ -278,19 +305,85 @@ export default function ModerationPage() {
     setWarnings((data as UserWarning[]) || []);
   }
 
-  async function loadDictionary() {
-    const { data, error } = await supabase
-      .from('moderation_dictionary')
-      .select('*')
-      .order('created_at', { ascending: false });
+  const loadDictionary = async () => {
+    setLoading(true); // Assuming setLoading is the correct state to use here
+    try {
+      const supabase = getClient();
+      const { data, error } = await supabase
+        .from('moderation_dictionary')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    if (error) {
+      if (error) throw error;
+      setDictionary((data as DictionaryWord[]) || []);
+    } catch (error) {
       logger.error('Failed to load dictionary', error);
-      return;
+      toast.error('Sözlük yüklenemedi');
+    } finally {
+      setLoading(false);
     }
+  };
 
-    setDictionary((data as DictionaryWord[]) || []);
-  }
+  const loadTriageQueue = async () => {
+    setLoading(true); // Assuming setLoading is the correct state to use here
+    try {
+      const supabase = getClient();
+      const { data, error } = await supabase
+        .from('view_moderation_queue')
+        .select('*');
+
+      if (error) throw error;
+      setTriageQueue((data as TriageQueueItem[]) || []);
+    } catch (error) {
+      logger.error('Failed to load triage queue', error);
+      toast.error('Bekleyen içerikler yüklenemedi');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleApproveContent = async (momentId: string) => {
+    try {
+      const supabase = getClient();
+      const { error } = await supabase
+        .from('moments')
+        .update({
+          is_approved: true,
+          is_hidden: false,
+          moderation_status: 'approved',
+        })
+        .eq('id', momentId);
+
+      if (error) throw error;
+      toast.success('İçerik onaylandı ve yayına alındı');
+      loadTriageQueue(); // Refresh
+      loadStats();
+    } catch (error) {
+      logger.error('Failed to approve content', error);
+      toast.error('İşlem başarısız');
+    }
+  };
+
+  const handleRejectContent = async (momentId: string) => {
+    try {
+      const supabase = getClient();
+      const { error } = await supabase
+        .from('moments')
+        .update({
+          is_approved: false,
+          is_hidden: true,
+          moderation_status: 'rejected',
+        })
+        .eq('id', momentId);
+
+      if (error) throw error;
+      toast.success('İçerik reddedildi (gizli tutuluyor)');
+      loadTriageQueue(); // Refresh
+    } catch (error) {
+      logger.error('Failed to reject content', error);
+      toast.error('İşlem başarısız');
+    }
+  };
 
   // P1 FIX: Remove 'as any' type casts - use proper Supabase typing
   async function handleApproveAppeal(id: string) {
@@ -502,7 +595,11 @@ export default function ModerationPage() {
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="overview">
+          <TabsTrigger value="triage">
+            <Shield className="mr-2 h-4 w-4" />
+            Triage Queue
+          </TabsTrigger>
+          <TabsTrigger value="logs">
             <Shield className="mr-2 h-4 w-4" />
             Logs
           </TabsTrigger>
@@ -520,8 +617,74 @@ export default function ModerationPage() {
           </TabsTrigger>
         </TabsList>
 
+        {/* Triage Queue Content */}
+        <TabsContent value="triage" className="space-y-4">
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {triageQueue.length === 0 ? (
+                <div className="col-span-full p-12 text-center text-muted-foreground border border-dashed rounded-lg">
+                  <CheckCircle className="w-12 h-12 mx-auto mb-4 text-green-500" />
+                  <h3 className="text-lg font-medium text-foreground">
+                    All Caught Up!
+                  </h3>
+                  <p>No pending content requires moderation.</p>
+                </div>
+              ) : (
+                triageQueue.map((item) => (
+                  <div
+                    key={item.moment_id}
+                    className="group relative overflow-hidden rounded-xl border bg-card transition-all hover:shadow-md"
+                  >
+                    <div className="aspect-[9/16] w-full bg-muted/20 relative">
+                      {/* In real app, use a secure Image component that can sign the URL */}
+                      <div className="absolute inset-0 flex items-center justify-center text-xs text-muted-foreground">
+                        Preview: {item.media_url}
+                      </div>
+                      <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                        Score: {item.ai_moderation_score ?? 'N/A'}
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h4 className="font-medium line-clamp-1">
+                            {item.title}
+                          </h4>
+                          <p className="text-xs text-muted-foreground">
+                            by @{item.username}
+                          </p>
+                        </div>
+                        <span className="text-xs text-orange-500 font-mono bg-orange-500/10 px-2 py-0.5 rounded">
+                          Pending
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 mt-4">
+                        <CanvaButton
+                          variant="secondary"
+                          className="w-full text-red-500 hover:text-red-600 hover:bg-red-50"
+                          onClick={() => handleRejectContent(item.moment_id)}
+                        >
+                          Reject
+                        </CanvaButton>
+                        <CanvaButton
+                          variant="primary"
+                          className="w-full"
+                          onClick={() => handleApproveContent(item.moment_id)}
+                        >
+                          Approve
+                        </CanvaButton>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </TabsContent>
+
         {/* Moderation Logs */}
-        <TabsContent value="overview" className="space-y-4">
+        <TabsContent value="logs" className="space-y-4">
           <div className="flex gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

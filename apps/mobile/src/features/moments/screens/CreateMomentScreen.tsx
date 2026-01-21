@@ -297,12 +297,14 @@ const CreateMomentScreen: React.FC = () => {
 
         // Show toast after navigation completes
         setTimeout(() => {
-          showToast(
-            t('screens.createMoment.successMessage') ||
-              'Moment başarıyla yayınlandı!',
-            'success',
-          );
-        }, 300);
+          showAlert({
+            title: t('common.success', 'Başarılı'),
+            message: t(
+              'screens.createMoment.securityCheckMessage',
+              'Moment yayınlandı! İçeriğiniz topluluk güvenliği için kısa bir AI kontrolünden geçiyor. Onaylandığında herkes görebilecek.',
+            ),
+          });
+        }, 500);
       } else {
         HapticManager.error();
         showToast('Could not create moment. Please try again.', 'error');

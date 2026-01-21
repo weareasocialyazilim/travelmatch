@@ -272,8 +272,7 @@ export const EditMomentScreen = ({
                 color={COLORS.text.secondary}
               />
               <Text style={styles.infoText}>
-                Başlık veya fiyat değişiklikleri anında yansır. Fotoğraf
-                değişikliği yakında eklenecek.
+                Başlık veya fiyat değişiklikleri anında yansır.
               </Text>
             </View>
           </View>

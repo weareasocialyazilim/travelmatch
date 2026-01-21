@@ -31,6 +31,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { RootStackParamList } from '@/navigation/routeParams';
@@ -44,6 +45,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { useScreenSecurity } from '@/hooks/useScreenSecurity';
 import { showAlert } from '@/stores/modalStore';
 import { logger } from '@/utils/logger';
+
+// Withdrawal Rate: 1 Coin = 1.00 TRY (As per Financial Constitution)
+const COIN_TO_TRY_RATE = 1.0;
 
 // ═══════════════════════════════════════════════════════════════════
 // KYC LEVELS & REQUIREMENTS
@@ -359,22 +363,35 @@ const AmountInput: React.FC<{
 
   return (
     <View style={styles.amountContainer}>
-      <Text style={styles.amountLabel}>Çekim Tutarı</Text>
+      <Text style={styles.amountLabel}>Çekim Miktarı (Coin)</Text>
       <View
         style={[styles.amountInputWrapper, error && styles.amountInputError]}
       >
-        <Text style={styles.currencySymbol}>₺</Text>
+        <MaterialCommunityIcons
+          name="star-four-points"
+          size={24}
+          color={THEME.accent}
+          style={{ marginRight: 8 }}
+        />
         <TextInput
           style={styles.amountInput}
           value={value}
           onChangeText={onChange}
-          keyboardType="numeric"
+          keyboardType="number-pad"
           placeholder="0"
           placeholderTextColor={THEME.textMuted}
           maxLength={10}
         />
       </View>
       {error && <Text style={styles.errorText}>{error}</Text>}
+
+      {/* Conversion Display */}
+      {value ? (
+        <Text style={styles.conversionText}>
+          ≈ ₺
+          {(parseInt(value || '0') * COIN_TO_TRY_RATE).toLocaleString('tr-TR')}
+        </Text>
+      ) : null}
 
       {/* Quick Amount Buttons */}
       <View style={styles.quickAmounts}>
@@ -462,18 +479,18 @@ const WithdrawScreen: React.FC = () => {
   // ─────────────────────────────────────────────────────────────────
 
   const validateAmount = useCallback((): string | null => {
-    const numAmount = parseFloat(amount);
+    const numAmount = parseInt(amount); // Coins are integers
 
     if (!amount || isNaN(numAmount)) {
-      return 'Lütfen bir tutar girin';
+      return 'Lütfen coin miktarı girin';
     }
 
     if (numAmount < 50) {
-      return 'Minimum çekim tutarı ₺50';
+      return 'Minimum çekim: 50 Coin';
     }
 
-    if (balance && numAmount > balance.available) {
-      return `Maksimum çekilebilir tutar: ₺${balance.available.toLocaleString('tr-TR')}`;
+    if (balance && numAmount > (balance.coins || 0)) {
+      return `Yetersiz bakiye: ${balance.coins || 0} Coin mevcut`;
     }
 
     if (!selectedAccount) {
@@ -489,7 +506,9 @@ const WithdrawScreen: React.FC = () => {
 
   const handleVerifyKYC = () => {
     // Navigate to KYC verification flow
-    (navigation as StackNavigationProp<RootStackParamList>).navigate('IdentityVerification');
+    (navigation as StackNavigationProp<RootStackParamList>).navigate(
+      'IdentityVerification',
+    );
   };
 
   // If user doesn't meet KYC requirements, show gate screen
@@ -515,11 +534,12 @@ const WithdrawScreen: React.FC = () => {
       return;
     }
 
-    const numAmount = parseFloat(amount);
+    const numAmount = parseInt(amount);
+    const fiatValue = numAmount * COIN_TO_TRY_RATE;
 
     showAlert(
       'Çekim Onayı',
-      `₺${numAmount.toLocaleString('tr-TR')} tutarındaki çekim talebinizi onaylıyor musunuz?\n\nTutar, PayTR tarafından doğrulandıktan sonra banka hesabınıza 1-3 iş günü içinde aktarılacaktır.`,
+      `${numAmount} Coin karşılığı ₺${fiatValue.toLocaleString('tr-TR')} çekim talebinizi onaylıyor musunuz?\n\nTutar, PayTR tarafından doğrulandıktan sonra banka hesabınıza 1-3 iş günü içinde aktarılacaktır.`,
       [
         { text: 'İptal', style: 'cancel' },
         {
@@ -530,9 +550,9 @@ const WithdrawScreen: React.FC = () => {
             setError(null);
 
             try {
-              // Trigger PayTR settlement via edge function
-              const result = await walletService.requestPayTRSettlement({
-                amount: numAmount,
+              // Trigger Coin Withdrawal via edge function
+              const result = await walletService.requestCoinWithdrawal({
+                coinAmount: numAmount,
                 bankAccountId: selectedAccount!,
               });
 
@@ -550,7 +570,9 @@ const WithdrawScreen: React.FC = () => {
                 ],
               );
             } catch (err: any) {
-              logger.error('[WithdrawScreen] Settlement error:', { error: err });
+              logger.error('[WithdrawScreen] Settlement error:', {
+                error: err,
+              });
               HapticManager.error();
               setError(
                 err.message ||
@@ -609,9 +631,30 @@ const WithdrawScreen: React.FC = () => {
           >
             {/* Balance Card */}
             <GlassCard>
-              <Text style={styles.balanceLabel}>Çekilebilir Bakiye</Text>
-              <Text style={styles.balanceAmount}>
-                ₺{balance?.available.toLocaleString('tr-TR') || '0'}
+              <Text style={styles.balanceLabel}>Çekilebilir Coin</Text>
+              <View
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
+              >
+                <MaterialCommunityIcons
+                  name="star-four-points"
+                  size={28}
+                  color={THEME.accent}
+                />
+                <Text style={styles.balanceAmount}>
+                  {balance?.coins || '0'}
+                </Text>
+              </View>
+              <Text
+                style={{
+                  color: THEME.textSecondary,
+                  fontSize: 13,
+                  marginTop: 4,
+                }}
+              >
+                ≈ ₺
+                {((balance?.coins || 0) * COIN_TO_TRY_RATE).toLocaleString(
+                  'tr-TR',
+                )}
               </Text>
               {balance && balance.pending > 0 && (
                 <View style={styles.pendingInfo}>
@@ -635,7 +678,7 @@ const WithdrawScreen: React.FC = () => {
                   setAmount(val);
                   setError(null);
                 }}
-                maxAmount={balance?.available || 0}
+                maxAmount={balance?.coins || 0}
                 error={error || undefined}
               />
             </GlassCard>
@@ -897,6 +940,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: THEME.danger,
     marginTop: 8,
+  },
+  conversionText: {
+    fontSize: 13,
+    color: THEME.success,
+    marginTop: 8,
+    fontWeight: '600',
   },
   quickAmounts: {
     flexDirection: 'row',

@@ -200,12 +200,7 @@ export const ImmersiveMomentCard = memo(
             {/* Price Tag */}
             <View style={styles.priceTag}>
               <Text style={styles.priceLabel}>Requested Gift</Text>
-              <Text style={styles.priceValue}>
-                ${price}
-                {item.currency &&
-                  item.currency !== 'USD' &&
-                  ` ${item.currency}`}
-              </Text>
+              <Text style={styles.priceValue}>{price} LVND</Text>
             </View>
 
             {/* Chat Lock Badge */}
