@@ -491,28 +491,20 @@ importers:
         specifier: ^1.5.2
         version: 1.5.2
       react-native-gesture-handler:
-<<<<<<< Updated upstream
         specifier: 2.28.0
         version: 2.28.0(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
       react-native-get-random-values:
         specifier: ^2.0.0
         version: 2.0.0(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))
+      react-native-iap:
+        specifier: ^14.7.2
+        version: 14.7.6(react-native-nitro-modules@0.33.2(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
       react-native-mmkv:
         specifier: ^4.1.0
         version: 4.1.1(react-native-nitro-modules@0.33.2(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
-=======
-        specifier: ~2.28.0
-        version: 2.28.0(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
-      react-native-iap:
-        specifier: ^14.7.2
-        version: 14.7.2(react-native-nitro-modules@0.33.1(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
-      react-native-mmkv:
-        specifier: ^4.1.0
-        version: 4.1.1(react-native-nitro-modules@0.33.1(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
       react-native-purchases:
         specifier: ^9.7.1
-        version: 9.7.1(react-native-web@0.21.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
->>>>>>> Stashed changes
+        version: 9.7.1(react-native-web@0.21.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
       react-native-qrcode-svg:
         specifier: ^6.3.21
         version: 6.3.21(react-native-svg@15.15.1(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
@@ -15019,7 +15011,6 @@ packages:
       react: 19.1.0
       react-native: 0.81.5
 
-<<<<<<< Updated upstream
   react-native-get-random-values@2.0.0:
     resolution:
       {
@@ -15027,17 +15018,16 @@ packages:
       }
     peerDependencies:
       react-native: 0.81.5
-=======
-  react-native-iap@14.7.2:
+
+  react-native-iap@14.7.6:
     resolution:
       {
-        integrity: sha512-8nYAMikgCNH52f2GbEF2Fn6/KnbMKrhpoDyryXd7dqhC6vth0PmQAhqJbK7AaUZ3rhWVNEp77e9QLRPLDvnYIA==,
+        integrity: sha512-G0u4TUShdsiTdgPu1I3cMSHAJr6NCIYJ8hlx4rq5rYzRxY6mChRjLlgoNBi91wj4neseh1ds2NNhHj51nhVehQ==,
       }
     peerDependencies:
       react: 19.1.0
       react-native: 0.81.5
       react-native-nitro-modules: ^0.31.1
->>>>>>> Stashed changes
 
   react-native-is-edge-to-edge@1.2.1:
     resolution:
@@ -21445,7 +21435,9 @@ snapshots:
       metro-runtime: 0.83.3
     transitivePeerDependencies:
       - '@babel/core'
+      - bufferutil
       - supports-color
+      - utf-8-validate
 
   '@react-native/normalize-colors@0.74.89': {}
 
@@ -21581,9 +21573,6 @@ snapshots:
       react: 19.1.0
       react-redux: 9.2.0(@types/react@19.2.8)(react@19.1.0)(redux@5.0.1)
 
-<<<<<<< Updated upstream
-  '@rnmapbox/maps@10.2.10(expo@54.0.31(@babel/core@7.28.6)(react-native-webview@13.16.0(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)':
-=======
   '@revenuecat/purchases-js-hybrid-mappings@17.28.0':
     dependencies:
       '@revenuecat/purchases-js': 1.24.1
@@ -21592,8 +21581,7 @@ snapshots:
 
   '@revenuecat/purchases-typescript-internal@17.28.0': {}
 
-  '@rnmapbox/maps@10.2.10(expo@54.0.31(@babel/core@7.28.6)(react-native-webview@13.16.0(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)':
->>>>>>> Stashed changes
+  '@rnmapbox/maps@10.2.10(expo@54.0.31(@babel/core@7.28.6)(react-native-webview@13.16.0(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@turf/along': 6.5.0
       '@turf/distance': 6.5.0
@@ -24758,30 +24746,7 @@ snapshots:
 
   eslint-config-next@16.1.4(@typescript-eslint/parser@8.53.1(eslint@9.39.2(jiti@1.21.7))(typescript@5.9.3))(eslint@9.39.2(jiti@1.21.7))(typescript@5.9.3):
     dependencies:
-<<<<<<< Updated upstream
       '@next/eslint-plugin-next': 16.1.4
-=======
-      '@next/eslint-plugin-next': 14.1.0
-      '@rushstack/eslint-patch': 1.15.0
-      '@typescript-eslint/parser': 6.21.0(eslint@8.57.1)(typescript@5.9.3)
-      eslint: 8.57.1
-      eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@1.21.7))(typescript@5.9.3))(eslint@8.57.1))(eslint@8.57.1)
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
-      eslint-plugin-jsx-a11y: 6.10.2(eslint@8.57.1)
-      eslint-plugin-react: 7.37.5(eslint@8.57.1)
-      eslint-plugin-react-hooks: 5.0.0-canary-7118f5dd7-20230705(eslint@8.57.1)
-    optionalDependencies:
-      typescript: 5.9.3
-    transitivePeerDependencies:
-      - eslint-import-resolver-webpack
-      - eslint-plugin-import-x
-      - supports-color
-
-  eslint-config-next@16.0.10(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@1.21.7))(typescript@5.9.3))(eslint@9.39.2(jiti@1.21.7))(typescript@5.9.3):
-    dependencies:
-      '@next/eslint-plugin-next': 16.0.10
->>>>>>> Stashed changes
       eslint: 9.39.2(jiti@1.21.7)
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@9.39.2(jiti@1.21.7))
@@ -24818,26 +24783,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-<<<<<<< Updated upstream
   eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0)(eslint@9.39.2(jiti@1.21.7)):
-=======
-  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@1.21.7))(typescript@5.9.3))(eslint@8.57.1))(eslint@8.57.1):
-    dependencies:
-      '@nolyfill/is-core-module': 1.0.39
-      debug: 4.4.3
-      eslint: 8.57.1
-      get-tsconfig: 4.13.0
-      is-bun-module: 2.0.0
-      stable-hash: 0.0.5
-      tinyglobby: 0.2.15
-      unrs-resolver: 1.11.1
-    optionalDependencies:
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
-    transitivePeerDependencies:
-      - supports-color
-
-  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@1.21.7))(typescript@5.9.3))(eslint@9.39.2(jiti@1.21.7)))(eslint@9.39.2(jiti@1.21.7)):
->>>>>>> Stashed changes
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.4.3
@@ -24848,11 +24794,7 @@ snapshots:
       tinyglobby: 0.2.15
       unrs-resolver: 1.11.1
     optionalDependencies:
-<<<<<<< Updated upstream
       eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.53.1(eslint@9.39.2(jiti@1.21.7))(typescript@5.9.3))(eslint@9.39.2(jiti@1.21.7))
-=======
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@1.21.7))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.2(jiti@1.21.7))
->>>>>>> Stashed changes
     transitivePeerDependencies:
       - supports-color
 
@@ -24871,22 +24813,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-<<<<<<< Updated upstream
   eslint-module-utils@2.12.1(@typescript-eslint/parser@8.53.1(eslint@9.39.2(jiti@1.21.7))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.2(jiti@1.21.7)):
-=======
-  eslint-module-utils@2.12.1(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@1.21.7))(typescript@5.9.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
-    dependencies:
-      debug: 3.2.7
-    optionalDependencies:
-      '@typescript-eslint/parser': 6.21.0(eslint@8.57.1)(typescript@5.9.3)
-      eslint: 8.57.1
-      eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@1.21.7))(typescript@5.9.3))(eslint@8.57.1))(eslint@8.57.1)
-    transitivePeerDependencies:
-      - supports-color
-
-  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@1.21.7))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@1.21.7))(typescript@5.9.3))(eslint@9.39.2(jiti@1.21.7)))(eslint@9.39.2(jiti@1.21.7)))(eslint@9.39.2(jiti@1.21.7)):
->>>>>>> Stashed changes
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -24908,40 +24835,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-<<<<<<< Updated upstream
   eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.53.1(eslint@9.39.2(jiti@1.21.7))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@1.21.7)):
-=======
-  eslint-plugin-import@2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1):
-    dependencies:
-      '@rtsao/scc': 1.1.0
-      array-includes: 3.1.9
-      array.prototype.findlastindex: 1.2.6
-      array.prototype.flat: 1.3.3
-      array.prototype.flatmap: 1.3.3
-      debug: 3.2.7
-      doctrine: 2.1.0
-      eslint: 8.57.1
-      eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.1(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@1.21.7))(typescript@5.9.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
-      hasown: 2.0.2
-      is-core-module: 2.16.1
-      is-glob: 4.0.3
-      minimatch: 3.1.2
-      object.fromentries: 2.0.8
-      object.groupby: 1.0.3
-      object.values: 1.2.1
-      semver: 6.3.1
-      string.prototype.trimend: 1.0.9
-      tsconfig-paths: 3.15.0
-    optionalDependencies:
-      '@typescript-eslint/parser': 6.21.0(eslint@8.57.1)(typescript@5.9.3)
-    transitivePeerDependencies:
-      - eslint-import-resolver-typescript
-      - eslint-import-resolver-webpack
-      - supports-color
-
-  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@1.21.7))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.2(jiti@1.21.7)):
->>>>>>> Stashed changes
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
@@ -24999,28 +24893,6 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-<<<<<<< Updated upstream
-=======
-  eslint-plugin-jsx-a11y@6.10.2(eslint@8.57.1):
-    dependencies:
-      aria-query: 5.3.2
-      array-includes: 3.1.9
-      array.prototype.flatmap: 1.3.3
-      ast-types-flow: 0.0.8
-      axe-core: 4.11.1
-      axobject-query: 4.1.0
-      damerau-levenshtein: 1.0.8
-      emoji-regex: 9.2.2
-      eslint: 8.57.1
-      hasown: 2.0.2
-      jsx-ast-utils: 3.3.5
-      language-tags: 1.0.9
-      minimatch: 3.1.2
-      object.fromentries: 2.0.8
-      safe-regex-test: 1.1.0
-      string.prototype.includes: 2.0.1
-
->>>>>>> Stashed changes
   eslint-plugin-jsx-a11y@6.10.2(eslint@9.39.2(jiti@1.21.7)):
     dependencies:
       aria-query: 5.3.2
@@ -28891,22 +28763,18 @@ snapshots:
       react: 19.1.0
       react-native: 0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.2.8)(react@19.1.0)
 
-<<<<<<< Updated upstream
   react-native-get-random-values@2.0.0(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0)):
     dependencies:
       fast-base64-decode: 1.0.0
       react-native: 0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0)
 
-  react-native-is-edge-to-edge@1.2.1(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0):
-=======
-  react-native-iap@14.7.2(react-native-nitro-modules@0.33.1(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0):
+  react-native-iap@14.7.6(react-native-nitro-modules@0.33.2(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0):
     dependencies:
       react: 19.1.0
-      react-native: 0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0)
-      react-native-nitro-modules: 0.33.1(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
+      react-native: 0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0)
+      react-native-nitro-modules: 0.33.2(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
 
-  react-native-is-edge-to-edge@1.2.1(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0):
->>>>>>> Stashed changes
+  react-native-is-edge-to-edge@1.2.1(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0):
     dependencies:
       react: 19.1.0
       react-native: 0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0)
@@ -28927,20 +28795,16 @@ snapshots:
       react: 19.1.0
       react-native: 0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0)
 
-<<<<<<< Updated upstream
-  react-native-qrcode-svg@6.3.21(react-native-svg@15.15.1(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0):
-=======
-  react-native-purchases@9.7.1(react-native-web@0.21.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0):
+  react-native-purchases@9.7.1(react-native-web@0.21.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0):
     dependencies:
       '@revenuecat/purchases-js-hybrid-mappings': 17.28.0
       '@revenuecat/purchases-typescript-internal': 17.28.0
       react: 19.1.0
-      react-native: 0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0)
+      react-native: 0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0)
     optionalDependencies:
       react-native-web: 0.21.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
 
-  react-native-qrcode-svg@6.3.21(react-native-svg@15.15.1(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0):
->>>>>>> Stashed changes
+  react-native-qrcode-svg@6.3.21(react-native-svg@15.15.1(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.6)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.83.1(@babel/core@7.28.6))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0):
     dependencies:
       prop-types: 15.8.1
       qrcode: 1.5.4

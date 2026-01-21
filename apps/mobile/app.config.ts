@@ -44,15 +44,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 
       // Camera and Photos
       NSCameraUsageDescription:
-<<<<<<< Updated upstream
         'Özel anlarınızı (Moments) kaydedip takipçilerinizle paylaşabilmeniz için kamera erişimi gereklidir.',
       NSPhotoLibraryUsageDescription:
         "Vibe'ınızı yansıtan fotoğraf ve videoları profilinizde paylaşabilmeniz için galeri erişimi gereklidir.",
-=======
-        'Lovendo needs camera access to capture photos of your moments.',
-      NSPhotoLibraryUsageDescription:
-        'Lovendo needs photo library access to upload moment photos.',
->>>>>>> Stashed changes
       NSPhotoLibraryAddUsageDescription:
         'Lovendo needs permission to save photos to your library.',
 

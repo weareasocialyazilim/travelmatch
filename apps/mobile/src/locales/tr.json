@@ -355,7 +355,6 @@
     "welcome": "Lovendo'ya Hoş Geldiniz",
     "welcomeMessage": "İçerik üreticilerini keşfedin ve hediyeleşerek bağ kurun",
     "step1Title": "Anları Keşfedin",
-<<<<<<< Updated upstream
     "step1Description": "İçerik üreticileri tarafından paylaşılan özel anları keşfedin",
     "step2Title": "Destekleyin ve Bağlantı Kurun",
     "step2Description": "Anlara destek olun ve üreticilerle sohbet edin",
@@ -365,17 +364,6 @@
   "welcome": {
     "title": "Lovendo'ya Hoş Geldiniz",
     "subtitle": "Anları paylaşın, destek kazanın.\nHer etkileşimi anlamlı ve değerli kılın.",
-=======
-    "step1Description": "Yerli halk tarafından oluşturulan benzersiz seyahat deneyimlerini keşfedin",
-    "step2Title": "Talep Gönderin ve Bağlantı Kurun",
-    "step2Description": "Anları rezerve edin ve ev sahipleriyle sohbet edin",
-    "step3Title": "Hikayenizi Paylaşın",
-    "step3Description": "Kendi anlarınızı oluşturun ve para kazanın"
-  },
-  "welcome": {
-    "title": "Lovendo'ya Hoş Geldiniz",
-    "subtitle": "Yerel halkla tanışın. Deneyimlerinizi paylaşın.\nHer bağlantıyı anlamlı kılın.",
->>>>>>> Stashed changes
     "continueWithApple": "Apple ile devam et",
     "continueWithGoogle": "Google ile devam et",
     "continueWithFacebook": "Facebook ile devam et",
