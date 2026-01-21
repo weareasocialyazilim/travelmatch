@@ -232,12 +232,8 @@ prompt_secret "VITE_SUPABASE_ANON_KEY" \
     "Supabase key for admin panel (same as SUPABASE_ANON_KEY)" \
     ""
 
-prompt_secret "STRIPE_SECRET_KEY" \
-    "Stripe secret key. Get from: https://dashboard.stripe.com/apikeys" \
-    ""
-
-prompt_secret "STRIPE_WEBHOOK_SECRET" \
-    "Stripe webhook secret. Get from: https://dashboard.stripe.com/webhooks" \
+prompt_secret "PAYTR_MERCHANT_KEY" \
+    "PayTR merchant key. Get from: https://www.paytr.com/panel/integration" \
     ""
 
 prompt_secret "OPENAI_API_KEY" \

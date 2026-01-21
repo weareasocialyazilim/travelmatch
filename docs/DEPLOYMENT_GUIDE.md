@@ -1,4 +1,5 @@
 # 🚀 Lovendo Deployment Guide
+
 **Version:** 1.0.0  
 **Last Updated:** December 8, 2024  
 **Status:** Production-Ready ✅
@@ -24,6 +25,7 @@
 Lovendo uses a **fully automated CI/CD pipeline** for deployments:
 
 ### Architecture
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                    GitHub Actions                        │
@@ -45,12 +47,12 @@ Lovendo uses a **fully automated CI/CD pipeline** for deployments:
 
 ### Deployment Triggers
 
-| Component | Trigger | Workflow | Target |
-|-----------|---------|----------|--------|
-| **Mobile Apps** | GitHub Release | `deploy.yml` | App Store + Google Play |
-| **Edge Functions** | Push to `main` | `monorepo-ci.yml` | Supabase Edge Runtime |
-| **Database** | Manual | Supabase Dashboard | PostgreSQL Production |
-| **Storybook** | Push to `main` | `design-system.yml` | Vercel |
+| Component          | Trigger        | Workflow            | Target                  |
+| ------------------ | -------------- | ------------------- | ----------------------- |
+| **Mobile Apps**    | GitHub Release | `deploy.yml`        | App Store + Google Play |
+| **Edge Functions** | Push to `main` | `monorepo-ci.yml`   | Supabase Edge Runtime   |
+| **Database**       | Manual         | Supabase Dashboard  | PostgreSQL Production   |
+| **Storybook**      | Push to `main` | `design-system.yml` | Vercel                  |
 
 ---
 
@@ -58,14 +60,15 @@ Lovendo uses a **fully automated CI/CD pipeline** for deployments:
 
 ### Required Accounts
 
-1. **GitHub** 
+1. **GitHub**
    - Repository access with admin rights
    - GitHub Actions enabled
 
 2. **Expo/EAS**
    - Expo account ([expo.dev](https://expo.dev))
    - EAS Build subscription ($29/month for production)
-   - Generate `EXPO_TOKEN` from [expo.dev/settings/access-tokens](https://expo.dev/settings/access-tokens)
+   - Generate `EXPO_TOKEN` from
+     [expo.dev/settings/access-tokens](https://expo.dev/settings/access-tokens)
 
 3. **Apple Developer**
    - Apple Developer Account ($99/year)
@@ -82,7 +85,8 @@ Lovendo uses a **fully automated CI/CD pipeline** for deployments:
    - Supabase project created
    - Production database configured
    - Edge Functions enabled
-   - Generate access token from [app.supabase.com/account/tokens](https://app.supabase.com/account/tokens)
+   - Generate access token from
+     [app.supabase.com/account/tokens](https://app.supabase.com/account/tokens)
 
 6. **Cloudflare** (Optional - for CDN)
    - Cloudflare account
@@ -149,6 +153,7 @@ cp services/.env.example services/.env
 ### 2. Configure Environment Variables
 
 #### **Root `.env`**
+
 ```bash
 # Supabase
 SUPABASE_URL=https://your-project.supabase.co
@@ -168,6 +173,7 @@ API_URL=https://api.lovendo.app
 ```
 
 #### **Mobile `.env`** (`apps/mobile/.env`)
+
 ```bash
 EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
@@ -177,6 +183,7 @@ EXPO_PUBLIC_SENTRY_DSN=https://xxx@sentry.io/xxx
 ```
 
 #### **OAuth `.env.oauth`**
+
 See `docs/OAUTH_SETUP_GUIDE.md` for detailed OAuth setup.
 
 ```bash
@@ -197,7 +204,9 @@ FACEBOOK_APP_ID=1234567890
 ## 📱 Mobile App Deployment
 
 ### Overview
+
 Mobile apps are deployed using **Expo Application Services (EAS)** which handles:
+
 - Native builds (iOS & Android)
 - App Store & Google Play submissions
 - Over-the-air (OTA) updates
@@ -223,6 +232,7 @@ Or via GitHub UI: **Releases → Draft a new release**
 #### **Step 2: Automatic Build & Submit**
 
 The `deploy.yml` workflow automatically:
+
 1. ✅ Builds iOS & Android production binaries
 2. ✅ Submits to App Store Connect & Google Play Console
 3. ✅ Notifies team on completion
@@ -232,6 +242,7 @@ The `deploy.yml` workflow automatically:
 #### **Step 3: Manual App Store Steps**
 
 ##### **iOS (App Store Connect)**
+
 1. Go to [appstoreconnect.apple.com](https://appstoreconnect.apple.com)
 2. Select your app → TestFlight
 3. Verify build appears (usually 5-10 minutes)
@@ -243,6 +254,7 @@ The `deploy.yml` workflow automatically:
    - Review time: 1-3 days
 
 ##### **Android (Google Play Console)**
+
 1. Go to [play.google.com/console](https://play.google.com/console)
 2. Select your app → Production
 3. Verify build uploaded
@@ -288,6 +300,7 @@ eas update:list --branch production
 ```
 
 **Important:** OTA updates work for:
+
 - ✅ JavaScript code changes
 - ✅ Asset updates (images, fonts)
 - ❌ Native code changes (requires new build)
@@ -298,11 +311,13 @@ eas update:list --branch production
 ## ⚡ Edge Functions Deployment
 
 ### Overview
+
 Supabase Edge Functions are deployed automatically on push to `main` via `monorepo-ci.yml`.
 
 ### Auto-Deployment
 
 **Deployed Functions:**
+
 1. `process-payment` - Payment processing
 2. `proof-validator` - Travel proof validation
 3. `moment-suggestions` - AI-powered suggestions
@@ -350,7 +365,7 @@ Set secrets via Supabase Dashboard or CLI:
 
 ```bash
 # Via CLI
-supabase secrets set STRIPE_SECRET_KEY=sk_live_xxxxx
+supabase secrets set PAYTR_MERCHANT_KEY=xxxxx
 supabase secrets set OPENAI_API_KEY=sk-xxxxx
 
 # Via Dashboard
@@ -376,6 +391,7 @@ curl -i --location --request POST \
 ## 🗄️ Database Migrations
 
 ### Overview
+
 Database schema changes are managed via **Supabase Migrations**.
 
 ### Migration Workflow
@@ -391,6 +407,7 @@ supabase migration new add_user_preferences
 ```
 
 Example migration:
+
 ```sql
 -- Add user preferences table
 CREATE TABLE IF NOT EXISTS public.user_preferences (
@@ -471,6 +488,7 @@ pnpm seed:staging
 ### Health Checks
 
 #### **Mobile App Health**
+
 ```bash
 # Check app status
 eas build:list --limit 5
@@ -480,6 +498,7 @@ eas build:list --limit 5
 ```
 
 #### **Edge Functions Health**
+
 ```bash
 # Function logs
 supabase functions logs <function-name> --tail
@@ -489,6 +508,7 @@ supabase functions logs <function-name> --tail
 ```
 
 #### **Database Health**
+
 ```bash
 # Connection test
 psql $DATABASE_URL -c "SELECT 1;"
@@ -502,17 +522,20 @@ psql $DATABASE_URL -c "SELECT 1;"
 #### **Mobile App Rollback**
 
 **Option 1: OTA Update** (if JS-only issue)
+
 ```bash
 cd apps/mobile
 eas update --branch production --message "Rollback to v1.0.0"
 ```
 
 **Option 2: Binary Rollback** (if native issue)
+
 1. GitHub → Releases → Previous release
 2. Re-run deploy workflow for that tag
 3. Or manually submit previous build from EAS
 
 #### **Edge Functions Rollback**
+
 ```bash
 # Re-deploy previous version
 git checkout <previous-commit>
@@ -521,6 +544,7 @@ git checkout main
 ```
 
 #### **Database Rollback**
+
 ```bash
 # Run rollback migration (see Database Migrations section)
 supabase migration new rollback_<feature>
@@ -536,12 +560,14 @@ supabase db push
 #### **1. EAS Build Fails**
 
 **Error:** `EXPO_TOKEN is not set`
+
 ```bash
 # Solution: Add to GitHub Secrets
 # Settings → Secrets → Actions → New secret
 ```
 
 **Error:** `Provisioning profile invalid`
+
 ```bash
 # Solution: Update provisioning profile
 eas credentials
@@ -549,6 +575,7 @@ eas credentials
 ```
 
 **Error:** `Out of disk space`
+
 ```bash
 # Solution: Use --clear-cache flag
 eas build --platform ios --profile production --clear-cache
@@ -557,6 +584,7 @@ eas build --platform ios --profile production --clear-cache
 #### **2. Edge Function Deployment Fails**
 
 **Error:** `Unauthorized`
+
 ```bash
 # Solution: Re-login
 supabase login
@@ -564,6 +592,7 @@ supabase link --project-ref your-project-ref
 ```
 
 **Error:** `Function size too large`
+
 ```bash
 # Solution: Remove node_modules, use deno deploy
 # Edge Functions use Deno, not Node.js
@@ -573,6 +602,7 @@ supabase link --project-ref your-project-ref
 #### **3. Database Migration Fails**
 
 **Error:** `Migration already applied`
+
 ```bash
 # Solution: Check migration history
 supabase migration list
@@ -582,6 +612,7 @@ supabase db push --skip-migration <migration-name>
 ```
 
 **Error:** `RLS policy conflicts`
+
 ```bash
 # Solution: Drop conflicting policies first
 DROP POLICY IF EXISTS "policy_name" ON table_name;
@@ -590,6 +621,7 @@ DROP POLICY IF EXISTS "policy_name" ON table_name;
 #### **4. GitHub Actions Fails**
 
 **Check logs:**
+
 ```bash
 # Via CLI
 gh run list --workflow=deploy.yml
@@ -600,6 +632,7 @@ gh run view <run-id>
 ```
 
 **Common fixes:**
+
 - Check all secrets are set
 - Verify Node version matches (20.x)
 - Check dependency installation logs
@@ -665,18 +698,21 @@ gh run view <run-id>
 ## 🔗 Quick Links
 
 ### Documentation
+
 - [OAuth Setup Guide](./OAUTH_SETUP_GUIDE.md)
 - [GitHub Secrets Setup](./GITHUB_SECRETS_SETUP.md)
 - [ESLint Issues Report](./ESLINT_ISSUES_REPORT.md)
 - [IDOR Protection](./IDOR_PROTECTION.md)
 
 ### External Resources
+
 - [Expo EAS Docs](https://docs.expo.dev/eas/)
 - [Supabase Edge Functions](https://supabase.com/docs/guides/functions)
 - [App Store Connect](https://appstoreconnect.apple.com)
 - [Google Play Console](https://play.google.com/console)
 
 ### Dashboards
+
 - [GitHub Actions](https://github.com/kemalteksalgit/lovendo/actions)
 - [Expo Dashboard](https://expo.dev/accounts/lovendo/projects)
 - [Supabase Dashboard](https://app.supabase.com/project/your-project)
@@ -687,11 +723,13 @@ gh run view <run-id>
 ## 📞 Support
 
 **Deployment Issues:**
+
 - Check GitHub Actions logs first
 - Review Supabase function logs
 - Contact DevOps team if needed
 
 **Emergency Rollback:**
+
 1. Stop auto-deployment (disable GitHub Actions workflow)
 2. Execute rollback procedure (see section above)
 3. Notify team immediately

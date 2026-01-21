@@ -59,7 +59,7 @@ const TRIAGE_ACTIONS_ENABLED = false; // PASSIVE MODE
 
 export const FEATURE_FLAGS = {
   // Payment
-  STRIPE_ENABLED: true,
+  PAYTR_ENABLED: true,
   ESCROW_ENABLED: true,
 
   // Social

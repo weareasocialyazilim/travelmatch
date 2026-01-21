@@ -1,11 +1,11 @@
 -- Migration: Add kyc_verifications table for tracking KYC verification history
--- Description: Stores detailed verification results from providers (Onfido, Stripe Identity)
+-- Description: Stores detailed verification results from providers (Onfido)
 
 -- Create kyc_verifications table
 CREATE TABLE IF NOT EXISTS public.kyc_verifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  provider TEXT NOT NULL CHECK (provider IN ('onfido', 'stripe_identity', 'mock')),
+  provider TEXT NOT NULL CHECK (provider IN ('onfido', 'mock')),
   provider_id TEXT, -- ID from external provider
   status TEXT NOT NULL CHECK (status IN ('verified', 'rejected', 'needs_review')),
   confidence NUMERIC(3, 2) CHECK (confidence >= 0 AND confidence <= 1), -- 0.00 to 1.00
@@ -51,4 +51,4 @@ CREATE TRIGGER update_kyc_verifications_updated_at
   EXECUTE FUNCTION update_updated_at_column();
 
 -- Add comment
-COMMENT ON TABLE public.kyc_verifications IS 'Stores KYC verification history from external providers (Onfido, Stripe Identity)';
+COMMENT ON TABLE public.kyc_verifications IS 'Stores KYC verification history from external providers (Onfido)';

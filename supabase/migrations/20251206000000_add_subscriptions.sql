@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS user_subscriptions (
   current_period_start TIMESTAMP WITH TIME ZONE,
   current_period_end TIMESTAMP WITH TIME ZONE,
   cancel_at_period_end BOOLEAN DEFAULT FALSE,
-  provider TEXT DEFAULT 'stripe', -- or 'apple', 'google'
+  provider TEXT DEFAULT 'paytr', -- or 'apple', 'google'
   provider_subscription_id TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())

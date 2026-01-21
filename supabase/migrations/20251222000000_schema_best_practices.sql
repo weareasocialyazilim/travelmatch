@@ -136,7 +136,7 @@ Features stored as JSONB array.';
 COMMENT ON TABLE user_subscriptions IS
 'User subscription state.
 Tracks current plan, billing period, and payment provider.
-Integrates with Stripe, Apple, and Google subscriptions.';
+Integrates with PayTR, Apple, and Google subscriptions.';
 
 COMMENT ON TABLE conversation_participants IS
 'Junction table for conversation membership.

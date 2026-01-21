@@ -18,13 +18,6 @@ echo -e "${YELLOW}🔐 Scanning for secrets...${NC}"
 
 # Patterns to detect
 PATTERNS=(
-    # === STRIPE ===
-    'sk_live_[a-zA-Z0-9]{24,}'           # Stripe live secret key
-    'pk_live_[a-zA-Z0-9]{24,}'           # Stripe live public key
-    'sk_test_[a-zA-Z0-9]{24,}'           # Stripe test secret key
-    'rk_live_[a-zA-Z0-9]{24,}'           # Stripe restricted key
-    'whsec_[a-zA-Z0-9]{24,}'             # Stripe webhook secret
-    
     # === TWILIO ===
     'AC[a-f0-9]{32}'                     # Twilio Account SID
     'SK[a-f0-9]{32}'                     # Twilio API Key SID

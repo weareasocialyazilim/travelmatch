@@ -67,9 +67,9 @@ CREATE INDEX IF NOT EXISTS idx_transactions_status ON transactions(status);
 CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type);
 CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON transactions(created_at DESC);
 
--- Add index for metadata queries (Stripe payment intent ID)
+-- Add index for metadata queries (PayTR transaction ID)
 CREATE INDEX IF NOT EXISTS idx_transactions_metadata_payment_intent 
-  ON transactions((metadata->>'stripe_payment_intent_id'));
+  ON transactions((metadata->>'paytr_transaction_id'));
 
 -- ============================================
 -- DATABASE FUNCTIONS

@@ -26,8 +26,8 @@ If selling Premium/Boost features:
 
 - [ ] **Restore Purchases:** Button exists on the paywall.
 - [ ] **Terms:** EULA link visible on the paywall.
-- [ ] **Physical Goods:** Trips/Gifts handled via Stripe/PayTR must complying with "Physical vs
-      Digital" rules. (Dating premium features MUST be IAP).
+- [ ] **Physical Goods:** Trips/Gifts handled via PayTR must comply with "Physical vs Digital"
+      rules. (Dating premium features MUST be IAP).
 
 ## 4. Metadata
 

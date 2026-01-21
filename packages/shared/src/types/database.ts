@@ -1412,7 +1412,6 @@ export type Database = {
             | 'pending'
             | 'deleted'
             | null;
-          stripe_customer_id: string | null;
           suspended_at: string | null;
           suspended_by: string | null;
           suspension_ends_at: string | null;
@@ -1457,7 +1456,6 @@ export type Database = {
             | 'pending'
             | 'deleted'
             | null;
-          stripe_customer_id?: string | null;
           suspended_at?: string | null;
           suspended_by?: string | null;
           suspension_ends_at?: string | null;
@@ -1502,7 +1500,6 @@ export type Database = {
             | 'pending'
             | 'deleted'
             | null;
-          stripe_customer_id?: string | null;
           suspended_at?: string | null;
           suspended_by?: string | null;
           suspension_ends_at?: string | null;
@@ -1514,10 +1511,10 @@ export type Database = {
       };
     } & {
       [key: string]: {
-        Row: Record<string, any>;
-        Insert: Record<string, any>;
-        Update: Record<string, any>;
-        Relationships: any;
+        Row: Record<string, unknown>;
+        Insert: Record<string, unknown>;
+        Update: Record<string, unknown>;
+        Relationships: unknown;
       };
     };
     Views: {
