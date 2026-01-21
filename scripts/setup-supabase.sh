@@ -165,8 +165,6 @@ echo -e "${GREEN}═════════════════════
 
 echo -e "${BLUE}📋 Next Steps:${NC}"
 echo -e "  1. Set Edge Function secrets:"
-echo -e "     ${YELLOW}npx supabase secrets set STRIPE_SECRET_KEY=sk_live_xxxxx${NC}"
-echo -e "     ${YELLOW}npx supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_xxxxx${NC}"
 echo -e "     ${YELLOW}npx supabase secrets set OPENAI_API_KEY=sk-xxxxx${NC}"
 echo ""
 echo -e "  2. Verify storage buckets in dashboard:"

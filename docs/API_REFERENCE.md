@@ -23,9 +23,11 @@
 
 ## Overview
 
-Lovendo API provides access to user profiles, travel moments, gift transactions, and payment processing. The API follows RESTful conventions and uses Supabase as the backend infrastructure.
+Lovendo API provides access to user profiles, travel moments, gift transactions, and payment
+processing. The API follows RESTful conventions and uses Supabase as the backend infrastructure.
 
 **Key Features:**
+
 - 🔐 JWT-based authentication
 - 📄 Cursor-based pagination for infinite scroll
 - ⚡ Real-time subscriptions via Supabase Realtime
@@ -43,15 +45,17 @@ Lovendo API provides access to user profiles, travel moments, gift transactions,
 All API requests require authentication using JWT tokens from Supabase Auth.
 
 **Authorization Header:**
+
 ```http
 Authorization: Bearer <YOUR_JWT_TOKEN>
 ```
 
 **Get JWT Token:**
+
 ```typescript
 const { data, error } = await supabase.auth.signInWithPassword({
   email: 'user@example.com',
-  password: 'password123'
+  password: 'password123',
 });
 
 const token = data.session?.access_token;
@@ -70,13 +74,13 @@ const { data, error } = await supabase.auth.refreshSession();
 
 ### Authentication Errors
 
-| Error Code | HTTP Status | Description | Recovery |
-|-----------|-------------|-------------|----------|
-| `AUTH_INVALID_CREDENTIALS` | 401 | Wrong email/password | Check credentials, use "Forgot Password" |
-| `AUTH_SESSION_EXPIRED` | 401 | Session expired | Log in again |
-| `AUTH_EMAIL_NOT_VERIFIED` | 403 | Email not verified | Check email for verification link |
-| `AUTH_ACCOUNT_DISABLED` | 403 | Account disabled | Contact support |
-| `AUTH_TOO_MANY_ATTEMPTS` | 429 | Too many login attempts | Wait 5 minutes |
+| Error Code                 | HTTP Status | Description             | Recovery                                 |
+| -------------------------- | ----------- | ----------------------- | ---------------------------------------- |
+| `AUTH_INVALID_CREDENTIALS` | 401         | Wrong email/password    | Check credentials, use "Forgot Password" |
+| `AUTH_SESSION_EXPIRED`     | 401         | Session expired         | Log in again                             |
+| `AUTH_EMAIL_NOT_VERIFIED`  | 403         | Email not verified      | Check email for verification link        |
+| `AUTH_ACCOUNT_DISABLED`    | 403         | Account disabled        | Contact support                          |
+| `AUTH_TOO_MANY_ATTEMPTS`   | 429         | Too many login attempts | Wait 5 minutes                           |
 
 ---
 
@@ -84,16 +88,17 @@ const { data, error } = await supabase.auth.refreshSession();
 
 ### Cursor-Based Pagination
 
-Lovendo uses **cursor-based pagination** for better performance and consistency, especially for real-time data like feeds and infinite scroll.
+Lovendo uses **cursor-based pagination** for better performance and consistency, especially for
+real-time data like feeds and infinite scroll.
 
 #### Why Cursor-Based?
 
-| Feature | Offset-Based | Cursor-Based |
-|---------|--------------|--------------|
-| **Performance** | ❌ Slow for large offsets (O(n)) | ✅ Constant time (O(1)) |
-| **Consistency** | ❌ Items can be duplicated/missed | ✅ Consistent results |
-| **Real-time** | ❌ Poor with live data | ✅ Excellent |
-| **Infinite Scroll** | ⚠️ Works but inefficient | ✅ Perfect |
+| Feature             | Offset-Based                      | Cursor-Based            |
+| ------------------- | --------------------------------- | ----------------------- |
+| **Performance**     | ❌ Slow for large offsets (O(n))  | ✅ Constant time (O(1)) |
+| **Consistency**     | ❌ Items can be duplicated/missed | ✅ Consistent results   |
+| **Real-time**       | ❌ Poor with live data            | ✅ Excellent            |
+| **Infinite Scroll** | ⚠️ Works but inefficient          | ✅ Perfect              |
 
 #### Standard Pagination Response
 
@@ -101,10 +106,10 @@ Lovendo uses **cursor-based pagination** for better performance and consistency,
 interface PaginatedResponse<T> {
   data: T[];
   pagination: {
-    nextCursor: string | null;  // Use this for next page
-    prevCursor: string | null;  // Use this for previous page (optional)
-    hasMore: boolean;            // True if more items exist
-    limit: number;               // Items per page
+    nextCursor: string | null; // Use this for next page
+    prevCursor: string | null; // Use this for previous page (optional)
+    hasMore: boolean; // True if more items exist
+    limit: number; // Items per page
   };
 }
 ```
@@ -112,16 +117,19 @@ interface PaginatedResponse<T> {
 #### Making Paginated Requests
 
 **First Page:**
+
 ```http
 GET /api/moments?limit=20
 ```
 
 **Next Page:**
+
 ```http
 GET /api/moments?limit=20&cursor=eyJpZCI6IjEyMyIsImNyZWF0ZWRfYXQiOiIyMDI0LTEyLTA3In0
 ```
 
 **Response:**
+
 ```json
 {
   "data": [
@@ -141,9 +149,7 @@ GET /api/moments?limit=20&cursor=eyJpZCI6IjEyMyIsImNyZWF0ZWRfYXQiOiIyMDI0LTEyLTA
 ```typescript
 import { useState } from 'react';
 
-function useCursorPagination<T>(
-  fetcher: (cursor?: string) => Promise<PaginatedResponse<T>>
-) {
+function useCursorPagination<T>(fetcher: (cursor?: string) => Promise<PaginatedResponse<T>>) {
   const [items, setItems] = useState<T[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
@@ -151,11 +157,11 @@ function useCursorPagination<T>(
 
   const loadMore = async () => {
     if (loading || !hasMore) return;
-    
+
     setLoading(true);
     try {
       const response = await fetcher(cursor || undefined);
-      setItems(prev => [...prev, ...response.data]);
+      setItems((prev) => [...prev, ...response.data]);
       setCursor(response.pagination.nextCursor);
       setHasMore(response.pagination.hasMore);
     } finally {
@@ -167,8 +173,8 @@ function useCursorPagination<T>(
 }
 
 // Usage
-const { items, loadMore, hasMore, loading } = useCursorPagination(
-  (cursor) => fetchMoments({ limit: 20, cursor })
+const { items, loadMore, hasMore, loading } = useCursorPagination((cursor) =>
+  fetchMoments({ limit: 20, cursor }),
 );
 ```
 
@@ -178,12 +184,12 @@ const { items, loadMore, hasMore, loading } = useCursorPagination(
 
 ### Global Rate Limits
 
-| Endpoint Type | Limit | Window | Error Code |
-|---------------|-------|--------|-----------|
-| Read endpoints | 100 requests | 1 minute | `RATE_LIMIT_EXCEEDED` |
-| Write endpoints | 30 requests | 1 minute | `RATE_LIMIT_EXCEEDED` |
-| Payment endpoints | 10 requests | 1 minute | `RATE_LIMIT_EXCEEDED` |
-| Auth endpoints | 5 requests | 5 minutes | `AUTH_TOO_MANY_ATTEMPTS` |
+| Endpoint Type     | Limit        | Window    | Error Code               |
+| ----------------- | ------------ | --------- | ------------------------ |
+| Read endpoints    | 100 requests | 1 minute  | `RATE_LIMIT_EXCEEDED`    |
+| Write endpoints   | 30 requests  | 1 minute  | `RATE_LIMIT_EXCEEDED`    |
+| Payment endpoints | 10 requests  | 1 minute  | `RATE_LIMIT_EXCEEDED`    |
+| Auth endpoints    | 5 requests   | 5 minutes | `AUTH_TOO_MANY_ATTEMPTS` |
 
 ### Rate Limit Headers
 
@@ -253,7 +259,7 @@ function MyComponent() {
         await someAsyncOperation();
       },
       t,
-      { onRetry: handleActionAuto }
+      { onRetry: handleActionAuto },
     );
   };
 }
@@ -266,6 +272,7 @@ function MyComponent() {
 Shows localized error alert with retry option.
 
 **Parameters:**
+
 - `error: unknown` - Any error type
 - `t: TFunction` - Translation function from `useTranslation()`
 - `options?: { onRetry?, onDismiss?, customTitle?, customMessage? }`
@@ -275,6 +282,7 @@ Shows localized error alert with retry option.
 Wraps async function with automatic error handling.
 
 **Parameters:**
+
 - `fn: () => Promise<T>` - Async function to execute
 - `t: TFunction` - Translation function
 - `options?: { onError?, showAlert?, onRetry?, customErrorMessage? }`
@@ -299,6 +307,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Response:**
+
 ```json
 {
   "id": "uuid",
@@ -340,6 +349,7 @@ Authorization: Bearer <JWT_TOKEN>
 **RLS Policy:** Users can only update their own profile.
 
 **Possible Errors:**
+
 - `AUTH_SESSION_EXPIRED` (401) - Session expired
 - `VALIDATION_REQUIRED_FIELD` (400) - Missing required field
 - `PERMISSION_DENIED` (403) - Attempting to update another user's profile
@@ -356,6 +366,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Query Parameters:**
+
 - `limit` (optional): Items per page (default: 20, max: 100)
 - `cursor` (optional): Cursor from previous response
 - `type` (optional): Filter by type (`coffee`, `ticket`, `dinner`, `other`)
@@ -363,6 +374,7 @@ Authorization: Bearer <JWT_TOKEN>
 - `location` (optional): Filter by location (`lat,lng,radius_km`)
 
 **Response:**
+
 ```json
 {
   "data": [
@@ -380,7 +392,7 @@ Authorization: Bearer <JWT_TOKEN>
         "country": "France"
       },
       "image_url": "https://...",
-      "price_amount": 5.50,
+      "price_amount": 5.5,
       "price_currency": "USD",
       "created_at": "2024-12-07T10:00:00Z"
     }
@@ -419,11 +431,13 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Validation:**
+
 - `title`: Min 5 characters (`VALIDATION_REQUIRED_FIELD`)
 - `price_amount`: Must be positive (`VALIDATION_INVALID_AMOUNT`)
 - `type`: Must be one of: `coffee`, `ticket`, `dinner`, `other`
 
 **Possible Errors:**
+
 - `VALIDATION_REQUIRED_FIELD` (400) - Missing required field
 - `VALIDATION_INVALID_AMOUNT` (400) - Invalid price
 - `UPLOAD_FILE_TOO_LARGE` (400) - Image too large (max 5MB)
@@ -440,12 +454,14 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Query Parameters:**
+
 - `limit`: Items per page
 - `cursor`: Pagination cursor
 - `type`: Filter by type (`gift`, `withdrawal`, `refund`, `deposit`)
 - `status`: Filter by status (`pending`, `completed`, `failed`)
 
 **Response:**
+
 ```json
 {
   "data": [
@@ -456,7 +472,7 @@ Authorization: Bearer <JWT_TOKEN>
       "moment_id": "uuid",
       "type": "gift",
       "status": "completed",
-      "amount": 10.00,
+      "amount": 10.0,
       "currency": "USD",
       "created_at": "2024-12-07T12:00:00Z",
       "completed_at": "2024-12-07T12:01:00Z"
@@ -496,6 +512,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Response:**
+
 ```json
 {
   "id": "uuid",
@@ -513,12 +530,14 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Proof Verification Flow:**
+
 1. User submits proof → `status: "pending"`
 2. AI analyzes proof → `ai_score` calculated (0-100)
 3. Community votes (optional) → `community_score` calculated
 4. Admin approves → `status: "verified"`, `verified_at` set
 
 **Possible Errors:**
+
 - `UPLOAD_FILE_TOO_LARGE` (400) - Image exceeds 5MB
 - `UPLOAD_INVALID_FORMAT` (400) - Invalid file format
 - `RESOURCE_NOT_FOUND` (404) - Moment not found
@@ -545,6 +564,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Response:**
+
 ```json
 {
   "clientSecret": "pi_xxx_secret_xxx",
@@ -558,6 +578,7 @@ Authorization: Bearer <JWT_TOKEN>
 **Rate Limit**: 10 requests/minute per user
 
 **Possible Errors:**
+
 - `PAYMENT_CARD_DECLINED` (402) - Card declined
 - `PAYMENT_INSUFFICIENT_FUNDS` (402) - Insufficient funds
 - `PAYMENT_INVALID_CARD` (400) - Invalid card details
@@ -617,7 +638,7 @@ CREATE TABLE moments (
 );
 
 -- Performance Index (CRITICAL for cursor pagination)
-CREATE INDEX idx_moments_created_at_id 
+CREATE INDEX idx_moments_created_at_id
   ON moments (created_at DESC, id DESC);
 
 -- RLS Policies
@@ -797,23 +818,22 @@ async function handlePayment(momentId: string, amount: number) {
 
   const result = await withErrorHandling(
     async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      const response = await fetch(
-        `${SUPABASE_URL}/functions/v1/create-payment-intent`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session?.access_token}`,
-          },
-          body: JSON.stringify({
-            momentId,
-            amount,
-            currency: 'USD',
-          }),
-        }
-      );
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/create-payment-intent`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+        body: JSON.stringify({
+          momentId,
+          amount,
+          currency: 'USD',
+        }),
+      });
 
       if (!response.ok) {
         const error = await response.json();
@@ -821,10 +841,10 @@ async function handlePayment(momentId: string, amount: number) {
       }
 
       const { clientSecret } = await response.json();
-      
-      // Use Stripe to confirm payment
-      const { error } = await stripe.confirmCardPayment(clientSecret);
-      
+
+      // Payment confirmation handled by PayTR
+      // Redirect user to payment page
+
       if (error) {
         throw error;
       }
@@ -835,7 +855,7 @@ async function handlePayment(momentId: string, amount: number) {
     {
       onRetry: () => handlePayment(momentId, amount),
       showAlert: true,
-    }
+    },
   );
 
   if (result?.success) {
@@ -866,8 +886,8 @@ function useMomentsSubscription() {
         },
         (payload) => {
           console.log('New moment:', payload.new);
-          setMoments(prev => [payload.new as Moment, ...prev]);
-        }
+          setMoments((prev) => [payload.new as Moment, ...prev]);
+        },
       )
       .subscribe();
 
@@ -889,77 +909,77 @@ function useMomentsSubscription() {
 
 #### Network Errors
 
-| Code | HTTP | User Message | Retryable |
-|------|------|--------------|-----------|
-| `NETWORK_ERROR` | - | "Unable to connect. Please check your internet connection." | ✅ |
-| `TIMEOUT` | 408 | "The request took too long. Please try again." | ✅ |
-| `NO_INTERNET` | - | "No internet connection. Please check your WiFi or mobile data." | ✅ |
+| Code            | HTTP | User Message                                                     | Retryable |
+| --------------- | ---- | ---------------------------------------------------------------- | --------- |
+| `NETWORK_ERROR` | -    | "Unable to connect. Please check your internet connection."      | ✅        |
+| `TIMEOUT`       | 408  | "The request took too long. Please try again."                   | ✅        |
+| `NO_INTERNET`   | -    | "No internet connection. Please check your WiFi or mobile data." | ✅        |
 
 #### Authentication Errors
 
-| Code | HTTP | User Message | Retryable |
-|------|------|--------------|-----------|
-| `AUTH_INVALID_CREDENTIALS` | 401 | "Incorrect email or password. Please try again." | ❌ |
-| `AUTH_SESSION_EXPIRED` | 401 | "Your session has expired. Please log in again." | ❌ |
-| `AUTH_EMAIL_NOT_VERIFIED` | 403 | "Please verify your email address to continue." | ❌ |
-| `AUTH_ACCOUNT_DISABLED` | 403 | "Your account has been disabled. Please contact support." | ❌ |
-| `AUTH_TOO_MANY_ATTEMPTS` | 429 | "Too many login attempts. Please try again in a few minutes." | ✅ |
+| Code                       | HTTP | User Message                                                  | Retryable |
+| -------------------------- | ---- | ------------------------------------------------------------- | --------- |
+| `AUTH_INVALID_CREDENTIALS` | 401  | "Incorrect email or password. Please try again."              | ❌        |
+| `AUTH_SESSION_EXPIRED`     | 401  | "Your session has expired. Please log in again."              | ❌        |
+| `AUTH_EMAIL_NOT_VERIFIED`  | 403  | "Please verify your email address to continue."               | ❌        |
+| `AUTH_ACCOUNT_DISABLED`    | 403  | "Your account has been disabled. Please contact support."     | ❌        |
+| `AUTH_TOO_MANY_ATTEMPTS`   | 429  | "Too many login attempts. Please try again in a few minutes." | ✅        |
 
 #### Validation Errors
 
-| Code | HTTP | User Message | Retryable |
-|------|------|--------------|-----------|
-| `VALIDATION_REQUIRED_FIELD` | 400 | "This field is required." | ❌ |
-| `VALIDATION_INVALID_EMAIL` | 400 | "Please enter a valid email address." | ❌ |
-| `VALIDATION_INVALID_PHONE` | 400 | "Please enter a valid phone number." | ❌ |
-| `VALIDATION_PASSWORD_TOO_SHORT` | 400 | "Password must be at least 8 characters." | ❌ |
-| `VALIDATION_PASSWORDS_DONT_MATCH` | 400 | "Passwords do not match." | ❌ |
-| `VALIDATION_INVALID_AMOUNT` | 400 | "Invalid amount. Must be positive." | ❌ |
+| Code                              | HTTP | User Message                              | Retryable |
+| --------------------------------- | ---- | ----------------------------------------- | --------- |
+| `VALIDATION_REQUIRED_FIELD`       | 400  | "This field is required."                 | ❌        |
+| `VALIDATION_INVALID_EMAIL`        | 400  | "Please enter a valid email address."     | ❌        |
+| `VALIDATION_INVALID_PHONE`        | 400  | "Please enter a valid phone number."      | ❌        |
+| `VALIDATION_PASSWORD_TOO_SHORT`   | 400  | "Password must be at least 8 characters." | ❌        |
+| `VALIDATION_PASSWORDS_DONT_MATCH` | 400  | "Passwords do not match."                 | ❌        |
+| `VALIDATION_INVALID_AMOUNT`       | 400  | "Invalid amount. Must be positive."       | ❌        |
 
 #### Payment Errors
 
-| Code | HTTP | User Message | Retryable |
-|------|------|--------------|-----------|
-| `PAYMENT_FAILED` | 402 | "Payment failed. Please try again or use a different card." | ✅ |
-| `PAYMENT_CARD_DECLINED` | 402 | "Your card was declined. Please check your card details." | ❌ |
-| `PAYMENT_INSUFFICIENT_FUNDS` | 402 | "Insufficient funds. Please add money to your account." | ❌ |
-| `PAYMENT_INVALID_CARD` | 400 | "Invalid card details. Please check and try again." | ❌ |
-| `PAYMENT_PROCESSING_ERROR` | 500 | "We couldn't process your payment. Please try again." | ✅ |
+| Code                         | HTTP | User Message                                                | Retryable |
+| ---------------------------- | ---- | ----------------------------------------------------------- | --------- |
+| `PAYMENT_FAILED`             | 402  | "Payment failed. Please try again or use a different card." | ✅        |
+| `PAYMENT_CARD_DECLINED`      | 402  | "Your card was declined. Please check your card details."   | ❌        |
+| `PAYMENT_INSUFFICIENT_FUNDS` | 402  | "Insufficient funds. Please add money to your account."     | ❌        |
+| `PAYMENT_INVALID_CARD`       | 400  | "Invalid card details. Please check and try again."         | ❌        |
+| `PAYMENT_PROCESSING_ERROR`   | 500  | "We couldn't process your payment. Please try again."       | ✅        |
 
 #### Upload Errors
 
-| Code | HTTP | User Message | Retryable |
-|------|------|--------------|-----------|
-| `UPLOAD_FILE_TOO_LARGE` | 400 | "File is too large. Maximum size is 5MB." | ❌ |
-| `UPLOAD_INVALID_FORMAT` | 400 | "Invalid file format. Please upload JPG, PNG, or HEIC." | ❌ |
-| `UPLOAD_FAILED` | 500 | "Upload failed. Please try again." | ✅ |
-| `UPLOAD_QUOTA_EXCEEDED` | 400 | "Storage limit reached. Please delete some files first." | ❌ |
+| Code                    | HTTP | User Message                                             | Retryable |
+| ----------------------- | ---- | -------------------------------------------------------- | --------- |
+| `UPLOAD_FILE_TOO_LARGE` | 400  | "File is too large. Maximum size is 5MB."                | ❌        |
+| `UPLOAD_INVALID_FORMAT` | 400  | "Invalid file format. Please upload JPG, PNG, or HEIC."  | ❌        |
+| `UPLOAD_FAILED`         | 500  | "Upload failed. Please try again."                       | ✅        |
+| `UPLOAD_QUOTA_EXCEEDED` | 400  | "Storage limit reached. Please delete some files first." | ❌        |
 
 #### Permission Errors
 
-| Code | HTTP | User Message | Retryable |
-|------|------|--------------|-----------|
-| `PERMISSION_CAMERA_DENIED` | 403 | "Camera access is required. Please enable it in Settings." | ❌ |
-| `PERMISSION_LOCATION_DENIED` | 403 | "Location access is required for this feature." | ❌ |
-| `PERMISSION_STORAGE_DENIED` | 403 | "Storage access is required to save photos." | ❌ |
-| `PERMISSION_NOTIFICATIONS_DENIED` | 403 | "Enable notifications to stay updated." | ❌ |
+| Code                              | HTTP | User Message                                               | Retryable |
+| --------------------------------- | ---- | ---------------------------------------------------------- | --------- |
+| `PERMISSION_CAMERA_DENIED`        | 403  | "Camera access is required. Please enable it in Settings." | ❌        |
+| `PERMISSION_LOCATION_DENIED`      | 403  | "Location access is required for this feature."            | ❌        |
+| `PERMISSION_STORAGE_DENIED`       | 403  | "Storage access is required to save photos."               | ❌        |
+| `PERMISSION_NOTIFICATIONS_DENIED` | 403  | "Enable notifications to stay updated."                    | ❌        |
 
 #### Resource Errors
 
-| Code | HTTP | User Message | Retryable |
-|------|------|--------------|-----------|
-| `RESOURCE_NOT_FOUND` | 404 | "The requested item could not be found." | ❌ |
-| `RESOURCE_ALREADY_EXISTS` | 409 | "This item already exists." | ❌ |
-| `RESOURCE_DELETED` | 410 | "This item has been deleted." | ❌ |
+| Code                      | HTTP | User Message                             | Retryable |
+| ------------------------- | ---- | ---------------------------------------- | --------- |
+| `RESOURCE_NOT_FOUND`      | 404  | "The requested item could not be found." | ❌        |
+| `RESOURCE_ALREADY_EXISTS` | 409  | "This item already exists."              | ❌        |
+| `RESOURCE_DELETED`        | 410  | "This item has been deleted."            | ❌        |
 
 #### Server Errors
 
-| Code | HTTP | User Message | Retryable |
-|------|------|--------------|-----------|
-| `SERVER_ERROR` | 500 | "Something went wrong on our end. Please try again later." | ✅ |
-| `SERVICE_UNAVAILABLE` | 503 | "Service is temporarily unavailable. Please try again in a few minutes." | ✅ |
-| `MAINTENANCE_MODE` | 503 | "We're currently doing maintenance. We'll be back soon!" | ✅ |
-| `RATE_LIMIT_EXCEEDED` | 429 | "Too many requests. Please wait a moment and try again." | ✅ |
+| Code                  | HTTP | User Message                                                             | Retryable |
+| --------------------- | ---- | ------------------------------------------------------------------------ | --------- |
+| `SERVER_ERROR`        | 500  | "Something went wrong on our end. Please try again later."               | ✅        |
+| `SERVICE_UNAVAILABLE` | 503  | "Service is temporarily unavailable. Please try again in a few minutes." | ✅        |
+| `MAINTENANCE_MODE`    | 503  | "We're currently doing maintenance. We'll be back soon!"                 | ✅        |
+| `RATE_LIMIT_EXCEEDED` | 429  | "Too many requests. Please wait a moment and try again."                 | ✅        |
 
 ---
 
@@ -969,7 +989,7 @@ function useMomentsSubscription() {
 - **[Environment Variables](./ENVIRONMENT_VARIABLES.md)** - Configuration guide
 - **[Quality Improvements](./QUALITY_IMPROVEMENTS.md)** - Testing & CI/CD
 - **[Supabase Docs](https://supabase.com/docs)** - Official Supabase documentation
-- **[Stripe API](https://stripe.com/docs/api)** - Stripe payment API reference
+- **[PayTR Docs](https://www.paytr.com/magaza/entegrasyon)** - PayTR payment integration guide
 
 ---
 

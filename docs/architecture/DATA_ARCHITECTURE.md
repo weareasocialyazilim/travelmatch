@@ -1,9 +1,9 @@
 # Lovendo Data Architecture
 
-> **Version**: 1.0.0
-> **Last Updated**: December 2024
+> **Version**: 1.0.0 **Last Updated**: December 2024
 
-This document describes the data architecture of Lovendo, including database design, data flows, and storage patterns.
+This document describes the data architecture of Lovendo, including database design, data flows, and
+storage patterns.
 
 ## Table of Contents
 
@@ -21,13 +21,13 @@ This document describes the data architecture of Lovendo, including database des
 
 ### Technology Stack
 
-| Component | Technology | Purpose |
-|-----------|------------|---------|
-| Primary Database | PostgreSQL 15 | OLTP workloads |
-| Extensions | PostGIS, uuid-ossp | Geospatial, UUID generation |
-| Connection Pooling | PgBouncer | Connection management |
-| Cache Layer | Redis 7.2 | Session, rate limiting, cache |
-| Object Storage | S3/Minio | File storage |
+| Component          | Technology         | Purpose                       |
+| ------------------ | ------------------ | ----------------------------- |
+| Primary Database   | PostgreSQL 15      | OLTP workloads                |
+| Extensions         | PostGIS, uuid-ossp | Geospatial, UUID generation   |
+| Connection Pooling | PgBouncer          | Connection management         |
+| Cache Layer        | Redis 7.2          | Session, rate limiting, cache |
+| Object Storage     | S3/Minio           | File storage                  |
 
 ### Database Configuration
 
@@ -280,7 +280,7 @@ CREATE TABLE subscriptions (
   user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
   plan TEXT NOT NULL CHECK (plan IN ('free', 'premium', 'business')),
   status TEXT DEFAULT 'active' CHECK (status IN ('active', 'cancelled', 'expired')),
-  stripe_subscription_id TEXT,
+  paytr_subscription_id TEXT,
   current_period_start TIMESTAMPTZ,
   current_period_end TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -494,15 +494,15 @@ $$;
 
 ### Data Retention Policies
 
-| Data Type | Retention Period | Action |
-|-----------|-----------------|--------|
-| Active users | Indefinite | None |
-| Deleted users | 30 days | Hard delete |
-| Messages | 2 years | Archive to cold storage |
-| Notifications | 90 days | Auto-delete |
-| Transactions | 7 years | Archive (legal requirement) |
-| Audit logs | 1 year | Archive |
-| Session data | 7 days | Auto-expire |
+| Data Type     | Retention Period | Action                      |
+| ------------- | ---------------- | --------------------------- |
+| Active users  | Indefinite       | None                        |
+| Deleted users | 30 days          | Hard delete                 |
+| Messages      | 2 years          | Archive to cold storage     |
+| Notifications | 90 days          | Auto-delete                 |
+| Transactions  | 7 years          | Archive (legal requirement) |
+| Audit logs    | 1 year           | Archive                     |
+| Session data  | 7 days           | Auto-expire                 |
 
 ### GDPR Compliance
 
@@ -578,19 +578,19 @@ $$;
 
 ### Backup Strategy
 
-| Type | Frequency | Retention | Storage |
-|------|-----------|-----------|---------|
-| Full backup | Daily | 30 days | S3 Glacier |
-| Incremental | Hourly | 7 days | S3 Standard |
-| Transaction logs | Continuous | 7 days | S3 Standard |
-| Point-in-time | N/A | 7 days | Supabase |
+| Type             | Frequency  | Retention | Storage     |
+| ---------------- | ---------- | --------- | ----------- |
+| Full backup      | Daily      | 30 days   | S3 Glacier  |
+| Incremental      | Hourly     | 7 days    | S3 Standard |
+| Transaction logs | Continuous | 7 days    | S3 Standard |
+| Point-in-time    | N/A        | 7 days    | Supabase    |
 
 ### Recovery Objectives
 
-| Metric | Target |
-|--------|--------|
+| Metric                         | Target     |
+| ------------------------------ | ---------- |
 | RPO (Recovery Point Objective) | 15 minutes |
-| RTO (Recovery Time Objective) | 1 hour |
+| RTO (Recovery Time Objective)  | 1 hour     |
 
 ### Disaster Recovery
 
@@ -616,11 +616,7 @@ async function getMoment(id: string): Promise<Moment> {
   if (cached) return JSON.parse(cached);
 
   // Fetch from database
-  const { data } = await supabase
-    .from('moments')
-    .select('*')
-    .eq('id', id)
-    .single();
+  const { data } = await supabase.from('moments').select('*').eq('id', id).single();
 
   // Cache for 5 minutes
   await redis.setex(`moment:${id}`, 300, JSON.stringify(data));

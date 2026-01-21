@@ -61,7 +61,7 @@ CREATE POLICY "Service role only for used_2fa_codes" ON public.used_2fa_codes
 CREATE TABLE IF NOT EXISTS public.kyc_verifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
-  provider TEXT NOT NULL CHECK (provider IN ('onfido', 'stripe_identity', 'manual_review', 'mock')),
+  provider TEXT NOT NULL CHECK (provider IN ('onfido', 'onfido', 'manual_review', 'mock')),
   provider_check_id TEXT,
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'pending_review', 'verified', 'rejected', 'expired')),
   document_type TEXT,

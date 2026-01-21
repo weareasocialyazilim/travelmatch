@@ -52,7 +52,7 @@ CREATE INDEX idx_webhook_events_event_id ON processed_webhook_events(event_id);
 CREATE INDEX idx_webhook_events_processed_at ON processed_webhook_events(processed_at DESC);
 
 -- ============================================
--- EXTEND USERS TABLE FOR STRIPE
+-- EXTEND USERS TABLE FOR PAYMENTS (Legacy - removed by later migration)
 -- ============================================
 ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT UNIQUE;
 CREATE INDEX IF NOT EXISTS idx_users_stripe_customer_id ON users(stripe_customer_id);

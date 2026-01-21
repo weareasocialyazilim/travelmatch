@@ -1,10 +1,12 @@
 # Lovendo Database Schema Reference
 
-This document provides a comprehensive reference for the Lovendo PostgreSQL database schema, following PostgreSQL best practices.
+This document provides a comprehensive reference for the Lovendo PostgreSQL database schema,
+following PostgreSQL best practices.
 
 ## Overview
 
 Lovendo uses **PostgreSQL** via **Supabase** with the following extensions:
+
 - `uuid-ossp` - UUID generation
 - `postgis` - Geospatial queries and data types
 - `pg_cron` - Scheduled job execution (escrow auto-refund)
@@ -13,7 +15,8 @@ Lovendo uses **PostgreSQL** via **Supabase** with the following extensions:
 
 The schema follows these PostgreSQL best practices:
 
-1. **Primary Keys**: UUID for global uniqueness (required for Supabase auth integration and mobile client sharing)
+1. **Primary Keys**: UUID for global uniqueness (required for Supabase auth integration and mobile
+   client sharing)
 2. **Normalization**: 3NF with selective denormalization only for proven performance needs
 3. **NOT NULL**: Applied wherever semantically required
 4. **Data Types**:
@@ -61,6 +64,7 @@ CREATE TABLE users (
 ```
 
 **Indexes:**
+
 - `idx_users_email` - Email lookups
 - `idx_users_coordinates` (GIST) - Proximity searches
 - `idx_users_verified_coordinates` - Verified users near location
@@ -97,6 +101,7 @@ CREATE TABLE moments (
 ```
 
 **Indexes:**
+
 - `idx_moments_user_id` - User's moments (FK index)
 - `idx_moments_coordinates` (GIST) - Location-based discovery
 - `idx_moments_active` - Active moments by date
@@ -122,6 +127,7 @@ CREATE TABLE requests (
 ```
 
 **Indexes:**
+
 - `idx_requests_moment_id` - Requests for a moment
 - `idx_requests_user_id` - User's requests
 - `idx_requests_pending` - Pending requests for processing
@@ -178,6 +184,7 @@ CREATE TABLE messages (
 ```
 
 **Indexes:**
+
 - `idx_messages_conversation_id` - Messages in conversation
 - `idx_messages_unread` - Unread messages for notification counts
 
@@ -235,6 +242,7 @@ CREATE TABLE escrow_transactions (
 ```
 
 **Key Functions:**
+
 - `create_escrow_transaction()` - Creates escrow and debits sender
 - `release_escrow()` - Releases funds to recipient
 - `refund_escrow()` - Refunds to sender
@@ -274,7 +282,7 @@ CREATE TABLE user_subscriptions (
   current_period_start TIMESTAMPTZ,
   current_period_end TIMESTAMPTZ,
   cancel_at_period_end BOOLEAN DEFAULT FALSE,
-  provider TEXT DEFAULT 'stripe',
+  provider TEXT DEFAULT 'paytr',
   provider_subscription_id TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -420,24 +428,30 @@ All tables have RLS enabled with policies following the principle of least privi
 ## Indexing Strategy
 
 ### FK Indexes (Manual)
+
 PostgreSQL doesn't auto-create indexes on FK columns. All FKs have manual indexes:
+
 - `idx_moments_user_id`
 - `idx_requests_moment_id`, `idx_requests_user_id`
 - `idx_messages_conversation_id`, `idx_messages_sender_id`
 - `idx_transactions_user_id`, `idx_transactions_moment_id`
 
 ### Spatial Indexes (GIST)
+
 - `idx_moments_coordinates` - Location-based moment discovery
 - `idx_users_coordinates` - Find travelers nearby
 
 ### Partial Indexes
+
 - `idx_users_verified` WHERE verified = TRUE
 - `idx_moments_active` WHERE status = 'active'
 - `idx_requests_pending` WHERE status = 'pending'
 - `idx_notifications_unread` WHERE read = FALSE
 
 ### Composite Indexes
+
 Ordered by selectivity for common query patterns:
+
 - `(user_id, status)` - User's filtered items
 - `(status, created_at DESC)` - Admin queues
 - `(category, date DESC)` - Discovery feeds
@@ -445,6 +459,7 @@ Ordered by selectivity for common query patterns:
 ## JSONB Usage
 
 JSONB is used sparingly for optional/semi-structured data:
+
 - `users.notification_preferences` - Per-user notification settings
 - `users.privacy_settings` - Privacy configuration
 - `messages.metadata` - Message-type-specific data
@@ -455,18 +470,18 @@ All JSONB columns have GIN indexes where queried.
 
 ## Best Practices Applied
 
-| Practice | Implementation |
-|----------|---------------|
-| TIMESTAMPTZ not TIMESTAMP | All timestamp columns use WITH TIME ZONE |
-| TEXT not VARCHAR | All string columns use TEXT |
-| NUMERIC for money | balance, amount, price all use DECIMAL/NUMERIC |
-| FK indexes | All foreign keys have manual indexes |
-| Soft deletes | users.deleted_at with partial index |
-| Enum for stable values | admin_role, task_priority, task_status |
-| CHECK for evolving values | status fields use TEXT + CHECK |
-| UUID for PKs | Required for Supabase auth and client sharing |
-| JSONB not JSON | All JSON columns use JSONB with GIN indexes |
-| Table comments | All tables documented |
+| Practice                  | Implementation                                 |
+| ------------------------- | ---------------------------------------------- |
+| TIMESTAMPTZ not TIMESTAMP | All timestamp columns use WITH TIME ZONE       |
+| TEXT not VARCHAR          | All string columns use TEXT                    |
+| NUMERIC for money         | balance, amount, price all use DECIMAL/NUMERIC |
+| FK indexes                | All foreign keys have manual indexes           |
+| Soft deletes              | users.deleted_at with partial index            |
+| Enum for stable values    | admin_role, task_priority, task_status         |
+| CHECK for evolving values | status fields use TEXT + CHECK                 |
+| UUID for PKs              | Required for Supabase auth and client sharing  |
+| JSONB not JSON            | All JSON columns use JSONB with GIN indexes    |
+| Table comments            | All tables documented                          |
 
 ## Migration Files
 

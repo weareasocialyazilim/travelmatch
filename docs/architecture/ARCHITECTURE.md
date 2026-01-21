@@ -1,8 +1,6 @@
 # Lovendo Architecture Documentation
 
-> **Version**: 1.0.0
-> **Last Updated**: December 2024
-> **Status**: Production Ready (90% Complete)
+> **Version**: 1.0.0 **Last Updated**: December 2024 **Status**: Production Ready (90% Complete)
 
 ## Table of Contents
 
@@ -22,7 +20,9 @@
 
 ## Executive Summary
 
-Lovendo is a social travel platform that connects travelers through shared experiences and gift exchanges. The platform enables users to create and join "moments" - unique travel experiences - and facilitates secure peer-to-peer transactions.
+Lovendo is a social travel platform that connects travelers through shared experiences and gift
+exchanges. The platform enables users to create and join "moments" - unique travel experiences - and
+facilitates secure peer-to-peer transactions.
 
 ### Key Business Capabilities
 
@@ -34,15 +34,15 @@ Lovendo is a social travel platform that connects travelers through shared exper
 
 ### Architecture Highlights
 
-| Aspect | Decision |
-|--------|----------|
+| Aspect                 | Decision                                                |
+| ---------------------- | ------------------------------------------------------- |
 | **Architecture Style** | Monorepo with modular backend (Supabase Edge Functions) |
-| **Frontend** | React Native (Mobile), Next.js (Web), React (Admin) |
-| **Backend** | Supabase (PostgreSQL + Edge Functions) |
-| **State Management** | Zustand (client-side) |
-| **API Pattern** | REST via PostgREST |
-| **Real-time** | Supabase Realtime (WebSocket) |
-| **Infrastructure** | Docker Compose (dev), Cloud-native (prod) |
+| **Frontend**           | React Native (Mobile), Next.js (Web), React (Admin)     |
+| **Backend**            | Supabase (PostgreSQL + Edge Functions)                  |
+| **State Management**   | Zustand (client-side)                                   |
+| **API Pattern**        | REST via PostgREST                                      |
+| **Real-time**          | Supabase Realtime (WebSocket)                           |
+| **Infrastructure**     | Docker Compose (dev), Cloud-native (prod)               |
 
 ---
 
@@ -96,6 +96,7 @@ Lovendo is a social travel platform that connects travelers through shared exper
 ### 1. Monorepo with Shared Packages
 
 All applications and packages live in a single repository managed by **Turborepo**, enabling:
+
 - Shared TypeScript types across all applications
 - Unified design system and UI components
 - Consistent build and test pipelines
@@ -104,6 +105,7 @@ All applications and packages live in a single repository managed by **Turborepo
 ### 2. Backend-as-a-Service First
 
 We leverage **Supabase** as our primary backend to:
+
 - Reduce operational complexity
 - Leverage built-in authentication, storage, and real-time capabilities
 - Use PostgreSQL with Row Level Security for data access control
@@ -112,6 +114,7 @@ We leverage **Supabase** as our primary backend to:
 ### 3. Mobile-First Design
 
 The mobile application is the primary user interface:
+
 - React Native + Expo for cross-platform development
 - Offline-first patterns with optimistic updates
 - Performance-optimized with lazy loading and image optimization
@@ -135,37 +138,38 @@ The mobile application is the primary user interface:
 
 ## C4 Model Overview
 
-This section provides a summary of the C4 model diagrams. For detailed diagrams, see [C4_MODEL.md](./C4_MODEL.md).
+This section provides a summary of the C4 model diagrams. For detailed diagrams, see
+[C4_MODEL.md](./C4_MODEL.md).
 
 ### Level 1: System Context
 
 Lovendo interacts with the following external systems:
 
-| External System | Description | Integration |
-|-----------------|-------------|-------------|
-| **Stripe** | Payment processing | REST API |
-| **Onfido** | KYC/Identity verification | REST API |
-| **Cloudflare** | CDN and image optimization | REST API |
-| **Apple/Google** | OAuth providers | OAuth 2.0 |
-| **Push Notification Services** | APNs, FCM | Native SDKs |
-| **Mapbox** | Maps and geocoding | Native SDK |
+| External System                | Description                | Integration |
+| ------------------------------ | -------------------------- | ----------- |
+| **Stripe**                     | Payment processing         | REST API    |
+| **Onfido**                     | KYC/Identity verification  | REST API    |
+| **Cloudflare**                 | CDN and image optimization | REST API    |
+| **Apple/Google**               | OAuth providers            | OAuth 2.0   |
+| **Push Notification Services** | APNs, FCM                  | Native SDKs |
+| **Mapbox**                     | Maps and geocoding         | Native SDK  |
 
 ### Level 2: Container Diagram
 
-| Container | Technology | Purpose |
-|-----------|------------|---------|
-| Mobile App | React Native + Expo | Primary user interface |
-| Web Landing | Next.js 16 | Marketing and SEO |
-| Admin Panel | React + Radix UI | Back-office operations |
-| API Gateway | Kong | Request routing, auth, rate limiting |
-| REST API | PostgREST | Auto-generated REST endpoints |
-| Auth Service | GoTrue | Authentication and authorization |
-| Realtime | Supabase Realtime | WebSocket subscriptions |
-| Database | PostgreSQL 15 | Primary data store |
-| Cache | Redis | Session, caching, rate limiting |
-| Object Storage | Supabase Storage / S3 | File uploads |
-| Job Queue | BullMQ + Redis | Background processing |
-| Edge Functions | Deno | Serverless business logic |
+| Container      | Technology            | Purpose                              |
+| -------------- | --------------------- | ------------------------------------ |
+| Mobile App     | React Native + Expo   | Primary user interface               |
+| Web Landing    | Next.js 16            | Marketing and SEO                    |
+| Admin Panel    | React + Radix UI      | Back-office operations               |
+| API Gateway    | Kong                  | Request routing, auth, rate limiting |
+| REST API       | PostgREST             | Auto-generated REST endpoints        |
+| Auth Service   | GoTrue                | Authentication and authorization     |
+| Realtime       | Supabase Realtime     | WebSocket subscriptions              |
+| Database       | PostgreSQL 15         | Primary data store                   |
+| Cache          | Redis                 | Session, caching, rate limiting      |
+| Object Storage | Supabase Storage / S3 | File uploads                         |
+| Job Queue      | BullMQ + Redis        | Background processing                |
+| Edge Functions | Deno                  | Serverless business logic            |
 
 ### Level 3: Component Diagram
 
@@ -178,6 +182,7 @@ See [C4_MODEL.md](./C4_MODEL.md) for detailed component diagrams of each contain
 ### Frontend Applications
 
 #### Mobile App (`apps/mobile`)
+
 ```
 Framework:     React Native 0.83 + Expo SDK 54
 Language:      TypeScript 5.9 (strict mode)
@@ -191,6 +196,7 @@ E2E:           Maestro
 ```
 
 #### Web Landing (`apps/web`)
+
 ```
 Framework:     Next.js 16 + Turbopack
 Language:      TypeScript 5.9
@@ -199,6 +205,7 @@ Compiler:      React Compiler (experimental)
 ```
 
 #### Admin Panel (`apps/admin`)
+
 ```
 Framework:     Next.js 16
 UI Library:    Radix UI + Tailwind CSS
@@ -210,6 +217,7 @@ Forms:         React Hook Form + Zod
 ### Backend Services
 
 #### Supabase Stack
+
 ```
 Database:      PostgreSQL 15 + PostGIS
 Auth:          GoTrue v2.99
@@ -220,6 +228,7 @@ Edge Functions: Deno Runtime
 ```
 
 #### Supporting Services
+
 ```
 Cache:         Redis 7.2 (Redis Stack)
 Job Queue:     BullMQ (Node.js workers)
@@ -230,11 +239,11 @@ S3 Emulation:  Minio / LocalStack
 
 ### Shared Packages
 
-| Package | Purpose |
-|---------|---------|
-| `@lovendo/shared` | Common utilities, types, validation |
-| `@lovendo/design-system` | UI components, tokens, theming |
-| `@lovendo/monitoring` | Logging, metrics, error tracking |
+| Package                  | Purpose                             |
+| ------------------------ | ----------------------------------- |
+| `@lovendo/shared`        | Common utilities, types, validation |
+| `@lovendo/design-system` | UI components, tokens, theming      |
+| `@lovendo/monitoring`    | Logging, metrics, error tracking    |
 
 ### Development Tools
 
@@ -256,17 +265,15 @@ CI/CD:         GitHub Actions
 
 ```yaml
 # Local Development Stack (docker-compose.yml)
-┌─────────────────────────────────────────────────────────┐
-│                    Docker Network                       │
-│                                                         │
-│  ┌───────────┐  ┌───────────┐  ┌───────────┐          │
-│  │ PostgreSQL│  │   Kong    │  │  GoTrue   │          │
+┌─────────────────────────────────────────────────────────┐ │                    Docker
+Network                       │ │                                                         │
+│  ┌───────────┐  ┌───────────┐  ┌───────────┐          │ │  │
+PostgreSQL│  │   Kong    │  │  GoTrue   │          │
 │  │   :5432   │  │   :8000   │  │   :9999   │          │
 │  └───────────┘  └───────────┘  └───────────┘          │
 │                                                         │
-│  ┌───────────┐  ┌───────────┐  ┌───────────┐          │
-│  │ PostgREST │  │ Realtime  │  │  Storage  │          │
-│  │   :3000   │  │   :4000   │  │   :5000   │          │
+│  ┌───────────┐  ┌───────────┐  ┌───────────┐          │ │  │ PostgREST │  │
+Realtime  │  │  Storage  │          │ │  │   :3000   │  │   :4000   │  │   :5000   │          │
 │  └───────────┘  └───────────┘  └───────────┘          │
 │                                                         │
 │  ┌───────────┐  ┌───────────┐  ┌───────────┐          │
@@ -274,9 +281,8 @@ CI/CD:         GitHub Actions
 │  │   :6379   │  │   :3001   │  │   :8025   │          │
 │  └───────────┘  └───────────┘  └───────────┘          │
 │                                                         │
-│  ┌───────────┐  ┌───────────┐  ┌───────────┐          │
-│  │ Job Queue │  │Job Worker │  │   Minio   │          │
-│  │   :3002   │  │  (scale)  │  │   :9000   │          │
+│  ┌───────────┐  ┌───────────┐  ┌───────────┐          │ │  │ Job Queue │  │Job Worker
+│  │   Minio   │          │ │  │   :3002   │  │  (scale)  │  │   :9000   │          │
 │  └───────────┘  └───────────┘  └───────────┘          │
 │                                                         │
 └─────────────────────────────────────────────────────────┘
@@ -364,25 +370,26 @@ CI/CD:         GitHub Actions
 
 ### Database Tables
 
-| Table | Description | RLS |
-|-------|-------------|-----|
-| `users` | User profiles, preferences, balance | Yes |
-| `moments` | Travel experiences/events | Yes |
-| `requests` | Join requests for moments | Yes |
-| `conversations` | Chat threads | Yes |
-| `messages` | Individual messages | Yes |
-| `reviews` | User reviews and ratings | Yes |
-| `notifications` | Push notification queue | Yes |
-| `transactions` | Payment records | Yes |
-| `favorites` | Saved moments | Yes |
-| `blocks` | Blocked users | Yes |
-| `reports` | Content/user reports | Yes |
-| `subscriptions` | Premium subscriptions | Yes |
-| `kyc_verifications` | Identity verification status | Yes |
+| Table               | Description                         | RLS |
+| ------------------- | ----------------------------------- | --- |
+| `users`             | User profiles, preferences, balance | Yes |
+| `moments`           | Travel experiences/events           | Yes |
+| `requests`          | Join requests for moments           | Yes |
+| `conversations`     | Chat threads                        | Yes |
+| `messages`          | Individual messages                 | Yes |
+| `reviews`           | User reviews and ratings            | Yes |
+| `notifications`     | Push notification queue             | Yes |
+| `transactions`      | Payment records                     | Yes |
+| `favorites`         | Saved moments                       | Yes |
+| `blocks`            | Blocked users                       | Yes |
+| `reports`           | Content/user reports                | Yes |
+| `subscriptions`     | Premium subscriptions               | Yes |
+| `kyc_verifications` | Identity verification status        | Yes |
 
 ### Data Flow Patterns
 
 #### 1. Moment Creation Flow
+
 ```
 Mobile App → API Gateway → PostgREST → PostgreSQL
                                           │
@@ -394,14 +401,15 @@ Mobile App → API Gateway → PostgREST → PostgreSQL
 ```
 
 #### 2. Payment Flow
+
 ```
 Mobile App → Edge Function (create-payment-intent)
                     │
                     ▼
-              Stripe API → Webhook
+              PayTR API → Webhook
                               │
                               ▼
-              Edge Function (stripe-webhook)
+              Edge Function (paytr-webhook)
                               │
                               ▼
                         PostgreSQL
@@ -450,15 +458,15 @@ See [DATA_ARCHITECTURE.md](./DATA_ARCHITECTURE.md) for detailed documentation.
 
 ### Security Controls
 
-| Control | Implementation |
-|---------|----------------|
-| Authentication | JWT + Refresh Token Rotation |
-| Authorization | RLS Policies + RBAC |
-| Data Encryption | TLS 1.3 in transit, AES-256 at rest |
-| API Security | Rate limiting, request validation |
-| Secret Management | Infisical, environment variables |
-| Audit Logging | Trigger-based audit trail |
-| KYC/AML | Onfido integration |
+| Control           | Implementation                      |
+| ----------------- | ----------------------------------- |
+| Authentication    | JWT + Refresh Token Rotation        |
+| Authorization     | RLS Policies + RBAC                 |
+| Data Encryption   | TLS 1.3 in transit, AES-256 at rest |
+| API Security      | Rate limiting, request validation   |
+| Secret Management | Infisical, environment variables    |
+| Audit Logging     | Trigger-based audit trail           |
+| KYC/AML           | Onfido integration                  |
 
 See [SECURITY_ARCHITECTURE.md](./SECURITY_ARCHITECTURE.md) for detailed documentation.
 
@@ -473,7 +481,7 @@ See [SECURITY_ARCHITECTURE.md](./SECURITY_ARCHITECTURE.md) for detailed document
 const callExternalAPI = async (params: APIParams) => {
   try {
     const response = await fetch(url, {
-      headers: { 'Authorization': `Bearer ${API_KEY}` },
+      headers: { Authorization: `Bearer ${API_KEY}` },
       timeout: 30000,
     });
 
@@ -527,20 +535,20 @@ const callExternalAPI = async (params: APIParams) => {
 
 ### Performance
 
-| Metric | Target | Current |
-|--------|--------|---------|
-| TTI (Mobile) | < 3s | ~2s |
-| API Response (p95) | < 200ms | ~150ms |
-| Database Query | < 50ms | ~30ms |
-| Bundle Size | < 5MB | ~4.2MB |
+| Metric             | Target  | Current |
+| ------------------ | ------- | ------- |
+| TTI (Mobile)       | < 3s    | ~2s     |
+| API Response (p95) | < 200ms | ~150ms  |
+| Database Query     | < 50ms  | ~30ms   |
+| Bundle Size        | < 5MB   | ~4.2MB  |
 
 ### Reliability
 
-| Metric | Target |
-|--------|--------|
-| Uptime | 99.9% |
-| RTO | < 1 hour |
-| RPO | < 15 minutes |
+| Metric | Target       |
+| ------ | ------------ |
+| Uptime | 99.9%        |
+| RTO    | < 1 hour     |
+| RPO    | < 15 minutes |
 
 ### Scalability
 
@@ -591,6 +599,6 @@ const callExternalAPI = async (params: APIParams) => {
 
 ## Document History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0.0 | Dec 2024 | Architecture Team | Initial documentation |
+| Version | Date     | Author            | Changes               |
+| ------- | -------- | ----------------- | --------------------- |
+| 1.0.0   | Dec 2024 | Architecture Team | Initial documentation |

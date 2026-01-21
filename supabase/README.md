@@ -34,7 +34,7 @@ supabase/
 │   │   └── errorHandler.ts
 │   │
 │   ├── api/                # REST API gateway
-│   ├── stripe-webhook/     # Payment webhooks
+│   ├── paytr-webhook/     # Payment webhooks
 │   ├── verify-kyc/         # KYC verification
 │   ├── transfer-funds/     # Fund transfers
 │   └── ...                 # 16 more functions
@@ -117,9 +117,9 @@ nano supabase/.env.local
 ### Payment Functions
 | Function | Method | Auth | Description |
 |----------|--------|------|-------------|
-| `create-payment-intent` | POST | JWT | Create Stripe PaymentIntent |
+| `create-payment-intent` | POST | JWT | Create PayTR PaymentIntent |
 | `confirm-payment` | POST | JWT | Confirm payment |
-| `stripe-webhook` | POST | Signature | Handle Stripe events |
+| `paytr-webhook` | POST | Signature | Handle PayTR events |
 | `transfer-funds` | POST | JWT | Transfer between users |
 
 ### User Functions
@@ -187,15 +187,13 @@ supabase db push
 supabase functions deploy --all
 
 # Or deploy specific function
-supabase functions deploy stripe-webhook
+supabase functions deploy paytr-webhook
 ```
 
 ### Secrets Management
 
 ```bash
 # Set production secrets
-supabase secrets set STRIPE_SECRET_KEY=sk_live_xxx
-supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_xxx
 
 # List secrets
 supabase secrets list

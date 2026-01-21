@@ -78,7 +78,6 @@ echo ""
 
 set_secret "EXPO_PUBLIC_SUPABASE_URL" "Supabase project URL (e.g., https://xxx.supabase.co)" false
 set_secret "EXPO_PUBLIC_SUPABASE_ANON_KEY" "Supabase anonymous key" false
-set_secret "STRIPE_TEST_PUBLISHABLE_KEY" "Stripe test publishable key (pk_test_...)" false
 set_secret "TEST_USER_EMAIL" "Test user email for E2E tests" false
 set_secret "TEST_USER_PASSWORD" "Test user password (must be strong)" false
 

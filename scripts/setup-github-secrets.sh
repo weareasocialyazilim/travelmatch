@@ -82,8 +82,6 @@ if [[ "$continue_p1" =~ ^[Yy]$ ]]; then
     set_secret "EXPO_PUBLIC_SUPABASE_ANON_KEY" "Same as SUPABASE_ANON_KEY"
     set_secret "VITE_SUPABASE_URL" "Same as SUPABASE_URL" "https://bjikxgtbptrvawkguypv.supabase.co"
     set_secret "VITE_SUPABASE_ANON_KEY" "Same as SUPABASE_ANON_KEY"
-    set_secret "STRIPE_SECRET_KEY" "Get from: https://dashboard.stripe.com/apikeys"
-    set_secret "STRIPE_WEBHOOK_SECRET" "Get from: Stripe Dashboard → Webhooks"
     set_secret "OPENAI_API_KEY" "Get from: https://platform.openai.com/api-keys"
 fi
 

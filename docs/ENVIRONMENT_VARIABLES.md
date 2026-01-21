@@ -67,7 +67,7 @@ SENDGRID_TEMPLATE_GIFT_NOTIFICATION=d-xxxxx
 # Expo
 EXPO_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGci...
-EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxxxx
+
 
 # App Configuration
 EXPO_PUBLIC_APP_ENV=development # development | staging | production

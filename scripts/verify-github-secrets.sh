@@ -51,8 +51,6 @@ declare -A P1_SECRETS=(
     ["EXPO_PUBLIC_SUPABASE_ANON_KEY"]="Public Supabase key for mobile app"
     ["VITE_SUPABASE_URL"]="Supabase URL for admin panel"
     ["VITE_SUPABASE_ANON_KEY"]="Supabase key for admin panel"
-    ["STRIPE_SECRET_KEY"]="Stripe secret key for payments"
-    ["STRIPE_WEBHOOK_SECRET"]="Stripe webhook signing secret"
     ["OPENAI_API_KEY"]="OpenAI API key for AI features"
     ["ANTHROPIC_API_KEY"]="Anthropic API key (optional)"
 )
