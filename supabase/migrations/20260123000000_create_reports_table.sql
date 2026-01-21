@@ -17,6 +17,20 @@ CREATE TABLE IF NOT EXISTS public.reports (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Add reported_user_id column if it doesn't exist
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' 
+        AND table_name = 'reports' 
+        AND column_name = 'reported_user_id'
+    ) THEN
+        ALTER TABLE public.reports 
+        ADD COLUMN reported_user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL;
+    END IF;
+END $$;
+
 -- RLS Policies
 ALTER TABLE public.reports ENABLE ROW LEVEL SECURITY;
 
