@@ -41,8 +41,8 @@ FUNCTIONS=(
   "release-escrow"
   "send-push-notification"
   "send-verification"
-  "stripe-connect"
-  "stripe-webhook"
+  "paytr-connect"
+  "paytr-webhook"
   "subscription-webhook"
   "verify-phone"
 )
