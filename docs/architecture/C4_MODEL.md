@@ -31,7 +31,7 @@ graph TB
     end
 
     subgraph external ["External Systems"]
-        stripe["Stripe<br/><i>External System</i><br/>Payment processing"]
+        paytr["PayTR<br/><i>External System</i><br/>Payment processing"]
         onfido["Onfido<br/><i>External System</i><br/>KYC verification"]
         cloudflare["Cloudflare<br/><i>External System</i><br/>CDN & image optimization"]
         mapbox["Mapbox<br/><i>External System</i><br/>Maps & geocoding"]
@@ -43,7 +43,7 @@ graph TB
     traveler -->|"Uses mobile app to<br/>create/join moments"| system
     admin -->|"Manages users,<br/>content, payments"| system
 
-    system -->|"Processes payments"| stripe
+    system -->|"Processes payments"| paytr
     system -->|"Verifies identity"| onfido
     system -->|"Serves images"| cloudflare
     system -->|"Gets maps/location"| mapbox
@@ -54,7 +54,7 @@ graph TB
     style traveler fill:#08427b,stroke:#052e56,color:#fff
     style admin fill:#08427b,stroke:#052e56,color:#fff
     style system fill:#1168bd,stroke:#0b4884,color:#fff
-    style stripe fill:#999999,stroke:#666666,color:#fff
+    style paytr fill:#999999,stroke:#666666,color:#fff
     style onfido fill:#999999,stroke:#666666,color:#fff
     style cloudflare fill:#999999,stroke:#666666,color:#fff
     style mapbox fill:#999999,stroke:#666666,color:#fff
@@ -67,7 +67,7 @@ graph TB
 
 | System | Purpose | Protocol | Data Exchanged |
 |--------|---------|----------|----------------|
-| **Stripe** | Payment processing | REST API | Payment intents, webhooks, customer data |
+| **PayTR** | Payment processing | REST API | Payment intents, webhooks, customer data |
 | **Onfido** | Identity verification | REST API | Document images, verification results |
 | **Cloudflare** | CDN & optimization | REST API | Images, cache invalidation |
 | **Mapbox** | Maps & geocoding | Native SDK | Coordinates, map tiles |
@@ -301,7 +301,7 @@ graph TB
         subgraph payment_funcs ["Payments"]
             create_payment["create-payment<br/><i>Function</i><br/>Payment initiation"]
             confirm_payment["confirm-payment<br/><i>Function</i><br/>Payment confirmation"]
-            stripe_webhook["stripe-webhook<br/><i>Function</i><br/>Stripe event handler"]
+            paytr_webhook["paytr-webhook<br/><i>Function</i><br/>PayTR event handler"]
             transfer_funds["transfer-funds<br/><i>Function</i><br/>Internal transfers"]
         end
 
@@ -336,7 +336,7 @@ graph TB
     style verify_2fa fill:#85bbf0,stroke:#5d9fd6,color:#000
     style create_payment fill:#85bbf0,stroke:#5d9fd6,color:#000
     style confirm_payment fill:#85bbf0,stroke:#5d9fd6,color:#000
-    style stripe_webhook fill:#85bbf0,stroke:#5d9fd6,color:#000
+    style paytr_webhook fill:#85bbf0,stroke:#5d9fd6,color:#000
     style transfer_funds fill:#85bbf0,stroke:#5d9fd6,color:#000
     style verify_kyc fill:#85bbf0,stroke:#5d9fd6,color:#000
     style verify_proof fill:#85bbf0,stroke:#5d9fd6,color:#000
@@ -560,7 +560,7 @@ sequenceDiagram
     participant U as User
     participant M as Mobile App
     participant E as Edge Function
-    participant ST as Stripe
+    participant ST as PayTR
     participant P as PostgreSQL
 
     U->>M: Confirm payment
@@ -573,7 +573,7 @@ sequenceDiagram
     M->>ST: Confirm with card details
     ST-->>M: Payment result
 
-    ST->>E: POST /functions/v1/stripe-webhook
+    ST->>E: POST /functions/v1/paytr-webhook
     E->>E: Verify webhook signature
     E->>P: UPDATE transactions SET status='completed'
     E->>P: UPDATE users SET balance

@@ -2,7 +2,9 @@
 
 ## Overview
 
-Lovendo uses **Supabase** (PostgreSQL 15) as its primary database, providing a scalable, secure, and feature-rich backend for the social travel platform. This document outlines the complete database architecture, design decisions, and best practices.
+Lovendo uses **Supabase** (PostgreSQL 15) as its primary database, providing a scalable, secure, and
+feature-rich backend for the social travel platform. This document outlines the complete database
+architecture, design decisions, and best practices.
 
 ## Table of Contents
 
@@ -24,13 +26,13 @@ Lovendo uses **Supabase** (PostgreSQL 15) as its primary database, providing a s
 
 ### Technology Stack
 
-| Component | Technology | Purpose |
-|-----------|------------|---------|
-| Database | PostgreSQL 15 | Primary data store |
-| Platform | Supabase | Managed PostgreSQL with auth, storage, realtime |
-| Extensions | PostGIS, uuid-ossp, pg_cron | Geospatial, UUIDs, scheduled jobs |
-| Auth | Supabase Auth | JWT-based authentication |
-| Realtime | Supabase Realtime | WebSocket subscriptions for chat |
+| Component  | Technology                  | Purpose                                         |
+| ---------- | --------------------------- | ----------------------------------------------- |
+| Database   | PostgreSQL 15               | Primary data store                              |
+| Platform   | Supabase                    | Managed PostgreSQL with auth, storage, realtime |
+| Extensions | PostGIS, uuid-ossp, pg_cron | Geospatial, UUIDs, scheduled jobs               |
+| Auth       | Supabase Auth               | JWT-based authentication                        |
+| Realtime   | Supabase Realtime           | WebSocket subscriptions for chat                |
 
 ### Database Structure
 
@@ -138,6 +140,7 @@ CREATE TABLE users (
 ```
 
 **Key Design Decisions:**
+
 - Uses UUID for distributed-friendly IDs
 - JSONB for flexible notification/privacy settings
 - Soft delete via `deleted_at` for account recovery
@@ -174,6 +177,7 @@ CREATE TABLE moments (
 ```
 
 **Key Design Decisions:**
+
 - PostGIS `GEOGRAPHY` type for accurate distance calculations
 - State machine via `status` field with CHECK constraint
 - Denormalized `current_participants` updated by triggers
@@ -236,7 +240,8 @@ CREATE TABLE messages (
 );
 ```
 
-**Migration Note:** The system is transitioning from array-based `participant_ids` to the normalized `conversation_participants` junction table for better query performance and RLS optimization.
+**Migration Note:** The system is transitioning from array-based `participant_ids` to the normalized
+`conversation_participants` junction table for better query performance and RLS optimization.
 
 ---
 
@@ -303,7 +308,7 @@ CREATE TABLE user_subscriptions (
   current_period_start TIMESTAMPTZ,
   current_period_end TIMESTAMPTZ,
   cancel_at_period_end BOOLEAN DEFAULT FALSE,
-  provider TEXT DEFAULT 'stripe',  -- 'stripe', 'apple', 'google'
+  provider TEXT DEFAULT 'paytr',  -- 'paytr', 'apple', 'google'
   provider_subscription_id TEXT
 );
 ```
@@ -327,7 +332,7 @@ CREATE TABLE reviews (
 CREATE TABLE kyc_verifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  provider TEXT NOT NULL CHECK (provider IN ('onfido', 'stripe_identity', 'mock')),
+  provider TEXT NOT NULL CHECK (provider IN ('onfido', 'mock')),
   provider_id TEXT,
   status TEXT NOT NULL CHECK (status IN ('verified', 'rejected', 'needs_review')),
   confidence NUMERIC(3,2) CHECK (confidence >= 0 AND confidence <= 1),
@@ -787,7 +792,8 @@ $$ LANGUAGE plpgsql STABLE;
 
 ### Security Best Practices
 
-1. **SECURITY DEFINER Functions**: All custom functions use `SECURITY DEFINER` with explicit `search_path = public, pg_temp` to prevent search path injection.
+1. **SECURITY DEFINER Functions**: All custom functions use `SECURITY DEFINER` with explicit
+   `search_path = public, pg_temp` to prevent search path injection.
 
 2. **RLS Optimization**: All policies use `(select auth.uid())` pattern to cache auth calls.
 
@@ -847,12 +853,12 @@ FOR VALUES FROM ('2025-01-01') TO ('2025-02-01');
 
 ### Performance Targets
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Query response (P95) | < 50ms | pg_stat_statements |
-| Connection pool | 100 concurrent | Supabase dashboard |
-| RLS overhead | < 10ms | EXPLAIN ANALYZE |
-| Index hit ratio | > 99% | pg_stat_user_tables |
+| Metric               | Target         | Measurement         |
+| -------------------- | -------------- | ------------------- |
+| Query response (P95) | < 50ms         | pg_stat_statements  |
+| Connection pool      | 100 concurrent | Supabase dashboard  |
+| RLS overhead         | < 10ms         | EXPLAIN ANALYZE     |
+| Index hit ratio      | > 99%          | pg_stat_user_tables |
 
 ---
 
@@ -897,6 +903,7 @@ Located at: `supabase/scripts/health-check.sh`
 ### Workflow
 
 1. **Create Migration**:
+
    ```bash
    supabase migration new your_migration_name
    ```
@@ -904,11 +911,13 @@ Located at: `supabase/scripts/health-check.sh`
 2. **Edit Migration**: Add SQL to `supabase/migrations/TIMESTAMP_name.sql`
 
 3. **Test Locally**:
+
    ```bash
    supabase db reset  # Applies all migrations
    ```
 
 4. **Deploy to Staging**:
+
    ```bash
    supabase db push --db-url $STAGING_URL
    ```
@@ -938,35 +947,33 @@ pnpm db:generate-types
 
 ## Appendix: Complete Table List
 
-| Table | Domain | RLS | Realtime | Description |
-|-------|--------|-----|----------|-------------|
-| users | Core | ✅ | ❌ | User profiles |
-| moments | Core | ✅ | ❌ | Travel experiences |
-| requests | Core | ✅ | ❌ | Join requests |
-| conversations | Chat | ✅ | ✅ | Chat threads |
-| conversation_participants | Chat | ✅ | ✅ | Normalized participants |
-| messages | Chat | ✅ | ✅ | Chat messages |
-| reviews | Trust | ✅ | ❌ | User reviews |
-| notifications | Comms | ✅ | ✅ | Push notifications |
-| reports | Safety | ✅ | ❌ | User reports |
-| blocks | Safety | ✅ | ❌ | User blocks |
-| favorites | Social | ✅ | ❌ | Saved moments |
-| transactions | Payment | ✅ | ❌ | Financial transactions |
-| escrow_transactions | Payment | ✅ | ❌ | Escrow holds |
-| subscription_plans | Payment | ✅ | ❌ | Plan definitions |
-| user_subscriptions | Payment | ✅ | ❌ | User subscriptions |
-| kyc_verifications | Trust | ✅ | ❌ | KYC history |
-| proof_verifications | Trust | ✅ | ❌ | Proof verification |
-| admin_users | Admin | ✅ | ❌ | Admin accounts |
-| admin_sessions | Admin | ✅ | ❌ | Admin sessions |
-| audit_logs | Audit | ✅ | ❌ | Audit trail |
-| role_permissions | Admin | ✅ | ❌ | RBAC permissions |
-| feed_delta | Infra | ✅ | ❌ | Incremental sync |
-| rate_limits | Infra | ✅ | ❌ | Rate limiting |
-| cdn_invalidation_logs | Infra | ✅ | ❌ | CDN cache logs |
+| Table                     | Domain  | RLS | Realtime | Description             |
+| ------------------------- | ------- | --- | -------- | ----------------------- |
+| users                     | Core    | ✅  | ❌       | User profiles           |
+| moments                   | Core    | ✅  | ❌       | Travel experiences      |
+| requests                  | Core    | ✅  | ❌       | Join requests           |
+| conversations             | Chat    | ✅  | ✅       | Chat threads            |
+| conversation_participants | Chat    | ✅  | ✅       | Normalized participants |
+| messages                  | Chat    | ✅  | ✅       | Chat messages           |
+| reviews                   | Trust   | ✅  | ❌       | User reviews            |
+| notifications             | Comms   | ✅  | ✅       | Push notifications      |
+| reports                   | Safety  | ✅  | ❌       | User reports            |
+| blocks                    | Safety  | ✅  | ❌       | User blocks             |
+| favorites                 | Social  | ✅  | ❌       | Saved moments           |
+| transactions              | Payment | ✅  | ❌       | Financial transactions  |
+| escrow_transactions       | Payment | ✅  | ❌       | Escrow holds            |
+| subscription_plans        | Payment | ✅  | ❌       | Plan definitions        |
+| user_subscriptions        | Payment | ✅  | ❌       | User subscriptions      |
+| kyc_verifications         | Trust   | ✅  | ❌       | KYC history             |
+| proof_verifications       | Trust   | ✅  | ❌       | Proof verification      |
+| admin_users               | Admin   | ✅  | ❌       | Admin accounts          |
+| admin_sessions            | Admin   | ✅  | ❌       | Admin sessions          |
+| audit_logs                | Audit   | ✅  | ❌       | Audit trail             |
+| role_permissions          | Admin   | ✅  | ❌       | RBAC permissions        |
+| feed_delta                | Infra   | ✅  | ❌       | Incremental sync        |
+| rate_limits               | Infra   | ✅  | ❌       | Rate limiting           |
+| cdn_invalidation_logs     | Infra   | ✅  | ❌       | CDN cache logs          |
 
 ---
 
-*Document Version: 1.0.0*
-*Last Updated: 2025-12-22*
-*Author: Database Architecture Team*
+_Document Version: 1.0.0_ _Last Updated: 2025-12-22_ _Author: Database Architecture Team_

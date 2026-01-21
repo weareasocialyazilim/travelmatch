@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS integration_health_events (
 
   -- Integration identifier
   integration_name TEXT NOT NULL,
-  -- Possible values: 'supabase', 'stripe', 'twilio', 'sendgrid', 'posthog', 'sentry', 'openai', 'mapbox', etc.
+  -- Possible values: 'supabase', 'paytr', 'twilio', 'sendgrid', 'posthog', 'sentry', 'openai', 'mapbox', etc.
 
   -- Event type
   event_type TEXT NOT NULL DEFAULT 'health_check',

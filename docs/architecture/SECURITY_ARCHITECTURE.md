@@ -1,9 +1,9 @@
 # Lovendo Security Architecture
 
-> **Version**: 1.0.0
-> **Last Updated**: December 2024
+> **Version**: 1.0.0 **Last Updated**: December 2024
 
-This document describes the security architecture of Lovendo, including authentication, authorization, data protection, and compliance measures.
+This document describes the security architecture of Lovendo, including authentication,
+authorization, data protection, and compliance measures.
 
 ## Table of Contents
 
@@ -127,11 +127,11 @@ sequenceDiagram
 
 ### Token Lifetimes
 
-| Token Type | Lifetime | Storage | Rotation |
-|------------|----------|---------|----------|
-| Access Token | 15 minutes | Memory | On expiry |
-| Refresh Token | 7 days | SecureStore | On use |
-| Session | 7 days | Database | On refresh |
+| Token Type    | Lifetime   | Storage     | Rotation   |
+| ------------- | ---------- | ----------- | ---------- |
+| Access Token  | 15 minutes | Memory      | On expiry  |
+| Refresh Token | 7 days     | SecureStore | On use     |
+| Session       | 7 days     | Database    | On refresh |
 
 ### Multi-Factor Authentication (2FA)
 
@@ -169,11 +169,11 @@ sequenceDiagram
 
 ### OAuth Providers
 
-| Provider | Status | Scopes |
-|----------|--------|--------|
-| Google | Enabled | email, profile |
-| Apple | Enabled | email, name |
-| Facebook | Planned | email |
+| Provider | Status  | Scopes         |
+| -------- | ------- | -------------- |
+| Google   | Enabled | email, profile |
+| Apple    | Enabled | email, name    |
+| Facebook | Planned | email          |
 
 ### Secure Token Storage
 
@@ -272,17 +272,17 @@ CREATE POLICY "Read non-blocked moments"
 
 ### Permission Matrix
 
-| Resource | Anonymous | Authenticated | Verified | Admin | Service |
-|----------|-----------|---------------|----------|-------|---------|
-| View public moments | R | R | R | R | R |
-| Create moments | - | R | RW | RW | RW |
-| View own profile | - | R | R | R | R |
-| Update own profile | - | RW | RW | RW | RW |
-| Send messages | - | - | RW | RW | RW |
-| Make payments | - | - | RW | RW | RW |
-| View transactions | - | R | R | R | R |
-| Admin dashboard | - | - | - | RW | - |
-| Delete users | - | - | - | D | D |
+| Resource            | Anonymous | Authenticated | Verified | Admin | Service |
+| ------------------- | --------- | ------------- | -------- | ----- | ------- |
+| View public moments | R         | R             | R        | R     | R       |
+| Create moments      | -         | R             | RW       | RW    | RW      |
+| View own profile    | -         | R             | R        | R     | R       |
+| Update own profile  | -         | RW            | RW       | RW    | RW      |
+| Send messages       | -         | -             | RW       | RW    | RW      |
+| Make payments       | -         | -             | RW       | RW    | RW      |
+| View transactions   | -         | R             | R        | R     | R       |
+| Admin dashboard     | -         | -             | -        | RW    | -       |
+| Delete users        | -         | -             | -        | D     | D       |
 
 R = Read, W = Write, D = Delete
 
@@ -307,12 +307,12 @@ const sslPinning = {
 
 #### At Rest
 
-| Data Type | Encryption | Key Management |
-|-----------|------------|----------------|
-| Database | AES-256 | Supabase managed |
-| File storage | AES-256 | S3/Minio managed |
-| Backups | AES-256-GCM | Customer managed |
-| Secrets | AES-256 | Infisical |
+| Data Type    | Encryption  | Key Management   |
+| ------------ | ----------- | ---------------- |
+| Database     | AES-256     | Supabase managed |
+| File storage | AES-256     | S3/Minio managed |
+| Backups      | AES-256-GCM | Customer managed |
+| Secrets      | AES-256     | Infisical        |
 
 ### Sensitive Data Handling
 
@@ -335,9 +335,9 @@ logger.info('User logged in', { email: user.email }); // email is redacted
 
 ```typescript
 const SENSITIVE_PATTERNS = [
-  /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,  // Email
-  /\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b/g,           // Credit card
-  /\bpassword['":\s]*['"]?[\w!@#$%^&*]+['"]?/gi,           // Password
+  /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, // Email
+  /\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b/g, // Credit card
+  /\bpassword['":\s]*['"]?[\w!@#$%^&*]+['"]?/gi, // Password
   /\bBearer\s+[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+/g, // JWT
   // ... 29 more patterns
 ];
@@ -345,12 +345,12 @@ const SENSITIVE_PATTERNS = [
 
 ### Data Classification
 
-| Classification | Examples | Handling |
-|----------------|----------|----------|
-| **Public** | Moment titles, categories | No restrictions |
-| **Internal** | User IDs, moment IDs | Auth required |
-| **Confidential** | Email, phone, location | RLS + encryption |
-| **Restricted** | Passwords, payment data | Never logged, encrypted |
+| Classification   | Examples                  | Handling                |
+| ---------------- | ------------------------- | ----------------------- |
+| **Public**       | Moment titles, categories | No restrictions         |
+| **Internal**     | User IDs, moment IDs      | Auth required           |
+| **Confidential** | Email, phone, location    | RLS + encryption        |
+| **Restricted**   | Passwords, payment data   | Never logged, encrypted |
 
 ---
 
@@ -363,8 +363,8 @@ const SENSITIVE_PATTERNS = [
 plugins:
   - name: rate-limiting
     config:
-      minute: 100        # 100 requests per minute
-      hour: 1000         # 1000 requests per hour
+      minute: 100 # 100 requests per minute
+      hour: 1000 # 1000 requests per hour
       policy: redis
       fault_tolerant: true
       hide_client_headers: false
@@ -372,13 +372,13 @@ plugins:
 
 #### Rate Limits by Endpoint
 
-| Endpoint | Limit | Window |
-|----------|-------|--------|
-| `/auth/v1/token` | 5 | 1 minute |
-| `/auth/v1/signup` | 3 | 1 minute |
-| `/rest/v1/*` | 100 | 1 minute |
-| `/storage/v1/upload` | 10 | 1 minute |
-| `/functions/v1/*` | 50 | 1 minute |
+| Endpoint             | Limit | Window   |
+| -------------------- | ----- | -------- |
+| `/auth/v1/token`     | 5     | 1 minute |
+| `/auth/v1/signup`    | 3     | 1 minute |
+| `/rest/v1/*`         | 100   | 1 minute |
+| `/storage/v1/upload` | 10    | 1 minute |
+| `/functions/v1/*`    | 50    | 1 minute |
 
 ### Input Validation
 
@@ -462,7 +462,8 @@ const securityHeaders = [
   },
   {
     key: 'Content-Security-Policy',
-    value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';",
+    value:
+      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';",
   },
 ];
 ```
@@ -511,7 +512,7 @@ infisical:
     - prod
   secrets:
     - SUPABASE_SERVICE_KEY
-    - STRIPE_SECRET_KEY
+    - PAYTR_MERCHANT_KEY
     - ONFIDO_API_KEY
     - JWT_SECRET
     - REDIS_PASSWORD
@@ -540,14 +541,14 @@ VOLUME ["/tmp"]
 
 ### GDPR Compliance
 
-| Requirement | Implementation |
-|-------------|----------------|
-| Right to Access | Data export endpoint |
-| Right to Erasure | Soft delete + 30-day purge |
-| Data Portability | JSON export of all user data |
-| Consent Management | Explicit opt-in for marketing |
-| Data Minimization | Only collect necessary data |
-| Breach Notification | Automated alerting + process |
+| Requirement         | Implementation                |
+| ------------------- | ----------------------------- |
+| Right to Access     | Data export endpoint          |
+| Right to Erasure    | Soft delete + 30-day purge    |
+| Data Portability    | JSON export of all user data  |
+| Consent Management  | Explicit opt-in for marketing |
+| Data Minimization   | Only collect necessary data   |
+| Breach Notification | Automated alerting + process  |
 
 ### Data Export
 
@@ -643,14 +644,14 @@ $$;
 
 ### Security Alerts
 
-| Event | Severity | Alert Channel |
-|-------|----------|---------------|
-| Failed login (5+ attempts) | High | Slack + Email |
-| Password change | Medium | Email |
-| 2FA disabled | High | Email + SMS |
-| Large transaction | High | Slack |
-| Admin action | Medium | Audit log |
-| Rate limit exceeded | Low | Metrics |
+| Event                      | Severity | Alert Channel |
+| -------------------------- | -------- | ------------- |
+| Failed login (5+ attempts) | High     | Slack + Email |
+| Password change            | Medium   | Email         |
+| 2FA disabled               | High     | Email + SMS   |
+| Large transaction          | High     | Slack         |
+| Admin action               | Medium   | Audit log     |
+| Rate limit exceeded        | Low      | Metrics       |
 
 ### Sentry Integration
 
@@ -677,12 +678,12 @@ Sentry.init({
 
 ### Incident Classification
 
-| Severity | Description | Response Time | Examples |
-|----------|-------------|---------------|----------|
-| P1 - Critical | Service down, data breach | 15 minutes | Database breach, auth failure |
-| P2 - High | Major feature broken | 1 hour | Payment failures, message delivery |
-| P3 - Medium | Minor feature broken | 4 hours | Search issues, slow performance |
-| P4 - Low | Cosmetic issues | 24 hours | UI bugs, typos |
+| Severity      | Description               | Response Time | Examples                           |
+| ------------- | ------------------------- | ------------- | ---------------------------------- |
+| P1 - Critical | Service down, data breach | 15 minutes    | Database breach, auth failure      |
+| P2 - High     | Major feature broken      | 1 hour        | Payment failures, message delivery |
+| P3 - Medium   | Minor feature broken      | 4 hours       | Search issues, slow performance    |
+| P4 - Low      | Cosmetic issues           | 24 hours      | UI bugs, typos                     |
 
 ### Response Procedures
 
@@ -724,12 +725,12 @@ Sentry.init({
 
 ### Security Contacts
 
-| Role | Responsibility | Escalation |
-|------|----------------|------------|
-| On-call Engineer | First response | 15 min |
-| Security Lead | Incident commander | 30 min |
-| CTO | Executive decisions | 1 hour |
-| Legal | Breach notification | As needed |
+| Role             | Responsibility      | Escalation |
+| ---------------- | ------------------- | ---------- |
+| On-call Engineer | First response      | 15 min     |
+| Security Lead    | Incident commander  | 30 min     |
+| CTO              | Executive decisions | 1 hour     |
+| Legal            | Breach notification | As needed  |
 
 ---
 
@@ -739,11 +740,12 @@ Sentry.init({
 
 The following security exceptions are documented and accepted:
 
-| Table | Reason | Risk Level |
-|-------|--------|------------|
+| Table             | Reason                                                                                                               | Risk Level                                              |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
 | `spatial_ref_sys` | PostGIS system table containing EPSG coordinate reference definitions. Owned by `supabase_admin`, cannot enable RLS. | **LOW** - Read-only reference data, no user information |
 
 **Note**: This is a FALSE POSITIVE in security linters. The `spatial_ref_sys` table:
+
 - Contains only geographic coordinate system definitions (EPSG codes)
 - Is read-only for application users
 - Has no user-specific or sensitive data

@@ -149,7 +149,6 @@ npx supabase functions deploy
 npx supabase functions deploy payment/create-payment-intent
 
 # Set secrets
-npx supabase secrets set STRIPE_SECRET_KEY=sk_live_xxxxx
 npx supabase secrets set OPENAI_API_KEY=sk-xxxxx
 
 # Test function
