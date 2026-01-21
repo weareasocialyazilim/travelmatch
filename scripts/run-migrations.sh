@@ -4,8 +4,18 @@
 
 set -e
 
-PROJECT_REF="bjikxgtbptrvawkguypv"
-ACCESS_TOKEN="sbp_9a6ad7e105b0ad9ae37cb9aea7968f3cfb070a38"
+PROJECT_REF="${SUPABASE_PROJECT_REF}"
+if [ -z "$PROJECT_REF" ]; then
+  echo "Error: SUPABASE_PROJECT_REF is not set"
+  exit 1
+fi
+
+ACCESS_TOKEN="${SUPABASE_ACCESS_TOKEN}"
+if [ -z "$ACCESS_TOKEN" ]; then
+  echo "Error: SUPABASE_ACCESS_TOKEN is not set"
+  exit 1
+fi
+
 API_URL="https://api.supabase.com/v1/projects/${PROJECT_REF}/database/query"
 MIGRATIONS_DIR="supabase/migrations"
 
