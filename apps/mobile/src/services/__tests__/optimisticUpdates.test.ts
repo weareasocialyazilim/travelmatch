@@ -28,7 +28,7 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockNetInfo = NetInfo;
+const mockNetInfo = NetInfo as any;
 
 // Global mock cache service
 const mockCache: Record<string, unknown> = {};

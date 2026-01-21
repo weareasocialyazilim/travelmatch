@@ -1,0 +1,5 @@
+supabase/** @backend-lead @security-lead
+supabase/migrations/** @backend-lead
+.github/workflows/** @devops-lead
+services/** @backend-lead
+packages/** @backend-lead

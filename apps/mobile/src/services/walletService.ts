@@ -167,16 +167,17 @@ class WalletService {
         return await this.getDatabaseBalance(user.id);
       }
 
-      // Fetch updated coins_balance from database since Auth user doesn't have it
-      const { data: dbUser } = await supabase
-        .from('users')
-        .select('coins_balance')
-        .eq('id', user.id)
+      // Fetch updated coins_balance from wallets table
+      const { data: coinWallet } = await supabase
+        .from('wallets')
+        .select('balance')
+        .eq('user_id', user.id)
+        .eq('currency', 'LVND')
         .single();
 
       const balance: WalletBalance = {
         available: result.available_balance,
-        coins: (dbUser as any)?.coins_balance || 0,
+        coins: coinWallet?.balance || 0,
         pending: result.pending_balance,
         currency: result.currency || 'TRY',
       };
@@ -190,15 +191,16 @@ class WalletService {
         currency: balance.currency,
       });
 
-      // Sync to database for offline fallback
-      await supabase
-        .from('users')
-        .update({
+      // Sync to wallets table for offline fallback (Fiat)
+      await supabase.from('wallets').upsert(
+        {
+          user_id: user.id,
+          currency: balance.currency,
           balance: balance.available,
-          pending_balance: balance.pending,
-          balance_last_synced: new Date().toISOString(),
-        })
-        .eq('id', user.id);
+          last_synced_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id, currency' },
+      );
 
       logger.info('PayTR balance fetched:', {
         available: balance.available,
@@ -216,26 +218,23 @@ class WalletService {
    * Fallback: Get balance from database (used when PayTR API unavailable)
    */
   private async getDatabaseBalance(userId: string): Promise<WalletBalance> {
-    const { data, error } = await supabase
-      .from('users')
-      .select('balance, coins_balance, pending_balance, currency')
-      .eq('id', userId)
-      .single();
+    const { data: wallets, error } = await supabase
+      .from('wallets')
+      .select('balance, currency')
+      .eq('user_id', userId);
 
     if (error) throw error;
 
-    const dbData = data as unknown as {
-      balance?: number;
-      coins_balance?: number;
-      pending_balance?: number;
-      currency?: string;
-    };
+    const coinWallet = wallets?.find((w) => w.currency === 'LVND');
+    const fiatWallet = wallets?.find(
+      (w) => w.currency !== 'LVND', // Assume non-LVND is fiat (TRY/USD)
+    );
 
     return {
-      available: dbData.balance || 0,
-      coins: dbData.coins_balance || 0,
-      pending: dbData.pending_balance || 0,
-      currency: dbData.currency || 'TRY',
+      available: fiatWallet?.balance || 0,
+      coins: coinWallet?.balance || 0,
+      pending: 0, // Pending balance not persisted in wallets table
+      currency: fiatWallet?.currency || 'TRY',
     };
   }
 

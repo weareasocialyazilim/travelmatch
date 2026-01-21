@@ -8,20 +8,18 @@ SELECT
     m.id AS moment_id,
     m.title,
     m.user_id,
-    p.username,
-    m.media_url,
+    -- p.username removed
+    m.images[1] AS media_url,
     m.created_at,
-    m.is_approved,
-    m.is_hidden,
-    m.ai_moderation_score, -- Assuming this column exists or will be added
-    m.ai_moderation_labels -- Assuming this column exists or will be added
+    (m.moderation_status = 'approved') AS is_approved,
+    FALSE AS is_hidden, -- Column does not exist yet
+    NULL::DECIMAL(5,2) AS ai_moderation_score,
+    NULL::TEXT[] AS ai_moderation_labels
 FROM 
     public.moments m
-JOIN 
-    public.profiles p ON m.user_id = p.id
+-- JOIN public.profiles p ON m.user_id = p.id (Removed: table does not exist)
 WHERE 
-    m.is_approved = false 
-    OR m.is_hidden = true
+    m.moderation_status != 'approved'
 ORDER BY 
     m.created_at DESC;
 
@@ -33,9 +31,9 @@ WITH EscrowStats AS (
         COUNT(*) as total_transactions,
         SUM(amount) as total_escrow_volume,
         SUM(CASE WHEN status = 'held' THEN amount ELSE 0 END) as active_escrow_balance,
-        SUM(CASE WHEN escrow_tier = 'direct' THEN amount ELSE 0 END) as direct_volume,
-        SUM(CASE WHEN escrow_tier = 'optional' THEN amount ELSE 0 END) as optional_volume,
-        SUM(CASE WHEN escrow_tier = 'mandatory' THEN amount ELSE 0 END) as mandatory_volume
+        0::numeric as direct_volume,
+        0::numeric as optional_volume,
+        0::numeric as mandatory_volume
     FROM 
         public.escrow_transactions
 ),

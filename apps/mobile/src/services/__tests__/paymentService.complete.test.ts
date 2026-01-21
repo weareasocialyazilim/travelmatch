@@ -4,11 +4,10 @@
  * Comprehensive tests for payment operations, wallet, and transactions
  */
 
-// Define __DEV__ for tests
-declare global {
-  var __DEV__: boolean;
+// Define __DEV__ for tests if not already defined
+if (typeof global.__DEV__ === 'undefined') {
+  (global as any).__DEV__ = true;
 }
-global.__DEV__ = true;
 
 import { securePaymentService as paymentService } from '../securePaymentService';
 import { supabase } from '../../config/supabase';
@@ -39,10 +38,8 @@ jest.mock('../supabaseDbService', () => ({
   },
 }));
 
-const mockSupabase = supabase as jest.Mocked<typeof supabase>;
-const mockTransactionsService = transactionsService as jest.Mocked<
-  typeof transactionsService
->;
+const mockSupabase = supabase as any;
+const mockTransactionsService = transactionsService as any;
 
 describe('PaymentService', () => {
   const mockUser = { id: 'user-123', email: 'test@example.com' };
@@ -74,7 +71,7 @@ describe('PaymentService', () => {
 
       // Mock both wallets and escrow_transactions tables
       mockSupabase.from.mockImplementation((tableName: string) => {
-        if (tableName === 'users') {
+        if (tableName === 'wallets') {
           return {
             select: jest.fn().mockReturnValue({
               eq: jest.fn().mockReturnValue({
@@ -178,6 +175,7 @@ describe('PaymentService', () => {
           description: 'Gift sent',
           moment_id: 'moment-1',
           metadata: {},
+          escrow_status: null,
         },
       ];
 
@@ -272,7 +270,7 @@ describe('PaymentService', () => {
 
     it('should return empty array on error', async () => {
       mockTransactionsService.list.mockResolvedValue({
-        data: null,
+        data: null as any,
         count: 0,
         error: new Error('Database error'),
       });
@@ -297,6 +295,7 @@ describe('PaymentService', () => {
         description: 'Gift sent',
         moment_id: 'moment-1',
         metadata: {},
+        escrow_status: 'locked' as const,
       };
 
       mockTransactionsService.get.mockResolvedValue({
@@ -461,6 +460,8 @@ describe('PaymentService', () => {
         created_at: new Date().toISOString(),
         description: 'Payment processed',
         metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -596,6 +597,8 @@ describe('PaymentService', () => {
         created_at: new Date().toISOString(),
         description: 'Withdrawal to bank account',
         metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -734,6 +737,8 @@ describe('PaymentService', () => {
         created_at: new Date().toISOString(),
         description: 'Withdrawal to bank account',
         metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       mockTransactionsService.create.mockResolvedValue({
@@ -744,13 +749,11 @@ describe('PaymentService', () => {
       // Mock successful fetch for this specific test
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
-        json: jest
-          .fn()
-          .mockResolvedValue({
-            settlementId: 'sett-123',
-            status: 'success',
-            fiat_amount: 100,
-          }),
+        json: jest.fn().mockResolvedValue({
+          settlementId: 'sett-123',
+          status: 'success',
+          fiat_amount: 100,
+        }),
       });
 
       const result = await paymentService.requestWithdrawal(100, 'ba_123');

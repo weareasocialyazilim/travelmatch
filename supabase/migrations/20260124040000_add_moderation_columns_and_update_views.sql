@@ -4,16 +4,21 @@
 -- 1. Add columns to moments
 ALTER TABLE public.moments 
 ADD COLUMN IF NOT EXISTS ai_moderation_score DECIMAL(5,2),
-ADD COLUMN IF NOT EXISTS ai_moderation_labels JSONB DEFAULT '[]';
+ADD COLUMN IF NOT EXISTS ai_moderation_labels JSONB DEFAULT '[]',
+ADD COLUMN IF NOT EXISTS is_approved BOOLEAN DEFAULT TRUE,
+ADD COLUMN IF NOT EXISTS is_hidden BOOLEAN DEFAULT FALSE;
 
 -- 2. Update view_moderation_queue (refresh it)
+-- Drop first to avoid column mismatch errors (cannot change name of view column...)
+DROP VIEW IF EXISTS public.view_moderation_queue;
+
 CREATE OR REPLACE VIEW public.view_moderation_queue AS
 SELECT 
     m.id AS moment_id,
     m.title,
     m.user_id,
-    p.username,
-    m.media_url,
+    COALESCE(u.email, 'Unknown') AS username,
+    CASE WHEN array_length(m.images, 1) > 0 THEN m.images[1] ELSE NULL END AS media_url,
     m.created_at,
     m.is_approved,
     m.is_hidden,
@@ -21,8 +26,8 @@ SELECT
     m.ai_moderation_labels
 FROM 
     public.moments m
-JOIN 
-    public.profiles p ON m.user_id = p.id
+LEFT JOIN 
+    public.users u ON m.user_id = u.id
 WHERE 
     m.is_approved = false 
     OR m.is_hidden = true
@@ -30,49 +35,33 @@ ORDER BY
     m.created_at DESC;
 
 -- 3. Update view_financial_health to use wallets table
+DROP VIEW IF EXISTS public.view_financial_health;
+
 CREATE OR REPLACE VIEW public.view_financial_health AS
 WITH EscrowStats AS (
     SELECT
         COUNT(*) as total_transactions,
-        SUM(amount) as total_escrow_volume,
-        SUM(CASE WHEN escrow_status = 'locked' THEN amount ELSE 0 END) as active_escrow_balance
+        COALESCE(SUM(amount), 0) as total_escrow_volume,
+        COALESCE(SUM(CASE WHEN escrow_status = 'locked' THEN amount ELSE 0 END), 0) as active_escrow_balance
     FROM 
         public.transactions
-    WHERE 
-        type = 'gift' -- Assuming gifts go to escrow
+    WHERE
+        status = 'completed' OR escrow_status = 'locked'
 ),
 WalletStats AS (
     SELECT
-        SUM(coins_balance) as total_coins_sold,
-        SUM(pending_balance) as apple_pending_funds
-    FROM 
+        COALESCE(SUM(coins_balance), 0) as total_user_balance,
+        COALESCE(SUM(pending_balance), 0) as total_pending_balance
+    FROM
         public.wallets
-),
-WithdrawalStats AS (
-    SELECT
-        COUNT(*) as pending_count,
-        SUM(amount) as pending_amount
-    FROM 
-        public.withdrawal_requests
-    WHERE 
-        status = 'pending_processing' OR status = 'pending_approval'
 )
-SELECT 
+SELECT
     e.total_transactions,
     e.total_escrow_volume,
     e.active_escrow_balance,
-    w.total_coins_sold,
-    w.apple_pending_funds,
-    wd.pending_count as pending_withdrawals_count,
-    wd.pending_amount as pending_withdrawals_amount,
+    w.total_user_balance,
+    w.total_pending_balance,
     NOW() as last_updated
-FROM 
-    EscrowStats e
-CROSS JOIN 
-    WalletStats w
-CROSS JOIN 
-    WithdrawalStats wd;
-
--- 4. Grants
-GRANT SELECT ON public.wallets TO authenticated;
-GRANT SELECT ON public.withdrawal_requests TO authenticated;
+FROM
+    EscrowStats e,
+    WalletStats w;

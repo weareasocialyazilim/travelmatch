@@ -52,8 +52,8 @@ jest.mock('@/utils/logger', () => ({
   },
 }));
 
-const mockAuth = auth as jest.Mocked<typeof auth>;
-const mockSupabase = supabase as jest.Mocked<typeof supabase>;
+const mockAuth = auth as any;
+const mockSupabase = supabase as any;
 const mockLogger = logger as jest.Mocked<typeof logger>;
 
 describe('supabaseAuthService', () => {

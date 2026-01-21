@@ -1,0 +1,11 @@
+{
+  "name": "@lovendo/integrations-utils",
+  "version": "1.0.0",
+  "main": "http-client.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

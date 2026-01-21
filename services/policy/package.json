@@ -1,0 +1,11 @@
+{
+  "name": "@lovendo/policy",
+  "version": "1.0.0",
+  "main": "registry.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

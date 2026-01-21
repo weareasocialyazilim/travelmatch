@@ -39,7 +39,7 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockSupabase = supabase;
+const mockSupabase = supabase as any;
 const mockTransactionsService = transactionsService;
 const mockLogger = logger;
 
@@ -187,6 +187,9 @@ describe('PaymentService - Webhook Failures', () => {
         status: 'pending',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       // First 3 polls: pending, then completed
@@ -235,6 +238,9 @@ describe('PaymentService - Webhook Failures', () => {
         status: 'pending',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       // Always return pending
@@ -269,6 +275,9 @@ describe('PaymentService - Webhook Failures', () => {
         status: 'pending',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       // Poll 1: pending, Poll 2: failed
@@ -405,6 +414,9 @@ describe('PaymentService - Webhook Failures', () => {
         status: 'pending',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       // Webhook times out (50ms timeout, 100ms processing)
@@ -461,6 +473,9 @@ describe('PaymentService - Webhook Failures', () => {
         status: 'pending',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       mockTransactionsService.update.mockResolvedValue({
@@ -510,6 +525,9 @@ describe('PaymentService - Webhook Failures', () => {
         status: 'pending',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       mockTransactionsService.update.mockResolvedValue({

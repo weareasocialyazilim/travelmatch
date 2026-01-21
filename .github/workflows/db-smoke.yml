@@ -1,0 +1,46 @@
+name: db-smoke
+
+on:
+  pull_request:
+    branches: ['main']
+  workflow_dispatch: {}
+
+jobs:
+  db-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Supabase CLI
+        run: |
+          npm i -g supabase@latest
+          supabase --version
+
+      - name: Install psql client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Start Supabase local
+        run: supabase start
+
+      - name: Get DB URL
+        id: dburl
+        run: |
+          DB_URL="$(supabase status | awk -F': ' '/DB URL/ {print $2}' | tail -n 1)"
+          echo "db_url=$DB_URL" >> $GITHUB_OUTPUT
+
+      - name: Run smoke tests
+        env:
+          SUPABASE_DB_URL: ${{ steps.dburl.outputs.db_url }}
+        run: |
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/smoke.sql
+
+      - name: Stop Supabase local
+        if: always()
+        run: supabase stop

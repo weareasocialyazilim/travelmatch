@@ -1,0 +1,11 @@
+{
+  "name": "@lovendo/entitlements",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

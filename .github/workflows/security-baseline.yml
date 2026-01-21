@@ -1,0 +1,47 @@
+name: security-baseline
+
+on:
+  pull_request:
+    branches: ['main']
+  workflow_dispatch: {}
+
+jobs:
+  security-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Supabase CLI
+        run: |
+          npm i -g supabase@latest
+          supabase --version
+
+      - name: Install psql client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Start Supabase local
+        run: supabase start
+
+      - name: Get DB URL
+        id: dburl
+        run: |
+          DB_URL="$(supabase status | awk -F': ' '/DB URL/ {print $2}' | tail -n 1)"
+          echo "db_url=$DB_URL" >> $GITHUB_OUTPUT
+
+      - name: Run DB security audit
+        env:
+          SUPABASE_DB_URL: ${{ steps.dburl.outputs.db_url }}
+        run: |
+          chmod +x ./scripts/db-security-audit.sh
+          ./scripts/db-security-audit.sh
+
+      - name: Stop Supabase local
+        if: always()
+        run: supabase stop

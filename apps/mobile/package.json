@@ -42,6 +42,7 @@
     "@expo/vector-icons": "~15.0.3",
     "@hookform/resolvers": "^5.2.2",
     "@lovendo/design-system": "workspace:*",
+    "@lovendo/entitlements": "workspace:*",
     "@lovendo/shared": "workspace:*",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/datetimepicker": "^8.6.0",

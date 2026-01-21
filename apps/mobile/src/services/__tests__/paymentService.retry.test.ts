@@ -34,7 +34,7 @@ jest.mock('../../utils/logger', () => ({
   },
 }));
 
-const mockSupabase = supabase as jest.Mocked<typeof supabase>;
+const mockSupabase = supabase as any;
 const mockTransactionsService = transactionsService as jest.Mocked<
   typeof transactionsService
 >;
@@ -95,6 +95,9 @@ describe('PaymentService - Retry Logic', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       // First 2 attempts fail with network error, 3rd succeeds
@@ -129,6 +132,9 @@ describe('PaymentService - Retry Logic', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       // Two failures then success
@@ -186,6 +192,9 @@ describe('PaymentService - Retry Logic', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       // First attempt fails, second succeeds
@@ -217,6 +226,9 @@ describe('PaymentService - Retry Logic', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       // Fail 3 times, succeed on 4th (last) attempt
@@ -250,6 +262,9 @@ describe('PaymentService - Retry Logic', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       mockTransactionsService.create.mockResolvedValueOnce({
@@ -324,15 +339,9 @@ describe('PaymentService - Retry Logic', () => {
 
   describe('Withdrawal Retry', () => {
     it('should retry withdrawal after network failure', async () => {
-      const mockTransaction = {
-        id: 'tx-456',
-        user_id: 'user-123',
-        amount: -100,
-        currency: 'USD',
-        type: 'withdrawal',
-        status: 'pending',
-        created_at: new Date().toISOString(),
-        description: 'Withdrawal to bank account',
+      const mockResult = {
+        settlementId: 'set-123',
+        fiatAmount: 100,
       };
 
       // Helper for withdrawal retry (simplified - no actual delays)
@@ -355,10 +364,7 @@ describe('PaymentService - Retry Logic', () => {
       jest
         .spyOn(paymentService, 'withdrawFunds')
         .mockRejectedValueOnce(new Error('Network error'))
-        .mockResolvedValueOnce({
-          success: true,
-          transaction: mockTransaction,
-        });
+        .mockResolvedValueOnce(mockResult);
 
       const result = await withdrawWithRetry({
         amount: 100,
@@ -366,8 +372,8 @@ describe('PaymentService - Retry Logic', () => {
         bankAccountId: 'ba_123',
       });
 
-      expect(result.success).toBe(true);
-      expect(result.transaction.type).toBe('withdrawal');
+      expect(result.settlementId).toBe('set-123');
+      expect(result.fiatAmount).toBe(100);
     });
   });
 
@@ -446,6 +452,9 @@ describe('PaymentService - Retry Logic', () => {
         status: 'completed',
         created_at: new Date().toISOString(),
         description: 'Gift sent',
+        metadata: {},
+        moment_id: null,
+        escrow_status: null,
       };
 
       mockTransactionsService.create

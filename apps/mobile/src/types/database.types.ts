@@ -1377,6 +1377,47 @@ export type Database = {
           },
         ];
       };
+      wallets: {
+        Row: {
+          id: string;
+          user_id: string;
+          balance: number;
+          currency: string;
+          status: string;
+          created_at: string;
+          updated_at: string;
+          last_synced_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          balance?: number;
+          currency?: string;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+          last_synced_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          balance?: number;
+          currency?: string;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+          last_synced_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'wallets_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       users: {
         Row: {
           avatar_url: string | null;

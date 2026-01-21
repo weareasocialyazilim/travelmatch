@@ -47,7 +47,7 @@ jest.mock('../cacheInvalidationService', () => ({
   invalidateAllPaymentCache: jest.fn().mockResolvedValue(undefined),
 }));
 
-const mockSupabase = supabase as jest.Mocked<typeof supabase>;
+const mockSupabase = supabase as any;
 const mockTransactionsService = transactionsService as jest.Mocked<
   typeof transactionsService
 >;
@@ -100,6 +100,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
               description: 'Gift sent',
               moment_id: null,
               metadata: {},
+              escrow_status: null,
             },
             error: null,
           });
@@ -248,6 +249,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
               description: 'Withdrawal to bank account',
               moment_id: null,
               metadata: {},
+              escrow_status: null,
             },
             error: null,
           });
@@ -512,6 +514,9 @@ describe('PaymentService - Timeout Edge Cases', () => {
               status: 'completed',
               created_at: new Date().toISOString(),
               description: 'Gift sent',
+              moment_id: null,
+              metadata: {},
+              escrow_status: null,
             },
             error: null,
           });
@@ -533,6 +538,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
             description: 'Gift sent (retry)',
             moment_id: null,
             metadata: {},
+            escrow_status: null,
           },
           error: null,
         });
@@ -590,6 +596,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
               description: 'Payment 1',
               moment_id: null,
               metadata: {},
+              escrow_status: null,
             },
             error: null,
           });
@@ -610,6 +617,7 @@ describe('PaymentService - Timeout Edge Cases', () => {
               description: 'Payment 2',
               moment_id: null,
               metadata: {},
+              escrow_status: null,
             },
             error: null,
           });
