@@ -28,15 +28,15 @@
 
 ### ✅ Third-Party Integrations
 
-| Service           | Status     | Notes                       |
-| ----------------- | ---------- | --------------------------- |
-| Sentry            | ✅ Ready   | DSN + Auth Token configured |
-| PostHog           | ✅ Ready   | API Key configured          |
-| Mapbox            | ✅ Ready   | Public + Secret tokens      |
-| Cloudflare Images | ✅ Ready   | Account + Token             |
-| Stripe            | ⚠️ Sandbox | Need production keys        |
-| Codecov           | ✅ Ready   | Token configured            |
-| Snyk              | ✅ Ready   | Token configured            |
+| Service           | Status        | Notes                       |
+| ----------------- | ------------- | --------------------------- |
+| Sentry            | ✅ Ready      | DSN + Auth Token configured |
+| PostHog           | ✅ Ready      | API Key configured          |
+| Mapbox            | ✅ Ready      | Public + Secret tokens      |
+| Cloudflare Images | ✅ Ready      | Account + Token             |
+| PayTR             | ✅ Production | Payment provider configured |
+| Codecov           | ✅ Ready      | Token configured            |
+| Snyk              | ✅ Ready      | Token configured            |
 
 ### ✅ Mobile App (Expo/EAS)
 
@@ -145,7 +145,7 @@ eas submit --platform android --latest
 
 ### After Store Approval
 
-- [ ] Enable Stripe production mode
+- [ ] Enable PayTR production mode
 - [ ] Update app.config.ts with production keys if needed
 - [ ] Monitor Sentry for new errors
 - [ ] Monitor PostHog for user activity

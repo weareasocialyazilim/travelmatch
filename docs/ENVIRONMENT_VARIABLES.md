@@ -15,20 +15,6 @@ SUPABASE_PROJECT_REF=xxxxx
 SUPABASE_ACCESS_TOKEN=sbp_xxxxx # Personal access token
 ```
 
-### 💳 Stripe
-
-```bash
-# API Keys
-STRIPE_PUBLISHABLE_KEY=pk_test_xxxxx # Client-side
-STRIPE_SECRET_KEY=sk_test_xxxxx # Server-side only
-
-# Webhooks
-STRIPE_WEBHOOK_SECRET=whsec_xxxxx
-
-# Connected Accounts
-STRIPE_CLIENT_ID=ca_xxxxx # For OAuth flow
-```
-
 ### 🤖 OpenAI
 
 ```bash
@@ -94,7 +80,6 @@ EXPO_PUBLIC_API_URL=https://xxxxx.supabase.co/functions/v1
 # Vite
 VITE_SUPABASE_URL=https://xxxxx.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGci...
-VITE_STRIPE_PUBLISHABLE_KEY=pk_test_xxxxx
 
 # Admin Configuration
 VITE_APP_ENV=development
@@ -107,10 +92,6 @@ VITE_API_URL=https://xxxxx.supabase.co/functions/v1
 # Supabase
 SUPABASE_ACCESS_TOKEN=sbp_xxxxx
 SUPABASE_PROJECT_REF=xxxxx
-
-# Stripe
-STRIPE_SECRET_KEY=sk_live_xxxxx
-STRIPE_WEBHOOK_SECRET=whsec_xxxxx
 
 # OpenAI
 OPENAI_API_KEY=sk-xxxxx
@@ -136,11 +117,6 @@ SUPABASE_ANON_KEY=eyJhbGci...
 SUPABASE_SERVICE_KEY=eyJhbGci...
 SUPABASE_PROJECT_REF=xxxxx
 
-# Stripe
-STRIPE_PUBLISHABLE_KEY=pk_test_xxxxx
-STRIPE_SECRET_KEY=sk_test_xxxxx
-STRIPE_WEBHOOK_SECRET=whsec_xxxxx
-
 # OpenAI
 OPENAI_API_KEY=sk-xxxxx
 ```
@@ -150,7 +126,6 @@ OPENAI_API_KEY=sk-xxxxx
 ```bash
 EXPO_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGci...
-EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxxxx
 EXPO_PUBLIC_APP_ENV=development
 ```
 
@@ -159,7 +134,6 @@ EXPO_PUBLIC_APP_ENV=development
 ```bash
 VITE_SUPABASE_URL=https://xxxxx.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGci...
-VITE_STRIPE_PUBLISHABLE_KEY=pk_test_xxxxx
 VITE_APP_ENV=development
 ```
 
@@ -169,8 +143,6 @@ VITE_APP_ENV=development
 SUPABASE_URL=https://xxxxx.supabase.co
 SUPABASE_SERVICE_KEY=eyJhbGci...
 OPENAI_API_KEY=sk-xxxxx
-STRIPE_SECRET_KEY=sk_test_xxxxx
-STRIPE_WEBHOOK_SECRET=whsec_xxxxx
 
 # Twilio
 TWILIO_ACCOUNT_SID=ACxxxxx
@@ -202,11 +174,11 @@ services/.env
 
 ### Use Different Keys for Environments
 
-| Environment     | Stripe          | OpenAI            | Supabase  |
-| --------------- | --------------- | ----------------- | --------- |
-| **Development** | `pk_test_xxxxx` | `sk-xxxxx` (dev)  | Project A |
-| **Staging**     | `pk_test_xxxxx` | `sk-xxxxx` (dev)  | Project B |
-| **Production**  | `pk_live_xxxxx` | `sk-xxxxx` (prod) | Project C |
+| Environment     | OpenAI            | Supabase  |
+| --------------- | ----------------- | --------- |
+| **Development** | `sk-xxxxx` (dev)  | Project A |
+| **Staging**     | `sk-xxxxx` (dev)  | Project B |
+| **Production**  | `sk-xxxxx` (prod) | Project C |
 
 ### Rotate Keys Regularly
 
@@ -245,14 +217,6 @@ services/.env
 2. Select your project
 3. Go to Settings → API
 4. Copy `URL`, `anon key`, and `service_role key`
-
-#### Stripe
-
-1. Go to [Stripe Dashboard](https://dashboard.stripe.com)
-2. Developers → API keys
-3. Copy `Publishable key` and `Secret key`
-4. Developers → Webhooks → Add endpoint
-5. Copy `Signing secret`
 
 #### OpenAI
 
@@ -320,8 +284,6 @@ checkRequiredEnvVars(['SUPABASE_URL', 'SUPABASE_SERVICE_KEY', 'OPENAI_API_KEY'])
 
 - [ ] Created Supabase project
 - [ ] Copied Supabase URL and keys
-- [ ] Created Stripe account
-- [ ] Added webhook endpoint in Stripe
 - [ ] Created OpenAI account
 - [ ] Generated OpenAI API key
 - [ ] **Created Twilio account**

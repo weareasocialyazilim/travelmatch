@@ -30,7 +30,7 @@ Use this checklist to track compliance remediation progress.
 
 - [ ] **CRIT-004**: Implement real KYC verification
   - File: `supabase/functions/verify-kyc/index.ts:110`
-  - Action: Integrate Onfido or Stripe Identity
+  - Action: Integrate Onfido or similar KYC provider
   - Owner: Backend Team
   - Due: Before launch
 

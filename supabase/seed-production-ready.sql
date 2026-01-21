@@ -171,7 +171,7 @@ VALUES
   -- Completed deposit
   ('tttttttt-tttt-tttt-tttt-tttttttttt03', '11111111-1111-1111-1111-111111111111',
    NULL, 'deposit', 100.00, 'TRY', 'completed',
-   'Deposit via Stripe', NOW() - INTERVAL '30 days'),
+   'Deposit via PayTR', NOW() - INTERVAL '30 days'),
 
   -- Refunded transaction
   ('tttttttt-tttt-tttt-tttt-tttttttttt04', '55555555-5555-5555-5555-555555555555',

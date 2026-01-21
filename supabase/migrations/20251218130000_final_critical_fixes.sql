@@ -151,7 +151,7 @@ END $$;
 -- Add missing indexes for Edge Function performance
 -- ============================================================
 
--- Webhook deduplication index (critical for stripe-webhook)
+-- Webhook deduplication index (critical for payment webhooks)
 CREATE INDEX IF NOT EXISTS idx_processed_webhook_events_event_id 
 ON processed_webhook_events(event_id);
 

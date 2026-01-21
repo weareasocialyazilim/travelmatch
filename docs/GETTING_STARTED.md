@@ -116,7 +116,7 @@ cp apps/admin/.env.example apps/admin/.env
 
 # Edit .env files with your credentials
 # - Supabase URL and keys
-# - Stripe API keys
+# - PayTR API keys (for payments)
 # - OAuth credentials (optional)
 ```
 
@@ -127,9 +127,10 @@ cp apps/admin/.env.example apps/admin/.env
 EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
-# Stripe (for payments)
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_PUBLISHABLE_KEY=pk_test_...
+# PayTR (for payments)
+PAYTR_MERCHANT_ID=...
+PAYTR_MERCHANT_KEY=...
+PAYTR_MERCHANT_SALT=...
 ```
 
 See [ENVIRONMENT_VARIABLES.md](./ENVIRONMENT_VARIABLES.md) for complete list.
@@ -185,12 +186,14 @@ packages/design-system (UI components)
 ### Import Paths
 
 **Before (old structure):**
+
 ```typescript
 import { User } from '../../../types/user';
 import { COLORS } from '../../constants/colors';
 ```
 
 **After (monorepo):**
+
 ```typescript
 import type { User } from '@lovendo/shared/types';
 import { COLORS } from '@lovendo/design-system/tokens';
@@ -225,12 +228,14 @@ pnpm clean
 ### Turborepo Features
 
 **Parallel Execution:**
+
 ```bash
 # Builds all packages in parallel (respecting dependencies)
 pnpm build
 ```
 
 **Caching:**
+
 ```bash
 # First build: ~2 minutes
 pnpm build
@@ -240,6 +245,7 @@ pnpm build
 ```
 
 **Selective Execution:**
+
 ```bash
 # Only run tests for changed packages
 pnpm turbo run test --filter=...[origin/main]
@@ -282,12 +288,14 @@ pnpm start
 ```
 
 **Options:**
+
 - Press `i` - Open iOS simulator
 - Press `a` - Open Android emulator
 - Scan QR code - Open on physical device (Expo Go app)
 - Press `w` - Open in web browser
 
 **Hot Reload:**
+
 - Save file → App reloads automatically
 - Press `r` → Manual reload
 - Press `Shift+r` → Reload and clear cache
@@ -329,6 +337,7 @@ pnpm dev
 ```
 
 This starts:
+
 - Mobile app (Expo)
 - Admin panel (Vite)
 - Storybook (if configured)
@@ -354,6 +363,7 @@ pnpm test src/hooks/useMoments.test.ts
 ```
 
 **Coverage Thresholds:**
+
 - Global: 85-90%
 - Services: 90-95%
 - Hooks: 88-92%
@@ -408,6 +418,7 @@ node scripts/bundle-size-check.mjs --compare
 ### Issue: `pnpm install` fails
 
 **Solution:**
+
 ```bash
 # Clear pnpm cache
 pnpm store prune
@@ -422,6 +433,7 @@ pnpm install
 ### Issue: Module not found `@lovendo/shared`
 
 **Solution:**
+
 ```bash
 # Rebuild all packages
 pnpm turbo run build --force
@@ -433,6 +445,7 @@ pnpm --filter shared build
 ### Issue: TypeScript errors after update
 
 **Solution:**
+
 ```bash
 # Clear TypeScript cache
 find . -name "*.tsbuildinfo" -delete
@@ -443,8 +456,8 @@ pnpm turbo run type-check --force
 
 ### Issue: Metro bundler can't resolve packages
 
-**Solution:**
-Update `apps/mobile/metro.config.js`:
+**Solution:** Update `apps/mobile/metro.config.js`:
+
 ```javascript
 const path = require('path');
 const { getDefaultConfig } = require('expo/metro-config');
@@ -467,6 +480,7 @@ module.exports = config;
 ### Issue: Expo app won't start
 
 **Solution:**
+
 ```bash
 # Clear Expo cache
 pnpm --filter mobile start --clear
@@ -479,6 +493,7 @@ rm -rf apps/mobile/node_modules/.cache
 ### Issue: Admin panel build fails
 
 **Solution:**
+
 ```bash
 # Clear Vite cache
 rm -rf apps/admin/dist
@@ -491,6 +506,7 @@ pnpm --filter admin build
 ### Issue: ESLint errors
 
 **Solution:**
+
 ```bash
 # Auto-fix issues
 pnpm lint --fix
@@ -502,6 +518,7 @@ pnpm eslint src/hooks/useMoments.ts --fix
 ### Issue: Supabase connection fails
 
 **Solution:**
+
 1. Check environment variables are correct
 2. Verify Supabase project is running
 3. Check network connection
@@ -513,21 +530,21 @@ pnpm eslint src/hooks/useMoments.ts --fix
 
 ### Build Times (with Turborepo)
 
-| Task | Without Turbo | With Turbo | Improvement |
-|------|---------------|------------|-------------|
-| First build | ~10 min | ~2 min | **80% faster** |
-| Rebuild (no changes) | ~10 min | ~5 sec | **99% faster** |
-| Type check | ~2 min | ~20 sec | **83% faster** |
-| CI/CD pipeline | ~15 min | ~3 min | **80% faster** |
+| Task                 | Without Turbo | With Turbo | Improvement    |
+| -------------------- | ------------- | ---------- | -------------- |
+| First build          | ~10 min       | ~2 min     | **80% faster** |
+| Rebuild (no changes) | ~10 min       | ~5 sec     | **99% faster** |
+| Type check           | ~2 min        | ~20 sec    | **83% faster** |
+| CI/CD pipeline       | ~15 min       | ~3 min     | **80% faster** |
 
 ### Bundle Sizes
 
-| App | Main Bundle | Vendor Bundle | Total |
-|-----|-------------|---------------|-------|
-| Mobile (Android) | 500 KB | 1.5 MB | **4 MB** |
-| Mobile (iOS) | 500 KB | 1.5 MB | **4 MB** |
-| Admin Panel | 300 KB | 800 KB | **1.6 MB** |
-| Design System | 150 KB | 200 KB | **350 KB** |
+| App              | Main Bundle | Vendor Bundle | Total      |
+| ---------------- | ----------- | ------------- | ---------- |
+| Mobile (Android) | 500 KB      | 1.5 MB        | **4 MB**   |
+| Mobile (iOS)     | 500 KB      | 1.5 MB        | **4 MB**   |
+| Admin Panel      | 300 KB      | 800 KB        | **1.6 MB** |
+| Design System    | 150 KB      | 200 KB        | **350 KB** |
 
 ---
 
@@ -544,6 +561,7 @@ pnpm eslint src/hooks/useMoments.ts --fix
    - `supabase/migrations/` - Database schema
 
 3. ✅ **Run Tests**
+
    ```bash
    pnpm test
    maestro test tests/e2e/flows/

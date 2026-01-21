@@ -63,7 +63,7 @@ MODE) | | Mock Data | AKTIF | | Database Write | YOK | | Approve/Reject | DISABL
 **Desteklenen Entegrasyonlar:**
 
 - Supabase
-- Stripe
+- PayTR
 - Twilio
 - SendGrid
 - PostHog

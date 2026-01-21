@@ -521,7 +521,7 @@ erDiagram
 │   │  │ - free             │         │ - user_id           │     │ │
 │   │  │ - starter ($10)    │         │ - plan_id           │     │ │
 │   │  │ - pro ($25)        │         │ - status            │     │ │
-│   │  │ - vip ($50)        │         │ - provider (stripe) │     │ │
+│   │  │ - vip ($50)        │         │ - provider (paytr)  │     │ │
 │   │  └────────────────────┘         └─────────────────────┘     │ │
 │   └─────────────────────────────────────────────────────────────┘ │
 └──────────────────────────────────────────────────────────────────┘
@@ -561,7 +561,7 @@ erDiagram
 │   │   └─────────┘                │ - status          │        │   │
 │   │                              └───────────────────┘        │   │
 │   │                                                            │   │
-│   │   Providers: onfido, stripe_identity, mock                │   │
+│   │   Providers: onfido, mock                                 │   │
 │   └───────────────────────────────────────────────────────────┘   │
 │                                                                    │
 │   ┌───────────────────────────────────────────────────────────┐   │
@@ -640,33 +640,33 @@ erDiagram
 
 ## Relationship Cardinality Summary
 
-| Relationship | Cardinality | Description |
-|-------------|-------------|-------------|
-| users → moments | 1:N | User creates many moments |
-| users → requests | 1:N | User makes many requests |
-| moments → requests | 1:N | Moment receives many requests |
-| users → reviews (reviewer) | 1:N | User writes many reviews |
-| users → reviews (reviewed) | 1:N | User receives many reviews |
-| moments → reviews | 1:N | Moment has many reviews |
-| users ↔ conversations | N:M | Via conversation_participants |
-| conversations → messages | 1:N | Conversation has many messages |
-| users → messages | 1:N | User sends many messages |
-| users → notifications | 1:N | User receives many notifications |
-| users → favorites | 1:N | User has many favorites |
-| moments → favorites | 1:N | Moment has many favorites |
-| users → transactions | 1:N | User has many transactions |
-| users → escrow (sender) | 1:N | User sends many escrows |
-| users → escrow (recipient) | 1:N | User receives many escrows |
-| subscription_plans → user_subscriptions | 1:N | Plan has many subscribers |
-| users → user_subscriptions | 1:N | User has subscription history |
-| users → kyc_verifications | 1:N | User has verification history |
-| users ↔ blocks | N:M | Self-referential many-to-many |
-| users → reports (reporter) | 1:N | User files many reports |
-| users/moments → reports (reported) | 1:N | Entity receives many reports |
-| admin_users → admin_sessions | 1:N | Admin has many sessions |
-| admin_users → tasks | 1:N | Admin assigned many tasks |
-| users → audit_logs | 1:N | User generates many logs |
+| Relationship                            | Cardinality | Description                      |
+| --------------------------------------- | ----------- | -------------------------------- |
+| users → moments                         | 1:N         | User creates many moments        |
+| users → requests                        | 1:N         | User makes many requests         |
+| moments → requests                      | 1:N         | Moment receives many requests    |
+| users → reviews (reviewer)              | 1:N         | User writes many reviews         |
+| users → reviews (reviewed)              | 1:N         | User receives many reviews       |
+| moments → reviews                       | 1:N         | Moment has many reviews          |
+| users ↔ conversations                   | N:M         | Via conversation_participants    |
+| conversations → messages                | 1:N         | Conversation has many messages   |
+| users → messages                        | 1:N         | User sends many messages         |
+| users → notifications                   | 1:N         | User receives many notifications |
+| users → favorites                       | 1:N         | User has many favorites          |
+| moments → favorites                     | 1:N         | Moment has many favorites        |
+| users → transactions                    | 1:N         | User has many transactions       |
+| users → escrow (sender)                 | 1:N         | User sends many escrows          |
+| users → escrow (recipient)              | 1:N         | User receives many escrows       |
+| subscription_plans → user_subscriptions | 1:N         | Plan has many subscribers        |
+| users → user_subscriptions              | 1:N         | User has subscription history    |
+| users → kyc_verifications               | 1:N         | User has verification history    |
+| users ↔ blocks                          | N:M         | Self-referential many-to-many    |
+| users → reports (reporter)              | 1:N         | User files many reports          |
+| users/moments → reports (reported)      | 1:N         | Entity receives many reports     |
+| admin_users → admin_sessions            | 1:N         | Admin has many sessions          |
+| admin_users → tasks                     | 1:N         | Admin assigned many tasks        |
+| users → audit_logs                      | 1:N         | User generates many logs         |
 
 ---
 
-*Last Updated: 2025-12-22*
+_Last Updated: 2025-12-22_
